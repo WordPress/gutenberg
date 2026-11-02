@@ -15,11 +15,7 @@ import { RichTextData } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockTreeVersion } from './block-tree-version';
-import {
-	PENDING_ATTRIBUTES,
-	proposedAttributes,
-	readSuggestionMarker,
-} from './marker';
+import { PENDING_ATTRIBUTES, markerAnchorKeys } from './marker';
 import {
 	findInlineOp,
 	findPostAttributeOps,
@@ -31,7 +27,6 @@ import {
 	SUGGESTION_ID_ATTRIBUTE,
 	isSuggestionFormat,
 } from '../inline-suggestions';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 
 /**
  * The id attribute of a serialized inline marker. Matched on the serialized
@@ -146,16 +141,10 @@ export function buildAnchorIndex(
 		if ( ! attributes ) {
 			continue;
 		}
-		const marker = readSuggestionMarker( attributes );
-		if ( marker ) {
-			for ( const noteId of getNoteIdsFromMetadata(
-				attributes.metadata
-			) ) {
-				structural.add( `${ marker.type }:${ noteId }` );
-				if ( proposedAttributes( marker ) ) {
-					structural.add( `${ PENDING_ATTRIBUTES }:${ noteId }` );
-				}
-			}
+		for ( const [ noteId, kind ] of markerAnchorKeys(
+			attributes.metadata
+		) ) {
+			structural.add( `${ kind }:${ noteId }` );
 		}
 		for ( const attribute of inlineAttributes ) {
 			const value = attributes[ attribute ];

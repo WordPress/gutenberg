@@ -1,0 +1,29 @@
+{
+	"name": "annezazu",
+	"description": "annezazu's question on #73411: A adds a sentence, B bolds words in it, C deletes words in it including one B bolded.",
+	"phase": "current",
+	"users": { "A": "overlap-anne", "B": "overlap-bob", "C": "overlap-carl" },
+	"base": "Intro.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"kind": "add",
+			"text": " Bright red apples fell.",
+			"at": 6
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 14, 24 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		},
+		{ "key": "C", "author": "C", "kind": "del", "range": [ 18, 29 ] }
+	],
+	"expect": {
+		"all-accepted": "Intro. Bright <b>red </b>.",
+		"all-rejected": "Intro."
+	}
+}

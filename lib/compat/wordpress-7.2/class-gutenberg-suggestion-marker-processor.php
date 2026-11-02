@@ -24,7 +24,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Marker_Processor' ) ) {
 		 * edit is ever enqueued on this processor, so the offsets always refer
 		 * to the unmodified input.
 		 *
-		 * @return int[]|null Start offset and length, or null when the
+		 * @return array{int, int}|null Start offset and length, or null when the
 		 *                    processor is not paused on a token.
 		 */
 		public function get_token_span(): ?array {

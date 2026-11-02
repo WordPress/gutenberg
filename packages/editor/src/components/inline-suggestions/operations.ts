@@ -1,11 +1,4 @@
-import {
-	RichTextData,
-	create,
-	insert,
-	remove,
-	removeFormat,
-	applyFormat,
-} from '@wordpress/rich-text';
+import { RichTextData, create, insert, remove } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_CLASS_PROBE,
@@ -15,12 +8,15 @@ import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_FORMAT,
+	addSuggestionMarker,
 	canonicalizeSuggestionStack,
 	findSuggestionRange,
 	isSuggestionFormat,
+	removeSuggestionMarker,
 	suggestionFormatNameFor,
 	suggestionKindOf,
-	suggestionMarkersAt,
+	suggestionMarkerId,
+	suggestionMarkerListsAt,
 	suggestionMarkersIn,
 } from './format';
 import type { SuggestionMarkerKind } from './format';
@@ -60,12 +56,8 @@ export function buildSuggestionMarkerAttributes( {
  * Whether any character in `[start, end)` of a per-character format-stack array
  * already carries a suggestion marker of any kind.
  *
- * Interception paths use this to leave edits that touch an existing suggestion
- * to the default path: `applyFormat` over a non-collapsed range REMOVES other
- * formats of the same type inside it, so wrapping a range that overlaps another
- * suggestion's marker would silently re-attribute part of that marker to the
- * new id — and the damaged marker's accept/reject would then act on a partial
- * range.
+ * Interception paths use this to tell plain text from text that already
+ * carries a suggestion.
  *
  * @param formats Per-character format stacks (from `create()`).
  * @param start   Range start (inclusive).
@@ -92,15 +84,54 @@ export function formatsRangeHasSuggestion(
 }
 
 /**
- * The `add` marker covering a character in a per-character format stack array,
- * or undefined.
+ * The `add` markers covering a character, outermost first.
  *
  * @param formats Per-character format stacks (from `create()`).
  * @param index   Character index.
- * @return The addition marker at that character.
+ * @return The addition markers at that character.
  */
-function additionMarkerAt( formats: any, index: number ) {
-	return suggestionMarkersAt( formats[ index ] ).add;
+function additionMarkersAt( formats: any, index: number ): any[] {
+	return suggestionMarkerListsAt( formats[ index ] ).add;
+}
+
+/**
+ * Whether a character carries the `add` marker of a suggestion.
+ *
+ * @param formats Per-character format stacks (from `create()`).
+ * @param index   Character index.
+ * @param id      Note id.
+ * @return True when it does.
+ */
+function carriesAddition( formats: any, index: number, id: string ) {
+	return additionMarkersAt( formats, index ).some(
+		( marker ) => suggestionMarkerId( marker ) === id
+	);
+}
+
+/**
+ * The `add` markers that enclose a gap: carried by the characters on both
+ * sides of it. Text entered in the gap is inside those additions, so it
+ * carries them too (a nested addition rides on the one it was typed into).
+ *
+ * @param formats     Per-character format stacks (from `create()`).
+ * @param before      Index of the character before the gap.
+ * @param after       Index of the character after the gap.
+ * @param [excludeId] Note id to leave out (the addition being written).
+ * @return The enclosing addition markers, outermost first.
+ */
+function enclosingAdditions(
+	formats: any,
+	before: number,
+	after: number,
+	excludeId?: string
+): any[] {
+	if ( ! Array.isArray( formats ) || before < 0 || after >= formats.length ) {
+		return [];
+	}
+	return additionMarkersAt( formats, before ).filter( ( marker ) => {
+		const id = suggestionMarkerId( marker );
+		return id !== excludeId && carriesAddition( formats, after, id );
+	} );
 }
 
 /**
@@ -122,12 +153,12 @@ function additionMarkerAt( formats: any, index: number ) {
  * is unmarked, so the new text is as plausibly a fresh addition, and starting a
  * separate marker there fragments nothing.
  *
- * Conservative elsewhere too. The marker has to be an `add` marker (typing
- * inside someone's proposed deletion is a different, unsettled gesture),
- * authored by the person making this edit, and unfragmented — a marker whose id
- * also appears elsewhere in the value cannot be re-stamped as one range. An
- * editor whose own id is unknown counts as unauthored, matching only a marker
- * that carries no author either.
+ * Conservative elsewhere too. The marker has to be an `add` marker authored
+ * by the person making this edit (where additions are stacked, the innermost
+ * of theirs), and unfragmented — a marker whose id also appears elsewhere in
+ * the value cannot be re-stamped as one range. An editor whose own id is
+ * unknown counts as unauthored, matching only a marker that carries no author
+ * either.
  *
  * @param formats       Per-character format stacks (from `create()`).
  * @param offset        Caret offset.
@@ -148,47 +179,40 @@ export function formatsAdditionRunToExtend(
 	) {
 		return null;
 	}
-	const attributes = additionMarkerAt( formats, offset - 1 )?.attributes;
-	if ( ! attributes ) {
-		return null;
-	}
-	const rawId = attributes[ SUGGESTION_ID_ATTRIBUTE ];
-	if ( rawId === undefined || rawId === null || rawId === '' ) {
-		return null;
-	}
 	/*
 	 * Extending re-attributes nothing: the marker and its note stay the
 	 * original author's, so only that author may grow it. An unknown editor
 	 * therefore matches an unauthored marker only — growing someone else's
 	 * would re-stamp their span with no `data-author` and fold this text into
-	 * their note.
+	 * their note. Among stacked additions the innermost of the author's own
+	 * is the one being typed in.
 	 */
-	if (
-		String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
-		( authorToken ?? '' )
-	) {
+	const own = additionMarkersAt( formats, offset - 1 )
+		.filter(
+			( marker ) =>
+				String(
+					marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+				) === ( authorToken ?? '' )
+		)
+		.pop();
+	const id = own ? suggestionMarkerId( own ) : '';
+	if ( ! id ) {
 		return null;
 	}
-	const id = String( rawId );
 	// A replacement's `del` run shares this id; only the `add` run grows.
-	const idAt = ( index: number ) => {
-		const value = additionMarkerAt( formats, index )?.attributes?.[
-			SUGGESTION_ID_ATTRIBUTE
-		];
-		return value === undefined || value === null ? null : String( value );
-	};
+	const idAt = ( index: number ) => carriesAddition( formats, index, id );
 	let start = offset - 1;
-	while ( start > 0 && idAt( start - 1 ) === id ) {
+	while ( start > 0 && idAt( start - 1 ) ) {
 		start--;
 	}
 	let end = offset;
-	while ( end < formats.length && idAt( end ) === id ) {
+	while ( end < formats.length && idAt( end ) ) {
 		end++;
 	}
 	// A marker already split into fragments (an earlier nested insert, a
 	// copy/paste) has no single range to grow.
 	for ( let i = 0; i < formats.length; i++ ) {
-		if ( ( i < start || i >= end ) && idAt( i ) === id ) {
+		if ( ( i < start || i >= end ) && idAt( i ) ) {
 			return null;
 		}
 	}
@@ -355,8 +379,9 @@ function removeMarkedRange(
  * permanent (accepting an addition) — the two ends of a suggestion that resolve
  * to "the marked run stays, the marker goes".
  *
- * Only the given kind's marker is dropped: a deletion or formatting change
- * nested in an accepted addition stays pending.
+ * Only the given kind's marker with that id is dropped: a deletion,
+ * formatting change or addition nested in an accepted addition stays pending,
+ * and so does another deletion of the same text.
  *
  * @param value        Block attribute value (RichTextData or other).
  * @param suggestionId Suggestion (marker) id.
@@ -377,14 +402,19 @@ function unwrapMarker(
 	}
 	const record = toRichTextRecord( value )!;
 	let result = record;
-	const formatName = suggestionFormatNameFor( kind );
 	for ( const [ start, end ] of runsCarryingId(
 		record,
 		range,
 		suggestionId,
 		kind
 	) ) {
-		result = removeFormat( result, formatName, start, end );
+		result = removeSuggestionMarker(
+			result,
+			kind,
+			suggestionId,
+			start,
+			end
+		);
 	}
 	return new RichTextData( result as any );
 }
@@ -504,7 +534,8 @@ export function acceptInlineFormat(
 
 /**
  * Wrap a range of a value in a suggestion marker of one kind, keeping every
- * marker of another kind on it, and put the result in canonical order.
+ * other marker on it (another suggestion's marker of the same kind too: a
+ * second deletion of the same words), and put the result in canonical order.
  *
  * @param value              Block attribute value (RichTextData or other).
  * @param options            Options.
@@ -531,13 +562,13 @@ export function wrapSuggestionMarker(
 	if ( ! ( value instanceof RichTextData ) ) {
 		return null;
 	}
-	const record = applyFormat(
-		toRichTextRecord( value )! as any,
-		{ type: suggestionFormatNameFor( kind ), attributes } as any,
+	const record = addSuggestionMarker(
+		toRichTextRecord( value )!,
+		{ type: suggestionFormatNameFor( kind ), attributes },
 		start,
 		end
 	);
-	return new RichTextData( canonicalizeSuggestionStack( record ) as any );
+	return new RichTextData( record as any );
 }
 
 /**
@@ -577,9 +608,9 @@ function formatMarkerIndices(
 	const indices: number[] = [];
 	for ( let i = 0; i < record.text.length; i++ ) {
 		if (
-			suggestionMarkersAt( record.formats[ i ] ).format?.attributes?.[
-				SUGGESTION_ID_ATTRIBUTE
-			] === target
+			suggestionMarkerListsAt( record.formats[ i ] ).format.some(
+				( marker ) => suggestionMarkerId( marker ) === target
+			)
 		) {
 			indices.push( i );
 		}
@@ -692,6 +723,11 @@ export function rejectInlineFormat(
  * formatting (a pasted `<strong>`/`<a href>`): the run keeps those formats and
  * the marker wraps them.
  *
+ * Text entered inside another suggestion's addition also carries that
+ * addition's marker: it is nested in it, kept if both are accepted and gone
+ * if the outer one is rejected. Inside a deletion it does not join it; the
+ * deletion runs on either side.
+ *
  * @param value              Block attribute value (RichTextData or other).
  * @param options            Options.
  * @param options.text       Proposed plain text to insert.
@@ -738,18 +774,27 @@ export function insertInlineAddition(
 	 * it as a unit.
 	 */
 	const marker = { type: suggestionFormatNameFor( 'add' ), attributes };
+	const inherited = enclosingAdditions(
+		record.formats,
+		startIndex - 1,
+		endIndex,
+		suggestionMarkerId( marker )
+	);
 	const formats = new Array( run.text.length );
 	for ( let index = 0; index < formats.length; index++ ) {
 		const stack = run.formats[ index ];
-		formats[ index ] = stack ? [ marker, ...stack ] : [ marker ];
+		formats[ index ] = [ ...inherited, marker, ...( stack ?? [] ) ];
 	}
+	const inserted = insert(
+		record,
+		{ ...run, formats } as any,
+		startIndex,
+		endIndex
+	);
 	return new RichTextData(
-		insert(
-			record,
-			{ ...run, formats } as any,
-			startIndex,
-			endIndex
-		) as any
+		( inherited.length
+			? canonicalizeSuggestionStack( inserted )
+			: inserted ) as any
 	);
 }
 
@@ -816,10 +861,17 @@ export function growInlineAddition(
 		markerEnd
 	);
 	const marker = { type: suggestionFormatNameFor( 'add' ), attributes };
+	// Additions the grown one is nested in hold the new text too.
+	const inherited = enclosingAdditions(
+		record.formats,
+		insertAt - 1,
+		insertAt,
+		suggestionMarkerId( marker )
+	);
 	const formats = new Array( run.text.length );
 	for ( let index = 0; index < formats.length; index++ ) {
 		const stack = run.formats[ index ];
-		formats[ index ] = stack ? [ marker, ...stack ] : [ marker ];
+		formats[ index ] = [ ...inherited, marker, ...( stack ?? [] ) ];
 	}
 	const inserted = insert(
 		record,
@@ -827,13 +879,13 @@ export function growInlineAddition(
 		insertAt,
 		insertAt
 	);
-	const formatted = applyFormat(
+	const formatted = addSuggestionMarker(
 		inserted,
-		marker as any,
+		marker,
 		markerStart,
 		markerEnd + run.text.length
 	);
-	return new RichTextData( canonicalizeSuggestionStack( formatted ) as any );
+	return new RichTextData( formatted as any );
 }
 
 /**
@@ -944,17 +996,18 @@ export function reviseOwnAddition(
 		) {
 			return null;
 		}
-		const ownsDeletion = formats.some(
-			( stack: any ) =>
-				suggestionMarkersAt( stack ).del?.attributes?.[
-					SUGGESTION_ID_ATTRIBUTE
-				] === run.id
+		const ownsDeletion = formats.some( ( stack: any ) =>
+			suggestionMarkerListsAt( stack ).del.some(
+				( marker ) => suggestionMarkerId( marker ) === run.id
+			)
 		);
 		if ( ownsDeletion ) {
 			return null;
 		}
 	}
-	const attributes = additionMarkerAt( formats, run.start ).attributes;
+	const attributes = additionMarkersAt( formats, run.start ).find(
+		( marker ) => suggestionMarkerId( marker ) === run.id
+	).attributes;
 	const ownStart = Math.max( start, run.start );
 	const ownEnd = Math.min( end, run.end );
 	const remainingEnd = run.end - ( ownEnd - ownStart );
@@ -975,20 +1028,17 @@ export function reviseOwnAddition(
 		// moved with the addition's new end.
 		const deletionStart = before ? outside.start : markerEnd;
 		next = new RichTextData(
-			canonicalizeSuggestionStack(
-				applyFormat(
-					toRichTextRecord( next )! as any,
-					{
-						type: suggestionFormatNameFor( 'del' ),
-						attributes: {
-							...attributes,
-							[ SUGGESTION_TYPE_ATTRIBUTE ]:
-								SUGGESTION_TYPE_DELETION,
-						},
-					} as any,
-					deletionStart,
-					deletionStart + ( outside.end - outside.start )
-				)
+			addSuggestionMarker(
+				toRichTextRecord( next )!,
+				{
+					type: suggestionFormatNameFor( 'del' ),
+					attributes: {
+						...attributes,
+						[ SUGGESTION_TYPE_ATTRIBUTE ]: SUGGESTION_TYPE_DELETION,
+					},
+				},
+				deletionStart,
+				deletionStart + ( outside.end - outside.start )
 			) as any
 		);
 	}
@@ -1054,8 +1104,7 @@ export function deleteAcrossOwnMarkers(
 		 * nested in it: that suggestion described text that is no longer
 		 * proposed.
 		 */
-		const { add } = suggestionMarkersAt( formats[ i ] );
-		if ( add && isOwn( add ) ) {
+		if ( additionMarkersAt( formats, i ).some( isOwn ) ) {
 			kinds.push( 'add' );
 			continue;
 		}

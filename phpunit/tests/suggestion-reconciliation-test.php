@@ -492,17 +492,19 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 		$this->assertSame( array( 'inline' => true ), $index[4] );
 		$this->assertSame( array( 'inline' => true ), $index[5] );
-		foreach ( array( 6, 7, 8 ) as $id ) {
-			$this->assertSame(
-				array(
-					'pending-move'       => true,
-					'pending-attributes' => true,
-				),
-				$index[ $id ]
-			);
-		}
+		$this->assertSame(
+			array(
+				'pending-move'       => true,
+				'pending-attributes' => true,
+			),
+			$index[8]
+		);
+		// The marker names its note, so the block's other note links (plain
+		// notes, decided suggestions) anchor nothing.
+		$this->assertArrayNotHasKey( 6, $index );
+		$this->assertArrayNotHasKey( 7, $index );
 		$this->assertSame( array( 'pending-insert' => true ), $index[9] );
-		$this->assertCount( 6, $index );
+		$this->assertCount( 4, $index );
 	}
 
 	/**
