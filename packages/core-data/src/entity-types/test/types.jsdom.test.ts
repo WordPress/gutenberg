@@ -763,7 +763,11 @@ describe( 'Entity record types', () => {
 				1
 			);
 			true satisfies Expect< typeof record, Post< 'edit' > | null >;
-			editedRecord.title?.raw satisfies string | undefined;
+			// Raw fields are edited as strings, as `getEditedEntityRecord` returns.
+			editedRecord.title satisfies string | undefined;
+			editedRecord.content satisfies string | undefined;
+			// @ts-expect-error -- the edited title is the raw string, not an object.
+			editedRecord.title?.raw;
 
 			const { records } = useEntityRecords( 'postType', 'post' );
 			true satisfies Expect< typeof records, Post< 'edit' >[] | null >;
