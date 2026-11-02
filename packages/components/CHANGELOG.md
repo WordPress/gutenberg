@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `CustomGradientPicker`: Use the WordPress UI select for choosing the gradient type ([#85750](https://github.com/WordPress/gutenberg/pull/85750)).
 -   `Spinner`: Use a neutral half-circle arc with a stroke that scales with its size ([#85859](https://github.com/WordPress/gutenberg/pull/85859)).
 -   `Tooltip`: Match the dark gray background of the design system tooltip ([#85858](https://github.com/WordPress/gutenberg/pull/85858)).
 -   `Modal`: Adapt colors and rounded corners to the design system theme ([#85855](https://github.com/WordPress/gutenberg/pull/85855)).
