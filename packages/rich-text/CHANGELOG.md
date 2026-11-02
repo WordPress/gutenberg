@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -9,12 +11,14 @@
 
 ### Enhancements
 
+-   Render a value to the DOM or to an HTML string faster by appending each run of identically formatted text at once, instead of one character at a time ([#85177](https://github.com/WordPress/gutenberg/pull/85177)).
 -   Type `start` and `end` of `RichTextValue` as optional, since a value has no selection until one is set, and document the return types of the public functions ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
 
 ### Bug Fixes
 
 -   `getTextContent`: Remove every object replacement character from the returned text, not just the first one ([#81526](https://github.com/WordPress/gutenberg/pull/81526)).
 -   Fix `replace` for a caret at `0` and patterns with named groups, `insert` and `split` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
+-   `useRichText`: Keep the formats at the caret for text typed after a paste or undo, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
 
 ### Internal
 

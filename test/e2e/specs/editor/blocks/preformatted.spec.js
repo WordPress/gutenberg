@@ -78,4 +78,24 @@ test.describe( 'Preformatted', () => {
 			},
 		] );
 	} );
+
+	test( 'should apply active formatting when pasting plain text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '13' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: '2' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/preformatted',
+				attributes: { content: '<strong>123</strong>' },
+			},
+		] );
+	} );
 } );

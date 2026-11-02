@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { TextControl, Button, Popover } from '@wordpress/components';
 import { SelectControl, Stack } from '@wordpress/ui';
@@ -52,6 +51,7 @@ function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="language"
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
