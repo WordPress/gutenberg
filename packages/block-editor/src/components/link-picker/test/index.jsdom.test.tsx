@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
-import { render, screen, within, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	within,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { useDispatch } from '@wordpress/data';
 import { useSelect } from '@wordpress/data';
@@ -10,6 +16,19 @@ import type { LinkSuggestionsQuery } from '../../link-control/types';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockScrollIntoView();
+
+/**
+ * Presses Enter in an element. `user.keyboard( '[Enter]' )` sends a `keyCode`
+ * of `0`, which `URLInput` ignores.
+ *
+ * @param element Element to press Enter in.
+ */
+function triggerEnter( element: Element ) {
+	fireEvent.keyDown( element, {
+		key: 'Enter',
+		keyCode: 13,
+	} );
+}
 
 const mockFetchSearchSuggestions = vi.fn();
 
@@ -425,6 +444,84 @@ describe( 'LinkPicker', () => {
 
 			// The suggestionsQuery prop is passed through to LinkControl
 			// which uses it to filter search results
+		} );
+	} );
+
+	describe( 'Plain URL mode', () => {
+		it( 'should ask for a URL instead of a search', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ vi.fn() }
+					label="Link"
+					showSuggestions={ false }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button' ) );
+
+			expect(
+				await screen.findByRole( 'combobox', {
+					name: 'Paste or type URL',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'should not search for suggestions', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ vi.fn() }
+					label="Link"
+					showSuggestions={ false }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button' ) );
+			const urlInput = await screen.findByRole( 'combobox', {
+				name: 'Paste or type URL',
+			} );
+			await user.type( urlInput, 'Test' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should select the typed URL when Enter is pressed', async () => {
+			const user = userEvent.setup();
+			const onSelect = vi.fn();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ onSelect }
+					label="Link"
+					showSuggestions={ false }
+				/>
+			);
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+			const urlInput = await screen.findByRole( 'combobox', {
+				name: 'Paste or type URL',
+			} );
+			await user.type( urlInput, 'https://wordpress.org' );
+			triggerEnter( urlInput );
+
+			expect( onSelect ).toHaveBeenCalledTimes( 1 );
+			expect( onSelect ).toHaveBeenCalledWith(
+				expect.objectContaining( { url: 'https://wordpress.org' } )
+			);
+			expect(
+				screen.queryByRole( 'combobox', {
+					name: 'Paste or type URL',
+				} )
+			).not.toBeInTheDocument();
+			expect( button ).toHaveFocus();
 		} );
 	} );
 
