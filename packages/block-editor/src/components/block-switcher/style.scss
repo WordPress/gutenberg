@@ -6,6 +6,12 @@
 	min-width: 300px;
 }
 
+.block-editor-block-switcher__transforms__menugroup .components-menu-item__button:focus:not([aria-disabled="true"]) .block-editor-block-icon.has-colors {
+	// Override inline icon colors to match the highlighted transform item.
+	color: inherit !important;
+	background-color: transparent !important;
+}
+
 .block-editor-block-switcher__popover-preview-container {
 	left: 0;
 	position: absolute;

@@ -8,7 +8,12 @@
 
 ### Bug Fixes
 
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 -   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).
+
+### Internal
+
+-   Type check tests through the default dev project, replacing `tsconfig.test.json` ([#85516](https://github.com/WordPress/gutenberg/pull/85516)).
 
 ## 0.10.0 (2026-10-20)
 
