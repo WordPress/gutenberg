@@ -1166,7 +1166,7 @@ _Parameters_
 
 - _kind_ `Kind`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
 - _name_ `Name`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
-- _recordId_ `string | number`: ID of the requested entity record.
+- _recordId_ `string | number`: ID of the requested entity record. Omitted for entities without a key, such as `root`/`site`.
 - _options_ `Options`: Optional hook options.
 
 _Returns_

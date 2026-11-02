@@ -176,6 +176,12 @@ export interface RootEntityRecordTypes< C extends Context > {
 	icon: Icon< C >;
 	iconCollection: IconCollection< C >;
 	menu: NavMenu< C >;
+	/*
+	 * The settings endpoint returns every setting registered with
+	 * `show_in_rest`, including those added by plugins, so keys beyond the
+	 * core settings are readable as `unknown`.
+	 */
+	site: Settings< C > & { [ setting: string ]: unknown };
 	taxonomy: Taxonomy< C >;
 	widgetType: WidgetType< C >;
 }
@@ -325,6 +331,7 @@ export interface RootEntityContexts {
 	icon: 'view';
 	iconCollection: 'view';
 	menu: 'edit';
+	site: 'view';
 	taxonomy: 'edit';
 	widgetType: 'edit';
 }
