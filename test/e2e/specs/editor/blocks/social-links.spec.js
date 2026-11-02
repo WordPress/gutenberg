@@ -46,7 +46,9 @@ test.describe( 'Social Icons', () => {
 		).toHaveAttribute( 'aria-selected', 'true' );
 		const textInput = settings.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
-		const linkButton = settings.getByRole( 'button', { name: /^Link/ } );
+		const linkButton = settings.getByRole( 'button', {
+			name: /^Link to:/,
+		} );
 		await expect( linkButton ).toHaveText( /wordpress\.org/ );
 		await expect(
 			settings.getByRole( 'link', { name: 'View' } )
@@ -127,7 +129,7 @@ test.describe( 'Social Icons', () => {
 			.click();
 		await page
 			.getByRole( 'menuitem', {
-				name: 'Link, reset to default',
+				name: 'Link to, reset to default',
 			} )
 			.click();
 

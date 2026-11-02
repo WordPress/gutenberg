@@ -232,7 +232,7 @@ const SocialLinkEdit = ( {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						isShownByDefault
-						label={ __( 'Link' ) }
+						label={ __( 'Link to' ) }
 						hasValue={ () => !! url }
 						onDeselect={ () => {
 							setAttributes( { url: undefined } );
@@ -243,7 +243,7 @@ const SocialLinkEdit = ( {
 							onSelect={ ( { url: newUrl } ) =>
 								setAttributes( { url: newUrl || undefined } )
 							}
-							label={ __( 'Link' ) }
+							label={ __( 'Link to' ) }
 							// A social profile is outside the site, so there are no pages to suggest.
 							showSuggestions={ false }
 						/>
