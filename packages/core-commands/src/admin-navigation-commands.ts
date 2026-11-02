@@ -4,18 +4,20 @@ import { external } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import type { CommandConfig } from '@wordpress/commands';
+import type { BaseEntityRecords } from '@wordpress/core-data';
+import type { AdminMenuCommand } from './types';
 
 const getViewSiteCommand = () =>
 	function useViewSiteCommand() {
 		const homeUrl = useSelect( ( select ) => {
 			// Site index.
-			return select( coreStore ).getEntityRecord(
-				'root',
-				'__unstableBase'
-			)?.home;
+			return select( coreStore ).getEntityRecord<
+				BaseEntityRecords.Base< 'edit' >
+			>( 'root', '__unstableBase' )?.home;
 		}, [] );
 
-		const commands = useMemo( () => {
+		const commands = useMemo< CommandConfig[] >( () => {
 			if ( ! homeUrl ) {
 				return [];
 			}
@@ -40,8 +42,10 @@ const getViewSiteCommand = () =>
 		};
 	};
 
-export function useAdminNavigationCommands( menuCommands ) {
-	const commands = useMemo( () => {
+export function useAdminNavigationCommands(
+	menuCommands?: AdminMenuCommand[] | null
+) {
+	const commands = useMemo< CommandConfig[] >( () => {
 		return ( menuCommands ?? [] ).map( ( menuCommand ) => {
 			const label = sprintf(
 				/* translators: %s: menu label */

@@ -1,15 +1,18 @@
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import type { RouterPrivateApis } from '@wordpress/router';
 import { CommandMenu } from '@wordpress/commands';
 import { useAdminNavigationCommands } from './admin-navigation-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { unlock } from './lock-unlock';
+import type { CommandPaletteSettings } from './types';
+export type { AdminMenuCommand, CommandPaletteSettings } from './types';
 export { privateApis } from './private-apis';
 
-const { RouterProvider } = unlock( routerPrivateApis );
+const { RouterProvider } = unlock< RouterPrivateApis >( routerPrivateApis );
 
 // Register core commands and render the Command Palette.
-function CommandPalette( { settings } ) {
+function CommandPalette( { settings }: { settings: CommandPaletteSettings } ) {
 	const { menu_commands: menuCommands, is_network_admin: isNetworkAdmin } =
 		settings;
 	useAdminNavigationCommands( menuCommands );
@@ -24,9 +27,9 @@ function CommandPalette( { settings } ) {
 /**
  * Initializes the Command Palette.
  *
- * @param {Object} settings Command palette settings.
+ * @param settings Command palette settings.
  */
-export function initializeCommandPalette( settings ) {
+export function initializeCommandPalette( settings: CommandPaletteSettings ) {
 	const root = document.createElement( 'div' );
 	document.body.appendChild( root );
 	createRoot( root ).render(
