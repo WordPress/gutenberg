@@ -706,7 +706,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					$metadata = array();
 				}
 
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
+				$metadata['sizes'] ??= array();
 
 				$fallback_sizes = array(
 					'thumbnail',
@@ -1580,7 +1580,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					continue;
 				}
 
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
+				$metadata['sizes'] ??= array();
 
 				foreach ( $image_size as $name ) {
 					$metadata['sizes'][ $name ] = array(
@@ -1670,7 +1670,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					continue;
 				}
 
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
+				$metadata['sizes'] ??= array();
 
 				$metadata['sizes'][ $image_size ] = array(
 					'width'     => $sub_size['width'] ?? 0,
