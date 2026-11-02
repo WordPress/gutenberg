@@ -196,15 +196,22 @@ export function getPageKey( href: string = window.location.href ) {
  * argument.
  *
  * Several apps can share one document (see `startAdminShell`). Each app's
- * history belongs to one wp-admin page: while the URL points at another
- * page, the history keeps returning the location it last saw on its own
- * page and does not notify its router. A hidden app therefore ignores the
- * visible app's navigation, and resumes from the URL when it is shown again.
+ * history belongs to one wp-admin page. While the URL points at another page:
+ *
+ * - the history keeps returning the location it last saw on its own page and
+ *   does not notify its router, so a hidden app ignores the visible app's
+ *   navigation and resumes from the URL when it is shown again;
+ * - links it creates still point at its own page;
+ * - its own navigation doesn't write to the URL, so a hidden app can't change
+ *   the address of the page that is showing.
  *
  * @param pageKey Page this history belongs to. See `getPageKey`.
  */
 function createPathHistory( pageKey: string ) {
 	let lastOwnLocation: ReturnType< typeof parseHref > | undefined;
+	// The page's own URL, without its route, to build links from while
+	// another page is showing.
+	let ownPageUrl = new URL( window.location.href );
 	const isOwnUrl = () => getPageKey() === pageKey;
 
 	const history = createBrowserHistory( {
@@ -213,15 +220,19 @@ function createPathHistory( pageKey: string ) {
 				return lastOwnLocation;
 			}
 			const url = new URL( window.location.href );
+			ownPageUrl = url;
 			const path = url.searchParams.get( 'p' ) || '/';
 			const pathHref = `${ path }${ url.hash }`;
 			lastOwnLocation = parseHref( pathHref, window.history.state );
 			return lastOwnLocation;
 		},
 		createHref: ( href: string ) => {
-			const searchParams = new URLSearchParams( window.location.search );
+			const base = isOwnUrl()
+				? new URL( window.location.href )
+				: ownPageUrl;
+			const searchParams = new URLSearchParams( base.search );
 			searchParams.set( 'p', href );
-			return `${ window.location.pathname }?${ searchParams }`;
+			return `${ base.pathname }?${ searchParams }`;
 		},
 	} );
 
@@ -234,6 +245,16 @@ function createPathHistory( pageKey: string ) {
 				callback( ...args );
 			}
 		} );
+
+	// Only the app whose page is in the URL writes to it.
+	for ( const method of [ 'push', 'replace' ] as const ) {
+		const write: ( ...args: unknown[] ) => void = history[ method ];
+		history[ method ] = ( ...args: unknown[] ) => {
+			if ( isOwnUrl() ) {
+				write( ...args );
+			}
+		};
+	}
 
 	return history;
 }
