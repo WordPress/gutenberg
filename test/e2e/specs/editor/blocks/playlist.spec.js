@@ -281,13 +281,9 @@ test.describe( 'Playlist block', () => {
 		const contentTab = blockSettings.getByRole( 'tabpanel', {
 			name: 'Content',
 		} );
-		// The track file and the track image are both media controls, named
-		// after the current file or, without one, what they add.
+		// The track control is a media control, named after the current file.
 		const trackControl = contentTab.getByRole( 'button', {
 			name: 'playlist-e2e-test.wav',
-		} );
-		const trackImageControl = contentTab.getByRole( 'button', {
-			name: 'Add image',
 		} );
 		const titleInput = contentTab.getByRole( 'textbox', { name: 'Title' } );
 		const artistInput = contentTab.getByRole( 'textbox', {
@@ -296,7 +292,6 @@ test.describe( 'Playlist block', () => {
 		const albumInput = contentTab.getByRole( 'textbox', { name: 'Album' } );
 		const controlsInOrder = [
 			trackControl,
-			trackImageControl,
 			titleInput,
 			artistInput,
 			albumInput,
@@ -312,34 +307,6 @@ test.describe( 'Playlist block', () => {
 		expect( tops ).toEqual( [ ...tops ].sort( ( a, b ) => a - b ) );
 		await expect( artistInput ).toHaveValue( 'Existing Artist' );
 		await expect( albumInput ).toHaveValue( 'Existing Album' );
-		// Alternative text describes the track image, so it waits for one.
-		await expect(
-			contentTab.getByRole( 'textbox', { name: 'Alternative text' } )
-		).toBeHidden();
-
-		await trackImageControl.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Open Media Library' } )
-			.click();
-		const mediaLibrary = page.locator( '.media-modal' );
-		await mediaLibrary
-			.getByRole( 'tab', { name: 'Media Library' } )
-			.click();
-		await mediaLibrary
-			.locator( `.attachment[data-id="${ uploadedImage.id }"]` )
-			.click();
-		await mediaLibrary
-			.getByRole( 'button', { name: 'Select', exact: true } )
-			.click();
-
-		await expect(
-			contentTab.getByRole( 'button', {
-				name: uploadedImage.source_url.split( '/' ).pop(),
-			} )
-		).toBeVisible();
-		await expect(
-			contentTab.getByRole( 'textbox', { name: 'Alternative text' } )
-		).toBeVisible();
 
 		await titleInput.fill( 'Edited Track' );
 
@@ -352,7 +319,6 @@ test.describe( 'Playlist block', () => {
 						attributes: {
 							id: uploadedAudio.id,
 							src: uploadedAudio.source_url,
-							image: uploadedImage.source_url,
 							title: 'Edited Track',
 						},
 					},

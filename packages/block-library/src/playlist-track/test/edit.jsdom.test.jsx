@@ -6,10 +6,9 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
-// The Content tab's track and track image controls are `MediaReplaceFlow`s
-// too, which `MediaControl` renders with a class name of its own.
+// The Content tab's track control is a `MediaReplaceFlow` too, which
+// `MediaControl` renders with a class name of its own.
 let mockSidebarMediaReplaceFlowProps;
-let mockTrackImageMediaReplaceFlowProps;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
@@ -26,12 +25,10 @@ vi.mock( import( '@wordpress/block-editor' ), async () => {
 		),
 		MediaPlaceholder: () => <div />,
 		MediaReplaceFlow: ( props ) => {
-			if ( ! props.className ) {
-				mockMediaReplaceFlowProps = props;
-			} else if ( props.allowedTypes.includes( 'image' ) ) {
-				mockTrackImageMediaReplaceFlowProps = props;
-			} else {
+			if ( props.className ) {
 				mockSidebarMediaReplaceFlowProps = props;
+			} else {
+				mockMediaReplaceFlowProps = props;
 			}
 			const { name, onSelect } = props;
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
@@ -128,7 +125,6 @@ describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
 		mockSidebarMediaReplaceFlowProps = undefined;
-		mockTrackImageMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: vi.fn(),
 		} );
@@ -327,7 +323,9 @@ describe( 'PlaylistTrackEdit', () => {
 		const contentTab = screen.getByTestId( 'inspector-controls-content' );
 		const controls = [
 			within( contentTab ).getByText( 'song.mp3' ),
-			within( contentTab ).getByText( 'cover.jpg' ),
+			within( contentTab ).getByRole( 'img', {
+				name: 'Preview of the track image',
+			} ),
 			within( contentTab ).getByRole( 'textbox', {
 				name: 'Alternative text',
 			} ),
@@ -346,54 +344,6 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			screen.queryByTestId( 'inspector-controls-default' )
 		).not.toBeInTheDocument();
-	} );
-
-	it( 'shows the track image as a media control in the Content tab', () => {
-		renderEdit( { isSelected: true } );
-
-		expect( mockTrackImageMediaReplaceFlowProps ).toEqual(
-			expect.objectContaining( {
-				allowedTypes: [ 'image' ],
-				mediaURL: 'https://example.com/cover.jpg',
-			} )
-		);
-		// The preview is the control's constrained thumbnail, not a full-size
-		// image.
-		expect(
-			screen.queryByRole( 'img', { name: 'Preview of the track image' } )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'sets the track image from the Content tab media control', () => {
-		const { setAttributes } = renderEdit( {
-			attributes: { image: undefined, imageAlt: undefined },
-			isSelected: true,
-		} );
-
-		act( () => {
-			mockTrackImageMediaReplaceFlowProps.onSelect( {
-				url: 'https://example.com/new-cover.jpg',
-				alt: 'A new cover',
-			} );
-		} );
-
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			image: 'https://example.com/new-cover.jpg',
-			imageAlt: 'A new cover',
-		} );
-	} );
-
-	it( 'removes the track image from the Content tab media control', () => {
-		const { setAttributes } = renderEdit( { isSelected: true } );
-
-		act( () => {
-			mockTrackImageMediaReplaceFlowProps.onReset();
-		} );
-
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			image: undefined,
-			imageAlt: undefined,
-		} );
 	} );
 
 	it( 'shows the track file and a replace control in the Content tab for a single selected track', () => {
