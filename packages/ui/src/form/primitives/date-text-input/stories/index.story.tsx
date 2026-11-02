@@ -70,6 +70,7 @@ export const BaseUiForm: Story = {
 				onFormSubmit={ ( data ) => setSubmitted( data ) }
 				render={
 					<Stack
+						render={ <form /> }
 						direction="column"
 						gap="lg"
 						style={ { maxWidth: 440 } }
@@ -84,8 +85,10 @@ export const BaseUiForm: Story = {
 						<Stack { ...props } direction="column" gap="sm">
 							<>{ props.children }</>
 							<Text
-								variant="muted"
-								size="small"
+								variant="body-sm"
+								style={ {
+									color: 'var(--wpds-color-foreground-content-neutral-weak)',
+								} }
 							>{ `Dirty: ${ state.dirty } · Touched: ${ state.touched } · Valid: ${ state.valid }` }</Text>
 						</Stack>
 					) }
@@ -102,7 +105,14 @@ export const BaseUiForm: Story = {
 						Enter a date in 2026 (YYYY-MM-DD).
 					</Field.Description>
 					<BaseField.Error
-						render={ <Text variant="error" size="small" /> }
+						render={
+							<Text
+								variant="body-sm"
+								style={ {
+									color: 'var(--wpds-color-foreground-content-error-weak)',
+								} }
+							/>
+						}
 					/>
 				</BaseField.Root>
 				<BaseField.Root
@@ -120,7 +130,14 @@ export const BaseUiForm: Story = {
 					/>
 					<Field.Description>YYYY-MM-DD/YYYY-MM-DD</Field.Description>
 					<BaseField.Error
-						render={ <Text variant="error" size="small" /> }
+						render={
+							<Text
+								variant="body-sm"
+								style={ {
+									color: 'var(--wpds-color-foreground-content-error-weak)',
+								} }
+							/>
+						}
 					/>
 				</BaseField.Root>
 				<BaseField.Root
@@ -134,13 +151,20 @@ export const BaseUiForm: Story = {
 						Between 09:00 and 17:00.
 					</Field.Description>
 					<BaseField.Error
-						render={ <Text variant="error" size="small" /> }
+						render={
+							<Text
+								variant="body-sm"
+								style={ {
+									color: 'var(--wpds-color-foreground-content-error-weak)',
+								} }
+							/>
+						}
 					/>
 				</BaseField.Root>
 				<Stack gap="sm">
 					<Button type="submit">Save schedule</Button>
 					<Button
-						variant="outlined"
+						variant="outline"
 						type="reset"
 						onClick={ () => setSubmitted( null ) }
 					>
