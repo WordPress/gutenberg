@@ -84,6 +84,25 @@ export default function DateEdit( {
 		[ otherPosts ]
 	);
 
+	// The saved status, not the edited one: a status picked in the same form
+	// doesn't change whether the date floats until the post is saved.
+	const savedStatus = useSelect(
+		( select ) => {
+			if ( ! data.type || ! data.id ) {
+				return undefined;
+			}
+			const saved: { status?: string } | undefined = select(
+				coreStore
+			).getEntityRecord( 'postType', data.type, data.id );
+			return saved?.status;
+		},
+		[ data.type, data.id ]
+	);
+	const isFloating = isDateFloating( {
+		...data,
+		status: savedStatus ?? data.status,
+	} );
+
 	const disabled = field.isDisabled( { item: data, field } );
 
 	const onReset = () => {
@@ -122,7 +141,7 @@ export default function DateEdit( {
 				variant="secondary"
 				__next40pxDefaultSize
 				accessibleWhenDisabled
-				disabled={ disabled || isDateFloating( data ) }
+				disabled={ disabled || isFloating }
 				onClick={ onReset }
 			>
 				{ __( 'Reset' ) }

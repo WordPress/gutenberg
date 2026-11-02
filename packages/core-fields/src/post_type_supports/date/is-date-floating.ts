@@ -5,6 +5,9 @@ import type { PostWithDate } from './types';
  * draft or pending post whose date was reset (`null`), or still follows its
  * modified date, as the server keeps it while it floats.
  *
+ * Pass the saved status of the post: a status edited but not saved yet doesn't
+ * change whether the date floats.
+ *
  * @param item The post.
  * @return Whether the date floats.
  */
