@@ -1863,7 +1863,7 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback() instead.
  *
- * @return object WP_Term The classic navigation.
+ * @return WP_Term|null The classic navigation, or null if there are no classic menus.
  */
 function block_core_navigation_get_classic_menu_fallback() {
 
@@ -1900,6 +1900,8 @@ function block_core_navigation_get_classic_menu_fallback() {
 		);
 		return $classic_nav_menus[0];
 	}
+
+	return null;
 }
 
 /**

@@ -343,12 +343,6 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Function block_core_navigation_get_classic_menu_fallback\(\) should return object but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Function block_core_navigation_get_classic_menu_fallback_blocks\(\) should return array but returns string\.$#'
 			identifier: return.type
 			count: 1
@@ -361,7 +355,7 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: mixed, post_name\: mixed, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
+			message: '#^Parameter \#1 \$postarr of function wp_insert_post expects array\{ID\?\: int, post_author\?\: int, post_date\?\: string, post_date_gmt\?\: string, post_content\?\: string, post_content_filtered\?\: string, post_title\?\: string, post_excerpt\?\: string, \.\.\.\}, array\{post_content\: non\-empty\-array, post_title\: string, post_name\: string, post_status\: ''publish'', post_type\: ''wp_navigation''\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
@@ -503,18 +497,6 @@ parameters:
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/term-template/index.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine-css-rules-store.php
-
-		-
-			message: '#^Parameter \#1 \$style_value of static method WP_Style_Engine\:\:get_slug_from_preset_value\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine.php
 
 		-
 			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
