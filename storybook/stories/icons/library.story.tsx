@@ -1,6 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useArgs } from 'storybook/preview-api';
-import { useState, type Element as ReactElement } from '@wordpress/element';
+import {
+	useArgs,
+	useCallback as useStoryCallback,
+} from 'storybook/preview-api';
+import {
+	useCallback,
+	useEffect,
+	useState,
+	type Element as ReactElement,
+} from '@wordpress/element';
 import {
 	SearchControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -56,8 +64,21 @@ const LibraryExample = ( {
 } ): ReactElement => {
 	const [ filter, setFilter ] = useState( initialFilter );
 	const [ collection, setCollection ] = useState( initialCollection );
+	// Select locally first, so the grid updates without waiting for the
+	// args round trip through the Storybook manager.
+	const [ selectedSlug, setSelectedSlug ] = useState( icon );
+	useEffect( () => setSelectedSlug( icon ), [ icon ] );
+	const handleSelect = useCallback(
+		( name: string ) => {
+			const slug = nameToSlug( name );
+			setSelectedSlug( slug );
+			onSelectIcon( slug );
+		},
+		[ onSelectIcon ]
+	);
 	const selectedName =
-		ICON_NAMES.find( ( name ) => nameToSlug( name ) === icon ) ?? null;
+		ICON_NAMES.find( ( name ) => nameToSlug( name ) === selectedSlug ) ??
+		null;
 
 	return (
 		<Stack gap="3xl" className={ styles.layout }>
@@ -97,9 +118,7 @@ const LibraryExample = ( {
 						filter={ filter }
 						collection={ collection }
 						selectedName={ selectedName }
-						onSelect={ ( name ) =>
-							onSelectIcon( nameToSlug( name ) )
-						}
+						onSelect={ handleSelect }
 					/>
 				</div>
 			</Stack>
@@ -114,11 +133,10 @@ export const Library: StoryObj< LibraryArgs > = {
 	},
 	render: function Render( args ) {
 		const [ , updateArgs ] = useArgs< LibraryArgs >();
-		return (
-			<LibraryExample
-				{ ...args }
-				onSelectIcon={ ( slug ) => updateArgs( { icon: slug } ) }
-			/>
+		const onSelectIcon = useStoryCallback(
+			( slug: string ) => updateArgs( { icon: slug } ),
+			[ updateArgs ]
 		);
+		return <LibraryExample { ...args } onSelectIcon={ onSelectIcon } />;
 	},
 };
