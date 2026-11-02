@@ -5,7 +5,7 @@ import type { Area, ImageCropperProps, MediaSize, Point } from '../../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../../constants';
 
 /**
- * @deprecated The `react-easy-crop` based cropper is deprecated.
+ * @deprecated Use `Cropper` instead.
  */
 export default function ImageCropper( {
 	src,

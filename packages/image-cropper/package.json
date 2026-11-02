@@ -26,6 +26,7 @@
 		"src",
 		"build",
 		"build-module",
+		"build-style",
 		"build-types"
 	],
 	"main": "build/index.cjs",
@@ -36,19 +37,31 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
+		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
+		"clsx": "^2.1.1",
 		"dequal": "^2.0.3",
+		"gl-matrix": "^3.4.3",
 		"react-easy-crop": "^5.4.2"
 	},
 	"devDependencies": {
-		"@wordpress/ui": "file:../ui"
+		"@storybook/react-vite": "^10.6.3",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui",
+		"vitest": "^5.0.3",
+		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

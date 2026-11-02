@@ -1,5 +1,5 @@
 import { useMemo } from '@wordpress/element';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import type { AspectRatioPreset } from '@wordpress/image-cropper';
 import {
 	DEFAULT_ASPECT_RATIOS,
 	useMediaEditor,

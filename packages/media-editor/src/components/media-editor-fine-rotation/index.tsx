@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
+import { MAX_ROTATION_OFFSET } from '@wordpress/image-cropper';
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
-import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 import RotationRuler from '../rotation-ruler';
 
 export interface MediaEditorFineRotationProps {

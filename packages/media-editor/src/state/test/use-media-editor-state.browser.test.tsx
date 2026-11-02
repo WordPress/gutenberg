@@ -3,13 +3,13 @@ import { userEvent } from 'vitest/browser';
 import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect } from '@wordpress/element';
-import { Cropper } from '../../image-editor';
+import { Cropper } from '@wordpress/image-cropper';
+// Browser Mode needs the package's real styles for layout and transitions.
+import '@wordpress/image-cropper/src/style.scss';
 import {
 	useMediaEditorState,
 	type MediaEditorSession,
 } from '../use-media-editor-state';
-// Browser Mode needs the package's real styles for layout and transitions.
-import '../../image-editor/style.scss';
 
 // Shown below 1:1 in the fixture, so pixel snapping stays off until a crop
 // magnifies the image past one screen pixel per source pixel.

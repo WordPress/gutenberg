@@ -6,9 +6,19 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import '@wordpress/components/src/style.scss';
+import '@wordpress/image-cropper/src/style.scss';
 import MediaEditor, { type MediaEditorFrameProps } from '../index';
 import type { Media } from '../../media-editor-provider';
-import '../../../style.scss';
+// The package stylesheet loads the cropper's built CSS, which only exists
+// after a build, so load the same styles from source.
+import '../../media-preview/style.scss';
+import '../style.scss';
+import '../../media-form/style.scss';
+import '../../media-editor-modal/style.scss';
+import '../../media-editor-canvas/style.scss';
+import '../../media-editor-image-controls/style.scss';
+import '../../media-editor-keyboard-shortcuts-modal/style.scss';
+import '../../rotation-ruler/style.scss';
 
 const original: Media = {
 	id: 10,

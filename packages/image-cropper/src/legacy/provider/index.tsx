@@ -23,7 +23,7 @@ export const ImageCropperContext = createContext< ImageCropperContextValue >( {
 } );
 
 /**
- * @deprecated The `react-easy-crop` based cropper is deprecated.
+ * @deprecated Use `Cropper` instead.
  */
 export default function ImageCropperProvider( {
 	children,
@@ -45,7 +45,7 @@ export default function ImageCropperProvider( {
 }
 
 /**
- * @deprecated The `react-easy-crop` based cropper is deprecated.
+ * @deprecated Use `Cropper` instead.
  */
 export const useImageCropper = () => {
 	const context = useContext( ImageCropperContext );

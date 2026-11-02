@@ -1,10 +1,10 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-import type { CropperState } from '../image-editor';
 import {
+	type CropGeometry,
 	cropperReducer,
 	areCropperStatesEqual,
 	computeInscribedRect,
-} from '../image-editor/core';
+} from '@wordpress/image-cropper';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropOptionsSlice,
@@ -136,7 +136,7 @@ export function areMediaEditorStatesEqual(
  * @return Composite initial state.
  */
 export function buildInitialMediaEditorState(
-	cropper: CropperState
+	cropper: CropGeometry
 ): MediaEditorState {
 	return {
 		cropper,

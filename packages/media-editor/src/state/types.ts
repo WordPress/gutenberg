@@ -1,5 +1,9 @@
-import type { CropperState, NormalizedRect, Size } from '../image-editor';
-import type { CropperAction } from '../image-editor/core';
+import type {
+	CropGeometry,
+	NormalizedRect,
+	Size,
+	CropperAction,
+} from '@wordpress/image-cropper';
 
 /**
  * Sidebar control state for the cropper. Lives in the composite store
@@ -53,7 +57,7 @@ export type EditsSlice = Record< string, EditValue >;
  * referentially equal across actions that don't touch them.
  */
 export interface MediaEditorState {
-	cropper: CropperState;
+	cropper: CropGeometry;
 	cropOptions: CropOptionsSlice;
 	edits: EditsSlice;
 }

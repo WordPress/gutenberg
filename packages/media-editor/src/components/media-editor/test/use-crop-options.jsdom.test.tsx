@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from '@wordpress/element';
+import { ORIGINAL_ASPECT_RATIO } from '@wordpress/image-cropper';
 import { useCropOptions } from '../use-crop-options';
-import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
 
 const IMAGE = {

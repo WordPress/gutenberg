@@ -1,20 +1,10 @@
 # Image Cropper
 
-An implementation of [react-easy-crop](https://www.npmjs.com/package/react-easy-crop).
+An image cropper with pan, zoom, rotation, flip and a resizable crop area, and helpers to send the result to WordPress.
 
-## Current features
-
-- **Image Cropping**: Interactive aspect ratio-based crop area with drag and resize functionality
-- **Rotation**: Rotate images in 90-degree increments
-- **Zoom Control**: Zoom in/out with configurable min/max limits
-- **Aspect Ratio**: Set and maintain specific aspect ratios
-- **Flip Controls**: Horizontal and vertical image flipping
-- **State Management**: Centralized state management with React Context
-- **Custom Reset State**: Configure custom initial states for reset operations
-
-## Future features
-
-- [ ] Freeform cropping
+<div class="callout callout-alert">
+The `Cropper` API is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 ## Installation
 
@@ -24,9 +14,98 @@ Install the module
 npm install @wordpress/image-cropper --save
 ```
 
+## Styles
+
+The cropper's styles ship in `build-style/style.css`. Load them in your stylesheet:
+
+```scss
+@use "@wordpress/image-cropper/build-style/style.css";
+```
+
+## Quick Start
+
+```tsx
+import { Cropper, useCropperController } from '@wordpress/image-cropper';
+
+function ImageCropper() {
+	const controller = useCropperController();
+
+	return (
+		<div style={ { width: 600, height: 400 } }>
+			<Cropper
+				src="https://example.com/photo.jpg"
+				controller={ controller }
+				freeformCrop
+				showDimming
+				showGrid="interactive"
+			/>
+		</div>
+	);
+}
+```
+
+`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It does not provide undo and redo.
+
 ## API
 
-### Components
+### `Cropper`
+
+Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `aspectRatio`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
+
+### `useCropperController( initialState? )`
+
+React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`.
+
+### `CropperProvider` / `useCropper`
+
+A context wrapper around `useCropperController` for component trees that share one cropper.
+
+### `getSourceRegion` / `getSourceRegionPercent`
+
+Where the crop lands in the source image, in pixels or in percentages.
+
+### `buildModifiers( controller )`
+
+The rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
+
+### `exportCroppedImage`
+
+Draws the crop to a canvas and returns a `Blob`. The image must be served with cross-origin (CORS) headers.
+
+### `DEFAULT_ASPECT_RATIOS`, `ORIGINAL_ASPECT_RATIO`
+
+The default aspect-ratio presets, and the preset value that means "the image's own ratio".
+
+### `MAX_ZOOM`, `MAX_ROTATION_OFFSET`, `getMinZoom`
+
+Limits for building your own zoom and rotation controls.
+
+## More
+
+-   [src/docs/architecture.md](src/docs/architecture.md)
+-   [src/docs/recipes.md](src/docs/recipes.md)
+
+## Deprecated: `ImageCropper`
+
+`ImageCropper`, `ImageCropperProvider`, `useImageCropper` and `normalizeRotation` are deprecated. They are built on [react-easy-crop](https://www.npmjs.com/package/react-easy-crop) and will be rebuilt on `Cropper`, then removed. New code should use `Cropper`.
+
+### Current features
+
+- **Image Cropping**: Interactive aspect ratio-based crop area with drag and resize functionality
+- **Rotation**: Rotate images in 90-degree increments
+- **Zoom Control**: Zoom in/out with configurable min/max limits
+- **Aspect Ratio**: Set and maintain specific aspect ratios
+- **Flip Controls**: Horizontal and vertical image flipping
+- **State Management**: Centralized state management with React Context
+- **Custom Reset State**: Configure custom initial states for reset operations
+
+### Future features
+
+- [ ] Freeform cropping
+
+### API
+
+#### Components
 
 - `ImageCropper` - The main cropping component that provides the cropping canvas.
 
@@ -41,7 +120,7 @@ interface ImageCropperProps {
 
 - `ImageCropperProvider` - Context provider for state management. This component implements the React Context pattern to share cropper state across your application. It manages all internal cropper state including crop position, zoom levels, rotation, flip transformations, aspect ratios, and media dimensions. Any component that needs to read or modify cropper state must be a descendant of this provider. The provider also handles state persistence and provides methods for resetting to custom initial states.
 
-### Hooks
+#### Hooks
 
 - `useImageCropper` - Provides access to all cropper state and methods.
 
@@ -64,7 +143,7 @@ const {
 } = useImageCropper();
 ```
 
-### Types
+#### Types
 
 - `ImageCropperState` - State interface for cropper data
 - `ImageCropperProps` - Props interface for ImageCropper component
@@ -72,7 +151,7 @@ const {
 - `Flip` - Flip state interface
 - `Point`, `Area`, `MediaSize` - Re-exported from react-easy-crop
 
-### Utilities
+#### Utilities
 
 - `normalizeRotation` - Utility function to normalize rotation values to 0-360 degrees
 
@@ -83,9 +162,9 @@ const normalized = normalizeRotation( -90 ); // Returns 270
 const normalized2 = normalizeRotation( 450 ); // Returns 90
 ```
 
-## Usage
+### Usage
 
-### Basic Implementation
+#### Basic Implementation
 
 The image cropper provides the core cropping functionality without any built-in UI controls. You must implement your own tools using the `useImageCropper` hook.
 
@@ -168,7 +247,7 @@ function ImageEditorTools() {
 }
 ```
 
-### Advanced Usage with Custom Reset State
+#### Advanced Usage with Custom Reset State
 
 You can configure a custom initial state that will be used when the reset function is called:
 

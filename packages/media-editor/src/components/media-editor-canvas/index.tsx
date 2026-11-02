@@ -2,9 +2,9 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Cropper } from '@wordpress/image-cropper';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { Cropper } from '../../image-editor';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
 
 export interface MediaEditorCanvasProps {

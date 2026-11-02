@@ -1,0 +1,53 @@
+# Cropper Architecture
+
+## Layers
+
+| Layer | Files | Responsibility |
+| --- | --- | --- |
+| Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
+| React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
+| Presets | `src/state/` | The default aspect-ratio presets. |
+| Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
+| Deprecated cropper | `src/legacy/` | The older cropper built on `react-easy-crop`. Nothing outside this folder imports it. |
+
+The cropper does not own undo and redo. The media editor adds them in its own state code, because its sidebar controls and the cropper's gestures share one undo stack.
+
+## Coordinate Spaces
+
+| Space | What lives here | Coordinates |
+| --- | --- | --- |
+| World | Image and crop rectangle | Normalized 0-1, origin at the top-left of the image. |
+| Camera | Pan, zoom, rotation, and flip transform | `mat2d` mapping world to screen. |
+| Screen | DOM container, pointer events, CSS transforms | Pixels relative to the cropper canvas. |
+| Viewport | Display-only pan/zoom of the cropper stage | CSS pixels; does not affect export. |
+
+## Data Flow
+
+State code that wraps the cropper delegates cropper actions to `cropperReducer()`. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
+
+## Design Decisions
+
+### Containment
+
+Restriction logic projects crop corners through the camera and checks that they stay inside the image.
+
+### Rendering
+
+The render path uses focused calculations for CSS transforms, stencil placement, dimming, and grid overlays.
+
+### State
+
+The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. Undo and redo, saving, and editor UI state belong to the code that uses the cropper.
+
+### Viewport
+
+Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
+
+## Extension Points
+
+| Task | API |
+| --- | --- |
+| Alternate crop area shape | `stencil` prop implementing `StencilProps`. |
+| Crop data for REST requests | `getSourceRegion()`, `getSourceRegionPercent()` and `buildModifiers()`. |
+| Export in the browser | `controller.getCroppedImage()` or `exportCroppedImage()`. |
+| Shared cropper state across components | `CropperProvider` / `useCropper()`. |

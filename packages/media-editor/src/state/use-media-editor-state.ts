@@ -9,17 +9,15 @@ import {
 	ORIGINAL_ASPECT_RATIO,
 	exportCroppedImage,
 	type CropperController,
-	type CropperState,
+	type CropGeometry,
 	type NormalizedRect,
 	type Size,
-} from '../image-editor';
-import {
 	DEFAULT_STATE,
 	areCropperStatesEqual,
 	enforceContainment,
 	type CropperAction,
-} from '../image-editor/core';
-import { buildCropperSetters } from '../image-editor/react/hooks';
+	buildCropperSetters,
+} from '@wordpress/image-cropper';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
@@ -51,7 +49,7 @@ import type {
  */
 export function resolveAspectRatio(
 	presetKey: string,
-	cropperImage: CropperState[ 'image' ] | null
+	cropperImage: CropGeometry[ 'image' ] | null
 ): number | undefined {
 	const num = parseFloat( presetKey );
 	if ( num === 0 || Number.isNaN( num ) ) {
@@ -74,8 +72,8 @@ export function resolveAspectRatio(
 }
 
 function areCropperImagesEqual(
-	a: CropperState[ 'image' ],
-	b: CropperState[ 'image' ]
+	a: CropGeometry[ 'image' ],
+	b: CropGeometry[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -125,7 +123,7 @@ export interface MediaEditorSession {
 	 * baseline, and no history. Reporting the same image again is a
 	 * no-op.
 	 */
-	setSourceImage: ( image: CropperState[ 'image' ] ) => void;
+	setSourceImage: ( image: CropGeometry[ 'image' ] ) => void;
 	/**
 	 * Whether anything in the session differs from its baseline,
 	 * including editor-only state such as the aspect-ratio preset.
@@ -295,7 +293,7 @@ export function useMediaEditorState(): MediaEditorSession {
 		[ dispatchCropperAction ]
 	);
 
-	const setSourceImage = useCallback( ( image: CropperState[ 'image' ] ) => {
+	const setSourceImage = useCallback( ( image: CropGeometry[ 'image' ] ) => {
 		if ( areCropperImagesEqual( stateRef.current.cropper.image, image ) ) {
 			return;
 		}
@@ -319,7 +317,7 @@ export function useMediaEditorState(): MediaEditorSession {
 	}, [] );
 
 	const resetCropper = useCallback(
-		( resetState?: Partial< CropperState > ) => {
+		( resetState?: Partial< CropGeometry > ) => {
 			dispatchWithHistory( {
 				type: 'CROPPER',
 				action: { type: 'RESET', payload: resetState },
