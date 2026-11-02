@@ -34,3 +34,20 @@
 		padding: 4px;
 	}
 }
+
+.icon-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 12px;
+}
+
+.icon-button {
+	flex-direction: column;
+	padding: 8px;
+}
+
+.icon-name {
+	font-size: 12px;
+	font-weight: 400;
+	word-break: break-all;
+}

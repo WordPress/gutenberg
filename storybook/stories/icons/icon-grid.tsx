@@ -1,4 +1,3 @@
-import { __experimentalGrid as Grid } from '@wordpress/components';
 import { Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/ui';
 import {
@@ -7,6 +6,7 @@ import {
 	nameToSlug,
 	type Collection,
 } from './manifest';
+import styles from './library.module.scss';
 
 function filterIcons( filter: string, collection: Collection ) {
 	const normalizedFilter = filter.toLowerCase();
@@ -55,7 +55,7 @@ export function IconGrid( {
 	}
 
 	return (
-		<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
+		<div className={ styles[ 'icon-grid' ] }>
 			{ filteredIcons.map( ( [ name, icon ] ) => {
 				const slug = nameToSlug( name );
 				if ( ! ALL_ICONS_MANIFEST.has( slug ) ) {
@@ -71,21 +71,15 @@ export function IconGrid( {
 						tone={ isSelected ? 'brand' : 'neutral' }
 						aria-pressed={ isSelected }
 						onClick={ () => onSelect( name ) }
-						style={ { flexDirection: 'column', padding: 8 } }
+						className={ styles[ 'icon-button' ] }
 					>
 						<Icon icon={ icon } size={ 32 } />
-						<span
-							style={ {
-								fontSize: 12,
-								fontWeight: 'normal',
-								wordBreak: 'break-all',
-							} }
-						>
+						<span className={ styles[ 'icon-name' ] }>
 							{ name }
 						</span>
 					</Button>
 				);
 			} ) }
-		</Grid>
+		</div>
 	);
 }
