@@ -53,6 +53,44 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 }
 
 describe( 'buildRamps', () => {
+	it.each( [
+		{ scheme: 'Blue', background: '#3876a8' },
+		{ scheme: 'Ocean', background: '#5f787f' },
+	] )(
+		'keeps weak neutral text at 4.5:1 or higher in the $scheme scheme',
+		( { background } ) => {
+			const { ramp, warnings } = buildBgRamp( background );
+
+			expect(
+				getContrast( ramp.surface3, ramp.fgSurface3 )
+			).toBeGreaterThanOrEqual( 4.5 );
+			expect( warnings ).toBeUndefined();
+		}
+	);
+
+	it( 'reports a ramp warning when rounded colors miss a required contrast target', () => {
+		const { ramp, warnings } = buildRamp(
+			'rgb(0 10.6 0)',
+			{
+				...BG_RAMP_CONFIG,
+				fgSurface3: {
+					contrast: {
+						reference: 'seed',
+						followDirection: 'lighter',
+						target: 20.05,
+					},
+					lightness: () => 1,
+				},
+			},
+			{ rescaleToFitContrastTargets: false }
+		);
+
+		expect( getContrast( ramp.surface2, ramp.fgSurface3 ) ).toBeLessThan(
+			20.05
+		);
+		expect( warnings ).toContain( 'fgSurface3' );
+	} );
+
 	it( 'restores the weak intent background colors', () => {
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const intentColors = [ 'info', 'success', 'warning', 'error' ] as const;
