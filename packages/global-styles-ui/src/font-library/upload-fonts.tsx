@@ -151,8 +151,16 @@ function UploadFonts() {
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontName = name.get( 16 ) || name.get( 1 );
-		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
+		// Name records are optional in WOFF and WOFF2, so fall back through
+		// the other names, then the file name.
+		const fontName =
+			name.get( 16 ) ||
+			name.get( 1 ) ||
+			name.get( 4 ) ||
+			name.get( 6 ) ||
+			fontFile.name.replace( /\.[^.]+$/, '' );
+		const subfamily = name.get( 2 ) || '';
+		const isItalic = subfamily.toLowerCase().includes( 'italic' );
 		const fontWeight =
 			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
 		const isVariable = !! font.opentype.tables.fvar;
@@ -179,9 +187,8 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const handleInstall = async ( fontFaces: FontFace[] ) => {
-		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-
 		try {
+			const fontFamilies = makeFamiliesFromFaces( fontFaces );
 			await installFonts( fontFamilies );
 			setNotice( {
 				type: 'success',
