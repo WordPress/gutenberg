@@ -416,7 +416,7 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 	page.getByRole( 'gridcell' ).first().element().focus();
 	await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowUp}{Tab}{Tab}' );
 	const checkbox = page.getByRole( 'checkbox', {
-		name: 'Post 1',
+		name: 'Select Post 1',
 		exact: true,
 	} );
 	await expect.element( checkbox ).toHaveFocus();
