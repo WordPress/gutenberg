@@ -453,10 +453,27 @@ test.describe( 'Table of Contents', () => {
 				.click();
 			await expect( page ).toHaveURL( /#updated-section$/ );
 			await expect( page.locator( '#updated-section' ) ).toBeInViewport();
+		} );
 
-			// Previewing unsaved changes to the published post lists the
-			// previewed headings, not the saved ones.
-			await admin.editPost( postId );
+		test( 'previewing unsaved changes to a published post lists the previewed headings', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Published section',
+						anchor: 'published-section',
+					},
+				] )
+			);
+			await editor.publishPost();
+			await page.getByRole( 'button', { name: 'Close panel' } ).click();
+
+			// Preview the post with unsaved changes. WordPress applies them to
+			// the global post only, not to the saved post.
 			await editor.setContent(
 				postContentWithTocAndHeadings( [
 					{
@@ -466,14 +483,19 @@ test.describe( 'Table of Contents', () => {
 				] )
 			);
 			const previewPage = await editor.openPreviewPage();
-			const previewToc = previewPage.getByRole( 'navigation', {
+
+			const tableOfContents = previewPage.getByRole( 'navigation', {
 				name: 'Table of Contents',
 			} );
 			await expect(
-				previewToc.getByRole( 'link', { name: 'Previewed section' } )
+				tableOfContents.getByRole( 'link', {
+					name: 'Previewed section',
+				} )
 			).toBeVisible();
 			await expect(
-				previewToc.getByRole( 'link', { name: 'Updated section' } )
+				tableOfContents.getByRole( 'link', {
+					name: 'Published section',
+				} )
 			).toHaveCount( 0 );
 			await previewPage.close();
 		} );
