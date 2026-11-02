@@ -6,6 +6,7 @@
 
 -   `useEntityRecord`, `useEntityRecords` and `useEntityRecordsWithPermissions` now infer the record type from their `kind` and `name` arguments, matching `getEntityRecord`. Pairs the map does not cover, and calls that name the record type explicitly, behave as before.
 -   The entity record map now covers templates and template parts, so `postType`/`wp_template` and `postType`/`wp_template_part` infer `WpTemplate` and `WpTemplatePart`.
+-   The entity record map now covers font collections, so `root`/`fontCollection` infers `FontCollection`. Its `description`, `font_families` and `categories` are no longer optional, since the REST API always returns them.
 
 ### Breaking Changes
 

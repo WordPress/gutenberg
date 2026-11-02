@@ -17,15 +17,15 @@ declare module './base-entity-records' {
 			/**
 			 * A description of the collection.
 			 */
-			description?: string;
+			description: string;
 			/**
 			 * List of font families in this collection.
 			 */
-			font_families?: CollectionFontFamily[];
+			font_families: CollectionFontFamily[];
 			/**
 			 * Categories for organizing fonts.
 			 */
-			categories?: Array< {
+			categories: Array< {
 				slug: string;
 				name: string;
 			} >;
