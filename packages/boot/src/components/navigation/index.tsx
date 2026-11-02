@@ -85,7 +85,7 @@ function Navigation( {
 	const renderItem = ( item: MenuItem ) => {
 		const onClick =
 			item.id === 'home'
-				? ( event: MouseEvent< HTMLAnchorElement > ) => {
+				? ( event: MouseEvent< HTMLElement > ) => {
 						event.preventDefault();
 						navigate( {
 							to: '/',

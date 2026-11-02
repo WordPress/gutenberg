@@ -18,7 +18,7 @@ import {
 	Button,
 	DropdownMenu,
 	MenuItem,
-	Notice,
+	Notice as WCNotice,
 	Spinner as WCSpinner,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
@@ -543,7 +543,7 @@ function ExternalPreviewNotice( {
 	}
 
 	return (
-		<Notice
+		<WCNotice
 			className={ styles[ 'external-notice' ] }
 			status="warning"
 			onDismiss={ onDismiss }
@@ -563,7 +563,7 @@ function ExternalPreviewNotice( {
 			>
 				{ __( 'Open in new tab' ) }
 			</a>
-		</Notice>
+		</WCNotice>
 	);
 }
 

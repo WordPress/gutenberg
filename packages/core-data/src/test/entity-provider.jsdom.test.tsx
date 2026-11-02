@@ -393,11 +393,11 @@ describe( 'useEntityBlockEditor', () => {
 			{ context: 'edit' }
 		);
 
-		let blocks;
+		let blocks!: Array< Block >;
 		const TestComponent = () => {
 			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 2,
-			} );
+			} ) as EntityBlockEditorWithBlocks;
 			return <div />;
 		};
 

@@ -122,7 +122,7 @@ export function Editor( {
 		templateId,
 		finalSettings.isPreviewMode ? 'preview' : 'edit',
 	].join( ':' );
-	const openedPageSidebarForRef = useRef< string | undefined >();
+	const openedPageSidebarForRef = useRef< string | undefined >( undefined );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const shouldOpenPageSidebar =
 		resolvedPostType === 'page' &&

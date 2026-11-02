@@ -344,7 +344,7 @@ export const route = {
 			);
 			const preferredSlot = getPreferredTemplateSlot(
 				params.type,
-				postTypeObject
+				postTypeObject as unknown as PostTypeObject | undefined
 			);
 			if ( ! preferredSlot ) {
 				return undefined;

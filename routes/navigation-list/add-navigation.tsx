@@ -6,7 +6,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	Modal,
 	TextControl,
 	__experimentalVStack as VStack,
@@ -111,7 +111,7 @@ export const AddNavigationModal = ( {
 						placeholder={ __( 'Enter menu name' ) }
 						disabled={ isBusy }
 					/>
-					<CheckboxControl
+					<WCCheckboxControl
 						label={ __( 'Auto sync with site pages' ) }
 						checked={ autoSyncWithPages }
 						onChange={ setAutoSyncWithPages }

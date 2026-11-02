@@ -1,6 +1,5 @@
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, _n, sprintf } from '@wordpress/i18n';
-// @ts-expect-error - No type declarations available for @wordpress/blocks.
 import { parse, serialize } from '@wordpress/blocks';
 
 type ParsedBlock = {

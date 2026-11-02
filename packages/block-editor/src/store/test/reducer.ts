@@ -5366,17 +5366,20 @@ describe( 'state', () => {
 									name: 'core/group',
 									clientId: 'template-section',
 									attributes: {},
+									isValid: true,
 									innerBlocks: [
 										{
 											name: 'core/paragraph',
 											clientId: 'section-paragraph',
 											attributes: {},
+											isValid: true,
 											innerBlocks: [],
 										},
 										{
 											name: 'core/template-part',
 											clientId: 'template-part',
 											attributes: {},
+											isValid: true,
 											innerBlocks: [],
 										},
 									],
@@ -5396,6 +5399,7 @@ describe( 'state', () => {
 									name: 'core/paragraph',
 									clientId: 'template-part-paragraph',
 									attributes: {},
+									isValid: true,
 									innerBlocks: [],
 								},
 							],

@@ -32,7 +32,7 @@ type DragState =
 
 const DEFAULT_SECTION_ID = 'default';
 const ADVANCED_SECTION_ID = 'advanced';
-const { Menu } = unlock( componentsPrivateApis );
+const { Menu: WCMenu } = unlock( componentsPrivateApis );
 
 function getItemDropIndex(
 	section: SidebarNavigationSection,
@@ -75,7 +75,7 @@ export default function CustomizeNavigation() {
 	);
 	const { activeWorkspace } = useActiveWorkspace();
 	const layout = useSidebarNavigationLayout( menuItems, activeWorkspace );
-	const dragStateRef = useRef< DragState | undefined >();
+	const dragStateRef = useRef< DragState | undefined >( undefined );
 
 	const setCurrentDragState = ( nextDragState: DragState | undefined ) => {
 		dragStateRef.current = nextDragState;
@@ -331,8 +331,8 @@ export default function CustomizeNavigation() {
 										>
 											{ item.label }
 										</span>
-										<Menu placement="bottom-end">
-											<Menu.TriggerButton
+										<WCMenu placement="bottom-end">
+											<WCMenu.TriggerButton
 												render={
 													<Button
 														icon={ moreVertical }
@@ -344,8 +344,8 @@ export default function CustomizeNavigation() {
 													/>
 												}
 											/>
-											<Menu.Popover>
-												<Menu.Item
+											<WCMenu.Popover>
+												<WCMenu.Item
 													onClick={ () =>
 														layout.setItemVisibility(
 															item.id,
@@ -355,27 +355,27 @@ export default function CustomizeNavigation() {
 														)
 													}
 												>
-													<Menu.ItemLabel>
+													<WCMenu.ItemLabel>
 														{ layout.isItemVisible(
 															item.id
 														)
 															? __( 'Hide' )
 															: __( 'Show' ) }
-													</Menu.ItemLabel>
-												</Menu.Item>
-												<Menu.Separator />
-												<Menu>
-													<Menu.SubmenuTriggerItem>
-														<Menu.ItemLabel>
+													</WCMenu.ItemLabel>
+												</WCMenu.Item>
+												<WCMenu.Separator />
+												<WCMenu>
+													<WCMenu.SubmenuTriggerItem>
+														<WCMenu.ItemLabel>
 															{ __( 'Move to…' ) }
-														</Menu.ItemLabel>
-													</Menu.SubmenuTriggerItem>
-													<Menu.Popover>
+														</WCMenu.ItemLabel>
+													</WCMenu.SubmenuTriggerItem>
+													<WCMenu.Popover>
 														{ layout.sections.map(
 															(
 																targetSection
 															) => (
-																<Menu.Item
+																<WCMenu.Item
 																	key={
 																		targetSection.id
 																	}
@@ -395,18 +395,18 @@ export default function CustomizeNavigation() {
 																		}
 																	} }
 																>
-																	<Menu.ItemLabel>
+																	<WCMenu.ItemLabel>
 																		{
 																			targetSection.label
 																		}
-																	</Menu.ItemLabel>
-																</Menu.Item>
+																	</WCMenu.ItemLabel>
+																</WCMenu.Item>
 															)
 														) }
-													</Menu.Popover>
-												</Menu>
-											</Menu.Popover>
-										</Menu>
+													</WCMenu.Popover>
+												</WCMenu>
+											</WCMenu.Popover>
+										</WCMenu>
 									</div>
 								) ) }
 							</div>

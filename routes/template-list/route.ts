@@ -200,7 +200,12 @@ async function getActivationTemplates( activeView: string | undefined ) {
 
 	const defaultTemplateTypes = activeTheme?.default_template_types ?? [];
 	const activeTemplates = [ ...( staticRecords ?? [] ) ] as TemplateRecord[];
-	const activeTemplatesOption = site?.active_templates;
+	// The site settings carry the active templates, which `Settings` doesn't
+	// declare.
+	const activeTemplatesOption = (
+		site as
+			{ active_templates?: Record< string, string | number > } | undefined
+	 )?.active_templates;
 
 	if ( activeTemplatesOption ) {
 		for ( const activeSlug in activeTemplatesOption ) {
@@ -234,9 +239,9 @@ async function getActivationTemplates( activeView: string | undefined ) {
 	}
 
 	if ( activeView && activeView !== 'active' ) {
-		return ( staticRecords ?? [] ).filter(
-			( record: TemplateRecord ) => record.author_text === activeView
-		) as TemplateRecord[];
+		return (
+			( staticRecords ?? [] ) as unknown as TemplateRecord[]
+		 ).filter( ( record ) => record.author_text === activeView );
 	}
 
 	return activeTemplates.filter(
@@ -347,7 +352,7 @@ export const route = {
 		if ( template ) {
 			return getTemplateCanvas(
 				template.id.toString(),
-				template as TemplateRecord
+				template as unknown as TemplateRecord
 			);
 		}
 

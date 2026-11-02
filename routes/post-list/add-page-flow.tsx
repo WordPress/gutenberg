@@ -2,13 +2,13 @@ import { Preview as LazyEditorPreview } from '@wordpress/lazy-editor';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	DropdownMenu,
 	Icon as WCIcon,
 	MenuItem,
 	Modal,
-	Notice,
-	SelectControl,
+	Notice as WCNotice,
+	SelectControl as WCSelectControl,
 	TextControl,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -1003,7 +1003,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 						: {} ),
 				},
 				{ throwOnError: true }
-			) ) as PostRecord;
+			) ) as unknown as PostRecord;
 
 			if ( publishImmediately && newPage.status !== 'publish' ) {
 				newPage = ( await saveEntityRecord(
@@ -1014,7 +1014,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 						status: 'publish',
 					},
 					{ throwOnError: true }
-				) ) as PostRecord;
+				) ) as unknown as PostRecord;
 			}
 
 			if ( addToMenu ) {
@@ -1257,7 +1257,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 												<div className="apm-layout-results-header">
 													{ pageTemplates.options
 														.length > 1 && (
-														<SelectControl
+														<WCSelectControl
 															label={ __(
 																'Preview with'
 															) }
@@ -1372,7 +1372,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 				{ isShowingForm && (
 					<div className="apm-form">
 						{ validationError && (
-							<Notice
+							<WCNotice
 								status="error"
 								isDismissible
 								onRemove={ () =>
@@ -1380,7 +1380,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 								}
 							>
 								{ validationError }
-							</Notice>
+							</WCNotice>
 						) }
 						<TextControl
 							label={ __( 'Page title' ) }
@@ -1395,7 +1395,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 						/>
 						<div className="apm-checkbox-group">
 							<div className="apm-checkbox-item">
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Publish immediately' ) }
 									checked={ publishImmediately }
 									onChange={ setPublishImmediately }
@@ -1411,7 +1411,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 								</Text>
 							</div>
 							<div className="apm-checkbox-item">
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Add to navigation menu' ) }
 									checked={ addToMenu }
 									onChange={ setAddToMenu }
@@ -1435,7 +1435,7 @@ export function AddPageFlow( { onClose }: AddPageFlowProps ) {
 								<Card.Title>{ __( 'Advanced' ) }</Card.Title>
 							</CollapsibleCard.Header>
 							<CollapsibleCard.Content>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Page Template' ) }
 									value={ selectedTemplateSlug }
 									options={ pageTemplates.options }

@@ -2951,9 +2951,9 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 
 		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
 		if ( hasEditedContentOnlySection && isWithinEditedContentOnlySection ) {
-			const editedSectionBlock = state.blocks.byClientId?.get(
-				state.editedContentOnlySection
-			);
+			const editedSectionBlock = state.editedContentOnlySection
+				? state.blocks.byClientId?.get( state.editedContentOnlySection )
+				: undefined;
 			const isEditingTemplatePart =
 				editedSectionBlock?.name === 'core/template-part';
 			// Prototype universal canvas rule: template parts remain separate
