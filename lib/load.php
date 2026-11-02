@@ -179,6 +179,9 @@ if (
 ) {
 	require __DIR__ . '/experimental/route-entity-fields-preload.php';
 }
+if ( gutenberg_is_experiment_enabled( 'gutenberg-admin-shell' ) ) {
+	require __DIR__ . '/experimental/admin-shell/load.php';
+}
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 	require __DIR__ . '/experimental/media-editor/load.php';
 }

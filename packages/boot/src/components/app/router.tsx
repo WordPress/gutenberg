@@ -176,14 +176,47 @@ function createRouteTree(
 	return rootRoute.addChildren( dynamicRoutes );
 }
 
-// Create custom history that parses ?p= query parameter
-function createPathHistory() {
-	return createBrowserHistory( {
+/**
+ * Returns the key identifying which wp-admin page a URL belongs to: the
+ * `page` query argument for plugin pages (`admin.php?page=…`), or the file
+ * name for Core pages (`font-library.php`).
+ *
+ * @param href URL to read. Defaults to the current location.
+ * @return Page key.
+ */
+export function getPageKey( href: string = window.location.href ) {
+	const url = new URL( href, window.location.href );
+	return (
+		url.searchParams.get( 'page' ) ?? url.pathname.split( '/' ).pop() ?? ''
+	);
+}
+
+/**
+ * Creates a browser history that reads the route from the `?p=` query
+ * argument.
+ *
+ * Several apps can share one document (see `startAdminShell`). Each app's
+ * history belongs to one wp-admin page: while the URL points at another
+ * page, the history keeps returning the location it last saw on its own
+ * page and does not notify its router. A hidden app therefore ignores the
+ * visible app's navigation, and resumes from the URL when it is shown again.
+ *
+ * @param pageKey Page this history belongs to. See `getPageKey`.
+ */
+function createPathHistory( pageKey: string ) {
+	let lastOwnLocation: ReturnType< typeof parseHref > | undefined;
+	const isOwnUrl = () => getPageKey() === pageKey;
+
+	const history = createBrowserHistory( {
 		parseLocation: () => {
+			if ( ! isOwnUrl() && lastOwnLocation ) {
+				return lastOwnLocation;
+			}
 			const url = new URL( window.location.href );
 			const path = url.searchParams.get( 'p' ) || '/';
 			const pathHref = `${ path }${ url.hash }`;
-			return parseHref( pathHref, window.history.state );
+			lastOwnLocation = parseHref( pathHref, window.history.state );
+			return lastOwnLocation;
 		},
 		createHref: ( href: string ) => {
 			const searchParams = new URLSearchParams( window.location.search );
@@ -191,19 +224,37 @@ function createPathHistory() {
 			return `${ window.location.pathname }?${ searchParams }`;
 		},
 	} );
+
+	// Only the app whose page is in the URL reacts to history changes.
+	type Subscriber = ( ...args: unknown[] ) => void;
+	const subscribe: ( callback: Subscriber ) => () => void = history.subscribe;
+	history.subscribe = ( callback: Subscriber ) =>
+		subscribe( ( ...args ) => {
+			if ( isOwnUrl() ) {
+				callback( ...args );
+			}
+		} );
+
+	return history;
 }
 
 interface RouterProps {
 	routes: Route[];
 	rootComponent?: ComponentType;
+	/**
+	 * wp-admin page the router belongs to. Defaults to the page in the URL
+	 * when the router is created.
+	 */
+	pageKey?: string;
 }
 
 export default function Router( {
 	routes,
 	rootComponent = Root,
+	pageKey,
 }: RouterProps ) {
 	const router = useMemo( () => {
-		const history = createPathHistory();
+		const history = createPathHistory( pageKey ?? getPageKey() );
 		const routeTree = createRouteTree( routes, rootComponent );
 
 		return createRouter( {
@@ -231,7 +282,7 @@ export default function Router( {
 				},
 			},
 		} );
-	}, [ routes, rootComponent ] );
+	}, [ routes, rootComponent, pageKey ] );
 
 	return <RouterProvider router={ router } />;
 }
