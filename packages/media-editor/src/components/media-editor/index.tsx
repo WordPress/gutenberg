@@ -6,9 +6,11 @@ import {
 	MenuItem,
 	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
+	__unstableAnimatePresence as AnimatePresence,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
-import { useViewportMatch } from '@wordpress/compose';
+import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { NavigableRegion } from '@wordpress/admin-ui';
@@ -82,6 +84,26 @@ const DETAILS_PANEL = 'details';
 
 /** Identifier for the crop panel. Images only; other media has nothing to crop. */
 const CROP_PANEL = 'crop';
+
+// Matches the editor's sidebar in `ComplementaryArea`.
+const SIDEBAR_ANIMATION_DURATION = 0.3;
+
+type SidebarTransition = {
+	type: 'tween';
+	duration: number;
+	ease: number[];
+};
+
+const sidebarVariants = {
+	// `auto` leaves the width to the sidebar's stylesheet.
+	open: { width: 'auto' },
+	// Takes the transition from `AnimatePresence`'s `custom` prop, so a
+	// sidebar that is already closing still gets the current one.
+	closed: ( transition: SidebarTransition ) => ( {
+		width: 0,
+		transition,
+	} ),
+};
 
 interface MediaEditorTab {
 	id: string;
@@ -221,7 +243,7 @@ interface MediaEditorFrameContextValue {
 	onSave: () => void;
 	/**
 	 * When `true`, the media has a lineage root to restore to, so the
-	 * "Restore original image" menu item is shown.
+	 * history menu shows its "Restore original" item.
 	 */
 	canRestoreOriginal: boolean;
 	/**
@@ -264,20 +286,66 @@ export interface HeaderActionsProps {
 	showCloseButton?: boolean;
 }
 
-function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const {
-		isImage,
-		isSaving,
-		onCancel,
-		isWide,
-		activePanel,
-		onTogglePanel,
-		canRestoreOriginal,
-		isSourceReplaced,
-		onRestoreOriginal,
-	} = useMediaEditorFrameContext();
+function PanelToggle() {
+	const { isWide, activePanel, onTogglePanel } = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
+	// The sidebar holds more than one panel, so this opens and closes the
+	// sidebar rather than naming a panel: reopening returns to whichever tab
+	// was last showing, and the tab strip inside switches between them.
+	return (
+		<Button
+			size="compact"
+			icon={ drawerRight }
+			label={ __( 'Media settings' ) }
+			isPressed={ isPanelOpen }
+			// Only a docked column really expands beside the canvas; below
+			// that the panel replaces the view, which the pressed state
+			// already describes.
+			aria-expanded={ isWide ? isPanelOpen : undefined }
+			onClick={ onTogglePanel }
+		/>
+	);
+}
+
+function MoreMenu() {
+	const { isImage } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
+	if ( ! isImage ) {
+		return null;
+	}
+	return (
+		<>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More options' ) }
+				toggleProps={ { size: 'compact' } }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<MenuGroup>
+						<MenuItem
+							icon={ keyboard }
+							iconPosition="left"
+							onClick={ () => {
+								setIsShortcutsModalOpen( true );
+								closeMenu();
+							} }
+						>
+							{ __( 'Keyboard shortcuts' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
+		</>
+	);
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isSaving, onCancel } = useMediaEditorFrameContext();
 	return (
 		<Stack
 			className="media-editor__header-actions"
@@ -285,65 +353,8 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ /* The sidebar holds more than one panel, so this opens and
-			     closes the sidebar rather than naming a panel: reopening
-			     returns to whichever tab was last showing, and the tab strip
-			     inside switches between them. */ }
-			<Button
-				size="compact"
-				icon={ drawerRight }
-				label={ __( 'Media settings' ) }
-				isPressed={ isPanelOpen }
-				// Only a docked column really expands beside the canvas; below
-				// that the panel replaces the view, which the pressed state
-				// already describes.
-				aria-expanded={ isWide ? isPanelOpen : undefined }
-				onClick={ onTogglePanel }
-			/>
-			{ isImage && (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'More options' ) }
-					toggleProps={ { size: 'compact' } }
-				>
-					{ ( { onClose: closeMenu } ) => (
-						<>
-							{ canRestoreOriginal && (
-								<MenuGroup>
-									<MenuItem
-										icon={ backup }
-										iconPosition="left"
-										disabled={
-											isSourceReplaced || isSaving
-										}
-										info={ __(
-											'Discards unsaved changes and loads the original image.'
-										) }
-										onClick={ () => {
-											onRestoreOriginal();
-											closeMenu();
-										} }
-									>
-										{ __( 'Restore original image' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<MenuGroup>
-								<MenuItem
-									icon={ keyboard }
-									iconPosition="left"
-									onClick={ () => {
-										setIsShortcutsModalOpen( true );
-										closeMenu();
-									} }
-								>
-									{ __( 'Keyboard shortcuts' ) }
-								</MenuItem>
-							</MenuGroup>
-						</>
-					) }
-				</DropdownMenu>
-			) }
+			<PanelToggle />
+			<MoreMenu />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -354,18 +365,21 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					accessibleWhenDisabled
 				/>
 			) }
-			{ isShortcutsModalOpen && (
-				<MediaEditorKeyboardShortcutsModal
-					onClose={ () => setIsShortcutsModalOpen( false ) }
-				/>
-			) }
 		</Stack>
 	);
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, isWide, activePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		isUndoRedoDisabled,
+		isWide,
+		activePanel,
+		canRestoreOriginal,
+		isSourceReplaced,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -411,15 +425,6 @@ function HistoryActions() {
 		>
 			<Button
 				size="compact"
-				variant="tertiary"
-				disabled={ isUndoRedoDisabled || ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
-			<Button
-				size="compact"
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
@@ -442,6 +447,48 @@ function HistoryActions() {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
+			<DropdownMenu
+				icon={ backup }
+				label={ __( 'History' ) }
+				popoverProps={ { placement: 'top-start' } }
+				toggleProps={ {
+					size: 'compact',
+					disabled:
+						isUndoRedoDisabled ||
+						( ! isDirty && ! canRestoreOriginal ),
+					accessibleWhenDisabled: true,
+				} }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								disabled={ isUndoRedoDisabled || ! isDirty }
+								onClick={ () => {
+									handleReset();
+									closeMenu();
+								} }
+							>
+								{ __( 'Reset image edits' ) }
+							</MenuItem>
+						</MenuGroup>
+						{ canRestoreOriginal && (
+							<MenuGroup>
+								<MenuItem
+									disabled={ isSourceReplaced || isSaving }
+									info={ __( 'Discards unsaved changes.' ) }
+									onClick={ () => {
+										onRestoreOriginal();
+										closeMenu();
+									} }
+								>
+									{ __( 'Restore original' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
 		</Stack>
 	);
 }
@@ -520,6 +567,14 @@ function MediaEditorContent( {
 	// people in the first place. Within one opening it does hold — see
 	// `chosenPanel` below.
 	const isWide = useViewportMatch( 'small' );
+	// Below `small` the open panel replaces the canvas instead of sitting
+	// beside it, so there is nothing to animate.
+	const disableSidebarMotion = useReducedMotion() || ! isWide;
+	const sidebarTransition: SidebarTransition = {
+		type: 'tween',
+		duration: disableSidebarMotion ? 0 : SIDEBAR_ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
 	// Width picks the starting panel, but only until the user opens or closes
 	// it. After that their choice holds for the rest of the session: closing
 	// the panel and then resizing — or crossing the breakpoint by rotating a
@@ -902,25 +957,41 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ !! activePanel && (
-							<MediaEditorSidebar
-								tabs={ tabs }
-								// Swapping the edited media can drop the Crop
-								// tab out from under an open panel — saving a
-								// crop moves the editor to a new id, which may
-								// resolve as non-image. Fall back rather than
-								// hand `Tabs.Root` a value no tab matches.
-								activeTab={
-									tabs.some(
-										( tab ) => tab.id === activePanel
-									)
-										? activePanel
-										: DETAILS_PANEL
-								}
-								onSelectTab={ selectPanel }
-								disabled={ isSaving }
-							/>
-						) }
+						<AnimatePresence
+							initial={ false }
+							custom={ sidebarTransition }
+						>
+							{ !! activePanel && (
+								<motion.div
+									className="media-editor__sidebar-container"
+									variants={ sidebarVariants }
+									initial="closed"
+									animate="open"
+									exit="closed"
+									transition={ sidebarTransition }
+								>
+									<MediaEditorSidebar
+										tabs={ tabs }
+										// Swapping the edited media can drop the
+										// Crop tab out from under an open panel —
+										// saving a crop moves the editor to a new
+										// id, which may resolve as non-image.
+										// Fall back rather than hand `Tabs.Root`
+										// a value no tab matches.
+										activeTab={
+											tabs.some(
+												( tab ) =>
+													tab.id === activePanel
+											)
+												? activePanel
+												: DETAILS_PANEL
+										}
+										onSelectTab={ selectPanel }
+										disabled={ isSaving }
+									/>
+								</motion.div>
+							) }
+						</AnimatePresence>
 					</div>
 				) }
 			</div>
@@ -995,6 +1066,8 @@ export function MediaEditor( props: MediaEditorProps ) {
 // `DataViewsPicker` exposes its own sub-components. They read what they need
 // from context, so a frame only chooses where they go and how they look.
 MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.PanelToggle = PanelToggle;
+MediaEditor.MoreMenu = MoreMenu;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
 

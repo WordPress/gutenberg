@@ -7,12 +7,17 @@
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
+### Bug Fixes
+
+-   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
 ### Internal
 
 -   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
 -   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).
 -   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+-   Note beside `applyTemplateReplacements()` that Gutenberg's PHPStan analysis of the PHP templates keeps a sample value for each placeholder, which must be updated along with it ([#66693](https://github.com/WordPress/gutenberg/pull/66693)).
 
 ## 0.26.0 (2026-10-20)
 

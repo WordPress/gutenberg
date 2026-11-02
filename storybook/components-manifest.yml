@@ -175,6 +175,7 @@
   props:
       - children
       - className
+      - infotip
       - intent
       - render
       - style
