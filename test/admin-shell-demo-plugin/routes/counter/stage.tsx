@@ -1,6 +1,7 @@
 import { Page } from '@wordpress/admin-ui';
 import { usePageVisibility } from '@wordpress/boot';
 import { Button } from '@wordpress/components';
+import { useCommand } from '@wordpress/commands';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -48,6 +49,16 @@ function Stage() {
 	}, [ registerShortcut ] );
 	// Only fires while this page is showing.
 	useShortcut( SHORTCUT, () => setCount( ( value ) => value + 1 ) );
+
+	// Only in the command palette while this page is showing.
+	useCommand( {
+		name: 'admin-shell-demo/add-one',
+		label: __( 'Add one to the counter' ),
+		callback: ( { close } ) => {
+			setCount( ( value ) => value + 1 );
+			close();
+		},
+	} );
 
 	return (
 		<Page

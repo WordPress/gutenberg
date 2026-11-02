@@ -1,4 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
+import { Dropdown as WCDropdown } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Link, Stack, Text, TextareaControl } from '@wordpress/ui';
@@ -34,6 +35,24 @@ function Stage() {
 				<Link href="themes.php?page=font-library-wp-admin">
 					{ __( 'Open Appearance › Fonts' ) }
 				</Link>
+				<WCDropdown
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<button
+							type="button"
+							aria-expanded={ isOpen }
+							onClick={ onToggle }
+						>
+							{ __( 'Open a popover' ) }
+						</button>
+					) }
+					renderContent={ () => (
+						<Text>
+							{ __(
+								'A popover from @wordpress/components. Switch pages while it is open: it hides with this page.'
+							) }
+						</Text>
+					) }
+				/>
 			</Stack>
 		</Page>
 	);

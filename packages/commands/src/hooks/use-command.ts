@@ -1,7 +1,8 @@
-import { useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 import type { CommandConfig } from '../store/types';
+import { CommandsDisabledContext } from '../commands-disabled-context';
 
 /**
  * Attach a command to the command palette. Used for static commands.
@@ -27,13 +28,15 @@ import type { CommandConfig } from '../store/types';
  */
 export function useCommand( command: CommandConfig ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
+	const isDisabled =
+		useContext( CommandsDisabledContext ) || command.disabled;
 	const currentCallbackRef = useRef( command.callback );
 	useEffect( () => {
 		currentCallbackRef.current = command.callback;
 	}, [ command.callback ] );
 
 	useEffect( () => {
-		if ( command.disabled ) {
+		if ( isDisabled ) {
 			return;
 		}
 		registerCommand( {
@@ -58,7 +61,7 @@ export function useCommand( command: CommandConfig ) {
 		command.context,
 		command.category,
 		command.keywords,
-		command.disabled,
+		isDisabled,
 		registerCommand,
 		unregisterCommand,
 	] );
@@ -100,6 +103,7 @@ export function useCommand( command: CommandConfig ) {
  */
 export function useCommands( commands: CommandConfig[] ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
+	const isScopeDisabled = useContext( CommandsDisabledContext );
 	const currentCallbacksRef = useRef<
 		Record< string, CommandConfig[ 'callback' ] >
 	>( {} );
@@ -116,7 +120,7 @@ export function useCommands( commands: CommandConfig[] ) {
 	}, [ commands ] );
 
 	useEffect( () => {
-		if ( ! commands ) {
+		if ( ! commands || isScopeDisabled ) {
 			return;
 		}
 		commands.forEach( ( command ) => {
@@ -148,5 +152,5 @@ export function useCommands( commands: CommandConfig[] ) {
 				unregisterCommand( command.name );
 			} );
 		};
-	}, [ commands, registerCommand, unregisterCommand ] );
+	}, [ commands, isScopeDisabled, registerCommand, unregisterCommand ] );
 }

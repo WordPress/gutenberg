@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useSyncExternalStore,
 } from '@wordpress/element';
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as keyboardShortcutsPrivateApis } from '@wordpress/keyboard-shortcuts';
 import { unlock } from '../../lock-unlock';
 import { getPageKey } from './page-key';
@@ -18,6 +19,10 @@ interface ShortcutContextValue {
 
 const { ShortcutContext } = unlock( keyboardShortcutsPrivateApis ) as {
 	ShortcutContext: React.Context< ShortcutContextValue >;
+};
+
+const { CommandsDisabledContext } = unlock( commandsPrivateApis ) as {
+	CommandsDisabledContext: React.Context< boolean >;
 };
 
 const PageKeyContext = createContext< string | undefined >( undefined );
@@ -61,8 +66,9 @@ export function usePageVisibility() {
 
 /**
  * Scopes an app to its admin page: `usePageVisibility` reads the page from
- * here, and keyboard shortcuts registered inside only fire while the page is
- * showing.
+ * here, keyboard shortcuts registered inside only fire while the page is
+ * showing, and its commands are only in the command palette while the page
+ * is showing.
  *
  * @param props          Component props.
  * @param props.pageKey  Page the app belongs to. See `getPageKey`.
@@ -75,6 +81,9 @@ export function PageScope( {
 	pageKey: string;
 	children: ReactNode;
 } ) {
+	const isVisible = useSyncExternalStore( subscribe, () =>
+		isPageVisible( pageKey )
+	);
 	const parentShortcuts = useContext( ShortcutContext );
 	const shortcuts = useMemo( () => {
 		const wrappers = new Map< ShortcutCallback, ShortcutCallback >();
@@ -101,7 +110,9 @@ export function PageScope( {
 	return (
 		<PageKeyContext.Provider value={ pageKey }>
 			<ShortcutContext.Provider value={ shortcuts }>
-				{ children }
+				<CommandsDisabledContext.Provider value={ ! isVisible }>
+					{ children }
+				</CommandsDisabledContext.Provider>
 			</ShortcutContext.Provider>
 		</PageKeyContext.Provider>
 	);

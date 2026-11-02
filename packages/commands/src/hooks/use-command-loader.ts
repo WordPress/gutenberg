@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 import type { CommandLoaderConfig, CommandLoaderHook } from '../store/types';
+import { CommandsDisabledContext } from '../commands-disabled-context';
 
 /**
  * Attach a command loader to the command palette. Used for dynamic commands.
@@ -79,6 +80,7 @@ import type { CommandLoaderConfig, CommandLoaderHook } from '../store/types';
 export default function useCommandLoader( loader: CommandLoaderConfig ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
+	const isDisabled = useContext( CommandsDisabledContext ) || loader.disabled;
 	const currentHookRef = useRef( loader.hook );
 	useEffect( () => {
 		currentHookRef.current = loader.hook;
@@ -93,7 +95,7 @@ export default function useCommandLoader( loader: CommandLoaderConfig ) {
 	);
 
 	useEffect( () => {
-		if ( loader.disabled ) {
+		if ( isDisabled ) {
 			return;
 		}
 		registerCommandLoader( {
@@ -110,7 +112,7 @@ export default function useCommandLoader( loader: CommandLoaderConfig ) {
 		hook,
 		loader.context,
 		loader.category,
-		loader.disabled,
+		isDisabled,
 		registerCommandLoader,
 		unregisterCommandLoader,
 	] );

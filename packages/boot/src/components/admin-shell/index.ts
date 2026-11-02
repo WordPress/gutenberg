@@ -50,6 +50,9 @@ export const PAGE_CHANGE_EVENT = 'wp-admin-shell-page-change';
 
 const DEFAULT_MAX_ALIVE_PAGES = 5;
 const PLACEHOLDER_TIMEOUT = 5000;
+// How long preloaded REST responses are used before the page fetches fresh
+// data instead.
+const PRELOAD_MAX_AGE = 30 * 1000;
 
 interface MountedPage {
 	/** Element shown and hidden when switching to and from the page. */
@@ -66,6 +69,7 @@ interface PageMemory {
 
 let isStarted = false;
 let getAlivePages: () => string[] = () => [];
+let updateMaxAlivePages: ( maxAlivePages: number ) => void = () => {};
 
 /**
  * Returns the pages whose apps the admin shell keeps mounted, shown least
@@ -75,6 +79,17 @@ let getAlivePages: () => string[] = () => [];
  */
 export function getAlivePageKeys() {
 	return getAlivePages();
+}
+
+/**
+ * Changes how many pages' apps the admin shell keeps mounted at most,
+ * including the visible one, and unmounts the pages shown least recently if
+ * there are now too many. Does nothing when the shell isn't running.
+ *
+ * @param maxAlivePages Maximum number of mounted pages, at least 1.
+ */
+export function setMaxAlivePages( maxAlivePages: number ) {
+	updateMaxAlivePages( maxAlivePages );
 }
 
 function scheduleIdle( callback: () => void ) {
@@ -159,7 +174,9 @@ export function startAdminShell( {
 	}
 	isStarted = true;
 
-	const maxAlive = Math.max( 1, Math.floor( maxAlivePages ) || 1 );
+	const toLimit = ( value: number ) =>
+		Math.max( 1, Math.floor( value ) || 1 );
+	let maxAlive = toLimit( maxAlivePages );
 	let activePage: AdminShellPage = initialPage;
 
 	const mounted = new Map< string, MountedPage >( [
@@ -171,6 +188,10 @@ export function startAdminShell( {
 	// Mounted pages, shown least recently first.
 	const recency: string[] = [ initialPage.pageKey ];
 	getAlivePages = () => [ ...recency ];
+	updateMaxAlivePages = ( value ) => {
+		maxAlive = toLimit( value );
+		evictPages();
+	};
 	const memory = new Map< string, PageMemory >();
 	const getMemory = ( pageKey: string ) => {
 		let pageMemory = memory.get( pageKey );
@@ -196,47 +217,89 @@ export function startAdminShell( {
 	function warm( page: AdminShellPage ) {
 		let warmup = warmups.get( page.pageKey );
 		if ( ! warmup ) {
-			warmup = Promise.all( [
-				( async () => {
-					await runInitModules( page.initModules );
-					await Promise.all(
-						page.routes
-							.flatMap( ( route ) => [
-								route.route_module,
-								route.content_module,
-							] )
-							.filter( ( id ): id is string => !! id )
-							.map( ( id ) => import( id ) )
-					);
-				} )(),
-				preloadData( page ),
-			] ).then( () => undefined );
+			warmup = ( async () => {
+				await runInitModules( page.initModules );
+				await Promise.all(
+					page.routes
+						.flatMap( ( route ) => [
+							route.route_module,
+							route.content_module,
+						] )
+						.filter( ( id ): id is string => !! id )
+						.map( ( id ) => import( id ) )
+				);
+			} )();
 			warmups.set( page.pageKey, warmup );
 		}
-		return warmup;
+		return Promise.all( [ warmup, preloadData( page ) ] ).then(
+			() => undefined
+		);
 	}
 
+	/*
+	 * REST responses preloaded for pages that aren't mounted yet, by page.
+	 * A response is used once, and only within PRELOAD_MAX_AGE of being
+	 * fetched; after that the page fetches fresh data itself.
+	 */
+	const preloads = new Map<
+		string,
+		{
+			fetchedAt: number;
+			request: Promise< void >;
+			middleware?: Parameters< typeof apiFetch.use >[ 0 ];
+		}
+	>();
+	const isFresh = ( fetchedAt: number ) =>
+		Date.now() - fetchedAt < PRELOAD_MAX_AGE;
+
+	apiFetch.use( ( options, next ) => {
+		const middlewares = [ ...preloads.values() ]
+			.filter( ( preload ) => isFresh( preload.fetchedAt ) )
+			.map( ( preload ) => preload.middleware )
+			.filter( ( middleware ) => !! middleware );
+		const run = middlewares.reduceRight< typeof next >(
+			( nextMiddleware, middleware ) => ( nextOptions ) =>
+				middleware!( nextOptions, nextMiddleware ),
+			next
+		);
+		return run( options );
+	} );
+
 	/**
-	 * Fetches the REST responses the page preloads on its own page load, and
-	 * hands them to `apiFetch`, so the page's first requests don't go to the
-	 * network. A failure only means the page fetches its data itself.
+	 * Fetches the REST responses the page preloads on its own page load, so
+	 * the page's first requests don't go to the network. Reuses a request
+	 * made recently, for example when the link was pointed at just before it
+	 * was clicked. A failure only means the page fetches its data itself.
 	 *
 	 * @param page Page to preload data for.
 	 */
-	async function preloadData( page: AdminShellPage ) {
+	function preloadData( page: AdminShellPage ) {
 		if ( ! page.preloadPath ) {
-			return;
+			return Promise.resolve();
 		}
-		try {
-			const data = await apiFetch< Record< string, unknown > >( {
-				path: page.preloadPath,
+		const existing = preloads.get( page.pageKey );
+		if ( existing && isFresh( existing.fetchedAt ) ) {
+			return existing.request;
+		}
+		const preload: {
+			fetchedAt: number;
+			request: Promise< void >;
+			middleware?: Parameters< typeof apiFetch.use >[ 0 ];
+		} = { fetchedAt: Date.now(), request: Promise.resolve() };
+		preload.request = apiFetch< Record< string, unknown > >( {
+			path: page.preloadPath,
+		} )
+			.then( ( data ) => {
+				if ( data && typeof data === 'object' ) {
+					preload.middleware =
+						apiFetch.createPreloadingMiddleware( data );
+				}
+			} )
+			.catch( () => {
+				// The page loads its data itself.
 			} );
-			if ( data && typeof data === 'object' ) {
-				apiFetch.use( apiFetch.createPreloadingMiddleware( data ) );
-			}
-		} catch {
-			// The page loads its data itself.
-		}
+		preloads.set( page.pageKey, preload );
+		return preload.request;
 	}
 
 	function rememberHeader( pageKey: string ) {

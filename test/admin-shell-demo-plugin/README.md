@@ -6,7 +6,7 @@ The plugin adds a top-level **Shell Demo** menu with two pages:
 
 -   **Notes**: a text field to show that a page keeps its state while you're on another page, plus links to another page's route and to Gutenberg's Fonts page.
 -   **Counter**: a counter, and a second route (`/history`) to show that each page keeps its own route. It also shows a page pausing while hidden (a timer using `usePageVisibility`) and a keyboard shortcut (Shift+Alt+U, or Control+Option+U on a Mac) that only works while the page is showing.
--   **Settings**: a "Pages to keep alive" option, which the plugin passes to the `admin_shell_max_alive_pages` filter, and the list of pages currently in memory. Set it to 2, then open three pages in a row: the first one is unloaded and loses its state, and opening it again boots it again without a page load. The option applies from the next page load.
+-   **Settings**: a "Pages to keep alive" option, which the plugin passes to the `admin_shell_max_alive_pages` filter, and the list of pages currently in memory. Set it to 2, then open three pages in a row: the first one is unloaded and loses its state, and opening it again boots it again without a page load. Saving also passes the new limit to the running shell with `setMaxAlivePages()`, so it applies right away.
 
 ## How it integrates
 

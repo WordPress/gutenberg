@@ -5,6 +5,7 @@ import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
 	type AnyRoute,
+	type AnyRouter,
 } from '@wordpress/route';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -246,6 +247,27 @@ function createPathHistory( pageKey: string ) {
 	return history;
 }
 
+/*
+ * One history per page, reused when the admin shell mounts a page again
+ * after unmounting it. A browser history adds window listeners and wraps
+ * `history.pushState` when it is created, and can't safely undo that while
+ * other pages' histories have wrapped it since, so a new history on every
+ * mount would leak both.
+ */
+const pathHistories = new Map<
+	string,
+	ReturnType< typeof createPathHistory >
+>();
+
+function getPathHistory( pageKey: string ) {
+	let history = pathHistories.get( pageKey );
+	if ( ! history ) {
+		history = createPathHistory( pageKey );
+		pathHistories.set( pageKey, history );
+	}
+	return history;
+}
+
 interface RouterProps {
 	routes: Route[];
 	rootComponent?: ComponentType;
@@ -256,6 +278,52 @@ interface RouterProps {
 	pageKey?: string;
 }
 
+/*
+ * The router of each page, reused when the admin shell mounts the page again
+ * with the same routes. Every router adds a document scroll listener for
+ * scroll restoration that is never removed, and that listener keeps the
+ * router, its routes and its loaded data in memory.
+ */
+const pageRouters = new Map<
+	string,
+	{ routes: Route[]; rootComponent: ComponentType; router: AnyRouter }
+>();
+
+function createPageRouter(
+	pageKey: string,
+	routes: Route[],
+	rootComponent: ComponentType
+) {
+	const history = getPathHistory( pageKey );
+	const routeTree = createRouteTree( routes, rootComponent );
+
+	return createRouter( {
+		history,
+		routeTree,
+		defaultPreload: 'intent',
+		defaultNotFoundComponent: NotFoundComponent,
+		defaultViewTransition: {
+			types: ( {
+				fromLocation,
+			}: {
+				fromLocation?: unknown;
+				toLocation: unknown;
+				pathChanged: boolean;
+				hrefChanged: boolean;
+				hashChanged: boolean;
+			} ) => {
+				// Disable view transition on initial navigation (no previous location)
+				if ( ! fromLocation ) {
+					return false;
+				}
+
+				// Enable with navigation type for subsequent navigations
+				return [ 'navigate' ];
+			},
+		},
+	} );
+}
+
 export default function Router( {
 	routes,
 	rootComponent = Root,
@@ -263,34 +331,25 @@ export default function Router( {
 }: RouterProps ) {
 	const ownPageKey = useMemo( () => pageKey ?? getPageKey(), [ pageKey ] );
 	const router = useMemo( () => {
-		const history = createPathHistory( ownPageKey );
-		const routeTree = createRouteTree( routes, rootComponent );
-
-		return createRouter( {
-			history,
-			routeTree,
-			defaultPreload: 'intent',
-			defaultNotFoundComponent: NotFoundComponent,
-			defaultViewTransition: {
-				types: ( {
-					fromLocation,
-				}: {
-					fromLocation?: unknown;
-					toLocation: unknown;
-					pathChanged: boolean;
-					hrefChanged: boolean;
-					hashChanged: boolean;
-				} ) => {
-					// Disable view transition on initial navigation (no previous location)
-					if ( ! fromLocation ) {
-						return false;
-					}
-
-					// Enable with navigation type for subsequent navigations
-					return [ 'navigate' ];
-				},
-			},
+		const existing = pageRouters.get( ownPageKey );
+		if (
+			existing &&
+			existing.routes === routes &&
+			existing.rootComponent === rootComponent
+		) {
+			return existing.router;
+		}
+		const pageRouter = createPageRouter(
+			ownPageKey,
+			routes,
+			rootComponent
+		);
+		pageRouters.set( ownPageKey, {
+			routes,
+			rootComponent,
+			router: pageRouter,
 		} );
+		return pageRouter;
 	}, [ routes, rootComponent, ownPageKey ] );
 
 	return (

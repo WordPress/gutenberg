@@ -2,6 +2,7 @@ import { Page } from '@wordpress/admin-ui';
 import {
 	getAlivePageKeys,
 	PAGE_CHANGE_EVENT,
+	setMaxAlivePages,
 	usePageVisibility,
 } from '@wordpress/boot';
 import { Button } from '@wordpress/components';
@@ -19,6 +20,7 @@ const OPTION = 'admin_shell_demo_max_alive_pages';
  */
 function useAlivePages() {
 	const [ alivePages, setAlivePages ] = useState( getAlivePageKeys );
+	const refresh = () => setAlivePages( getAlivePageKeys() );
 	useEffect( () => {
 		const onChange = ( event: Event ) =>
 			setAlivePages(
@@ -29,11 +31,11 @@ function useAlivePages() {
 		return () =>
 			document.removeEventListener( PAGE_CHANGE_EVENT, onChange );
 	}, [] );
-	return alivePages;
+	return [ alivePages, refresh ] as const;
 }
 
 function Stage() {
-	const [ maxAlivePages, setMaxAlivePages ] = useEntityProp(
+	const [ maxAlivePages, setOptionValue ] = useEntityProp(
 		'root',
 		'site',
 		OPTION
@@ -44,7 +46,7 @@ function Stage() {
 		[]
 	);
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const alivePages = useAlivePages();
+	const [ alivePages, refreshAlivePages ] = useAlivePages();
 	const isVisible = usePageVisibility();
 
 	return (
@@ -59,13 +61,13 @@ function Stage() {
 				<InputControl
 					label={ __( 'Pages to keep alive' ) }
 					description={ __(
-						'How many pages stay in memory, including the one showing. When you open one more, the page you looked at least recently is unloaded and loses its state, such as an unsaved note. Applies from the next page load.'
+						'How many pages stay in memory, including the one showing. When you open one more, the page you looked at least recently is unloaded and loses its state, such as an unsaved note. Applies as soon as you save.'
 					) }
 					type="number"
 					min={ 1 }
 					value={ String( maxAlivePages ?? '' ) }
 					onChange={ ( event ) =>
-						setMaxAlivePages(
+						setOptionValue(
 							Math.max(
 								1,
 								parseInt( event.target.value, 10 ) || 1
@@ -77,7 +79,12 @@ function Stage() {
 					__next40pxDefaultSize
 					variant="primary"
 					isBusy={ isSaving }
-					onClick={ () => saveEditedEntityRecord( 'root', 'site' ) }
+					onClick={ async () => {
+						await saveEditedEntityRecord( 'root', 'site' );
+						// Apply the new limit to the running shell right away.
+						setMaxAlivePages( Number( maxAlivePages ) );
+						refreshAlivePages();
+					} }
 				>
 					{ __( 'Save' ) }
 				</Button>

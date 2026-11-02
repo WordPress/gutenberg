@@ -8,6 +8,7 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../../../packages/admin-ui",
+		"@wordpress/components": "file:../../../../packages/components",
 		"@wordpress/element": "file:../../../../packages/element",
 		"@wordpress/i18n": "file:../../../../packages/i18n",
 		"@wordpress/ui": "file:../../../../packages/ui"
