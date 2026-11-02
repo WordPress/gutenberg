@@ -101,7 +101,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @param WP_Comment $note A root note or a reply.
 	 * @return bool True if the note's thread is resolved.
 	 */
-	protected function is_in_resolved_thread( $note ): bool {
+	protected function is_thread_resolved( $note ): bool {
 		$thread_root = $note;
 		$visited     = array( (int) $thread_root->comment_ID => true );
 		while ( $thread_root->comment_parent ) {
@@ -446,7 +446,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		$note = get_comment( $comment->comment_parent );
-		if ( $note && $this->is_in_resolved_thread( $note ) ) {
+		if ( $note && $this->is_thread_resolved( $note ) ) {
 			return new WP_Error(
 				'rest_cannot_delete',
 				__( 'A reaction cannot be removed from a resolved note.', 'gutenberg' ),
@@ -705,7 +705,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			 * Resolving a thread approves its root note, and the editor
 			 * disables reactions from then on; hold stale tabs to that too.
 			 */
-			if ( $this->is_in_resolved_thread( $parent_comment ) ) {
+			if ( $this->is_thread_resolved( $parent_comment ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction cannot be added to a resolved note.', 'gutenberg' ),
