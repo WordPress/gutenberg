@@ -207,48 +207,18 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
 		await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
 		await expectStacked( alphaThread, bravoThread );
-	} );
 
-	test( 'pushes the next thread down when a thread grows', async ( {
-		editor,
-		page,
-		blockNoteUtils,
-	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Alpha' },
-			comment: 'Alpha note',
+		await test.step( 'Pushes the next thread down when a thread grows', async () => {
+			const { height: initialHeight } = await alphaThread.boundingBox();
+
+			await blockNoteUtils.addReply( 'A reply that makes it taller' );
+
+			await expect
+				.poll( async () => ( await alphaThread.boundingBox() ).height )
+				.toBeGreaterThan( initialHeight );
+			await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
+			await expectStacked( alphaThread, bravoThread );
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Bravo' },
-			comment: 'Bravo note',
-		} );
-
-		const alphaThread = getThread( page, 'Alpha note' );
-		const bravoThread = getThread( page, 'Bravo note' );
-		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
-		await expectStacked( alphaThread, bravoThread );
-		const { height: initialHeight } = await alphaThread.boundingBox();
-
-		const replyForm = alphaThread.getByRole( 'textbox', {
-			name: 'Reply to',
-		} );
-		await replyForm.click();
-		await replyForm.pressSequentially( 'A reply that makes it taller' );
-		await alphaThread
-			.getByRole( 'button', { name: 'Reply', exact: true } )
-			.click();
-		await expect(
-			alphaThread.getByText( 'A reply that makes it taller' )
-		).toBeVisible();
-
-		await expect
-			.poll( async () => ( await alphaThread.boundingBox() ).height )
-			.toBeGreaterThan( initialHeight );
-		await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
-		await expectStacked( alphaThread, bravoThread );
 	} );
 
 	test( 'follows its block when blocks are reordered', async ( {
@@ -327,7 +297,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	} );
 
-	test( 'follows its block when content above grows', async ( {
+	test( 'follows its block when the layout around it shifts', async ( {
 		editor,
 		page,
 		blockNoteUtils,
@@ -341,59 +311,100 @@ test.describe( 'Block Notes: floating notes', () => {
 			attributes: { content: 'Noted' },
 			comment: 'Following note',
 		} );
+		await addSpacerParagraphs( editor );
 
 		const thread = getThread( page, 'Following note' );
 		const noted = getParagraph( editor, 'Noted' );
-		await expectAligned( thread, noted );
-		const { y: initialTop } = await noted.boundingBox();
+		const getNotedTop = async () => ( await noted.boundingBox() ).y;
 
-		// Grow the block above without changing the block list.
-		await page.evaluate( ( content ) => {
-			const [ first ] = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
-			window.wp.data
-				.dispatch( 'core/block-editor' )
-				.updateBlockAttributes( first.clientId, { content } );
-		}, SPACER_TEXT );
+		await test.step( 'The title grows', async () => {
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+			// Focus the title first: deselecting the block collapses the
+			// thread, which re-measures on its own.
+			await title.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expectAligned( thread, noted );
+			const initialTop = await getNotedTop();
 
-		await expect
-			.poll( async () => ( await noted.boundingBox() ).y )
-			.toBeGreaterThan( initialTop + 50 );
-		await expectAligned( thread, noted );
-	} );
+			// The title sits outside the block list, so the list moves without
+			// resizing. A few lines, so the block stays in the viewport.
+			await title.fill( 'Lorem ipsum dolor sit amet, consectetur' );
 
-	test( 'follows its block when the title grows', async ( {
-		editor,
-		page,
-		blockNoteUtils,
-	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Title note',
+			await expect.poll( getNotedTop ).toBeGreaterThan( initialTop + 50 );
+			await expectAligned( thread, noted );
 		} );
 
-		const thread = getThread( page, 'Title note' );
-		const noted = getParagraph( editor, 'Noted' );
-		const title = editor.canvas.getByRole( 'textbox', {
-			name: 'Add title',
+		await test.step( 'Content above grows', async () => {
+			const initialTop = await getNotedTop();
+
+			// Grow the block above without changing the block list.
+			await page.evaluate( ( content ) => {
+				const [ first ] = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( first.clientId, { content } );
+			}, SPACER_TEXT );
+
+			await expect.poll( getNotedTop ).toBeGreaterThan( initialTop + 50 );
+			await expectAligned( thread, noted );
 		} );
-		// Focus the title first: deselecting the block collapses the thread,
-		// which re-measures on its own.
-		await title.click();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
-		await expectAligned( thread, noted );
-		const { y: initialTop } = await noted.boundingBox();
 
-		// The title sits outside the block list, so the list moves without
-		// resizing. A few lines, so the block stays in the viewport.
-		await title.fill( 'Lorem ipsum dolor sit amet, consectetur' );
+		await test.step( 'An editor notice shifts the canvas', async () => {
+			const notice = page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.getByText( 'Test notice', { exact: true } );
+			const initialTop = await getNotedTop();
 
-		await expect
-			.poll( async () => ( await noted.boundingBox() ).y )
-			.toBeGreaterThan( initialTop + 50 );
-		await expectAligned( thread, noted );
+			// Moves the canvas without resizing anything inside it.
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/notices' )
+					.createNotice( 'warning', 'Test notice', {
+						id: 'floating-notes-notice',
+					} )
+			);
+
+			await expect( notice ).toBeVisible();
+			// A notes column beside the canvas would cut the notice short.
+			const noticeBox = await page
+				.locator( '.notices-inline-notices__notice' )
+				.filter( { hasText: 'Test notice' } )
+				.boundingBox();
+			const canvasBox = await page
+				.locator( 'iframe[name="editor-canvas"]' )
+				.boundingBox();
+			expect(
+				canvasBox.x +
+					canvasBox.width -
+					( noticeBox.x + noticeBox.width )
+			).toBeLessThan( 40 );
+			await expect.poll( getNotedTop ).toBeGreaterThan( initialTop + 20 );
+			await expectAligned( thread, noted );
+
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/notices' )
+					.removeNotice( 'floating-notes-notice' )
+			);
+
+			await expect( notice ).toBeHidden();
+			await expectAligned( thread, noted );
+		} );
+
+		await test.step( 'The canvas scrolls', async () => {
+			await scrollCanvasTo( editor, 0 );
+			await expectAligned( thread, noted );
+			const initialTop = await getNotedTop();
+
+			await scrollCanvasTo( editor, 150 );
+
+			await expect.poll( getNotedTop ).toBeLessThan( initialTop - 100 );
+			await expectAligned( thread, noted );
+		} );
 	} );
 
 	test( 'anchors to a closed Details block', async ( {
@@ -431,88 +442,6 @@ test.describe( 'Block Notes: floating notes', () => {
 		await summary.click();
 		await expect( details ).toHaveAttribute( 'open' );
 		await expectAligned( thread, inside );
-	} );
-
-	test( 'follows its block when an editor notice shifts the canvas', async ( {
-		editor,
-		page,
-		blockNoteUtils,
-	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Notice note',
-		} );
-
-		const thread = getThread( page, 'Notice note' );
-		const noted = getParagraph( editor, 'Noted' );
-		const notice = page
-			.getByRole( 'region', { name: 'Editor content' } )
-			.getByText( 'Test notice', { exact: true } );
-		await expectAligned( thread, noted );
-		const { y: initialTop } = await noted.boundingBox();
-
-		// Moves the canvas without resizing anything inside it.
-		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/notices' )
-				.createNotice( 'warning', 'Test notice', {
-					id: 'floating-notes-notice',
-				} )
-		);
-
-		await expect( notice ).toBeVisible();
-		// A notes column beside the canvas would cut the notice short.
-		const noticeBox = await page
-			.locator( '.notices-inline-notices__notice' )
-			.filter( { hasText: 'Test notice' } )
-			.boundingBox();
-		const canvasBox = await page
-			.locator( 'iframe[name="editor-canvas"]' )
-			.boundingBox();
-		expect(
-			canvasBox.x + canvasBox.width - ( noticeBox.x + noticeBox.width )
-		).toBeLessThan( 40 );
-		await expect
-			.poll( async () => ( await noted.boundingBox() ).y )
-			.toBeGreaterThan( initialTop + 20 );
-		await expectAligned( thread, noted );
-
-		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/notices' )
-				.removeNotice( 'floating-notes-notice' )
-		);
-
-		await expect( notice ).toBeHidden();
-		await expectAligned( thread, noted );
-	} );
-
-	test( 'keeps threads aligned while the canvas scrolls', async ( {
-		editor,
-		page,
-		blockNoteUtils,
-	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Noted' },
-			comment: 'Scrolling note',
-		} );
-		await addSpacerParagraphs( editor );
-
-		const thread = getThread( page, 'Scrolling note' );
-		const noted = getParagraph( editor, 'Noted' );
-
-		await scrollCanvasTo( editor, 0 );
-		await expectAligned( thread, noted );
-		const { y: initialTop } = await noted.boundingBox();
-
-		await scrollCanvasTo( editor, 150 );
-
-		await expect
-			.poll( async () => ( await noted.boundingBox() ).y )
-			.toBeLessThan( initialTop - 100 );
-		await expectAligned( thread, noted );
 	} );
 
 	// Scrolling a selected thread into view scrolls the floating panel, which
@@ -789,6 +718,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		}
 
 		test( 'caps the thread height and keeps the reply form reachable', async ( {
+			editor,
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -809,23 +739,24 @@ test.describe( 'Block Notes: floating notes', () => {
 			} );
 			await replyForm.scrollIntoViewIfNeeded();
 			await expect( replyForm ).toBeInViewport();
-		} );
 
-		test( 'scrolls the selected thread into view', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await addTallThread( { blockNoteUtils } );
+			await test.step( 'Scrolls the selected thread into view', async () => {
+				// Deselect, then select the note again through its block.
+				await blockNoteUtils.deselect();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
-			// Deselect, then select the note again through its block.
-			const thread = getThread( page, 'Tall note' );
-			await blockNoteUtils.deselect();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
-			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-			await expect( thread ).toBeInViewport( { ratio: FULLY_VISIBLE } );
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( thread ).toBeInViewport( {
+					ratio: FULLY_VISIBLE,
+				} );
+			} );
 		} );
 
 		test( 'scrolls the thread before the canvas', async ( {
