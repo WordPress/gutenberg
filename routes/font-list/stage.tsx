@@ -10,7 +10,7 @@ import type { FontCollection as FontCollectionType } from '@wordpress/core-data'
 import { unlock } from './lock-unlock';
 import './style.scss';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function FontLibraryPage() {
@@ -68,21 +68,21 @@ function FontLibraryPage() {
 	return (
 		<Page title={ __( 'Fonts' ) } className="font-library-page">
 			<div className="font-library-page__content">
-				<Tabs
+				<WCTabs
 					selectedTabId={ activeTab }
 					onSelect={ ( tabId: string ) => setActiveTab( tabId ) }
 				>
 					<div className="font-library-page__tablist">
-						<Tabs.TabList>
+						<WCTabs.TabList>
 							{ tabs.map( ( { id, title } ) => (
-								<Tabs.Tab key={ id } tabId={ id }>
+								<WCTabs.Tab key={ id } tabId={ id }>
 									{ title }
-								</Tabs.Tab>
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
+						</WCTabs.TabList>
 					</div>
 					{ tabs.map( ( { id } ) => (
-						<Tabs.TabPanel
+						<WCTabs.TabPanel
 							key={ id }
 							tabId={ id }
 							focusable={ false }
@@ -94,9 +94,9 @@ function FontLibraryPage() {
 								onChange={ setUser }
 								activeTab={ id }
 							/>
-						</Tabs.TabPanel>
+						</WCTabs.TabPanel>
 					) ) }
-				</Tabs>
+				</WCTabs>
 			</div>
 		</Page>
 	);
