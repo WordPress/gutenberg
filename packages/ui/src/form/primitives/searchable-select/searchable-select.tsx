@@ -1,3 +1,4 @@
+import { useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
@@ -5,6 +6,7 @@ import * as Combobox from '../combobox';
 import type { ComboboxCollectionProps } from '../combobox/types';
 import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
+import { Trigger } from './trigger';
 import {
 	findCreatableItems,
 	hasGroupedItems,
@@ -14,6 +16,8 @@ import {
 	type ItemGroup,
 	type SearchableSelectProps,
 } from './types';
+
+const DEFAULT_TRIGGER = <Trigger />;
 
 function warnSearchableSelectProps(
 	items: Item[] | ItemGroup[] | undefined,
@@ -72,7 +76,7 @@ export const SearchableSelect = forwardRef<
 		statusContent,
 		items,
 		placeholder,
-		triggerContent,
+		trigger,
 		searchPlaceholder = __( 'Search' ),
 		popupWidth,
 		'aria-label': ariaLabel,
@@ -84,21 +88,24 @@ export const SearchableSelect = forwardRef<
 ) {
 	warnSearchableSelectProps( items, children );
 
+	const triggerElement = useRender( {
+		render: trigger ?? DEFAULT_TRIGGER,
+		ref,
+		props: {
+			placeholder,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledby,
+			'aria-describedby': ariaDescribedby,
+		},
+	} );
+
 	return (
 		<Combobox.Root< Item, false >
 			items={ items }
 			{ ...restProps }
 			grid={ undefined }
 		>
-			<Combobox.Trigger
-				ref={ ref }
-				placeholder={ placeholder }
-				aria-label={ ariaLabel }
-				aria-labelledby={ ariaLabelledby }
-				aria-describedby={ ariaDescribedby }
-			>
-				{ triggerContent }
-			</Combobox.Trigger>
+			{ triggerElement }
 
 			<Combobox.Popup
 				width={ popupWidth }

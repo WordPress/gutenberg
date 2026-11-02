@@ -39,7 +39,7 @@ jobs:
     # dangerous triggers, credential leaks, and sophisticated security vulnerabilities.
     zizmor:
         name: Run Zizmor
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             security-events: write
             actions: read

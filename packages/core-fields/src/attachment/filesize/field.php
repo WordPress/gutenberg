@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'File size', 'gutenberg' ),
+	'label'         => __( 'File size' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 	'readOnly'      => true,

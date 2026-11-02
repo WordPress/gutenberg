@@ -11,6 +11,10 @@ import { unlock } from '../../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
+// The default tag name is stored as an empty string, but the select treats an
+// empty value as no selection and shows its placeholder.
+const DEFAULT_TAG_NAME = '__default';
+
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
@@ -70,8 +74,12 @@ export function TemplatePartAdvancedControls( {
 				</>
 			) }
 			<HTMLElementControl
-				tagName={ tagName || '' }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+				tagName={ tagName || DEFAULT_TAG_NAME }
+				onChange={ ( value ) =>
+					setAttributes( {
+						tagName: value === DEFAULT_TAG_NAME ? '' : value,
+					} )
+				}
 				clientId={ clientId }
 				options={ [
 					{
@@ -80,7 +88,7 @@ export function TemplatePartAdvancedControls( {
 							__( 'Default based on area (%s)' ),
 							`<${ defaultWrapper }>`
 						),
-						value: '',
+						value: DEFAULT_TAG_NAME,
 					},
 					{ label: '<header>', value: 'header' },
 					{ label: '<main>', value: 'main' },
