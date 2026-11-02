@@ -98,11 +98,11 @@ export function getResetLayout(
  * Returns the type of a layout, resolving a legacy constrained layout that
  * has no `type` to `constrained`.
  *
- * @param { Object|undefined } layout Layout values.
+ * @param layout Layout values.
  *
- * @return { string } Layout type.
+ * @return Layout type.
  */
-function getLayoutTypeName( layout ) {
+function getLayoutTypeName( layout?: Layout ): string {
 	return layout?.type ?? normalizeLegacyLayout( layout )?.type ?? 'default';
 }
 
