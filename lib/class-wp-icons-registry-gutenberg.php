@@ -202,8 +202,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Builds the allowed attribute list for wp_kses() from attribute names.
 	 *
-	 * @param non-empty-string ...$attribute_names Attribute names to allow.
-	 * @return array<non-empty-string, true> Attribute names mapped to true.
+	 * @param non-falsy-string ...$attribute_names Attribute names to allow.
+	 * @return array<non-falsy-string, true> Attribute names mapped to true.
 	 */
 	private function get_allowed_attribute_list( ...$attribute_names ): array {
 		return array_fill_keys( $attribute_names, true );
@@ -227,7 +227,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
 
-		/**
+		/*
 		 * ARIA and accessibility attributes. wp_kses() does not support an
 		 * `aria-*` wildcard, so every ARIA state and property is listed
 		 * explicitly. The list mirrors the WAI-ARIA states and properties.
@@ -331,7 +331,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			'visibility',
 		);
 
-		/**
+		/*
 		 * Allowed tags for wp_kses(). WP_HTML_Processor::normalize() with
 		 * constraints (similar structure to this array) is proposed to improve
 		 * HTML/SVG sanitization in the future.
@@ -835,9 +835,11 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 					'viewbox',
 				)
 			),
-			// Animation elements. `<animate>` and `<set>` are excluded: their
-			// `attributeName` targets any attribute at runtime, letting them
-			// replace a value wp_kses() already validated, such as `href`.
+			/*
+			 * Animation elements. `<animate>` and `<set>` are excluded: their
+			 * `attributeName` targets any attribute at runtime, letting them
+			 * replace a value wp_kses() already validated, such as `href`.
+			 */
 			'animatemotion'       => array_merge(
 				$core_attributes,
 				$this->get_allowed_attribute_list(
@@ -894,31 +896,41 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return '';
 		}
 
-		// Find the first SVG root, ignoring surrounding content. The namespace
-		// check rejects a foreign-namespaced `<svg>`, such as in `<math><svg>`.
+		/*
+		 * Find the first SVG root, ignoring surrounding content. The namespace
+		 * check rejects a foreign-namespaced `<svg>`, such as in `<math><svg>`.
+		 */
+		// @phpstan-ignore argument.type (The core docblock accepts a string query, but the generated stub drops `string` when converting the hash notation to an array shape.)
 		if ( ! $processor->next_tag( 'SVG' ) || 'svg' !== $processor->get_namespace() ) {
 			return '';
 		}
 
-		// A self-closing `<svg />` has no descendants and no closing tag. Scanning
-		// past it would swallow the next sibling and hide it from the check below.
+		/*
+		 * A self-closing `<svg />` has no descendants and no closing tag. Scanning
+		 * past it would swallow the next sibling and hide it from the check below.
+		 */
 		$svg = $processor->serialize_token();
 		if ( $processor->expects_closer() ) {
 			$depth = $processor->get_current_depth();
 			while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
 				$svg .= $processor->serialize_token();
 			}
-			// An early stop inside an SVG means truncated input, not unsupported
-			// markup. Reject it: the parser can synthesize closing tags that were
-			// never written, so no valid document remains to trust.
+			/*
+			 * An early stop inside an SVG means truncated input, not unsupported
+			 * markup. Reject it: the parser can synthesize closing tags that were
+			 * never written, so no valid document remains to trust.
+			 */
 			if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
 				return '';
 			}
 			$svg .= '</svg>';
 		}
 
-		// Reject more than one top-level SVG. Nested SVGs were extracted above,
-		// so only sibling roots remain to be found.
+		/*
+		 * Reject more than one top-level SVG. Nested SVGs were extracted above,
+		 * so only sibling roots remain to be found.
+		 */
+		// @phpstan-ignore argument.type (The core docblock accepts a string query, but the generated stub drops `string` when converting the hash notation to an array shape.)
 		while ( $processor->next_tag( 'SVG' ) ) {
 			if ( 'svg' === $processor->get_namespace() ) {
 				return '';

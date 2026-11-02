@@ -494,8 +494,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @param string $expected The expected sanitized output.
 	 */
 	public function test_sanitize_inline_svg( string $input, string $expected ) {
-		$sanitized = $this->sanitize_inline_svg( $input );
-		$this->assertSame( $expected, $sanitized );
+		$this->assertEqualHTML( $expected, $this->sanitize_inline_svg( $input ) );
 	}
 
 	/**
@@ -517,6 +516,20 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$xlink = is_wp_version_compatible( '7.1' )
 			? ' xmlns:xlink="http://www.w3.org/1999/xlink"'
 			: '';
+
+		/*
+		 * WordPress 7.2 reimplements wp_kses() with the HTML Tag Processor and
+		 * rejects the whole SVG when it contains an HTML integration point, such
+		 * as `<p>` inside `<foreignObject>`. Earlier versions strip the tags and
+		 * keep their text content.
+		 *
+		 * @link https://core.trac.wordpress.org/changeset/64233
+		 *
+		 * TODO: Remove this conditional once WordPress 7.1 support is dropped.
+		 */
+		$html_inside_foreign_object = is_wp_version_compatible( '7.2' )
+			? ''
+			: '<svg xmlns="http://www.w3.org/2000/svg">paragraph contentalert(1)<path d="M0 0h24v24H0z" /></svg>';
 
 		return array(
 			// Root selection: exactly one SVG element in the SVG namespace.
@@ -598,9 +611,9 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'input'    => '<svg xmlns="http://www.w3.org/2000/svg"><p>paragraph content</p><path d="M0 0h24v24H0z" /><div>div content</div></svg>',
 				'expected' => '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
 			),
-			'strips foreignObject but keeps text content'  => array(
+			'rejects html inside foreignObject'            => array(
 				'input'    => '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><p>paragraph content</p><script>alert(1)</script></foreignObject><path d="M0 0h24v24H0z" /></svg>',
-				'expected' => '<svg xmlns="http://www.w3.org/2000/svg">paragraph contentalert(1)<path d="M0 0h24v24H0z" /></svg>',
+				'expected' => $html_inside_foreign_object,
 			),
 			'strips script tags'                           => array(
 				'input'    => '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><path d="M0 0h24v24H0z" /></svg>',
