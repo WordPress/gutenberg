@@ -654,7 +654,7 @@ export function switchToBlockType(
 		return applyFilters(
 			'blocks.switchToBlockType.transformedBlock',
 			result,
-			blocksArray,
+			blocks,
 			index,
 			results
 		);
