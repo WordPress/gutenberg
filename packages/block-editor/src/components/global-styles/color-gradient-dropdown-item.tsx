@@ -4,6 +4,7 @@ import {
 	ColorIndicator,
 	Dropdown,
 	Button,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -11,12 +12,6 @@ import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
 import { Stack, Tabs } from '@wordpress/ui';
 import type { ReactNode } from 'react';
 import ColorGradientControl from '../colors-gradients/control';
-import {
-	getInheritanceProps,
-	InheritanceResetButton,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import { useToolsPanelItemPopoverProps } from './utils';
 import type { ColorGradientOptions } from '../colors-gradients/types';
 import type {
@@ -210,26 +205,13 @@ export default function ColorGradientDropdownItem( {
 	panelId,
 	contrastWarning,
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
-	isPlaceholder = false,
-	hasInheritedValue = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: ColorGradientDropdownItemProps ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
 	const colorGradientDropdownButtonRef =
 		useRef< HTMLButtonElement >( undefined );
-	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
-	// A local override exists when the user has set a value that shadows an
-	// inherited one — only then do we offer the reset-to-inherited / push
-	// actions and the override label indicator.
-	const hasLocalOverride =
-		showInheritanceLabelIndicators && hasValue() && hasInheritedValue;
-	const inheritanceProps = showInheritanceLabelIndicators
-		? getInheritanceProps( isPlaceholder, hasLocalOverride, itemClassName )
-		: { className: itemClassName };
 	return (
-		<InheritanceToolsPanelItem
-			{ ...inheritanceProps }
-			showLocalOverrideActionsInLabel={ false }
+		<ToolsPanelItem
+			className={ clsx( 'block-editor-color-gradient-item', className ) }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -261,34 +243,22 @@ export default function ColorGradientDropdownItem( {
 									label={ label }
 								/>
 							</Button>
-							{ hasValue() &&
-								( hasLocalOverride ? (
-									<InheritanceResetButton
-										className="block-editor-panel-color-gradient-settings__reset"
-										onResetToInherited={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) : (
-									<Button
-										__next40pxDefaultSize
-										label={ __( 'Reset' ) }
-										className="block-editor-panel-color-gradient-settings__reset"
-										size="small"
-										icon={ resetIcon }
-										onClick={ () => {
-											resetValue();
-											if ( isOpen ) {
-												onToggle();
-											}
-											colorGradientDropdownButtonRef.current?.focus();
-										} }
-									/>
-								) ) }
+							{ hasValue() && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
 							{ contrastWarning && (
 								// An icon-only warning that stays visible while a
 								// contrast warning is in effect. It is not a menu;
@@ -318,6 +288,6 @@ export default function ColorGradientDropdownItem( {
 					/>
 				) }
 			/>
-		</InheritanceToolsPanelItem>
+		</ToolsPanelItem>
 	);
 }
