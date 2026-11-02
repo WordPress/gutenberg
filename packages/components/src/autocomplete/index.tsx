@@ -331,6 +331,7 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
+				onHover={ ( index ) => dispatch( { type: 'SELECT', index } ) }
 				contentRef={ contentRef }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>

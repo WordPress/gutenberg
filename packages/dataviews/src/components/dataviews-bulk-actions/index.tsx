@@ -17,6 +17,7 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import getActionLabel from '../../utils/get-action-label';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -143,8 +144,7 @@ function ActionTrigger< Item >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -191,9 +191,7 @@ function ActionButton< Item >( {
 				disabled={ !! action.disabled || isBusy }
 			>
 				<Menu.ItemLabel>
-					{ typeof action.label === 'string'
-						? action.label
-						: action.label( selectedEligibleItems ) }
+					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }
 				</Menu.ItemLabel>
 			</Menu.Item>
 		);
