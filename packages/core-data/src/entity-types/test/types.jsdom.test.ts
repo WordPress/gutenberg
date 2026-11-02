@@ -35,6 +35,7 @@ import type {
 } from '../index';
 import type { Attachment } from '../attachment';
 import type { Comment, CommentStatus } from '../comment';
+import type { WpFontFamily } from '../font-family';
 import type { GlobalStyles } from '../global-styles';
 import type { CollectionFontFamily, FontCollection } from '../font-collection';
 import type { Block } from '../block';
@@ -204,6 +205,25 @@ describe( 'Entity record types', () => {
 				typeof widgetType,
 				WidgetType< 'edit' > | null
 			>;
+		};
+	} );
+
+	it( 'font families follow the REST schema', () => {
+		() => {
+			const { records: families } = useEntityRecords(
+				'postType',
+				'wp_font_family',
+				{ _embed: true, per_page: -1 }
+			);
+			true satisfies Expect<
+				typeof families,
+				WpFontFamily< 'edit' >[] | null
+			>;
+			families?.[ 0 ].id satisfies number | undefined;
+			families?.[ 0 ].font_family_settings.slug satisfies
+				string | undefined;
+			// @ts-expect-error -- the slug lives in `font_family_settings`.
+			families?.[ 0 ].slug;
 		};
 	} );
 

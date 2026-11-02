@@ -1,9 +1,4 @@
-import type {
-	Context,
-	ContextualField,
-	RenderedText,
-	OmitNevers,
-} from './helpers';
+import type { Context, ContextualField, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -15,17 +10,18 @@ declare module './base-entity-records' {
 			/**
 			 * Unique identifier for the font family.
 			 */
-			id: number | string;
+			id: number;
 			/**
-			 * An alphanumeric identifier for the font family unique to its type.
+			 * Version of the theme.json schema used for the typography settings.
 			 */
-			slug: string;
+			theme_json_version: number;
 			/**
-			 * The name of the font family (rendered).
+			 * The IDs of the child font faces in the font family.
 			 */
-			name: RenderedText< C >;
+			font_faces: number[];
 			/**
-			 * Font family settings as a JSON object (camelCase properties).
+			 * Font family settings as a JSON object (camelCase properties). The
+			 * family's name and slug live here.
 			 */
 			font_family_settings: FontFamily;
 			/**
