@@ -18,9 +18,10 @@ export { dsTokenFallbacks };
  * use it.
  *
  * @param {import('postcss').AcceptedPlugin[]} plugins Plugins that run before `postcss-modules`.
+ * @param {string}                             rootDir Directory that file paths are hashed relative to.
  * @return {(name: string, filename: string, css: string) => string} Class name generator.
  */
-function createScopedNameGenerator( plugins ) {
+function createScopedNameGenerator( plugins, rootDir ) {
 	const processor = postcss( plugins );
 	/** @type {Map<string, string>} */
 	const processedSources = new Map();
@@ -35,7 +36,7 @@ function createScopedNameGenerator( plugins ) {
 		// Hash a relative path so that names do not depend on the checkout location.
 		const hash = createHash( 'sha1' )
 			.update(
-				path.relative( process.cwd(), filename ).replaceAll( '\\', '/' )
+				path.relative( rootDir, filename ).replaceAll( '\\', '/' )
 			)
 			.update( '\0' )
 			.update( processedCss )
@@ -62,12 +63,13 @@ function createScopedNameGenerator( plugins ) {
  * @param {Object}  options
  * @param {boolean} [options.cssModules=false] Whether to scope class names as CSS Modules.
  * @param {boolean} [options.minify=true]      Whether to minify the CSS.
+ * @param {string}  [options.rootDir]          The repository root, which scoped class names depend on. Defaults to the current directory.
  * @return {Promise<{css: string, classNames: Record<string, string>|null}>} Compiled CSS, and the local to scoped class name map when `cssModules` is set.
  */
 export async function compileCss(
 	cssText,
 	filePath,
-	{ cssModules = false, minify = true } = {}
+	{ cssModules = false, minify = true, rootDir = process.cwd() } = {}
 ) {
 	/** @type {Record<string, string>|null} */
 	let classNames = null;
@@ -77,7 +79,10 @@ export async function compileCss(
 	if ( cssModules ) {
 		plugins.push(
 			postcssModules( {
-				generateScopedName: createScopedNameGenerator( plugins ),
+				generateScopedName: createScopedNameGenerator(
+					plugins,
+					rootDir
+				),
 				getJSON: ( _, json ) => {
 					classNames = json;
 				},
