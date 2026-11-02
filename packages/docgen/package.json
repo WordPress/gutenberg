@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "2.57.0",
+	"version": "3.0.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,7 +33,8 @@
 		"docgen": "./bin/cli.js"
 	},
 	"dependencies": {
-		"@babel/core": "^7.25.7",
+		"@babel/parser": "^7.28.6",
+		"@babel/types": "^7.29.7",
 		"comment-parser": "^1.1.1",
 		"mdast-util-inject": "^1.1.0",
 		"optionator": "^0.8.2",
@@ -42,7 +43,6 @@
 		"unified": "^7.1.0"
 	},
 	"devDependencies": {
-		"@types/babel__core": "^7.20.5",
 		"vitest": "^5.0.3"
 	},
 	"publishConfig": {

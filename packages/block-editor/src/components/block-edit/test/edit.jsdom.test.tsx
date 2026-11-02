@@ -7,7 +7,9 @@ import {
 	unregisterBlockBindingsSource,
 	unregisterBlockType,
 	getBlockTypes,
+	store as blocksStore,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { StrictMode, useContext } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import Edit from '../edit';
@@ -18,6 +20,7 @@ import {
 	getBoundAttributesForCopy,
 } from '../../provider/block-refs-provider';
 import { BlockEditContextProvider, isPreviewModeKey } from '../context';
+import { unlock } from '../../../lock-unlock';
 
 const noop = () => null;
 
@@ -82,6 +85,13 @@ describe( 'Edit', () => {
 			blockContext?: Record< string, unknown >;
 		} ) {
 			const blockRefs = useContext( BlockRefs );
+			const blockBindingsSources = useSelect(
+				( select ) =>
+					unlock(
+						select( blocksStore )
+					).getAllBlockBindingsSources(),
+				[]
+			);
 			return (
 				<BlockRefs.Provider
 					value={ {
@@ -90,7 +100,7 @@ describe( 'Edit', () => {
 					} }
 				>
 					<PrivateBlockContext.Provider
-						value={ { bindableAttributes } }
+						value={ { bindableAttributes, blockBindingsSources } }
 					>
 						<BlockEditContextProvider
 							value={ {

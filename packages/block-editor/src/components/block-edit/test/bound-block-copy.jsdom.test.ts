@@ -92,14 +92,24 @@ describe( 'copying a rendered bound block', () => {
 	} );
 
 	function BoundBlock( { clientId }: { clientId: string } ) {
-		const attributes = useSelect(
-			( select ) =>
-				select( blockEditorStore ).getBlockAttributes( clientId ),
+		const { attributes, blockBindingsSources } = useSelect(
+			( select ) => ( {
+				attributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				blockBindingsSources: unlock(
+					select( blocksStore )
+				).getAllBlockBindingsSources(),
+			} ),
 			[ clientId ]
 		);
 		return createElement(
 			PrivateBlockContext.Provider,
-			{ value: { bindableAttributes: [ 'content' ] } },
+			{
+				value: {
+					bindableAttributes: [ 'content' ],
+					blockBindingsSources,
+				},
+			},
 			createElement( Edit, {
 				name: blockName,
 				clientId,

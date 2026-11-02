@@ -2902,6 +2902,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-border-radius-xl',
 				],
 				groups: {},
+				$description:
+					'Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.',
 			},
 			width: {
 				tokens: [
@@ -2912,6 +2914,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-border-width-focus',
 				],
 				groups: {},
+				$description:
+					'Thickness of borders, dividers, and focus rings.',
 			},
 		},
 	},
@@ -3099,6 +3103,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-dimension-padding-3xl',
 				],
 				groups: {},
+				$description:
+					'Space between the edge of a container and its content.',
 			},
 			gap: {
 				tokens: [
@@ -3111,6 +3117,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-dimension-gap-3xl',
 				],
 				groups: {},
+				$description:
+					'Space between sibling elements in a flex or grid layout.',
 			},
 			size: {
 				tokens: [
@@ -3124,6 +3132,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-dimension-size-lg',
 				],
 				groups: {},
+				$description:
+					'Width and height of controls, icons, and markers.',
 			},
 			'surface-width': {
 				tokens: [
@@ -3135,6 +3145,8 @@ export const groups = /** @type {const} */ ( {
 					'--wpds-dimension-surface-width-2xl',
 				],
 				groups: {},
+				$description:
+					'Widths for surfaces such as popovers, dialogs, and panels.',
 			},
 		},
 	},

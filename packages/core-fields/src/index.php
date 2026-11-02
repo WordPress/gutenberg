@@ -120,6 +120,21 @@ function wp_register_core_field_collections() {
 	// wp_block: unregister unwanted default fields, and register its own.
 	wp_unregister_entity_fields( 'postType', 'wp_block', array( 'date', 'excerpt', 'password', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_entity_field_collection( __DIR__ . '/wp_block' );
+	// Patterns are sorted client-side, where the author's ID isn't a useful
+	// order, like the template authors.
+	if ( post_type_supports( 'wp_block', 'author' ) ) {
+		wp_update_entity_fields(
+			'core',
+			'postType',
+			'wp_block',
+			array(
+				array(
+					'id'            => 'author',
+					'enableSorting' => false,
+				),
+			)
+		);
+	}
 
 	// attachment: unregister all default fields, and register its own.
 	wp_unregister_entity_fields( 'postType', 'attachment' );

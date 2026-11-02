@@ -35,7 +35,9 @@ import type { BlockAttributes } from '../../../store/types';
 
 type ClipboardContext = {
 	registry: ReturnType< typeof useRegistry >;
-	attributesForCopy: ContextType< typeof BlockRefs >[ 'attributesForCopy' ];
+	attributesForCopy: NonNullable<
+		ContextType< typeof BlockRefs >[ 'attributesForCopy' ]
+	>;
 };
 
 type ClipboardSurfaceProps = {
@@ -79,18 +81,22 @@ function ClipboardSurface( {
 	const registry = useRegistry();
 	const { attributesForCopy } = useContext( BlockRefs );
 	useLayoutEffect( () => {
-		onReady( { registry, attributesForCopy } );
+		onReady( { registry, attributesForCopy: attributesForCopy! } );
 	}, [ registry, attributesForCopy, onReady ] );
 	return createElement( Surface, { focusedClientId } );
 }
 
-const ClipboardProvider = withRegistryProvider(
-	( props: ClipboardSurfaceProps ) =>
-		createElement(
-			BlockRefsProvider,
-			null,
-			createElement( ClipboardSurface, props )
-		)
+// The registry wrapper forwards the surface props in addition to its own props.
+const ClipboardProvider = (
+	withRegistryProvider as unknown as (
+		component: ComponentType< ClipboardSurfaceProps >
+	) => ComponentType< ClipboardSurfaceProps >
+ )( ( props: ClipboardSurfaceProps ) =>
+	createElement(
+		BlockRefsProvider,
+		null,
+		createElement( ClipboardSurface, props )
+	)
 );
 
 function mountClipboard(
@@ -485,8 +491,8 @@ describe.each< [ string, ClipboardSurfaceProps[ 'Surface' ] ] >( [
 				} else if ( snapshotStatus === 'duplicate' ) {
 					const instances = attributesForCopy.get(
 						boundBlock.clientId
-					);
-					instances.set( {}, instances.values().next().value );
+					)!;
+					instances.set( {}, instances.values().next().value! );
 				} else {
 					act( () => {
 						registry

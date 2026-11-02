@@ -81,15 +81,16 @@ test.describe( 'Preload', () => {
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				'GET /wp/v2/entity-actions?kind=postType&name=page',
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
+				'GET /wp/v2/templates?context=edit&per_page=100&post_type=page',
 				'GET /wp/v2/types/page?context=edit',
-				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',
+				'GET /wp/v2/users?context=view&include%5B0%5D=1&who=authors',
 				'GET /wp/v2/view-config?kind=postType&name=page',
+				'GET /wp/v2/view-config?kind=postType&name=page&_fields=form',
 				'OPTIONS /wp/v2/settings',
 				'OPTIONS /wp/v2/templates',
 				'POST /wp/v2/users/me',

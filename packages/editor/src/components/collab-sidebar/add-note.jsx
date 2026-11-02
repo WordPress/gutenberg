@@ -10,23 +10,18 @@ import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
 import { focusNoteThread, hasFocusWithin } from './utils';
-import { useNoteDraft } from './hooks';
+import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( {
-	clientId,
-	onSubmit,
-	onDiscard,
-	sidebarRef,
-	floating,
-} ) {
+export function AddNote( { clientId, sidebarRef, floating } ) {
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { onCreate, onDiscard } = useNoteActions();
 	const isSubmittingRef = useRef( false );
 	const { initialValue, setDraft, hasDraft } = useNoteDraft( clientId );
 
@@ -61,7 +56,7 @@ export function AddNote( {
 		 */
 		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
 			onDiscard( clientId );
-			toggleBlockSpotlight( clientId, false );
+			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
 	} );
@@ -71,7 +66,7 @@ export function AddNote( {
 		onDiscard( clientId );
 		selectNote( undefined );
 		blockElement?.focus();
-		toggleBlockSpotlight( clientId, false );
+		toggleBlockHighlight( clientId, false );
 	};
 
 	return (
@@ -94,7 +89,7 @@ export function AddNote( {
 							 * save fails (it surfaces its own error notice);
 							 * keep the form open so the draft isn't lost.
 							 */
-							const savedRecord = await onSubmit( {
+							const savedRecord = await onCreate( {
 								content: inputComment,
 							} );
 							if ( savedRecord ) {

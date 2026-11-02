@@ -90,7 +90,7 @@ export function getCSSWideKeyword( value: CSSProperties[ 'color' ] ) {
 							: 0xfffd
 					);
 				}
-				return character ?? ''; // Emotion removed comments before parsing values.
+				return character ?? ''; // Remove CSS comments before matching keywords.
 			}
 		)
 		.replace( /^[ \t\n\r\f]+|[ \t\n\r\f]+$/g, '' )

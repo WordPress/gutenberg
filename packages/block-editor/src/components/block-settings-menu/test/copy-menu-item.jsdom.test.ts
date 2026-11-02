@@ -43,9 +43,9 @@ describe( 'CopyMenuItem', () => {
 		writeText: Mock< () => Promise< void > >;
 	};
 	let block: Block< BlockAttributes >;
-	let attributesForCopy: ContextType<
-		typeof BlockRefs
-	>[ 'attributesForCopy' ];
+	let attributesForCopy: NonNullable<
+		ContextType< typeof BlockRefs >[ 'attributesForCopy' ]
+	>;
 
 	beforeEach( () => {
 		vi.clearAllMocks();
@@ -159,7 +159,7 @@ describe( 'CopyMenuItem', () => {
 				BlockRefs.Provider,
 				{
 					value: {
-						refsMap: observableMap(),
+						refsMap: observableMap< string, Element | null >(),
 						eventHandlers: new Map(),
 						attributesForCopy,
 					},
