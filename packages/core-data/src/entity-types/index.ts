@@ -177,6 +177,7 @@ export interface RootEntityRecordTypes< C extends Context > {
 	iconCollection: IconCollection< C >;
 	menu: NavMenu< C >;
 	taxonomy: Taxonomy< C >;
+	widgetType: WidgetType< C >;
 }
 
 /**
@@ -324,6 +325,7 @@ export interface RootEntityContexts {
 	iconCollection: 'view';
 	menu: 'edit';
 	taxonomy: 'edit';
+	widgetType: 'edit';
 }
 
 /**
