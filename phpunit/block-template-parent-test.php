@@ -180,6 +180,31 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		return get_stylesheet() . '//' . $slug;
 	}
 
+	/**
+	 * Creates a custom `wp_template_part` post for the active theme.
+	 *
+	 * @param string $slug    Template part slug.
+	 * @param string $content Template part content.
+	 * @return string The template part ID, as `theme//slug`.
+	 */
+	private function create_template_part( $slug, $content ) {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_name'    => $slug,
+				'post_title'   => $slug,
+				'post_content' => $content,
+				'post_status'  => 'publish',
+			)
+		);
+		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
+		wp_set_post_terms( $post_id, WP_TEMPLATE_PART_AREA_UNCATEGORIZED, 'wp_template_part_area' );
+
+		$this->template_post_ids[] = $post_id;
+
+		return get_stylesheet() . '//' . $slug;
+	}
+
 	public function test_parent_slug_is_read_from_the_template() {
 		$child_id = $this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->', 'layout' );
 
@@ -489,6 +514,50 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_an_empty_template_is_rendered_inside_the_one_it_names() {
+		global $_wp_current_template_content, $_wp_current_template_id;
+
+		$this->create_template(
+			'layout',
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
+		);
+		$child_id = $this->create_template( 'page-404', '', 'layout' );
+
+		$child                        = get_block_template( $child_id, 'wp_template' );
+		$_wp_current_template_id      = $child->id;
+		$_wp_current_template_content = $child->content;
+
+		apply_filters( 'template_include', ABSPATH . WPINC . '/template-canvas.php' );
+
+		$this->assertSame(
+			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} /-->',
+			$_wp_current_template_content,
+			'A template with no blocks of its own is still rendered inside the template it names, which is where its header and its footer are.'
+		);
+	}
+
+	public function test_a_template_part_does_not_stand_in_for_the_template_of_the_same_slug() {
+		$this->create_template_part( 'layout', '<!-- wp:paragraph --><p>The part</p><!-- /wp:paragraph --><!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:paragraph --><p>The template</p><!-- /wp:paragraph --><!-- wp:post-content /-->' );
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+			'layout'
+		);
+
+		// Reading the template parts of the site, as the editor does, is what
+		// puts a part among the templates read while answering the request.
+		get_block_templates( array(), 'wp_template_part' );
+
+		$child = get_block_template( $child_id, 'wp_template' );
+
+		$this->assertStringContainsString(
+			'<p>The template</p>',
+			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
+			'A template part that has the slug of a template, and so its id, is not a template to render one inside.'
+		);
+	}
+
 	public function test_rest_response_reports_the_template_it_is_rendered_inside() {
 		wp_set_current_user( self::$admin_id );
 		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
@@ -508,6 +577,31 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( '', $response->get_data()['template'] );
+	}
+
+	public function test_rest_response_reports_the_fields_a_request_names_without_the_id() {
+		wp_set_current_user( self::$admin_id );
+		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->', 'layout' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
+		$request->set_param( '_fields', 'slug,template' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame(
+			'layout',
+			$response->get_data()['template'],
+			'A request that names the fields it wants is answered with the template this one is rendered inside: core keeps the id in the prepared response for the fields registered on it.'
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//layout' );
+		$request->set_param( '_fields', 'slug,has_content_slot' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertTrue(
+			$response->get_data()['has_content_slot'],
+			'A request that leaves out both the id and the content is still answered with whether the template can render one inside.'
+		);
 	}
 
 	public function test_rest_request_stores_the_template_to_render_inside() {

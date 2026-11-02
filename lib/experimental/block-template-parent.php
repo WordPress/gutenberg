@@ -89,7 +89,13 @@ function gutenberg_block_templates_read( $templates = null, $reset = false ) {
 	}
 
 	foreach ( (array) $templates as $template ) {
-		if ( $template instanceof WP_Block_Template ) {
+		/*
+		 * Core applies the filter the memo is filled from for template parts
+		 * as well, and a template part can have the same slug as a template,
+		 * so the same id. Only templates are remembered, so that a part never
+		 * stands in for the template a template is rendered inside.
+		 */
+		if ( $template instanceof WP_Block_Template && 'wp_template' === $template->type ) {
 			$read[ $template->id ] = $template;
 		}
 	}
@@ -425,11 +431,16 @@ function gutenberg_resolve_block_template_parents( $template_id, $content ) {
 function gutenberg_render_block_template_inside_parent( $template ) {
 	global $_wp_current_template_content, $_wp_current_template_id;
 
-	if ( empty( $_wp_current_template_id ) || empty( $_wp_current_template_content ) ) {
+	if ( empty( $_wp_current_template_id ) ) {
 		return $template;
 	}
 
-	$resolved = gutenberg_resolve_block_template_parents( $_wp_current_template_id, $_wp_current_template_content );
+	/*
+	 * A template with no blocks of its own is still rendered inside the
+	 * template it names: that is where its header and its footer are, and the
+	 * slot renders as empty the way the content block of an empty post does.
+	 */
+	$resolved = gutenberg_resolve_block_template_parents( $_wp_current_template_id, (string) $_wp_current_template_content );
 	if ( null !== $resolved ) {
 		$_wp_current_template_content = $resolved;
 	}
@@ -579,9 +590,10 @@ function gutenberg_get_block_template_has_content_slot_field( $item ) {
 	}
 
 	// The content belongs to the `edit` context, so a response that leaves it
-	// out is answered from the template itself.
+	// out is answered from the template itself, as read for the request rather
+	// than read again for every template of a collection.
 	if ( isset( $item['id'] ) ) {
-		$template = get_block_template( $item['id'], 'wp_template' );
+		$template = gutenberg_get_block_template_read( $item['id'] );
 
 		return $template ? gutenberg_block_template_has_content_slot( $template->content ) : false;
 	}
