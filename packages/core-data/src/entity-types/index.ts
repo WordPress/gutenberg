@@ -416,10 +416,10 @@ type EntityRecordInContexts<
  * `context` selects which fields the REST API serialises, so a `'view'`
  * request must not be typed with the edit-context fields.
  *
- * `_fields` can omit any field, including nested fields. The exact selection
- * is not inferred from the query, but a request that includes `_fields`
- * returns a recursively partial record so omitted data cannot be read as if
- * it were present.
+ * `_fields` limits the record to the fields it names. When those names are
+ * literal, as in `{ _fields: 'id,slug' }`, the record is narrowed to exactly
+ * those fields. When they are not known at compile time, any field may be
+ * missing, so the record is recursively partial instead.
  */
 export type EntityRecordOfQuery<
 	Kind extends EntityKind,
@@ -427,12 +427,13 @@ export type EntityRecordOfQuery<
 	Query,
 > = Query extends unknown
 	? '_fields' extends keyof Query
-		? DeepPartial<
+		? ProjectedRecord<
 				EntityRecordInContexts<
 					Kind,
 					Name,
 					ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
-				>
+				>,
+				FieldPathsOf< Query[ '_fields' & keyof Query ] >
 			>
 		: EntityRecordInContexts<
 				Kind,
@@ -451,3 +452,59 @@ type DeepPartial< T > = T extends readonly unknown[]
 	: T extends object
 		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
 		: T;
+
+type TrimField< S extends string > = S extends ` ${ infer Rest }`
+	? TrimField< Rest >
+	: S extends `${ infer Rest } `
+		? TrimField< Rest >
+		: S;
+
+type SplitFields< S extends string > =
+	S extends `${ infer Head },${ infer Tail }`
+		? TrimField< Head > | SplitFields< Tail >
+		: TrimField< S >;
+
+/**
+ * The field paths a `_fields` value names, as a comma-separated string or an
+ * array. Resolves to `never` when the names are not known at compile time.
+ */
+type FieldPathsOf< Fields > = 0 extends 1 & Fields
+	? never
+	: Fields extends string
+		? string extends Fields
+			? never
+			: SplitFields< Fields >
+		: Fields extends readonly ( infer Field )[]
+			? Field extends string
+				? string extends Field
+					? never
+					: Field
+				: never
+			: never;
+
+/**
+ * The top-level field a path such as `_links.version-history.href` reads.
+ */
+type TopLevelField< Path extends string > =
+	Path extends `${ infer Field }.${ string }` ? Field : Path;
+
+/**
+ * Keeps only the fields `_fields` names. A field named in full keeps its
+ * type; a field named only through a nested path keeps just what that path
+ * reaches, so it becomes recursively partial.
+ */
+type ProjectedRecord< RecordType, Paths > = [ Paths ] extends [ never ]
+	? DeepPartial< RecordType >
+	: RecordType extends unknown
+		? {
+				[
+					K in keyof RecordType as K extends TopLevelField<
+						Paths & string
+					>
+						? K
+						: never
+				]: K extends Paths
+					? RecordType[ K ]
+					: DeepPartial< RecordType[ K ] >;
+			}
+		: never;
