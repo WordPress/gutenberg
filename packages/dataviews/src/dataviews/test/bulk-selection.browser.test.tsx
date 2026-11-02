@@ -458,17 +458,30 @@ function TrashableTable() {
 		isPrimary: true,
 		supportsBulk: true,
 		RenderModal: ( { items: itemsToTrash, closeModal } ) => (
-			<button
-				onClick={ () => {
-					const ids = itemsToTrash.map( ( { id } ) => id );
-					setItems( ( current ) =>
-						current.filter( ( { id } ) => ! ids.includes( id ) )
-					);
-					closeModal?.();
-				} }
-			>
-				Confirm
-			</button>
+			<>
+				<button
+					onClick={ () => {
+						const ids = itemsToTrash.map( ( { id } ) => id );
+						setItems( ( current ) =>
+							current.filter( ( { id } ) => ! ids.includes( id ) )
+						);
+					} }
+				>
+					Remove
+				</button>
+				<button onClick={ () => closeModal?.() }>Done</button>
+				<button
+					onClick={ () => {
+						const ids = itemsToTrash.map( ( { id } ) => id );
+						setItems( ( current ) =>
+							current.filter( ( { id } ) => ! ids.includes( id ) )
+						);
+						closeModal?.();
+					} }
+				>
+					Confirm
+				</button>
+			</>
 		),
 	};
 	return (
@@ -537,4 +550,86 @@ it( 'leaves focus alone when it was moved away before the item was removed', asy
 		.element( page.getByRole( 'row', { name: /First post/ } ) )
 		.not.toBeInTheDocument();
 	expect( checkbox.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'moves focus to the select all checkbox when a bulk action removes the selected items', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+	);
+	// The toolbar comes before the rows, which have a Trash button too.
+	await user.click(
+		page.getByRole( 'button', { name: 'Trash', exact: true } ).first()
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Confirm', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'moves focus once there is a control again after the focused item was removed', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ [] } /> );
+	await rerender( <TableOf items={ [ posts[ 1 ] ] } /> );
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'moves focus to the select all checkbox when the focused item is removed', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'moves focus to the select all checkbox when a dialog closes after its action removed the items', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+	);
+	// The toolbar comes before the rows, which have a Trash button too.
+	await user.click(
+		page.getByRole( 'button', { name: 'Trash', exact: true } ).first()
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Remove', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
 } );

@@ -49,17 +49,25 @@ export default function useFocusFallback() {
 		// moved away on purpose, e.g. by clicking outside any control. Don't
 		// bring it back when that control goes away later. A modal hiding the
 		// rest of the page also blurs the control, but focus comes back on
-		// close.
+		// close. Removing or hiding the control blurs it too, so only decide
+		// once that is done.
 		const onFocusOut = ( event: FocusEvent ) => {
 			const target = event.target as HTMLElement;
 			if (
-				! event.relatedTarget &&
-				target.isConnected &&
-				isVisible( target ) &&
-				! target.closest( '[inert], [aria-hidden="true"]' )
+				event.relatedTarget ||
+				target.closest( '[inert], [aria-hidden="true"]' )
 			) {
-				lastFocused = null;
+				return;
 			}
+			queueMicrotask( () => {
+				if (
+					lastFocused === target &&
+					target.isConnected &&
+					isVisible( target )
+				) {
+					lastFocused = null;
+				}
+			} );
 		};
 		const observer = new MutationObserver( () => {
 			if ( ! lastFocused ) {
@@ -75,8 +83,15 @@ export default function useFocusFallback() {
 			if ( ! wasRemoved || ! isLost ) {
 				return;
 			}
+			const fallback = getFallback( container );
+			// Nothing to move focus to yet, e.g. while the previous page loads
+			// after the last item of a page was removed: try again on the next
+			// change.
+			if ( ! fallback ) {
+				return;
+			}
 			lastFocused = null;
-			getFallback( container )?.focus();
+			fallback.focus();
 		} );
 		container.addEventListener( 'focusin', onFocusIn );
 		container.addEventListener( 'focusout', onFocusOut );
@@ -86,6 +101,10 @@ export default function useFocusFallback() {
 			attributes: true,
 			attributeFilter: [ 'hidden', 'inert' ],
 		} );
+		// Modals render outside the layout. One can close after its action
+		// removed the control it returns focus to, without changing the layout
+		// any more, so check again when it goes away.
+		observer.observe( ownerDocument.body, { childList: true } );
 		return () => {
 			container.removeEventListener( 'focusin', onFocusIn );
 			container.removeEventListener( 'focusout', onFocusOut );
