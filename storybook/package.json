@@ -70,7 +70,6 @@
 		"react-dom": "^19.3.0",
 		"storybook": "^10.6.3",
 		"storybook-addon-tag-badges": "^3.1.0",
-		"terser": "^5.37.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vite": "^8.3.5",
 		"vitest": "^5.0.3"
