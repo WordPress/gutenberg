@@ -272,6 +272,10 @@ async function main() {
 			} ) ),
 			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
 			{ props: {}, content: 'Save & <continue> "now"' },
+			{
+				props: { class: 'is-&amp;' },
+				content: 'A &amp; B &hellip; &#8217;',
+			},
 		];
 		const renderReact = ( phpProps, text ) => {
 			const reactProps = { ...react.props };

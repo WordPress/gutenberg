@@ -78,8 +78,7 @@ function gutenberg_ui_components_render_markup( $component, $props, $content ) {
 			if ( in_array( $placeholder[2] ?? '', array( 'href', 'src', 'action', 'formaction' ), true ) ) {
 				return esc_url( $value );
 			}
-			// React escapes `&`, `<`, `>` and quotes, and never reads entities.
-			return htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+			return gutenberg_ui_components_esc_plain_text( $value );
 		},
 		$html
 	);
