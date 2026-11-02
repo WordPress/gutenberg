@@ -762,7 +762,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	it( '`_fields` returns a partial record', () => {
+	it( '`_fields` narrows the record to the fields it names', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -770,43 +770,87 @@ describe( 'Entity record types', () => {
 				1,
 				{ _fields: 'id,slug' }
 			);
-			post?.id satisfies number | undefined;
-			post?.title?.raw satisfies string | undefined;
-			// The runtime treats an array as one projected value, so its element
-			// type stays intact while the array field itself becomes optional.
-			post?.categories?.[ 0 ] satisfies number | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			post?.title.raw;
+			true satisfies Expect<
+				typeof post,
+				{ id: number; slug: string } | undefined
+			>;
+			// @ts-expect-error -- `title` was not requested.
+			post?.title;
+
+			// Spaces around the names and the array form name the same fields.
+			const spaced = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: 'id, slug' }
+			);
+			true satisfies Expect< typeof spaced, typeof post >;
+			const listed = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: [ 'id', 'slug' ] }
+			);
+			true satisfies Expect< typeof listed, typeof post >;
 
 			const posts = select( coreStore ).getEntityRecords(
 				'postType',
 				'post',
-				{ _fields: 'id,slug' }
+				{ _fields: 'id,title' }
 			);
-			posts?.[ 0 ].title?.raw satisfies string | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			posts?.[ 0 ].title.raw;
+			posts?.[ 0 ].title.raw satisfies string | undefined;
+			// @ts-expect-error -- `slug` was not requested.
+			posts?.[ 0 ].slug;
 
 			// `_fields` alongside a context still resolves the context.
 			const view = select( coreStore ).getEntityRecord(
 				'postType',
 				'post',
 				1,
-				{ context: 'view', _fields: 'id,slug' }
+				{ context: 'view', _fields: 'id,title' }
 			);
-			view?.title?.rendered satisfies string | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			view?.title.rendered;
+			view?.title.rendered satisfies string | undefined;
+			// @ts-expect-error -- `raw` is edit-only.
+			view?.title.raw;
 
+			// A nested path keeps only part of its field, so that field is
+			// recursively partial. The runtime treats an array as one projected
+			// value, so array elements stay intact.
 			const styles = select( coreStore ).getEntityRecord(
 				'root',
 				'globalStyles',
 				1,
 				{ _fields: 'id,_links.version-history.href' }
 			);
-			// Nested `_fields` filtering never returns partially projected array
-			// elements: the array is either complete or empty.
+			styles?.id satisfies number | undefined;
 			styles?._links?.[ 'version-history' ]?.[ 0 ]?.count.toFixed();
+			// @ts-expect-error -- `title` was not requested.
+			styles?.title;
+
+			// The hooks narrow the same way.
+			const { records: collections } = useEntityRecords(
+				'root',
+				'fontCollection',
+				{ _fields: 'slug,name,description' }
+			);
+			true satisfies Expect<
+				typeof collections,
+				{ slug: string; name: string; description: string }[] | null
+			>;
+		};
+	} );
+
+	it( '`_fields` that is not known at compile time returns a partial record', () => {
+		( fields: string ) => {
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: fields }
+			);
+			post?.title?.raw satisfies string | undefined;
+			// @ts-expect-error -- any field may be missing.
+			post?.title.raw;
 		};
 	} );
 
