@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Set the selection checkbox of the `grid` and `pickerGrid` layouts apart from previews of any color with a ring in the surface color ([#87223](https://github.com/WordPress/gutenberg/pull/87223)).
 
 ## 22.1.0 (2026-11-18)
 
