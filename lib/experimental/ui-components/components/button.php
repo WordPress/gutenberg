@@ -31,8 +31,8 @@ function gutenberg_ui_render_button( $props, $classes, $content ) {
 	return sprintf(
 		'<button type="%1$s" tabindex="0" class="%2$s"%3$s>%4$s</button>',
 		esc_attr( $props['type'] ),
-		esc_attr( implode( ' ', $classes ) ),
+		gutenberg_ui_components_esc_plain_text( implode( ' ', $classes ) ),
 		$props['disabled'] ? ' data-disabled="" disabled=""' : '',
-		esc_html( $content )
+		gutenberg_ui_components_esc_plain_text( $content )
 	);
 }
