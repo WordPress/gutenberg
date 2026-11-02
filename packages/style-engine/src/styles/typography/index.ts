@@ -121,6 +121,18 @@ const textTransform = {
 	},
 };
 
+const textWrap = {
+	name: 'textWrap',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textWrap' ],
+			'textWrap'
+		);
+	},
+};
+
 const writingMode = {
 	name: 'writingMode',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -157,5 +169,6 @@ export default [
 	textIndent,
 	textShadow,
 	textTransform,
+	textWrap,
 	writingMode,
 ];
