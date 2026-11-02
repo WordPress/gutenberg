@@ -44,7 +44,7 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.0.5"
 	},
 	"publishConfig": {
 		"access": "public"

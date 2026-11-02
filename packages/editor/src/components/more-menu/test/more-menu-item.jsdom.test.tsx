@@ -3,8 +3,10 @@ import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import MoreMenuItem from '../more-menu-item';
 
 function renderMenu( children: ReactNode ) {
