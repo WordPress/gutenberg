@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { speak } from '@wordpress/a11y';
 import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../index';
 import {
@@ -174,6 +175,8 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 	} as unknown as typeof original;
 } );
 
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) as any );
+
 describe( 'DataViews component', () => {
 	it.each( [ 'Delete', 'Delete……' ] )(
 		'uses button and item-menu labels for modal action "%s"',
@@ -303,6 +306,46 @@ describe( 'DataViews component', () => {
 			name: 'Title',
 		} );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+	} );
+
+	it( 'announces when selecting makes bulk actions available or unavailable', async () => {
+		vi.mocked( speak ).mockClear();
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, titleField: 'title' } }
+				actions={ actions }
+			/>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select Hello World' } )
+		);
+		expect( speak ).toHaveBeenLastCalledWith( 'Bulk actions available.' );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select Homepage' } )
+		);
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select Hello World' } )
+		);
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select Homepage' } )
+		);
+		expect( speak ).toHaveBeenLastCalledWith(
+			'Bulk actions no longer available.'
+		);
+		expect( speak ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'does not announce bulk actions when the consumer clears the selection', () => {
+		vi.mocked( speak ).mockClear();
+		const props = { onChangeSelection: vi.fn(), actions };
+		const { rerender } = render(
+			<DataViewWrapper { ...props } selection={ [ '1' ] } />
+		);
+		rerender( <DataViewWrapper { ...props } selection={ [] } /> );
+		expect( speak ).not.toHaveBeenCalled();
 	} );
 
 	it( 'disabled desktop bulk action cannot run', async () => {
