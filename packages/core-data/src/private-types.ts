@@ -13,7 +13,12 @@ import type {
 	ReceiveItemsAction,
 	RemoveItemsAction,
 } from './queried-data/types';
-import type { EntityConfig, EntityProviderProps, RestRecord } from './types';
+import type {
+	EntityConfig,
+	EntityProviderProps,
+	PreSaveHandler,
+	RestRecord,
+} from './types';
 
 /**
  * The IDs of the provided entities, by kind and name, and their revisions
@@ -111,6 +116,8 @@ export type Action =
 	| { type: 'RECEIVE_EDITOR_ASSETS'; assets: Record< string, unknown > }
 	| { type: 'RECEIVE_EDITOR_SETTINGS'; settings: Record< string, unknown > }
 	| { type: 'RECEIVE_EMBED_PREVIEW'; url: string; preview: unknown }
+	| { type: 'ADD_PRE_SAVE_HANDLER'; handler: PreSaveHandler }
+	| { type: 'REMOVE_PRE_SAVE_HANDLER'; handler: PreSaveHandler }
 	| {
 			type: 'RECEIVE_ENTITY_ACTIONS_CONFIG';
 			kind: string;

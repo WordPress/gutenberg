@@ -357,7 +357,10 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'saveEntityRecord', () => {
 		const persistedRecord = { id: 10, title: 'Initial', meta: {} };
-		const select = { getRawEntityRecord: () => persistedRecord };
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+			getPreSaveHandlers: () => [],
+		};
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 		};

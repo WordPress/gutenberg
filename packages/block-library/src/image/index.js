@@ -6,6 +6,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { getNewAttachmentImageBlockAttributes } from './use-open-image-media-editor-modal';
 
 const { name } = metadata;
 
@@ -51,6 +52,14 @@ export const settings = {
 		return {
 			'data-align': attributes.align,
 		};
+	},
+	mediaEditor: {
+		getMedia: ( { id, url } ) => ( { id, url } ),
+		applyMedia: ( attributes, media ) => ( {
+			id: media.id,
+			url: media.source_url,
+			...getNewAttachmentImageBlockAttributes( attributes, media ),
+		} ),
 	},
 	transforms,
 	edit,

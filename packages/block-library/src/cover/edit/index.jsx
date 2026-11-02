@@ -58,7 +58,11 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
+const { openMediaEditorModalKey, getMediaEditorStateKey } = unlock(
+	blockEditorPrivateApis
+);
+
+const EMPTY_MEDIA_EDITOR_STATE = {};
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -132,6 +136,16 @@ function CoverEdit( {
 			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
 		[]
 	);
+	// `previewUrl` is a crop from the media editor that is saved with the post.
+	const { previewUrl: pendingPreviewUrl, isLocked: isMediaEditorLocked } =
+		useSelect(
+			( select ) =>
+				select( blockEditorStore )
+					.getSettings()
+					[ getMediaEditorStateKey ]?.( select, clientId ) ??
+				EMPTY_MEDIA_EDITOR_STATE,
+			[ clientId ]
+		);
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -214,8 +228,9 @@ function CoverEdit( {
 	// to preview in edit the dynamic featured image
 	const url = useFeaturedImage
 		? mediaUrl
-		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-			originalUrl?.replaceAll( '&amp;', '&' );
+		: ( pendingPreviewUrl ??
+			// Ensure the url is not malformed due to sanitization through `wp_kses`.
+			originalUrl?.replaceAll( '&amp;', '&' ) );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
@@ -570,6 +585,7 @@ function CoverEdit( {
 		let isUndone = false;
 		openMediaEditorModal( {
 			id,
+			clientId,
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
 			},
@@ -578,12 +594,19 @@ function CoverEdit( {
 				setIsSwappingMedia( false );
 				setAttributes( previousImage );
 			},
-			onUpdate: async ( { id: newId, url: newUrl } ) => {
+			onUpdate: async ( {
+				id: newId,
+				url: newUrl,
+				isPending,
+				previewUrl,
+			} ) => {
 				if ( typeof newId !== 'number' ) {
 					return;
 				}
 
-				if ( newId !== id && newUrl ) {
+				// With a pending crop the block shows the crop preview, so
+				// there's no new file to wait for.
+				if ( newId !== id && newUrl && ! isPending ) {
 					setIsSwappingMedia( true );
 				}
 
@@ -597,8 +620,9 @@ function CoverEdit( {
 				};
 
 				if ( newUrl ) {
-					const averageBackgroundColor =
-						await getMediaColor( newUrl );
+					const averageBackgroundColor = await getMediaColor(
+						previewUrl ?? newUrl
+					);
 					// Snackbar Undo can run while the image color is loading.
 					if ( isUndone ) {
 						return;
@@ -643,6 +667,7 @@ function CoverEdit( {
 		} );
 	}, [
 		id,
+		clientId,
 		getLatestProps,
 		openMediaEditorModal,
 		setAttributes,
@@ -726,7 +751,7 @@ function CoverEdit( {
 			onEditMedia={ openCoverMediaEditorModal }
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
-			isEditMediaDisabled={ isSwappingMedia }
+			isEditMediaDisabled={ isSwappingMedia || isMediaEditorLocked }
 		/>
 	);
 

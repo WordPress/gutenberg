@@ -8,6 +8,14 @@ export function getId( state: State ): number | null {
 	return state.id;
 }
 
+export function getDeferCrop( state: State ): boolean {
+	return state.deferCrop;
+}
+
+export function getPendingCrop( state: State ) {
+	return state.pendingCrop;
+}
+
 export function getOnUpdate( state: State ) {
 	return state.onUpdate;
 }

@@ -661,28 +661,6 @@ export const saveEntityRecord =
 		);
 
 		try {
-			// Evaluate optimized edits.
-			// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
-			for ( const [ key, value ] of Object.entries( record ) ) {
-				if ( typeof value === 'function' ) {
-					const evaluatedValue = value(
-						select.getEditedEntityRecord( kind, name, recordId )
-					);
-					dispatch.editEntityRecord(
-						kind,
-						name,
-						recordId,
-						{
-							[ key ]: evaluatedValue,
-						},
-						{ undoIgnore: true }
-					);
-					// Fields are set by their name.
-					( record as Record< string, unknown > )[ key ] =
-						evaluatedValue;
-				}
-			}
-
 			dispatch( {
 				type: 'SAVE_ENTITY_RECORD_START',
 				kind,
@@ -695,6 +673,39 @@ export const saveEntityRecord =
 			let hasError = false;
 			const { baseURL } = entityConfig;
 			try {
+				// Before function edits are evaluated, so they see any edits
+				// the handlers make.
+				if ( ! isAutosave ) {
+					for ( const handler of select.getPreSaveHandlers() ) {
+						record = await handler(
+							record as Record< string, unknown >,
+							{ kind, name, recordId }
+						);
+					}
+				}
+
+				// Evaluate optimized edits.
+				// (Function edits that should be evaluated on save to avoid expensive computations on every edit.)
+				for ( const [ key, value ] of Object.entries( record ) ) {
+					if ( typeof value === 'function' ) {
+						const evaluatedValue = value(
+							select.getEditedEntityRecord( kind, name, recordId )
+						);
+						dispatch.editEntityRecord(
+							kind,
+							name,
+							recordId,
+							{
+								[ key ]: evaluatedValue,
+							},
+							{ undoIgnore: true }
+						);
+						// Fields are set by their name.
+						( record as Record< string, unknown > )[ key ] =
+							evaluatedValue;
+					}
+				}
+
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = (

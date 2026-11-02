@@ -76,6 +76,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	getMediaEditorStateKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -364,6 +365,8 @@ export default function Image( {
 		imageSizes,
 		maxWidth,
 		editMediaEntity,
+		pendingPreviewUrl,
+		isMediaEditorLocked,
 	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
@@ -371,12 +374,19 @@ export default function Image( {
 
 			const rootClientId = getBlockRootClientId( clientId );
 			const settings = getSettings();
+			const mediaEditorState = settings[ getMediaEditorStateKey ]?.(
+				select,
+				clientId
+			);
 
 			return {
 				imageEditing: settings.imageEditing,
 				imageSizes: settings.imageSizes,
 				maxWidth: settings.maxWidth,
 				editMediaEntity: settings?.[ mediaEditKey ],
+				// A crop from the media editor that is saved with the post.
+				pendingPreviewUrl: mediaEditorState?.previewUrl,
+				isMediaEditorLocked: !! mediaEditorState?.isLocked,
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
@@ -398,6 +408,7 @@ export default function Image( {
 		[]
 	);
 	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
+		clientId,
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
@@ -925,7 +936,7 @@ export default function Image( {
 							// Disable rather than hide while the edited image
 							// loads, so the button keeps focus when the modal
 							// closes instead of dropping it to the canvas.
-							disabled={ isSwappingMedia }
+							disabled={ isSwappingMedia || isMediaEditorLocked }
 						/>
 					) }
 					{ showCoverControls && (
@@ -1192,7 +1203,7 @@ export default function Image( {
 			) : (
 				<>
 					<img
-						src={ temporaryURL || url }
+						src={ temporaryURL || pendingPreviewUrl || url }
 						alt={ defaultedAlt }
 						onError={ onImageError }
 						onLoad={ onImageLoad }

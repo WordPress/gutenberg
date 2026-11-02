@@ -7,6 +7,7 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const { name } = metadata;
 
@@ -41,6 +42,14 @@ export const settings = {
 				},
 			},
 		],
+	},
+	mediaEditor: {
+		getMedia: ( { id, url } ) => ( { id, url } ),
+		applyMedia: ( attributes, media ) => ( {
+			id: media.id,
+			url: media.source_url,
+			sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+		} ),
 	},
 	transforms,
 	save,

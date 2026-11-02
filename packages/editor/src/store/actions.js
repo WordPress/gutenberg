@@ -240,6 +240,31 @@ export const editPost =
 			.editEntityRecord( 'postType', type, id, edits, options );
 	};
 
+const PENDING_MEDIA_EDITS_LOCK = 'pending-media-edits';
+
+/**
+ * Saves the media edits waiting for the post to be saved, such as crops made
+ * in the media editor, and points their blocks at the new images.
+ *
+ * @param {Object} thunkArgs          Thunk arguments.
+ * @param {Object} thunkArgs.select   Editor store selectors.
+ * @param {Object} thunkArgs.dispatch Editor store actions.
+ * @return {Promise<Object|false>} A save error, or `false` on success.
+ */
+async function savePendingMediaEdits( { select, dispatch } ) {
+	dispatch.lockPostSaving( PENDING_MEDIA_EDITS_LOCK );
+	try {
+		const error = await dispatch.commitPendingMediaEdits( {
+			kind: 'postType',
+			name: select.getCurrentPostType(),
+			id: select.getCurrentPostId(),
+		} );
+		return error ?? false;
+	} finally {
+		dispatch.unlockPostSaving( PENDING_MEDIA_EDITS_LOCK );
+	}
+}
+
 /**
  * Action for saving the current post in the editor.
  *
@@ -250,6 +275,21 @@ export const savePost =
 	async ( { select, dispatch, registry } ) => {
 		if ( ! select.isEditedPostSaveable() ) {
 			return;
+		}
+
+		let error = false;
+		// Before committing pending media edits, so the editor shows the post
+		// as saving while they're committed.
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
+
+		// Before the content is read, so the post is saved pointing at the
+		// edited images. Autosaves and previews keep the originals.
+		if (
+			! options.isAutosave &&
+			! options.isPreview &&
+			Object.keys( select.getPendingMediaEdits() ).length
+		) {
+			error = await savePendingMediaEdits( { select, dispatch } );
 		}
 
 		const content = select.getEditedPostContent();
@@ -271,17 +311,17 @@ export const savePost =
 				),
 			content,
 		};
-		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
-		let error = false;
-		try {
-			edits = await applyFiltersAsync(
-				'editor.preSavePost',
-				edits,
-				options
-			);
-		} catch ( err ) {
-			error = err;
+		if ( ! error ) {
+			try {
+				edits = await applyFiltersAsync(
+					'editor.preSavePost',
+					edits,
+					options
+				);
+			} catch ( err ) {
+				error = err;
+			}
 		}
 
 		if ( ! error ) {

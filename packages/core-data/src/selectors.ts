@@ -20,6 +20,7 @@ import {
 } from './utils';
 import type * as ET from './entity-types';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
+import type { PreSaveHandler } from './types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -56,6 +57,7 @@ export interface State {
 		string,
 		Record< string, EntityActionsConfig >
 	>;
+	preSaveHandlers: Array< PreSaveHandler >;
 }
 
 type EntityRecordKey = string | number;
@@ -1012,11 +1014,21 @@ export function hasEditsForEntityRecord(
 	recordId?: EntityRecordKey
 ): boolean {
 	logEntityDeprecation( kind, name, 'hasEditsForEntityRecord' );
-	return (
+	if (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
 		Object.keys(
 			getEntityRecordNonTransientEdits( state, kind, name, recordId )
 		).length > 0
+	) {
+		return true;
+	}
+	const { dirtyTransientEdits } = getEntityConfig( state, kind, name ) || {};
+	if ( ! dirtyTransientEdits ) {
+		return false;
+	}
+	const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
+	return Object.keys( dirtyTransientEdits ).some(
+		( key ) => edits[ key ] !== undefined
 	);
 }
 

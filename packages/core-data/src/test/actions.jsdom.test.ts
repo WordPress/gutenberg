@@ -857,6 +857,7 @@ describe( 'saveEntityRecord', () => {
 		];
 		const select = {
 			getRawEntityRecord: () => post,
+			getPreSaveHandlers: () => [],
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
 
@@ -922,6 +923,7 @@ describe( 'saveEntityRecord', () => {
 		];
 		const select = {
 			getRawEntityRecord: () => post,
+			getPreSaveHandlers: () => [],
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => entities ) };
 
@@ -944,6 +946,7 @@ describe( 'saveEntityRecord', () => {
 		];
 		const select = {
 			getRawEntityRecord: () => post,
+			getPreSaveHandlers: () => [],
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => entities ) };
 
@@ -959,6 +962,85 @@ describe( 'saveEntityRecord', () => {
 		).resolves.toEqual( undefined );
 	} );
 
+	describe( 'pre-save handlers', () => {
+		const configs = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+
+		function save(
+			handlers: Array< ( record: any, context: any ) => any >,
+			options = {}
+		) {
+			const select = {
+				getRawEntityRecord: () => ( { id: 10 } ),
+				getEditedEntityRecord: () => ( { id: 10, blocks: 'edited' } ),
+				getPreSaveHandlers: () => handlers,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => configs ),
+			};
+			return saveEntityRecord(
+				'postType',
+				'post',
+				{ id: 10, title: 'Title' },
+				options
+			)( thunkArgs( { select, dispatch, resolveSelect } ) );
+		}
+
+		it( 'saves the record the handlers return', async () => {
+			apiFetchMock.mockImplementation( ( { data } ) => data );
+			Object.assign( dispatch, { editEntityRecord: vi.fn() } );
+			const handler = vi.fn( ( record ) => ( {
+				...record,
+				content: ( { blocks }: { blocks: string } ) => blocks,
+			} ) );
+
+			await save( [ handler ] );
+
+			expect( handler ).toHaveBeenCalledWith(
+				{ id: 10, title: 'Title' },
+				{ kind: 'postType', name: 'post', recordId: 10 }
+			);
+			// Function edits are evaluated after the handlers run.
+			expect( apiFetch ).toHaveBeenCalledWith( {
+				path: '/wp/v2/posts/10',
+				method: 'PUT',
+				data: { id: 10, title: 'Title', content: 'edited' },
+			} );
+		} );
+
+		it( 'fails the save when a handler throws', async () => {
+			const error = new Error( 'Handler error' );
+
+			await expect(
+				save(
+					[
+						() => {
+							throw error;
+						},
+					],
+					{ throwOnError: true }
+				)
+			).rejects.toBe( error );
+			expect( apiFetch ).not.toHaveBeenCalled();
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'SAVE_ENTITY_RECORD_FINISH',
+					error,
+				} )
+			);
+		} );
+
+		it( 'skips the handlers for an autosave', async () => {
+			apiFetchMock.mockImplementation( () => ( { id: 11 } ) );
+			const handler = vi.fn( ( record ) => record );
+
+			await save( [ handler ], { isAutosave: true } );
+
+			expect( handler ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	it( 'triggers a PUT request for an existing record', async () => {
 		const post = { id: 10, title: 'new post' };
 		const configs = [
@@ -966,6 +1048,7 @@ describe( 'saveEntityRecord', () => {
 		];
 		const select = {
 			getRawEntityRecord: () => post,
+			getPreSaveHandlers: () => [],
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
 
@@ -1077,6 +1160,7 @@ describe( 'saveEntityRecord', () => {
 			);
 			const select = {
 				getRawEntityRecord: () => persistedRecord,
+				getPreSaveHandlers: () => [],
 			};
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => configs ),
@@ -1164,6 +1248,7 @@ describe( 'saveEntityRecord', () => {
 			];
 			const select = {
 				getRawEntityRecord: () => persistedRecord,
+				getPreSaveHandlers: () => [],
 			};
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => configs ),
@@ -1208,6 +1293,7 @@ describe( 'saveEntityRecord', () => {
 			];
 			const select = {
 				getRawEntityRecord: () => persistedRecord,
+				getPreSaveHandlers: () => [],
 			};
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => configs ),
@@ -1239,6 +1325,7 @@ describe( 'saveEntityRecord', () => {
 			];
 			const select = {
 				getRawEntityRecord: () => undefined,
+				getPreSaveHandlers: () => [],
 			};
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => configs ),
@@ -1289,6 +1376,7 @@ describe( 'saveEntityRecord', () => {
 		];
 		const select = {
 			getRawEntityRecord: () => ( {} ),
+			getPreSaveHandlers: () => [],
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
 
@@ -1358,6 +1446,7 @@ describe( 'saveEntityRecord', () => {
 			dispatch.receiveAutosaves = vi.fn();
 			select = {
 				getRawEntityRecord: () => persistedRecord,
+				getPreSaveHandlers: () => [],
 			};
 			syncManager = {
 				beforeSave: vi.fn( () => ( {
