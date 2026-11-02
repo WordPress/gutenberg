@@ -98,6 +98,9 @@ export default function DateEdit( {
 		},
 		[ data.type, data.id ]
 	);
+	// There is nothing to reset once the date is reset (`null`): whatever the
+	// status, the post takes its date when it is saved.
+	const isReset = ! value;
 	const isFloating = isDateFloating( {
 		...data,
 		status: savedStatus ?? data.status,
@@ -141,7 +144,7 @@ export default function DateEdit( {
 				variant="secondary"
 				__next40pxDefaultSize
 				accessibleWhenDisabled
-				disabled={ disabled || isFloating }
+				disabled={ disabled || isReset || isFloating }
 				onClick={ onReset }
 			>
 				{ __( 'Reset' ) }

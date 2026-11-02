@@ -112,4 +112,21 @@ describe( 'DateEdit', () => {
 			await screen.findByRole( 'button', { name: 'Reset' } )
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
+
+	it( 'disables the reset of a published post whose date was reset', async () => {
+		render(
+			<DateEdit
+				data={ {
+					status: 'publish',
+					date: null,
+					modified: '2026-10-20T10:00:00',
+				} }
+				field={ field }
+				onChange={ () => {} }
+			/>
+		);
+		expect(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
 } );
