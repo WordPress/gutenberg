@@ -181,6 +181,13 @@ export default function AutoGridItemMovers( {
 		}
 		const update = () => setSnapshot( readSnapshot() );
 		update();
+		// The grid's DOM and generated child layout styles can update after
+		// this effect, and moving an item doesn't resize anything, so measure
+		// again once the browser has laid out the change.
+		let frame = requestAnimationFrame( () => {
+			update();
+			frame = requestAnimationFrame( update );
+		} );
 		const observer = new ResizeObserver( update );
 		observer.observe( gridElement );
 		for ( const clientId of blockOrder ) {
@@ -189,7 +196,10 @@ export default function AutoGridItemMovers( {
 				observer.observe( element );
 			}
 		}
-		return () => observer.disconnect();
+		return () => {
+			cancelAnimationFrame( frame );
+			observer.disconnect();
+		};
 	}, [ blockElement, blockOrder, refsMap, readSnapshot ] );
 
 	const selected = snapshot?.items.find(
@@ -264,12 +274,49 @@ export default function AutoGridItemMovers( {
 						candidate.rect.intersectsRect( nearby )
 				) );
 
-		if ( canReorder ) {
+		// A vertical move lands in the cell of a block that is a row of
+		// blocks away in order. It is a plain reorder when every block it
+		// passes is an auto-placed 1x1 and no explicit block sits in those rows.
+		const isVertical = direction === 'up' || direction === 'down';
+		const verticalTargetIndex =
+			isVertical && targets.length === 1
+				? blockOrder.indexOf( targets[ 0 ].clientId )
+				: -1;
+		const canReorderVertically =
+			verticalTargetIndex >= 0 &&
+			( forward
+				? verticalTargetIndex > currentIndex
+				: verticalTargetIndex < currentIndex ) &&
+			[ item, ...otherItems ]
+				.filter( ( candidate ) => {
+					const index = blockOrder.indexOf( candidate.clientId );
+					return (
+						index >=
+							Math.min( currentIndex, verticalTargetIndex ) &&
+						index <= Math.max( currentIndex, verticalTargetIndex )
+					);
+				} )
+				.every(
+					( candidate ) =>
+						! candidate.isExplicit &&
+						candidate.rect.columnSpan === 1 &&
+						candidate.rect.rowSpan === 1
+				) &&
+			! otherItems.some(
+				( candidate ) =>
+					candidate.isExplicit &&
+					candidate.rect.rowEnd >=
+						Math.min( item.rect.rowStart, target.rowStart ) &&
+					candidate.rect.rowStart <=
+						Math.max( item.rect.rowEnd, target.rowEnd )
+			);
+
+		if ( canReorder || canReorderVertically ) {
 			moveBlocksToPosition(
 				[ blockClientId ],
 				gridClientId,
 				gridClientId,
-				targetIndex
+				canReorder ? targetIndex : verticalTargetIndex
 			);
 			return;
 		}
