@@ -1,10 +1,12 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
+import selectionStyles from '../../menu-item/selection-style.module.scss';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
@@ -38,7 +40,12 @@ const DefaultControlsGroup = ( {
 					return (
 						<MenuItem
 							key={ label }
-							className={ itemClassName }
+							className={ clsx(
+								itemClassName,
+								selectionStyles.item
+							) }
+							icon={ check }
+							iconPosition="left"
 							role="menuitem"
 							label={ sprintf(
 								// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the reset action, to match the visible menu label order.
@@ -67,7 +74,11 @@ const DefaultControlsGroup = ( {
 					<MenuItem
 						key={ label }
 						icon={ check }
-						className={ itemClassName }
+						iconPosition="left"
+						className={ clsx(
+							itemClassName,
+							selectionStyles.item
+						) }
 						role="menuitemcheckbox"
 						isSelected
 						aria-disabled
@@ -106,7 +117,9 @@ const OptionalControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ isSelected ? check : null }
+						icon={ check }
+						iconPosition="left"
+						className={ selectionStyles.item }
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
@@ -213,6 +226,9 @@ const ToolsPanelHeader = (
 							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
+									icon={ check }
+									iconPosition="left"
+									className={ selectionStyles.item }
 									aria-disabled={ ! canResetAll }
 									// @ts-expect-error - TODO: If this "tertiary" style is something we really want to allow on MenuItem,
 									// we should rename it and explicitly allow it as an official API. All the other Button variants
