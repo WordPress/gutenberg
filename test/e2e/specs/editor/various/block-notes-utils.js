@@ -140,7 +140,7 @@ class BlockNoteUtils {
 		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 		await this.#page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.pressSequentially( content );
+			.fill( content );
 		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
@@ -178,16 +178,14 @@ class BlockNoteUtils {
 	async addReply( content ) {
 		const sidebar = this.#getNotesSurface();
 		const replyForm = sidebar.getByRole( 'textbox', { name: 'Reply to' } );
-		// The reply form doesn't focus on mount.
-		await replyForm.click();
-		await replyForm.pressSequentially( content );
+		await replyForm.fill( content );
 		await sidebar
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect(
 			sidebar.getByText( content, { exact: true } )
 		).toBeVisible();
-		// The form clears after the reply saves; typing earlier appends to it.
+		// The form clears once the reply saves.
 		await expect( replyForm ).toHaveText( '' );
 	}
 
