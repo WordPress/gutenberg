@@ -1,4 +1,4 @@
-import type { CropperState, Size } from '../../image-editor';
+import type { CropperController } from '../../image-editor';
 import { getRotatedBBox } from '../../image-editor/core/camera';
 
 /**
@@ -71,20 +71,26 @@ const CROP_TOLERANCE = 0.1;
  * leave the sign alone because `flip_h · flip_v = -I` commutes with
  * rotation.
  *
- * @param state     Current cropper state.
- * @param imageSize Natural dimensions of the source image.
- * @return Ordered modifier array; empty when nothing is server-relevant.
+ * @param cropper The cropper controller. The current edit and the loaded
+ *                image's natural size are both read from its state.
+ * @return Ordered modifier array; empty when nothing is server-relevant or
+ *         no image has loaded.
  */
 export function buildModifiers(
-	state: CropperState,
-	imageSize: Size
+	cropper: Pick< CropperController, 'state' >
 ): Modifier[] {
 	const modifiers: Modifier[] = [];
+	const { state } = cropper;
+	const { image } = state;
 
-	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
 		return modifiers;
 	}
 
+	const imageSize = {
+		width: image.naturalWidth,
+		height: image.naturalHeight,
+	};
 	const { cropRect, pan, zoom, flip } = state;
 	const hasFlipH = flip.horizontal;
 	const hasFlipV = flip.vertical;
