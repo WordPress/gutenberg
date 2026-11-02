@@ -147,6 +147,10 @@ export type AutocompleterUIProps = {
 	 */
 	onSelect: ( option: KeyedOption ) => void;
 	/**
+	 * A function to be called when the pointer moves over an option.
+	 */
+	onHover: ( index: number ) => void;
+	/**
 	 * A function that defines the behavior of the completer when it is reset
 	 */
 	reset: ( event: Event ) => void;

@@ -91,7 +91,7 @@ export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
-export { default as FormToggle } from './form-toggle';
+export { default as FormToggle } from './form-toggle/deprecated';
 export { default as FormTokenField } from './form-token-field';
 export { default as GradientPicker } from './gradient-picker';
 export { default as CustomGradientPicker } from './custom-gradient-picker';
@@ -186,7 +186,7 @@ export {
 	ToolsPanelItem as __experimentalToolsPanelItem,
 	ToolsPanelContext as __experimentalToolsPanelContext,
 } from './tools-panel';
-export { default as Tooltip } from './tooltip';
+export { default as Tooltip } from './tooltip/deprecated';
 export {
 	default as __experimentalTreeGrid,
 	TreeGridRow as __experimentalTreeGridRow,

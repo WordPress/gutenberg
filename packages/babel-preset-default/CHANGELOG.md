@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Always polyfill `Array.prototype.toSorted`, even when all supported browsers implement it natively ([#86159](https://github.com/WordPress/gutenberg/pull/86159)).
+
 ## 10.0.0 (2026-10-20)
 
 ### Breaking Changes
