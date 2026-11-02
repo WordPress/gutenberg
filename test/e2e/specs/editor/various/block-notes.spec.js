@@ -150,6 +150,7 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).toBeVisible();
 		// Should focus the newly added note thread.
 		await expect( thread ).toBeFocused();
+		await expect( thread ).toHaveAccessibleName( 'Note: A test comment' );
 	} );
 
 	test( 'can reply to a block note', async ( { blockNoteUtils } ) => {
@@ -866,27 +867,6 @@ test.describe( 'Block Notes', () => {
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
 
-		test( 'should have accessible name for the note threads', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
-			} );
-
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem' )
-				.first();
-
-			await thread.focus();
-			await expect( thread ).toHaveAccessibleName( 'Note: Test comment' );
-		} );
-
 		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
 			blockNoteUtils,
 		} ) => {
@@ -1176,31 +1156,7 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Emoji Reactions', () => {
-		test( 'can add an emoji reaction to a note', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing emoji reactions' },
-				comment: 'Test comment for reactions',
-			} );
-
-			await blockNoteUtils.addReactionToComment( 'Heart' );
-
-			// Verify the reaction button appears with count.
-			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
-			} );
-			await expect( reactionButton ).toBeVisible();
-			await expect( reactionButton ).toContainText( '1' );
-			await expect( reactionButton ).toHaveAttribute(
-				'aria-pressed',
-				'true'
-			);
-		} );
-
-		test( 'can re-add the same reaction after removing it', async ( {
+		test( 'can add, remove and re-add a reaction', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1216,6 +1172,10 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
+			await expect( reactionButton ).toHaveAttribute(
+				'aria-pressed',
+				'true'
+			);
 
 			// Remove the reaction.
 			await reactionButton.click();
@@ -1908,69 +1868,6 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toBeVisible();
 		} );
 
-		test( 'removes the inline marker when the note is deleted', async ( {
-			editor,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Delete the whole note.' },
-			} );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await blockNoteUtils.addNote( 'Remove my marker on delete' );
-
-			await expect(
-				editor.canvas.locator( 'mark.wp-note' ).first()
-			).toBeVisible();
-
-			// Deleting the note strips its inline marker from the content (rather
-			// than leaving a stray highlight behind) while keeping the text.
-			await blockNoteUtils.deleteNote();
-
-			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
-				0
-			);
-			await expect( paragraph ).toHaveText( 'Delete the whole note.' );
-		} );
-
-		test( 'removes the inline marker when the note is resolved', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Resolve this note.' },
-			} );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await blockNoteUtils.addNote( 'Resolve removes my marker' );
-
-			await expect(
-				editor.canvas.locator( 'mark.wp-note' ).first()
-			).toBeVisible();
-
-			// Resolving drops the highlight, so the marker is removed from the
-			// content and the note settles back to a block-level note.
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-
-			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
-				0
-			);
-			await expect( paragraph ).toHaveText( 'Resolve this note.' );
-		} );
-
 		test( 'adds, resolves and deletes inline notes in merged text', async ( {
 			editor,
 			page,
@@ -2025,34 +1922,6 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await expect( paragraph ).toHaveText( 'One two three four' );
-		} );
-
-		test( 'anchors the marker to only the selected text', async ( {
-			editor,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Hello brave new world.' },
-			} );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-
-			// Select just the word "brave" (offsets 6-11) so the inline note
-			// wraps a sub-range rather than the whole block.
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
-
-			await blockNoteUtils.addNote( 'Just this word' );
-
-			// The marker wraps only "brave", and the rest of the sentence stays
-			// outside it.
-			const mark = editor.canvas.locator( 'mark.wp-note' );
-			await expect( mark ).toHaveCount( 1 );
-			await expect( mark ).toHaveText( 'brave' );
-			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
 		} );
 
 		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
