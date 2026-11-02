@@ -337,12 +337,12 @@ export function TypographyPanel( {
 	const hasTextGradient =
 		'text' === value?.background?.backgroundClip &&
 		!! value?.background?.gradient;
+	// The Gradient control shows without the text color setting.
 	const enableContrastChecking =
 		! value?.color?.gradient &&
 		( 'text' === value?.background?.backgroundClip
 			? hasTextGradient
-			: !! value?.color?.text ) &&
-		settings?.color?.text &&
+			: !! value?.color?.text && settings?.color?.text ) &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
 	const contrastWarning = useBlockColorContrastWarning( {
