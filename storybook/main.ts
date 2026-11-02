@@ -223,19 +223,7 @@ const config: StorybookConfig = {
 				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
 				// meaningful budget above the current 3.15 MB largest chunk.
 				chunkSizeWarningLimit: 3_500,
-				/**
-				 * Use terser with keep_fnames to preserve component names in source code display.
-				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
-				 * which breaks the Storybook docs source code display.
-				 * @see https://github.com/storybookjs/storybook/issues/20769
-				 */
-				minify: NODE_ENV === 'production' ? 'terser' : false,
-				terserOptions: {
-					keep_fnames: true,
-					mangle: {
-						keep_fnames: true,
-					},
-				},
+				minify: NODE_ENV === 'production' ? 'oxc' : false,
 				rolldownOptions: {
 					checks: {
 						// Storybook's legacy `react-docgen` and
@@ -244,6 +232,28 @@ const config: StorybookConfig = {
 						// timing warnings.
 						pluginTimings: false,
 					},
+					// Preserve function and class names so Storybook renders
+					// `<BoxControl>` rather than a mangled `<J>`. Since setting
+					// `output.minify` overrides Vite's minify setting, assign
+					// it only in production where we expect minification.
+					//
+					// See: https://github.com/storybookjs/storybook/issues/20769
+					output:
+						NODE_ENV === 'production'
+							? {
+									minify: {
+										compress: {
+											keepNames: {
+												function: true,
+												class: true,
+											},
+										},
+										mangle: {
+											keepNames: true,
+										},
+									},
+								}
+							: {},
 				},
 			},
 			define: {

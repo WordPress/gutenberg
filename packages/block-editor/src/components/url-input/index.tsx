@@ -26,7 +26,9 @@ import type {
 	URLInputSuggestionsListProps,
 } from './types';
 
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl: WCValidatedInputControl } = unlock(
+	componentsPrivateApis
+);
 
 const noop = () => {};
 
@@ -464,7 +466,7 @@ function Control( {
 	}
 
 	const MaybeValidatedInputControl = isValidated
-		? ValidatedInputControl
+		? WCValidatedInputControl
 		: WCInputControl;
 
 	return (

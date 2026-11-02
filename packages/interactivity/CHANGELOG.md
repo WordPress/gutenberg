@@ -21,6 +21,10 @@
 -   Skip `data-wp-bind--on*` directives instead of binding event handler attributes. Bind an event handler with `data-wp-on--*` instead. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag and pollute the store. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 
+### Internal
+
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes

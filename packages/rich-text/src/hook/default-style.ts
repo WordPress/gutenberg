@@ -1,5 +1,3 @@
-import { useCallback } from '@wordpress/element';
-
 /**
  * In HTML, leading and trailing spaces are not visible, and multiple spaces
  * elsewhere are visually reduced to one space. This rule prevents spaces from
@@ -20,11 +18,6 @@ import { useCallback } from '@wordpress/element';
  */
 const whiteSpace = 'pre-wrap';
 
-export function useDefaultStyle() {
-	return useCallback( ( element: HTMLElement | null ) => {
-		if ( ! element ) {
-			return;
-		}
-		element.style.whiteSpace = element.style.whiteSpace || whiteSpace;
-	}, [] );
+export function setDefaultStyle( element: HTMLElement ) {
+	element.style.whiteSpace = element.style.whiteSpace || whiteSpace;
 }
