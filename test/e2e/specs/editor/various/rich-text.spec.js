@@ -154,6 +154,36 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should not highlight the format of a deselected block', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: '<strong>Heading text</strong> end' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a <em>italic</em> b' },
+		} );
+		const italic = editor.canvas.locator( 'em' );
+		await italic.click();
+		await expect( italic ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toHaveClass( /is-selected/ );
+		await expect( italic ).toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
