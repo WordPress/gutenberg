@@ -4,7 +4,7 @@
 	"name": "core/archives",
 	"title": "Archives",
 	"category": "widgets",
-	"description": "Display a date archive of your posts.",
+	"description": "Displays a date archive of your posts.",
 	"textdomain": "default",
 	"attributes": {
 		"displayAsDropdown": {
