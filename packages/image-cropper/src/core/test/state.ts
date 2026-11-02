@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { CropGeometry, Size } from '../types';
+import type { CropperControllerState, Size } from '../types';
 import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import { cropperReducer, enforceContainment, isStateDirty } from '../state';
 import {
@@ -13,7 +13,9 @@ const IMAGE: Size = { width: 1600, height: 900 };
 const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 const CONTAINER: Size = { width: 800, height: 600 };
 
-function makeState( overrides: Partial< CropGeometry > = {} ): CropGeometry {
+function makeState(
+	overrides: Partial< CropperControllerState > = {}
+): CropperControllerState {
 	const merged = {
 		...DEFAULT_STATE,
 		image: {
@@ -53,7 +55,7 @@ function makeState( overrides: Partial< CropGeometry > = {} ): CropGeometry {
  * @return The world-space AABB of the visible region.
  */
 function getCropWorldRegion(
-	state: CropGeometry,
+	state: CropperControllerState,
 	imageSize: Size,
 	containerSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -171,8 +173,8 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	 * @param tolerance Allowed difference per axis (default 0.02).
 	 */
 	function expectSameVisibleRegion(
-		before: CropGeometry,
-		after: CropGeometry,
+		before: CropperControllerState,
+		after: CropperControllerState,
 		tolerance = 0.02
 	) {
 		const regionBefore = getCropWorldRegion( before, IMAGE, CONTAINER );

@@ -1,4 +1,8 @@
-import type { CropperAction, CropGeometry, TransformOperation } from './types';
+import type {
+	CropperAction,
+	CropperControllerState,
+	TransformOperation,
+} from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,
 	DEFAULT_STATE,
@@ -27,8 +31,8 @@ function nearlyEqual( a: number, b: number ): boolean {
  * @return Whether the two states are value-equal across all tracked fields.
  */
 export function areCropperStatesEqual(
-	a: CropGeometry,
-	b: CropGeometry
+	a: CropperControllerState,
+	b: CropperControllerState
 ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
@@ -49,7 +53,10 @@ export function areCropperStatesEqual(
 	);
 }
 
-function clampRequestedZoom( state: CropGeometry, zoom: number ): number {
+function clampRequestedZoom(
+	state: CropperControllerState,
+	zoom: number
+): number {
 	// With an image, enforceContainment raises zoom to the coverage-aware
 	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
 	// the conservative resting default.
@@ -75,7 +82,7 @@ function clampRequestedZoom( state: CropGeometry, zoom: number ): number {
  * @return The equivalent reducer action.
  */
 function operationToAction(
-	state: CropGeometry,
+	state: CropperControllerState,
 	op: TransformOperation
 ): CropperAction {
 	switch ( op.type ) {
@@ -117,7 +124,9 @@ function operationToAction(
  * @param state The state to enforce containment on.
  * @return The state with cropRect, zoom, and position restricted.
  */
-export function enforceContainment( state: CropGeometry ): CropGeometry {
+export function enforceContainment(
+	state: CropperControllerState
+): CropperControllerState {
 	if ( ! state.image ) {
 		return state;
 	}
@@ -180,7 +189,7 @@ export function enforceContainment( state: CropGeometry ): CropGeometry {
  * @param next The post-containment state to commit.
  * @return The state with base fields synced to current.
  */
-function commitBase( next: CropGeometry ): CropGeometry {
+function commitBase( next: CropperControllerState ): CropperControllerState {
 	if (
 		next.basePan.x === next.pan.x &&
 		next.basePan.y === next.pan.y &&
@@ -215,9 +224,9 @@ function commitBase( next: CropGeometry ): CropGeometry {
  * @return The new cropper state.
  */
 export function cropperReducer(
-	state: CropGeometry,
+	state: CropperControllerState,
 	action: CropperAction
-): CropGeometry {
+): CropperControllerState {
 	// Every action runs through enforceContainment to maintain the invariant:
 	// the image always fully covers the crop area.
 	switch ( action.type ) {
@@ -466,8 +475,8 @@ export function cropperReducer(
  * @return True if any tracked field differs.
  */
 export function isStateDirty(
-	current: CropGeometry,
-	initial: CropGeometry
+	current: CropperControllerState,
+	initial: CropperControllerState
 ): boolean {
 	return (
 		! nearlyEqual( current.pan.x, initial.pan.x ) ||

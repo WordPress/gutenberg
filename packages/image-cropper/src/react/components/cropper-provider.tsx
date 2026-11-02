@@ -3,7 +3,7 @@ import {
 	useCropperController,
 	type CropperController,
 } from '../hooks/use-cropper-controller';
-import type { CropGeometry } from '../../core/types';
+import type { CropperControllerState } from '../../core/types';
 
 /**
  * The context value type for the CropperProvider.
@@ -18,7 +18,7 @@ const CropperContext = createContext< CropperContextValue >( null );
  */
 interface CropperProviderProps {
 	/** Optional partial initial state to merge with defaults. */
-	initialState?: Partial< CropGeometry >;
+	initialState?: Partial< CropperControllerState >;
 	/** Child components. */
 	children: React.ReactNode;
 }

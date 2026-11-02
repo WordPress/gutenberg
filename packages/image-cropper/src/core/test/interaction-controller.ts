@@ -12,7 +12,7 @@ import {
 	InteractionController,
 	type CropperInteractionActions,
 } from '../interaction-controller';
-import type { CropGeometry, Size } from '../types';
+import type { CropperControllerState, Size } from '../types';
 import {
 	DEFAULT_STATE,
 	DEFAULT_WHEEL_ZOOM_SPEED,
@@ -34,9 +34,11 @@ if ( typeof globalThis.Element === 'undefined' ) {
  * Create a cropper state with an image set so restrictPanZoom works.
  *
  * @param overrides Partial state overrides.
- * @return A complete CropGeometry.
+ * @return A complete CropperControllerState.
  */
-function makeState( overrides: Partial< CropGeometry > = {} ): CropGeometry {
+function makeState(
+	overrides: Partial< CropperControllerState > = {}
+): CropperControllerState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -256,7 +258,7 @@ describe( 'InteractionController', () => {
 	 * @return The controller instance and the options object (for lazy mutation).
 	 */
 	function createController(
-		state: CropGeometry,
+		state: CropperControllerState,
 		options: Record< string, unknown > = {}
 	) {
 		const opts = {

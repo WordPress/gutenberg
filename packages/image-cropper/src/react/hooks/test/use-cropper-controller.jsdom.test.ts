@@ -972,10 +972,10 @@ describe( 'useCropperController', () => {
 	} );
 
 	describe( 'isStateDirty coverage guard', () => {
-		// This test ensures that isStateDirty checks ALL fields in CropGeometry.
-		// If you add a field to CropGeometry/DEFAULT_STATE and this test fails,
+		// This test ensures that isStateDirty checks ALL fields in CropperControllerState.
+		// If you add a field to CropperControllerState/DEFAULT_STATE and this test fails,
 		// you MUST also update isStateDirty() in use-cropper-controller.ts.
-		it( 'should track all CropGeometry fields', () => {
+		it( 'should track all CropperControllerState fields', () => {
 			// Flatten DEFAULT_STATE keys into dot-notation paths.
 			// e.g., { pan: { x: 0, y: 0 } } → ['crop.x', 'crop.y']
 			function flattenKeys(
@@ -1005,7 +1005,7 @@ describe( 'useCropperController', () => {
 			}
 
 			// The fields that isStateDirty currently checks.
-			// Keep this in sync — if you add a field to CropGeometry,
+			// Keep this in sync — if you add a field to CropperControllerState,
 			// add it here AND in isStateDirty().
 			const dirtyCheckedFields = [
 				'pan.x',

@@ -48,7 +48,7 @@
  * - If Core's pipeline operation order ever changes, update
  *   `serverSourcePixel` to match — it mirrors the server exactly.
  * - Adding a new cropper operation (e.g. skew) means: extend
- *   `CropGeometry`, teach `buildModifiers` to emit it, extend
+ *   `CropperControllerState`, teach `buildModifiers` to emit it, extend
  *   `serverSourcePixel` to undo it, and add values to the grid in
  *   `buildRows`. The probes don't need to change.
  */
@@ -59,11 +59,13 @@ import { buildModifiers } from '../build-modifiers';
 import type { Modifier } from '../build-modifiers';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
-import type { CropGeometry, Size } from '../core/types';
+import type { CropperControllerState, Size } from '../core/types';
 
 const IMAGE: Size = { width: 1600, height: 900 };
 
-function makeState( overrides: Partial< CropGeometry > = {} ): CropGeometry {
+function makeState(
+	overrides: Partial< CropperControllerState > = {}
+): CropperControllerState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -87,7 +89,7 @@ function makeState( overrides: Partial< CropGeometry > = {} ): CropGeometry {
  * @param v          Vertical probe in [0, 1] across the output.
  */
 function exportSourcePixel(
-	state: CropGeometry,
+	state: CropperControllerState,
 	imageSize: Size,
 	outputSize: Size,
 	u: number,
@@ -225,7 +227,7 @@ const PROBES: { label: string; u: number; v: number }[] = [
 
 interface ParityRow {
 	label: string;
-	state: CropGeometry;
+	state: CropperControllerState;
 	probeLabel: string;
 	u: number;
 	v: number;

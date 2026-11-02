@@ -1,8 +1,8 @@
-import type { CropGeometry, NormalizedRect, Size } from '../core';
+import type { CropperControllerState, NormalizedRect, Size } from '../core';
 import type { CropperAction } from '../core/types';
 
 /**
- * Crop options that share the undo history with the cropper geometry.
+ * Crop options that share the undo history with the cropper state.
  */
 export interface CropOptions {
 	/**
@@ -21,14 +21,14 @@ export const DEFAULT_CROP_OPTIONS: CropOptions = {
 };
 
 /**
- * The state a crop session holds: the cropper geometry and the crop
+ * The state a crop session holds: the cropper state and the crop
  * options. Every undo/redo snapshot is a full state.
  *
  * A session can hold more than this: `useCropSession` accepts a reducer
  * for a wider state that still includes these two slices.
  */
 export interface CropSessionState {
-	cropper: CropGeometry;
+	cropper: CropperControllerState;
 	cropOptions: CropOptions;
 }
 

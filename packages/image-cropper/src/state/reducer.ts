@@ -1,4 +1,4 @@
-import type { CropGeometry } from '../core';
+import type { CropperControllerState } from '../core';
 import {
 	cropperReducer,
 	areCropperStatesEqual,
@@ -113,14 +113,14 @@ export function areCropSessionStatesEqual(
 }
 
 /**
- * Build the state a session starts from: the given geometry and default
- * crop options.
+ * Build the state a session starts from: the given cropper state and
+ * default crop options.
  *
- * @param cropper The cropper geometry.
+ * @param cropper The cropper state.
  * @return Initial state.
  */
 export function buildInitialCropSessionState(
-	cropper: CropGeometry
+	cropper: CropperControllerState
 ): CropSessionState {
 	return {
 		cropper,

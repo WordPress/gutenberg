@@ -11,7 +11,7 @@ import {
 	enforceContainment,
 	exportCroppedImage,
 	type CropperAction,
-	type CropGeometry,
+	type CropperControllerState,
 	type NormalizedRect,
 	type Size,
 } from '../core';
@@ -25,8 +25,8 @@ import { resolveAspectRatio } from './resolve-aspect-ratio';
 import type { CropOptions, CropSessionAction, CropSessionState } from './types';
 
 function areCropperImagesEqual(
-	a: CropGeometry[ 'image' ],
-	b: CropGeometry[ 'image' ]
+	a: CropperControllerState[ 'image' ],
+	b: CropperControllerState[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -37,7 +37,7 @@ function areCropperImagesEqual(
 
 /**
  * Options for `useCropSession`. Leave them out for a session that holds
- * only the cropper geometry and crop options.
+ * only the cropper state and crop options.
  *
  * To hold more state in the same undo history, pass all three, defined
  * outside the component so they keep their identity between renders.
@@ -50,8 +50,8 @@ export interface CropSessionOptions< S extends CropSessionState, A > {
 	reducer: ( state: S, action: A | CropSessionAction< S > ) => S;
 	/** Value equality for the full state, used to skip no-op snapshots. */
 	areStatesEqual: ( a: S, b: S ) => boolean;
-	/** Builds the state a session starts from, given its geometry. */
-	createInitialState: ( cropper: CropGeometry ) => S;
+	/** Builds the state a session starts from, given its cropper state. */
+	createInitialState: ( cropper: CropperControllerState ) => S;
 }
 
 /**
@@ -90,7 +90,7 @@ export interface CropSession<
 	 * session: the initial state, a clean baseline, and no history.
 	 * Reporting the same image again is a no-op.
 	 */
-	setSourceImage: ( image: CropGeometry[ 'image' ] ) => void;
+	setSourceImage: ( image: CropperControllerState[ 'image' ] ) => void;
 	/**
 	 * Whether anything in the session differs from its baseline,
 	 * including state that does not change the image, such as the
@@ -124,7 +124,7 @@ const DEFAULT_OPTIONS = {
 /**
  * A crop session with undo and redo.
  *
- * Cropper geometry, crop options and any state added through `options`
+ * Cropper state, crop options and any state added through `options`
  * go through one reducer and one history stack.
  *
  * History:
@@ -256,7 +256,7 @@ export function useCropSession<
 	);
 
 	const setSourceImage = useCallback(
-		( image: CropGeometry[ 'image' ] ) => {
+		( image: CropperControllerState[ 'image' ] ) => {
 			if (
 				areCropperImagesEqual( stateRef.current.cropper.image, image )
 			) {
@@ -284,7 +284,7 @@ export function useCropSession<
 	);
 
 	const resetCropper = useCallback(
-		( resetState?: Partial< CropGeometry > ) => {
+		( resetState?: Partial< CropperControllerState > ) => {
 			dispatchWithHistory( {
 				type: 'CROPPER',
 				action: { type: 'RESET', payload: resetState },

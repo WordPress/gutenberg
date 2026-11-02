@@ -6,7 +6,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import type {
-	CropGeometry,
+	CropperControllerState,
 	CropperAction,
 	NormalizedRect,
 	Size,
@@ -34,11 +34,11 @@ import {
  */
 export interface CropperController extends CropperSetters {
 	/** The current cropper state (read-only). */
-	state: CropGeometry;
+	state: CropperControllerState;
 	/** Set the loaded image (natural size and src). */
-	setImage: ( image: CropGeometry[ 'image' ] ) => void;
+	setImage: ( image: CropperControllerState[ 'image' ] ) => void;
 	/** Reset the state. Optionally merge partial state overrides. */
-	reset: ( resetState?: Partial< CropGeometry > ) => void;
+	reset: ( resetState?: Partial< CropperControllerState > ) => void;
 	/** Whether the current state differs from the initial state. */
 	isDirty: boolean;
 	/**
@@ -63,8 +63,8 @@ export interface CropperController extends CropperSetters {
 }
 
 function areCropperImagesEqual(
-	a: CropGeometry[ 'image' ],
-	b: CropGeometry[ 'image' ]
+	a: CropperControllerState[ 'image' ],
+	b: CropperControllerState[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -87,7 +87,7 @@ function areCropperImagesEqual(
  * @return The cropper controller — state, setters, and helpers.
  */
 export function useCropperController(
-	initialState?: Partial< CropGeometry >
+	initialState?: Partial< CropperControllerState >
 ): CropperController {
 	const [ state, dispatch ] = useReducer(
 		cropperReducer,
@@ -99,9 +99,10 @@ export function useCropperController(
 	// `isDirty`. Stored in state (not a ref) so the comparison reads
 	// a value, not a ref's `current`. `setImage` and `reset` refresh
 	// this when the consumer establishes a new baseline.
-	const [ initialBaseline, setInitialBaseline ] = useState< CropGeometry >(
-		() => enforceContainment( { ...DEFAULT_STATE, ...initialState } )
-	);
+	const [ initialBaseline, setInitialBaseline ] =
+		useState< CropperControllerState >( () =>
+			enforceContainment( { ...DEFAULT_STATE, ...initialState } )
+		);
 	// Latest-state ref used by setters that need to read fresh state
 	// (focal-point zoom, toggleFlip, reset, setImage). Updated
 	// synchronously inside `dispatchAndSync` so multiple actions in
@@ -116,7 +117,7 @@ export function useCropperController(
 	}, [] );
 
 	const setImage = useCallback(
-		( image: CropGeometry[ 'image' ] ) => {
+		( image: CropperControllerState[ 'image' ] ) => {
 			if ( areCropperImagesEqual( stateRef.current.image, image ) ) {
 				return;
 			}
@@ -134,7 +135,7 @@ export function useCropperController(
 	);
 
 	const reset = useCallback(
-		( resetState?: Partial< CropGeometry > ) => {
+		( resetState?: Partial< CropperControllerState > ) => {
 			const nextInitialState = dispatchAndSync( {
 				type: 'RESET',
 				payload: resetState,

@@ -1,6 +1,6 @@
 import type {
 	CropperAction,
-	CropGeometry,
+	CropperControllerState,
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
@@ -39,12 +39,12 @@ export interface CropperSetters {
  *   `CROPPER` envelope so the history machinery can record them.
  *
  * Both pass their own dispatch function and a getter that returns
- * the current `CropGeometry`. The factory shape keeps the two hooks
+ * the current `CropperControllerState`. The factory shape keeps the two hooks
  * in lockstep — add a setter here once, both hooks get it.
  *
  * @param dispatchCropperAction Apply a `CropperAction` to the
  *                              underlying reducer.
- * @param getCropperState       Return the current `CropGeometry`.
+ * @param getCropperState       Return the current `CropperControllerState`.
  *                              Used by setters that need to read
  *                              the latest state to compute their
  *                              payload (focal-point zoom, flip toggle).
@@ -52,7 +52,7 @@ export interface CropperSetters {
  */
 export function buildCropperSetters(
 	dispatchCropperAction: ( action: CropperAction ) => void,
-	getCropperState: () => CropGeometry
+	getCropperState: () => CropperControllerState
 ): CropperSetters {
 	return {
 		setPan: ( pan ) =>

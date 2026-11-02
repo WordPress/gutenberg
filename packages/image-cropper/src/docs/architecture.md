@@ -10,7 +10,7 @@
 | Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
 | Deprecated cropper | `src/legacy/` | The older cropper built on `react-easy-crop`. Nothing outside this folder imports it. |
 
-`useCropperController` has no undo and redo. `useCropSession` adds them: cropper geometry and crop options go through one reducer and one history stack, so a control such as the aspect-ratio preset and a crop gesture share one undo stack. A wider state can join the same history by passing its own reducer, which handles its own actions and passes the rest to `cropSessionReducer`. The media editor does this for its named edits.
+`useCropperController` has no undo and redo. `useCropSession` adds them: the cropper state and crop options go through one reducer and one history stack, so a control such as the aspect-ratio preset and a crop gesture share one undo stack. A wider state can join the same history by passing its own reducer, which handles its own actions and passes the rest to `cropSessionReducer`. The media editor does this for its named edits.
 
 ## Coordinate Spaces
 

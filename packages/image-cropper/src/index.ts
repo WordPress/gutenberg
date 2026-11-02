@@ -11,7 +11,7 @@ export type { CropperProps } from './react/components';
 
 // State and extension types.
 export type {
-	CropGeometry,
+	CropperControllerState,
 	NormalizedPoint,
 	NormalizedRect,
 	Size,

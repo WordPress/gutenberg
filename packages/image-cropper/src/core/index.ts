@@ -1,6 +1,6 @@
 // Types
 export type {
-	CropGeometry,
+	CropperControllerState,
 	CropperAction,
 	TransformOperation,
 	NormalizedPoint,

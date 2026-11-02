@@ -1,4 +1,4 @@
-import type { CropGeometry, NormalizedRect, Size } from '../types';
+import type { CropperControllerState, NormalizedRect, Size } from '../types';
 
 /**
  * Magnitude beyond which any cropper-math input is treated as corrupt.
@@ -109,7 +109,9 @@ export function sanitizeRect( rect: NormalizedRect ): NormalizedRect {
  * @param state The cropper state to sanitize.
  * @return A cropper state with the math-relevant numeric fields finite.
  */
-export function sanitizeCropperState( state: CropGeometry ): CropGeometry {
+export function sanitizeCropperState(
+	state: CropperControllerState
+): CropperControllerState {
 	const panX = safeBoundedNumber( state.pan.x, 0 );
 	const panY = safeBoundedNumber( state.pan.y, 0 );
 	const basePanX = safeBoundedNumber( state.basePan.x, 0 );

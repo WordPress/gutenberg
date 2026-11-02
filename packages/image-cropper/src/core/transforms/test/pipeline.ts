@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { CropGeometry, TransformOperation } from '../../types';
+import type { CropperControllerState, TransformOperation } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import { applyOperationToState, stateFromPipeline } from '../pipeline';
 import { cropperReducer } from '../../state';
 
 describe( 'applyOperationToState', () => {
-	let baseState: CropGeometry;
+	let baseState: CropperControllerState;
 
 	beforeEach( () => {
 		baseState = {
@@ -73,7 +73,7 @@ describe( 'applyOperationToState', () => {
 	} );
 
 	it( 'should handle flip horizontal: toggle off', () => {
-		const flippedState: CropGeometry = {
+		const flippedState: CropperControllerState = {
 			...baseState,
 			flip: { horizontal: true, vertical: false },
 		};
@@ -154,7 +154,7 @@ describe( 'stateFromPipeline', () => {
 		// The custom initial represents a user who committed to this
 		// pose via UI actions. Sync base fields so the pipeline replay
 		// (which routes through the reducer) doesn't relax them.
-		const customInitial: CropGeometry = {
+		const customInitial: CropperControllerState = {
 			...DEFAULT_STATE,
 			rotation: 90,
 			baseRotation: 90,

@@ -3,7 +3,7 @@ import {
 	cropSessionReducer,
 	areCropSessionStatesEqual,
 	buildInitialCropSessionState,
-	type CropGeometry,
+	type CropperControllerState,
 } from '@wordpress/image-cropper';
 import type { MediaEditorAction, MediaEditorState } from './types';
 
@@ -73,14 +73,14 @@ export function areMediaEditorStatesEqual(
 }
 
 /**
- * Build the state a session starts from: the given geometry, default
- * crop options, and no edits.
+ * Build the state a session starts from: the given cropper state,
+ * default crop options, and no edits.
  *
- * @param cropper The cropper geometry.
+ * @param cropper The cropper state.
  * @return Initial state.
  */
 export function buildInitialMediaEditorState(
-	cropper: CropGeometry
+	cropper: CropperControllerState
 ): MediaEditorState {
 	return { ...buildInitialCropSessionState( cropper ), edits: {} };
 }
