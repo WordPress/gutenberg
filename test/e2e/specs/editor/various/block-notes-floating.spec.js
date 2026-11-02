@@ -1,5 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { BlockNoteUtils } = require( './block-notes-utils' );
+const { BlockNoteUtils, getAuthorTint } = require( './block-notes-utils' );
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
@@ -900,90 +900,6 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	} );
 
-	test.describe( 'Multiple notes per block', () => {
-		test( 'resolving one note does not affect sibling notes on the same block', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with notes to resolve' },
-				comment: 'Note A',
-			} );
-			await blockNoteUtils.addNote( 'Note B' );
-
-			const notes = getFloatingNotes( page );
-
-			// Resolve Note A.
-			const threadA = notes.getByRole( 'treeitem', {
-				name: 'Note: Note A',
-			} );
-			await threadA.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( threadA ).toBeHidden();
-
-			// Note B should still be visible and unresolved (expanded).
-			const threadB = notes.getByRole( 'treeitem', {
-				name: 'Note: Note B',
-			} );
-			await expect( threadB ).toBeVisible();
-
-			// Both notes should still exist in metadata.
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
-				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-			expect( noteIds ).toHaveLength( 2 );
-		} );
-
-		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block for auto-select' },
-				comment: 'First note',
-			} );
-			await blockNoteUtils.addNote( 'Second note' );
-
-			const notes = getFloatingNotes( page );
-
-			// Resolve the first note.
-			const firstThread = notes.getByRole( 'treeitem', {
-				name: 'Note: First note',
-			} );
-			await firstThread.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( firstThread ).toBeHidden();
-
-			// Click the title to deselect the block and its comment.
-			await blockNoteUtils.deselect();
-
-			// Click back on the original block.
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Block for auto-select' } )
-				.click();
-
-			// The second (unresolved) note should be the active one.
-			const secondThread = notes.getByRole( 'treeitem', {
-				name: 'Note: Second note',
-			} );
-			await expect( secondThread ).toHaveAttribute(
-				'aria-expanded',
-				'true'
-			);
-		} );
-	} );
-
 	test.describe( 'Canvas margin', () => {
 		function getCanvasFrame( page ) {
 			return page.locator( 'iframe[name="editor-canvas"]' );
@@ -1181,40 +1097,69 @@ test.describe( 'Block Notes: floating notes', () => {
 			await requestUtils.resetPreferences();
 		} );
 
-		test( 'hides and shows floating notes', async ( {
+		test( 'hides and shows floating notes and their highlights', async ( {
+			editor,
 			page,
+			requestUtils,
 			blockNoteUtils,
 		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
-				attributes: { content: 'Testing block notes' },
+				attributes: { content: 'Note the whole block.' },
 				comment: 'A floating note',
 			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note these words.' },
+			} );
+			await getParagraph( editor, 'Note these words.' ).click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+
 			const thread = getThread( page, 'A floating note' );
+			const blockNoted = getParagraph( editor, 'Note the whole block.' );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+			const allNotesHeading = getAllNotes( page ).getByRole( 'heading', {
+				name: 'All notes',
+			} );
+			const expectHighlighted = async ( background ) => {
+				await expect( blockNoted ).toHaveCSS(
+					'background-color',
+					background,
+					{ pseudo: 'after' }
+				);
+				await expect( marker ).toHaveCSS(
+					'background-color',
+					background
+				);
+			};
+
+			await expectHighlighted( tint );
 
 			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
 			await expect( thread ).toBeHidden();
+			await expectHighlighted( 'rgba(0, 0, 0, 0)' );
+			await expect( marker ).toHaveCSS( 'text-decoration-line', 'none' );
+			// The marker stays in the content, it just isn't painted.
+			await expect( marker ).toHaveText( 'Note these words.' );
 
 			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
 			await expect( thread ).toBeVisible();
+			await expectHighlighted( tint );
 
-			// Floating notes yield to "All notes".
+			// Floating notes yield to "All notes", which is still a view of
+			// the notes, so the highlights stay.
 			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
-			await expect(
-				getAllNotes( page ).getByRole( 'heading', {
-					name: 'All notes',
-				} )
-			).toBeVisible();
+			await expect( allNotesHeading ).toBeVisible();
 			await expect( getFloatingNotes( page ) ).toBeHidden();
+			await expectHighlighted( tint );
 
 			// Showing notes closes "All notes".
 			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
 			await expect( thread ).toBeVisible();
-			await expect(
-				getAllNotes( page ).getByRole( 'heading', {
-					name: 'All notes',
-				} )
-			).toBeHidden();
+			await expect( allNotesHeading ).toBeHidden();
 		} );
 
 		test( 'minimizes floating notes', async ( {

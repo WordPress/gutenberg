@@ -1,5 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { BlockNoteUtils } = require( './block-notes-utils' );
+const { BlockNoteUtils, getAuthorTint } = require( './block-notes-utils' );
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
@@ -17,29 +17,6 @@ test.describe( 'Block Notes', () => {
 		await requestUtils.deleteAllComments( 'note' );
 		await requestUtils.resetPreferences();
 	} );
-
-	// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-	// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
-	// palette is changed without updating the e2e expectation.
-	const AVATAR_BORDER_COLORS = [
-		'#6F42C1',
-		'#D94145',
-		'#FBBF24',
-		'#FF35EE',
-		'#879F11',
-		'#0F766E',
-		'#00CFFF',
-	];
-
-	// The current user's author color at the highlight's 0x40 alpha.
-	async function getAuthorTint( requestUtils ) {
-		const { id } = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-		const hex = AVATAR_BORDER_COLORS[ id % AVATAR_BORDER_COLORS.length ];
-		const [ r, g, b ] = [ 1, 3, 5 ].map( ( i ) =>
-			parseInt( hex.slice( i, i + 2 ), 16 )
-		);
-		return `rgba(${ r }, ${ g }, ${ b }, 0.25)`;
-	}
 
 	test( 'should move focus to add a new note form', async ( {
 		editor,
@@ -1175,7 +1152,7 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Multiple notes per block', () => {
-		test( 'can add and delete multiple notes on the same block', async ( {
+		test( 'handles several notes on the same block', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -1214,6 +1191,32 @@ test.describe( 'Block Notes', () => {
 					( b ) => b.name === 'core/paragraph'
 				)?.attributes?.metadata?.noteId;
 			expect( await getNoteIds() ).toHaveLength( 2 );
+
+			await test.step( 'Resolving one note keeps the other', async () => {
+				await blockNoteUtils.getThread( 'First note on block' ).click();
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect(
+					page
+						.getByRole( 'region', { name: 'Editor settings' } )
+						.locator(
+							'.editor-collab-sidebar-panel__status-separator'
+						)
+				).toBeVisible();
+				await expect(
+					blockNoteUtils.getThread( 'Second note on block' )
+				).toBeVisible();
+				expect( await getNoteIds() ).toHaveLength( 2 );
+			} );
+
+			await test.step( 'Selecting the block selects its first unresolved note', async () => {
+				await blockNoteUtils.deselect();
+				await editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.click();
+				await expect(
+					blockNoteUtils.getThread( 'Second note on block' )
+				).toHaveAttribute( 'aria-expanded', 'true' );
+			} );
 
 			await test.step( 'Deleting one note preserves the other', async () => {
 				await blockNoteUtils
@@ -2098,62 +2101,6 @@ test.describe( 'Block Notes', () => {
 				'rgba(0, 0, 0, 0)',
 				{ pseudo: 'after' }
 			);
-		} );
-
-		test( 'hides the highlights along with the notes', async ( {
-			editor,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const tint = await getAuthorTint( requestUtils );
-
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Note the whole block.' },
-			} );
-			await blockNoteUtils.addNote( 'Block-level note' );
-			const blockNoted = editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.first();
-
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Note these words.' },
-			} );
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.last()
-				.click();
-			await blockNoteUtils.selectBlockText();
-			await blockNoteUtils.addNote( 'Inline note' );
-			const marker = editor.canvas.locator( 'mark.wp-note' );
-
-			const expectHighlighted = async ( background ) => {
-				await expect( blockNoted ).toHaveCSS(
-					'background-color',
-					background,
-					{ pseudo: 'after' }
-				);
-				await expect( marker ).toHaveCSS(
-					'background-color',
-					background
-				);
-			};
-
-			await expectHighlighted( tint );
-
-			// "All notes" is still a view of the notes, so the highlights stay.
-			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
-			await expectHighlighted( tint );
-
-			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
-			await expectHighlighted( 'rgba(0, 0, 0, 0)' );
-			await expect( marker ).toHaveCSS( 'text-decoration-line', 'none' );
-			// The marker stays in the content, it just isn't painted.
-			await expect( marker ).toHaveText( 'Note these words.' );
-
-			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
-			await expectHighlighted( tint );
 		} );
 	} );
 

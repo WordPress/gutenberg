@@ -1,5 +1,32 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+// palette is changed without updating the e2e expectation.
+const AVATAR_BORDER_COLORS = [
+	'#6F42C1',
+	'#D94145',
+	'#FBBF24',
+	'#FF35EE',
+	'#879F11',
+	'#0F766E',
+	'#00CFFF',
+];
+
+/**
+ * The current user's author color at the note highlight's 0x40 alpha.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils
+ */
+async function getAuthorTint( requestUtils ) {
+	const { id } = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+	const hex = AVATAR_BORDER_COLORS[ id % AVATAR_BORDER_COLORS.length ];
+	const [ r, g, b ] = [ 1, 3, 5 ].map( ( i ) =>
+		parseInt( hex.slice( i, i + 2 ), 16 )
+	);
+	return `rgba(${ r }, ${ g }, ${ b }, 0.25)`;
+}
+
 class BlockNoteUtils {
 	/** @type {import('@playwright/test').Page} */
 	#page;
@@ -223,4 +250,4 @@ class BlockNoteUtils {
 	}
 }
 
-module.exports = { BlockNoteUtils };
+module.exports = { BlockNoteUtils, getAuthorTint };
