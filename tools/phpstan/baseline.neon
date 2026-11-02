@@ -85,34 +85,10 @@ parameters:
 			path: ../../lib/client-assets.php
 
 		-
-			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
-			identifier: empty.property
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/block-bindings.php
-
-		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SPAN'' given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/block-comments.php
-
-		-
-			message: '#^Cannot assign offset ''media_type'' to WP_REST_Request\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Cannot assign offset ''mime_type'' to WP_REST_Request\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^WP_REST_Request does not accept array\<mixed, mixed\>\.$#'
-			identifier: offsetAssign.valueType
-			count: 2
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
 
 		-
 			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
@@ -131,18 +107,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/icons.php
-
-		-
-			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/rest-api.php
-
-		-
-			message: '#^Function gutenberg_exclude_notes_from_comment_count_7_2\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: ../../lib/compat/wordpress-7.2/note-reactions.php
 
 		-
 			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'

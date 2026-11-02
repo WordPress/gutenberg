@@ -50,11 +50,11 @@ class Gutenberg_REST_Attachments_Controller_7_1 extends WP_REST_Attachments_Cont
 
 		// Restore the array parameters to the request.
 		if ( null !== $media_type_array ) {
-			$request['media_type'] = $media_type_array;
+			$request->set_param( 'media_type', $media_type_array );
 		}
 
 		if ( null !== $mime_type_array ) {
-			$request['mime_type'] = $mime_type_array;
+			$request->set_param( 'mime_type', $mime_type_array );
 		}
 
 		if ( empty( $query_args['post_status'] ) ) {
