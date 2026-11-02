@@ -1,9 +1,6 @@
 import { createContext, useContext } from '@wordpress/element';
-import {
-	cleanEmptyObject,
-	getValueFromObjectPath,
-	setImmutably,
-} from '../utils/object';
+import { cleanEmptyObject } from './utils';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import type { BlockStyle, BlockStyleState, ResetAllFilter } from './types';
 
 const DEFAULT_STATE_VALUE = 'default';
