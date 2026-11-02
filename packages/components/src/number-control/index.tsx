@@ -10,7 +10,7 @@ import Button from '../button';
 import styles from './style.module.scss';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import type { StateReducer } from '../input-control/reducer/state';
-import { add, subtract, clamp, ensureValidStep } from '../utils/math';
+import { add, subtract, multiply, clamp, ensureValidStep } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { NumberControlProps } from './types';
@@ -58,7 +58,7 @@ function UnforwardedNumberControl(
 
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
-	const baseSpin = ensureNumber( spinFactor ) * baseStep;
+	const baseSpin = multiply( ensureNumber( spinFactor ), baseStep );
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
@@ -87,7 +87,9 @@ function UnforwardedNumberControl(
 	) => {
 		event?.preventDefault();
 		const shift = event?.shiftKey && isShiftStepEnabled;
-		const delta = shift ? ensureNumber( shiftStep ) * baseSpin : baseSpin;
+		const delta = shift
+			? multiply( ensureNumber( shiftStep ), baseSpin )
+			: baseSpin;
 		let nextValue = isValueEmpty( value ) ? baseValue : value;
 		if ( direction === 'up' ) {
 			nextValue = add( nextValue, delta );
@@ -132,7 +134,7 @@ function UnforwardedNumberControl(
 			const [ x, y ] = payload.delta;
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift
-				? ensureNumber( shiftStep ) * baseSpin
+				? multiply( ensureNumber( shiftStep ), baseSpin )
 				: baseSpin;
 
 			let directionModifier;
@@ -162,7 +164,7 @@ function UnforwardedNumberControl(
 
 			if ( delta !== 0 ) {
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-				const distance = delta * modifier * directionModifier;
+				const distance = multiply( delta, modifier, directionModifier );
 
 				nextState.value = constrainValue(
 					// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined

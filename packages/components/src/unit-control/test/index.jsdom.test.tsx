@@ -398,6 +398,45 @@ describe( 'UnitControl', () => {
 				expect.anything()
 			);
 		} );
+
+		it( 'should enforce integer rounding on commit when step={ 1 } is explicitly provided', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render(
+				<UnitControl value="50%" step={ 1 } onChange={ onChangeSpy } />
+			);
+
+			const input = getInput();
+			await user.clear( input );
+			await user.type( input, '50.5' );
+			await user.keyboard( '[Enter]' );
+
+			expect( input ).toHaveValue( 51 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'51%',
+				expect.anything()
+			);
+		} );
+
+		it( 'should step 0.3vw by 6 steps to 0.9vw without floating-point inaccuracies', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render( <UnitControl value="0.3vw" onChange={ onChangeSpy } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			for ( let i = 0; i < 6; i++ ) {
+				await user.keyboard( '[ArrowUp]' );
+			}
+
+			expect( input ).toHaveValue( 0.9 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'0.9vw',
+				expect.anything()
+			);
+		} );
 	} );
 
 	describe( 'Unit', () => {

@@ -52,6 +52,32 @@ export function subtract( ...args: Array< number | string > ) {
 }
 
 /**
+ * Safely multiplies values together, handling floating-point precision issues.
+ *
+ * @param args Values to multiply together.
+ *
+ * @return The product of values.
+ */
+export function multiply( ...args: Array< number | string > ) {
+	if ( ! args.length ) {
+		return 0;
+	}
+
+	const precision = args.reduce< number >(
+		( total, arg ) => total + getPrecision( getNumber( arg ) ),
+		0
+	);
+	const product = args.reduce< number >( ( total, arg, index ) => {
+		const value = getNumber( arg );
+		return index === 0 ? value : total * value;
+	}, 1 );
+
+	return precision
+		? getNumber( product.toFixed( Math.min( precision, 20 ) ) )
+		: product;
+}
+
+/**
  * Determines the decimal position of a number value.
  *
  * @param value The number to evaluate.
