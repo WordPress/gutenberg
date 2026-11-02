@@ -4,11 +4,13 @@
 
 ### Enhancements
 
+-   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 
 ### Bug Fixes
 
 -   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
+-   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
 -   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
