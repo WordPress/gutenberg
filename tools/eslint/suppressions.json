@@ -6773,11 +6773,6 @@
 			"count": 3
 		}
 	},
-	"packages/core-commands/src/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
