@@ -12,17 +12,15 @@ export const BLACK: PlainColorObject = {
 	alpha: 1,
 };
 
-// Reserve room for rounding both generated colors to 8-bit sRGB:
-// - A channel rounds by up to half a step, 0.5 / 255. Across the 256 rounding
-//   intervals, sRGB linearization gives a maximum factor of about 1.00792 in
-//   (linear channel value + 0.05). Relative luminance is a weighted sum of
-//   channels, so the same bound applies to (luminance + 0.05) for one color.
-// - Contrast divides the lighter color's (luminance + 0.05) by the darker
-//   color's. Rounding both can compound those factors: 1.00792 ** 2 is about
-//   1.0159, close to the 1.016:1 maximum between adjacent 8-bit gray levels.
-// - This is a relative error, not a loss of 0.016 contrast points. Reserve 2%
-//   of the target ratio; adjustContrastTarget multiplies the target by 1.02.
-//   It accounts for the logarithmic search tolerance separately.
+// Rounding reserve for 8-bit sRGB:
+// - Channels round by up to 0.5/255. Linearizing all 256 rounding intervals
+//   gives a maximum factor of about 1.00792 in (linear channel value + 0.05).
+//   The weighted luminance sum obeys the same bound for (luminance + 0.05).
+// - Contrast is (lighter luminance + 0.05) / (darker luminance + 0.05).
+//   Both colors' errors can compound: 1.00792 ** 2 is about 1.0159, close to
+//   the 1.016:1 maximum contrast between adjacent 8-bit gray levels.
+// - This is relative error, not 0.016 contrast points. adjustContrastTarget
+//   multiplies the target by 1.02 for a 2% reserve; log tolerance is separate.
 export const CONTRAST_ROUNDING_MARGIN = 0.02;
 
 // When enabling "lighter direction" bias, this is the amount by which
@@ -42,10 +40,9 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Convergence tolerance for log(achieved contrast / target contrast).
-// A converged result can be as low as target * exp(-0.004), about 99.6% of
-// the target. This is not an absolute error of 0.004 contrast points.
-// adjustContrastTarget compensates by multiplying by exp(0.004), about 1.00401.
+// Convergence allows log(achieved/target) >= -0.004: achieved can be as low as
+// target * exp(-0.004), about 99.6% of target. This is relative, not 0.004
+// contrast points. adjustContrastTarget multiplies by exp(0.004), about 1.00401.
 export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
