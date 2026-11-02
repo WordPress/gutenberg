@@ -4159,7 +4159,13 @@ class WP_Theme_JSON_Gutenberg {
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
-				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+				$declarations = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+				$declarations = self::get_state_declarations_with_text_clip_escapes(
+					$declarations,
+					$style_variation_node,
+					array( $node )
+				);
+				$style_variation_declarations[ $style_variation['selector'] ] = $declarations;
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? self::get_block_name_from_metadata_path( $block_metadata ) : null );

@@ -1119,6 +1119,88 @@ describe( 'global styles renderer', () => {
 				expect( result ).toContain( 'background-image: unset' );
 			} );
 
+			it( 'restores the fill for a variation text color under a block text clip', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/paragraph': {
+									...textGradient,
+									variations: {
+										highlight: {
+											color: { text: '#ff0000' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/paragraph': {
+							selector: '.wp-block-paragraph',
+							styleVariationSelectors: {
+								highlight:
+									'.is-style-highlight.wp-block-paragraph',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain(
+					':root :where(.is-style-highlight.wp-block-paragraph){color: #ff0000;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'restores the fill for an inner block text color inside a variation under a block text clip', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/paragraph': {
+									...textGradient,
+								},
+								'core/group': {
+									variations: {
+										card: {
+											blocks: {
+												'core/paragraph': {
+													color: { text: '#ff0000' },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/paragraph': {
+							selector: '.wp-block-paragraph',
+						},
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								card: '.is-style-card.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain(
+					':root :where(.is-style-card.wp-block-group .wp-block-paragraph){color: #ff0000;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
 			it( 'reads the block clip for a breakpoint inside a variation', () => {
 				const result = transformToStyles(
 					Object.freeze( {

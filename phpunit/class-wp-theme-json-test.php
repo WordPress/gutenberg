@@ -1545,6 +1545,112 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_variation_reads_the_block_clip_and_restores_text_fill() {
+		register_block_style(
+			'core/paragraph',
+			array(
+				'name'  => 'highlight',
+				'label' => 'Highlight',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'highlight' => array(
+									'color' => array( 'text' => '#00ff00' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/paragraph',
+				'path'       => array( 'styles', 'blocks', 'core/paragraph' ),
+				'selector'   => 'p',
+				'css'        => 'p',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/paragraph', 'variations', 'highlight' ),
+						'selector' => 'p.is-style-highlight',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/paragraph', 'highlight' );
+
+		$this->assertStringContainsString(
+			':root :where(p.is-style-highlight){color: #00ff00;-webkit-text-fill-color: currentColor;}',
+			$actual_styles
+		);
+	}
+
+	public function test_variation_escaping_a_text_clip_clears_the_inherited_gradient() {
+		register_block_style(
+			'core/paragraph',
+			array(
+				'name'  => 'solid',
+				'label' => 'Solid',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'solid' => array(
+									'background' => array( 'backgroundClip' => 'border-box' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/paragraph',
+				'path'       => array( 'styles', 'blocks', 'core/paragraph' ),
+				'selector'   => 'p',
+				'css'        => 'p',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/paragraph', 'variations', 'solid' ),
+						'selector' => 'p.is-style-solid',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/paragraph', 'solid' );
+
+		$this->assertStringContainsString(
+			':root :where(p.is-style-solid){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}',
+			$actual_styles
+		);
+	}
+
 	public function test_variation_pseudo_state_reads_the_block_clip() {
 		register_block_style(
 			'core/button',

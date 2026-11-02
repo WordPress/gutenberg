@@ -1373,6 +1373,15 @@ export const getNodesWithStyles = (
 									return;
 								}
 
+								const innerBlockBaseStyles = tree.styles
+									?.blocks?.[ variationBlockName ]
+									? [
+											tree.styles.blocks[
+												variationBlockName
+											],
+										]
+									: undefined;
+
 								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
 									name: variationBlockName,
@@ -1386,6 +1395,7 @@ export const getNodesWithStyles = (
 										blockSelectors[ variationBlockName ]
 											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
+									baseStyles: innerBlockBaseStyles,
 								} );
 
 								// Process element styles for the inner blocks
