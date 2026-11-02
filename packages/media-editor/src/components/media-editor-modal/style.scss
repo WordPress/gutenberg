@@ -41,7 +41,7 @@
 }
 
 // Active (enabled) undo/redo icon buttons take the admin accent colour so
-// they read as live alongside the Reset/Cancel/Save actions. Disabled
+// they read as live alongside the Cancel/Save actions. Disabled
 // buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
 // keep the default muted icon colour.
 // Scoped to the modal: the package ships one stylesheet, so an unscoped

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the tests to TypeScript ([#85088](https://github.com/WordPress/gutenberg/pull/85088)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes

@@ -27,6 +27,7 @@
 		"build",
 		"index.js",
 		"polyfill-exclusions.js",
+		"polyfill-inclusions.js",
 		"replace-polyfills.js"
 	],
 	"main": "index.js",
@@ -51,6 +52,7 @@
 	},
 	"devDependencies": {
 		"core-js-builder": "^3.39.0",
+		"core-js-compat": "^3.39.0",
 		"terser": "^5.37.0",
 		"vitest": "^5.0.3"
 	},
