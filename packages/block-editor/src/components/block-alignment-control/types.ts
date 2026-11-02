@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import type { BlockTypeIcon } from '@wordpress/blocks';
 import type { LayoutAlignment } from '../../layouts/types';
 
 /**
@@ -13,6 +14,24 @@ export interface BlockAlignmentOption {
  * The block alignment options, keyed by alignment.
  */
 export type BlockAlignmentOptions = Record< string, BlockAlignmentOption >;
+
+/**
+ * What is withholding a block's alignments, and how to get to it.
+ */
+export interface BlockAlignmentConstraint {
+	/**
+	 * What about the responsible block is doing the limiting.
+	 */
+	description: string;
+	/**
+	 * The way to reach that block, offered alongside the description.
+	 */
+	action: {
+		label: string;
+		icon?: BlockTypeIcon | null;
+		onClick: () => void;
+	};
+}
 
 /**
  * Props of `BlockAlignmentControl` and `BlockAlignmentToolbar`.
@@ -43,6 +62,11 @@ export interface BlockAlignmentControlProps {
 	 * The description passed to the dropdown's toggle.
 	 */
 	description?: string;
+	/**
+	 * What is withholding this block's alignments, when something is. Offered
+	 * below the alignments themselves.
+	 */
+	constraint?: BlockAlignmentConstraint;
 }
 
 /**
