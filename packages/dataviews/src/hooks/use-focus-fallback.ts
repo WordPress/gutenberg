@@ -45,19 +45,45 @@ function getFallback( container: HTMLElement ) {
  * back to the document body and keyboard users have to start over from the
  * top of the page.
  *
- * @param isEmpty Whether there are no items left to show, in which case the
- *                layout has no controls and focus moves to the ones around it.
+ * @param options                  Options.
+ * @param options.isEmpty          Whether there are no items left to show, in
+ *                                 which case the layout has no controls and
+ *                                 focus moves to the ones around it.
+ * @param options.isInfiniteScroll Whether items load as the view scrolls,
+ *                                 which also unloads the ones scrolled past.
  */
-export default function useFocusFallback( isEmpty: boolean ) {
-	const isEmptyRef = useRef( isEmpty );
+export default function useFocusFallback( {
+	isEmpty,
+	isInfiniteScroll,
+}: {
+	isEmpty: boolean;
+	isInfiniteScroll: boolean;
+} ) {
+	const optionsRef = useRef( { isEmpty, isInfiniteScroll } );
 	useLayoutEffect( () => {
-		isEmptyRef.current = isEmpty;
-	}, [ isEmpty ] );
+		optionsRef.current = { isEmpty, isInfiniteScroll };
+	}, [ isEmpty, isInfiniteScroll ] );
 	return useRefEffect( ( container: HTMLElement ) => {
 		const { ownerDocument } = container;
+		// The control to bring focus back to if it goes away while focused. It
+		// is the last control focused in the layout, kept while focus is in a
+		// menu or dialog opened from it, which hand focus back when they close.
 		let lastFocused: HTMLElement | null = null;
+		const isHandOff = ( element: HTMLElement ) => {
+			const popup = element.closest(
+				'[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], .components-popover'
+			);
+			// Not the dialog the whole view is in, such as a media modal.
+			return !! popup && ! popup.contains( container );
+		};
 		const onFocusIn = ( event: FocusEvent ) => {
-			lastFocused = event.target as HTMLElement;
+			const target = event.target as HTMLElement;
+			if ( container.contains( target ) ) {
+				lastFocused = target;
+			} else if ( ! isHandOff( target ) ) {
+				// Focus moved on to another control, e.g. the search.
+				lastFocused = null;
+			}
 		};
 		// Focus that leaves for nowhere while the control is still usable was
 		// moved away on purpose, e.g. by clicking outside any control. Don't
@@ -67,29 +93,20 @@ export default function useFocusFallback( isEmpty: boolean ) {
 		// once that is done.
 		const onFocusOut = ( event: FocusEvent ) => {
 			const target = event.target as HTMLElement;
-			const next = event.relatedTarget as HTMLElement | null;
-			// Focus moved to another control outside the layout, e.g. the
-			// search, was moved on purpose too. Menus and dialogs opened from
-			// the layout hand it back, so keep tracking for them.
-			if ( next ) {
-				if (
-					! container.contains( next ) &&
-					! next.closest(
-						'[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]'
-					)
-				) {
-					lastFocused = null;
-				}
-				return;
-			}
-			if ( target.closest( '[inert], [aria-hidden="true"]' ) ) {
+			if (
+				event.relatedTarget ||
+				! ( container.contains( target ) || isHandOff( target ) ) ||
+				target.closest( '[inert], [aria-hidden="true"]' )
+			) {
 				return;
 			}
 			queueMicrotask( () => {
+				const { activeElement } = ownerDocument;
 				if (
-					lastFocused === target &&
 					target.isConnected &&
-					isVisible( target )
+					isVisible( target ) &&
+					// Unless focus went on to another control meanwhile.
+					( ! activeElement || activeElement === ownerDocument.body )
 				) {
 					lastFocused = null;
 				}
@@ -111,17 +128,31 @@ export default function useFocusFallback( isEmpty: boolean ) {
 				! activeElement ||
 				activeElement === ownerDocument.body ||
 				( activeElement === lastFocused && wasRemoved );
-			if ( ! wasRemoved || ! isLost ) {
+			if ( ! isLost ) {
+				return;
+			}
+			// Still there, but focus was knocked off it, e.g. as the layout
+			// turned inert to load while a modal returned focus to it.
+			if ( ! wasRemoved ) {
+				if ( ! lastFocused.closest( '[inert]' ) ) {
+					lastFocused.focus();
+				}
+				return;
+			}
+			// Infinite scroll unloads the items scrolled past, which is not
+			// the focused item going away.
+			if ( optionsRef.current.isInfiniteScroll ) {
+				lastFocused = null;
 				return;
 			}
 			// With no items left, the layout has no controls: use the ones
 			// around it, such as the search.
 			const fallback =
 				getFallback( container ) ??
-				( isEmptyRef.current
+				( optionsRef.current.isEmpty
 					? getFallback(
 							container.closest< HTMLElement >(
-								'.dataviews-wrapper'
+								'.dataviews-wrapper, .dataviews-picker-wrapper'
 							) ?? container
 						)
 					: undefined );
@@ -131,8 +162,9 @@ export default function useFocusFallback( isEmpty: boolean ) {
 			if ( ! fallback ) {
 				return;
 			}
-			// Once it lands, `onFocusIn` tracks the fallback instead. Until
-			// then, the next change tries again.
+			// Once it lands, `onFocusIn` tracks the fallback, or stops tracking
+			// for one outside the layout. Until then, the next change tries
+			// again.
 			fallback.focus();
 		};
 		// Wait a frame, so that a closing popover or modal returns focus to its
@@ -152,8 +184,8 @@ export default function useFocusFallback( isEmpty: boolean ) {
 			} );
 		};
 		const observer = new MutationObserver( scheduleRestore );
-		container.addEventListener( 'focusin', onFocusIn );
-		container.addEventListener( 'focusout', onFocusOut );
+		ownerDocument.addEventListener( 'focusin', onFocusIn );
+		ownerDocument.addEventListener( 'focusout', onFocusOut );
 		observer.observe( container, {
 			childList: true,
 			subtree: true,
@@ -172,8 +204,8 @@ export default function useFocusFallback( isEmpty: boolean ) {
 			attributeFilter: [ 'aria-hidden', 'inert' ],
 		} );
 		return () => {
-			container.removeEventListener( 'focusin', onFocusIn );
-			container.removeEventListener( 'focusout', onFocusOut );
+			ownerDocument.removeEventListener( 'focusin', onFocusIn );
+			ownerDocument.removeEventListener( 'focusout', onFocusOut );
 			observer.disconnect();
 			pageObserver.disconnect();
 			if ( frame !== undefined ) {

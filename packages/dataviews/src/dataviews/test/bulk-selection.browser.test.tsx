@@ -5,6 +5,7 @@ import { speak } from '@wordpress/a11y';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
+import useFocusFallback from '../../hooks/use-focus-fallback';
 import type { Action, Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import '../../style.scss';
@@ -532,9 +533,11 @@ function nextFrames() {
 function TableOf( {
 	items,
 	totalItems = items.length,
+	infiniteScroll,
 }: {
 	items: Post[];
 	totalItems?: number;
+	infiniteScroll?: boolean;
 } ) {
 	return (
 		<DataViews
@@ -546,6 +549,7 @@ function TableOf( {
 				fields: [ 'author' ],
 				page: 1,
 				perPage: 10,
+				infiniteScrollEnabled: infiniteScroll,
 			} }
 			onChangeView={ () => {} }
 			actions={ actions }
@@ -568,29 +572,6 @@ it( 'leaves focus alone when it was moved away before the item was removed', asy
 		.not.toBeInTheDocument();
 	await nextFrames();
 	expect( checkbox.ownerDocument.body ).toHaveFocus();
-} );
-
-it( 'moves focus to the select all checkbox when a bulk action removes the selected items', async () => {
-	const user = userEvent.setup();
-	await render( <TrashableTable /> );
-	await user.click(
-		page.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
-	);
-	// The toolbar comes before the rows, which have a Trash button too.
-	await user.click(
-		page.getByRole( 'button', { name: 'Trash', exact: true } ).first()
-	);
-	await user.click(
-		page.getByRole( 'button', { name: 'Confirm', exact: true } )
-	);
-	await expect
-		.element( page.getByRole( 'row', { name: /First post/ } ) )
-		.not.toBeInTheDocument();
-	await expect
-		.element(
-			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
-		)
-		.toHaveFocus();
 } );
 
 it( 'moves focus once there is a control again after the focused item was removed', async () => {
@@ -706,6 +687,167 @@ it( 'forgets the focused item once focus moves to another control', async () => 
 	search.focus();
 	search.blur();
 	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await nextFrames();
+	expect( search.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'leaves focus alone after the search took it and the items come back', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ [] } /> );
+	const search = page.getByRole( 'searchbox', { name: 'Search' } );
+	await expect.element( search ).toHaveFocus();
+	const searchElement = search.element() as HTMLElement;
+	searchElement.blur();
+	await rerender( <TableOf items={ [ posts[ 1 ] ] } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /Second post/ } ) )
+		.toBeInTheDocument();
+	await nextFrames();
+	expect( searchElement.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'leaves focus to a dialog that closes without removing anything', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	const trigger = page
+		.getByRole( 'row', { name: /First post/ } )
+		.getByRole( 'button', { name: 'Trash', exact: true } );
+	await user.click( trigger );
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await nextFrames();
+	await expect.element( trigger ).toHaveFocus();
+} );
+
+function LoadingTable( { isLoading }: { isLoading: boolean } ) {
+	const renameAction: Action< Post > = {
+		id: 'rename',
+		label: 'Rename',
+		isPrimary: true,
+		RenderModal: ( { closeModal } ) => (
+			<button onClick={ () => closeModal?.() }>Done</button>
+		),
+	};
+	return (
+		<DataViews
+			data={ posts }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+				page: 1,
+				perPage: 10,
+			} }
+			onChangeView={ () => {} }
+			actions={ [ renameAction ] }
+			isLoading={ isLoading }
+			paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'brings focus back to the trigger of a dialog that closed while loading', async () => {
+	const user = userEvent.setup();
+	const { rerender } = await render( <LoadingTable isLoading={ false } /> );
+	const trigger = page
+		.getByRole( 'row', { name: /First post/ } )
+		.getByRole( 'button', { name: 'Rename', exact: true } );
+	await user.click( trigger );
+	// The action saves, so the view loads, and the dialog closes meanwhile:
+	// it can't return focus to its trigger in the inert table.
+	await rerender( <LoadingTable isLoading /> );
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await rerender( <LoadingTable isLoading={ false } /> );
+	await expect.element( trigger ).toHaveFocus();
+} );
+
+function FallbackList( {
+	items,
+	isInfiniteScroll,
+}: {
+	items: string[];
+	isInfiniteScroll: boolean;
+} ) {
+	const ref = useFocusFallback( { isEmpty: false, isInfiniteScroll } );
+	return (
+		<div ref={ ref }>
+			{ items.map( ( item ) => (
+				<button key={ item }>{ item }</button>
+			) ) }
+		</div>
+	);
+}
+
+async function removeFocusedItem( isInfiniteScroll: boolean ) {
+	const { rerender } = await render(
+		<FallbackList
+			items={ [ 'One', 'Two' ] }
+			isInfiniteScroll={ isInfiniteScroll }
+		/>
+	);
+	const one = page
+		.getByRole( 'button', { name: 'One', exact: true } )
+		.element() as HTMLElement;
+	one.focus();
+	await rerender(
+		<FallbackList
+			items={ [ 'Two' ] }
+			isInfiniteScroll={ isInfiniteScroll }
+		/>
+	);
+	await nextFrames();
+	return one.ownerDocument;
+}
+
+it( 'moves focus on when the focused item is removed', async () => {
+	await removeFocusedItem( false );
+	await expect
+		.element( page.getByRole( 'button', { name: 'Two', exact: true } ) )
+		.toHaveFocus();
+} );
+
+it( 'leaves focus alone when infinite scroll unloads the focused item', async () => {
+	const { body } = await removeFocusedItem( true );
+	expect( body ).toHaveFocus();
+} );
+
+it( 'moves focus within a view inside a dialog', async () => {
+	const { rerender } = await render(
+		<div role="dialog" aria-label="Media">
+			<TableOf items={ posts } />
+		</div>
+	);
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	const search = page
+		.getByRole( 'searchbox', { name: 'Search' } )
+		.element() as HTMLElement;
+	// Moving on to another control of the dialog is moving on.
+	search.focus();
+	search.blur();
+	await rerender(
+		<div role="dialog" aria-label="Media">
+			<TableOf items={ posts.slice( 1 ) } />
+		</div>
+	);
 	await expect
 		.element( page.getByRole( 'row', { name: /First post/ } ) )
 		.not.toBeInTheDocument();

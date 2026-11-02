@@ -38,7 +38,10 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 
 	const layoutRef = useMergeRefs( [
 		containerRef,
-		useFocusFallback( ! isLoading && paginationInfo.totalItems === 0 ),
+		useFocusFallback( {
+			isEmpty: ! isLoading && paginationInfo.totalItems === 0,
+			isInfiniteScroll: !! view.infiniteScrollEnabled,
+		} ),
 	] );
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
