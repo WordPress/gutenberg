@@ -750,7 +750,7 @@ describe( 'parseConfig', () => {
 			parseConfig( '/test/gutenberg', '/cache' )
 		).rejects.toEqual(
 			new ValidationError(
-				`Invalid /test/gutenberg/.wp-env.json: "runtime" must be one of: docker, playground.`
+				`Invalid /test/gutenberg/.wp-env.json: "runtime" must be one of: docker, playground, php.`
 			)
 		);
 	} );

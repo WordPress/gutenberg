@@ -189,9 +189,9 @@
 					"default": false
 				},
 				"runtime": {
-					"description": "The runtime to use for the environment. 'docker' uses Docker containers, 'playground' uses WordPress Playground (experimental).",
+					"description": "The runtime to use for the environment. 'docker' uses Docker containers, 'playground' uses WordPress Playground (experimental), 'php' uses the installed PHP's built-in web server (experimental).",
 					"type": "string",
-					"enum": [ "docker", "playground" ],
+					"enum": [ "docker", "playground", "php" ],
 					"default": "docker"
 				},
 				"lifecycleScripts": {
