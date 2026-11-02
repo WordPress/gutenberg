@@ -584,7 +584,9 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 		const { registry } = renderWith( 'suggest', [ block ] );
 		act( () => {
-			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } as any );
+			registry
+				.dispatch( coreStore )
+				.receiveCurrentUser( { id: 3 } as any );
 		} );
 		seedComment( registry, {
 			id: 99,
@@ -680,7 +682,9 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 		const { registry } = renderWith( 'suggest', [ block ] );
 		act( () => {
-			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } as any );
+			registry
+				.dispatch( coreStore )
+				.receiveCurrentUser( { id: 3 } as any );
 		} );
 
 		propose( registry, block.clientId, { level: 4 }, { authorId: 7 } );
