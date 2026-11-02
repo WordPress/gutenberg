@@ -39,9 +39,6 @@ const meta: Meta = {
 };
 export default meta;
 
-const WP_GET_ICON_URL =
-	'https://developer.wordpress.org/reference/functions/wp_get_icon/';
-
 const COLLECTION_DESCRIPTIONS: Record< Collection, ReactElement > = {
 	all: (
 		<>
@@ -59,7 +56,10 @@ const COLLECTION_DESCRIPTIONS: Record< Collection, ReactElement > = {
 	core: (
 		<>
 			These icons are registered in WordPress. Render them in PHP with{ ' ' }
-			<Link href={ WP_GET_ICON_URL } openInNewTab>
+			<Link
+				href="https://developer.wordpress.org/reference/functions/wp_get_icon/"
+				openInNewTab
+			>
 				wp_get_icon()
 			</Link>
 			. They are also available through the Icons REST API and in the Icon
@@ -70,7 +70,10 @@ const COLLECTION_DESCRIPTIONS: Record< Collection, ReactElement > = {
 		<>
 			These icons are registered in WordPress for the admin interface.
 			Render them in PHP with{ ' ' }
-			<Link href={ WP_GET_ICON_URL } openInNewTab>
+			<Link
+				href="https://developer.wordpress.org/reference/functions/wp_get_icon/"
+				openInNewTab
+			>
 				wp_get_icon()
 			</Link>
 			. They are not available through the Icons REST API or in the Icon
