@@ -1,4 +1,3 @@
-// @ts-expect-error Module 'deep-freeze' has no type definitions in @wordpress/data.
 import deepFreeze from 'deep-freeze';
 import { describe, expect, it } from 'vitest';
 import reducer from '../reducer';
