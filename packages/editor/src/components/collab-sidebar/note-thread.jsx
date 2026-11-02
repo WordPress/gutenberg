@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
 	useDebounce,
+	useEvent,
 	__experimentalUseFocusOutside as useFocusOutside,
 } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -80,6 +81,7 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 
 export function NoteThread( {
 	note,
+	anchorClientId,
 	focusThreadOrAdjacent,
 	isSelected,
 	expandReplies = false,
@@ -94,11 +96,19 @@ export function NoteThread( {
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const relatedBlockElement = useBlockElement( note.blockClientId );
-	const debouncedToggleBlockHighlight = useDebounce(
-		toggleBlockHighlight,
-		50
-	);
+	const relatedBlockElement = useBlockElement( anchorClientId );
+	// The anchor can move to another copy while highlighted, so turning the
+	// highlight off clears every copy.
+	const setBlockHighlight = useEvent( ( isHighlighted ) => {
+		if ( isHighlighted ) {
+			toggleBlockHighlight( anchorClientId, true );
+			return;
+		}
+		for ( const clientId of note.blockClientIds ) {
+			toggleBlockHighlight( clientId, false );
+		}
+	} );
+	const debouncedSetBlockHighlight = useDebounce( setBlockHighlight, 50 );
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
@@ -148,8 +158,8 @@ export function NoteThread( {
 		// Drop the highlight, unless another note (possibly on the same block) now owns it.
 		if ( ! isNoteFocused ) {
 			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
-			debouncedToggleBlockHighlight.cancel();
-			toggleBlockHighlight( note.blockClientId, false );
+			debouncedSetBlockHighlight.cancel();
+			setBlockHighlight( false );
 		}
 
 		// In the note's block, the caret events decide; deselecting here too would race them.
@@ -168,19 +178,19 @@ export function NoteThread( {
 	} );
 
 	function onMouseEnter() {
-		debouncedToggleBlockHighlight( note.blockClientId, true );
+		debouncedSetBlockHighlight( true );
 	}
 
 	function onMouseLeave() {
-		debouncedToggleBlockHighlight( note.blockClientId, false );
+		debouncedSetBlockHighlight( false );
 	}
 
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
 		setHasFocus( true );
-		debouncedToggleBlockHighlight.cancel();
-		toggleBlockHighlight( note.blockClientId, true );
+		debouncedSetBlockHighlight.cancel();
+		setBlockHighlight( true );
 	}
 
 	function onSelectNote() {
@@ -188,13 +198,13 @@ export function NoteThread( {
 			return;
 		}
 
-		pickNote( note.id, note.blockClientId );
+		pickNote( note.id, anchorClientId );
 		focusNoteThread( note.id, sidebarRef.current );
 	}
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockHighlight( note.blockClientId, false );
+		setBlockHighlight( false );
 	}
 
 	function handleResolve() {
@@ -254,8 +264,8 @@ export function NoteThread( {
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
-				key={ note.blockClientId }
-				clientId={ note.blockClientId }
+				key={ anchorClientId }
+				clientId={ anchorClientId }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
