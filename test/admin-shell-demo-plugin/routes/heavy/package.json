@@ -1,0 +1,24 @@
+{
+	"name": "@wordpress/admin-shell-demo-heavy-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": [
+			"shell-demo-heavy-1",
+			"shell-demo-heavy-2",
+			"shell-demo-heavy-3"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../../../packages/admin-ui",
+		"@wordpress/components": "file:../../../../packages/components",
+		"@wordpress/dataviews": "file:../../../../packages/dataviews",
+		"@wordpress/element": "file:../../../../packages/element",
+		"@wordpress/i18n": "file:../../../../packages/i18n",
+		"@wordpress/ui": "file:../../../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0"
+	}
+}

@@ -59,6 +59,19 @@ function admin_shell_demo_add_menu_pages() {
 		'shell-counter',
 		'admin_shell_demo_shell_demo_counter_wp_admin_render_page'
 	);
+	// Three copies of a deliberately heavy page, to test memory limits.
+	foreach ( array( 1, 2, 3 ) as $number ) {
+		add_submenu_page(
+			'shell-demo-notes-wp-admin',
+			/* translators: %d: number of the heavy demo page. */
+			sprintf( __( 'Heavy page %d', 'admin-shell-demo' ), $number ),
+			/* translators: %d: number of the heavy demo page. */
+			sprintf( __( 'Heavy page %d', 'admin-shell-demo' ), $number ),
+			'manage_options',
+			"shell-demo-heavy-{$number}-wp-admin",
+			"admin_shell_demo_shell_demo_heavy_{$number}_wp_admin_render_page"
+		);
+	}
 	add_submenu_page(
 		'shell-demo-notes-wp-admin',
 		__( 'Settings', 'admin-shell-demo' ),
@@ -82,6 +95,9 @@ function admin_shell_demo_add_shell_pages( $pages ) {
 	$pages[] = 'shell-demo-notes-wp-admin';
 	$pages[] = 'shell-counter';
 	$pages[] = 'shell-demo-settings-wp-admin';
+	$pages[] = 'shell-demo-heavy-1-wp-admin';
+	$pages[] = 'shell-demo-heavy-2-wp-admin';
+	$pages[] = 'shell-demo-heavy-3-wp-admin';
 	return $pages;
 }
 add_filter( 'admin_shell_pages', 'admin_shell_demo_add_shell_pages' );

@@ -133,6 +133,7 @@
 		{ "path": "tools/validation" },
 		{ "path": "test/admin-shell-demo-plugin/routes/counter" },
 		{ "path": "test/admin-shell-demo-plugin/routes/counter-history" },
+		{ "path": "test/admin-shell-demo-plugin/routes/heavy" },
 		{ "path": "test/admin-shell-demo-plugin/routes/notes" },
 		{ "path": "test/admin-shell-demo-plugin/routes/settings" },
 		{ "path": "test/e2e" },

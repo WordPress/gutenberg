@@ -26,7 +26,10 @@
 		"pages": [
 			"shell-demo-notes",
 			"shell-demo-counter",
-			"shell-demo-settings"
+			"shell-demo-settings",
+			"shell-demo-heavy-1",
+			"shell-demo-heavy-2",
+			"shell-demo-heavy-3"
 		]
 	},
 	"dependencies": {
@@ -36,6 +39,7 @@
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/keyboard-shortcuts": "file:../../packages/keyboard-shortcuts",
