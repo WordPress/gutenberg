@@ -10,6 +10,11 @@
 			"label": "Message"
 		}
 	],
+	"example": {
+		"attributes": {
+			"message": "Hello World"
+		}
+	},
 	"category": "demo",
 	"presentation": "full-bleed",
 	"textdomain": "default"

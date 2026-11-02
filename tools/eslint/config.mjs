@@ -427,13 +427,22 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Card: 'WCCard',
 						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
+						IconButton: 'WCIconButton',
 						__experimentalInputControl: 'WCInputControl',
+						Menu: 'WCMenu',
+						Notice: 'WCNotice',
+						Popover: 'WCPopover',
 						SelectControl: 'WCSelectControl',
 						Spinner: 'WCSpinner',
+						Tabs: 'WCTabs',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
+						ValidatedInputControl: 'WCValidatedInputControl',
+						ValidatedTextareaControl: 'WCValidatedTextareaControl',
+						VisuallyHidden: 'WCVisuallyHidden',
 					},
 				},
 			],
@@ -919,6 +928,24 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Block library src — no effects. Existing ones are recorded in
+	// the suppressions file until they are replaced.
+	{
+		files: [ 'packages/block-library/src/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax,
+				{
+					selector:
+						'CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/]',
+					message:
+						'Avoid effects in blocks. Compute the value during render, handle it in the event that causes it, read it with a store selector, or use `useRefEffect` to subscribe to a DOM node.',
+				},
+			],
+		},
+	},
+
 	// Override: Tests and Storybook — allow literal `id` attributes.
 	// Later than the components re-spread of `restrictedSyntax`. Ignore
 	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.
@@ -1196,7 +1223,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',

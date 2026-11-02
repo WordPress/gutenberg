@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	Popover,
+	Popover as WCPopover,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { getScrollContainer } from '@wordpress/dom';
@@ -288,7 +288,7 @@ export default function ListViewDropIndicatorPreview( {
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			animate={ false }
 			anchor={ popoverAnchor }
 			focusOnMount={ false }
@@ -340,6 +340,6 @@ export default function ListViewDropIndicatorPreview( {
 					<div className="block-editor-list-view-block__menu-cell"></div>
 				</div>
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

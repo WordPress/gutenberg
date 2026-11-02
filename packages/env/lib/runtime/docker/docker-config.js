@@ -96,10 +96,9 @@ RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.
 RUN sed -i '/buster-updates/d' /etc/apt/sources.list
 
 # bullseye (https://www.debian.org/News/2026/20260831)
-# The security suite is not on archive.debian.org yet, so it is dropped rather
-# than rewritten.
 RUN sed -i 's|deb.debian.org/debian bullseye|archive.debian.org/debian bullseye|g' /etc/apt/sources.list
-RUN sed -i '/bullseye-security/d' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
+RUN sed -i 's|deb.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
 RUN sed -i '/bullseye-updates/d' /etc/apt/sources.list
 
 # Create the host's user so that we can match ownership in the container.

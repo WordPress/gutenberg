@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
+import { Menu as BUMenu } from '@base-ui/react/menu';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -10,16 +11,16 @@ import {
 	Button,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 	IconButton,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
-	Menu,
 	Stack,
 	Tooltip,
+	getWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
 import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
+import type { ReactionSummary } from './use-note-reactions';
 
 interface ReactionButtonProps {
 	noteId: number;
@@ -27,6 +28,11 @@ interface ReactionButtonProps {
 	count: number;
 	isActive: boolean;
 	disabled: boolean;
+	onToggle: ( hexKey: string ) => void;
+}
+
+interface ReactionPickerProps {
+	reactions?: ReactionSummary;
 	onToggle: ( hexKey: string ) => void;
 }
 
@@ -168,6 +174,90 @@ function ReactionButton( {
 	);
 }
 
+function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<BUMenu.Root
+			orientation="horizontal"
+			// Hover would move the highlight away from the item the keyboard
+			// is on.
+			highlightItemOnHover={ false }
+			open={ isOpen }
+			onOpenChange={ setIsOpen }
+		>
+			<BUMenu.Trigger
+				render={
+					<IconButton
+						size="small"
+						variant="minimal"
+						tone="neutral"
+						className="editor-collab-sidebar-panel__add-reaction-button"
+						icon={ reactionIcon }
+						label={ __( 'Add reaction' ) }
+					/>
+				}
+			/>
+			<BUMenu.Portal container={ getWpCompatOverlaySlot() }>
+				<BUMenu.Positioner
+					side="bottom"
+					align="end"
+					sideOffset={ 8 }
+					collisionPadding={ 12 }
+				>
+					<BUMenu.Popup
+						aria-label={ __( 'Add reaction' ) }
+						className="editor-collab-sidebar-panel__reaction-picker"
+						onKeyDownCapture={ ( event ) => {
+							// Escape would otherwise close only the focused
+							// item's tooltip.
+							if ( event.key === 'Escape' ) {
+								event.stopPropagation();
+								setIsOpen( false );
+							}
+						} }
+					>
+						{ REACTION_EMOJIS.map( ( { emoji, hexKey, label } ) => (
+							<Tooltip.Root key={ hexKey }>
+								<Tooltip.Trigger
+									render={
+										<BUMenu.CheckboxItem
+											nativeButton
+											checked={
+												!! reactions?.[ hexKey ]
+													?.current_user_reaction
+											}
+											onCheckedChange={ () =>
+												onToggle( hexKey )
+											}
+											closeOnClick
+											// Typeahead matches `label`, not `aria-label`.
+											label={ label }
+											aria-label={ label }
+											className="editor-collab-sidebar-panel__reaction-option"
+											render={
+												<Button
+													variant="minimal"
+													tone="neutral"
+												/>
+											}
+										/>
+									}
+								>
+									<span className="editor-collab-sidebar-panel__reaction-option-emoji">
+										{ emoji }
+									</span>
+								</Tooltip.Trigger>
+								<Tooltip.Popup>{ label }</Tooltip.Popup>
+							</Tooltip.Root>
+						) ) }
+					</BUMenu.Popup>
+				</BUMenu.Positioner>
+			</BUMenu.Portal>
+		</BUMenu.Root>
+	);
+}
+
 /**
  * A note's reaction pills, followed by the add-reaction picker.
  *
@@ -220,51 +310,10 @@ export function NoteReactions( {
 				 * first reaction lands would remount the open picker's trigger.
 				 */ }
 				{ canReact && (
-					<Menu.Root>
-						<Menu.Trigger
-							render={
-								<IconButton
-									size="small"
-									variant="minimal"
-									tone="neutral"
-									className="editor-collab-sidebar-panel__add-reaction-button"
-									icon={ reactionIcon }
-									label={ __( 'Add reaction' ) }
-								/>
-							}
-						/>
-						<Menu.Popup
-							aria-label={ __( 'Add reaction' ) }
-							positioner={
-								<Menu.Positioner side="bottom" align="end" />
-							}
-						>
-							{ REACTION_EMOJIS.map(
-								( { emoji, hexKey, label } ) => (
-									<Menu.CheckboxItem
-										key={ hexKey }
-										checked={
-											!! reactions?.[ hexKey ]
-												?.current_user_reaction
-										}
-										onCheckedChange={ () =>
-											toggleReaction( hexKey )
-										}
-										closeOnClick
-										prefix={
-											<span className="editor-collab-sidebar-panel__reaction-option-emoji">
-												{ emoji }
-											</span>
-										}
-									>
-										<Menu.ItemLabel>
-											{ label }
-										</Menu.ItemLabel>
-									</Menu.CheckboxItem>
-								)
-							) }
-						</Menu.Popup>
-					</Menu.Root>
+					<ReactionPicker
+						reactions={ reactions }
+						onToggle={ toggleReaction }
+					/>
 				) }
 			</Stack>
 		</ThemeProvider>
