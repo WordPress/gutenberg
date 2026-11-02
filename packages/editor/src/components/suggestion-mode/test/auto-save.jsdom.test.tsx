@@ -714,7 +714,9 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 		const { registry } = renderWith( 'suggest', [ block ] );
 		act( () => {
-			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } as any );
+			registry
+				.dispatch( coreStore )
+				.receiveCurrentUser( { id: 3 } as any );
 		} );
 		await pastDebounce();
 
