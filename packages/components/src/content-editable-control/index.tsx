@@ -4,7 +4,6 @@ import { forwardRef, useRef } from '@wordpress/element';
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
-import { VisuallyHidden } from '../visually-hidden';
 import type { ContentEditableControlProps } from './types';
 import styles from './style.module.scss';
 
@@ -38,13 +37,7 @@ function UnforwardedContentEditableControl(
 
 	return (
 		<BaseControl { ...baseControlProps }>
-			{ hideLabelFromVision ? (
-				// Hidden so a screen reader doesn't read it as page text before
-				// the field it names; `aria-labelledby` still resolves it.
-				<VisuallyHidden id={ labelId } aria-hidden="true">
-					{ label }
-				</VisuallyHidden>
-			) : (
+			{ ! hideLabelFromVision && (
 				<BaseControl.VisualLabel
 					id={ labelId }
 					// Focus the field on label click, like `<label for>` would.
@@ -57,7 +50,9 @@ function UnforwardedContentEditableControl(
 				className={ styles.editable }
 				role="textbox"
 				aria-multiline
-				aria-labelledby={ labelId }
+				// A hidden label is named directly, so it isn't also read as page text.
+				aria-label={ hideLabelFromVision ? label : undefined }
+				aria-labelledby={ hideLabelFromVision ? undefined : labelId }
 				aria-placeholder={ placeholder || undefined }
 				aria-disabled={ disabled || undefined }
 				aria-required={ required || undefined }
