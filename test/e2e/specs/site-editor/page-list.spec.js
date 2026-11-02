@@ -661,6 +661,43 @@ test.describe( 'Page List', () => {
 		} );
 	} );
 
+	test.describe( 'Trash', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		test( 'moves focus to the select all checkbox after trashing the selected page', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+			const table = page.getByRole( 'table' );
+			await table
+				.getByRole( 'checkbox', { name: 'Select Sample Page' } )
+				.click();
+			// The toolbar comes before the rows, which have a Trash button too.
+			await page
+				.locator( '.dataviews-bulk-actions' )
+				.getByRole( 'button', { name: 'Trash', exact: true } )
+				.click();
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Trash', exact: true } )
+				.click();
+
+			await expect(
+				table.getByRole( 'row', { name: /Sample Page/ } )
+			).toBeHidden();
+			await expect(
+				table.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
+		} );
+	} );
+
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {
 		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
 		// UTC-5 offset means the displayed time should be 5 hours earlier.
