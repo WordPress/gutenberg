@@ -34,7 +34,6 @@ import {
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
-import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import {
@@ -127,70 +126,65 @@ function RichTextWrapper(
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
-	const selector = ( select: SelectFunction ) => {
-		// Avoid subscribing to the block editor store if the block is not
-		// selected, alone or with others.
-		if ( ! isBlockSelected && ! isBlockMultiSelected ) {
-			return { isSelected: false };
-		}
+	const hasValue = adjustedValue.length > 0;
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
 
-		const { getSelectionStart, getSelectionEnd } =
-			select( blockEditorStore );
-		const selectionStart = getSelectionStart();
-		const selectionEnd = getSelectionEnd();
-		const isInField = ( end: BlockSelection ) =>
-			end.clientId === clientId &&
-			( identifier
-				? end.attributeKey === identifier
-				: // The field's own selection carries its instance ID.
-					( end as Record< symbol, unknown > )[ instanceIdKey ] ===
-					instanceId );
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
 
-		let isSelected: boolean | undefined;
+	const selectField = ( select: SelectFunction ) => {
+		const selectSelection = () => {
+			// Avoid subscribing to the block editor store if the block is not
+			// selected, alone or with others.
+			if ( ! isBlockSelected && ! isBlockMultiSelected ) {
+				return { isSelected: false };
+			}
 
-		if ( originalIsSelected === undefined ) {
-			isSelected =
-				isInField( selectionStart ) &&
-				selectionEnd.clientId === clientId;
-		} else if ( originalIsSelected ) {
-			isSelected = selectionStart.clientId === clientId;
-		}
+			const { getSelectionStart, getSelectionEnd } =
+				select( blockEditorStore );
+			const selectionStart = getSelectionStart();
+			const selectionEnd = getSelectionEnd();
+			const isInField = ( end: BlockSelection ) =>
+				end.clientId === clientId &&
+				( identifier
+					? end.attributeKey === identifier
+					: // The field's own selection carries its instance ID.
+						( end as Record< symbol, unknown > )[
+							instanceIdKey
+						] === instanceId );
 
-		// The selection spans blocks, so the field may hold one end of it.
-		const isCrossBlockEnd =
-			! isSelected && selectionStart.clientId !== selectionEnd.clientId;
+			let isSelected: boolean | undefined;
 
-		return {
-			selectionStart: isSelected ? selectionStart.offset : undefined,
-			selectionEnd: isSelected ? selectionEnd.offset : undefined,
-			isSelected,
-			crossBlockStart:
-				isCrossBlockEnd && isInField( selectionStart )
-					? selectionStart.offset
-					: undefined,
-			crossBlockEnd:
-				isCrossBlockEnd && isInField( selectionEnd )
-					? selectionEnd.offset
-					: undefined,
+			if ( originalIsSelected === undefined ) {
+				isSelected =
+					isInField( selectionStart ) &&
+					selectionEnd.clientId === clientId;
+			} else if ( originalIsSelected ) {
+				isSelected = selectionStart.clientId === clientId;
+			}
+
+			// The selection spans blocks, so the field may hold one end of it.
+			const isCrossBlockEnd =
+				! isSelected &&
+				selectionStart.clientId !== selectionEnd.clientId;
+
+			return {
+				selectionStart: isSelected ? selectionStart.offset : undefined,
+				selectionEnd: isSelected ? selectionEnd.offset : undefined,
+				isSelected,
+				crossBlockStart:
+					isCrossBlockEnd && isInField( selectionStart )
+						? selectionStart.offset
+						: undefined,
+				crossBlockEnd:
+					isCrossBlockEnd && isInField( selectionEnd )
+						? selectionEnd.offset
+						: undefined,
+			};
 		};
-	};
-	const {
-		selectionStart,
-		selectionEnd,
-		isSelected,
-		crossBlockStart,
-		crossBlockEnd,
-	} = useSelect( selector, [
-		clientId,
-		identifier,
-		instanceId,
-		originalIsSelected,
-		isBlockSelected,
-		isBlockMultiSelected,
-	] );
-
-	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
-		( select ) => {
+		const selectBindings = () => {
 			// A field without an identifier matches no binding.
 			if ( ! blockBindings?.[ identifier as string ] ) {
 				return {};
@@ -229,7 +223,7 @@ function RichTextWrapper(
 				} );
 
 			// Don't modify placeholders if value is not empty.
-			if ( adjustedValue.length > 0 ) {
+			if ( hasValue ) {
 				return {
 					disableBoundBlock: _disableBoundBlock,
 					// Null values will make them fall back to the default behavior.
@@ -279,33 +273,17 @@ function RichTextWrapper(
 					blockAttributes?.placeholder || _bindingsPlaceholder,
 				bindingsLabel: _bindingsLabel,
 			};
-		},
-		[
-			blockBindings,
-			identifier,
-			blockName,
-			adjustedValue,
-			clientId,
-			blockContext,
-		]
-	);
-	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
-	const hasOverrideEnabled =
-		blockBindings?.__default?.source === 'core/pattern-overrides';
-
-	const shouldDisableForPattern =
-		isInsidePatternOverrides && ! hasOverrideEnabled;
-
-	const shouldDisableEditing =
-		readOnly || disableBoundBlock || shouldDisableForPattern;
-
-	// Whether the wrapper is the editing host, which depends on the selected
-	// block, not necessarily this one. Only the selected, default-mode block
-	// can be it, so others skip the subscription entirely.
-	const isEditingHost = useSelect(
-		( select ) => {
+		};
+		// Whether the wrapper is the editing host, which depends on the selected
+		// block, not necessarily this one. Only the selected, default-mode block
+		// can be it, so others don't read the store.
+		const selectIsEditingHost = (
+			disableBoundBlock: boolean | undefined
+		) => {
 			if (
-				shouldDisableEditing ||
+				readOnly ||
+				disableBoundBlock ||
+				shouldDisableForPattern ||
 				! hasDefaultEditingMode ||
 				! isBlockSelected
 			) {
@@ -316,9 +294,46 @@ function RichTextWrapper(
 				select( blockEditorStore )
 			);
 			return canHostEditableRoot( getSelectedBlockClientId() );
-		},
-		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
-	);
+		};
+
+		const bindings = selectBindings();
+		return {
+			...selectSelection(),
+			...bindings,
+			isEditingHost: selectIsEditingHost( bindings.disableBoundBlock ),
+		};
+	};
+	// One subscription for the selection, the bindings and the editing host:
+	// each mounted subscription costs every field, and most fields need none
+	// of them until their block is selected.
+	const {
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		crossBlockStart,
+		crossBlockEnd,
+		disableBoundBlock,
+		bindingsPlaceholder,
+		bindingsLabel,
+		isEditingHost,
+	} = useSelect( selectField, [
+		clientId,
+		identifier,
+		instanceId,
+		originalIsSelected,
+		isBlockSelected,
+		isBlockMultiSelected,
+		blockBindings,
+		blockName,
+		hasValue,
+		blockContext,
+		readOnly,
+		shouldDisableForPattern,
+		hasDefaultEditingMode,
+	] );
+
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || shouldDisableForPattern;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -420,6 +435,9 @@ function RichTextWrapper(
 		]
 	);
 
+	// When the field last changed, or 0 after a format change.
+	const lastChangeRef = useRef( 0 );
+
 	const {
 		value,
 		getValue,
@@ -429,7 +447,20 @@ function RichTextWrapper(
 		[ getDomPositionKey ]: getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange: adjustedOnChange,
+		onChange( newValue: unknown, meta: { __unstableText: string } ) {
+			// Typing goes into one undo level until a second without typing or
+			// a format change, after which the next change starts a new one.
+			if ( Date.now() - lastChangeRef.current >= 1000 ) {
+				__unstableMarkLastChangeAsPersistent();
+			}
+			// The hook is untyped, and calls it with the field's kind of value.
+			( adjustedOnChange as ( ...args: unknown[] ) => void )(
+				newValue,
+				meta
+			);
+			lastChangeRef.current =
+				meta.__unstableText === value.text ? 0 : Date.now();
+		},
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -456,7 +487,7 @@ function RichTextWrapper(
 		const element = anchorRef.current;
 
 		// A pointer press outside the field makes it non editable until the
-		// release (see rich text's preventFocusCapture). Focusing it then
+		// release (see usePreventFocusCapture). Focusing it then
 		// makes the block focus handler drop the text selection.
 		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;
@@ -598,12 +629,6 @@ function RichTextWrapper(
 		ariaActiveDescendant,
 	] );
 
-	useMarkPersistent( {
-		html: adjustedValue,
-		value,
-		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
-	} );
-
 	const [ keyboardShortcuts ] = useState(
 		() => new Set< ( event: KeyboardEvent ) => void >()
 	);
@@ -708,7 +733,9 @@ function RichTextWrapper(
 						supportsSplitting,
 					} ),
 					anchorRef,
-					setAnchorElement,
+					// Only the selected field shows the toolbar that needs the
+					// element. Storing it on mount would render every field twice.
+					isSelected && setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning

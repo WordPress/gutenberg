@@ -1,0 +1,12 @@
+{
+	"name": "php-stubs/wordpress-stubs",
+	"version": "7.2.0-beta3.65047",
+	"description": "WordPress stubs generated from https://github.com/WordPress/wordpress-develop/commit/cb5eaeacdfec3c15eae12f52397520d06ae190de (r65047), in place of the released package.",
+	"license": "GPL-2.0-or-later",
+	"extra": {
+		"source": {
+			"commit": "cb5eaeacdfec3c15eae12f52397520d06ae190de",
+			"revision": 65047
+		}
+	}
+}

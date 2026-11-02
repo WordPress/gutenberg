@@ -496,6 +496,52 @@ const siteStatusWidgetType: WidgetType = {
 	],
 };
 
+/*
+ * The goal type under three action sets, so the footer strips can be
+ * compared side by side: text links, a text link beside an icon-only link,
+ * and callback buttons declared at runtime.
+ */
+function FooterCallbacksWidget( props: WidgetRenderProps< GoalAttributes > ) {
+	useWidgetActions( [
+		{
+			id: 'refresh',
+			label: 'Refresh',
+			relevance: 'high',
+			callback: () => wait( 1500 ),
+		},
+		{
+			id: 'export-progress',
+			label: 'Export progress',
+			relevance: 'medium',
+			icon: download,
+			callback: () => wait( 1500 ),
+		},
+	] );
+
+	return <GoalProgressWidget { ...props } />;
+}
+
+const FOOTER_WIDGET_TYPES: WidgetType[] = [
+	{
+		...goalProgressWidgetType,
+		name: 'demo/footer-text-links',
+		title: 'Text links',
+		actions: GOAL_ACTIONS.map( ( { icon, ...action } ) => action ),
+	},
+	{
+		...goalProgressWidgetType,
+		name: 'demo/footer-icon-link',
+		title: 'Icon-only link',
+	},
+	{
+		...goalProgressWidgetType,
+		name: 'demo/footer-callbacks',
+		title: 'Callback buttons',
+		renderModule: 'demo/widgets/footer-callbacks/render',
+		actions: [],
+	},
+];
+
 // What `import( widget.renderModule )` resolves to in a real host.
 const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 	let component: ComponentType< WidgetRenderProps< unknown > >;
@@ -505,6 +551,10 @@ const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 		>;
 	} else if ( moduleId === siteStatusWidgetType.renderModule ) {
 		component = SiteStatusWidget;
+	} else if ( moduleId === FOOTER_WIDGET_TYPES[ 2 ].renderModule ) {
+		component = FooterCallbacksWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
 	} else {
 		component = TrafficSnapshotWidget as ComponentType<
 			WidgetRenderProps< unknown >
@@ -661,7 +711,7 @@ The widget only declares relevance; the fit is measured by the chrome, so the sa
 
 Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link (declared icon as prefix) in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
-Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
+Each type also carries a \`help\` note, opened from the help icon in the header, that describes its attributes and what they do.
 `,
 			},
 		},
@@ -870,9 +920,62 @@ export const RuntimeActions: StoryObj = {
 				story: `
 A widget declares actions from what its render knows, through \`useWidgetActions\`, and from more than one component.
 
-The footer starts with the declared "Details" link. Once the check settles, the widget declares "Review 3 items" with the same \`id\`, and it takes that place. Its export section, a child component, declares "Download CSV": a \`callback\` action, disabled while the export runs. \`WidgetRender\` joins both declarations, so the host receives one list.
+The footer starts with the declared "Details" link. Once the check settles, the widget declares "Review 3 items" with the same \`id\`, and it takes that place. Its export section, a child component, declares "Download CSV": a \`callback\` action, disabled while the export runs. \`WidgetRender\` joins both declarations, so the host receives one list. The strip keeps its height as they arrive.
 
 "Hide export" unmounts the section and withdraws only its action. "Resolve one" shrinks the list; once nothing is left, "Details" returns.
+`,
+			},
+		},
+	},
+};
+
+const FOOTER_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'footer-text-links',
+		type: 'demo/footer-text-links',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 1 },
+	},
+	{
+		uuid: 'footer-icon-link',
+		type: 'demo/footer-icon-link',
+		attributes: { metric: 'orders', target: '1000' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'footer-callbacks',
+		type: 'demo/footer-callbacks',
+		attributes: { metric: 'revenue', target: '10000' },
+		placement: { width: 1, height: 1, order: 3 },
+	},
+];
+
+function FooterStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( FOOTER_LAYOUT );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ FOOTER_WIDGET_TYPES }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ { model: 'grid', rowHeight: 200 } }
+		>
+			<WidgetDashboard.Widgets />
+		</WidgetDashboard>
+	);
+}
+
+export const Footer: StoryObj = {
+	render: () => <FooterStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Three tiles whose footers hold different affordances: text links, a text link beside an icon-only link, and callback buttons declared at runtime.
+
+Every strip has one height, the text line plus its padding, and a compact control sits centered in it: the dividers stay level across the tiles, and the body keeps its size whatever the footer holds. Run a callback to watch its button disable while the promise settles, without moving the strip.
 `,
 			},
 		},

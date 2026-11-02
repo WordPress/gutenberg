@@ -227,8 +227,12 @@ function Fields( {
 	contentRef,
 }: FieldsProps ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceBlocks, selectionChange } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		replaceBlocks,
+		selectionChange,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
@@ -334,6 +338,8 @@ function Fields( {
 				),
 				{ uniqueByBlock: true }
 			);
+			// The next change to these blocks starts a new undo level.
+			__unstableMarkLastChangeAsPersistent();
 			return;
 		}
 		// The selected text was replaced, by an inline image or a

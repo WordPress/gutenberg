@@ -21,6 +21,7 @@
 		{ "path": "packages/connectors" },
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-actions" },
+		{ "path": "packages/core-commands" },
 		{ "path": "packages/core-data" },
 		{ "path": "packages/core-fields" },
 		{ "path": "packages/data" },

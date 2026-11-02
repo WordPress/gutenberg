@@ -112,6 +112,176 @@ test.describe( 'Autosave', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should keep the current content as a revision when restoring the backup', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const backupKey = `wp-autosave-block-editor-post-${ postId }`;
+		const getLatestRevision = async () => {
+			const revisions = await requestUtils.rest( {
+				path: `/wp/v2/posts/${ postId }/revisions`,
+				params: { context: 'edit' },
+			} );
+			return revisions[ 0 ].content.raw;
+		};
+
+		// Make a backup, then edit further and autosave. A draft's autosave
+		// updates the post without adding a revision.
+		await page.keyboard.type( ' backup' );
+		const backup = await page.evaluate( ( key ) => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.autosave( { local: true } );
+			return window.sessionStorage.getItem( key );
+		}, backupKey );
+		await page.keyboard.type( ' newer' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		// The older backup is left behind, as by another tab.
+		await page.evaluate(
+			( [ key, value ] ) => window.sessionStorage.setItem( key, value ),
+			[ backupKey, backup ]
+		);
+		await page.reload();
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'before save backup newer',
+					dropCap: false,
+				},
+				innerBlocks: [],
+			},
+		] );
+		expect( await getLatestRevision() ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save</p>\n<!-- /wp:paragraph -->'
+		);
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Restore' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toHaveText( [ 'Backup restored.' ] );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup', dropCap: false },
+				innerBlocks: [],
+			},
+		] );
+
+		expect( await getLatestRevision() ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save backup newer</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	test( 'should wait for a running autosave before restoring the backup', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const backupKey = `wp-autosave-block-editor-post-${ postId }`;
+
+		// Make a backup, then save past it.
+		await page.keyboard.type( ' backup' );
+		const backup = await page.evaluate( ( key ) => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.autosave( { local: true } );
+			return window.sessionStorage.getItem( key );
+		}, backupKey );
+		await page.keyboard.type( ' saved' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page.waitForFunction(
+			() => ! window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+		);
+		await page.evaluate(
+			( [ key, value ] ) => window.sessionStorage.setItem( key, value ),
+			[ backupKey, backup ]
+		);
+		await page.reload();
+
+		// Hold an autosave of newer text until Restore is pressed.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' newest' );
+		let releaseAutosave;
+		const autosaveReleased = new Promise( ( resolve ) => {
+			releaseAutosave = resolve;
+		} );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/autosaves' ),
+			async ( route ) => {
+				await autosaveReleased;
+				await route.continue();
+			}
+		);
+		const autosaveRequest = page.waitForRequest( ( request ) =>
+			decodeURIComponent( request.url() ).includes( '/autosaves' )
+		);
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).autosave();
+		} );
+		await autosaveRequest;
+		await page.getByRole( 'button', { name: 'View the backup' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'button', { name: 'Restore' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		releaseAutosave();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toHaveText( [ 'Backup restored.' ] );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save backup', dropCap: false },
+				innerBlocks: [],
+			},
+		] );
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }/revisions`,
+			params: { context: 'edit' },
+		} );
+		expect( revisions[ 0 ].content.raw ).toBe(
+			'<!-- wp:paragraph -->\n<p>before save backup saved newest</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
 	test( 'should keep the backup when its view is closed', async ( {
 		editor,
 		page,
