@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove `@wordpress/media-editor` from the list of core modules allowed to use private APIs ([#86114](https://github.com/WordPress/gutenberg/pull/86114)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

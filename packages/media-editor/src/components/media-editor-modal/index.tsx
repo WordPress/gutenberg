@@ -11,7 +11,7 @@ import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
-interface MediaEditorModalProps {
+export interface MediaEditorModalProps {
 	/**
 	 * Attachment fields to render in the Details tab.
 	 *

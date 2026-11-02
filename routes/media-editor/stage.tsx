@@ -5,17 +5,13 @@ import { useSelect } from '@wordpress/data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as mediaEditorPrivateApis,
-	type Media,
-} from '@wordpress/media-editor';
+import { MediaEditor, type Media } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { useViewConfig } from '@wordpress/views';
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );
-const { MediaEditor } = unlock( mediaEditorPrivateApis );
 
 /**
  * The stage only renders a form, so it requests the `form` of the entity view

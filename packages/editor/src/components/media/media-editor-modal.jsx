@@ -1,14 +1,12 @@
 import { useSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import {
+	MediaEditorModal,
+	store as mediaEditorStore,
+} from '@wordpress/media-editor';
 import { useViewConfig } from '@wordpress/views';
-import { unlock } from '../../lock-unlock';
 import usePostFields from '../post-fields';
-
-const { MediaEditorModal, store: mediaEditorStore } = unlock(
-	mediaEditorPrivateApis
-);
 
 /*
  * The modal only renders a form, so it requests the `form` of the attachment

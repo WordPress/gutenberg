@@ -12,6 +12,10 @@
 
 -   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
 
+### Internal
+
+-   Remove `@wordpress/private-apis` dependency and export `MediaEditor`, `MediaEditorModal`, and `store` as regular package exports ([#86114](https://github.com/WordPress/gutenberg/pull/86114)).
+
 ## 0.21.0 (2026-10-20)
 
 ### Breaking Changes
