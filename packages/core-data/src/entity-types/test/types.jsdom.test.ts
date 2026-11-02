@@ -415,6 +415,11 @@ describe( 'Entity record types', () => {
 			globalStyles?.title.raw satisfies string | undefined;
 			// @ts-expect-error -- the entity record has no revision author.
 			globalStyles?.author;
+			// `settings` and `styles` follow the theme.json shape.
+			globalStyles?.settings.typography?.fontFamilies;
+			globalStyles?.styles.color?.background;
+			// @ts-expect-error -- not a theme.json setting.
+			globalStyles?.settings.typography?.notASetting;
 
 			const actions = dispatch( coreStore );
 			const currentGlobalStylesId =
