@@ -62,8 +62,8 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				isLast: lastIndex === blockOrder.length - 1,
 				orientation: getBlockListSettings( _rootClientId )?.orientation,
 				isManualGrid:
-					layout?.type === 'grid' &&
-					layout.isManualPlacement &&
+					parentLayout?.type === 'grid' &&
+					parentLayout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity,
 				isAutoGrid:
 					normalizedClientIds.length === 1 &&
