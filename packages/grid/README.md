@@ -150,6 +150,7 @@ interface DashboardGridLayoutItem {
 | `children`           | `ReactNode`                                | —        | Required. Each child needs a `key` matching a layout entry.                                                                                             |
 | `columns`            | `number \| ColumnSteps`                    | `6`      | Column count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns). |
 | `minColumnWidth`     | `number`                                   | —        | Per-column floor in pixels: the count drops on narrow containers so no column is narrower, down to one. Alone, as many columns as fit.                 |
+| `gap`                | `GapSize`                                  | —        | Gap between tiles as a design-system step (`xs` to `3xl`), written to `--wp-grid-gap` on the root. Absent, the root inherits the property or falls back to `xl`. See [Gap](#gap). |
 | `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
 | `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
 | `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                             |
@@ -165,9 +166,7 @@ interface DashboardGridLayoutItem {
 `<div>` attributes (`id`, `aria-*`, `data-*`, event handlers,
 `style`, etc.) flow through. The grid's own layout styles
 (`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
-`style` for those properties. Tile gap is owned by a design-system
-token; override it with `--wp-grid-gap` (see [Theming with CSS
-variables](#theming-with-css-variables)).
+`style` for those properties. The tile gap is a design-system step declared with `gap` (see [Gap](#gap)).
 
 #### Child-level props
 
@@ -334,6 +333,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `children`           | `ReactNode`                                | —       | Required. Each child needs a `key` matching a layout entry.                                                                                                                                             |
 | `columns`            | `number \| ColumnSteps`                    | `6`     | Lane count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns).                               |
 | `minColumnWidth`     | `number`                                   | —       | Per-lane floor in pixels: the count drops on narrow containers so no lane is narrower, down to one. Alone, as many lanes as fit.                                                                       |
+| `gap`                | `GapSize`                                  | —       | Gap between tiles as a design-system step (`xs` to `3xl`), written to `--wp-grid-gap` on the root. Absent, the root inherits the property or falls back to `xl`. See [Gap](#gap).                     |
 | `flowTolerance`      | `number`                                   | `16`    | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions.                     |
 | `rowUnit`            | `number`                                   | `4`     | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
 | `itemLimits`         | `Record< string, GridItemWidthLimits >`    | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. See [Size limits](#size-limits).                                                                                          |
@@ -438,6 +438,20 @@ reserves at least its minimum and never exceeds its maximum.
 Height limits apply when `rowHeight` is numeric and stay open with
 `'auto'` rows. `DashboardLanes` takes `GridItemWidthLimits`: lane
 heights are content-driven.
+
+### Gap
+
+The gap between tiles is the fourth geometry input, next to `columns`, `minColumnWidth` and `rowHeight`: both surfaces fit the columns with it, size every tile with it and snap a resize with it. It is declared with `gap`, a step of the design-system gap scale (`GapSize` from `@wordpress/theme`: `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`), never a pixel number.
+
+```jsx
+<DashboardGrid layout={ layout } columns={ 4 } gap="md">
+	{ children }
+</DashboardGrid>
+```
+
+The surface writes the step's token to `--wp-grid-gap` on its root, so the value keeps resolving in CSS and follows the density of the design system. It then reads the computed `column-gap` back for its layout math, on mount, on every resize and whenever `gap` changes, so a density change applies without a remount. Absent, nothing is written: the root inherits `--wp-grid-gap` from an ancestor or falls back to the `xl` step (see [Theming with CSS variables](#theming-with-css-variables)).
+
+The rule that separates the prop from the custom properties: what the layout math reads is declared as a prop; what only paint reads stays a CSS custom property.
 
 ### Accessibility
 
@@ -570,7 +584,7 @@ root itself via `style`). All values fall back to sensible defaults.
 
 | Variable                                 | Default                                             | Applies to                                                                                                            |
 | ---------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `--wp-grid-gap`                          | `var(--wpds-dimension-gap-xl)`                      | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay.                                         |
+| `--wp-grid-gap`                          | `var(--wpds-dimension-gap-xl)`                      | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay, when the surface has no `gap` prop; `gap` writes this property on the root. See [Gap](#gap). |
 | `--wp-grid-drag-preview-scale`           | `1.05`                                              | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift.                                      |
 | `--wp-grid-drag-preview-radius`          | `0`                                                 | Border radius of the drag-preview functional frame so the lift shadow follows the consumer's tile shape.              |
 | `--wp-grid-placeholder-opacity`          | `0.4`                                               | Opacity of the placeholder tile (the original item while a drag is in flight).                                        |

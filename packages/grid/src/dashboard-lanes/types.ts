@@ -1,3 +1,4 @@
+import type { GapSize } from '@wordpress/theme';
 import type { ColumnSteps } from '../shared/column-policy';
 import type {
 	DragPreviewRenderProps,
@@ -97,8 +98,7 @@ export interface DashboardLanesProps extends Omit<
 	 * Inline styles on the surface root. Merged underneath the
 	 * surface's own layout styles, so `display` and
 	 * `gridTemplateColumns` always win. The gap between tiles is
-	 * owned by the design-system gap token and is not configurable
-	 * per instance; override it via a theme or density change.
+	 * declared with `gap`, not here.
 	 */
 	style?: React.CSSProperties;
 
@@ -190,6 +190,15 @@ export interface DashboardLanesProps extends Omit<
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Gap between tiles, as a step of the design-system gap scale. The
+	 * surface writes the step's token to `--wp-grid-gap` on its root, so
+	 * the value resolves in CSS and follows density. Absent, the root
+	 * inherits `--wp-grid-gap` from an ancestor or falls back to the `xl`
+	 * step.
+	 */
+	gap?: GapSize;
 
 	/**
 	 * Per-item width limits in pixels, keyed by layout item key. Lane

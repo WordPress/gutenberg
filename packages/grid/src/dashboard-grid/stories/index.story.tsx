@@ -37,6 +37,12 @@ const meta: Meta< typeof DashboardGrid > = {
 			description:
 				'Per-column floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
+		gap: {
+			control: 'select',
+			options: [ 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl' ],
+			description:
+				'Gap between tiles as a design-system step. Writes `--wp-grid-gap` on the root; unset, the surface falls back to `xl`.',
+		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
 			description: 'Row height in pixels, or `auto`.',
@@ -380,6 +386,7 @@ export const Columns: Story = {
  * `columns` as a map: one column from 0px, two from 600px, four from
  * 960px. The count steps at those container widths regardless of how
  * wide each column ends up; add `minColumnWidth` to lower it further.
+ * The `gap` control spaces the tiles by a design-system step.
  */
 export const ColumnSteps: Story = {
 	argTypes: {
@@ -387,6 +394,7 @@ export const ColumnSteps: Story = {
 	},
 	args: {
 		columns: { 0: 1, 600: 2, 960: 4 },
+		gap: 'xl',
 		rowHeight: 96,
 		layout: [
 			{ key: 'fixed-1', width: 1, height: 1 },
@@ -430,7 +438,8 @@ export const ColumnSteps: Story = {
 /**
  * A step can be `'auto'`: from that width up there is no cap and the
  * floor alone decides the count. Here the steps fix one and two columns
- * below 960px, and 240px columns fill the container above it.
+ * below 960px, and 240px columns fill the container above it. A wider
+ * `gap` fits fewer columns at the same width.
  */
 export const ColumnStepsWithFloor: Story = {
 	argTypes: {

@@ -26,6 +26,7 @@ import {
 import { GridItem } from './grid-item';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { gapStyle, readComputedGap } from '../shared/gap';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -109,6 +110,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			style,
 			rowHeight = 'auto',
 			minColumnWidth,
+			gap,
 			itemLimits,
 			editMode = false,
 			onChangeLayout,
@@ -167,9 +169,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const [ containerHeight, setContainerHeight ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
-			( [ { contentRect } ] ) => {
+			( [ { contentRect, target } ] ) => {
 				setContainerWidth( contentRect.width );
 				setContainerHeight( contentRect.height );
+				setGapPx( ( current ) => readComputedGap( target ) ?? current );
 			}
 		);
 		const mergedGridRef = useMergeRefs( [
@@ -181,7 +184,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// Measure before paint to avoid a single-column flash in
 		// responsive mode; `useResizeObserver` delivers async. The
 		// computed `column-gap` is read from the resolved CSS so the
-		// math tracks the design-system token under any density.
+		// math tracks the design-system token under any density, and
+		// read again when `gap` changes, once its token is on the root.
 		useLayoutEffect( () => {
 			if ( ! gridRoot ) {
 				return;
@@ -193,13 +197,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			if ( height > 0 ) {
 				setContainerHeight( height );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( gridRoot ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
-			}
-		}, [ gridRoot ] );
+			setGapPx( ( current ) => readComputedGap( gridRoot ) ?? current );
+		}, [ gridRoot, gap ] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(
@@ -721,6 +720,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						data-wp-grid-resizing={ isResizing || undefined }
 						style={ {
 							...style,
+							...gapStyle( gap ),
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 							gridAutoRows: rowHeight,
 						} }
