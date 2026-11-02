@@ -95,6 +95,26 @@ By default, the following module requests are handled:
 | `react-dom`                  | `ReactDOM`           | `react-dom`   |
 | `react`                      | `React`              | `react`       |
 
+#### Bundled `@wordpress/*` packages
+
+Some `@wordpress/*` packages are bundled directly into your build rather than externalized to global `wp.*` scripts. These packages do not have shared runtime script handles registered in WordPress core, and must be included in your project's `dependencies` so that webpack can bundle them into your output:
+
+- `@wordpress/admin-ui`
+- `@wordpress/dataviews` (and `@wordpress/dataviews/wp`)
+- `@wordpress/fields`
+- `@wordpress/global-styles-engine`
+- `@wordpress/global-styles-ui`
+- `@wordpress/grid`
+- `@wordpress/icons`
+- `@wordpress/interface`
+- `@wordpress/kebab-case`
+- `@wordpress/react-inert-value`
+- `@wordpress/style-runtime`
+- `@wordpress/sync`
+- `@wordpress/ui`
+- `@wordpress/undo-manager`
+- `@wordpress/views`
+
 **Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script handles from bundle compilation so that a list of script dependencies does not need to be manually maintained. If you don't need to extract a list of script dependencies, use the `externals` option directly.
 
 This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
