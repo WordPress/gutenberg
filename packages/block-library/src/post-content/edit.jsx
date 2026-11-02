@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
+	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -21,6 +22,96 @@ import { useCanEditEntity } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+
+/**
+ * The post type the blocks of a template stand for, which follows from the
+ * slug of the template the way it does when the template is edited on its own:
+ * `page` renders a page, `single` a post, and `single-{postType}` one of that
+ * post type. A template whose slug says nothing about what it renders, such as
+ * `index` or `404`, stands for no post type in particular.
+ *
+ * Kept here rather than shared with the editor, which infers the same thing for
+ * the template at the root of its canvas: this package is WordPress agnostic
+ * about everything but core data, and the rule is the template hierarchy's.
+ *
+ * @param {string}   templateSlug       Slug of the template.
+ * @param {Object[]} [postTypeEntities] The post type entities of the site, for a `single-{postType}` slug.
+ * @return {string|undefined} The post type, or `undefined` when the slug names none.
+ */
+function getTemplatePostType( templateSlug, postTypeEntities ) {
+	if ( templateSlug === 'page' ) {
+		return 'page';
+	}
+
+	if ( templateSlug === 'single' ) {
+		return 'post';
+	}
+
+	if ( templateSlug?.split( '-' )[ 0 ] === 'single' ) {
+		const postTypeNames =
+			postTypeEntities?.map( ( entity ) => entity.name ) || [];
+		const match = templateSlug.match(
+			`^single-(${ postTypeNames.join( '|' ) })(?:-.+)?$`
+		);
+
+		if ( match ) {
+			return match[ 1 ];
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * The context the blocks of a template rendered in this one are given.
+ *
+ * A template can name the template it is rendered inside, whose content block
+ * is the slot its blocks take the place of. Those blocks belong to the template
+ * being rendered rather than to this one, so they stand for the post that
+ * template renders, the way they do when it is edited on its own: a title block
+ * among them is the title of that post and not of the template, and a content
+ * block among them is where that post's content goes rather than the template
+ * rendering itself.
+ *
+ * @param {Object} props          The context this block is rendered in.
+ * @param {string} props.postType Post type of the entity being rendered.
+ * @param {string} props.postId   ID of the entity being rendered.
+ * @return {Object|undefined} The context for the blocks, or `undefined` when they are not a template's.
+ */
+function useTemplateSlotContext( { postType, postId } ) {
+	const templateSlug = useSelect(
+		( select ) => {
+			if ( 'wp_template' !== postType || ! postId ) {
+				return undefined;
+			}
+
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			)?.slug;
+		},
+		[ postType, postId ]
+	);
+	const postTypeEntities = useSelect(
+		( select ) =>
+			templateSlug
+				? select( coreStore ).getEntitiesConfig( 'postType' )
+				: undefined,
+		[ templateSlug ]
+	);
+
+	return useMemo( () => {
+		if ( ! templateSlug ) {
+			return undefined;
+		}
+
+		return {
+			postId: undefined,
+			postType: getTemplatePostType( templateSlug, postTypeEntities ),
+		};
+	}, [ templateSlug, postTypeEntities ] );
+}
 
 function ReadOnlyContent( {
 	parentLayout,
@@ -75,19 +166,31 @@ function EditableContentLoaded( {
 	blocks,
 	onInput,
 	onChange,
+	slotContext,
 	tagName: TagName = 'div',
 } ) {
-	const props = useInnerBlocksProps( blockProps, {
+	const { children, ...props } = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
 		onChange,
 	} );
-	return <TagName { ...props } />;
+	return (
+		<TagName { ...props }>
+			{ slotContext ? (
+				<BlockContextProvider value={ slotContext }>
+					{ children }
+				</BlockContextProvider>
+			) : (
+				children
+			) }
+		</TagName>
+	);
 }
 
 function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
+	const slotContext = useTemplateSlotContext( context );
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -124,6 +227,7 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 			blocks={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
+			slotContext={ slotContext }
 			tagName={ TagName }
 		/>
 	);
