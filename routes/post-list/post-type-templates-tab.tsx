@@ -11,13 +11,24 @@ import {
 	useCallback,
 	useState,
 } from '@wordpress/element';
-import { Modal, Spinner, Tooltip as WCTooltip } from '@wordpress/components';
+import {
+	Modal,
+	Spinner as WCSpinner,
+	Tooltip as WCTooltip,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { page, postList } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { Badge, Button, Icon, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import {
+	Badge,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Icon,
+	Stack,
+	Text,
+} from '@wordpress/ui';
 import { getTemplatePlaceholderItemId } from './view-utils';
 import { isPageApplicableTemplate } from './template-utils';
 
@@ -505,8 +516,18 @@ export function PostTypeTemplatesTab( {
 				select( coreStore );
 			const currentTheme = getCurrentTheme();
 			return {
-				activeTemplatesOption: getEntityRecord( 'root', 'site' )
-					?.active_templates,
+				// The site settings carry the active templates, which
+				// `Settings` doesn't declare.
+				activeTemplatesOption: (
+					getEntityRecord( 'root', 'site' ) as
+						| {
+								active_templates?: Record<
+									string,
+									string | number
+								>;
+						  }
+						| undefined
+				 )?.active_templates,
 				activeTheme: currentTheme,
 				defaultTemplateTypes:
 					currentTheme?.default_template_types || [],
@@ -664,7 +685,7 @@ export function PostTypeTemplatesTab( {
 					_fallbackTemplateId: fallbackTemplate.id,
 					_fallbackTemplateTitle:
 						getTemplateRecordTitle( fallbackTemplate ),
-				} as PageTemplateRecord;
+				} as unknown as PageTemplateRecord;
 			} )
 			.filter( Boolean ) as PageTemplateRecord[];
 
@@ -833,7 +854,7 @@ export function PostTypeTemplatesTab( {
 			>
 				{ isLoading && templates.length === 0 && (
 					<Stack justify="center" align="center">
-						<Spinner />
+						<WCSpinner />
 					</Stack>
 				) }
 				{ ! isLoading && templates.length === 0 && (

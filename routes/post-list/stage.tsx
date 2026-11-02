@@ -12,6 +12,7 @@ import { Page } from '@wordpress/admin-ui';
 import type {
 	View,
 	Action,
+	Field,
 	SupportedLayouts,
 	Form,
 } from '@wordpress/dataviews';
@@ -23,7 +24,7 @@ import {
 	Button as ComponentsButton,
 	DropdownMenu,
 	MenuItem,
-	Notice,
+	Notice as WCNotice,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -84,7 +85,7 @@ type PageListItem = Post & {
 	_isTemplatePage?: boolean;
 };
 
-const TemplatePreviewRender = previewField.render as ComponentType< {
+const TemplatePreviewRender = previewField.render as unknown as ComponentType< {
 	item: PageListItem;
 } >;
 function TemplateTitleRender( { item }: { item: PageListItem } ) {
@@ -327,7 +328,7 @@ function PostListView( {
 							'postType',
 							'page',
 							frontPageId
-						) as Post )
+						) as unknown as Post )
 					: undefined,
 			};
 		},
@@ -369,7 +370,7 @@ function PostListView( {
 					rendered: template.description || '',
 				},
 				_isTemplatePage: true,
-			} as PageListItem;
+			} as unknown as PageListItem;
 		},
 		[ homepageSettings.homeUrl, homepageSettings.showOnFront, postType ]
 	);
@@ -570,84 +571,91 @@ function PostListView( {
 		postType,
 	} );
 	const fields = useMemo( () => {
-		const mappedFields = allFields.map( ( field ) => {
-			if (
-				field.type === 'media' ||
-				field.id === 'content-preview' ||
-				field.id === 'featured_media'
-			) {
-				return {
-					...field,
-					render( props: { item: PageListItem } ) {
-						if ( isTemplateLikeItem( props.item ) ) {
-							return (
-								<TemplateItemPreview>
-									<TemplatePreviewRender
-										item={ props.item }
-									/>
-								</TemplateItemPreview>
-							);
-						}
+		const mappedFields = allFields.map(
+			( field: Field< PageListItem > ) => {
+				if (
+					field.type === 'media' ||
+					field.id === 'content-preview' ||
+					field.id === 'featured_media'
+				) {
+					return {
+						...field,
+						render( props: { item: PageListItem } ) {
+							if ( isTemplateLikeItem( props.item ) ) {
+								return (
+									<TemplateItemPreview>
+										<TemplatePreviewRender
+											item={ props.item }
+										/>
+									</TemplateItemPreview>
+								);
+							}
 
-						const Render = field.render as ComponentType<
-							typeof props
-						>;
-						return <Render { ...props } />;
-					},
-				};
+							const Render = field.render as ComponentType<
+								typeof props
+							>;
+							return <Render { ...props } />;
+						},
+					};
+				}
+
+				if ( field.id === 'title' ) {
+					return {
+						...field,
+						render( props: { item: PageListItem } ) {
+							if ( isTemplateLikeItem( props.item ) ) {
+								return (
+									<TemplateItemTitle
+										badgeLabel={
+											props.item._isTemplatePage
+												? __( 'Homepage' )
+												: undefined
+										}
+									>
+										<TemplateTitleRender
+											item={ props.item }
+										/>
+									</TemplateItemTitle>
+								);
+							}
+
+							const Render = field.render as ComponentType<
+								typeof props
+							>;
+							return <Render { ...props } />;
+						},
+					};
+				}
+
+				if ( field.id === 'status' ) {
+					return {
+						...field,
+						render( props: { item: PageListItem } ) {
+							if ( isTemplateLikeItem( props.item ) ) {
+								return (
+									<TemplateItemBadge>
+										{ __( 'Active' ) }
+									</TemplateItemBadge>
+								);
+							}
+
+							const Render = field.render as ComponentType<
+								typeof props
+							>;
+							return <Render { ...props } />;
+						},
+					};
+				}
+
+				return field;
 			}
-
-			if ( field.id === 'title' ) {
-				return {
-					...field,
-					render( props: { item: PageListItem } ) {
-						if ( isTemplateLikeItem( props.item ) ) {
-							return (
-								<TemplateItemTitle
-									badgeLabel={
-										props.item._isTemplatePage
-											? __( 'Homepage' )
-											: undefined
-									}
-								>
-									<TemplateTitleRender item={ props.item } />
-								</TemplateItemTitle>
-							);
-						}
-
-						const Render = field.render as ComponentType<
-							typeof props
-						>;
-						return <Render { ...props } />;
-					},
-				};
-			}
-
-			if ( field.id === 'status' ) {
-				return {
-					...field,
-					render( props: { item: PageListItem } ) {
-						if ( isTemplateLikeItem( props.item ) ) {
-							return (
-								<TemplateItemBadge>
-									{ __( 'Active' ) }
-								</TemplateItemBadge>
-							);
-						}
-
-						const Render = field.render as ComponentType<
-							typeof props
-						>;
-						return <Render { ...props } />;
-					},
-				};
-			}
-
-			return field;
-		} );
+		);
 
 		if (
-			! mappedFields.some( ( field ) => field.id === 'content-preview' )
+			! mappedFields.some(
+				( field: Field< PageListItem > ) =>
+					field.id === 'content-preview'
+			)
 		) {
 			mappedFields.push( {
 				id: 'content-preview',
@@ -986,7 +994,7 @@ function PostListView( {
 				</Tabs.Root>
 			</div>
 			{ showLatestPostsHomepageNotice && (
-				<Notice
+				<WCNotice
 					className="routes-post-list__homepage-notice"
 					status="info"
 					onDismiss={ dismissLatestPostsHomepageNotice }
@@ -1013,7 +1021,7 @@ function PostListView( {
 					>
 						{ __( 'Configure Homepage' ) }
 					</ComponentsButton>
-				</Notice>
+				</WCNotice>
 			) }
 			{ activeContentTab === 'templates' ? (
 				<PostTypeTemplatesTab postType={ postType } />

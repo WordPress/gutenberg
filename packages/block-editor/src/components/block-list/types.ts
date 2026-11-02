@@ -45,6 +45,8 @@ export interface PrivateBlockContextValue {
 	isMultiSelected?: boolean;
 	isPartiallySelected?: boolean;
 	isReusable?: boolean;
+	/** Whether the block is a template-owned section of the universal canvas. */
+	isUniversalCanvasGlobalSection?: boolean;
 	isDragging?: boolean;
 	hasChildSelected?: boolean;
 	isSectionBlock?: boolean;

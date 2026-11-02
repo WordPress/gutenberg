@@ -1,9 +1,9 @@
 import {
 	Button,
 	Modal,
-	Notice,
+	Notice as WCNotice,
 	RadioControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -311,14 +311,14 @@ export default function ConfigureHomepageModal( {
 				/>
 				{ mode === READING_DISPLAY_STATIC && (
 					<div className={ styles[ 'static-fields' ] }>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Homepage' ) }
 							value={ homePageId }
 							options={ homepageOptions }
 							onChange={ handleHomepageSelect }
 							__next40pxDefaultSize
 						/>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Posts page' ) }
 							value={ postsPageId }
 							options={ postsPageOptions }
@@ -332,9 +332,9 @@ export default function ConfigureHomepageModal( {
 					</div>
 				) }
 				{ validationError && (
-					<Notice status="warning" isDismissible={ false }>
+					<WCNotice status="warning" isDismissible={ false }>
 						{ validationError }
-					</Notice>
+					</WCNotice>
 				) }
 			</div>
 			<div className={ styles.footer }>

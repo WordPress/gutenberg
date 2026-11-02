@@ -13,7 +13,6 @@ import {
 	createBlock,
 	hasBlockSupport,
 	store as blocksStore,
-	// @ts-expect-error - No type declarations available for @wordpress/blocks
 } from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
@@ -58,8 +57,8 @@ export default function LeafMoreMenu( {
 	} ) as string;
 	const removeLabel = isBulkSelection
 		? sprintf(
-				/* translators: %s: number of selected menu items */
-				__( 'Remove %s items' ),
+				/* translators: %d: number of selected menu items */
+				__( 'Remove %d items' ),
 				selectedClientIds.length
 			)
 		: sprintf(
@@ -264,10 +263,12 @@ export default function LeafMoreMenu( {
 										convertedSiblingBlocks,
 										false
 									);
-									selectBlock(
-										firstConvertedSubmenuClientId,
-										null
-									);
+									if ( firstConvertedSubmenuClientId ) {
+										selectBlock(
+											firstConvertedSubmenuClientId,
+											null
+										);
+									}
 									onClose();
 								} }
 							>

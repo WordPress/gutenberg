@@ -2,7 +2,7 @@ import {
 	Button,
 	Icon as WCIcon,
 	Modal,
-	Notice,
+	Notice as WCNotice,
 	TextControl,
 } from '@wordpress/components';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -20,7 +20,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
 	store as blocksStore,
-	// @ts-expect-error - No type declarations available for @wordpress/blocks
+	type Block,
 } from '@wordpress/blocks';
 import {
 	archive,
@@ -241,9 +241,9 @@ interface LinkedNavigationState {
 
 interface AddMenuItemsModalProps {
 	navigationBlocks: NavigationBlock[];
-	navigationMenu: PostRecord;
+	navigationMenu: { content?: string | { raw?: string } };
 	onClose: () => void;
-	onAddBlocks: ( blocks: NavigationBlock[] ) => void;
+	onAddBlocks: ( blocks: Block[] ) => void;
 }
 
 const EMPTY_SOURCE_RECORDS: MenuItemSourceRecords = {
@@ -290,8 +290,7 @@ function getPostTypeItemLabel( postType: PostTypeRecord ) {
 
 function createDefaultView( group: PickerGroup ): View {
 	const isGrid = group === 'media';
-	return {
-		type: isGrid ? 'pickerGrid' : 'pickerTable',
+	const baseView = {
 		search: '',
 		filters: [],
 		page: 1,
@@ -300,13 +299,22 @@ function createDefaultView( group: PickerGroup ): View {
 		mediaField: 'preview',
 		descriptionField: 'linkLabel',
 		fields: getDefaultFieldsForGroup( group ),
-		layout: {
-			badgeFields: [ 'typeLabel', 'status', 'inThisMenu' ],
-			previewSize: group === 'media' ? 140 : 160,
-		},
 		showMedia: isGrid,
 		showDescription: false,
 	};
+
+	if ( isGrid ) {
+		return {
+			...baseView,
+			type: 'pickerGrid',
+			layout: {
+				badgeFields: [ 'typeLabel', 'status', 'inThisMenu' ],
+				previewSize: 140,
+			},
+		};
+	}
+
+	return { ...baseView, type: 'pickerTable' };
 }
 
 function getPostTitle( record: PostRecord | MediaRecord ) {
@@ -406,7 +414,7 @@ function isItemInNavigation(
 	);
 }
 
-function getNavigationLinkBlock( item: PickerItem ): NavigationBlock {
+function getNavigationLinkBlock( item: PickerItem ): Block {
 	const attributes: Record< string, unknown > = {
 		label: item.title,
 		type: item.sourceType,
@@ -437,7 +445,7 @@ function getNavigationLinkBlock( item: PickerItem ): NavigationBlock {
 	return createBlock( 'core/navigation-link', attributes );
 }
 
-function getNavigationBlock( item: PickerItem ): NavigationBlock {
+function getNavigationBlock( item: PickerItem ): Block {
 	if ( item.group === 'blocks' && item.blockName ) {
 		return createBlock( item.blockName );
 	}
@@ -561,7 +569,8 @@ function SourceIcon( { item }: { item: PickerItem } ) {
 	let icon = pageIcon;
 
 	if ( item.group === 'blocks' ) {
-		icon = item.blockIcon || blockDefault;
+		// A block type's icon source is a valid icon.
+		icon = ( item.blockIcon as typeof icon | undefined ) || blockDefault;
 	} else if ( item.group === 'media' ) {
 		icon = item.mediaUrl ? image : file;
 	} else if ( item.group === 'taxonomy' ) {
@@ -747,12 +756,12 @@ export default function AddMenuItemsModal( {
 
 		const contentRecords = resolvedContentPostTypes.flatMap( ( postType ) =>
 			(
-				core.getEntityRecords(
+				( core.getEntityRecords(
 					'postType',
 					postType.slug,
 					CONTENT_QUERY
-				) || []
-			).map( ( record: PostRecord ) => ( {
+				) ?? [] ) as unknown as PostRecord[]
+			 ).map( ( record: PostRecord ) => ( {
 				record: {
 					id: record.id,
 					link: record.link,
@@ -768,12 +777,12 @@ export default function AddMenuItemsModal( {
 		);
 		const termRecords = resolvedTaxonomies.flatMap( ( taxonomy ) =>
 			(
-				core.getEntityRecords(
+				( core.getEntityRecords(
 					'taxonomy',
 					taxonomy.slug,
 					TERMS_QUERY
-				) || []
-			).map( ( record: TermRecord ) => ( {
+				) ?? [] ) as unknown as TermRecord[]
+			 ).map( ( record: TermRecord ) => ( {
 				record: {
 					id: record.id,
 					link: record.link,
@@ -827,7 +836,10 @@ export default function AddMenuItemsModal( {
 		[ sourceRecordsPayload ]
 	);
 
-	const menuContent = navigationMenu.content?.raw || '';
+	const menuContent =
+		( typeof navigationMenu.content === 'string'
+			? navigationMenu.content
+			: navigationMenu.content?.raw ) || '';
 	const linkedState = useMemo(
 		() =>
 			navigationBlocks.length
@@ -1047,24 +1059,26 @@ export default function AddMenuItemsModal( {
 		);
 	}, [ activeItems, addItems, selection ] );
 
-	const actions: Action< PickerItem >[] = useMemo(
-		() => [
-			{
-				id: 'cancel',
-				label: __( 'Cancel' ),
-				supportsBulk: true,
-				callback: onClose,
-			},
-			{
-				id: 'confirm',
-				label: __( 'Add to menu' ),
-				isPrimary: true,
-				supportsBulk: true,
-				callback: addSelectedItems,
-			},
-		],
-		[ addSelectedItems, onClose ]
-	);
+	// The picker only takes actions that run a callback, not modal ones.
+	const actions: Extract< Action< PickerItem >, { callback: unknown } >[] =
+		useMemo(
+			() => [
+				{
+					id: 'cancel',
+					label: __( 'Cancel' ),
+					supportsBulk: true,
+					callback: onClose,
+				},
+				{
+					id: 'confirm',
+					label: __( 'Add to menu' ),
+					isPrimary: true,
+					supportsBulk: true,
+					callback: addSelectedItems,
+				},
+			],
+			[ addSelectedItems, onClose ]
+		);
 
 	const selectGroup = useCallback( ( nextGroup: PickerGroup ) => {
 		setActiveGroup( nextGroup );
@@ -1185,13 +1199,13 @@ export default function AddMenuItemsModal( {
 						</div>
 
 						{ error && (
-							<Notice
+							<WCNotice
 								status="error"
 								isDismissible
 								onRemove={ () => setError( undefined ) }
 							>
 								{ error }
-							</Notice>
+							</WCNotice>
 						) }
 
 						{ activeGroup === 'custom' ? (
@@ -1247,12 +1261,12 @@ export default function AddMenuItemsModal( {
 								paginationInfo={ paginationInfo }
 								defaultLayouts={ {
 									pickerGrid: {
-										badgeFields: [
-											'typeLabel',
-											'status',
-											'inThisMenu',
-										],
 										layout: {
+											badgeFields: [
+												'typeLabel',
+												'status',
+												'inThisMenu',
+											],
 											previewSize:
 												activeGroup === 'media'
 													? 140

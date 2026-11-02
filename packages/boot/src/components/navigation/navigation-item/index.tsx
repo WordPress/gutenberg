@@ -38,7 +38,7 @@ interface NavigationItemProps {
 	/**
 	 * Optional click handler for custom navigation behavior.
 	 */
-	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
+	onClick?: ( event: MouseEvent< HTMLElement > ) => void;
 }
 
 export default function NavigationItem( {

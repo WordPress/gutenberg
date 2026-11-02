@@ -1,7 +1,6 @@
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
-	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -16,8 +15,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, type Block } from '@wordpress/blocks';
 import {
 	createInterpolateElement,
 	type ComponentType,
@@ -46,13 +44,6 @@ import { __ } from '@wordpress/i18n';
 import { EmptyState, Stack } from '@wordpress/ui';
 import LeafMoreMenu from './leaf-more-menu';
 import AddMenuItemsModal from '../add-menu-items-modal';
-
-type Block = {
-	clientId: string;
-	name: string;
-	attributes: Record< string, unknown >;
-	innerBlocks?: Block[];
-};
 
 type NavigationMenuRecord = {
 	id: number;
@@ -289,6 +280,15 @@ function NavigationTreeAppender( {
 		.filter( Boolean )
 		.join( ' ' );
 
+	// The tree grid cell's ref and focus props go to the toggle, which
+	// forwards them to its button, though `ToggleProps` doesn't declare a ref.
+	const toggleProps = {
+		...treeGridCellProps,
+		ref: buttonRef,
+		className: toggleClassName,
+		__next40pxDefaultSize: true,
+		'aria-describedby': descriptionId,
+	};
 	const dropdown = (
 		<DropdownMenu
 			icon={ plus }
@@ -299,13 +299,7 @@ function NavigationTreeAppender( {
 					setIsChoosingSubmenuType( false );
 				}
 			} }
-			toggleProps={ {
-				...treeGridCellProps,
-				ref: buttonRef,
-				className: toggleClassName,
-				__next40pxDefaultSize: true,
-				'aria-describedby': descriptionId,
-			} }
+			toggleProps={ toggleProps }
 		>
 			{ ( { onClose } ) => (
 				<>

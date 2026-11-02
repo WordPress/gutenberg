@@ -5,9 +5,9 @@ import {
 	DropdownMenu,
 	MenuItem,
 	Modal,
-	Notice,
-	SelectControl,
-	Spinner,
+	Notice as WCNotice,
+	SelectControl as WCSelectControl,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -122,6 +122,8 @@ function getKnownPluralAreaLabel( area: string ) {
 			return __( 'Navigation overlays' );
 		case UNCATEGORIZED_TEMPLATE_PART_AREA:
 			return __( 'General areas' );
+		default:
+			return undefined;
 	}
 }
 
@@ -394,7 +396,7 @@ function getLocationFields(
 			enableSorting: false,
 			enableGlobalSearch: true,
 			getValue: ( { item } ) => item.location,
-			render: ( { item } ) => <Text weight="600">{ item.location }</Text>,
+			render: ( { item } ) => <Text>{ item.location }</Text>,
 		},
 		{
 			id: 'area',
@@ -431,9 +433,7 @@ function LocationPreviewCard( { location }: { location: NavigationLocation } ) {
 			<div className="routes-navigation-locations-canvas__card-header">
 				<Stack direction="row" gap="sm" align="center">
 					<Icon icon={ layout } size={ 20 } />
-					<Text variant="body-sm" weight="600">
-						{ location.label }
-					</Text>
+					<Text variant="body-sm">{ location.label }</Text>
 				</Stack>
 				<Button
 					variant="tertiary"
@@ -719,13 +719,13 @@ function ChooseLocationModal( {
 					) }
 				</Text>
 				{ error && (
-					<Notice
+					<WCNotice
 						status="error"
 						isDismissible
 						onRemove={ () => setError( undefined ) }
 					>
 						{ error }
-					</Notice>
+					</WCNotice>
 				) }
 				{ ! isResolving && candidates.length === 0 ? (
 					<EmptyState.Root className="routes-navigation-choose-location-modal__empty-state">
@@ -771,7 +771,7 @@ function ChooseLocationModal( {
 				) }
 				{ candidates.length > 0 && (
 					<div className="routes-navigation-choose-location-modal__footer">
-						<Text variant="muted">
+						<Text>
 							{ getLocationSelectionSummary(
 								selectedCandidates.length,
 								mode
@@ -892,7 +892,7 @@ export default function NavigationLocationsCanvas( {
 	if ( isResolving ) {
 		return (
 			<div className="routes-navigation-locations-canvas is-centered">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
@@ -955,7 +955,7 @@ export default function NavigationLocationsCanvas( {
 					>
 						{ __( 'Menu locations' ) }
 					</Text>
-					<Text variant="muted">
+					<Text>
 						{ sprintf(
 							/* translators: %d: Number of locations where this navigation menu is shown. */
 							_n(
@@ -970,7 +970,7 @@ export default function NavigationLocationsCanvas( {
 				<div className="routes-navigation-locations-canvas__actions">
 					{ showLocationFilter && (
 						<div className="routes-navigation-locations-canvas__switcher">
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Show' ) }
 								hideLabelFromVision
 								value={ selectedArea }

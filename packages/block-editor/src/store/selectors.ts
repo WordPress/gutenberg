@@ -3547,7 +3547,8 @@ export function __unstableHasActiveBlockOverlayActive(
 	const isNavigationOverlayTemplatePart =
 		attributes?.area === 'navigation-overlay' ||
 		attributes?.slug === 'overlay' ||
-		attributes?.slug?.includes( 'overlay' );
+		( typeof attributes?.slug === 'string' &&
+			attributes.slug.includes( 'overlay' ) );
 	const isUniversalCanvasTemplateSection =
 		state.settings.__experimentalUniversalCanvas &&
 		getBlockListSettings( state, clientId )?.templateLock === 'contentOnly';

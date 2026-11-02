@@ -52,7 +52,8 @@ export default function EditSectionButton( { clientId }: ClientIdProps ) {
 			const isNavigationOverlayTemplatePart =
 				attributes?.area === 'navigation-overlay' ||
 				attributes?.slug === 'overlay' ||
-				attributes?.slug?.includes( 'overlay' );
+				( typeof attributes?.slug === 'string' &&
+					attributes.slug.includes( 'overlay' ) );
 			const isTemplateSection =
 				!! settings.__experimentalUniversalCanvas &&
 				getBlockListSettings( sectionClientId )?.templateLock ===
@@ -131,7 +132,9 @@ export default function EditSectionButton( { clientId }: ClientIdProps ) {
 	};
 
 	const handleConfirmEdit = () => {
-		setPreference( 'core/edit-site', warningKey, true );
+		if ( warningKey ) {
+			setPreference( 'core/edit-site', warningKey, true );
+		}
 		setIsWarningModalOpen( false );
 		startEditing();
 	};

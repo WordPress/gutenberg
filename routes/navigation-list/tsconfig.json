@@ -3,7 +3,7 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"jsx": "react-jsx",
-		"rootDir": ".",
+		"rootDir": "..",
 		"noEmit": true,
 		"emitDeclarationOnly": false,
 		"composite": false,

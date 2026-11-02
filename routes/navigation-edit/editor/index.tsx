@@ -38,11 +38,7 @@ export default function NavigationMenuEditor( {
 		'postType',
 		'wp_navigation',
 		{ id }
-	) as [
-		unknown[] | undefined,
-		( blocks: unknown[], options?: Record< string, unknown > ) => void,
-		( blocks: unknown[], options?: Record< string, unknown > ) => void,
-	];
+	);
 
 	const settings = useMemo( () => {
 		if ( ! editorSettings ) {
