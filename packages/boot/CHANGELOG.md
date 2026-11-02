@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add `startAdminShell` (experimental), which switches between admin pages built with `@wordpress/build` inside one document instead of loading a new one. Each page's router now ignores URLs of other admin pages.
 -   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).
 
 ### Bug Fixes

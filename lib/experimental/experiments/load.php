@@ -101,7 +101,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-admin-shell',
 					'label'       => __( 'Instant admin page switching', 'gutenberg' ),
-					'description' => __( 'Switches between the Fonts, Connectors and Gutenberg admin pages without reloading the page. Each page you open stays in memory as you left it. (Proof of concept.)', 'gutenberg' ),
+					'description' => __( 'Switches between admin pages built with @wordpress/build, such as Fonts and Connectors, without reloading the page. Plugins can add their pages with the admin_shell_pages filter. Each page you open stays in memory as you left it. (Proof of concept.)', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-react-19',

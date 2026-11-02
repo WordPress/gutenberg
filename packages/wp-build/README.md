@@ -338,7 +338,7 @@ add_submenu_page(
 
 Note: The callback function name is prefixed with your plugin name (from `wpPlugin.name` in root `package.json`). For example, if your plugin name is `my-plugin`, the function will be `my_plugin_my_admin_page_wp_admin_render_page`.
 
-The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
+The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation. A different menu slug also works, except the bare page ID, which full-page mode uses: the page loads its app whenever the current menu item's callback is the generated render function.
 
 **Deep linking with the `p` query parameter:**
 
@@ -358,6 +358,22 @@ Full-page mode takes over the entire admin screen with a custom sidebar:
 ```php
 add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_plugin_my_admin_page_render_page', 'icon', 20 );
 ```
+
+**Switching between pages without a page load (experimental):**
+
+Each generated WP-Admin mode page adds a description of itself to the `wp_build_admin_pages` filter: its render callback, mount element, script handle, boot dependencies filter, routes and init modules. An admin shell can use it to open the page inside the document of another admin page, instead of loading it. To let the shell switch to your pages, list their menu slugs (the `page` query argument) in the `admin_shell_pages` filter. The shell finds the page behind a menu slug from the menu item's callback, so the slug can be anything:
+
+```php
+add_filter(
+	'admin_shell_pages',
+	function ( $pages ) {
+		$pages[] = 'my-admin-page-wp-admin';
+		return $pages;
+	}
+);
+```
+
+A listed page should load its data through REST or script modules. Classic scripts, styles and inline data that only its own page load enqueues are not loaded when the shell opens it. In Gutenberg, the shell is behind the "Instant admin page switching" experiment; see `test/admin-shell-demo-plugin` for a working example.
 
 **Init Modules:**
 Init modules are JavaScript packages that execute during page initialization, after menu items and routes are registered and before the app renders. They're ideal for:

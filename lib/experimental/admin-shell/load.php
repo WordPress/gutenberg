@@ -2,11 +2,25 @@
 /**
  * Admin shell (proof of concept).
  *
- * Lets the wp-build admin pages (Appearance > Fonts, Settings > Connectors,
- * Settings > Gutenberg) switch between each other without a page load. The
- * page that loads boots as usual; the shell boots the other pages' apps into
- * the same document when their admin menu links are clicked. See
- * `startAdminShell()` in `packages/boot/src/components/admin-shell`.
+ * Lets admin pages built with @wordpress/build switch between each other
+ * without a page load, whichever plugin they come from. The page that loads
+ * boots as usual; the shell boots the other pages' apps into the same
+ * document when their admin menu links are clicked. See `startAdminShell()`
+ * in `packages/boot/src/components/admin-shell`.
+ *
+ * A page takes part when both hold:
+ *
+ * - its menu slug, the `page` query argument, is listed in the
+ *   `admin_shell_pages` filter (for example `font-library-wp-admin`, or any
+ *   other slug the plugin registered the page under);
+ * - its menu page is rendered by a page built with a version of
+ *   @wordpress/build that describes its pages through the
+ *   `wp_build_admin_pages` filter. The shell matches the two through the
+ *   menu page's callback, so the menu slug doesn't need to follow a pattern.
+ *
+ * A listed page should load what it needs through REST or script modules.
+ * Classic scripts, styles and inline data that only its own page load
+ * enqueues are not loaded when the shell opens it.
  *
  * Only loaded while the `gutenberg-admin-shell` experiment is enabled.
  *
@@ -14,75 +28,115 @@
  */
 
 /**
- * Returns the wp-build pages that can be switched between in place.
- *
- * Each entry has the page `slug` (as listed in `wpPlugin.pages`) and the
- * page's `init` modules. The page must be rendered in wp-admin through the
- * generated `gutenberg_{slug}_wp_admin_render_page()` callback.
- *
- * A page qualifies when everything it needs is loaded by every member page:
- * Boot's script dependencies, plus script modules loaded on demand. Pages
- * that enqueue extra classic scripts or styles of their own (for example
- * Guidelines, which needs `wp-block-library`) don't qualify yet.
+ * Lists Gutenberg's own pages in the admin shell.
  *
  * @access private
  *
- * @return array<array{slug: string, init: string[]}> Shell pages.
+ * @param string[] $pages Pages that can be switched between in place.
+ * @return string[] Pages, with Gutenberg's added.
  */
-function _gutenberg_admin_shell_pages(): array {
-	return array(
+function _gutenberg_admin_shell_add_gutenberg_pages( array $pages ): array {
+	return array_merge(
+		$pages,
 		array(
-			'slug' => 'font-library',
-			'init' => array(),
-		),
-		array(
-			'slug' => 'options-connectors',
-			'init' => array(),
-		),
-		array(
-			'slug' => 'experiments',
-			'init' => array(),
-		),
+			'font-library-wp-admin',
+			'options-connectors-wp-admin',
+			'experiments-wp-admin',
+		)
 	);
 }
+add_filter( 'admin_shell_pages', '_gutenberg_admin_shell_add_gutenberg_pages' );
 
 /**
- * Returns the shell page that is being viewed, if any.
+ * Returns the pages that can be switched between in place and that the
+ * current user can open, keyed by their menu slug.
  *
  * @access private
  *
- * @return array{slug: string, init: string[]}|null The current shell page.
+ * @return array<string, array> Descriptions of the pages, as given by the
+ *                              `wp_build_admin_pages` filter, plus the menu
+ *                              page's `parent` and `title`.
  */
-function _gutenberg_admin_shell_current_page(): ?array {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing check.
-	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-	foreach ( _gutenberg_admin_shell_pages() as $shell_page ) {
-		if ( $shell_page['slug'] . '-wp-admin' === $page ) {
-			return $shell_page;
+function _gutenberg_admin_shell_get_pages(): array {
+	/**
+	 * Filters the admin pages that the admin shell can switch between without
+	 * loading a new document.
+	 *
+	 * Each entry is the menu slug of an admin page, its `page` query argument,
+	 * whose menu callback renders a page built with @wordpress/build. For
+	 * example `my-page-wp-admin`, or any slug the page was registered under.
+	 *
+	 * @param string[] $pages Menu slugs of pages that can be switched between in place.
+	 */
+	$listed = (array) apply_filters( 'admin_shell_pages', array() );
+
+	/**
+	 * Filters the admin pages built with @wordpress/build, keyed by page ID.
+	 * Each generated page adds itself.
+	 *
+	 * @param array<string, array> $pages Page descriptions.
+	 */
+	$described = (array) apply_filters( 'wp_build_admin_pages', array() );
+
+	$pages = array();
+	foreach ( array_unique( array_filter( $listed, 'is_string' ) ) as $menu_slug ) {
+		$menu_entry = _gutenberg_admin_shell_menu_entry( $menu_slug );
+		if ( ! $menu_entry ) {
+			continue;
+		}
+
+		// Find the page the menu item renders.
+		$hook_name = get_plugin_page_hookname( $menu_slug, $menu_entry['parent'] );
+		foreach ( $described as $description ) {
+			$render_callback = $description['render_callback'] ?? null;
+			if (
+				is_string( $render_callback ) &&
+				false !== has_action( $hook_name, $render_callback ) &&
+				is_callable( $description['routes_callback'] ?? null )
+			) {
+				$pages[ $menu_slug ] = array_merge( $description, $menu_entry, array( 'hook_name' => $hook_name ) );
+				break;
+			}
 		}
 	}
-	return null;
+	return $pages;
 }
 
 /**
- * Finds the admin menu entry of a page.
+ * Returns the `page` query argument of the current request.
+ *
+ * @access private
+ *
+ * @return string The page, or an empty string.
+ */
+function _gutenberg_admin_shell_current_page(): string {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing check.
+	return isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+}
+
+/**
+ * Finds the admin menu entry of a page the current user can open.
  *
  * @access private
  *
  * @param string $page Page query argument, e.g. `font-library-wp-admin`.
- * @return array{parent: string, title: string}|null Parent file and page title,
- *                                                   or null when the current
+ * @return array{parent: string, title: string}|null Parent slug (empty for a
+ *                                                   top-level page) and page
+ *                                                   title, or null when the
  *                                                   user has no menu item for it.
  */
 function _gutenberg_admin_shell_menu_entry( string $page ): ?array {
-	global $submenu, $_parent_pages;
+	global $menu, $submenu, $_parent_pages;
 
-	$parent = $_parent_pages[ $page ] ?? null;
-	if ( ! is_string( $parent ) || empty( $submenu[ $parent ] ) ) {
+	// Top-level pages are recorded with a `false` parent.
+	if ( ! is_array( $_parent_pages ) || ! array_key_exists( $page, $_parent_pages ) ) {
 		return null;
 	}
+	$parent = (string) $_parent_pages[ $page ];
 
-	foreach ( $submenu[ $parent ] as $item ) {
+	// A top-level page is listed in $menu, and usually first in its own submenu.
+	$items = $parent ? ( $submenu[ $parent ] ?? array() ) : array_merge( $submenu[ $page ] ?? array(), (array) $menu );
+	foreach ( $items as $item ) {
 		if ( isset( $item[2] ) && $page === $item[2] && current_user_can( $item[1] ) ) {
 			return array(
 				'parent' => $parent,
@@ -94,99 +148,92 @@ function _gutenberg_admin_shell_menu_entry( string $page ): ?array {
 }
 
 /**
- * Builds the shell's description of every page the user can open, and makes
- * sure the other pages' route modules are in the current page's import map.
+ * Builds the shell's description of every listed page the user can open,
+ * and makes sure the other pages' modules are in the current page's import
+ * map.
  *
- * Runs once, from the current page's boot dependencies filter, so that other
- * pages' routes are registered before the import map is printed. Registering
- * routes only registers script modules; nothing is printed or fetched unless
- * the user switches to the page.
+ * Runs from the current page's boot dependencies filter, so that other pages'
+ * routes are registered before the import map is printed. Registering routes
+ * only registers script modules: nothing is printed or fetched unless the
+ * user switches to the page.
  *
  * @access private
  *
  * @param array $boot_dependencies Boot script module dependencies of the current page.
- * @return array Dependencies, with the other pages' route modules added as dynamic imports.
+ * @return array Dependencies, with the other pages' modules added as dynamic imports.
  */
 function _gutenberg_admin_shell_add_page_dependencies( array $boot_dependencies ): array {
 	global $_gutenberg_admin_shell_manifest;
 
+	$pages   = _gutenberg_admin_shell_get_pages();
 	$current = _gutenberg_admin_shell_current_page();
-	if ( ! $current || isset( $_gutenberg_admin_shell_manifest ) ) {
+	if ( ! isset( $pages[ $current ] ) || isset( $_gutenberg_admin_shell_manifest ) ) {
 		return $boot_dependencies;
 	}
 
 	$_gutenberg_admin_shell_manifest = array();
-	foreach ( _gutenberg_admin_shell_pages() as $shell_page ) {
-		$slug            = $shell_page['slug'];
-		$slug_underscore = str_replace( '-', '_', $slug );
-		$page            = $slug . '-wp-admin';
-		$routes_function = "gutenberg_get_{$slug_underscore}_wp_admin_routes";
-		$menu_entry      = _gutenberg_admin_shell_menu_entry( $page );
+	foreach ( $pages as $page => $description ) {
+		$routes       = (array) call_user_func( $description['routes_callback'] );
+		$init_modules = array_values( (array) ( $description['init_modules'] ?? array() ) );
 
-		if ( ! $menu_entry || ! function_exists( $routes_function ) ) {
-			continue;
-		}
-
-		$is_current = $slug === $current['slug'];
-		if ( ! $is_current ) {
-			/** This action is documented in the generated page-wp-admin.php. */
-			do_action( "{$page}_init" );
-		}
-
-		$routes = call_user_func( $routes_function );
-		if ( ! $is_current ) {
+		if ( $page !== $current ) {
+			$module_ids = $init_modules;
 			foreach ( $routes as $route ) {
-				foreach ( array( 'route_module', 'content_module' ) as $module_key ) {
-					if ( ! empty( $route[ $module_key ] ) ) {
-						$boot_dependencies[] = array(
-							'import' => 'dynamic',
-							'id'     => $route[ $module_key ],
-						);
-					}
-				}
+				$module_ids[] = $route['route_module'] ?? null;
+				$module_ids[] = $route['content_module'] ?? null;
 			}
-			foreach ( $shell_page['init'] as $init_module ) {
+			foreach ( array_filter( $module_ids ) as $module_id ) {
 				$boot_dependencies[] = array(
 					'import' => 'dynamic',
-					'id'     => $init_module,
+					'id'     => $module_id,
 				);
 			}
 		}
 
-		$hook_suffix = get_plugin_page_hookname( $page, $menu_entry['parent'] );
-
 		$_gutenberg_admin_shell_manifest[] = array(
 			'pageKey'     => $page,
 			'url'         => menu_page_url( $page, false ),
-			'mountId'     => $page . '-app',
-			'title'       => $menu_entry['title'],
-			'bodyClass'   => preg_replace( '/[^a-z0-9_-]+/i', '-', $hook_suffix ),
+			'mountId'     => $description['mount_id'],
+			'title'       => $description['title'],
+			'bodyClass'   => preg_replace( '/[^a-z0-9_-]+/i', '-', $description['hook_name'] ),
 			'routes'      => $routes,
-			'initModules' => $shell_page['init'],
+			'initModules' => $init_modules,
 		);
 	}
 
 	return $boot_dependencies;
 }
 
-foreach ( _gutenberg_admin_shell_pages() as $_gutenberg_admin_shell_page ) {
-	add_filter(
-		$_gutenberg_admin_shell_page['slug'] . '-wp-admin_boot_dependencies',
-		'_gutenberg_admin_shell_add_page_dependencies'
-	);
+/**
+ * Hooks the shell into the current page, when it is listed.
+ *
+ * Runs before the generated page enqueue functions, which run at the default
+ * priority and apply the page's boot dependencies filter.
+ *
+ * @access private
+ */
+function _gutenberg_admin_shell_prepare(): void {
+	$pages   = _gutenberg_admin_shell_get_pages();
+	$current = _gutenberg_admin_shell_current_page();
+	if ( ! isset( $pages[ $current ] ) ) {
+		return;
+	}
+	add_filter( $pages[ $current ]['boot_dependencies_filter'], '_gutenberg_admin_shell_add_page_dependencies' );
+	add_action( 'admin_enqueue_scripts', '_gutenberg_admin_shell_enqueue', 20 );
 }
-unset( $_gutenberg_admin_shell_page );
+add_action( 'admin_enqueue_scripts', '_gutenberg_admin_shell_prepare', 5 );
 
 /**
- * Starts the shell on a shell page, once Boot's own startup script is queued.
+ * Starts the shell, once the current page's own startup script is queued.
  *
  * @access private
  */
 function _gutenberg_admin_shell_enqueue(): void {
 	global $_gutenberg_admin_shell_manifest;
 
+	$pages   = _gutenberg_admin_shell_get_pages();
 	$current = _gutenberg_admin_shell_current_page();
-	if ( ! $current || empty( $_gutenberg_admin_shell_manifest ) || count( $_gutenberg_admin_shell_manifest ) < 2 ) {
+	if ( ! isset( $pages[ $current ] ) || empty( $_gutenberg_admin_shell_manifest ) || count( $_gutenberg_admin_shell_manifest ) < 2 ) {
 		return;
 	}
 
@@ -205,7 +252,7 @@ function _gutenberg_admin_shell_enqueue(): void {
 	JS;
 
 	wp_add_inline_script(
-		$current['slug'] . '-wp-admin-prerequisites',
+		$pages[ $current ]['script_handle'],
 		sprintf(
 			'( %s )( %s );',
 			$start_js,
@@ -213,5 +260,3 @@ function _gutenberg_admin_shell_enqueue(): void {
 		)
 	);
 }
-// After the generated page enqueue functions, which run at the default priority.
-add_action( 'admin_enqueue_scripts', '_gutenberg_admin_shell_enqueue', 20 );

@@ -1,12 +1,15 @@
 /**
  * Admin shell (proof of concept).
  *
- * Makes switching between wp-build admin pages (for example Appearance >
- * Fonts and Settings > Connectors) happen inside the current document instead
- * of loading a new one. Each page keeps its own app: the page that loaded
- * boots as usual, and other pages are booted into the same document the first
- * time their admin menu link is clicked. Switching back shows the existing
- * app again, exactly as it was left.
+ * Makes switching between admin pages built with `@wordpress/build` (for
+ * example Appearance > Fonts and Settings > Connectors, or a plugin's pages)
+ * happen inside the current document instead of loading a new one. Each page
+ * keeps its own app: the page that loaded boots as usual, and other pages are
+ * booted into the same document the first time a link to them is clicked.
+ * Switching back shows the existing app again, exactly as it was left.
+ *
+ * The server decides which pages take part and passes them to
+ * `startAdminShell()`.
  *
  * URLs don't change: every page keeps its own `?page=` URL, so reloads,
  * bookmarks, Back/Forward and opening a link in a new tab behave as before.
@@ -160,9 +163,13 @@ function highlightMenuItem( page: AdminShellPage ) {
 	if ( ! menu ) {
 		return;
 	}
-	const link = Array.from(
+	// A top-level page is linked twice, by its menu item and by the first
+	// item of its submenu. The submenu link is the one marked current.
+	const links = Array.from(
 		menu.querySelectorAll< HTMLAnchorElement >( 'a[href]' )
-	).find( ( a ) => isSameAdminPage( a.href, page ) );
+	).filter( ( a ) => isSameAdminPage( a.href, page ) );
+	const link =
+		links.find( ( a ) => a.closest( '.wp-submenu' ) ) ?? links[ 0 ];
 	if ( ! link ) {
 		return;
 	}
@@ -405,7 +412,7 @@ export function startAdminShell( { pages }: StartAdminShellProps ) {
 			return;
 		}
 		const link = ( event.target as Element | null )?.closest?.(
-			'#adminmenu a[href]'
+			'a[href]'
 		) as HTMLAnchorElement | null;
 		if ( ! link || ( link.target && link.target !== '_self' ) ) {
 			return;
@@ -414,16 +421,27 @@ export function startAdminShell( { pages }: StartAdminShellProps ) {
 		if ( ! page || ! isSameAdminPage( link.href, page ) ) {
 			return;
 		}
-		event.preventDefault();
+		const isMenuLink = !! link.closest( '#adminmenu' );
 
 		if ( page === activePage ) {
-			// Like a reload, the active page's menu item goes to its start.
-			if ( window.location.href !== link.href ) {
-				window.history.pushState( null, '', link.href );
+			// Links within the page belong to its router. Like a reload, the
+			// page's own menu item goes back to its start.
+			if ( isMenuLink ) {
+				event.preventDefault();
+				if ( window.location.href !== link.href ) {
+					window.history.pushState( null, '', link.href );
+				}
 			}
 			return;
 		}
-		navigateTo( page, states.get( page.pageKey )?.lastUrl ?? link.href );
+
+		event.preventDefault();
+		// The menu returns to where the page was left; other links, such as
+		// a link from one page to a route of another, go where they point.
+		navigateTo(
+			page,
+			( isMenuLink && states.get( page.pageKey )?.lastUrl ) || link.href
+		);
 	} );
 
 	// Back and Forward between pages. Each app's router reads its own URL.
@@ -434,10 +452,10 @@ export function startAdminShell( { pages }: StartAdminShellProps ) {
 		}
 	} );
 
-	// Prepare a page as soon as its menu item is pointed at or focused.
+	// Prepare a page as soon as a link to it is pointed at or focused.
 	const warmFromEvent = ( event: Event ) => {
 		const link = ( event.target as Element | null )?.closest?.(
-			'#adminmenu a[href]'
+			'a[href]'
 		) as HTMLAnchorElement | null;
 		const page = link && pagesByKey.get( getPageKey( link.href ) );
 		if ( page && isSameAdminPage( link.href, page ) ) {
