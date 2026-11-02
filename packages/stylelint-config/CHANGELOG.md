@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   SCSS: Stop requiring an empty line before Sass directives such as `@if`, `@include` and `@warn`, or before the first nested at-rule, in `at-rule-empty-line-before` ([#69606](https://github.com/WordPress/gutenberg/pull/69606)).
+
 ### Internal
 
 -   Load design token Stylelint plugins from `@wordpress/theme-build-tools` instead of `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
