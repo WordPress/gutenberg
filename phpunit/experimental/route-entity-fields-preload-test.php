@@ -5,6 +5,7 @@
  *
  * @package gutenberg
  *
+ * @covers ::_gutenberg_get_post_type_fields_preload_paths
  * @covers ::_gutenberg_get_route_post_types
  * @covers ::_gutenberg_get_route_view_config_preload_paths
  * @covers ::_gutenberg_preload_route_entity_fields

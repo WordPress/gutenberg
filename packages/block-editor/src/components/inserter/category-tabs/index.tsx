@@ -7,7 +7,7 @@ import { useState } from '@wordpress/element';
 import { unlock } from '../../../lock-unlock';
 import type { CategoryTabsProps, InserterTabCategory } from '../types';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 function CategoryTabs< T extends InserterTabCategory >( {
 	categories,
@@ -38,7 +38,7 @@ function CategoryTabs< T extends InserterTabCategory >( {
 	}
 
 	return (
-		<Tabs
+		<WCTabs
 			selectOnMove={ false }
 			selectedTabId={ selectedTabId }
 			orientation="vertical"
@@ -53,9 +53,9 @@ function CategoryTabs< T extends InserterTabCategory >( {
 			activeTabId={ activeTabId }
 			onActiveTabIdChange={ setActiveId }
 		>
-			<Tabs.TabList className="block-editor-inserter__category-tablist">
+			<WCTabs.TabList className="block-editor-inserter__category-tablist">
 				{ categories.map( ( category ) => (
-					<Tabs.Tab
+					<WCTabs.Tab
 						key={ category.name }
 						tabId={ category.name }
 						aria-current={
@@ -63,11 +63,11 @@ function CategoryTabs< T extends InserterTabCategory >( {
 						}
 					>
 						{ category.label }
-					</Tabs.Tab>
+					</WCTabs.Tab>
 				) ) }
-			</Tabs.TabList>
+			</WCTabs.TabList>
 			{ categories.map( ( category ) => (
-				<Tabs.TabPanel
+				<WCTabs.TabPanel
 					key={ category.name }
 					tabId={ category.name }
 					focusable={ false }
@@ -94,9 +94,9 @@ function CategoryTabs< T extends InserterTabCategory >( {
 					>
 						{ children }
 					</motion.div>
-				</Tabs.TabPanel>
+				</WCTabs.TabPanel>
 			) ) }
-		</Tabs>
+		</WCTabs>
 	);
 }
 

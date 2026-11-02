@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `MediaEdit`: Prevent animation on item removal for multiple select ([#85372](https://github.com/WordPress/gutenberg/pull/85372)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+
 ## 0.50.0 (2026-10-20)
 
 ### Breaking Changes

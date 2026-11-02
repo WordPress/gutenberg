@@ -8,7 +8,7 @@ import {
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
-import { isPlainObject } from '../utils';
+import { isPlainObject, isReservedKey } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -106,7 +106,8 @@ const stateHandlers: ProxyHandler< object > = {
 		 */
 		if (
 			peeking ||
-			( ! target.hasOwnProperty( key ) && key in target ) ||
+			( ! Object.prototype.hasOwnProperty.call( target, key ) &&
+				key in target ) ||
 			( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
 		) {
 			return Reflect.get( target, key, receiver );
@@ -285,6 +286,11 @@ const deepMergeRecursive = (
 	let hasNewKeys = false;
 
 	for ( const key in source ) {
+		// Assigning `__proto__` would replace the prototype of `target`.
+		if ( isReservedKey( key ) ) {
+			continue;
+		}
+
 		const isNew = ! ( key in target );
 		hasNewKeys = hasNewKeys || isNew;
 
