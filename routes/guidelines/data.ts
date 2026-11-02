@@ -11,7 +11,6 @@ import type {
 	GuidelineRow,
 	ContentBlock,
 	GuidelineQuery,
-	KnowledgeRow,
 } from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -123,12 +122,11 @@ export function useGuidelineData(): GuidelineData {
 		[ slugs ]
 	);
 
-	const { records: rowRecords, hasResolved: rowsResolved } =
-		useEntityRecords< KnowledgeRow >(
-			KNOWLEDGE_KIND,
-			KNOWLEDGE_NAME,
-			query
-		);
+	const { records: rowRecords, hasResolved: rowsResolved } = useEntityRecords(
+		KNOWLEDGE_KIND,
+		KNOWLEDGE_NAME,
+		query
+	);
 
 	const bySlug = useMemo( () => {
 		const map: Record< string, GuidelineRow > = {};
@@ -178,7 +176,7 @@ interface ReclaimableRow {
 async function findReclaimableRow(
 	slug: string
 ): Promise< ReclaimableRow | undefined > {
-	const rows = ( await resolveSelect( coreStore ).getEntityRecords(
+	const rows = await resolveSelect( coreStore ).getEntityRecords(
 		KNOWLEDGE_KIND,
 		KNOWLEDGE_NAME,
 		{
@@ -186,7 +184,7 @@ async function findReclaimableRow(
 			status: [ 'publish', 'private', 'draft', 'pending', 'future' ],
 			per_page: 1,
 		}
-	) ) as ReclaimableRow[] | null;
+	);
 
 	return rows?.[ 0 ];
 }
