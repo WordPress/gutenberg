@@ -1,7 +1,6 @@
 import { Icon } from '@wordpress/icons';
 import { Badge, Stack, Text, VisuallyHidden } from '@wordpress/ui';
 import { CopySvgButton } from './copy-svg-button';
-import { LibraryDescription } from './library-description';
 import {
 	ALL_ICONS_MANIFEST,
 	COLLECTIONS,
@@ -60,7 +59,6 @@ export function IconDetails( { name }: { name: string } ) {
 					} ) }
 				</Stack>
 			</Stack>
-			<LibraryDescription />
 		</Stack>
 	);
 }
