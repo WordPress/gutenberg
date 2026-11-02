@@ -69,6 +69,25 @@ function TermTemplateBlockPreview( {
 // Prevent re-rendering of the block preview when the terms data changes.
 const MemoizedTermTemplateBlockPreview = memo( TermTemplateBlockPreview );
 
+/**
+ * The Term Template block's edit component.
+ *
+ * @param {Object}                       props                                React props.
+ * @param {string}                       props.clientId                       The block's client ID.
+ * @param {Object}                       props.attributes                     Block attributes.
+ * @param {Object}                       [props.attributes.layout]            Layout settings.
+ * @param {(attributes: Object) => void} props.setAttributes                  Callback for updating block attributes.
+ * @param {Object}                       props.context                        Block context.
+ * @param {Object}                       [props.context.termQuery]            Query provided by the Terms Query block.
+ * @param {string}                       [props.context.termQuery.taxonomy]   Taxonomy to list terms from.
+ * @param {string}                       [props.context.termQuery.order]      Sort direction.
+ * @param {string}                       [props.context.termQuery.orderBy]    Field to sort by.
+ * @param {boolean}                      [props.context.termQuery.hideEmpty]  Whether to hide terms without posts.
+ * @param {boolean}                      [props.context.termQuery.showNested] Whether to show nested terms.
+ * @param {number}                       [props.context.termQuery.perPage]    Number of terms to show.
+ * @param {number[]}                     [props.context.termQuery.include]    IDs of the terms to show.
+ * @param {string}                       [props.__unstableLayoutClassNames]   Layout class names.
+ */
 export default function TermTemplateEdit( {
 	clientId,
 	attributes: { layout },
