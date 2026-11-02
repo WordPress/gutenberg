@@ -380,6 +380,35 @@ describe( 'global styles renderer', () => {
 				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
+
+		it( 'should output aspect ratio presets', () => {
+			const tree = {
+				settings: {
+					dimensions: {
+						aspectRatios: {
+							default: [
+								{
+									name: 'Square - 1:1',
+									slug: 'square',
+									ratio: '1',
+								},
+							],
+							theme: [
+								{
+									name: 'Wide - 16:9',
+									slug: '16-9',
+									ratio: '16/9',
+								},
+							],
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( generateCustomProperties( tree, {} ) ).toEqual(
+				':root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--16-9: 16/9;}'
+			);
+		} );
 	} );
 
 	describe( 'transformToStyles', () => {
