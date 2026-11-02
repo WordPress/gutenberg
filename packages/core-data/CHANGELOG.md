@@ -10,6 +10,7 @@
 ### Breaking Changes
 
 -   `WpTemplate` and `WpTemplatePart` now match the REST schema: `has_theme_file` and `is_custom` are `boolean` instead of `Record< string, string >`, `modified` can be `null`, and `original_source` is added. `WpTemplatePart` also gains `author_text`, `plugin`, `is_custom` and `modified`.
+-   `GlobalStyles` types `settings` and `styles` with the theme.json shapes from `@wordpress/global-styles-engine` instead of `Record< string, Object >`, so reads such as `settings.typography.fontFamilies` type check without naming `GlobalStylesConfig` by hand.
 
 ### Internal
 

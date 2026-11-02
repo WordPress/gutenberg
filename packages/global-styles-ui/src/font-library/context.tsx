@@ -11,10 +11,7 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import type {
-	FontFamilyPreset,
-	GlobalStylesConfig,
-} from '@wordpress/global-styles-engine';
+import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import type {
 	CollectionFontFace,
 	CollectionFontFamily,
@@ -52,7 +49,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		return { globalStylesId: __experimentalGetCurrentGlobalStylesId() };
 	}, [] );
 
-	const globalStyles = useEntityRecord< GlobalStylesConfig >(
+	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
 		globalStylesId ?? 0,
