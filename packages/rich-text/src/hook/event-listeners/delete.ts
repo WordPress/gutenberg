@@ -1,36 +1,23 @@
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { remove } from '../../remove';
-import { subscribeOwnedListener } from '../../subscribe-owned-listener';
-import type { EventListenerEffect } from '../types';
+import type { RichTextField } from '../types';
 
-const deleteHandler: EventListenerEffect = ( props ) => ( element ) => {
-	function onKeyDown( event: KeyboardEvent ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
-			return;
-		}
-
-		const { createRecord, handleChange } = props.current;
-		const currentValue = createRecord();
-		const { start, end, text } = currentValue;
-
-		// Always handle full content deletion ourselves.
-		if ( start === 0 && end !== 0 && end === text.length ) {
-			handleChange( remove( currentValue ) );
-			event.preventDefault();
-		}
+export function onBeforeInput( field: RichTextField, event: InputEvent ) {
+	if (
+		event.defaultPrevented ||
+		! event.inputType.startsWith( 'deleteContent' )
+	) {
+		return;
 	}
 
-	return subscribeOwnedListener(
-		element,
-		'keydown',
-		onKeyDown as EventListener
-	);
-};
+	const { createRecord, handleChange } = field.props.current;
+	const currentValue = createRecord();
+	const { start, end, text } = currentValue;
 
-export default deleteHandler;
+	// Delete all content ourselves. In WebKit, deleting all content of a
+	// `position: relative` element inside a larger editing host removes
+	// the element itself (https://bugs.webkit.org/show_bug.cgi?id=186377).
+	if ( start === 0 && end !== 0 && end === text.length ) {
+		handleChange( remove( currentValue ) );
+		event.preventDefault();
+	}
+}

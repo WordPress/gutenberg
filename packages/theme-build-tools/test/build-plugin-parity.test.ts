@@ -20,7 +20,7 @@ import vitePlugin from '../vite-plugins/vite-ds-token-fallbacks.mjs';
 import type { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
 import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 
-const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
+const fixturesDirectory = join( import.meta.dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
 const unknownJsFixture = join( fixturesDirectory, 'unknown-token.ts' );
 const emptyFallbackCssFixture = join( fixturesDirectory, 'empty-fallback.css' );
