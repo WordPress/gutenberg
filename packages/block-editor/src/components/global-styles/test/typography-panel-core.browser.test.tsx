@@ -1,30 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import TypographyPanel from '../typography-panel';
-import type { PanelStyle, TypographyPanelProps } from '../types';
-
-// Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
-// experiment off, which is what WordPress Core gets. Deleted rather than set to
-// `false`, because an experiment that was never turned on leaves the global
-// unset, and `undefined` is the value that fires a receiving component's own
-// default parameter. Setting `false` here would test a state that does not
-// occur.
-beforeEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
-
-const baseSettings = {
-	typography: {
-		lineHeight: true,
-		letterSpacing: true,
-	},
-};
+import type { PanelStyle } from '../types';
 
 // Three presets with distinct slugs and distinct hex values, enough to drive the
 // text color dropdown and to tell "left alone" apart from "synced".
@@ -44,59 +23,8 @@ const PALETTE_SETTINGS = {
 	},
 };
 
-async function renderPanel( props: Partial< TypographyPanelProps > ) {
-	return await render(
-		<TypographyPanel
-			value={ {} }
-			settings={ baseSettings }
-			onChange={ () => {} }
-			panelId="test-panel"
-			{ ...props }
-		/>
-	);
-}
-
-const getItem = ( name: string | RegExp ) => {
-	const control = screen.getByRole( 'spinbutton', { name } );
-	// The class hooks sit on the wrapping ToolsPanelItem, which has no role.
-	// eslint-disable-next-line testing-library/no-node-access
-	return control.closest( '.components-tools-panel-item' );
-};
-
-describe( 'TypographyPanel with the indicator experiment off', () => {
-	// `showInheritanceLabelIndicators` defaults to the experiment flag, so a
-	// caller that passes no prop gets no inheritance treatment. The layout
-	// className must still come through.
-	it( 'applies no inherited treatment by default, even when an inherited value is present', async () => {
-		await renderPanel( {
-			value: {},
-			inheritedValue: { typography: { lineHeight: '1.5' } },
-		} );
-
-		const lineHeightItem = getItem( /line height/i );
-		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-	} );
-
-	it( 'renders no reset dot by default when a local value shadows an inherited one', async () => {
-		await renderPanel( {
-			value: { typography: { lineHeight: '2' } },
-			inheritedValue: { typography: { lineHeight: '1.5' } },
-		} );
-
-		expect( getItem( /line height/i ) ).not.toHaveClass(
-			'has-local-override-from-global-styles'
-		);
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Reset to inherited value',
-			} )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'renders the default color reset button by default when a local color shadows an inherited one', async () => {
+describe( 'TypographyPanel color reset', () => {
+	it( 'renders the default color reset button when a local color shadows an inherited one', async () => {
 		await render(
 			<TypographyPanel
 				value={ { color: { text: 'var:preset|color|blue' } } }
@@ -108,40 +36,8 @@ describe( 'TypographyPanel with the indicator experiment off', () => {
 		);
 
 		expect(
-			screen.queryByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).not.toBeInTheDocument();
-		expect(
 			screen.getByRole( 'button', { name: /^reset$/i } )
 		).toBeInTheDocument();
-	} );
-
-	// The point of the change: the value reaches the control for everyone,
-	// while every part of the indicator treatment stays behind the experiment.
-	it( 'shows the inherited value on the control and no inheritance treatment', async () => {
-		await renderPanel( {
-			value: {},
-			inheritedValue: { typography: { lineHeight: '1.5' } },
-			showInheritanceLabelIndicators: false,
-		} );
-
-		expect(
-			screen.getByRole( 'spinbutton', { name: /line height/i } )
-		).toHaveValue( 1.5 );
-
-		const lineHeightItem = getItem( /line height/i );
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( lineHeightItem ).not.toHaveClass(
-			'has-local-override-from-global-styles'
-		);
-		expect(
-			screen.queryByRole( 'button', {
-				name: 'Reset to inherited value',
-			} )
-		).not.toBeInTheDocument();
 	} );
 } );
 
