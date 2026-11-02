@@ -3178,4 +3178,33 @@ test.describe( 'List (@firefox)', () => {
 			)
 			.toBe( 'core/list' );
 	} );
+
+	test( 'should keep every item when upgrading an old list with a shortcode', async ( {
+		editor,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:list -->
+<ul><li>First[note]A <a href="https://example.com">link</a>.[/note]</li><li>Second</li></ul>
+<!-- /wp:list -->`
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content:
+								'First[note]A <a href="https://example.com">link</a>.[/note]',
+						},
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'Second' },
+					},
+				],
+			},
+		] );
+	} );
 } );

@@ -3,13 +3,13 @@ import { InspectorControls } from '@wordpress/block-editor';
 import {
 	TextControl,
 	ToggleControl,
-	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const LIST_STYLE_OPTIONS = [
+const LIST_STYLE_ITEMS = [
 	{
 		label: __( 'Numbers' ),
 		value: 'decimal',
@@ -58,12 +58,16 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
 						} )
 					}
 				>
-					<WCSelectControl
+					<SelectControl
 						label={ __( 'List style' ) }
-						options={ LIST_STYLE_OPTIONS }
-						value={ type || 'decimal' }
-						onChange={ ( newValue ) =>
-							setAttributes( { type: newValue } )
+						items={ LIST_STYLE_ITEMS }
+						value={
+							LIST_STYLE_ITEMS.find(
+								( item ) => item.value === type
+							) ?? LIST_STYLE_ITEMS[ 0 ]
+						}
+						onValueChange={ ( item ) =>
+							item && setAttributes( { type: item.value } )
 						}
 					/>
 				</ToolsPanelItem>

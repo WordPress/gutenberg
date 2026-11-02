@@ -663,6 +663,20 @@ export function hasFocusWithin( element ) {
 }
 
 /**
+ * Block a thread shows at: the selected block when the note belongs to it,
+ * else the note's first block.
+ *
+ * @param {Object}  thread           Note thread.
+ * @param {?string} selectedClientId Selected block client ID.
+ * @return {?string} Block client ID.
+ */
+export function getAnchorClientId( thread, selectedClientId ) {
+	return thread.blockClientIds?.includes( selectedClientId )
+		? selectedClientId
+		: thread.blockClientId;
+}
+
+/**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
  * @param {Array} threads Ordered list of thread objects.
