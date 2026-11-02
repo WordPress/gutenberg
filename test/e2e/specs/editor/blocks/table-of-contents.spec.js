@@ -307,7 +307,8 @@ test.describe( 'Table of Contents', () => {
 				.getByRole( 'combobox', {
 					name: 'Include headings down to level',
 				} )
-				.selectOption( '3' );
+				.click();
+			await page.getByRole( 'option', { name: 'Heading 3' } ).click();
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [

@@ -4,14 +4,25 @@
 
 ### New Features
 
+-   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 -   Add a session-scoped editor intent (`edit`, `suggest`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit) and +X (Suggest) on Windows, ⌘⌥⇧Z/X on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. Pending overlay edits auto-save as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one. Blocks with a pending suggestion are marked with a green bracket/outline, and the notes sidebar shows a Docs-style 'Add / Delete / Format' summary with checkmark-and-close icon buttons to accept or reject ([#80428](https://github.com/WordPress/gutenberg/pull/80428)).
 -   Suggestion mode: let suggestions overlap the way they do in Google Docs. Another reviewer can type, delete or change formatting inside or across a pending suggestion: suggestions of one kind stack as nested markers (oldest outermost), each formatting suggestion records only what it changes as a per-suggestion `delta`, and other authors' removals and attribute changes on a suggested block nest on its marker with their own notes. Accepting and rejecting in any order ends at the same text, and a suggestion a decision leaves with nothing to change is marked outdated. Splitting a block inside someone else's suggestion and moving a block someone else already suggested moving are still declined ([#85794](https://github.com/WordPress/gutenberg/pull/85794)).
 -   Suggestion mode: keep overlapping suggestions consistent under real-time collaboration. Markers merged from peers are put in canonical order, and repeated, garbled, empty and foreign markers are dropped, with one peer writing each correction so the peers converge ([#85794](https://github.com/WordPress/gutenberg/pull/85794)).
 
+### Enhancements
+
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
+
 ### Bug Fixes
 
+-   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
+-   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
+-   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Suggestion mode: stop post-level edits from reaching the saved post while suggesting. Only the post status was locked, so the excerpt, featured image, slug, terms, post meta and every other post setting changed directly. The title, excerpt, featured image, slug, terms and registered meta keys are now proposed - one note each, shown in place while suggesting, applied on accept - and every other post setting is read-only, refused whether it is written through `editPost` or straight to the entity, and stripped from any save made while suggesting ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).

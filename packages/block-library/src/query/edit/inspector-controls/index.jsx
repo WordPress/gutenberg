@@ -1,7 +1,7 @@
 import {
 	TextControl,
 	SelectControl as WCSelectControl,
-	Notice,
+	Notice as WCNotice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -254,14 +254,14 @@ export default function QueryInspectorControls( props ) {
 									/>
 								</ToggleGroupControl>
 								{ hasInheritanceWarning && (
-									<Notice
+									<WCNotice
 										status="warning"
 										isDismissible={ false }
 									>
 										{ __(
 											'Cannot inherit the current template query when placed inside the singular content (e.g., post, page, 404, blank).'
 										) }
-									</Notice>
+									</WCNotice>
 								) }
 							</VStack>
 						</ToolsPanelItem>
