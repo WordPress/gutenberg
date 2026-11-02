@@ -178,8 +178,9 @@ export function postOperationsFromTitle(
  * mutation lands) and by Reject (to drop the pending state).
  *
  * A proposal that rode along on a structural marker goes with it: the
- * block's one note carried the structural op and the attribute ops
- * together, so the decision on that note resolved both.
+ * marker's note carried the structural op and the attribute ops together,
+ * so the decision on that note resolved both. Suggestions other authors
+ * nested on the block stay pending.
  *
  * @param currentAttributes Block's current attributes.
  * @return Partial attributes payload safe for `updateBlockAttributes`.
@@ -191,7 +192,26 @@ export function clearSuggestionMarkerAttributes(
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
 	}
-	const { suggestion: _drop, ...rest } = meta;
+	const { suggestion, ...rest } = meta;
+	/*
+	 * Other authors' suggestions nested on the block outlive the decision:
+	 * the first takes the marker's place, carrying the rest.
+	 */
+	const nested: any[] = Array.isArray( suggestion?.nested )
+		? suggestion.nested.filter(
+				( entry: any ) =>
+					entry && typeof entry === 'object' && entry.type
+			)
+		: [];
+	if ( nested.length > 0 ) {
+		const [ next, ...others ] = nested;
+		return {
+			metadata: {
+				...rest,
+				suggestion: others.length ? { ...next, nested: others } : next,
+			},
+		};
+	}
 	return { metadata: rest };
 }
 

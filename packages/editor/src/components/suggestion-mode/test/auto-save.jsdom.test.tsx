@@ -689,6 +689,60 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
 
+	it( 'saves the current user’s proposal nested on another author’s block', async () => {
+		createSuggestion.mockResolvedValue( { id: 15 } );
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					authorId: 7,
+					commentId: 12,
+					after: { level: 3 },
+					nested: [
+						{
+							type: 'pending-attributes',
+							authorId: 3,
+							after: { content: 'Hello' },
+						},
+					],
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		act( () => {
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } );
+		} );
+		await pastDebounce();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( createSuggestion ).toHaveBeenCalledWith( {
+			clientId: block.clientId,
+			blockName: TEST_BLOCK,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'Hi',
+					after: 'Hello',
+				},
+			],
+		} );
+		expect( markerOf( registry, block.clientId ) ).toEqual( {
+			type: 'pending-attributes',
+			authorId: 7,
+			commentId: 12,
+			after: { level: 3 },
+			nested: [
+				{
+					type: 'pending-attributes',
+					authorId: 3,
+					after: { content: 'Hello' },
+					commentId: 15,
+				},
+			],
+		} );
+	} );
+
 	it( 'does nothing when the editor is not in Suggest intent', async () => {
 		const block = heading();
 		const { registry } = renderWith( 'edit', [ block ] );

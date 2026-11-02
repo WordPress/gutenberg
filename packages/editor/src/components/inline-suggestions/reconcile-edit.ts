@@ -6,10 +6,9 @@ import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	isSuggestionFormat,
-	suggestionMarkersAt,
+	suggestionMarkerListsAt,
 	suggestionMarkersIn,
 } from './format';
-import type { SuggestionMarkerKind } from './format';
 import { classifyOverlap } from './overlap';
 import type { OverlapBlocking, OverlapReason } from './overlap';
 import {
@@ -217,14 +216,14 @@ export function widenReplaceToWords(
 }
 
 /**
- * The markers active at a character, by kind.
+ * The `add` markers at a character, outermost first.
  *
  * @param record Rich-text record.
  * @param index  Character index.
- * @return Markers keyed by kind.
+ * @return Addition markers.
  */
-function markersAt( record: any, index: number ) {
-	return suggestionMarkersAt( record.formats?.[ index ] );
+function additionsAt( record: any, index: number ): any[] {
+	return suggestionMarkerListsAt( record.formats?.[ index ] ).add;
 }
 
 /**
@@ -335,14 +334,14 @@ export interface MarkerAction {
  *   - insert inside, or at the trailing edge of, the
  *     author's own `add` marker                       -> grow that marker
  *   - delete unmarked text                            -> new `del` marker (kept, struck through)
- *   - delete text already inside a `del` marker       -> no-op (already proposed for deletion)
+ *   - insert inside another author's `add` marker      -> new `add` nested in it
+ *   - delete text inside or over another author's
+ *     `add` or `del` marker                           -> new `del` nested in or stacked on it
  *   - delete the author's own `add` text              -> remove that marker (un-add)
  *   - replace unmarked text (type-over)               -> `del` over the old run + `add` for the new
  *
- * Ambiguous cases (an edit straddling a marker boundary, deleting a mix of
- * marked and unmarked text, or editing another author's marker) return no
- * actions; the caller leaves the value as the user typed it rather than guess.
- * Those are tightened in later phases with the safety-net e2e as the oracle.
+ * An edit over the author's own markers that none of these covers returns no
+ * actions and a refusal.
  *
  * @param prevValue        Block attribute value before the edit.
  * @param nextValue        Block attribute value after the edit.
@@ -378,30 +377,20 @@ export function planEditMarkers(
 	const authorToken =
 		authorId !== undefined && authorId !== null ? String( authorId ) : null;
 
-	// Whether every character in [start, end) carries a suggestion marker of the
-	// given kind sharing one id; returns that id, or null otherwise.
-	const uniformMarker = (
-		start: number,
-		end: number,
-		kind: SuggestionMarkerKind
-	) => {
+	// The innermost of the author's own additions that every character in
+	// [start, end) carries, or null when there is none.
+	const uniformOwnAddition = ( start: number, end: number ) => {
 		if ( start >= end ) {
 			return null;
 		}
-		let id: string | null = null;
-		for ( let i = start; i < end; i++ ) {
-			const f = markersAt( record, i )[ kind ];
-			if ( ! f ) {
-				return null;
-			}
-			const fid = markerId( f );
-			if ( id === null ) {
-				id = fid;
-			} else if ( id !== fid ) {
-				return null;
-			}
+		let ids = additionsAt( record, start )
+			.filter( ( format ) => isOwnMarker( format, authorToken ) )
+			.map( markerId );
+		for ( let i = start + 1; i < end && ids.length; i++ ) {
+			const here = additionsAt( record, i ).map( markerId );
+			ids = ids.filter( ( id ) => here.includes( id ) );
 		}
-		return id;
+		return ids.length ? ids[ ids.length - 1 ] : null;
 	};
 
 	// Whether [start, end) is entirely free of suggestion markers.
@@ -444,10 +433,10 @@ export function planEditMarkers(
 			};
 		}
 		/*
-		 * Inside someone's addition or deletion the new text cannot be
-		 * expressed: splitting that marker would leave its accept/reject
-		 * acting on a partial range. Inside a formatting change it becomes
-		 * an addition of its own, next to (not part of) that change.
+		 * Inside someone's addition the new text nests in it; inside
+		 * someone's deletion it sits between the deletion's halves; inside a
+		 * formatting change it is an addition of its own, next to (not part
+		 * of) that change.
 		 */
 		const verdict = classifyOverlap( record.formats, {
 			gesture: 'insert',
@@ -484,15 +473,8 @@ export function planEditMarkers(
 		// The author removing their own pending addition: drop that marker.
 		// Another author's addition is not theirs to withdraw; deleting in it
 		// proposes a deletion inside it instead (below).
-		const addId = uniformMarker(
-			edit.start,
-			edit.end,
-			SUGGESTION_TYPE_ADDITION
-		);
-		if (
-			addId !== null &&
-			isOwnMarker( markersAt( record, edit.start ).add, authorToken )
-		) {
+		const addId = uniformOwnAddition( edit.start, edit.end );
+		if ( addId !== null ) {
 			return {
 				kind: 'delete',
 				actions: [ { type: 'remove-add', id: addId } ],
@@ -500,9 +482,10 @@ export function planEditMarkers(
 		}
 		/*
 		 * Unmarked text, text inside someone else's addition, across it and
-		 * plain text, or over a formatting change: a new deletion. Over a
-		 * deletion, or a mix of the author's own markers, there is no marker
-		 * action to plan; the empty plan reads as "not handled" to
+		 * plain text, over a formatting change, or over someone else's
+		 * deletion (a second deletion of the same words): a new deletion.
+		 * Over a mix of the author's own markers there is no marker action
+		 * to plan; the empty plan reads as "not handled" to
 		 * `maybeHandleContentEdit`, so the edit is declined rather than
 		 * applied in place or silently discarded.
 		 */
