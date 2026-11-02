@@ -212,6 +212,9 @@
 	// Ensure selection checkbox stays above the preview field.
 	z-index: 1;
 	opacity: 0;
+	// The preview can be any color, including the checkbox's own background
+	// or border. A ring in the surface color sets it apart from the preview.
+	box-shadow: 0 0 0 calc(2 * var(--wpds-border-width-xs)) var(--wpds-color-background-surface-neutral-strong);
 
 	@media not (prefers-reduced-motion) {
 		transition: opacity 0.1s linear;

@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import {
@@ -52,7 +51,8 @@ export default function AuthorView( {
 					<img
 						ref={ imgRef }
 						onLoad={ handleLoad }
-						alt={ __( 'Author avatar' ) }
+						// Decorative: the name of the author is next to it.
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>

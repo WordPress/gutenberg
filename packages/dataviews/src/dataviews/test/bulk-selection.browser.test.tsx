@@ -1,12 +1,16 @@
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
-import { afterEach, beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { speak } from '@wordpress/a11y';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
+import useFocusFallback from '../../hooks/use-focus-fallback';
 import type { Action, Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import '../../style.scss';
+
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) as any );
 
 const initialViewport = {
 	width: window.innerWidth,
@@ -95,10 +99,12 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.toHaveFocus();
 	await user.keyboard( '{Tab}' );
 	await expect
-		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.element(
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
+		)
 		.toHaveFocus();
 	await user.click(
-		page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 	);
 
 	await expect
@@ -133,7 +139,7 @@ it( 'blocks focus on bulk actions and covers column headings while loading', asy
 		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
 	);
 	const cancel = page
-		.getByRole( 'button', { name: 'Cancel', exact: true } )
+		.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		.element();
 	const table = page.getByRole( 'table' ).element();
 	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
@@ -243,7 +249,10 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			).toBeLessThanOrEqual( 0.5 );
 			await expect
 				.element(
-					page.getByRole( 'button', { name: 'Cancel', exact: true } )
+					page.getByRole( 'button', {
+						name: 'Clear selection',
+						exact: true,
+					} )
 				)
 				.toBeInViewport();
 		}
@@ -254,7 +263,7 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			.poll( () => toolbar.getBoundingClientRect().height )
 			.toBe( 96 );
 		await user.click(
-			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		);
 		await expect
 			.element(
@@ -416,7 +425,7 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 	page.getByRole( 'gridcell' ).first().element().focus();
 	await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowUp}{Tab}{Tab}' );
 	const checkbox = page.getByRole( 'checkbox', {
-		name: 'Post 1',
+		name: 'Select Post 1',
 		exact: true,
 	} );
 	await expect.element( checkbox ).toHaveFocus();
@@ -431,4 +440,507 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 			);
 		} )
 		.toBe( true );
+} );
+
+function TrashableTable() {
+	const [ items, setItems ] = useState( posts );
+	const [ view, setView ] = useState< View >( {
+		type: 'table',
+		titleField: 'title',
+		fields: [ 'author' ],
+		page: 1,
+		perPage: 10,
+	} );
+	const { data, paginationInfo } = filterSortAndPaginate(
+		items,
+		view,
+		fields
+	);
+	const trashAction: Action< Post > = {
+		id: 'trash',
+		label: 'Trash',
+		isPrimary: true,
+		supportsBulk: true,
+		RenderModal: ( { items: itemsToTrash, closeModal } ) => (
+			<>
+				<button
+					onClick={ () => {
+						const ids = itemsToTrash.map( ( { id } ) => id );
+						setItems( ( current ) =>
+							current.filter( ( { id } ) => ! ids.includes( id ) )
+						);
+					} }
+				>
+					Remove
+				</button>
+				<button onClick={ () => closeModal?.() }>Done</button>
+				<button
+					onClick={ () => {
+						const ids = itemsToTrash.map( ( { id } ) => id );
+						setItems( ( current ) =>
+							current.filter( ( { id } ) => ! ids.includes( id ) )
+						);
+						closeModal?.();
+					} }
+				>
+					Confirm
+				</button>
+			</>
+		),
+	};
+	return (
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ setView }
+			actions={ [ trashAction ] }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'moves focus to the select all checkbox when an action removes the item that held it', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page
+			.getByRole( 'row', { name: /First post/ } )
+			.getByRole( 'button', { name: 'Trash', exact: true } )
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Confirm', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+// Focus is restored a frame after the change, so wait for it before
+// checking that it was left alone.
+function nextFrames() {
+	return new Promise( ( resolve ) =>
+		requestAnimationFrame( () => requestAnimationFrame( resolve ) )
+	);
+}
+
+function TableOf( {
+	items,
+	totalItems = items.length,
+	infiniteScroll,
+}: {
+	items: Post[];
+	totalItems?: number;
+	infiniteScroll?: boolean;
+} ) {
+	return (
+		<DataViews
+			data={ items }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+				page: 1,
+				perPage: 10,
+				infiniteScrollEnabled: infiniteScroll,
+			} }
+			onChangeView={ () => {} }
+			actions={ actions }
+			paginationInfo={ { totalItems, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'leaves focus alone when it was moved away before the item was removed', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	const checkbox = page
+		.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+		.element() as HTMLElement;
+	checkbox.focus();
+	checkbox.blur();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await nextFrames();
+	expect( checkbox.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'moves focus once there is a control again after the focused item was removed', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	// Like the last item of a page, while the page before it loads.
+	await rerender( <TableOf items={ [] } totalItems={ 1 } /> );
+	await rerender( <TableOf items={ [ posts[ 1 ] ] } /> );
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'moves focus to the select all checkbox when the focused item is removed', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'moves focus to the select all checkbox when a dialog closes after its action removed the items', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	await user.click(
+		page.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+	);
+	// The toolbar comes before the rows, which have a Trash button too.
+	await user.click(
+		page.getByRole( 'button', { name: 'Trash', exact: true } ).first()
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'Remove', exact: true } )
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toHaveFocus();
+} );
+
+it( 'does not announce bulk actions in layouts that do not show them', async () => {
+	vi.mocked( speak ).mockClear();
+	const user = userEvent.setup();
+	await render(
+		<DataViews
+			data={ posts }
+			fields={ fields }
+			view={ { type: 'list', titleField: 'title', fields: [ 'author' ] } }
+			onChangeView={ () => {} }
+			actions={ actions }
+			paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+			defaultLayouts={ { list: true } }
+		/>
+	);
+	await user.click(
+		page.getByRole( 'button', { name: 'First post', exact: true } )
+	);
+	await expect
+		.element(
+			page.getByRole( 'button', { name: 'First post', exact: true } )
+		)
+		.toHaveAttribute( 'aria-pressed', 'true' );
+	expect( speak ).not.toHaveBeenCalled();
+} );
+
+it( 'moves focus to the search when no items are left', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ [] } /> );
+	await expect
+		.element( page.getByRole( 'searchbox', { name: 'Search' } ) )
+		.toHaveFocus();
+} );
+
+it( 'forgets the focused item once focus moves to another control', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	const search = page
+		.getByRole( 'searchbox', { name: 'Search' } )
+		.element() as HTMLElement;
+	search.focus();
+	search.blur();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await nextFrames();
+	expect( search.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'leaves focus alone after the search took it and the items come back', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ [] } /> );
+	const search = page.getByRole( 'searchbox', { name: 'Search' } );
+	await expect.element( search ).toHaveFocus();
+	const searchElement = search.element() as HTMLElement;
+	searchElement.blur();
+	await rerender( <TableOf items={ [ posts[ 1 ] ] } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /Second post/ } ) )
+		.toBeInTheDocument();
+	await nextFrames();
+	expect( searchElement.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'leaves focus to a dialog that closes without removing anything', async () => {
+	const user = userEvent.setup();
+	await render( <TrashableTable /> );
+	const trigger = page
+		.getByRole( 'row', { name: /First post/ } )
+		.getByRole( 'button', { name: 'Trash', exact: true } );
+	await user.click( trigger );
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await nextFrames();
+	await expect.element( trigger ).toHaveFocus();
+} );
+
+function LoadingTable( { isLoading }: { isLoading: boolean } ) {
+	const renameAction: Action< Post > = {
+		id: 'rename',
+		label: 'Rename',
+		isPrimary: true,
+		RenderModal: ( { closeModal } ) => (
+			<button onClick={ () => closeModal?.() }>Done</button>
+		),
+	};
+	return (
+		<DataViews
+			data={ posts }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+				page: 1,
+				perPage: 10,
+			} }
+			onChangeView={ () => {} }
+			actions={ [ renameAction ] }
+			isLoading={ isLoading }
+			paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'brings focus back to the trigger of a dialog that closed while loading', async () => {
+	const user = userEvent.setup();
+	const { rerender } = await render( <LoadingTable isLoading={ false } /> );
+	const trigger = page
+		.getByRole( 'row', { name: /First post/ } )
+		.getByRole( 'button', { name: 'Rename', exact: true } );
+	await user.click( trigger );
+	// The action saves, so the view loads, and the dialog closes meanwhile:
+	// it can't return focus to its trigger in the inert table.
+	await rerender( <LoadingTable isLoading /> );
+	await user.click(
+		page.getByRole( 'button', { name: 'Done', exact: true } )
+	);
+	await rerender( <LoadingTable isLoading={ false } /> );
+	await expect.element( trigger ).toHaveFocus();
+} );
+
+const LIST = Array.from( { length: 30 }, ( _, index ) => `Item ${ index }` );
+
+function FallbackList( {
+	items = LIST,
+	hidden = [],
+	ariaHidden = [],
+	disabled = [],
+	isInfiniteScroll = false,
+}: {
+	items?: string[];
+	hidden?: string[];
+	ariaHidden?: string[];
+	disabled?: string[];
+	isInfiniteScroll?: boolean;
+} ) {
+	const ref = useFocusFallback( { isEmpty: false, isInfiniteScroll } );
+	return (
+		<div style={ { height: 100, overflow: 'auto' } } data-testid="scroller">
+			<div ref={ ref }>
+				{ items.map( ( item ) => (
+					<div
+						key={ item }
+						style={ { height: 40 } }
+						aria-hidden={ ariaHidden.includes( item ) || undefined }
+					>
+						<button
+							hidden={ hidden.includes( item ) }
+							aria-disabled={
+								disabled.includes( item ) || undefined
+							}
+						>
+							{ item }
+						</button>
+					</div>
+				) ) }
+			</div>
+		</div>
+	);
+}
+
+function focusItem( name: string ) {
+	const element = page
+		.getByRole( 'button', { name, exact: true, includeHidden: true } )
+		.element() as HTMLElement;
+	element.focus();
+	return element;
+}
+
+it.each( [ false, true ] )(
+	'moves focus on when the focused item is removed, with infinite scroll %s',
+	async ( isInfiniteScroll ) => {
+		const { rerender } = await render(
+			<FallbackList isInfiniteScroll={ isInfiniteScroll } />
+		);
+		focusItem( 'Item 0' );
+		await nextFrames();
+		// Like an action removing the item it was triggered on.
+		await rerender(
+			<FallbackList
+				items={ LIST.slice( 1 ) }
+				isInfiniteScroll={ isInfiniteScroll }
+			/>
+		);
+		await expect
+			.element(
+				page.getByRole( 'button', { name: 'Item 1', exact: true } )
+			)
+			.toHaveFocus();
+	}
+);
+
+it( 'moves focus on when the focused control is hidden, with infinite scroll', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	focusItem( 'Item 0' );
+	await nextFrames();
+	await rerender( <FallbackList hidden={ [ 'Item 0' ] } isInfiniteScroll /> );
+	await expect
+		.element( page.getByRole( 'button', { name: 'Item 1', exact: true } ) )
+		.toHaveFocus();
+} );
+
+it( 'leaves focus alone when infinite scroll unloads an item scrolled off screen', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	const item = focusItem( 'Item 0' );
+	const scroller = page.getByTestId( 'scroller' ).element() as HTMLElement;
+	scroller.scrollTop = scroller.scrollHeight;
+	await nextFrames();
+	await nextFrames();
+	// Infinite scroll unloads the items scrolled past.
+	await rerender(
+		<FallbackList items={ LIST.slice( 1 ) } isInfiniteScroll />
+	);
+	await nextFrames();
+	expect( item.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'moves focus on when an item slightly off screen is removed, with infinite scroll', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	focusItem( 'Item 0' );
+	const scroller = page.getByTestId( 'scroller' ).element() as HTMLElement;
+	scroller.scrollTop = 150;
+	await nextFrames();
+	await nextFrames();
+	await rerender(
+		<FallbackList items={ LIST.slice( 1 ) } isInfiniteScroll />
+	);
+	await expect
+		.element( page.getByRole( 'button', { name: 'Item 1', exact: true } ) )
+		.toHaveFocus();
+} );
+
+it( 'forgets a control hidden on its own once focus leaves it', async () => {
+	// Like the table media, hidden next to the title but focusable by mouse.
+	const { rerender } = await render(
+		<FallbackList ariaHidden={ [ 'Item 0' ] } />
+	);
+	const item = focusItem( 'Item 0' );
+	item.blur();
+	await rerender(
+		<FallbackList ariaHidden={ [ 'Item 0' ] } hidden={ [ 'Item 5' ] } />
+	);
+	await nextFrames();
+	expect( item.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'skips disabled and hidden controls when moving focus on', async () => {
+	const { rerender } = await render( <FallbackList /> );
+	focusItem( 'Item 0' );
+	await rerender(
+		<FallbackList
+			items={ LIST.slice( 1 ) }
+			disabled={ [ 'Item 1' ] }
+			ariaHidden={ [ 'Item 2' ] }
+		/>
+	);
+	await expect
+		.element( page.getByRole( 'button', { name: 'Item 3', exact: true } ) )
+		.toHaveFocus();
+} );
+
+it( 'moves focus within a view inside a dialog', async () => {
+	const { rerender } = await render(
+		<div role="dialog" aria-label="Media">
+			<TableOf items={ posts } />
+		</div>
+	);
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	const search = page
+		.getByRole( 'searchbox', { name: 'Search' } )
+		.element() as HTMLElement;
+	// Moving on to another control of the dialog is moving on.
+	search.focus();
+	search.blur();
+	await rerender(
+		<div role="dialog" aria-label="Media">
+			<TableOf items={ posts.slice( 1 ) } />
+		</div>
+	);
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await nextFrames();
+	expect( search.ownerDocument.body ).toHaveFocus();
 } );

@@ -16,7 +16,11 @@ const { useLocation, useMatches } = unlock( routePrivateApis );
  * This hook should be called from the Root component to ensure it runs on every route.
  */
 export default function useRouteTitle() {
-	const location = useLocation();
+	// Only a new path is a new screen. Search parameters also change while the
+	// screen stays, e.g. when the selection changes or an item is moved to the
+	// trash, and announcing the title then would clear the live regions and cut
+	// off the notice of what happened.
+	const { pathname } = useLocation();
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const routeTitle = ( currentMatch?.loaderData as any )?.title as
@@ -35,7 +39,7 @@ export default function useRouteTitle() {
 
 	useEffect( () => {
 		isInitialLocationRef.current = false;
-	}, [ location ] );
+	}, [ pathname ] );
 
 	useEffect( () => {
 		// Don't update or announce the title for initial page load.
@@ -68,5 +72,5 @@ export default function useRouteTitle() {
 				speak( decodedRouteTitle, 'assertive' );
 			}
 		}
-	}, [ routeTitle, siteTitle, location ] );
+	}, [ routeTitle, siteTitle, pathname ] );
 }

@@ -1,10 +1,12 @@
 import type { ComponentType } from 'react';
 import { useContext } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
+import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
+import useFocusFallback from '../../hooks/use-focus-fallback';
 import type { ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
@@ -20,6 +22,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		getItemLevel,
 		hasInitiallyLoaded,
 		isLoading,
+		paginationInfo,
 		view,
 		onChangeView,
 		selection,
@@ -33,6 +36,13 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
+	const layoutRef = useMergeRefs( [
+		containerRef,
+		useFocusFallback( {
+			isEmpty: ! isLoading && paginationInfo.totalItems === 0,
+			isInfiniteScroll: !! view.infiniteScrollEnabled,
+		} ),
+	] );
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
 	} );
@@ -59,7 +69,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
-		<div className="dataviews-layout__container" ref={ containerRef }>
+		<div className="dataviews-layout__container" ref={ layoutRef }>
 			<ViewComponent
 				className={ className }
 				actions={ actions }

@@ -172,6 +172,8 @@
 	left: var(--wpds-dimension-padding-sm);
 	// Ensure selection checkbox stays above the preview field.
 	z-index: 1;
+	// Set the checkbox apart from previews of any color, as the grid does.
+	box-shadow: 0 0 0 calc(2 * var(--wpds-border-width-xs)) var(--wpds-color-background-surface-neutral-strong);
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.
