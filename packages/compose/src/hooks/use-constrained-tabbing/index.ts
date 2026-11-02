@@ -54,6 +54,12 @@ function useConstrainedTabbing(): React.RefCallback< Element > {
 				return;
 			}
 
+			// Without a tabbable destination, native Tab would leave the area.
+			if ( ! focus.tabbable.find( node ).length ) {
+				event.preventDefault();
+				return;
+			}
+
 			// If the element that is about to receive focus is outside the
 			// area, move focus to a div and insert it at the start or end of
 			// the area, depending on the direction. Without preventing default

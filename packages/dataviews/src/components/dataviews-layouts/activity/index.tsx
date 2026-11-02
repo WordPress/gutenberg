@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewActivityProps } from '../../../types';
@@ -87,7 +87,7 @@ export default function ViewActivity< Item >(
 			</div>
 			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

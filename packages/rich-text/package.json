@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "7.57.0",
+	"version": "8.0.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,7 @@
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss",
-		"src/index.js",
+		"src/index.ts",
 		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",

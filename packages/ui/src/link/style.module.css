@@ -3,8 +3,20 @@
 
 	@layer components {
 		.link {
+			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
+
+			border-radius: var(--wpds-border-radius-sm);
 			text-underline-offset: 0.2em;
 			text-decoration-thickness: from-font;
+		}
+
+		.link-with-icon {
+			text-decoration-line: none;
+		}
+
+		.link-contents {
+			text-decoration: inherit;
+			text-decoration-line: underline;
 		}
 
 		/* Brand tone */
@@ -40,6 +52,7 @@
 
 		/* Unstyled variant */
 		.is-unstyled {
+			--_gcd-a-border-radius: 0;
 			--_gcd-a-color: inherit;
 
 			color: inherit;
@@ -47,23 +60,22 @@
 		}
 
 		/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
-		 * Twemoji replacement and text-selection issues. The icon is an
-		 * inline-block so the link underline stays scoped to the text. */
+		 * Twemoji replacement and text-selection issues. */
 
 		.link-icon {
 			line-height: 1;
-			display: inline-block;
 			margin-inline-start: var(--wpds-dimension-padding-xs);
 			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
 		}
 
 		.link-icon::after {
-			content: "\2197";
+			/* WORD JOINER prevents a break before the arrow, including in CJK text. */
+			content: "\2060\2197";
 		}
 
 		.link-icon:dir(rtl)::after {
-			content: "\2196";
+			content: "\2060\2196";
 		}
 	}
 }

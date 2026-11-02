@@ -27,8 +27,15 @@ describe( 'Breadcrumb', () => {
 	let originalScrollWidth: PropertyDescriptor | undefined;
 	let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
 	let originalFonts: PropertyDescriptor | undefined;
+	let listPaddingReset: HTMLStyleElement;
 
 	beforeEach( () => {
+		// TODO: jsdom-only reset; the component stylesheet, which the jsdom project mocks away, already removes the UA list padding that the measurements would otherwise subtract.
+		listPaddingReset = document.createElement( 'style' );
+		listPaddingReset.textContent =
+			'ol { padding-inline-start: 0; padding-inline-end: 0; }';
+		document.head.appendChild( listPaddingReset );
+
 		availableWidth = 500;
 		listAvailableWidth = null;
 		labelWidths = new Map();
@@ -170,6 +177,7 @@ describe( 'Breadcrumb', () => {
 	} );
 
 	afterEach( () => {
+		listPaddingReset.remove();
 		if ( originalClientWidth ) {
 			Object.defineProperty(
 				HTMLElement.prototype,
@@ -261,6 +269,67 @@ describe( 'Breadcrumb', () => {
 			);
 		} );
 
+		it( 'labels the selection list without naming its layout wrapper', () => {
+			render(
+				<Breadcrumb.Root
+					aria-label="Block hierarchy"
+					render={ ( renderProps ) => (
+						<div
+							{ ...renderProps }
+							role="group"
+							aria-label="Wrapper"
+							aria-labelledby="wrapper-label"
+						/>
+					) }
+				>
+					<Breadcrumb.ButtonItem>Document</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list.tagName ).toBe( 'OL' );
+
+			// Custom renderers cannot reintroduce a second named container.
+			expect( list.parentElement ).not.toHaveAttribute( 'role' );
+			expect( list.parentElement ).not.toHaveAttribute( 'aria-label' );
+			expect( list.parentElement ).not.toHaveAttribute(
+				'aria-labelledby'
+			);
+		} );
+
+		it( 'uses the referenced label for the selection list', () => {
+			render(
+				<>
+					<span id="hierarchy-label">Block hierarchy</span>
+					<Breadcrumb.Root
+						aria-label="Fallback hierarchy"
+						aria-labelledby="hierarchy-label"
+					>
+						<Breadcrumb.CurrentItem aria-current="true">
+							Document
+						</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
+				</>
+			);
+
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list ).toHaveAttribute(
+				'aria-labelledby',
+				'hierarchy-label'
+			);
+
+			// The label reference is applied only to the list, even without ancestors.
+			expect( list.parentElement ).not.toHaveAttribute(
+				'aria-labelledby'
+			);
+			expect( list.parentElement ).not.toHaveAttribute( 'aria-label' );
+		} );
+
 		it( 'keeps the intrinsic tree inert and out of the accessibility tree', () => {
 			const { container } = renderDefaultTrail();
 			const measurementTree =
@@ -346,7 +415,8 @@ describe( 'Breadcrumb', () => {
 			);
 
 			const link = screen.getByRole( 'link', {
-				name: 'General (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'General(opens in a new tab)',
 			} );
 			expect( link ).toHaveAttribute( 'href', href );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
@@ -487,9 +557,11 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.CurrentItem>
 				</Breadcrumb.Root>
 			);
-			expect(
-				screen.getByRole( 'group', { name: 'Block hierarchy' } )
-			).toBeVisible();
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list ).toBeVisible();
+
 			expect(
 				screen.queryByRole( 'navigation' )
 			).not.toBeInTheDocument();
@@ -649,7 +721,8 @@ describe( 'Breadcrumb', () => {
 			);
 			act( flushAllAnimationFrames );
 			const menuLink = await screen.findByRole( 'menuitem', {
-				name: 'Settings (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'Settings(opens in a new tab)',
 			} );
 			expect( menuLink ).toHaveAttribute(
 				'href',
@@ -924,7 +997,9 @@ describe( 'Breadcrumb', () => {
 				screen.queryByRole( 'button', { name: /hidden breadcrumb/ } )
 			).not.toBeInTheDocument();
 
-			list.style.paddingInline = '4px';
+			// TODO: jsdom-only longhands; it does not expand the paddingInline shorthand into the computed logical longhands the component reads.
+			list.style.paddingInlineStart = '4px';
+			list.style.paddingInlineEnd = '4px';
 			notifyResize( list );
 
 			expect(

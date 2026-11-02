@@ -1,7 +1,13 @@
+import isPreferencesData from '../../is-preferences-data';
 import type { ScopedPreferences } from '../../types';
 
+const copyScope = ( scope: unknown ) =>
+	isPreferencesData( scope ) ? { ...scope } : undefined;
+
 export default function convertEditorSettings( data: ScopedPreferences ) {
-	let newData = data;
+	const newData = { ...data };
+	const editPost = copyScope( data[ 'core/edit-post' ] );
+	const editSite = copyScope( data[ 'core/edit-site' ] );
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'distractionFree',
@@ -22,27 +28,29 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {
-		if ( data?.[ 'core/edit-post' ]?.[ setting ] !== undefined ) {
-			newData = {
-				...newData,
-				core: {
-					...newData?.core,
-					[ setting ]: data[ 'core/edit-post' ][ setting ],
-				},
+		if ( editPost?.[ setting ] !== undefined ) {
+			newData.core = {
+				...copyScope( newData.core ),
+				[ setting ]: editPost[ setting ],
 			};
-			delete newData[ 'core/edit-post' ]![ setting ];
+			delete editPost[ setting ];
 		}
 
-		if ( data?.[ 'core/edit-site' ]?.[ setting ] !== undefined ) {
-			delete newData[ 'core/edit-site' ]![ setting ];
+		if ( editSite?.[ setting ] !== undefined ) {
+			delete editSite[ setting ];
 		}
 	} );
 
-	if ( Object.keys( newData?.[ 'core/edit-post' ] ?? {} )?.length === 0 ) {
+	// Empty and invalid scopes are removed rather than persisted.
+	if ( editPost && Object.keys( editPost ).length > 0 ) {
+		newData[ 'core/edit-post' ] = editPost;
+	} else {
 		delete newData[ 'core/edit-post' ];
 	}
 
-	if ( Object.keys( newData?.[ 'core/edit-site' ] ?? {} )?.length === 0 ) {
+	if ( editSite && Object.keys( editSite ).length > 0 ) {
+		newData[ 'core/edit-site' ] = editSite;
+	} else {
 		delete newData[ 'core/edit-site' ];
 	}
 

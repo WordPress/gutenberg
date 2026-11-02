@@ -91,7 +91,7 @@ test.describe( 'Style Book', () => {
 		page,
 	} ) => {
 		await page
-			.getByRole( 'button', { name: 'Blocks', exact: true } )
+			.getByRole( 'button', { name: 'Blocks & Elements', exact: true } )
 			.click();
 		await page
 			.getByRole( 'button', { name: 'Heading', exact: true } )
@@ -114,7 +114,7 @@ test.describe( 'Style Book', () => {
 			.click();
 
 		await expect(
-			page.locator( 'role=button[name="Blocks"]' )
+			page.locator( 'role=button[name="Blocks & Elements"]' )
 		).toBeVisible();
 	} );
 

@@ -22,10 +22,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import {
-	privateApis as patternPrivateApis,
-	// @ts-expect-error - No type declarations available for @wordpress/patterns
-} from '@wordpress/patterns';
+import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { DEFAULT_VIEWS } from './view-utils';
@@ -36,7 +33,7 @@ import type { NormalizedPattern } from './use-patterns';
 import ImportPatternButton from './import-pattern-button';
 // Unlock WordPress private APIs
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
 /**
  * Style dependencies
@@ -192,13 +189,14 @@ function PatternListView( {
 		];
 	}, [ type, postTypeFields, patternCategoryField ] );
 
-	// Apply client-side sorting and pagination, but NOT filtering
-	// Filtering is done server-side in usePatterns hook
+	// Apply client-side sorting and pagination, and the author filter. The
+	// other filters are done server-side in usePatterns hook
 	const { data: posts, paginationInfo } = useMemo( () => {
-		// Remove filters from view - filtering is managed server-side
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search; // Search also done server-side
-		viewWithoutFilters.filters = []; // Remove all filters
+		viewWithoutFilters.filters = view.filters?.filter(
+			( { field } ) => field === 'author'
+		);
 		return filterSortAndPaginate(
 			patternsWithPermissions,
 			viewWithoutFilters,
@@ -235,7 +233,7 @@ function PatternListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
-	const postTypeActions: Action< any >[] = usePostActions( {
+	const actions: Action< any >[] = usePostActions( {
 		postType: PATTERN_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: NormalizedPattern[] ) => {
@@ -248,19 +246,6 @@ function PatternListView( {
 			}
 		},
 	} );
-
-	const actions = useMemo( () => {
-		return [
-			...postTypeActions?.flatMap< Action< any > >( ( action ) => {
-				// Skip revisions as the admin does not support it
-				if ( action.id === 'view-post-revisions' ) {
-					return [];
-				}
-
-				return [ action ];
-			} ),
-		];
-	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
 		( typeSlug: string ) => {
@@ -314,23 +299,23 @@ function PatternListView( {
 		>
 			{ DEFAULT_VIEWS.length > 1 && (
 				<div className="routes-pattern-list__tabs-wrapper">
-					<Tabs
+					<WCTabs
 						onSelect={ handleTabChange }
 						selectedTabId={ type ?? 'all' }
 					>
-						<Tabs.TabList>
+						<WCTabs.TabList>
 							{ DEFAULT_VIEWS.map(
 								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
+									<WCTabs.Tab
 										tabId={ filter.slug }
 										key={ filter.slug }
 									>
 										{ filter.label }
-									</Tabs.Tab>
+									</WCTabs.Tab>
 								)
 							) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews

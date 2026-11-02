@@ -2,9 +2,33 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
+### Bug Fixes
+
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
+
+### Internal
+
+-   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   Accept the boolean and sides forms of the `padding`, `margin` and `blockGap` spacing settings, and `false` for the unsupported `contentSize` and `wideSize` layout settings ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
+
+## 2.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
+
+### New Features
+
+-   Add `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and `::placeholder` support for the `textInput` element ([#71634](https://github.com/WordPress/gutenberg/pull/71634)).
+
+### Enhancements
+
+-   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
 
 ## 1.24.0 (2026-10-07)
 

@@ -4,7 +4,7 @@ import {
 	QueryControls,
 	RadioControl,
 	RangeControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	ToolbarGroup,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -610,7 +610,7 @@ export default function LatestPostsEdit( {
 				{ inspectorControls }
 				<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
 					{ ! Array.isArray( latestPosts ) ? (
-						<Spinner />
+						<WCSpinner />
 					) : (
 						__( 'No posts found.' )
 					) }

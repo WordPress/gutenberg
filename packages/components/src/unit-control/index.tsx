@@ -4,7 +4,8 @@ import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { WordPressComponentProps } from '../context';
-import { ValueInput } from './styles/unit-control-styles';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
@@ -101,6 +102,7 @@ function UnforwardedUnitControl(
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
 		'components-unit-control-wrapper',
+		styles[ 'value-input' ],
 		className
 	);
 
@@ -204,7 +206,7 @@ function UnforwardedUnitControl(
 	}
 
 	return (
-		<ValueInput
+		<NumberControl
 			{ ...props }
 			autoComplete={ autoComplete }
 			className={ classes }

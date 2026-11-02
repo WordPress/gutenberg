@@ -78,7 +78,7 @@ There are some exceptions where writing plain JavaScript (`.js`) is permitted:
 
 -   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
 -   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
--   If authoring new files in a package which is largely untyped, such that the new file would not have reasonable access to existing package typings.
+-   If authoring new files in a package that has no `tsconfig.json` yet, such that the new file would not have reasonable access to existing package typings. Packages with a `tsconfig.json` reject new JavaScript files (`.js`, `.jsx`, `.mjs`, `.cjs`) under `src` and `test` through the `gutenberg/use-typescript` ESLint rule, as do `routes/` and `tools/`, with the files that predate the rule listed in `tools/eslint/suppressions.json`.
 
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
@@ -408,7 +408,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.ts](/packages/block-editor/src/store/private-actions.ts):
 
 ```js
 const privateSettings = [
@@ -815,6 +815,16 @@ We use
 The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
+
+PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in `lib/`, and all the PHP that WordPress core ships from this repository: the PHP in packages such as `block-library`, and the PHP templates in `packages/wp-build/templates`. The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves. After running `composer install` and `npm run build`, which generates PHP files that the analysis needs, run `composer phpstan`, or `npm run typecheck:php` to run it in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment). Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched; regenerate the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`) and commit the result. The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: `tools/phpstan/wordpress-stubs/composer.json` records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access. To update them to the latest trunk, run `composer phpstan:generate-wordpress-stubs -- --commit=trunk`, then `composer update` and `composer phpstan:baselines`, and commit the updated `composer.json`. When a change depends on a wordpress-develop pull request, generate the stubs from that pull request with `--pr=<number>`, so that the analysis knows what the pull request adds, and commit the `composer.json` with the change. While working on both, `--checkout` generates them from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, but those stubs cannot be generated in CI, so use `--pr` before pushing. Once the core change is committed, regenerate them with `--commit=trunk` before merging. To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of `phpstan.neon.dist`. The tests in `phpunit/` are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
+
+```neon
+includes:
+	- phpstan.neon.dist
+parameters:
+	paths:
+		- phpunit
+```
 
 ## GitHub Actions workflow files
 

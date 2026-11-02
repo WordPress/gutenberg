@@ -36,7 +36,7 @@ interface FixedWindowListOptions {
  * @return Array with the fixed window list and setter
  */
 export default function useFixedWindowList(
-	elementRef: React.RefObject< HTMLElement >,
+	elementRef: React.RefObject< HTMLElement | null >,
 	itemHeight: number,
 	totalItems: number,
 	options?: FixedWindowListOptions

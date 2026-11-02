@@ -107,6 +107,33 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await expect( overlayMenuItem ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
 		} );
+
+		test( 'As a user I want a navigation block inserted into an overlay to keep the flex layout so block spacing applies', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await createNavigationOverlay( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes.layout
+					)
+				)
+				.toMatchObject( { type: 'flex', orientation: 'vertical' } );
+		} );
 	} );
 
 	test.describe( 'Customization', () => {

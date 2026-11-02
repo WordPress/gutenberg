@@ -5,12 +5,13 @@ import { Icon } from '../../../icon';
 import { Input as InputPrimitive } from '../input';
 import { InputLayout } from '../input-layout';
 import type { ComboboxInputProps } from './types';
+import styles from './style.module.css';
 
 const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
 	<InputPrimitive
 		prefix={
 			<InputLayout.Slot padding="minimal">
-				<Icon icon={ search } />
+				<Icon icon={ search } className={ styles[ 'search-icon' ] } />
 			</InputLayout.Slot>
 		}
 		{ ...props }

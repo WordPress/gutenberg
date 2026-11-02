@@ -5,11 +5,21 @@ import {
 	DEFAULT_GRADIENT,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 	DIRECTIONAL_ORIENTATION_ANGLE_MAP,
+	HUE_INTERPOLATION_METHODS,
+	POLAR_INTERPOLATION_COLOR_SPACES,
+	RECTANGULAR_INTERPOLATION_COLOR_SPACES,
 } from './constants';
 import { serializeGradient } from './serializer';
-import type { ControlPoint } from './types';
+import type { ControlPoint, GradientAST } from './types';
 
 extend( [ namesPlugin ] );
+
+const ANGLE_UNIT_TO_DEGREES: Record< gradientParser.AngleUnit, number > = {
+	deg: 1,
+	rad: 180 / Math.PI,
+	grad: 0.9,
+	turn: 360,
+};
 
 export function getLinearGradientRepresentation(
 	gradientAST: gradientParser.GradientNode
@@ -25,23 +35,138 @@ function hasUnsupportedLength( item: gradientParser.ColorStop ) {
 	return item.length === undefined || item.length.type !== '%';
 }
 
+/**
+ * Reads the first argument of a gradient, the one that holds the orientation
+ * and the color interpolation method, as a list of space separated tokens.
+ *
+ * @param gradient CSS gradient.
+ * @param start    Index right after the opening parenthesis.
+ */
+function readFirstArgument( gradient: string, start: number ) {
+	const tokens: string[] = [];
+	let token = '';
+	let depth = 0;
+
+	for ( let index = start; index < gradient.length; index++ ) {
+		const char = gradient[ index ];
+
+		if ( depth === 0 && ( char === ',' || char === ')' ) ) {
+			if ( token ) {
+				tokens.push( token );
+			}
+			return { tokens, end: index };
+		}
+
+		if ( char === '(' ) {
+			depth++;
+		} else if ( char === ')' ) {
+			depth--;
+		}
+
+		if ( depth === 0 && /\s/.test( char ) ) {
+			if ( token ) {
+				tokens.push( token );
+			}
+			token = '';
+		} else {
+			token += char;
+		}
+	}
+
+	// The gradient is missing its closing parenthesis.
+	return undefined;
+}
+
+/**
+ * `gradient-parser` can't read a color interpolation method such as
+ * `in oklch`, so it is taken out of the gradient before it is parsed.
+ *
+ * Only the first argument is searched, at its top level, so a color stop like
+ * `color-mix( in srgb, … )` is never mistaken for one.
+ *
+ * This is a workaround until `gradient-parser` supports color interpolation
+ * methods. It can be removed once an upstream release does:
+ * https://github.com/rafaelcaricio/gradient-parser/issues/57
+ *
+ * @param gradient CSS gradient.
+ */
+function extractColorInterpolation( gradient: string ) {
+	const start = gradient.indexOf( '(' ) + 1;
+	const firstArgument = start && readFirstArgument( gradient, start );
+	if ( ! firstArgument ) {
+		return { gradient };
+	}
+
+	const { tokens, end } = firstArgument;
+	const words = tokens.map( ( token ) => token.toLowerCase() );
+	const index = words.indexOf( 'in' );
+	if ( index === -1 ) {
+		return { gradient };
+	}
+
+	const colorSpace = words[ index + 1 ];
+	let length;
+	if (
+		POLAR_INTERPOLATION_COLOR_SPACES.includes( colorSpace ) &&
+		HUE_INTERPOLATION_METHODS.includes( words[ index + 2 ] ) &&
+		words[ index + 3 ] === 'hue'
+	) {
+		length = 4;
+	} else if (
+		RECTANGULAR_INTERPOLATION_COLOR_SPACES.includes( colorSpace ) ||
+		POLAR_INTERPOLATION_COLOR_SPACES.includes( colorSpace )
+	) {
+		length = 2;
+	} else {
+		return { gradient };
+	}
+
+	const remainder = [
+		...tokens.slice( 0, index ),
+		...tokens.slice( index + length ),
+	].join( ' ' );
+	// Without an orientation, the comma after the first argument goes too.
+	const hasEmptyFirstArgument = ! remainder && gradient[ end ] === ',';
+
+	return {
+		gradient:
+			gradient.slice( 0, start ) +
+			remainder +
+			gradient.slice( hasEmptyFirstArgument ? end + 1 : end ),
+		colorInterpolation: words.slice( index, index + length ).join( ' ' ),
+	};
+}
+
 export function getGradientAstWithDefault( value?: string | null ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
-	let gradientAST: gradientParser.GradientNode | undefined;
+	let gradientAST: GradientAST | undefined;
 	let hasGradient = !! value;
 
-	const valueToParse = value ?? DEFAULT_GRADIENT;
+	const { gradient: valueToParse, colorInterpolation } =
+		extractColorInterpolation( value ?? DEFAULT_GRADIENT );
 
 	try {
 		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
+		if ( colorInterpolation ) {
+			gradientAST.colorInterpolation = colorInterpolation;
+		}
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
 		console.warn(
 			'wp.components.CustomGradientPicker failed to parse the gradient with error',
 			error
 		);
+	}
 
+	// The picker cannot preserve conic orientations or a second position per stop.
+	// Keep these newly parsed forms on the existing unselected fallback path.
+	if (
+		! gradientAST ||
+		gradientAST.type === 'conic-gradient' ||
+		gradientAST.type === 'repeating-conic-gradient' ||
+		gradientAST.colorStops.some( ( stop ) => stop.length2 !== undefined )
+	) {
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
 		hasGradient = false;
 	}
@@ -50,11 +175,25 @@ export function getGradientAstWithDefault( value?: string | null ) {
 		! Array.isArray( gradientAST.orientation ) &&
 		gradientAST.orientation?.type === 'directional'
 	) {
+		const direction =
+			gradientAST.orientation.value.toLowerCase() as keyof typeof DIRECTIONAL_ORIENTATION_ANGLE_MAP;
 		gradientAST.orientation = {
 			type: 'angular',
-			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[
-				gradientAST.orientation.value
-			].toString(),
+			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[ direction ].toString(),
+			unit: 'deg',
+		};
+	}
+
+	if (
+		! Array.isArray( gradientAST.orientation ) &&
+		gradientAST.orientation?.type === 'angular' &&
+		gradientAST.orientation.unit !== 'deg'
+	) {
+		const { value: angle, unit } = gradientAST.orientation;
+		gradientAST.orientation = {
+			type: 'angular',
+			value: `${ Number( angle ) * ANGLE_UNIT_TO_DEGREES[ unit ] }`,
+			unit: 'deg',
 		};
 	}
 
@@ -73,7 +212,7 @@ export function getGradientAstWithDefault( value?: string | null ) {
 }
 
 export function getGradientAstWithControlPoints(
-	gradientAST: gradientParser.GradientNode,
+	gradientAST: GradientAST,
 	newControlPoints: ControlPoint[]
 ) {
 	return {
@@ -92,7 +231,7 @@ export function getGradientAstWithControlPoints(
 						: [ `${ r }`, `${ g }`, `${ b }` ],
 			};
 		} ),
-	} as gradientParser.GradientNode;
+	} as GradientAST;
 }
 
 export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
@@ -111,7 +250,7 @@ export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
 			return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
 		}
 		case 'hsla': {
-			const [ hue, saturation, lightness, alpha ] = colorStop.value;
+			const [ hue, saturation, lightness, alpha = '1' ] = colorStop.value;
 			return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
 		}
 		default:

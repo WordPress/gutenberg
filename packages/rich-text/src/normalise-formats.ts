@@ -1,5 +1,5 @@
 import { isFormatEqual } from './is-format-equal';
-import type { RichTextValue } from './types';
+import type { RichTextContent } from './types';
 
 /**
  * Normalises formats: ensures subsequent adjacent equal formats have the same
@@ -9,7 +9,7 @@ import type { RichTextValue } from './types';
  *
  * @return New value with normalised formats.
  */
-export function normaliseFormats( value: RichTextValue ) {
+export function normaliseFormats< T extends RichTextContent >( value: T ) {
 	const newFormats = value.formats.slice();
 
 	newFormats.forEach( ( formatsAtIndex, index ) => {

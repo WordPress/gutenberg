@@ -3,7 +3,7 @@ import {
 	FlexItem,
 	ToggleControl,
 	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -237,7 +237,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			{ inspectorControls }
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

@@ -33,6 +33,22 @@ export interface ConvertImageOptions {
 }
 
 /**
+ * Options for encoding raw pixels as a JPEG.
+ */
+export interface EncodePixelsOptions {
+	/**
+	 * Desired quality (0-1).
+	 */
+	quality?: number;
+	/**
+	 * Raw bytes of the image file the pixels were decoded from. Its EXIF
+	 * block is copied into the JPEG, with the orientation reset to 1 since
+	 * the pixels are already upright.
+	 */
+	metadataSource?: ArrayBuffer;
+}
+
+/**
  * Options for resizing an image.
  */
 export interface ResizeImageOptions {
@@ -54,6 +70,13 @@ export interface ResizeImageOptions {
 	 * Defaults to 16.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized,
+	 * cropped or not, from the `wp_generate_animated_image_subsizes`
+	 * filter. Defaults to false, which flattens them to the first frame
+	 * like WordPress core.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
@@ -177,6 +200,14 @@ export interface SaveOptions< T extends string > {
 	 * flattening them to 8-bit.
 	 */
 	bitdepth?: number;
+	/**
+	 * Maximum inter-frame error for transparency.
+	 *
+	 * Pixels that differ from the previous frame by less than this are
+	 * rendered as transparent, improving compression at slight quality cost.
+	 * Only used by gifsave; do not provide for any other type!
+	 */
+	interframe_maxerror?: number;
 	/**
 	 * Quantise to an 8bpp palette. Only supported by PNG.
 	 * Do not provide for any other type!
