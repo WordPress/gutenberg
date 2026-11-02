@@ -406,10 +406,20 @@ function nextToken(): Token {
 	const hasAttrs = !! attrsMatch;
 	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
 
-	// A closer can't be void or have attributes, but existing content may
-	// contain one, so it's accepted rather than rejected: a void closer such
-	// as `<!-- /wp:image /-->` is parsed as a void block, and attributes on
-	// a closer that isn't void are ignored.
+	if ( isCloser && ( isVoid || hasAttrs ) ) {
+		// Although the closing flag and void flag are mutually exclusive,
+		// and closing tags should not contain JSON attributes, it's unlikely
+		// that almost-valid block delimiter syntax was accidentally produced.
+		// It's more likely that some code accidentally added the closing flag.
+		//
+		// In these cases, instead of treating the delimiter as non-block HTML
+		// content, the parser shall prefer treating the block delimiter as a
+		// void block if the void flag is present. Otherwise it shall ignore
+		// any attributes that exist on a closing delimiter.
+		//
+		// This particular error-resolution behavior may change in the future.
+	}
+
 	if ( isVoid ) {
 		return [ 'void-block', name, attrs, startedAt, length ];
 	}
