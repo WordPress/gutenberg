@@ -142,7 +142,6 @@ wp.data.select( 'core' ).getLastEntityDeleteError( 'postType', 'page', 9 )
 Here's how we can apply it in `DeletePageButton`:
 
 ```js
-import { useEffect } from 'react';
 const DeletePageButton = ({ pageId }) => {
 	// ...
 	const { error, /* ... */ } = useSelect(
@@ -152,11 +151,10 @@ const DeletePageButton = ({ pageId }) => {
 		} ),
 		[pageId]
 	);
-	useEffect( () => {
-		if ( error ) {
-			// Display the error
-		}
-	}, [error] )
+	
+	if ( error ) {
+	    // Display the error
+	}	
 
 	// ...
 }
@@ -222,7 +220,6 @@ Now we're ready to tell the user about any errors that may have occurred.
 With the SnackbarNotices component in place, we're ready to dispatch some notifications! Here's how:
 
 ```js
-import { useEffect } from 'react';
 import { store as noticesStore } from '@wordpress/notices';
 function DeletePageButton( { pageId } ) {
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
@@ -277,9 +274,10 @@ And that's it!
 All the pieces are in place, great! Here’s all the changes we've made in this chapter:
 
 ```js
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button, Modal, TextControl } from '@wordpress/components';
+import { Button, Modal, TextControl, SnackbarList } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = useState( '' );
