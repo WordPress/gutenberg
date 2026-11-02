@@ -60,6 +60,11 @@ type Expect< A, B > = [ A ] extends [ B ]
 	: never;
 
 /**
+ * Resolves to `true` unless `T` is `any`.
+ */
+type IsNotAny< T > = 0 extends 1 & T ? false : true;
+
+/**
  * A post whose context is not known at compile time: one record per context,
  * leaving only the fields all three serialise readable.
  */
@@ -185,6 +190,37 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'postType', 'wp_template_part' >,
 				WpTemplatePart< 'edit' >
 			>;
+		};
+	} );
+
+	it( 'any taxonomy resolves to a term', () => {
+		( taxonomy: string ) => {
+			true satisfies Expect<
+				EntityRecordOf< 'taxonomy', 'category' >,
+				Term< 'edit' >
+			>;
+
+			// A name only known at runtime, such as a block attribute, still
+			// resolves, because every taxonomy is served as terms.
+			const { records: terms } = useEntityRecords( 'taxonomy', taxonomy, {
+				per_page: -1,
+			} );
+			true satisfies Expect< typeof terms, Term< 'edit' >[] | null >;
+			terms?.[ 0 ].name satisfies string | undefined;
+		};
+	} );
+
+	it( 'a name typed `any` resolves only when the kind has one record type', () => {
+		( name: any ) => {
+			// Every taxonomy is a term, so an `any` name still resolves.
+			const { records: terms } = useEntityRecords( 'taxonomy', name );
+			true satisfies Expect< typeof terms, Term< 'edit' >[] | null >;
+			// `Expect` accepts `any`, so check for it separately.
+			true satisfies IsNotAny< NonNullable< typeof terms >[ number ] >;
+
+			// Post types differ, so an `any` name stays as wide as before.
+			const { records: posts } = useEntityRecords( 'postType', name );
+			false satisfies IsNotAny< NonNullable< typeof posts >[ number ] >;
 		};
 	} );
 
