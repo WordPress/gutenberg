@@ -128,6 +128,7 @@ export function useSuggestionDecisions() {
 		insertBlock,
 		moveBlockToPosition,
 		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent: markLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
@@ -1000,6 +1001,9 @@ export function useSuggestionDecisions() {
 			},
 			message: string
 		) => {
+			// Typing stays one undo level until the next change to the field, so
+			// close it here or undo would take the suggestion back with the decision.
+			markLastChangeAsPersistent();
 			const partners = findGroupPartners( args );
 			const decided = await decideOne( {
 				...args,
@@ -1019,7 +1023,7 @@ export function useSuggestionDecisions() {
 				} );
 			}
 		},
-		[ findGroupPartners, createNotice ]
+		[ findGroupPartners, createNotice, markLastChangeAsPersistent ]
 	);
 
 	const applySuggestion = useCallback(
