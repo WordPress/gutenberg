@@ -9,8 +9,8 @@
 
 ### Enhancements
 
--   Add `opensDialog` for actions whose `callback` opens a dialog. The triggers of these actions and of `RenderModal` actions now have `aria-haspopup="dialog"` ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Replace the close icon that cancels the selection with a "Clear selection" button next to the bulk actions ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Add `opensDialog` for actions whose `callback` opens a dialog. The triggers of these actions and of `RenderModal` actions now have `aria-haspopup="dialog"` ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Replace the close icon that cancels the selection with a "Clear selection" button next to the bulk actions ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
 -   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Omit trailing ellipses from action button labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
@@ -21,12 +21,12 @@
 
 ### Bug Fixes
 
--   Name the action in the labels of selection checkboxes: "Select [title]" ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Announce when selecting items makes bulk actions available and when clearing the selection removes them ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Move focus to the "Select all" checkbox, or the first control of the layout, when the focused control is removed, such as after moving an item to the trash ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Keep the table media out of the tab order and the accessibility tree when the title next to it leads to the same place, and show a focus ring on it otherwise ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Name list items by their title only, not by all of their content ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
--   Set the grid selection checkbox apart from previews of any color ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Name the action in the labels of selection checkboxes: "Select [title]" ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Announce when selecting items makes bulk actions available and when clearing the selection removes them ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Move focus to the "Select all" checkbox, or the first control of the layout, when the focused control is removed, such as after moving an item to the trash ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Keep the table media out of the tab order and the accessibility tree when the title next to it leads to the same place, and show a focus ring on it otherwise ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Name list items by their title only, not by all of their content ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
+-   Set the grid selection checkbox apart from previews of any color ([#86150](https://github.com/WordPress/gutenberg/pull/86150)).
 -   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
