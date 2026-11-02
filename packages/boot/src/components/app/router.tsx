@@ -76,10 +76,10 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 			};
 
 			const [ , loaderData, canvasData, titleData ] = await Promise.all( [
-				resolveSelect( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				),
+				// A failed site-data prefetch must not prevent the route from loading.
+				resolveSelect( coreStore )
+					.getEntityRecord( 'root', '__unstableBase' )
+					.catch( () => undefined ),
 				routeConfig.loader
 					? routeConfig.loader( context )
 					: Promise.resolve( undefined ),
