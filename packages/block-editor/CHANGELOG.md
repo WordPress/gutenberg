@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   In-between inserter: Limit title-gap (`is-before-first-block`) hit-testing to the "+" so the overlay no longer steals clicks on the first block (fixes WebKit shift+click multi-selection inside a Group) ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
