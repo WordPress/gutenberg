@@ -13,7 +13,7 @@
  */
 
 return array(
-	'label'         => __( 'Author', 'gutenberg' ),
+	'label'         => __( 'Author' ),
 	'enableSorting' => false,
 	'filterBy'      => array(
 		'isPrimary' => true,

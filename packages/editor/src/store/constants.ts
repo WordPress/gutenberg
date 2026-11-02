@@ -41,3 +41,9 @@ export const DESIGN_POST_TYPES = [
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 ];
+
+/**
+ * Slot after the message of the autosave failure notice, filled with the
+ * countdown to the next autosave.
+ */
+export const AUTOSAVE_RETRY_SLOT = Symbol( 'AutosaveRetry' );
