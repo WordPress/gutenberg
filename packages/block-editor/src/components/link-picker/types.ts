@@ -45,11 +45,6 @@ export interface LinkPickerProps {
 	label?: string;
 	help?: string;
 	/**
-	 * Whether to search for suggestions as the user types. Turn it off to
-	 * only accept a URL.
-	 */
-	showSuggestions?: boolean;
-	/**
 	 * Changes the suggestions before they are shown, including the ones shown
 	 * before anything is typed.
 	 */

@@ -22,7 +22,6 @@ import type { LinkPickerProps } from './types';
  * @param props.suggestionsQuery     - Query parameters for suggestions
  * @param props.label                - Label for the control
  * @param props.help                 - Help text for the control
- * @param props.showSuggestions      - Whether to search for suggestions, or only accept a URL
  * @param props.transformSuggestions - Changes the suggestions before they are shown
  */
 export function LinkPicker( {
@@ -31,7 +30,6 @@ export function LinkPicker( {
 	suggestionsQuery,
 	label,
 	help,
-	showSuggestions = true,
 	transformSuggestions,
 }: LinkPickerProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -112,13 +110,7 @@ export function LinkPicker( {
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }
 							transformSuggestions={ transformSuggestions }
-							showSuggestions={ showSuggestions }
-							showInitialSuggestions={ showSuggestions }
-							searchInputPlaceholder={
-								showSuggestions
-									? undefined
-									: __( 'Paste or type URL' )
-							}
+							showInitialSuggestions
 							forceIsEditingLink
 							settings={ [] }
 						/>
