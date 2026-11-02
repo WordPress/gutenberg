@@ -61,7 +61,7 @@ const singleSelectCallback = vi.fn();
 const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
-		label: 'Confirm',
+		label: 'Confirm…',
 		supportsBulk: false,
 		isPrimary: true,
 		callback: singleSelectCallback,
@@ -406,7 +406,7 @@ describe( 'DataViews Picker', () => {
 				const actions: ActionButton< Data >[] = [
 					{
 						id: 'confirm',
-						label: ( items ) => `Confirm ${ items.length }`,
+						label: ( items ) => `Confirm ${ items.length }…`,
 						supportsBulk: true,
 						isPrimary: true,
 						isEligible: ( item ) => item.id !== 1,

@@ -11,7 +11,6 @@ import {
 import {
 	Button,
 	ComboboxControl,
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -25,6 +24,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
+import { SelectControl } from '@wordpress/ui';
 import { recreateWithRecommendedBlocks } from './utils';
 import {
 	useDefaultAvatar,
@@ -255,16 +255,28 @@ function PostAuthorEdit( {
 								setAttributes( { avatarSize: 48 } )
 							}
 						>
-							<WCSelectControl
-								label={ __( 'Avatar size' ) }
-								value={ avatarSize }
-								options={ avatarSizes }
-								onChange={ ( size ) => {
-									setAttributes( {
-										avatarSize: Number( size ),
-									} );
-								} }
-							/>
+							{ avatarSizes.length > 0 && (
+								<SelectControl
+									label={ __( 'Avatar size' ) }
+									value={
+										avatarSizes.find(
+											( item ) =>
+												item.value ===
+												String( avatarSize )
+										) ?? avatarSizes[ 0 ]
+									}
+									items={ avatarSizes }
+									onValueChange={ ( item ) => {
+										if ( item ) {
+											setAttributes( {
+												avatarSize: Number(
+													item.value
+												),
+											} );
+										}
+									} }
+								/>
+							) }
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem
