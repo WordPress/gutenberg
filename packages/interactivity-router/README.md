@@ -90,14 +90,19 @@ Example:
 </div>
 ```
 
-The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay.
+Navigation ignores a router region inside the [inert content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) of a [`data-wp-html`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-html) element, whether that's the server-rendered fallback or HTML the directive inserted, as if the region had no `data-wp-router-region` attribute. `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence. See [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide.
+
+The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay. The router uses the first element on the current page that matches the selector, skipping any element with [inert `data-wp-html` content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) and anything inside that content.
 
 When navigating between pages:
 
-- If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
+- If a region exists on both the current and the new page, its content is updated, and `attachTo` doesn't move it. If the new page's `attachTo` has no usable element, though, the region shows nothing, as if the new page didn't have it.
 - If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
 - If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+- If the new page's `attachTo` has no usable element, the region isn't attached, and the rest of the navigation completes as if the new page didn't have the region: the other regions update, the title and URL change, and no error is thrown. There's no usable element when the selector matches nothing, when every match has inert `data-wp-html` content or is inside it, or when the selector isn't valid. The router resolves `attachTo` every time it renders the page, including on Back and Forward, so a later render can still attach the region.
 - If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+
+The router ignores `attachTo` for a region that the initial page declared with `attachTo`: on every later page, that region behaves as a regular router region.
 
 Example with `attachTo`:
 

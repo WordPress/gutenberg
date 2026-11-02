@@ -2,7 +2,13 @@ name: Unit Tests
 
 on:
     pull_request:
-    push:
+    # Running on pushes to the release branches leads Zizmor to treat this as a release workflow, and so
+    # to report every cache that its jobs restore as open to cache poisoning: an attacker who can write
+    # a cache entry on trunk could have it restored here. That only matters for a workflow that publishes
+    # what it builds, and nothing built here is published; the jobs only report test and lint results,
+    # and the build-assets artifact is only used by this workflow's own jobs. If that changes, remove
+    # this ignore and avoid restoring caches in the jobs that publish.
+    push: # zizmor: ignore[cache-poisoning] Nothing built in this workflow is published; see above.
         branches:
             - trunk
             - 'release/[0-9]+.[0-9]'
@@ -378,7 +384,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
@@ -486,7 +492,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
@@ -500,6 +506,115 @@ jobs:
             - name: Show PHPCS results in PR
               if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
               run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    phpstan:
+        name: PHP static analysis
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes, build-assets]
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # The PHP versions to analyze for are set by `phpVersion` in tools/phpstan/base.neon,
+            # so the version PHPStan runs on does not affect the results.
+            - name: Set up PHP
+              uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+              with:
+                  php-version: '8.4'
+                  coverage: none
+
+            # This date is used to ensure that the Composer cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            # The build generates the PHP files that define the gutenberg_* functions and *_Gutenberg
+            # classes that lib/ calls, which PHPStan scans.
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: build-assets
+                  path: build
+
+            # The WordPress stubs are not committed, and generating them from the core commit that
+            # tools/phpstan/wordpress-stubs/composer.json records takes a while, so they are cached by
+            # that file and the script that generates them. The script generates them again when the
+            # cached ones were generated from another source. As with the result cache, only runs on
+            # trunk save a cache.
+            - name: Restore the WordPress stubs
+              id: restore-wordpress-stubs
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: tools/phpstan/wordpress-stubs/wordpress-stubs.stub
+                  key: ${{ runner.os }}-wordpress-stubs-${{ hashFiles('tools/phpstan/wordpress-stubs/composer.json', 'tools/phpstan/generate-wordpress-stubs.php') }}
+
+            - name: Generate the WordPress stubs
+              run: composer phpstan:generate-wordpress-stubs
+
+            - name: Save the WordPress stubs
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' && steps.restore-wordpress-stubs.outputs.cache-hit != 'true' }}
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: tools/phpstan/wordpress-stubs/wordpress-stubs.stub
+                  key: ${{ steps.restore-wordpress-stubs.outputs.cache-primary-key }}
+
+            # Restores the latest cache saved on trunk for the same configuration and dependencies.
+            # PHPStan invalidates the parts of the cache that the changed files affect. The baseline is
+            # left out of the key, since it only filters the errors and does not change the analysis,
+            # so a change to it can reuse the cache.
+            - name: Restore PHPStan result cache
+              id: restore-phpstan-cache
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon') }}-${{ github.run_id }}
+                  restore-keys: |
+                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon') }}-
+
+            # The report is written to a file for the next step. PHPStan exits with 1 when it reports
+            # errors, which that step handles; anything higher means the analysis did not finish.
+            - name: Run PHPStan
+              run: |
+                  status=0
+                  composer phpstan -- --error-format=json --no-progress > "${RUNNER_TEMP}/phpstan-report.json" || status=$?
+                  if [ "${status}" -gt 1 ]; then
+                      echo "::error title=PHPStan did not complete::The analysis exited with status ${status}, so the code was not fully checked."
+                      exit "${status}"
+                  fi
+
+            # Only runs on trunk save a cache. One saved for a pull request could only be restored by
+            # that pull request, so it would mostly use up the repository's cache storage, and push
+            # out the caches that every run restores.
+            - name: Save PHPStan result cache
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan
+                  key: ${{ steps.restore-phpstan-cache.outputs.cache-primary-key }}
+
+            # Annotates the errors and lists all of them in the job summary, including those on lines
+            # the pull request did not change and those with no line, such as an out-of-date baseline.
+            - name: Report the PHPStan results
+              run: node .github/workflows/scripts/phpstan-report.js "${RUNNER_TEMP}/phpstan-report.json"
 
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
@@ -531,6 +646,7 @@ jobs:
                 unit-js-date,
                 test-php,
                 phpcs,
+                phpstan,
             ]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
