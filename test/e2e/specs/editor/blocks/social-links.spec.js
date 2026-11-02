@@ -46,27 +46,45 @@ test.describe( 'Social Icons', () => {
 		).toHaveAttribute( 'aria-selected', 'true' );
 		const textInput = settings.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
-		const linkButton = settings.getByRole( 'button', {
-			name: /^Link to:/,
-		} );
-		await expect( linkButton ).toHaveText( /wordpress\.org/ );
+		const urlInput = settings.getByRole( 'combobox', { name: 'Link to' } );
+		await expect( urlInput ).toHaveValue( 'https://wordpress.org/' );
 		await expect(
 			settings.getByRole( 'link', { name: 'View' } )
 		).toHaveAttribute( 'href', 'https://wordpress.org/' );
 
-		// The link is typed, not searched for.
-		await linkButton.click();
-		const urlInput = page.getByRole( 'combobox', {
-			name: 'Paste or type URL',
-		} );
-		await expect( urlInput ).toBeFocused();
-		await page.keyboard.type( 'wordpress.org/news' );
+		// An invalid link shows an error once the field is left, but is kept.
+		await urlInput.fill( 'df' );
+		await page.keyboard.press( 'Tab' );
 		await expect(
-			page.getByRole( 'listbox', { name: 'Search results' } )
+			settings.getByText( 'Please enter a valid URL.' )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
 		).toBeHidden();
-		await page.keyboard.press( 'Enter' );
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes.url
+			)
+			.toBe( 'df' );
 
-		await expect( linkButton ).toHaveText( /wordpress\.org\/news/ );
+		// An email address is valid, and View opens it as the front end does.
+		await urlInput.fill( 'me@example.com' );
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			settings.getByText( 'Please enter a valid URL.' )
+		).toBeHidden();
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'mailto:me@example.com' );
+
+		// A link without a protocol opens over HTTPS, as on the front end.
+		await urlInput.fill( 'wordpress.org/news' );
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			settings.getByText( 'Please enter a valid URL.' )
+		).toBeHidden();
 		await expect(
 			settings.getByRole( 'link', { name: 'View' } )
 		).toHaveAttribute( 'href', 'https://wordpress.org/news' );
@@ -81,7 +99,7 @@ test.describe( 'Social Icons', () => {
 						name: 'core/social-link',
 						attributes: {
 							service: 'wordpress',
-							url: 'https://wordpress.org/news',
+							url: 'wordpress.org/news',
 							label: 'WP',
 						},
 					},
@@ -139,5 +157,55 @@ test.describe( 'Social Icons', () => {
 		const [ socialLink ] = ( await editor.getBlocks() )[ 0 ].innerBlocks;
 		expect( socialLink.attributes.url ).toBeUndefined();
 		expect( await editor.getEditedPostContent() ).not.toContain( '"url"' );
+	} );
+
+	test( 'shows an error for an invalid link in the canvas popover', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/social-links',
+			innerBlocks: [
+				{
+					name: 'core/social-link',
+					attributes: { service: 'wordpress' },
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'button', { name: 'WordPress' } )
+			.click();
+
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Enter social link',
+		} );
+		await expect( urlInput ).toBeFocused();
+
+		// An invalid link keeps the popover open with an error, but is kept.
+		await page.keyboard.type( 'df' );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByText( 'Please enter a valid URL.' )
+		).toBeVisible();
+		await expect( urlInput ).toBeVisible();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes.url
+			)
+			.toBe( 'df' );
+
+		// A valid link closes it.
+		await urlInput.fill( 'wordpress.org' );
+		await page.keyboard.press( 'Enter' );
+		await expect( urlInput ).toBeHidden();
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].innerBlocks[ 0 ]
+						.attributes.url
+			)
+			.toBe( 'wordpress.org' );
 	} );
 } );

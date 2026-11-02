@@ -9,9 +9,13 @@ import {
 	useBlockEditingMode,
 	useBlockProps,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import {
+	flushSync,
+	useState,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	Icon as WCIcon,
 	Button,
@@ -27,13 +31,65 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
+import { isEmail, prependHTTPS } from '@wordpress/url';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import ViewLinkButton from '../utils/view-link-button';
-import { useLinkPreview } from '../utils/link-picker';
-import { unlock } from '../lock-unlock';
+import isValidLink from './is-valid-link';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const INVALID_LINK = {
+	type: 'invalid',
+	message: __( 'Please enter a valid URL.' ),
+};
+
+/**
+ * Shows an error for an invalid Social Icon link once it is checked, without
+ * rejecting the link. The error is only set when the link is checked, on blur
+ * or submit, because `URLInput` remounts its input the first time it is given
+ * a validity, which would otherwise interrupt typing.
+ *
+ * @param {string} url The link.
+ * @return {Object} The `URLInput` props, and `validate`, which checks the link
+ *                  and returns whether it is valid.
+ */
+function useLinkValidity( url ) {
+	const [ customValidity, setCustomValidity ] = useState();
+	const inputRef = useRef();
+
+	// Clear the error as soon as the link is valid again.
+	if ( customValidity && isValidLink( url ) ) {
+		setCustomValidity( undefined );
+	}
+
+	const validate = () => {
+		if ( isValidLink( url ) ) {
+			return true;
+		}
+		// Render the validated input before revealing its error.
+		flushSync( () => setCustomValidity( INVALID_LINK ) );
+		// A synthetic `invalid` event shows the error without moving focus.
+		inputRef.current?.dispatchEvent( new window.Event( 'invalid' ) );
+		return false;
+	};
+
+	return { customValidity, inputRef, validate };
+}
+
+/**
+ * Returns the link the front end renders for a valid Social Icon link: an
+ * email address becomes a `mailto:` link, and a link without a protocol uses
+ * HTTPS.
+ *
+ * @param {string} url The link.
+ * @return {string|undefined} The rendered link.
+ */
+const getRenderedLink = ( url ) => {
+	// There is nothing to view for a link that isn't valid.
+	if ( ! url || ! isValidLink( url ) ) {
+		return undefined;
+	}
+	return isEmail( url ) ? `mailto:${ url }` : prependHTTPS( url );
+};
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -43,6 +99,7 @@ const SocialLinkURLPopover = ( {
 	clientId,
 } ) => {
 	const { removeBlock } = useDispatch( blockEditorStore );
+	const { customValidity, inputRef, validate } = useLinkValidity( url );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
@@ -56,6 +113,10 @@ const SocialLinkURLPopover = ( {
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
+					// Keep the popover open to show the error. The link is kept.
+					if ( ! validate() ) {
+						return;
+					}
 					setPopover( false );
 					popoverAnchor?.focus();
 				} }
@@ -70,6 +131,8 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
+						inputRef={ inputRef }
+						customValidity={ customValidity }
 						onKeyDown={ ( event ) => {
 							if (
 								!! url ||
@@ -117,7 +180,11 @@ const SocialLinkEdit = ( {
 		iconBackgroundColorValue,
 	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const linkPreview = useLinkPreview( { url } );
+	const {
+		customValidity: linkValidity,
+		inputRef: linkInputRef,
+		validate: validateLink,
+	} = useLinkValidity( url );
 	const wrapperClasses = clsx(
 		'wp-social-link',
 		// Manually adding this class for backwards compatibility of CSS when moving the
@@ -238,17 +305,24 @@ const SocialLinkEdit = ( {
 							setAttributes( { url: undefined } );
 						} }
 					>
-						<LinkPicker
-							preview={ linkPreview }
-							onSelect={ ( { url: newUrl } ) =>
-								setAttributes( { url: newUrl || undefined } )
-							}
-							label={ __( 'Link to' ) }
-							// A social profile is outside the site, so there are no pages to suggest.
-							allowSearch={ false }
-						/>
+						<div onBlur={ validateLink }>
+							<URLInput
+								className="wp-block-social-link__url-input"
+								label={ __( 'Link to' ) }
+								placeholder={ __( 'Enter social link' ) }
+								value={ url || '' }
+								onChange={ ( value ) =>
+									setAttributes( { url: value || undefined } )
+								}
+								disableSuggestions
+								isFullWidth
+								required={ false }
+								inputRef={ linkInputRef }
+								customValidity={ linkValidity }
+							/>
+						</div>
 					</ToolsPanelItem>
-					<ViewLinkButton url={ url } />
+					<ViewLinkButton url={ getRenderedLink( url ) } />
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">

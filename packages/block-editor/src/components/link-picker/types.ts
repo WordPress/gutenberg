@@ -43,11 +43,6 @@ export interface LinkPickerProps {
 	suggestionsQuery?: LinkSuggestionsQuery;
 	label?: string;
 	help?: string;
-	/**
-	 * Whether to search for links as the user types. Turn it off to only
-	 * accept a typed URL.
-	 */
-	allowSearch?: boolean;
 }
 
 /**
