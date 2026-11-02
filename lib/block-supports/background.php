@@ -74,18 +74,18 @@ function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 		return array();
 	}
 
-	$classes_and_styles = array();
+	$attributes = array();
 
 	$has_background = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
 
 	// A text clip paints the glyphs, not the box, so there is no block background.
 	if ( $has_background && 'text' !== $background_styles['backgroundClip'] ) {
-		$classes_and_styles['class'] = 'has-background';
+		$attributes['class'] = 'has-background';
 	}
 
-	$classes_and_styles['style'] = $styles['css'];
+	$attributes['style'] = $styles['css'];
 
-	return $classes_and_styles;
+	return $attributes;
 }
 
 /**

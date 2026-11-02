@@ -408,8 +408,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that the background helper returns classes and styles for block attributes.
-	 *
 	 * @covers ::gutenberg_get_background_classes_and_styles
 	 *
 	 * @dataProvider data_get_background_classes_and_styles
@@ -422,9 +420,9 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for the background helper.
+	 * Data provider.
 	 *
-	 * @return array[]
+	 * @return array
 	 */
 	public function data_get_background_classes_and_styles() {
 		return array(
