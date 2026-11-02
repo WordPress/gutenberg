@@ -9,8 +9,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import MoreMenuItem from '../more-menu/more-menu-item';
 import { toMenuItems } from '../more-menu/more-menu-submenu';

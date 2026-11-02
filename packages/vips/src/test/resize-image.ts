@@ -486,6 +486,36 @@ describe( 'resizeImage', () => {
 			);
 		} );
 
+		it( 'keeps an animation the 1 GiB heap budget flattened', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			// 150 frames of 1200x900 need ~650 MB, over the old ~0.5 GiB budget.
+			mockState.width = 1200;
+			mockState.pageHeight = 900;
+			mockState.height = 900 * 150;
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+				option_string: '[n=-1]',
+			} );
+		} );
+
 		it( 'falls back to the first frame when the animation exceeds the memory budget', async () => {
 			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
 				lastModified: 1234567891,
@@ -494,14 +524,14 @@ describe( 'resizeImage', () => {
 			const buffer = await gifFile.arrayBuffer();
 
 			/*
-			 * A 1200x900 GIF is only ~4 MB decoded as a single frame, but 150
-			 * frames of it need ~650 MB, which does not fit the 1 GiB WASM
-			 * heap. Such an animation must flatten rather than abort the
-			 * upload.
+			 * A 1200x900 GIF is only ~4 MB decoded as a single frame, but 250
+			 * frames of it need ~1.1 GB, which does not fit the animation
+			 * memory budget. Such an animation must flatten rather than abort
+			 * the upload.
 			 */
 			mockState.width = 1200;
 			mockState.pageHeight = 900;
-			mockState.height = 900 * 150;
+			mockState.height = 900 * 250;
 
 			await resizeImage(
 				'itemId',
@@ -530,7 +560,7 @@ describe( 'resizeImage', () => {
 			 * budget it was measured against.
 			 */
 			expect( console ).toHaveWarnedWith(
-				expect.stringContaining( '150 frames' )
+				expect.stringContaining( '250 frames' )
 			);
 		} );
 

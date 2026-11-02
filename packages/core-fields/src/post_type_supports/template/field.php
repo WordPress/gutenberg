@@ -13,7 +13,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Template', 'gutenberg' ),
+	'label'         => __( 'Template' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 );

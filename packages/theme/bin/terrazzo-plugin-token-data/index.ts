@@ -19,6 +19,7 @@ interface TokenMetadata {
 }
 
 interface TokenGroup {
+	$description?: string;
 	tokens: string[];
 	groups: Record< string, TokenGroup >;
 }
@@ -84,6 +85,10 @@ export default function pluginTokenData( {
 						groups: {},
 					};
 					currentGroup = currentGroup.groups[ segment ];
+				}
+				const groupDescription = token.token.group?.$description;
+				if ( groupDescription && path.length > 1 ) {
+					currentGroup.$description = groupDescription;
 				}
 				currentGroup.tokens.push( token.localID );
 			}

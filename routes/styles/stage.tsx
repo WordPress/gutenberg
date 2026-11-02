@@ -1,6 +1,5 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {

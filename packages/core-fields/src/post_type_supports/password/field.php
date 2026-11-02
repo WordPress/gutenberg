@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Password', 'gutenberg' ),
+	'label'         => __( 'Password' ),
 	'enableSorting' => false,
 	'enableHiding'  => false,
 	'filterBy'      => false,

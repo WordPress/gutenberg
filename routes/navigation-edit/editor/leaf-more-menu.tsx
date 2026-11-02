@@ -2,7 +2,6 @@ import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 
@@ -29,7 +28,8 @@ export default function LeafMoreMenu( {
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		BlockTitle( { clientId, maximumLength: 25 } )
+		// The menu is for an existing block, which has a title.
+		BlockTitle( { clientId, maximumLength: 25 } ) as string
 	);
 
 	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
@@ -58,8 +58,12 @@ export default function LeafMoreMenu( {
 				return {
 					rootClientId: _rootClientId,
 					canDuplicate:
-						hasBlockSupport( _blockName, 'multiple', true ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
+						// The menu is for an existing block, which has a name.
+						hasBlockSupport(
+							_blockName as string,
+							'multiple',
+							true
+						) && canInsertBlockType( _blockName, _rootClientId ),
 					canInsertBlock:
 						( canInsertDefaultBlock || !! directInsertBlock ) &&
 						canInsertBlockType( _blockName, _rootClientId ),
