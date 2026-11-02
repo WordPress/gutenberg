@@ -68,6 +68,10 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
  * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_shadow_classes_and_styles( $block_attributes ) {
+	if ( ! is_array( $block_attributes ) ) {
+		return array();
+	}
+
 	$shadow = $block_attributes['style']['shadow'] ?? null;
 
 	$attributes = array();
