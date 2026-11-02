@@ -60,6 +60,7 @@ To add a new icon to the library, follow these steps:
      - `core`: the public collection. Its icons are exposed through the SVG Icons API, which makes them selectable in the Icon block.
      - `core-admin`: the collection the WordPress admin interface renders from. It is not public, so its icons are never exposed through the REST API or selectable in the Icon block, and unregistering `core` cannot take them away from the admin interface.
    - `keywords` (optional): An array of additional translatable search terms for the icon (e.g. `[ "hamburger", "navigation" ]` for a Menu icon).
+   - `dashicons` (optional): An array of the Dashicon class names the icon replaces in the admin interface, with the closest match first (e.g. `[ "dashicons-edit", "dashicons-edit-large" ]` for the Pencil icon). Only icons in the `core-admin` collection may set it, and each Dashicon is replaced by at most one icon.
 4. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
 After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.

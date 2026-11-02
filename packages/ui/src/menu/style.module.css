@@ -206,6 +206,11 @@
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
+				&[data-highlighted] {
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+					--_gcd-a-outline: var(--_gcd-div-outline);
+				}
+
 				@media ( forced-colors: active ) {
 					--_gcd-a-color: GrayText;
 
