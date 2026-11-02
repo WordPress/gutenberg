@@ -11586,16 +11586,6 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/commands/commands.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/widget-dashboard/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/widgets/src/blocks/legacy-widget/edit/convert-to-blocks-button.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

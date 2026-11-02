@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `useCommandContext` React hook for setting the active Command Palette context ([#86118](https://github.com/WordPress/gutenberg/pull/86118)).
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes

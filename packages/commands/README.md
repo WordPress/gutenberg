@@ -146,6 +146,25 @@ _Parameters_
 
 - _command_ `CommandConfig`: command config.
 
+### useCommandContext
+
+Sets the active context of the command palette.
+
+_Usage_
+
+```js
+import { useCommandContext } from '@wordpress/commands';
+
+function MyComponent() {
+	useCommandContext( 'entity-edit' );
+	return <div>...</div>;
+}
+```
+
+_Parameters_
+
+- _context_ `string`: Context to set.
+
 ### useCommandLoader
 
 Attach a command loader to the command palette. Used for dynamic commands.
