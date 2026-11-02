@@ -27,9 +27,11 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+  - `blockGap`: `{"__experimentalDefault":"1.25em"}`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
