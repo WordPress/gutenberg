@@ -1,6 +1,11 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
+.block-editor-background-clip-control__option {
+	display: flex;
+	align-items: center;
+}
+
 // Swatch: the fill is the background, the dashed edge the border.
 .block-editor-background-clip-control__option::before {
 	content: "";

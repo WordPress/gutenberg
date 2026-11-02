@@ -66,10 +66,13 @@ export default function BackgroundClipControl( {
 					key={ item.value }
 					value={ item }
 					label={ item.label }
-					className={ `block-editor-background-clip-control__option is-${ item.value }` }
 				>
 					<SelectControl.ItemLabel>
-						{ item.label }
+						<span
+							className={ `block-editor-background-clip-control__option is-${ item.value }` }
+						>
+							{ item.label }
+						</span>
 					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ) }
