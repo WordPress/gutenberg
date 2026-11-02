@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Real-time collaboration: Re-parse blocks of persisted CRDT documents when unregistered blocks are present, so a block does not stay missing after its plugin is reactivated ([#77796](https://github.com/WordPress/gutenberg/issues/77796)).
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
