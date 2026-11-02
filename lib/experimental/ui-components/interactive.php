@@ -37,7 +37,7 @@ function gutenberg_ui_components_wrap_interactive( $component, $props, $html ) {
 
 	return sprintf(
 		'<wp-ui-interactive style="display:contents" data-interactive="%s">%s</wp-ui-interactive>',
-		esc_attr(
+		gutenberg_ui_components_esc_plain_text(
 			wp_json_encode(
 				array(
 					'component' => $component['interactive']['component'],

@@ -44,7 +44,7 @@ function gutenberg_ui_render_switch_control( $props, $classes, $content, $parts 
 			'</div>' .
 			'<label id="%6$s-label" for="%6$s-field" class="%13$s">%14$s</label>' .
 		'</div>',
-		esc_attr( implode( ' ', $classes ) ),
+		gutenberg_ui_components_esc_plain_text( implode( ' ', $classes ) ),
 		esc_attr( implode( ' ', $parts['wrapper'] ) ),
 		$state,
 		$props['disabled'] ? '-1' : '0',
@@ -54,9 +54,9 @@ function gutenberg_ui_render_switch_control( $props, $classes, $content, $parts 
 		esc_attr( implode( ' ', $parts['switch'] ) ),
 		esc_attr( implode( ' ', $parts['thumb'] ) ),
 		$props['disabled'] ? ' disabled=""' : '',
-		esc_attr( $props['name'] ),
+		gutenberg_ui_components_esc_plain_text( $props['name'] ),
 		$props['checked'] ? ' checked=""' : '',
 		esc_attr( implode( ' ', $parts['label'] ) ),
-		esc_html( $props['label'] )
+		gutenberg_ui_components_esc_plain_text( $props['label'] )
 	);
 }

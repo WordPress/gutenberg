@@ -31,19 +31,19 @@ function gutenberg_ui_render_searchable_select_control( $props ) {
 	foreach ( $props['items'] as $item ) {
 		$options .= sprintf(
 			'<option value="%s"%s%s>%s</option>',
-			esc_attr( $item['value'] ),
+			gutenberg_ui_components_esc_plain_text( $item['value'] ),
 			selected( $props['value'], $item['value'], false ),
 			disabled( ! empty( $item['disabled'] ), true, false ),
-			esc_html( $item['label'] )
+			gutenberg_ui_components_esc_plain_text( $item['label'] )
 		);
 	}
 
 	return sprintf(
 		'<span class="wp-ui-fallback"><label for="%1$s">%2$s</label><select id="%1$s" name="%3$s"%4$s>%5$s</select></span>',
 		esc_attr( $id ),
-		esc_html( $props['label'] ),
-		esc_attr( $props['name'] ),
-		'' !== $props['class'] ? ' class="' . esc_attr( $props['class'] ) . '"' : '',
+		gutenberg_ui_components_esc_plain_text( $props['label'] ),
+		gutenberg_ui_components_esc_plain_text( $props['name'] ),
+		'' !== $props['class'] ? ' class="' . gutenberg_ui_components_esc_plain_text( $props['class'] ) . '"' : '',
 		$options
 	);
 }

@@ -66,6 +66,67 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '" onclick="', $html );
 	}
 
+	/**
+	 * Entities in props and content are plain text, as in React: named, numeric
+	 * or not, they show as written instead of being read as entities.
+	 */
+	public function test_keeps_entities_in_text_and_attributes_literal() {
+		$processor = new WP_HTML_Tag_Processor(
+			gutenberg_get_ui_component(
+				'button',
+				array( 'class' => 'is-&amp;' ),
+				'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;'
+			)
+		);
+
+		$processor->next_tag( 'button' );
+		$this->assertContains( 'is-&amp;', explode( ' ', $processor->get_attribute( 'class' ) ) );
+
+		$processor->next_token();
+		$this->assertSame( 'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;', $processor->get_modifiable_text() );
+	}
+
+	/**
+	 * What PHP prints and the props React mounts with both keep entities
+	 * literal, so the text doesn't change when React takes over.
+	 */
+	public function test_keeps_entities_literal_in_a_native_fallback_and_react_props() {
+		$processor = new WP_HTML_Tag_Processor(
+			gutenberg_get_ui_component(
+				'searchable-select-control',
+				array(
+					'label' => 'A &amp; B',
+					'name'  => 'a&amp;b',
+					'class' => 'is-&amp;',
+					'items' => array(
+						array(
+							'value' => 'c&amp;d',
+							'label' => 'C &amp; D',
+						),
+					),
+				)
+			)
+		);
+
+		$processor->next_tag( 'wp-ui-interactive' );
+		$interactive = json_decode( $processor->get_attribute( 'data-interactive' ), true );
+		$this->assertSame( 'A &amp; B', $interactive['props']['label'] );
+		$this->assertSame( 'C &amp; D', $interactive['props']['items'][0]['label'] );
+
+		$processor->next_tag( 'label' );
+		$processor->next_token();
+		$this->assertSame( 'A &amp; B', $processor->get_modifiable_text() );
+
+		$processor->next_tag( 'select' );
+		$this->assertSame( 'a&amp;b', $processor->get_attribute( 'name' ) );
+		$this->assertSame( 'is-&amp;', $processor->get_attribute( 'class' ) );
+
+		$processor->next_tag( 'option' );
+		$this->assertSame( 'c&amp;d', $processor->get_attribute( 'value' ) );
+		$processor->next_token();
+		$this->assertSame( 'C &amp; D', $processor->get_modifiable_text() );
+	}
+
 	public function test_invalid_props_fall_back_to_their_default() {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 

@@ -360,7 +360,20 @@ async function main() {
 			// Every combination, rendered with React. Plus a custom class, and
 			// text that needs escaping, so the tests also check that PHP
 			// escapes it the way React does.
-			const escaped = 'Save & <continue> "now"';
+			const withText = ( text, extraProps = {} ) =>
+				null === exampleContent
+					? {
+							props: {
+								...exampleProps,
+								...extraProps,
+								label: text,
+							},
+							content: null,
+						}
+					: {
+							props: { ...exampleProps, ...extraProps },
+							content: text,
+						};
 			const cases = [
 				...getCombinations( variants ).map( ( values ) => ( {
 					props: { ...exampleProps, ...values },
@@ -370,12 +383,8 @@ async function main() {
 					props: { ...exampleProps, class: 'my-plugin-class' },
 					content: exampleContent,
 				},
-				null === exampleContent
-					? {
-							props: { ...exampleProps, label: escaped },
-							content: null,
-						}
-					: { props: exampleProps, content: escaped },
+				withText( 'Save & <continue> "now"' ),
+				withText( 'A &amp; B &hellip; &#8217;', { class: 'is-&amp;' } ),
 			];
 			for ( const { props: phpProps, content: text } of cases ) {
 				fixtures.push( {
