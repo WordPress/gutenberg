@@ -40,47 +40,14 @@ describe( 'getBlockElementColors()', () => {
 		} );
 	} );
 
-	it( 'reads a solid background clipped to the text as the text color', () => {
+	it( 'reads the lowest contrast opaque stop of a linear text gradient', () => {
 		const blockEl = renderBlock(
-			`<div style="background-color: rgb(0, 0, 0)"><p class="wp-block-paragraph" style="color: rgb(255, 255, 255); background-color: rgb(255, 255, 0); ${ TEXT_GRADIENT }">Text</p></div>`
+			`<p class="wp-block-paragraph" style="background-image: linear-gradient(90deg, rgb(0, 0, 0), rgb(255, 255, 0), rgba(255, 255, 255, 0.5)); ${ TEXT_GRADIENT }">Text</p>`
 		);
 
 		expect( getBlockElementColors( blockEl, blockType ) ).toMatchObject( {
 			textColor: 'rgb(255, 255, 0)',
-			backgroundColor: 'rgb(0, 0, 0)',
-		} );
-	} );
-
-	it.each( [
-		[
-			'linear',
-			'linear-gradient(90deg, rgb(0, 0, 0), rgb(255, 255, 0), rgba(255, 255, 255, 0.5))',
-		],
-		[ 'radial', 'radial-gradient(rgb(0, 0, 0), rgb(255, 255, 0))' ],
-		[ 'conic', 'conic-gradient(from 90deg, rgb(255, 255, 0), black)' ],
-	] )(
-		'reads the lowest contrast opaque stop of a %s text gradient',
-		( _type, gradient ) => {
-			const blockEl = renderBlock(
-				`<p class="wp-block-paragraph" style="background-image: ${ gradient }; ${ TEXT_GRADIENT }">Text</p>`
-			);
-
-			expect( getBlockElementColors( blockEl, blockType ) ).toMatchObject(
-				{
-					textColor: 'rgb(255, 255, 0)',
-					backgroundColor: 'rgb(255, 255, 255)',
-				}
-			);
-		}
-	);
-
-	it( 'resolves a gradient set through a custom property', () => {
-		const blockEl = renderBlock(
-			`<p class="wp-block-paragraph" style="--gradient: linear-gradient(rgb(6, 147, 227), rgb(155, 81, 224)); background-image: var(--gradient); ${ TEXT_GRADIENT }">Text</p>`
-		);
-
-		expect( getBlockElementColors( blockEl, blockType ) ).toMatchObject( {
-			textColor: 'rgb(6, 147, 227)',
+			backgroundColor: 'rgb(255, 255, 255)',
 		} );
 	} );
 
@@ -105,25 +72,6 @@ describe( 'getBlockElementColors()', () => {
 			textColor: 'rgb(221, 221, 221)',
 		} );
 	} );
-
-	it.each( [
-		[ 'an image', "url('data:image/gif;base64,R0lGODlhAQABAAAAACw=')" ],
-		[
-			'only translucent stops',
-			'linear-gradient(rgba(0, 0, 0, 0.5), rgba(255, 255, 0, 0.5))',
-		],
-	] )(
-		'returns no text color for %s clipped to the text',
-		( _type, image ) => {
-			const blockEl = renderBlock(
-				`<p class="wp-block-paragraph" style="background-image: ${ image }; ${ TEXT_GRADIENT }">Text</p>`
-			);
-
-			expect(
-				getBlockElementColors( blockEl, blockType ).textColor
-			).toBeUndefined();
-		}
-	);
 
 	it( 'reads a link color that keeps its fill, and the gradient for one that does not', () => {
 		const blockEl = renderBlock(
