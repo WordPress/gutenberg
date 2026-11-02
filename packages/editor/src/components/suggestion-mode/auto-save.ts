@@ -56,7 +56,11 @@ import type {
 	BlockTreeReader,
 	PostFieldProposal,
 } from './operations';
-import { readSuggestionMarker, proposedAttributes } from './marker';
+import {
+	authorMarker,
+	proposedAttributes,
+	withMarkerEntryReplaced,
+} from './marker';
 import type { SuggestionMarker } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { getBlockTreeVersion } from './block-tree-version';
@@ -295,11 +299,16 @@ export default function SuggestionAutoSave() {
 		return tracked;
 	}, [] );
 
+	// The current user's suggestion on the block: its marker, or their entry
+	// nested on another author's.
 	const readBlock = useCallback(
 		( clientId: string ) => {
 			const blockEditor: any = registry.select( blockEditorStore );
 			const attributes = blockEditor.getBlockAttributes( clientId );
-			const marker = readSuggestionMarker( attributes );
+			const userId =
+				( registry.select( coreStore ) as any )?.getCurrentUser?.()
+					?.id ?? null;
+			const marker = authorMarker( attributes, userId );
 			return { blockEditor, attributes, marker };
 		},
 		[ registry ]
@@ -317,14 +326,20 @@ export default function SuggestionAutoSave() {
 			}
 			const { commentId: _old, ...rest } = marker;
 			const next = id ? { ...rest, commentId: id } : rest;
+			const metadata = withMarkerEntryReplaced(
+				attributes.metadata,
+				marker,
+				next
+			);
+			if ( ! metadata ) {
+				return;
+			}
 			const dispatch: any = registry.dispatch( blockEditorStore );
 			// Bookkeeping, not an edit: keep it off the undo stack.
 			dispatch.__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
-			dispatch.updateBlockAttributes( clientId, {
-				metadata: { ...attributes.metadata, suggestion: next },
-			} );
+			dispatch.updateBlockAttributes( clientId, { metadata } );
 		},
 		[ registry, readBlock, track ]
 	);
@@ -567,21 +582,24 @@ export default function SuggestionAutoSave() {
 		const seen = new Set< string >();
 		for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
 			[] ) {
-			const marker = readSuggestionMarker(
-				blockEditor.getBlockAttributes( clientId )
-			);
-			if ( ! marker ) {
+			const attributes = blockEditor.getBlockAttributes( clientId );
+			if ( ! attributes?.metadata?.suggestion ) {
 				continue;
 			}
-			// A proposal another user wrote (it reached us through sync) is
-			// theirs to save; saving it here would open a note in our name.
-			// Until the current user resolves, every authored marker waits;
-			// the pass re-runs once it does.
-			if (
-				marker.authorId !== null &&
-				marker.authorId !== undefined &&
-				marker.authorId !== currentUserId
-			) {
+			// A suggestion another user wrote (it reached us through sync)
+			// is theirs to save; saving it here would open a note in our
+			// name. On a block with several authors' suggestions, ours is
+			// the one nested or outer entry we wrote. Until the current user
+			// resolves, every authored marker waits; the pass re-runs once
+			// it does.
+			if ( currentUserId === null ) {
+				const outer = attributes.metadata.suggestion;
+				if ( outer.authorId !== null && outer.authorId !== undefined ) {
+					continue;
+				}
+			}
+			const marker = authorMarker( attributes, currentUserId );
+			if ( ! marker ) {
 				continue;
 			}
 			seen.add( clientId );

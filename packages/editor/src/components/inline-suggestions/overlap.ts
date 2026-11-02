@@ -1,20 +1,17 @@
 /**
  * Which gestures may land on text that already carries a suggestion marker.
  *
- * Each marker kind is its own rich-text format, so markers of different kinds
- * can share characters without re-attributing each other. That makes most
- * cross-kind overlaps by another author expressible:
+ * Markers stack: each kind is its own rich-text format, and a character may
+ * carry several markers of one kind, one per suggestion. So almost any
+ * gesture by another author is expressible, as Google Docs allows it:
  *
- * - a deletion or formatting change inside someone's addition (a child that
- *   resolves on its own, and goes away if the addition is rejected);
- * - a deletion spanning someone's addition and plain text;
- * - a deletion over someone's formatting change, and the reverse.
- *
- * Same-kind overlap still cannot be expressed (rich text keeps one marker of a
- * kind per character), and neither can a formatting change that crosses the
- * edge of someone's addition: its original run would capture proposed text.
- * Those are refused, naming the marker in the way so the refusal can say whose
- * suggestion it is.
+ * - text typed inside someone's addition nests in it, and text typed inside
+ *   someone's deletion sits between its two halves;
+ * - a deletion inside or across someone's addition nests in it, and one over
+ *   someone's deletion adds a second deletion of the same words;
+ * - a deletion over someone's formatting change, and the reverse;
+ * - a formatting change inside or across someone's addition, and one on
+ *   someone's formatting change, which stacks as a second delta.
  *
  * Gestures over the editing author's own add and del markers are handled
  * before this is asked (growing, revising or deleting across their own
@@ -24,20 +21,17 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_ID_ATTRIBUTE,
 	suggestionKindOf,
-	suggestionMarkersAt,
 	suggestionMarkersIn,
 } from './format';
 import type { SuggestionMarkerKind } from './format';
 
 export type OverlapGesture = 'insert' | 'delete' | 'format' | 'type-over';
 
-export type OverlapReason =
-	| 'add-in-add'
-	| 'insert-in-del'
-	| 'del-over-del'
-	| 'format-on-format'
-	| 'format-straddles-add'
-	| 'own-marker';
+/**
+ * Why a gesture was declined: it reached the author's own addition or
+ * deletion, which the own-marker paths handle before asking.
+ */
+export type OverlapReason = 'own-marker';
 
 export interface OverlapBlocking {
 	/** Note id the blocking marker carries. */
@@ -79,15 +73,10 @@ function isOwn( marker: any, authorToken: string | null ) {
 	);
 }
 
-function idOf( marker: any ) {
-	return String( marker?.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] );
-}
-
 /**
  * Classify a gesture against the markers it would land on.
  *
- * - `insert` is a collapsed caret at `start`; it is inside a marker when the
- *   characters on both sides carry it.
+ * - `insert` is a collapsed caret at `start`; it is always allowed.
  * - `delete`, `format` and `type-over` act on `[start, end)`.
  *
  * @param formats             Per-character format stacks.
@@ -117,80 +106,39 @@ export function classifyOverlap(
 		return ALLOW;
 	}
 
+	/*
+	 * Text entered at a caret nests in any addition around it and sits
+	 * between the halves of any deletion around it.
+	 */
 	if ( gesture === 'insert' ) {
-		if ( start <= 0 || start >= formats.length ) {
-			return ALLOW;
-		}
-		const left = suggestionMarkersAt( formats[ start - 1 ] );
-		const right = suggestionMarkersAt( formats[ start ] );
-		const inside = ( kind: SuggestionMarkerKind ) =>
-			left[ kind ] &&
-			right[ kind ] &&
-			idOf( left[ kind ] ) === idOf( right[ kind ] )
-				? left[ kind ]
-				: null;
-		const addition = inside( 'add' );
-		if ( addition && ! isOwn( addition, authorToken ) ) {
-			return refuse( 'add-in-add', addition );
-		}
-		const deletion = inside( 'del' );
-		if ( deletion && ! isOwn( deletion, authorToken ) ) {
-			return refuse( 'insert-in-del', deletion );
-		}
+		return ALLOW;
+	}
+
+	/*
+	 * A formatting change nests in someone's addition, stacks on someone's
+	 * formatting change, may cross the edge of either, and over the author's
+	 * own addition revises it; see `planFormatMarkers`.
+	 */
+	if ( gesture === 'format' ) {
 		return ALLOW;
 	}
 
 	const from = Math.max( 0, start );
 	const to = Math.min( end, formats.length );
 
-	if ( gesture === 'format' ) {
-		/*
-		 * Formatting inside someone's addition is a child of it only when the
-		 * whole range sits in that one addition. Crossing its edge would
-		 * record, as the original run to restore on reject, text that is
-		 * itself only proposed.
-		 */
-		let enclosing: any = null;
-		for ( let i = from; i < to; i++ ) {
-			const markers = suggestionMarkersAt( formats[ i ] );
-			if ( markers.format ) {
-				return refuse(
-					isOwn( markers.format, authorToken )
-						? 'own-marker'
-						: 'format-on-format',
-					markers.format
-				);
-			}
-			if ( markers.add && isOwn( markers.add, authorToken ) ) {
-				return refuse( 'own-marker', markers.add );
-			}
-			const addition = markers.add ?? null;
-			if ( i === from ) {
-				enclosing = addition;
-			} else if (
-				( addition ? idOf( addition ) : null ) !==
-				( enclosing ? idOf( enclosing ) : null )
-			) {
-				return refuse( 'format-straddles-add', addition ?? enclosing );
-			}
-		}
-		return ALLOW;
-	}
-
+	/*
+	 * Deleting or typing over someone's markers nests in their additions and
+	 * adds a second deletion over theirs. Only the author's own markers are
+	 * left to the own-marker paths.
+	 */
 	for ( let i = from; i < to; i++ ) {
 		for ( const marker of suggestionMarkersIn( formats[ i ] ) ) {
 			const kind = suggestionKindOf( marker );
-			const own = isOwn( marker, authorToken );
-			if ( kind === 'del' ) {
-				return refuse( own ? 'own-marker' : 'del-over-del', marker );
-			}
-			if ( kind === 'add' ) {
-				if ( own ) {
-					return refuse( 'own-marker', marker );
-				}
-				if ( gesture === 'type-over' ) {
-					return refuse( 'add-in-add', marker );
-				}
+			if (
+				( kind === 'del' || kind === 'add' ) &&
+				isOwn( marker, authorToken )
+			) {
+				return refuse( 'own-marker', marker );
 			}
 		}
 	}

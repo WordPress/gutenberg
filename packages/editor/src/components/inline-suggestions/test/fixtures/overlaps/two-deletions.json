@@ -1,0 +1,19 @@
+{
+	"name": "two-deletions",
+	"description": "Two authors propose deleting overlapping words: the shared word carries both deletion ids.",
+	"phase": "A",
+	"users": { "A": "overlap-anne", "B": "overlap-bob" },
+	"base": "one two three",
+	"suggestions": [
+		{ "key": "A", "author": "A", "kind": "del", "range": [ 4, 13 ] },
+		{ "key": "B", "author": "B", "kind": "del", "range": [ 0, 7 ] }
+	],
+	"expect": {
+		"all-accepted": "",
+		"all-rejected": "one two three"
+	},
+	"cases": [
+		{ "decisions": { "A": "accept", "B": "reject" }, "published": "one " },
+		{ "decisions": { "A": "reject", "B": "accept" }, "published": " three" }
+	]
+}
