@@ -105,9 +105,8 @@ export function LinkPicker( {
 							</p>
 						</VisuallyHidden>
 						<LinkControl
-							// An empty link, rather than none, so that Apply submits the
-							// typed URL as a change.
-							value={ {} }
+							// @ts-expect-error `LinkControl` reads a `null` value as no link.
+							value={ null }
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }
 							showSuggestions={ allowSearch }

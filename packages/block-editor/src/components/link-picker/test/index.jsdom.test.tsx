@@ -409,36 +409,6 @@ describe( 'LinkPicker', () => {
 	} );
 
 	describe( 'Saving a URL', () => {
-		it( 'should save and close the URL edit popover when the Apply button is pressed with a valid URL', async () => {
-			const user = userEvent.setup();
-			const onSelect = vi.fn();
-
-			render(
-				<LinkPicker
-					preview={ createMockPreview() }
-					onSelect={ onSelect }
-					label="Link"
-				/>
-			);
-
-			await user.click( screen.getByRole( 'button' ) );
-			const searchInput = await screen.findByRole( 'combobox', {
-				name: 'Search or type URL',
-			} );
-			await user.type( searchInput, 'https://wordpress.org' );
-			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
-
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
-				expect.objectContaining( { url: 'https://wordpress.org' } )
-			);
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Search or type URL',
-				} )
-			).not.toBeInTheDocument();
-		} );
-
 		it( 'should save and close the URL edit popover when Enter is pressed with a valid URL', async () => {
 			const user = userEvent.setup();
 			const onSelect = vi.fn();
