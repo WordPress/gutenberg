@@ -1,7 +1,7 @@
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { prependHTTPS } from '@wordpress/url';
 import {
 	create,
@@ -335,7 +335,7 @@ function InlineLinkUI( {
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			animate={ false }
 			onClose={ stopAddingLink }
@@ -366,7 +366,7 @@ function InlineLinkUI( {
 					},
 				} }
 			/>
-		</Popover>
+		</WCPopover>
 	);
 }
 
