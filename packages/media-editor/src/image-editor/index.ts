@@ -1,12 +1,11 @@
 /**
- * The image editor's barrel. Inside the package, import the image editor
- * through here.
+ * The image editor's main file. Inside the package, import the image editor
+ * from here.
  *
- * Keep this barrel explicit so implementation details from `core/`,
- * `react/hooks/`, or `react/components/` do not get shared by accident. The
- * media editor's own state code imports the reducer-level helpers from
- * `./core` and `./react/hooks` directly, as the package's components
- * already do.
+ * Keep the list of exports below explicit, so the internals of `core/`,
+ * `react/hooks/`, and `react/components/` do not get shared by accident. The
+ * media editor's own state code imports its state helpers from `./core` and
+ * `./react/hooks` directly, as the package's components already do.
  *
  * Outside the package, only a small part of this module is available,
  * through the package's private API (see `../private-apis.ts`).

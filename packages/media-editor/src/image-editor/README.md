@@ -1,6 +1,6 @@
 # Image Editor
 
-> **Status: private.** This module is not part of `@wordpress/media-editor`'s public API. Inside the package, import it through the local `../image-editor` barrel. A small part of it is also available to other packages through the package's private API; see [Private API](#private-api).
+> **Status: private.** This module is not part of `@wordpress/media-editor`'s public API. Inside the package, import it from the `../image-editor` folder. A small part of it is also available to other packages through the package's private API; see [Private API](#private-api).
 
 The image editor is the cropper engine used by the media editor:
 
