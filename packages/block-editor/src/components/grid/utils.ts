@@ -74,23 +74,62 @@ export function getComputedCSS( element: Element, property: string ) {
 }
 
 /**
- * Given a grid-template-columns or grid-template-rows CSS property value, gets the start and end
- * position in pixels of each grid track.
+ * Converts a computed `column-gap` or `row-gap` value to pixels. Lengths
+ * compute to pixels, but percentages are preserved and `normal` is 0 in grids.
+ *
+ * @param gap         The computed gap value.
+ * @param contentSize The size in pixels of the grid's content box along the
+ *                    gap's axis, which percentages resolve against.
+ *
+ * @return The gap in pixels.
+ */
+function getGapInPixels( gap: string, contentSize: number ): number {
+	const value = parseFloat( gap );
+	if ( ! Number.isFinite( value ) ) {
+		return 0;
+	}
+	return gap.trim().endsWith( '%' ) ? ( value * contentSize ) / 100 : value;
+}
+
+/**
+ * Gets the start and end position in pixels of each track of a grid element
+ * along one axis, from its computed grid-template-columns or
+ * grid-template-rows and column-gap or row-gap.
  *
  * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
  *
- * @param template The grid-template-columns or grid-template-rows CSS property value.
- *                 Only supports fixed sizes in pixels.
- * @param gap      The gap between grid tracks in pixels.
+ * @param gridElement The grid element.
+ * @param axis        Either 'column' or 'row'.
  *
  * @return An array of objects with the start and end
  *         position in pixels of each grid track.
  */
-export function getGridTracks( template: string, gap: number ): GridTrack[] {
+export function getGridTracks(
+	gridElement: HTMLElement,
+	axis: 'column' | 'row'
+): GridTrack[] {
+	const isColumn = axis === 'column';
+	const padding = ( isColumn ? [ 'left', 'right' ] : [ 'top', 'bottom' ] )
+		.map( ( side ) =>
+			parseFloat( getComputedCSS( gridElement, `padding-${ side }` ) )
+		)
+		.reduce( ( total, value ) => total + value, 0 );
+	const contentSize =
+		( isColumn ? gridElement.clientWidth : gridElement.clientHeight ) -
+		padding;
+	const gapInPixels = getGapInPixels(
+		getComputedCSS( gridElement, `${ axis }-gap` ),
+		contentSize
+	);
+	const template = getComputedCSS(
+		gridElement,
+		isColumn ? 'grid-template-columns' : 'grid-template-rows'
+	);
+
 	const tracks: GridTrack[] = [];
 	for ( const size of template.split( ' ' ) ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
-		const start = previousTrack ? previousTrack.end + gap : 0;
+		const start = previousTrack ? previousTrack.end + gapInPixels : 0;
 		const end = start + parseFloat( size );
 		tracks.push( { start, end } );
 	}
@@ -127,17 +166,9 @@ export function getClosestTrack(
 	);
 }
 
-export function getGridRect( gridElement: Element, rect: DOMRect ) {
-	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
-	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
-	const gridColumnTracks = getGridTracks(
-		getComputedCSS( gridElement, 'grid-template-columns' ),
-		columnGap
-	);
-	const gridRowTracks = getGridTracks(
-		getComputedCSS( gridElement, 'grid-template-rows' ),
-		rowGap
-	);
+export function getGridRect( gridElement: HTMLElement, rect: DOMRect ) {
+	const gridColumnTracks = getGridTracks( gridElement, 'column' );
+	const gridRowTracks = getGridTracks( gridElement, 'row' );
 	const columnStart = getClosestTrack( gridColumnTracks, rect.left ) + 1;
 	const rowStart = getClosestTrack( gridRowTracks, rect.top ) + 1;
 	const columnEnd =

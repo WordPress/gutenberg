@@ -44,30 +44,6 @@ const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
 	down: [ 0, 1 ],
 };
 
-function getTracks(
-	template: string,
-	gap: string,
-	contentSize: number
-): GridTrack[] | undefined {
-	const sizes = template.split( ' ' ).filter( Boolean );
-	if (
-		! sizes.length ||
-		sizes.some( ( size ) => ! /^\d+(\.\d+)?px$/.test( size ) )
-	) {
-		return undefined;
-	}
-	let gapPixels = 0;
-	if ( gap.endsWith( '%' ) ) {
-		gapPixels = ( parseFloat( gap ) * contentSize ) / 100;
-	} else if ( gap !== 'normal' ) {
-		gapPixels = parseFloat( gap );
-	}
-	if ( ! Number.isFinite( gapPixels ) ) {
-		return undefined;
-	}
-	return getGridTracks( sizes.join( ' ' ), gapPixels );
-}
-
 function getTrackRange(
 	tracks: GridTrack[],
 	start: number,
@@ -95,28 +71,12 @@ function getGridSnapshot(
 	if ( ! view || ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
 		return undefined;
 	}
-	const computed = view.getComputedStyle( gridElement );
-	const horizontalInsets =
-		parseFloat( computed.borderLeftWidth ) +
-		parseFloat( computed.borderRightWidth ) +
-		parseFloat( computed.paddingLeft ) +
-		parseFloat( computed.paddingRight );
-	const verticalInsets =
-		parseFloat( computed.borderTopWidth ) +
-		parseFloat( computed.borderBottomWidth ) +
-		parseFloat( computed.paddingTop ) +
-		parseFloat( computed.paddingBottom );
-	const columns = getTracks(
-		computed.gridTemplateColumns,
-		computed.columnGap,
-		gridElement.offsetWidth - horizontalInsets
-	);
-	const rows = getTracks(
-		computed.gridTemplateRows,
-		computed.rowGap,
-		gridElement.offsetHeight - verticalInsets
-	);
-	if ( ! columns || ! rows ) {
+	const columns = getGridTracks( gridElement, 'column' );
+	const rows = getGridTracks( gridElement, 'row' );
+	// Tracks are not measurable in pixels, for example when not a grid.
+	if (
+		[ ...columns, ...rows ].some( ( { end } ) => ! Number.isFinite( end ) )
+	) {
 		return undefined;
 	}
 
@@ -126,6 +86,7 @@ function getGridSnapshot(
 	if ( ! scaleX || ! scaleY ) {
 		return undefined;
 	}
+	const computed = view.getComputedStyle( gridElement );
 	const isRightToLeft = computed.direction === 'rtl';
 	const inlineOffset =
 		parseFloat(
