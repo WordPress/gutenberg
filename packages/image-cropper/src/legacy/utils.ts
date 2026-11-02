@@ -5,6 +5,8 @@
  * by subtracting the rotation value from 0. ImageMagick rotates clockwise only and will subtract the rotation value from 360.
  * It's utterly confusing, and probably in need of a refactor.
  *
+ * @deprecated The `react-easy-crop` based cropper is deprecated.
+ *
  * @param {number} rotation - The rotation value to normalize.
  * @return {number} The normalized rotation value.
  */

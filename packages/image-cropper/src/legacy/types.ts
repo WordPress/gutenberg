@@ -1,6 +1,7 @@
 import type { Point, Area, MediaSize } from 'react-easy-crop';
 
 // Re-export types for convenience.
+/** @deprecated The `react-easy-crop` based cropper is deprecated. */
 export type { Point, Area, MediaSize };
 
 export type Flip = {
@@ -8,6 +9,7 @@ export type Flip = {
 	vertical: boolean;
 };
 
+/** @deprecated The `react-easy-crop` based cropper is deprecated. */
 export interface ImageCropperState {
 	rotation?: number;
 	crop?: Area;
@@ -16,6 +18,7 @@ export interface ImageCropperState {
 	aspectRatio?: number;
 }
 
+/** @deprecated The `react-easy-crop` based cropper is deprecated. */
 export interface CropperState {
 	crop: Point;
 	croppedArea?: Area;
@@ -27,6 +30,7 @@ export interface CropperState {
 	mediaSize: MediaSize | null;
 }
 
+/** @deprecated The `react-easy-crop` based cropper is deprecated. */
 export interface ImageCropperProps {
 	src: string;
 	onLoad?: ( mediaSize: MediaSize ) => void;
@@ -34,6 +38,7 @@ export interface ImageCropperProps {
 	maxZoom?: number;
 }
 
+/** @deprecated The `react-easy-crop` based cropper is deprecated. */
 export interface ImageCropperContextValue {
 	cropperState: CropperState;
 	setCropperState: (

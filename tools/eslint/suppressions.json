@@ -11260,7 +11260,7 @@
 			"count": 2
 		}
 	},
-	"packages/image-cropper/src/stories/index.story.tsx": {
+	"packages/image-cropper/src/legacy/stories/index.story.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
