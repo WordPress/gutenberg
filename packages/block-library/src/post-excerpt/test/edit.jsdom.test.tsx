@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import type { ComponentType, ReactNode } from 'react';
 
 // The block library's type projects leave out its JavaScript files, so the
-// component and hooks are loaded by path, which TypeScript does not follow.
+// component is loaded by path, which TypeScript does not follow.
 const { default: PostExcerptEditor } = await vi.importActual< {
 	default: ComponentType< {
 		attributes: {
@@ -29,11 +29,6 @@ vi.mock( import( '@wordpress/core-data' ), async ( importOriginal ) => {
 		useEntityProp: () => [ '', vi.fn(), {} ],
 	} as never;
 } );
-
-vi.mock( '../../utils/hooks', () => ( {
-	useCanEditEntity: () => false,
-	useToolsPanelDropdownMenuProps: () => ( {} ),
-} ) );
 
 vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
 	const original = await importOriginal();
@@ -95,6 +90,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 		...original,
 		useSelect: ( callback: ( select: () => object ) => unknown ) =>
 			callback( () => ( {
+				canUser: () => false,
 				getPostType: () => ( { supports: { excerpt: true } } ),
 			} ) ),
 		useDispatch: () => ( {
