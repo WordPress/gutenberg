@@ -4178,6 +4178,9 @@ class WP_Theme_JSON_Gutenberg {
 		$style_variation_responsive_pseudo_css = array();
 		$style_variation_layout_metadata       = array();
 		if ( ! $media_query && ! empty( $block_metadata['variations'] ) ) {
+			// A block pseudo node lists the variations too, so read the block's resting styles, not `$node`.
+			$variation_block_node = _wp_array_get( $this->theme_json, array_slice( $block_metadata['path'], 0, 3 ), array() );
+
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
 
@@ -4201,7 +4204,7 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations[ $style_variation['selector'] ] = self::get_state_declarations_with_text_clip_escapes(
 					static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json ),
 					$style_variation_node,
-					array( $node, $text_clip_base_block_styles )
+					array( $variation_block_node, $text_clip_base_block_styles )
 				);
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
@@ -4269,7 +4272,7 @@ class WP_Theme_JSON_Gutenberg {
 					$breakpoint_declarations = self::get_state_declarations_with_text_clip_escapes(
 						$breakpoint_declarations,
 						$breakpoint_node,
-						array( $style_variation_node, $node, $text_clip_base_block_styles )
+						array( $style_variation_node, $variation_block_node, $text_clip_base_block_styles )
 					);
 					if ( ! empty( $breakpoint_declarations ) ) {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
