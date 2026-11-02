@@ -7,17 +7,23 @@ const { createRoute, getEntityRecord } = vi.hoisted( () => ( {
 	getEntityRecord: vi.fn(),
 } ) );
 
-vi.mock( '@wordpress/data', () => ( {
+// @ts-expect-error The stub provides only the selector used by the loader.
+vi.mock( import( '@wordpress/data' ), () => ( {
 	resolveSelect: () => ( { getEntityRecord } ),
 } ) );
-vi.mock( '@wordpress/core-data', () => ( { store: {} } ) );
-vi.mock( '@wordpress/admin-ui', () => ( { Page: () => null } ) );
-vi.mock( '../../root', () => ( { default: () => null } ) );
-vi.mock( '../../error-boundary', () => ( { default: () => null } ) );
-vi.mock( '../../../lock-unlock', () => ( {
+// @ts-expect-error The stub uses an empty store descriptor.
+vi.mock( import( '@wordpress/core-data' ), () => ( { store: {} } ) );
+// @ts-expect-error The stub omits Page's static properties.
+vi.mock( import( '@wordpress/admin-ui' ), () => ( { Page: () => null } ) );
+// @ts-expect-error The stub renders nothing instead of the root element.
+vi.mock( import( '../../root' ), () => ( { default: () => null } ) );
+// @ts-expect-error The stub replaces the error boundary class with a function.
+vi.mock( import( '../../error-boundary' ), () => ( { default: () => null } ) );
+// @ts-expect-error The stub returns its input without a generic type assertion.
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( value: unknown ) => value,
 } ) );
-vi.mock( '@wordpress/route', () => ( {
+vi.mock( import( '@wordpress/route' ), () => ( {
 	privateApis: {
 		createRoute,
 		createRootRoute: () => ( { addChildren: vi.fn() } ),
@@ -31,7 +37,9 @@ test( 'loads a route when the site data request fails', async () => {
 	createRoute.mockReturnValue( { lazy: vi.fn().mockReturnThis() } );
 	getEntityRecord.mockRejectedValue( { code: 'http_request_failed' } );
 
-	renderToString( <Router routes={ [ { path: '/', content_module: 'test-page' } ] } /> );
+	renderToString(
+		<Router routes={ [ { path: '/', content_module: 'test-page' } ] } />
+	);
 
 	const { loader } = createRoute.mock.calls[ 0 ][ 0 ];
 	await expect( loader( {} ) ).resolves.toEqual( {
