@@ -205,6 +205,39 @@ describe( 'DataViews component', () => {
 		}
 	);
 
+	it( 'marks the triggers of actions that open a dialog', async () => {
+		render(
+			<DataViewWrapper
+				actions={ [
+					{ ...actions[ 0 ], isPrimary: true },
+					{
+						id: 'quick-edit',
+						label: 'Quick edit',
+						isPrimary: true,
+						opensDialog: true,
+						callback: vi.fn(),
+					},
+					{ id: 'view', label: 'View', callback: vi.fn() },
+				] }
+				data={ [ data[ 0 ] ] }
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Quick edit' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		const user = userEvent.setup();
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'View' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Delete…' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+	} );
+
 	it( 'renders header bulk actions once in a custom table composition', () => {
 		render(
 			<DataViewWrapper

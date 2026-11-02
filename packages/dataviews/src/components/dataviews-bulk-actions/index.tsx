@@ -18,6 +18,7 @@ import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
 import getActionLabel from '../../utils/get-action-label';
+import getActionPopup from '../../utils/get-action-popup';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -157,6 +158,7 @@ function ActionTrigger< Item >( {
 			icon={ isMobile ? action.icon : undefined }
 			size="compact"
 			onClick={ onClick }
+			aria-haspopup={ getActionPopup( action ) }
 			isBusy={ isBusy }
 		>
 			{ ! isMobile && label }
@@ -189,6 +191,7 @@ function ActionButton< Item >( {
 			<Menu.Item
 				onClick={ onClick }
 				disabled={ !! action.disabled || isBusy }
+				aria-haspopup={ getActionPopup( action ) }
 			>
 				<Menu.ItemLabel>
 					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }
