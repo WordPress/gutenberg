@@ -232,12 +232,12 @@ describe( 'useWidgetTypes', () => {
 
 		const attributes = result.current[ 0 ][ 0 ].attributes ?? [];
 
-		// Record entries lead and win shared keys; the module completes them
-		// (here the type, resolved through the registry) and adds its own.
+		// Module entries keep their position (location, then label) and are
+		// completed by record entries; new record-only entries (extra) follow.
 		expect( attributes.map( ( attribute ) => attribute.id ) ).toEqual( [
 			'location',
-			'extra',
 			'label',
+			'extra',
 		] );
 		expect( attributes[ 0 ] ).toMatchObject( {
 			type: 'text',
@@ -249,7 +249,47 @@ describe( 'useWidgetTypes', () => {
 		// module's custom validator.
 		expect( attributes[ 0 ].isValid ).toMatchObject( { required: true } );
 		expect( attributes[ 0 ].isValid?.custom ).toBeTypeOf( 'function' );
-		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
+		expect( attributes[ 1 ] ).toMatchObject( { label: 'Label' } );
+		expect( attributes[ 2 ] ).toMatchObject( { label: 'Extra' } );
+	} );
+
+	it( "preserves the module's attribute position when merging with record attributes", async () => {
+		const reorderedRecords: WidgetModuleRecord[] = [
+			{
+				...records[ 0 ],
+				attributes: [
+					// Only the second module attribute ('label') is defined in the record
+					{ id: 'label', label: 'Custom Label' },
+					// A new record-only attribute
+					{ id: 'extra', type: 'text', label: 'Extra' },
+				],
+			},
+		];
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( reorderedRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		const attributes = result.current[ 0 ][ 0 ].attributes ?? [];
+
+		// Module declared [ 'location', 'label' ].
+		// Merging record entry for 'label' preserves its position; new 'extra' is appended after.
+		expect( attributes.map( ( attribute ) => attribute.id ) ).toEqual( [
+			'location',
+			'label',
+			'extra',
+		] );
+		expect( attributes[ 0 ] ).toMatchObject( { id: 'location' } );
+		expect( attributes[ 1 ] ).toMatchObject( {
+			id: 'label',
+			label: 'Custom Label',
+		} );
+		expect( attributes[ 2 ] ).toMatchObject( {
+			id: 'extra',
+			label: 'Extra',
+		} );
 	} );
 
 	it( 'reads the record example without a metadata module', async () => {
