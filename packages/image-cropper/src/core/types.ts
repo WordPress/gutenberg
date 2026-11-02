@@ -102,6 +102,11 @@ export interface CropperControllerState {
 	flip: Flip;
 	/** The crop rectangle in normalized coordinates. */
 	cropRect: NormalizedRect;
+	/**
+	 * Locked width / height ratio of the crop, in source pixels.
+	 * `undefined` means free: the crop can take any shape.
+	 */
+	aspectRatio?: number;
 }
 
 /**
@@ -136,6 +141,16 @@ export type CropperAction =
 	| { type: 'SET_FLIP'; payload: Flip }
 	/** Sets the crop rectangle. */
 	| { type: 'SET_CROP_RECT'; payload: NormalizedRect }
+	/**
+	 * Locks the crop to a width / height ratio, or unlocks it with
+	 * `undefined`. Locking reshapes the crop to the largest box of that
+	 * ratio for the rendered image size. The caller passes that size
+	 * because the reducer has no DOM access.
+	 */
+	| {
+			type: 'SET_ASPECT_RATIO';
+			payload: { aspectRatio: number | undefined; visualSize: Size };
+	  }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */

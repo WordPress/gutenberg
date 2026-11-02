@@ -1,9 +1,5 @@
 import type { CropperControllerState } from '../core';
-import {
-	cropperReducer,
-	areCropperStatesEqual,
-	computeInscribedRect,
-} from '../core';
+import { cropperReducer, areCropperStatesEqual } from '../core';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropSessionAction,
@@ -38,33 +34,26 @@ export function cropSessionReducer< S extends CropSessionState >(
 		}
 		case 'SET_ASPECT_RATIO_VALUE': {
 			const { presetKey, resolved, visualSize } = action.payload;
-			// Update the preset key and reshape the cropRect together
-			// (when the ratio is fixed and there is a visualSize), so it
-			// is one undo entry.
-			const shouldReshape =
-				resolved !== undefined &&
-				resolved > 0 &&
-				visualSize.width > 0 &&
-				visualSize.height > 0;
-			const nextCropOptions = {
-				...state.cropOptions,
-				aspectRatioValue: presetKey,
-			};
-			if ( ! shouldReshape ) {
-				if ( state.cropOptions.aspectRatioValue === presetKey ) {
-					return state;
-				}
-				return { ...state, cropOptions: nextCropOptions };
-			}
-			const newCropRect = computeInscribedRect( resolved, visualSize );
+			// The cropper owns the ratio and reshapes the crop; the
+			// session keeps the preset the dropdown shows. Both change in
+			// one step, so it is one undo entry.
 			const nextCropper = cropperReducer( state.cropper, {
-				type: 'SET_CROP_RECT',
-				payload: newCropRect,
+				type: 'SET_ASPECT_RATIO',
+				payload: { aspectRatio: resolved, visualSize },
 			} );
+			if (
+				nextCropper === state.cropper &&
+				state.cropOptions.aspectRatioValue === presetKey
+			) {
+				return state;
+			}
 			return {
 				...state,
 				cropper: nextCropper,
-				cropOptions: nextCropOptions,
+				cropOptions: {
+					...state.cropOptions,
+					aspectRatioValue: presetKey,
+				},
 			};
 		}
 		case 'RESET': {

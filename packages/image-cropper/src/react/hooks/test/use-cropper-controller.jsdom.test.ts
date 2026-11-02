@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCropperController } from '../use-cropper-controller';
 import { DEFAULT_STATE } from '../../../core/constants';
+import { computeInscribedRect } from '../../../core/crop-rect';
 
 describe( 'useCropperController', () => {
 	it( 'should initialize with DEFAULT_STATE', () => {
@@ -1045,5 +1046,18 @@ describe( 'useCropperController', () => {
 
 			expect( stateKeys ).toEqual( dirtyCheckedFields );
 		} );
+	} );
+
+	it( 'locks the aspect ratio and reshapes the crop for the reported visual size', () => {
+		const visualSize = { width: 800, height: 450 };
+		const { result } = renderHook( () => useCropperController() );
+
+		act( () => result.current.setVisualSize( visualSize ) );
+		act( () => result.current.setAspectRatio( 1 ) );
+
+		expect( result.current.state.aspectRatio ).toBe( 1 );
+		expect( result.current.state.cropRect ).toEqual(
+			computeInscribedRect( 1, visualSize )
+		);
 	} );
 } );

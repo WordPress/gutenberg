@@ -7,7 +7,6 @@ import {
 	Cropper,
 	buildModifiers,
 	getSourceRegion,
-	resolveAspectRatio,
 	useCropSession,
 	type CropSession,
 } from '..';
@@ -35,10 +34,6 @@ function CropperWithHistory( {
 			<Cropper
 				src={ IMAGE.src }
 				controller={ session.cropper }
-				aspectRatio={ resolveAspectRatio(
-					session.cropOptions.aspectRatioValue,
-					session.cropper.state.image
-				) }
 				freeformCrop
 				onGestureStart={ session.beginGesture }
 				onGestureEnd={ session.endGesture }

@@ -48,8 +48,7 @@ export interface CropperController extends CropperSetters {
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
 	 * Called by `Cropper` whenever its rendered image size changes; not for
-	 * consumers to call. A composite controller uses the size to reshape the
-	 * crop for an aspect ratio. The pure cropper hook ignores it.
+	 * consumers to call. `setAspectRatio` uses the size to reshape the crop.
 	 */
 	setVisualSize: ( size: Size ) => void;
 	/**
@@ -149,8 +148,15 @@ export function useCropperController(
 		[ dispatchAndSync ]
 	);
 
+	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
+
 	const setters = useMemo(
-		() => buildCropperSetters( dispatchAndSync, () => stateRef.current ),
+		() =>
+			buildCropperSetters(
+				dispatchAndSync,
+				() => stateRef.current,
+				() => visualSizeRef.current
+			),
 		[ dispatchAndSync ]
 	);
 
@@ -173,12 +179,10 @@ export function useCropperController(
 		[ state ]
 	);
 
-	// No-op for the pure hook — visualSize matters only when a
-	// composite store needs to compute aspect-ratio reshapes
-	// (see useMediaEditorState). Typed to accept a Size so it
-	// satisfies the controller surface; the value is intentionally
-	// ignored.
-	const setVisualSize = useCallback( () => {}, [] );
+	// `setAspectRatio` needs the rendered size to reshape the crop.
+	const setVisualSize = useCallback( ( size: Size ) => {
+		visualSizeRef.current = size;
+	}, [] );
 
 	// In the pure hook, history isn't a concern — viewport-driven
 	// reshape is identical to setCropRect.

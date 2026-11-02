@@ -82,8 +82,6 @@ export interface CropperProps {
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
-	/** Fixed aspect ratio (width / height) in pixel space for the crop area. */
-	aspectRatio?: number;
 	/**
 	 * Enable freeform crop mode with resizable handles.
 	 * When false (default), the crop area is fixed and centered.
@@ -131,7 +129,6 @@ export interface CropperProps {
  * @param root0.showDimensions    Show live dimensions tooltip during resize.
  * @param root0.minZoom           Minimum zoom level override.
  * @param root0.maxZoom           Maximum zoom level.
- * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
  * @param root0.focusOnMount      Focus the crop area on mount.
  * @param root0.disabled          Ignore all crop interaction.
@@ -153,7 +150,6 @@ function CropperInner(
 		showDimensions = true,
 		minZoom,
 		maxZoom,
-		aspectRatio,
 		freeformCrop = false,
 		focusOnMount = false,
 		disabled = false,
@@ -173,6 +169,8 @@ function CropperInner(
 		setVisualSize,
 		adjustCropRectForViewport,
 	} = controller;
+	// The controller owns the locked ratio (`setAspectRatio`).
+	const { aspectRatio } = state;
 	const {
 		viewport: viewportState,
 		setViewportPan,
@@ -281,21 +279,19 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// Report the rendered image size to the controller. Composite
-	// controllers need it to compute aspect-ratio reshapes from the
-	// reducer (the dropdown dispatches without DOM access); pure
-	// controllers ignore it.
+	// Report the rendered image size to the controller, which needs it
+	// to reshape the crop when the aspect ratio is locked (the reducer
+	// has no DOM access).
 	useEffect( () => {
 		setVisualSize( visualSize );
 	}, [ visualSize, setVisualSize ] );
 
-	// In fixed-crop mode, auto-size the crop rect only when a fixed
-	// aspect ratio is selected. With "Free" selected, turning freeform
-	// handles off should preserve the user's current unconstrained
+	// In fixed-crop mode, keep the crop the largest box of the locked
+	// ratio as the rendered size changes. With no ratio locked, turning
+	// freeform handles off preserves the user's current unconstrained
 	// crop. Uses `adjustCropRectForViewport` so window-resize-driven
-	// reshapes don't create undo entries (composite controller); the
-	// dedup at lines below avoids redundant dispatches when the
-	// reducer has already updated the cropRect for an aspect change.
+	// reshapes don't create undo entries; the check below skips the
+	// dispatch when the controller has already reshaped the crop.
 	useEffect( () => {
 		if (
 			freeformCrop ||
@@ -320,46 +316,6 @@ function CropperInner(
 	}, [
 		freeformCrop,
 		aspectRatio,
-		visualSize,
-		adjustCropRectForViewport,
-		state.cropRect,
-	] );
-
-	// In freeform mode, when aspectRatio changes, reshape the crop to
-	// the largest inscribed rect of the new ratio. Bails out when the
-	// cropRect already matches the inscribed rect — composite stores
-	// reshape atomically inside the reducer, so this effect is a
-	// no-op there.
-	const prevAspectRatioRef = useRef( aspectRatio );
-	useEffect( () => {
-		if ( prevAspectRatioRef.current === aspectRatio ) {
-			return;
-		}
-		prevAspectRatioRef.current = aspectRatio;
-
-		if (
-			! freeformCrop ||
-			visualSize.width === 0 ||
-			visualSize.height === 0 ||
-			! aspectRatio ||
-			aspectRatio <= 0
-		) {
-			return;
-		}
-		const rect = computeInscribedRect( aspectRatio, visualSize );
-		const current = state.cropRect;
-		if (
-			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
-			Math.abs( current.y - rect.y ) < CROP_RECT_EPSILON &&
-			Math.abs( current.width - rect.width ) < CROP_RECT_EPSILON &&
-			Math.abs( current.height - rect.height ) < CROP_RECT_EPSILON
-		) {
-			return;
-		}
-		adjustCropRectForViewport( rect );
-	}, [
-		aspectRatio,
-		freeformCrop,
 		visualSize,
 		adjustCropRectForViewport,
 		state.cropRect,

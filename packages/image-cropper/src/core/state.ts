@@ -11,6 +11,7 @@ import {
 } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
+import { computeInscribedRect } from './crop-rect';
 
 /** Small tolerance for cropper floating-point comparisons. */
 const STATE_EPSILON = 1e-6;
@@ -49,7 +50,8 @@ export function areCropperStatesEqual(
 		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
 		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
 		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
-		nearlyEqual( a.cropRect.height, b.cropRect.height )
+		nearlyEqual( a.cropRect.height, b.cropRect.height ) &&
+		a.aspectRatio === b.aspectRatio
 	);
 }
 
@@ -389,6 +391,27 @@ export function cropperReducer(
 					cropRect: action.payload,
 				} )
 			);
+
+		case 'SET_ASPECT_RATIO': {
+			const { aspectRatio, visualSize } = action.payload;
+			const shouldReshape =
+				aspectRatio !== undefined &&
+				aspectRatio > 0 &&
+				visualSize.width > 0 &&
+				visualSize.height > 0;
+			if ( ! shouldReshape ) {
+				return state.aspectRatio === aspectRatio
+					? state
+					: { ...state, aspectRatio };
+			}
+			return commitBase(
+				enforceContainment( {
+					...state,
+					aspectRatio,
+					cropRect: computeInscribedRect( aspectRatio, visualSize ),
+				} )
+			);
+		}
 
 		case 'SETTLE_CROP': {
 			// After a resize drag ends: expand the crop to fill the

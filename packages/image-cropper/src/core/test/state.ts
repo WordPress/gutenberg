@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { CropperControllerState, Size } from '../types';
 import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
-import { cropperReducer, enforceContainment, isStateDirty } from '../state';
+import {
+	areCropperStatesEqual,
+	cropperReducer,
+	enforceContainment,
+	isStateDirty,
+} from '../state';
+import { computeInscribedRect } from '../crop-rect';
 import {
 	createCamera,
 	screenToWorld,
@@ -874,5 +880,62 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 		expect( result.pan.x ).toBeCloseTo( state.pan.x, 5 );
 		expect( result.pan.y ).toBeCloseTo( state.pan.y, 5 );
 		expect( result.zoom ).toBeCloseTo( state.zoom, 5 );
+	} );
+} );
+
+describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
+	const VISUAL_SIZE: Size = { width: 800, height: 450 };
+
+	it( 'stores the ratio and reshapes the crop to the largest box of that ratio', () => {
+		const next = cropperReducer( makeState(), {
+			type: 'SET_ASPECT_RATIO',
+			payload: { aspectRatio: 1, visualSize: VISUAL_SIZE },
+		} );
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect ).toEqual(
+			computeInscribedRect( 1, VISUAL_SIZE )
+		);
+	} );
+
+	it( 'keeps the crop where it is when the ratio is unlocked', () => {
+		const cropRect = { x: 0.1, y: 0.2, width: 0.5, height: 0.4 };
+		const next = cropperReducer(
+			makeState( { aspectRatio: 1, cropRect } ),
+			{
+				type: 'SET_ASPECT_RATIO',
+				payload: { aspectRatio: undefined, visualSize: VISUAL_SIZE },
+			}
+		);
+
+		expect( next.aspectRatio ).toBeUndefined();
+		expect( next.cropRect ).toEqual( cropRect );
+	} );
+
+	it( 'stores the ratio without reshaping before the visual size is known', () => {
+		const state = makeState();
+		const next = cropperReducer( state, {
+			type: 'SET_ASPECT_RATIO',
+			payload: { aspectRatio: 1, visualSize: { width: 0, height: 0 } },
+		} );
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect ).toEqual( state.cropRect );
+	} );
+
+	it( 'is unlocked again by RESET', () => {
+		const next = cropperReducer( makeState( { aspectRatio: 1 } ), {
+			type: 'RESET',
+		} );
+
+		expect( next.aspectRatio ).toBeUndefined();
+	} );
+
+	it( 'counts as a change for history but not for isStateDirty', () => {
+		const state = makeState();
+		const locked = { ...state, aspectRatio: 1 };
+
+		expect( areCropperStatesEqual( state, locked ) ).toBe( false );
+		expect( isStateDirty( locked, state ) ).toBe( false );
 	} );
 } );

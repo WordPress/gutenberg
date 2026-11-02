@@ -84,16 +84,11 @@ function CropperPanel( { src }: { src: string } ) {
 import {
 	Cropper,
 	DEFAULT_ASPECT_RATIOS,
-	resolveAspectRatio,
 	useCropSession,
 } from '@wordpress/image-cropper';
 
 function CropperWithHistory( { src }: { src: string } ) {
 	const session = useCropSession();
-	const aspectRatio = resolveAspectRatio(
-		session.cropOptions.aspectRatioValue,
-		session.cropper.state.image
-	);
 
 	return (
 		<>
@@ -118,7 +113,6 @@ function CropperWithHistory( { src }: { src: string } ) {
 			<Cropper
 				src={ src }
 				controller={ session.cropper }
-				aspectRatio={ aspectRatio }
 				freeformCrop
 				onGestureStart={ session.beginGesture }
 				onGestureEnd={ session.endGesture }

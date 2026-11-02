@@ -7,8 +7,8 @@ import {
 } from '@wordpress/element';
 import {
 	DEFAULT_STATE,
-	areCropperStatesEqual,
 	enforceContainment,
+	isStateDirty,
 	exportCroppedImage,
 	type CropperAction,
 	type CropperControllerState,
@@ -250,7 +250,8 @@ export function useCropSession<
 		() =>
 			buildCropperSetters(
 				dispatchCropperAction,
-				() => stateRef.current.cropper
+				() => stateRef.current.cropper,
+				() => visualSizeRef.current
 			),
 		[ dispatchCropperAction ]
 	);
@@ -362,7 +363,9 @@ export function useCropSession<
 	);
 
 	const isDirty = ! areStatesEqual( state, initialBaseline );
-	const isCropperDirty = ! areCropperStatesEqual(
+	// Whether the crop result differs, so the locked ratio on its own
+	// does not count (the session's `isDirty` covers it).
+	const isCropperDirty = isStateDirty(
 		state.cropper,
 		initialBaseline.cropper
 	);

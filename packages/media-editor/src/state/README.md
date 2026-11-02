@@ -13,21 +13,16 @@ The session also holds named edits other than crop: `session.edits`, set with `s
 Use the media editor session when cropper state must share history with controls such as aspect ratio. The session owns history and gesture boundaries; pass its `cropper` controller to `<Cropper>`.
 
 ```tsx
-import { Cropper, resolveAspectRatio } from '@wordpress/image-cropper';
+import { Cropper } from '@wordpress/image-cropper';
 import { useMediaEditor } from '../state';
 
 function MediaEditorCanvas( { src }: { src: string } ) {
 	const session = useMediaEditor();
-	const aspectRatio = resolveAspectRatio(
-		session.cropOptions.aspectRatioValue,
-		session.cropper.state.image
-	);
 
 	return (
 		<Cropper
 			src={ src }
 			controller={ session.cropper }
-			aspectRatio={ aspectRatio }
 			freeformCrop
 			onGestureStart={ session.beginGesture }
 			onGestureEnd={ session.endGesture }

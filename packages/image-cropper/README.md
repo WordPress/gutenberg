@@ -50,11 +50,11 @@ function ImageCropper() {
 
 ### `Cropper`
 
-Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `aspectRatio`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
+Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
 
 ### `useCropperController( initialState? )`
 
-React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`.
+React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`. Lock the crop to a ratio with `controller.setAspectRatio( ratio )`, or unlock it with `undefined`; the ratio lives in `controller.state.aspectRatio`, and `<Cropper>` reads it from there.
 
 ### `useCropSession( options? )`
 
@@ -62,7 +62,7 @@ A cropper controller with undo and redo, gesture boundaries, crop options and as
 
 ### `resolveAspectRatio( presetKey, image )`
 
-Turns a preset value from `DEFAULT_ASPECT_RATIOS` into a width / height ratio, resolving "Original" from the loaded image.
+Turns a preset value from `DEFAULT_ASPECT_RATIOS` into a width / height ratio, resolving "Original" from the loaded image. Use it with `controller.setAspectRatio` when you keep your own preset; `useCropSession`'s `setAspectRatioValue` does it for you.
 
 ### `CropperProvider` / `useCropper`
 
