@@ -30,25 +30,3 @@ export function parseISODate( text: string ): string | null {
 		? text
 		: null;
 }
-
-/**
- * Convert an ISO date to the UTC date used by Calendar.
- * @param value
- */
-export function toCalendarDate( value: string ): Date {
-	if ( ! parseISODate( value ) ) {
-		throw new RangeError( 'DateInput: expected a valid YYYY-MM-DD date.' );
-	}
-	const [ year, month, day ] = value.split( '-' ).map( Number );
-	const date = new Date( 0 );
-	date.setUTCFullYear( year, month - 1, day );
-	return date;
-}
-
-/**
- * Convert Calendar's UTC date without involving the host time zone.
- * @param date
- */
-export function fromCalendarDate( date: Date ): string {
-	return `${ String( date.getUTCFullYear() ).padStart( 4, '0' ) }-${ String( date.getUTCMonth() + 1 ).padStart( 2, '0' ) }-${ String( date.getUTCDate() ).padStart( 2, '0' ) }`;
-}

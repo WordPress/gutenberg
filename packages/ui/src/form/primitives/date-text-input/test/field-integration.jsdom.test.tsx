@@ -6,13 +6,7 @@ import { Form } from '@base-ui/react/form';
 import { createRef, useState } from '@wordpress/element';
 import { ControlWithError } from '../../control-with-error';
 import { DateInput } from '../date-input';
-import { DateRangeInput } from '../date-range-input';
-import { TimeInput } from '../time-input';
-import {
-	DateInputControl,
-	DateRangeInputControl,
-	TimeInputControl,
-} from '../../../date-text-input-control/date-text-input-control';
+import { DateInputControl } from '../../../date-text-input-control/date-text-input-control';
 
 describe( 'text input Field and Form integration', () => {
 	it.each( [ 'onChange', 'onBlur', 'onSubmit' ] as const )(
@@ -25,7 +19,7 @@ describe( 'text input Field and Form integration', () => {
 				<Form validationMode={ mode } onFormSubmit={ submit }>
 					<Field.Root name="date" validate={ validate }>
 						<Field.Label>Date</Field.Label>
-						<DateInput defaultValue="2026-01-20" />
+						<DateInput locale="sv-SE" defaultValue="2026-01-20" />
 					</Field.Root>
 					<button type="button">Next</button>
 					<button type="submit">Save</button>
@@ -59,7 +53,11 @@ describe( 'text input Field and Form integration', () => {
 		render(
 			<Field.Root ref={ ref }>
 				<Field.Label>Date</Field.Label>
-				<DateInput value="2026-01-20" onValueChange={ change } />
+				<DateInput
+					locale="sv-SE"
+					value="2026-01-20"
+					onValueChange={ change }
+				/>
 			</Field.Root>
 		);
 		await user.click( screen.getByRole( 'textbox', { name: 'Date' } ) );
@@ -77,6 +75,7 @@ describe( 'text input Field and Form integration', () => {
 		const user = userEvent.setup();
 		render(
 			<DateInputControl
+				locale="sv-SE"
 				label="Date"
 				defaultValue="2026-01-20"
 				onValueChange={ ( _value, details ) => details.cancel() }
@@ -95,6 +94,7 @@ describe( 'text input Field and Form integration', () => {
 			return (
 				<>
 					<DateInputControl
+						locale="sv-SE"
 						label="Date"
 						value={ value }
 						onValueChange={ setValue }
@@ -135,7 +135,7 @@ describe( 'text input Field and Form integration', () => {
 				>
 					<Field.Root ref={ ref }>
 						<Field.Label>Date</Field.Label>
-						<DateInput defaultValue="2026-01-20" />
+						<DateInput locale="sv-SE" defaultValue="2026-01-20" />
 					</Field.Root>
 					<button type="reset">Reset</button>
 				</form>
@@ -157,6 +157,7 @@ describe( 'text input Field and Form integration', () => {
 		render(
 			<form>
 				<DateInputControl
+					locale="sv-SE"
 					label="Date"
 					value="2026-01-20"
 					onValueChange={ change }
@@ -174,6 +175,7 @@ describe( 'text input Field and Form integration', () => {
 		const ref = createRef< HTMLInputElement >();
 		render(
 			<DateInputControl
+				locale="sv-SE"
 				ref={ ref }
 				label="Date"
 				description="ISO date"
@@ -187,29 +189,26 @@ describe( 'text input Field and Form integration', () => {
 			'ISO date Use YYYY-MM-DD, for example 2026-01-20.'
 		);
 	} );
-	it( 'inherits Field disabled state for the input and calendar trigger', () => {
+	it( 'inherits Field disabled state for the input', () => {
 		render(
 			<Field.Root disabled>
 				<Field.Label>Date</Field.Label>
-				<DateInput showCalendar />
+				<DateInput locale="sv-SE" />
 			</Field.Root>
 		);
 		expect(
 			screen.getByRole( 'textbox', { name: 'Date' } )
 		).toBeDisabled();
-		expect(
-			screen.getByRole( 'button', { name: 'Choose date for Date' } )
-		).toBeDisabled();
 	} );
-	it( 'keeps a read-only field focusable without opening or editing', async () => {
+	it( 'keeps a read-only field focusable without editing', async () => {
 		const user = userEvent.setup();
 		const change = vi.fn();
 		render(
 			<DateInputControl
+				locale="sv-SE"
 				label="Date"
 				defaultValue="2026-01-20"
 				readOnly
-				showCalendar
 				onValueChange={ change }
 			/>
 		);
@@ -219,9 +218,6 @@ describe( 'text input Field and Form integration', () => {
 		expect( screen.getByRole( 'textbox', { name: 'Date' } ) ).toHaveValue(
 			'2026-01-20'
 		);
-		expect(
-			screen.getByRole( 'button', { name: 'Choose date for Date' } )
-		).toBeDisabled();
 		expect( change ).not.toHaveBeenCalled();
 	} );
 	it( 'clears a server error on a partial edit and retains date validation', async () => {
@@ -230,7 +226,7 @@ describe( 'text input Field and Form integration', () => {
 			<Form errors={ { date: 'Server rejected this date.' } }>
 				<Field.Root name="date">
 					<Field.Label>Date</Field.Label>
-					<DateInput defaultValue="2026-01-20" />
+					<DateInput locale="sv-SE" defaultValue="2026-01-20" />
 					<Field.Error />
 				</Field.Root>
 			</Form>
@@ -264,7 +260,11 @@ describe( 'text input Field and Form integration', () => {
 						}
 					>
 						<Field.Label>Date</Field.Label>
-						<DateInput value={ value } onValueChange={ setValue } />
+						<DateInput
+							locale="sv-SE"
+							value={ value }
+							onValueChange={ setValue }
+						/>
 						<Field.Error />
 					</Field.Root>
 					<button>Next</button>
@@ -279,110 +279,6 @@ describe( 'text input Field and Form integration', () => {
 		);
 		expect( screen.getByText( 'Choose another date.' ) ).toBeVisible();
 	} );
-	it( 'preserves partial range endpoints and submits the completed ISO interval', async () => {
-		const user = userEvent.setup();
-		const change = vi.fn();
-		const submit = vi.fn();
-		render(
-			<Form onFormSubmit={ submit }>
-				<Field.Root name="range">
-					<Field.Label>Range</Field.Label>
-					<DateRangeInput onValueChange={ change } />
-					<Field.Error />
-				</Field.Root>
-				<button type="submit">Save</button>
-			</Form>
-		);
-		const input = screen.getByRole( 'textbox', { name: 'Range' } );
-		await user.type( input, '2026-01-20/' );
-		expect( change ).toHaveBeenLastCalledWith(
-			{ from: '2026-01-20', to: undefined },
-			expect.anything()
-		);
-		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
-		expect( submit ).not.toHaveBeenCalled();
-		await user.click( input );
-		await user.keyboard( '{End}' );
-		await user.type( input, '2026-01-22' );
-		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
-		expect( submit ).toHaveBeenCalledWith(
-			{ range: '2026-01-20/2026-01-22' },
-			expect.anything()
-		);
-	} );
-	it( 'blocks a reversed range without swapping its endpoints', async () => {
-		const user = userEvent.setup();
-		const submit = vi.fn();
-		render(
-			<Form onFormSubmit={ submit }>
-				<Field.Root name="range">
-					<Field.Label>Range</Field.Label>
-					<DateRangeInput
-						defaultValue={ {
-							from: '2026-02-21',
-							to: '2026-02-20',
-						} }
-					/>
-					<Field.Error />
-				</Field.Root>
-				<button type="submit">Save</button>
-			</Form>
-		);
-		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
-		expect( submit ).not.toHaveBeenCalled();
-		expect( screen.getByRole( 'textbox', { name: 'Range' } ) ).toHaveValue(
-			'2026-02-21/2026-02-20'
-		);
-		expect(
-			screen.getByText(
-				'The end date must be on or after the start date.'
-			)
-		).toBeVisible();
-	} );
-	it( 'validates a time draft and then submits its corrected local value', async () => {
-		const user = userEvent.setup();
-		const submit = vi.fn();
-		render(
-			<Form onFormSubmit={ submit }>
-				<Field.Root name="time">
-					<Field.Label>Time</Field.Label>
-					<TimeInput min="09:00" max="17:00" />
-					<Field.Error />
-				</Field.Root>
-				<button type="submit">Save</button>
-			</Form>
-		);
-		const input = screen.getByRole( 'textbox', { name: 'Time' } );
-		await user.type( input, '25:90' );
-		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
-		expect( submit ).not.toHaveBeenCalled();
-		expect( input ).toHaveValue( '25:90' );
-		await user.clear( input );
-		await user.type( input, '10:30' );
-		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
-		expect( submit ).toHaveBeenCalledWith(
-			{ time: '10:30' },
-			expect.anything()
-		);
-	} );
-	it( 'provides labels and descriptions in each higher-level control', () => {
-		render(
-			<>
-				<DateRangeInputControl label="Range" description="Trip dates" />
-				<TimeInputControl label="Time" description="Local time" />
-			</>
-		);
-		expect(
-			screen.getByRole( 'textbox', { name: 'Range' } )
-		).toHaveAccessibleDescription(
-			'Trip dates Use YYYY-MM-DD/YYYY-MM-DD, for example 2026-01-20/2026-01-22.'
-		);
-		expect(
-			screen.getByRole( 'textbox', { name: 'Time' } )
-		).toHaveAccessibleDescription(
-			'Local time Use 24-hour HH:mm, for example 10:30.'
-		);
-	} );
 } );
 
 describe( 'WordPress validation wrapper integration', () => {
@@ -396,6 +292,7 @@ describe( 'WordPress validation wrapper integration', () => {
 			<form onSubmit={ submit }>
 				<ControlWithError getValidityTarget={ () => ref.current }>
 					<DateInputControl
+						locale="sv-SE"
 						ref={ ref }
 						label="Date"
 						description={ description }
@@ -431,7 +328,13 @@ describe( 'text clipboard input', () => {
 	it( 'validates pasted text and emits only parsed dates', async () => {
 		const user = userEvent.setup();
 		const change = vi.fn();
-		render( <DateInput aria-label="Date" onValueChange={ change } /> );
+		render(
+			<DateInput
+				locale="sv-SE"
+				aria-label="Date"
+				onValueChange={ change }
+			/>
+		);
 		const input = screen.getByRole< HTMLInputElement >( 'textbox', {
 			name: 'Date',
 		} );
@@ -463,6 +366,7 @@ describe( 'native form reassociation', () => {
 					<button type="reset">Reset second</button>
 				</form>
 				<DateInput
+					locale="sv-SE"
 					aria-label="Date"
 					form={ form }
 					defaultValue="2026-01-20"

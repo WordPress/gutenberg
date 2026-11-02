@@ -7,14 +7,8 @@ import { ControlWithError } from '../../control-with-error';
 import { Stack } from '../../../../stack';
 import { Button } from '../../../../button';
 import { Text } from '../../../../text';
-import {
-	DateInputControl,
-	DateRangeInputControl,
-	TimeInputControl,
-} from '../../../date-text-input-control/date-text-input-control';
+import { DateInputControl } from '../../../date-text-input-control/date-text-input-control';
 import { DateInput } from '../date-input';
-import { DateRangeInput } from '../date-range-input';
-import { TimeInput } from '../time-input';
 
 const meta: Meta = {
 	title: 'Components/@wordpress-ui/Prototypes/Date text input',
@@ -24,7 +18,7 @@ const meta: Meta = {
 		docs: {
 			description: {
 				component:
-					'Unexported first-party prototype. One native Base UI text input per value, without a Base UI patch. Text entry uses ISO dates and 24-hour times. Calendar labels follow the supplied locale.',
+					'Blocked, unexported experiment. Localized text editing with ISO React values and native form values. Base UI Form and Field.validate still receive displayed text. Base UI is unpatched.',
 			},
 		},
 	},
@@ -34,30 +28,34 @@ type Story = StoryObj;
 
 export const Overview: Story = {
 	render: () => (
-		<Stack direction="column" gap="xl" style={ { maxWidth: 440 } }>
-			<Text render={ <h2 /> }>Date and time text inputs</Text>
+		<Stack direction="column" gap="lg" style={ { maxWidth: 480 } }>
+			<Text render={ <h2 /> }>Localized single-date input</Text>
+			<Text>Each field represents the ISO date 2026-02-20.</Text>
 			<DateInputControl
-				label="Subscription date"
-				description="Year, month, and day (YYYY-MM-DD)."
-				defaultValue="2026-01-20"
-				showCalendar
-			/>
-			<DateRangeInputControl
-				label="Travel dates"
-				description="Start and end dates, separated by a slash."
-				defaultValue={ { from: '2026-01-20', to: '2026-02-09' } }
-				showCalendar
-			/>
-			<TimeInputControl
-				label="Reminder time"
-				description="24-hour local time, including seconds."
-				defaultValue="10:30:00"
-				precision="second"
+				locale="it-IT"
+				label="Italian"
+				description="Day / month / year"
+				defaultValue="2026-02-20"
 			/>
 			<DateInputControl
-				label="Standalone date input"
-				description="The calendar button is optional."
+				locale="en-US"
+				label="English (United States)"
+				description="Month / day / year"
+				defaultValue="2026-02-20"
 			/>
+			<DateInputControl
+				locale="ja-JP"
+				label="Japanese"
+				description="Year / month / day"
+				defaultValue="2026-02-20"
+			/>
+			<Stack direction="column" dir="rtl">
+				<DateInputControl
+					locale="ar-EG"
+					label="العربية (مصر)"
+					defaultValue="2026-02-20"
+				/>
+			</Stack>
 		</Stack>
 	),
 };
@@ -65,90 +63,60 @@ export const Overview: Story = {
 export const BaseUiForm: Story = {
 	render: function Example() {
 		const [ submitted, setSubmitted ] = useState< unknown >( null );
+		const [ native, setNative ] = useState< unknown >( null );
+		const [ value, setValue ] = useState< string | null >( '2026-02-20' );
 		return (
 			<Form
-				onFormSubmit={ ( data ) => setSubmitted( data ) }
+				onSubmit={ ( event ) =>
+					setNative(
+						Object.fromEntries(
+							new FormData( event.currentTarget )
+						)
+					)
+				}
+				onFormSubmit={ setSubmitted }
+				onReset={ () => {
+					setSubmitted( null );
+					setNative( null );
+					setValue( '2026-02-20' );
+				} }
 				render={
 					<Stack
 						render={ <form /> }
 						direction="column"
-						gap="lg"
-						style={ { maxWidth: 440 } }
+						gap="md"
+						style={ { maxWidth: 520 } }
 					/>
 				}
 			>
-				<Text render={ <h2 /> }>Schedule a subscription</Text>
+				<Text render={ <h2 /> }>
+					Base UI form integration experiment
+				</Text>
+				<Text>
+					Blocked: Base UI Form submits the displayed text. The
+					required value is an ISO date.
+				</Text>
 				<BaseField.Root
 					name="date"
 					validationMode="onBlur"
 					render={ ( props, state ) => (
 						<Stack { ...props } direction="column" gap="sm">
 							<>{ props.children }</>
-							<Text
-								variant="body-sm"
-								style={ {
-									color: 'var(--wpds-color-foreground-content-neutral-weak)',
-								} }
-							>{ `Dirty: ${ state.dirty } · Touched: ${ state.touched } · Valid: ${ state.valid }` }</Text>
+							<Text variant="body-sm">{ `Dirty: ${ state.dirty } · Touched: ${ state.touched } · Valid: ${ state.valid }` }</Text>
 						</Stack>
 					) }
 				>
 					<Field.Label>Subscription date</Field.Label>
 					<DateInput
+						locale="it-IT"
 						required
-						defaultValue="2026-01-20"
+						defaultValue="2026-02-20"
+						onValueChange={ setValue }
 						min="2026-01-01"
 						max="2026-12-31"
-						showCalendar
 					/>
 					<Field.Description>
-						Enter a date in 2026 (YYYY-MM-DD).
-					</Field.Description>
-					<BaseField.Error
-						render={
-							<Text
-								variant="body-sm"
-								style={ {
-									color: 'var(--wpds-color-foreground-content-error-weak)',
-								} }
-							/>
-						}
-					/>
-				</BaseField.Root>
-				<BaseField.Root
-					name="range"
-					validationMode="onBlur"
-					render={ <Stack direction="column" gap="sm" /> }
-				>
-					<Field.Label>Travel dates</Field.Label>
-					<DateRangeInput
-						defaultValue={ {
-							from: '2026-01-20',
-							to: '2026-02-09',
-						} }
-						showCalendar
-					/>
-					<Field.Description>YYYY-MM-DD/YYYY-MM-DD</Field.Description>
-					<BaseField.Error
-						render={
-							<Text
-								variant="body-sm"
-								style={ {
-									color: 'var(--wpds-color-foreground-content-error-weak)',
-								} }
-							/>
-						}
-					/>
-				</BaseField.Root>
-				<BaseField.Root
-					name="time"
-					validationMode="onBlur"
-					render={ <Stack direction="column" gap="sm" /> }
-				>
-					<Field.Label>Reminder time</Field.Label>
-					<TimeInput defaultValue="10:30" min="09:00" max="17:00" />
-					<Field.Description>
-						Between 09:00 and 17:00.
+						Enter a date in 2026 (DD/MM/YYYY).
 					</Field.Description>
 					<BaseField.Error
 						render={
@@ -162,61 +130,37 @@ export const BaseUiForm: Story = {
 					/>
 				</BaseField.Root>
 				<Stack gap="sm">
-					<Button type="submit">Save schedule</Button>
-					<Button
-						variant="outline"
-						type="reset"
-						onClick={ () => setSubmitted( null ) }
-					>
+					<Button type="submit">Save date</Button>
+					<Button variant="outline" type="reset">
 						Reset
 					</Button>
 				</Stack>
-				<Text render={ <pre aria-label="Submitted values" /> }>
-					{ submitted
-						? JSON.stringify( submitted, null, 2 )
-						: 'No values submitted.' }
-				</Text>
+				<Text
+					render={ <pre aria-label="React value" /> }
+				>{ `React value: ${ JSON.stringify( value ) }` }</Text>
+				<Text
+					render={ <pre aria-label="Native form values" /> }
+				>{ `Native FormData: ${ native ? JSON.stringify( native ) : 'not submitted' }` }</Text>
+				<Text
+					render={ <pre aria-label="Base UI form values" /> }
+				>{ `Base UI Form: ${ submitted ? JSON.stringify( submitted ) : 'not submitted' }` }</Text>
 			</Form>
 		);
 	},
 };
-export const RtlCalendar: Story = {
-	render: () => (
-		<Stack
-			direction="column"
-			gap="lg"
-			dir="rtl"
-			style={ { maxWidth: 440 } }
-		>
-			<DateInputControl
-				label="التاريخ"
-				description="YYYY-MM-DD"
-				defaultValue="2026-01-20"
-				locale="ar-EG"
-				showCalendar
-			/>
-			<DateRangeInputControl
-				label="نطاق التاريخ"
-				description="YYYY-MM-DD/YYYY-MM-DD"
-				defaultValue={ { from: '2026-01-20', to: '2026-01-25' } }
-				locale="ar-EG"
-				showCalendar
-			/>
-		</Stack>
-	),
-};
+
 export const ReadOnlyAndDisabled: Story = {
 	render: () => (
 		<Stack direction="column" gap="lg" style={ { maxWidth: 440 } }>
 			<DateInputControl
+				locale="it-IT"
 				label="Read-only date"
-				defaultValue="2026-01-20"
+				defaultValue="2026-02-20"
 				readOnly
-				showCalendar
 			/>
 			<Field.Root disabled>
 				<Field.Label>Disabled date</Field.Label>
-				<DateInput defaultValue="2026-01-20" showCalendar />
+				<DateInput locale="it-IT" defaultValue="2026-02-20" />
 			</Field.Root>
 		</Stack>
 	),
@@ -230,7 +174,7 @@ export const NativeValidation: Story = {
 			<Stack
 				direction="column"
 				gap="lg"
-				style={ { maxWidth: 440 } }
+				style={ { maxWidth: 480 } }
 				render={
 					<form
 						onSubmit={ ( event ) => {
@@ -255,17 +199,17 @@ export const NativeValidation: Story = {
 				>
 					<DateInputControl
 						ref={ ref }
+						locale="it-IT"
 						label="Subscription date"
 						name="date"
-						description="Enter a valid date (YYYY-MM-DD)."
-						defaultValue="2026-01-20"
-						showCalendar
+						description="Enter a valid date (DD/MM/YYYY)."
+						defaultValue="2026-02-20"
 					/>
 				</ControlWithError>
 				<Button type="submit">Save date</Button>
 				<Text>
 					{ submitted
-						? `Saved: ${ submitted }`
+						? `Saved ISO date: ${ submitted }`
 						: 'No date submitted.' }
 				</Text>
 			</Stack>

@@ -14,7 +14,7 @@ describe( 'single-text DateInput integration', () => {
 			<Form onFormSubmit={ submit }>
 				<Field.Root name="date">
 					<Field.Label>Date</Field.Label>
-					<DateInput defaultValue="2026-02-20" />
+					<DateInput locale="sv-SE" defaultValue="2026-02-20" />
 					<Field.Error />
 				</Field.Root>
 				<button type="submit">Save</button>
@@ -42,7 +42,7 @@ describe( 'single-text DateInput integration', () => {
 			<>
 				<Field.Root ref={ ref } name="date">
 					<Field.Label>Date</Field.Label>
-					<DateInput />
+					<DateInput locale="sv-SE" />
 					<Field.Description>
 						Enter the subscription date.
 					</Field.Description>
@@ -51,7 +51,7 @@ describe( 'single-text DateInput integration', () => {
 			</>
 		);
 		const input = screen.getByRole( 'textbox', { name: 'Date' } );
-		expect( input ).toHaveAttribute( 'name', 'date' );
+		expect( input ).not.toHaveAttribute( 'name' );
 		expect( input ).toHaveAccessibleDescription(
 			'Enter the subscription date. Use YYYY-MM-DD, for example 2026-01-20.'
 		);

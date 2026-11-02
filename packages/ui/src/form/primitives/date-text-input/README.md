@@ -1,45 +1,40 @@
-# Date text input prototype
+# Single-date localized text input experiment
 
-This is an unexported alternative for [#82177](https://github.com/WordPress/gutenberg/issues/82177). Each date, range, or time is edited in one native text input. `@wordpress/ui` Input supplies the existing Base UI Field/Form integration. Calendar selection uses the existing Calendar or RangeCalendar inside Popover. No Base UI patch, private context, React Aria dependency, or WordPress settings are required.
+**Blocked. Do not export or ship this component.** Localized editing, ISO React values, and ISO native form values work in this prototype. Unpatched Base UI 1.9.0 still gives `Form.onFormSubmit` and `Field.validate` the displayed text. This does not meet the agreed integration contract.
 
-## Formatting decision
+This is the single-date investigation for [#82177](https://github.com/WordPress/gutenberg/issues/82177). Range inputs, time inputs, calendar popups, and their wrappers are outside this draft. The earlier segmented experiments remain in #86139 and #86140.
 
-This draft deliberately makes the displayed text equal to the canonical form value. Dates use ASCII Gregorian `YYYY-MM-DD`, ranges use `YYYY-MM-DD/YYYY-MM-DD`, and times use 24-hour `HH:mm` or `HH:mm:ss`. The `locale` prop affects the calendar only. It does not change the input's order, separators, numerals, or time format. This is an additional compromise beyond replacing segmented editing. It needs product agreement before shipping.
+## Intended contract
 
-A localized text input could still use the same Base UI registration, but Base UI Form would then receive localized text. Returning canonical data from that form would require an explicit conversion contract. A hidden canonical input alone does not change the value Base UI registers for the visible control. This prototype does not promise that conversion.
+`value`, `defaultValue`, `onValueChange`, constraints, native form values, and Base UI form values use Gregorian `YYYY-MM-DD` strings. `null` represents an empty React value; `undefined` selects uncontrolled mode. Empty native values serialize as `''`. Public empty strings and invalid ISO values are rejected. A complete date that violates a constraint can reach the callback, but validation prevents submission.
 
-## Components and values
+The editor uses numeric Gregorian dates in the supplied `locale`, with locale order, separators, and numerals. It uses the runtime locale when none is supplied, without reading WordPress settings. International calendar conversion is not implemented. For example, Thai editing uses localized Gregorian dates rather than Buddhist years. This is an explicit prototype limitation, not a claim of React Aria calendar parity or readiness for all WordPress locales.
 
-| Component | Public value | Native/Base UI form value |
-| --- | --- | --- |
-| `DateInput` | ISO date string or `null` | ISO date string or `''` |
-| `DateRangeInput` | `{ from: string \| undefined, to?: string }` or `null` | ISO interval string or `''` |
-| `TimeInput` | Local time string or `null` | Local time string or `''` |
+The parser requires four year digits and two month/day digits. It accepts locale digits or ASCII digits, ignores Unicode direction marks, and accepts surrounding whitespace. It does not guess another locale, use `Date.parse` for user text, or normalize impossible dates. Unparseable drafts remain editable and serialize an empty native value rather than a stale date. Complete dates serialize their current ISO value even when constraints reject them. Native submission validates first; direct FormData reads do not validate. Read-only controls follow native behavior and submit their date without constraint validation. A locale change replaces a draft with the accepted value in the new format.
 
-`value={ undefined }` means uncontrolled. `null` means empty. Use `defaultValue` for an uncontrolled initial value. Empty strings are not public date/time values. Invalid public values and invalid bounds throw a `RangeError`; invalid typed drafts stay visible for correction. A range may have one complete endpoint, matching RangeCalendar's partial-selection contract. An entirely empty range uses `null`.
+Changing only the locale currently marks the Base UI field dirty because its state follows the displayed text. This is another unmet integration requirement.
 
-`onValueChange` receives parsed values, partial ranges, or `null` when cleared. It does not fire for an incomplete or impossible date/time draft. Parsed values can still violate bounds, availability, or range ordering; those errors block submission. The details object identifies typing or calendar selection and provides `cancel()`. Controlled consumers can also reject a change by retaining their value. Rejected complete changes restore the accepted value. Incomplete drafts remain editable until replaced, cleared, reset, or superseded by a different controlled value.
+The forwarded ref targets the visible native input. Field labeling, descriptions, disabled state, focus, dirty, filled, touched, native validity, server errors, and reset use the existing input integration. `DateInputControl` uses the same label/description composition as `InputControl`.
 
-`min` and `max` are inclusive. `isDateUnavailable` uses ISO dates. For ranges, availability applies to the endpoints; an unavailable date inside a range does not invalidate it. Time bounds use the selected precision and cannot wrap across midnight. Dates carry no time zone; times carry no date or offset. UTC is used only when adapting date-only strings to the Calendar's Date objects.
+## Verified integration gap
 
-`showCalendar` defaults to false. Both date components support a calendar button alongside inline editing. The calendar uses the same date constraints. A partial range keeps the popup open; a complete selection closes it. Escape returns focus to the input. Outside dismissal preserves the clicked target's focus. Calendar labels, RTL direction, and week conventions come from the existing calendar. Text is always left-to-right so ISO values remain readable in an RTL form.
+| Public composition | Native FormData | Base UI Form | Remaining failure |
+| --- | --- | --- | --- |
+| This prototype: localized Input plus hidden ISO value | ISO | Localized text | Field.validate also receives text. |
+| Input with an ISO controlled prop and localized render override | ISO with a hidden input | Localized text | Submit validation gets ISO, but blur/Enter validation reads the displayed text. |
+| Register a hidden canonical Field.Control | ISO | ISO | Label focus needs forwarding; unchanged canonical values do not track partial drafts or clear server errors. |
+| Combobox selected ISO value plus localized inputValue | ISO | ISO | Partial edits do not mark the field dirty/filled. Draft objects would leak into Field.validate. |
 
-`DateInputControl`, `DateRangeInputControl`, and `TimeInputControl` add the same Field label, description, and details composition as InputControl. Forwarded refs point to the actual native input. Standard `render`, input names, required, disabled, read-only, form association, and native input events remain available. `onValueChange` also covers calendar selection; native `onChange` describes text-input events.
+`Field.Control` registers a getter that reads the referenced input's `.value`, and `Form.onFormSubmit` calls that getter. Controlled registration values and editable DOM values cannot be given separate public serializers. The internal registration API is not exported. A hidden input fixes native serialization but does not alter Base UI's registered getter.
 
-## Validation and forms
+This is missing public custom-control support, not a demonstrated defect in ordinary Base UI Input behavior. The next upstream discussion should cover separate logical value, editable draft/state, serialization, and focus/validation targets. No Base UI files or dependency versions are changed here. DOM-value interception, private imports, and submit-time value swaps are deliberately absent.
 
-The visible input owns native `setCustomValidity` for date/time parsing and constraints. There is no hidden last-valid-value control. Native submission and Base UI Form submission reject incomplete, impossible, out-of-bounds, unavailable, and reversed drafts. Native FormData construction does not validate: if called directly while the input is invalid, it returns the current draft. Consumers must use the form's validation before treating submitted text as canonical.
+## Verification
 
-Base UI owns label/description association, focus, dirty, touched, validation timing, custom validation, and server errors. Its state describes the native text input. Moving from the input to its calendar button blurs the input, just as moving to an auxiliary button in another text control does. The prototype does not redefine Field focus as focus anywhere inside the calendar.
+The `BLOCKED:` tests use Vitest `it.fails` to execute the desired ISO assertions and record known unmet requirements. They are not skipped. A test run that succeeds still means these requirements failed as expected; it does not make this draft viable. Remove `fails` to see the direct failures. An unexpected success also fails the test suite and requires reviewing the blocker.
 
-For additional validation, use Base UI Field's `validate` or Form's `errors`. The WordPress `ControlWithError` wrapper can observe the date control's own validity without clearing it. This draft fixes the wrapper's unconditional clearing when `customValidity` is omitted. Explicit `ControlWithError.customValidity` still takes ownership of the native error slot and must not be combined with this input's independent validator.
+`localized-contract.jsdom.test.tsx` isolates the public Base UI alternatives. `localized-input.jsdom.test.tsx` checks the actual prototype, including its unmet form and custom-validation contracts. Other tests cover ISO-locale behavior, localized parsing and numerals, native submission, invalid dates and bounds, reset and reassociation, cancellation, controlled values, WordPress validation, and browser keyboard interactions.
 
-Native reset restores the uncontrolled default or retains the controlled value without emitting `onValueChange`. Canceling reset preserves the draft. Reassociating the input with another form moves its reset listener too.
+Storybook: **Components → @wordpress-ui → Prototypes → Date text input**. The Base UI form story shows the React value, native FormData, and actual Base UI submission side by side. The Native validation story demonstrates localized errors and ISO submission through the WordPress wrapper.
 
-## Review and verification
-
-Open Storybook's **Prototypes → Date text input** stories for standalone controls, date/range calendars, Base UI forms, WordPress error-wrapper composition, RTL calendars, and disabled/read-only states.
-
-The tests cover Gregorian leap-year boundaries and years 0001–9999; strict date/time parsing; bounds, availability, and range order; controlled acceptance/rejection and cancellation; partial drafts and ranges; reset and form reassociation; Field labels, descriptions, focus, dirty, touched, and validation timing; custom/server errors; native and Base UI submission; keyboard calendar selection and dismissal; read-only and disabled inputs; and canonical text with several calendar locales. Clipboard parsing is covered in jsdom; actual paste was also checked in the browser preview.
-
-Browser tests run in Chromium through the repository's standard test command. Locale cases assert calendar direction and stable ISO text, not exhaustive localized calendar formatting. This is not a React Aria segmented-editor parity claim. Screen-reader speech, mobile keyboards, and editor/admin integration still require verification. The prototype is not part of the package entrypoint and must not be treated as a released API.
+Passing isolated tests and screenshots do not establish screen-reader, mobile, editor, or full locale coverage. This prototype remains blocked before package exports or consumer adoption.

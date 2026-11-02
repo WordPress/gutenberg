@@ -1,9 +1,0 @@
-@layer wp-ui {
-	@layer utilities, components, compositions, overrides;
-
-	@layer compositions {
-		.popup {
-			width: min(24rem, calc(100vw - 2 * var(--wpds-dimension-gap-lg)));
-		}
-	}
-}

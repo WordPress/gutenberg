@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseISODate, toCalendarDate, fromCalendarDate } from '../date-model';
+import { parseISODate } from '../date-model';
 
 describe( 'date text validation', () => {
 	it.each( [
@@ -10,9 +10,8 @@ describe( 'date text validation', () => {
 		'2026-02-28',
 		'2026-04-30',
 		'9999-12-31',
-	] )( 'accepts and preserves %s across Calendar conversion', ( text ) => {
+	] )( 'accepts and preserves %s', ( text ) => {
 		expect( parseISODate( text ) ).toBe( text );
-		expect( fromCalendarDate( toCalendarDate( text ) ) ).toBe( text );
 	} );
 	it.each( [
 		'',
