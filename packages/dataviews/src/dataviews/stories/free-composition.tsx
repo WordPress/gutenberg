@@ -95,7 +95,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					</Card.Root>
 				</Stack>
 			</div>
-			<DataViews.Layout className={ styles.layout } />
+			<DataViews.Layout />
 		</>
 	);
 }

@@ -27,7 +27,7 @@ function getFocusableContext(
 	const focusables = finder.find( container );
 
 	const index = focusables.indexOf( target as HTMLElement );
-	if ( index > -1 ) {
+	if ( index > -1 || ( ! tabbableOnly && target === container ) ) {
 		return { index, target, focusables };
 	}
 	return null;
@@ -76,7 +76,10 @@ function UnforwardedNavigableContainer(
 				const targetHasMenuItemRole =
 					!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
-				if ( targetHasMenuItemRole ) {
+				if (
+					targetHasMenuItemRole ||
+					( ! onlyBrowserTabstops && event.target === container )
+				) {
 					event.preventDefault();
 				}
 			}
@@ -101,9 +104,12 @@ function UnforwardedNavigableContainer(
 			}
 
 			const { index, focusables } = context;
-			const nextIndex = cycle
-				? cycleValue( index, focusables.length, offset )
-				: index + offset;
+			let nextIndex = index + offset;
+			if ( index === -1 ) {
+				nextIndex = offset > 0 ? 0 : focusables.length - 1;
+			} else if ( cycle ) {
+				nextIndex = cycleValue( index, focusables.length, offset );
+			}
 
 			if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 				focusables[ nextIndex ].focus();
