@@ -8,7 +8,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Menu,
@@ -23,8 +23,6 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
-
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	const menuActionsRef = useRef( null );

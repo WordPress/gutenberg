@@ -11,14 +11,8 @@ vi.mock( import( '@wordpress/block-editor' ), () => ( {
 } ) );
 
 vi.mock( import( '@wordpress/global-styles-engine' ), () => ( {
-	privateApis: {},
-} ) );
-
-vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: () => ( {
-		getResponsiveMediaQueries: ( ...args ) =>
-			mockGetResponsiveMediaQueries( ...args ),
-	} ),
+	getResponsiveMediaQueries: ( ...args ) =>
+		mockGetResponsiveMediaQueries( ...args ),
 } ) );
 
 describe( 'Navigation layout custom properties', () => {

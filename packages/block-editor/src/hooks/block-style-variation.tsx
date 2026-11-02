@@ -4,8 +4,9 @@ import { useMemo } from '@wordpress/element';
 import {
 	toStyles,
 	getBlockSelectors,
-	privateApis as globalStylesEnginePrivateApis,
+	getVariationStyle,
 } from '@wordpress/global-styles-engine';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -16,8 +17,6 @@ import type {
 	OverrideStylesProps,
 	StyleOverrideOptions,
 } from './types';
-
-const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -251,7 +250,7 @@ function useBlockProps( {
 			return;
 		}
 
-		const variationConfig = { settings, styles };
+		const variationConfig = { settings, styles } as GlobalStylesConfig;
 		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;

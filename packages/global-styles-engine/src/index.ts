@@ -30,9 +30,25 @@ export {
 	getResolvedValue,
 	splitSelectorList,
 } from './utils/common';
-export { privateApis } from './private-apis';
+export {
+	getResponsiveMediaQueries,
+	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
+} from './utils/viewport';
+export {
+	getDuotoneFilter,
+	getDuotoneStylesheet,
+	getDuotoneUnsetStylesheet,
+} from './utils/duotone';
+export { resolveStyle } from './resolve-style';
+export { getVariationStyle } from './variation';
 
 // Types
 export type * from './types';
+export type {
+	ResolvedStyle,
+	SourceDescriptor,
+	ResolveStyleContext,
+} from './resolve-style';
 
 export { generatePreviewStateStyles as __unstableGeneratePreviewStateStyles } from './preview-state-styles';

@@ -57,8 +57,12 @@ export function getDuotoneStylesheet( selector: string, id: string ) {
  *
  * @return Duotone SVG.
  */
-export function getDuotoneFilter( id: string, colors: string[] ) {
-	const values = getValuesFromColors( colors );
+export function getDuotoneFilter(
+	id: string,
+	colors?: string[] | string | null
+) {
+	const colorArray = Array.isArray( colors ) ? colors : [];
+	const values = getValuesFromColors( colorArray );
 	return `
 <svg
 	xmlns:xlink="http://www.w3.org/1999/xlink"
