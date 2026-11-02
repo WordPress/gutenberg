@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
 -   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).
 -   List: Use the UI SelectControl for the List style setting ([#86141](https://github.com/WordPress/gutenberg/pull/86141)).
 -   Latest Comments: Use the UI SelectControl for the Display content setting ([#86138](https://github.com/WordPress/gutenberg/pull/86138)).
