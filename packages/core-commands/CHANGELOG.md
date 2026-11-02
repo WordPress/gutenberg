@@ -6,6 +6,10 @@
 
 -   Add native TypeScript support and export the command palette settings and admin menu command types ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).
 
+### Bug Fixes
+
+-   Command Palette: Fix the classic-theme guard so template commands are filtered out while template part commands stay available ([#86131](https://github.com/WordPress/gutenberg/pull/86131)).
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes
