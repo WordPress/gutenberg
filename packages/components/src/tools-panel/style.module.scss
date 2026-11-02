@@ -98,6 +98,11 @@
 
 .default-controls-item {
 	color: $gray-900;
+
+	// Match the foreground of the highlighted item's brand fill.
+	&:focus .reset-label {
+		color: inherit;
+	}
 }
 
 // Preserve the established specificity so disabled MenuItem styles

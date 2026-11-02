@@ -3475,4 +3475,166 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Notes shared by several blocks', () => {
+		test( 'shows, moves, deletes and restores a note on duplicated blocks', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			// Keeps the toolbar button once the shared note is deleted.
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/heading',
+				attributes: { content: 'Other block' },
+				comment: 'Other note',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Duplicate me' },
+				comment: 'Shared note',
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = blockNoteUtils.getThread( 'Shared note' );
+			// Moves focus out of the new thread, so only the caret selects notes.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await paragraphs.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await pageUtils.pressKeys( 'primary+shift+d' );
+			await expect( paragraphs ).toHaveCount( 2 );
+
+			const toolbar = page.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} );
+
+			await test.step( 'Keeps the note selected on the copy', async () => {
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+
+			await test.step( 'Lists the note once', async () => {
+				await expect( thread ).toHaveCount( 1 );
+			} );
+
+			await test.step( 'Counts the note on each copy', async () => {
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note (1 note)',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+
+			await test.step( 'Goes back to the selected copy', async () => {
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await thread.click();
+					await expect( thread ).toHaveAttribute(
+						'aria-expanded',
+						'true'
+					);
+					await thread
+						.getByRole( 'button', { name: 'Back to block' } )
+						.focus();
+					await page.keyboard.press( 'Enter' );
+					await expect( paragraphs.nth( index ) ).toBeFocused();
+				}
+			} );
+
+			await test.step( 'Deletes the note from every copy', async () => {
+				await thread.click();
+				await blockNoteUtils.deleteNote();
+				await expect( thread ).toBeHidden();
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+
+			await test.step( 'Restores the note on every copy', async () => {
+				await blockNoteUtils
+					.getNotice( 'Note deleted.' )
+					.getByRole( 'button', { name: 'Undo' } )
+					.click();
+				await expect(
+					blockNoteUtils.getNotice( 'Note restored.' )
+				).toBeVisible();
+				await expect( thread ).toHaveCount( 1 );
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note (1 note)',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+		} );
+
+		test( 'selects and resolves an inline note split across blocks', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Split note' );
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marks ).toHaveAttribute( 'data-id', /^\d+$/ );
+
+			await paragraphs.click();
+			await blockNoteUtils.selectBlockText( { start: 5, length: 0 } );
+			await page.keyboard.press( 'Enter' );
+			await expect( paragraphs ).toHaveCount( 2 );
+			await expect( marks ).toHaveCount( 2 );
+
+			const thread = blockNoteUtils.getThread( 'Split note' );
+
+			await test.step( 'Lists the note once', async () => {
+				await expect( thread ).toHaveCount( 1 );
+			} );
+
+			await test.step( "Selects the note from the first half's marker", async () => {
+				// Moves the block toolbar off the first marker.
+				await editor.canvas
+					.getByRole( 'textbox', { name: 'Add title' } )
+					.click();
+				await marks.first().click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await page.keyboard.type( '!' );
+				await expect( paragraphs.first() ).toContainText( '!' );
+				await expect( paragraphs.nth( 1 ) ).not.toContainText( '!' );
+			} );
+
+			await test.step( 'Resolves the note in both halves', async () => {
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marks ).toHaveCount( 0 );
+			} );
+		} );
+	} );
 } );

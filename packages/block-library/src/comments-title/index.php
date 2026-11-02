@@ -17,12 +17,12 @@
 function render_block_core_comments_title( $attributes ) {
 
 	if ( post_password_required() ) {
-		return;
+		return '';
 	}
 
 	$align_class_name    = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
-	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
+	$show_post_title     = ! empty( $attributes['showPostTitle'] );
+	$show_comments_count = ! empty( $attributes['showCommentsCount'] );
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 	$comments_count      = get_comments_number();
 	$post_title          = get_the_title();
@@ -32,7 +32,7 @@ function render_block_core_comments_title( $attributes ) {
 	}
 
 	if ( '0' === $comments_count ) {
-		return;
+		return '';
 	}
 
 	if ( $show_comments_count ) {

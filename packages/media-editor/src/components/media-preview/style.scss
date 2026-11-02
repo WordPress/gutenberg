@@ -48,11 +48,25 @@
 		max-width: 100%;
 	}
 
-	&--file {
-		text-align: center;
+	&--pdf {
+		align-items: stretch;
+		width: 100%;
+		max-width: $wide-content-width;
+		margin-inline: auto;
+	}
+
+	&__pdf {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+		border: 0;
+		border-radius: $radius-small;
 	}
 
 	&__file-info {
+		text-align: center;
 		background: $gray-100;
 		padding: $grid-unit-30;
 		border-radius: 2px;

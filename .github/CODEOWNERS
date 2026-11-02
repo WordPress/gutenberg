@@ -74,5 +74,7 @@
 # An entry without an owner cancels the rules above it, and last match wins,
 # so these stay at the end. Removing them brings back the review requests.
 /tools/eslint/suppressions.json
+/tools/phpstan/base.neon
+/tools/phpstan/baseline.neon
 /tools/stylelint/stylelint-suppressions.json
 /tools/validation/check-private-apis.config.json
