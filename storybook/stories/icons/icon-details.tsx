@@ -1,5 +1,5 @@
 import { Icon } from '@wordpress/icons';
-import { Badge, Stack, Text, VisuallyHidden } from '@wordpress/ui';
+import { Badge, Stack, Text } from '@wordpress/ui';
 import { CopySvgButton } from './copy-svg-button';
 import {
 	ALL_ICONS_MANIFEST,
@@ -39,24 +39,14 @@ export function IconDetails( { name }: { name: string } ) {
 					wrap="wrap"
 					style={ { margin: 0, padding: 0, listStyle: 'none' } }
 				>
-					{ COLLECTIONS.map( ( { value, label } ) => {
-						const isAvailable =
-							value === 'all' || collections.includes( value );
-						return (
-							<li key={ value }>
-								<Badge
-									intent={ isAvailable ? 'stable' : 'none' }
-								>
-									{ label }
-								</Badge>
-								{ ! isAvailable && (
-									<VisuallyHidden>
-										(not available)
-									</VisuallyHidden>
-								) }
-							</li>
-						);
-					} ) }
+					{ COLLECTIONS.filter(
+						( { value } ) =>
+							value === 'all' || collections.includes( value )
+					).map( ( { value, label } ) => (
+						<li key={ value }>
+							<Badge>{ label }</Badge>
+						</li>
+					) ) }
 				</Stack>
 			</Stack>
 		</Stack>
