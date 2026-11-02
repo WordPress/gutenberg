@@ -311,6 +311,7 @@ export default function CoverInspectorControls( {
 					<MediaControl
 						mediaId={ id }
 						mediaUrl={ url }
+						mediaType={ isImageBackground ? 'image' : 'video' }
 						filename={
 							image?.media_details?.sizes?.full?.file ||
 							image?.slug ||
