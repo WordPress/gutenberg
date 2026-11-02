@@ -12,9 +12,7 @@ import useBlockBindingsUtils from '../use-block-bindings-utils';
 import BlockBindingsAttributeControl from '../attribute-control';
 import type { Binding } from '../../../utils/block-bindings';
 
-vi.mock( import( '../../../../../data/src/components/use-select' ), {
-	spy: true,
-} );
+vi.mock( import( '@wordpress/data' ), { spy: true } );
 
 vi.mock( import( '../use-block-bindings-utils' ), () => ( {
 	default: vi.fn(),

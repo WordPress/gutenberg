@@ -6,13 +6,13 @@ import { Navigator, useNavigator } from '@wordpress/components';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
+import '@wordpress/dataviews/build-style/style.css';
+import '@wordpress/components/build-style/style.css';
 import ScreenRevisions from '../';
 import { GlobalStylesContext } from '../../context';
 import useGlobalStylesRevisions from '../use-global-styles-revisions';
 import type { Revision } from '../types';
 import type { GlobalStylesContextType } from '../../context';
-import '../../../../dataviews/src/style.scss';
-import '../../../../components/src/modal/style.scss';
 import '../style.scss';
 
 vi.mock(
