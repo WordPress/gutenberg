@@ -1,5 +1,9 @@
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, IconButton } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	IconButton,
+} from '@wordpress/ui';
 import type { WidgetCallbackAction } from '@wordpress/widget-primitives';
 
 interface CallbackActionProps {
