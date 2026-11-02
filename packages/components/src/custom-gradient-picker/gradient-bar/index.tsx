@@ -11,6 +11,25 @@ import type {
 	CustomGradientBarIdleState,
 } from '../types';
 
+const isLightGradient = (
+	background: React.CSSProperties[ 'background' ]
+): boolean => {
+	if ( typeof background !== 'string' ) {
+		return false;
+	}
+
+	return (
+		background.includes( 'rgb(255, 255, 255)' ) ||
+		background.includes( '#fff' ) ||
+		background.includes( '#ffffff' ) ||
+		background.includes( 'white' ) ||
+		// Check for rgba with high values.
+		/rgba?\(\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d),\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d),\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)(?:,\s*(?:0?\.\d+|1))?\s*\)/.test(
+			background
+		)
+	);
+};
+
 const customGradientBarReducer = (
 	state: CustomGradientBarReducerState,
 	action: CustomGradientBarReducerAction
@@ -125,7 +144,11 @@ export default function CustomGradientBar( {
 		<div
 			className={ clsx(
 				'components-custom-gradient-picker__gradient-bar',
-				{ 'has-gradient': hasGradient }
+				{
+					'has-gradient': hasGradient,
+					'has-light-gradient':
+						hasGradient && isLightGradient( background ),
+				}
 			) }
 			onMouseEnter={ onMouseEnterAndMove }
 			onMouseMove={ onMouseEnterAndMove }
