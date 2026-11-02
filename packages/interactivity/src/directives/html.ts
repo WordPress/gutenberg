@@ -4,6 +4,7 @@ import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
+import { getHtmlFallback } from '../vdom';
 import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
 
 /**
@@ -26,10 +27,15 @@ directive(
 		// Serialized HTML last applied or rejected; non-token values reset it
 		// to empty HTML so returning tokens are applied again after a removal.
 		const lastAppliedKey = useRef< string | undefined >( undefined );
-		// Fixed at the first render. Preact writes only when creating the node;
-		// all later writes, including navigation updates, belong to the effect.
+		// The value-rule state belongs to a host element, not its wrapper vnode.
+		const previousHost = useRef< HTMLElement | null >( null );
+		// Inputs are compared inside the effect so host replacements can be
+		// detected on every commit without repeating unchanged value-rule work.
+		const previousInputs = useRef< unknown[] | null >( null );
+		// Preact always receives empty HTML; fallback copies and later writes
+		// belong to this directive's layout effect.
 		const preactHtml = useRef< {
-			/** Empty HTML or the preserved fallback applied only at creation. */
+			/** The policy-free empty HTML value Preact can safely apply. */
 			__html: string;
 		} >();
 		// Evaluated value, or undefined when evaluation or its function throws.
@@ -67,11 +73,51 @@ directive(
 		const trusted = isDangerousHTML( result );
 		// Current token payload or the policy-free removal value.
 		const resolvedValue = trusted ? getDangerousHTML( result ) : emptyHTML;
+		// The detached fallback captured when this vnode was built.
+		const fallback = getHtmlFallback( element );
 
-		// Hydration never writes Preact's __html. Apply the current value only
-		// after commit, adopting exactly matching unwritten server nodes.
+		// Apply after commit; matching server nodes or content kept for the
+		// representation can be adopted without another innerHTML write. The
+		// vnode dependency makes this run for possible host replacements too.
 		useLayoutEffect( () => {
+			const node = ( element.ref as RefObject< HTMLElement > ).current!;
+			const hostChanged = previousHost.current !== node;
+			const inputs = [
+				result,
+				active,
+				preserveContent,
+				serverHTMLRepresentation,
+				trusted,
+				resolvedValue,
+				element.ref,
+			];
+			const inputsChanged =
+				previousInputs.current === null ||
+				inputs.some(
+					( input, index ) =>
+						input !== previousInputs.current![ index ]
+				);
+			previousInputs.current = inputs;
+
+			if ( hostChanged ) {
+				previousHost.current = node;
+				lastAppliedKey.current = undefined;
+				if (
+					active &&
+					preserveContent &&
+					! node.hasChildNodes() &&
+					fallback?.hasChildNodes()
+				) {
+					node.append(
+						node.ownerDocument.importNode( fallback, true )
+					);
+				}
+			}
+
 			if ( ! active ) {
+				return;
+			}
+			if ( ! hostChanged && ! inputsChanged ) {
 				return;
 			}
 			if ( preserveContent ) {
@@ -92,7 +138,6 @@ directive(
 			if ( lastAppliedKey.current === key ) {
 				return;
 			}
-			const node = ( element.ref as RefObject< HTMLElement > ).current!;
 			if (
 				lastAppliedKey.current === undefined &&
 				node.innerHTML === key
@@ -121,14 +166,15 @@ directive(
 			serverHTMLRepresentation,
 			trusted,
 			resolvedValue,
+			fallback,
 			element.ref,
+			element,
 		] );
 
 		if ( active ) {
-			preactHtml.current ??=
-				preserveContent && element.props.dangerouslySetInnerHTML?.__html
-					? element.props.dangerouslySetInnerHTML
-					: { __html: emptyHTML as unknown as string };
+			preactHtml.current ??= {
+				__html: emptyHTML as unknown as string,
+			};
 			element.props.dangerouslySetInnerHTML = preactHtml.current;
 			element.props.children = undefined;
 		}

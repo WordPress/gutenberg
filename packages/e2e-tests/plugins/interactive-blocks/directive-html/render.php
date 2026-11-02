@@ -8,8 +8,37 @@
 wp_interactivity_state(
 	'directive-html',
 	array(
-		'serverHtml' => array( 'wpServerHtml' => true ),
+		'serverHtml'           => array( 'wpServerHtml' => true ),
+		'lazy'                 => static function () {
+			return null;
+		},
+		/**
+		 * Leaves the list pending until its client fixture getter is registered.
+		 *
+		 * @return null Pending list value.
+		 */
+		'pendingHydrationList' => static function () {
+			return null;
+		},
 	)
+);
+
+add_filter(
+	'script_module_data_@wordpress/interactivity',
+	/**
+	 * Marks client-only values as pending until their fixture actions register.
+	 *
+	 * @param array|null $data Serialized Interactivity API server data.
+	 * @return array Server data with the pending fixture value declarations.
+	 */
+	static function ( $data ) {
+		$data = $data ?? array();
+		$data['derivedStateClosures']['directive-html'] = array_merge(
+			$data['derivedStateClosures']['directive-html'] ?? array(),
+			array( 'state.lazy', 'state.pendingHydrationList' )
+		);
+		return $data;
+	}
 );
 ?>
 
@@ -27,6 +56,41 @@ wp_interactivity_state(
 	<button data-wp-on--click="actions.setServerHtml" data-testid="set server html">Set Server HTML</button>
 	<ul data-testid="created items">
 		<template data-wp-each="state.list"><li><div data-wp-html="state.empty"></div></li></template>
+	</ul>
+	<button data-wp-on--click="actions.addFallback" data-testid="add fallback">Add fallback</button>
+	<button data-wp-on--click="actions.addTwoFallbacks" data-testid="add two fallbacks">Add two fallbacks</button>
+	<button data-wp-on--click="actions.addLazyItem" data-testid="add lazy item">Add lazy item</button>
+	<button data-wp-on--click="actions.registerLazy" data-testid="register lazy">Register lazy value</button>
+	<button data-wp-on--click="actions.addScriptItems" data-testid="add script items">Add script items</button>
+	<button data-wp-on--click="actions.addValueItems" data-testid="add value items">Add value items</button>
+	<button data-wp-on--click="actions.addEmptyItem" data-testid="add empty item">Add empty item</button>
+	<button data-wp-on--click="actions.rejectFirstItem" data-testid="reject first item">Reject first item</button>
+	<button data-wp-on--click="actions.addRejectedItem" data-testid="add rejected item">Add rejected item</button>
+	<button data-wp-on--click="actions.resolvePendingList" data-testid="resolve pending list">Resolve pending list</button>
+	<ul data-testid="fallback items">
+		<template data-wp-each="state.fallbackItems"><li><div data-wp-html="context.item.html"><p>Loading</p></div></li></template>
+	</ul>
+	<ul data-testid="lazy items">
+		<template data-wp-each="state.lazyItems"><li><div data-wp-html="state.lazy"><p>Loading</p></div></li></template>
+	</ul>
+	<ul data-testid="script items">
+		<template data-wp-each="state.scriptItems"><li><div data-wp-html="context.item.html"><p>Loading</p><script>window.fallbackRuns = ( window.fallbackRuns || 0 ) + 1;</script></div></li></template>
+	</ul>
+	<ul data-testid="value items">
+		<template data-wp-each="state.valueItems"><li><div data-wp-html="context.item.html"><p>Loading</p></div></li></template>
+	</ul>
+	<ul data-testid="empty fallback items">
+		<template data-wp-each="state.emptyItems"><li><div data-wp-html="context.item.html"></div></li></template>
+	</ul>
+	<ul data-testid="hydration items">
+		<template data-wp-each="state.hydrationList"><li><span data-wp-html="context.item.html"><i>Fallback</i></span></li></template>
+		<li data-wp-each-child><span data-wp-html="context.item.html"><b>one</b></span></li>
+		<li data-wp-each-child><span data-wp-html="context.item.html"><b>two</b></span></li>
+	</ul>
+	<ul data-testid="pending hydration items">
+		<template data-wp-each="state.pendingHydrationList"><li><span data-wp-html="context.item.html"><i>Fallback</i></span></li></template>
+		<li data-wp-each-child><span data-wp-html="context.item.html"><b>pending one</b></span></li>
+		<li data-wp-each-child><span data-wp-html="context.item.html"><b>pending two</b></span></li>
 	</ul>
 	<button data-wp-on--click="actions.setRejected" data-testid="set rejected html">Set Rejected HTML</button>
 

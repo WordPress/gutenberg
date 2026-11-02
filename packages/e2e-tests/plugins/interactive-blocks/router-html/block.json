@@ -8,7 +8,9 @@
 	"attributes": {
 		"page": { "type": "string" },
 		"value": { "type": "string", "default": "null" },
-		"next": { "type": "string" }
+		"next": { "type": "string" },
+		"resource": { "type": "string" },
+		"prefetch": { "type": "boolean", "default": false }
 	},
 	"supports": {
 		"interactivity": true
