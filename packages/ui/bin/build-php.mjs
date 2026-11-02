@@ -402,6 +402,10 @@ async function main() {
 				content: example.content,
 			},
 			{ props: example.props ?? {}, content: 'Save & <continue> "now"' },
+			{
+				props: { ...example.props, class: 'is-&amp;' },
+				content: 'A &amp; B &hellip; &#8217;',
+			},
 			...( component.compositionExamples ?? [] ).map(
 				( composition ) => ( {
 					props: { ...example.props, ...composition.props },

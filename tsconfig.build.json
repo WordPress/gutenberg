@@ -20,6 +20,7 @@
 		{ "path": "packages/compose/tsconfig.build.json" },
 		{ "path": "packages/core-abilities/tsconfig.build.json" },
 		{ "path": "packages/core-actions/tsconfig.build.json" },
+		{ "path": "packages/core-commands/tsconfig.build.json" },
 		{ "path": "packages/core-data/tsconfig.build.json" },
 		{ "path": "packages/core-fields/tsconfig.build.json" },
 		{ "path": "packages/data/tsconfig.build.json" },

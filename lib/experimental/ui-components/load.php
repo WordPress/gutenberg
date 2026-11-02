@@ -63,10 +63,13 @@ function gutenberg_ui_components_enqueue_assets() {
 /**
  * Returns the HTML of a `@wordpress/ui` component.
  *
- * The content is plain text, escaped when rendered. Unknown or invalid props
- * fall back to their default with a `_doing_it_wrong()` notice, so the screen
- * still renders. Missing required content, or a missing or invalid required
- * prop, renders nothing.
+ * The content is plain text, escaped when rendered. Entities show as written,
+ * as in React, so decode a string that is already HTML-encoded, such as the
+ * result of `get_the_title()` or a translated string like
+ * `__( 'Loading&hellip;' )`, first. Unknown or invalid props fall back to their
+ * default with a `_doing_it_wrong()` notice, so the screen still renders.
+ * Missing required content, or a missing or invalid required prop, renders
+ * nothing.
  *
  * Components that accept other components as content take them as returned
  * by this function, so nesting reads like nested calls:
@@ -172,7 +175,7 @@ function gutenberg_ui_components_render_content( $content, $allows_components ) 
 		return '';
 	}
 	if ( is_string( $content ) ) {
-		return $allows_components ? htmlspecialchars( $content, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ) : $content;
+		return $allows_components ? gutenberg_ui_components_esc_plain_text( $content ) : $content;
 	}
 	if ( ! $allows_components ) {
 		return null;
@@ -223,6 +226,21 @@ function gutenberg_ui_components_safe_html( $html ) {
 		);
 	}
 	return $create( $html );
+}
+
+/**
+ * Escapes plain text for HTML text or an attribute value, as React does.
+ *
+ * React escapes `&`, `<`, `>`, `"` and `'` in every string and never reads
+ * entities in it, so any entity a caller passes shows as written. Unlike
+ * `esc_html()` and `esc_attr()`, which leave existing entities alone, this
+ * does the same.
+ *
+ * @param string $text Plain text.
+ * @return string Escaped text.
+ */
+function gutenberg_ui_components_esc_plain_text( $text ) {
+	return htmlspecialchars( $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
 }
 
 /**

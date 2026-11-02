@@ -43,6 +43,8 @@ Generally, the parent button should have a triangular icon to the right of the i
 
 The parent button should retain the same visual styling regardless of whether the DropdownMenu is displayed or not.
 
+Opening the menu with a pointer focuses the menu container without highlighting an item. Arrow keys then move focus into the menu. Opening it with Enter, Space, or ArrowDown focuses the first item. Set `popoverProps.focusOnMount` to override this default focus behavior.
+
 #### Placement
 
 The DropdownMenu should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full DropdownMenu, it can be displayed instead above the parent button.
