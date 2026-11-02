@@ -66,9 +66,7 @@ export default function InnerContent( { clientId }: { clientId: string } ) {
 		// The container renders before the layout effect runs.
 		const container = containerRef.current!;
 
-		// Sanitize before injecting into the canvas: `safeHTML` removes
-		// `<script>` elements and inline event handlers, matching how block
-		// save content is rendered elsewhere in the editor.
+		// The canvas shares the editor's origin, so nothing else isolates this.
 		container.innerHTML = safeHTML( html );
 
 		setSlots(

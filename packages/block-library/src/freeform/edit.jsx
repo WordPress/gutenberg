@@ -5,6 +5,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { safeHTML } from '@wordpress/dom';
 import {
 	Button,
 	Placeholder,
@@ -52,7 +53,7 @@ export default function FreeformEdit( {
 			</BlockControls>
 			<div { ...useBlockProps() }>
 				{ content ? (
-					<RawHTML>{ content }</RawHTML>
+					<RawHTML>{ safeHTML( content ) }</RawHTML>
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
