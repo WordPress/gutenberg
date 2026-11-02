@@ -125,7 +125,11 @@ test.describe( 'Block Notes', () => {
 		await expect( addNoteButton ).toHaveText( '' );
 	} );
 
-	test( 'can add a note to a block', async ( { editor, page } ) => {
+	test( 'can add a note to a block', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
@@ -141,46 +145,22 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
-		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', {
-				name: 'Note: A test comment',
-			} );
+		const thread = blockNoteUtils.getThread( 'A test comment' );
 
 		await expect( thread ).toBeVisible();
 		// Should focus the newly added note thread.
 		await expect( thread ).toBeFocused();
 	} );
 
-	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
+	test( 'can reply to a block note', async ( { blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
-		const commentForm = page.getByRole( 'textbox', {
-			name: 'Reply to',
-		} );
-		const commentText = page
-			.locator( '.editor-collab-sidebar-panel__note-content' )
-			.last();
-
-		/*
-		 * The reply form intentionally does not focus on mount, so click into
-		 * it before typing the same way the edit flow does. This keeps the
-		 * test focused on reply behavior rather than auto-focus.
-		 */
-		await commentForm.click();
-		await commentForm.pressSequentially( 'Test reply' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Reply', exact: true } )
-			.click();
-		await expect( commentText ).toHaveText( 'Test reply' );
+		await blockNoteUtils.addReply( 'Test reply' );
 		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reply added.' } )
+			blockNoteUtils.getNotice( 'Reply added.' )
 		).toBeVisible();
 	} );
 
@@ -194,9 +174,7 @@ test.describe( 'Block Notes', () => {
 			comment: 'Focus test note',
 		} );
 
-		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', { name: 'Note: Focus test note' } );
+		const thread = blockNoteUtils.getThread( 'Focus test note' );
 		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
 
 		/*
@@ -252,20 +230,11 @@ test.describe( 'Block Notes', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to delete.',
 		} );
-		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
-		await page
-			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Delete' } )
-			.click();
+		await blockNoteUtils.deleteNote();
 
 		await expect(
 			page.locator( '.editor-collab-sidebar-panel__note-content' )
 		).toBeHidden();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Note deleted.' } )
-		).toBeVisible();
 	} );
 
 	test( 'can resolve and reopen a block note', async ( {
@@ -279,11 +248,7 @@ test.describe( 'Block Notes', () => {
 		} );
 		await blockNoteUtils.openBlockNoteSidebar();
 
-		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', {
-				name: 'Note: Test comment to resolve.',
-			} );
+		const thread = blockNoteUtils.getThread( 'Test comment to resolve.' );
 		await thread.click();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
@@ -374,9 +339,7 @@ test.describe( 'Block Notes', () => {
 		await expect( separator ).toBeHidden();
 
 		// Resolve the second note.
-		const resolvedThread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Note to resolve.',
-		} );
+		const resolvedThread = blockNoteUtils.getThread( 'Note to resolve.' );
 		await resolvedThread.click();
 		await expect( resolvedThread ).toHaveAttribute(
 			'aria-expanded',
@@ -444,12 +407,8 @@ test.describe( 'Block Notes', () => {
 		const sidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const headingThread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Fix the heading.',
-		} );
-		const imageThread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Swap the image.',
-		} );
+		const headingThread = blockNoteUtils.getThread( 'Fix the heading.' );
+		const imageThread = blockNoteUtils.getThread( 'Swap the image.' );
 
 		await headingThread.click();
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
@@ -466,9 +425,7 @@ test.describe( 'Block Notes', () => {
 
 		await editor.canvas.getByText( 'Second block.' ).click();
 		await expect( imageThread ).toBeVisible();
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.focus();
+		await blockNoteUtils.deselect();
 		await expect( imageThread ).toBeHidden();
 
 		await search.fill( 'admin' );
@@ -522,12 +479,8 @@ test.describe( 'Block Notes', () => {
 		const sidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const headingThread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Fix the heading.',
-		} );
-		const imageThread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Swap the image.',
-		} );
+		const headingThread = blockNoteUtils.getThread( 'Fix the heading.' );
+		const imageThread = blockNoteUtils.getThread( 'Swap the image.' );
 
 		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
 		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
@@ -540,7 +493,6 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test( 'expands collapsed replies while searching notes', async ( {
-		editor,
 		page,
 		blockNoteUtils,
 	} ) => {
@@ -552,29 +504,12 @@ test.describe( 'Block Notes', () => {
 		const sidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
-		const replyButton = sidebar.getByRole( 'button', {
-			name: 'Reply',
-			exact: true,
-		} );
-		for ( const reply of [ 'Check the table.', 'Last reply' ] ) {
-			await replyForm.click();
-			await replyForm.pressSequentially( reply );
-			await replyButton.click();
-		}
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Reply added.' } )
-		).toHaveCount( 2 );
+		await blockNoteUtils.addReply( 'Check the table.' );
+		await blockNoteUtils.addReply( 'Last reply' );
 
 		// Deselect the note so its middle reply collapses.
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.focus();
-		const thread = sidebar.getByRole( 'treeitem', {
-			name: 'Note: Test comment',
-		} );
+		await blockNoteUtils.deselect();
+		const thread = blockNoteUtils.getThread( 'Test comment' );
 		const moreReplies = thread.getByRole( 'button', {
 			name: '1 more reply',
 		} );
@@ -759,17 +694,9 @@ test.describe( 'Block Notes', () => {
 					} );
 
 					// Click on the title field to deselect the block and the note.
-					await editor.canvas
-						.getByRole( 'textbox', { name: 'Add title' } )
-						.focus();
+					await blockNoteUtils.deselect();
 
-					const thread = page
-						.getByRole( 'region', {
-							name: 'Editor settings',
-						} )
-						.getByRole( 'treeitem', {
-							name: 'Note: Test comment',
-						} );
+					const thread = blockNoteUtils.getThread( 'Test comment' );
 
 					// Expand the note with the specified key.
 					await thread.focus();
@@ -810,20 +737,8 @@ test.describe( 'Block Notes', () => {
 				comment: 'Two',
 			} );
 
-			const firstThread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: One',
-				} );
-			const secondThread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Two',
-				} );
+			const firstThread = blockNoteUtils.getThread( 'One' );
+			const secondThread = blockNoteUtils.getThread( 'Two' );
 
 			await firstThread.focus();
 			await page.keyboard.press( 'ArrowDown' );
@@ -853,20 +768,8 @@ test.describe( 'Block Notes', () => {
 				comment: 'Three',
 			} );
 
-			const firstThread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: One',
-				} );
-			const lastThread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Three',
-				} );
+			const firstThread = blockNoteUtils.getThread( 'One' );
+			const lastThread = blockNoteUtils.getThread( 'Three' );
 
 			await firstThread.focus();
 			await page.keyboard.press( 'End' );
@@ -886,13 +789,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment escape',
 			} );
 
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment escape',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment escape' );
 
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
@@ -913,11 +810,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Sticky collapse note',
 			} );
 
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Sticky collapse note',
-				} );
+			const thread = blockNoteUtils.getThread( 'Sticky collapse note' );
 
 			await thread.click();
 			await page.keyboard.press( 'Escape' );
@@ -931,7 +824,6 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'should collapse a note after canceling note form', async ( {
-			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -940,13 +832,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment',
 			} );
 
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
@@ -966,13 +852,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment',
 			} );
 
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 			const block = editor.canvas.getByRole( 'document', {
 				name: 'Block: Heading',
 			} );
@@ -1008,8 +888,6 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
-			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -1017,44 +895,11 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
 			} );
-			const replyForm = page.getByRole( 'textbox', {
-				name: 'Reply to',
-			} );
-			const replyButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } );
+			await blockNoteUtils.addReply( 'First reply' );
+			await blockNoteUtils.addReply( 'Second reply' );
+			await blockNoteUtils.deselect();
 
-			/*
-			 * The reply form intentionally does not focus on mount, so
-			 * click into the contenteditable to place the caret before
-			 * typing each reply.
-			 */
-			await replyForm.click();
-			await replyForm.pressSequentially( 'First reply' );
-			await replyButton.click();
-			await replyForm.click();
-			await replyForm.pressSequentially( 'Second reply' );
-			await replyButton.click();
-
-			// Check that two replies were added.
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added.' } )
-			).toHaveCount( 2 );
-
-			// Click on the title field to deselect the block and the note.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
-
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 
 			await thread
 				.getByRole( 'button', { name: '1 more reply' } )
@@ -1083,21 +928,15 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Third block content' },
 				comment: 'Third block comment',
 			} );
-			const firstThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: First block comment',
-				} );
-			const secondThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Second block comment',
-				} );
-			const thirdThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Third block comment',
-				} );
+			const firstThread = blockNoteUtils.getThread(
+				'First block comment'
+			);
+			const secondThread = blockNoteUtils.getThread(
+				'Second block comment'
+			);
+			const thirdThread = blockNoteUtils.getThread(
+				'Third block comment'
+			);
 
 			const secondBlock = editor.canvas
 				.getByRole( 'document', {
@@ -1150,7 +989,6 @@ test.describe( 'Block Notes', () => {
 		} );
 
 		test( 'should focus note thread when reply is deleted', async ( {
-			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -1163,30 +1001,9 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
 			} );
-			const commentForm = page.getByRole( 'textbox', {
-				name: 'Reply to',
-			} );
-			/*
-			 * The reply form intentionally does not focus on mount, so
-			 * click into the contenteditable to place the caret before
-			 * typing.
-			 */
-			await commentForm.click();
-			await commentForm.pressSequentially( 'Test reply' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } )
-				.click();
-			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete', 1 );
-			await page
-				.getByRole( 'dialog' )
-				.getByRole( 'button', { name: 'Delete' } )
-				.click();
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			await blockNoteUtils.addReply( 'Test reply' );
+			await blockNoteUtils.deleteNote( 1 );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 
 			await expect( thread ).toBeFocused();
 		} );
@@ -1200,13 +1017,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
 			} );
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 			const addNewCommentButton = thread.getByRole( 'button', {
 				name: 'Add new reply',
 			} );
@@ -1232,13 +1043,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
 			} );
-			const thread = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 			const replyButton = thread.getByRole( 'button', {
 				name: 'Reply',
 				exact: true,
@@ -1317,6 +1122,7 @@ test.describe( 'Block Notes', () => {
 			editor,
 			page,
 			pageUtils,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1327,11 +1133,7 @@ test.describe( 'Block Notes', () => {
 				name: 'New note',
 				exact: true,
 			} );
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: A test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'A test comment' );
 
 			await textbox.click();
 			await pageUtils.pressKeys( 'primary+Enter' );
@@ -1352,6 +1154,7 @@ test.describe( 'Block Notes', () => {
 			editor,
 			page,
 			pageUtils,
+			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1362,11 +1165,7 @@ test.describe( 'Block Notes', () => {
 				name: 'New note',
 				exact: true,
 			} );
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
-					name: 'Note: A test comment',
-				} );
+			const thread = blockNoteUtils.getThread( 'A test comment' );
 
 			await textbox.pressSequentially( 'A test comment' );
 			await pageUtils.pressKeys( 'primary+Enter' );
@@ -1572,9 +1371,9 @@ test.describe( 'Block Notes', () => {
 			const sidebar = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
-			const thread = sidebar.getByRole( 'treeitem', {
-				name: 'Note: Test comment for resolved reactions',
-			} );
+			const thread = blockNoteUtils.getThread(
+				'Test comment for resolved reactions'
+			);
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
@@ -1672,7 +1471,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'reactions stay visible once the thread is deselected', async ( {
 			page,
-			editor,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -1692,9 +1490,7 @@ test.describe( 'Block Notes', () => {
 			// Focus the title to deselect the block and the note. The pills
 			// carry information about the note, so unlike its actions they
 			// survive being deselected.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
+			await blockNoteUtils.deselect();
 			await expect(
 				page.getByRole( 'button', { name: 'Add reaction' } )
 			).toHaveCount( 0 );
@@ -1728,18 +1524,11 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
 			await expect(
-				settings.getByRole( 'treeitem', {
-					name: 'Note: First note on block',
-				} )
+				blockNoteUtils.getThread( 'First note on block' )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
-					name: 'Note: Second note on block',
-				} )
+				blockNoteUtils.getThread( 'Second note on block' )
 			).toBeVisible();
 
 			// noteId is stored as an array; the array shape (vs. a child
@@ -1763,28 +1552,17 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Note to delete' );
 
 			// Both notes should be visible.
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
 			await expect(
-				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+				blockNoteUtils.getThread( 'Note to keep' )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
-					name: 'Note: Note to delete',
-				} )
+				blockNoteUtils.getThread( 'Note to delete' )
 			).toBeVisible();
 
 			// Delete the second note.
-			const secondThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Note to delete',
-			} );
+			const secondThread = blockNoteUtils.getThread( 'Note to delete' );
 			await secondThread.click();
-			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
-			await page
-				.getByRole( 'dialog' )
-				.getByRole( 'button', { name: 'Delete' } )
-				.click();
+			await blockNoteUtils.deleteNote();
 
 			await expect(
 				page
@@ -1794,12 +1572,10 @@ test.describe( 'Block Notes', () => {
 
 			// First note should still be visible; second should be gone.
 			await expect(
-				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+				blockNoteUtils.getThread( 'Note to keep' )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
-					name: 'Note: Note to delete',
-				} )
+				blockNoteUtils.getThread( 'Note to delete' )
 			).toBeHidden();
 
 			// Metadata should still have one noteId remaining.
@@ -1813,7 +1589,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'keeps the clicked note selected on a block with several notes', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -1828,15 +1603,8 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Another block' },
 			} );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			const firstThread = settings.getByRole( 'treeitem', {
-				name: 'Note: First note',
-			} );
-			const secondThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Second note',
-			} );
+			const firstThread = blockNoteUtils.getThread( 'First note' );
+			const secondThread = blockNoteUtils.getThread( 'Second note' );
 
 			await secondThread.click();
 
@@ -1852,7 +1620,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'keeps a clicked inline note selected', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
@@ -1870,9 +1637,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Another block' },
 			} );
 
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			const thread = blockNoteUtils.getThread( 'Alpha note' );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
 			await thread.click();
@@ -1901,6 +1666,7 @@ test.describe( 'Block Notes', () => {
 		test( 'preserves an unsent draft per block when switching blocks', async ( {
 			editor,
 			page,
+			blockNoteUtils,
 		} ) => {
 			const newNoteForm = page.getByRole( 'textbox', {
 				name: 'New note',
@@ -1927,9 +1693,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', { name: 'Note: Second draft' } )
+				blockNoteUtils.getThread( 'Second draft' )
 			).toBeVisible();
 		} );
 
@@ -2010,9 +1774,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment',
 			} );
 
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Test comment' } );
+			const thread = blockNoteUtils.getThread( 'Test comment' );
 			const replyForm = page.getByRole( 'textbox', {
 				name: 'Reply to',
 			} );
@@ -2080,7 +1842,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'keeps the inline marker highlighted after a code-editor round-trip', async ( {
 			editor,
-			page,
 			pageUtils,
 			blockNoteUtils,
 		} ) => {
@@ -2095,14 +1856,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Survive the toggle' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+			await blockNoteUtils.addNote( 'Survive the toggle' );
 
 			// The `core/note` marker serializes as a `<mark>`; confirm it is
 			// present before the round-trip.
@@ -2138,22 +1892,13 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Anchored to text' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+			await blockNoteUtils.addNote( 'Anchored to text' );
 
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' ).first()
 			).toBeVisible();
 
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
+			const thread = blockNoteUtils.getThread( 'Anchored to text' );
 			await expect( thread ).toBeVisible();
 
 			// Remove the marked text. The marker disappears, but the note must
@@ -2173,7 +1918,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'removes the inline marker when the note is deleted', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
@@ -2187,14 +1931,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Remove my marker on delete' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+			await blockNoteUtils.addNote( 'Remove my marker on delete' );
 
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' ).first()
@@ -2202,11 +1939,7 @@ test.describe( 'Block Notes', () => {
 
 			// Deleting the note strips its inline marker from the content (rather
 			// than leaving a stray highlight behind) while keeping the text.
-			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
-			await page
-				.getByRole( 'dialog' )
-				.getByRole( 'button', { name: 'Delete' } )
-				.click();
+			await blockNoteUtils.deleteNote();
 
 			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
 				0
@@ -2230,14 +1963,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Resolve removes my marker' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+			await blockNoteUtils.addNote( 'Resolve removes my marker' );
 
 			await expect(
 				editor.canvas.locator( 'mark.wp-note' ).first()
@@ -2311,7 +2037,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'anchors the marker to only the selected text', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
@@ -2328,14 +2053,7 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Just this word' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+			await blockNoteUtils.addNote( 'Just this word' );
 
 			// The marker wraps only "brave", and the rest of the sentence stays
 			// outside it.
@@ -2510,7 +2228,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'removes the draft marker when another note in the block is picked', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
@@ -2521,9 +2238,7 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
-			const blockThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Block note' } );
+			const blockThread = blockNoteUtils.getThread( 'Block note' );
 
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
@@ -2586,7 +2301,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'clicking between inline markers selects the matching note', async ( {
 			editor,
-			page,
 			blockNoteUtils,
 		} ) => {
 			await editor.insertBlock( {
@@ -2624,15 +2338,8 @@ test.describe( 'Block Notes', () => {
 				content: 'Alpha note',
 			} );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			const alphaThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Alpha note',
-			} );
-			const charlieThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Charlie note',
-			} );
+			const alphaThread = blockNoteUtils.getThread( 'Alpha note' );
+			const charlieThread = blockNoteUtils.getThread( 'Charlie note' );
 			const alphaMark = editor.canvas
 				.locator( 'mark.wp-note' )
 				.filter( { hasText: 'Alpha' } );
@@ -2671,7 +2378,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'selects no note while the caret is outside the inline highlights', async ( {
 			editor,
-			page,
 			pageUtils,
 			blockNoteUtils,
 		} ) => {
@@ -2686,9 +2392,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
 			await blockNoteUtils.addNote( 'Alpha note' );
 
-			const alphaThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			const alphaThread = blockNoteUtils.getThread( 'Alpha note' );
 			await expect( alphaThread ).toHaveAttribute(
 				'aria-expanded',
 				'true'
@@ -2718,7 +2422,6 @@ test.describe( 'Block Notes', () => {
 
 		test( 'selects the block-level note when the caret leaves an inline highlight', async ( {
 			editor,
-			page,
 			pageUtils,
 			blockNoteUtils,
 		} ) => {
@@ -2734,15 +2437,8 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
 			await blockNoteUtils.addNote( 'Alpha note' );
 
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			const blockThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Block note',
-			} );
-			const alphaThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Alpha note',
-			} );
+			const blockThread = blockNoteUtils.getThread( 'Block note' );
+			const alphaThread = blockNoteUtils.getThread( 'Alpha note' );
 			await expect( alphaThread ).toHaveAttribute(
 				'aria-expanded',
 				'true'

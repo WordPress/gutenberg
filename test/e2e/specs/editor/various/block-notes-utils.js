@@ -57,6 +57,14 @@ class BlockNoteUtils {
 		} );
 	}
 
+	// Focusing the post title clears the block selection, and with it the
+	// selected note.
+	async deselect() {
+		await this.#editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+	}
+
 	// "All notes" has no toggle before the first note.
 	async showAllNotes() {
 		await this.#page.evaluate( () =>

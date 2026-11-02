@@ -27,9 +27,7 @@ const REPLY_COUNT = 6;
 
 test.describe( 'Block Notes: floating notes', () => {
 	// Tall enough that the selected thread in these tests fits within the
-	// viewport. One extending below the fold is scrolled into view, which
-	// shifts every thread off its anchor (see the `fixme` test below). Wide
-	// enough for the canvas margin beside the Settings sidebar.
+	// viewport. Wide enough for the canvas margin beside the Settings sidebar.
 	test.use( { viewport: { width: 1440, height: 900 } } );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -632,9 +630,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		// Deselect the note, collapsing the tall thread.
 		const tallThread = getThread( page, 'Tall note' );
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.focus();
+		await blockNoteUtils.deselect();
 		await expect( tallThread ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		await expectAligned(
@@ -665,9 +661,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		const expandedHeight = await getScrollHeight();
 
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.focus();
+		await blockNoteUtils.deselect();
 		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		expect( await getScrollHeight() ).toBe( expandedHeight );
@@ -702,9 +696,7 @@ test.describe( 'Block Notes: floating notes', () => {
 					comment: `${ label } note`,
 				} );
 			}
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
+			await blockNoteUtils.deselect();
 			await expect( getThread( page, 'Hotel note' ) ).toHaveAttribute(
 				'aria-expanded',
 				'false'
@@ -828,9 +820,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			// Deselect, then select the note again through its block.
 			const thread = getThread( page, 'Tall note' );
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
+			await blockNoteUtils.deselect();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
@@ -1044,9 +1034,7 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( firstThread ).toBeHidden();
 
 			// Click the title to deselect the block and its comment.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
+			await blockNoteUtils.deselect();
 
 			// Click back on the original block.
 			await editor.canvas
