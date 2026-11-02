@@ -373,6 +373,23 @@ describe( 'DataViews component', () => {
 		expect( speak ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'does not announce bulk actions in layouts that do not show them', async () => {
+		vi.mocked( speak ).mockClear();
+		// The list scrolls the selected item into view, which jsdom lacks.
+		window.HTMLElement.prototype.scrollIntoView = vi.fn();
+		render(
+			<DataViewWrapper
+				view={ { type: LAYOUT_LIST, titleField: 'title' } }
+				actions={ actions }
+			/>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Hello World' } )
+		);
+		expect( speak ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does not announce bulk actions when the consumer clears the selection', () => {
 		vi.mocked( speak ).mockClear();
 		const props = { onChangeSelection: vi.fn(), actions };

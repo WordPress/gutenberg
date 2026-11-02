@@ -11,6 +11,7 @@ import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { hasAPossibleBulkAction } from '../components/dataviews-bulk-actions';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -143,6 +144,10 @@ function DataViews< Item >( {
 	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function hasBulkActionsFor( ids: string[] ) {
+		// Only the table and grid show the bulk actions.
+		if ( view.type !== LAYOUT_TABLE && view.type !== LAYOUT_GRID ) {
+			return false;
+		}
 		return data.some(
 			( item ) =>
 				ids.includes( getItemId( item ) ) &&
