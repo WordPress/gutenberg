@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `switchToBlockType`: Pass the source blocks to the `blocks.switchToBlockType.transformedBlock` filter as an array when a single block is switched, so the block's metadata is kept ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
 -   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   `isReusableBlock`, `isTemplatePart`: Accept any object with a name ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
 -   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).

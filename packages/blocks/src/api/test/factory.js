@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import '../../store';
 import {
 	createBlock,
@@ -1238,6 +1239,45 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'switchToBlockType()', () => {
+		it( 'should pass the source blocks as an array to the transformedBlock filter when switching a single block', () => {
+			registerBlockType( 'core/updated-text-block', {
+				...defaultBlockSettings,
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: ( { value } ) =>
+								createBlock( 'core/updated-text-block', {
+									value,
+								} ),
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			const block = createBlock( 'core/text-block', { value: 'ribs' } );
+			const filter = vi.fn( ( transformedBlock ) => transformedBlock );
+			addFilter(
+				'blocks.switchToBlockType.transformedBlock',
+				'core/test/transformed-block',
+				filter
+			);
+
+			switchToBlockType( block, 'core/updated-text-block' );
+			removeFilter(
+				'blocks.switchToBlockType.transformedBlock',
+				'core/test/transformed-block'
+			);
+
+			expect( filter ).toHaveBeenCalledWith(
+				expect.objectContaining( { name: 'core/updated-text-block' } ),
+				[ block ],
+				0,
+				expect.any( Array )
+			);
+		} );
+
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
