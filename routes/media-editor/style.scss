@@ -26,6 +26,15 @@
 			margin-bottom: $grid-unit-30;
 		}
 	}
+
+	// From `small` up the canvas meets the page header's bottom border, so it
+	// drops its top corners to sit flush against it.
+	@include break-small() {
+		.media-editor__canvas-area {
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
+		}
+	}
 }
 
 // Below `small` History has no room in the page header, so it gets a bar of
@@ -40,7 +49,11 @@
 	align-items: center;
 	justify-content: center;
 	gap: $grid-unit-20;
-	padding: $grid-unit-20 $grid-unit-40;
+	// No top padding: the canvas column's bottom margin already spaces it.
+	padding: 0 $grid-unit-40 $grid-unit-20;
+	// Sits outside `.media-editor-route__content`, so it needs the same
+	// background or it shows the page's grey.
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	// `HistoryActions` is the only child, and it renders nothing when the
 	// canvas is off screen — below `large` an open Details panel replaces it.
