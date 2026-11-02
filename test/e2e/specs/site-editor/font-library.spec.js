@@ -90,7 +90,7 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 
-		test( 'keeps Category and Search fields stable when switching categories', async ( {
+		test( 'keeps Category and Search fields stable when switching categories @webkit', async ( {
 			admin,
 			page,
 		} ) => {
@@ -101,6 +101,29 @@ test.describe( 'Font Library', () => {
 					name: 'Serifenlose Schriftarten mit einer langen Bezeichnung',
 				},
 				{ slug: 'display', name: 'خطوط العرض ذات الاسم الطويل جدًا' },
+				{
+					slug: 'finnish',
+					name: 'Käsinkirjoitusta jäljittelevät kirjasintyypit',
+				},
+				{
+					slug: 'french',
+					name: 'Polices d’écriture manuscrite et calligraphique',
+				},
+				{
+					slug: 'expanded',
+					name: '[!! Handwritten and calligraphic font family categories !!]',
+				},
+				{ slug: 'wide-glyphs', name: 'Ｗ'.repeat( 32 ) },
+				{ slug: 'cjk', name: '手書き　および　カリグラフィーの書体' },
+				{
+					slug: 'whitespace',
+					name: 'WWWWWWWWWWWW\nWWWWWWWWWWWW\tWWWWWWWWWWWW',
+					visibleName: 'WWWWWWWWWWWW WWWWWWWWWWWW WWWWWWWWWWWW',
+				},
+				{
+					slug: 'non-breaking-spaces',
+					name: 'Polices\u00a0d’écriture\u202fmanuscrite',
+				},
 			];
 			const collection = {
 				slug: 'google-fonts',
@@ -131,6 +154,9 @@ test.describe( 'Font Library', () => {
 				name: 'Category',
 			} );
 			const search = dialog.getByRole( 'searchbox', { name: 'Search' } );
+			const searchWidths = new Map();
+			const categoryWidths = new Map();
+			const clippedValues = new Map();
 
 			for ( const width of [ 1280, 390, 320 ] ) {
 				await page.setViewportSize( { width, height: 900 } );
@@ -147,6 +173,22 @@ test.describe( 'Font Library', () => {
 				await page
 					.getByRole( 'tab', { name: 'Install Fonts' } )
 					.click();
+				await expect( search ).toBeVisible();
+				searchWidths.set(
+					width,
+					await dialog
+						.locator( '.font-library__search' )
+						.evaluate(
+							( element ) => element.getBoundingClientRect().width
+						)
+				);
+				clippedValues.set(
+					width,
+					await category.evaluate( ( button ) => {
+						const value = button.firstElementChild;
+						return value.scrollWidth > value.clientWidth;
+					} )
+				);
 
 				for ( const direction of [ 'ltr', 'rtl' ] ) {
 					await page.evaluate( ( dir ) => {
@@ -155,6 +197,11 @@ test.describe( 'Font Library', () => {
 					await expect( category ).toBeVisible();
 					await expect( search ).toBeVisible();
 					const categoryBounds = await category.boundingBox();
+					categoryWidths.set(
+						width,
+						( await category.locator( '..' ).boundingBox() ).width
+					);
+					expect( categoryBounds.width ).toBeLessThanOrEqual( 192 );
 					const searchBounds = await search.boundingBox();
 					for ( const bounds of [ categoryBounds, searchBounds ] ) {
 						expect( bounds.x ).toBeGreaterThanOrEqual( 0 );
@@ -163,16 +210,19 @@ test.describe( 'Font Library', () => {
 						);
 					}
 
-					for ( const { name } of [
+					for ( const { name, visibleName = name } of [
 						...categories,
 						{ name: 'All' },
 					] ) {
 						await category.focus();
 						await page.keyboard.press( 'Space' );
 						await page
-							.getByRole( 'option', { name, exact: true } )
+							.getByRole( 'option', {
+								name: visibleName,
+								exact: true,
+							} )
 							.click();
-						await expect( category ).toHaveText( name );
+						await expect( category ).toHaveText( visibleName );
 						expect( await category.boundingBox() ).toEqual(
 							categoryBounds
 						);
@@ -182,6 +232,9 @@ test.describe( 'Font Library', () => {
 					}
 				}
 			}
+			expect( searchWidths.get( 1280 ) ).toBe( 240 );
+			expect( categoryWidths.get( 1280 ) ).toBe( 192 );
+			expect( clippedValues.get( 1280 ) ).toBe( false );
 		} );
 
 		test( 'should show font variant panel when clicking on a font family', async ( {

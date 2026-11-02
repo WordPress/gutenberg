@@ -93,11 +93,16 @@ $footer-height: 90px;
 	}
 }
 
-.font-library__search,
+.font-library__search {
+	// Fixed width to ensure the control doesn't resize with the reset button.
+	width: 240px;
+}
+
 .font-library__category {
-	// Keep both fields stable when the selected category or reset button changes.
-	flex: 1;
-	min-width: 0;
+	// Keep the width independent of the selected label while leaving room for Search.
+	width: 192px;
+	max-width: 50%;
+	flex-shrink: 0;
 }
 
 .font-library__fonts-title {
