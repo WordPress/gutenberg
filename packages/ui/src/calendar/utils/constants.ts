@@ -20,6 +20,7 @@ const CLASSNAMES = {
 	nav: styles.nav,
 	month_caption: styles[ 'month-caption' ],
 	months: styles.months,
+	month: styles.month,
 	month_grid: styles[ 'month-grid' ],
 	weekday: styles.weekday,
 	today: styles.today,
@@ -47,9 +48,7 @@ const CLASSNAMES = {
 };
 
 /*
- * Only `preview` carries styles — the shape of the dashed preview border is
- * picked by the `Day` component from the `preview_start` / `preview_end`
- * modifiers themselves, not from a class.
+ * The `Day` component exposes preview endpoints as data attributes on the SVG.
  */
 export const MODIFIER_CLASSNAMES = {
 	preview: styles.preview,
