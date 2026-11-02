@@ -408,7 +408,7 @@ describe( 'LinkPicker', () => {
 		} );
 	} );
 
-	describe( 'Apply', () => {
+	describe( 'Saving a URL', () => {
 		it( 'should save and close the URL edit popover when the Apply button is pressed with a valid URL', async () => {
 			const user = userEvent.setup();
 			const onSelect = vi.fn();
@@ -437,6 +437,39 @@ describe( 'LinkPicker', () => {
 					name: 'Search or type URL',
 				} )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'should save and close the URL edit popover when Enter is pressed with a valid URL', async () => {
+			const user = userEvent.setup();
+			const onSelect = vi.fn();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ onSelect }
+					label="Link"
+					showSuggestions={ false }
+				/>
+			);
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+			const urlInput = await screen.findByRole( 'combobox', {
+				name: 'Paste or type URL',
+			} );
+			await user.type( urlInput, 'https://wordpress.org' );
+			triggerEnter( urlInput );
+
+			expect( onSelect ).toHaveBeenCalledTimes( 1 );
+			expect( onSelect ).toHaveBeenCalledWith(
+				expect.objectContaining( { url: 'https://wordpress.org' } )
+			);
+			expect(
+				screen.queryByRole( 'combobox', {
+					name: 'Paste or type URL',
+				} )
+			).not.toBeInTheDocument();
+			expect( button ).toHaveFocus();
 		} );
 	} );
 
@@ -521,39 +554,6 @@ describe( 'LinkPicker', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should select the typed URL when Enter is pressed', async () => {
-			const user = userEvent.setup();
-			const onSelect = vi.fn();
-
-			render(
-				<LinkPicker
-					preview={ createMockPreview() }
-					onSelect={ onSelect }
-					label="Link"
-					showSuggestions={ false }
-				/>
-			);
-
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
-			const urlInput = await screen.findByRole( 'combobox', {
-				name: 'Paste or type URL',
-			} );
-			await user.type( urlInput, 'https://wordpress.org' );
-			triggerEnter( urlInput );
-
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
-				expect.objectContaining( { url: 'https://wordpress.org' } )
-			);
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Paste or type URL',
-				} )
-			).not.toBeInTheDocument();
-			expect( button ).toHaveFocus();
 		} );
 	} );
 
