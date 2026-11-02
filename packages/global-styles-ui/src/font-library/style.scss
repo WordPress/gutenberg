@@ -93,9 +93,11 @@ $footer-height: 90px;
 	}
 }
 
-.font-library__search {
-	// Fixed width to ensure the control doesn't resize with the reset button.
-	width: 240px;
+.font-library__search,
+.font-library__category {
+	// Keep both fields stable when the selected category or reset button changes.
+	flex: 1;
+	min-width: 0;
 }
 
 .font-library__fonts-title {
