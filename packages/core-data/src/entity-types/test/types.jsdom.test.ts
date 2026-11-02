@@ -43,6 +43,7 @@ import type { NavMenu } from '../nav-menu';
 import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
+import type { Taxonomy } from '../taxonomy';
 import type { Term } from '../term';
 import type { User } from '../user';
 import type { WpTemplate } from '../wp-template';
@@ -170,6 +171,28 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'root', 'menu' >,
 				NavMenu< 'edit' >
 			>;
+
+			// Taxonomy definitions, not their terms.
+			const { records: taxonomies } = useEntityRecords(
+				'root',
+				'taxonomy',
+				{
+					per_page: -1,
+				}
+			);
+			true satisfies Expect<
+				typeof taxonomies,
+				Taxonomy< 'edit' >[] | null
+			>;
+			taxonomies?.[ 0 ].visibility.public satisfies boolean | undefined;
+			const viewTaxonomy = select( coreStore ).getEntityRecord(
+				'root',
+				'taxonomy',
+				'category',
+				{ context: 'view' }
+			);
+			// @ts-expect-error -- `visibility` is edit-only.
+			viewTaxonomy?.visibility;
 		};
 	} );
 
