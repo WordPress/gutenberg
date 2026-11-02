@@ -59,7 +59,7 @@
 			z-index: -1;
 
 			// Animate in.
-			@media not ( prefers-reduced-motion ) {
+			@media not (prefers-reduced-motion) {
 				animation: components-button__appear-animation 0.1s ease;
 				animation-fill-mode: forwards;
 			}
@@ -82,7 +82,11 @@
 			}
 
 			&::before {
-				background: $components-color-foreground;
+				background: var(--wpds-color-background-interactive-neutral-strong-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]):not(.is-busy)::before {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
 

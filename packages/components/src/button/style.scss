@@ -1,8 +1,5 @@
-@use "sass:color";
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 /**
  * For easier testing of potential regressions, you can use a Button variant matrix
@@ -39,7 +36,7 @@
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-content-neutral);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
@@ -49,8 +46,13 @@
 	}
 
 	&[aria-expanded="true"],
-	&:hover:not(:disabled, [aria-disabled="true"], [role^="menuitem"], [role="option"]) {
-		color: $components-color-accent;
+		&:hover:not(
+			:disabled,
+			[aria-disabled="true"],
+			[role^="menuitem"],
+			[role="option"]
+		) {
+		color: var(--wpds-color-foreground-interactive-brand);
 	}
 
 	/**
@@ -59,43 +61,34 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: var(--wpds-color-background-interactive-brand-strong);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover:not(:disabled) {
-			background: $components-color-accent-darker-10;
-			color: $components-color-accent-inverted;
+		&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+			background: var(--wpds-color-background-interactive-brand-strong-active);
+			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 
-		&:active:not(:disabled) {
-			background: $components-color-accent-darker-20;
-			color: $components-color-accent-inverted;
-		}
-
-		&:disabled,
-		&:disabled:active:enabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
-		&[aria-disabled="true"]:active:enabled {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: rgba($white, 0.4);
-			background: $components-color-accent;
+		// A busy button keeps its regular appearance, even when disabled.
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+			background: var(--wpds-color-background-interactive-brand-strong-disabled);
 		}
 
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $components-color-accent-inverted;
+			color: var(--wpds-color-foreground-interactive-brand-strong);
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				$components-color-accent 33%,
-				$components-color-accent-darker-20 33%,
-				$components-color-accent-darker-20 70%,
-				$components-color-accent 70%
+				var(--wpds-color-background-interactive-brand-strong) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 33%,
+				var(--wpds-color-background-interactive-brand-strong-active) 70%,
+				var(--wpds-color-background-interactive-brand-strong) 70%
 			);
 			/* stylelint-enable */
 		}
@@ -107,11 +100,12 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		&:disabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover {
-			color: $gray-600;
-			background: transparent;
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-brand-weak);
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-brand-weak-active);
+
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
+			background: var(--wpds-color-background-interactive-brand-weak-disabled);
 			transform: none;
 		}
 	}
@@ -121,34 +115,31 @@
 	 */
 
 	&.is-secondary {
-		@media not ( prefers-reduced-motion ) {
+		white-space: nowrap;
+		@media not (prefers-reduced-motion) {
 			transition: border-color 0.1s linear;
 		}
 
-		border-color: $components-color-accent;
-		white-space: nowrap;
-		color: $components-color-accent;
-		background: transparent;
+		border-color: var(--wpds-color-stroke-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
+		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
-		&:active:not(:disabled) {
-			// Hide the border while pressed, keeping its width to avoid a size shift.
-			border-color: transparent;
-		}
-
-		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			border-color: $components-color-accent-darker-20;
-			color: $components-color-accent-darker-20;
-			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+		&:is(:hover, :active):not(
+			:disabled,
+			[aria-disabled="true"],
+			.is-pressed
+		) {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+			color: var(--wpds-color-foreground-interactive-brand-active);
+			background: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
 		}
 
 		&:focus:not(:active) {
-			border-color: $components-color-accent;
+			border-color: var(--wpds-color-stroke-interactive-brand);
 		}
 
-		&:disabled:not(:focus),
-		&[aria-disabled="true"]:not(:focus),
-		&[aria-disabled="true"]:hover:not(:focus) {
-			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		&:is(:disabled, [aria-disabled="true"]):not(:focus) {
+			border-color: var(--wpds-color-stroke-interactive-brand-disabled);
 		}
 	}
 
@@ -158,59 +149,21 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $components-color-accent;
-		background: transparent;
+		color: var(--wpds-color-foreground-interactive-brand);
+		background: var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-brand-weak));
 
-		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			background: color-mix(in srgb, $components-color-accent 4%, transparent);
-			color: $components-color-accent-darker-20;
-		}
-
-		&:active:not(:disabled, [aria-disabled="true"]) {
-			background: color-mix(in srgb, $components-color-accent 8%, transparent);
+		&:is(:hover, :active):not(
+			:disabled,
+			[aria-disabled="true"],
+			.is-pressed
+		) {
+			background: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
-		}
-	}
-
-	/**
-	 * Destructive buttons.
-	 */
-	&.is-destructive {
-		--wp-components-color-accent: #{$alert-red};
-		--wp-components-color-accent-darker-10: #{color.adjust($alert-red, $lightness: -10%)};
-		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
-
-		// Only the default variant is styled differently from the non-destructive counterparts.
-		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
-			color: $alert-red;
-
-			&:hover:not(:disabled, [aria-disabled="true"]) {
-				color: color.adjust($alert-red, $lightness: -20%);
-			}
-
-			&:active:not(:disabled, [aria-disabled="true"]) {
-				background: $gray-400;
-			}
-
-			&:disabled,
-			&[aria-disabled="true"] {
-				color: $gray-600;
-			}
-		}
-
-		&.is-tertiary,
-		&.is-secondary {
-			&:hover:not(:disabled, [aria-disabled="true"]) {
-				background: rgba($alert-red, 0.04);
-			}
-
-			&:active:not(:disabled, [aria-disabled="true"]) {
-				background: rgba($alert-red, 0.08);
-			}
 		}
 	}
 
@@ -227,7 +180,7 @@
 		outline: none;
 		text-align: left;
 		font-weight: var(--wpds-typography-font-weight-default);
-		color: $components-color-accent;
+		color: var(--wpds-color-foreground-interactive-brand);
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
 		text-decoration-thickness: from-font;
@@ -247,24 +200,123 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):active {
-		color: $components-color-foreground;
+	&:not(
+		:disabled,
+		[aria-disabled="true"],
+		.is-primary,
+		.is-secondary,
+		.is-tertiary,
+		.is-destructive,
+		.is-pressed
+	):active {
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	/**
+	 * Destructive buttons.
+	 */
+	&.is-destructive {
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
+
+		&:where(.is-primary) {
+			background: var(--wpds-color-background-interactive-error-strong);
+			color: var(--wpds-color-foreground-interactive-error-strong);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				background: var(--wpds-color-background-interactive-error-strong-active);
+				color: var(--wpds-color-foreground-interactive-error-strong-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				background: var(--wpds-color-background-interactive-error-strong-disabled);
+				color: var(--wpds-color-foreground-interactive-error-strong-disabled);
+			}
+
+			&.is-busy,
+			&.is-busy:disabled,
+			&.is-busy[aria-disabled="true"] {
+				color: var(--wpds-color-foreground-interactive-error-strong);
+				background-size: 100px 100%;
+				/* stylelint-disable -- Keep gradient stops readable. */
+				background-image: linear-gradient(
+					-45deg,
+					var(--wpds-color-background-interactive-error-strong) 33%,
+					var(--wpds-color-background-interactive-error-strong-active) 33%,
+					var(--wpds-color-background-interactive-error-strong-active) 70%,
+					var(--wpds-color-background-interactive-error-strong) 70%
+				);
+				/* stylelint-enable */
+			}
+		}
+
+		&:where(.is-secondary, .is-tertiary) {
+			color: var(--wpds-color-foreground-interactive-error);
+			background: var(--wpds-color-background-interactive-error-weak);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				color: var(--wpds-color-foreground-interactive-error-active);
+				background: var(--wpds-color-background-interactive-error-weak-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
+				background: var(--wpds-color-background-interactive-error-weak-disabled);
+			}
+		}
+
+		&:where(.is-secondary) {
+			border-color: var(--wpds-color-stroke-interactive-error);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
+				border-color: var(--wpds-color-stroke-interactive-error-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]):not(:focus) {
+				border-color: var(--wpds-color-stroke-interactive-error-disabled);
+			}
+		}
+
+		&:where(:not(.is-primary, .is-secondary, .is-tertiary, .is-pressed)) {
+			color: var(--wpds-color-foreground-interactive-error);
+
+			&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-active);
+			}
+
+			&:active:not(:disabled, [aria-disabled="true"], .is-link) {
+				background: var(--wpds-color-background-interactive-error-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				color: var(--wpds-color-foreground-interactive-error-disabled);
+			}
+		}
 	}
 
 	&.is-busy,
 	&.is-secondary.is-busy,
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
+		&.is-secondary:not(.is-pressed),
+		&.is-tertiary:not(:disabled, [aria-disabled="true"], .is-pressed) {
+			color: var(--wpds-color-foreground-interactive-brand-active);
+
+			&.is-destructive {
+				color: var(--wpds-color-foreground-interactive-error-active);
+			}
+		}
+
 		@media not (prefers-reduced-motion) {
 			animation: components-button__busy-animation 2500ms infinite linear;
 		}
@@ -272,11 +324,10 @@
 		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 		background-image: linear-gradient(
 			-45deg,
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color.adjust($white, $lightness: -2%) 33%,
-			color.adjust($white, $lightness: -12%) 33%,
-			color.adjust($white, $lightness: -12%) 70%,
-			color.adjust($white, $lightness: -2%) 70%
+			var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-neutral-weak)) 33%,
+			var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-neutral-weak-active)) 33%,
+			var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-neutral-weak-active)) 70%,
+			var(--_wp-components-button-background-weak, var(--wpds-color-background-interactive-neutral-weak)) 70%
 		);
 		/* stylelint-enable */
 	}
@@ -342,26 +393,33 @@
 		}
 	}
 
-	// Toggled style.
+	// Keep the pressed foreground and background together during interaction.
 	&.is-pressed {
 		&,
-		&:hover {
-			color: $components-color-foreground-inverted;
-			&:not(:disabled, [aria-disabled="true"]) {
-				background: $components-color-foreground;
+		&:hover,
+		&.is-primary.is-busy:not(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
+		}
+
+		&:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&.is-secondary {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
+			&:hover {
+				background: var(--wpds-color-background-interactive-neutral-strong-active);
 			}
 		}
 
-		&:disabled,
-		&[aria-disabled="true"] {
-			color: $gray-600;
+		&:is(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
 
-			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
-				color: $components-color-foreground-inverted;
-				background: $gray-600;
+			&:not(.is-primary, .is-secondary, .is-tertiary) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
-
 	}
 
 	svg {

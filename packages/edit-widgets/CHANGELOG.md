@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching foreground and background colors for pressed header buttons ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
+
 ## 7.0.0 (2026-10-20)
 
 ### Breaking Changes

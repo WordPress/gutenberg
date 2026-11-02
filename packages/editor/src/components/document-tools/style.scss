@@ -52,8 +52,8 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed {
-			background: $gray-900;
+		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
 		&:focus:not(:active) {
@@ -77,7 +77,8 @@
 	}
 }
 
-.editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
+.editor-document-tools
+.editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
 	.show-icon-labels & {
 		width: auto;
 		padding: 0 $grid-unit-10;
