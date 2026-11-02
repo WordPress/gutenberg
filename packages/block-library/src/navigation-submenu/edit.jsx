@@ -184,11 +184,9 @@ export default function NavigationSubmenuEdit( {
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
+	if ( ! isSelected && isLinkOpen ) {
+		setIsLinkOpen( false );
+	}
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {

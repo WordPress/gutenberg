@@ -23,9 +23,19 @@ const invalidCharsRegex = /[^a-z0-9-_]/i;
 const isReservedNamePart = ( part: string ): boolean =>
 	isReservedKey( part.replace( /^-+|-+$/g, '' ).toLowerCase() );
 
-function parseDirectiveName( directiveName: string ): {
+/**
+ * Splits a directive attribute name into its prefix, suffix and unique ID.
+ *
+ * @param directiveName The full attribute name, starting with `data-wp-`.
+ * @return The parsed name, or null when the part after `data-wp-` contains
+ *         unsupported characters, starts with a hyphen or has a reserved part.
+ */
+export function parseDirectiveName( directiveName: string ): {
+	/** The directive name, such as `on` in `data-wp-on--click`. */
 	prefix: string;
+	/** The suffix after `--`, or null when absent or empty. */
 	suffix: string | null;
+	/** The unique ID after `---`, or null when absent or empty. */
 	uniqueId: string | null;
 } | null {
 	const parsed = splitDirectiveName( directiveName );

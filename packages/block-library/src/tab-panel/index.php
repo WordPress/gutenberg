@@ -21,9 +21,7 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 
 	static $tab_counters = array();
 
-	if ( ! isset( $tab_counters[ $tabs_id ] ) ) {
-		$tab_counters[ $tabs_id ] = 1;
-	}
+	$tab_counters[ $tabs_id ] ??= 1;
 
 	$tab_number = $tab_counters[ $tabs_id ];
 	++$tab_counters[ $tabs_id ];
