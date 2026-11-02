@@ -1,7 +1,7 @@
 import { type LinearGradientNode } from 'gradient-parser';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import { SelectControl } from '@wordpress/ui';
+import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
 import { Flex, FlexBlock } from '../flex';
@@ -132,6 +132,8 @@ export function CustomGradientPicker( {
 	enableAlpha = true,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
+	useEnableWpCompatOverlaySlot();
+
 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
 
 	// On radial gradients the bar should display a linear gradient.
