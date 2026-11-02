@@ -2562,7 +2562,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * the upload it also produces the derivative sizes.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_generates_subsizes_by_default(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2593,7 +2593,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * client-side processing pipeline can generate the derivatives itself.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_sideloads_without_subsizes(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2624,7 +2624,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * the URL sideload path, for parity with the uploaded-file path.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_fires_rest_after_insert_attachment(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2661,7 +2661,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * the `post` parameter.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_attaches_to_post(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2690,7 +2690,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * rather than creating an attachment.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_returns_error_on_download_failure(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2719,7 +2719,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @group multisite
 	 * @group ms-required
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 * @covers WP_REST_Attachments_Controller::check_upload_size
 	 */
 	public function test_create_item_from_url_exceeds_multisite_max_filesize(): void {
@@ -2749,7 +2749,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * @group multisite
 	 * @group ms-required
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 * @covers WP_REST_Attachments_Controller::check_upload_size
 	 */
 	public function test_create_item_from_url_exceeds_multisite_site_upload_space(): void {
@@ -2775,7 +2775,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * download is attempted, rather than handing an empty filename to the
 	 * sideload handler.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_rejects_url_without_filename(): void {
 		wp_set_current_user( self::$admin_id );
@@ -2805,7 +2805,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * such as a PHP script, is rejected before any download is attempted.
 	 *
 	 * @dataProvider data_create_item_from_url_rejects_non_image_extension
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 *
 	 * @param string $url URL with a disallowed file extension.
 	 */
@@ -2851,7 +2851,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a user without the `upload_files` capability cannot sideload
 	 * an external image and that the request bails before any download happens.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_requires_upload_capability(): void {
 		$subscriber_id = self::factory()->user->create( array( 'role' => 'subscriber' ) );
@@ -2868,18 +2868,11 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request->set_param( 'url', 'https://example.com/denied.jpg' );
 
-		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
-		$method     = new ReflectionMethod( $controller, 'create_item_from_url' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$method->setAccessible( true );
-		}
-		$result = $method->invoke( $controller, $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		remove_filter( 'pre_http_request', $track );
 
-		$this->assertWPError( $result );
-		$this->assertSame( 'rest_cannot_create', $result->get_error_code() );
-		$this->assertSame( 403, $result->get_error_data()['status'] );
+		$this->assertErrorResponse( 'rest_cannot_create', $response, 403 );
 		$this->assertFalse( $downloaded, 'No download should be attempted without upload_files.' );
 	}
 
@@ -2971,7 +2964,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * are written to the attachment, as they are for an uploaded file.
 	 *
 	 * @covers ::create_item
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_applies_request_fields(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3000,7 +2993,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a sideloaded attachment honors the requested post status,
 	 * which prepare_item_for_database() applies on the uploaded-file path.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_applies_request_status(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3022,7 +3015,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	/**
 	 * Verifies that `rest_insert_attachment` fires once for a sideloaded attachment.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_fires_rest_insert_attachment(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3055,7 +3048,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that an IPTC caption lands in the caption field rather than the
 	 * description, as it does for an uploaded file.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_puts_iptc_caption_in_the_caption(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3081,7 +3074,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a request title still wins over the IPTC headline, matching
 	 * the precedence the uploaded-file path applies.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_request_title_wins_over_iptc(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3104,7 +3097,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that an image with neither a request title nor IPTC metadata
 	 * falls back to the filename.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_falls_back_to_the_filename(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3126,7 +3119,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a failed sideload reports the error code and status the
 	 * uploaded-file path reports.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_reports_sideload_failure(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3155,7 +3148,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a request `alt_text` is stored, and takes precedence over an
 	 * alt read from the file's own metadata.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_applies_alt_text(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3180,7 +3173,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	/**
 	 * Verifies that registered post meta supplied with the request is written.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_applies_registered_meta(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3214,7 +3207,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that terms supplied with the request are assigned to the
 	 * sideloaded attachment.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_applies_terms(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3244,7 +3237,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * Verifies that a field registered with register_rest_field() has its
 	 * update callback run for a sideloaded attachment.
 	 *
-	 * @covers ::create_item_from_url
+	 * @covers ::upload_from_url
 	 */
 	public function test_create_item_from_url_updates_additional_fields(): void {
 		wp_set_current_user( self::$admin_id );
@@ -3276,6 +3269,163 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( 'probe field value', $received, 'The registered field update callback should run.' );
+	}
+
+	/**
+	 * Verifies that downloaded content which does not match an allowed type is
+	 * reported as a client error rather than a server error.
+	 *
+	 * @covers ::upload_from_url
+	 */
+	public function test_create_item_from_url_rejects_disallowed_content_type(): void {
+		wp_set_current_user( self::$admin_id );
+
+		// A URL that looks like an image but serves an HTML page.
+		$mock_html_download = static function ( $response, $args ) {
+			if ( ! empty( $args['filename'] ) ) {
+				file_put_contents( $args['filename'], '<!DOCTYPE html><html><body>Not an image</body></html>' );
+			}
+
+			return array(
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'headers'  => array(),
+				'cookies'  => array(),
+				'body'     => '',
+			);
+		};
+		add_filter( 'pre_http_request', $mock_html_download, 10, 2 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/not-an-image.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $mock_html_download, 10 );
+
+		$this->assertErrorResponse( 'rest_upload_invalid_file_type', $response, 400 );
+	}
+
+	/**
+	 * Verifies that a request cannot supply both an uploaded file and a `url`.
+	 *
+	 * @covers ::create_item
+	 */
+	public function test_create_item_rejects_a_file_and_url_together(): void {
+		wp_set_current_user( self::$admin_id );
+
+		// Fail loudly if the request is not rejected and a download is attempted.
+		$downloaded = false;
+		$track      = static function () use ( &$downloaded ) {
+			$downloaded = true;
+			return new WP_Error( 'http_request_failed', 'Should not be reached.' );
+		};
+		add_filter( 'pre_http_request', $track );
+
+		$test_file = DIR_TESTDATA . '/images/canola.jpg';
+		$request   = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'file'     => file_get_contents( $test_file ),
+					'name'     => 'canola.jpg',
+					'size'     => filesize( $test_file ),
+					'tmp_name' => $test_file,
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', $track );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$this->assertFalse( $downloaded, 'No download should be attempted when a file is also supplied.' );
+	}
+
+	/**
+	 * Verifies that a request cannot supply both a raw body upload and a `url`.
+	 *
+	 * @covers ::create_item
+	 */
+	public function test_create_item_rejects_a_body_upload_and_url_together(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
+	/**
+	 * Verifies that an error returned from the rest_pre_insert_attachment
+	 * filter is honored and no attachment is created.
+	 *
+	 * @covers ::insert_attachment
+	 */
+	public function test_create_item_from_url_honors_a_pre_insert_error(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$deny = static function () {
+			return new WP_Error( 'rest_pre_insert_denied', 'Denied.', array( 'status' => 400 ) );
+		};
+
+		add_filter( 'rest_pre_insert_attachment', $deny );
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$before = wp_count_posts( 'attachment' )->inherit;
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/denied-by-filter.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+		remove_filter( 'rest_pre_insert_attachment', $deny );
+
+		$this->assertErrorResponse( 'rest_pre_insert_denied', $response, 400 );
+		wp_cache_delete( _count_posts_cache_key( 'attachment' ), 'counts' );
+		$this->assertSame( $before, wp_count_posts( 'attachment' )->inherit, 'No attachment should be created.' );
+	}
+
+	/**
+	 * Verifies that a sideload attached to a page is not backdated to the
+	 * page's month, matching an uploaded file.
+	 *
+	 * @covers ::insert_attachment
+	 */
+	public function test_create_item_from_url_does_not_backdate_to_a_page(): void {
+		wp_set_current_user( self::$admin_id );
+
+		$page = self::factory()->post->create(
+			array(
+				'post_type' => 'page',
+				'post_date' => '2010-01-15 12:00:00',
+			)
+		);
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/page-image.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_param( 'post', $page );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertStringNotContainsString( '/2010/01/', get_attached_file( $response->get_data()['id'] ) );
 	}
 
 	/**
