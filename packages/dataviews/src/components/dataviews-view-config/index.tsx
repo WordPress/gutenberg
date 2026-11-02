@@ -125,7 +125,6 @@ function SortFieldControl() {
 			label={ __( 'Sort by' ) }
 			value={ selectedSortItem }
 			items={ orderOptions }
-			itemToStringValue={ ( item ) => JSON.stringify( item.value ) }
 			onValueChange={ ( item ) => {
 				if (
 					! item ||
