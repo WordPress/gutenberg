@@ -27,6 +27,7 @@
 
 ### Internal
 
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 -   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ## 19.0.0 (2026-10-20)
