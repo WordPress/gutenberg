@@ -161,8 +161,11 @@ export default function useDropZone( {
 					return;
 				}
 
-				// A mouse move with a button held is still part of the drag,
-				// in browsers that send them while dragging.
+				// A mouse move with a button held is still part of the drag.
+				// Chrome, Firefox and Safari on macOS don't send a mouse move
+				// to a document that the drag is still over, but a browser
+				// that did would end the drag here, and the next `dragover`
+				// would start it again.
 				if (
 					event.type === 'mousemove' &&
 					( event as MouseEvent ).buttons !== 0
