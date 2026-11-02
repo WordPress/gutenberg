@@ -1,0 +1,26 @@
+@layer wp-ui.components {
+	.editor {
+		display: flex;
+		align-items: center;
+		padding-inline: var(--wpds-dimension-padding-sm);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.segment {
+		box-sizing: content-box;
+		border: 0;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		min-width: 2ch;
+		padding-inline: 0;
+		padding-block: var(--wpds-dimension-padding-xs);
+		outline-offset: 2px;
+		border-radius: var(--wpds-border-radius-sm);
+		white-space: pre;
+
+		&:disabled {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+	}
+}
