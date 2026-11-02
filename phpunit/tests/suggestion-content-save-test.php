@@ -113,6 +113,22 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 	 *
 	 * @return array{0: int, 1: string, 2: int[]} Post id, editor content, note ids.
 	 */
+	/**
+	 * The post's latest revision, saved explicitly when an earlier test's
+	 * autosave request defined `DOING_AUTOSAVE`, which stops
+	 * `wp_save_post_revision()` for the rest of the run.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return WP_Post Revision.
+	 */
+	private function latest_revision( $post_id ) {
+		$revision = current( wp_get_post_revisions( $post_id ) );
+		if ( ! $revision ) {
+			$revision = get_post( _wp_put_post_revision( $post_id ) );
+		}
+		return $revision;
+	}
+
 	private function suggested_post() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$add     = $this->create_note( $post_id );
@@ -412,7 +428,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 
 	public function test_revisions_snapshot_their_proposals_and_inflate_from_them() {
 		list( $post_id, $content, $notes ) = $this->suggested_post();
-		$revision                          = current( wp_get_post_revisions( $post_id ) );
+		$revision                          = $this->latest_revision( $post_id );
 
 		$this->assertStringNotContainsString( 'zanzibarian', $revision->post_content );
 		$this->assertNotEmpty( get_metadata( 'post', $revision->ID, '_wp_suggestion_snapshot', true ) );
@@ -428,7 +444,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 
 	public function test_restoring_a_revision_reseeds_its_proposals() {
 		list( $post_id, $content, $notes ) = $this->suggested_post();
-		$revision                          = current( wp_get_post_revisions( $post_id ) );
+		$revision                          = $this->latest_revision( $post_id );
 		$this->save( $post_id, $this->paragraph( 'Rewritten' ) );
 		$this->assertSame( array(), $this->items_of( $notes[1] ) );
 
