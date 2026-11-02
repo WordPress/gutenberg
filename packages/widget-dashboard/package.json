@@ -72,6 +72,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/theme": "file:../theme",
 		"storybook": "^10.6.3",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
