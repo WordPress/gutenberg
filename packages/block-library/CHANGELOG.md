@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks ([#81728](https://github.com/WordPress/gutenberg/pull/81728)).
+
 ### Enhancements
 
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
