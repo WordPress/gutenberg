@@ -8,6 +8,7 @@ export default {
 	apiVersion: 1,
 	title: 'Store',
 	icon: moduleIcon,
+	example: { attributes: { location: 'Module', label: 'Store' } },
 	attributes: [
 		{
 			id: 'location',
