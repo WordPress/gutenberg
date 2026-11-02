@@ -91,14 +91,7 @@ export function useGuidelineData(): GuidelineData {
 
 	const scopes: Scope[] = useMemo(
 		() =>
-			( ( scopeRecords as Scope[] ) ?? [] )
-				.map( ( s ) => ( {
-					slug: s.slug,
-					title: s.title,
-					description: s.description,
-					order: s.order ?? 0,
-				} ) )
-				.sort( ( a, b ) => a.order - b.order ),
+			[ ...( scopeRecords ?? [] ) ].sort( ( a, b ) => a.order - b.order ),
 		[ scopeRecords ]
 	);
 
