@@ -16,7 +16,7 @@ export function generateFigmaFiles( resolver: Resolver ) {
 	] ) {
 		const contexts = modifier
 			? resolver.source.modifiers?.[ modifier ]?.contexts
-			: { default: {} };
+			: { typography: {} };
 		if ( ! contexts ) {
 			throw new Error(
 				`Missing Figma collection modifier: ${ modifier }`

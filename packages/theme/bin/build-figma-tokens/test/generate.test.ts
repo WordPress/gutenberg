@@ -47,7 +47,7 @@ describe( 'Figma collection files', () => {
 			'radius/pronounced.json',
 			'width/standard.json',
 			'width/high-dpi.json',
-			'typography/default.json',
+			'typography/typography.json',
 		] );
 
 		for ( const file of files.filter(
@@ -77,7 +77,7 @@ describe( 'Figma collection files', () => {
 
 	it( 'exports single font families and numeric weights with per-token scopes', () => {
 		const file = files.find(
-			( { filename } ) => filename === 'typography/default.json'
+			( { filename } ) => filename === 'typography/typography.json'
 		);
 		expect( file ).toBeDefined();
 		const typography = JSON.parse( file!.contents )[ 'wpds-typography' ];
@@ -106,7 +106,7 @@ describe( 'Figma collection files', () => {
 
 	it( 'preserves all typography names, dimensions, and descriptions', async () => {
 		const file = files.find(
-			( { filename } ) => filename === 'typography/default.json'
+			( { filename } ) => filename === 'typography/typography.json'
 		);
 		expect( file ).toBeDefined();
 		const typography = JSON.parse( file!.contents )[ 'wpds-typography' ];

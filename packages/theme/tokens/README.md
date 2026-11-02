@@ -88,7 +88,7 @@ The generator applies `wpds.resolver.json` to produce seven complete Figma-compa
 | ------------- | ------------------------------------------------------------------------------------------ | ------------ | --------------------------------------- |
 | Border radius | `radius/none.json`, `radius/subtle.json`, `radius/moderate.json`, `radius/pronounced.json` | `subtle`     | `wpds-border/radius/{xs,sm,md,lg,xl}`   |
 | Border width  | `width/standard.json`, `width/high-dpi.json`                                               | `high-dpi`   | `wpds-border/width/{xs,sm,md,lg,focus}` |
-| Typography | `typography/default.json` | `default` | `wpds-typography/{font-family,font-weight,font-size,line-height}/*` |
+| Typography | `typography/typography.json` | `typography` | `wpds-typography/{font-family,font-weight,font-size,line-height}/*` |
 
 Each file includes every token in its collection, with values, types, descriptions, and per-token Figma scope metadata. The token hierarchy determines the variable names, and aliases remain references.
 
@@ -96,11 +96,11 @@ These generated files are committed under `prebuilt/figma` and included in the n
 
 #### Typography exports
 
-`typography/default.json` adapts the canonical typography tokens for Figma's native importer. Font weights use `$type: "number"` with their original numeric values and `FONT_STYLE` scope metadata. Figma’s native JSON format uses `FONT_STYLE` for the Font weight scope on Number variables; the Plugin API calls this scope `FONT_WEIGHT`. Font families use `$type: "fontFamily"` with a single font name and the `FONT_FAMILY` scope: `SF Pro` for heading and body, and `Menlo` for mono. Font sizes and line heights retain their pixel dimensions and use `FONT_SIZE` and `LINE_HEIGHT` scopes. These mappings apply during Figma export. CSS generation uses the canonical token definitions and font-family stacks.
+`typography/typography.json` adapts the canonical typography tokens for Figma's native importer. Font weights use `$type: "number"` with their original numeric values and `FONT_STYLE` scope metadata. Figma’s native JSON format uses `FONT_STYLE` for the Font weight scope on Number variables; the Plugin API calls this scope `FONT_WEIGHT`. Font families use `$type: "fontFamily"` with a single font name and the `FONT_FAMILY` scope: `SF Pro` for heading and body, and `Menlo` for mono. Font sizes and line heights retain their pixel dimensions and use `FONT_SIZE` and `LINE_HEIGHT` scopes. These mappings apply during Figma export. CSS generation uses the canonical token definitions and font-family stacks.
 
 [Download and install SF Pro from Apple](https://developer.apple.com/fonts/) before working with the design system Figma libraries. Menlo, used for the monospace variable, is included with macOS. Browser users need Figma’s [local font support](https://help.figma.com/hc/en-us/articles/360039956894-Add-a-font-to-Figma) to access installed fonts. Importing the variables does not install the fonts.
 
-Create an empty Typography collection and import `typography/default.json`. Apply the imported variables through the font family, font weight, font size, and line height controls on text layers.
+Create an empty Typography collection and import `typography/typography.json`. Apply the imported variables through the font family, font weight, font size, and line height controls on text layers.
 
 #### Test in a Figma library branch
 
