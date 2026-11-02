@@ -112,7 +112,9 @@ function getGridSnapshot(
 				rowStart: rowRange[ 0 ],
 				rowEnd: rowRange[ 1 ],
 			} ),
-			isExplicit: layout.columnStart !== null || layout.rowStart !== null,
+			isExplicit:
+				( layout.columnStart ?? null ) !== null ||
+				( layout.rowStart ?? null ) !== null,
 		} );
 	}
 	return { columnCount: columns.length, items };
