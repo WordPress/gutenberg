@@ -17,7 +17,7 @@ import type { BlockTitleProps } from './types';
  */
 export function getBlockDisplayTitle(
 	select: DataRegistry[ 'select' ],
-	clientId: string,
+	clientId: string | null | undefined,
 	context?: string
 ): string | null {
 	if ( ! clientId ) {

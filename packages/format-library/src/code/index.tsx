@@ -3,7 +3,6 @@ import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
@@ -73,6 +72,7 @@ export const code = {
 					onUse={ onClick }
 				/>
 				<RichTextToolbarButton
+					name="code"
 					icon={ codeIcon }
 					title={ title }
 					onClick={ onClick }

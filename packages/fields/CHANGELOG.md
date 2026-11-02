@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `MediaEdit`: Prevent animation on item removal for multiple select ([#85372](https://github.com/WordPress/gutenberg/pull/85372)).
+
+## 0.50.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

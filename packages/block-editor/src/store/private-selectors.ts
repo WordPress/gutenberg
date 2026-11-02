@@ -1201,17 +1201,15 @@ export const isBlockParentHiddenAtViewport = (
 };
 
 /**
- * Returns true if there is a spotlighted block.
- *
- * The spotlight is also active when a contentOnly section is being edited, the selector
- * also returns true if this is the case.
+ * Returns true if there is a spotlighted block, which is the case while a
+ * contentOnly section is being edited.
  *
  * @param state Global application state.
  *
  * @return Whether the block is currently spotlighted.
  */
 export function hasBlockSpotlight( state: State ) {
-	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
+	return !! state.editedContentOnlySection;
 }
 
 /**

@@ -101,76 +101,74 @@
 }
 
 .tab {
-	& {
-		/* Resets */
-		border-radius: 0;
-		background: transparent;
-		border: none;
-		box-shadow: none;
+	/* Resets */
+	border-radius: 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
 
-		flex: 1 0 auto;
-		white-space: nowrap;
-		display: flex;
-		align-items: center;
-		/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
-		cursor: pointer;
-		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
-		font-family: $font-family-body;
-		font-weight: 400;
-		font-size: $font-size-medium;
-		color: var(--wpds-color-foreground-interactive-neutral);
+	flex: 1 0 auto;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
+	cursor: pointer;
+	line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
+	font-family: $font-family-body;
+	font-weight: 400;
+	font-size: $font-size-medium;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
-		&:is([aria-selected="true"], [aria-disabled="true"]) {
-			cursor: default;
-		}
+	&:is([aria-selected="true"], [aria-disabled="true"]) {
+		cursor: default;
+	}
 
-		&[aria-disabled="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral-disabled);
-		}
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
 
-		&:not([aria-disabled="true"]):is(
-			:not([aria-selected="true"]):hover,
-			:not([aria-selected="true"]):active,
-			[data-focus-visible]
-		) {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+	&:not([aria-disabled="true"]):is(
+		:not([aria-selected="true"]):hover,
+		:not([aria-selected="true"]):active,
+		[data-focus-visible]
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
-			&::after {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-				opacity: 1;
-			}
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Interaction background and focus indicator.
-		position: relative;
-		isolation: isolate;
 		&::after {
-			position: absolute;
-			z-index: -1;
-			pointer-events: none;
-
-			// Draw the indicator.
-			// Outline works for Windows high contrast mode as well.
-			outline: var(--wp-admin-border-width-focus) solid transparent;
-			border-radius: $radius-small;
-
-			// Animation
-			opacity: 0;
-
-			@media not (prefers-reduced-motion) {
-				transition: opacity 0.1s linear;
-			}
-		}
-
-		&[data-focus-visible]::after {
-			outline-color: $components-color-accent;
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 			opacity: 1;
 		}
+	}
+
+	&:focus:not(:disabled) {
+		box-shadow: none;
+		outline: none;
+	}
+
+	// Interaction background and focus indicator.
+	position: relative;
+	isolation: isolate;
+	&::after {
+		position: absolute;
+		z-index: -1;
+		pointer-events: none;
+
+		// Draw the indicator.
+		// Outline works for Windows high contrast mode as well.
+		outline: var(--wp-admin-border-width-focus) solid transparent;
+		border-radius: $radius-small;
+
+		// Animation
+		opacity: 0;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
+	}
+
+	&[data-focus-visible]::after {
+		outline-color: $components-color-accent;
+		opacity: 1;
 	}
 
 	[aria-orientation="horizontal"] & {

@@ -23,7 +23,7 @@ const meta: Meta< typeof CustomSelectControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now. See the [migration guide](?path=/docs/components-customselectcontrol--migration-guide).',
 		},
 	},
 	decorators: [
@@ -129,6 +129,32 @@ WithHints.args = {
 			key: 'full',
 			name: 'Full Size',
 			hint: '1600x1600',
+		},
+	],
+};
+
+export const WithCustomColors = Template.bind( {} );
+WithCustomColors.args = {
+	label: 'Custom colors',
+	options: [
+		{ key: 'default', name: 'Default' },
+		{
+			key: 'aquamarine',
+			name: 'Aquamarine',
+			style: {
+				backgroundColor: '#7fffd4',
+				color: '#16352b',
+				fontWeight: 600,
+			},
+		},
+		{
+			key: 'rose',
+			name: 'Rose',
+			style: {
+				backgroundColor: '#fff3f6',
+				color: '#6b2345',
+				fontStyle: 'italic',
+			},
 		},
 	],
 };

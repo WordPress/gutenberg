@@ -106,6 +106,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
+		"@testing-library/react": "^16.3.3",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {

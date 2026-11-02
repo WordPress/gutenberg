@@ -39,10 +39,10 @@ export type WritingFlowKeyEvent = KeyboardEvent &
 	};
 
 /**
- * A clipboard event, which rich text flags when it has a legacy split
- * handler.
+ * A clipboard event, or a drop event, which is handled as a paste. Rich text
+ * flags it when it has a legacy split handler.
  */
-export type WritingFlowClipboardEvent = ClipboardEvent & {
+export type WritingFlowClipboardEvent = ( ClipboardEvent | DragEvent ) & {
 	__deprecatedOnSplit?: unknown;
 };
 

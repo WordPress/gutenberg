@@ -9,20 +9,20 @@
 return array(
 	'id'            => 'sync-status',
 	'type'          => 'text',
-	'label'         => __( 'Sync status', 'gutenberg' ),
+	'label'         => __( 'Sync status' ),
 	'readOnly'      => true,
 	'enableSorting' => false,
 	'enableHiding'  => true,
 	'elements'      => array(
 		array(
 			'value'       => 'fully',
-			'label'       => _x( 'Synced', 'pattern (singular)', 'gutenberg' ),
-			'description' => __( 'Patterns that are kept in sync across the site.', 'gutenberg' ),
+			'label'       => _x( 'Synced', 'pattern (singular)' ),
+			'description' => __( 'Patterns that are kept in sync across the site.' ),
 		),
 		array(
 			'value'       => 'unsynced',
-			'label'       => _x( 'Not synced', 'pattern (singular)', 'gutenberg' ),
-			'description' => __( 'Patterns that can be changed freely without affecting the site.', 'gutenberg' ),
+			'label'       => _x( 'Not synced', 'pattern (singular)' ),
+			'description' => __( 'Patterns that can be changed freely without affecting the site.' ),
 		),
 	),
 	'filterBy'      => array(

@@ -18,6 +18,29 @@ test.describe( 'Block Notes', () => {
 		await requestUtils.resetPreferences();
 	} );
 
+	// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+	// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+	// palette is changed without updating the e2e expectation.
+	const AVATAR_BORDER_COLORS = [
+		'#6F42C1',
+		'#D94145',
+		'#FBBF24',
+		'#FF35EE',
+		'#879F11',
+		'#0F766E',
+		'#00CFFF',
+	];
+
+	// The current user's author color at the highlight's 0x40 alpha.
+	async function getAuthorTint( requestUtils ) {
+		const { id } = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+		const hex = AVATAR_BORDER_COLORS[ id % AVATAR_BORDER_COLORS.length ];
+		const [ r, g, b ] = [ 1, 3, 5 ].map( ( i ) =>
+			parseInt( hex.slice( i, i + 2 ), 16 )
+		);
+		return `rgba(${ r }, ${ g }, ${ b }, 0.25)`;
+	}
+
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
@@ -399,6 +422,174 @@ test.describe( 'Block Notes', () => {
 			'Resolved',
 			'Note to resolve.',
 		] );
+	} );
+
+	test( 'can search and filter notes in the "All notes" sidebar', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		await headingThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeVisible();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'HEADING' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+
+		await editor.canvas.getByText( 'Second block.' ).click();
+		await expect( imageThread ).toBeVisible();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await expect( imageThread ).toBeHidden();
+
+		await search.fill( 'admin' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeVisible();
+
+		await search.fill( 'nothing matches' );
+		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
+
+		await search.fill( '' );
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Resolved' } ).click();
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeHidden();
+
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter: Open' } )
+		).toBeVisible();
+		await sidebar.getByRole( 'button', { name: 'Filter: Open' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'All' } ).click();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter', exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'moves focus to the next note when resolving one hides it', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await headingThread.click();
+		await sidebar.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( headingThread ).toBeHidden();
+		await expect( imageThread ).toBeFocused();
+	} );
+
+	test( 'expands collapsed replies while searching notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment',
+		} );
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+		const replyButton = sidebar.getByRole( 'button', {
+			name: 'Reply',
+			exact: true,
+		} );
+		for ( const reply of [ 'Check the table.', 'Last reply' ] ) {
+			await replyForm.click();
+			await replyForm.pressSequentially( reply );
+			await replyButton.click();
+		}
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toHaveCount( 2 );
+
+		// Deselect the note so its middle reply collapses.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Test comment',
+		} );
+		const moreReplies = thread.getByRole( 'button', {
+			name: '1 more reply',
+		} );
+		await expect( moreReplies ).toBeVisible();
+		await expect( thread.getByText( 'Check the table.' ) ).toBeHidden();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'table' );
+		await expect( thread.getByText( 'Check the table.' ) ).toBeVisible();
+		await expect( moreReplies ).toBeHidden();
+
+		await search.fill( '' );
+		await expect( moreReplies ).toBeVisible();
 	} );
 
 	test( 'clearing the block selection does not select an orphaned note', async ( {
@@ -1330,26 +1521,39 @@ test.describe( 'Block Notes', () => {
 			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).toBeFocused();
-			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
-				page.getByRole( 'button', { name: /Celebration/ } )
+				page.getByRole( 'button', { name: /Plus/ } )
 			).toContainText( '1' );
 
 			// The menu marks the emoji the user has already reacted with.
 			await trigger.click();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
 			).toBeChecked();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
 			).not.toBeChecked();
+
+			// The emoji name shows in a tooltip, and one Escape closes both.
+			await menu
+				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
+				.hover();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect(
+				page.getByText( 'Heart', { exact: true } )
+			).toBeHidden();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1479,7 +1683,9 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				// The pointer can rest on the pill, which then names the
+				// reactors: "admin reacted with heart".
+				name: /heart/i,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
@@ -1824,39 +2030,12 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Inline notes', () => {
-		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
-		// palette is changed without updating the e2e expectation.
-		const AVATAR_BORDER_COLORS = [
-			'#6F42C1',
-			'#D94145',
-			'#FBBF24',
-			'#FF35EE',
-			'#879F11',
-			'#0F766E',
-			'#00CFFF',
-		];
-
-		function hexToRgb( hex ) {
-			return {
-				r: parseInt( hex.slice( 1, 3 ), 16 ),
-				g: parseInt( hex.slice( 3, 5 ), 16 ),
-				b: parseInt( hex.slice( 5, 7 ), 16 ),
-			};
-		}
-
-		test( 'highlights an inline marker with the author color at the rest opacity', async ( {
+		test( 'highlights an inline marker in the author color and thickens its underline when selected', async ( {
 			editor,
-			page,
 			requestUtils,
 			blockNoteUtils,
 		} ) => {
-			const me = await requestUtils.rest( {
-				path: '/wp/v2/users/me',
-			} );
-			const expectedColor =
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ];
-			const { r, g, b } = hexToRgb( expectedColor );
+			const tint = await getAuthorTint( requestUtils );
 
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1866,61 +2045,37 @@ test.describe( 'Block Notes', () => {
 			// Select all of the paragraph text so the inline path is taken:
 			// "Add note" creates an inline note whenever a non-collapsed
 			// rich-text selection is active, and a block-level note otherwise.
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Color me' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Color me' );
 
 			// The draft marker shows while the note is saved; wait for the
 			// saved note's id so the thread focus that follows has settled.
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
 
-			// Creating a note auto-selects it, which renders the marker at the
-			// active opacity. Move focus to the title to deselect so the marker
-			// settles back to its rest tint.
+			// Creating a note auto-selects it. Focus the title to deselect it.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
+			await expect( mark ).toHaveCSS( 'background-color', tint );
+			await expect( mark ).toHaveCSS(
+				'text-decoration-line',
+				'underline'
+			);
+			await expect( mark ).toHaveCSS(
+				'text-decoration-thickness',
+				'1.5px'
+			);
 
-			// Browsers report the per-author tint as an rgba() value with
-			// alpha ≈ 0x40/255. Require an exact RGB match (the prior
-			// admin-theme fallback can never satisfy it) with a small alpha
-			// tolerance, and poll since the tint transitions over ~0.1s.
-			await expect
-				.poll( async () => {
-					const bg = await mark.evaluate(
-						( el ) => window.getComputedStyle( el ).backgroundColor
-					);
-					const m = bg.match(
-						/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-					);
-					if ( ! m ) {
-						return bg;
-					}
-					const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
-					const isRest =
-						Number( m[ 1 ] ) === r &&
-						Number( m[ 2 ] ) === g &&
-						Number( m[ 3 ] ) === b &&
-						alpha > 0.2 &&
-						alpha < 0.35;
-					return isRest
-						? 'rest'
-						: `${ m[ 1 ] },${ m[ 2 ] },${ m[ 3 ] } a=${ alpha }`;
-				} )
-				.toBe( 'rest' );
+			await blockNoteUtils.getThread( 'Color me' ).click();
+			await expect( mark ).toHaveCSS(
+				'text-decoration-thickness',
+				'3px'
+			);
+			await expect( mark ).toHaveCSS( 'background-color', tint );
 		} );
 
 		test( 'keeps the inline marker highlighted after a code-editor round-trip', async ( {
@@ -2096,6 +2251,62 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 			await expect( paragraph ).toHaveText( 'Resolve this note.' );
+		} );
+
+		test( 'adds, resolves and deletes inline notes in merged text', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			// Each note action writes rich text data back, so each step merges
+			// again to get an HTML string.
+			async function appendAndMerge( content ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+				await paragraph.last().click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+				await expect( paragraph ).toHaveCount( 1 );
+			}
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One' },
+			} );
+
+			await test.step( 'Add a note', async () => {
+				await appendAndMerge( ' two' );
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First note' );
+				await expect( marker ).toHaveText( 'One two' );
+			} );
+
+			await test.step( 'Resolve the note', async () => {
+				await appendAndMerge( ' three' );
+				await blockNoteUtils.getThread( 'First note' ).click();
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'Delete a note', async () => {
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second note' );
+				await appendAndMerge( ' four' );
+				await blockNoteUtils.getThread( 'Second note' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marker ).toHaveCount( 0 );
+			} );
+
+			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
 		test( 'anchors the marker to only the selected text', async ( {
@@ -2373,61 +2584,6 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveText( 'Hello' );
 		} );
 
-		test( 'boosts the marker opacity when its note is selected', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Select my note.' },
-			} );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Pick me' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
-
-			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
-			await expect( mark ).toBeVisible();
-
-			const alphaOf = async () => {
-				const bg = await mark.evaluate(
-					( el ) => window.getComputedStyle( el ).backgroundColor
-				);
-				const match = bg.match(
-					/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-				);
-				return match && match[ 4 ] ? Number( match[ 4 ] ) : 1;
-			};
-
-			// Deselect the freshly added note (focus the title) so the marker
-			// drops to its rest tint (≈0x40/255).
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-			await expect.poll( alphaOf ).toBeLessThan( 0.35 );
-
-			// Selecting the note from the sidebar promotes its marker to the
-			// stronger active alpha (≈0x80/255) via the selected-note rule.
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
-				.click();
-
-			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
-		} );
-
 		test( 'clicking between inline markers selects the matching note', async ( {
 			editor,
 			page,
@@ -2617,6 +2773,139 @@ test.describe( 'Block Notes', () => {
 				'aria-expanded',
 				'false'
 			);
+		} );
+	} );
+
+	test.describe( 'Block-level note highlight', () => {
+		test( 'tints a noted block and keeps the tint when the block or note is selected', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+			} );
+			await blockNoteUtils.addNote( 'Whole image note' );
+
+			const image = editor.canvas.getByRole( 'document', {
+				name: 'Block: Image',
+			} );
+			const expectOverlay = async ( outlineStyle ) => {
+				await expect( image ).toHaveCSS( 'background-color', tint, {
+					pseudo: 'after',
+				} );
+				await expect( image ).toHaveCSS(
+					'outline-style',
+					outlineStyle,
+					{
+						pseudo: 'after',
+					}
+				);
+			};
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expectOverlay( 'none' );
+
+			// The selection outline shows without deepening the tint.
+			await blockNoteUtils.getThread( 'Whole image note' ).click();
+			await expectOverlay( 'solid' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expectOverlay( 'none' );
+			await editor.selectBlocks( image );
+			await expectOverlay( 'solid' );
+		} );
+
+		test( 'clears the tint when the block-level note is deleted', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Tint goes away.' },
+			} );
+			await blockNoteUtils.addNote( 'Temporary note' );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraph ).toHaveCSS( 'background-color', tint, {
+				pseudo: 'after',
+			} );
+
+			await blockNoteUtils.getThread( 'Temporary note' ).click();
+			await blockNoteUtils.deleteNote();
+			await expect( paragraph ).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)',
+				{ pseudo: 'after' }
+			);
+		} );
+
+		test( 'hides the highlights along with the notes', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note the whole block.' },
+			} );
+			await blockNoteUtils.addNote( 'Block-level note' );
+			const blockNoted = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note these words.' },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+				.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			const expectHighlighted = async ( background ) => {
+				await expect( blockNoted ).toHaveCSS(
+					'background-color',
+					background,
+					{ pseudo: 'after' }
+				);
+				await expect( marker ).toHaveCSS(
+					'background-color',
+					background
+				);
+			};
+
+			await expectHighlighted( tint );
+
+			// "All notes" is still a view of the notes, so the highlights stay.
+			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
+			await expectHighlighted( tint );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
+			await expectHighlighted( 'rgba(0, 0, 0, 0)' );
+			await expect( marker ).toHaveCSS( 'text-decoration-line', 'none' );
+			// The marker stays in the content, it just isn't painted.
+			await expect( marker ).toHaveText( 'Note these words.' );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
+			await expectHighlighted( tint );
 		} );
 	} );
 
@@ -3184,6 +3473,168 @@ test.describe( 'Block Notes', () => {
 			await page.keyboard.press( 'Escape' );
 			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
 			await expect( textbox ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Notes shared by several blocks', () => {
+		test( 'shows, moves, deletes and restores a note on duplicated blocks', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			// Keeps the toolbar button once the shared note is deleted.
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/heading',
+				attributes: { content: 'Other block' },
+				comment: 'Other note',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Duplicate me' },
+				comment: 'Shared note',
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = blockNoteUtils.getThread( 'Shared note' );
+			// Moves focus out of the new thread, so only the caret selects notes.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await paragraphs.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await pageUtils.pressKeys( 'primary+shift+d' );
+			await expect( paragraphs ).toHaveCount( 2 );
+
+			const toolbar = page.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} );
+
+			await test.step( 'Keeps the note selected on the copy', async () => {
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+
+			await test.step( 'Lists the note once', async () => {
+				await expect( thread ).toHaveCount( 1 );
+			} );
+
+			await test.step( 'Counts the note on each copy', async () => {
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note (1 note)',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+
+			await test.step( 'Goes back to the selected copy', async () => {
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await thread.click();
+					await expect( thread ).toHaveAttribute(
+						'aria-expanded',
+						'true'
+					);
+					await thread
+						.getByRole( 'button', { name: 'Back to block' } )
+						.focus();
+					await page.keyboard.press( 'Enter' );
+					await expect( paragraphs.nth( index ) ).toBeFocused();
+				}
+			} );
+
+			await test.step( 'Deletes the note from every copy', async () => {
+				await thread.click();
+				await blockNoteUtils.deleteNote();
+				await expect( thread ).toBeHidden();
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+
+			await test.step( 'Restores the note on every copy', async () => {
+				await blockNoteUtils
+					.getNotice( 'Note deleted.' )
+					.getByRole( 'button', { name: 'Undo' } )
+					.click();
+				await expect(
+					blockNoteUtils.getNotice( 'Note restored.' )
+				).toBeVisible();
+				await expect( thread ).toHaveCount( 1 );
+				for ( const index of [ 0, 1 ] ) {
+					await editor.selectBlocks( paragraphs.nth( index ) );
+					await expect(
+						toolbar.getByRole( 'button', {
+							name: 'Add note (1 note)',
+							exact: true,
+						} )
+					).toBeVisible();
+				}
+			} );
+		} );
+
+		test( 'selects and resolves an inline note split across blocks', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Split note' );
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marks ).toHaveAttribute( 'data-id', /^\d+$/ );
+
+			await paragraphs.click();
+			await blockNoteUtils.selectBlockText( { start: 5, length: 0 } );
+			await page.keyboard.press( 'Enter' );
+			await expect( paragraphs ).toHaveCount( 2 );
+			await expect( marks ).toHaveCount( 2 );
+
+			const thread = blockNoteUtils.getThread( 'Split note' );
+
+			await test.step( 'Lists the note once', async () => {
+				await expect( thread ).toHaveCount( 1 );
+			} );
+
+			await test.step( "Selects the note from the first half's marker", async () => {
+				// Moves the block toolbar off the first marker.
+				await editor.canvas
+					.getByRole( 'textbox', { name: 'Add title' } )
+					.click();
+				await marks.first().click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await page.keyboard.type( '!' );
+				await expect( paragraphs.first() ).toContainText( '!' );
+				await expect( paragraphs.nth( 1 ) ).not.toContainText( '!' );
+			} );
+
+			await test.step( 'Resolves the note in both halves', async () => {
+				await page.getByRole( 'button', { name: 'Resolve' } ).click();
+				await expect( marks ).toHaveCount( 0 );
+			} );
 		} );
 	} );
 } );
