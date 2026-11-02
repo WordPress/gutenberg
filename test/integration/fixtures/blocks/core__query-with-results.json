@@ -1,0 +1,24 @@
+[
+	{
+		"name": "core/query-with-results",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/post-template",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/query-pagination",
+				"isValid": true,
+				"attributes": {
+					"paginationArrow": "none",
+					"showLabel": true
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
