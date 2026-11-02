@@ -1,11 +1,16 @@
 /**
- * Public image editor contract.
+ * The image editor's barrel. Inside the package, import the image editor
+ * through here.
  *
  * Keep this barrel explicit so implementation details from `core/`,
- * `react/hooks/`, or `react/components/` do not become supported API by
- * accident. The media editor's own state code imports the reducer-level
- * helpers from `./core` and `./react/hooks` directly, as the package's
- * components already do; everyone else uses what is here.
+ * `react/hooks/`, or `react/components/` do not get shared by accident. The
+ * media editor's own state code imports the reducer-level helpers from
+ * `./core` and `./react/hooks` directly, as the package's components
+ * already do.
+ *
+ * Outside the package, only the cropper, its state hook and the
+ * source-region helpers are available, through the package's private API
+ * (see `../private-apis.ts`).
  */
 
 // React surface.

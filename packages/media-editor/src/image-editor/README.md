@@ -1,6 +1,6 @@
 # Image Editor
 
-> **Status: internal.** This module is not part of `@wordpress/media-editor`'s public API. Import it only from inside the media-editor package, through the local `../image-editor` barrel.
+> **Status: private.** This module is not part of `@wordpress/media-editor`'s public API. Inside the package, import it through the local `../image-editor` barrel. A small part of it is also available to other packages through the package's private API; see [Private API](#private-api).
 
 The image editor is the cropper engine used by the media editor:
 
@@ -50,6 +50,49 @@ Convenience context wrapper around `useCropperController` for component trees th
 ## Core Helpers
 
 `index.ts` also exports helpers for source-region calculation, pipeline replay, and canvas export. Use the named setters or `TransformOperation` values for state changes. The reducer-level helpers that `useMediaEditorState()` composes the cropper with are imported from `core` directly and are not part of this index.
+
+## Private API
+
+Packages that are allowed to use private APIs can unlock these from the `privateApis` export of `@wordpress/media-editor`: `Cropper`, `useCropperController`, `getSourceRegion`, `getSourceRegionPercent` and `buildModifiers`. Everything else in this module, including `CropperProvider` and `useCropper`, stays internal for now. Private APIs can change without notice.
+
+`buildModifiers( controller )` turns the controller's current edit into the list of flip, rotate and crop instructions that the media REST endpoint (`/wp/v2/media/<id>/edit`) applies on the server. It returns an empty list when nothing needs changing or no image has loaded.
+
+```tsx
+import apiFetch from '@wordpress/api-fetch';
+import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { unlock } from './lock-unlock'; // The package's own private API opt-in.
+
+const { Cropper, useCropperController, buildModifiers } = unlock(
+	mediaEditorPrivateApis
+);
+
+function CropImage( { attachmentId, src } ) {
+	const controller = useCropperController();
+
+	const save = async () => {
+		const modifiers = buildModifiers( controller );
+		if ( modifiers.length ) {
+			await apiFetch( {
+				path: `/wp/v2/media/${ attachmentId }/edit`,
+				method: 'POST',
+				data: { src, modifiers },
+			} );
+		}
+	};
+
+	return (
+		<>
+			<div style={ { width: 600, height: 400 } }>
+				<Cropper src={ src } controller={ controller } freeformCrop />
+			</div>
+			<button onClick={ () => controller.toggleFlip( 'horizontal' ) }>
+				Flip
+			</button>
+			<button onClick={ save }>Save</button>
+		</>
+	);
+}
+```
 
 ## Styles
 
