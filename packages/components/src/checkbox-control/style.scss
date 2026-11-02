@@ -70,6 +70,10 @@
 		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
 		opacity: 1;
 
+		@media (forced-colors: active) {
+			border-color: GrayText;
+		}
+
 		&:checked::before,
 		&[aria-checked="mixed"]::before {
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
