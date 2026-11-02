@@ -81,6 +81,7 @@ import {
 	isRelativePath,
 } from './components/link-control/is-url-like';
 import { isElementVisible } from './utils/dom';
+import { getContrastWarning } from './components/contrast-checker';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -161,4 +162,5 @@ lock( privateApis, {
 	isElementVisible,
 	getPopulatedCategories,
 	searchItems,
+	getContrastWarning,
 } );
