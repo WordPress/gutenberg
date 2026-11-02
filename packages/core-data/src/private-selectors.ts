@@ -304,35 +304,7 @@ export function isCollaborationSupported( state: State ): boolean {
 	return state.collaborationSupported;
 }
 
-/**
- * Returns the view configuration for the given entity type.
- *
- * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
- * it is consumed by the `getViewConfig` resolver to request a subset of the
- * config via the REST API `_fields` parameter and does not affect what is read
- * here. Partial responses are merged in the reducer, so the returned object may
- * accumulate properties across requests for the same entity.
- *
- * @param state Data state.
- * @param kind  Entity kind.
- * @param name  Entity name.
- *
- * @return The view configuration or undefined if not loaded.
- */
-export function getViewConfig(
-	state: State,
-	kind: string,
-	name: string
-): Record< string, any > | undefined {
-	return (
-		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
-			default_view: undefined,
-			default_layouts: undefined,
-			view_list: undefined,
-			form: undefined,
-		}
-	);
-}
+export { getViewConfig } from './selectors';
 
 /**
  * The fields registered on the server for an entity, as returned by the

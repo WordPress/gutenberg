@@ -44,7 +44,6 @@
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
 		"@wordpress/preferences": "file:../preferences",
-		"@wordpress/private-apis": "file:../private-apis",
 		"dequal": "^2.0.3"
 	},
 	"devDependencies": {
