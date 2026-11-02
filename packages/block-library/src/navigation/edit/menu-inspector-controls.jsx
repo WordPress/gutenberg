@@ -4,6 +4,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -111,6 +112,18 @@ const MenuInspectorControls = ( props ) => {
 	const { isOpened, expandRevision, handleToggle } =
 		useListViewPanelState( clientId );
 
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
+
+	const draftNotice = navigationMenu?.status === 'draft' && (
+		<Notice.Root intent="warning">
+			<Notice.Description>
+				{ __(
+					"This menu is a draft. It will not be visible on your site until it's published."
+				) }
+			</Notice.Description>
+		</Notice.Root>
+	);
+
 	if ( ! showBlockTitle ) {
 		return (
 			<InspectorControls group="list">
@@ -126,6 +139,7 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled
 						}
 					/>
+					{ draftNotice }
 					<MainContent
 						{ ...props }
 						expandRevision={ expandRevision }
@@ -155,6 +169,7 @@ const MenuInspectorControls = ( props ) => {
 						}
 					/>
 				) }
+				{ draftNotice }
 				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
 		</InspectorControls>
