@@ -139,6 +139,10 @@ describe( 'getNameAndSlugForPosition', () => {
 } );
 
 describe( 'deduplicateElementSlugs', () => {
+	it( 'handles an empty palette', () => {
+		expect( deduplicateElementSlugs( [] ) ).toEqual( [] );
+	} );
+
 	it( 'should not change the slugs if they are unique', () => {
 		const elements: PaletteElement[] = [
 			{
@@ -182,6 +186,62 @@ describe( 'deduplicateElementSlugs', () => {
 			},
 		] );
 	} );
+
+	it.each( [
+		{
+			slugs: [ 'red', 'red', 'red-1' ],
+			expected: [ 'red', 'red-2', 'red-1' ],
+		},
+		{
+			slugs: [ 'red-1', 'red', 'red' ],
+			expected: [ 'red-1', 'red', 'red-2' ],
+		},
+		{
+			slugs: [ 'red', 'red', 'red', 'red-1', 'red-3' ],
+			expected: [ 'red', 'red-2', 'red-4', 'red-1', 'red-3' ],
+		},
+		{
+			slugs: [ 'red', 'red-1', 'red-1', 'red-1-1' ],
+			expected: [ 'red', 'red-1', 'red-1-2', 'red-1-1' ],
+		},
+		{
+			slugs: [
+				'constructor',
+				'constructor',
+				'constructor-1',
+				'__proto__',
+				'__proto__',
+			],
+			expected: [
+				'constructor',
+				'constructor-2',
+				'constructor-1',
+				'__proto__',
+				'__proto__-1',
+			],
+		},
+	] )(
+		'avoids existing slug collisions for $slugs',
+		( { slugs, expected } ) => {
+			const elements = slugs.map( ( slug, index ) =>
+				Object.freeze( {
+					slug,
+					color: '#123456',
+					name: `Color ${ index + 1 }`,
+				} )
+			);
+			const actual = deduplicateElementSlugs( elements );
+
+			expect( actual ).toEqual(
+				elements.map( ( element, index ) => ( {
+					...element,
+					slug: expected[ index ],
+				} ) )
+			);
+			expect( elements.map( ( { slug } ) => slug ) ).toEqual( slugs );
+			expect( deduplicateElementSlugs( actual ) ).toEqual( actual );
+		}
+	);
 } );
 
 describe( 'PaletteEdit', () => {
@@ -223,6 +283,78 @@ describe( 'PaletteEdit', () => {
 			slug: 'blue-red',
 		},
 	];
+
+	it( 'preserves existing slugs while deduplicating an edited palette', async () => {
+		const initialColors: Color[] = [
+			{ slug: 'red', color: '#ff0000', name: 'First red' },
+			{ slug: 'red', color: '#ee0000', name: 'Duplicate red' },
+			{ slug: 'red-1', color: '#dd0000', name: 'Existing suffix' },
+		];
+		const onChange = vi.fn();
+
+		function ControlledPalette() {
+			const [ value, setValue ] = useState( initialColors.slice( 0, 1 ) );
+			return (
+				<>
+					<button
+						type="button"
+						onClick={ () => setValue( initialColors ) }
+					>
+						Load palette
+					</button>
+					<PaletteEdit
+						{ ...defaultProps }
+						colors={ value }
+						onChange={ ( nextColors ) => {
+							onChange( nextColors );
+							setValue( nextColors ?? [] );
+						} }
+					/>
+				</>
+			);
+		}
+
+		await render( <ControlledPalette /> );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Color options' } )
+		);
+		await userEvent.click(
+			await screen.findByRole( 'menuitem', { name: 'Show details' } )
+		);
+		// Load the duplicate definitions in details view, where items use their
+		// position as the key rather than the currently duplicated slug.
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Load palette' } )
+		);
+
+		const nameInputs = screen.getAllByRole( 'textbox', {
+			name: 'Color name',
+		} );
+		await userEvent.fill( nameInputs[ 1 ], 'Edited duplicate' );
+
+		const expected = [
+			initialColors[ 0 ],
+			{ ...initialColors[ 1 ], slug: 'red-2', name: 'Edited duplicate' },
+			initialColors[ 2 ],
+		];
+		await waitFor( () =>
+			expect( onChange ).toHaveBeenLastCalledWith( expected )
+		);
+
+		await userEvent.fill( nameInputs[ 2 ], 'Preserved preset' );
+		await waitFor( () =>
+			expect( onChange ).toHaveBeenLastCalledWith( [
+				expected[ 0 ],
+				expected[ 1 ],
+				{ ...expected[ 2 ], name: 'Preserved preset' },
+			] )
+		);
+		expect( initialColors.map( ( { slug } ) => slug ) ).toEqual( [
+			'red',
+			'red',
+			'red-1',
+		] );
+	} );
 
 	it( 'shows heading label', async () => {
 		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
