@@ -409,7 +409,7 @@ describe( 'LinkPicker', () => {
 	} );
 
 	describe( 'Apply', () => {
-		it( 'should select the typed URL when Apply is clicked', async () => {
+		it( 'should save and close the URL edit popover when the Apply button is pressed with a valid URL', async () => {
 			const user = userEvent.setup();
 			const onSelect = vi.fn();
 
@@ -554,38 +554,6 @@ describe( 'LinkPicker', () => {
 				} )
 			).not.toBeInTheDocument();
 			expect( button ).toHaveFocus();
-		} );
-
-		it( 'should select the typed URL when Apply is clicked', async () => {
-			const user = userEvent.setup();
-			const onSelect = vi.fn();
-
-			render(
-				<LinkPicker
-					preview={ createMockPreview() }
-					onSelect={ onSelect }
-					label="Link"
-					showSuggestions={ false }
-				/>
-			);
-
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
-			const urlInput = await screen.findByRole( 'combobox', {
-				name: 'Paste or type URL',
-			} );
-			await user.type( urlInput, 'https://wordpress.org' );
-			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
-
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
-				expect.objectContaining( { url: 'https://wordpress.org' } )
-			);
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Paste or type URL',
-				} )
-			).not.toBeInTheDocument();
 		} );
 	} );
 
