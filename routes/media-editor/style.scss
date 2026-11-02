@@ -65,3 +65,25 @@
 		display: none;
 	}
 }
+
+// Lets the breadcrumbs shrink below the title's width, so the title truncates
+// rather than pushing the file details out of the header.
+.media-editor-route nav:has(h1) {
+	min-width: 0;
+}
+
+// File type and size beside the title. Hidden below `small`, where the header
+// has no room for them.
+.media-editor-route__file-details {
+	display: none;
+	flex-shrink: 0;
+	gap: $grid-unit-05;
+	margin-inline-start: $grid-unit-05;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	text-transform: uppercase;
+	white-space: nowrap;
+
+	@include break-small() {
+		display: flex;
+	}
+}
