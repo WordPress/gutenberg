@@ -39,6 +39,7 @@ import type { GlobalStyles } from '../global-styles';
 import type { CollectionFontFamily, FontCollection } from '../font-collection';
 import type { Block } from '../block';
 import type { IconCollection } from '../icon-collection';
+import type { NavMenu } from '../nav-menu';
 import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
@@ -157,6 +158,18 @@ describe( 'Entity record types', () => {
 			threads?.[ 0 ].status satisfies CommentStatus | undefined;
 			threads?.[ 0 ].reaction_summary?.[ '1f44d' ]?.count satisfies
 				number | undefined;
+
+			// Menus are fetched in the edit context unless the query names one.
+			const { records: menus } = useEntityRecords( 'root', 'menu', {
+				per_page: -1,
+				context: 'view',
+			} );
+			true satisfies Expect< typeof menus, NavMenu< 'view' >[] | null >;
+			menus?.[ 0 ].locations satisfies string[] | undefined;
+			true satisfies Expect<
+				EntityRecordOf< 'root', 'menu' >,
+				NavMenu< 'edit' >
+			>;
 		};
 	} );
 
@@ -929,13 +942,13 @@ describe( 'Entity record types', () => {
 
 			// Built-in pairs stay on the same safe fallback until their legacy
 			// declarations have been verified against the current REST schema.
-			const menu = select( coreStore ).getEntityRecord(
+			const sidebar = select( coreStore ).getEntityRecord(
 				'root',
-				'menu',
-				1
+				'sidebar',
+				'sidebar-1'
 			);
 			true satisfies Expect<
-				typeof menu,
+				typeof sidebar,
 				UnknownEntityRecord | undefined
 			>;
 
