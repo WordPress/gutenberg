@@ -439,6 +439,8 @@ export default dedupePlugins( [
 						Tabs: 'WCTabs',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
+						ValidatedInputControl: 'WCValidatedInputControl',
+						ValidatedTextareaControl: 'WCValidatedTextareaControl',
 						VisuallyHidden: 'WCVisuallyHidden',
 					},
 				},
