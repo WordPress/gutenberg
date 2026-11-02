@@ -2,7 +2,8 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { compileCss, compileInlineStyle } from '../compile-inline-style.mjs';
+import { compileInlineStyle } from '../compile-inline-style.mjs';
+import { compileStyleFile } from '../compile-style-file.mjs';
 
 async function compileStyleModule() {
 	return compileInlineStyle( { minify: false } )(
@@ -156,24 +157,42 @@ describe( 'compileInlineStyle', () => {
 	} );
 } );
 
-describe( 'compileCss', () => {
-	test( 'scopes class names like the JavaScript module does', async () => {
-		const cssText = '.button { color: red; } .is-small { padding: 0; }';
-		const filePath = `${ import.meta.dirname }/fixture.module.css`;
+describe( 'compileStyleFile', () => {
+	let dir;
 
-		const { css, classNames } = await compileCss( cssText, filePath, {
+	beforeEach( async () => {
+		dir = await mkdtemp( path.join( tmpdir(), 'wp-build-css-' ) );
+	} );
+
+	afterEach( async () => {
+		await rm( dir, { recursive: true, force: true } );
+	} );
+
+	test( 'names classes relative to the root, as the JavaScript build does', async () => {
+		const cssText = '.card { color: red; }';
+		const filePath = path.join( dir, 'style.module.css' );
+		await writeFile( filePath, cssText );
+
+		const source = await compileInlineStyle( {
 			cssModules: true,
+			minify: false,
+		} )( cssText, dir, filePath );
+		const fromBuildRoot = await compileStyleFile( filePath, {
+			workingDir: dir,
+			rootDir: process.cwd(),
+			minify: false,
 		} );
-		const source = await compileInlineStyle( { cssModules: true } )(
-			cssText,
-			import.meta.dirname,
-			filePath
-		);
+		const fromOtherRoot = await compileStyleFile( filePath, {
+			workingDir: dir,
+			rootDir: dir,
+			minify: false,
+		} );
 
-		expect( Object.keys( classNames ) ).toEqual( [ 'button', 'is-small' ] );
 		expect( source ).toContain(
-			`export default ${ JSON.stringify( classNames ) };`
+			`export default ${ JSON.stringify( fromBuildRoot.classNames ) };`
 		);
-		expect( css ).toContain( `.${ classNames.button }` );
+		expect( fromOtherRoot.classNames.card ).not.toBe(
+			fromBuildRoot.classNames.card
+		);
 	} );
 } );
