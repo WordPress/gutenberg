@@ -122,8 +122,8 @@ function getGridSnapshot(
 }
 
 /**
- * Directional movers for a child of an auto grid. Each move reorders the
- * block when that moves it one cell, and otherwise pins it to the target cell
+ * Directional movers for a child of an auto grid. Each move reorders the block
+ * if it can be auto-placed to that position, and otherwise pins it to the target cell
  * with an explicit column and row start.
  *
  * @param props
@@ -237,45 +237,23 @@ export default function AutoGridItemMovers( {
 		const targets = otherItems.filter( ( candidate ) =>
 			candidate.rect.intersectsRect( target )
 		);
-		const targetItem = targets[ 0 ];
 		const currentIndex = blockOrder.indexOf( blockClientId );
-		const targetIndex = targetItem
-			? blockOrder.indexOf( targetItem.clientId )
-			: -1;
 		const forward = direction === 'right' || direction === 'down';
-		const between = blockOrder.slice(
-			Math.min( currentIndex, targetIndex ),
-			Math.max( currentIndex, targetIndex ) + 1
-		);
-		const itemsByClientId = new Map(
-			current.items.map( ( candidate ) => [
-				candidate.clientId,
-				candidate,
-			] )
+		// Only swap with the next block in order; the rest reflow around it.
+		const targetIndex = forward ? currentIndex + 1 : currentIndex - 1;
+		const neighbor = otherItems.find(
+			( candidate ) => candidate.clientId === blockOrder[ targetIndex ]
 		);
 		const canReorder =
 			! item.isExplicit &&
-			item.rect.columnSpan === 1 &&
-			item.rect.rowSpan === 1 &&
-			targets.length === 1 &&
-			targetIndex >= 0 &&
-			( forward
-				? targetIndex > currentIndex
-				: targetIndex < currentIndex ) &&
+			!! neighbor &&
+			! neighbor.isExplicit &&
+			targets.includes( neighbor ) &&
 			! otherItems.some(
 				( candidate ) =>
 					candidate.isExplicit &&
 					candidate.rect.intersectsRect( nearby )
-			) &&
-			between.every( ( clientId ) => {
-				const candidate = itemsByClientId.get( clientId );
-				return (
-					candidate &&
-					! candidate.isExplicit &&
-					candidate.rect.columnSpan === 1 &&
-					candidate.rect.rowSpan === 1
-				);
-			} );
+			);
 
 		if ( canReorder ) {
 			moveBlocksToPosition(
