@@ -301,6 +301,15 @@
 		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
 		border-radius: var(--wpds-border-radius-md);
 	}
+
+	// Drawn inside the box, like its border, as the grid does.
+	&:focus-visible {
+		outline: none;
+
+		&::after {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+		}
+	}
 }
 
 // Only when the view configures `layout.aspectRatio` (the table then carries

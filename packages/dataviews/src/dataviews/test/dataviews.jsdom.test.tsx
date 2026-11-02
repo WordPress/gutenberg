@@ -813,6 +813,33 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
+		it( 'keeps clickable media next to a clickable title out of the tab order', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			expect(
+				screen.getAllByRole( 'button', { name: data[ 0 ].title } )
+			).toHaveLength( 1 );
+			const media = screen
+				.getAllByRole( 'button', { hidden: true } )
+				.find( ( button ) =>
+					button.classList.contains(
+						'dataviews-column-primary__media'
+					)
+				);
+			expect( media ).toHaveAttribute( 'tabindex', '-1' );
+			expect( media ).toHaveAttribute( 'aria-hidden', 'true' );
+		} );
+
 		it( 'should render actions column if actions are supported and passed in', () => {
 			render( <DataViewWrapper actions={ actions } /> );
 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();
