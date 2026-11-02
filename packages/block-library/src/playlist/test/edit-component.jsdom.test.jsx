@@ -66,10 +66,13 @@ vi.mock( import( '@wordpress/blob' ), () => ( {
 
 vi.mock( import( '@wordpress/components' ), () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
-	SelectControl: () => <div />,
 	ToggleControl: () => <div />,
 	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
+} ) );
+
+vi.mock( import( '@wordpress/ui' ), () => ( {
+	SelectControl: () => <div />,
 } ) );
 
 vi.mock( import( '@wordpress/data' ), () => ( {
