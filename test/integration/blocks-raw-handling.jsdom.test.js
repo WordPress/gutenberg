@@ -6,6 +6,7 @@ import {
 	createBlock,
 	getBlockTypes,
 	getBlockContent,
+	parse,
 	pasteHandler,
 	rawHandler,
 	registerBlockType,
@@ -798,4 +799,67 @@ describe( 'rawHandler', () => {
 		expect( blocks[ 0 ].name ).toBe( 'core/list' );
 		expect( blocks[ 0 ].attributes.className ).toBe( 'fancy' );
 	} );
+
+	it( 'should convert a pullquote from classic content', () => {
+		// The parser passes classic content through autop, which wraps the
+		// cite in a paragraph.
+		const classic = parse(
+			'<figure class="wp-block-pullquote"><blockquote><p>Quote</p><cite>Citation</cite></blockquote></figure>'
+		);
+		expect( classic[ 0 ].name ).toBe( 'core/freeform' );
+
+		expect(
+			serialize( rawHandler( { HTML: serialize( classic ) } ) )
+		).toBe(
+			'<!-- wp:pullquote -->\n<figure class="wp-block-pullquote"><blockquote><p>Quote</p><cite>Citation</cite></blockquote></figure>\n<!-- /wp:pullquote -->'
+		);
+	} );
+
+	it( 'should keep every paragraph, the alignment and the classes of a pullquote', () => {
+		const HTML =
+			'<figure id="quote" class="wp-block-pullquote alignwide is-style-solid-color"><blockquote><p>One</p><p>Two</p><cite>Citation</cite></blockquote></figure>';
+
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:pullquote {"align":"wide","anchor":"quote","className":"is-style-solid-color"} -->\n<figure class="wp-block-pullquote alignwide is-style-solid-color" id="quote"><blockquote><p>One<br>Two</p><cite>Citation</cite></blockquote></figure>\n<!-- /wp:pullquote -->'
+		);
+	} );
+
+	it( 'should keep a cite inside the quoted text as part of the pullquote', () => {
+		const HTML =
+			'<figure class="wp-block-pullquote"><blockquote><p>Quote about <cite>a work</cite>.</p><cite>Citation</cite></blockquote></figure>';
+
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:pullquote -->\n<figure class="wp-block-pullquote"><blockquote><p>Quote about <cite>a work</cite>.</p><cite>Citation</cite></blockquote></figure>\n<!-- /wp:pullquote -->'
+		);
+	} );
+
+	it.each( [
+		[
+			'a list',
+			'<figure class="wp-block-pullquote"><blockquote><ul><li>One</li></ul><cite>Citation</cite></blockquote></figure>',
+		],
+		[
+			'a caption',
+			'<figure class="wp-block-pullquote"><blockquote><p>Quote</p></blockquote><figcaption>Caption</figcaption></figure>',
+		],
+		[
+			'inline styles',
+			'<figure class="wp-block-pullquote" style="background-color:#000"><blockquote><p>Quote</p></blockquote></figure>',
+		],
+		[
+			'attributes on the cite',
+			'<figure class="wp-block-pullquote"><blockquote><p>Quote</p><p><cite class="author">Citation</cite></p></blockquote></figure>',
+		],
+		[
+			'two citations',
+			'<figure class="wp-block-pullquote"><blockquote><p>One</p><cite>Citation</cite><p>Two</p><cite>Citation</cite></blockquote></figure>',
+		],
+	] )(
+		'should keep a pullquote with %s in a Custom HTML block',
+		( _, HTML ) => {
+			expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+				`<!-- wp:html -->\n${ HTML }\n<!-- /wp:html -->`
+			);
+		}
+	);
 } );
