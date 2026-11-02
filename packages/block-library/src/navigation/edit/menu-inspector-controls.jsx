@@ -4,7 +4,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -15,6 +14,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import NavigationDraftBadge from './navigation-draft-badge';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -114,16 +114,6 @@ const MenuInspectorControls = ( props ) => {
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
-	const draftNotice = navigationMenu?.status === 'draft' && (
-		<Notice.Root intent="warning">
-			<Notice.Description>
-				{ __(
-					"This menu is a draft. It will not be visible on your site until it's published."
-				) }
-			</Notice.Description>
-		</Notice.Root>
-	);
-
 	if ( ! showBlockTitle ) {
 		return (
 			<InspectorControls group="list">
@@ -139,7 +129,6 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled
 						}
 					/>
-					{ draftNotice }
 					<MainContent
 						{ ...props }
 						expandRevision={ expandRevision }
@@ -169,7 +158,9 @@ const MenuInspectorControls = ( props ) => {
 						}
 					/>
 				) }
-				{ draftNotice }
+				{ navigationMenu?.status === 'draft' && (
+					<NavigationDraftBadge />
+				) }
 				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
 		</InspectorControls>

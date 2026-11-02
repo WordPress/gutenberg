@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import MenuInspectorControls from '../menu-inspector-controls';
 import useNavigationMenu from '../../use-navigation-menu';
 
@@ -14,7 +15,7 @@ vi.mock( import( '../../../lock-unlock' ), async () => {
 	} );
 
 	return {
-		unlock: ( target: any ) => ( {
+		unlock: ( target ) => ( {
 			PrivateListView: () => <div data-testid="private-list-view" />,
 			PrivateBlockContext,
 			useListViewPanelState: () => ( {
@@ -29,27 +30,22 @@ vi.mock( import( '../../../lock-unlock' ), async () => {
 	};
 } );
 
-vi.mock( import( '../navigation-list-view-header' ), () => ( {
-	default: () => <div data-testid="navigation-list-view-header" />,
-} ) );
-
 vi.mock( import( '../navigation-menu-selector' ), () => ( {
 	default: () => <div data-testid="navigation-menu-selector" />,
 } ) );
 
 vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
-	const actual =
-		await importOriginal< typeof import( '@wordpress/block-editor' ) >();
+	const actual = await importOriginal();
 	return {
 		...actual,
-		InspectorControls: ( { children }: { children: React.ReactNode } ) => (
+		InspectorControls: ( { children } ) => (
 			<div data-testid="inspector-controls">{ children }</div>
 		),
 	};
 } );
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
-	const actual = await importOriginal< typeof import( '@wordpress/data' ) >();
+	const actual = await importOriginal();
 	return {
 		...actual,
 		useSelect: () => true,
@@ -69,10 +65,10 @@ describe( 'MenuInspectorControls', () => {
 		vi.clearAllMocks();
 	} );
 
-	it( 'renders draft warning notice when navigation menu status is draft', () => {
-		(
-			useNavigationMenu as unknown as ReturnType< typeof vi.fn >
-		 ).mockReturnValue( {
+	it( 'renders draft badge and infotip when navigation menu status is draft', async () => {
+		const user = userEvent.setup();
+
+		useNavigationMenu.mockReturnValue( {
 			navigationMenu: {
 				id: 123,
 				status: 'draft',
@@ -82,17 +78,22 @@ describe( 'MenuInspectorControls', () => {
 		render( <MenuInspectorControls { ...defaultProps } /> );
 
 		const inspector = screen.getByTestId( 'inspector-controls' );
+		const draftBadge = within( inspector ).getByRole( 'button', {
+			name: 'Draft',
+		} );
+		expect( draftBadge ).toBeVisible();
+
+		await user.click( draftBadge );
+
 		expect(
-			within( inspector ).getByText(
-				"This menu is a draft. It will not be visible on your site until it's published."
-			)
-		).toBeInTheDocument();
+			await screen.findByRole( 'dialog', { name: 'Draft status' } )
+		).toHaveTextContent(
+			"This menu is a draft. It will not be visible on your site until it's published."
+		);
 	} );
 
-	it( 'does not render draft warning notice when navigation menu status is publish', () => {
-		(
-			useNavigationMenu as unknown as ReturnType< typeof vi.fn >
-		 ).mockReturnValue( {
+	it( 'does not render draft badge when navigation menu status is publish', () => {
+		useNavigationMenu.mockReturnValue( {
 			navigationMenu: {
 				id: 123,
 				status: 'publish',
@@ -103,16 +104,15 @@ describe( 'MenuInspectorControls', () => {
 
 		const inspector = screen.getByTestId( 'inspector-controls' );
 		expect(
-			within( inspector ).queryByText(
-				"This menu is a draft. It will not be visible on your site until it's published."
-			)
+			within( inspector ).queryByRole( 'button', { name: 'Draft' } )
+		).not.toBeInTheDocument();
+		expect(
+			within( inspector ).queryByText( 'Draft' )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'does not render draft warning notice when navigation menu is not defined', () => {
-		(
-			useNavigationMenu as unknown as ReturnType< typeof vi.fn >
-		 ).mockReturnValue( {
+	it( 'does not render draft badge when navigation menu is not defined', () => {
+		useNavigationMenu.mockReturnValue( {
 			navigationMenu: undefined,
 		} );
 
@@ -120,9 +120,10 @@ describe( 'MenuInspectorControls', () => {
 
 		const inspector = screen.getByTestId( 'inspector-controls' );
 		expect(
-			within( inspector ).queryByText(
-				"This menu is a draft. It will not be visible on your site until it's published."
-			)
+			within( inspector ).queryByRole( 'button', { name: 'Draft' } )
+		).not.toBeInTheDocument();
+		expect(
+			within( inspector ).queryByText( 'Draft' )
 		).not.toBeInTheDocument();
 	} );
 } );
