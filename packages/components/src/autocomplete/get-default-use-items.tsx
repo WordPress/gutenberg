@@ -2,7 +2,11 @@ import removeAccents from 'remove-accents';
 import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import { escapeRegExp } from '../utils/strings';
-import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
+import type {
+	CancelablePromise,
+	KeyedOption,
+	ListedOptionCompleter,
+} from './types';
 
 function filterOptions(
 	search: RegExp,
@@ -37,7 +41,9 @@ function filterOptions(
 	return filtered;
 }
 
-export default function getDefaultUseItems( autocompleter: WPCompleter ) {
+export default function getDefaultUseItems(
+	autocompleter: ListedOptionCompleter
+) {
 	return ( filterValue: string ) => {
 		const [ items, setItems ] = useState< Array< KeyedOption > >( [] );
 		/*

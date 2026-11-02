@@ -180,7 +180,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg $theme_json Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
 		static::$core = $theme_json->get_theme_json();
@@ -280,15 +280,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * See test_add_registered_block_styles_to_theme_data and test_unwraps_block_style_variations.
 			 */
-			$theme_json_data = static::inject_variations_from_block_style_variation_files( $theme_json_data, $variations );
-			$theme_json_data = static::inject_variations_from_block_styles_registry( $theme_json_data );
+			$theme_json_data = self::inject_variations_from_block_style_variation_files( $theme_json_data, $variations );
+			$theme_json_data = self::inject_variations_from_block_styles_registry( $theme_json_data );
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
 			 *
 			 * @since 6.1.0
 			 *
-			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+			 * @param WP_Theme_JSON_Data_Gutenberg $theme_json Class to access and update the underlying data.
 			 */
 			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			static::$theme = $theme_json->get_theme_json();
@@ -398,7 +398,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$config = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = static::remove_json_comments( $block_type->supports['__experimentalStyle'] );
+				$config['styles']['blocks'][ $block_name ] = self::remove_json_comments( $block_type->supports['__experimentalStyle'] );
 			}
 
 			if (
@@ -416,7 +416,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg $theme_json Class to access and update the underlying data.
 		 */
 		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
 		static::$blocks = $theme_json->get_theme_json();
@@ -434,7 +434,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		unset( $json_array['//'] );
 		foreach ( $json_array as $k => $v ) {
 			if ( is_array( $v ) ) {
-				$json_array[ $k ] = static::remove_json_comments( $v );
+				$json_array[ $k ] = self::remove_json_comments( $v );
 			}
 		}
 
@@ -541,7 +541,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 *
 				 * @since 6.1.0
 				 *
-				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
+				 * @param WP_Theme_JSON_Data_Gutenberg $theme_json Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
 
@@ -789,10 +789,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$base_directory     = get_stylesheet_directory() . '/styles';
 		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
-			$variation_files = static::recursively_iterate_json( $base_directory );
+			$variation_files = self::recursively_iterate_json( $base_directory );
 		}
 		if ( is_dir( $template_directory ) && $template_directory !== $base_directory ) {
-			$variation_files_parent = static::recursively_iterate_json( $template_directory );
+			$variation_files_parent = self::recursively_iterate_json( $template_directory );
 			// If the child and parent variation file basename are the same, only include the child theme's.
 			foreach ( $variation_files_parent as $parent_path => $parent ) {
 				foreach ( $variation_files as $child_path => $child ) {
@@ -823,13 +823,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			if ( get_stylesheet_directory() === $directory ) {
 				$variation_files = static::get_style_variation_files_from_current_theme();
 			} else {
-				$variation_files = static::recursively_iterate_json( $directory );
+				$variation_files = self::recursively_iterate_json( $directory );
 			}
 		}
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = self::read_json_file( $path );
-			if ( is_array( $decoded_file ) && static::style_variation_has_scope( $decoded_file, $scope ) ) {
+			if ( is_array( $decoded_file ) && self::style_variation_has_scope( $decoded_file, $scope ) ) {
 				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
 				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 				if ( empty( $variation['title'] ) ) {

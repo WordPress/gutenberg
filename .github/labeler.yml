@@ -214,10 +214,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/private-apis/**'
 
-'[Package] Project management automation':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/project-management-automation/**'
-
 '[Package] React i18n':
     - changed-files:
           - any-glob-to-any-file: 'packages/react-i18n/**'
@@ -249,6 +245,10 @@
 '[Package] Theme':
     - changed-files:
           - any-glob-to-any-file: 'packages/theme/**'
+
+'[Package] Theme Build Tools':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme-build-tools/**'
 
 '[Package] Token List':
     - changed-files:

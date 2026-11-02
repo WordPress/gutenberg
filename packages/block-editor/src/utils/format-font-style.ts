@@ -8,7 +8,7 @@ import type { FormattedFont } from './types';
  * @return new object with formatted font style
  */
 export function formatFontStyle(
-	fontStyle: FormattedFont | string | undefined
+	fontStyle?: FormattedFont | string
 ): FormattedFont {
 	if ( ! fontStyle ) {
 		return {};

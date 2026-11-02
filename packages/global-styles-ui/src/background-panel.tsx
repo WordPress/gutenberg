@@ -1,4 +1,3 @@
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useStyle, useSetting, useStyleWithResolvedBackground } from './hooks';
 import { unlock } from './lock-unlock';
@@ -46,7 +45,6 @@ export default function BackgroundPanel() {
 			onChange={ setStyle }
 			settings={ settings }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }

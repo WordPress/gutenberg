@@ -29,7 +29,7 @@ async function waitForProcessToExit( pid ) {
 test( 'terminates a watcher and its descendant process', async () => {
 	watcher = spawnWatchProcess(
 		process.execPath,
-		[ path.join( __dirname, 'fixtures/watch-process.mjs' ) ],
+		[ path.join( import.meta.dirname, 'fixtures/watch-process.mjs' ) ],
 		{ stdio: [ 'ignore', 'pipe', 'inherit' ] }
 	);
 
