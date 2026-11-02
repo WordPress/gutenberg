@@ -66,9 +66,9 @@ describe( 'DateEdit', () => {
 				onChange={ () => {} }
 			/>
 		);
-		expect(
-			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		const reset = await screen.findByRole( 'button', { name: 'Reset' } );
+		expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( reset ).toHaveAccessibleDescription( 'Publishes immediately.' );
 	} );
 
 	it( 'keeps the reset of a floating draft disabled when it is scheduled but not saved', async () => {
@@ -108,9 +108,9 @@ describe( 'DateEdit', () => {
 				/>
 			</RegistryProvider>
 		);
-		expect(
-			await screen.findByRole( 'button', { name: 'Reset' } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		const reset = await screen.findByRole( 'button', { name: 'Reset' } );
+		expect( reset ).not.toHaveAttribute( 'aria-disabled', 'true' );
+		expect( reset ).not.toHaveAccessibleDescription();
 	} );
 
 	it( 'disables the reset of a published post whose date was reset', async () => {
@@ -125,8 +125,10 @@ describe( 'DateEdit', () => {
 				onChange={ () => {} }
 			/>
 		);
-		expect(
-			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		const reset = await screen.findByRole( 'button', { name: 'Reset' } );
+		expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( reset ).toHaveAccessibleDescription(
+			'Changes to the time you save.'
+		);
 	} );
 } );

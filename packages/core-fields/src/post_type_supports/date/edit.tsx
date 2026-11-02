@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { getSettings } from '@wordpress/date';
-import { useMemo, useState } from '@wordpress/element';
+import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
 import type { PostWithDate } from './types';
@@ -108,6 +108,16 @@ export default function DateEdit( {
 
 	const disabled = field.isDisabled( { item: data, field } );
 
+	// Why Reset is disabled: the picker shows a date even when the post has
+	// none of its own (the save time of a floating draft, or now once reset).
+	let note;
+	if ( isFloating ) {
+		note = __( 'Publishes immediately.' );
+	} else if ( isReset ) {
+		note = __( 'Changes to the time you save.' );
+	}
+	const noteId = useId();
+
 	const onReset = () => {
 		onChange( field.setValue( { item: data, value: null } ) );
 		speak( __( 'Publish date set to now.' ), 'assertive' );
@@ -146,9 +156,15 @@ export default function DateEdit( {
 				accessibleWhenDisabled
 				disabled={ disabled || isReset || isFloating }
 				onClick={ onReset }
+				aria-describedby={ note ? noteId : undefined }
 			>
 				{ __( 'Reset' ) }
 			</Button>
+			{ note && (
+				<Fieldset.Description id={ noteId }>
+					{ note }
+				</Fieldset.Description>
+			) }
 		</Stack>
 	);
 }
