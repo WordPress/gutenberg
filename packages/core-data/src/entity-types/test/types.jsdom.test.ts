@@ -34,6 +34,7 @@ import type {
 	OmitNevers,
 } from '../index';
 import type { Attachment } from '../attachment';
+import type { Comment, CommentStatus } from '../comment';
 import type { GlobalStyles } from '../global-styles';
 import type { CollectionFontFamily, FontCollection } from '../font-collection';
 import type { Block } from '../block';
@@ -140,6 +141,17 @@ describe( 'Entity record types', () => {
 			>;
 			collection?.font_families satisfies
 				CollectionFontFamily[] | undefined;
+
+			// Comments are fetched in the edit context.
+			const { records: threads } = useEntityRecords( 'root', 'comment', {
+				post: 1,
+				type: 'note',
+			} );
+			true satisfies Expect< typeof threads, Comment< 'edit' >[] | null >;
+			threads?.[ 0 ].content.raw satisfies string | undefined;
+			threads?.[ 0 ].status satisfies CommentStatus | undefined;
+			threads?.[ 0 ].reaction_summary?.[ '1f44d' ]?.count satisfies
+				number | undefined;
 		};
 	} );
 
@@ -881,13 +893,13 @@ describe( 'Entity record types', () => {
 
 			// Built-in pairs stay on the same safe fallback until their legacy
 			// declarations have been verified against the current REST schema.
-			const comment = select( coreStore ).getEntityRecord(
+			const menu = select( coreStore ).getEntityRecord(
 				'root',
-				'comment',
+				'menu',
 				1
 			);
 			true satisfies Expect<
-				typeof comment,
+				typeof menu,
 				UnknownEntityRecord | undefined
 			>;
 

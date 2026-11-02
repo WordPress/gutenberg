@@ -7,7 +7,12 @@ import type {
 } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
-export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
+/**
+ * The status the REST API reports for a comment. Other values, such as
+ * `post-trashed`, pass through from the database unchanged.
+ */
+export type CommentStatus =
+	'approved' | 'hold' | 'spam' | 'trash' | ( string & {} );
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -76,6 +81,24 @@ declare module './base-entity-records' {
 			 * Avatar URLs for the comment author.
 			 */
 			author_avatar_urls: AvatarUrls;
+			/**
+			 * Reaction counts for a note, keyed by emoji hex key. Only notes
+			 * carry it.
+			 */
+			reaction_summary?: Record<
+				string,
+				{
+					/**
+					 * Total number of reactions with this emoji.
+					 */
+					count: number;
+					/**
+					 * The current user's reaction comment ID for this emoji,
+					 * or 0 if they have not reacted.
+					 */
+					current_user_reaction: number;
+				}
+			>;
 			/**
 			 * Meta fields.
 			 */
