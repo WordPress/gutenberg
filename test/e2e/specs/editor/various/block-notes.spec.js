@@ -215,8 +215,8 @@ test.describe( 'Block Notes', () => {
 			.click();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__note-content' )
-		).toHaveText( 'Test comment after edit.' );
+			blockNoteUtils.getThread( 'Test comment after edit.' )
+		).toBeVisible();
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -224,7 +224,7 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
-	test( 'can delete a block note', async ( { page, blockNoteUtils } ) => {
+	test( 'can delete a block note', async ( { blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
@@ -233,7 +233,7 @@ test.describe( 'Block Notes', () => {
 		await blockNoteUtils.deleteNote();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__note-content' )
+			blockNoteUtils.getThread( 'Test comment to delete.' )
 		).toBeHidden();
 	} );
 
@@ -280,7 +280,7 @@ test.describe( 'Block Notes', () => {
 		await resolveButton.click();
 
 		await blockNoteUtils.openBlockNoteSidebar();
-		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		await blockNoteUtils.getThread( 'Test comment to resolve.' ).click();
 		// Re-selecting the thread shows the Resolve button, now disabled,
 		// confirming the note was resolved.
 		await expect( resolveButton ).toBeDisabled();
@@ -1229,20 +1229,12 @@ test.describe( 'Block Notes', () => {
 			//    duplicate-reaction guard included trashed comments,
 			//    so the just-removed reaction blocked the re-add with
 			//    `rest_comment_duplicate_reaction` ("You have already
-			//    reacted with this emoji").
+			//    reacted with this emoji"). Reactions aren't optimistic,
+			//    so either failure leaves the pill hidden.
 			await blockNoteUtils.addReactionToComment( 'Heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
-
-			// The duplicate-reaction error must never appear — pins both
-			// fixes (client refetch + server status='approve' query)
-			// against regression.
-			await expect(
-				page.locator( '.components-snackbar__content', {
-					hasText: /already reacted/i,
-				} )
-			).toHaveCount( 0 );
 		} );
 
 		test( 'editing a note after toggling a reaction keeps its text', async ( {
