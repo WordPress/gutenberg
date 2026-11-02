@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Post Template: In the `front-page` template, preview the static front page instead of the latest posts when an inheriting Query Loop is used and the homepage settings display a static page ([#86151](https://github.com/WordPress/gutenberg/pull/86151)).
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 

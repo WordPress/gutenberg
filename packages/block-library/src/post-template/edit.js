@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
@@ -108,7 +101,12 @@ export default function PostTemplateEdit( {
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords, getTaxonomies } = select( coreStore );
+			const {
+				getEntityRecords,
+				getTaxonomies,
+				canUser,
+				getEntityRecord,
+			} = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 			const templateCategory =
 				inherit &&
@@ -234,11 +232,37 @@ export default function PostTemplateEdit( {
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || currentPostType;
+			const previewQuery = { ...query, ...restQueryArgs };
+
+			/*
+			 * On the front end, an inheriting Query Loop inside the
+			 * `front-page` template resolves to the global query. When the
+			 * homepage settings display a static page, that query is a
+			 * singular query for that page instead of the latest posts.
+			 */
+			if ( inherit && templateSlug === 'front-page' ) {
+				const site =
+					canUser( 'read', {
+						kind: 'root',
+						name: 'site',
+					} ) && getEntityRecord( 'root', 'site' );
+				if ( site?.show_on_front === 'page' && site?.page_on_front ) {
+					return {
+						posts: getEntityRecords( 'postType', 'page', {
+							include: [ site.page_on_front ],
+							per_page: 1,
+						} ),
+						blocks: getBlocks( clientId ),
+					};
+				}
+			}
+
 			return {
-				posts: getEntityRecords( 'postType', usedPostType, {
-					...query,
-					...restQueryArgs,
-				} ),
+				posts: getEntityRecords(
+					'postType',
+					usedPostType,
+					previewQuery
+				),
 				blocks: getBlocks( clientId ),
 			};
 		},
