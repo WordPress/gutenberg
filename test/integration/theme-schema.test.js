@@ -103,6 +103,21 @@ describe( 'theme.json schema', () => {
 		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
 	} );
 
+	test( 'rejects separate row and column block gaps in element styles', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					button: {
+						spacing: { blockGap: { top: '1.3em', left: '0.75em' } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(

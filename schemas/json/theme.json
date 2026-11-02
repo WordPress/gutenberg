@@ -2593,7 +2593,31 @@
 					]
 				}
 			},
-			"additionalProperties": false
+			"additionalProperties": false,
+			"allOf": [
+				{
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"spacing": {
+								"type": "object",
+								"properties": {
+									"blockGap": {
+										"description": "Elements only support a single block gap value.",
+										"oneOf": [
+											{ "type": "string" },
+											{
+												"$ref": "#/definitions/refComplete"
+											}
+										]
+									}
+								}
+							}
+						}
+					}
+				}
+			]
 		},
 		"stylesBlocksPropertiesComplete": {
 			"description": "Styles defined on a per-block basis using the block's selector.",
