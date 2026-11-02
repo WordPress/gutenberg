@@ -164,16 +164,22 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Inserts a paragraph with a block-level note without going through the
+	 * Inserts a block with a block-level note without going through the
 	 * notes UI. For tests that need notes but don't test adding them. Leaves
 	 * the note selected, as adding it through the UI does.
 	 *
 	 * @param {Object}   options
-	 * @param {string}   options.content   Paragraph content.
+	 * @param {string}   [options.name]    Block name, a paragraph by default.
+	 * @param {string}   options.content   Block content.
 	 * @param {string}   options.note      Text of the note.
 	 * @param {string[]} [options.replies] Texts of the note's replies.
 	 */
-	async insertBlockWithNote( { content, note, replies = [] } ) {
+	async insertBlockWithNote( {
+		name = 'core/paragraph',
+		content,
+		note,
+		replies = [],
+	} ) {
 		// Saves the way the notes UI does, so the notes list picks it up.
 		const noteId = await this.#page.evaluate(
 			async ( { noteContent, replyContents } ) => {
@@ -200,7 +206,7 @@ class BlockNoteUtils {
 			{ noteContent: note, replyContents: replies }
 		);
 		await this.#editor.insertBlock( {
-			name: 'core/paragraph',
+			name,
 			attributes: { content, metadata: { noteId: [ noteId ] } },
 		} );
 		// The caret entered the block before the notes list had the note.

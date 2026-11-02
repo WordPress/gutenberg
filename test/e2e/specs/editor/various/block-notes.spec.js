@@ -23,10 +23,9 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Howdy!' },
-			comment: 'Test comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Howdy!',
+			note: 'Test comment',
 		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -122,14 +121,14 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).toBeVisible();
 		// Should focus the newly added note thread.
 		await expect( thread ).toBeFocused();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		await expect( thread ).toHaveAccessibleName( 'Note: A test comment' );
 	} );
 
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Testing block comments' },
-			comment: 'Test comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Test comment',
 		} );
 		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
 
@@ -154,10 +153,10 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/heading',
-			attributes: { content: 'Testing block comments' },
-			comment: 'test comment before edit',
+		await blockNoteUtils.insertBlockWithNote( {
+			name: 'core/heading',
+			content: 'Testing block comments',
+			note: 'test comment before edit',
 		} );
 		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
 		const actionsButton = sidebar.getByRole( 'button', {
@@ -200,10 +199,9 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test( 'can delete a block note', async ( { blockNoteUtils } ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Testing block comments' },
-			comment: 'Test comment to delete.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Test comment to delete.',
 		} );
 		await blockNoteUtils.deleteNote();
 
@@ -216,10 +214,10 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/heading',
-			attributes: { content: 'Testing block comments' },
-			comment: 'Test comment to resolve.',
+		await blockNoteUtils.insertBlockWithNote( {
+			name: 'core/heading',
+			content: 'Testing block comments',
+			note: 'Test comment to resolve.',
 		} );
 		await blockNoteUtils.openBlockNoteSidebar();
 
@@ -261,22 +259,19 @@ test.describe( 'Block Notes', () => {
 		blockNoteUtils,
 	} ) => {
 		// First block: this note stays active and unresolved.
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Stays active.' },
-			comment: 'Active note.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Stays active.',
+			note: 'Active note.',
 		} );
 		// Second block: this note will be resolved.
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Resolve me.' },
-			comment: 'Note to resolve.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Resolve me.',
+			note: 'Note to resolve.',
 		} );
 		// Third block: its note is orphaned when the block is deleted.
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Orphan me.' },
-			comment: 'Note losing its block.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Orphan me.',
+			note: 'Note losing its block.',
 		} );
 
 		await blockNoteUtils.openBlockNoteSidebar();
@@ -344,15 +339,13 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'First block.' },
-			comment: 'Fix the heading.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'First block.',
+			note: 'Fix the heading.',
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Second block.' },
-			comment: 'Swap the image.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Second block.',
+			note: 'Swap the image.',
 		} );
 
 		await blockNoteUtils.openBlockNoteSidebar();
@@ -432,10 +425,9 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Testing block comments' },
-			comment: 'Test comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Test comment',
 		} );
 		const sidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
@@ -478,10 +470,9 @@ test.describe( 'Block Notes', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Another block' },
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Orphan me.' },
-			comment: 'Orphaned note.',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Orphan me.',
+			note: 'Orphaned note.',
 		} );
 
 		// Delete the noted block, orphaning its note.
@@ -519,21 +510,20 @@ test.describe( 'Block Notes', () => {
 		page,
 		blockNoteUtils,
 	} ) => {
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/heading',
-			attributes: { content: 'First block' },
-			comment: 'First block comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			name: 'core/heading',
+			content: 'First block',
+			note: 'First block comment',
 		} );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'Second block' },
-			comment: 'Second block comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Second block',
+			note: 'Second block comment',
 		} );
 		await editor.insertBlock( { name: 'core/spacer' } );
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/heading',
-			attributes: { content: 'Third block' },
-			comment: 'Third block comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			name: 'core/heading',
+			content: 'Third block',
+			note: 'Third block comment',
 		} );
 
 		const threadsContainer = page
@@ -572,10 +562,9 @@ test.describe( 'Block Notes', () => {
 		blockNoteUtils,
 	} ) => {
 		// An existing thread to select later.
-		await blockNoteUtils.addBlockWithNote( {
-			type: 'core/paragraph',
-			attributes: { content: 'First block' },
-			comment: 'First block comment',
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'First block',
+			note: 'First block comment',
 		} );
 
 		// Open a new-note form on a second block and move focus into it.
@@ -615,10 +604,10 @@ test.describe( 'Block Notes', () => {
 			editor,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				name: 'core/heading',
+				content: 'Testing block comments',
+				note: 'Test comment',
 			} );
 			await blockNoteUtils.deselect();
 			const thread = blockNoteUtils.getThread( 'Test comment' );
@@ -654,11 +643,10 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			for ( const comment of [ 'One', 'Two', 'Three' ] ) {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing block comments' },
-					comment,
+			for ( const note of [ 'One', 'Two', 'Three' ] ) {
+				await blockNoteUtils.insertBlockWithNote( {
+					content: 'Testing block comments',
+					note,
 				} );
 			}
 
@@ -683,10 +671,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Sticky collapse' },
-				comment: 'Sticky collapse note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Sticky collapse',
+				note: 'Sticky collapse note',
 			} );
 
 			const thread = blockNoteUtils.getThread( 'Sticky collapse note' );
@@ -706,10 +693,10 @@ test.describe( 'Block Notes', () => {
 		test( 'should collapse a note after canceling note form', async ( {
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				name: 'core/heading',
+				content: 'Testing block comments',
+				note: 'Test comment',
 			} );
 
 			const thread = blockNoteUtils.getThread( 'Test comment' );
@@ -726,10 +713,10 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				name: 'core/heading',
+				content: 'Testing block comments',
+				note: 'Test comment',
 			} );
 
 			const thread = blockNoteUtils.getThread( 'Test comment' );
@@ -751,20 +738,17 @@ test.describe( 'Block Notes', () => {
 			editor,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'First block content' },
-				comment: 'First block comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'First block content',
+				note: 'First block comment',
 			} );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Second block content' },
-				comment: 'Second block comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Second block content',
+				note: 'Second block comment',
 			} );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Third block content' },
-				comment: 'Third block comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Third block content',
+				note: 'Third block comment',
 			} );
 			const firstThread = blockNoteUtils.getThread(
 				'First block comment'
@@ -829,15 +813,13 @@ test.describe( 'Block Notes', () => {
 		test( 'should focus note thread when reply is deleted', async ( {
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing block comments',
+				note: 'Test note',
 			} );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing block comments',
+				note: 'Test comment',
 			} );
 			await blockNoteUtils.addReply( 'Test reply' );
 			await blockNoteUtils.deleteNote( 1 );
@@ -851,10 +833,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing block comments',
+				note: 'Test comment',
 			} );
 			const thread = blockNoteUtils.getThread( 'Test comment' );
 
@@ -924,10 +905,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing re-add reaction' },
-				comment: 'Re-add reaction',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing re-add reaction',
+				note: 'Re-add reaction',
 			} );
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
@@ -999,10 +979,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing keyboard accessibility' },
-				comment: 'Test comment for keyboard access',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing keyboard accessibility',
+				note: 'Test comment for keyboard access',
 			} );
 
 			const trigger = page.getByRole( 'button', {
@@ -1066,10 +1045,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing resolved reactions' },
-				comment: 'Test comment for resolved reactions',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing resolved reactions',
+				note: 'Test comment for resolved reactions',
 			} );
 
 			// The floating overlay hides a resolved thread, so drive this
@@ -1119,10 +1097,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing the hover trigger' },
-				comment: 'Test comment for the hover trigger',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing the hover trigger',
+				note: 'Test comment for the hover trigger',
 			} );
 
 			const trigger = page.getByRole( 'button', {
@@ -1157,10 +1134,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with multiple notes' },
-				comment: 'First note on block',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Block with multiple notes',
+				note: 'First note on block',
 			} );
 
 			// Second "Add note" should open the new-note form, not the reply
@@ -1237,10 +1213,9 @@ test.describe( 'Block Notes', () => {
 			editor,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with notes' },
-				comment: 'First note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Block with notes',
+				note: 'First note',
 			} );
 			await blockNoteUtils.addNote( 'Second note' );
 			// Move the block selection away, so clicking a thread also selects its block.
@@ -1414,10 +1389,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Noted block' },
-				comment: 'Test comment',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Noted block',
+				note: 'Test comment',
 			} );
 
 			const thread = blockNoteUtils.getThread( 'Test comment' );
@@ -1785,10 +1759,9 @@ test.describe( 'Block Notes', () => {
 			editor,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Hello brave new world.' },
-				comment: 'Block note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Hello brave new world.',
+				note: 'Block note',
 			} );
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
@@ -1980,10 +1953,9 @@ test.describe( 'Block Notes', () => {
 			pageUtils,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Alpha bravo charlie.' },
-				comment: 'Block note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Alpha bravo charlie.',
+				note: 'Block note',
 			} );
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
@@ -2263,10 +2235,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Saved with a note.' },
-				comment: 'Saved note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Saved with a note.',
+				note: 'Saved note',
 			} );
 			await editor.saveDraft();
 			await page.reload();
@@ -2373,10 +2344,9 @@ test.describe( 'Block Notes', () => {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Reply to me.' },
-				comment: 'Parent note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Reply to me.',
+				note: 'Parent note',
 			} );
 			await blockNoteUtils.addReply( 'Restore this reply' );
 			const reply = page
@@ -2394,10 +2364,9 @@ test.describe( 'Block Notes', () => {
 			editor,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Orphan me.' },
-				comment: 'Orphaned note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Orphan me.',
+				note: 'Orphaned note',
 			} );
 			await editor.clickBlockOptionsMenuItem( 'Delete' );
 			await blockNoteUtils.openBlockNoteSidebar();
@@ -2498,10 +2467,9 @@ test.describe( 'Block Notes', () => {
 			pageUtils,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Reply link host' },
-				comment: 'Reply link note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Reply link host',
+				note: 'Reply link note',
 			} );
 			const replyTextbox = page.getByRole( 'textbox', {
 				name: 'Reply to',
@@ -2641,15 +2609,14 @@ test.describe( 'Block Notes', () => {
 			blockNoteUtils,
 		} ) => {
 			// Keeps the toolbar button once the shared note is deleted.
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Other block' },
-				comment: 'Other note',
+			await blockNoteUtils.insertBlockWithNote( {
+				name: 'core/heading',
+				content: 'Other block',
+				note: 'Other note',
 			} );
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Duplicate me' },
-				comment: 'Shared note',
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Duplicate me',
+				note: 'Shared note',
 			} );
 			const paragraphs = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
