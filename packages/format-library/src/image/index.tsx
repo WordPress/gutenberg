@@ -1,5 +1,5 @@
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl as WCTextareaControl,
@@ -14,7 +14,6 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import type { FormatEditProps } from '../types';
 
@@ -95,7 +94,7 @@ function InlineUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -176,7 +175,7 @@ function InlineUI( {
 					</Stack>
 				</Stack>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 
@@ -222,6 +221,7 @@ function Edit( {
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
+						name="image"
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

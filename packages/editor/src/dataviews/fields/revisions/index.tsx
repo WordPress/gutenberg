@@ -1,6 +1,6 @@
 import type { Field } from '@wordpress/dataviews';
-import type { BasePost } from '@wordpress/fields';
 import { __ } from '@wordpress/i18n';
+import type { BasePost } from '../../types';
 import RevisionsView from './revisions-view';
 
 const revisionsField: Field< BasePost > = {

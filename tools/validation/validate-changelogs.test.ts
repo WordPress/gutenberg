@@ -51,16 +51,19 @@ describe( 'validateChangelog', () => {
 		expect( errors ).toEqual( [] );
 	} );
 
-	test( 'accepts a nested PR link after a blank line under the parent bullet', () => {
+	test( 'finds a nested PR link after a blank line under the parent bullet', () => {
 		const errors = validateChangelog(
 			changelog( `### Breaking Changes
 
 -   Parent description:
 
     -   \`Child\` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
-` )
+` ),
+			{ filePath: 'packages/ui/CHANGELOG.md' }
 		);
-		expect( errors ).toEqual( [] );
+		expect( errors ).toEqual( [
+			'packages/ui/CHANGELOG.md:9: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.',
+		] );
 	} );
 
 	test( 'accepts a PR link on a soft-wrapped continuation line', () => {
@@ -160,6 +163,21 @@ describe( 'validateChangelog', () => {
 		);
 		expect( errors ).toEqual( [
 			'packages/sync/CHANGELOG.md:7: Unreleased entry is missing a Gutenberg pull request link.',
+		] );
+	} );
+
+	test( 'rejects blank lines between top-level entries', () => {
+		const errors = validateChangelog(
+			changelog( `### Bug Fixes
+
+-   Fixed one thing ([#1](https://github.com/WordPress/gutenberg/pull/1)).
+
+-   Fixed another thing ([#2](https://github.com/WordPress/gutenberg/pull/2)).
+` ),
+			{ filePath: 'packages/ui/CHANGELOG.md' }
+		);
+		expect( errors ).toEqual( [
+			'packages/ui/CHANGELOG.md:9: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.',
 		] );
 	} );
 

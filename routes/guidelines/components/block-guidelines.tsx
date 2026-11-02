@@ -1,7 +1,7 @@
 import {
 	Button,
 	Icon as WCIcon,
-	Notice,
+	Notice as WCNotice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -197,13 +197,13 @@ export default function BlockGuidelines( {
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
 			{ error && (
-				<Notice status="error" onRemove={ () => setError( null ) }>
+				<WCNotice status="error" onRemove={ () => setError( null ) }>
 					{ sprintf(
 						/* translators: %s: Error message. */
 						__( 'Error: %s' ),
 						error
 					) }
-				</Notice>
+				</WCNotice>
 			) }
 			{ rows.length > 0 && (
 				<DataViews

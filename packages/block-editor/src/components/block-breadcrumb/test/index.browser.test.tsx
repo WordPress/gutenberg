@@ -62,7 +62,7 @@ afterEach( () => unregisterBlockType( 'test/breadcrumb' ) );
 
 it( 'clears selection and focuses the editor canvas from the document button', async () => {
 	// Supply block DOM refs so the document button can find and focus the editor canvas.
-	const refsMap = observableMap();
+	const refsMap = observableMap< string, Element | null >();
 	await render(
 		<RegistryProvider value={ registry }>
 			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>

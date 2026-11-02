@@ -347,7 +347,9 @@ _Returns_
 
 ### getEditedPostSlug
 
-Returns the slug for the post being edited, preferring a manually edited value if one exists, then the server-generated slug from the post entity, then a JS approximation of the current post title, and finally the post ID.
+Returns the slug for the post being edited: the edited or saved slug if one is set, otherwise the slug derived from the current title, which is what WordPress uses when the post is published. Returns an empty string for a post with neither.
+
+The server-generated slug isn't used: it comes from the saved title, so it lags behind title edits, and for a new post it comes from the `Auto Draft` placeholder.
 
 _Parameters_
 
