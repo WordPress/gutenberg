@@ -95,10 +95,12 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.toHaveFocus();
 	await user.keyboard( '{Tab}' );
 	await expect
-		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.element(
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
+		)
 		.toHaveFocus();
 	await user.click(
-		page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 	);
 
 	await expect
@@ -133,7 +135,7 @@ it( 'blocks focus on bulk actions and covers column headings while loading', asy
 		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
 	);
 	const cancel = page
-		.getByRole( 'button', { name: 'Cancel', exact: true } )
+		.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		.element();
 	const table = page.getByRole( 'table' ).element();
 	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
@@ -243,7 +245,10 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			).toBeLessThanOrEqual( 0.5 );
 			await expect
 				.element(
-					page.getByRole( 'button', { name: 'Cancel', exact: true } )
+					page.getByRole( 'button', {
+						name: 'Clear selection',
+						exact: true,
+					} )
 				)
 				.toBeInViewport();
 		}
@@ -254,7 +259,7 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			.poll( () => toolbar.getBoundingClientRect().height )
 			.toBe( 96 );
 		await user.click(
-			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		);
 		await expect
 			.element(

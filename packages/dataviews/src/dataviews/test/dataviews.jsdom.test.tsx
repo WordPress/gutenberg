@@ -275,7 +275,9 @@ describe( 'DataViews component', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Delete' } )
 		).toBeInTheDocument();
-		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Clear selection' } )
+		);
 		expect( screen.getByText( 'Select all' ) ).toBeVisible();
 	} );
 
@@ -439,7 +441,7 @@ describe( 'DataViews component', () => {
 		).toBeInTheDocument();
 
 		await user.click(
-			within( toolbar ).getByRole( 'button', { name: 'Cancel' } )
+			within( toolbar ).getByRole( 'button', { name: 'Clear selection' } )
 		);
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 		expect(

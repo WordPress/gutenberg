@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall, chevronDown } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Checkbox,
@@ -224,18 +224,20 @@ function renderBulkActionsContent< Item >(
 	isMobile: boolean,
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
+	// A text button next to the actions, rather than a close icon at the far
+	// end, so it can't be read as closing the whole view and stays in sight
+	// for screen magnifier users.
 	const clearSelection = selectedItems.length > 0 && (
 		<Button
 			className="dataviews-bulk-actions__clear"
-			icon={ closeSmall }
-			showTooltip
-			tooltipPosition="top"
+			variant="tertiary"
 			size="compact"
-			label={ __( 'Cancel' ) }
 			disabled={ !! actionInProgress }
 			accessibleWhenDisabled={ false }
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
-		/>
+		>
+			{ __( 'Clear selection' ) }
+		</Button>
 	);
 	const renderActions = ( isMenuItem = false ) =>
 		actionsToShow.map( ( action ) => (
