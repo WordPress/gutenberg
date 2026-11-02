@@ -192,6 +192,7 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 	page: Page< C >;
 	post: Post< C >;
 	wp_block: Block< C >;
+	wp_font_family: WpFontFamily< C >;
 	wp_navigation: Navigation< C >;
 	wp_template: WpTemplate< C >;
 	wp_template_part: WpTemplatePart< C >;
