@@ -378,7 +378,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'del' === $marker['kind'] ) {
 					continue;
 				}
-				$note_id = $marker['id'];
+				$note_id = (int) $marker['id'];
 				if ( isset( $exclude[ $note_id ] ) ) {
 					continue;
 				}

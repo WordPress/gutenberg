@@ -1357,7 +1357,7 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 	 */
 	$positions = array();
 	foreach ( $blocks as $index => $block ) {
-		$is_separator = ( ! isset( $block['blockName'] ) || null === $block['blockName'] )
+		$is_separator = ! isset( $block['blockName'] )
 			&& '' === trim( isset( $block['innerHTML'] ) ? $block['innerHTML'] : '' );
 		if ( ! $is_separator ) {
 			$positions[] = $index;
