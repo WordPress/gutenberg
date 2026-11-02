@@ -25,6 +25,7 @@
 		"disabled": { "type": "boolean", "default": false },
 		"class": { "type": "string", "default": "" }
 	},
+	"example": { "content": "Save changes" },
 	"react": {
 		"component": "Button",
 		"props": { "focusableWhenDisabled": false }

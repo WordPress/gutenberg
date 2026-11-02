@@ -21,10 +21,12 @@
  *
  * @param array  $component Component from the manifest.
  * @param array  $props     Validated props.
- * @param string $content   Content, as plain text.
+ * @param string $content   Content: plain text, or HTML when `$is_html` is set.
+ * @param bool   $is_html   Whether the content is HTML rendered by
+ *                          `gutenberg_get_ui_component()`, so it's printed as is.
  * @return string HTML.
  */
-function gutenberg_ui_components_render_markup( $component, $props, $content ) {
+function gutenberg_ui_components_render_markup( $component, $props, $content, $is_html = false ) {
 	$markup = $component['markup'];
 	$key    = array();
 	foreach ( $component['props'] as $prop => $schema ) {
@@ -73,8 +75,11 @@ function gutenberg_ui_components_render_markup( $component, $props, $content ) {
 	$values = array_merge( array_map( 'strval', $props ), array( 'content' => $content ) );
 	return preg_replace_callback(
 		'/__wpuislot_([a-z0-9_]+?)__(?:attr_([a-z0-9-]+)|text)__/',
-		static function ( $placeholder ) use ( $values ) {
+		static function ( $placeholder ) use ( $values, $is_html ) {
 			$value = $values[ $placeholder[1] ] ?? '';
+			if ( $is_html && 'content' === $placeholder[1] ) {
+				return $value;
+			}
 			if ( in_array( $placeholder[2] ?? '', array( 'href', 'src', 'action', 'formaction' ), true ) ) {
 				return esc_url( $value );
 			}

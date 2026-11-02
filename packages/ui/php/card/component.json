@@ -1,0 +1,33 @@
+{
+	"name": "card",
+	"content": { "required": true, "components": true },
+	"props": {
+		"title": { "type": "string", "required": true },
+		"class": { "type": "string", "default": "" }
+	},
+	"example": {
+		"props": { "title": "Site health" },
+		"content": "Your site has 2 recommended improvements."
+	},
+	"compositionExamples": [
+		{
+			"name": "with a button",
+			"content": [
+				"Your site has 2 recommended improvements.",
+				{
+					"component": "button",
+					"props": { "variant": "outline" },
+					"content": "View details"
+				}
+			]
+		}
+	],
+	"react": {
+		"render": [
+			"Card.Root",
+			{ "className": "$class" },
+			[ "Card.Header", {}, [ "Card.Title", {}, "$title" ] ],
+			[ "Card.Content", {}, "$content" ]
+		]
+	}
+}

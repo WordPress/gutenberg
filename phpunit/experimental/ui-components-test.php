@@ -35,7 +35,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$cases = array();
 		foreach ( json_decode( file_get_contents( $file ), true ) as $fixture ) {
-			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . $fixture['content'] ] = array( $fixture );
+			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . wp_json_encode( $fixture['content'] ) ] = array( $fixture );
 		}
 		return $cases;
 	}
@@ -46,7 +46,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $fixture Props, content and React's render.
 	 */
 	public function test_renders_the_same_markup_as_react( $fixture ) {
-		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] );
+		$html = (string) gutenberg_get_ui_component( $fixture['component'], $fixture['props'], gutenberg_ui_components_example_content( $fixture['content'] ) );
 
 		$this->assertSame(
 			self::normalize_html( $fixture['html'] ),
@@ -70,8 +70,8 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
 		$this->assertSame(
-			gutenberg_get_ui_component( 'button', array(), 'Save' ),
-			gutenberg_get_ui_component( 'button', array( 'variant' => 'sparkly' ), 'Save' )
+			(string) gutenberg_get_ui_component( 'button', array(), 'Save' ),
+			(string) gutenberg_get_ui_component( 'button', array( 'variant' => 'sparkly' ), 'Save' )
 		);
 	}
 
@@ -83,7 +83,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	public function test_missing_required_content_renders_nothing( $content ) {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
-		$this->assertSame( '', gutenberg_get_ui_component( 'button', array(), $content ) );
+		$this->assertSame( '', (string) gutenberg_get_ui_component( 'button', array(), $content ) );
 	}
 
 	/**
@@ -97,10 +97,70 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_html_passed_as_content_is_escaped() {
+		$html = gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			'<img src=x onerror=alert(1)>'
+		);
+
+		$this->assertStringNotContainsString( '<img', $html );
+		$this->assertStringContainsString( '&lt;img', $html );
+	}
+
+	public function test_nested_components_are_rendered_and_text_is_escaped() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			array(
+				'<b>Save</b> your changes.',
+				gutenberg_get_ui_component( 'button', array(), 'Save' ),
+			)
+		);
+
+		$this->assertStringContainsString( '&lt;b&gt;Save&lt;/b&gt; your changes.', $html );
+		$this->assertStringContainsString( '<button', $html );
+	}
+
+	public function test_a_closure_prints_content() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			static function () {
+				echo '<p>' . esc_html( 'Your site has 2 recommended improvements.' ) . '</p>';
+			}
+		);
+
+		$this->assertStringContainsString( '<p>Your site has 2 recommended improvements.</p>', $html );
+	}
+
+	public function test_sanitized_html_is_kept_without_scripts() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			Gutenberg_UI_Safe_HTML::sanitized( '<p>Saved.</p><script>alert(1)</script>' )
+		);
+
+		$this->assertStringContainsString( '<p>Saved.</p>', $html );
+		$this->assertStringNotContainsString( '<script>', $html );
+	}
+
+	public function test_safe_html_cant_be_unserialized() {
+		$this->expectException( LogicException::class );
+
+		unserialize( serialize( Gutenberg_UI_Safe_HTML::sanitized( '<p>Saved.</p>' ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions
+	}
+
+	public function test_a_component_that_only_takes_text_escapes_component_output() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
+
+		$this->assertSame( '', (string) gutenberg_get_ui_component( 'button', array(), gutenberg_get_ui_component( 'button', array(), 'Save' ) ) );
+	}
+
 	public function test_an_unknown_component_renders_nothing() {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
-		$this->assertSame( '', gutenberg_get_ui_component( 'not-a-component' ) );
+		$this->assertSame( '', (string) gutenberg_get_ui_component( 'not-a-component' ) );
 	}
 
 	public function test_rendering_enqueues_the_stylesheet() {
