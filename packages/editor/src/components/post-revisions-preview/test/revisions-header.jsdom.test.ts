@@ -87,4 +87,16 @@ describe( 'hasChangesToRestore', () => {
 
 		expect( hasChangesToRestore( revision, post ) ).toBe( false );
 	} );
+	it( 'compares other protected meta the revision carries', () => {
+		const revision = getRevision( {
+			meta: { ...post.meta, _plugin_revisioned: 'old' },
+		} );
+
+		expect(
+			hasChangesToRestore( revision, {
+				...post,
+				meta: { ...post.meta, _plugin_revisioned: 'new' },
+			} )
+		).toBe( true );
+	} );
 } );

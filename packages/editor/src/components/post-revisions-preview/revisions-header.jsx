@@ -13,6 +13,9 @@ import { store as editorStore } from '../../store';
 import { sidebars } from '../sidebar/constants';
 import { unlock } from '../../lock-unlock';
 
+// Matches `POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE` in @wordpress/core-data.
+const CRDT_DOCUMENT_META_KEY = '_crdt_document';
+
 /**
  * Whether restoring a revision would actually change the post.
  *
@@ -53,18 +56,12 @@ export function hasChangesToRestore( revision, post ) {
 		return true;
 	}
 
-	// Revisions only carry meta registered with `revisions_enabled`, so compare
-	// the keys the revision actually has instead of the whole meta object.
-	//
-	// Protected keys are skipped. They hold internal bookkeeping rather than
-	// authored content, and revisions do not store it faithfully: the
-	// collaborative editing document (`_crdt_document`) is saved empty on every
-	// revision, so comparing it would report a difference against every single
-	// revision and never let the button settle.
+	// Compare the keys the revision carries. The collaborative editing document
+	// is not revisioned and comes back empty on every revision, so it is skipped.
 	if ( revision.meta ) {
 		return Object.keys( revision.meta ).some(
 			( key ) =>
-				! key.startsWith( '_' ) &&
+				key !== CRDT_DOCUMENT_META_KEY &&
 				! fastDeepEqual( revision.meta[ key ], post.meta?.[ key ] )
 		);
 	}
