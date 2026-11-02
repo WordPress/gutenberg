@@ -210,6 +210,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_dimensions_height_preset_style'  => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'height' => 'var:preset|dimension|medium',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'height:var(--wp--preset--dimension--medium);',
+					'declarations' => array(
+						'height' => 'var(--wp--preset--dimension--medium)',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(
