@@ -113,7 +113,7 @@ export function LinkPicker( {
 							showInitialSuggestions={ allowSearch }
 							searchInputPlaceholder={
 								allowSearch
-									? undefined
+									? __( 'Search or type URL' )
 									: __( 'Paste or type URL' )
 							}
 							forceIsEditingLink
