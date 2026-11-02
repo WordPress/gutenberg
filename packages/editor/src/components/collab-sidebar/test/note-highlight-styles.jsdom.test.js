@@ -235,8 +235,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'overlays each block with its author tint and an all-around rule at rest', () => {
 		const css = buildBlockHighlightCss(
 			[
-				{ id: 7, author: 1, blockClientId: 'abc-1' },
-				{ id: 12, author: 3, blockClientId: 'abc-2' },
+				{ id: 7, author: 1, blockClientIds: [ 'abc-1' ] },
+				{ id: 12, author: 3, blockClientIds: [ 'abc-2' ] },
 			],
 			getBlockAttributes
 		);
@@ -257,10 +257,34 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'skips threads whose marker exists in their block (inline notes)', () => {
 		expect(
 			buildBlockHighlightCss(
-				[ { id: 7, author: 1, blockClientId: 'block-inline' } ],
+				[ { id: 7, author: 1, blockClientIds: [ 'block-inline' ] } ],
 				getBlockAttributes
 			)
 		).toBe( '' );
+	} );
+
+	it( 'does not tint a block left without the marker of a shared inline note', () => {
+		expect(
+			buildBlockHighlightCss(
+				[
+					{
+						id: 7,
+						author: 1,
+						blockClientIds: [ 'block-inline', 'abc-1' ],
+					},
+				],
+				getBlockAttributes
+			)
+		).toBe( '' );
+	} );
+
+	it( 'tints every block of a shared note', () => {
+		const css = buildBlockHighlightCss(
+			[ { id: 7, author: 1, blockClientIds: [ 'abc-1', 'abc-2' ] } ],
+			getBlockAttributes
+		);
+		expect( css ).toContain( overlaySelectorFor( 'abc-1' ) );
+		expect( css ).toContain( overlaySelectorFor( 'abc-2' ) );
 	} );
 
 	it( 'skips suggestion threads, which carry their own markers', () => {
@@ -270,7 +294,7 @@ describe( 'buildBlockHighlightCss', () => {
 					{
 						id: 8,
 						author: 1,
-						blockClientId: 'abc-1',
+						blockClientIds: [ 'abc-1' ],
 						meta: { _wp_suggestion: '{"operations":[]}' },
 					},
 				],
@@ -282,8 +306,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'colors a block with several block-level notes by the first one', () => {
 		const css = buildBlockHighlightCss(
 			[
-				{ id: 9, author: 2, blockClientId: 'abc-1' },
-				{ id: 11, author: 4, blockClientId: 'abc-1' },
+				{ id: 9, author: 2, blockClientIds: [ 'abc-1' ] },
+				{ id: 11, author: 4, blockClientIds: [ 'abc-1' ] },
 			],
 			getBlockAttributes
 		);
@@ -297,7 +321,7 @@ describe( 'buildBlockHighlightCss', () => {
 	// block, not its text.
 	it( 'does not underline the text of an annotated block', () => {
 		const css = buildBlockHighlightCss(
-			[ { id: 7, author: 1, blockClientId: 'abc-1' } ],
+			[ { id: 7, author: 1, blockClientIds: [ 'abc-1' ] } ],
 			getBlockAttributes
 		);
 		expect( css ).not.toContain( 'text-decoration' );
@@ -312,7 +336,7 @@ describe( 'buildBlockHighlightCss', () => {
 	 */
 	it( 'falls back to a dashed outline under forced colors', () => {
 		const css = buildBlockHighlightCss(
-			[ { id: 7, author: 1, blockClientId: 'abc-1' } ],
+			[ { id: 7, author: 1, blockClientIds: [ 'abc-1' ] } ],
 			getBlockAttributes
 		);
 		expect( css ).toContain(
@@ -330,8 +354,8 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'emits only resting rules, with no state variants', () => {
 		const css = buildBlockHighlightCss(
 			[
-				{ id: 7, author: 1, blockClientId: 'abc-1' },
-				{ id: 12, author: 3, blockClientId: 'abc-2' },
+				{ id: 7, author: 1, blockClientIds: [ 'abc-1' ] },
+				{ id: 12, author: 3, blockClientIds: [ 'abc-2' ] },
 			],
 			getBlockAttributes
 		);
@@ -350,8 +374,8 @@ describe( 'buildBlockHighlightCss', () => {
 		expect(
 			buildBlockHighlightCss(
 				[
-					{ author: 2, blockClientId: 'abc-1' },
-					{ id: 9, author: 2, blockClientId: null },
+					{ author: 2, blockClientIds: [ 'abc-1' ] },
+					{ id: 9, author: 2, blockClientIds: [] },
 				],
 				getBlockAttributes
 			)
@@ -360,7 +384,7 @@ describe( 'buildBlockHighlightCss', () => {
 
 	it( 'falls back to author 0 when the field is missing', () => {
 		const css = buildBlockHighlightCss(
-			[ { id: 7, blockClientId: 'abc-1' } ],
+			[ { id: 7, blockClientIds: [ 'abc-1' ] } ],
 			getBlockAttributes
 		);
 		expect( css ).toContain(
