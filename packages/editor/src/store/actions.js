@@ -1000,7 +1000,17 @@ export const setIsInserterOpened =
 			unlock( registry.dispatch( blockEditorStore ) ).setInsertionPoint(
 				null
 			);
-			registry.dispatch( blockEditorStore ).hideInsertionPoint();
+			// The in-between inserter marks its own cue with
+			// `__unstableWithInserter` and mounts the quick inserter inside
+			// that cue's popover. The quick inserter closes this inserter
+			// when it opens, so hiding that cue here would unmount it.
+			// See https://github.com/WordPress/gutenberg/issues/72297.
+			if (
+				! registry.select( blockEditorStore ).getBlockInsertionPoint()
+					?.__unstableWithInserter
+			) {
+				registry.dispatch( blockEditorStore ).hideInsertionPoint();
+			}
 		}
 
 		dispatch( {

@@ -1765,6 +1765,25 @@ describe( 'Editor actions', () => {
 			).toBe( false );
 		} );
 
+		it( 'keeps the in-between inserter cue when the inserter is closed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+			registry
+				.dispatch( blockEditorStore )
+				.showInsertionPoint( 'section-root', 1, {
+					__unstableWithInserter: true,
+				} );
+
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+
+			expect(
+				registry
+					.select( blockEditorStore )
+					.isBlockInsertionPointVisible()
+			).toBe( true );
+		} );
+
 		it( 'should open and close the inserter', () => {
 			const registry = createRegistryWithStores();
 
