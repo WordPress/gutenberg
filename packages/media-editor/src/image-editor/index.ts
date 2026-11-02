@@ -8,9 +8,8 @@
  * `./core` and `./react/hooks` directly, as the package's components
  * already do.
  *
- * Outside the package, only the cropper, its state hook and the
- * source-region helpers are available, through the package's private API
- * (see `../private-apis.ts`).
+ * Outside the package, only a small part of this module is available,
+ * through the package's private API (see `../private-apis.ts`).
  */
 
 // React surface.
