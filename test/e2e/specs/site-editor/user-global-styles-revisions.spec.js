@@ -18,6 +18,9 @@ test.use( {
 } );
 
 test.describe( 'Style Revisions', () => {
+	// Later tests use the revisions that earlier tests save.
+	test.describe.configure( { mode: 'serial' } );
+
 	let stylesPostId;
 
 	test.beforeAll( async ( { requestUtils } ) => {

@@ -22,7 +22,7 @@ export default function SiteTitleEdit( props ) {
 	useDeprecatedTextAlign( props );
 
 	const { attributes, setAttributes } = props;
-	const { level, levelOptions, isLink, linkTarget } = attributes;
+	const { level, levelOptions, isLink, linkTarget, fitText } = attributes;
 	const canUserEdit = useSelect(
 		( select ) =>
 			select( coreStore ).canUser( 'update', {
@@ -58,6 +58,11 @@ export default function SiteTitleEdit( props ) {
 				onChange={ ( newTitle ) => setSiteTitle( newTitle.trim() ) }
 				allowedFormats={ [] }
 				disableLineBreaks
+				// Rich text only sets its `pre-wrap` default on mount, so
+				// both values are explicit for Fit text to toggle cleanly.
+				style={ {
+					whiteSpace: fitText ? 'inherit' : 'pre-wrap',
+				} }
 			/>
 		</TagName>
 	) : (
