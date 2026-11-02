@@ -4,8 +4,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	privateApis,
+	store as coreStore,
 	type PostEditorAwarenessState,
 	type PostSaveEvent,
+	type PostStatusObject,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
@@ -25,30 +27,121 @@ const NOTIFICATION_TYPE = {
 	COLLAB_USER_EXITED: 'collab-user-exited',
 } as const;
 
+/**
+ * Statuses that count as "published" for the purpose of choosing a message.
+ * Matches the list the editor's own save notice uses.
+ */
 const PUBLISHED_STATUSES = [ 'publish', 'private', 'future' ];
+
+const DRAFT_STATUSES = [ 'draft', 'auto-draft' ];
+
+interface PostUpdatedMessageArgs {
+	/** Display name of the collaborator who saved. */
+	name: string;
+	/** Singular label of the post type, e.g. "Post" or "Story". */
+	postTypeLabel: string;
+	/** WordPress post status at the time of save. */
+	status: string;
+	/** Status label registered with `register_post_status()`, when known. */
+	statusLabel: string | undefined;
+	/** Post status before this save, when known. */
+	previousStatus: string | undefined;
+}
 
 /**
  * Returns the snackbar message for a post updated notification.
  *
- * @param name           Display name of the collaborator who saved.
- * @param status         WordPress post status at the time of save.
- * @param isFirstPublish Whether this save transitioned the post to published.
+ * The message is built from the labels a site registers with
+ * `register_post_type()` and `register_post_status()`, so a site that calls
+ * posts "stories" or adds an "Embargo" status sees its own words instead of
+ * "post" and "published".
+ *
+ * @param args                Message inputs.
+ * @param args.name           Display name of the collaborator who saved.
+ * @param args.postTypeLabel  Singular label of the post type, e.g. "Post".
+ * @param args.status         WordPress post status at the time of save.
+ * @param args.statusLabel    Registered label of that status, when known.
+ * @param args.previousStatus Post status before this save, when known.
  */
-function getPostUpdatedMessage(
-	name: string,
-	status: string,
-	isFirstPublish: boolean
-): string {
-	if ( isFirstPublish ) {
-		/* translators: %s: collaborator display name */
-		return sprintf( __( 'Post published by %s.' ), name );
+function getPostUpdatedMessage( {
+	name,
+	postTypeLabel,
+	status,
+	statusLabel,
+	previousStatus,
+}: PostUpdatedMessageArgs ): string {
+	const wasPublished =
+		!! previousStatus && PUBLISHED_STATUSES.includes( previousStatus );
+
+	if ( ! wasPublished && status === 'publish' ) {
+		return sprintf(
+			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+			__( '%1$s published by %2$s.' ),
+			postTypeLabel,
+			name
+		);
 	}
+
+	if ( ! wasPublished && status === 'future' ) {
+		return sprintf(
+			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+			__( '%1$s scheduled by %2$s.' ),
+			postTypeLabel,
+			name
+		);
+	}
+
+	if ( ! wasPublished && status === 'private' ) {
+		return sprintf(
+			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+			__( '%1$s published privately by %2$s.' ),
+			postTypeLabel,
+			name
+		);
+	}
+
 	if ( PUBLISHED_STATUSES.includes( status ) ) {
-		/* translators: %s: collaborator display name */
-		return sprintf( __( 'Post updated by %s.' ), name );
+		return sprintf(
+			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+			__( '%1$s updated by %2$s.' ),
+			postTypeLabel,
+			name
+		);
 	}
-	/* translators: %s: collaborator display name */
-	return sprintf( __( 'Draft saved by %s.' ), name );
+
+	if ( DRAFT_STATUSES.includes( status ) ) {
+		if ( wasPublished ) {
+			return sprintf(
+				/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+				__( '%1$s reverted to draft by %2$s.' ),
+				postTypeLabel,
+				name
+			);
+		}
+
+		/* translators: %s: collaborator display name */
+		return sprintf( __( 'Draft saved by %s.' ), name );
+	}
+
+	// Any other status, such as "pending" or one a plugin registered: name
+	// the status the collaborator moved the post to, using its registered
+	// label. A save that keeps the status is reported as a plain save.
+	if ( status !== previousStatus && statusLabel ) {
+		return sprintf(
+			/* translators: 1: post type singular label, e.g. "Post". 2: post status label, e.g. "Pending". 3: collaborator display name. */
+			__( '%1$s status set to %2$s by %3$s.' ),
+			postTypeLabel,
+			statusLabel,
+			name
+		);
+	}
+
+	return sprintf(
+		/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
+		__( '%1$s saved by %2$s.' ),
+		postTypeLabel,
+		name
+	);
 }
 
 /**
@@ -64,33 +157,56 @@ export function useCollaboratorNotifications(
 ): void {
 	const {
 		postStatus,
+		postTypeLabel,
+		postStatuses,
 		isCollaborationEnabled,
 		showJoinNotifications,
 		showLeaveNotifications,
 		showPostSaveNotifications,
-	} = useSelect( ( select ) => {
-		const {
-			getCurrentPostAttribute,
-			isCollaborationEnabledForCurrentPost,
-		} = unlock( select( editorStore ) );
-		// Notification preferences default to enabled when unset.
-		const getNotificationPreference = ( name: string ) =>
-			select( preferencesStore ).get( 'core', name ) ?? true;
-		return {
-			postStatus: getCurrentPostAttribute( 'status' ) as
-				string | undefined,
-			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-			showJoinNotifications: getNotificationPreference(
-				'showCollaborationJoinNotifications'
-			),
-			showLeaveNotifications: getNotificationPreference(
-				'showCollaborationLeaveNotifications'
-			),
-			showPostSaveNotifications: getNotificationPreference(
+	} = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostAttribute,
+				isCollaborationEnabledForCurrentPost,
+			} = unlock( select( editorStore ) );
+			const { getEntityRecords, getPostType } = select( coreStore );
+			// Notification preferences default to enabled when unset.
+			const getNotificationPreference = ( name: string ) =>
+				select( preferencesStore ).get( 'core', name ) ?? true;
+			const _isCollaborationEnabled =
+				isCollaborationEnabledForCurrentPost();
+			const _showPostSaveNotifications = getNotificationPreference(
 				'showCollaborationPostSaveNotifications'
-			),
-		};
-	}, [] );
+			);
+			const needsSaveLabels =
+				_isCollaborationEnabled && _showPostSaveNotifications;
+
+			return {
+				postStatus: getCurrentPostAttribute( 'status' ) as
+					string | undefined,
+				// `getPostType()` with no slug resolves the whole collection,
+				// so only ask for it when a post type is known.
+				postTypeLabel:
+					needsSaveLabels && postType
+						? getPostType( postType )?.labels?.singular_name
+						: undefined,
+				// Registered post statuses carry the labels a site set with
+				// `register_post_status()`, including custom statuses.
+				postStatuses: needsSaveLabels
+					? getEntityRecords< PostStatusObject >( 'root', 'status' )
+					: undefined,
+				isCollaborationEnabled: _isCollaborationEnabled,
+				showJoinNotifications: getNotificationPreference(
+					'showCollaborationJoinNotifications'
+				),
+				showLeaveNotifications: getNotificationPreference(
+					'showCollaborationLeaveNotifications'
+				),
+				showPostSaveNotifications: _showPostSaveNotifications,
+			};
+		},
+		[ postType ]
+	);
 
 	const { createNotice } = useDispatch( noticesStore );
 
@@ -217,18 +333,21 @@ export function useCollaboratorNotifications(
 					saveEvent.postStatus ?? postStatus ?? 'draft';
 
 				// Use the previous save event's status when available for
-				// accurate first-publish detection across rapid saves.
-				const prevStatus = prevEvent?.postStatus ?? postStatus;
-				const isFirstPublish =
-					! (
-						prevStatus && PUBLISHED_STATUSES.includes( prevStatus )
-					) && PUBLISHED_STATUSES.includes( effectiveStatus );
+				// accurate status change detection across rapid saves.
+				const previousStatus = prevEvent?.postStatus ?? postStatus;
 
-				const message = getPostUpdatedMessage(
-					getCollaboratorDisplayName( saver.collaboratorInfo ),
-					effectiveStatus,
-					isFirstPublish
-				);
+				const message = getPostUpdatedMessage( {
+					name: getCollaboratorDisplayName( saver.collaboratorInfo ),
+					// The post type is loaded with the post, so the fallback
+					// only covers a save that lands before it resolves.
+					postTypeLabel: postTypeLabel ?? __( 'Post' ),
+					status: effectiveStatus,
+					statusLabel: postStatuses?.find(
+						( postStatusRecord ) =>
+							postStatusRecord.slug === effectiveStatus
+					)?.name,
+					previousStatus,
+				} );
 
 				void createNotice( 'info', message, {
 					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${
@@ -238,7 +357,13 @@ export function useCollaboratorNotifications(
 					isDismissible: false,
 				} );
 			},
-			[ createNotice, postStatus, shouldShowPostSaveNotifications ]
+			[
+				createNotice,
+				postStatus,
+				postStatuses,
+				postTypeLabel,
+				shouldShowPostSaveNotifications,
+			]
 		)
 	);
 }
