@@ -21,6 +21,7 @@
 
 ### Bug Fixes
 
+-   Block Inspector: Save the typed URL and close the popover when Apply is clicked in a "Link to" field, such as a Navigation Link's or a Button's, as pressing Enter already did ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
