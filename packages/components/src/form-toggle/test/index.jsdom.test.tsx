@@ -1,9 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from '@wordpress/element';
-import FormToggle, { noop } from '..';
+import { createRef, useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
+import { noop } from '..';
+import FormToggle from '../deprecated';
+import ToggleControl from '../../toggle-control';
 import type { FormToggleProps } from '../types';
+
+const DEPRECATION_MESSAGE =
+	'wp.components.FormToggle is deprecated since version 7.3 and will be removed in version 7.5. Please use Switch from @wordpress/ui instead.';
+
+globalThis.wpVitest.mockMatchMedia();
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
@@ -21,6 +33,23 @@ const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
 };
 
 describe( 'FormToggle', () => {
+	it( 'warns when rendering the deprecated component', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+		render( <FormToggle onChange={ noop } /> );
+
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
+	} );
+
+	it( 'does not warn when rendering ToggleControl', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+		render( <ToggleControl label="My toggle" onChange={ noop } /> );
+
+		expect(
+			screen.getByRole( 'checkbox', { name: 'My toggle' } )
+		).toBeVisible();
+		expect( console ).not.toHaveWarned();
+	} );
+
 	describe( 'basic rendering', () => {
 		it( 'should render a span element with an unchecked checkbox', () => {
 			const { container } = render( <FormToggle onChange={ noop } /> );
@@ -30,9 +59,11 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render a checked checkbox when providing checked prop', () => {
-			render( <FormToggle onChange={ noop } checked /> );
+			const ref = createRef< HTMLInputElement >();
+			render( <FormToggle onChange={ noop } checked ref={ ref } /> );
 
 			expect( getInput() ).toBeChecked();
+			expect( ref.current ).toBe( getInput() );
 		} );
 
 		it( 'should render with an additional className', () => {
