@@ -20,9 +20,8 @@ import { getStyleForState } from '../../hooks/block-style-state';
 import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
 import { isPlainObject } from '../../utils/object';
 import { GridItemMover } from './grid-item-movers';
-import { getGridTracks, GridRect } from './utils';
+import { getGridTracks, getRectInGrid, getTrackRange, GridRect } from './utils';
 import type { ChildLayoutBlockStyle, BlockStyleState } from '../../hooks/types';
-import type { GridTrack } from './types';
 
 type Direction = 'left' | 'right' | 'up' | 'down';
 
@@ -44,22 +43,6 @@ const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
 	down: [ 0, 1 ],
 };
 
-function getTrackRange(
-	tracks: GridTrack[],
-	start: number,
-	end: number
-): [ number, number ] | undefined {
-	const first = tracks.findIndex( ( track ) => track.end > start + 0.1 );
-	let last = tracks.length - 1;
-	while ( last >= 0 && tracks[ last ].start >= end - 0.1 ) {
-		last--;
-	}
-	if ( first < 0 || last < first ) {
-		return undefined;
-	}
-	return [ first + 1, last + 1 ];
-}
-
 function getGridSnapshot(
 	gridElement: HTMLElement,
 	blockOrder: string[],
@@ -67,8 +50,7 @@ function getGridSnapshot(
 	getElement: ( clientId: string ) => Element | null | undefined,
 	styleState: BlockStyleState
 ): GridSnapshot | undefined {
-	const view = gridElement.ownerDocument.defaultView;
-	if ( ! view || ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
+	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
 		return undefined;
 	}
 	const columns = getGridTracks( gridElement, 'column' );
@@ -80,25 +62,6 @@ function getGridSnapshot(
 		return undefined;
 	}
 
-	const gridBounds = gridElement.getBoundingClientRect();
-	const scaleX = gridBounds.width / gridElement.offsetWidth;
-	const scaleY = gridBounds.height / gridElement.offsetHeight;
-	if ( ! scaleX || ! scaleY ) {
-		return undefined;
-	}
-	const computed = view.getComputedStyle( gridElement );
-	const isRightToLeft = computed.direction === 'rtl';
-	const inlineOffset =
-		parseFloat(
-			isRightToLeft ? computed.borderRightWidth : computed.borderLeftWidth
-		) +
-		parseFloat(
-			isRightToLeft ? computed.paddingRight : computed.paddingLeft
-		);
-	const topOffset =
-		parseFloat( computed.borderTopWidth ) +
-		parseFloat( computed.paddingTop );
-
 	const items: GridItem[] = [];
 	for ( const clientId of blockOrder ) {
 		const element = getElement( clientId );
@@ -109,23 +72,12 @@ function getGridSnapshot(
 		) {
 			continue;
 		}
-		const bounds = element.getBoundingClientRect();
-		const startX = isRightToLeft
-			? ( gridBounds.right - bounds.right ) / scaleX
-			: ( bounds.left - gridBounds.left ) / scaleX;
-		const endX = isRightToLeft
-			? ( gridBounds.right - bounds.left ) / scaleX
-			: ( bounds.right - gridBounds.left ) / scaleX;
-		const columnRange = getTrackRange(
-			columns,
-			startX - inlineOffset,
-			endX - inlineOffset
-		);
-		const rowRange = getTrackRange(
-			rows,
-			( bounds.top - gridBounds.top ) / scaleY - topOffset,
-			( bounds.bottom - gridBounds.top ) / scaleY - topOffset
-		);
+		const bounds = getRectInGrid( gridElement, element );
+		if ( ! bounds ) {
+			continue;
+		}
+		const columnRange = getTrackRange( columns, bounds.left, bounds.right );
+		const rowRange = getTrackRange( rows, bounds.top, bounds.bottom );
 		if ( ! columnRange || ! rowRange ) {
 			continue;
 		}
