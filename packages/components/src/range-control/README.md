@@ -326,6 +326,13 @@ Forcing the Tooltip UI to show or hide. This is overridden to `false` when `step
 -   Required: No
 -   Platform: Web
 
+### `size`: `'default' | 'compact'`
+
+Adjusts the size of the control.
+
+-   Required: No
+-   Default: `'default'`
+
 ### `step`: `number | 'any'`
 
 The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.

@@ -10,7 +10,7 @@ import { buildFocalPointZoomAction } from '../../core/setter-helpers';
 
 /**
  * The named cropper setters shared by every hook that drives the
- * cropper reducer — the pure `useCropperReducer` and any composite
+ * cropper reducer — the pure `useCropperController` and any composite
  * store that delegates cropper actions (e.g. `useMediaEditorState`).
  *
  * `setImage` and `reset` are intentionally NOT included: each hook
@@ -34,7 +34,7 @@ export interface CropperSetters {
  * Build the named cropper setters from a dispatch function and a
  * state getter. The two consuming hooks differ in how they dispatch:
  *
- * - `useCropperReducer` dispatches directly into its `useReducer`.
+ * - `useCropperController` dispatches directly into its `useReducer`.
  * - `useMediaEditorState` wraps cropper actions in a composite
  *   `CROPPER` envelope so the history machinery can record them.
  *

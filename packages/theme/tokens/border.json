@@ -43,6 +43,7 @@
 			}
 		},
 		"width": {
+			"$description": "Thickness of borders, dividers, and focus rings.",
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
 				"$description": "Extra small width",

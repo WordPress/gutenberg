@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { createPortal, useState } from '@wordpress/element';
+import '@wordpress/theme/design-tokens.css';
 import StyleProvider from '../../style-provider';
 import InputControl from '..';
 

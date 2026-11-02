@@ -8,6 +8,6 @@
 
 return array(
 	'type'        => 'text',
-	'label'       => __( 'Site Title', 'gutenberg' ),
-	'description' => __( "Displays in your site's layout via the Site Title block.", 'gutenberg' ),
+	'label'       => __( 'Site Title' ),
+	'description' => __( "Displays in your site's layout via the Site Title block." ),
 );

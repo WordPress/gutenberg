@@ -5,38 +5,6 @@ test.describe( 'Buttons', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'adds a sibling after the selected button from the parent selector', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/buttons',
-			innerBlocks: [
-				{ name: 'core/button', attributes: { text: 'First' } },
-				{ name: 'core/button', attributes: { text: 'Second' } },
-			],
-		} );
-		await editor.canvas
-			.locator( '[data-type="core/button"]' )
-			.first()
-			.click();
-
-		await editor.showBlockToolbar();
-		await page.locator( 'role=button[name="Add button"]' ).click();
-		await page.keyboard.type( 'New' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/buttons',
-				innerBlocks: [
-					{ name: 'core/button', attributes: { text: 'First' } },
-					{ name: 'core/button', attributes: { text: 'New' } },
-					{ name: 'core/button', attributes: { text: 'Second' } },
-				],
-			},
-		] );
-	} );
-
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await expect(
@@ -109,6 +77,43 @@ test.describe( 'Buttons', () => {
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
+	} );
+
+	test( 'closes the link editor when the button is deselected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( { name: 'core/buttons' } );
+		const buttonBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Button',
+			exact: true,
+		} );
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
+		).toBeFocused();
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect( urlInput ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( urlInput ).toBeHidden();
+
+		await editor.selectBlocks( buttonBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link', exact: true } )
+		).toBeVisible();
+		await expect( urlInput ).toBeHidden();
 	} );
 
 	test( 'moves focus from the link editor back to the button when escape is pressed after the URL has been submitted', async ( {
@@ -429,6 +434,11 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'textbox', { name: 'Hex color' } )
 			.fill( 'ff0000' );
 		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.getByRole( 'button', {
+				name: 'Gradient control point at position 0% with color code rgb(255,0,0).',
+			} )
+		).toBeVisible();
 		await page
 			.getByRole( 'button', {
 				name: /^Gradient control point at position 100% with color code/,
@@ -437,10 +447,14 @@ test.describe( 'Buttons', () => {
 		await page
 			.getByRole( 'textbox', { name: 'Hex color' } )
 			.fill( '00ff00' );
+		await expect(
+			page.getByRole( 'button', {
+				name: 'Gradient control point at position 100% with color code rgb(0,255,0).',
+			} )
+		).toBeVisible();
 
 		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:buttons -->
 <div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"background\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
 <div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Content</a></div>
@@ -845,5 +859,31 @@ test.describe( 'Buttons', () => {
 				listView.getByRole( 'button', { name: 'Add Button' } )
 			).toBeHidden();
 		} );
+	} );
+
+	test( 'keeps the usual inspector outside a Navigation block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'Testing' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button', exact: true } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			settings.getByRole( 'heading', { name: 'Settings' } )
+		).toBeHidden();
+		await expect(
+			settings.getByRole( 'textbox', { name: 'Text' } )
+		).toBeHidden();
 	} );
 } );

@@ -27,7 +27,7 @@ export interface FluidTypographyArgs {
 	 * Size to derive maximumFontSize and minimumFontSize from, if necessary.
 	 * Optional if minimumFontSize and maximumFontSize are specified.
 	 */
-	fontSize?: string | number;
+	fontSize?: string | number | null;
 	/**
 	 * Maximum font size for any clamp() calculation. Optional.
 	 */
@@ -64,11 +64,21 @@ export interface TypographyValueAndUnit {
 	unit: string;
 }
 
+type BaseFontSizePickerProps = ComponentProps< typeof BaseFontSizePicker >;
+
+/**
+ * The font size presets of the base picker.
+ */
+export type FontSizePickerPresets = BaseFontSizePickerProps[ 'fontSizes' ];
+
 /**
  * Props of the block editor's `FontSizePicker`, which reads the font sizes
  * from the block settings.
  */
-export type FontSizePickerProps = ComponentProps< typeof BaseFontSizePicker >;
+export type FontSizePickerProps = Omit<
+	BaseFontSizePickerProps,
+	'fontSizes' | 'disableCustomFontSizes'
+>;
 
 /**
  * Props of a component wrapped by `withFontSizes`.
