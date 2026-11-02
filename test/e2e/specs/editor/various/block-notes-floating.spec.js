@@ -466,7 +466,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expect( notice ).toBeVisible();
 		// A notes column beside the canvas would cut the notice short.
 		const noticeBox = await page
-			.locator( '.components-notice' )
+			.locator( '.notices-inline-notices__notice' )
 			.filter( { hasText: 'Test notice' } )
 			.boundingBox();
 		const canvasBox = await page

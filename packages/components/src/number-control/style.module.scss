@@ -14,7 +14,7 @@
 }
 
 .spin-button {
-	// Preserve the specificity of the Emotion wrapper over Button styles.
+	// Preserve the established specificity over Button styles.
 	&.spin-button.spin-button.spin-button.spin-button {
 		color: $components-color-accent;
 	}

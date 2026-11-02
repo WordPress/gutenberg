@@ -20,9 +20,14 @@ collab-sidebar/
 ├── note-byline.jsx                  NoteByline - avatar + name + relative date
 ├── note-form.jsx                    NoteForm - rich text input + submit/cancel
 ├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
-├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
+├── add-note-menu-item.jsx           AddNoteMenuItem - block options menu "Add note" trigger
+├── add-note-toolbar-button.tsx      AddNoteToolbarButton - block-toolbar "Add note" trigger
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
+│
+├── reactions/                       emoji reactions on a note
+│   ├── use-note-reactions.ts        useNoteReactions( noteId ) - [ reaction_summary, toggleReaction ]
+│   ├── note-reactions.tsx           NoteReactions - reaction pills with reactor-name tooltips + add-reaction Menu
+│   └── reaction-emojis.ts           the reaction emoji and their storage keys
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
@@ -38,12 +43,12 @@ collab-sidebar/
 ```
 NotesSidebarContainer (index.jsx)         - gates on post type support, owns the unsent drafts Map
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + useNoteSelection + sidebar registration
-      ├── AddNoteMenuItem                - slot fill in the block toolbar
-      ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
+      ├── AddNoteMenuItem                - slot fill in the block options menu
+      ├── AddNoteToolbarButton           - slot fill in the block toolbar (once the post has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + useNoteFocus + keyboard nav
-      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
-      │         └── NoteThread[]         - per thread
+      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteFocus + keyboard nav + focusThreadOrAdjacent
+      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new', calls useNoteActions
+      │         └── NoteThread[]         - per thread, calls useNoteActions
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard

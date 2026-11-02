@@ -27,6 +27,7 @@ export type LinkFormatAttributes = {
 export interface LinkFormat {
 	type: 'core/link';
 	attributes: LinkFormatAttributes;
+	unregisteredAttributes?: Record< string, string >;
 }
 
 /**

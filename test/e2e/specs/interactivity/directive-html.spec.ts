@@ -23,6 +23,18 @@ test.describe( 'data-wp-html', () => {
 		);
 	} );
 
+	test( 'keeps the server-rendered content for the server representation until a token replaces it', async ( {
+		page,
+	} ) => {
+		await expect( page.getByTestId( 'hydration' ) ).toHaveText(
+			'hydrated'
+		);
+		const el = page.getByTestId( 'server html' );
+		expect( await el.innerHTML() ).toBe( '<p>Server-rendered HTML</p>' );
+		await page.getByTestId( 'set server html' ).click();
+		await expect.poll( () => el.innerHTML() ).toBe( '<p>Client HTML</p>' );
+	} );
+
 	test( 'removes content safely and renders late trusted HTML under Trusted Types enforcement', async ( {
 		page,
 		interactivityUtils: utils,
@@ -60,6 +72,9 @@ test.describe( 'data-wp-html', () => {
 			.all() ) {
 			expect( await item.innerHTML() ).toBe( '' );
 		}
+		expect( await page.getByTestId( 'server html' ).innerHTML() ).toBe(
+			'<p>Server-rendered HTML</p>'
+		);
 		// Flush queued CSP events after each observed commit, including hydration.
 		const violations = async () =>
 			page.evaluate( async () => {

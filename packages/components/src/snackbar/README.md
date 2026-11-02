@@ -49,7 +49,7 @@ The displayed message of a notice. Also used as the spoken message for assistive
 
 #### `explicitDismiss`: `boolean`
 
-Whether to require user action to dismiss the snackbar. By default, this is dismissed on a timeout, without user interaction.
+Whether to require user action to dismiss the snackbar. By default, this is dismissed on a timeout, without user interaction: after 6 seconds, or after 10 seconds when the snackbar has an action.
 
 -   Required: No
 -   Default: `false`

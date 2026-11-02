@@ -856,7 +856,7 @@ export const synchronizeTemplate =
  * @param {boolean} isForward
  */
 export const __unstableDeleteSelection =
-	( isForward: boolean ) =>
+	( isForward?: boolean ) =>
 	( { registry, select, dispatch }: BlockEditorThunkArgs ): false | void => {
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();

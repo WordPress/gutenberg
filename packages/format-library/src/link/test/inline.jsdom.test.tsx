@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
-// @ts-expect-error The block-editor package does not expose TypeScript declarations.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	create,
@@ -20,7 +19,6 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 type LinkChanges = Record< string, string | boolean >;
 const controls = vi.hoisted( () => ( { nextValue: {} as LinkChanges } ) );
 
-// @ts-expect-error The block-editor package does not expose TypeScript declarations.
 vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
@@ -29,16 +27,23 @@ vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
 			function LinkControl( {
 				onChange,
 				onRemove,
-			}: {
-				onChange: ( nextValue: LinkChanges ) => void;
-				onRemove: () => void;
-			} ) {
+			}: Pick<
+				Parameters< typeof actual.LinkControl >[ 0 ],
+				'onChange' | 'onRemove'
+			> ) {
 				return createElement(
 					'div',
 					null,
 					createElement(
 						'button',
-						{ onClick: () => onChange( controls.nextValue ) },
+						{
+							onClick: () =>
+								onChange?.(
+									controls.nextValue as Parameters<
+										NonNullable< typeof onChange >
+									>[ 0 ]
+								),
+						},
 						'Apply link'
 					),
 					createElement(
@@ -48,7 +53,10 @@ vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
 					)
 				);
 			},
-			{ DEFAULT_LINK_SETTINGS: actual.LinkControl.DEFAULT_LINK_SETTINGS }
+			{
+				DEFAULT_LINK_SETTINGS: actual.LinkControl.DEFAULT_LINK_SETTINGS,
+				ViewerFill: actual.LinkControl.ViewerFill,
+			}
 		),
 	};
 } );
