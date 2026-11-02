@@ -170,6 +170,7 @@ export type EntityRecord< C extends Context = 'edit' > =
  * types.
  */
 export interface RootEntityRecordTypes< C extends Context > {
+	comment: Comment< C >;
 	fontCollection: FontCollection< C >;
 	globalStyles: GlobalStyles< C >;
 	icon: Icon< C >;
@@ -294,6 +295,7 @@ export type EntityRecordOf<
  * @see EntityContextDefaults
  */
 export interface RootEntityContexts {
+	comment: 'edit';
 	fontCollection: 'view';
 	globalStyles: 'edit';
 	icon: 'view';
