@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `rawHandler`, `pasteHandler`: Keep shortcodes in text inline unless they're on their own line, or aligned at the start or end of a line ([#85795](https://github.com/WordPress/gutenberg/pull/85795)).
+
 ## 17.0.0 (2026-10-20)
 
 ### Breaking Changes
