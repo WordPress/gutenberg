@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
