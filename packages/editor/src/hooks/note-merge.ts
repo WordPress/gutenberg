@@ -1,5 +1,5 @@
 import { addFilter } from '@wordpress/hooks';
-import type { BlockType } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
@@ -49,6 +49,51 @@ export function addNoteMergeCallback( settings: BlockType ): BlockType {
 		},
 	};
 }
+
+/**
+ * Keeps the notes of a single block when it's switched to another block type.
+ * Blocks of different types are merged by switching the second block first,
+ * and a block switched on its own reaches the filter as a block instead of an
+ * array, so its metadata isn't kept.
+ *
+ * @param result Transformed block.
+ * @param source Source block or blocks.
+ * @return Transformed block with the source block's notes.
+ */
+export function keepNotesOnTransform(
+	result: Block,
+	source: Block | Block[]
+): Block {
+	if ( Array.isArray( source ) ) {
+		return result;
+	}
+
+	const noteIds: number[] = getNoteIdsFromMetadata(
+		source.attributes?.metadata ?? {}
+	);
+	if ( noteIds.length === 0 ) {
+		return result;
+	}
+
+	const metadata = ( result.attributes?.metadata ?? {} ) as Metadata;
+	const mergedMetadata = noteIds.reduce(
+		( current, noteId ) =>
+			addNoteIdToMetadata( current, noteId ) as Metadata,
+		metadata
+	);
+	return mergedMetadata === metadata
+		? result
+		: {
+				...result,
+				attributes: { ...result.attributes, metadata: mergedMetadata },
+			};
+}
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/editor/notes/keep-notes-on-transform',
+	keepNotesOnTransform
+);
 
 addFilter(
 	'blocks.registerBlockType',
