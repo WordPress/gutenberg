@@ -4,14 +4,20 @@ import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox and Menu, pending WordPress/gutenberg#76135.
-import { Checkbox, Field, Menu, Stack } from '@wordpress/ui';
+import {
+	Checkbox,
+	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import getActionLabel from '../../utils/get-action-label';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -138,8 +144,7 @@ function ActionTrigger< Item >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
+	const label = getActionLabel( action, items );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -186,9 +191,7 @@ function ActionButton< Item >( {
 				disabled={ !! action.disabled || isBusy }
 			>
 				<Menu.ItemLabel>
-					{ typeof action.label === 'string'
-						? action.label
-						: action.label( selectedEligibleItems ) }
+					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }
 				</Menu.ItemLabel>
 			</Menu.Item>
 		);

@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Meta Boxes: Show the meta box area below the editor by default, with an option to pin it to a resizable pane ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
+-   Meta Boxes: Use the design system outline for the panel toggle's keyboard focus ring ([#85355](https://github.com/WordPress/gutenberg/pull/85355)).
 
 ## 9.0.0 (2026-10-20)
 

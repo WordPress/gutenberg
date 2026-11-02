@@ -329,10 +329,14 @@ function MetaBoxesMain() {
 		</div>
 	);
 
+	// Height applies only while pinned. A short window grows with the boxes
+	// instead of taking a fixed slice of the screen.
 	let usedHeight;
 	if ( isPinned ) {
 		if ( ! isOpen ) {
 			usedHeight = min;
+		} else if ( isShort ) {
+			usedHeight = 'auto';
 		} else if ( typeof sessionHeight === 'number' ) {
 			usedHeight = sessionHeight;
 		} else if ( typeof openHeight === 'number' ) {

@@ -13,6 +13,7 @@ import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
 import type { ResolvedAssets } from '../../store/types';
 import type { EventConstructor, IframeProps } from './types';
+import { CanvasWindowContext } from './canvas-window-context';
 
 function bubbleEvent(
 	event: Event | SyntheticEvent,
@@ -500,7 +501,13 @@ function Iframe( {
 							) }
 						>
 							<StyleProvider document={ iframeDocument }>
-								{ children }
+								<CanvasWindowContext.Provider
+									value={
+										iframeDocument.defaultView ?? undefined
+									}
+								>
+									{ children }
+								</CanvasWindowContext.Provider>
 							</StyleProvider>
 						</body>,
 						iframeDocument.documentElement
