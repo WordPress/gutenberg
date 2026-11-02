@@ -504,3 +504,37 @@ it( 'moves focus to the select all checkbox when an action removes the item that
 		)
 		.toHaveFocus();
 } );
+
+function TableOf( { items }: { items: Post[] } ) {
+	return (
+		<DataViews
+			data={ items }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+				page: 1,
+				perPage: 10,
+			} }
+			onChangeView={ () => {} }
+			actions={ actions }
+			paginationInfo={ { totalItems: items.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+}
+
+it( 'leaves focus alone when it was moved away before the item was removed', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	const checkbox = page
+		.getByRole( 'checkbox', { name: 'Select First post', exact: true } )
+		.element() as HTMLElement;
+	checkbox.focus();
+	checkbox.blur();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	expect( checkbox.ownerDocument.body ).toHaveFocus();
+} );

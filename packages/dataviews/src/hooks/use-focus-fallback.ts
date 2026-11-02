@@ -45,6 +45,22 @@ export default function useFocusFallback() {
 		const onFocusIn = ( event: FocusEvent ) => {
 			lastFocused = event.target as HTMLElement;
 		};
+		// Focus that leaves for nowhere while the control is still usable was
+		// moved away on purpose, e.g. by clicking outside any control. Don't
+		// bring it back when that control goes away later. A modal hiding the
+		// rest of the page also blurs the control, but focus comes back on
+		// close.
+		const onFocusOut = ( event: FocusEvent ) => {
+			const target = event.target as HTMLElement;
+			if (
+				! event.relatedTarget &&
+				target.isConnected &&
+				isVisible( target ) &&
+				! target.closest( '[inert], [aria-hidden="true"]' )
+			) {
+				lastFocused = null;
+			}
+		};
 		const observer = new MutationObserver( () => {
 			if ( ! lastFocused ) {
 				return;
@@ -63,6 +79,7 @@ export default function useFocusFallback() {
 			getFallback( container )?.focus();
 		} );
 		container.addEventListener( 'focusin', onFocusIn );
+		container.addEventListener( 'focusout', onFocusOut );
 		observer.observe( container, {
 			childList: true,
 			subtree: true,
@@ -71,6 +88,7 @@ export default function useFocusFallback() {
 		} );
 		return () => {
 			container.removeEventListener( 'focusin', onFocusIn );
+			container.removeEventListener( 'focusout', onFocusOut );
 			observer.disconnect();
 		};
 	}, [] );
