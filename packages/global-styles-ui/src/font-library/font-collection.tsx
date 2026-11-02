@@ -367,6 +367,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
+									className="font-library__category"
 									label={ __( 'Category' ) }
 									items={ categoryItems }
 									value={ selectedCategoryItem }

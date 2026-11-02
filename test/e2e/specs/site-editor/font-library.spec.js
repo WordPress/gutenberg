@@ -90,6 +90,100 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 
+		test( 'keeps Category and Search fields stable when switching categories', async ( {
+			admin,
+			page,
+		} ) => {
+			const categories = [
+				{ slug: 'serif', name: 'Serif' },
+				{
+					slug: 'sans-serif',
+					name: 'Serifenlose Schriftarten mit einer langen Bezeichnung',
+				},
+				{ slug: 'display', name: 'خطوط العرض ذات الاسم الطويل جدًا' },
+			];
+			const collection = {
+				slug: 'google-fonts',
+				name: 'Google Fonts',
+				description: '',
+				categories,
+				font_families: [],
+			};
+			await page.route( '**/wp/v2/font-collections**', ( route ) =>
+				route.fulfill( {
+					json: new URL( route.request().url() ).pathname.endsWith(
+						'/google-fonts'
+					)
+						? collection
+						: [ collection ],
+				} )
+			);
+
+			await page.evaluate( () => {
+				window.localStorage.setItem(
+					'wp-font-library-google-fonts-permission',
+					'true'
+				);
+			} );
+
+			const dialog = page.getByRole( 'dialog', { name: 'Fonts' } );
+			const category = dialog.getByRole( 'combobox', {
+				name: 'Category',
+			} );
+			const search = dialog.getByRole( 'searchbox', { name: 'Search' } );
+
+			for ( const width of [ 1280, 390, 320 ] ) {
+				await page.setViewportSize( { width, height: 900 } );
+				await admin.visitSiteEditor();
+				const stylesUrl = new URL( page.url() );
+				stylesUrl.searchParams.set( 'p', '/styles' );
+				await page.goto( stylesUrl.href );
+				await page
+					.getByRole( 'button', { name: 'Typography' } )
+					.click();
+				await page
+					.getByRole( 'button', { name: 'Manage fonts' } )
+					.click();
+				await page
+					.getByRole( 'tab', { name: 'Install Fonts' } )
+					.click();
+
+				for ( const direction of [ 'ltr', 'rtl' ] ) {
+					await page.evaluate( ( dir ) => {
+						document.documentElement.dir = dir;
+					}, direction );
+					await expect( category ).toBeVisible();
+					await expect( search ).toBeVisible();
+					const categoryBounds = await category.boundingBox();
+					const searchBounds = await search.boundingBox();
+					for ( const bounds of [ categoryBounds, searchBounds ] ) {
+						expect( bounds.x ).toBeGreaterThanOrEqual( 0 );
+						expect( bounds.x + bounds.width ).toBeLessThanOrEqual(
+							width
+						);
+					}
+
+					for ( const { name } of [
+						...categories,
+						{ name: 'All' },
+					] ) {
+						await category.focus();
+						await page.keyboard.press( 'Space' );
+						await page
+							.getByRole( 'option', { name, exact: true } )
+							.click();
+						await expect( category ).toHaveText( name );
+						expect( await category.boundingBox() ).toEqual(
+							categoryBounds
+						);
+						expect( await search.boundingBox() ).toEqual(
+							searchBounds
+						);
+					}
+				}
+			}
+		} );
+
 		test( 'should show font variant panel when clicking on a font family', async ( {
 			page,
 		} ) => {
