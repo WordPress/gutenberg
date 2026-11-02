@@ -1,9 +1,4 @@
-import clsx from 'clsx';
-import {
-	RichText,
-	useBlockProps,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -12,8 +7,6 @@ export default function save( { attributes } ) {
 		fileName,
 		textLinkHref,
 		textLinkTarget,
-		showDownloadButton,
-		downloadButtonText,
 		displayPreview,
 		previewHeight,
 	} = attributes;
@@ -59,19 +52,7 @@ export default function save( { attributes } ) {
 						<RichText.Content value={ fileName } />
 					</a>
 				) }
-				{ showDownloadButton && (
-					<a
-						href={ href }
-						className={ clsx(
-							'wp-block-file__button',
-							__experimentalGetElementClassName( 'button' )
-						) }
-						download
-						aria-describedby={ describedById }
-					>
-						<RichText.Content value={ downloadButtonText } />
-					</a>
-				) }
+				<InnerBlocks.Content />
 			</div>
 		)
 	);

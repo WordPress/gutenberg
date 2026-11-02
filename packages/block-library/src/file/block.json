@@ -48,12 +48,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"downloadButtonText": {
-			"type": "rich-text",
-			"source": "rich-text",
-			"selector": "a[download]",
-			"role": "content"
-		},
 		"displayPreview": {
 			"type": "boolean"
 		},

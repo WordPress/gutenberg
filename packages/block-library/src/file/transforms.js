@@ -2,11 +2,8 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { _x } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-
-// Transforms bypass the default variation, so set the localized default here.
-const downloadButtonText = _x( 'Download', 'button label' );
+import { createDownloadButtons } from './utils';
 
 // The File → audio/video/image transforms are identical apart from the target
 // block, its media MIME type, and the src attribute name (image uses `url`).
@@ -69,12 +66,16 @@ const transforms = {
 							} )
 						);
 					} else {
+						// The upload sets the URL of the download button.
 						blocks.push(
-							createBlock( 'core/file', {
-								blob: blobURL,
-								fileName: file.name,
-								downloadButtonText,
-							} )
+							createBlock(
+								'core/file',
+								{
+									blob: blobURL,
+									fileName: file.name,
+								},
+								[ createDownloadButtons( {} ) ]
+							)
 						);
 					}
 				} );
@@ -88,14 +89,17 @@ const transforms = {
 			transform: ( attributes ) => {
 				// Audio/Video use `src`, Image uses `url`.
 				const href = attributes.src ?? attributes.url;
-				return createBlock( 'core/file', {
-					href,
-					fileName: attributes.caption || getFilename( href ),
-					textLinkHref: href,
-					id: attributes.id,
-					anchor: attributes.anchor,
-					downloadButtonText,
-				} );
+				return createBlock(
+					'core/file',
+					{
+						href,
+						fileName: attributes.caption || getFilename( href ),
+						textLinkHref: href,
+						id: attributes.id,
+						anchor: attributes.anchor,
+					},
+					[ createDownloadButtons( { url: href } ) ]
+				);
 			},
 		},
 	],

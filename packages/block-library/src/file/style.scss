@@ -13,7 +13,16 @@
 		text-align: right;
 	}
 
+	// Blocks saved before the download button became an inner Button block.
 	* + .wp-block-file__button {
+		margin-left: 0.75em;
+	}
+
+	> .wp-block-buttons {
+		display: inline-flex;
+	}
+
+	> * + .wp-block-buttons {
 		margin-left: 0.75em;
 	}
 }

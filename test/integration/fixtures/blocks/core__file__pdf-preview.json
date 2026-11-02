@@ -8,10 +8,29 @@
 			"fileName": "yolo",
 			"textLinkHref": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
 			"showDownloadButton": true,
-			"downloadButtonText": "Download",
 			"displayPreview": true,
 			"previewHeight": 370
 		},
-		"innerBlocks": []
+		"innerBlocks": [
+			{
+				"name": "core/buttons",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/button",
+						"isValid": true,
+						"attributes": {
+							"tagName": "a",
+							"type": "button",
+							"url": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
+							"text": "Download",
+							"download": true
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
 	}
 ]

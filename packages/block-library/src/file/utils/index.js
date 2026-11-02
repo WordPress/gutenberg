@@ -1,3 +1,22 @@
+import { createBlock } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
+
+/**
+ * Creates the inner blocks of the File block download button.
+ *
+ * @param {Object} options      The button options.
+ * @param {string} options.url  The URL of the file.
+ * @param {string} options.text The button text. Defaults to "Download".
+ * @return {Object} A Buttons block that holds the download Button block.
+ */
+export const createDownloadButtons = ( {
+	url,
+	text = _x( 'Download', 'button label' ),
+} ) =>
+	createBlock( 'core/buttons', {}, [
+		createBlock( 'core/button', { url, text, download: true } ),
+	] );
+
 /**
  * Uses a combination of user agent matching and feature detection to determine whether
  * the current browser supports rendering PDFs inline.

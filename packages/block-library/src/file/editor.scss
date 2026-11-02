@@ -38,14 +38,11 @@
 
 	a {
 		min-width: 1em;
-
-		&:not(.wp-block-file__button) {
-			display: inline-block;
-		}
+		display: inline-block;
 	}
 
-	.wp-block-file__button-richtext-wrapper {
-		display: inline-block;
+	.wp-block-file__content-wrapper > .wp-block-buttons {
+		display: inline-flex;
 		margin-left: 0.75em;
 	}
 }

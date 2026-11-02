@@ -13,8 +13,8 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	useInnerBlocksProps,
 	store as blockEditorStore,
-	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -24,7 +24,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
-import { browserSupportsPdfs } from './utils';
+import { browserSupportsPdfs, createDownloadButtons } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
@@ -59,7 +59,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		textLinkHref,
 		textLinkTarget,
 		showDownloadButton,
-		downloadButtonText,
 		displayPreview,
 		previewHeight,
 	} = attributes;
@@ -79,7 +78,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { toggleSelection, replaceInnerBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
+	const { getBlockOrder } = useSelect( blockEditorStore );
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -130,7 +131,27 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			blob: undefined,
 			...pdfAttributes,
 		} );
+		setDownloadButtonURL( newMedia.url );
 		setTemporaryURL();
+	}
+
+	// The download button is an inner Button block. Keep its URL in sync with
+	// the file, or create the button when it doesn't exist yet.
+	function setDownloadButtonURL( url ) {
+		if ( ! showDownloadButton ) {
+			return;
+		}
+		const [ buttonsClientId ] = getBlockOrder( clientId );
+		const [ buttonClientId ] = buttonsClientId
+			? getBlockOrder( buttonsClientId )
+			: [];
+		if ( buttonClientId ) {
+			updateBlockAttributes( buttonClientId, { url } );
+		} else {
+			replaceInnerBlocks( clientId, [
+				createDownloadButtons( { url } ),
+			] );
+		}
 	}
 
 	function onUploadError( message ) {
@@ -151,6 +172,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
+		replaceInnerBlocks(
+			clientId,
+			newValue ? [ createDownloadButtons( { url: href } ) ] : []
+		);
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -182,6 +207,15 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			}
 		),
 	} );
+
+	const { children, ...innerBlocksProps } = useInnerBlocksProps(
+		{ className: 'wp-block-file__content-wrapper' },
+		{
+			allowedBlocks: [ 'core/buttons' ],
+			templateLock: 'all',
+			renderAppender: false,
+		}
+	);
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
@@ -274,7 +308,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						) }
 					</ResizableBox>
 				) }
-				<div className="wp-block-file__content-wrapper">
+				<div { ...innerBlocksProps }>
 					<RichText
 						identifier="fileName"
 						tagName="a"
@@ -288,31 +322,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						}
 						href={ textLinkHref }
 					/>
-					{ showDownloadButton && (
-						<div className="wp-block-file__button-richtext-wrapper">
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
-							<RichText
-								identifier="downloadButtonText"
-								tagName="div" // Must be block-level or else cursor disappears.
-								aria-label={ __( 'Download button text' ) }
-								className={ clsx(
-									'wp-block-file__button',
-									__experimentalGetElementClassName(
-										'button'
-									)
-								) }
-								value={ downloadButtonText }
-								withoutInteractiveFormatting
-								placeholder={ __( 'Add text…' ) }
-								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText:
-											removeAnchorTag( text ),
-									} )
-								}
-							/>
-						</div>
-					) }
+					{ children }
 				</div>
 			</div>
 		</>

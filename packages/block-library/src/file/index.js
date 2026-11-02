@@ -6,7 +6,6 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-import variations from './variations';
 
 const { name } = metadata;
 
@@ -19,12 +18,25 @@ export const settings = {
 			href: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Armstrong_Small_Step.ogg',
 			fileName: _x( 'Armstrong_Small_Step', 'Name of the file' ),
 		},
+		innerBlocks: [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: _x( 'Download', 'button label' ),
+							download: true,
+						},
+					},
+				],
+			},
+		],
 	},
 	transforms,
 	deprecated,
 	edit,
 	save,
-	variations,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -2,13 +2,32 @@
 	{
 		"blockName": "core/file",
 		"attrs": {
-			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
-			"showDownloadButton": true
+			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js"
 		},
-		"innerBlocks": [],
-		"innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button wp-element-button\" download>Download</a></div>\n",
-		"innerContent": [
-			"\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button wp-element-button\" download>Download</a></div>\n"
-		]
+		"innerBlocks": [
+			{
+				"blockName": "core/buttons",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/button",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" download>Download</a></div>\n",
+						"innerContent": [
+							"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" download>Download</a></div>\n"
+						]
+					}
+				],
+				"innerHTML": "\n<div class=\"wp-block-buttons\"></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-buttons\">",
+					null,
+					"</div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-file\"></div>\n",
+		"innerContent": [ "\n<div class=\"wp-block-file\">", null, "</div>\n" ]
 	}
 ]
