@@ -285,7 +285,8 @@ function gutenberg_get_layout_container_values( $layout ) {
  * against the value, not the CSS attribute.
  *
  * Numeric zero is converted to a string because it is valid CSS without a unit.
- * Other non-string values are rejected.
+ * A bare `var(--wp--preset--*)` or `var(--wp--custom--*)` reference is accepted, since global styles
+ * resolve presets to one before they get here. Other non-string values are rejected.
  *
  * @param mixed $gap_value Block gap value.
  * @return string|string[]|null Sanitized block gap value.
@@ -313,6 +314,11 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 
 	if ( '' === trim( $gap_value ) ) {
 		return null;
+	}
+
+	// Global styles resolve preset and custom references to a CSS variable before they get here.
+	if ( preg_match( '/^var\(--wp--(?:preset|custom)--[a-z0-9_-]+\)$/i', $gap_value ) ) {
+		return $gap_value;
 	}
 
 	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
@@ -854,13 +860,30 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
 
 		/*
-		 * If the gap value is an array, we use the "left" value because it represents the horizontal gap, which
-		 * is the relevant one for computation of responsive grid columns.
+		 * Mirror the editor: the horizontal ("left") gap is the relevant one for computation of responsive
+		 * grid columns. Unlike the `gap` declaration, this does not depend on theme block gap support.
+		 * A user-defined value that is not serialized is ignored, and any side without a value
+		 * falls back to the global (or default) gap.
 		 */
+		$to_css_gap_value = static function ( $value ) {
+			if ( is_string( $value ) && str_contains( $value, 'var:preset|spacing|' ) ) {
+				$slug = _wp_to_kebab_case( substr( $value, strrpos( $value, '|' ) + 1 ) );
+				return "var(--wp--preset--spacing--$slug)";
+			}
+			return $value;
+		};
+
 		if ( is_array( $fallback_gap_value ) ) {
-			$responsive_gap_value = $fallback_gap_value['left'] ?? reset( $fallback_gap_value );
+			$responsive_gap_value = $fallback_gap_value['left'] ?? $fallback_gap_value['top'] ?? reset( $fallback_gap_value );
 		} else {
 			$responsive_gap_value = $fallback_gap_value;
+		}
+
+		if ( ! $should_skip_gap_serialization && isset( $gap_value ) ) {
+			$user_gap_value = is_array( $gap_value ) ? ( $gap_value['left'] ?? null ) : $gap_value;
+			if ( null !== $user_gap_value ) {
+				$responsive_gap_value = $to_css_gap_value( $user_gap_value );
+			}
 		}
 
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
@@ -877,16 +900,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					}
 					$process_value = $gap_value[ $gap_side ] ?? $fallback_value;
 				}
-				// Get spacing CSS variable from preset value if provided.
-				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
-					$index_to_splice = strrpos( $process_value, '|' ) + 1;
-					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
-					$process_value   = "var(--wp--preset--spacing--$slug)";
-				}
-				if ( ! is_array( $gap_value ) || 'left' === $gap_side ) {
-					$responsive_gap_value = $process_value;
-				}
-				$combined_gap_value .= "$process_value ";
+				$combined_gap_value .= $to_css_gap_value( $process_value ) . ' ';
 			}
 			$gap_value = trim( $combined_gap_value );
 		}

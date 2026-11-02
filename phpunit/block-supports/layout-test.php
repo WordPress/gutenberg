@@ -53,6 +53,20 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+
+		// Global styles resolve a preset gap to a CSS variable before layout styles use it.
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'preset-gap',
+				'label'      => 'Preset Gap',
+				'style_data' => array(
+					'spacing' => array(
+						'blockGap' => 'var:preset|spacing|40',
+					),
+				),
+			)
+		);
 	}
 
 	public function tear_down() {
@@ -63,6 +77,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 		// Clean up variation test data.
 		unregister_block_style( 'core/group', 'custom-gap' );
+		unregister_block_style( 'core/group', 'preset-gap' );
 		WP_Theme_JSON_Resolver::clean_cached_data();
 
 		parent::tear_down();
@@ -554,6 +569,47 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					'fallback_gap_value'    => '1.2rem',
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (1.2rem * (3 - 1))) /3), 1fr));container-type:inline-size;gap:2rem 1.2rem;}',
+			),
+			'grid layout uses the block gap for responsive columns without block gap support' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 6,
+						'minimumColumnWidth' => '9rem',
+					),
+					'has_block_gap_support' => false,
+					'gap_value'             => 'var:preset|spacing|40',
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(9rem, 100%), (100% - (var(--wp--preset--spacing--40) * (6 - 1))) /6), 1fr));container-type:inline-size;}',
+			),
+			'grid layout keeps a resolved preset fallback gap for responsive columns' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 2,
+						'minimumColumnWidth' => '20rem',
+					),
+					'has_block_gap_support' => true,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--32)',
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(20rem, 100%), (100% - (var(--wp--preset--spacing--32) * (2 - 1))) /2), 1fr));container-type:inline-size;}',
+			),
+			'grid layout ignores a skipped gap for responsive columns' => array(
+				'args'            => array(
+					'selector'                      => '.wp-layout',
+					'layout'                        => array(
+						'type'               => 'grid',
+						'columnCount'        => 3,
+						'minimumColumnWidth' => '12rem',
+					),
+					'has_block_gap_support'         => true,
+					'gap_value'                     => '3rem',
+					'should_skip_gap_serialization' => true,
+					'fallback_gap_value'            => '1.2rem',
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (1.2rem * (3 - 1))) /3), 1fr));container-type:inline-size;}',
 			),
 			'grid layout preserves zero horizontal gap'    => array(
 				'args'            => array(
@@ -1212,6 +1268,44 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (99px * (3 - 1))) /3), 1fr))',
 			$actual_stylesheet,
 			'Generated CSS should contain the variation blockGap value of 99px.'
+		);
+	}
+
+	/**
+	 * Tests that a global block gap defined as a spacing preset is used for responsive grid columns.
+	 *
+	 * Global styles resolve the preset to `var(--wp--preset--spacing--40)`, which must not be
+	 * rejected by the block gap sanitizer and replaced by the default fallback.
+	 *
+	 * @covers ::wp_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_uses_preset_global_block_gap_value() {
+		switch_theme( 'block-theme' );
+
+		$block_content = '<div class="wp-block-group is-style-preset-gap"></div>';
+		$block         = array(
+			'blockName'    => 'core/group',
+			'attrs'        => array(
+				'className' => 'is-style-preset-gap',
+				'layout'    => array(
+					'type'               => 'grid',
+					'columnCount'        => 6,
+					'minimumColumnWidth' => '9rem',
+				),
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => $block_content,
+			'innerContent' => array( $block_content ),
+		);
+
+		gutenberg_render_layout_support_flag( $block_content, $block );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'grid-template-columns:repeat(auto-fill, minmax(max(min(9rem, 100%), (100% - (var(--wp--preset--spacing--40) * (6 - 1))) /6), 1fr))',
+			$actual_stylesheet,
+			'Generated CSS should use the resolved preset blockGap, not the 0.5em fallback.'
 		);
 	}
 
