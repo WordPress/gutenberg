@@ -117,9 +117,9 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 	 * @dataProvider data_get_shadow_classes_and_styles
 	 *
 	 * @param mixed $block_attributes Block attributes.
-	 * @param array $expected         Expected shadow classes and styles.
+	 * @param array $expected         Expected classes and styles.
 	 */
-	public function test_gutenberg_get_shadow_classes_and_styles( $block_attributes, $expected ) {
+	public function test_get_shadow_classes_and_styles( $block_attributes, $expected ) {
 		$this->assertSame( $expected, gutenberg_get_shadow_classes_and_styles( $block_attributes ) );
 	}
 
@@ -148,6 +148,10 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 			),
 			'non-array attributes' => array(
 				'block_attributes' => null,
+				'expected'         => array(),
+			),
+			'object attributes'    => array(
+				'block_attributes' => (object) array( 'style' => array( 'shadow' => '1px 1px 1px #000' ) ),
 				'expected'         => array(),
 			),
 		);
