@@ -127,13 +127,13 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
  * React escapes `&`, `<`, `>`, `"` and `'` in every string and never reads
  * entities in it, so any entity a caller passes shows as written. Unlike
  * `esc_html()` and `esc_attr()`, which leave existing entities alone, this
- * does the same.
+ * does the same. Otherwise it follows `esc_html()`, including the site's charset.
  *
  * @param string $text Plain text.
  * @return string Escaped text.
  */
 function gutenberg_ui_components_esc_plain_text( $text ) {
-	return htmlspecialchars( $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+	return _wp_specialchars( wp_check_invalid_utf8( $text ), ENT_QUOTES, false, true );
 }
 
 /**

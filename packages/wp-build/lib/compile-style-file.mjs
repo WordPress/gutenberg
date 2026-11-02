@@ -19,7 +19,7 @@ export { compileCss, disposeSassCompiler };
  * @param {string}  filePath              Absolute path to a `.css` or `.scss` file.
  * @param {Object}  options
  * @param {string}  options.workingDir    Directory of the package that owns the file.
- * @param {string}  [options.rootDir]     The repository root. Defaults to the current directory.
+ * @param {string}  [options.rootDir]     The repository root, which Sass load paths and scoped class names depend on. Defaults to the current directory.
  * @param {boolean} [options.cssModules]  Whether to scope class names as CSS Modules. Defaults to true for `.module.*` files.
  * @param {boolean} [options.minify=true] Whether to minify the CSS.
  * @return {Promise<{css: string, classNames: Record<string, string>|null}>} Compiled CSS and class name map.
@@ -38,5 +38,5 @@ export async function compileStyleFile(
 		style: 'expanded',
 	} );
 
-	return compileCss( cssText, filePath, { cssModules, minify } );
+	return compileCss( cssText, filePath, { cssModules, minify, rootDir } );
 }

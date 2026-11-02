@@ -150,10 +150,6 @@ function compileMarkup( { props, variants, renderReact } ) {
 }
 
 async function main() {
-	// postcss-modules scopes class names relative to the working directory, so
-	// compile from the repository root, as the JavaScript build does.
-	process.chdir( ROOT_DIR );
-
 	const stylesheets = await compileStylesheets();
 	const ui = await import(
 		pathToFileURL( path.join( PACKAGE_DIR, 'build-module/index.mjs' ) ).href
