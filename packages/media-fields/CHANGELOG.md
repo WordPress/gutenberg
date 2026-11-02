@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Hide the decorative author avatar from assistive technologies, as the name of the author is next to it ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ## 0.23.0 (2026-10-20)
 
 ### Breaking Changes

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `MediaEdit`: Show that clicking the preview of a media item replaces it ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
 
 ## 6.0.0 (2026-10-20)
