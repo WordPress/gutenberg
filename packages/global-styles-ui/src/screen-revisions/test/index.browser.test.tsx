@@ -1,30 +1,32 @@
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { page, userEvent } from 'vitest/browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useNavigator } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { createElement } from '@wordpress/element';
+import { Navigator, useNavigator } from '@wordpress/components';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
 import ScreenRevisions from '../';
 import { GlobalStylesContext } from '../../context';
 import useGlobalStylesRevisions from '../use-global-styles-revisions';
-
-globalThis.wpVitest.mockMatchMedia();
-
-vi.mock( import( '../../../../data/src/components/use-select' ), () => ( {
-	default: vi.fn(),
-} ) );
-
-vi.mock( import( '@wordpress/components' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	useNavigator: vi.fn(),
-} ) );
+import type { Revision } from '../types';
+import type { GlobalStylesContextType } from '../../context';
+import '../../../../dataviews/src/style.scss';
+import '../../../../components/src/modal/style.scss';
+import '../style.scss';
 
 vi.mock(
 	import( '@wordpress/global-styles-engine' ),
 	async ( importOriginal ) => ( {
 		...( await importOriginal() ),
-		areGlobalStylesEqual: ( a, b ) =>
+		areGlobalStylesEqual: (
+			a: Parameters<
+				typeof import( '@wordpress/global-styles-engine' ).areGlobalStylesEqual
+			>[ 0 ],
+			b: Parameters<
+				typeof import( '@wordpress/global-styles-engine' ).areGlobalStylesEqual
+			>[ 1 ]
+		) =>
 			JSON.stringify( { styles: a?.styles, settings: a?.settings } ) ===
 			JSON.stringify( { styles: b?.styles, settings: b?.settings } ),
 		getGlobalStylesChanges: vi.fn( () => [ 'Colors styles.' ] ),
@@ -35,121 +37,11 @@ vi.mock( import( '../use-global-styles-revisions' ), () => ( {
 	default: vi.fn(),
 } ) );
 
-vi.mock( import( '../../screen-header' ), async () => {
-	const { createElement: h } = await import( '@wordpress/element' );
-	return {
-		ScreenHeader: ( { title, description } ) =>
-			h(
-				'div',
-				null,
-				h( 'h2', null, title ),
-				h( 'p', null, description )
-			),
-	};
-} );
-
-vi.mock( import( '@wordpress/dataviews' ), async () => {
-	const { createElement: h } = await import( '@wordpress/element' );
-	const DataViewsPicker = ( {
-		data,
-		fields,
-		getItemId,
-		selection,
-		onChangeSelection,
-		view,
-		onChangeView,
-		itemListLabel,
-		actions = [],
-	} ) => {
-		// DataViews hands the fields and the actions shallow clones of the
-		// items, never the originals.
-		const items = data.map( ( item ) => ( { ...item } ) );
-		const titleField = fields.find( ( f ) => f.id === view.titleField );
-		const descriptionField = fields.find(
-			( f ) => f.id === view.descriptionField
-		);
-		const selectedItems = items.filter( ( item ) =>
-			selection.includes( getItemId( item ) )
-		);
-
-		return h(
-			'div',
-			{ role: 'listbox', 'aria-label': itemListLabel },
-			items.map( ( item ) =>
-				h(
-					'div',
-					{
-						key: getItemId( item ),
-						role: 'option',
-						'aria-label': titleField.getValue( { item } ),
-						'aria-selected': selection.includes(
-							getItemId( item )
-						),
-						onClick: () =>
-							onChangeSelection( [ getItemId( item ) ] ),
-						onKeyDown: () => {},
-						tabIndex: -1,
-					},
-					h( titleField.render, { item, field: titleField } ),
-					h( descriptionField.render, {
-						item,
-						field: descriptionField,
-					} )
-				)
-			),
-			h(
-				'button',
-				{ onClick: () => onChangeSelection( [] ) },
-				'Clear selection'
-			),
-			h(
-				'button',
-				{
-					onClick: () =>
-						onChangeView( {
-							...view,
-							page: ( view.page ?? 1 ) + 1,
-						} ),
-				},
-				'Next page'
-			),
-			// Mirrors the picker footer's action buttons: eligibility
-			// disables the button, the label sees the selection, the
-			// callback only receives eligible items.
-			actions.map( ( action ) => {
-				const eligibleItems = action.isEligible
-					? selectedItems.filter( action.isEligible )
-					: selectedItems;
-				return h(
-					'button',
-					{
-						key: action.id,
-						disabled:
-							! selection.length ||
-							( !! action.isEligible && ! eligibleItems.length ),
-						onClick: () => action.callback( eligibleItems ),
-					},
-					typeof action.label === 'string'
-						? action.label
-						: action.label( selectedItems )
-				);
-			} )
-		);
-	};
-	DataViewsPicker.Layout = () => null;
-	DataViewsPicker.Footer = () => null;
-	DataViewsPicker.Pagination = () => null;
-	DataViewsPicker.PageSelect = () => null;
-	DataViewsPicker.Actions = () => null;
-
-	return { DataViewsPicker };
-} );
-
 const STYLES_A = { color: { background: '#fff' } };
 const STYLES_B = { color: { background: '#111' } };
 const STYLES_C = { color: { background: '#222' } };
 
-const REVISIONS = [
+const REVISIONS: Revision[] = [
 	{
 		id: 'unsaved',
 		styles: STYLES_A,
@@ -160,14 +52,26 @@ const REVISIONS = [
 		id: 10,
 		styles: STYLES_B,
 		settings: {},
-		author: { name: 'Alice', avatar_urls: { 48: 'http://alice.avatar' } },
+		author: {
+			id: 1,
+			name: 'Alice',
+			avatar_urls: {
+				48: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+			},
+		},
 		modified: '2026-07-07T12:00:00',
 	},
 	{
 		id: 9,
 		styles: STYLES_C,
 		settings: {},
-		author: { name: 'Bob', avatar_urls: { 48: 'http://bob.avatar' } },
+		author: {
+			id: 2,
+			name: 'Bob',
+			avatar_urls: {
+				48: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+			},
+		},
 		modified: '2026-07-07T11:00:00',
 	},
 	{ id: 'parent', styles: {}, settings: {} },
@@ -175,59 +79,99 @@ const REVISIONS = [
 
 // The second page of an older set: it carries neither the unsaved entry nor
 // revision 10.
-const OLDER_REVISIONS = [
+const OLDER_REVISIONS: Revision[] = [
 	{
 		id: 8,
 		styles: STYLES_C,
 		settings: {},
-		author: { name: 'Bob', avatar_urls: { 48: 'http://bob.avatar' } },
+		author: {
+			id: 2,
+			name: 'Bob',
+			avatar_urls: {
+				48: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+			},
+		},
 		modified: '2026-07-06T11:00:00',
 	},
 	{ id: 'parent', styles: {}, settings: {} },
 ];
 
-function renderScreen( {
+const mockedRevisions = vi.mocked( useGlobalStylesRevisions );
+
+function CurrentPath() {
+	const { location } = useNavigator();
+	return <output aria-label="Current path">{ location.path }</output>;
+}
+
+async function renderScreen( {
 	userConfig = { styles: STYLES_A, settings: {} },
+	revisionId,
+}: {
+	userConfig?: GlobalStylesContextType[ 'user' ];
+	revisionId?: string;
 } = {} ) {
 	const onChange = vi.fn();
-	render(
-		createElement(
-			GlobalStylesContext.Provider,
-			{ value: { user: userConfig, base: {}, merged: {}, onChange } },
-			createElement( ScreenRevisions )
-		)
+	const registry = createRegistry();
+	registry.register( coreStore );
+	const coreActions = registry.dispatch( coreStore );
+	coreActions.receiveCurrentUser( {
+		id: 3,
+		name: 'admin',
+		slug: 'admin',
+		url: '',
+		description: '',
+		link: '',
+		meta: {},
+		avatar_urls: {
+			24: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+			48: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+			96: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+		},
+	} );
+	coreActions.finishResolution( 'getCurrentUser', [] );
+	coreActions.receiveCurrentTheme( { stylesheet: 'test-theme' } );
+	await coreActions.receiveEntityRecords( 'root', 'theme', [
+		{ stylesheet: 'test-theme', name: { rendered: 'Test Theme' } },
+	] );
+	coreActions.finishResolution( 'getCurrentTheme', [] );
+	const tree = () => (
+		<RegistryProvider value={ registry }>
+			<GlobalStylesContext.Provider
+				value={ { user: userConfig, base: {}, merged: {}, onChange } }
+			>
+				<Navigator
+					initialPath={
+						revisionId ? `/revisions/${ revisionId }` : '/revisions'
+					}
+				>
+					<CurrentPath />
+					<Navigator.Screen path="/">
+						<h2>Styles</h2>
+					</Navigator.Screen>
+					<Navigator.Screen path="/revisions/:revisionId?">
+						<ScreenRevisions />
+					</Navigator.Screen>
+				</Navigator>
+			</GlobalStylesContext.Provider>
+		</RegistryProvider>
 	);
-	return { onChange };
+	const view = await render( tree() );
+	return { onChange, rerender: () => view.rerender( tree() ) };
 }
 
 describe( 'ScreenRevisions', () => {
-	let goTo;
-
 	beforeEach( () => {
 		vi.clearAllMocks();
-		goTo = vi.fn();
-		useNavigator.mockReturnValue( { params: {}, goTo } );
-		useGlobalStylesRevisions.mockReturnValue( {
+		mockedRevisions.mockReturnValue( {
 			revisions: REVISIONS,
 			isLoading: false,
 			hasUnsavedChanges: false,
 			revisionsCount: 12,
 		} );
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				getCurrentTheme: () => ( {
-					name: { rendered: 'Test Theme' },
-				} ),
-				getCurrentUser: () => ( {
-					name: 'admin',
-					avatar_urls: { 48: 'http://admin.avatar' },
-				} ),
-			} ) )
-		);
 	} );
 
-	it( 'renders the expected label for every revision kind', () => {
-		renderScreen();
+	it( 'renders the expected label for every revision kind', async () => {
+		await renderScreen();
 
 		const options = screen.getAllByRole( 'option' );
 		expect( options ).toHaveLength( 4 );
@@ -254,8 +198,8 @@ describe( 'ScreenRevisions', () => {
 		expect( screen.getByAltText( 'Bob' ) ).toBeVisible();
 	} );
 
-	it( 'marks the default selection as active when it matches the editor styles', () => {
-		renderScreen();
+	it( 'marks the default selection as active when it matches the editor styles', async () => {
+		const { onChange } = await renderScreen();
 
 		// No route param selects the first revision (the unsaved one), whose
 		// styles match the editor styles.
@@ -263,23 +207,29 @@ describe( 'ScreenRevisions', () => {
 		expect( selected ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( within( selected ).getByText( 'Active' ) ).toBeVisible();
 		// The footer action is not applicable to the active revision.
-		expect(
-			screen.getByRole( 'button', { name: 'Apply' } )
-		).toBeDisabled();
+		const apply = page.getByRole( 'button', { name: 'Apply' } );
+		await expect
+			.element( apply )
+			.toHaveAttribute( 'aria-disabled', 'true' );
+		apply.element().focus();
+		await userEvent.keyboard( '{Enter}' );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'marks the latest revision as active by id when nothing is unsaved', () => {
+	it( 'marks the latest revision as active by id when nothing is unsaved', async () => {
 		// Saved revisions only, and the latest one carries a payload the editor
 		// styles do not compare equal to, as happens when the revisions and the
 		// global styles endpoints serialize the same styles differently.
-		useGlobalStylesRevisions.mockReturnValue( {
+		mockedRevisions.mockReturnValue( {
 			revisions: REVISIONS.slice( 1 ),
 			isLoading: false,
 			hasUnsavedChanges: false,
 			revisionsCount: 12,
 		} );
 
-		renderScreen( { userConfig: { styles: STYLES_A, settings: {} } } );
+		const { onChange } = await renderScreen( {
+			userConfig: { styles: STYLES_A, settings: {} },
+		} );
 
 		const latest = screen.getAllByRole( 'option' )[ 0 ];
 		expect( latest ).toHaveAttribute( 'aria-selected', 'true' );
@@ -287,15 +237,22 @@ describe( 'ScreenRevisions', () => {
 			/This revision matches current editor styles\.$/
 		);
 		expect( within( latest ).getByText( 'Active' ) ).toBeVisible();
-		expect(
-			screen.getByRole( 'button', { name: 'Apply' } )
-		).toBeDisabled();
+		const apply = page.getByRole( 'button', { name: 'Apply' } );
+		await expect
+			.element( apply )
+			.toHaveAttribute( 'aria-disabled', 'true' );
+		apply.element().focus();
+		await userEvent.keyboard( '{Enter}' );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'appends the matching-styles hint to the selected revision label', () => {
-		useNavigator.mockReturnValue( { params: { revisionId: '10' }, goTo } );
+	it( 'appends the matching-styles hint to the selected revision label', async () => {
+		const revisionId = '10';
 
-		renderScreen( { userConfig: { styles: STYLES_B, settings: {} } } );
+		await renderScreen( {
+			revisionId,
+			userConfig: { styles: STYLES_B, settings: {} },
+		} );
 
 		expect( screen.getAllByRole( 'option' )[ 1 ] ).toHaveAccessibleName(
 			/^Changes saved by Alice on .* This revision matches current editor styles\.$/
@@ -303,9 +260,10 @@ describe( 'ScreenRevisions', () => {
 	} );
 
 	it( 'shows the changes summary for the selected revision and applies it from the footer', async () => {
-		useNavigator.mockReturnValue( { params: { revisionId: '9' }, goTo } );
+		const revisionId = '9';
 
-		const { onChange } = renderScreen( {
+		const { onChange } = await renderScreen( {
+			revisionId,
 			userConfig: { styles: STYLES_B, settings: {} },
 		} );
 
@@ -339,27 +297,35 @@ describe( 'ScreenRevisions', () => {
 		);
 	} );
 
-	it( 'labels the footer action for the reset entry', () => {
-		useNavigator.mockReturnValue( {
-			params: { revisionId: 'parent' },
-			goTo,
+	it( 'labels the footer action for the reset entry', async () => {
+		const revisionId = 'parent';
+
+		const { onChange } = await renderScreen( {
+			revisionId,
+			userConfig: { styles: STYLES_B, settings: {} },
 		} );
 
-		renderScreen( { userConfig: { styles: STYLES_B, settings: {} } } );
-
-		expect( screen.getByRole( 'button', { name: 'Reset' } ) ).toBeEnabled();
+		const reset = page.getByRole( 'button', { name: 'Reset' } );
+		await expect
+			.element( reset )
+			.not.toHaveAttribute( 'aria-disabled', 'true' );
+		await userEvent.click( reset );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 'parent' } )
+		);
 	} );
 
 	it( 'asks for confirmation before applying over unsaved changes', async () => {
-		useNavigator.mockReturnValue( { params: { revisionId: '9' }, goTo } );
-		useGlobalStylesRevisions.mockReturnValue( {
+		const revisionId = '9';
+		mockedRevisions.mockReturnValue( {
 			revisions: REVISIONS,
 			isLoading: false,
 			hasUnsavedChanges: true,
 			revisionsCount: 12,
 		} );
 
-		const { onChange } = renderScreen( {
+		const { onChange } = await renderScreen( {
+			revisionId,
 			userConfig: { styles: STYLES_B, settings: {} },
 		} );
 
@@ -381,15 +347,16 @@ describe( 'ScreenRevisions', () => {
 	} );
 
 	it( 'closes the confirmation without applying when the selected revision is gone', async () => {
-		useNavigator.mockReturnValue( { params: { revisionId: '9' }, goTo } );
-		useGlobalStylesRevisions.mockImplementation( ( { query } ) => ( {
-			revisions: query.page === 1 ? REVISIONS : OLDER_REVISIONS,
+		const revisionId = '9';
+		mockedRevisions.mockReturnValue( {
+			revisions: REVISIONS,
 			isLoading: false,
 			hasUnsavedChanges: true,
 			revisionsCount: 12,
-		} ) );
+		} );
 
-		const { onChange } = renderScreen( {
+		const { onChange, rerender } = await renderScreen( {
+			revisionId,
 			userConfig: { styles: STYLES_B, settings: {} },
 		} );
 
@@ -398,12 +365,14 @@ describe( 'ScreenRevisions', () => {
 		);
 		const dialog = screen.getByRole( 'dialog' );
 
-		// The page changes underneath the open dialog and no longer carries
-		// revision 9. The dialog hides the rest of the screen from the
-		// accessibility tree, hence the hidden option.
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Next page', hidden: true } )
-		);
+		// The fetched page changes while confirmation is open.
+		mockedRevisions.mockReturnValue( {
+			revisions: OLDER_REVISIONS,
+			isLoading: false,
+			hasUnsavedChanges: true,
+			revisionsCount: 12,
+		} );
+		await rerender();
 
 		await userEvent.click(
 			within( dialog ).getByRole( 'button', { name: 'Apply' } )
@@ -413,31 +382,50 @@ describe( 'ScreenRevisions', () => {
 	} );
 
 	it( 'navigates to the clicked revision and ignores empty selections', async () => {
-		renderScreen();
+		await renderScreen();
 
 		await userEvent.click(
 			screen.getByRole( 'option', {
 				name: /^Changes saved by Alice on /,
 			} )
 		);
-		expect( goTo ).toHaveBeenCalledWith( '/revisions/10' );
+		await expect
+			.element( page.getByRole( 'status', { name: 'Current path' } ) )
+			.toHaveTextContent( /^\/revisions\/10$/ );
+		expect(
+			screen.getByRole( 'option', {
+				name: /^Changes saved by Alice on /,
+			} )
+		).toHaveAttribute( 'aria-selected', 'true' );
 
 		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Clear selection' } )
+			screen.getByRole( 'option', {
+				name: /^Changes saved by Alice on /,
+			} )
 		);
-		expect( goTo ).toHaveBeenCalledTimes( 1 );
+		await expect
+			.element( page.getByRole( 'status', { name: 'Current path' } ) )
+			.toHaveTextContent( /^\/revisions\/10$/ );
+		expect(
+			screen.getByRole( 'option', {
+				name: /^Changes saved by Alice on /,
+			} )
+		).toHaveAttribute( 'aria-selected', 'true' );
 	} );
 
 	it( 'selects nothing when the revision in the path is on another page', async () => {
-		useNavigator.mockReturnValue( { params: { revisionId: '10' }, goTo } );
-		useGlobalStylesRevisions.mockImplementation( ( { query } ) => ( {
-			revisions: query.page === 1 ? REVISIONS : OLDER_REVISIONS,
+		const revisionId = '10';
+		mockedRevisions.mockImplementation( ( { query } = {} ) => ( {
+			revisions: query?.page === 1 ? REVISIONS : OLDER_REVISIONS,
 			isLoading: false,
 			hasUnsavedChanges: false,
 			revisionsCount: 12,
 		} ) );
 
-		renderScreen( { userConfig: { styles: STYLES_A, settings: {} } } );
+		const { onChange } = await renderScreen( {
+			revisionId,
+			userConfig: { styles: STYLES_A, settings: {} },
+		} );
 
 		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
 			query: { per_page: 10, page: 1 },
@@ -448,7 +436,10 @@ describe( 'ScreenRevisions', () => {
 		);
 
 		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Next page' } )
+			page.getByRole( 'combobox', { name: 'Current page' } )
+		);
+		await userEvent.click(
+			page.getByRole( 'option', { name: '2', exact: true } )
 		);
 		expect( useGlobalStylesRevisions ).toHaveBeenLastCalledWith( {
 			query: { per_page: 10, page: 2 },
@@ -461,8 +452,12 @@ describe( 'ScreenRevisions', () => {
 			expect( option ).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 		expect( screen.queryByText( 'Active' ) ).not.toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: 'Apply' } )
-		).toBeDisabled();
+		const apply = page.getByRole( 'button', { name: 'Apply' } );
+		await expect
+			.element( apply )
+			.toHaveAttribute( 'aria-disabled', 'true' );
+		apply.element().focus();
+		await userEvent.keyboard( '{Enter}' );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 } );
