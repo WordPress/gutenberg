@@ -453,6 +453,29 @@ test.describe( 'Table of Contents', () => {
 				.click();
 			await expect( page ).toHaveURL( /#updated-section$/ );
 			await expect( page.locator( '#updated-section' ) ).toBeInViewport();
+
+			// Previewing unsaved changes to the published post lists the
+			// previewed headings, not the saved ones.
+			await admin.editPost( postId );
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Previewed section',
+						anchor: 'previewed-section',
+					},
+				] )
+			);
+			const previewPage = await editor.openPreviewPage();
+			const previewToc = previewPage.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				previewToc.getByRole( 'link', { name: 'Previewed section' } )
+			).toBeVisible();
+			await expect(
+				previewToc.getByRole( 'link', { name: 'Updated section' } )
+			).toHaveCount( 0 );
+			await previewPage.close();
 		} );
 
 		test( 'clicking a table of contents item on the front of site scrolls to the matching section', async ( {
