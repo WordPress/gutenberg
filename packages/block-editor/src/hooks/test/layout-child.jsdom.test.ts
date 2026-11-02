@@ -1,5 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
+	createBlock,
+	getBlockTypes,
+	registerBlockType,
+	switchToBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
+import {
+	addTransforms,
 	getChildLayoutStyleRules,
 	getChildLayoutStyles,
 	getResponsiveChildLayoutStyles,
@@ -217,6 +226,179 @@ describe( 'layout child', () => {
 					},
 				},
 			} );
+		} );
+	} );
+
+	describe( 'addTransforms()', () => {
+		const gridLayout = {
+			columnStart: 2,
+			rowStart: 1,
+			columnSpan: 3,
+			rowSpan: 2,
+		};
+
+		function getBlock(
+			clientId: string,
+			attributes: Record< string, unknown > = {},
+			innerBlocks: Block[] = []
+		): Block {
+			return {
+				name: 'core/test',
+				clientId,
+				isValid: true,
+				attributes,
+				innerBlocks,
+			};
+		}
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		const sourceFactories: Array<
+			[ string, ( block: Block ) => Block | Block[] ]
+		> = [
+			[ 'a block', ( block ) => block ],
+			[ 'an array of one block', ( block ) => [ block ] ],
+		];
+
+		it.each( sourceFactories )(
+			'keeps the child layout when %s is switched to a block type that drops its style',
+			( _, getSource ) => {
+				registerBlockType( 'core/test-from', {
+					apiVersion: 3,
+					title: 'From',
+					category: 'common',
+					attributes: { style: { type: 'object' } },
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/test-to' ],
+								transform: () => createBlock( 'core/test-to' ),
+							},
+						],
+					},
+					save: () => null,
+				} );
+				registerBlockType( 'core/test-to', {
+					apiVersion: 3,
+					title: 'To',
+					category: 'common',
+					attributes: { style: { type: 'object' } },
+					save: () => null,
+				} );
+
+				const transformed = switchToBlockType(
+					getSource(
+						createBlock( 'core/test-from', {
+							style: {
+								layout: gridLayout,
+								'@mobile': { layout: { columnSpan: 1 } },
+							},
+						} )
+					),
+					'core/test-to'
+				);
+
+				if ( ! transformed ) {
+					throw new Error(
+						'Expected the block transform to succeed.'
+					);
+				}
+
+				expect( transformed[ 0 ].attributes.style ).toEqual( {
+					layout: gridLayout,
+					'@mobile': { layout: { columnSpan: 1 } },
+				} );
+			}
+		);
+
+		it( 'keeps the other styles of the transformed block', () => {
+			const transformed = addTransforms(
+				getBlock( '2', {
+					style: { typography: { textAlign: 'center' } },
+				} ),
+				[ getBlock( '1', { style: { layout: gridLayout } } ) ],
+				0,
+				[ getBlock( '2' ) ]
+			);
+
+			expect( transformed.attributes.style ).toEqual( {
+				typography: { textAlign: 'center' },
+				layout: gridLayout,
+			} );
+		} );
+
+		it( 'keeps a child layout the transform set itself', () => {
+			const result = getBlock( '2', {
+				style: { layout: { columnSpan: 1 } },
+			} );
+			const transformed = addTransforms(
+				result,
+				[ getBlock( '1', { style: { layout: gridLayout } } ) ],
+				0,
+				[ result ]
+			);
+
+			expect( transformed.attributes.style ).toEqual( {
+				layout: { columnSpan: 1 },
+			} );
+		} );
+
+		it( 'keeps each child layout when as many blocks result as were transformed', () => {
+			const source = [
+				getBlock( '1', { style: { layout: { columnStart: 1 } } } ),
+				getBlock( '2', { style: { layout: { columnStart: 3 } } } ),
+			];
+			const results = [ getBlock( '3' ), getBlock( '4' ) ];
+
+			expect(
+				addTransforms( results[ 1 ], source, 1, results ).attributes
+					.style
+			).toEqual( { layout: { columnStart: 3 } } );
+		} );
+
+		it( 'does not copy the child layout to a block that wraps the transformed blocks', () => {
+			const source = [
+				getBlock( '1', { style: { layout: gridLayout } } ),
+			];
+			const result = getBlock( '2', {}, source );
+
+			expect(
+				addTransforms( result, source, 0, [ result ] ).attributes.style
+			).toBeUndefined();
+		} );
+
+		it( 'does not copy the child layout when one block becomes many', () => {
+			const results = [ getBlock( '2' ), getBlock( '3' ) ];
+
+			expect(
+				addTransforms(
+					results[ 0 ],
+					[ getBlock( '1', { style: { layout: gridLayout } } ) ],
+					0,
+					results
+				).attributes.style
+			).toBeUndefined();
+		} );
+
+		it( 'does not copy the child layout when many blocks become one', () => {
+			const result = getBlock( '3' );
+
+			expect(
+				addTransforms(
+					result,
+					[
+						getBlock( '1', { style: { layout: gridLayout } } ),
+						getBlock( '2', { style: { layout: gridLayout } } ),
+					],
+					0,
+					[ result ]
+				).attributes.style
+			).toBeUndefined();
 		} );
 	} );
 } );

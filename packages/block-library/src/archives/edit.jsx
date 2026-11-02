@@ -1,6 +1,5 @@
 import {
 	ToggleControl,
-	SelectControl as WCSelectControl,
 	Spinner as WCSpinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -9,8 +8,16 @@ import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+
+const ARCHIVE_TYPE_ITEMS = [
+	{ label: __( 'Year' ), value: 'yearly' },
+	{ label: __( 'Month' ), value: 'monthly' },
+	{ label: __( 'Week' ), value: 'weekly' },
+	{ label: __( 'Day' ), value: 'daily' },
+];
 
 export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
@@ -108,17 +115,16 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 							setAttributes( { type: 'monthly' } )
 						}
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Group by' ) }
-							options={ [
-								{ label: __( 'Year' ), value: 'yearly' },
-								{ label: __( 'Month' ), value: 'monthly' },
-								{ label: __( 'Week' ), value: 'weekly' },
-								{ label: __( 'Day' ), value: 'daily' },
-							] }
-							value={ type }
-							onChange={ ( value ) =>
-								setAttributes( { type: value } )
+							items={ ARCHIVE_TYPE_ITEMS }
+							value={
+								ARCHIVE_TYPE_ITEMS.find(
+									( item ) => item.value === type
+								) ?? ARCHIVE_TYPE_ITEMS[ 0 ]
+							}
+							onValueChange={ ( item ) =>
+								item && setAttributes( { type: item.value } )
 							}
 						/>
 					</ToolsPanelItem>
