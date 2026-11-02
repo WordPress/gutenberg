@@ -68,14 +68,17 @@ test.describe( 'Playlist block', () => {
 				'Beta',
 				'Alpha',
 			] );
-			expect( ( await editor.getBlocks() )[ 0 ] ).toMatchObject( {
-				attributes: { order: 'desc' },
-				innerBlocks: [
-					{ attributes: { title: 'Gamma' } },
-					{ attributes: { title: 'Beta' } },
-					{ attributes: { title: 'Alpha' } },
-				],
-			} );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'desc' },
+					innerBlocks: [
+						{ attributes: { title: 'Gamma' } },
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Alpha' } },
+					],
+				},
+			] );
 
 			await order.click();
 			await page.getByRole( 'option', { name: 'Ascending' } ).click();
@@ -86,14 +89,17 @@ test.describe( 'Playlist block', () => {
 				'Beta',
 				'Gamma',
 			] );
-			expect( ( await editor.getBlocks() )[ 0 ] ).toMatchObject( {
-				attributes: { order: 'asc' },
-				innerBlocks: [
-					{ attributes: { title: 'Alpha' } },
-					{ attributes: { title: 'Beta' } },
-					{ attributes: { title: 'Gamma' } },
-				],
-			} );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'asc' },
+					innerBlocks: [
+						{ attributes: { title: 'Alpha' } },
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Gamma' } },
+					],
+				},
+			] );
 		} );
 
 		test( 'preserves manual track order when users reselect the current Order', async ( {
@@ -119,11 +125,17 @@ test.describe( 'Playlist block', () => {
 				'Alpha',
 				'Gamma',
 			] );
-			expect(
-				( await editor.getBlocks() )[ 0 ].innerBlocks.map(
-					( track ) => track.attributes.title
-				)
-			).toEqual( [ 'Beta', 'Alpha', 'Gamma' ] );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'asc' },
+					innerBlocks: [
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Alpha' } },
+						{ attributes: { title: 'Gamma' } },
+					],
+				},
+			] );
 		} );
 
 		test( 'changes the waveform Shape and clears its stored value when users return to Bars', async ( {
