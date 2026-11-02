@@ -30,6 +30,21 @@ function example( number ) {
 }
 ```
 
+Variables assigned from a method which mutates the object it is called on (`push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`) are never reported, since deferring the assignment would also defer the mutation and change behavior:
+
+```js
+function example( queue ) {
+	// Not reported: moving this past the return would also move the mutation
+	// of `queue`, so `queue.length` below would be evaluated differently.
+	const next = queue.shift();
+	if ( ! queue.length ) {
+		return null;
+	}
+
+	return next;
+}
+```
+
 ## Options
 
 This rule accepts a single options argument:
