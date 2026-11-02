@@ -219,9 +219,10 @@ export const useLocalizationProps = ( {
 			dir: isRightToLeft ? 'rtl' : 'ltr',
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
-				// Some locales (e.g. `ja`, `zh`, `ko`) append a literal suffix
-				// such as `日` to a standalone day, which doesn't belong in a
-				// calendar grid. Only keep the localized day number.
+				// Some locales append a literal suffix to a standalone day,
+				// such as `日` in `ja` / `zh` or the trailing period in `cs`
+				// (`15.`), which doesn't belong in a calendar grid. Only keep
+				// the localized day number.
 				formatDay: ( date: Date ) =>
 					dayNumberFormatter
 						.formatToParts( date )
