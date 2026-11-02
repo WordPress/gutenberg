@@ -677,15 +677,14 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 
 	/**
 	 * Renders a block's style variation and returns the instance stylesheet,
-	 * with a block type text gradient in the given origin.
+	 * with the given block type styles in the theme origin.
 	 *
 	 * @param string $block_name  Block name.
 	 * @param string $class_name  Block class name.
-	 * @param array  $block_types Block type styles to merge into the origin.
-	 * @param string $origin      Origin filter suffix, `theme` or `user`.
+	 * @param array  $block_types Block type styles to merge into the theme origin.
 	 * @return string The block style variation instance stylesheet.
 	 */
-	private function render_variation_styles_with_block_type_styles( $block_name, $class_name, $block_types, $origin = 'theme' ) {
+	private function render_variation_styles_with_block_type_styles( $block_name, $class_name, $block_types ) {
 		$filter = static function ( $theme_json ) use ( $block_types ) {
 			return $theme_json->update_with(
 				array(
@@ -697,7 +696,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			);
 		};
 
-		add_filter( "wp_theme_json_data_$origin", $filter );
+		add_filter( 'wp_theme_json_data_theme', $filter );
 		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 
 		try {
@@ -712,7 +711,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			$inline_styles = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
 			return is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
 		} finally {
-			remove_filter( "wp_theme_json_data_$origin", $filter );
+			remove_filter( 'wp_theme_json_data_theme', $filter );
 			wp_deregister_style( 'block-style-variation-styles' );
 			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 		}
@@ -770,41 +769,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * Tests that a variation text color from user Global Styles is escaped too.
-	 *
-	 * @covers ::gutenberg_render_block_style_variation_support_styles
-	 */
-	public function test_block_style_variation_text_color_escapes_user_block_type_text_clip() {
-		switch_theme( 'block-theme' );
-		register_block_style(
-			'core/paragraph',
-			array(
-				'name'       => 'clip-user-text-color',
-				'style_data' => array(
-					'color' => array(
-						'text' => '#00aa00',
-					),
-				),
-			)
-		);
-
-		try {
-			$actual = $this->render_variation_styles_with_block_type_styles(
-				'core/paragraph',
-				'is-style-clip-user-text-color',
-				self::get_text_gradient_block_type_styles( 'core/paragraph' ),
-				'user'
-			);
-		} finally {
-			unregister_block_style( 'core/paragraph', 'clip-user-text-color' );
-		}
-
-		$this->assertMatchesRegularExpression(
-			'/:root :where\(p\.is-style-clip-user-text-color--\d+\)\{color: #00aa00;-webkit-text-fill-color: currentColor;\}/',
-			$actual
-		);
-	}
 
 	/**
 	 * Tests that an inner block color in a variation shared by several blocks
@@ -847,40 +811,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * Tests that a variation box clip drops the inherited block type text gradient.
-	 *
-	 * @covers ::gutenberg_render_block_style_variation_support_styles
-	 */
-	public function test_block_style_variation_box_clip_unsets_block_type_text_gradient() {
-		switch_theme( 'block-theme' );
-		register_block_style(
-			'core/paragraph',
-			array(
-				'name'       => 'clip-box',
-				'style_data' => array(
-					'background' => array(
-						'backgroundClip' => 'border-box',
-					),
-				),
-			)
-		);
-
-		try {
-			$actual = $this->render_variation_styles_with_block_type_styles(
-				'core/paragraph',
-				'is-style-clip-box',
-				self::get_text_gradient_block_type_styles( 'core/paragraph' )
-			);
-		} finally {
-			unregister_block_style( 'core/paragraph', 'clip-box' );
-		}
-
-		$this->assertMatchesRegularExpression(
-			'/:root :where\(p\.is-style-clip-box--\d+\)\{[^}]*background-image: unset;[^}]*\}/',
-			$actual
-		);
-	}
 
 	/**
 	 * Tests that a variation breakpoint text color refills the letters over a

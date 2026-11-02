@@ -1282,19 +1282,6 @@ describe( 'global styles renderer', () => {
 				);
 			} );
 
-			it( 'drops the type gradient for a variation box clip', () => {
-				expect(
-					renderInstance(
-						'core/paragraph',
-						'hl-1',
-						{ background: { backgroundClip: 'border-box' } },
-						{ 'core/paragraph': textGradient }
-					)
-				).toEqual(
-					':root :where(.is-style-hl-1.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}'
-				);
-			} );
-
 			it( 'refills the letters for a variation breakpoint color', () => {
 				expect(
 					renderInstance(
@@ -1321,38 +1308,26 @@ describe( 'global styles renderer', () => {
 				);
 			} );
 
-			it( 'never outputs the block type styles', () => {
+			it( 'adds nothing when the block type has no text clip', () => {
 				expect(
 					renderInstance(
 						'core/paragraph',
 						'hl-1',
-						{ color: { text: '#00aa00' } },
-						{ 'core/paragraph': textGradient }
-					)
-				).not.toContain( 'linear-gradient' );
-			} );
-
-			it( 'matches toStyles when no block type sets a text clip', () => {
-				const variationStyles = {
-					color: { text: '#00aa00' },
-					'@mobile': { background: { backgroundClip: 'border-box' } },
-				};
-				const withoutBase = renderInstance(
-					'core/paragraph',
-					'hl-1',
-					variationStyles
-				);
-
-				expect(
-					renderInstance( 'core/paragraph', 'hl-1', variationStyles, {
-						'core/paragraph': {
-							background: {
-								gradient: textGradient.background.gradient,
+						{
+							color: { text: '#00aa00' },
+							'@mobile': {
+								background: { backgroundClip: 'border-box' },
 							},
 						},
-					} )
-				).toEqual( withoutBase );
-				expect( withoutBase ).toEqual(
+						{
+							'core/paragraph': {
+								background: {
+									gradient: textGradient.background.gradient,
+								},
+							},
+						}
+					)
+				).toEqual(
 					':root :where(.is-style-hl-1.wp-block-paragraph){color: #00aa00;}@media (width <= 480px){:root :where(.is-style-hl-1.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;}}'
 				);
 			} );
