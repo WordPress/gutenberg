@@ -12,11 +12,10 @@ export const BLACK: PlainColorObject = {
 	alpha: 1,
 };
 
-// Margin added to target contrasts to counter for algorithm approximations and rounding errors.
-// - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
-// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
-// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
-export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
+// Rounding both colors to 8-bit sRGB can reduce their contrast by about 1.6%.
+// Reserve 2% of the target ratio. The numerical search tolerance is accounted
+// for separately in adjustContrastTarget.
+export const CONTRAST_ROUNDING_MARGIN = 0.02;
 
 // When enabling "lighter direction" bias, this is the amount by which
 // black text contrast needs to be greater than white text contrast.
@@ -35,7 +34,7 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Contrast precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+// Tolerance for the logarithm of contrast ratios during numerical searches.
 export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
