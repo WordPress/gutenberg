@@ -1,4 +1,4 @@
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -42,10 +42,13 @@ interface PostUpdatedMessageArgs {
 	postTypeLabel: string;
 	/** WordPress post status at the time of save. */
 	status: string;
-	/** Status label registered with `register_post_status()`, when known. */
-	statusLabel: string | undefined;
 	/** Post status before this save, when known. */
 	previousStatus: string | undefined;
+	/**
+	 * Resolves the label registered with `register_post_status()` for the
+	 * saved status. Only called when the message names the status.
+	 */
+	getStatusLabel: () => Promise< string | undefined >;
 }
 
 /**
@@ -60,16 +63,16 @@ interface PostUpdatedMessageArgs {
  * @param args.name           Display name of the collaborator who saved.
  * @param args.postTypeLabel  Singular label of the post type, e.g. "Post".
  * @param args.status         WordPress post status at the time of save.
- * @param args.statusLabel    Registered label of that status, when known.
  * @param args.previousStatus Post status before this save, when known.
+ * @param args.getStatusLabel Resolves the registered label of the status.
  */
-function getPostUpdatedMessage( {
+async function getPostUpdatedMessage( {
 	name,
 	postTypeLabel,
 	status,
-	statusLabel,
 	previousStatus,
-}: PostUpdatedMessageArgs ): string {
+	getStatusLabel,
+}: PostUpdatedMessageArgs ): Promise< string > {
 	const wasPublished =
 		!! previousStatus && PUBLISHED_STATUSES.includes( previousStatus );
 
@@ -125,15 +128,20 @@ function getPostUpdatedMessage( {
 
 	// Any other status, such as "pending" or one a plugin registered: name
 	// the status the collaborator moved the post to, using its registered
-	// label. A save that keeps the status is reported as a plain save.
-	if ( status !== previousStatus && statusLabel ) {
-		return sprintf(
-			/* translators: 1: post type singular label, e.g. "Post". 2: post status label, e.g. "Pending". 3: collaborator display name. */
-			__( '%1$s status set to %2$s by %3$s.' ),
-			postTypeLabel,
-			statusLabel,
-			name
-		);
+	// label. A save that keeps the status is reported as a plain save, and
+	// so is a status whose label cannot be loaded.
+	if ( status !== previousStatus ) {
+		const statusLabel = await getStatusLabel();
+
+		if ( statusLabel ) {
+			return sprintf(
+				/* translators: 1: post type singular label, e.g. "Post". 2: post status label, e.g. "Pending". 3: collaborator display name. */
+				__( '%1$s status set to %2$s by %3$s.' ),
+				postTypeLabel,
+				statusLabel,
+				name
+			);
+		}
 	}
 
 	return sprintf(
@@ -158,7 +166,6 @@ export function useCollaboratorNotifications(
 	const {
 		postStatus,
 		postTypeLabel,
-		postStatuses,
 		isCollaborationEnabled,
 		showJoinNotifications,
 		showLeaveNotifications,
@@ -169,46 +176,37 @@ export function useCollaboratorNotifications(
 				getCurrentPostAttribute,
 				isCollaborationEnabledForCurrentPost,
 			} = unlock( select( editorStore ) );
-			const { getEntityRecords, getPostType } = select( coreStore );
 			// Notification preferences default to enabled when unset.
 			const getNotificationPreference = ( name: string ) =>
 				select( preferencesStore ).get( 'core', name ) ?? true;
-			const _isCollaborationEnabled =
-				isCollaborationEnabledForCurrentPost();
-			const _showPostSaveNotifications = getNotificationPreference(
-				'showCollaborationPostSaveNotifications'
-			);
-			const needsSaveLabels =
-				_isCollaborationEnabled && _showPostSaveNotifications;
 
 			return {
 				postStatus: getCurrentPostAttribute( 'status' ) as
 					string | undefined,
-				// `getPostType()` with no slug resolves the whole collection,
-				// so only ask for it when a post type is known.
-				postTypeLabel:
-					needsSaveLabels && postType
-						? getPostType( postType )?.labels?.singular_name
-						: undefined,
-				// Registered post statuses carry the labels a site set with
-				// `register_post_status()`, including custom statuses.
-				postStatuses: needsSaveLabels
-					? getEntityRecords< PostStatusObject >( 'root', 'status' )
+				// The editor loads the post type with the post, so this is
+				// already resolved. `getPostType()` with no slug resolves the
+				// whole collection, so only ask when a post type is known.
+				postTypeLabel: postType
+					? select( coreStore ).getPostType( postType )?.labels
+							?.singular_name
 					: undefined,
-				isCollaborationEnabled: _isCollaborationEnabled,
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				showJoinNotifications: getNotificationPreference(
 					'showCollaborationJoinNotifications'
 				),
 				showLeaveNotifications: getNotificationPreference(
 					'showCollaborationLeaveNotifications'
 				),
-				showPostSaveNotifications: _showPostSaveNotifications,
+				showPostSaveNotifications: getNotificationPreference(
+					'showCollaborationPostSaveNotifications'
+				),
 			};
 		},
 		[ postType ]
 	);
 
 	const { createNotice } = useDispatch( noticesStore );
+	const registry = useRegistry();
 
 	// Pass null when collaboration is disabled or a notification type is
 	// turned off to prevent the hooks from subscribing to awareness state.
@@ -318,7 +316,7 @@ export function useCollaboratorNotifications(
 		postSavePostId,
 		postSavePostType,
 		useCallback(
-			(
+			async (
 				saveEvent: PostSaveEvent,
 				saver: PostEditorAwarenessState,
 				prevEvent: PostSaveEvent | null
@@ -336,17 +334,33 @@ export function useCollaboratorNotifications(
 				// accurate status change detection across rapid saves.
 				const previousStatus = prevEvent?.postStatus ?? postStatus;
 
-				const message = getPostUpdatedMessage( {
+				// Registered statuses carry the label a site set with
+				// `register_post_status()`. The status is only requested
+				// when a message names it, so editor startup makes no extra
+				// request, and the record is cached for later saves.
+				const getStatusLabel = async () => {
+					try {
+						const record = await registry
+							.resolveSelect( coreStore )
+							.getEntityRecord< PostStatusObject >(
+								'root',
+								'status',
+								effectiveStatus
+							);
+						return record?.name;
+					} catch {
+						return undefined;
+					}
+				};
+
+				const message = await getPostUpdatedMessage( {
 					name: getCollaboratorDisplayName( saver.collaboratorInfo ),
 					// The post type is loaded with the post, so the fallback
 					// only covers a save that lands before it resolves.
 					postTypeLabel: postTypeLabel ?? __( 'Post' ),
 					status: effectiveStatus,
-					statusLabel: postStatuses?.find(
-						( postStatusRecord ) =>
-							postStatusRecord.slug === effectiveStatus
-					)?.name,
 					previousStatus,
+					getStatusLabel,
 				} );
 
 				void createNotice( 'info', message, {
@@ -360,8 +374,8 @@ export function useCollaboratorNotifications(
 			[
 				createNotice,
 				postStatus,
-				postStatuses,
 				postTypeLabel,
+				registry,
 				shouldShowPostSaveNotifications,
 			]
 		)

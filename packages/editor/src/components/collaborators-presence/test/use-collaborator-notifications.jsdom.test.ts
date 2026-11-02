@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
 
 type NoticesStore = ( typeof import( '@wordpress/notices' ) )[ 'store' ];
@@ -19,6 +19,7 @@ type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
 vi.mock( import( '@wordpress/data' ), () => ( {
 	useSelect: vi.fn(),
 	useDispatch: vi.fn(),
+	useRegistry: vi.fn(),
 } ) );
 
 vi.mock( import( '@wordpress/notices' ), () => ( {
@@ -127,10 +128,18 @@ const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
 
 const mockCreateNotice = vi.fn();
 
-// Spied so tests can prove the statuses request is skipped when no save
-// notification will be shown.
-const mockGetEntityRecords = vi.fn( ( kind: string, name: string ) =>
-	kind === 'root' && name === 'status' ? state.postStatuses : undefined
+// Stands in for `resolveSelect( coreStore ).getEntityRecord()`. Spied so
+// tests can prove a status is only requested when a message names it.
+const mockGetEntityRecord = vi.fn(
+	async ( kind: string, name: string, key: string ) => {
+		if ( kind !== 'root' || name !== 'status' ) {
+			return undefined;
+		}
+		if ( state.postStatuses === undefined ) {
+			throw new Error( 'rest_no_route' );
+		}
+		return state.postStatuses.find( ( record ) => record.slug === key );
+	}
 );
 
 type PostStatusRecord = { slug: string; name: string };
@@ -140,7 +149,7 @@ type PreferenceState = {
 	// Singular label registered for the post type; undefined mimics a post
 	// type that has not resolved yet.
 	postTypeLabel: string | undefined;
-	// Records the statuses endpoint returns; undefined mimics an unresolved
+	// Records the statuses endpoint can resolve; undefined mimics a failed
 	// request.
 	postStatuses: PostStatusRecord[] | undefined;
 	isCollaborationEnabled: boolean;
@@ -182,7 +191,6 @@ function mockSelect( storeKey: string ) {
 							slug,
 							labels: { singular_name: state.postTypeLabel },
 						},
-			getEntityRecords: mockGetEntityRecords,
 		};
 	}
 	if ( storeKey === 'core/preferences' ) {
@@ -220,10 +228,13 @@ beforeEach( () => {
 	mockRegistered.leavePostId = undefined;
 	mockRegistered.savePostId = undefined;
 	mockCreateNotice.mockClear();
-	mockGetEntityRecords.mockClear();
+	mockGetEntityRecord.mockClear();
 	( useSelect as Mock ).mockImplementation( ( selector: Function ) =>
 		selector( mockSelect )
 	);
+	( useRegistry as Mock ).mockReturnValue( {
+		resolveSelect: () => ( { getEntityRecord: mockGetEntityRecord } ),
+	} );
 	( useDispatch as Mock ).mockReturnValue( {
 		createNotice: mockCreateNotice,
 	} );
@@ -468,10 +479,10 @@ describe( 'useCollaboratorNotifications', () => {
 			},
 		] )(
 			'fires "$expected" when $description',
-			( { postStatus, saveEventStatus, prevEvent, expected } ) => {
+			async ( { postStatus, saveEventStatus, prevEvent, expected } ) => {
 				renderNotifications( { postStatus } );
 
-				mockRegistered.save?.(
+				await mockRegistered.save?.(
 					{
 						savedAt: Date.now(),
 						savedByClientId: alice.clientId,
@@ -520,10 +531,10 @@ describe( 'useCollaboratorNotifications', () => {
 			},
 		] )(
 			'uses the registered post type label when $description',
-			( { postStatus, saveEventStatus, expected } ) => {
+			async ( { postStatus, saveEventStatus, expected } ) => {
 				renderNotifications( { postStatus, postTypeLabel: 'Story' } );
 
-				mockRegistered.save?.(
+				await mockRegistered.save?.(
 					{
 						savedAt: Date.now(),
 						savedByClientId: alice.clientId,
@@ -541,22 +552,46 @@ describe( 'useCollaboratorNotifications', () => {
 			}
 		);
 
-		it( 'requests the registered statuses once save notifications are on', () => {
-			renderNotifications();
+		it( 'only requests a status when the message names it', async () => {
+			renderNotifications( { postStatus: 'draft' } );
 
-			expect( mockGetEntityRecords ).toHaveBeenCalledWith(
+			// Core transitions have their own wording and need no label.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).not.toHaveBeenCalled();
+
+			// A move to another status resolves just that status.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'embargo',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockGetEntityRecord ).toHaveBeenCalledWith(
 				'root',
-				'status'
+				'status',
+				'embargo'
 			);
 		} );
 
-		it( 'falls back to "Post" when the post type has not resolved', () => {
+		it( 'falls back to "Post" when the post type has not resolved', async () => {
 			renderNotifications( {
 				postStatus: 'draft',
 				postTypeLabel: undefined,
 			} );
 
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,
@@ -573,13 +608,13 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
-		it( 'reports a plain save when the status label is unknown', () => {
+		it( 'reports a plain save when the status cannot be resolved', async () => {
 			renderNotifications( {
 				postStatus: 'draft',
 				postStatuses: undefined,
 			} );
 
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,
@@ -596,10 +631,10 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
-		it( 'does not fire when postStatus is unknown', () => {
+		it( 'does not fire when postStatus is unknown', async () => {
 			renderNotifications( { postStatus: undefined } );
 
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,
@@ -612,7 +647,7 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 
-		it( 'does not fire when post-save notifications are disabled', () => {
+		it( 'does not fire when post-save notifications are disabled', async () => {
 			renderNotifications( {
 				showCollaborationPostSaveNotifications: false,
 			} );
@@ -623,11 +658,7 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockRegistered.joinPostId ).toBe( 123 );
 			expect( mockRegistered.leavePostId ).toBe( 123 );
 
-			// The registered statuses are only needed to word a save
-			// notification, so they are not requested.
-			expect( mockGetEntityRecords ).not.toHaveBeenCalled();
-
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,
@@ -647,7 +678,6 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockRegistered.joinPostId ).toBeNull();
 			expect( mockRegistered.leavePostId ).toBeNull();
 			expect( mockRegistered.savePostId ).toBeNull();
-			expect( mockGetEntityRecords ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
