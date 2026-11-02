@@ -62,14 +62,10 @@ interface UseSaveMediaEditorReturn {
 }
 
 function getCropModifiers( session: MediaEditorSession ): Modifier[] {
-	const { state } = session.cropper;
-	if ( ! session.hasOutputEdits || ! state.image ) {
+	if ( ! session.hasOutputEdits ) {
 		return [];
 	}
-	return buildModifiers( state, {
-		width: state.image.naturalWidth,
-		height: state.image.naturalHeight,
-	} );
+	return buildModifiers( session.cropper );
 }
 
 function getMetadataEdits(
