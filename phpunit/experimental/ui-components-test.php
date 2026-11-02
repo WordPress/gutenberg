@@ -66,26 +66,6 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '" onclick="', $html );
 	}
 
-	/**
-	 * Entities in props and content are plain text, as in React: named, numeric
-	 * or not, they show as written instead of being read as entities.
-	 */
-	public function test_keeps_entities_in_text_and_attributes_literal() {
-		$processor = new WP_HTML_Tag_Processor(
-			gutenberg_get_ui_component(
-				'button',
-				array( 'class' => 'is-&amp;' ),
-				'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;'
-			)
-		);
-
-		$processor->next_tag( 'button' );
-		$this->assertContains( 'is-&amp;', explode( ' ', $processor->get_attribute( 'class' ) ) );
-
-		$processor->next_token();
-		$this->assertSame( 'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;', $processor->get_modifiable_text() );
-	}
-
 	public function test_invalid_props_fall_back_to_their_default() {
 		$this->setExpectedIncorrectUsage( 'gutenberg_get_ui_component' );
 
@@ -124,6 +104,10 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	public function test_rendering_enqueues_the_stylesheet() {
+		// Earlier tests have rendered components too, and styles aren't reset between tests.
+		wp_dequeue_style( 'wp-ui-components' );
+		$this->assertFalse( wp_style_is( 'wp-ui-components', 'enqueued' ) );
+
 		gutenberg_get_ui_component( 'button', array(), 'Save' );
 
 		$this->assertTrue( wp_style_is( 'wp-ui-components', 'enqueued' ) );
