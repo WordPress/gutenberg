@@ -65,7 +65,7 @@ function getVisibleTextColor(
 	return stops ? getLowestContrastColor( stops, backdrop ) : undefined;
 }
 
-function getBlockElementColors(
+export function getBlockElementColors(
 	blockEl: Element | null,
 	blockType: BlockType | null | undefined
 ): BlockElementColors {
