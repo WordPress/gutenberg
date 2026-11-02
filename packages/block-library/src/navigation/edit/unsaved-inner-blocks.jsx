@@ -1,19 +1,21 @@
-import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { areBlocksDirty } from './are-blocks-dirty';
-import { DEFAULT_BLOCK, SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
+import { SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 
 const EMPTY_OBJECT = {};
 
 export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
+	isCreating,
 	hasSelection,
 } ) {
 	const originalBlocksRef = useRef();
+	const lastSaveAttemptRef = useRef();
+	const creationStartedRef = useRef( false );
 
 	useEffect( () => {
 		// Initially store the uncontrolled inner blocks for
@@ -38,17 +40,6 @@ export default function UnsavedInnerBlocks( {
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
-
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-navigation__container',
-		},
-		{
-			renderAppender: hasSelection ? undefined : false,
-			defaultBlock: DEFAULT_BLOCK,
-			directInsert: true,
-		}
-	);
 
 	const { isSaving, hasResolvedAllNavigationMenus } = useSelect(
 		( select ) => {
@@ -87,6 +78,9 @@ export default function UnsavedInnerBlocks( {
 		if (
 			isDisabled ||
 			isSaving ||
+			isCreating ||
+			creationStartedRef.current ||
+			lastSaveAttemptRef.current === blocks ||
 			! hasResolvedAllNavigationMenus ||
 			! hasSelection ||
 			! innerBlocksAreDirty
@@ -94,18 +88,22 @@ export default function UnsavedInnerBlocks( {
 			return;
 		}
 
-		createNavigationMenu( null, blocks );
+		lastSaveAttemptRef.current = blocks;
+		creationStartedRef.current = true;
+		// The parent displays the creation error; retry after another edit.
+		createNavigationMenu( null, blocks ).catch( () => {
+			creationStartedRef.current = false;
+		} );
 	}, [
 		blocks,
 		createNavigationMenu,
 		isDisabled,
 		isSaving,
+		isCreating,
 		hasResolvedAllNavigationMenus,
 		innerBlocksAreDirty,
 		hasSelection,
 	] );
 
-	const Wrapper = isSaving ? Disabled : 'div';
-
-	return <Wrapper { ...innerBlocksProps } />;
+	return null;
 }
