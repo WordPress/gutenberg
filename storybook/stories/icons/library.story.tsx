@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useArgs } from 'storybook/preview-api';
 import { useState, type Element as ReactElement } from '@wordpress/element';
 import {
 	SearchControl,
@@ -10,8 +11,12 @@ import { Stack } from '@wordpress/ui';
 import { CollectionNotice } from './collection-notice';
 import { IconDetails } from './icon-details';
 import { IconGrid } from './icon-grid';
-import { COLLECTIONS, type Collection } from './manifest';
-import { useSelectedIcon } from './use-selected-icon';
+import {
+	COLLECTIONS,
+	ICON_NAMES,
+	nameToSlug,
+	type Collection,
+} from './manifest';
 import styles from './library.module.scss';
 
 const meta: Meta = {
@@ -26,6 +31,7 @@ const meta: Meta = {
 	argTypes: {
 		filter: { control: false },
 		collection: { control: false },
+		icon: { control: false },
 	},
 };
 export default meta;
@@ -33,15 +39,25 @@ export default meta;
 type LibraryArgs = {
 	filter: string;
 	collection: Collection;
+	/**
+	 * Slug of the selected icon. Storybook keeps changed args in the URL, so
+	 * the selection can be shared as a link.
+	 */
+	icon?: string;
 };
 
 const LibraryExample = ( {
 	filter: initialFilter,
 	collection: initialCollection,
-}: LibraryArgs ): ReactElement => {
+	icon,
+	onSelectIcon,
+}: LibraryArgs & {
+	onSelectIcon: ( slug: string ) => void;
+} ): ReactElement => {
 	const [ filter, setFilter ] = useState( initialFilter );
 	const [ collection, setCollection ] = useState( initialCollection );
-	const { selectedName, selectIcon } = useSelectedIcon();
+	const selectedName =
+		ICON_NAMES.find( ( name ) => nameToSlug( name ) === icon ) ?? null;
 
 	return (
 		<Stack gap="3xl" className={ styles.layout }>
@@ -81,7 +97,9 @@ const LibraryExample = ( {
 						filter={ filter }
 						collection={ collection }
 						selectedName={ selectedName }
-						onSelect={ selectIcon }
+						onSelect={ ( name ) =>
+							onSelectIcon( nameToSlug( name ) )
+						}
 					/>
 				</div>
 			</Stack>
@@ -94,5 +112,13 @@ export const Library: StoryObj< LibraryArgs > = {
 		filter: '',
 		collection: 'all',
 	},
-	render: ( args ) => <LibraryExample { ...args } />,
+	render: function Render( args ) {
+		const [ , updateArgs ] = useArgs< LibraryArgs >();
+		return (
+			<LibraryExample
+				{ ...args }
+				onSelectIcon={ ( slug ) => updateArgs( { icon: slug } ) }
+			/>
+		);
+	},
 };
