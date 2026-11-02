@@ -1727,6 +1727,22 @@ describe( 'DataViews component', () => {
 			).toHaveAccessibleDescription( /Author\s*Jane/ );
 		} );
 
+		it( 'names an item by its content when its title is empty', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'list',
+						titleField: 'title',
+						fields: [ 'author' ],
+					} }
+					data={ [ { ...data[ 0 ], title: '' } ] }
+				/>
+			);
+			expect(
+				await screen.findByRole( 'row', { name: /Jane/ } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'names an item by its content when the title is not shown', async () => {
 			render(
 				<DataViewWrapper

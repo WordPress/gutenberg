@@ -290,7 +290,11 @@ function ListItem< Item >( {
 			// the actions and every field. The fields stay available as the
 			// description of the item. Without a title, the content is all
 			// there is to name it by.
-			aria-labelledby={ renderedTitleField ? labelId : undefined }
+			aria-labelledby={
+				renderedTitleField && titleField?.getValue?.( { item } )
+					? labelId
+					: undefined
+			}
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,

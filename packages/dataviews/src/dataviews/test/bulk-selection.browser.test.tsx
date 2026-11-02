@@ -775,54 +775,122 @@ it( 'brings focus back to the trigger of a dialog that closed while loading', as
 	await expect.element( trigger ).toHaveFocus();
 } );
 
+const LIST = Array.from( { length: 30 }, ( _, index ) => `Item ${ index }` );
+
 function FallbackList( {
-	items,
-	isInfiniteScroll,
+	items = LIST,
+	hidden = [],
+	ariaHidden = [],
+	isInfiniteScroll = false,
 }: {
-	items: string[];
-	isInfiniteScroll: boolean;
+	items?: string[];
+	hidden?: string[];
+	ariaHidden?: string[];
+	isInfiniteScroll?: boolean;
 } ) {
 	const ref = useFocusFallback( { isEmpty: false, isInfiniteScroll } );
 	return (
-		<div ref={ ref }>
-			{ items.map( ( item ) => (
-				<button key={ item }>{ item }</button>
-			) ) }
+		<div style={ { height: 100, overflow: 'auto' } } data-testid="scroller">
+			<div ref={ ref }>
+				{ items.map( ( item ) => (
+					<div
+						key={ item }
+						style={ { height: 40 } }
+						aria-hidden={ ariaHidden.includes( item ) || undefined }
+					>
+						<button hidden={ hidden.includes( item ) }>
+							{ item }
+						</button>
+					</div>
+				) ) }
+			</div>
 		</div>
 	);
 }
 
-async function removeFocusedItem( isInfiniteScroll: boolean ) {
-	const { rerender } = await render(
-		<FallbackList
-			items={ [ 'One', 'Two' ] }
-			isInfiniteScroll={ isInfiniteScroll }
-		/>
-	);
-	const one = page
-		.getByRole( 'button', { name: 'One', exact: true } )
+function focusItem( name: string ) {
+	const element = page
+		.getByRole( 'button', { name, exact: true, includeHidden: true } )
 		.element() as HTMLElement;
-	one.focus();
-	await rerender(
-		<FallbackList
-			items={ [ 'Two' ] }
-			isInfiniteScroll={ isInfiniteScroll }
-		/>
-	);
-	await nextFrames();
-	return one.ownerDocument;
+	element.focus();
+	return element;
 }
 
-it( 'moves focus on when the focused item is removed', async () => {
-	await removeFocusedItem( false );
+it.each( [ false, true ] )(
+	'moves focus on when the focused item is removed, with infinite scroll %s',
+	async ( isInfiniteScroll ) => {
+		const { rerender } = await render(
+			<FallbackList isInfiniteScroll={ isInfiniteScroll } />
+		);
+		focusItem( 'Item 0' );
+		await nextFrames();
+		// Like an action removing the item it was triggered on.
+		await rerender(
+			<FallbackList
+				items={ LIST.slice( 1 ) }
+				isInfiniteScroll={ isInfiniteScroll }
+			/>
+		);
+		await expect
+			.element(
+				page.getByRole( 'button', { name: 'Item 1', exact: true } )
+			)
+			.toHaveFocus();
+	}
+);
+
+it( 'moves focus on when the focused control is hidden, with infinite scroll', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	focusItem( 'Item 0' );
+	await nextFrames();
+	await rerender( <FallbackList hidden={ [ 'Item 0' ] } isInfiniteScroll /> );
 	await expect
-		.element( page.getByRole( 'button', { name: 'Two', exact: true } ) )
+		.element( page.getByRole( 'button', { name: 'Item 1', exact: true } ) )
 		.toHaveFocus();
 } );
 
-it( 'leaves focus alone when infinite scroll unloads the focused item', async () => {
-	const { body } = await removeFocusedItem( true );
-	expect( body ).toHaveFocus();
+it( 'leaves focus alone when infinite scroll unloads an item scrolled off screen', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	const item = focusItem( 'Item 0' );
+	const scroller = page.getByTestId( 'scroller' ).element() as HTMLElement;
+	scroller.scrollTop = scroller.scrollHeight;
+	await nextFrames();
+	await nextFrames();
+	// Infinite scroll unloads the items scrolled past.
+	await rerender(
+		<FallbackList items={ LIST.slice( 1 ) } isInfiniteScroll />
+	);
+	await nextFrames();
+	expect( item.ownerDocument.body ).toHaveFocus();
+} );
+
+it( 'moves focus on when an item slightly off screen is removed, with infinite scroll', async () => {
+	const { rerender } = await render( <FallbackList isInfiniteScroll /> );
+	focusItem( 'Item 0' );
+	const scroller = page.getByTestId( 'scroller' ).element() as HTMLElement;
+	scroller.scrollTop = 150;
+	await nextFrames();
+	await nextFrames();
+	await rerender(
+		<FallbackList items={ LIST.slice( 1 ) } isInfiniteScroll />
+	);
+	await expect
+		.element( page.getByRole( 'button', { name: 'Item 1', exact: true } ) )
+		.toHaveFocus();
+} );
+
+it( 'forgets a control hidden on its own once focus leaves it', async () => {
+	// Like the table media, hidden next to the title but focusable by mouse.
+	const { rerender } = await render(
+		<FallbackList ariaHidden={ [ 'Item 0' ] } />
+	);
+	const item = focusItem( 'Item 0' );
+	item.blur();
+	await rerender(
+		<FallbackList ariaHidden={ [ 'Item 0' ] } hidden={ [ 'Item 5' ] } />
+	);
+	await nextFrames();
+	expect( item.ownerDocument.body ).toHaveFocus();
 } );
 
 it( 'moves focus within a view inside a dialog', async () => {

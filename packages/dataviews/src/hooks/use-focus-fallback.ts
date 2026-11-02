@@ -13,6 +13,21 @@ function isVisible( element: Element ) {
 	return element.getClientRects().length > 0;
 }
 
+function getScrollContainer( element: HTMLElement ) {
+	const { defaultView } = element.ownerDocument;
+	for (
+		let node: HTMLElement | null = element;
+		node;
+		node = node.parentElement
+	) {
+		const { overflowY } = defaultView?.getComputedStyle( node ) ?? {};
+		if ( overflowY === 'auto' || overflowY === 'scroll' ) {
+			return node;
+		}
+	}
+	return null;
+}
+
 /**
  * The control to focus when focus is lost: the first checkbox, which is the
  * "Select all" one where the layout has it, or else the first control.
@@ -69,6 +84,47 @@ export default function useFocusFallback( {
 		// is the last control focused in the layout, kept while focus is in a
 		// menu or dialog opened from it, which hand focus back when they close.
 		let lastFocused: HTMLElement | null = null;
+		// Whether it was on screen when last seen. Infinite scroll unloads
+		// items once they are well off screen, which isn't focus going away.
+		let wasInView = true;
+		const { defaultView } = ownerDocument;
+		const IntersectionObserverClass = defaultView?.IntersectionObserver;
+		const visibility = IntersectionObserverClass
+			? new IntersectionObserverClass(
+					( entries ) => {
+						for ( const entry of entries ) {
+							// Removing or hiding it also reports it off screen.
+							if (
+								entry.target === lastFocused &&
+								entry.target.isConnected &&
+								isVisible( entry.target )
+							) {
+								wasInView = entry.isIntersecting;
+							}
+						}
+					},
+					{
+						// Against the scroll container, a little beyond its
+						// edges, as unloading only takes rows well past them.
+						// Sideways scrolling doesn't unload anything.
+						root: getScrollContainer( container ),
+						rootMargin: '400px 100000px',
+					}
+				)
+			: undefined;
+		const track = ( element: HTMLElement | null ) => {
+			if ( element === lastFocused ) {
+				return;
+			}
+			if ( lastFocused ) {
+				visibility?.unobserve( lastFocused );
+			}
+			lastFocused = element;
+			wasInView = true;
+			if ( element ) {
+				visibility?.observe( element );
+			}
+		};
 		const isHandOff = ( element: HTMLElement ) => {
 			const popup = element.closest(
 				'[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], .components-popover'
@@ -76,13 +132,22 @@ export default function useFocusFallback( {
 			// Not the dialog the whole view is in, such as a media modal.
 			return !! popup && ! popup.contains( container );
 		};
+		// Hidden along with the rest of the page by a modal, or inert while
+		// the layout loads, rather than hidden on its own like the table media.
+		const isHiddenByModal = ( element: HTMLElement ) => {
+			const hidden = element.closest( '[aria-hidden="true"]' );
+			return (
+				!! element.closest( '[inert]' ) ||
+				( !! hidden && hidden.contains( container ) )
+			);
+		};
 		const onFocusIn = ( event: FocusEvent ) => {
 			const target = event.target as HTMLElement;
 			if ( container.contains( target ) ) {
-				lastFocused = target;
+				track( target );
 			} else if ( ! isHandOff( target ) ) {
 				// Focus moved on to another control, e.g. the search.
-				lastFocused = null;
+				track( null );
 			}
 		};
 		// Focus that leaves for nowhere while the control is still usable was
@@ -96,7 +161,7 @@ export default function useFocusFallback( {
 			if (
 				event.relatedTarget ||
 				! ( container.contains( target ) || isHandOff( target ) ) ||
-				target.closest( '[inert], [aria-hidden="true"]' )
+				isHiddenByModal( target )
 			) {
 				return;
 			}
@@ -108,7 +173,7 @@ export default function useFocusFallback( {
 					// Unless focus went on to another control meanwhile.
 					( ! activeElement || activeElement === ownerDocument.body )
 				) {
-					lastFocused = null;
+					track( null );
 				}
 			} );
 		};
@@ -135,14 +200,14 @@ export default function useFocusFallback( {
 			// turned inert to load while a modal returned focus to it.
 			if ( ! wasRemoved ) {
 				if ( ! lastFocused.closest( '[inert]' ) ) {
-					lastFocused.focus();
+					lastFocused.focus( { preventScroll: true } );
 				}
 				return;
 			}
 			// Infinite scroll unloads the items scrolled past, which is not
-			// the focused item going away.
-			if ( optionsRef.current.isInfiniteScroll ) {
-				lastFocused = null;
+			// the focused item going away. An action removes one on screen.
+			if ( optionsRef.current.isInfiniteScroll && ! wasInView ) {
+				track( null );
 				return;
 			}
 			// With no items left, the layout has no controls: use the ones
@@ -174,7 +239,6 @@ export default function useFocusFallback( {
 			if ( ! lastFocused ) {
 				return;
 			}
-			const { defaultView } = ownerDocument;
 			if ( frame !== undefined ) {
 				defaultView?.cancelAnimationFrame( frame );
 			}
@@ -208,8 +272,9 @@ export default function useFocusFallback( {
 			ownerDocument.removeEventListener( 'focusout', onFocusOut );
 			observer.disconnect();
 			pageObserver.disconnect();
+			visibility?.disconnect();
 			if ( frame !== undefined ) {
-				ownerDocument.defaultView?.cancelAnimationFrame( frame );
+				defaultView?.cancelAnimationFrame( frame );
 			}
 		};
 	}, [] );
