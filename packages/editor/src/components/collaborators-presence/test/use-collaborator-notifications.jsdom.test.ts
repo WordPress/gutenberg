@@ -7,6 +7,7 @@ type NoticesStore = ( typeof import( '@wordpress/notices' ) )[ 'store' ];
 type PreferencesStore =
 	( typeof import( '@wordpress/preferences' ) )[ 'store' ];
 type EditorStore = ( typeof import( '../../../store' ) )[ 'store' ];
+type CoreStore = ( typeof import( '@wordpress/core-data' ) )[ 'store' ];
 type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
 
 // --- Mocks ---
@@ -33,7 +34,10 @@ vi.mock( import( '../../../store' ), () => ( {
 	store: 'core/editor' as unknown as EditorStore,
 } ) );
 
-vi.mock( import( '@wordpress/core-data' ), () => ( { privateApis: {} } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( {
+	privateApis: {},
+	store: 'core' as unknown as CoreStore,
+} ) );
 
 // Captures the callbacks and postIds the hook registers with each of the
 // three core-data subscriptions it unlocks. Must be prefixed with `mock`
@@ -123,16 +127,43 @@ const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
 
 const mockCreateNotice = vi.fn();
 
+// Spied so tests can prove the statuses request is skipped when no save
+// notification will be shown.
+const mockGetEntityRecords = vi.fn( ( kind: string, name: string ) =>
+	kind === 'root' && name === 'status' ? state.postStatuses : undefined
+);
+
+type PostStatusRecord = { slug: string; name: string };
+
 type PreferenceState = {
 	postStatus: string | undefined;
+	// Singular label registered for the post type; undefined mimics a post
+	// type that has not resolved yet.
+	postTypeLabel: string | undefined;
+	// Records the statuses endpoint returns; undefined mimics an unresolved
+	// request.
+	postStatuses: PostStatusRecord[] | undefined;
 	isCollaborationEnabled: boolean;
 	showCollaborationJoinNotifications: boolean;
 	showCollaborationLeaveNotifications: boolean;
 	showCollaborationPostSaveNotifications: boolean;
 };
 
+// Labels as WordPress registers them for core statuses, plus one a plugin
+// registered with `register_post_status()`.
+const CORE_STATUSES: PostStatusRecord[] = [
+	{ slug: 'publish', name: 'Published' },
+	{ slug: 'future', name: 'Scheduled' },
+	{ slug: 'draft', name: 'Draft' },
+	{ slug: 'pending', name: 'Pending' },
+	{ slug: 'private', name: 'Private' },
+	{ slug: 'embargo', name: 'Embargoed' },
+];
+
 const DEFAULT_STATE: PreferenceState = {
 	postStatus: 'draft',
+	postTypeLabel: 'Post',
+	postStatuses: CORE_STATUSES,
 	isCollaborationEnabled: true,
 	showCollaborationJoinNotifications: true,
 	showCollaborationLeaveNotifications: true,
@@ -142,6 +173,18 @@ const DEFAULT_STATE: PreferenceState = {
 let state: PreferenceState = { ...DEFAULT_STATE };
 
 function mockSelect( storeKey: string ) {
+	if ( storeKey === 'core' ) {
+		return {
+			getPostType: ( slug: string ) =>
+				state.postTypeLabel === undefined
+					? undefined
+					: {
+							slug,
+							labels: { singular_name: state.postTypeLabel },
+						},
+			getEntityRecords: mockGetEntityRecords,
+		};
+	}
 	if ( storeKey === 'core/preferences' ) {
 		return {
 			get: ( scope: string, name: string ) =>
@@ -177,6 +220,7 @@ beforeEach( () => {
 	mockRegistered.leavePostId = undefined;
 	mockRegistered.savePostId = undefined;
 	mockCreateNotice.mockClear();
+	mockGetEntityRecords.mockClear();
 	( useSelect as Mock ).mockImplementation( ( selector: Function ) =>
 		selector( mockSelect )
 	);
@@ -352,6 +396,76 @@ describe( 'useCollaboratorNotifications', () => {
 				},
 				expected: 'Post published by Alice.',
 			},
+			{
+				description: 'a draft is scheduled',
+				postStatus: 'draft',
+				saveEventStatus: 'future',
+				prevEvent: null,
+				expected: 'Post scheduled by Alice.',
+			},
+			{
+				description: 'a draft is published privately',
+				postStatus: 'draft',
+				saveEventStatus: 'private',
+				prevEvent: null,
+				expected: 'Post published privately by Alice.',
+			},
+			{
+				description: 'a scheduled post is updated',
+				postStatus: 'future',
+				saveEventStatus: 'future',
+				prevEvent: null,
+				expected: 'Post updated by Alice.',
+			},
+			{
+				description: 'a published post is reverted to draft',
+				postStatus: 'publish',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Post reverted to draft by Alice.',
+			},
+			{
+				description: 'a draft is submitted for review',
+				postStatus: 'draft',
+				saveEventStatus: 'pending',
+				prevEvent: null,
+				expected: 'Post status set to Pending by Alice.',
+			},
+			{
+				description: 'a pending post is saved again',
+				postStatus: 'pending',
+				saveEventStatus: 'pending',
+				prevEvent: null,
+				expected: 'Post saved by Alice.',
+			},
+			{
+				description: 'a draft is moved to a custom status',
+				postStatus: 'draft',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Post status set to Embargoed by Alice.',
+			},
+			{
+				description: 'a published post is moved to a custom status',
+				postStatus: 'publish',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Post status set to Embargoed by Alice.',
+			},
+			{
+				description: 'a post in a custom status is saved again',
+				postStatus: 'embargo',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Post saved by Alice.',
+			},
+			{
+				description: 'a post in a custom status is moved back to draft',
+				postStatus: 'embargo',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Draft saved by Alice.',
+			},
 		] )(
 			'fires "$expected" when $description',
 			( { postStatus, saveEventStatus, prevEvent, expected } ) => {
@@ -378,6 +492,109 @@ describe( 'useCollaboratorNotifications', () => {
 				);
 			}
 		);
+
+		it.each( [
+			{
+				description: 'publishing',
+				postStatus: 'draft',
+				saveEventStatus: 'publish',
+				expected: 'Story published by Alice.',
+			},
+			{
+				description: 'scheduling',
+				postStatus: 'draft',
+				saveEventStatus: 'future',
+				expected: 'Story scheduled by Alice.',
+			},
+			{
+				description: 'updating',
+				postStatus: 'publish',
+				saveEventStatus: 'publish',
+				expected: 'Story updated by Alice.',
+			},
+			{
+				description: 'moving to a custom status',
+				postStatus: 'draft',
+				saveEventStatus: 'embargo',
+				expected: 'Story status set to Embargoed by Alice.',
+			},
+		] )(
+			'uses the registered post type label when $description',
+			( { postStatus, saveEventStatus, expected } ) => {
+				renderNotifications( { postStatus, postTypeLabel: 'Story' } );
+
+				mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: saveEventStatus,
+					},
+					alice,
+					null
+				);
+
+				expect( mockCreateNotice ).toHaveBeenCalledWith(
+					'info',
+					expected,
+					expect.anything()
+				);
+			}
+		);
+
+		it( 'requests the registered statuses once save notifications are on', () => {
+			renderNotifications();
+
+			expect( mockGetEntityRecords ).toHaveBeenCalledWith(
+				'root',
+				'status'
+			);
+		} );
+
+		it( 'falls back to "Post" when the post type has not resolved', () => {
+			renderNotifications( {
+				postStatus: 'draft',
+				postTypeLabel: undefined,
+			} );
+
+			mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				null
+			);
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Post published by Alice.',
+				expect.anything()
+			);
+		} );
+
+		it( 'reports a plain save when the status label is unknown', () => {
+			renderNotifications( {
+				postStatus: 'draft',
+				postStatuses: undefined,
+			} );
+
+			mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'embargo',
+				},
+				alice,
+				null
+			);
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Post saved by Alice.',
+				expect.anything()
+			);
+		} );
 
 		it( 'does not fire when postStatus is unknown', () => {
 			renderNotifications( { postStatus: undefined } );
@@ -406,6 +623,10 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockRegistered.joinPostId ).toBe( 123 );
 			expect( mockRegistered.leavePostId ).toBe( 123 );
 
+			// The registered statuses are only needed to word a save
+			// notification, so they are not requested.
+			expect( mockGetEntityRecords ).not.toHaveBeenCalled();
+
 			mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
@@ -426,6 +647,7 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockRegistered.joinPostId ).toBeNull();
 			expect( mockRegistered.leavePostId ).toBeNull();
 			expect( mockRegistered.savePostId ).toBeNull();
+			expect( mockGetEntityRecords ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
