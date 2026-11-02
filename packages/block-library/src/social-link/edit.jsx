@@ -44,8 +44,8 @@ const INVALID_LINK = {
 
 /**
  * Shows an error for an invalid Social Icon link once it is checked, without
- * rejecting the link. The error is only set when the link is checked, on blur
- * or submit, because `URLInput` remounts its input the first time it is given
+ * rejecting the link. The error is only set when the link is checked, on blur,
+ * because `URLInput` remounts its input the first time it is given
  * a validity, which would otherwise interrupt typing.
  *
  * @param {string} url The link.
@@ -99,7 +99,6 @@ const SocialLinkURLPopover = ( {
 	clientId,
 } ) => {
 	const { removeBlock } = useDispatch( blockEditorStore );
-	const { customValidity, inputRef, validate } = useLinkValidity( url );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
@@ -113,10 +112,6 @@ const SocialLinkURLPopover = ( {
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					// Keep the popover open to show the error. The link is kept.
-					if ( ! validate() ) {
-						return;
-					}
 					setPopover( false );
 					popoverAnchor?.focus();
 				} }
@@ -131,8 +126,6 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
-						inputRef={ inputRef }
-						customValidity={ customValidity }
 						onKeyDown={ ( event ) => {
 							if (
 								!! url ||
