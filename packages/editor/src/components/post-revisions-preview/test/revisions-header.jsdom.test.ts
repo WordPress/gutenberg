@@ -1,4 +1,7 @@
+import { describe, expect, it, vi } from 'vitest';
 import { hasChangesToRestore } from '../revisions-header';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const post = {
 	content: '<!-- wp:paragraph --><p>Saved</p><!-- /wp:paragraph -->',
@@ -11,7 +14,7 @@ const post = {
 	},
 };
 
-function getRevision( overrides = {} ) {
+function getRevision( overrides: Record< string, unknown > = {} ) {
 	return {
 		id: 2,
 		content: { raw: post.content },
