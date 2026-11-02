@@ -111,7 +111,7 @@ test.describe( 'Suggestion data with the experiment off', () => {
 			editor.canvas.locator( 'mark.wp-suggestion-add' )
 		).toBeVisible();
 
-		const notice = page.locator( '.components-notice', {
+		const notice = page.locator( '.notices-inline-notices__notice', {
 			hasText: NOTICE_TEXT,
 		} );
 		await expect( notice ).toBeVisible();
@@ -150,7 +150,7 @@ test.describe( 'Suggestion data with the experiment off', () => {
 				.first()
 		).toBeVisible();
 		await expect(
-			page.locator( '.components-notice', { hasText: NOTICE_TEXT } )
+			page.locator( '.notices-inline-notices__notice', { hasText: NOTICE_TEXT } )
 		).toHaveCount( 0 );
 	} );
 
@@ -174,7 +174,7 @@ test.describe( 'Suggestion data with the experiment off', () => {
 			editor.canvas.locator( 'mark.wp-suggestion-add' )
 		).toBeVisible();
 		await expect(
-			page.locator( '.components-notice', { hasText: NOTICE_TEXT } )
+			page.locator( '.notices-inline-notices__notice', { hasText: NOTICE_TEXT } )
 		).toHaveCount( 0 );
 	} );
 } );
