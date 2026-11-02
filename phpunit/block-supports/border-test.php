@@ -537,6 +537,8 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_get_border_classes_and_styles
+	 *
 	 * @dataProvider data_get_border_classes_and_styles
 	 *
 	 * @param mixed $block_attributes Block attributes.
