@@ -1,6 +1,5 @@
 import { Icon } from '@wordpress/icons';
 import { Badge, Stack, Text } from '@wordpress/ui';
-import { CopySvgButton } from './copy-svg-button';
 import {
 	ALL_ICONS_MANIFEST,
 	COLLECTIONS,
@@ -27,7 +26,6 @@ export function IconDetails( { name }: { name: string } ) {
 						{ iconInfo?.label ?? name }
 					</Text>
 					<code>{ slug }</code>
-					<CopySvgButton icon={ icon } />
 				</Stack>
 			</Stack>
 			<Stack direction="column" gap="sm" align="flex-start">
