@@ -8,9 +8,13 @@ import usePostContentBlockTypes from './use-post-content-block-types';
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
+ *
+ * @param {Object}   props                     Component props.
+ * @param {string[]} [props.contentBlockTypes] The blocks that hold the content being edited. Defaults to the post content blocks, which is what a page is edited through. Pass a list to edit something else through other blocks, such as a template rendered inside another, whose only slot is the post content block of the template around it. Must be a stable value.
  */
-export default function DisableNonPageContentBlocks() {
-	const postContentBlockTypes = usePostContentBlockTypes();
+export default function DisableNonPageContentBlocks( { contentBlockTypes } ) {
+	const defaultBlockTypes = usePostContentBlockTypes();
+	const postContentBlockTypes = contentBlockTypes ?? defaultBlockTypes;
 	const { contentOnlyIds, templateParts } = useSelect(
 		( select ) => {
 			const { getPostBlocksByName } = unlock( select( editorStore ) );

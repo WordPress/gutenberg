@@ -61,6 +61,17 @@ const NON_CONTEXTUAL_POST_TYPES = [
 ];
 
 /**
+ * The blocks that hold what is being edited when a template is rendered inside
+ * another one.
+ *
+ * The slot is the post content block of the template around it, and the server
+ * substitutes that block alone. A post title or a featured image in the
+ * template around it belongs to that template, which is edited on its own
+ * screen, so neither is content to edit here.
+ */
+const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/post-content' ];
+
+/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -182,7 +193,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		 * so that the canvas stands for it. There is nothing to render around
 		 * it then, unlike a template that names another one to render inside.
 		 */
-		const template = _template?.id === post.id ? undefined : _template;
+		const standsForOwnTemplate = _template?.id === post.id;
+		const template = standsForOwnTemplate ? undefined : _template;
 		const hasTemplate = !! template;
 		const {
 			editorSettings,
@@ -212,8 +224,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
+				//
+				// A canvas that stands for the template it is editing has
+				// nothing to render around it, so the mode that renders a
+				// post inside its template has nothing to show: the template
+				// is edited on its own however the preference for the post
+				// type reads, and the mode is settled rather than pending.
 				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+					renderingMode ??
+					( standsForOwnTemplate
+						? 'post-only'
+						: getDefaultRenderingMode( post.type ) );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -253,7 +274,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[
+				post.type,
+				post.id,
+				hasTemplate,
+				standsForOwnTemplate,
+				renderingMode,
+			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -298,12 +325,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				postContext.postType = post.type;
 			}
 
+			/*
+			 * The template the blocks being edited belong to. For a template
+			 * rendered inside another that is the template itself: the blocks
+			 * in the slot are its own, and what they stand for — an archive, a
+			 * category, an author — follows from its slug rather than from the
+			 * slug of the template around them.
+			 */
+			let templateSlug;
+			if ( isTemplateInsideTemplate ) {
+				templateSlug = post.slug;
+			} else if ( rootLevelPost.type === 'wp_template' ) {
+				templateSlug = rootLevelPost.slug;
+			}
+
 			return {
 				...postContext,
-				templateSlug:
-					rootLevelPost.type === 'wp_template'
-						? rootLevelPost.slug
-						: undefined,
+				templateSlug,
 			};
 		}, [
 			isTemplateInsideTemplate,
@@ -483,7 +521,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
 									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
+										<DisableNonPageContentBlocks
+											contentBlockTypes={
+												isTemplateInsideTemplate
+													? TEMPLATE_SLOT_BLOCK_TYPES
+													: undefined
+											}
+										/>
 									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />

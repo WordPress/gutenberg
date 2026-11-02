@@ -103,20 +103,25 @@ export default function EditSiteEditor( {
 	const postWithTemplate = !! context?.postId;
 	/*
 	 * A template can name the template it is rendered inside, so the canvas has
-	 * one to show around it the way a page does. `null` means it is rendered on
-	 * its own.
+	 * one to show around it the way a page does. A template that names none
+	 * stands for itself, which is what it names as its own template, so that
+	 * the editor can tell it apart from a template still being resolved.
 	 */
 	const parentTemplateId = useSelect(
 		( select ) => {
 			if ( postWithTemplate || postType !== TEMPLATE_POST_TYPE ) {
 				return undefined;
 			}
-			return (
-				unlock( select( coreDataStore ) ).getTemplateId(
-					postType,
-					postId
-				) ?? undefined
+			const templateId = unlock( select( coreDataStore ) ).getTemplateId(
+				postType,
+				postId
 			);
+
+			if ( templateId === undefined ) {
+				return undefined;
+			}
+
+			return templateId ?? postId;
 		},
 		[ postWithTemplate, postType, postId ]
 	);

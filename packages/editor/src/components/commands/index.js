@@ -489,10 +489,19 @@ const getPageContentFocusCommands = () =>
 			const {
 				getRenderingMode,
 				getEditorSettings: _getEditorSettings,
+				getCurrentPostId,
 				getCurrentTemplateId,
 			} = unlock( select( editorStore ) );
 			const editorSettings = _getEditorSettings();
-			const _templateId = getCurrentTemplateId();
+			/*
+			 * A canvas editing a template names that template as its own, so
+			 * there is no template to go and edit: it is the one being edited.
+			 */
+			const _currentTemplateId = getCurrentTemplateId();
+			const _templateId =
+				_currentTemplateId === getCurrentPostId()
+					? undefined
+					: _currentTemplateId;
 			return {
 				isTemplateHidden: getRenderingMode() === 'post-only',
 				onNavigateToEntityRecord:
