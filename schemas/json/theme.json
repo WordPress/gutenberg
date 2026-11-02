@@ -1788,7 +1788,7 @@
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately.",
+							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" },
@@ -3780,7 +3780,7 @@
 						"type": "object",
 						"properties": {
 							"blockGap": {
-								"description": "The root block gap sets a single CSS value, so it can't be split into rows and columns.",
+								"description": "Root styles only support a single block gap value for now.",
 								"oneOf": [
 									{ "type": "string" },
 									{ "$ref": "#/definitions/refComplete" }
