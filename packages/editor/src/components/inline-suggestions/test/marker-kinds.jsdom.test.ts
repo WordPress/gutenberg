@@ -345,7 +345,7 @@ describe( 'marker kind checks', () => {
 	 * marker). Every check goes through the kind helpers in `format.ts`.
 	 */
 	it( 'leaves no raw suggestion format name comparison outside format.ts', () => {
-		const root = join( __dirname, '..', '..', '..' );
+		const root = join( import.meta.dirname, '..', '..', '..' );
 		const offenders: string[] = [];
 		const walk = ( dir: string ) => {
 			for ( const entry of readdirSync( dir ) ) {
