@@ -80,6 +80,10 @@ function ColorGradientControlInner( {
 		/>
 	);
 
+	const notice = noticeProps && (
+		<WCNotice isDismissible={ false } { ...noticeProps } />
+	);
+
 	const tabPanels = {
 		// The `ColorPalette` must stay at a stable position in the tree whether
 		// or not a notice is present. Wrapping it in a `VStack` only when a
@@ -90,31 +94,33 @@ function ColorGradientControlInner( {
 		[ TAB_IDS.color ]: (
 			<>
 				{ colorPalette }
-				{ noticeProps && (
-					<WCNotice isDismissible={ false } { ...noticeProps } />
-				) }
+				{ notice }
 			</>
 		),
+		// Same ordering as the color tab, for the same reason.
 		[ TAB_IDS.gradient ]: (
-			<GradientPicker
-				value={ gradientValue }
-				selectedSlug={ gradientSlug }
-				onChange={
-					canChooseAColor
-						? ( newGradient, _index, newSlug ) => {
-								onGradientChange!( newGradient, newSlug );
-								onColorChange!();
-							}
-						: ( newGradient, _index, newSlug ) =>
-								onGradientChange!( newGradient, newSlug )
-				}
-				{ ...{ gradients, disableCustomGradients } }
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				headingLevel={ headingLevel }
-			/>
+			<>
+				<GradientPicker
+					value={ gradientValue }
+					selectedSlug={ gradientSlug }
+					onChange={
+						canChooseAColor
+							? ( newGradient, _index, newSlug ) => {
+									onGradientChange!( newGradient, newSlug );
+									onColorChange!();
+								}
+							: ( newGradient, _index, newSlug ) =>
+									onGradientChange!( newGradient, newSlug )
+					}
+					{ ...{ gradients, disableCustomGradients } }
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ clearable }
+					headingLevel={ headingLevel }
+				/>
+				{ notice }
+			</>
 		),
 	};
 
