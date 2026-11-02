@@ -37,6 +37,59 @@ test.describe( 'File', () => {
 		] );
 	} );
 
+	test( 'keeps the download button linked to the file', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/file',
+			attributes: { href: FILE_URL },
+		} );
+		await editor.openDocumentSettingsSidebar();
+		// Turn the button off and on again to create it, as the editor does.
+		const toggle = page.getByRole( 'checkbox', {
+			name: 'Show download button',
+		} );
+		await toggle.click();
+		await toggle.click();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button' } )
+			.click();
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+		).toBeHidden();
+
+		// The unlink shortcut must not remove the URL either.
+		await pageUtils.pressKeys( 'primaryShift+k' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/file',
+				innerBlocks: [
+					{
+						name: 'core/buttons',
+						innerBlocks: [
+							{
+								name: 'core/button',
+								attributes: {
+									url: FILE_URL,
+									metadata: {
+										bindings: {
+											url: { source: 'core/file-data' },
+										},
+									},
+								},
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'removes and adds the download button with the toggle', async ( {
 		editor,
 		page,

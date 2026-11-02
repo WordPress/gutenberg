@@ -24,7 +24,14 @@
 							"type": "button",
 							"url": "http://localhost:8889/wp-content/uploads/2021/04/yolo.pdf",
 							"text": "Download",
-							"download": true
+							"download": true,
+							"metadata": {
+								"bindings": {
+									"url": {
+										"source": "core/file-data"
+									}
+								}
+							}
 						},
 						"innerBlocks": []
 					}

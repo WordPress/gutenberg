@@ -52,6 +52,14 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 
+## Context
+
+_Defined via the [`usesContext` and `providesContext`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/) properties in block.json._
+
+**Provides context:**
+
+- `core/file-href` → attribute `href`
+
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.

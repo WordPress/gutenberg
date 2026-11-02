@@ -11,7 +11,15 @@
 				"innerBlocks": [
 					{
 						"blockName": "core/button",
-						"attrs": {},
+						"attrs": {
+							"metadata": {
+								"bindings": {
+									"url": {
+										"source": "core/file-data"
+									}
+								}
+							}
+						},
 						"innerBlocks": [],
 						"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" download>Download</a></div>\n",
 						"innerContent": [

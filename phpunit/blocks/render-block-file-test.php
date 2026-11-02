@@ -115,4 +115,36 @@ class Tests_Blocks_Render_File extends WP_UnitTestCase {
 
 		$this->assertSame( $content, gutenberg_render_block_core_file( array(), $content ) );
 	}
+
+	/**
+	 * Returns File block markup whose inner download button is bound to the file URL.
+	 *
+	 * @param string $file_url   The File block `href` attribute.
+	 * @param string $button_url The URL saved on the inner Button block.
+	 * @return string The block markup.
+	 */
+	private function get_file_block_with_bound_button( $file_url, $button_url ) {
+		return '<!-- wp:file ' . wp_json_encode( array( 'href' => $file_url ) ) . ' --><div class="wp-block-file"><a id="wp-block-file--media-1" href="' . esc_url( $file_url ) . '">yolo</a><!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button {"download":true,"metadata":{"bindings":{"url":{"source":"core/file-data"}}}} --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="' . esc_url( $button_url ) . '" download>Download</a></div><!-- /wp:button --></div><!-- /wp:buttons --></div><!-- /wp:file -->';
+	}
+
+	/**
+	 * @covers ::gutenberg_block_bindings_file_data_get_value
+	 */
+	public function test_bound_download_button_links_to_the_file() {
+		$file_url = 'http://' . WP_TESTS_DOMAIN . '/yolo.zip';
+		$output   = do_blocks( $this->get_file_block_with_bound_button( $file_url, 'http://' . WP_TESTS_DOMAIN . '/other.zip' ) );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$processor->next_tag( array( 'class_name' => 'wp-block-button__link' ) );
+		$this->assertSame( $file_url, $processor->get_attribute( 'href' ) );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_bindings_file_data_get_value
+	 */
+	public function test_bound_download_button_sanitizes_the_file_url() {
+		$output = do_blocks( $this->get_file_block_with_bound_button( 'javascript:alert(1)', 'http://' . WP_TESTS_DOMAIN . '/yolo.zip' ) );
+
+		$this->assertStringNotContainsString( 'javascript:', $output );
+	}
 }

@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Block Bindings: Add the `core/file-data` source, which binds the File block download button to the file URL ([#86163](https://github.com/WordPress/gutenberg/pull/86163)).
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements

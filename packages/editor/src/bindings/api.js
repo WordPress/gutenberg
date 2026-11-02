@@ -1,4 +1,5 @@
 import { registerBlockBindingsSource } from '@wordpress/blocks';
+import fileData from './file-data';
 import patternOverrides from './pattern-overrides';
 import postData from './post-data';
 import postMeta from './post-meta';
@@ -15,6 +16,7 @@ import termData from './term-data';
  * ```
  */
 export function registerCoreBlockBindingsSources() {
+	registerBlockBindingsSource( fileData );
 	registerBlockBindingsSource( patternOverrides );
 	registerBlockBindingsSource( postData );
 	registerBlockBindingsSource( postMeta );

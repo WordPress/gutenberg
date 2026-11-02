@@ -24,7 +24,14 @@
 							"type": "button",
 							"url": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
 							"text": "Download",
-							"download": true
+							"download": true,
+							"metadata": {
+								"bindings": {
+									"url": {
+										"source": "core/file-data"
+									}
+								}
+							}
 						},
 						"innerBlocks": []
 					}

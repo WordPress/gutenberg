@@ -14,7 +14,14 @@ export const createDownloadButtons = ( {
 	text = _x( 'Download', 'button label' ),
 } ) =>
 	createBlock( 'core/buttons', {}, [
-		createBlock( 'core/button', { url, text, download: true } ),
+		createBlock( 'core/button', {
+			url,
+			text,
+			download: true,
+			// Keeps the button linked to the file. `url` is still saved, so
+			// the markup is correct where bindings are not processed.
+			metadata: { bindings: { url: { source: 'core/file-data' } } },
+		} ),
 	] );
 
 /**

@@ -56,6 +56,9 @@
 			"default": 600
 		}
 	},
+	"providesContext": {
+		"core/file-href": "href"
+	},
 	"supports": {
 		"anchor": true,
 		"align": true,
