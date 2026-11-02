@@ -267,6 +267,11 @@ export interface AutoGenerateAttribute extends BlockAttribute {
 	autoGenerateControl?: boolean;
 	label?: string;
 	items?: Pick< BlockAttribute, 'type' | 'enum' >;
+	minimum?: number;
+	maximum?: number;
+	minLength?: number;
+	maxLength?: number;
+	pattern?: string;
 }
 
 /**
