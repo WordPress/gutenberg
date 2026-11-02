@@ -22,16 +22,14 @@ import useDeprecatedAlign from './deprecated-attributes';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
-		isRTL() && (
-			<ToolbarButton
-				icon={ formatLTR }
-				title={ _x( 'Left to right', 'editor button' ) }
-				isActive={ direction === 'ltr' }
-				onClick={ () => {
-					setDirection( direction === 'ltr' ? undefined : 'ltr' );
-				} }
-			/>
-		)
+		<ToolbarButton
+			icon={ formatLTR }
+			title={ _x( 'Left to right', 'editor button' ) }
+			isActive={ direction === 'ltr' }
+			onClick={ () => {
+				setDirection( direction === 'ltr' ? undefined : 'ltr' );
+			} }
+		/>
 	);
 }
 
@@ -127,7 +125,8 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
+			{ /* An empty fill would still draw an empty toolbar group. */ }
+			{ blockEditingMode === 'default' && isRTL() && (
 				<BlockControls group="block">
 					<ParagraphRTLControl
 						direction={ direction }

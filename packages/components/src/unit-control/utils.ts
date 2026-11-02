@@ -343,18 +343,6 @@ export function getValidParsedQuantityAndUnit(
 }
 
 /**
- * Takes a unit value and finds the matching accessibility label for the
- * unit abbreviation.
- *
- * @param unit Unit value (example: `px`)
- * @return a11y label for the unit abbreviation
- */
-export function getAccessibleLabelForUnit( unit: string ): string | undefined {
-	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
-	return match?.a11yLabel ? match?.a11yLabel : match?.value;
-}
-
-/**
  * Filters available units based on values defined a list of allowed unit values.
  *
  * @param allowedUnitValues Collection of allowed unit value strings.

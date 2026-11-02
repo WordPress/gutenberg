@@ -220,4 +220,76 @@ describe( 'hydrateRegions', () => {
 			/^updated$/
 		);
 	} );
+
+	it( 'keeps the server-rendered content of data-wp-each items whose value is the server representation', async () => {
+		const propertyNamespace = uniqueNamespace();
+		const itemNamespace = uniqueNamespace();
+		populateServerData( {
+			state: {
+				[ propertyNamespace ]: {
+					list: [
+						{ html: { wpServerHtml: true } },
+						{ html: { wpServerHtml: true } },
+					],
+				},
+				[ itemNamespace ]: { list: [ { wpServerHtml: true } ] },
+			},
+		} );
+		const { state } = store( propertyNamespace, { state: {} } );
+		const listState = state as { list: Array< { html: unknown } > };
+
+		document.body.innerHTML = `
+			<div id="property" data-wp-interactive="${ propertyNamespace }">
+				<template data-wp-each="state.list"><div><span data-wp-html="context.item.html"><i>Fallback</i></span></div></template>
+				<div data-wp-each-child="${ propertyNamespace }::state.list"><span data-wp-html="context.item.html"><b>one</b></span></div>
+				<div data-wp-each-child="${ propertyNamespace }::state.list"><span data-wp-html="context.item.html"><b>two</b></span></div>
+			</div>
+			<div id="item" data-wp-interactive="${ itemNamespace }">
+				<template data-wp-each="state.list"><div><span data-wp-html="context.item"><i>Fallback</i></span></div></template>
+				<div data-wp-each-child="${ itemNamespace }::state.list"><span data-wp-html="context.item"><b>item</b></span></div>
+			</div>
+		`;
+		const targets = [
+			...document.querySelectorAll< HTMLElement >( '[data-wp-html]' ),
+		];
+		const serverNodes = targets.map(
+			( target ) => target.firstElementChild
+		);
+
+		await act( () => hydrateRegions() );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		targets.forEach( ( target, index ) =>
+			expect( target.firstElementChild ).toBe( serverNodes[ index ] )
+		);
+
+		// An item added on the client shows the template's fallback.
+		await act( () => {
+			listState.list = [
+				...listState.list,
+				{ html: { wpServerHtml: true } },
+			];
+		} );
+		const items = [
+			...document.querySelectorAll< HTMLElement >(
+				'#property [data-wp-html]'
+			),
+		];
+		expect( items.map( ( item ) => item.innerHTML ) ).toEqual( [
+			'<b>one</b>',
+			'<b>two</b>',
+			'<i>Fallback</i>',
+		] );
+
+		// A token updates only its own item.
+		await act( () => {
+			listState.list[ 0 ].html = asDangerousHTML( '<b>new</b>' );
+		} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( items.map( ( item ) => item.innerHTML ) ).toEqual( [
+			'<b>new</b>',
+			'<b>two</b>',
+			'<i>Fallback</i>',
+		] );
+		expect( items[ 1 ].firstElementChild ).toBe( serverNodes[ 1 ] );
+	} );
 } );

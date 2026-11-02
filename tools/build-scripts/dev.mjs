@@ -314,7 +314,7 @@ function checkForConflictingProcesses() {
 			console.warn( `   ${ line.trim() }` );
 		}
 		console.warn(
-			`\nA stale webpack dev server can overwrite esbuild output in build/scripts/`
+			`\nA stale webpack dev server can overwrite wp-build output in build/scripts/`
 		);
 		console.warn(
 			`with webpack chunk format, breaking the editor when SCRIPT_DEBUG is enabled.`

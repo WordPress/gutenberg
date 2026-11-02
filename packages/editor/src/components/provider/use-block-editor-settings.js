@@ -54,6 +54,10 @@ function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
 }
 
+function currentUserIdSelect( select ) {
+	return select( coreStore ).getCurrentUser()?.id;
+}
+
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
@@ -114,6 +118,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
@@ -144,6 +149,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -222,6 +228,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				bigImageSizeThreshold: baseData?.image_size_threshold,
 				imageStripMeta: baseData?.image_strip_meta,
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
+				generateAnimatedImageSubsizes:
+					baseData?.generate_animated_image_subsizes,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -378,6 +386,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			bigImageSizeThreshold,
 			imageStripMeta,
 			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode,
@@ -420,6 +429,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
@@ -503,6 +513,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
 	] );
 }

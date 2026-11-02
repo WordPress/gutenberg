@@ -74,16 +74,21 @@ function useUpdatedRef< T >( value: T ): RefObject< T > {
  * @template T
  * @param    text      The text to copy. Use a function if not
  *                     already available and expensive to compute.
- * @param    onSuccess Called when to text is copied.
+ * @param    onSuccess Called when the text is copied. Runs even after
+ *                     the element unmounts, so other UI can update.
+ * @param    onError   Called when copying fails. Runs even after the
+ *                     element unmounts, so other UI can update.
  *
  * @return   A ref to assign to the target element.
  */
 export default function useCopyToClipboard< T extends HTMLElement >(
 	text: string | ( () => string ),
-	onSuccess?: () => void
+	onSuccess?: () => void,
+	onError?: () => void
 ): RefCallback< T > {
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
+	const onErrorRef = useUpdatedRef( onError );
 	return useRefEffect( ( node ) => {
 		// Tracks whether the node is still mounted when the Promise resolves.
 		let isActive = true;
@@ -102,6 +107,8 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 				if ( onSuccessRef.current ) {
 					onSuccessRef.current();
 				}
+			} else if ( onErrorRef.current ) {
+				onErrorRef.current();
 			}
 		};
 		node.addEventListener( 'click', handleClick );

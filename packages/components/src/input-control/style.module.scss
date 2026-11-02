@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .border {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 
@@ -18,4 +21,227 @@
 
 .border.is-borderless {
 	border-color: transparent;
+}
+
+.root {
+	box-sizing: border-box;
+	position: relative;
+	border-radius: $radius-small;
+	padding-block-start: 0;
+}
+
+.container {
+	align-items: center;
+	box-sizing: border-box;
+	border-radius: inherit;
+	display: flex;
+	flex: 1;
+	position: relative;
+	background-color: $components-color-background;
+
+	&:where(.is-disabled) {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
+	}
+
+	&:where(.full-width) {
+		width: 100%;
+	}
+
+	&:where(.custom-width) {
+		width: var(--_wp-components-input-control-width);
+	}
+
+	&:where(.edge-width) {
+		flex: 0 0 var(--_wp-components-input-control-width);
+	}
+}
+
+// CSS-wide keywords must apply to width itself, rather than its custom property.
+@each $keyword in inherit, initial, revert, revert-layer, unset {
+	.container:where(.width-#{$keyword}) {
+		width: #{$keyword};
+	}
+}
+
+.prefix {
+	box-sizing: border-box;
+	display: block;
+}
+
+.suffix {
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+}
+
+.backdrop.backdrop.backdrop {
+	box-sizing: border-box;
+	border-radius: inherit;
+	border-style: solid;
+	border-width: 1px;
+	inset: 0;
+	margin: 0;
+	padding: 0;
+	pointer-events: none;
+	position: absolute;
+}
+
+.input.input.input {
+	// Keep the original specificity over wp-admin's form styles.
+	--_wp-components-input-control-padding: 12px;
+	background-color: transparent;
+	box-sizing: border-box;
+	border: none;
+	box-shadow: none !important;
+	color: $components-color-foreground;
+	display: block;
+	font-family: inherit;
+	font-size: 16px;
+	margin: 0;
+	outline: none;
+	width: 100%;
+	height: 40px;
+	min-height: 40px;
+	line-height: 1;
+
+	@media (min-width: 600px) {
+		font-size: 13px;
+	}
+
+	&:where(.is-small) {
+		height: 24px;
+		min-height: 24px;
+		--_wp-components-input-control-padding: 8px;
+
+		@media (min-width: 600px) {
+			font-size: 11px;
+		}
+	}
+
+	&:where(.is-compact) {
+		height: 32px;
+		min-height: 32px;
+		--_wp-components-input-control-padding: 8px;
+	}
+
+	padding-inline-start: var(--_wp-components-input-control-padding-start, var(--_wp-components-input-control-padding));
+	padding-inline-end: var(--_wp-components-input-control-padding-end, var(--_wp-components-input-control-padding));
+
+	&:where(.is-dragging) {
+		cursor: var(--_wp-components-input-control-drag-cursor, auto);
+		user-select: none;
+
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none !important;
+			margin: 0 !important;
+		}
+	}
+
+	&:where(.has-drag-cursor):active {
+		cursor: var(--_wp-components-input-control-drag-cursor);
+	}
+
+	&:where(:disabled) {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
+	}
+
+	&:disabled::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	&::-webkit-input-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	&::-moz-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	&:-ms-input-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	&[type="date"],
+	&[type="datetime-local"],
+	&[type="month"],
+	&[type="time"],
+	&[type="week"] {
+		&::-webkit-datetime-edit {
+			display: flex;
+			align-items: center;
+			height: 100%;
+		}
+	}
+
+	// Hide Safari's value-like placeholder in empty date/time inputs. Keep
+	// the focused segment editor visible for typing.
+	@supports (-webkit-hyphens: none) and (not (-moz-appearance: none)) {
+		&[type="date"][data-empty-value]:not(:focus),
+		&[type="time"][data-empty-value]:not(:focus),
+		&[type="datetime-local"][data-empty-value]:not(:focus) {
+			color: transparent;
+
+			&:disabled::-webkit-datetime-edit-text {
+				color: transparent;
+			}
+		}
+	}
+
+	&[type="email"],
+	&[type="url"] {
+		/* rtl:ignore */
+		direction: ltr;
+	}
+}
+
+.label.label.label {
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: 1.4;
+	text-transform: uppercase;
+	box-sizing: border-box;
+	display: block;
+	padding-block: 0;
+	max-width: 100%;
+	z-index: 1;
+}
+
+.label-wrapper.label-wrapper {
+	// Keep the label's space over FlexItem's max-width in either style order.
+	max-width: calc(100% - 10px);
+}
+
+@mixin prefix-suffix-padding($property) {
+	#{$property}: $grid-unit-15;
+
+	&:where(.is-small, .is-compact) {
+		#{$property}: $grid-unit-10;
+	}
+
+	&:where(.has-reduced-padding) {
+		display: flex;
+		#{$property}: $grid-unit-10;
+
+		&:where(.is-small, .is-compact) {
+			#{$property}: $grid-unit-05;
+		}
+	}
+}
+
+.prefix-wrapper {
+	@include prefix-suffix-padding(padding-inline-start);
+}
+
+.suffix-wrapper {
+	@include prefix-suffix-padding(padding-inline-end);
 }
