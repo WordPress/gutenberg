@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "27.0.0",
+	"version": "28.0.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"configs",
@@ -40,7 +40,6 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
 		"@eslint/compat": "^2.0.0",
 		"@vitest/eslint-plugin": "^1.6.27",
 		"@wordpress/prettier-config": "file:../prettier-config",
@@ -61,7 +60,6 @@
 		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
-		"@types/eslint": "^9",
 		"@types/estree": "^1.0.8",
 		"@typescript-eslint/parser": "^8.70.1",
 		"eslint": "^10.0.0",

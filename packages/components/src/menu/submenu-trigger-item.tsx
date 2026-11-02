@@ -1,11 +1,14 @@
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
 import { chevronRightSmall } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
 import type { WordPressComponentProps } from '../context';
 import type { ItemProps } from './types';
 import { Context } from './context';
 import { Item } from './item';
-import * as Styled from './styles';
+import Icon from '../icon';
+import styles from './style.module.scss';
 
 export const SubmenuTriggerItem = forwardRef<
 	HTMLDivElement,
@@ -35,7 +38,11 @@ export const SubmenuTriggerItem = forwardRef<
 					suffix={
 						<>
 							{ suffix }
-							<Styled.SubmenuChevronIcon
+							<Icon
+								className={ clsx(
+									styles[ 'submenu-chevron-icon' ],
+									{ [ styles[ 'is-rtl' ] ]: isRTL() }
+								) }
 								aria-hidden="true"
 								icon={ chevronRightSmall }
 								size={ 24 }

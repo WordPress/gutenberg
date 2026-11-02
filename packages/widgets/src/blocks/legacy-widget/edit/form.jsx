@@ -3,7 +3,7 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import Control from './control';
 
@@ -92,7 +92,7 @@ export default function Form( {
 						{ title }
 					</h3>
 				) }
-				<Popover
+				<WCPopover
 					focusOnMount={ false }
 					placement="right"
 					offset={ 32 }
@@ -105,7 +105,7 @@ export default function Form( {
 						className="wp-block-legacy-widget__edit-form"
 						hidden={ ! isVisible }
 					></div>
-				</Popover>
+				</WCPopover>
 			</div>
 		);
 	}

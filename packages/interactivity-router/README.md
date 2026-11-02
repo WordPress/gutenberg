@@ -48,6 +48,9 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
+		// `navigating` and `initiator` are also part of the store's state,
+		// but they are written by `navigate()` instead of being declared
+		// here, so both read `undefined` until the first navigation.
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -55,6 +58,8 @@ const { state, actions } = store( 'core/router', {
 	}
 })
 ```
+
+Beyond the current URL, the store's state describes the navigation itself: whether one is in flight (`state.navigating`) and who started it (`state.initiator`). See [State](#state) below.
 
 <div class="callout callout-tip">
     The core "Query Loop" block is <a href="https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/view.js#L35">using this package</a> to provide the <a href="https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/index.php#L33">region-based navigation</a>.
@@ -85,14 +90,19 @@ Example:
 </div>
 ```
 
-The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay.
+Navigation ignores a router region inside the [inert content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) of a [`data-wp-html`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-html) element, whether that's the server-rendered fallback or HTML the directive inserted, as if the region had no `data-wp-router-region` attribute. `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence. See [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide.
+
+The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay. The router uses the first element on the current page that matches the selector, skipping any element with [inert `data-wp-html` content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) and anything inside that content.
 
 When navigating between pages:
 
-- If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
+- If a region exists on both the current and the new page, its content is updated, and `attachTo` doesn't move it. If the new page's `attachTo` has no usable element, though, the region shows nothing, as if the new page didn't have it.
 - If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
 - If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+- If the new page's `attachTo` has no usable element, the region isn't attached, and the rest of the navigation completes as if the new page didn't have the region: the other regions update, the title and URL change, and no error is thrown. There's no usable element when the selector matches nothing, when every match has inert `data-wp-html` content or is inside it, or when the selector isn't valid. The router resolves `attachTo` every time it renders the page, including on Back and Forward, so a later render can still attach the region.
 - If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+
+The router ignores `attachTo` for a region that the initial page declared with `attachTo`: on every later page, that region behaves as a regular router region.
 
 Example with `attachTo`:
 
@@ -127,6 +137,7 @@ navigate( href: string, options: NavigateOptions = {} )
     - `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
     - `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
     - `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
+    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none. Any other value (an empty string, a number, an object, `false`) is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
 
 #### `prefetch`
 
@@ -148,7 +159,17 @@ prefetch( url: string, options: PrefetchOptions = {} )
 
 ### State
 
-`state.url` is a reactive property synchronized with the current URL.
+All three properties are reactive, so reading them inside a directive or a `watch()` callback subscribes to their changes.
+
+-   `state.url` (`string`): Synchronized with the current URL.
+-   `state.navigating` (`boolean | undefined`): Truthy while a client-side navigation is in flight. The start is published as soon as the navigation enters the client-side pipeline, without waiting for the destination page; the end is published after the new content has been committed to the DOM, on a later frame, and the delay between the commit and the end is unbounded. A navigation that falls back to a full page load mid-flight keeps it truthy while the browser replaces the document, and resets it to `false` if the document is still there 10 seconds later; a navigation that throws while rendering ends normally, with the page possibly only partially updated. In both cases the end promises no new content. Neither the `loadingAnimation` nor the `screenReaderAnnouncement` option affects it: they change the built-in feedback, not this key.
+-   `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for back/forward traversals, for calls made with no directive scope, and for calls made from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal that reloads the document clears it to `null`.
+
+Neither `navigating` nor `initiator` is declared when the store is registered, so both read `undefined` until the first client-side navigation writes them, and on pages where the router module never loads. Consume them by truthiness — `if ( state.navigating )` and `state.initiator === myRegionId` — rather than comparing against `false` or `null`. Note that a binding such as `data-wp-bind--aria-busy="state.navigating"` renders no attribute at all while the value is `undefined`, rather than `aria-busy="false"`.
+
+A derived `state.initiator` carries the region's id, not the raw `data-wp-router-region` attribute text. For [the JSON object form](#data-wp-router-region) it is the value of the `id` property, a `namespace::` prefix is stripped, and an empty or non-string id reads `null` rather than an empty string. Compare against the id you gave the region, spelled exactly as you gave it.
+
+For the full semantics — which navigations are covered and which produce no transition at all, what overlapping navigations do to both readings, and which directive to read them from — see [Reacting to the navigation lifecycle](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#reacting-to-the-navigation-lifecycle) in the Client-Side Navigation guide.
 
 ## Installation
 

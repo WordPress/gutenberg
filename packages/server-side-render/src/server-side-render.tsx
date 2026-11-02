@@ -6,7 +6,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Placeholder, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useServerSideRender } from './hook';
 import type {
@@ -64,7 +64,7 @@ function DefaultLoadingResponsePlaceholder( {
 						marginLeft: '-9px',
 					} }
 				>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			<div style={ { opacity: showLoader ? '0.3' : 1 } }>

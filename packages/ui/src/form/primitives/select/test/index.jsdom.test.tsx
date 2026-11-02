@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useId } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import * as Select from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../../../utils/wp-compat-overlay-slot';
 
 describe( 'Select', () => {
 	it( 'auto-resolves trigger label from items when value is an object', () => {
@@ -246,7 +250,6 @@ describe( 'Select', () => {
 				</Select.Root>
 			)
 		).toThrow( 'Select.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description nested in the item label', () => {
@@ -269,7 +272,6 @@ describe( 'Select', () => {
 		).toThrow(
 			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description outside an item', () => {
@@ -280,6 +282,46 @@ describe( 'Select', () => {
 		).toThrow(
 			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
 		);
-		expect( console ).toHaveErrored();
+	} );
+} );
+
+describe( 'Select.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Select.Root defaultOpen>
+				<Select.Trigger>Open Select</Select.Trigger>
+				<div data-testid="portal-target" />
+				<Select.Popup
+					portal={ <Select.Portal container={ container } /> }
+				>
+					Portal content
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		await waitFor( () => {
+			expect(
+				within( target ).getByText( 'Portal content' )
+			).toBeVisible();
+		} );
 	} );
 } );

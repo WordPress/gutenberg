@@ -6,18 +6,20 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
-	DEFAULT_STATE,
 	ORIGINAL_ASPECT_RATIO,
-	areCropperStatesEqual,
-	buildCropperSetters,
-	enforceContainment,
 	exportCroppedImage,
-	type CropperAction,
 	type CropperController,
 	type CropperState,
 	type NormalizedRect,
 	type Size,
 } from '../image-editor';
+import {
+	DEFAULT_STATE,
+	areCropperStatesEqual,
+	enforceContainment,
+	type CropperAction,
+} from '../image-editor/core';
+import { buildCropperSetters } from '../image-editor/react/hooks';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
@@ -25,6 +27,8 @@ import {
 } from './composite-reducer';
 import type {
 	CropOptionsSlice,
+	EditsSlice,
+	EditValue,
 	MediaEditorAction,
 	MediaEditorState,
 } from './types';
@@ -102,8 +106,19 @@ export interface MediaEditorSession {
 	cropOptions: CropOptionsSlice;
 	/** Set the aspect-ratio preset. Atomic with the cropRect reshape. */
 	setAspectRatioValue: ( presetKey: string ) => void;
-	/** Reset cropOptions to defaults. */
-	resetCropOptions: () => void;
+	/**
+	 * Put every slice back to its starting state in one undo entry:
+	 * default geometry and crop options, no edits. Keeps the image.
+	 */
+	reset: () => void;
+	/** The named edits other than crop, keyed by edit name. */
+	edits: EditsSlice;
+	/**
+	 * Set a named edit, or remove it by passing `undefined`. Recorded
+	 * in the session history like any crop change. Setting a value
+	 * equal in content to the current one is a no-op.
+	 */
+	setEdit: ( name: string, value: EditValue | undefined ) => void;
 	/**
 	 * Replace the image being edited. A different image starts a
 	 * fresh session: default geometry and crop options, a clean
@@ -143,8 +158,8 @@ export interface MediaEditorSession {
  * The media editor session.
  *
  * Owns the only undo/redo history for the editor. Cropper geometry
- * actions and sidebar cropOptions actions flow through the same
- * reducer and the same history stack.
+ * actions, sidebar cropOptions actions and named edits flow through
+ * the same reducer and the same history stack.
  *
  * History semantics:
  * - Each action's pre-state is pushed to the undo stack before the
@@ -303,7 +318,7 @@ export function useMediaEditorState(): MediaEditorSession {
 		setHasRedo( false );
 	}, [] );
 
-	const reset = useCallback(
+	const resetCropper = useCallback(
 		( resetState?: Partial< CropperState > ) => {
 			dispatchWithHistory( {
 				type: 'CROPPER',
@@ -335,9 +350,27 @@ export function useMediaEditorState(): MediaEditorSession {
 		[ dispatchWithHistory ]
 	);
 
-	const resetCropOptions = useCallback( () => {
-		dispatchWithHistory( { type: 'RESET_CROP_OPTIONS' } );
+	// =====================================================================
+	// Session
+	// =====================================================================
+
+	const reset = useCallback( () => {
+		dispatchWithHistory( { type: 'RESET' } );
 	}, [ dispatchWithHistory ] );
+
+	// =====================================================================
+	// Edits-slice setters
+	// =====================================================================
+
+	const setEdit = useCallback(
+		( name: string, value: EditValue | undefined ) => {
+			dispatchWithHistory( {
+				type: 'SET_EDIT',
+				payload: { name, value },
+			} );
+		},
+		[ dispatchWithHistory ]
+	);
 
 	// =====================================================================
 	// History
@@ -421,7 +454,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			...cropperSetters,
 			state: state.cropper,
 			setImage: setSourceImage,
-			reset,
+			reset: resetCropper,
 			isDirty: isCropperDirty,
 			getCroppedImage,
 			setVisualSize,
@@ -431,7 +464,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			cropperSetters,
 			state.cropper,
 			setSourceImage,
-			reset,
+			resetCropper,
 			isCropperDirty,
 			getCroppedImage,
 			setVisualSize,
@@ -444,8 +477,10 @@ export function useMediaEditorState(): MediaEditorSession {
 			cropper,
 			cropOptions: state.cropOptions,
 			setAspectRatioValue,
-			resetCropOptions,
+			edits: state.edits,
+			setEdit,
 			setSourceImage,
+			reset,
 			isDirty,
 			// Only geometry changes the saved image so far.
 			hasOutputEdits: isCropperDirty,
@@ -460,8 +495,10 @@ export function useMediaEditorState(): MediaEditorSession {
 			cropper,
 			state.cropOptions,
 			setAspectRatioValue,
-			resetCropOptions,
+			state.edits,
+			setEdit,
 			setSourceImage,
+			reset,
 			isDirty,
 			isCropperDirty,
 			hasUndo,

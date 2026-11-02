@@ -50,9 +50,7 @@ export function getBestImageUrl(
 		}
 
 		// Sort ascending by width.
-		const sorted = [ ...validEntries ].sort(
-			( a, b ) => a.width - b.width
-		);
+		const sorted = validEntries.toSorted( ( a, b ) => a.width - b.width );
 		// Pick the smallest size that is >= target width.
 		const match = sorted.find( ( s ) => s.width >= targetWidth );
 		if ( match ) {

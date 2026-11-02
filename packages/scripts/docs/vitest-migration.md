@@ -328,7 +328,7 @@ A `.jsdom.test.*` or `.browser.test.*` filename alone does not select an environ
 -   Import `describe`, `test`, `expect`, hooks, and `vi` from `vitest`. Replace Jest mocks using the [Jest migration guide](https://vitest.dev/guide/migration/jest). Mock factories, module reset behavior, and timers can differ.
 -   Convert `testMatch` to `test.include`, `moduleNameMapper` to Vite aliases, and `setupFilesAfterEnv` to `test.setupFiles`. Choose the required cleanup options explicitly. Vitest's defaults do not reproduce the WordPress Jest preset.
 -   Replace `@wordpress/jest-console` matchers with local `vi.spyOn( console, 'error' )` assertions and restore the spy. Unexpected console output does not fail a Vitest test by default. If your suite requires that contract, implement and test it in your own setup. Do not import Gutenberg's console setup.
--   Review snapshots when converting them. Keep runner-neutral `@testing-library/jest-dom` and snapshot-diff matchers where needed.
+-   Review snapshots when converting them, and prefer direct assertions for the behavior that changes between states. Runner-neutral `@testing-library/jest-dom` matchers remain supported.
 -   Use `--update` for snapshots and `--no-file-parallelism` for debugging. Jest options such as `--runInBand`, `--updateSnapshot`, and `--ci` are not interchangeable with Vitest options.
 -   The public `test-unit` ESLint config uses `@vitest/eslint-plugin` recommended rules without declaring globals. Projects retaining Jest should install `eslint-plugin-jest` and select its `flat/recommended` config explicitly.
 

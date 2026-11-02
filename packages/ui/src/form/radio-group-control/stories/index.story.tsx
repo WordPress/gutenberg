@@ -6,6 +6,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof RadioGroupControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/RadioGroupControl',
 	id: 'design-system-components-form-radiogroupcontrol',
 	component: RadioGroupControl,
@@ -13,6 +14,12 @@ const meta: Meta< typeof RadioGroupControl > = {
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		defaultValue: { control: false },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

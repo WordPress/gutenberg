@@ -12,7 +12,7 @@ export function useResizeObserver< T extends HTMLElement >(
 ): ( element?: T | null ) => void {
 	const callbackEvent = useEvent( callback );
 
-	const observedElementRef = useRef< T | null >( null );
+	const observedElementRef = useRef< T >( null );
 	const resizeObserverRef = useRef< ResizeObserver >( undefined );
 	useEffect( () => {
 		if ( observedElementRef.current ) {

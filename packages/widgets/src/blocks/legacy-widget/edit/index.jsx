@@ -5,7 +5,12 @@ import {
 	InspectorControls,
 	BlockIcon,
 } from '@wordpress/block-editor';
-import { Flex, FlexBlock, Spinner, Placeholder } from '@wordpress/components';
+import {
+	Flex,
+	FlexBlock,
+	Spinner as WCSpinner,
+	Placeholder,
+} from '@wordpress/components';
 import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
@@ -107,7 +112,7 @@ function NotEmpty( {
 	if ( ! hasResolvedWidgetType ) {
 		return (
 			<Placeholder>
-				<Spinner />
+				<WCSpinner />
 			</Placeholder>
 		);
 	}
@@ -147,7 +152,7 @@ function NotEmpty( {
 				<>
 					{ hasPreview === null && mode === 'preview' && (
 						<Placeholder>
-							<Spinner />
+							<WCSpinner />
 						</Placeholder>
 					) }
 					{ hasPreview === true && (

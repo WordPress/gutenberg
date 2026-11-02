@@ -1,5 +1,6 @@
-import { describe, expect, it, vi, type Mock } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
 import { MediaEditorStateProvider } from '../../../state';
@@ -30,19 +31,22 @@ function setupCropPanel(
 }
 
 describe( 'MediaEditorCropPanel', () => {
-	it( 'passes selected aspect ratio changes to the caller', () => {
+	it( 'passes selected aspect ratio changes to the caller', async () => {
+		const user = userEvent.setup();
 		const controls = setupCropPanel( {
 			aspectRatioValue: '1',
 		} );
 
-		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
-			target: { value: '0' },
-		} );
+		await user.click(
+			screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Free' } )
+		);
 
-		expect( controls.onAspectRatioChange ).toHaveBeenCalled();
-		expect(
-			( controls.onAspectRatioChange as Mock ).mock.calls[ 0 ][ 0 ]
-		).toBe( '0' );
+		expect( controls.onAspectRatioChange ).toHaveBeenCalledExactlyOnceWith(
+			'0'
+		);
 	} );
 
 	it( 'renders rotate, flip and zoom controls', () => {

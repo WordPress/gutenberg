@@ -14,9 +14,9 @@ import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
-	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
@@ -83,7 +83,7 @@ const defaultSyncedProperties = new Set< string >( [
 	'title',
 ] );
 
-describe( 'defaultSyncConfig', () => {
+describe( 'taxonomySyncConfig', () => {
 	// Regression test for https://github.com/WordPress/gutenberg/issues/79907:
 	// reporting unchanged properties as changes marks resolved records
 	// (e.g. taxonomy terms) as dirty whenever a synced update arrives.
@@ -96,11 +96,11 @@ describe( 'defaultSyncConfig', () => {
 			meta: [],
 			_links: { self: [ { href: 'https://example.com' } ] },
 		};
-		defaultSyncConfig.applyChangesToCRDTDoc( doc, record );
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, record );
 
 		// The edited record deep-equals the document contents, but
 		// `Y.Map.toJSON()` returns fresh object instances.
-		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+		const changes = taxonomySyncConfig.getChangesFromCRDTDoc( doc, {
 			...record,
 			meta: [],
 			_links: { self: [ { href: 'https://example.com' } ] },
@@ -112,19 +112,91 @@ describe( 'defaultSyncConfig', () => {
 
 	it( 'getChangesFromCRDTDoc returns only the properties that differ from the edited record', () => {
 		const doc = new Y.Doc();
-		defaultSyncConfig.applyChangesToCRDTDoc( doc, {
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, {
 			id: 1,
 			name: 'Renamed category',
 			slug: 'uncategorized',
 		} );
 
-		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+		const changes = taxonomySyncConfig.getChangesFromCRDTDoc( doc, {
 			id: 1,
 			name: 'Uncategorized',
 			slug: 'uncategorized',
 		} );
 
 		expect( changes ).toEqual( { name: 'Renamed category' } );
+		doc.destroy();
+	} );
+
+	it( 'does not put read-only term data into shared documents', () => {
+		const doc = new Y.Doc();
+		const editableFields = {
+			name: 'Renamed category',
+			slug: 'renamed-category',
+			description: 'Category description',
+			parent: 2,
+			meta: { color: 'blue' },
+			custom_field: 'Plugin-provided value',
+		};
+
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, {
+			...editableFields,
+			id: 1,
+			count: 3,
+			link: 'https://example.com/category/renamed-category/',
+			taxonomy: 'category',
+			_links: { self: [ { href: 'https://example.com' } ] },
+			_embedded: { author: [ { id: 1 } ] },
+		} );
+
+		expect( doc.getMap( CRDT_RECORD_MAP_KEY ).toJSON() ).toEqual(
+			editableFields
+		);
+		doc.destroy();
+	} );
+
+	it( 'ignores stale read-only data from existing shared documents while preserving term edits', () => {
+		const doc = new Y.Doc();
+		const record = {
+			id: 1,
+			count: 3,
+			name: 'Uncategorized',
+			slug: 'uncategorized',
+			description: '',
+			parent: 0,
+			meta: { color: 'red' },
+			custom_field: 'Original value',
+			link: 'https://example.com/category/uncategorized/',
+			taxonomy: 'category',
+			_links: { self: [ { href: 'https://example.com' } ] },
+			_embedded: { author: [ { id: 1 } ] },
+		};
+		const termEdits = {
+			name: 'Renamed category',
+			slug: 'renamed-category',
+			description: 'Category description',
+			parent: 2,
+			meta: { color: 'blue' },
+			custom_field: 'Plugin-provided value',
+		};
+
+		// Seed a document written before read-only fields were excluded.
+		const sharedRecord = {
+			...record,
+			...termEdits,
+			count: 0,
+			link: 'https://old.example.com/category/uncategorized/',
+			_links: { self: [ { href: 'https://old.example.com' } ] },
+			_embedded: { author: [ { id: 2 } ] },
+		};
+		const ymap = doc.getMap( CRDT_RECORD_MAP_KEY );
+		for ( const [ key, value ] of Object.entries( sharedRecord ) ) {
+			ymap.set( key, value );
+		}
+
+		expect(
+			taxonomySyncConfig.getChangesFromCRDTDoc( doc, record )
+		).toEqual( termEdits );
 		doc.destroy();
 	} );
 } );

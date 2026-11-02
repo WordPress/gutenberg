@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import '@wordpress/theme/design-tokens.css';
 import { Menu } from '..';
 import Modal from '../../modal';
 // Load the body scroll-lock rule that WordPress enqueues for Modal.

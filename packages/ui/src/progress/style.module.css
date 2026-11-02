@@ -2,6 +2,11 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
+		.root {
+			/* Keep progress readable; consumers can override the width for their layout. */
+			width: 160px;
+		}
+
 		.label,
 		.value {
 			color: var(--wpds-color-foreground-content-neutral);

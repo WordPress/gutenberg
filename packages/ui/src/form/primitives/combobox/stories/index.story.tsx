@@ -10,6 +10,10 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
@@ -287,7 +291,7 @@ export const AsyncItems: Story = {
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
 		const [ value, setValue ] = useState< FixtureItem | undefined >();
 		const [ open, setOpen ] = useState( false );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Combobox.Root
@@ -302,14 +306,15 @@ export const AsyncItems: Story = {
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					setOpen( nextOpen );
 					if ( ! nextOpen ) {
-						clearTimeout( timeoutRef.current );
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
@@ -558,4 +563,42 @@ export const WithCustomZIndex: Story = {
 			</Combobox.Popup>,
 		],
 	},
+};
+
+/**
+ * Use `width` on `Combobox.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems,
+	},
+	render: ( args ) => (
+		<Combobox.Root { ...args }>
+			<Combobox.Trigger aria-label="Label" />
+			<Combobox.Popup aria-label="Label" width="sm">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ (
+								item: ( typeof longLabelPopupItems )[ number ]
+							) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>
+		</Combobox.Root>
+	),
 };

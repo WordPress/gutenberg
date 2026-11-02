@@ -82,7 +82,10 @@ const backgroundAttachment = {
 	},
 };
 
-const VALID_BACKGROUND_CLIP_VALUES = [
+/**
+ * The values `background-clip` accepts. Anything else generates no CSS.
+ */
+export const VALID_BACKGROUND_CLIP_VALUES = [
 	'border-box',
 	'padding-box',
 	'content-box',
