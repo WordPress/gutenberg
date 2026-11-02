@@ -1,4 +1,5 @@
 import { useRefEffect } from '@wordpress/compose';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 
 const FOCUSABLE_SELECTOR = [
 	'button:not([disabled])',
@@ -43,8 +44,15 @@ function getFallback( container: HTMLElement ) {
  * focus to is gone by the time the modal closes. Without this, focus falls
  * back to the document body and keyboard users have to start over from the
  * top of the page.
+ *
+ * @param isEmpty Whether there are no items left to show, in which case the
+ *                layout has no controls and focus moves to the ones around it.
  */
-export default function useFocusFallback() {
+export default function useFocusFallback( isEmpty: boolean ) {
+	const isEmptyRef = useRef( isEmpty );
+	useLayoutEffect( () => {
+		isEmptyRef.current = isEmpty;
+	}, [ isEmpty ] );
 	return useRefEffect( ( container: HTMLElement ) => {
 		const { ownerDocument } = container;
 		let lastFocused: HTMLElement | null = null;
@@ -59,10 +67,22 @@ export default function useFocusFallback() {
 		// once that is done.
 		const onFocusOut = ( event: FocusEvent ) => {
 			const target = event.target as HTMLElement;
-			if (
-				event.relatedTarget ||
-				target.closest( '[inert], [aria-hidden="true"]' )
-			) {
+			const next = event.relatedTarget as HTMLElement | null;
+			// Focus moved to another control outside the layout, e.g. the
+			// search, was moved on purpose too. Menus and dialogs opened from
+			// the layout hand it back, so keep tracking for them.
+			if ( next ) {
+				if (
+					! container.contains( next ) &&
+					! next.closest(
+						'[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]'
+					)
+				) {
+					lastFocused = null;
+				}
+				return;
+			}
+			if ( target.closest( '[inert], [aria-hidden="true"]' ) ) {
 				return;
 			}
 			queueMicrotask( () => {
@@ -94,7 +114,17 @@ export default function useFocusFallback() {
 			if ( ! wasRemoved || ! isLost ) {
 				return;
 			}
-			const fallback = getFallback( container );
+			// With no items left, the layout has no controls: use the ones
+			// around it, such as the search.
+			const fallback =
+				getFallback( container ) ??
+				( isEmptyRef.current
+					? getFallback(
+							container.closest< HTMLElement >(
+								'.dataviews-wrapper'
+							) ?? container
+						)
+					: undefined );
 			// Nothing to move focus to yet, e.g. while the previous page loads
 			// after the last item of a page was removed: try again on the next
 			// change.

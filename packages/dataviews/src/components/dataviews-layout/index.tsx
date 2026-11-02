@@ -22,6 +22,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		getItemLevel,
 		hasInitiallyLoaded,
 		isLoading,
+		paginationInfo,
 		view,
 		onChangeView,
 		selection,
@@ -35,7 +36,10 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
-	const layoutRef = useMergeRefs( [ containerRef, useFocusFallback() ] );
+	const layoutRef = useMergeRefs( [
+		containerRef,
+		useFocusFallback( ! isLoading && paginationInfo.totalItems === 0 ),
+	] );
 	const isDelayedInitialLoading = useDelayedLoading( ! hasInitiallyLoaded, {
 		delay: 200,
 	} );

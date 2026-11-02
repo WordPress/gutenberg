@@ -521,7 +521,21 @@ it( 'moves focus to the select all checkbox when an action removes the item that
 		.toHaveFocus();
 } );
 
-function TableOf( { items }: { items: Post[] } ) {
+// Focus is restored a frame after the change, so wait for it before
+// checking that it was left alone.
+function nextFrames() {
+	return new Promise( ( resolve ) =>
+		requestAnimationFrame( () => requestAnimationFrame( resolve ) )
+	);
+}
+
+function TableOf( {
+	items,
+	totalItems = items.length,
+}: {
+	items: Post[];
+	totalItems?: number;
+} ) {
 	return (
 		<DataViews
 			data={ items }
@@ -535,7 +549,7 @@ function TableOf( { items }: { items: Post[] } ) {
 			} }
 			onChangeView={ () => {} }
 			actions={ actions }
-			paginationInfo={ { totalItems: items.length, totalPages: 1 } }
+			paginationInfo={ { totalItems, totalPages: 1 } }
 			defaultLayouts={ { table: true } }
 		/>
 	);
@@ -552,6 +566,7 @@ it( 'leaves focus alone when it was moved away before the item was removed', asy
 	await expect
 		.element( page.getByRole( 'row', { name: /First post/ } ) )
 		.not.toBeInTheDocument();
+	await nextFrames();
 	expect( checkbox.ownerDocument.body ).toHaveFocus();
 } );
 
@@ -586,7 +601,8 @@ it( 'moves focus once there is a control again after the focused item was remove
 	} )
 		.element()
 		.focus();
-	await rerender( <TableOf items={ [] } /> );
+	// Like the last item of a page, while the page before it loads.
+	await rerender( <TableOf items={ [] } totalItems={ 1 } /> );
 	await rerender( <TableOf items={ [ posts[ 1 ] ] } /> );
 	await expect
 		.element(
@@ -660,4 +676,39 @@ it( 'does not announce bulk actions in layouts that do not show them', async () 
 		)
 		.toHaveAttribute( 'aria-pressed', 'true' );
 	expect( speak ).not.toHaveBeenCalled();
+} );
+
+it( 'moves focus to the search when no items are left', async () => {
+	const { rerender } = await render( <TableOf items={ [ posts[ 0 ] ] } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	await rerender( <TableOf items={ [] } /> );
+	await expect
+		.element( page.getByRole( 'searchbox', { name: 'Search' } ) )
+		.toHaveFocus();
+} );
+
+it( 'forgets the focused item once focus moves to another control', async () => {
+	const { rerender } = await render( <TableOf items={ posts } /> );
+	page.getByRole( 'checkbox', {
+		name: 'Select First post',
+		exact: true,
+	} )
+		.element()
+		.focus();
+	const search = page
+		.getByRole( 'searchbox', { name: 'Search' } )
+		.element() as HTMLElement;
+	search.focus();
+	search.blur();
+	await rerender( <TableOf items={ posts.slice( 1 ) } /> );
+	await expect
+		.element( page.getByRole( 'row', { name: /First post/ } ) )
+		.not.toBeInTheDocument();
+	await nextFrames();
+	expect( search.ownerDocument.body ).toHaveFocus();
 } );
