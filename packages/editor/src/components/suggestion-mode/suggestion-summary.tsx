@@ -54,8 +54,12 @@
  * than run together into a phrase nobody typed.
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Matches the note card's own "Show more" toggle.
-import { Button as UIButton, Stack, Text } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Matches the note card's own "Show more" toggle.
+	Button as UIButton,
+	Stack,
+	Text,
+} from '@wordpress/ui';
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
