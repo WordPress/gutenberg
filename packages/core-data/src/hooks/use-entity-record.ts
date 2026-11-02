@@ -10,14 +10,17 @@ export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
 	record: RecordType | null;
 
-	/** The edited entity record */
-	editedRecord: Partial< RecordType >;
+	/**
+	 * The edited entity record. Fields edited as raw markup, such as a post's
+	 * `title` and `content`, hold that markup as a string.
+	 */
+	editedRecord: Partial< ET.Updatable< RecordType > >;
 
 	/** The edits to the edited entity record */
-	edits: Partial< RecordType >;
+	edits: Partial< ET.Updatable< RecordType > >;
 
 	/** Apply local (in-browser) edits to the edited entity record */
-	edit: ( diff: Partial< RecordType > ) => void;
+	edit: ( diff: Partial< ET.Updatable< RecordType > > ) => void;
 
 	/** Persist the edits to the server */
 	save: () => Promise< void >;

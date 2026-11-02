@@ -1,5 +1,3 @@
-import type { EntityRecord } from './index';
-
 export interface AvatarUrls {
 	/**
 	 * Avatar URL with image size of 24 pixels.
@@ -159,6 +157,6 @@ export type RenderedText< C extends Context > = OmitNevers< {
  * // updatablePost.title is a string
  * ```
  */
-export type Updatable< T extends EntityRecord< 'edit' > > = {
+export type Updatable< T > = {
 	[ K in keyof T ]: T[ K ] extends RenderedText< any > ? string : T[ K ];
 };
