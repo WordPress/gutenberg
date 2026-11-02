@@ -6,7 +6,7 @@
 }
 
 /* The slug reads as one path after the `/` prefix, as in the editor's slug control. */
-.slug input {
+.slug input[type="text"] {
 	padding-inline-start: 0;
 }
 
