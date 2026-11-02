@@ -197,14 +197,17 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 /**
  * The taxonomies the map knows about, and the record each one returns.
  *
- * A custom taxonomy is added by merging into this interface.
+ * `loadTaxonomyEntities` registers every taxonomy the REST API lists, and the
+ * terms controller serves each of them, so any taxonomy name resolves to
+ * `Term`. That includes a name only known at runtime, such as one read from a
+ * block attribute. A plugin can merge in a taxonomy whose record extends
+ * `Term` with fields of its own.
  *
  * @see RootEntityRecordTypes
  */
-export interface TaxonomyEntityRecordTypes<
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	C extends Context,
-> {}
+export interface TaxonomyEntityRecordTypes< C extends Context > {
+	[ name: string ]: Term< C >;
+}
 
 /**
  * Maps an entity's `kind` and `name` to the record type it returns.
@@ -282,8 +285,25 @@ export type EntityRecordOf<
 	 * context, but TypeScript cannot see that, so the lookup is re-narrowed
 	 * against the map for the context actually being resolved.
 	 */
-> = EntityRecordTypes< C >[ Kind ][ Name &
+> = EntityRecordTypes< C >[ Kind ][ LookupName<
+	keyof EntityRecordTypes< C >[ Kind ],
+	Name
+> &
 	keyof EntityRecordTypes< C >[ Kind ] ];
+
+/**
+ * The name to look up in a kind's map.
+ *
+ * A JavaScript caller often passes a name typed `any`, such as a block
+ * attribute. When every name of the kind resolves to the same record, as with
+ * taxonomies, `any` is looked up as `string` and resolves to that record.
+ * Otherwise it stays `any`, as before the map existed.
+ */
+type LookupName< Keys, Name > = 0 extends 1 & Name
+	? string extends Keys
+		? string
+		: any
+	: Name;
 
 /**
  * The context a `root` entity is fetched in when the call names none.
@@ -324,7 +344,9 @@ export interface PostTypeEntityContexts {
  *
  * @see EntityContextDefaults
  */
-export interface TaxonomyEntityContexts {}
+export interface TaxonomyEntityContexts {
+	[ name: string ]: 'edit';
+}
 
 /**
  * Maps a `kind`/`name` pair to the context it is fetched in when the call
@@ -358,11 +380,24 @@ export interface EntityContextDefaults {
 export type DefaultContextOf<
 	Kind extends EntityKind,
 	Name extends EntityNameOf< Kind >,
-> = Kind extends keyof EntityContextDefaults
-	? Name extends keyof EntityContextDefaults[ Kind ]
-		? EntityContextDefaults[ Kind ][ Name ] extends Context
-			? EntityContextDefaults[ Kind ][ Name ]
-			: Context
+> = DefaultContextOfName< Kind, Name >;
+
+/*
+ * Kept separate from `DefaultContextOf` so `Name` carries no constraint here:
+ * TypeScript resolves an `any` name against the constraint rather than the
+ * map, which would lose the taxonomy context.
+ */
+type DefaultContextOfName< Kind, Name > =
+	Kind extends keyof EntityContextDefaults
+		? ContextOfName<
+				EntityContextDefaults[ Kind ],
+				LookupName< keyof EntityContextDefaults[ Kind ], Name >
+			>
+		: Context;
+
+type ContextOfName< Contexts, Key > = Key extends keyof Contexts
+	? Contexts[ Key ] extends Context
+		? Contexts[ Key ]
 		: Context
 	: Context;
 
