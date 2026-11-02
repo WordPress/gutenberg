@@ -3,7 +3,7 @@ import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components/@wordpress-components/Feedback/ProgressBar',
+	title: 'Components/@wordpress-components/Deprecated/ProgressBar',
 	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
@@ -16,7 +16,7 @@ const meta: Meta< typeof ProgressBar > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead.',
+			notes: 'Deprecated. Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-progressbar--migration-guide).',
 		},
 	},
 };

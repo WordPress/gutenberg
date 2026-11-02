@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../blocks" },
+		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
