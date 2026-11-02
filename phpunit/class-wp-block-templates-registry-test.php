@@ -22,7 +22,7 @@ class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {
 		$template_name = 'test-plugin//test-template';
 		$template      = self::$registry->register( $template_name );
 
-		$this->assertSame( $template->slug, 'test-template' );
+		$this->assertSame( 'test-template', $template->slug );
 
 		self::$registry->unregister( $template_name );
 	}
@@ -114,7 +114,7 @@ class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Description of registered template', $registered_template->description, 'Template description mismatch.' );
 		$this->assertSame( 'plugin', $registered_template->source, "Template source should be 'plugin'." );
 		$this->assertSame( 'plugin', $registered_template->origin, "Template origin should be 'plugin'." );
-		$this->assertEquals( array( 'post', 'page' ), $registered_template->post_types, 'Template post types mismatch.' );
+		$this->assertSame( array( 'post', 'page' ), $registered_template->post_types, 'Template post types mismatch.' );
 		$this->assertSame( 'test-plugin', $registered_template->plugin, 'Plugin name mismatch.' );
 
 		self::$registry->unregister( $template_name );
