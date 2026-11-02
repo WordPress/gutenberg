@@ -33,6 +33,10 @@ export type ControlWithErrorProps = Omit<
 	/**
 	 * Show a custom message based on the validation status.
 	 *
+	 * When omitted, the wrapper observes the control's existing native validity.
+	 * Supplying this prop takes ownership of the native custom-validity message;
+	 * do not combine it with a child that independently calls `setCustomValidity()`.
+	 *
 	 * - When `type` is `invalid`, the message will be applied to the underlying element using the
 	 * native [`setCustomValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity).
 	 * This means the custom message will be prioritized over any existing validity messages

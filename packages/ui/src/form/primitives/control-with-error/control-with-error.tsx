@@ -92,6 +92,7 @@ export const ControlWithError = forwardRef<
 	const [ validity, setValidity ] = useState< Validity | undefined >();
 	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
+	const hasManagedValidityRef = useRef( false );
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
@@ -175,11 +176,16 @@ export const ControlWithError = forwardRef<
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
-		validityTarget?.setCustomValidity(
-			customValidity?.type === 'invalid'
-				? ( customValidity.message ?? '' )
-				: ''
-		);
+		// Without customValidity, observe a control's own validator. Once this
+		// wrapper manages validity, removing the prop clears its native error.
+		if ( customValidity !== undefined || hasManagedValidityRef.current ) {
+			validityTarget?.setCustomValidity(
+				customValidity?.type === 'invalid'
+					? ( customValidity.message ?? '' )
+					: ''
+			);
+			hasManagedValidityRef.current = customValidity !== undefined;
+		}
 
 		const nextValidity = getValidity( customValidity, validityTarget );
 		if ( ! isSameValidity( nextValidity, validity ) ) {
