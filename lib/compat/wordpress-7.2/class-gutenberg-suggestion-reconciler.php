@@ -513,7 +513,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * size limit in full form.
 		 *
 		 * @param string             $content   Content.
-		 * @param array<int, true>   $notes     Suggestion notes of the post.
+		 * @param array<int, mixed>  $notes     Suggestion notes of the post, by note ID.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
 		 * @return array{content: string, items: array<int, array[]>, skipped: array<int, true>}
 		 */
