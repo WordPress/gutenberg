@@ -5,6 +5,22 @@ import RootSinglePage from '../root/single-page';
 import { store } from '../../store';
 import type { MenuItem, Route } from '../../store/types';
 
+/*
+ * The React roots of single-page apps, by mount element, so the admin shell
+ * can unmount pages it no longer keeps alive.
+ */
+const roots = new Map< Element, ReturnType< typeof createRoot > >();
+
+/**
+ * Unmounts the single-page app mounted into `element`, if any.
+ *
+ * @param element Mount element.
+ */
+export function unmountPage( element: Element ) {
+	roots.get( element )?.unmount();
+	roots.delete( element );
+}
+
 interface AppProps {
 	rootComponent?: ComponentType;
 }
@@ -109,6 +125,7 @@ export async function initSinglePage( {
 	const rootElement = document.getElementById( mountId );
 	if ( rootElement ) {
 		const root = createRoot( rootElement );
+		roots.set( rootElement, root );
 		root.render(
 			<StrictMode>
 				<App rootComponent={ RootSinglePage } />
@@ -138,6 +155,7 @@ export function mountGuestPage( {
 	routes,
 }: MountGuestPageProps ) {
 	const root = createRoot( element );
+	roots.set( element, root );
 	root.render(
 		<StrictMode>
 			<GuestApp routes={ routes } pageKey={ pageKey } />

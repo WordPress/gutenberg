@@ -13,13 +13,22 @@
 			"path": "../../../../packages/admin-ui/tsconfig.build.json"
 		},
 		{
+			"path": "../../../../packages/boot/tsconfig.build.json"
+		},
+		{
 			"path": "../../../../packages/components/tsconfig.build.json"
+		},
+		{
+			"path": "../../../../packages/data/tsconfig.build.json"
 		},
 		{
 			"path": "../../../../packages/element/tsconfig.build.json"
 		},
 		{
 			"path": "../../../../packages/i18n/tsconfig.build.json"
+		},
+		{
+			"path": "../../../../packages/keyboard-shortcuts/tsconfig.build.json"
 		},
 		{
 			"path": "../../../../packages/route/tsconfig.build.json"

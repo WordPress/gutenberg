@@ -373,7 +373,11 @@ add_filter(
 );
 ```
 
-A listed page should load its data through REST or script modules. Classic scripts, styles and inline data that only its own page load enqueues are not loaded when the shell opens it. In Gutenberg, the shell is behind the "Instant admin page switching" experiment; see `test/admin-shell-demo-plugin` for a working example.
+Before the shell opens a page, it preloads the REST responses from the page's `{prefix}_{page}_wp_admin_preload_paths` filter, as the page's own load does. Inside a page, `usePageVisibility()` from `@wordpress/boot` tells whether the page is showing, so it can pause work while hidden; keyboard shortcuts registered with `useShortcut` already stop while the page is hidden.
+
+A listed page should load its data through REST or script modules. A page that needs classic scripts or styles besides Boot's can list their handles with an array entry, `array( 'page' => 'my-admin-page-wp-admin', 'scripts' => array( … ), 'styles' => array( … ) )`, and they are then enqueued on every page in the shell. Inline data that only its own page load prints is not available when the shell opens it.
+
+In Gutenberg, the shell is behind the "Instant admin page switching" experiment, and the `admin_shell_max_alive_pages` filter (default 5) sets how many pages stay in memory. See `test/admin-shell-demo-plugin` for a working example.
 
 **Init Modules:**
 Init modules are JavaScript packages that execute during page initialization, after menu items and routes are registered and before the app renders. They're ideal for:

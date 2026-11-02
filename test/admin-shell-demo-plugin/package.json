@@ -25,14 +25,19 @@
 		"packageNamespace": "admin-shell-demo",
 		"pages": [
 			"shell-demo-notes",
-			"shell-demo-counter"
+			"shell-demo-counter",
+			"shell-demo-settings"
 		]
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/boot": "file:../../packages/boot",
 		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/keyboard-shortcuts": "file:../../packages/keyboard-shortcuts",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/ui": "file:../../packages/ui"
 	},

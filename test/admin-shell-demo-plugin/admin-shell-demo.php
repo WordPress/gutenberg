@@ -26,7 +26,7 @@ require_once $admin_shell_demo_build;
 
 /**
  * Adds the demo pages to the admin menu: a top-level "Shell Demo" menu with
- * a Notes page and a Counter page. The callbacks are the generated render
+ * a Notes page, a Counter page and a Settings page. The callbacks are the generated render
  * functions of the pages in `wpPlugin.pages`.
  *
  * Notes uses the default menu slug, the page ID plus `-wp-admin`. Counter
@@ -59,6 +59,14 @@ function admin_shell_demo_add_menu_pages() {
 		'shell-counter',
 		'admin_shell_demo_shell_demo_counter_wp_admin_render_page'
 	);
+	add_submenu_page(
+		'shell-demo-notes-wp-admin',
+		__( 'Settings', 'admin-shell-demo' ),
+		__( 'Settings', 'admin-shell-demo' ),
+		'manage_options',
+		'shell-demo-settings-wp-admin',
+		'admin_shell_demo_shell_demo_settings_wp_admin_render_page'
+	);
 }
 add_action( 'admin_menu', 'admin_shell_demo_add_menu_pages' );
 
@@ -73,6 +81,43 @@ add_action( 'admin_menu', 'admin_shell_demo_add_menu_pages' );
 function admin_shell_demo_add_shell_pages( $pages ) {
 	$pages[] = 'shell-demo-notes-wp-admin';
 	$pages[] = 'shell-counter';
+	$pages[] = 'shell-demo-settings-wp-admin';
 	return $pages;
 }
 add_filter( 'admin_shell_pages', 'admin_shell_demo_add_shell_pages' );
+
+/**
+ * Registers the "Pages to keep alive" option, which the Settings page edits
+ * through the REST API.
+ */
+function admin_shell_demo_register_settings() {
+	register_setting(
+		'admin_shell_demo',
+		'admin_shell_demo_max_alive_pages',
+		array(
+			'type'              => 'integer',
+			'description'       => __( 'How many admin pages the admin shell keeps in memory.', 'admin-shell-demo' ),
+			'default'           => 5,
+			'sanitize_callback' => static function ( $value ) {
+				return max( 1, absint( $value ) );
+			},
+			'show_in_rest'      => array(
+				'schema' => array(
+					'minimum' => 1,
+				),
+			),
+		)
+	);
+}
+add_action( 'init', 'admin_shell_demo_register_settings' );
+
+/**
+ * Passes the "Pages to keep alive" option to the admin shell.
+ *
+ * @param int $max_alive_pages Maximum number of pages the shell keeps mounted.
+ * @return int The option's value.
+ */
+function admin_shell_demo_max_alive_pages( $max_alive_pages ) {
+	return (int) get_option( 'admin_shell_demo_max_alive_pages', $max_alive_pages );
+}
+add_filter( 'admin_shell_max_alive_pages', 'admin_shell_demo_max_alive_pages' );

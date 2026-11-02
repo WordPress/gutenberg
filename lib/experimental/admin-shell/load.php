@@ -66,7 +66,19 @@ function _gutenberg_admin_shell_get_pages(): array {
 	 * whose menu callback renders a page built with @wordpress/build. For
 	 * example `my-page-wp-admin`, or any slug the page was registered under.
 	 *
-	 * @param string[] $pages Menu slugs of pages that can be switched between in place.
+	 * A page that needs classic scripts or styles besides Boot's own can list
+	 * their handles by giving an array instead of a slug:
+	 *
+	 *     array(
+	 *         'page'    => 'my-page-wp-admin',
+	 *         'scripts' => array( 'my-plugin-legacy-settings' ),
+	 *         'styles'  => array( 'my-plugin-legacy-styles' ),
+	 *     )
+	 *
+	 * Those handles are then enqueued on every page in the shell, since a
+	 * classic script can't be added to the page once it has loaded.
+	 *
+	 * @param array<string|array> $pages Pages that can be switched between in place.
 	 */
 	$listed = (array) apply_filters( 'admin_shell_pages', array() );
 
@@ -79,7 +91,12 @@ function _gutenberg_admin_shell_get_pages(): array {
 	$described = (array) apply_filters( 'wp_build_admin_pages', array() );
 
 	$pages = array();
-	foreach ( array_unique( array_filter( $listed, 'is_string' ) ) as $menu_slug ) {
+	foreach ( $listed as $entry ) {
+		$entry     = is_string( $entry ) ? array( 'page' => $entry ) : $entry;
+		$menu_slug = is_array( $entry ) ? ( $entry['page'] ?? null ) : null;
+		if ( ! is_string( $menu_slug ) || isset( $pages[ $menu_slug ] ) ) {
+			continue;
+		}
 		$menu_entry = _gutenberg_admin_shell_menu_entry( $menu_slug );
 		if ( ! $menu_entry ) {
 			continue;
@@ -87,14 +104,23 @@ function _gutenberg_admin_shell_get_pages(): array {
 
 		// Find the page the menu item renders.
 		$hook_name = get_plugin_page_hookname( $menu_slug, $menu_entry['parent'] );
-		foreach ( $described as $description ) {
+		foreach ( $described as $page_id => $description ) {
 			$render_callback = $description['render_callback'] ?? null;
 			if (
 				is_string( $render_callback ) &&
 				false !== has_action( $hook_name, $render_callback ) &&
 				is_callable( $description['routes_callback'] ?? null )
 			) {
-				$pages[ $menu_slug ] = array_merge( $description, $menu_entry, array( 'hook_name' => $hook_name ) );
+				$pages[ $menu_slug ] = array_merge(
+					$description,
+					$menu_entry,
+					array(
+						'page_id'   => (string) $page_id,
+						'hook_name' => $hook_name,
+						'scripts'   => array_filter( (array) ( $entry['scripts'] ?? array() ), 'is_string' ),
+						'styles'    => array_filter( (array) ( $entry['styles'] ?? array() ), 'is_string' ),
+					)
+				);
 				break;
 			}
 		}
@@ -198,6 +224,9 @@ function _gutenberg_admin_shell_add_page_dependencies( array $boot_dependencies 
 			'bodyClass'   => preg_replace( '/[^a-z0-9_-]+/i', '-', $description['hook_name'] ),
 			'routes'      => $routes,
 			'initModules' => $init_modules,
+			'preloadPath' => is_callable( $description['preload_paths_callback'] ?? null )
+				? add_query_arg( 'page', rawurlencode( $description['page_id'] ), '/__experimental/admin-shell/preload' )
+				: null,
 		);
 	}
 
@@ -220,6 +249,12 @@ function _gutenberg_admin_shell_prepare(): void {
 	}
 	add_filter( $pages[ $current ]['boot_dependencies_filter'], '_gutenberg_admin_shell_add_page_dependencies' );
 	add_action( 'admin_enqueue_scripts', '_gutenberg_admin_shell_enqueue', 20 );
+
+	// Classic scripts and styles that listed pages need on top of Boot's.
+	foreach ( $pages as $page ) {
+		array_map( 'wp_enqueue_script', $page['scripts'] );
+		array_map( 'wp_enqueue_style', $page['styles'] );
+	}
 }
 add_action( 'admin_enqueue_scripts', '_gutenberg_admin_shell_prepare', 5 );
 
@@ -237,11 +272,22 @@ function _gutenberg_admin_shell_enqueue(): void {
 		return;
 	}
 
+	/**
+	 * Filters how many admin pages' apps the admin shell keeps mounted at
+	 * most, including the one showing. When a page beyond the limit is shown,
+	 * the page shown least recently is unmounted; opening it again boots it
+	 * again, at the URL it was left on, without a page load. A page left
+	 * mounted keeps its state, such as unsaved input and scroll position.
+	 *
+	 * @param int $max_alive_pages Maximum number of mounted pages. Default 5.
+	 */
+	$max_alive_pages = max( 1, (int) apply_filters( 'admin_shell_max_alive_pages', 5 ) );
+
 	$start_js = <<<'JS'
-	( pages ) => {
+	( pages, maxAlivePages ) => {
 		const run = async () => {
 			const mod = await import( "@wordpress/boot" );
-			mod.startAdminShell?.( { pages } );
+			mod.startAdminShell?.( { pages, maxAlivePages } );
 		};
 		if ( document.readyState === "loading" ) {
 			document.addEventListener( "DOMContentLoaded", run );
@@ -254,9 +300,73 @@ function _gutenberg_admin_shell_enqueue(): void {
 	wp_add_inline_script(
 		$pages[ $current ]['script_handle'],
 		sprintf(
-			'( %s )( %s );',
+			'( %s )( %s, %d );',
 			$start_js,
-			wp_json_encode( $_gutenberg_admin_shell_manifest, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+			wp_json_encode( $_gutenberg_admin_shell_manifest, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+			$max_alive_pages
 		)
 	);
+}
+
+/**
+ * Registers the endpoint that returns the REST responses an admin page
+ * preloads on its own page load, so the shell can preload them before it
+ * opens the page.
+ *
+ * @access private
+ */
+function _gutenberg_admin_shell_register_routes(): void {
+	register_rest_route(
+		'__experimental/admin-shell',
+		'/preload',
+		array(
+			'methods'             => WP_REST_Server::READABLE,
+			'args'                => array(
+				'page' => array(
+					'description' => __( 'ID of the admin page, as built with @wordpress/build.', 'gutenberg' ),
+					'type'        => 'string',
+					'required'    => true,
+				),
+			),
+			'permission_callback' => static function ( WP_REST_Request $request ) {
+				$description = _gutenberg_admin_shell_describe_page( $request['page'] );
+				return $description && current_user_can( $description['capability'] ?? 'manage_options' );
+			},
+			'callback'            => static function ( WP_REST_Request $request ) {
+				$description = _gutenberg_admin_shell_describe_page( $request['page'] );
+				if ( ! $description || ! is_callable( $description['preload_paths_callback'] ?? null ) ) {
+					return new WP_Error( 'rest_not_found', __( 'This page doesn\'t preload any data.', 'gutenberg' ), array( 'status' => 404 ) );
+				}
+
+				/*
+				 * Each path is requested as the current user, with its own
+				 * permission checks, so this returns only what the user could
+				 * fetch from those endpoints directly.
+				 */
+				$preload_data = array_reduce(
+					(array) call_user_func( $description['preload_paths_callback'] ),
+					'rest_preload_api_request',
+					array()
+				);
+
+				// Return an object even when nothing was preloaded.
+				return rest_ensure_response( (object) $preload_data );
+			},
+		)
+	);
+}
+add_action( 'rest_api_init', '_gutenberg_admin_shell_register_routes' );
+
+/**
+ * Returns the description of an admin page built with @wordpress/build.
+ *
+ * @access private
+ *
+ * @param string $page_id Page ID.
+ * @return array|null The description, or null when there is no such page.
+ */
+function _gutenberg_admin_shell_describe_page( string $page_id ): ?array {
+	/** This filter is documented in lib/experimental/admin-shell/load.php */
+	$described = (array) apply_filters( 'wp_build_admin_pages', array() );
+	return isset( $described[ $page_id ] ) && is_array( $described[ $page_id ] ) ? $described[ $page_id ] : null;
 }

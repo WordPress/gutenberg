@@ -13,6 +13,8 @@ import styles from '../root/style.module.scss';
 import ErrorBoundary from '../error-boundary';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
+import { getPageKey } from './page-key';
+import { PageScope } from './page-visibility';
 
 const {
 	createLazyRoute,
@@ -177,21 +179,6 @@ function createRouteTree(
 }
 
 /**
- * Returns the key identifying which wp-admin page a URL belongs to: the
- * `page` query argument for plugin pages (`admin.php?page=…`), or the file
- * name for Core pages (`font-library.php`).
- *
- * @param href URL to read. Defaults to the current location.
- * @return Page key.
- */
-export function getPageKey( href: string = window.location.href ) {
-	const url = new URL( href, window.location.href );
-	return (
-		url.searchParams.get( 'page' ) ?? url.pathname.split( '/' ).pop() ?? ''
-	);
-}
-
-/**
  * Creates a browser history that reads the route from the `?p=` query
  * argument.
  *
@@ -274,8 +261,9 @@ export default function Router( {
 	rootComponent = Root,
 	pageKey,
 }: RouterProps ) {
+	const ownPageKey = useMemo( () => pageKey ?? getPageKey(), [ pageKey ] );
 	const router = useMemo( () => {
-		const history = createPathHistory( pageKey ?? getPageKey() );
+		const history = createPathHistory( ownPageKey );
 		const routeTree = createRouteTree( routes, rootComponent );
 
 		return createRouter( {
@@ -303,7 +291,11 @@ export default function Router( {
 				},
 			},
 		} );
-	}, [ routes, rootComponent, pageKey ] );
+	}, [ routes, rootComponent, ownPageKey ] );
 
-	return <RouterProvider router={ router } />;
+	return (
+		<PageScope pageKey={ ownPageKey }>
+			<RouterProvider router={ router } />
+		</PageScope>
+	);
 }

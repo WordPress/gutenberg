@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Generated admin pages describe themselves through the `wp_build_admin_pages` filter, so an admin shell can open them inside another admin page without a page load.
+-   Generated admin pages describe themselves through the `wp_build_admin_pages` filter, including their capability and preloaded REST paths, so an admin shell can open them inside another admin page without a page load. A WP-Admin mode page now also loads under any menu slug whose callback is its render function.
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 

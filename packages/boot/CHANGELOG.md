@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `startAdminShell` (experimental), which switches between admin pages built with `@wordpress/build` inside one document instead of loading a new one. Each page's router now ignores URLs of other admin pages.
+-   Add `startAdminShell` (experimental), which switches between admin pages built with `@wordpress/build` inside one document instead of loading a new one, keeping at most `maxAlivePages` pages mounted. Each page's router now ignores URLs of other admin pages, and its keyboard shortcuts only fire while its page is showing. Add `usePageVisibility`, `getAlivePageKeys` and the `PAGE_CHANGE_EVENT` document event, so pages can pause work while hidden and react to page changes.
 -   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).
 
 ### Bug Fixes

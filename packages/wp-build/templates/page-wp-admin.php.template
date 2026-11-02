@@ -121,6 +121,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_describe_page( $pages ) {
 		'script_handle'            => '{{PAGE_SLUG}}-wp-admin-prerequisites',
 		'boot_dependencies_filter' => '{{PAGE_SLUG}}-wp-admin_boot_dependencies',
 		'routes_callback'          => '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_init_routes',
+		'preload_paths_callback'   => '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths',
+		'capability'               => '{{CAPABILITY}}',
 		'init_modules'             => {{INIT_MODULES_JSON}},
 	);
 	return $pages;
@@ -128,10 +130,11 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_describe_page( $pages ) {
 add_filter( 'wp_build_admin_pages', '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_describe_page' );
 
 /**
- * Preload REST API data for the {{PAGE_SLUG}}-wp-admin page.
- * Automatically called during page rendering.
+ * Returns the REST API paths preloaded for the {{PAGE_SLUG}}-wp-admin page.
+ *
+ * @return array<string|string[]> Paths to preload.
  */
-function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
+function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths() {
 	// Define paths to preload - same for all pages
 	// This must exactly match the _fields list in packages/core-data/src/entities.ts,
 	// same fields in the same order, or the preload is never consumed.
@@ -150,11 +153,17 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	 *
 	 * @param array<string|string[]> $preload_paths Paths to preload.
 	 */
-	$preload_paths = apply_filters( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths', $preload_paths );
+	return apply_filters( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths', $preload_paths );
+}
 
+/**
+ * Preload REST API data for the {{PAGE_SLUG}}-wp-admin page.
+ * Automatically called during page rendering.
+ */
+function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	// Use rest_preload_api_request to gather the preloaded data
 	$preload_data = array_reduce(
-		$preload_paths,
+		{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths(),
 		'rest_preload_api_request',
 		array()
 	);
