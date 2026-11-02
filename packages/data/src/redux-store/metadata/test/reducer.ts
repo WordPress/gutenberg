@@ -1,9 +1,11 @@
+// @ts-expect-error Module 'deep-freeze' has no type definitions in @wordpress/data.
 import deepFreeze from 'deep-freeze';
 import { describe, expect, it } from 'vitest';
 import reducer from '../reducer';
 
 describe( 'reducer', () => {
 	it( 'should default to an empty object', () => {
+		// @ts-expect-error Deliberately testing default state with an empty action object.
 		const state = reducer( undefined, {} );
 
 		expect( state ).toEqual( {} );
