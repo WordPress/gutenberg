@@ -139,6 +139,46 @@ describe( 'post_type_supports', () => {
 		);
 	} );
 
+	it( 'drops the future date of a post that is no longer scheduled', () => {
+		const { setValue } = postTypeSupports.status;
+		const item = { status: 'future', date: '2999-01-01T09:00:00' };
+		expect( setValue?.( { item, value: 'draft' } ) ).toEqual( {
+			status: 'draft',
+			date: null,
+		} );
+		expect( setValue?.( { item, value: 'future' } ) ).toEqual( {
+			status: 'future',
+		} );
+		expect(
+			setValue?.( {
+				item: { status: 'future', date: '2000-01-01T09:00:00' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
+		expect(
+			setValue?.( {
+				item: { status: 'publish', date: '2999-01-01T09:00:00' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
+	} );
+
+	it( 'clears the password of a post made private', () => {
+		const { setValue } = postTypeSupports.status;
+		expect(
+			setValue?.( {
+				item: { status: 'publish', password: 'secret' },
+				value: 'private',
+			} )
+		).toEqual( { status: 'private', password: '' } );
+		expect(
+			setValue?.( {
+				item: { status: 'publish', password: 'secret' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
+	} );
+
 	it( "locks the status for the users who can't publish the post", () => {
 		const isDisabled = postTypeSupports.status.isDisabled as ( args: {
 			item: { _links?: Record< string, unknown > };
