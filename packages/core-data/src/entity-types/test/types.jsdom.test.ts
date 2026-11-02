@@ -35,6 +35,7 @@ import type {
 } from '../index';
 import type { Attachment } from '../attachment';
 import type { GlobalStyles } from '../global-styles';
+import type { CollectionFontFamily, FontCollection } from '../font-collection';
 import type { Block } from '../block';
 import type { IconCollection } from '../icon-collection';
 import type { Navigation } from '../navigation';
@@ -127,6 +128,18 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'root', 'globalStyles' >,
 				GlobalStyles< 'edit' >
 			>;
+
+			const collection = select( coreStore ).getEntityRecord(
+				'root',
+				'fontCollection',
+				'google-fonts'
+			);
+			true satisfies Expect<
+				typeof collection,
+				FontCollection< 'view' > | undefined
+			>;
+			collection?.font_families satisfies
+				CollectionFontFamily[] | undefined;
 		};
 	} );
 
