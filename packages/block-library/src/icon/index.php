@@ -16,7 +16,7 @@
  */
 function render_block_core_icon( $attributes ) {
 	if ( empty( $attributes['icon'] ) || ! is_string( $attributes['icon'] ) ) {
-		return;
+		return '';
 	}
 
 	// Icons in non-public collections are not available in the editor, so do not render them either.
@@ -24,7 +24,7 @@ function render_block_core_icon( $attributes ) {
 	if ( null !== $registered_icon ) {
 		$icon_collection = WP_Icon_Collections_Registry::get_instance()->get_registered( $registered_icon['collection'] );
 		if ( null !== $icon_collection && ! $icon_collection['public'] ) {
-			return;
+			return '';
 		}
 	}
 
@@ -49,7 +49,7 @@ function render_block_core_icon( $attributes ) {
 
 		// Mirror of the defaults in the background block support.
 		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+			$background_styles['backgroundSize'] ??= 'cover';
 			if ( 'contain' === $background_styles['backgroundSize'] && empty( $background_styles['backgroundPosition'] ) ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}
@@ -123,7 +123,7 @@ function render_block_core_icon( $attributes ) {
 	);
 
 	if ( '' === $svg ) {
-		return;
+		return '';
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $svg );

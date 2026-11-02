@@ -3,8 +3,10 @@ import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import useBlockBindingsUtils from './use-block-bindings-utils';
 import BlockContext from '../block-context';
 import type {

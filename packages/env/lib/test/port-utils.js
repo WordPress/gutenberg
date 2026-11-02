@@ -5,6 +5,7 @@ const net = require( 'node:net' );
 let createServer = vi
 	.spyOn( net, 'createServer' )
 	.mockImplementation( () => undefined );
+let connect = vi.spyOn( net, 'connect' );
 const {
 	isPortAvailable,
 	findAvailablePort,
@@ -20,7 +21,29 @@ describe( 'port-utils', () => {
 	beforeEach( () => {
 		createServer = vi.spyOn( net, 'createServer' );
 		createServer.mockReset().mockImplementation( () => undefined );
+		mockAnswering( false );
 	} );
+
+	/**
+	 * Helper that configures net.connect to find another server on the port,
+	 * or none.
+	 *
+	 * @param {boolean} answers Whether another server answers.
+	 */
+	function mockAnswering( answers ) {
+		connect = vi.spyOn( net, 'connect' );
+		connect.mockReset().mockImplementation( () => {
+			const socket = {
+				once: vi.fn( ( event, cb ) => {
+					if ( event === ( answers ? 'connect' : 'error' ) ) {
+						cb();
+					}
+				} ),
+				destroy: vi.fn(),
+			};
+			return socket;
+		} );
+	}
 
 	/**
 	 * Helper that configures net.createServer to return fresh mock servers.
@@ -65,6 +88,13 @@ describe( 'port-utils', () => {
 
 		it( 'returns false for a port in use', async () => {
 			mockPortAvailability( () => false );
+			const result = await isPortAvailable( 8888 );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when another server answers on the port', async () => {
+			mockPortAvailability( () => true );
+			mockAnswering( true );
 			const result = await isPortAvailable( 8888 );
 			expect( result ).toBe( false );
 		} );

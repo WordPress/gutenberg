@@ -24,9 +24,13 @@ The database credentials are: user `root`, password `password`. For a comprehens
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-## Experimental: WordPress Playground Runtime
+## Experimental runtimes
 
-`wp-env` now supports an experimental alternative runtime using [WordPress Playground](https://wordpress.github.io/wordpress-playground/). Playground runs WordPress entirely in WebAssembly, eliminating the need for Docker.
+Besides Docker, `wp-env` has two experimental runtimes that don't need Docker. Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
+
+### WordPress Playground Runtime
+
+[WordPress Playground](https://wordpress.github.io/wordpress-playground/) runs WordPress entirely in WebAssembly, eliminating the need for Docker.
 
 To use the Playground runtime:
 
@@ -34,24 +38,33 @@ To use the Playground runtime:
 $ wp-env start --runtime=playground
 ```
 
-### Playground vs Docker
-
-| Feature | Docker | Playground |
-|---------|--------|------------|
-| Requires Docker | Yes | No |
-| Xdebug | Yes | Yes |
-| SPX profiling | Yes | No |
-| phpMyAdmin | Yes | Yes |
-| MySQL database | Yes | No (SQLite) |
-| Multisite | Yes | Yes |
-| Custom PHP version | Yes | Yes |
-| Custom MariaDB version | Yes | No (SQLite) |
-| Plugin/theme mounting | Yes | Yes |
-| `wp-env run` command | Yes | No |
-
 The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the `run` command for executing arbitrary commands.
 
-Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
+### PHP Runtime
+
+The PHP runtime serves WordPress with the PHP installed on your computer, using PHP's built-in web server and a SQLite database. It needs no Docker and starts in seconds. PHP must be on your `PATH`, with the `pdo_sqlite` extension.
+
+```sh
+$ wp-env start --runtime=php
+```
+
+WordPress is copied from the configured `core` source into the work directory, and plugins, themes and mappings are linked into it, so changes to your files show up straight away. When the plugins, themes, mappings or core in the config change, the next start builds the site again, keeping the database and uploads. After changing the files of a local `core` folder, run `wp-env start --update`. `wp-env reset` restores the database to how it was right after installation. Run it again with another `WP_ENV_PORT` to change the port. On Windows, PHP's built-in server handles one request at a time, so pages with many requests load slower.
+
+### Runtime comparison
+
+| Feature | Docker | Playground | PHP |
+|---------|--------|------------|-----|
+| Requires Docker | Yes | No | No |
+| Xdebug | Yes | Yes | No |
+| SPX profiling | Yes | No | No |
+| phpMyAdmin | Yes | Yes | No |
+| MySQL database | Yes | No (SQLite) | No (SQLite) |
+| Multisite | Yes | Yes | No |
+| Custom PHP version | Yes | Yes | No (the installed PHP) |
+| Custom MariaDB version | Yes | No (SQLite) | No (SQLite) |
+| Plugin/theme mounting | Yes | Yes | Yes |
+| `wp-env run` command | Yes | No | No |
+| `wp-env logs` command | Yes | No | Yes, without `--watch` |
 
 ## Installation
 
@@ -352,8 +365,9 @@ Options:
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
   --runtime  Select the runtime to use. "docker" uses Docker containers,
-             "playground" uses WordPress Playground (experimental).
-                                  [string] [choices: "docker", "playground"]
+             "playground" uses WordPress Playground (experimental), "php" uses
+             the PHP installed on this computer (experimental).
+                                  [string] [choices: "docker", "playground", "php"]
   --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
              are set, uses "debug". You may set multiple Xdebug modes by passing
              them in a comma-separated list: `--xdebug=develop,coverage`. See

@@ -256,7 +256,7 @@ describe( 'computeBuildKey', () => {
 describe( 'resolveShards', () => {
 	const specs = fs
 		.readdirSync(
-			path.join( __dirname, '../../../test/performance/specs' )
+			path.join( import.meta.dirname, '../../../test/performance/specs' )
 		)
 		.filter( ( file ) => /\.spec\.[jt]s$/.test( file ) )
 		.map( ( file ) => file.replace( /\.spec\.[jt]s$/, '' ) );

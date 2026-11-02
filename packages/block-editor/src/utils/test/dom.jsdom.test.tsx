@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
-import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
+	VisuallyHidden as WCVisuallyHidden,
+} from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import {
 	getElementBounds,
