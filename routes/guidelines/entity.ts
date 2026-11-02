@@ -2,11 +2,11 @@ import { dispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Context } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import type { Scope } from './types';
+import type { KnowledgeRow, Scope } from './types';
 
 /*
- * Adds the entity registered below to the core-data record map, so
- * `useEntityRecords( 'root', 'guidelineScope' )` returns `Scope` records.
+ * Adds the guidelines entities to the core-data record map: the scope entity
+ * registered below, and the `wp_knowledge` post type core-data loads itself.
  */
 declare module '@wordpress/core-data' {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- merged declarations must repeat the type parameter.
@@ -15,6 +15,10 @@ declare module '@wordpress/core-data' {
 	}
 	interface RootEntityContexts {
 		guidelineScope: 'view';
+	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- merged declarations must repeat the type parameter.
+	interface PostTypeEntityRecordTypes< C extends Context > {
+		wp_knowledge: KnowledgeRow;
 	}
 }
 
