@@ -44,4 +44,41 @@ describe( 'NumberControl drag to change value', () => {
 
 		await expect.element( input ).toHaveValue( 55 );
 	} );
+
+	it( 'normalizes drag multiplication for fractional values with spinFactor without floating-point inaccuracies', async () => {
+		function DragFractionalControl() {
+			const [ value, setValue ] = useState< string | number | undefined >(
+				'0.3'
+			);
+
+			return (
+				<NumberControl
+					value={ value }
+					step="any"
+					spinFactor={ 0.1 }
+					dragThreshold={ 0 }
+					onChange={ setValue }
+				/>
+			);
+		}
+
+		const screen = await render( <DragFractionalControl /> );
+		const input = screen.getByRole( 'spinbutton' );
+
+		const pointer = {
+			pointerId: 1,
+			pointerType: 'mouse' as const,
+			isPrimary: true,
+			button: 0,
+			buttons: 1,
+			clientX: 50,
+		};
+
+		// Drag 6px upwards (delta of -6 for north direction modifier -1 => +0.6).
+		fireEvent.pointerDown( input.element(), { ...pointer, clientY: 100 } );
+		fireEvent.pointerMove( window, { ...pointer, clientY: 94 } );
+		fireEvent.pointerUp( window, { ...pointer, clientY: 94, buttons: 0 } );
+
+		await expect.element( input ).toHaveValue( 0.9 );
+	} );
 } );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { add, subtract, clamp, ensureValidStep } from '../math';
+import { add, subtract, multiply, clamp, ensureValidStep } from '../math';
 
 describe( 'add', () => {
 	it( 'should add string and number values', () => {
@@ -32,6 +32,36 @@ describe( 'subtract', () => {
 
 	it( 'should subtract multiple arguments', () => {
 		expect( subtract( '105', '30', 10, 5 ) ).toBe( 60 );
+	} );
+} );
+
+describe( 'multiply', () => {
+	it( 'should multiply string and number values', () => {
+		expect( multiply( '10', '5' ) ).toBe( 50 );
+		expect( multiply( 10, 5 ) ).toBe( 50 );
+		expect( multiply( '10', 5 ) ).toBe( 50 );
+		expect( multiply( 10, '5' ) ).toBe( 50 );
+
+		// Negative values.
+		expect( multiply( 10, '-5' ) ).toBe( -50 );
+		expect( multiply( -10, '-5' ) ).toBe( 50 );
+	} );
+
+	it( 'should multiply multiple arguments', () => {
+		expect( multiply( '2', '3', 4, 5 ) ).toBe( 120 );
+	} );
+
+	it( 'should normalize floating-point precision on multiplication', () => {
+		// In raw JavaScript IEEE 754, 6 * 0.1 is 0.6000000000000001
+		expect( multiply( 6, 0.1 ) ).toBe( 0.6 );
+		expect( multiply( 6, 0.1, -1 ) ).toBe( -0.6 );
+		expect( multiply( -6, 0.1, -1 ) ).toBe( 0.6 );
+		expect( multiply( 0.3, 0.3 ) ).toBe( 0.09 );
+
+		// Drag calculation for 0.3vw + delta of 6 pixels with spinFactor 0.1:
+		const distance = multiply( 6, 0.1, 1 );
+		expect( distance ).toBe( 0.6 );
+		expect( add( 0.3, distance ) ).toBe( 0.9 );
 	} );
 } );
 
