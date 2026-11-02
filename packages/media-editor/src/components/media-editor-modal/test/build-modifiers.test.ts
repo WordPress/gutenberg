@@ -333,7 +333,7 @@ describe( 'buildModifiers ↔ Export-camera parity', () => {
 
 	for ( const { label, state, u, v } of rows ) {
 		it( label, () => {
-			const modifiers = buildModifiers( state, IMAGE );
+			const modifiers = buildModifiers( { state } );
 
 			// Output canvas is whatever the server would emit: the crop rect
 			// if present, otherwise the full rotated AABB. This makes (u, v)
@@ -356,4 +356,12 @@ describe( 'buildModifiers ↔ Export-camera parity', () => {
 			expect( server.y ).toBeCloseTo( exported.y, 0 );
 		} );
 	}
+} );
+
+describe( 'buildModifiers without a loaded image', () => {
+	it( 'returns no modifiers, whatever the edit', () => {
+		const state = makeState( { image: null, rotation: 45 } );
+
+		expect( buildModifiers( { state } ) ).toEqual( [] );
+	} );
 } );
