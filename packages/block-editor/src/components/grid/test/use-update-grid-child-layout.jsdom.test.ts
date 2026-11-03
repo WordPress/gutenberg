@@ -174,14 +174,14 @@ describe( 'getGridChildUpdates()', () => {
 				} ).b?.style
 			).toEqual( {
 				layout: { columnStart: 2, rowStart: 1 },
-				rotate: 30,
+				transform: { rotate: '30deg' },
 			} );
 			expect(
 				getUpdates( {
 					change: rotateTo( -15 ),
 					selectedState: TABLET_STATE,
 				} ).b?.style?.[ '@tablet' ]
-			).toEqual( { rotate: -15 } );
+			).toEqual( { transform: { rotate: '-15deg' } } );
 		} );
 
 		it( 'unrotates the blocks rotated on mobile when it unstacks a grid, as the stack showed them', () => {
@@ -193,28 +193,43 @@ describe( 'getGridChildUpdates()', () => {
 				gridClientId: 'grid',
 				gridAttributes: manualGrid,
 				children: [
-					{ clientId: 'a', attributes: { style: { rotate: 30 } } },
+					{
+						clientId: 'a',
+						attributes: {
+							style: { transform: { rotate: '30deg' } },
+						},
+					},
 					{
 						clientId: 'b',
-						attributes: { style: { '@mobile': { rotate: -45 } } },
+						attributes: {
+							style: {
+								'@mobile': { transform: { rotate: '-45deg' } },
+							},
+						},
 					},
 					{
 						clientId: 'c',
 						attributes: {
-							style: { rotate: 30, '@tablet': { rotate: 15 } },
+							style: {
+								transform: { rotate: '30deg' },
+								'@tablet': { transform: { rotate: '15deg' } },
+							},
 						},
 					},
 					{
 						clientId: 'd',
 						attributes: {
-							style: { rotate: 30, '@mobile': { rotate: 0 } },
+							style: {
+								transform: { rotate: '30deg' },
+								'@mobile': { transform: { rotate: '0deg' } },
+							},
 						},
 					},
 					{ clientId: 'unrotated', attributes: {} },
 				],
 			} );
 			expect( updates.a?.style ).toEqual( {
-				rotate: 30,
+				transform: { rotate: '30deg' },
 				'@mobile': {
 					layout: {
 						columnStart: 1,
@@ -222,40 +237,56 @@ describe( 'getGridChildUpdates()', () => {
 						rowStart: 1,
 						rowSpan: 1,
 					},
-					rotate: 0,
+					transform: { rotate: '0deg' },
 				},
 			} );
-			expect( updates.b?.style?.[ '@mobile' ]?.rotate ).toBe( 0 );
+			expect( updates.b?.style?.[ '@mobile' ]?.transform ).toEqual( {
+				rotate: '0deg',
+			} );
 			// Only the mobile rotation changes.
 			expect( updates.c?.style ).toMatchObject( {
-				rotate: 30,
-				'@tablet': { rotate: 15 },
-				'@mobile': { rotate: 0 },
+				transform: { rotate: '30deg' },
+				'@tablet': { transform: { rotate: '15deg' } },
+				'@mobile': { transform: { rotate: '0deg' } },
 			} );
-			expect( updates.d?.style?.[ '@mobile' ]?.rotate ).toBe( 0 );
+			expect( updates.d?.style?.[ '@mobile' ]?.transform ).toEqual( {
+				rotate: '0deg',
+			} );
 			expect(
 				updates.unrotated?.style?.[ '@mobile' ]
-			).not.toHaveProperty( 'rotate' );
+			).not.toHaveProperty( 'transform' );
 		} );
 
 		it( 'unstacks a grid stacked on mobile first, keeping the other blocks unrotated', () => {
 			const updates = getGridChildUpdates( {
 				clientId: 'b',
-				style: { rotate: 10 },
+				style: { transform: { rotate: '10deg' } },
 				change: rotateTo( 45 ),
 				selectedState: MOBILE_STATE,
 				gridClientId: 'grid',
 				gridAttributes: manualGrid,
 				children: [
-					{ clientId: 'a', attributes: { style: { rotate: 30 } } },
-					{ clientId: 'b', attributes: { style: { rotate: 10 } } },
+					{
+						clientId: 'a',
+						attributes: {
+							style: { transform: { rotate: '30deg' } },
+						},
+					},
+					{
+						clientId: 'b',
+						attributes: {
+							style: { transform: { rotate: '10deg' } },
+						},
+					},
 				],
 			} );
 			expect( updates.a?.style ).toMatchObject( {
-				rotate: 30,
-				'@mobile': { rotate: 0 },
+				transform: { rotate: '30deg' },
+				'@mobile': { transform: { rotate: '0deg' } },
 			} );
-			expect( updates.b?.style ).toMatchObject( { rotate: 10 } );
+			expect( updates.b?.style ).toMatchObject( {
+				transform: { rotate: '10deg' },
+			} );
 			expect( updates.b?.style?.[ '@mobile' ] ).toEqual( {
 				layout: {
 					columnStart: 1,
@@ -263,7 +294,7 @@ describe( 'getGridChildUpdates()', () => {
 					rowStart: 2,
 					rowSpan: 1,
 				},
-				rotate: 45,
+				transform: { rotate: '45deg' },
 			} );
 			expect(
 				updates.grid?.style?.[ '@mobile' ]?.layout?.stackOnMobile

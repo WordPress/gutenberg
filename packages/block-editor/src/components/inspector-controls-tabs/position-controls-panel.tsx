@@ -7,7 +7,6 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { default as InspectorControls } from '../inspector-controls';
-import BlockSupportSlotContainer from '../inspector-controls/block-support-slot-container';
 import { store as blockEditorStore } from '../../store';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -15,7 +14,6 @@ import { unlock } from '../../lock-unlock';
 import type { TreeBlock } from '../../store/types';
 import type { BlockStyleState } from '../../hooks/types';
 import type { PositionStyleAttribute } from './types';
-import type { BlockSupportResetAllFilter } from '../inspector-controls/types';
 
 const DEFAULT_STATE_VALUE = 'default';
 
@@ -56,11 +54,7 @@ const hasAnyPositionValue = ( style?: PositionStyleAttribute ): boolean => {
 	);
 };
 
-const PositionControlsPanel = ( {
-	hasPositionFills,
-}: {
-	hasPositionFills: boolean;
-} ) => {
+const PositionControlsPanel = () => {
 	const { selectedClientIds, selectedBlocks, hasPositionAttribute } =
 		useSelect( ( select ) => {
 			const { getBlocksByClientId, getSelectedBlockClientIds } =
@@ -90,7 +84,7 @@ const PositionControlsPanel = ( {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	function resetPosition( resetFilters: BlockSupportResetAllFilter[] = [] ) {
+	function resetPosition() {
 		if ( ! selectedClientIds?.length || ! selectedBlocks?.length ) {
 			return;
 		}
@@ -100,31 +94,12 @@ const PositionControlsPanel = ( {
 		);
 		const attributesByClientId = Object.fromEntries(
 			selectedBlocks?.map( ( { clientId, attributes } ) => {
-				let updatedAttributes: Record< string, unknown > = {
-					style: attributes?.style,
-				};
-				const resetContext = {
-					attributes,
-					clientId,
-					name: registry
-						.select( blockEditorStore )
-						.getBlockName( clientId ),
-				};
-				resetFilters.forEach( ( resetFilter ) => {
-					updatedAttributes = {
-						...updatedAttributes,
-						...resetFilter( updatedAttributes, resetContext ),
-					};
-				} );
-				if ( ! hasPositionFills ) {
-					return [ clientId, updatedAttributes ];
-				}
 				const viewport = getPositionStateViewport(
 					getSelectedBlockStyleState( clientId )
 				);
 				const style: PositionStyleAttribute = {
 					// The style attribute is an object.
-					...( updatedAttributes.style as
+					...( attributes?.style as
 						PositionStyleAttribute | undefined ),
 				};
 
@@ -155,10 +130,7 @@ const PositionControlsPanel = ( {
 					};
 				}
 
-				return [
-					clientId,
-					{ ...updatedAttributes, style: cleanEmptyObject( style ) },
-				];
+				return [ clientId, { style: cleanEmptyObject( style ) } ];
 			} )
 		);
 
@@ -170,45 +142,29 @@ const PositionControlsPanel = ( {
 			className="block-editor-block-inspector__position"
 			label={ __( 'Position' ) }
 			resetAll={ resetPosition }
-			panelId={
-				selectedClientIds.length === 1 ? selectedClientIds[ 0 ] : null
-			}
 			dropdownMenuProps={ dropdownMenuProps }
 		>
-			{ hasPositionFills && (
-				<ToolsPanelItem
-					isShownByDefault={ hasPositionAttribute }
-					label={ __( 'Position' ) }
-					hasValue={ () => hasPositionAttribute }
-					onDeselect={ () => resetPosition() }
-					panelId={
-						selectedClientIds.length === 1
-							? selectedClientIds[ 0 ]
-							: undefined
-					}
-				>
-					<InspectorControls.Slot group="position" />
-				</ToolsPanelItem>
-			) }
-			<BlockSupportSlotContainer
-				Slot={ InspectorControlsGroups[ 'position-tools' ].Slot }
-			/>
+			<ToolsPanelItem
+				isShownByDefault={ hasPositionAttribute }
+				label={ __( 'Position' ) }
+				hasValue={ () => hasPositionAttribute }
+				onDeselect={ resetPosition }
+			>
+				<InspectorControls.Slot group="position" />
+			</ToolsPanelItem>
 		</ToolsPanel>
 	);
 };
 
 const PositionControls = () => {
 	const fills = useSlotFills( InspectorControlsGroups.position.name );
-	const toolFills = useSlotFills(
-		InspectorControlsGroups[ 'position-tools' ].name
-	);
 	const hasFills = Boolean( fills && fills.length );
 
-	if ( ! hasFills && ! toolFills?.length ) {
+	if ( ! hasFills ) {
 		return null;
 	}
 
-	return <PositionControlsPanel hasPositionFills={ hasFills } />;
+	return <PositionControlsPanel />;
 };
 
 export default PositionControls;

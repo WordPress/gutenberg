@@ -77,3 +77,42 @@ function gutenberg_add_box_sizing_to_safe_style_css( array $attr ): array {
 	return $attr;
 }
 add_filter( 'safe_style_css', 'gutenberg_add_box_sizing_to_safe_style_css' );
+
+/**
+ * Adds 'rotate' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `rotate` property. The
+ * style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_rotate_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'rotate', $attr, true ) ) {
+		$attr[] = 'rotate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_rotate_to_safe_style_css' );
+
+/**
+ * Only allows a single angle as the value of the `rotate` property.
+ *
+ * Mirrors the style engine, so axis and list forms are rejected too.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_rotate_angle_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) || 'rotate' !== strtolower( trim( $parts[0] ) ) ) {
+		return $allow_css;
+	}
+
+	return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_ANGLE_PATTERN, trim( $parts[1] ) );
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_rotate_angle_only', 10, 2 );
