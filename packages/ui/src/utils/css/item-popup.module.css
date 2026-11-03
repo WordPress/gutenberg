@@ -206,7 +206,7 @@
 				&:focus-visible {
 					--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
 
-					outline: var(--_gcd-div-outline);
+					outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
 					outline-offset: 0;
 				}
 
