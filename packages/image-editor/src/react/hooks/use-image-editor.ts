@@ -42,11 +42,17 @@ import {
 export interface InternalImageEditorController extends ImageEditorSetters {
 	/** The current editor state (read-only). */
 	state: InternalImageEditorState;
-	/** Set the loaded image (natural size and src). */
+	/**
+	 * Set the loaded image (natural size and src). A different image
+	 * replacing a loaded one starts fresh, keeping only the locked ratio.
+	 */
 	setImage: ( image: InternalImageEditorState[ 'image' ] ) => void;
-	/** Reset the state. Optionally merge partial state overrides. */
+	/**
+	 * Go back to the clean state. Optionally merge partial state
+	 * overrides.
+	 */
 	reset: ( resetState?: Partial< InternalImageEditorState > ) => void;
-	/** Whether the current state differs from the initial state. */
+	/** Whether the state differs from the clean state. */
 	isDirty: boolean;
 	/** The smallest zoom that still covers the crop area. */
 	minZoom: number;
@@ -145,11 +151,15 @@ export function useInternalImageEditor(
 		? ( controlledState as InternalImageEditorState )
 		: ownState;
 
-	// The "clean" snapshot the controller's own state is compared against
-	// for `isDirty`. `setImage` and `reset` refresh it. A controlled
-	// state is compared against the starting state for its image.
-	const [ ownBaseline, setOwnBaseline ] =
-		useState< InternalImageEditorState >( () => ownState );
+	// The clean state `isDirty` compares against and `reset` returns to.
+	// It starts as the consumer's starting state, and follows the changes
+	// the person did not make (an image loading, the canvas fitting the
+	// crop) until the person makes an edit. `reset` and a new image make
+	// it clean again.
+	const [ baseline, setBaseline ] = useState< InternalImageEditorState >(
+		() => state
+	);
+	const hasEditedRef = useRef( false );
 
 	// Latest state, so several setters in one event see each other's
 	// output before React re-renders. Synced to the rendered state after
@@ -171,6 +181,11 @@ export function useInternalImageEditor(
 				return next;
 			}
 			latestRef.current = next;
+			if ( isEdit ) {
+				hasEditedRef.current = true;
+			} else if ( ! hasEditedRef.current ) {
+				setBaseline( next );
+			}
 			if ( isControlled ) {
 				onChangeRef.current?.( next, { isEdit } );
 			} else {
@@ -183,23 +198,45 @@ export function useInternalImageEditor(
 
 	const setImage = useCallback(
 		( image: InternalImageEditorState[ 'image' ] ) => {
-			if ( areImagesEqual( latestRef.current.image, image ) ) {
+			const current = latestRef.current;
+			if ( areImagesEqual( current.image, image ) ) {
 				return;
 			}
-			const next = apply( { type: 'SET_IMAGE', payload: image }, false );
-			// Containment can nudge pan/zoom on load; start clean from the
-			// loaded state.
-			setOwnBaseline( next );
+			hasEditedRef.current = false;
+			if ( current.image && image ) {
+				// A different image replaces the loaded one: start it fresh,
+				// keeping only the locked ratio. The old pan, zoom, rotation,
+				// flip and crop do not fit the new image.
+				apply(
+					{
+						type: 'RESET',
+						payload: { image, aspectRatio: current.aspectRatio },
+					},
+					false
+				);
+				return;
+			}
+			// The first image keeps the starting state, which may be an edit
+			// saved earlier or a locked ratio.
+			apply( { type: 'SET_IMAGE', payload: image }, false );
 		},
 		[ apply ]
 	);
 
 	const reset = useCallback(
 		( resetState?: Partial< InternalImageEditorState > ) => {
-			const next = apply( { type: 'RESET', payload: resetState } );
-			setOwnBaseline( next );
+			const next = apply( {
+				type: 'RESET',
+				payload: {
+					...baseline,
+					image: latestRef.current.image,
+					...resetState,
+				},
+			} );
+			hasEditedRef.current = false;
+			setBaseline( next );
 		},
-		[ apply ]
+		[ apply, baseline ]
 	);
 
 	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
@@ -216,10 +253,7 @@ export function useInternalImageEditor(
 		[ apply ]
 	);
 
-	const isDirty = isStateDirty(
-		state,
-		isControlled ? createImageEditorState( state.image ) : ownBaseline
-	);
+	const isDirty = isStateDirty( state, baseline );
 
 	const getCroppedImage = useCallback(
 		( mimeType?: string, quality?: number ): Promise< Blob > => {
@@ -288,7 +322,10 @@ export function useInternalImageEditor(
 export interface ImageEditorController {
 	/** The current state. */
 	readonly state: ImageEditorState;
-	/** Whether the edit differs from the starting state for the image. */
+	/**
+	 * Whether the person has changed anything since the clean state: the
+	 * state you started from, as the editor settled it before any edit.
+	 */
 	readonly isDirty: boolean;
 	/** The smallest zoom that still covers the crop area. */
 	readonly minZoom: number;
@@ -296,9 +333,12 @@ export interface ImageEditorController {
 	readonly maxZoom: number;
 	/** How far, in degrees, fine rotation goes either way of a quarter turn. */
 	readonly maxRotationOffset: number;
-	/** Load an image, or clear it with `null`. */
+	/**
+	 * Load an image, or clear it with `null`. A different image replacing
+	 * a loaded one starts fresh, keeping only the locked ratio.
+	 */
 	setImage: ( image: ImageEditorState[ 'image' ] ) => void;
-	/** Go back to the starting state for the loaded image. */
+	/** Go back to the clean state, keeping the locked ratio. */
 	reset: () => void;
 	/** Move the image under the crop, in fractions of the image. */
 	setPan: ( pan: NormalizedPoint ) => void;

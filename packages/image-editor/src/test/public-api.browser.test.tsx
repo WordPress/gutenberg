@@ -111,5 +111,7 @@ describe( 'the public API', () => {
 				height: 600,
 			} )
 		);
+		// Fitting the crop to the locked ratio is not an edit.
+		expect( controller.isDirty ).toBe( false );
 	} );
 } );

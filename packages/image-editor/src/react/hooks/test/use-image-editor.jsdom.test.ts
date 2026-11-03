@@ -1000,10 +1000,12 @@ describe( 'useInternalImageEditor', () => {
 describe( 'useInternalImageEditor with the state kept by the caller', () => {
 	const IMAGE = { src: 'photo.jpg', naturalWidth: 1200, naturalHeight: 600 };
 
-	function useControlled() {
-		const [ state, setState ] = useState( () =>
-			createImageEditorState( IMAGE )
-		);
+	function useControlled(
+		initialState: InternalImageEditorState = createImageEditorState(
+			IMAGE
+		) as InternalImageEditorState
+	) {
+		const [ state, setState ] = useState( initialState );
 		const changes = useRef< Array< { isEdit: boolean } > >( [] );
 		const controller = useInternalImageEditor( {
 			state,
@@ -1059,5 +1061,75 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		} );
 
 		expect( result.current.controller.state.flip.horizontal ).toBe( false );
+	} );
+
+	describe( 'with a locked ratio to start', () => {
+		const LOCKED = {
+			...createImageEditorState(),
+			aspectRatio: 1,
+		} as InternalImageEditorState;
+		// The square the canvas fits a 2:1 image's crop to.
+		const FITTED = computeInscribedRect( 1, { width: 600, height: 300 } );
+
+		it( 'is clean once the image loads and the canvas fits the crop', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+
+			act( () => result.current.controller.setImage( IMAGE ) );
+			act( () =>
+				result.current.controller.adjustCropRectForViewport( FITTED )
+			);
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
+		it( 'returns to the fitted square, still locked, on reset', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+			act( () => result.current.controller.setImage( IMAGE ) );
+			act( () =>
+				result.current.controller.adjustCropRectForViewport( FITTED )
+			);
+
+			act( () => result.current.controller.snapRotate90( 1 ) );
+			expect( result.current.controller.isDirty ).toBe( true );
+
+			act( () => result.current.controller.reset() );
+
+			expect( result.current.controller.state.aspectRatio ).toBe( 1 );
+			expect( result.current.controller.state.rotation ).toBe( 0 );
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
+		it( 'starts a different image fresh, keeping the lock', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+			act( () => result.current.controller.setImage( IMAGE ) );
+			act( () => {
+				result.current.controller.snapRotate90( 1 );
+				result.current.controller.toggleFlip( 'horizontal' );
+			} );
+
+			act( () =>
+				result.current.controller.setImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			const { state } = result.current.controller;
+			expect( state.image?.src ).toBe( 'other.jpg' );
+			expect( state.aspectRatio ).toBe( 1 );
+			expect( state.rotation ).toBe( 0 );
+			expect( state.flip ).toEqual( {
+				horizontal: false,
+				vertical: false,
+			} );
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
 	} );
 } );

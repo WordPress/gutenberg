@@ -81,7 +81,8 @@ The controller has:
 
 -   `state`: the current state.
 -   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. Positions and sizes are fractions from 0 to 1. `setAspectRatio( undefined )` unlocks the crop.
--   `setImage( image )` to load an image, `reset()` to go back to the starting state for it, and `isDirty`, which is `true` when the edit differs from that starting state.
+-   `setImage( image )` to load an image. The canvas calls it when `src` loads. The first image keeps the state you started from, such as an edit you saved earlier. A different image replacing a loaded one starts fresh: no pan, zoom, rotation, flip or crop from the old image, but a locked ratio stays.
+-   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the person has changed anything since then. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. `reset()` keeps a locked ratio.
 -   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit.
 
 ### `ImageEditorState`, `createImageEditorState( image? )`
