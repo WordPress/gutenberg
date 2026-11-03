@@ -16,32 +16,38 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getStyleForState } from '../../hooks/block-style-state';
 import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
 import { isPlainObject } from '../../utils/object';
 import { GridItemMover } from './grid-item-movers';
-import { getGridTracks, getRectInGrid, getTrackRange, GridRect } from './utils';
-import type { ChildLayoutBlockStyle, BlockStyleState } from '../../hooks/types';
+import {
+	getGridMeasurement,
+	getRectInGrid,
+	getTrackRange,
+	GridRect,
+} from './utils';
+import {
+	findAutoGridReorderIndex,
+	type AutoGridMoveDirection,
+	type AutoGridSnapshot,
+} from './auto-grid-placement';
+import type { ChildLayoutBlockStyle } from '../../hooks/types';
 
-type Direction = 'left' | 'right' | 'up' | 'down';
-
-interface GridItem {
-	clientId: string;
-	rect: GridRect;
-	isExplicit: boolean;
-}
-
-interface GridSnapshot {
-	columnCount: number;
-	items: GridItem[];
-}
-
-const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
+const DIRECTION_OFFSETS: Record< AutoGridMoveDirection, [ number, number ] > = {
 	left: [ -1, 0 ],
 	right: [ 1, 0 ],
 	up: [ 0, -1 ],
 	down: [ 0, 1 ],
 };
+
+function hasAppliedGridStart(
+	computedStyle: CSSStyleDeclaration,
+	axis: 'column' | 'row'
+) {
+	const computedStart = computedStyle
+		.getPropertyValue( `grid-${ axis }-start` )
+		.trim();
+	return computedStart !== 'auto' && ! computedStart.startsWith( 'span ' );
+}
 
 /**
  * Reads where each child of an auto grid is rendered, as column and row
@@ -49,9 +55,8 @@ const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
  *
  * @param gridElement The grid element.
  * @param blockOrder  The client IDs of the grid's children.
- * @param blockStyles The style attributes of the children, by client ID.
  * @param getElement  Gets the element of a block by client ID.
- * @param styleState  The style state the explicit positions are read from.
+ * @param isAutoFit   Whether empty auto-fit column tracks collapse.
  *
  * @return The grid's column count and items, or undefined if the grid can't
  *         be measured.
@@ -59,15 +64,14 @@ const DIRECTION_OFFSETS: Record< Direction, [ number, number ] > = {
 function getGridSnapshot(
 	gridElement: HTMLElement,
 	blockOrder: string[],
-	blockStyles: Record< string, unknown >,
 	getElement: ( clientId: string ) => Element | null | undefined,
-	styleState: BlockStyleState
-): GridSnapshot | undefined {
-	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
+	isAutoFit: boolean
+): AutoGridSnapshot | undefined {
+	const measurement = getGridMeasurement( gridElement, isAutoFit );
+	if ( ! measurement ) {
 		return undefined;
 	}
-	const columns = getGridTracks( gridElement, 'column' );
-	const rows = getGridTracks( gridElement, 'row' );
+	const { columns, rows } = measurement;
 	// Tracks are not measurable in pixels, for example when not a grid.
 	if (
 		[ ...columns, ...rows ].some( ( { end } ) => ! Number.isFinite( end ) )
@@ -75,7 +79,7 @@ function getGridSnapshot(
 		return undefined;
 	}
 
-	const items: GridItem[] = [];
+	const items: AutoGridSnapshot[ 'items' ] = [];
 	for ( const clientId of blockOrder ) {
 		const element = getElement( clientId );
 		if (
@@ -85,7 +89,7 @@ function getGridSnapshot(
 		) {
 			continue;
 		}
-		const bounds = getRectInGrid( gridElement, element );
+		const bounds = getRectInGrid( gridElement, element, measurement );
 		if ( ! bounds ) {
 			continue;
 		}
@@ -94,16 +98,8 @@ function getGridSnapshot(
 		if ( ! columnRange || ! rowRange ) {
 			continue;
 		}
-
-		const rawStyle = blockStyles[ clientId ];
-		const style = isPlainObject( rawStyle )
-			? ( rawStyle as ChildLayoutBlockStyle )
-			: undefined;
-		const viewportStyle = getStyleForState( style, {
-			viewport: styleState.viewport,
-			pseudo: 'default',
-		} ) as ChildLayoutBlockStyle | undefined;
-		const layout = { ...style?.layout, ...viewportStyle?.layout };
+		const computedStyle =
+			element.ownerDocument.defaultView!.getComputedStyle( element );
 		items.push( {
 			clientId,
 			rect: new GridRect( {
@@ -112,10 +108,12 @@ function getGridSnapshot(
 				rowStart: rowRange[ 0 ],
 				rowEnd: rowRange[ 1 ],
 			} ),
-			// An unset start can be undefined or null, and neither is explicit.
-			isExplicit:
-				( layout.columnStart ?? null ) !== null ||
-				( layout.rowStart ?? null ) !== null,
+			columnStart: hasAppliedGridStart( computedStyle, 'column' )
+				? columnRange[ 0 ]
+				: undefined,
+			rowStart: hasAppliedGridStart( computedStyle, 'row' )
+				? rowRange[ 0 ]
+				: undefined,
 		} );
 	}
 	return { columnCount: columns.length, items };
@@ -123,23 +121,26 @@ function getGridSnapshot(
 
 /**
  * Directional movers for a child of an auto grid. Each move reorders the block
- * if it can be auto-placed to that position, and otherwise pins it to the target cell
- * with an explicit column and row start.
+ * if it can be auto-placed in that direction, and otherwise pins it to the
+ * target cell with an explicit column and row start.
  *
  * @param props
  * @param props.blockClientId The client ID of the child block.
  * @param props.gridClientId  The client ID of the grid block.
+ * @param props.isAutoFit     Whether the grid collapses empty column tracks.
  */
 export default function AutoGridItemMovers( {
 	blockClientId,
 	gridClientId,
+	isAutoFit,
 }: {
 	blockClientId: string;
 	gridClientId: string;
+	isAutoFit: boolean;
 } ) {
 	const { refsMap } = useContext( BlockRefs );
 	const blockElement = useBlockElement( blockClientId );
-	const { blockOrder, blockStyles, styleState } = useSelect(
+	const { blockOrder, blockStyle, styleState } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
@@ -149,7 +150,9 @@ export default function AutoGridItemMovers( {
 			const order: string[] = getBlockOrder( gridClientId );
 			return {
 				blockOrder: order,
-				blockStyles: getBlockStyles( order ),
+				blockStyle: getBlockStyles( [ blockClientId ] )[
+					blockClientId
+				],
 				styleState: getSelectedBlockStyleState( blockClientId ),
 			};
 		},
@@ -157,7 +160,7 @@ export default function AutoGridItemMovers( {
 	);
 	const { moveBlocksToPosition, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
-	const [ snapshot, setSnapshot ] = useState< GridSnapshot >();
+	const [ snapshot, setSnapshot ] = useState< AutoGridSnapshot >();
 
 	const readSnapshot = useCallback( () => {
 		const gridElement = blockElement?.parentElement;
@@ -167,11 +170,10 @@ export default function AutoGridItemMovers( {
 		return getGridSnapshot(
 			gridElement,
 			blockOrder,
-			blockStyles,
 			( clientId ) => refsMap.get( clientId ),
-			styleState
+			isAutoFit
 		);
-	}, [ blockElement, blockOrder, blockStyles, refsMap, styleState ] );
+	}, [ blockElement, blockOrder, isAutoFit, refsMap ] );
 
 	useEffect( () => {
 		const gridElement = blockElement?.parentElement;
@@ -206,7 +208,7 @@ export default function AutoGridItemMovers( {
 		( item ) => item.clientId === blockClientId
 	);
 
-	function move( direction: Direction ) {
+	function move( direction: AutoGridMoveDirection ) {
 		const current = readSnapshot();
 		const item = current?.items.find(
 			( candidate ) => candidate.clientId === blockClientId
@@ -229,101 +231,25 @@ export default function AutoGridItemMovers( {
 			return;
 		}
 
-		const nearby = new GridRect( {
-			columnStart: Math.max(
-				1,
-				Math.min( item.rect.columnStart, target.columnStart ) - 1
-			),
-			columnEnd: Math.max( item.rect.columnEnd, target.columnEnd ) + 1,
-			rowStart: Math.max(
-				1,
-				Math.min( item.rect.rowStart, target.rowStart ) - 1
-			),
-			rowEnd: Math.max( item.rect.rowEnd, target.rowEnd ) + 1,
-		} );
-		const otherItems = current.items.filter(
-			( candidate ) => candidate.clientId !== blockClientId
+		const targetIndex = findAutoGridReorderIndex(
+			current,
+			blockOrder,
+			blockClientId,
+			target,
+			direction
 		);
-		const targets = otherItems.filter( ( candidate ) =>
-			candidate.rect.intersectsRect( target )
-		);
-		const currentIndex = blockOrder.indexOf( blockClientId );
-		const forward = direction === 'right' || direction === 'down';
-		// Only swap with the next block in order; the rest reflow around it.
-		const targetIndex = forward ? currentIndex + 1 : currentIndex - 1;
-		const neighbor = otherItems.find(
-			( candidate ) => candidate.clientId === blockOrder[ targetIndex ]
-		);
-		// Explicit blocks only affect the result of a swap when spans can
-		// make the auto-placed blocks flow around them differently.
-		const isSimpleSwap =
-			!! neighbor &&
-			item.rect.columnSpan === 1 &&
-			item.rect.rowSpan === 1 &&
-			neighbor.rect.columnSpan === 1 &&
-			neighbor.rect.rowSpan === 1;
-		const canReorder =
-			! item.isExplicit &&
-			!! neighbor &&
-			! neighbor.isExplicit &&
-			targets.includes( neighbor ) &&
-			( isSimpleSwap ||
-				! otherItems.some(
-					( candidate ) =>
-						candidate.isExplicit &&
-						candidate.rect.intersectsRect( nearby )
-				) );
-
-		// A vertical move lands in the cell of a block that is a row of
-		// blocks away in order. It is a plain reorder when every block it
-		// passes is an auto-placed 1x1 and no explicit block sits in those rows.
-		const isVertical = direction === 'up' || direction === 'down';
-		const verticalTargetIndex =
-			isVertical && targets.length === 1
-				? blockOrder.indexOf( targets[ 0 ].clientId )
-				: -1;
-		const canReorderVertically =
-			verticalTargetIndex >= 0 &&
-			( forward
-				? verticalTargetIndex > currentIndex
-				: verticalTargetIndex < currentIndex ) &&
-			[ item, ...otherItems ]
-				.filter( ( candidate ) => {
-					const index = blockOrder.indexOf( candidate.clientId );
-					return (
-						index >=
-							Math.min( currentIndex, verticalTargetIndex ) &&
-						index <= Math.max( currentIndex, verticalTargetIndex )
-					);
-				} )
-				.every(
-					( candidate ) =>
-						! candidate.isExplicit &&
-						candidate.rect.columnSpan === 1 &&
-						candidate.rect.rowSpan === 1
-				) &&
-			! otherItems.some(
-				( candidate ) =>
-					candidate.isExplicit &&
-					candidate.rect.rowEnd >=
-						Math.min( item.rect.rowStart, target.rowStart ) &&
-					candidate.rect.rowStart <=
-						Math.max( item.rect.rowEnd, target.rowEnd )
-			);
-
-		if ( canReorder || canReorderVertically ) {
+		if ( targetIndex !== undefined ) {
 			moveBlocksToPosition(
 				[ blockClientId ],
 				gridClientId,
 				gridClientId,
-				canReorder ? targetIndex : verticalTargetIndex
+				targetIndex
 			);
 			return;
 		}
 
-		const rawStyle = blockStyles[ blockClientId ];
-		const style = isPlainObject( rawStyle )
-			? ( rawStyle as ChildLayoutBlockStyle )
+		const style = isPlainObject( blockStyle )
+			? ( blockStyle as ChildLayoutBlockStyle )
 			: undefined;
 		updateBlockAttributes( blockClientId, {
 			style: getUpdatedChildLayoutStyle(
