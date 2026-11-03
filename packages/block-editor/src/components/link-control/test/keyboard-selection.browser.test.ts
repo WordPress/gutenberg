@@ -10,6 +10,7 @@ import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 import type { LinkControlValue } from '../types';
 
 const mockFetchSearchSuggestions = vi.fn();
+const mockFetchLinkEntity = vi.fn();
 
 vi.mock( import( '@wordpress/data' ), { spy: true } );
 
@@ -25,8 +26,11 @@ beforeEach( () => {
 	vi.mocked( useSelect ).mockImplementation( () => ( {
 		fetchSearchSuggestions: mockFetchSearchSuggestions,
 		fetchRichUrlData: undefined,
+		fetchLinkEntity: mockFetchLinkEntity,
 	} ) );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
+	mockFetchLinkEntity.mockReset();
+	mockFetchLinkEntity.mockResolvedValue( null );
 } );
 
 describe( 'LinkControl keyboard selection', () => {
@@ -110,4 +114,55 @@ describe( 'LinkControl keyboard selection', () => {
 				.toBeVisible();
 		}
 	);
+
+	it( 'binds a result chosen with the Tab key and saved with Apply', async () => {
+		// Arrow down to the "Hello Page" result and press Tab: that fills
+		// in its URL, without picking the result. Apply then finds the page
+		// from its URL, and the link saves bound to it, as if it was picked.
+		const helloPage = {
+			id: 2,
+			title: 'Hello Page',
+			type: 'page',
+			url: 'https://example.com/hello-page/',
+		};
+		mockFetchSearchSuggestions.mockResolvedValue( [ helloPage ] );
+		mockFetchLinkEntity.mockResolvedValue( {
+			...helloPage,
+			kind: 'post-type',
+		} );
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			createElement(
+				SlotFillProvider,
+				null,
+				createElement( LinkControl, {
+					forceIsEditingLink: true,
+					onChange,
+				} )
+			)
+		);
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await user.type( searchInput, 'Hello' );
+		await screen.findByRole( 'listbox', {
+			name: 'Search results for "Hello"',
+		} );
+
+		await user.keyboard( '{ArrowDown}' );
+		await user.keyboard( '{Tab}' );
+		await expect.element( searchInput ).toHaveValue( helloPage.url );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect.poll( () => onChange.mock.calls.length ).toBe( 1 );
+		expect( mockFetchLinkEntity ).toHaveBeenCalledWith( helloPage.url );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				id: helloPage.id,
+				type: 'page',
+				kind: 'post-type',
+			} )
+		);
+	} );
 } );

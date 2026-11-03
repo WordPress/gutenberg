@@ -162,6 +162,15 @@ export type FetchLinkSuggestions = (
 ) => Promise< LinkControlSuggestion[] >;
 
 /**
+ * Finds the post or term on the site that a URL links to, as the private
+ * `fetchLinkEntityKey` editor setting does, so that a typed or pasted URL can
+ * be bound like a picked search result. Resolves to `null` when nothing does.
+ */
+export type FetchLinkEntity = (
+	url: string
+) => Promise< LinkControlSuggestion | null >;
+
+/**
  * Fetches the rich preview data of a URL, as the
  * `__experimentalFetchRichUrlData` editor setting does.
  */

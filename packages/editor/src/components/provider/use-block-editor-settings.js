@@ -27,6 +27,7 @@ import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
+const { fetchLinkEntity } = unlock( coreDataPrivateApis );
 
 const EMPTY_OBJECT = {};
 
@@ -130,6 +131,7 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	fetchLinkEntityKey,
 } = unlock( privateApis );
 
 /**
@@ -169,6 +171,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		viewablePostTypeLabel,
 		currentPostId,
+		homeUrl,
+		siteUrl,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -277,6 +281,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
+				homeUrl: baseData?.home,
+				siteUrl: baseData?.url,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -437,6 +443,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
+			[ fetchLinkEntityKey ]: ( url ) =>
+				fetchLinkEntity( url, { homeUrl, siteUrl } ),
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
 			// This might be better as a generic "canUser" selector.
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
@@ -515,6 +523,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		imageMaxBitDepth,
 		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
+		homeUrl,
+		siteUrl,
 	] );
 }
 

@@ -2653,6 +2653,48 @@ test.describe( 'Navigation block', () => {
 			await expect( linkButton ).toBeFocused();
 		} );
 
+		test( 'binds a pasted page URL to the page when Apply is pressed', async ( {
+			editor,
+			page,
+			navigation,
+			pageUtils,
+		} ) => {
+			// Pasting the URL of "Test Page 1" links to that page, as if it
+			// was picked from the search results.
+			await editor.selectBlocks( navigation.getNavBlock() );
+			await page.getByRole( 'link', { name: 'Empty Link' } ).click();
+			await editor.openDocumentSettingsSidebar();
+
+			const linkButton = navigation
+				.getContentControls()
+				.getByRole( 'button', { name: /Link to:/ } );
+			await linkButton.click();
+
+			const searchInput = navigation.getLinkControlSearch();
+			await expect( searchInput ).toBeFocused();
+			pageUtils.setClipboardData( { plainText: testPage1.link } );
+			await pageUtils.pressKeys( 'primary+v' );
+			await navigation
+				.getLinkPopover()
+				.getByRole( 'button', { name: 'Apply' } )
+				.click();
+
+			await expect( searchInput ).toBeHidden();
+			const emptyLink = await page.evaluate( () => {
+				const { getBlocksByName, getBlockAttributes } =
+					window.wp.data.select( 'core/block-editor' );
+				return getBlocksByName( 'core/navigation-link' )
+					.map( ( clientId ) => getBlockAttributes( clientId ) )
+					.find( ( { label } ) => label === 'Empty Link' );
+			} );
+			expect( emptyLink ).toMatchObject( {
+				id: testPage1.id,
+				type: 'page',
+				kind: 'post-type',
+				url: testPage1.link,
+			} );
+		} );
+
 		test( 'can add a page link to an empty link field', async ( {
 			editor,
 			page,
