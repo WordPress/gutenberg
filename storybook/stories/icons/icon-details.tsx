@@ -14,7 +14,7 @@ export function IconDetails( { name }: { name: string } ) {
 	const collections = iconInfo?.collections ?? [];
 
 	return (
-		<Stack direction="column" gap="lg" align="flex-start">
+		<Stack direction="column" gap="md" align="flex-start">
 			<Stack direction="row" gap="xl" align="center">
 				<Icon icon={ icon } size={ 128 } />
 				<Stack direction="column" gap="md" align="flex-start">
