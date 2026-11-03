@@ -221,6 +221,21 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	it( 'every other entity needs a record ID', () => {
+		() => {
+			// Without an ID, `save()` would create a record instead of
+			// updating one, so omitting it is a type error.
+			// @ts-expect-error -- a post has a key.
+			useEntityRecord( 'postType', 'post' );
+			// @ts-expect-error -- naming the record type does not lift it.
+			useEntityRecord< Post >( 'postType', 'post' );
+			// @ts-expect-error -- neither does an unknown pair.
+			useEntityRecord( 'myPlugin', 'order' );
+			// @ts-expect-error -- nor an ID that may be missing.
+			useEntityRecord( 'postType', 'post', undefined );
+		};
+	} );
+
 	it( 'font families follow the REST schema', () => {
 		() => {
 			const { records: families } = useEntityRecords(

@@ -154,9 +154,23 @@ export default function useEntityRecord<
 >(
 	kind: Kind,
 	name: Name,
-	recordId?: string | number,
+	recordId: string | number,
 	options?: Options
 ): EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >;
+
+/*
+ * The site settings have no key, so they are the one record read without an
+ * ID. Every other entity requires one: without it, `save()` would create a
+ * new record instead of updating the one being edited.
+ */
+export default function useEntityRecord(
+	kind: 'root',
+	name: 'site',
+	recordId?: undefined,
+	options?: Options
+): EntityRecordResolution<
+	ET.EntityRecordOfQuery< 'root', 'site', undefined >
+>;
 
 /*
  * Retained so call sites that name the record type explicitly, and pairs
@@ -165,7 +179,7 @@ export default function useEntityRecord<
 export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
-	recordId?: string | number,
+	recordId: string | number,
 	options?: Options
 ): EntityRecordResolution< RecordType >;
 export default function useEntityRecord< RecordType >(
