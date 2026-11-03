@@ -26,6 +26,7 @@ import border from './border';
 import customCSS from './custom-css';
 import rotate from './rotation';
 import position from './position';
+import transform from './transform';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
@@ -74,6 +75,7 @@ createBlockListBlockFilter( [
 	customCSS,
 	rotate,
 	position,
+	transform,
 	blockStyleVariation,
 	childLayout,
 	layout,

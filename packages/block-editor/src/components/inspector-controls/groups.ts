@@ -23,6 +23,9 @@ const InspectorControlsPositionTools = createSlotFill(
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
+const InspectorControlsTransform = createSlotFill(
+	'InspectorControlsTransform'
+);
 const InspectorControlsStyleState = createSlotFill(
 	'InspectorControlsStyleState'
 );
@@ -49,6 +52,7 @@ const groups: Record< string, SlotFill > = {
 	'position-tools': InspectorControlsPositionTools,
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
+	transform: InspectorControlsTransform,
 	typography: InspectorControlsTypography,
 	'style-state': InspectorControlsStyleState,
 };
