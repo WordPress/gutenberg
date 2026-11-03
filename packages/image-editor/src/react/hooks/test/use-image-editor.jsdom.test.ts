@@ -1068,6 +1068,23 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		expect( result.current.controller.state.flip.horizontal ).toBe( false );
 	} );
 
+	it( 'starts fresh after the image is cleared and another loads', () => {
+		const { result } = renderHook( () => useControlled() );
+
+		act( () => result.current.controller.setZoom( 2 ) );
+		act( () => result.current.controller.setImage( null ) );
+		act( () =>
+			result.current.controller.setImage( {
+				src: 'other.jpg',
+				naturalWidth: 800,
+				naturalHeight: 800,
+			} )
+		);
+
+		expect( result.current.controller.state.zoom ).toBe( 1 );
+		expect( result.current.controller.isDirty ).toBe( false );
+	} );
+
 	describe( 'with a locked ratio to start', () => {
 		const LOCKED = {
 			...createImageEditorState(),
@@ -1098,6 +1115,23 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 
 			expect( result.current.controller.state.aspectRatio ).toBe( 1 );
 			expect( result.current.controller.state.rotation ).toBe( 0 );
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
+		it( 'fits the crop when the state starts with its image and a lock', () => {
+			const { result } = renderHook( () =>
+				useControlled( {
+					...createImageEditorState( IMAGE ),
+					aspectRatio: 1,
+				} as InternalImageEditorState )
+			);
+
+			// The canvas reports the image it loaded, which the state has.
+			act( () => result.current.controller.setImage( IMAGE ) );
+
 			expect( result.current.controller.state.cropRect ).toEqual(
 				FITTED
 			);

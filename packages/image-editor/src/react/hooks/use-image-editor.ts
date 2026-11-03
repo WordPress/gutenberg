@@ -23,6 +23,7 @@ import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
 	enforceContainment,
+	fitCropToLockedRatio,
 	isStateDirty,
 } from '../../core/state';
 import {
@@ -42,8 +43,8 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	/** The current editor state (read-only). */
 	state: InternalImageEditorState;
 	/**
-	 * Set the loaded image (natural size and src). A different image
-	 * replacing a loaded one starts fresh, keeping only the locked ratio.
+	 * Set the loaded image (natural size and src). Replacing or clearing a
+	 * loaded image starts fresh, keeping only the locked ratio.
 	 */
 	setImage: ( image: InternalImageEditorState[ 'image' ] ) => void;
 	/**
@@ -194,13 +195,22 @@ export function useInternalImageEditor(
 		( image: InternalImageEditorState[ 'image' ] ) => {
 			const current = latestRef.current;
 			if ( areImagesEqual( current.image, image ) ) {
+				// A state can arrive with its image already in it and a crop
+				// that does not match its locked ratio. Fit the crop now, as
+				// loading the image would have.
+				if ( fitCropToLockedRatio( current ) !== current ) {
+					apply(
+						{ type: 'SET_CROP_RECT', payload: current.cropRect },
+						false
+					);
+				}
 				return;
 			}
 			hasEditedRef.current = false;
-			if ( current.image && image ) {
-				// A different image replaces the loaded one: start it fresh,
+			if ( current.image ) {
+				// The loaded image is replaced or cleared: start fresh,
 				// keeping only the locked ratio. The old pan, zoom, rotation,
-				// flip and crop do not fit the new image.
+				// flip and crop do not fit another image.
 				apply(
 					{
 						type: 'RESET',
@@ -318,8 +328,8 @@ export interface ImageEditorController {
 	/** How far, in degrees, fine rotation goes either way of a quarter turn. */
 	readonly maxRotationOffset: number;
 	/**
-	 * Load an image, or clear it with `null`. A different image replacing
-	 * a loaded one starts fresh, keeping only the locked ratio.
+	 * Load an image, or clear it with `null`. Replacing or clearing a
+	 * loaded image starts fresh, keeping only the locked ratio.
 	 */
 	setImage: ( image: ImageEditorState[ 'image' ] ) => void;
 	/** Go back to the clean state, keeping the locked ratio. */

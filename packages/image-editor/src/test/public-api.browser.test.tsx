@@ -115,6 +115,36 @@ describe( 'the public API', () => {
 		expect( controller.isDirty ).toBe( false );
 	} );
 
+	it( 'keeps a locked ratio for a state that starts with its image, and for the crop setter', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		await render(
+			<ConsumerEditor
+				onController={ onController }
+				initialState={ {
+					...createImageEditorState( IMAGE ),
+					aspectRatio: 1,
+				} }
+			/>
+		);
+
+		await waitFor( () =>
+			expect( cropSize( controller ) ).toEqual( {
+				width: 600,
+				height: 600,
+			} )
+		);
+		expect( controller.isDirty ).toBe( false );
+
+		act( () =>
+			controller.setCropRect( { x: 0, y: 0, width: 1, height: 1 } )
+		);
+		expect( controller.state.aspectRatio ).toBe( 1 );
+		expect( cropSize( controller ) ).toEqual( { width: 600, height: 600 } );
+	} );
+
 	it( 'starts with the crop locked to a ratio in freeform mode too', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {

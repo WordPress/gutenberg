@@ -3,6 +3,7 @@ import type {
 	ImageEditorState,
 	InternalImageEditorState,
 	NormalizedRect,
+	Size,
 	TransformOperation,
 } from './types';
 import {
@@ -24,20 +25,17 @@ function nearlyEqual( a: number, b: number ): boolean {
 }
 
 /**
- * The crop rect for the locked ratio: the largest centred box of that
- * ratio. The crop rect is measured against the view the canvas shows,
- * which has the image's shape turned by its rotation snapped to a quarter
- * turn, so the image is enough to work it out. `undefined` when no ratio
- * is locked or no image is loaded.
+ * The shape of the view the crop rect is measured against: the image,
+ * turned by its rotation snapped to a quarter turn. It is the shape the
+ * canvas lays out, so the reducer can keep a locked ratio without the
+ * canvas. `undefined` when no image is loaded.
  *
  * @param state The editor state.
- * @return The crop rect for the locked ratio, or `undefined`.
+ * @return The view's width and height, or `undefined`.
  */
-function getLockedCropRect(
-	state: InternalImageEditorState
-): NormalizedRect | undefined {
-	const { image, aspectRatio, rotation } = state;
-	if ( ! image || ! aspectRatio || aspectRatio <= 0 ) {
+function getViewShape( state: InternalImageEditorState ): Size | undefined {
+	const { image, rotation } = state;
+	if ( ! image ) {
 		return undefined;
 	}
 	const viewShape = getRotatedBBox(
@@ -45,32 +43,82 @@ function getLockedCropRect(
 		image.naturalHeight,
 		Math.round( rotation / 90 ) * 90
 	);
-	if ( viewShape.width === 0 || viewShape.height === 0 ) {
-		return undefined;
-	}
-	return computeInscribedRect( aspectRatio, viewShape );
+	return viewShape.width > 0 && viewShape.height > 0 ? viewShape : undefined;
 }
 
 /**
- * Fit a full-frame crop to the locked ratio. A full frame is what a state
- * starts with and what a reset or a new image goes back to, so this makes
- * a locked ratio hold from the start in freeform mode too. A crop the
- * person shaped, or saved earlier, is left alone.
+ * The crop rect for the locked ratio: the largest centred box of that
+ * ratio. `undefined` when no ratio is locked or no image is loaded.
  *
  * @param state The editor state.
- * @return The state, with the crop fitted when it was the full frame.
+ * @return The crop rect for the locked ratio, or `undefined`.
  */
-function fitFullFrameToLockedRatio(
+function getLockedCropRect(
+	state: InternalImageEditorState
+): NormalizedRect | undefined {
+	const viewShape = getViewShape( state );
+	if ( ! viewShape || ! state.aspectRatio || state.aspectRatio <= 0 ) {
+		return undefined;
+	}
+	return computeInscribedRect( state.aspectRatio, viewShape );
+}
+
+/**
+ * How far a crop's shape may be from the locked ratio, relative to it, and
+ * still count as matching. It leaves room for rounding in a handle drag.
+ */
+const LOCKED_RATIO_TOLERANCE = 1e-3;
+
+/**
+ * Make the crop match the locked ratio, so a locked ratio always means a
+ * crop of that ratio. A crop that matches is returned as it is. Otherwise
+ * the crop keeps its centre and width and takes the height the ratio
+ * needs; if that is taller than the view, it takes the full height and
+ * the width the ratio needs. A full frame becomes the largest box of the
+ * ratio.
+ *
+ * @param state The editor state.
+ * @return The same state when the crop matches, or a state with a crop
+ *         that does.
+ */
+export function fitCropToLockedRatio(
 	state: InternalImageEditorState
 ): InternalImageEditorState {
-	const { cropRect } = state;
-	const isFullFrame =
-		nearlyEqual( cropRect.x, 0 ) &&
-		nearlyEqual( cropRect.y, 0 ) &&
-		nearlyEqual( cropRect.width, 1 ) &&
-		nearlyEqual( cropRect.height, 1 );
-	const lockedCropRect = isFullFrame ? getLockedCropRect( state ) : undefined;
-	return lockedCropRect ? { ...state, cropRect: lockedCropRect } : state;
+	const { aspectRatio, cropRect } = state;
+	const viewShape = getViewShape( state );
+	if (
+		! viewShape ||
+		! aspectRatio ||
+		aspectRatio <= 0 ||
+		cropRect.width <= 0 ||
+		cropRect.height <= 0
+	) {
+		return state;
+	}
+	// The crop's width / height, in view fractions, that gives the locked
+	// ratio in pixels.
+	const lockedShape = ( aspectRatio * viewShape.height ) / viewShape.width;
+	const shape = cropRect.width / cropRect.height;
+	if ( Math.abs( shape / lockedShape - 1 ) <= LOCKED_RATIO_TOLERANCE ) {
+		return state;
+	}
+	let width = Math.min( cropRect.width, 1 );
+	let height = width / lockedShape;
+	if ( height > 1 ) {
+		height = 1;
+		width = lockedShape;
+	}
+	const centreX = cropRect.x + cropRect.width / 2;
+	const centreY = cropRect.y + cropRect.height / 2;
+	return {
+		...state,
+		cropRect: {
+			x: Math.min( Math.max( centreX - width / 2, 0 ), 1 - width ),
+			y: Math.min( Math.max( centreY - height / 2, 0 ), 1 - height ),
+			width,
+			height,
+		},
+	};
 }
 
 /**
@@ -290,7 +338,7 @@ export function imageEditorReducer(
 		case 'SET_IMAGE':
 			return commitBase(
 				enforceContainment(
-					fitFullFrameToLockedRatio( {
+					fitCropToLockedRatio( {
 						...state,
 						image: action.payload,
 					} )
@@ -443,10 +491,12 @@ export function imageEditorReducer(
 
 		case 'SET_CROP_RECT':
 			return commitBase(
-				enforceContainment( {
-					...state,
-					cropRect: action.payload,
-				} )
+				enforceContainment(
+					fitCropToLockedRatio( {
+						...state,
+						cropRect: action.payload,
+					} )
+				)
 			);
 
 		case 'SET_ASPECT_RATIO': {
@@ -526,7 +576,7 @@ export function imageEditorReducer(
 		case 'RESET':
 			return commitBase(
 				enforceContainment(
-					fitFullFrameToLockedRatio( {
+					fitCropToLockedRatio( {
 						...DEFAULT_STATE,
 						image: state.image,
 						...action.payload,

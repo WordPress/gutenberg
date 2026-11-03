@@ -951,8 +951,10 @@ describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
 	} );
 
-	it( 'leaves a crop the person shaped when an image loads', () => {
-		const cropRect = { x: 0.2, y: 0.2, width: 0.3, height: 0.3 };
+	it( 'leaves a crop that matches the locked ratio when an image loads', () => {
+		// A square on the 16:9 image: 0.3 of the height is 0.16875 of the
+		// width.
+		const cropRect = { x: 0.2, y: 0.2, width: 0.16875, height: 0.3 };
 		const next = imageEditorReducer(
 			makeState( { image: null, aspectRatio: 1, cropRect } ),
 			{
@@ -966,6 +968,43 @@ describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 		);
 
 		expect( next.cropRect ).toEqual( cropRect );
+	} );
+
+	it( 'fits a crop the setter sends to the locked ratio', () => {
+		const next = imageEditorReducer( makeState( { aspectRatio: 1 } ), {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0, y: 0, width: 1, height: 1 },
+		} );
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect.width ).toBeCloseTo(
+			computeInscribedRect( 1, IMAGE ).width,
+			10
+		);
+		expect( next.cropRect.height ).toBeCloseTo( 1, 10 );
+		expect( next.cropRect.x ).toBeCloseTo(
+			computeInscribedRect( 1, IMAGE ).x,
+			10
+		);
+	} );
+
+	it( 'keeps the centre of a crop it fits to the locked ratio', () => {
+		const next = imageEditorReducer( makeState( { aspectRatio: 1 } ), {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0.1, y: 0.2, width: 0.3, height: 0.3 },
+		} );
+
+		// Same width and centre, with the height a square needs.
+		expect( next.cropRect.width ).toBeCloseTo( 0.3, 10 );
+		expect( next.cropRect.height ).toBeCloseTo( 0.3 / 0.5625, 10 );
+		expect( next.cropRect.x + next.cropRect.width / 2 ).toBeCloseTo(
+			0.25,
+			10
+		);
+		expect( next.cropRect.y + next.cropRect.height / 2 ).toBeCloseTo(
+			0.35,
+			10
+		);
 	} );
 
 	it( 'fits the crop to a ratio RESET keeps', () => {
