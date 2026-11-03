@@ -67,6 +67,25 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Helper method to build a WP_Block instance with post context.
+	 *
+	 * @param array $attributes Block attributes.
+	 * @return WP_Block
+	 */
+	public static function build_block( $attributes ) {
+		return new WP_Block(
+			array(
+				'blockName' => 'core/media-text',
+				'attrs'     => $attributes,
+			),
+			array(
+				'postId'   => self::$post->ID,
+				'postType' => self::$post->post_type,
+			)
+		);
+	}
+
+	/**
 	 * Test gutenberg_render_block_core_media_text with the featured image on the left.
 	 */
 	public function test_render_block_core_media_text_featured_image() {
@@ -78,7 +97,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$attributes = array(
 			'useFeaturedImage' => true,
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
 		// Assert that the rendered block contains the featured image as an image element,
@@ -87,7 +107,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'useFeaturedImage' => true,
 			'imageFill'        => true,
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -103,7 +124,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$attributes = array(
 			'useFeaturedImage' => true,
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
 		// Assert that the rendered block contains the featured image as an image element,
@@ -112,7 +134,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'useFeaturedImage' => true,
 			'imageFill'        => true,
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -129,7 +152,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'useFeaturedImage' => true,
 			'mediaPosition'    => 'right',
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
 		// Assert that the rendered block contains the featured image as an image element,
@@ -139,7 +163,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'mediaPosition'    => 'right',
 			'imageFill'        => true,
 		);
-		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$block      = self::build_block( $attributes );
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -157,8 +182,9 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'useFeaturedImage' => true,
 			'mediaPosition'    => 'right',
 		);
+		$block      = self::build_block( $attributes );
 
-		$rendered = gutenberg_render_block_core_media_text( $attributes, $content );
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
 		// Assert that the rendered block contains the featured image as an image element,
@@ -168,8 +194,9 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 			'mediaPosition'    => 'right',
 			'imageFill'        => true,
 		);
+		$block      = self::build_block( $attributes );
 
-		$rendered = gutenberg_render_block_core_media_text( $attributes, $content );
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content, $block );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 }
