@@ -36,7 +36,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`button`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- `transform`:
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
   - `rotate`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `["top","bottom"]`

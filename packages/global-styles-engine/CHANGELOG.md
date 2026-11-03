@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `transform.rotate` setting ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ## 2.2.0 (2026-11-18)
 
 ### Bug Fixes
