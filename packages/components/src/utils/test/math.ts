@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { add, subtract, clamp, ensureValidStep } from '../math';
+import { add, subtract, multiply, clamp, ensureValidStep } from '../math';
 
 describe( 'add', () => {
 	it( 'should add string and number values', () => {
@@ -15,6 +15,12 @@ describe( 'add', () => {
 
 	it( 'should add multiple arguments', () => {
 		expect( add( '105', '30', 10, 5 ) ).toBe( 150 );
+	} );
+
+	it( 'should handle scientific notation without losing precision', () => {
+		expect( add( 0.1, 1e-7 ) ).toBe( 0.1000001 );
+		expect( add( 0.1, '1e-7' ) ).toBe( 0.1000001 );
+		expect( add( 0.1, 1.25e-7 ) ).toBe( 0.100000125 );
 	} );
 } );
 
@@ -32,6 +38,47 @@ describe( 'subtract', () => {
 
 	it( 'should subtract multiple arguments', () => {
 		expect( subtract( '105', '30', 10, 5 ) ).toBe( 60 );
+	} );
+
+	it( 'should handle scientific notation without losing precision', () => {
+		expect( subtract( 0.1, 1e-7 ) ).toBe( 0.0999999 );
+		expect( subtract( 0.1, '1e-7' ) ).toBe( 0.0999999 );
+		expect( subtract( 0.1, 1.25e-7 ) ).toBe( 0.099999875 );
+	} );
+} );
+
+describe( 'multiply', () => {
+	it( 'should multiply string and number values', () => {
+		expect( multiply( '10', '5' ) ).toBe( 50 );
+		expect( multiply( 10, 5 ) ).toBe( 50 );
+		expect( multiply( '10', 5 ) ).toBe( 50 );
+		expect( multiply( 10, '5' ) ).toBe( 50 );
+
+		// Negative values.
+		expect( multiply( 10, '-5' ) ).toBe( -50 );
+		expect( multiply( -10, '-5' ) ).toBe( 50 );
+	} );
+
+	it( 'should multiply multiple arguments', () => {
+		expect( multiply( '2', '3', 4, 5 ) ).toBe( 120 );
+	} );
+
+	it( 'should handle scientific notation in arguments', () => {
+		expect( multiply( 2, 1e-7 ) ).toBe( 2e-7 );
+		expect( multiply( 0.1, 1e-7 ) ).toBe( 1e-8 );
+	} );
+
+	it( 'should normalize floating-point precision on multiplication', () => {
+		// In raw JavaScript IEEE 754, 6 * 0.1 is 0.6000000000000001
+		expect( multiply( 6, 0.1 ) ).toBe( 0.6 );
+		expect( multiply( 6, 0.1, -1 ) ).toBe( -0.6 );
+		expect( multiply( -6, 0.1, -1 ) ).toBe( 0.6 );
+		expect( multiply( 0.3, 0.3 ) ).toBe( 0.09 );
+
+		// Drag calculation for 0.3vw + delta of 6 pixels with spinFactor 0.1:
+		const distance = multiply( 6, 0.1, 1 );
+		expect( distance ).toBe( 0.6 );
+		expect( add( 0.3, distance ) ).toBe( 0.9 );
 	} );
 } );
 

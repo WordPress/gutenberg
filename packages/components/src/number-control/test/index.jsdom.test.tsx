@@ -319,6 +319,24 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 1.75 );
 		} );
 
+		it( 'should increment when spinFactor uses scientific notation', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step="any"
+					spinFactor={ 1e-7 }
+					value={ 0.1 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowUp]' );
+
+			expect( input ).toHaveValue( 0.1000001 );
+		} );
+
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
@@ -470,6 +488,24 @@ describe( 'NumberControl', () => {
 			await user.keyboard( '[ArrowDown]' );
 
 			expect( input ).toHaveValue( 1.55 );
+		} );
+
+		it( 'should decrement when spinFactor uses scientific notation', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<StatefulNumberControl
+					step="any"
+					spinFactor={ 1e-7 }
+					value={ 0.1 }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowDown]' );
+
+			expect( input ).toHaveValue( 0.0999999 );
 		} );
 
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
