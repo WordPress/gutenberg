@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `MenuItem` and `DropdownMenu`: Stop showing a focus ring when a disabled item is hovered with a pointer ([#86269](https://github.com/WordPress/gutenberg/pull/86269)).
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#86062](https://github.com/WordPress/gutenberg/pull/86062)).
 -   `ToolsPanel`: Keep the "Reset" label visible on the highlighted menu item ([#86060](https://github.com/WordPress/gutenberg/pull/86060)).
 -   `DropdownMenu`, `MenuItem`, `Autocomplete`: Synchronize the active item with pointer movement and keyboard navigation ([#85487](https://github.com/WordPress/gutenberg/pull/85487)).
