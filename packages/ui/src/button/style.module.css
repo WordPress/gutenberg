@@ -188,15 +188,15 @@
 
 			/* Forced colors discard the strong background, so fill pressed buttons
 			   with the system selection colors instead. Opting out of color
-			   adjustment removes the text backplate, so the focus ring needs an
-			   explicit system color too. */
+			   adjustment removes the text backplate, so the border and focus ring
+			   need explicit system colors too. */
 			&.is-minimal[aria-pressed="true"]:not(.is-loading) {
 				@media ( forced-colors: active ) {
 					forced-color-adjust: none;
 					outline-color: CanvasText;
 					background-color: SelectedItem;
 					color: SelectedItemText;
-					border-color: SelectedItem;
+					border-color: ButtonBorder;
 
 					&[data-disabled] {
 						background-color: GrayText;
