@@ -105,7 +105,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *
 	 * @var array<string, true>
 	 */
-	protected $core_admin_icon_names = array();
+	private $core_admin_icon_names = array();
 
 	/**
 	 * Resolved path of the core icon library directory.
