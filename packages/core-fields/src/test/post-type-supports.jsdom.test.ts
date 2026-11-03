@@ -64,7 +64,7 @@ describe( 'post_type_supports', () => {
 	it( 'summarizes the comment and ping statuses', () => {
 		const render = postTypeSupports.discussion.render as ( props: {
 			item: Record< string, string >;
-		} ) => string;
+		} ) => string | null;
 		expect(
 			render( { item: { comment_status: 'open', ping_status: 'open' } } )
 		).toBe( 'Open' );
@@ -78,7 +78,12 @@ describe( 'post_type_supports', () => {
 				item: { comment_status: 'closed', ping_status: 'open' },
 			} )
 		).toBe( 'Pings only' );
-		expect( render( { item: {} } ) ).toBe( 'Closed' );
+		expect(
+			render( {
+				item: { comment_status: 'closed', ping_status: 'closed' },
+			} )
+		).toBe( 'Closed' );
+		expect( render( { item: {} } ) ).toBeNull();
 	} );
 
 	it( 'shows the sticky field when the post can be made sticky', () => {
