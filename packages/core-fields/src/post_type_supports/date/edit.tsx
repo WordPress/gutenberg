@@ -107,8 +107,6 @@ export default function DateEdit( {
 		status: savedStatus ?? data.status,
 	} );
 
-	const disabled = field.isDisabled( { item: data, field } );
-
 	// Only DataViews filters pass an operator. A filter picks a date to compare
 	// against, so resetting the post date means nothing there.
 	const isFilter = !! operator;
@@ -162,7 +160,7 @@ export default function DateEdit( {
 					variant="secondary"
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					disabled={ disabled || isReset }
+					disabled={ isReset }
 					onClick={ onReset }
 					aria-describedby={ note ? noteId : undefined }
 				>
