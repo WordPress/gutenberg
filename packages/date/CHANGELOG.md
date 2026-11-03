@@ -8,6 +8,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   `format`: Return the `B` (Swatch Internet Time) format character as three digits computed with whole number division, matching PHP's `date()`. It previously gave `499` at noon BMT instead of `500`, and `3` instead of `003` early in the day ([#85125](https://github.com/WordPress/gutenberg/pull/85125)).
+
 ### Internal
 
 -   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84830](https://github.com/WordPress/gutenberg/pull/84830)).
