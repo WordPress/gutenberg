@@ -46,8 +46,8 @@ function _gutenberg_ui_render_button( $props, $content ) {
 	return sprintf(
 		'<button type="%1$s" tabindex="0" class="%2$s"%3$s>%4$s</button>',
 		esc_attr( $props['type'] ),
-		gutenberg_ui_components_esc_plain_text( implode( ' ', $classes ) ),
+		esc_attr( implode( ' ', $classes ) ),
 		$props['disabled'] ? ' data-disabled="" disabled=""' : '',
-		gutenberg_ui_components_esc_plain_text( $content )
+		esc_html( $content )
 	);
 }
