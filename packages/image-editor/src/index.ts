@@ -10,7 +10,13 @@ export { ImageEditorCanvas } from './react/components';
 export type { ImageEditorCanvasProps } from './react/components';
 export { useImageEditor, createImageEditorState } from './react/hooks';
 export type { ImageEditorController, ImageEditorOptions } from './react/hooks';
-export type { ImageEditorState } from './core/types';
+export type {
+	Flip,
+	ImageEditorState,
+	NormalizedPoint,
+	NormalizedRect,
+	Size,
+} from './core/types';
 export { areImageEditorStatesEqual } from './core/state';
 
 // Map the edit onto the original image, for saving it.

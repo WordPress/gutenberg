@@ -25,6 +25,34 @@ function nearlyEqual( a: number, b: number ): boolean {
 }
 
 /**
+ * Fill in the values the editor keeps for itself when a state does not
+ * carry them. A state the editor handed out always has them, so the same
+ * object comes back; one built by hand does not, and the reducer reads
+ * them on the first change. The base pose starts where the state is.
+ *
+ * @param state A state from the editor, or one built by hand.
+ * @return The state, with the editor's own values present.
+ */
+export function withBaseValues(
+	state: ImageEditorState
+): InternalImageEditorState {
+	const full = state as InternalImageEditorState;
+	if (
+		full.basePan &&
+		typeof full.baseZoom === 'number' &&
+		typeof full.baseRotation === 'number'
+	) {
+		return full;
+	}
+	return {
+		...full,
+		basePan: full.basePan ?? { ...state.pan },
+		baseZoom: full.baseZoom ?? state.zoom,
+		baseRotation: full.baseRotation ?? state.rotation,
+	};
+}
+
+/**
  * The shape of the view the crop rect is measured against: the image,
  * turned by its rotation snapped to a quarter turn. It is the shape the
  * canvas lays out, so the reducer can keep a locked ratio without the
@@ -504,10 +532,16 @@ export function imageEditorReducer(
 			);
 
 		case 'SET_ASPECT_RATIO': {
-			const next = { ...state, aspectRatio: action.payload };
+			// A ratio of zero or less is not a shape; treat it as free, so
+			// it compares equal to an unlocked crop.
+			const aspectRatio =
+				action.payload !== undefined && action.payload > 0
+					? action.payload
+					: undefined;
+			const next = { ...state, aspectRatio };
 			const cropRect = getLockedCropRect( next );
 			if ( ! cropRect ) {
-				return state.aspectRatio === action.payload ? state : next;
+				return state.aspectRatio === aspectRatio ? state : next;
 			}
 			return commitBase( enforceContainment( { ...next, cropRect } ) );
 		}

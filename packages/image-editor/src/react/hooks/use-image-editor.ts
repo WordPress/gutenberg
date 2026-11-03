@@ -25,11 +25,19 @@ import {
 	enforceContainment,
 	fitCropToLockedRatio,
 	isStateDirty,
+	withBaseValues,
 } from '../../core/state';
 import {
 	buildImageEditorSetters,
 	type ImageEditorSetters,
 } from './build-image-editor-setters';
+
+/**
+ * Marks a controller as one `useImageEditor` made. `<ImageEditorCanvas>`
+ * also calls methods that are not on the public type, so a hand-built
+ * object would type-check and then fail. Nothing sets this at runtime.
+ */
+declare const imageEditorController: unique symbol;
 
 /**
  * The editor controller surface — the contract the ImageEditorCanvas component
@@ -40,6 +48,7 @@ import {
  * your own undo history.
  */
 export interface InternalImageEditorController extends ImageEditorSetters {
+	readonly [ imageEditorController ]: true;
 	/** The current editor state (read-only). */
 	state: InternalImageEditorState;
 	/**
@@ -140,11 +149,10 @@ export function useInternalImageEditor(
 	const [ ownState, setOwnState ] = useState< InternalImageEditorState >(
 		() => enforceContainment( { ...DEFAULT_STATE, ...initialState } )
 	);
-	// A state the consumer passes back is one the editor handed out, so it
-	// carries the values the editor keeps for itself.
-	const state = isControlled
-		? ( controlledState as InternalImageEditorState )
-		: ownState;
+	// A state the consumer passes back is usually one the editor handed
+	// out, which carries the values the editor keeps for itself. One built
+	// by hand does not, so fill them in rather than read them as undefined.
+	const state = isControlled ? withBaseValues( controlledState ) : ownState;
 
 	// The clean state `isDirty` compares against and `reset` returns to.
 	// It starts as the consumer's starting state, and follows the changes
@@ -284,18 +292,21 @@ export function useInternalImageEditor(
 	const minZoom = getMinZoom( state );
 
 	return useMemo(
-		() => ( {
-			...setters,
-			state,
-			setImage,
-			reset,
-			isDirty,
-			minZoom,
-			maxZoom: MAX_ZOOM,
-			maxRotationOffset: MAX_ROTATION_OFFSET,
-			getCroppedImage,
-			adjustCropRectForViewport,
-		} ),
+		() =>
+			// The brand is a type-only marker, so the real controller is
+			// the one object that carries it.
+			( {
+				...setters,
+				state,
+				setImage,
+				reset,
+				isDirty,
+				minZoom,
+				maxZoom: MAX_ZOOM,
+				maxRotationOffset: MAX_ROTATION_OFFSET,
+				getCroppedImage,
+				adjustCropRectForViewport,
+			} ) as InternalImageEditorController,
 		[
 			setters,
 			state,
@@ -314,6 +325,7 @@ export function useInternalImageEditor(
  * changes a person can make, and the limits for building controls.
  */
 export interface ImageEditorController {
+	readonly [ imageEditorController ]: true;
 	/** The current state. */
 	readonly state: ImageEditorState;
 	/**

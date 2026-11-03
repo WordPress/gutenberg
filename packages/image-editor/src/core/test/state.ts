@@ -913,6 +913,16 @@ describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 		expect( next.cropRect.height ).toBeCloseTo( expected.height, 10 );
 	} );
 
+	it( 'treats a ratio of zero as free, so it matches an unlocked crop', () => {
+		const next = imageEditorReducer( makeState(), {
+			type: 'SET_ASPECT_RATIO',
+			payload: 0,
+		} );
+
+		expect( next.aspectRatio ).toBeUndefined();
+		expect( areImageEditorStatesEqual( next, makeState() ) ).toBe( true );
+	} );
+
 	it( 'keeps the crop where it is when the ratio is unlocked', () => {
 		const cropRect = { x: 0.1, y: 0.2, width: 0.5, height: 0.4 };
 		const next = imageEditorReducer(

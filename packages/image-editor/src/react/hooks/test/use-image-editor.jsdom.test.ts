@@ -1068,6 +1068,26 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		expect( result.current.controller.state.flip.horizontal ).toBe( false );
 	} );
 
+	it( "takes a state built by hand, without the editor's own values", () => {
+		// Only the fields the public `ImageEditorState` declares.
+		const byHand = {
+			image: IMAGE,
+			pan: { x: 0, y: 0 },
+			zoom: 1,
+			rotation: 0,
+			flip: { horizontal: false, vertical: false },
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+		} as InternalImageEditorState;
+		const { result } = renderHook( () => useControlled( byHand ) );
+
+		// Reaches the reducer, which reads the editor's own values, rather
+		// than throwing on the way in.
+		act( () => result.current.controller.setZoom( 2 ) );
+
+		expect( result.current.controller.state.zoom ).toBe( 2 );
+		expect( result.current.controller.isDirty ).toBe( true );
+	} );
+
 	it( 'starts fresh after the image is cleared and another loads', () => {
 		const { result } = renderHook( () => useControlled() );
 

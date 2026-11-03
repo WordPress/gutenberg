@@ -19,6 +19,8 @@ const GRID_INTERACTIVE_CLASS = 'wp-image-editor__canvas--grid-interactive';
 const SHOW_GRID_CLASS = 'wp-image-editor__canvas--show-grid';
 
 function createController(): InternalImageEditorController {
+	// The brand on the controller type is a marker only `useImageEditor`
+	// sets, so a test double has to assert it.
 	return {
 		state: {
 			...DEFAULT_STATE,
@@ -46,7 +48,7 @@ function createController(): InternalImageEditorController {
 		maxRotationOffset: MAX_ROTATION_OFFSET,
 		getCroppedImage: vi.fn(),
 		adjustCropRectForViewport: vi.fn(),
-	};
+	} as unknown as InternalImageEditorController;
 }
 
 function CanvasFixture( { children }: { children: React.ReactNode } ) {

@@ -56,6 +56,38 @@ function cropSize( controller: ImageEditorController ) {
 }
 
 describe( 'the public API', () => {
+	it( 'only takes a controller `useImageEditor` made', () => {
+		// The canvas also calls methods that are not on the public type, so
+		// an object that merely matches it must not type-check here.
+		const byHand = {
+			state: createImageEditorState(),
+			isDirty: false,
+			minZoom: 1,
+			maxZoom: 10,
+			maxRotationOffset: 45,
+			setImage: () => {},
+			reset: () => {},
+			setPan: () => {},
+			setZoom: () => {},
+			setRotation: () => {},
+			snapRotate90: () => {},
+			setFlip: () => {},
+			toggleFlip: () => {},
+			setCropRect: () => {},
+			setAspectRatio: () => {},
+		};
+
+		const rejected = (
+			<ImageEditorCanvas
+				src="x.png"
+				// @ts-expect-error -- a hand-built controller is not ours.
+				controller={ byHand }
+			/>
+		);
+
+		expect( rejected ).toBeTruthy();
+	} );
+
 	it( 'crops and maps the edit to the original from the package exports alone', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {
