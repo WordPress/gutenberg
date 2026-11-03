@@ -479,6 +479,80 @@ function transformPhpContent( content, transforms ) {
 }
 
 /**
+ * Find the source files a package copies to the build with `wpCopyFiles`.
+ *
+ * @param {string} packageDir  Package directory.
+ * @param {Object} packageJson Package's package.json.
+ * @return {Promise<string[]>} Absolute paths of the files to copy.
+ */
+async function getCopyFiles( packageDir, packageJson ) {
+	if ( ! packageJson.wpCopyFiles ) {
+		return [];
+	}
+	return glob(
+		packageJson.wpCopyFiles.files.map( ( filePattern ) =>
+			normalizePath( path.join( packageDir, filePattern ) )
+		)
+	);
+}
+
+/**
+ * Copy one of a package's `wpCopyFiles` to the build, transforming PHP files.
+ *
+ * @param {string} sourceFile  Absolute path of the file to copy.
+ * @param {string} packageDir  Package directory.
+ * @param {string} packageName Package name (short name).
+ * @param {Object} packageJson Package's package.json.
+ * @return {Promise<string>} Path the file was written to.
+ */
+async function copyPackageFile(
+	sourceFile,
+	packageDir,
+	packageName,
+	packageJson
+) {
+	const { transforms = {} } = packageJson.wpCopyFiles;
+	const relativePath = path.relative(
+		path.join( packageDir, 'src' ),
+		sourceFile
+	);
+	let destPath = path.join( BUILD_DIR, 'scripts', packageName, relativePath );
+
+	if ( ! sourceFile.endsWith( '.php' ) || ! transforms.php ) {
+		await mkdir( path.dirname( destPath ), { recursive: true } );
+		await copyFile( sourceFile, destPath );
+		return destPath;
+	}
+
+	const content = await readFile( sourceFile, 'utf8' );
+	const transformed = transformPhpContent( content, transforms.php );
+
+	if ( transforms.php.filenameSuffix ) {
+		const ext = path.extname( destPath );
+		const base = path.basename( destPath, ext );
+		destPath = path.join(
+			path.dirname( destPath ),
+			`${ base }${ transforms.php.filenameSuffix }${ ext }`
+		);
+	}
+
+	// Check if we should flatten index.php files
+	if (
+		transforms.php.flattenIndexFiles &&
+		path.basename( sourceFile ) === 'index.php'
+	) {
+		// Flatten: button/index.php → button.php
+		const parentDir = path.dirname( destPath );
+		const blockName = path.basename( parentDir );
+		destPath = path.join( path.dirname( parentDir ), `${ blockName }.php` );
+	}
+
+	await mkdir( path.dirname( destPath ), { recursive: true } );
+	await writeFile( destPath, transformed );
+	return destPath;
+}
+
+/**
  * Plugin to handle moment-timezone aliases.
  * Redirects moment-timezone imports to use pre-built bundles with limited data.
  *
@@ -901,76 +975,10 @@ async function bundlePackage( packageName, options = {} ) {
 		}
 	}
 
-	if ( packageJson.wpCopyFiles ) {
-		const { files, transforms = {} } = packageJson.wpCopyFiles;
-		const packageSourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
-
-		for ( const filePattern of files ) {
-			const matchedFiles = await glob(
-				normalizePath( path.join( packageDir, filePattern ) )
-			);
-
-			for ( const sourceFile of matchedFiles ) {
-				const relativePath = path.relative(
-					packageSourceDir,
-					sourceFile
-				);
-				const destPath = path.join( outputDir, relativePath );
-				const destDir = path.dirname( destPath );
-
-				if ( sourceFile.endsWith( '.php' ) && transforms.php ) {
-					builds.push(
-						( async () => {
-							let finalPath = destPath;
-							let finalDir = destDir;
-
-							const content = await readFile(
-								sourceFile,
-								'utf8'
-							);
-							const transformed = transformPhpContent(
-								content,
-								transforms.php
-							);
-
-							if ( transforms.php.filenameSuffix ) {
-								const ext = path.extname( destPath );
-								const base = path.basename( destPath, ext );
-								finalPath = path.join(
-									destDir,
-									`${ base }${ transforms.php.filenameSuffix }${ ext }`
-								);
-							}
-
-							// Check if we should flatten index.php files
-							if (
-								transforms.php.flattenIndexFiles &&
-								path.basename( sourceFile ) === 'index.php'
-							) {
-								// Flatten: button/index.php → button.php
-								const parentDir = path.dirname( finalPath );
-								const blockName = path.basename( parentDir );
-								finalPath = path.join(
-									path.dirname( parentDir ),
-									`${ blockName }.php`
-								);
-								finalDir = path.dirname( finalPath );
-							}
-
-							await mkdir( finalDir, { recursive: true } );
-							await writeFile( finalPath, transformed );
-						} )()
-					);
-				} else {
-					builds.push(
-						mkdir( destDir, { recursive: true } ).then( () =>
-							copyFile( sourceFile, destPath )
-						)
-					);
-				}
-			}
-		}
+	for ( const sourceFile of await getCopyFiles( packageDir, packageJson ) ) {
+		builds.push(
+			copyPackageFile( sourceFile, packageDir, packageName, packageJson )
+		);
 	}
 
 	if ( builds.length === 0 ) {
@@ -2800,6 +2808,52 @@ async function watchMode() {
 		}
 	}
 
+	/**
+	 * Copy a changed PHP file to the build, without rebuilding its package.
+	 *
+	 * @param {string} filename Absolute path of the PHP file.
+	 */
+	async function recopyPhpFile( filename ) {
+		const packageName = getPackageName( filename );
+		const relativePath = path.relative( PACKAGES_DIR, filename );
+		try {
+			const startTime = Date.now();
+			const packageDir = path.join( PACKAGES_DIR, packageName );
+			await copyPackageFile(
+				filename,
+				packageDir,
+				packageName,
+				fullToPackageJson.get( shortToFull.get( packageName ) )
+			);
+			const copyTime = Date.now() - startTime;
+			console.log( `✅ ${ relativePath } (copied) (${ copyTime }ms)` );
+		} catch ( error ) {
+			console.log( `❌ ${ relativePath } - Error: ${ error.message }` );
+		}
+	}
+
+	/**
+	 * Determine whether a file is a PHP file that its package copies to the
+	 * build with `wpCopyFiles`.
+	 *
+	 * Only the build's copy of such a file depends on it, so a change to it
+	 * needs the file copied again, not its package rebuilt.
+	 *
+	 * @param {string} filename    Absolute path of the file.
+	 * @param {string} packageName Package name (short name).
+	 * @return {Promise<boolean>} Whether the file is a copied PHP file.
+	 */
+	async function isCopiedPhpFile( filename, packageName ) {
+		if ( ! filename.endsWith( '.php' ) ) {
+			return false;
+		}
+		const copyFiles = await getCopyFiles(
+			path.join( PACKAGES_DIR, packageName ),
+			fullToPackageJson.get( shortToFull.get( packageName ) )
+		);
+		return copyFiles.includes( normalizePath( filename ) );
+	}
+
 	async function processNextRebuild() {
 		if ( needsRebuild.size === 0 ) {
 			isRebuilding = false;
@@ -2817,6 +2871,8 @@ async function watchMode() {
 			} else if ( item.startsWith( 'widget:' ) ) {
 				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
 				await rebuildWidget( widgetDirName );
+			} else if ( item.startsWith( 'php:' ) ) {
+				await recopyPhpFile( item.slice( 4 ) ); // Remove 'php:' prefix
 			} else {
 				await rebuildPackage( item );
 			}
@@ -2860,7 +2916,7 @@ async function watchMode() {
 		console.error( '❌ Watcher error:', error );
 	} );
 
-	const handleFileChange = async ( filename ) => {
+	const handleFileChange = async ( filename, event ) => {
 		if ( ! isPackageSourceFile( filename ) ) {
 			return;
 		}
@@ -2870,19 +2926,34 @@ async function watchMode() {
 			return;
 		}
 
+		/*
+		 * A changed PHP file only needs copying again. An added or removed
+		 * one still rebuilds its package, which copies all of its files.
+		 */
+		const item =
+			event === 'change' &&
+			( await isCopiedPhpFile( path.resolve( filename ), packageName ) )
+				? `php:${ path.resolve( filename ) }`
+				: packageName;
+
+		// Queue the item, so that it is not written while a rebuild is running.
 		if ( isRebuilding ) {
-			needsRebuild.add( packageName );
+			needsRebuild.add( item );
 			return;
 		}
 
 		isRebuilding = true;
-		await rebuildPackage( packageName );
+		needsRebuild.add( item );
 		await processNextRebuild();
 	};
 
-	watcher.on( 'change', handleFileChange );
-	watcher.on( 'add', handleFileChange );
-	watcher.on( 'unlink', handleFileChange );
+	watcher.on( 'change', ( filename ) =>
+		handleFileChange( filename, 'change' )
+	);
+	watcher.on( 'add', ( filename ) => handleFileChange( filename, 'add' ) );
+	watcher.on( 'unlink', ( filename ) =>
+		handleFileChange( filename, 'unlink' )
+	);
 
 	// Watch route files if routes exist
 	if ( allRoutes.length > 0 ) {
