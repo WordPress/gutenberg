@@ -84,12 +84,13 @@ export default {
 		// automatically, so the control is irrelevant in manual placement mode.
 		const showFillControl = ! layout?.isManualPlacement;
 		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
+		const defaultRowCount = layout.isManualPlacement ? 3 : undefined;
 		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
 		const hasColumnsAndRowsValue = () =>
 			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
-			hasLayoutValue( 'rowCount' );
+			hasLayoutValue( 'rowCount', defaultRowCount );
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
@@ -98,7 +99,7 @@ export default {
 				cleanEmptyObject( {
 					...layout,
 					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
-					rowCount: resetLayout?.rowCount,
+					rowCount: resetLayout?.rowCount ?? defaultRowCount,
 				} )
 			);
 		const resetMinimumColumnWidth = () =>

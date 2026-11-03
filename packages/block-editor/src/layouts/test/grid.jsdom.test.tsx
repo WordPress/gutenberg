@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
 import grid from '../grid';
+import type { Layout } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -18,6 +21,63 @@ function renderInspectorControls( props = {} ) {
 				{ ...props }
 			/>
 		</ToolsPanel>
+	);
+}
+
+function SyncManualGridLayout( {
+	layout,
+	onChange,
+}: {
+	layout: Layout;
+	onChange: ( layout: Layout ) => void;
+} ) {
+	useEffect( () => {
+		if ( layout.isManualPlacement && layout.rowCount === undefined ) {
+			onChange( {
+				...layout,
+				columnCount: layout.columnCount ?? 3,
+				rowCount: 3,
+			} );
+		}
+	}, [ layout, onChange ] );
+
+	return null;
+}
+
+function GridLayoutTransform( {
+	onInspectorChange,
+}: {
+	onInspectorChange: ( layout: Layout | undefined ) => void;
+} ) {
+	const [ layout, setLayout ] = useState< Layout >( {
+		type: 'grid',
+		columnCount: 3,
+	} );
+	const onChange = ( nextLayout: Layout | undefined ) => {
+		onInspectorChange( nextLayout );
+		setLayout( nextLayout ?? {} );
+	};
+
+	return (
+		<>
+			<button
+				onClick={ () =>
+					setLayout( {
+						type: 'grid',
+						isManualPlacement: true,
+					} )
+				}
+			>
+				Transform to Canvas
+			</button>
+			<SyncManualGridLayout layout={ layout } onChange={ setLayout } />
+			<GridLayoutInspectorControls
+				clientId={ PANEL_ID }
+				layout={ layout }
+				layoutBlockSupport={ { allowSizingOnChildren: true } }
+				onChange={ onChange }
+			/>
+		</>
 	);
 }
 
@@ -154,5 +214,30 @@ describe( 'GridLayoutInspectorControls', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Columns' } )
 		).toHaveDisplayValue( '' );
+	} );
+
+	it( 'does not reset the default row count when switching from auto to manual placement', async () => {
+		const user = userEvent.setup();
+		const onInspectorChange = vi.fn();
+		render(
+			<ToolsPanel
+				label="Layout"
+				resetAll={ vi.fn() }
+				panelId={ PANEL_ID }
+			>
+				<GridLayoutTransform onInspectorChange={ onInspectorChange } />
+			</ToolsPanel>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform to Canvas' } )
+		);
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Rows' } )
+			).toHaveDisplayValue( '3' )
+		);
+
+		expect( onInspectorChange ).not.toHaveBeenCalled();
 	} );
 } );
