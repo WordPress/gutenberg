@@ -112,7 +112,7 @@ const LibraryExample = ( {
 
 	return (
 		<Stack gap="3xl" className={ styles.layout }>
-			<Stack direction="column" gap="2xl" className={ styles.details }>
+			<Stack direction="column" gap="lg" className={ styles.details }>
 				<SearchControl
 					label="Icon name"
 					hideLabelFromVision={ false }
