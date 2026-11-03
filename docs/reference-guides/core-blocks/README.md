@@ -111,7 +111,7 @@ Prompt visitors to take action with a button-style link.
 -	**Name:** [core/button](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/buttons
--	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), dimensions (width), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), dimensions (width), interactivity (clientNavigation), shadow, spacing (padding), splitting, transform (rotate), typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url
 
 ## Buttons
@@ -366,7 +366,7 @@ Gather blocks in a layout container.
 
 -	**Name:** [core/group](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
--	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight, textColumns), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), transform (rotate), typography (fontSize, lineHeight, textColumns), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -375,7 +375,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** [core/heading](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), className, color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textIndent, textShadow)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), className, color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, transform (rotate), typography (fitText, fontSize, lineHeight, textAlign, textIndent, textShadow)
 -	**Attributes:** content, level, levelOptions, placeholder
 
 ## Home Link
@@ -412,7 +412,7 @@ Insert an image to make a visual statement.
 
 -	**Name:** [core/image](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity, shadow, spacing (margin)
+-	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity, shadow, spacing (margin), transform (rotate)
 -	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, isDecorative, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
@@ -1099,7 +1099,7 @@ Embed a video from your media library or upload a new one.
 
 -	**Name:** [core/video](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-video/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, anchor, dimensions (minHeight, minWidth), filter (duotone), interactivity (clientNavigation, interactive), shadow, spacing (margin, padding)
+-	**Supports:** align, anchor, dimensions (minHeight, minWidth), filter (duotone), interactivity (clientNavigation, interactive), shadow, spacing (margin, padding), transform (rotate)
 -	**Attributes:** autoplay, blob, caption, controls, height, id, loop, muted, playsInline, poster, preload, src, tracks, width
 
 <!-- END TOKEN Autogenerated - DO NOT EDIT -->
