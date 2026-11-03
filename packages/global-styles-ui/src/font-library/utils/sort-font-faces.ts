@@ -6,10 +6,6 @@ function getNumericFontWeight( value: string ): number {
 			return 400;
 		case 'bold':
 			return 700;
-		case 'bolder':
-			return 500;
-		case 'lighter':
-			return 300;
 		default:
 			return parseInt( value, 10 );
 	}
@@ -27,10 +23,21 @@ export function sortFontFaces( faces: FontFace[] ): FontFace[] {
 
 		// If both fontStyles are the same, sort by fontWeight
 		if ( a.fontStyle === b.fontStyle ) {
-			return (
-				getNumericFontWeight( a.fontWeight?.toString() ?? 'normal' ) -
-				getNumericFontWeight( b.fontWeight?.toString() ?? 'normal' )
+			const aWeight = getNumericFontWeight(
+				a.fontWeight?.toString() ?? 'normal'
 			);
+			const bWeight = getNumericFontWeight(
+				b.fontWeight?.toString() ?? 'normal'
+			);
+
+			if ( Number.isNaN( aWeight ) || Number.isNaN( bWeight ) ) {
+				return (
+					Number( Number.isNaN( aWeight ) ) -
+					Number( Number.isNaN( bWeight ) )
+				);
+			}
+
+			return aWeight - bWeight;
 		}
 
 		// Sort other fontStyles alphabetically
