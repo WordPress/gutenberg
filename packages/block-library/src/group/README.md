@@ -36,6 +36,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`button`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
+  - `rotate`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `["top","bottom"]`
   - `padding`: `true`
@@ -45,7 +47,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `minWidth`: `true`
 - [`position`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#position):
   - `sticky`: `true`
-- `rotation`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`

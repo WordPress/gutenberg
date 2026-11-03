@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
-import { applyFilters } from '@wordpress/hooks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
@@ -369,6 +368,21 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'outputs a hover rotation as the individual rotate property', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { rotate: '8deg' } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { rotate: 8deg !important; }'
+		);
+	} );
+
 	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
 		expect(
 			getBlockStateStylesCSS(
@@ -577,6 +591,29 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'routes a viewport rotation through the transform feature selector', () => {
+		registerBlockType( 'test/state-rotate', {
+			apiVersion: 3,
+			title: 'State Rotate',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: { transform: '.wp-block-test-state-rotate img' },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { transform: { rotate: '0' } } },
+			'test/state-rotate',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-rotate' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 0 !important; }}',
 		] );
 	} );
 
@@ -1058,30 +1095,5 @@ describe( 'omitStyle', () => {
 
 		expect( omitStyle( style, [] ) ).toEqual( style );
 		expect( omitStyle( style, [ [] ] ) ).toEqual( style );
-	} );
-} );
-
-describe( 'addAttribute', () => {
-	const addAttribute = ( supports: Record< string, boolean > ) =>
-		(
-			applyFilters(
-				'blocks.registerBlockType',
-				{ attributes: {}, supports },
-				'core/foo'
-			) as { attributes: Record< string, unknown > }
-		 ).attributes;
-
-	it( 'adds the style attribute for rotation alone', () => {
-		expect( addAttribute( { customCSS: false, rotation: true } ) ).toEqual(
-			{
-				style: { type: 'object' },
-			}
-		);
-	} );
-
-	it( "doesn't add it to a block without any style support", () => {
-		expect( addAttribute( { customCSS: false, rotation: false } ) ).toEqual(
-			{}
-		);
 	} );
 } );

@@ -16,10 +16,6 @@ const InspectorControlsDimensions = createSlotFill(
 const InspectorControlsLayout = createSlotFill( 'InspectorControlsLayout' );
 const InspectorControlsElements = createSlotFill( 'InspectorControlsElements' );
 const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
-// The position group contains the legacy selector; tools register separately.
-const InspectorControlsPositionTools = createSlotFill(
-	'InspectorControlsPositionTools'
-);
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
@@ -46,7 +42,6 @@ const groups: Record< string, SlotFill > = {
 	layout: InspectorControlsLayout,
 	list: InspectorControlsListView,
 	position: InspectorControlsPosition,
-	'position-tools': InspectorControlsPositionTools,
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,

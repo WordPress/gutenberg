@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes
