@@ -248,18 +248,40 @@ export const HelpText: Story = {
  */
 export const LongFilterName: Story = {
 	play: async ( { canvasElement } ) => {
-		const shortName = await widthOf( canvasElement, 'Name' );
-		const longName = await widthOf( canvasElement, 'Date of' );
-		expect( longName ).toBe( shortName );
+		const header = async ( filterName: string ) => {
+			const content = await openFilter( canvasElement, filterName );
+			const name = content.querySelector< HTMLElement >(
+				'.dataviews-filters__summary-operators-filter-name'
+			);
+			const select = content.querySelector< HTMLElement >(
+				'.dataviews-filters__summary-operators-filter-select'
+			);
+			if ( ! name || ! select ) {
+				throw new Error( 'No filter name or operator in the popover.' );
+			}
+			return {
+				content,
+				name,
+				width: Math.round( content.getBoundingClientRect().width ),
+				nameHeight: Math.round( name.getBoundingClientRect().height ),
+				selectWidth: Math.round( select.getBoundingClientRect().width ),
+			};
+		};
+		const short = await header( 'Name' );
+		await closeFilter();
+		const long = await header( 'Date of' );
+		const { content, name } = long;
+		// The popover keeps its width, and the name stays on one line,
+		// truncated, without squeezing the operator.
+		expect( long.width ).toBe( short.width );
+		expect( long.nameHeight ).toBe( short.nameHeight );
+		expect( long.selectWidth ).toBe( short.selectWidth );
+		expect( name.scrollWidth ).toBeGreaterThan( name.clientWidth );
+		expect( content.scrollWidth ).toBeLessThanOrEqual(
+			content.clientWidth
+		);
 		// The name is still shown: its text gets some room, not just the
 		// name's padding.
-		const content = await openFilter( canvasElement, 'Date of' );
-		const name = content.querySelector< HTMLElement >(
-			'.dataviews-filters__summary-operators-filter-name'
-		);
-		if ( ! name ) {
-			throw new Error( 'No filter name in the popover.' );
-		}
 		const { paddingLeft, paddingRight } = getComputedStyle( name );
 		const textWidth =
 			name.clientWidth -
