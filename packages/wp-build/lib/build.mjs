@@ -2737,6 +2737,9 @@ async function watchMode() {
 			await transpilePackage( packageName );
 			await bundlePackage( packageName );
 
+			// A PHP file may have been added or removed.
+			await updateCopiedPhpFiles( packageName );
+
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 
@@ -2832,27 +2835,30 @@ async function watchMode() {
 		}
 	}
 
-	/**
-	 * Determine whether a file is a PHP file that its package copies to the
-	 * build with `wpCopyFiles`.
-	 *
-	 * Only the build's copy of such a file depends on it, so a change to it
-	 * needs the file copied again, not its package rebuilt.
-	 *
-	 * @param {string} filename    Absolute path of the file.
-	 * @param {string} packageName Package name (short name).
-	 * @return {Promise<boolean>} Whether the file is a copied PHP file.
+	/*
+	 * The PHP files each package copies to the build with `wpCopyFiles`, by
+	 * package name. Only the build's copy of such a file depends on it, so a
+	 * change to it needs the file copied again, not its package rebuilt.
 	 */
-	async function isCopiedPhpFile( filename, packageName ) {
-		if ( ! filename.endsWith( '.php' ) ) {
-			return false;
-		}
+	const copiedPhpFiles = new Map();
+
+	/**
+	 * Find the PHP files a package copies to the build with `wpCopyFiles`.
+	 *
+	 * @param {string} packageName Package name (short name).
+	 */
+	async function updateCopiedPhpFiles( packageName ) {
 		const copyFiles = await getCopyFiles(
 			path.join( PACKAGES_DIR, packageName ),
 			fullToPackageJson.get( shortToFull.get( packageName ) )
 		);
-		return copyFiles.includes( normalizePath( filename ) );
+		copiedPhpFiles.set(
+			packageName,
+			new Set( copyFiles.filter( ( file ) => file.endsWith( '.php' ) ) )
+		);
 	}
+
+	await Promise.all( PACKAGES.map( updateCopiedPhpFiles ) );
 
 	async function processNextRebuild() {
 		if ( needsRebuild.size === 0 ) {
@@ -2930,10 +2936,10 @@ async function watchMode() {
 		 * A changed PHP file only needs copying again. An added or removed
 		 * one still rebuilds its package, which copies all of its files.
 		 */
+		const file = normalizePath( path.resolve( filename ) );
 		const item =
-			event === 'change' &&
-			( await isCopiedPhpFile( path.resolve( filename ), packageName ) )
-				? `php:${ path.resolve( filename ) }`
+			event === 'change' && copiedPhpFiles.get( packageName )?.has( file )
+				? `php:${ file }`
 				: packageName;
 
 		// Queue the item, so that it is not written while a rebuild is running.
