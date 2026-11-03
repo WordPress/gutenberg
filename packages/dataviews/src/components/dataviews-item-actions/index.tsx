@@ -1,4 +1,5 @@
 import type { MouseEventHandler } from 'react';
+import clsx from 'clsx';
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
@@ -39,6 +40,17 @@ interface ItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	isCompact?: boolean;
+	/**
+	 * Whether to leave out the primary action buttons and show only the
+	 * actions menu, for layouts that render the primary actions elsewhere.
+	 */
+	hidePrimaryActions?: boolean;
+}
+
+interface ItemPrimaryActionsProps< Item > {
+	item: Item;
+	actions: Action< Item >[];
+	className?: string;
 }
 
 interface CompactItemActionsProps< Item > {
@@ -166,6 +178,7 @@ export default function ItemActions< Item >( {
 	item,
 	actions,
 	isCompact,
+	hidePrimaryActions = false,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
@@ -206,12 +219,15 @@ export default function ItemActions< Item >( {
 				width: 'auto',
 			} }
 		>
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-			{ ( primaryActions.length < eligibleActions.length ||
+			{ ! hidePrimaryActions && (
+				<PrimaryActions
+					item={ item }
+					actions={ primaryActions }
+					registry={ registry }
+				/>
+			) }
+			{ ( ( hidePrimaryActions && eligibleActions.length > 0 ) ||
+				primaryActions.length < eligibleActions.length ||
 				// Since we hide primary actions on mobile, we need to show the menu
 				// there if there are any actions at all.
 				isMobileViewport ) && (
@@ -221,6 +237,47 @@ export default function ItemActions< Item >( {
 					registry={ registry }
 				/>
 			) }
+		</Stack>
+	);
+}
+
+/**
+ * Renders the primary actions of an item that are eligible for it, for
+ * layouts that place them apart from the actions menu.
+ */
+export function ItemPrimaryActions< Item >( {
+	item,
+	actions,
+	className,
+}: ItemPrimaryActionsProps< Item > ) {
+	const registry = useRegistry();
+	const primaryActions = useMemo(
+		() =>
+			actions.filter(
+				( action ) =>
+					action.isPrimary &&
+					( ! action.isEligible || action.isEligible( item ) )
+			),
+		[ actions, item ]
+	);
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	// On mobile, the actions menu lists the primary actions instead.
+	if ( isMobileViewport || primaryActions.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<Stack
+			direction="row"
+			wrap="wrap"
+			className={ clsx( 'dataviews-item-actions', className ) }
+		>
+			<PrimaryActions
+				item={ item }
+				actions={ primaryActions }
+				registry={ registry }
+			/>
 		</Stack>
 	);
 }
