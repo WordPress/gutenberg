@@ -3,7 +3,6 @@ import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { viewPostRevisions } from '@wordpress/fields';
 import { addQueryArgs } from '@wordpress/url';
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -47,7 +46,7 @@ export const useSiteEditorPostActions = ( options ) => {
 	return useMemo(
 		() =>
 			postTypeActions.map( ( action ) =>
-				action.id === viewPostRevisions.id
+				action.id === 'view-post-revisions'
 					? {
 							...action,
 							callback( items ) {
