@@ -1,21 +1,19 @@
 import type {
 	CropperAction,
-	CropperState,
+	CropperControllerState,
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
+	Size,
 	TransformOperation,
 } from '../../core/types';
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
 
 /**
- * The named cropper setters shared by every hook that drives the
- * cropper reducer — the pure `useCropperController` and any composite
- * store that delegates cropper actions (e.g. `useMediaEditorState`).
+ * The named cropper setters `useCropperController` exposes.
  *
- * `setImage` and `reset` are intentionally NOT included: each hook
- * has additional bookkeeping for them (dirty-baseline, history clear)
- * that doesn't fit a shared factory.
+ * `setImage` and `reset` are not included: the controller has extra
+ * bookkeeping for them (its dirty baseline).
  */
 export interface CropperSetters {
 	setPan: ( pan: NormalizedPoint ) => void;
@@ -26,33 +24,37 @@ export interface CropperSetters {
 	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
 	snapRotate90: ( direction: 1 | -1 ) => void;
 	setCropRect: ( rect: NormalizedRect ) => void;
+	/**
+	 * Lock the crop to a width / height ratio in source pixels, or
+	 * unlock it with `undefined`. Locking reshapes the crop to the
+	 * largest box of that ratio. `<Cropper>` reads the ratio from the
+	 * state to lock its resize handles.
+	 */
+	setAspectRatio: ( aspectRatio: number | undefined ) => void;
 	settleCrop: () => void;
 	applyOperation: ( op: TransformOperation ) => void;
 }
 
 /**
- * Build the named cropper setters from a dispatch function and a
- * state getter. The two consuming hooks differ in how they dispatch:
- *
- * - `useCropperController` dispatches directly into its `useReducer`.
- * - `useMediaEditorState` wraps cropper actions in a composite
- *   `CROPPER` envelope so the history machinery can record them.
- *
- * Both pass their own dispatch function and a getter that returns
- * the current `CropperState`. The factory shape keeps the two hooks
- * in lockstep — add a setter here once, both hooks get it.
+ * Build the named cropper setters from a dispatch function and getters
+ * for the latest state and the rendered size.
  *
  * @param dispatchCropperAction Apply a `CropperAction` to the
  *                              underlying reducer.
- * @param getCropperState       Return the current `CropperState`.
+ * @param getCropperState       Return the current `CropperControllerState`.
  *                              Used by setters that need to read
  *                              the latest state to compute their
  *                              payload (focal-point zoom, flip toggle).
+ * @param getVisualSize         Return the rendered image size the
+ *                              `<Cropper>` last reported, which
+ *                              `setAspectRatio` needs to reshape the
+ *                              crop.
  * @return The named cropper setters.
  */
 export function buildCropperSetters(
 	dispatchCropperAction: ( action: CropperAction ) => void,
-	getCropperState: () => CropperState
+	getCropperState: () => CropperControllerState,
+	getVisualSize: () => Size
 ): CropperSetters {
 	return {
 		setPan: ( pan ) =>
@@ -91,6 +93,11 @@ export function buildCropperSetters(
 			dispatchCropperAction( {
 				type: 'SET_CROP_RECT',
 				payload: rect,
+			} ),
+		setAspectRatio: ( aspectRatio ) =>
+			dispatchCropperAction( {
+				type: 'SET_ASPECT_RATIO',
+				payload: { aspectRatio, visualSize: getVisualSize() },
 			} ),
 		settleCrop: () => dispatchCropperAction( { type: 'SETTLE_CROP' } ),
 		applyOperation: ( op ) =>

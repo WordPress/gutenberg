@@ -32,6 +32,7 @@ function createController(): CropperController {
 		toggleFlip: vi.fn(),
 		snapRotate90: vi.fn(),
 		setCropRect: vi.fn(),
+		setAspectRatio: vi.fn(),
 		settleCrop: vi.fn(),
 		applyOperation: vi.fn(),
 		reset: vi.fn(),
@@ -287,6 +288,7 @@ describe( 'Cropper', () => {
 		controller.state = {
 			...controller.state,
 			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
+			aspectRatio: 1,
 		};
 		await renderCropper(
 			<Cropper
@@ -294,7 +296,6 @@ describe( 'Cropper', () => {
 				controller={ controller }
 				showDimming={ false }
 				freeformCrop={ false }
-				aspectRatio={ 1 }
 			/>
 		);
 
@@ -1391,13 +1392,13 @@ describe( 'Cropper', () => {
 				height: 0.641,
 			},
 			zoom: 0.5,
+			aspectRatio: 1,
 		};
 		const { rerender } = await renderCropper(
 			<Cropper
 				src="locked-ratio.png"
 				controller={ controller }
 				freeformCrop
-				aspectRatio={ 1 }
 			/>
 		);
 
@@ -1408,7 +1409,6 @@ describe( 'Cropper', () => {
 				src="locked-ratio.png"
 				controller={ controller }
 				freeformCrop
-				aspectRatio={ 1 }
 			/>
 		);
 

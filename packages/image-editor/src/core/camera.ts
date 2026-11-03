@@ -1,6 +1,6 @@
 import { mat2d, vec2 } from 'gl-matrix';
 import type {
-	CropperState,
+	CropperControllerState,
 	NormalizedPoint,
 	NormalizedRect,
 	Size,
@@ -182,7 +182,7 @@ export function getViewScale(
  * @return The composed camera matrix.
  */
 export function createCamera(
-	state: CropperState,
+	state: CropperControllerState,
 	containerSize: Size,
 	imageSize: Size
 ): Camera {
@@ -380,7 +380,7 @@ export function getVisibleBounds( camera: Camera ): VisualBounds {
  * @return The composed export camera matrix.
  */
 export function createExportCamera(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	outputSize: Size
 ): Camera {

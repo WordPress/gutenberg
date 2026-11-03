@@ -1,4 +1,4 @@
-import type { CropperState, NormalizedPoint, Size } from './types';
+import type { CropperControllerState, NormalizedPoint, Size } from './types';
 import {
 	DEFAULT_KEYBOARD_STEP,
 	DEFAULT_WHEEL_ZOOM_SPEED,
@@ -21,7 +21,7 @@ const ZOOM_ANIMATION_DURATION = 200;
  * @param state The current cropper state.
  * @return The image dimensions.
  */
-function getImageSizeFromState( state: CropperState ): {
+function getImageSizeFromState( state: CropperControllerState ): {
 	width: number;
 	height: number;
 } {
@@ -82,7 +82,7 @@ export interface CropperInteractionActions {
  */
 export interface InteractionControllerOptions {
 	/** Returns the current cropper state. Called on every interaction. */
-	getState: () => CropperState;
+	getState: () => CropperControllerState;
 	/** State updates the interaction controller can request from its host UI. */
 	actions: CropperInteractionActions;
 	/** Returns the container dimensions in pixels. */

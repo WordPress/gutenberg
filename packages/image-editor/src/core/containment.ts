@@ -1,5 +1,5 @@
 import { mat2d, vec2 } from 'gl-matrix';
-import type { CropperState, NormalizedRect, Size } from './types';
+import type { CropperControllerState, NormalizedRect, Size } from './types';
 import { ABSOLUTE_MIN_ZOOM, MAX_ZOOM, MIN_ZOOM } from './constants';
 import { degreesToRadians } from './math/rotation';
 import {
@@ -95,7 +95,7 @@ function getMinZoomForCover(
  * @param state The current cropper state.
  * @return The minimum zoom factor.
  */
-export function getMinZoom( state: CropperState ): number {
+export function getMinZoom( state: CropperControllerState ): number {
 	if ( ! state.image ) {
 		return MIN_ZOOM;
 	}
@@ -138,7 +138,7 @@ export function getMinZoom( state: CropperState ): number {
  * @return The min/max x and y that a crop rect edge can reach in normalized space.
  */
 export function getImageCropBounds(
-	state: CropperState,
+	state: CropperControllerState,
 	elementSize: Size,
 	visualSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -301,7 +301,7 @@ const _scratchVec = vec2.create();
  * @return The restricted crop pan and zoom values.
  */
 export function restrictPanZoom(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	cropRect: NormalizedRect
 ): { pan: { x: number; y: number }; zoom: number } {

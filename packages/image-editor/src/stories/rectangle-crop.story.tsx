@@ -19,12 +19,9 @@ import {
 } from '@wordpress/icons';
 import { Cropper } from '../react/components/cropper';
 import { useCropperController } from '../react/hooks/use-cropper-controller';
-import {
-	MAX_ZOOM,
-	MAX_ROTATION_OFFSET,
-	ORIGINAL_ASPECT_RATIO,
-} from '../core/constants';
+import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
 import { DEFAULT_ASPECT_RATIOS } from '../presets/aspect-ratio-presets';
+import { resolveAspectRatio } from '../presets/resolve-aspect-ratio';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
@@ -33,7 +30,6 @@ import {
 	downloadCroppedImage,
 } from '../core/export/canvas-renderer';
 import {
-	getRotatedBBox,
 	createCamera,
 	screenToWorld,
 	getImageFit,
@@ -111,27 +107,6 @@ function useUploadableImage() {
 	return { src, isCustom, handleFileChange, resetToSample };
 }
 
-/**
- * Resolve an aspect ratio value from the select dropdown.
- * 0 = free (no lock), ORIGINAL_ASPECT_RATIO (-1) = image's natural ratio.
- */
-function resolveAspectRatio(
-	value: string,
-	imageState: { naturalWidth: number; naturalHeight: number } | null
-): number | undefined {
-	const num = parseFloat( value );
-	if ( num === 0 ) {
-		return undefined; // Free — no lock.
-	}
-	if ( num === ORIGINAL_ASPECT_RATIO && imageState ) {
-		return imageState.naturalWidth / imageState.naturalHeight;
-	}
-	if ( num > 0 ) {
-		return num;
-	}
-	return undefined;
-}
-
 const meta: Meta< typeof Cropper > = {
 	id: 'imageeditor-cropper',
 	title: 'Editor/Image Editor/Cropper',
@@ -182,7 +157,6 @@ const WithControlsComponent = () => {
 		setRotation,
 		setFlip,
 		setZoom,
-		setCropRect,
 		snapRotate90,
 		reset,
 		isDirty,
@@ -281,47 +255,11 @@ const WithControlsComponent = () => {
 	const handleAspectRatioChange = useCallback(
 		( value: string ) => {
 			setAspectRatioValue( value );
-
-			// In fixed mode (freeformCrop=false), the cropper's useEffect
-			// auto-computes the crop rect from the aspect ratio. In freeform
-			// mode, we adjust the crop rect here to fit the new ratio.
-			const resolved = resolveAspectRatio( value, state.image );
-			if ( freeformCrop && resolved && resolved > 0 && state.image ) {
-				const ratio = resolved;
-				const natW = state.image.naturalWidth;
-				const natH = state.image.naturalHeight;
-				const visualBBox = getRotatedBBox( natW, natH, state.rotation );
-				// normalizedRatio = w/h in normalized space that produces
-				// the desired pixel aspect ratio.
-				const normalizedRatio =
-					( ratio * visualBBox.height ) / visualBBox.width;
-
-				let w = state.cropRect.width;
-				let h = w / normalizedRatio;
-
-				if ( h > 1 ) {
-					h = state.cropRect.height;
-					w = h * normalizedRatio;
-				}
-
-				w = Math.min( w, 1 );
-				h = Math.min( h, 1 );
-
-				setCropRect( {
-					x: ( 1 - w ) / 2,
-					y: ( 1 - h ) / 2,
-					width: w,
-					height: h,
-				} );
-			}
+			controller.setAspectRatio(
+				resolveAspectRatio( value, state.image )
+			);
 		},
-		[
-			freeformCrop,
-			state.image,
-			state.cropRect,
-			state.rotation,
-			setCropRect,
-		]
+		[ controller, state.image ]
 	);
 
 	const handleReset = useCallback( () => {
@@ -485,10 +423,6 @@ const WithControlsComponent = () => {
 					showGrid={ GRID_MODES[ gridMode ] }
 					showDimming
 					freeformCrop={ freeformCrop }
-					aspectRatio={ resolveAspectRatio(
-						aspectRatioValue,
-						state.image
-					) }
 				/>
 			</div>
 			<Flex justify="space-between" align="center">

@@ -6,7 +6,7 @@ import {
 	sanitizeRect,
 } from '../sanitize';
 import { DEFAULT_STATE } from '../../constants';
-import type { CropperState } from '../../types';
+import type { CropperControllerState } from '../../types';
 
 describe( 'safeBoundedNumber', () => {
 	it( 'returns the value when it is finite and in range', () => {
@@ -112,8 +112,8 @@ describe( 'sanitizeRect', () => {
 
 describe( 'sanitizeCropperState', () => {
 	function makeBaseState(
-		overrides: Partial< CropperState > = {}
-	): CropperState {
+		overrides: Partial< CropperControllerState > = {}
+	): CropperControllerState {
 		return {
 			...DEFAULT_STATE,
 			...overrides,

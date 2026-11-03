@@ -44,25 +44,35 @@ function ImageCropper() {
 }
 ```
 
-`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It does not provide undo and redo.
+`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It keeps no undo history; to add one, keep the state yourself (see below).
 
 ## API
 
 ### `Cropper`
 
-Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `aspectRatio`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
+Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
 
-### `useCropperController( initialState? )`
+### `useCropperController( options? )`
 
-React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`.
+React hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`. Lock the crop to a ratio with `controller.setAspectRatio( ratio )`, or unlock it with `undefined`; the ratio lives in `controller.state.aspectRatio`, and `<Cropper>` reads it from there.
+
+With no options, the controller keeps its own state (pass `initialState` to start from something other than the default). To keep the state yourself, for example in an editor's own undo history, pass `state` and `onChange`. The controller works out each change and calls `onChange( nextState, { isEdit } )`. `isEdit` is `false` for changes the person did not make, such as an image loading or the crop being refitted after a window resize, which usually should not get an undo entry. Use `onGestureStart` and `onGestureEnd` on `<Cropper>` to group a drag into one undo entry.
+
+### `createCropperState( image? )`
+
+The state a cropper starts from for an image. Use it to build your starting state when you keep the state yourself.
+
+### `areCropperStatesEqual( a, b )`
+
+Whether two cropper states are the same crop, ignoring tiny floating-point differences. Use it to skip no-op entries in your own undo history.
 
 ### `buildModifiers( controller )`
 
 The rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
 
-### `DEFAULT_ASPECT_RATIOS`
+### `DEFAULT_ASPECT_RATIOS`, `resolveAspectRatio( presetKey, image )`
 
-The default aspect-ratio presets.
+The default aspect-ratio presets, and a function that turns a preset value into the ratio to pass to `controller.setAspectRatio`, resolving "Original" from the loaded image.
 
 ### `MAX_ZOOM`, `MAX_ROTATION_OFFSET`, `getMinZoom`
 

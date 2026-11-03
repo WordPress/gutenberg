@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useCropperController } from '../use-cropper-controller';
+import { useRef, useState } from '@wordpress/element';
+import {
+	createCropperState,
+	useCropperController,
+} from '../use-cropper-controller';
+import type { CropperControllerState } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';
+import { computeInscribedRect } from '../../../core/crop-rect';
 
 describe( 'useCropperController', () => {
 	it( 'should initialize with DEFAULT_STATE', () => {
@@ -12,7 +18,7 @@ describe( 'useCropperController', () => {
 
 	it( 'should initialize with merged partial state', () => {
 		const { result } = renderHook( () =>
-			useCropperController( { zoom: 2, rotation: 45 } )
+			useCropperController( { initialState: { zoom: 2, rotation: 45 } } )
 		);
 
 		expect( result.current.state.zoom ).toBe( 2 );
@@ -140,13 +146,15 @@ describe( 'useCropperController', () => {
 		// must honour values below 1 rather than clamping at MIN_ZOOM.
 		const { result } = renderHook( () =>
 			useCropperController( {
-				image: {
-					src: 'portrait.jpg',
-					naturalWidth: 900,
-					naturalHeight: 1600,
+				initialState: {
+					image: {
+						src: 'portrait.jpg',
+						naturalWidth: 900,
+						naturalHeight: 1600,
+					},
+					rotation: 19,
+					cropRect: { x: 0.48, y: 0, width: 0.04, height: 1 },
 				},
-				rotation: 19,
-				cropRect: { x: 0.48, y: 0, width: 0.04, height: 1 },
 			} )
 		);
 
@@ -972,10 +980,10 @@ describe( 'useCropperController', () => {
 	} );
 
 	describe( 'isStateDirty coverage guard', () => {
-		// This test ensures that isStateDirty checks ALL fields in CropperState.
-		// If you add a field to CropperState/DEFAULT_STATE and this test fails,
+		// This test ensures that isStateDirty checks ALL fields in CropperControllerState.
+		// If you add a field to CropperControllerState/DEFAULT_STATE and this test fails,
 		// you MUST also update isStateDirty() in use-cropper-controller.ts.
-		it( 'should track all CropperState fields', () => {
+		it( 'should track all CropperControllerState fields', () => {
 			// Flatten DEFAULT_STATE keys into dot-notation paths.
 			// e.g., { pan: { x: 0, y: 0 } } → ['crop.x', 'crop.y']
 			function flattenKeys(
@@ -1005,7 +1013,7 @@ describe( 'useCropperController', () => {
 			}
 
 			// The fields that isStateDirty currently checks.
-			// Keep this in sync — if you add a field to CropperState,
+			// Keep this in sync — if you add a field to CropperControllerState,
 			// add it here AND in isStateDirty().
 			const dirtyCheckedFields = [
 				'pan.x',
@@ -1045,5 +1053,83 @@ describe( 'useCropperController', () => {
 
 			expect( stateKeys ).toEqual( dirtyCheckedFields );
 		} );
+	} );
+
+	it( 'locks the aspect ratio and reshapes the crop for the reported visual size', () => {
+		const visualSize = { width: 800, height: 450 };
+		const { result } = renderHook( () => useCropperController() );
+
+		act( () => result.current.setVisualSize( visualSize ) );
+		act( () => result.current.setAspectRatio( 1 ) );
+
+		expect( result.current.state.aspectRatio ).toBe( 1 );
+		expect( result.current.state.cropRect ).toEqual(
+			computeInscribedRect( 1, visualSize )
+		);
+	} );
+} );
+
+describe( 'useCropperController with the state kept by the caller', () => {
+	const IMAGE = { src: 'photo.jpg', naturalWidth: 1200, naturalHeight: 600 };
+
+	function useControlled() {
+		const [ state, setState ] = useState( () =>
+			createCropperState( IMAGE )
+		);
+		const changes = useRef< Array< { isEdit: boolean } > >( [] );
+		const controller = useCropperController( {
+			state,
+			onChange: ( next: CropperControllerState, details ) => {
+				changes.current.push( details );
+				setState( next );
+			},
+		} );
+		return { controller, changes: changes.current };
+	}
+
+	it( 'reports each change as an edit and shows the state it is given', () => {
+		const { result } = renderHook( () => useControlled() );
+
+		act( () => result.current.controller.snapRotate90( 1 ) );
+
+		expect( result.current.controller.state.rotation ).toBe( 90 );
+		expect( result.current.changes ).toContainEqual( { isEdit: true } );
+		expect( result.current.controller.isDirty ).toBe( true );
+	} );
+
+	it( 'reports a viewport refit and a new image as not edits', () => {
+		const { result } = renderHook( () => useControlled() );
+
+		act( () =>
+			result.current.controller.adjustCropRectForViewport( {
+				x: 0.1,
+				y: 0.1,
+				width: 0.5,
+				height: 0.5,
+			} )
+		);
+		act( () =>
+			result.current.controller.setImage( {
+				src: 'other.jpg',
+				naturalWidth: 800,
+				naturalHeight: 800,
+			} )
+		);
+
+		expect( result.current.changes ).toEqual( [
+			{ isEdit: false },
+			{ isEdit: false },
+		] );
+	} );
+
+	it( 'keeps the latest state across several changes in one event', () => {
+		const { result } = renderHook( () => useControlled() );
+
+		act( () => {
+			result.current.controller.toggleFlip( 'horizontal' );
+			result.current.controller.toggleFlip( 'horizontal' );
+		} );
+
+		expect( result.current.controller.state.flip.horizontal ).toBe( false );
 	} );
 } );

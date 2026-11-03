@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from '@wordpress/element';
-import { ORIGINAL_ASPECT_RATIO } from '@wordpress/image-editor';
 import { useCropOptions } from '../use-crop-options';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
 
@@ -38,7 +37,13 @@ function CropOptionsHarness() {
 			<button
 				onClick={ () =>
 					cropOptions.setAspectRatioValue(
-						ORIGINAL_ASPECT_RATIO.toString()
+						// "Original" is the default preset with a negative
+						// value, as the dropdown offers it.
+						String(
+							cropOptions.aspectRatioOptions.find(
+								( option ) => option.value < 0
+							)?.value
+						)
 					)
 				}
 			>

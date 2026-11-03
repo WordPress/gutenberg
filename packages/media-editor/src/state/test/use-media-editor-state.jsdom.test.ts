@@ -113,8 +113,9 @@ describe( 'useMediaEditorState', () => {
 
 			act( () => result.current.setAspectRatioValue( '1' ) ); // Square
 
-			// Both slices changed atomically: preset key and cropRect.
+			// Both slices changed atomically: preset key, ratio and cropRect.
 			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
+			expect( result.current.cropper.state.aspectRatio ).toBe( 1 );
 			expect( result.current.cropper.state.cropRect ).not.toEqual(
 				initialCropRect
 			);
@@ -130,6 +131,7 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.cropper.state.cropRect ).toEqual(
 				initialCropRect
 			);
+			expect( result.current.cropper.state.aspectRatio ).toBeUndefined();
 		} );
 	} );
 

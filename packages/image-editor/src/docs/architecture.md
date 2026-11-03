@@ -1,4 +1,4 @@
-# Image Editor Architecture
+# Cropper Architecture
 
 ## Layers
 
@@ -6,9 +6,10 @@
 | --- | --- | --- |
 | Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
-| Media editor state | `src/state/` | Composite state for the media editor: cropper state, crop options, undo/redo, and gesture boundaries. |
+| Presets | `src/presets/` | The default aspect-ratio presets and `resolveAspectRatio`. |
+| Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
 
-The cropper layer does not own editor history. History belongs to the media editor session because sidebar controls and cropper gestures need one shared undo stack.
+The cropper keeps no undo history. History belongs to the code that uses the cropper, because it covers everything that code edits, not only the crop. To put the crop in an undo history, keep the cropper state yourself: `useCropperController( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 
 ## Coordinate Spaces
 
@@ -21,7 +22,7 @@ The cropper layer does not own editor history. History belongs to the media edit
 
 ## Data Flow
 
-`MediaEditorState` delegates cropper actions to `cropperReducer()`. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
+State code that wraps the cropper delegates cropper actions to `cropperReducer()`. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
 
 ## Design Decisions
 
@@ -35,29 +36,16 @@ The render path uses focused calculations for CSS transforms, stencil placement,
 
 ### State
 
-The core reducer is framework-agnostic and serializable. React and media-editor layers add DOM measurement, gestures, undo/redo, save behavior, and UI state.
-
-### Session
-
-`useMediaEditorState()` returns the media editor session. The session owns the source image, every editing slice, the shared undo/redo history, gesture boundaries, and whether the edits change the saved image (`hasOutputEdits`). The cropper is one participant: `session.cropper` is a geometry-only `CropperController` that a `<Cropper>` takes via its `controller` prop, and its `isDirty` covers geometry alone. Replacing the source image (`setSourceImage`, which the cropper's `setImage` also calls) starts a fresh session with default geometry and crop options, a clean baseline, and no history. Save code asks the session, not the cropper, whether image output needs saving.
-
-The session also holds named edits other than crop: `session.edits`, set with `session.setEdit( name, value )` and removed by passing `undefined`. They share the crop history, so undo, redo and gestures treat them like any crop change, and a different source image clears them. Values are plain data (`EditValue`: strings, numbers, booleans, `null`, and arrays and objects of those), because the session compares them by content to tell a real change from a no-op. Edits do not yet count towards `hasOutputEdits`; nothing saves them.
-
-`session.reset()` puts every slice back to its starting state in one undo entry: default geometry and crop options, no edits, same image. The Reset button calls it; it does not compose per-slice resets itself.
+The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. Undo and redo, saving, and editor UI state belong to the code that uses the cropper.
 
 ### Viewport
 
 Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
 
-## Internal Integration Points
-
-These APIs let code inside `@wordpress/media-editor` compose the cropper. They are not supported extension points for themes or plugins.
+## Extension Points
 
 | Task | API |
 | --- | --- |
-| Alternate crop UI inside media-editor | `stencil` prop implementing `StencilProps`. |
-| Programmatic edits | `TransformOperation[]`, `applyOperation`, or `stateFromPipeline`. |
-| Crop data for REST requests | `getSourceRegion()` and `getSourceRegionPercent()`. |
-| Canvas export | `exportCroppedImage()` or `applyToCanvas()`. |
-| Shared cropper state across internal components | `CropperProvider` / `useCropper()`. |
-| Media editor history | `useMediaEditorState()` session. |
+| Crop data for REST requests | `buildModifiers()`. |
+| Export in the browser | `controller.getCroppedImage()`. |
+| Keep the crop in your own undo history | `useCropperController( { state, onChange } )`, `createCropperState()` and `areCropperStatesEqual()`. |

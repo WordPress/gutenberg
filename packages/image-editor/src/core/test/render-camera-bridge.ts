@@ -33,7 +33,7 @@ import {
 } from '../camera';
 import { computeTransformStyle } from '../transform-style';
 import { DEFAULT_STATE } from '../constants';
-import type { CropperState, Size } from '../types';
+import type { CropperControllerState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
@@ -42,9 +42,11 @@ const IMAGE: Size = { width: 1600, height: 900 };
  * Create a test state with an image loaded.
  *
  * @param overrides Partial state overrides.
- * @return A complete CropperState with image set.
+ * @return A complete CropperControllerState with image set.
  */
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< CropperControllerState > = {}
+): CropperControllerState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -70,7 +72,7 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
  * @return The four stencil corners in screen pixels.
  */
 function stencilCornersViaCssPath(
-	state: CropperState,
+	state: CropperControllerState,
 	containerSize: Size,
 	imageSize: Size
 ): { x: number; y: number }[] {
@@ -117,7 +119,7 @@ function stencilCornersViaCssPath(
  * @return The four stencil corners in screen pixels.
  */
 function stencilCornersViaCameraPath(
-	state: CropperState,
+	state: CropperControllerState,
 	containerSize: Size,
 	imageSize: Size
 ): { x: number; y: number }[] {
@@ -166,7 +168,7 @@ function stencilCornersViaCameraPath(
  * @return The screen pixel position.
  */
 function pointViaCssPath(
-	state: CropperState,
+	state: CropperControllerState,
 	containerSize: Size,
 	imageSize: Size,
 	normPoint: { x: number; y: number }
@@ -215,7 +217,7 @@ function pointViaCssPath(
  * @return The screen pixel position.
  */
 function pointViaCameraPath(
-	state: CropperState,
+	state: CropperControllerState,
 	containerSize: Size,
 	imageSize: Size,
 	normPoint: { x: number; y: number }

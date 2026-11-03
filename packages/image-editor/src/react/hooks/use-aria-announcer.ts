@@ -1,15 +1,15 @@
 import { speak } from '@wordpress/a11y';
 import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import type { CropperState } from '../../core/types';
+import type { CropperControllerState } from '../../core/types';
 import { getSourceRegion } from '../../core/source-region';
 
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
 
 function getFlipAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: CropperControllerState,
+	previousState: CropperControllerState | null
 ): string | undefined {
 	if (
 		! previousState ||
@@ -32,8 +32,8 @@ function getFlipAnnouncement(
 }
 
 function getRotationAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: CropperControllerState,
+	previousState: CropperControllerState | null
 ): string | undefined {
 	if (
 		previousState &&
@@ -73,8 +73,8 @@ function getRotationAnnouncement(
 }
 
 function getCropAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: CropperControllerState,
+	previousState: CropperControllerState | null
 ): string | undefined {
 	if ( ! state.image ) {
 		return undefined;
@@ -109,8 +109,8 @@ function getCropAnnouncement(
 }
 
 function getZoomAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: CropperControllerState,
+	previousState: CropperControllerState | null
 ): string | undefined {
 	if (
 		previousState &&
@@ -127,8 +127,8 @@ function getZoomAnnouncement(
 }
 
 function buildAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: CropperControllerState,
+	previousState: CropperControllerState | null
 ): string {
 	// Flip changes are announced alone.
 	const flip = getFlipAnnouncement( state, previousState );
@@ -156,12 +156,12 @@ function buildAnnouncement(
  *
  * @param state The current cropper state to announce.
  */
-export function useAriaAnnouncer( state: CropperState ): void {
+export function useAriaAnnouncer( state: CropperControllerState ): void {
 	const timerRef = useRef< ReturnType< typeof setTimeout > | undefined >(
 		undefined
 	);
 	const prevMessageRef = useRef( '' );
-	const prevStateRef = useRef< CropperState | null >( null );
+	const prevStateRef = useRef< CropperControllerState | null >( null );
 	const latestStateRef = useRef( state );
 	useLayoutEffect( () => {
 		latestStateRef.current = state;

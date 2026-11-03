@@ -1,4 +1,4 @@
-# Image Editor Recipes
+# Cropper Recipes
 
 > **Status: experimental.** This API may change in any release.
 
@@ -51,72 +51,67 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 }
 ```
 
-When internal controls are split across components, use `CropperProvider`.
+## Keep the State Yourself
+
+To put the crop in your own undo history, alongside anything else your editor changes, keep the cropper state in your own state and pass it to the controller. The controller works out each change and hands you the next state. A minimal history, with a drag recorded as one entry:
 
 ```tsx
-import { Cropper, CropperProvider, useCropper } from '@wordpress/image-editor';
+import { useRef, useState } from '@wordpress/element';
+import {
+	Cropper,
+	areCropperStatesEqual,
+	createCropperState,
+	useCropperController,
+	type CropperControllerState,
+} from '@wordpress/image-editor';
 
-function Editor( { src }: { src: string } ) {
-	return (
-		<CropperProvider>
-			<Toolbar />
-			<CropperPanel src={ src } />
-		</CropperProvider>
-	);
-}
+function CropperWithHistory( { src }: { src: string } ) {
+	const [ crop, setCrop ] = useState( () => createCropperState() );
+	const [ past, setPast ] = useState< CropperControllerState[] >( [] );
+	const gestureStart = useRef< CropperControllerState | null >( null );
 
-function Toolbar() {
-	const { snapRotate90 } = useCropper();
-	return <button onClick={ () => snapRotate90( 1 ) }>Rotate right</button>;
-}
-
-function CropperPanel( { src }: { src: string } ) {
-	const controller = useCropper();
-	return <Cropper src={ src } controller={ controller } freeformCrop />;
-}
-```
-
-## Use the Media Editor Session
-
-Use the media editor session when cropper state must share history with controls such as aspect ratio. The session owns history and gesture boundaries; pass its `cropper` controller to `<Cropper>`.
-
-```tsx
-import { resolveAspectRatio, useMediaEditor } from '../../state';
-import { Cropper } from '@wordpress/image-editor';
-
-function MediaEditorCanvas( { src }: { src: string } ) {
-	const session = useMediaEditor();
-	const aspectRatio = resolveAspectRatio(
-		session.cropOptions.aspectRatioValue,
-		session.cropper.state.image
-	);
+	const controller = useCropperController( {
+		state: crop,
+		onChange: ( next, { isEdit } ) => {
+			if ( isEdit && ! gestureStart.current ) {
+				setPast( ( entries ) => [ ...entries, crop ] );
+			}
+			setCrop( next );
+		},
+	} );
 
 	return (
-		<Cropper
-			src={ src }
-			controller={ session.cropper }
-			aspectRatio={ aspectRatio }
-			freeformCrop
-			onGestureStart={ session.beginGesture }
-			onGestureEnd={ session.endGesture }
-		/>
+		<>
+			<button
+				disabled={ ! past.length }
+				onClick={ () => {
+					setCrop( past[ past.length - 1 ] );
+					setPast( past.slice( 0, -1 ) );
+				} }
+			>
+				Undo
+			</button>
+			<Cropper
+				src={ src }
+				controller={ controller }
+				freeformCrop
+				onGestureStart={ () => {
+					gestureStart.current = crop;
+				} }
+				onGestureEnd={ () => {
+					const start = gestureStart.current;
+					gestureStart.current = null;
+					if ( start && ! areCropperStatesEqual( start, crop ) ) {
+						setPast( ( entries ) => [ ...entries, start ] );
+					}
+				} }
+			/>
+		</>
 	);
 }
 ```
 
-## Get Source Coordinates
-
-Use source-region helpers when saving crop data instead of rendering a `Blob`.
-
-```ts
-import { getSourceRegion, getSourceRegionPercent } from '@wordpress/image-editor';
-
-const imageSize = { width: naturalWidth, height: naturalHeight };
-const region = getSourceRegion( controller.state, imageSize );
-const percent = getSourceRegionPercent( controller.state, imageSize );
-```
-
-`getSourceRegionPercent()` matches the crop data shape used by the WordPress attachments `/edit` endpoint.
+`isEdit` is `false` for an image loading or the crop being refitted after a window resize, so those do not get an undo entry. The media editor's session (`packages/media-editor/src/state`) is a fuller version of this, with redo and other edits in the same history.
 
 ## Export a Cropped Image
 
@@ -124,39 +119,27 @@ const percent = getSourceRegionPercent( controller.state, imageSize );
 const blob = await controller.getCroppedImage( 'image/jpeg', 0.9 );
 ```
 
-For a custom canvas pipeline, use `applyToCanvas()`.
-
-```ts
-import { applyToCanvas } from '@wordpress/image-editor';
-
-const output = applyToCanvas(
-	processedCanvas,
-	{ width: processedCanvas.width, height: processedCanvas.height },
-	controller.state
-);
-```
-
 Canvas export is browser-only. Cross-origin images need valid CORS headers or the canvas will be tainted.
 
-## Programmatic Edits
+## Send the Crop to WordPress
 
-`TransformOperation` values are plain JSON. Apply them one at a time or replay them from scratch.
+`buildModifiers()` turns the controller's crop into the rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
 
 ```ts
-import { stateFromPipeline, type TransformOperation } from '@wordpress/image-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { buildModifiers } from '@wordpress/image-editor';
 
-const operations: TransformOperation[] = [
-	{ type: 'crop', rect: { x: 0.1, y: 0.1, width: 0.8, height: 0.8 } },
-	{ type: 'rotate', degrees: 5 },
-	{ type: 'flip', direction: 'horizontal' },
-];
-
-for ( const operation of operations ) {
-	controller.applyOperation( operation );
+const modifiers = buildModifiers( controller );
+if ( modifiers.length ) {
+	await apiFetch( {
+		path: `/wp/v2/media/${ attachmentId }/edit`,
+		method: 'POST',
+		data: { src: imageUrl, modifiers },
+	} );
 }
-
-const finalState = stateFromPipeline( operations );
 ```
+
+An unedited image returns an empty list.
 
 ## Accessibility Notes
 
@@ -177,8 +160,10 @@ npm run test:unit -- packages/image-editor
 
 Useful test areas:
 
--   `core/test/camera.ts` for containment and camera invariants.
--   `core/test/state.ts` for reducer behavior.
--   `core/export/test/canvas-renderer.ts` for canvas export.
--   `react/components/test/cropper.tsx` for React cropper behavior.
--   `react/components/stencils/test/rectangle-stencil.tsx` for resize handles.
+-   `src/core/test/camera.ts` for containment and camera invariants.
+-   `src/core/test/state.ts` for reducer behavior.
+-   `src/core/export/test/canvas-renderer.jsdom.test.ts` for canvas export.
+-   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
+-   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
+-   `src/react/hooks/test/use-cropper-controller.jsdom.test.ts` for the controller, including keeping the state yourself.
+-   `src/test/build-modifiers.test.ts` for the server instructions.

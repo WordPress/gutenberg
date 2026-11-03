@@ -1,4 +1,4 @@
-import type { TransformOperation, CropperState } from '../types';
+import type { TransformOperation, CropperControllerState } from '../types';
 import { DEFAULT_STATE } from '../constants';
 import { cropperReducer } from '../state';
 
@@ -16,9 +16,9 @@ import { cropperReducer } from '../state';
  * @return A new cropper state with the operation applied.
  */
 export function applyOperationToState(
-	state: CropperState,
+	state: CropperControllerState,
 	op: TransformOperation
-): CropperState {
+): CropperControllerState {
 	return cropperReducer( state, { type: 'APPLY_OPERATION', payload: op } );
 }
 
@@ -31,8 +31,8 @@ export function applyOperationToState(
  */
 export function stateFromPipeline(
 	pipeline: TransformOperation[],
-	initialState: CropperState = { ...DEFAULT_STATE }
-): CropperState {
+	initialState: CropperControllerState = { ...DEFAULT_STATE }
+): CropperControllerState {
 	return pipeline.reduce(
 		( state, op ) => applyOperationToState( state, op ),
 		initialState

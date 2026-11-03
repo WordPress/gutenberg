@@ -1,4 +1,4 @@
-import type { CropperState } from '../types';
+import type { CropperControllerState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
@@ -32,7 +32,7 @@ export function loadImage( src: string ): Promise< HTMLImageElement > {
  */
 export function renderToCanvas(
 	image: HTMLImageElement,
-	state: CropperState
+	state: CropperControllerState
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
 	const { rotation, cropRect } = state;
@@ -140,7 +140,7 @@ export function canvasToDataURL(
  */
 export async function exportCroppedImage(
 	src: string,
-	state: CropperState,
+	state: CropperControllerState,
 	mimeType: string = 'image/png',
 	quality: number = DEFAULT_QUALITY
 ): Promise< Blob > {
@@ -171,7 +171,7 @@ export async function exportCroppedImage(
 export function applyToCanvas(
 	source: CanvasImageSource,
 	sourceSize: { width: number; height: number },
-	state: CropperState,
+	state: CropperControllerState,
 	outputSize?: { width: number; height: number }
 ): HTMLCanvasElement {
 	// Use snap-rotation bbox for default sizing so the default output
@@ -234,7 +234,7 @@ export function applyToCanvas(
  */
 export async function downloadCroppedImage(
 	src: string,
-	state: CropperState,
+	state: CropperControllerState,
 	filename: string = 'cropped-image',
 	mimeType: string = 'image/png',
 	quality: number = DEFAULT_QUALITY

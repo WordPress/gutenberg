@@ -1,4 +1,4 @@
-import type { NormalizedRect, Flip, CropperState } from './types';
+import type { NormalizedRect, Flip, CropperControllerState } from './types';
 
 /**
  * Default/resting zoom. A full, unrotated crop needs at least 1x to cover the
@@ -90,7 +90,7 @@ const DEFAULT_PAN: { x: number; y: number } = {
 	y: 0,
 };
 
-export const DEFAULT_STATE: CropperState = {
+export const DEFAULT_STATE: CropperControllerState = {
 	image: null,
 	pan: { ...DEFAULT_PAN },
 	zoom: MIN_ZOOM,

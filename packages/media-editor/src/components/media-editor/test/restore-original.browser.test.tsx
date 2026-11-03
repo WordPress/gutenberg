@@ -6,11 +6,11 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import '@wordpress/components/src/style.scss';
+// The package stylesheet loads the image editor's built CSS, which only
+// exists after a build, so load the same styles from source.
 import '@wordpress/image-editor/src/style.scss';
 import MediaEditor, { type MediaEditorFrameProps } from '../index';
 import type { Media } from '../../media-editor-provider';
-// The package stylesheet loads the image editor's built CSS, which only
-// exists after a build, so load the same styles from source.
 import '../../media-preview/style.scss';
 import '../style.scss';
 import '../../media-form/style.scss';

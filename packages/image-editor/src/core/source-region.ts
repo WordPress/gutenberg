@@ -1,6 +1,6 @@
 import { mat2d, vec2 } from 'gl-matrix';
 import type {
-	CropperState,
+	CropperControllerState,
 	HandlePosition,
 	NormalizedRect,
 	Size,
@@ -48,7 +48,7 @@ export interface SourceRegion {
  * @return The selected region in source pixels plus rotation/flip metadata.
  */
 export function getSourceRegion(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size
 ): SourceRegion {
 	// Sanitize before the zero-size short-circuit so the early return
@@ -139,7 +139,7 @@ export function getSourceRegion(
  * @return The normalized crop rect, or null when inputs cannot be mapped.
  */
 function getCropRectFromSourceRegion(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	region: SourceRegion
 ): NormalizedRect | null {
@@ -233,7 +233,7 @@ function isCardinalRotation( rotation: number ): boolean {
  * @return A crop rect whose selected source-region edges are whole pixels.
  */
 export function snapCropRectToSourcePixels(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	cropRect: NormalizedRect,
 	handle: HandlePosition
@@ -260,7 +260,7 @@ export function snapCropRectToSourcePixels(
  * @return A crop rect whose source-region edges are whole pixels.
  */
 export function snapCropRectToSourcePixelGrid(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	cropRect: NormalizedRect
 ): NormalizedRect {
@@ -273,7 +273,7 @@ export function snapCropRectToSourcePixelGrid(
 }
 
 function snapCropRectEdgesToSourcePixels(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size,
 	cropRect: NormalizedRect,
 	edges: SourcePixelSnapEdges
@@ -351,7 +351,7 @@ export interface SourceRegionPercent {
  * @return The crop region as percentages (0–100).
  */
 export function getSourceRegionPercent(
-	state: CropperState,
+	state: CropperControllerState,
 	imageSize: Size
 ): SourceRegionPercent {
 	if ( ! isValidSize( imageSize ) ) {

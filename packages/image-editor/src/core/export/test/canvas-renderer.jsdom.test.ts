@@ -7,7 +7,7 @@ import {
 	vi,
 	type Mock,
 } from 'vitest';
-import type { CropperState } from '../../types';
+import type { CropperControllerState } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import {
 	loadImage,
@@ -59,7 +59,9 @@ function createMockCanvas( ctx: ReturnType< typeof createMockContext > ) {
  *
  * @param overrides Optional partial state to merge.
  */
-function createTestState( overrides?: Partial< CropperState > ): CropperState {
+function createTestState(
+	overrides?: Partial< CropperControllerState >
+): CropperControllerState {
 	return {
 		...DEFAULT_STATE,
 		image: {

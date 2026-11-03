@@ -8,7 +8,7 @@ import type { mat2d } from 'gl-matrix';
  * screen pixels. It composes pan, rotation, flip, zoom, and contain-fit
  * into a single transform.
  *
- * Use `createCamera()` to build one from `CropperState`, then pass it to
+ * Use `createCamera()` to build one from `CropperControllerState`, then pass it to
  * `worldToScreen()` / `screenToWorld()` for coordinate conversion.
  *
  * A 3D camera would use `mat4`; this is strictly 2D (no perspective).
@@ -62,7 +62,7 @@ export type TransformOperation =
 /**
  * Full cropper state.
  */
-export interface CropperState {
+export interface CropperControllerState {
 	/** The source image information. Null until an image is loaded. */
 	image: {
 		src: string;
@@ -102,6 +102,11 @@ export interface CropperState {
 	flip: Flip;
 	/** The crop rectangle in normalized coordinates. */
 	cropRect: NormalizedRect;
+	/**
+	 * Locked width / height ratio of the crop, in source pixels.
+	 * `undefined` means free: the crop can take any shape.
+	 */
+	aspectRatio?: number;
 }
 
 /**
@@ -114,7 +119,7 @@ export interface CropperState {
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */
-	| { type: 'SET_IMAGE'; payload: CropperState[ 'image' ] }
+	| { type: 'SET_IMAGE'; payload: CropperControllerState[ 'image' ] }
 	/** Sets the image pan offset. (Crop rectangle is SET_CROP_RECT.) */
 	| { type: 'SET_PAN'; payload: NormalizedPoint }
 	/** Sets the zoom level, clamped to [coverage-aware min, MAX_ZOOM]. */
@@ -136,12 +141,22 @@ export type CropperAction =
 	| { type: 'SET_FLIP'; payload: Flip }
 	/** Sets the crop rectangle. */
 	| { type: 'SET_CROP_RECT'; payload: NormalizedRect }
+	/**
+	 * Locks the crop to a width / height ratio, or unlocks it with
+	 * `undefined`. Locking reshapes the crop to the largest box of that
+	 * ratio for the rendered image size. The caller passes that size
+	 * because the reducer has no DOM access.
+	 */
+	| {
+			type: 'SET_ASPECT_RATIO';
+			payload: { aspectRatio: number | undefined; visualSize: Size };
+	  }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */
 	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
-	| { type: 'RESET'; payload?: Partial< CropperState > };
+	| { type: 'RESET'; payload?: Partial< CropperControllerState > };
 
 /**
  * Viewport camera state — display-only, does not affect export or undo.

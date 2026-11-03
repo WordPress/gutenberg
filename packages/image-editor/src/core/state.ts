@@ -1,4 +1,8 @@
-import type { CropperAction, CropperState, TransformOperation } from './types';
+import type {
+	CropperAction,
+	CropperControllerState,
+	TransformOperation,
+} from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,
 	DEFAULT_STATE,
@@ -7,6 +11,7 @@ import {
 } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
+import { computeInscribedRect } from './crop-rect';
 
 /** Small tolerance for cropper floating-point comparisons. */
 const STATE_EPSILON = 1e-6;
@@ -27,8 +32,8 @@ function nearlyEqual( a: number, b: number ): boolean {
  * @return Whether the two states are value-equal across all tracked fields.
  */
 export function areCropperStatesEqual(
-	a: CropperState,
-	b: CropperState
+	a: CropperControllerState,
+	b: CropperControllerState
 ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
@@ -45,11 +50,15 @@ export function areCropperStatesEqual(
 		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
 		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
 		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
-		nearlyEqual( a.cropRect.height, b.cropRect.height )
+		nearlyEqual( a.cropRect.height, b.cropRect.height ) &&
+		a.aspectRatio === b.aspectRatio
 	);
 }
 
-function clampRequestedZoom( state: CropperState, zoom: number ): number {
+function clampRequestedZoom(
+	state: CropperControllerState,
+	zoom: number
+): number {
 	// With an image, enforceContainment raises zoom to the coverage-aware
 	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
 	// the conservative resting default.
@@ -75,7 +84,7 @@ function clampRequestedZoom( state: CropperState, zoom: number ): number {
  * @return The equivalent reducer action.
  */
 function operationToAction(
-	state: CropperState,
+	state: CropperControllerState,
 	op: TransformOperation
 ): CropperAction {
 	switch ( op.type ) {
@@ -117,7 +126,9 @@ function operationToAction(
  * @param state The state to enforce containment on.
  * @return The state with cropRect, zoom, and position restricted.
  */
-export function enforceContainment( state: CropperState ): CropperState {
+export function enforceContainment(
+	state: CropperControllerState
+): CropperControllerState {
 	if ( ! state.image ) {
 		return state;
 	}
@@ -180,7 +191,7 @@ export function enforceContainment( state: CropperState ): CropperState {
  * @param next The post-containment state to commit.
  * @return The state with base fields synced to current.
  */
-function commitBase( next: CropperState ): CropperState {
+function commitBase( next: CropperControllerState ): CropperControllerState {
 	if (
 		next.basePan.x === next.pan.x &&
 		next.basePan.y === next.pan.y &&
@@ -215,9 +226,9 @@ function commitBase( next: CropperState ): CropperState {
  * @return The new cropper state.
  */
 export function cropperReducer(
-	state: CropperState,
+	state: CropperControllerState,
 	action: CropperAction
-): CropperState {
+): CropperControllerState {
 	// Every action runs through enforceContainment to maintain the invariant:
 	// the image always fully covers the crop area.
 	switch ( action.type ) {
@@ -381,6 +392,27 @@ export function cropperReducer(
 				} )
 			);
 
+		case 'SET_ASPECT_RATIO': {
+			const { aspectRatio, visualSize } = action.payload;
+			const shouldReshape =
+				aspectRatio !== undefined &&
+				aspectRatio > 0 &&
+				visualSize.width > 0 &&
+				visualSize.height > 0;
+			if ( ! shouldReshape ) {
+				return state.aspectRatio === aspectRatio
+					? state
+					: { ...state, aspectRatio };
+			}
+			return commitBase(
+				enforceContainment( {
+					...state,
+					aspectRatio,
+					cropRect: computeInscribedRect( aspectRatio, visualSize ),
+				} )
+			);
+		}
+
 		case 'SETTLE_CROP': {
 			// After a resize drag ends: expand the crop to fill the
 			// available height (maintaining its aspect ratio), center it,
@@ -466,8 +498,8 @@ export function cropperReducer(
  * @return True if any tracked field differs.
  */
 export function isStateDirty(
-	current: CropperState,
-	initial: CropperState
+	current: CropperControllerState,
+	initial: CropperControllerState
 ): boolean {
 	return (
 		! nearlyEqual( current.pan.x, initial.pan.x ) ||

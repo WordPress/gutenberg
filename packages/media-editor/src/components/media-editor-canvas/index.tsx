@@ -1,11 +1,11 @@
 import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Cropper } from '@wordpress/image-editor';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { useMediaEditor, resolveAspectRatio } from '../../state';
+import { useMediaEditor } from '../../state';
 
 export interface MediaEditorCanvasProps {
 	/** Whether external placement activity should reveal the grid. */
@@ -43,8 +43,6 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const session = useMediaEditor();
-	const { aspectRatioValue } = session.cropOptions;
-	const cropperImage = session.cropper.state.image;
 	const { beginGesture, endGesture, setSourceImage } = session;
 
 	// Tracks whether the image pixels have actually loaded. The cropper's
@@ -56,15 +54,6 @@ export default function MediaEditorCanvas( {
 		url: string | undefined;
 		status: 'loaded' | 'error';
 	} >();
-
-	// Resolved aspect ratio is derived from the preset key + the
-	// loaded image (for the "Original" preset). The reducer doesn't
-	// store this number — only the preset key — so it's a render-time
-	// derivation here.
-	const aspectRatio = useMemo(
-		() => resolveAspectRatio( aspectRatioValue, cropperImage ),
-		[ aspectRatioValue, cropperImage ]
-	);
 
 	const handleGestureStart = useCallback( () => {
 		beginGesture();
@@ -147,7 +136,6 @@ export default function MediaEditorCanvas( {
 				<Cropper
 					src={ mediaUrl }
 					controller={ session.cropper }
-					aspectRatio={ aspectRatio }
 					freeformCrop
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }
