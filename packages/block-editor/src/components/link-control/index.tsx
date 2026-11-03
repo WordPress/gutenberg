@@ -26,11 +26,16 @@ import LinkPreview from './link-preview';
 import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
+import useLinkEntityLookup from './use-link-entity-lookup';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
 import normalizeUrl from './normalize-url';
+import { store as blockEditorStore } from '../../store';
+import { fetchLinkEntityKey } from '../../store/private-keys';
+import { unlock } from '../../lock-unlock';
 import type {
+	FetchLinkEntity,
 	LinkControlProps,
 	LinkControlSuggestion,
 	LinkControlValidity,
@@ -117,14 +122,23 @@ function LinkControl( {
 		LinkControlValidity | undefined
 	>( undefined );
 
-	const { advancedSettingsPreference } = useSelect( ( select ) => {
-		const prefsStore = select( preferencesStore );
+	const { advancedSettingsPreference, fetchLinkEntity } = useSelect(
+		( select ) => {
+			const prefsStore = select( preferencesStore );
 
-		return {
-			advancedSettingsPreference:
-				prefsStore.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
-		};
-	}, [] );
+			return {
+				advancedSettingsPreference:
+					prefsStore.get( PREFERENCE_SCOPE, PREFERENCE_KEY ) ?? false,
+				fetchLinkEntity: unlock(
+					select( blockEditorStore )
+				).getSettings()[ fetchLinkEntityKey ] as
+					FetchLinkEntity | undefined,
+			};
+		},
+		[]
+	);
+
+	const { lookUp, isLookingUp } = useLinkEntityLookup( fetchLinkEntity );
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 
@@ -336,6 +350,10 @@ function LinkControl( {
 	};
 
 	const handleSelectSuggestion = ( updatedValue: LinkControlSuggestion ) => {
+		if ( isLookingUp ) {
+			return;
+		}
+
 		// Validate URL suggestions (link, mailto, tel, internal) or manually entered URLs.
 		// Entity suggestions (post, page, category, etc.) don't need validation as they come from the database.
 		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
@@ -364,8 +382,22 @@ function LinkControl( {
 				...updatedValue,
 				url: normalizedUrl,
 			};
+
+			// Bind the URL to the post or term on the site that it links to,
+			// as if that was picked from the results.
+			if ( lookUp && normalizedUrl ) {
+				const directEntry = updatedValue;
+				lookUp( normalizedUrl ).then( ( linkEntity ) =>
+					saveSuggestion( { ...directEntry, ...linkEntity } )
+				);
+				return;
+			}
 		}
 
+		saveSuggestion( updatedValue );
+	};
+
+	const saveSuggestion = ( updatedValue: LinkControlSuggestion ) => {
 		// Preserve the URL for taxonomy entities before binding overrides it
 		if (
 			( updatedValue?.kind === 'taxonomy' ||
@@ -443,20 +475,52 @@ function LinkControl( {
 
 	// Centralized submission function
 	const submitUrlValue = () => {
-		if ( valueHasChanges ) {
-			// Submit the original value with new stored values applied
-			// on top. URL is a special case as it may also be a prop.
-			onChange( {
-				...value,
-				...internalControlValue,
-				url: normalizeUrl( currentUrlInputValue ).url,
-			} );
+		const finishEditing = () => {
+			stopEditing();
+			setCustomValidity( undefined );
+		};
+		if ( ! valueHasChanges ) {
+			finishEditing();
+			return;
 		}
-		stopEditing();
-		setCustomValidity( undefined );
+
+		// Submit the original value with new stored values applied
+		// on top. URL is a special case as it may also be a prop.
+		const nextValue: LinkControlValue = {
+			...value,
+			...internalControlValue,
+			url: normalizeUrl( currentUrlInputValue ).url,
+		};
+
+		// A bound link whose URL is unchanged keeps its binding. Any other URL
+		// is bound to the post or term on the site that it links to, if any.
+		const isBound = !! nextValue.id && nextValue.url === value?.url;
+		if ( ! lookUp || isBound ) {
+			onChange( nextValue );
+			finishEditing();
+			return;
+		}
+
+		lookUp( nextValue.url! ).then( ( linkEntity ) => {
+			onChange(
+				linkEntity
+					? {
+							...nextValue,
+							...linkEntity,
+							// The typed link text wins over the entity's title.
+							title: nextValue.title || linkEntity.title,
+						}
+					: nextValue
+			);
+			finishEditing();
+		} );
 	};
 
 	const handleSubmit = () => {
+		if ( isLookingUp ) {
+			return;
+		}
+
 		// Validate URL before submitting
 		if ( ! validateAndSetValidity() ) {
 			return;
@@ -564,7 +628,8 @@ function LinkControl( {
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	// When creating a new link (no existing value), allow submission if input is not empty and URL is valid
 	// When editing an existing link, also require that the value has changed
-	const isDisabled = currentInputIsEmpty || ! isUrlValid || ! valueHasChanges;
+	const isDisabled =
+		currentInputIsEmpty || ! isUrlValid || ! valueHasChanges || isLookingUp;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	const previewValue = useMemo( () => {
@@ -732,6 +797,7 @@ function LinkControl( {
 						onClick={ isDisabled ? noop : handleSubmit }
 						className="block-editor-link-control__search-submit"
 						aria-disabled={ isDisabled }
+						isBusy={ isLookingUp }
 					>
 						{ __( 'Apply' ) }
 					</Button>

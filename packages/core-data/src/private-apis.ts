@@ -8,6 +8,7 @@ import {
 	useOnPostSave,
 } from './hooks/use-post-editor-awareness-state';
 import { getTemplateInfo } from './utils/get-template-info';
+import fetchLinkEntity from './fetch/fetch-link-entity';
 import { getTemplatePartIcon } from './utils/get-template-part-icon';
 import {
 	EntitiesSavedStatesExtensible,
@@ -47,6 +48,7 @@ const lockedApis = {
 	useOnPostSave,
 	SelectionType,
 	SelectionDirection,
+	fetchLinkEntity,
 };
 
 export type CoreDataPrivateApis = typeof lockedApis;
