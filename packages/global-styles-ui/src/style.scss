@@ -33,7 +33,8 @@
 	// screen.
 	flex-shrink: 0;
 	height: 120px;
-	margin: 0 variables.$grid-unit-20 20px;
+	// The bottom spacing is shared with the padding of the sticky wrapper.
+	margin: 0 variables.$grid-unit-20 variables.$grid-unit-15;
 	border-radius: 2px;
 	overflow: hidden;
 	background: #f0f0f0;
@@ -177,6 +178,21 @@
 .global-styles-ui__shadows-panel__options-container,
 .global-styles-ui__typography-panel__options-container {
 	height: variables.$grid-unit * 3;
+}
+
+// Keep the block or element preview visible while scrolling the style
+// controls, so changes can be seen as they are made.
+.global-styles-ui__sticky-preview {
+	position: sticky;
+	// Offset the top padding of the scrolling screen, so the preview sticks
+	// flush with the top edge and no controls show above it.
+	top: calc(-1 * #{variables.$grid-unit-15});
+	// Above the controls, e.g. the thumb of a range control (z-index: 3).
+	z-index: 4;
+	// Cover the controls scrolling underneath the preview.
+	background: colors.$white;
+	padding-top: variables.$grid-unit-10;
+	padding-bottom: variables.$grid-unit-10;
 }
 
 .global-styles-ui__block-preview-panel {
