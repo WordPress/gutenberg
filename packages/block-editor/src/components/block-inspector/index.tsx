@@ -81,6 +81,10 @@ function StyleInspectorSlots( {
 			/>
 			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
 			<InspectorControls.Slot
+				group="transform"
+				label={ __( 'Transform' ) }
+			/>
+			<InspectorControls.Slot
 				group="elements"
 				label={ __( 'Elements' ) }
 				className="elements-block-support-panel__inner-wrapper"
@@ -151,6 +155,10 @@ function StyleStateInspectorSlots( {
 					<InspectorControls.Slot
 						group="border"
 						label={ __( 'Borders' ) }
+					/>
+					<InspectorControls.Slot
+						group="transform"
+						label={ __( 'Transform' ) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
