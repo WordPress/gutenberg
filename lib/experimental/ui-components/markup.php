@@ -75,10 +75,11 @@ function gutenberg_ui_components_render_markup( $component, $props, $content ) {
 		'/__wpuislot_([a-z0-9_]+?)__(?:attr_([a-z0-9-]+)|text)__/',
 		static function ( $placeholder ) use ( $values ) {
 			$value = $values[ $placeholder[1] ] ?? '';
-			if ( in_array( $placeholder[2] ?? '', array( 'href', 'src', 'action', 'formaction' ), true ) ) {
+			$attribute = $placeholder[2] ?? '';
+			if ( in_array( $attribute, array( 'href', 'src', 'action', 'formaction' ), true ) ) {
 				return esc_url( $value );
 			}
-			return gutenberg_ui_components_esc_plain_text( $value );
+			return '' === $attribute ? esc_html( $value ) : esc_attr( $value );
 		},
 		$html
 	);

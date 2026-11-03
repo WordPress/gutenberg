@@ -4,7 +4,7 @@
  *
  * The build renders every combination of each component's variants with
  * React. These tests check that PHP renders the same markup, so a change to
- * the React component that the PHP template or recipe doesn't follow fails
+ * the React component that the PHP template doesn't follow fails
  * here. They also check how props are validated and escaped.
  *
  * @package gutenberg
@@ -35,7 +35,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$cases = array();
 		foreach ( json_decode( file_get_contents( $file ), true ) as $fixture ) {
-			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . $fixture['content'] ] = array( $fixture );
+			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . ( $fixture['content'] ?? '' ) ] = array( $fixture );
 		}
 		return $cases;
 	}
@@ -46,13 +46,9 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $fixture Props, content and React's render.
 	 */
 	public function test_renders_the_same_markup_as_react( $fixture ) {
-		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] );
+		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] ?? null );
 
-		$this->assertSame(
-			self::normalize_html( $fixture['html'] ),
-			self::normalize_html( $html ),
-			"React:\n{$fixture['html']}\nPHP:\n{$html}"
-		);
+		$this->assertEqualHTML( $fixture['html'], $html );
 	}
 
 	public function test_escapes_text_and_attributes() {
@@ -111,57 +107,5 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		gutenberg_get_ui_component( 'button', array(), 'Save' );
 
 		$this->assertTrue( wp_style_is( 'wp-ui-components', 'enqueued' ) );
-	}
-
-	/**
-	 * Turns HTML into a list of tokens to compare, ignoring the order of
-	 * attributes and classes.
-	 *
-	 * @param string $html HTML.
-	 * @return array Tokens.
-	 */
-	private static function normalize_html( $html ) {
-		$tokens    = array();
-		$processor = new WP_HTML_Tag_Processor( $html );
-
-		while ( $processor->next_token() ) {
-			$type = $processor->get_token_type();
-
-			if ( '#text' === $type ) {
-				$text = trim( $processor->get_modifiable_text() );
-				if ( '' !== $text ) {
-					$tokens[] = $text;
-				}
-				continue;
-			}
-
-			if ( '#tag' !== $type ) {
-				continue;
-			}
-
-			if ( $processor->is_tag_closer() ) {
-				$tokens[] = '</' . strtolower( $processor->get_tag() ) . '>';
-				continue;
-			}
-
-			$attributes = array();
-			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
-				$value = $processor->get_attribute( $name );
-				if ( 'class' === $name ) {
-					$classes = preg_split( '/\s+/', trim( (string) $value ) );
-					sort( $classes );
-					$value = implode( ' ', $classes );
-				}
-				$attributes[ $name ] = true === $value ? '' : $value;
-			}
-			ksort( $attributes );
-
-			$tokens[] = array(
-				'tag'        => strtolower( $processor->get_tag() ),
-				'attributes' => $attributes,
-			);
-		}
-
-		return $tokens;
 	}
 }

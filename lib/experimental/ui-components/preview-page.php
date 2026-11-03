@@ -44,15 +44,6 @@ function gutenberg_ui_components_get_examples() {
 }
 
 /**
- * Prints component HTML. Components escape their own output.
- *
- * @param string $html Component HTML.
- */
-function gutenberg_ui_components_print( $html ) {
-	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-
-/**
  * Renders the preview page.
  */
 function gutenberg_ui_components_render_preview_page() {
@@ -82,15 +73,7 @@ function gutenberg_ui_components_render_preview_page() {
 				</tr>
 			</table>
 			<p class="submit">
-				<?php
-				gutenberg_ui_components_print(
-					gutenberg_get_ui_component(
-						'button',
-						array( 'type' => 'submit' ),
-						__( 'Save changes', 'gutenberg' )
-					)
-				);
-				?>
+				<?php gutenberg_ui_component( 'button', array( 'type' => 'submit' ), __( 'Save changes', 'gutenberg' ) ); ?>
 				<input type="submit" class="button button-primary" value="<?php esc_attr_e( 'Classic button', 'gutenberg' ); ?>" />
 			</p>
 		</form>
@@ -109,8 +92,8 @@ function gutenberg_ui_components_render_preview_page() {
 				<?php foreach ( gutenberg_ui_components_get_examples() as $example ) : ?>
 					<tr>
 						<td><code><?php echo esc_html( $example['component'] . ': ' . $example['name'] ); ?></code></td>
-						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ) ); ?></td>
-						<td><?php gutenberg_ui_components_print( $example['html'] ); ?></td>
+						<td><?php gutenberg_ui_component( $example['component'], $example['props'], $example['content'] ?? null ); ?></td>
+						<td><?php echo $example['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- React's render, from the build. ?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>

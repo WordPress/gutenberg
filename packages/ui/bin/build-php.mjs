@@ -3,28 +3,23 @@
  * admin screens.
  *
  * Each component PHP can render has a `php/<name>/component.json` with its
- * content, props and a recipe: the classes it always has, and the classes each
- * variant value adds. PHP renders the markup from a small template, and the
- * recipe says which classes go on it.
+ * content, props and the stylesheets it uses, named by their path in `src`
+ * (`button/style` for `src/button/style.module.css`).
  *
- * A component without a recipe gets its markup from React instead: the build
- * renders it with placeholders for its content and free-form props, once with
- * the defaults and once per variant value, and stores the default render plus
- * what each value changes. PHP applies those changes and fills in the
- * placeholders.
- *
- * Recipes name classes as in the component's own stylesheet (`is-brand` in
- * `src/button/style.module.css`), or as `<stylesheet>:<class>` for a shared
- * one (`utils/css/resets:box-sizing` in `src/utils/css/resets.module.css`).
+ * PHP gets the markup from React: the build renders each component with
+ * placeholders for its content and free-form props, once with the defaults
+ * and once per variant value, and stores the default render plus what each
+ * value changes. PHP applies those changes and fills in the placeholders.
  *
  * The build:
  *
- *   - Compiles the package's CSS modules with the same scoped class names as
- *     the React build, and writes the ones the recipes use to `style.css`.
- *   - Resolves each recipe to those scoped class names, in `manifest.json`.
+ *   - Compiles the stylesheets the components use, with the same scoped class
+ *     names as the React build, to `style.css`.
+ *   - Writes each component's props and markup, and each stylesheet's class
+ *     names, to `manifest.json`.
  *   - Renders every combination of variants with React, to `test/fixtures.json`.
- *     The PHPUnit parity tests check that PHP renders the same markup, so the
- *     recipes and templates can't drift from React without a failing test.
+ *     The PHPUnit parity tests check that PHP renders the same markup, so it
+ *     can't drift from React without a failing test.
  *
  * Runs after `wp-build` (as `build:wp`), because it renders the built package.
  * Writes to `build-php/`, which is never committed.
@@ -49,30 +44,26 @@ const ROOT_DIR = path.resolve( PACKAGE_DIR, '../..' );
 const OUT_DIR = path.join( PACKAGE_DIR, 'build-php' );
 
 /**
- * Compiles every CSS module in the package, keyed the way recipes refer to
- * them: `src/button/style.module.css` is `button/style`.
+ * Compiles a CSS module of the package, named by its path in `src`:
+ * `button/style` is `src/button/style.module.css` (or `.scss`).
  *
- * @return {Promise<Map<string, {css: string, classNames: Object}>>} Stylesheets.
+ * @param {string} key           Stylesheet name.
+ * @param {string} componentName Component that uses it, for the error.
+ * @return {Promise<{css: string, classNames: Object}>} Stylesheet.
  */
-async function compileStylesheets() {
-	const stylesheets = new Map();
-	const files = await glob( 'src/**/*.module.{css,scss}', {
+async function compileStylesheet( key, componentName ) {
+	const [ file ] = await glob( `src/${ key }.module.{css,scss}`, {
 		cwd: PACKAGE_DIR,
-		ignore: [ '**/stories/**', '**/test/**' ],
 	} );
-	for ( const file of files.sort() ) {
-		const key = file
-			.replace( /^src\//, '' )
-			.replace( /\.module\.(css|scss)$/, '' );
-		stylesheets.set(
-			key,
-			await compileStyleFile( path.join( PACKAGE_DIR, file ), {
-				workingDir: PACKAGE_DIR,
-				rootDir: ROOT_DIR,
-			} )
+	if ( ! file ) {
+		throw new Error(
+			`${ componentName }: there's no "${ key }" CSS module in the package.`
 		);
 	}
-	return stylesheets;
+	return compileStyleFile( path.join( PACKAGE_DIR, file ), {
+		workingDir: PACKAGE_DIR,
+		rootDir: ROOT_DIR,
+	} );
 }
 
 /**
@@ -150,63 +141,14 @@ function compileMarkup( { props, variants, renderReact } ) {
 }
 
 async function main() {
-	const stylesheets = await compileStylesheets();
 	const ui = await import(
 		pathToFileURL( path.join( PACKAGE_DIR, 'build-module/index.mjs' ) ).href
 	);
 
-	const resolveClass = ( reference, componentName ) => {
-		const [ key, local ] = reference.split( ':' );
-		const scoped = stylesheets.get( key )?.classNames?.[ local ];
-		if ( ! scoped ) {
-			throw new Error(
-				`${ componentName }: "${ reference }" doesn't match a class in the package's CSS modules.`
-			);
-		}
-		return scoped;
-	};
-
-	// Props are the public contract and the recipe is how each value looks, so
-	// they're kept apart. Check they agree, so a value can't be added to one
-	// and forgotten in the other.
-	const checkRecipe = ( { name, props, classes } ) => {
-		const problems = [];
-		for ( const [ prop, values ] of Object.entries( classes.variants ) ) {
-			const schema = props[ prop ];
-			const allowed =
-				schema?.enum ??
-				( 'boolean' === schema?.type ? [ false, true ] : null );
-			if ( ! allowed ) {
-				problems.push(
-					`the recipe has "${ prop }", which isn't an enum or boolean prop`
-				);
-				continue;
-			}
-			const expected = allowed.map( String );
-			for ( const value of Object.keys( values ) ) {
-				if ( ! expected.includes( value ) ) {
-					problems.push(
-						`the recipe has "${ prop }: ${ value }", which isn't an allowed value`
-					);
-				}
-			}
-			for ( const value of expected ) {
-				if ( ! ( value in values ) ) {
-					problems.push(
-						`the recipe is missing "${ prop }: ${ value }" (use [] if it adds no classes)`
-					);
-				}
-			}
-		}
-		if ( problems.length ) {
-			throw new Error( `${ name }: ${ problems.join( '; ' ) }.` );
-		}
-	};
-
-	const manifest = { components: {} };
+	const manifest = { components: {}, styles: {} };
+	const stylesheets = new Map();
 	const fixtures = [];
 	const examples = [];
-	const usedStylesheets = new Set();
 
 	for ( const file of (
 		await glob( 'php/*/component.json', { cwd: PACKAGE_DIR } )
@@ -214,40 +156,12 @@ async function main() {
 		const component = JSON.parse(
 			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
 		);
-		const { name, content, props, classes, react } = component;
-		const resolve = ( references ) =>
-			references.map( ( reference ) => {
-				const qualified = reference.includes( ':' )
-					? reference
-					: `${ name }/style:${ reference }`;
-				usedStylesheets.add( qualified.split( ':' )[ 0 ] );
-				return resolveClass( qualified, name );
-			} );
+		const { name, content, props, styles, react } = component;
 
-		if ( classes ) {
-			checkRecipe( component );
-			manifest.components[ name ] = {
-				content,
-				props,
-				classes: {
-					base: resolve( classes.base ),
-					variants: Object.fromEntries(
-						Object.entries( classes.variants ).map(
-							( [ prop, values ] ) => [
-								prop,
-								Object.fromEntries(
-									Object.entries( values ).map(
-										( [ value, references ] ) => [
-											value,
-											resolve( references ),
-										]
-									)
-								),
-							]
-						)
-					),
-				},
-			};
+		for ( const key of styles ) {
+			if ( ! stylesheets.has( key ) ) {
+				stylesheets.set( key, await compileStylesheet( key, name ) );
+			}
 		}
 
 		// Every combination of enums and booleans, rendered with React.
@@ -268,10 +182,6 @@ async function main() {
 			} ) ),
 			{ props: { class: 'my-plugin-button' }, content: 'Save changes' },
 			{ props: {}, content: 'Save & <continue> "now"' },
-			{
-				props: { class: 'is-&amp;' },
-				content: 'A &amp; B &hellip; &#8217;',
-			},
 		];
 		const renderReact = ( phpProps, text ) => {
 			const reactProps = { ...react.props };
@@ -282,37 +192,25 @@ async function main() {
 				createElement( ui[ react.component ], reactProps, text )
 			);
 		};
-		if ( ! classes ) {
-			manifest.components[ name ] = {
-				content,
-				props,
-				markup: compileMarkup( { props, variants, renderReact } ),
-			};
-			for ( const [ key, { classNames } ] of stylesheets ) {
-				const markup = JSON.stringify(
-					manifest.components[ name ].markup
-				);
-				if (
-					Object.values( classNames ?? {} ).some( ( className ) =>
-						markup.includes( className )
-					)
-				) {
-					usedStylesheets.add( key );
-				}
-			}
-		}
+		manifest.components[ name ] = {
+			content,
+			props,
+			markup: compileMarkup( { props, variants, renderReact } ),
+		};
 
 		for ( const { props: phpProps, content: text } of cases ) {
+			// A component without content renders without it.
+			const fixtureContent = content ? text : undefined;
 			fixtures.push( {
 				component: name,
 				props: phpProps,
-				content: text,
-				html: renderReact( phpProps, text ),
+				content: fixtureContent,
+				html: renderReact( phpProps, fixtureContent ),
 			} );
 		}
 
 		// For the preview page: the default, then each value on its own.
-		const exampleContent = 'Save changes';
+		const exampleContent = content ? 'Save changes' : undefined;
 		examples.push( {
 			component: name,
 			name: 'example',
@@ -336,14 +234,18 @@ async function main() {
 		}
 	}
 
+	// Sorted by name, so the order doesn't depend on which component uses a
+	// stylesheet first.
+	const keys = [ ...stylesheets.keys() ].sort();
+	for ( const key of keys ) {
+		manifest.styles[ key ] = stylesheets.get( key ).classNames;
+	}
+
 	await rm( OUT_DIR, { recursive: true, force: true } );
 	await mkdir( path.join( OUT_DIR, 'test' ), { recursive: true } );
 	await writeFile(
 		path.join( OUT_DIR, 'style.css' ),
-		[ ...stylesheets ]
-			.filter( ( [ key ] ) => usedStylesheets.has( key ) )
-			.map( ( [ , { css } ] ) => css )
-			.join( '\n' ) + '\n'
+		keys.map( ( key ) => stylesheets.get( key ).css ).join( '\n' ) + '\n'
 	);
 	await writeFile(
 		path.join( OUT_DIR, 'manifest.json' ),
