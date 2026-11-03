@@ -21,7 +21,7 @@
 -   The entity record map now covers font collections, so `root`/`fontCollection` infers `FontCollection`. Its `description`, `font_families` and `categories` are no longer optional, since the REST API always returns them ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   The entity record map now covers comments, menus, taxonomy definitions, widget types, font families and site settings. Site settings registered by plugins are readable as `unknown` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   Any taxonomy name, including one only known at runtime, resolves to `Term` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
--   A call that names no `context` resolves every post type and taxonomy in the `edit` context they are fetched in ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   A call that names no `context` resolves the built-in post types and every taxonomy in the `edit` context they are fetched in. A post type added by a plugin declares its own context in `PostTypeEntityContexts` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `useEntityRecord` no longer needs a record ID for an entity without a key, such as `useEntityRecord( 'root', 'site' )` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `Updatable` accepts any record type ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 

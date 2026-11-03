@@ -20,6 +20,9 @@ declare module '@wordpress/core-data' {
 	interface PostTypeEntityRecordTypes< C extends Context > {
 		wp_knowledge: KnowledgeRow;
 	}
+	interface PostTypeEntityContexts {
+		wp_knowledge: 'edit';
+	}
 }
 
 let registered = false;
