@@ -2309,106 +2309,68 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
-		test( 'keeps both block-level and inline notes when blocks are merged', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
+		for ( const { name, attributes: previousAttributes, label } of [
+			{
 				name: 'core/paragraph',
 				attributes: { content: 'One' },
-			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'two' },
-			} );
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-
-			await paragraph.last().click();
-			await blockNoteUtils.addNote( 'Block note' );
-			await paragraph.last().click();
-			await blockNoteUtils.selectBlockText();
-			await blockNoteUtils.addNote( 'Inline note' );
-			const [ , { attributes } ] = await editor.getBlocks();
-			const { noteId } = attributes.metadata;
-			expect( noteId ).toHaveLength( 2 );
-
-			await paragraph.last().click();
-			await blockNoteUtils.selectBlockText();
-			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'Backspace' );
-
-			await expect( paragraph ).toHaveCount( 1 );
-			await expect( paragraph ).toHaveText( 'Onetwo' );
-			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
-				'two'
-			);
-			await expect
-				.poll( editor.getBlocks )
-				.toMatchObject( [ { attributes: { metadata: { noteId } } } ] );
-			await expect(
-				blockNoteUtils.getThread( 'Block note' )
-			).toBeVisible();
-			await expect(
-				blockNoteUtils.getThread( 'Inline note' )
-			).toBeVisible();
-		} );
-
-		test( 'keeps both block-level and inline notes when blocks of different types are merged', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
+				label: 'Block: Paragraph',
+			},
+			{
 				name: 'core/heading',
 				attributes: { content: 'One', level: 2 },
-			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'two' },
-			} );
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
+				label: 'Block: Heading',
+			},
+		] ) {
+			test( `keeps both block-level and inline notes when a paragraph is merged into a ${ name } block`, async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				await editor.insertBlock( {
+					name,
+					attributes: previousAttributes,
+				} );
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'two' },
+				} );
+				const paragraph = editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.last();
 
-			await paragraph.click();
-			await blockNoteUtils.addNote( 'Block note' );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-			await blockNoteUtils.addNote( 'Inline note' );
-			const [ , { attributes } ] = await editor.getBlocks();
-			const { noteId } = attributes.metadata;
-			expect( noteId ).toHaveLength( 2 );
+				await paragraph.click();
+				await blockNoteUtils.addNote( 'Block note' );
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Inline note' );
+				const [ , { attributes } ] = await editor.getBlocks();
+				const { noteId } = attributes.metadata;
+				expect( noteId ).toHaveLength( 2 );
 
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-			await page.keyboard.press( 'ArrowLeft' );
-			await page.keyboard.press( 'Backspace' );
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
 
-			await expect( paragraph ).toHaveCount( 0 );
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Heading',
-				} )
-			).toHaveText( 'Onetwo' );
-			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
-				'two'
-			);
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/heading',
-					attributes: { metadata: { noteId } },
-				},
-			] );
-			await expect(
-				blockNoteUtils.getThread( 'Block note' )
-			).toBeVisible();
-			await expect(
-				blockNoteUtils.getThread( 'Inline note' )
-			).toBeVisible();
-		} );
+				await expect(
+					editor.canvas.getByRole( 'document', { name: label } )
+				).toHaveText( 'Onetwo' );
+				await expect(
+					editor.canvas.locator( 'mark.wp-note' )
+				).toHaveText( 'two' );
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( [
+						{ name, attributes: { metadata: { noteId } } },
+					] );
+				await expect(
+					blockNoteUtils.getThread( 'Block note' )
+				).toBeVisible();
+				await expect(
+					blockNoteUtils.getThread( 'Inline note' )
+				).toBeVisible();
+			} );
+		}
 
 		test( 'anchors the marker to only the selected text', async ( {
 			editor,
