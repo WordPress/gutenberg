@@ -248,10 +248,8 @@ describe( 'GradientPicker', () => {
 			screen.queryByRole( 'button', { name: 'Clear' } )
 		).not.toBeInTheDocument();
 
-		await user.selectOptions(
-			screen.getByRole( 'combobox', { name: 'Type' } ),
-			'radial-gradient'
-		);
+		await user.click( screen.getByRole( 'combobox', { name: 'Type' } ) );
+		await user.click( screen.getByRole( 'option', { name: 'Radial' } ) );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			'radial-gradient(rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
