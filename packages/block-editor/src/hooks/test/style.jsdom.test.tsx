@@ -368,6 +368,21 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'outputs a hover rotation as the individual rotate property', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { rotate: '8deg' } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { rotate: 8deg !important; }'
+		);
+	} );
+
 	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
 		expect(
 			getBlockStateStylesCSS(
@@ -576,6 +591,29 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'routes a viewport rotation through the transform feature selector', () => {
+		registerBlockType( 'test/state-rotate', {
+			apiVersion: 3,
+			title: 'State Rotate',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: { transform: '.wp-block-test-state-rotate img' },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { transform: { rotate: '0' } } },
+			'test/state-rotate',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-rotate' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 0 !important; }}',
 		] );
 	} );
 
