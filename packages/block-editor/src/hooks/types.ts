@@ -717,6 +717,21 @@ export interface DimensionsHookPanelProps {
 }
 
 /**
+ * The block attributes the transform support reads.
+ */
+export type TransformAttributes = {
+	style?: PanelStyle;
+	className?: string;
+};
+
+export interface TransformHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+}
+
+/**
  * The block attributes the border support reads and writes.
  */
 export type BorderAttributes = {
