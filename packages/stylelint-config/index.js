@@ -6,9 +6,9 @@ export default {
 		fileURLToPath( import.meta.resolve( m ) )
 	),
 	plugins: [
-		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
-		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-unknown-ds-tokens',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-setting-wpds-custom-properties',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	rules: {
 		'at-rule-empty-line-before': [
