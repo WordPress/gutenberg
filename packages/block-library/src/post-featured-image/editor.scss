@@ -101,6 +101,22 @@
 		width: 100%;
 	}
 
+	// Align the placeholder when it's narrower than its container, e.g. with a custom width.
+	&.aligncenter .components-placeholder {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	&.alignleft .components-placeholder {
+		/*rtl:ignore*/
+		margin-right: auto;
+	}
+
+	&.alignright .components-placeholder {
+		/*rtl:ignore*/
+		margin-left: auto;
+	}
+
 	// When the Post Featured Image block is linked,
 	// it's wrapped with a disabled <a /> tag.
 	// Ensure that the link is not clickable.
