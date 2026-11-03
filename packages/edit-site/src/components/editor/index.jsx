@@ -27,6 +27,7 @@ import SiteEditorMoreMenu from '../more-menu';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import { getDeviceType } from '../block-editor/viewport';
 import useEditorTitle from './use-editor-title';
+import { isEditorScreen } from '../routes/use-title';
 import useRevisionsURLSync from './use-revisions-url-sync';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
@@ -102,7 +103,11 @@ export default function EditSiteEditor( {
 	const postWithTemplate = !! context?.postId;
 	const editorPostType = postWithTemplate ? context.postType : postType;
 	const editorPostId = postWithTemplate ? context.postId : postId;
-	useEditorTitle( editorPostType, editorPostId );
+	useEditorTitle(
+		editorPostType,
+		editorPostId,
+		isEditorScreen( location.name, canvas )
+	);
 	const _isPreviewingTheme = isPreviewingTheme();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
