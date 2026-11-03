@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-import { MAX_ROTATION_OFFSET } from '@wordpress/image-editor';
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import RotationRuler from '../rotation-ruler';
@@ -28,7 +27,7 @@ export default function MediaEditorFineRotation( {
 	onPlacementControlInteraction,
 	disabled = false,
 }: MediaEditorFineRotationProps ) {
-	const { state, setRotation } = useMediaEditor().cropper;
+	const { state, setRotation, maxRotationOffset } = useMediaEditor().cropper;
 	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
 	// into one undo entry via the gesture idle window. Pointer-up still
 	// closes pointer drags immediately.
@@ -50,8 +49,8 @@ export default function MediaEditorFineRotation( {
 		// causing subsequent events to spiral.
 		const EPS = 0.01;
 		const clamped = Math.max(
-			-MAX_ROTATION_OFFSET + EPS,
-			Math.min( MAX_ROTATION_OFFSET - EPS, value )
+			-maxRotationOffset + EPS,
+			Math.min( maxRotationOffset - EPS, value )
 		);
 		onPlacementControlInteraction?.();
 		setRotation( baseAngle + clamped * visualDir );
@@ -65,8 +64,8 @@ export default function MediaEditorFineRotation( {
 		>
 			<RotationRuler
 				label={ __( 'Fine rotation' ) }
-				min={ -MAX_ROTATION_OFFSET }
-				max={ MAX_ROTATION_OFFSET }
+				min={ -maxRotationOffset }
+				max={ maxRotationOffset }
 				value={ fineOffset }
 				onChange={ handleRotationSlider }
 				disabled={ disabled }

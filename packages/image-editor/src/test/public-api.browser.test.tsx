@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { act, screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
 import {
-	Cropper,
+	ImageEditorCanvas,
+	createImageEditorState,
 	getStepsForOriginal,
-	useCropperController,
-	type CropperController,
+	useImageEditor,
+	type ImageEditorController,
 } from '..';
 // Browser Mode needs the package's real styles for layout.
 import '../style.scss';
@@ -18,25 +19,30 @@ const IMAGE = {
 	naturalHeight: 600,
 };
 
-function ConsumerCropper( {
+function ConsumerEditor( {
 	onController,
 }: {
-	onController: ( controller: CropperController ) => void;
+	onController: ( controller: ImageEditorController ) => void;
 } ) {
-	const controller = useCropperController();
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const controller = useImageEditor( { state, onChange: setState } );
 	const { setImage } = controller;
 	useEffect( () => setImage( IMAGE ), [ setImage ] );
 	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
-			<Cropper src={ IMAGE.src } controller={ controller } freeformCrop />
+			<ImageEditorCanvas
+				src={ IMAGE.src }
+				controller={ controller }
+				freeformCrop
+			/>
 		</div>
 	);
 }
 
 // Crop size in source pixels, from the normalized crop of an unrotated,
 // unzoomed image.
-function cropSize( controller: CropperController ) {
+function cropSize( controller: ImageEditorController ) {
 	const { width, height } = controller.state.cropRect;
 	return {
 		width: Math.round( width * IMAGE.naturalWidth ),
@@ -45,12 +51,12 @@ function cropSize( controller: CropperController ) {
 }
 
 describe( 'the public API', () => {
-	it( 'crops and builds the server instructions from the package exports alone', async () => {
-		let controller!: CropperController;
-		const onController = ( next: CropperController ) => {
+	it( 'crops and builds the steps for the original from the package exports alone', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
 			controller = next;
 		};
-		await render( <ConsumerCropper onController={ onController } /> );
+		await render( <ConsumerEditor onController={ onController } /> );
 		// The handles render once the cropper has measured itself.
 		await screen.findByRole( 'button', {
 			name: 'Resize from bottom-right corner',
@@ -59,6 +65,12 @@ describe( 'the public API', () => {
 			width: 1200,
 			height: 600,
 		} );
+
+		expect( {
+			minZoom: controller.minZoom,
+			maxZoom: controller.maxZoom,
+			maxRotationOffset: controller.maxRotationOffset,
+		} ).toEqual( { minZoom: 1, maxZoom: 10, maxRotationOffset: 45 } );
 
 		act( () => controller.setAspectRatio( 1 ) );
 		expect( controller.state.aspectRatio ).toBe( 1 );

@@ -4,7 +4,12 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-controller';
-import { DEFAULT_STATE } from '../../../core/constants';
+import {
+	DEFAULT_STATE,
+	MAX_ROTATION_OFFSET,
+	MAX_ZOOM,
+	MIN_ZOOM,
+} from '../../../core/constants';
 import { getSourceRegion } from '../../../core/source-region';
 // Browser Mode needs the package's real styles for layout and transitions.
 import '../../../style.scss';
@@ -37,6 +42,9 @@ function createController(): CropperController {
 		settleCrop: vi.fn(),
 		reset: vi.fn(),
 		isDirty: false,
+		minZoom: MIN_ZOOM,
+		maxZoom: MAX_ZOOM,
+		maxRotationOffset: MAX_ROTATION_OFFSET,
 		getCroppedImage: vi.fn(),
 		setVisualSize: vi.fn(),
 		adjustCropRectForViewport: vi.fn(),

@@ -3,7 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect } from '@wordpress/element';
-import { Cropper } from '@wordpress/image-editor';
+import { ImageEditorCanvas } from '@wordpress/image-editor';
 // Browser Mode needs the package's real styles for layout and transitions.
 import '@wordpress/image-editor/src/style.scss';
 import {
@@ -30,7 +30,7 @@ function CropperWithHistory( {
 	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
-			<Cropper
+			<ImageEditorCanvas
 				src={ IMAGE.src }
 				controller={ controller.cropper }
 				freeformCrop
@@ -41,7 +41,7 @@ function CropperWithHistory( {
 	);
 }
 
-describe( 'useMediaEditorState with a Cropper', () => {
+describe( 'useMediaEditorState with the canvas', () => {
 	it( 'keeps redo steps after redoing a handle crop that turns on pixel snapping', async () => {
 		let controller!: MediaEditorSession;
 		const onController = ( next: MediaEditorSession ) => {

@@ -68,7 +68,10 @@ const CROP_TOLERANCE = 0.001;
  *         image has loaded.
  */
 export function getStepsForOriginal(
-	state: CropperState
+	state: Pick<
+		CropperState,
+		'image' | 'pan' | 'zoom' | 'rotation' | 'flip' | 'cropRect'
+	>
 ): OriginalImageStep[] {
 	const steps: OriginalImageStep[] = [];
 	const { image } = state;

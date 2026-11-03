@@ -11,7 +11,12 @@ import type {
 	NormalizedRect,
 	Size,
 } from '../../core/types';
-import { DEFAULT_STATE } from '../../core/constants';
+import {
+	DEFAULT_STATE,
+	MAX_ROTATION_OFFSET,
+	MAX_ZOOM,
+} from '../../core/constants';
+import { getMinZoom } from '../../core/containment';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	cropperReducer,
@@ -40,6 +45,12 @@ export interface CropperController extends CropperSetters {
 	reset: ( resetState?: Partial< CropperState > ) => void;
 	/** Whether the current state differs from the initial state. */
 	isDirty: boolean;
+	/** The smallest zoom that still covers the crop area. */
+	minZoom: number;
+	/** The largest zoom. */
+	maxZoom: number;
+	/** How far fine rotation goes either way of a quarter turn, in degrees. */
+	maxRotationOffset: number;
 	/**
 	 * Export the cropped image as a Blob. Throws on failure — see
 	 * `exportCroppedImage` for error semantics.
@@ -234,6 +245,8 @@ export function useCropperController(
 		[ apply ]
 	);
 
+	const minZoom = getMinZoom( state );
+
 	return useMemo(
 		() => ( {
 			...setters,
@@ -241,6 +254,9 @@ export function useCropperController(
 			setImage,
 			reset,
 			isDirty,
+			minZoom,
+			maxZoom: MAX_ZOOM,
+			maxRotationOffset: MAX_ROTATION_OFFSET,
 			getCroppedImage,
 			setVisualSize,
 			adjustCropRectForViewport,
@@ -251,6 +267,7 @@ export function useCropperController(
 			setImage,
 			reset,
 			isDirty,
+			minZoom,
 			getCroppedImage,
 			setVisualSize,
 			adjustCropRectForViewport,

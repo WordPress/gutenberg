@@ -1,8 +1,8 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
-	areCropperStatesEqual,
-	createCropperState,
-	type CropperState,
+	areImageEditorStatesEqual,
+	createImageEditorState,
+	type ImageEditorState,
 } from '@wordpress/image-editor';
 import {
 	DEFAULT_CROP_OPTIONS,
@@ -59,7 +59,7 @@ export function mediaEditorReducer(
 		}
 		case 'RESET': {
 			const next = buildInitialMediaEditorState(
-				createCropperState( state.cropper.image )
+				createImageEditorState( state.cropper.image )
 			);
 			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}
@@ -84,7 +84,7 @@ export function areMediaEditorStatesEqual(
 		return true;
 	}
 	return (
-		areCropperStatesEqual( a.cropper, b.cropper ) &&
+		areImageEditorStatesEqual( a.cropper, b.cropper ) &&
 		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
 		fastDeepEqual( a.edits, b.edits )
 	);
@@ -98,7 +98,7 @@ export function areMediaEditorStatesEqual(
  * @return Initial state.
  */
 export function buildInitialMediaEditorState(
-	cropper: CropperState
+	cropper: ImageEditorState
 ): MediaEditorState {
 	return {
 		cropper,

@@ -2,6 +2,22 @@ import { describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useMediaEditorState } from '../use-media-editor-state';
 
+// The canvas reports its size and refits the crop through these. They are
+// on the controller, but not on its public type.
+interface CanvasOnlyMethods {
+	setVisualSize: ( size: { width: number; height: number } ) => void;
+	adjustCropRectForViewport: ( rect: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} ) => void;
+}
+
+function asCanvas( cropper: unknown ): CanvasOnlyMethods {
+	return cropper as CanvasOnlyMethods;
+}
+
 const IMAGE = {
 	src: 'test.jpg',
 	naturalWidth: 1200,
@@ -14,7 +30,7 @@ function setupHook( visualSize = { width: 600, height: 400 } ) {
 	const view = renderHook( () => useMediaEditorState() );
 	act( () => {
 		view.result.current.setSourceImage( IMAGE );
-		view.result.current.cropper.setVisualSize( visualSize );
+		asCanvas( view.result.current.cropper ).setVisualSize( visualSize );
 	} );
 	return view;
 }
@@ -324,7 +340,7 @@ describe( 'useMediaEditorState', () => {
 			const { result } = setupHook();
 
 			act( () =>
-				result.current.cropper.adjustCropRectForViewport( {
+				asCanvas( result.current.cropper ).adjustCropRectForViewport( {
 					x: 0,
 					y: 0,
 					width: 0.5,

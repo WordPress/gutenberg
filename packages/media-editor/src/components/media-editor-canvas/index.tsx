@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Cropper } from '@wordpress/image-editor';
+import { ImageEditorCanvas } from '@wordpress/image-editor';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { useMediaEditor } from '../../state';
@@ -133,7 +133,7 @@ export default function MediaEditorCanvas( {
 					'is-loaded': status === 'loaded',
 				} ) }
 			>
-				<Cropper
+				<ImageEditorCanvas
 					src={ mediaUrl }
 					controller={ session.cropper }
 					freeformCrop
