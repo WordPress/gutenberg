@@ -353,7 +353,21 @@ const formatMap = {
 	u: 'SSSSSS',
 	v: 'SSS',
 	// Timezone.
-	e: 'zz',
+	/**
+	 * Gets the timezone identifier, e.g. `America/New_York`, or the UTC offset
+	 * (`+03:30`) when the date has no named timezone, like PHP's `e`.
+	 *
+	 * @param momentDate Moment instance.
+	 *
+	 * @return Formatted date.
+	 */
+	e( momentDate: Moment ) {
+		const zoneName = momentDate.tz();
+		if ( zoneName ) {
+			return zoneName;
+		}
+		return momentDate.format( 'Z' );
+	},
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
@@ -492,7 +506,9 @@ export function gmdate(
 	dateFormat: string,
 	dateValue: Moment | Date | string | number = new Date()
 ) {
-	const dateMoment = momentLib( dateValue ).utc();
+	// `.utc()` first so the date stays in UTC even if the 'UTC' zone is not
+	// registered (`.tz()` is then a no-op); `.tz( 'UTC' )` makes `e` report 'UTC'.
+	const dateMoment = momentLib( dateValue ).utc().tz( 'UTC' );
 	return format( dateFormat, dateMoment );
 }
 
@@ -550,7 +566,7 @@ export function gmdateI18n(
 	dateFormat: string,
 	dateValue: Moment | Date | string | number = new Date()
 ) {
-	const dateMoment = momentLib( dateValue ).utc();
+	const dateMoment = momentLib( dateValue ).utc().tz( 'UTC' );
 	dateMoment.locale( settings.l10n.locale );
 	return format( dateFormat, dateMoment );
 }

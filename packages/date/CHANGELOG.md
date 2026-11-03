@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix the `e` format character in `date()`, `dateI18n()`, `gmdate()` and `gmdateI18n()` to return the timezone identifier or UTC offset, like PHP's `date()` ([#85718](https://github.com/WordPress/gutenberg/pull/85718)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
