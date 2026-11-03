@@ -3,6 +3,15 @@ import type { createSlotFill, DropdownMenu } from '@wordpress/components';
 
 type SlotFill = ReturnType< typeof createSlotFill >;
 
+declare global {
+	interface Window {
+		/**
+		 * Whether the writing toolbar experiment is enabled.
+		 */
+		__experimentalWritingToolbar?: boolean;
+	}
+}
+
 /**
  * The last item fill of the block toolbar, which carries its slot as a
  * static.
@@ -15,6 +24,19 @@ export type BlockToolbarLastItem = SlotFill[ 'Fill' ] & {
  * Style variant of the block toolbar.
  */
 export type BlockToolbarVariant = 'unstyled' | 'toolbar';
+
+/**
+ * Which half of the block toolbar is on show: the design tools, or the
+ * writing tools offered to blocks that support writing.
+ */
+export type ToolbarMode = 'design' | 'write';
+
+export interface ToolbarModeSwitchProps {
+	/** The mode the toolbar is in. */
+	mode: ToolbarMode;
+	/** Called with the mode to switch to. */
+	onChange: ( mode: ToolbarMode ) => void;
+}
 
 export interface PrivateBlockToolbarProps {
 	/** Show or hide the Drag Handle for drag and drop functionality. */

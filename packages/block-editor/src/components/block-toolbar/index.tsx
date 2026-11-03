@@ -29,6 +29,8 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import ToolbarModeSwitch from './toolbar-mode-switch';
+import { useToolbarMode } from './use-toolbar-mode';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import type { BlockToolbarProps, PrivateBlockToolbarProps } from './types';
 
@@ -73,6 +75,7 @@ export function PrivateBlockToolbar( {
 		areSelectedBlocksHiddenOnViewport,
 		showStyleStateSlot,
 		canEdit,
+		showWritingSwitch,
 	} = useSelect( ( select ) => {
 		const { canEditBlock } = select( blockEditorStore );
 		const {
@@ -137,6 +140,17 @@ export function PrivateBlockToolbar( {
 			selectedBlockClientIds.every( ( id: string ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
+		const _showWritingSwitch =
+			!! window.__experimentalWritingToolbar &&
+			selectedBlockClientIds.length === 1 &&
+			_isDefaultEditingMode &&
+			_canEditBlock &&
+			! _isSectionBlock &&
+			! _isZoomOut &&
+			isValid &&
+			isVisual &&
+			hasBlockSupport( _blockName, 'writing', false );
+
 		const _isEditingResponsiveStyleState =
 			!! selectedBlockClientId &&
 			isResponsiveEditing() &&
@@ -175,8 +189,12 @@ export function PrivateBlockToolbar( {
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
 			canEdit: _canEditBlock,
+			showWritingSwitch: _showWritingSwitch,
 		};
 	}, [] );
+
+	const [ toolbarMode, setToolbarMode ] = useToolbarMode( blockClientId );
+	const isWriting = showWritingSwitch && toolbarMode === 'write';
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -230,45 +248,59 @@ export function PrivateBlockToolbar( {
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
-				{ ( shouldShowVisualToolbar ||
-					isMultiToolbar ||
-					isPlaceholder ) && (
-					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
-						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-							<BlockToolbarIcon
-								clientIds={ blockClientIds }
-								isSynced={ isSynced }
-							/>
-							{ ! isPlaceholder &&
-								isDefaultEditingMode &&
-								showBlockVisibilityButton && (
-									<ViewportVisibilityToolbar
-										clientIds={ blockClientIds }
-									/>
-								) }
-							{ ! isPlaceholder &&
-								! isMultiToolbar &&
-								isDefaultEditingMode &&
-								showLockButtons && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
-							<BlockMover
-								clientIds={ blockClientIds }
-								hideDragHandle={ hideDragHandle }
-							/>
-						</ToolbarGroup>
-					</div>
+				{ showWritingSwitch && (
+					<ToolbarModeSwitch
+						mode={ toolbarMode }
+						onChange={ setToolbarMode }
+					/>
 				) }
-				{ ! areSelectedBlocksHiddenOnViewport &&
+				{ ! isWriting &&
+					( shouldShowVisualToolbar ||
+						isMultiToolbar ||
+						isPlaceholder ) && (
+						<div
+							ref={ nodeRef }
+							{ ...showHoveredOrFocusedGestures }
+						>
+							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+								<BlockToolbarIcon
+									clientIds={ blockClientIds }
+									isSynced={ isSynced }
+								/>
+								{ ! isPlaceholder &&
+									isDefaultEditingMode &&
+									showBlockVisibilityButton && (
+										<ViewportVisibilityToolbar
+											clientIds={ blockClientIds }
+										/>
+									) }
+								{ ! isPlaceholder &&
+									! isMultiToolbar &&
+									isDefaultEditingMode &&
+									showLockButtons && (
+										<BlockLockToolbar
+											clientId={ blockClientId }
+										/>
+									) }
+								<BlockMover
+									clientIds={ blockClientIds }
+									hideDragHandle={ hideDragHandle }
+								/>
+							</ToolbarGroup>
+						</div>
+					) }
+				{ ! isWriting &&
+					! areSelectedBlocksHiddenOnViewport &&
 					! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isPlaceholder && ! isMultiToolbar && canEdit && (
-					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
-				) }
+				{ ! isWriting &&
+					! isPlaceholder &&
+					! isMultiToolbar &&
+					canEdit && (
+						<EditSectionButton clientId={ blockClientIds[ 0 ] } />
+					) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
 					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
@@ -280,7 +312,23 @@ export function PrivateBlockToolbar( {
 					! areSelectedBlocksHiddenOnViewport &&
 					shouldShowVisualToolbar && (
 						<>
-							{ ! isSectionContainer && (
+							{ isWriting && (
+								<>
+									<BlockControls.Slot
+										group="writing"
+										className="block-editor-block-toolbar__slot"
+									/>
+									<BlockControls.Slot
+										group="inline"
+										className="block-editor-block-toolbar__slot"
+									/>
+									<BlockControls.Slot
+										group="block"
+										className="block-editor-block-toolbar__slot"
+									/>
+								</>
+							) }
+							{ ! isWriting && ! isSectionContainer && (
 								<>
 									{ showSlots && (
 										<>
@@ -307,7 +355,7 @@ export function PrivateBlockToolbar( {
 									) }
 								</>
 							) }
-							{ showSlots && (
+							{ ! isWriting && showSlots && (
 								<>
 									<BlockControls.Slot
 										group="other"

@@ -1,0 +1,34 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Each style, font and size previews itself at the size it renders at, so a
+// long name has to give way rather than widen the menu.
+.editor-writing-toolbar__style-popover,
+.editor-writing-toolbar__font-popover,
+.editor-writing-toolbar__size-popover {
+	.components-menu-item__button {
+		line-height: $default-line-height;
+	}
+
+	.components-menu-item__item {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.editor-writing-toolbar__style-popover .components-popover__content,
+.editor-writing-toolbar__size-popover .components-popover__content {
+	max-width: 280px;
+}
+
+.editor-writing-toolbar__custom-size {
+	padding: $grid-unit-10 $grid-unit-10 0;
+}
+
+.editor-writing-toolbar__size-value {
+	color: $gray-700;
+	flex-shrink: 0;
+	font-size: $helptext-font-size;
+	padding-left: $grid-unit-15;
+}

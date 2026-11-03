@@ -7,6 +7,7 @@ const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
 const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 const BlockControlsParent = createSlotFill( 'BlockControlsParent' );
 const BlockControlsStyleState = createSlotFill( 'BlockControlsStyleState' );
+const BlockControlsWriting = createSlotFill( 'BlockControlsWriting' );
 
 const groups: Record< string, SlotFill > = {
 	default: BlockControlsDefault,
@@ -15,6 +16,7 @@ const groups: Record< string, SlotFill > = {
 	other: BlockControlsOther,
 	parent: BlockControlsParent,
 	'style-state': BlockControlsStyleState,
+	writing: BlockControlsWriting,
 };
 
 export default groups;

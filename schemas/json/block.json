@@ -419,6 +419,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"writing": {
+					"description": "This property marks the block as one you write prose in, so the editor can offer it the writing toolbar: a toolbar of text styles, fonts and sizes in place of the design tools.",
+					"type": "boolean",
+					"default": false
+				},
 				"layout": {
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
 					"oneOf": [

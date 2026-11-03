@@ -1305,3 +1305,16 @@ supports: {
 	visibility: false,
 }
 ```
+
+## writing
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This property marks the block as one you write prose in. The editor then offers it the writing toolbar: a switch at the left of the block toolbar that swaps the design tools for a text style, font and size, alongside the usual inline formatting. Set it on a block whose point is the words in it.
+
+```js
+supports: {
+	writing: true,
+}
+```

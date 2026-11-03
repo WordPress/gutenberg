@@ -20,6 +20,7 @@
 		}
 	},
 	"supports": {
+		"writing": true,
 		"anchor": true,
 		"html": false,
 		"className": false,
