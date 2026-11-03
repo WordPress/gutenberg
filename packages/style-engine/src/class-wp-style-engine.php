@@ -33,7 +33,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @var string
 		 */
-		const VALID_ANGLE_PATTERN = '/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:deg|grad|rad|turn)|0)$/i';
+		const VALID_ANGLE_PATTERN = '/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:deg|grad|rad|turn)|0)$/iD';
 
 		/**
 		 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
