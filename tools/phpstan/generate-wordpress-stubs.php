@@ -20,7 +20,7 @@
  *   (no option)          Generate the stubs from the source recorded in wordpress-stubs/composer.json,
  *                        unless they already were. Add `--force` to generate them anyway, or
  *                        `--quiet` to not report that they already were, as `composer phpstan` does.
- *   --commit=<ref>      Generate from a commit of wordpress-develop, such as `trunk`.
+ *   --commit=<ref>       Generate from a commit of wordpress-develop, such as `trunk`.
  *   --pr=<number|url>    Generate from the head of a wordpress-develop pull request, for a Gutenberg
  *                        pull request that depends on it. Before the Gutenberg pull request is
  *                        merged, regenerate with `--commit=trunk` once the core change is committed.
