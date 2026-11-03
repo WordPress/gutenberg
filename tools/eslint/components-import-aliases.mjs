@@ -12,10 +12,13 @@ export default {
 	__experimentalInputControl: 'WCInputControl',
 	Menu: 'WCMenu',
 	Notice: 'WCNotice',
+	Popover: 'WCPopover',
 	SelectControl: 'WCSelectControl',
 	Spinner: 'WCSpinner',
 	Tabs: 'WCTabs',
 	TextareaControl: 'WCTextareaControl',
 	Tooltip: 'WCTooltip',
+	ValidatedInputControl: 'WCValidatedInputControl',
+	ValidatedTextareaControl: 'WCValidatedTextareaControl',
 	VisuallyHidden: 'WCVisuallyHidden',
 };

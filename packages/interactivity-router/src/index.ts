@@ -1,4 +1,5 @@
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
+import { closestHtmlDirectiveElement } from './html-directive-element';
 import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
 import {
 	preloadScriptModules,
@@ -30,6 +31,22 @@ const {
 const regionAttr = `data-wp-router-region`;
 const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
+
+/**
+ * Finds router regions outside `data-wp-html` content, in document order.
+ *
+ * The check starts at the region's parent, because `data-wp-router-region`
+ * takes precedence over `data-wp-html` on the region itself. Regions nested in
+ * other regions are kept, so `preparePage()` can handle them as part of their
+ * parent's content.
+ *
+ * @param dom Document whose regions should be discovered.
+ * @return Router region elements outside `data-wp-html` content.
+ */
+const discoverRegions = ( dom: Document ): Element[] =>
+	Array.from( dom.querySelectorAll( regionsSelector ) ).filter(
+		( region ) => ! closestHtmlDirectiveElement( region.parentElement )
+	);
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -252,7 +269,8 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
  * Processes a DOM document to extract router regions and related resources.
  *
  * This function analyzes the provided DOM document and creates a virtual DOM
- * representation of all HTML regions marked with a `router-region` directive.
+ * representation of regions marked with a `router-region` directive outside
+ * `data-wp-html` content.
  * It also extracts and preloads associated styles and scripts to prepare for
  * rendering the page.
  *
@@ -264,7 +282,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
  *                        regions. If a region exists in this cache, it will be
  *                        reused instead of creating a new vDOM representation.
  * @return                A Promise that resolves to a {@link Page} object
- *                        containing the virtual DOM for all router regions,
+ *                        containing the virtual DOM for discovered router regions,
  *                        preloaded styles and scripts, page title, and initial
  *                        server-rendered data.
  */
@@ -279,7 +297,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	// Preserve every extracted attachment selector under its region id for the
 	// render pass, including ids that collide with Object.prototype properties.
 	const regionsToAttach: Record< string, string > = Object.create( null );
-	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+	discoverRegions( dom ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
 		if ( region.parentElement.closest( `[${ regionAttr }]` ) ) {
@@ -316,18 +334,43 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 };
 
 /**
+ * Finds the first element matching `selector` in the live document that
+ * neither has inert `data-wp-html` content nor sits inside it.
+ *
+ * @param selector CSS selector resolved against the live document.
+ * @return The first usable element, or null if none exists or the selector
+ *         is invalid.
+ */
+const resolveAttachTarget = ( selector: string ): Element | null => {
+	try {
+		for ( const element of document.querySelectorAll( selector ) ) {
+			if ( ! closestHtmlDirectiveElement( element ) ) {
+				return element;
+			}
+		}
+	} catch {
+		// Invalid CSS selectors have no usable target; navigation still completes.
+	}
+	return null;
+};
+
+/**
  * Renders a page by applying styles, populating server data, rendering regions,
- * and updating the document title.
+ * and updating the document title. Pending attachments resolve against the live
+ * document on every render, including history restores. A region without a
+ * usable target is omitted from this render without altering the cached page.
  *
  * @param page The {@link Page} object to render.
  */
 const renderPage = ( page: Page ) => {
 	applyStyles( page.styles );
 
-	// Clone regionsToAttach.
-	const regionsToAttach = Object.assign(
+	// Keep skipped attachments out of this render without changing the cache.
+	// A null prototype prevents deleted ids such as `constructor` from resolving
+	// to inherited properties when attachment fragments look them up later.
+	const regions: Page[ 'regions' ] = Object.assign(
 		Object.create( null ),
-		page.regionsToAttach
+		page.regions
 	);
 
 	batch( () => {
@@ -345,23 +388,27 @@ const renderPage = ( page: Page ) => {
 
 		// Inits regions with attachTo that don't exist yet.
 		const parentsToUpdate = new Set< Element >();
-		for ( const id in regionsToAttach ) {
-			const parent = document.querySelector( regionsToAttach[ id ] );
+		for ( const id in page.regionsToAttach ) {
+			const parent = resolveAttachTarget( page.regionsToAttach[ id ] );
+			if ( ! parent ) {
+				delete regions[ id ];
+				continue;
+			}
 			if ( ! regionsToAttachByParent.has( parent ) ) {
 				regionsToAttachByParent.set( parent, [] );
 			}
-			const regions = regionsToAttachByParent.get( parent );
-			if ( ! regions.includes( id ) ) {
-				regions.push( id );
+			const ids = regionsToAttachByParent.get( parent );
+			if ( ! ids.includes( id ) ) {
+				ids.push( id );
 				parentsToUpdate.add( parent );
 			}
 		}
 
 		// Updates all existing regions.
-		for ( const id in page.regions ) {
+		for ( const id in regions ) {
 			if ( routerRegions.has( id ) ) {
 				routerRegions.get( id ).value = cloneRouterRegionContent(
-					page.regions[ id ]
+					regions[ id ]
 				);
 			}
 		}
@@ -369,10 +416,11 @@ const renderPage = ( page: Page ) => {
 		// Renders regions attached to the same parent in the same fragment.
 		parentsToUpdate.forEach( ( parent ) => {
 			const ids = regionsToAttachByParent.get( parent );
-			const vdoms = ids.map( ( id ) => page.regions[ id ] );
+			const vdoms = ids.map( ( id ) => regions[ id ] );
 
 			if ( ! rootFragmentsByParent.has( parent ) ) {
-				const regions = vdoms.map( ( { props, type } ) => {
+				// Root elements sharing this parent's attachment fragment.
+				const roots = vdoms.map( ( { props, type } ) => {
 					const elementType =
 						typeof type === 'function' ? props.type : type;
 
@@ -385,7 +433,7 @@ const renderPage = ( page: Page ) => {
 				} );
 				rootFragmentsByParent.set(
 					parent,
-					getRegionRootFragment( regions )
+					getRegionRootFragment( roots )
 				);
 			}
 			const fragment = rootFragmentsByParent.get( parent );
@@ -554,7 +602,7 @@ window.addEventListener( 'popstate', async () => {
 // Detect router regions with `attachTo` in the initial page. This step should
 // be done before the initial page is processed with `preparePage()` so this
 // function treats them as regular router regions.
-document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+discoverRegions( document ).forEach( ( region ) => {
 	const { id, attachTo } = parseRegionAttribute( region );
 	if ( attachTo ) {
 		initialRegionsToAttach.add( id );
