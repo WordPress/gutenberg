@@ -129,7 +129,7 @@ class WP_Navigation_Block_Renderer {
 		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
 
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] );
 		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
 	}
 
@@ -1611,7 +1611,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
  * @since 5.9.0
  *
  * @uses render_block_core_navigation()
- * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
 	register_block_type_from_metadata(
