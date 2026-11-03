@@ -2356,7 +2356,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'keeps an inline note when its block is merged into a block of a different type', async ( {
+		test( 'keeps both block-level and inline notes when blocks of different types are merged', async ( {
 			editor,
 			page,
 			blockNoteUtils,
@@ -2374,10 +2374,13 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await paragraph.click();
+			await blockNoteUtils.addNote( 'Block note' );
+			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
-			await blockNoteUtils.addNote( 'Merged note' );
+			await blockNoteUtils.addNote( 'Inline note' );
 			const [ , { attributes } ] = await editor.getBlocks();
 			const { noteId } = attributes.metadata;
+			expect( noteId ).toHaveLength( 2 );
 
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
@@ -2399,6 +2402,12 @@ test.describe( 'Block Notes', () => {
 					attributes: { metadata: { noteId } },
 				},
 			] );
+			await expect(
+				blockNoteUtils.getThread( 'Block note' )
+			).toBeVisible();
+			await expect(
+				blockNoteUtils.getThread( 'Inline note' )
+			).toBeVisible();
 		} );
 
 		test( 'anchors the marker to only the selected text', async ( {
