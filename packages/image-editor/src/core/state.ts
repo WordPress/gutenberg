@@ -214,7 +214,7 @@ function operationToAction(
 				},
 			};
 		case 'zoom':
-			return { type: 'SET_ZOOM', payload: op.factor };
+			return { type: 'SET_ZOOM', payload: op.level };
 	}
 }
 

@@ -97,10 +97,10 @@ describe( 'applyOperationToState', () => {
 		expect( result.flip.vertical ).toBe( true );
 	} );
 
-	it( 'should handle zoom: set zoom factor', () => {
+	it( 'should handle zoom: set zoom level', () => {
 		const result = applyOperationToState( baseState, {
 			type: 'zoom',
-			factor: 3.5,
+			level: 3.5,
 		} );
 
 		expect( result.zoom ).toBe( 3.5 );
@@ -129,7 +129,7 @@ describe( 'stateFromPipeline', () => {
 		const pipeline: TransformOperation[] = [
 			{ type: 'rotate', degrees: 45 },
 			{ type: 'flip', direction: 'horizontal' },
-			{ type: 'zoom', factor: 2 },
+			{ type: 'zoom', level: 2 },
 			{
 				type: 'crop',
 				rect: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
@@ -214,7 +214,7 @@ describe( 'pipeline / reducer parity', () => {
 	it( 'zoom op matches SET_ZOOM', () => {
 		const pipelineResult = applyOperationToState( stateWithImage, {
 			type: 'zoom',
-			factor: 3,
+			level: 3,
 		} );
 		const reducerResult = imageEditorReducer( stateWithImage, {
 			type: 'SET_ZOOM',

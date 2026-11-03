@@ -54,10 +54,18 @@ export interface Flip {
  * A JSON-serializable transform operation for the non-destructive pipeline.
  */
 export type TransformOperation =
+	/**
+	 * Place the crop box in the view the canvas shows, in fractions of
+	 * the view. Which part of the photo it frames depends on the pan and
+	 * zoom.
+	 */
 	| { type: 'crop'; rect: NormalizedRect }
+	/** Rotate clockwise on screen by this many degrees, from where it is. */
 	| { type: 'rotate'; degrees: number }
+	/** Mirror along this axis, or undo a mirror already there. */
 	| { type: 'flip'; direction: 'horizontal' | 'vertical' }
-	| { type: 'zoom'; factor: number };
+	/** Set the zoom level. 1 = no zoom. */
+	| { type: 'zoom'; level: number };
 
 /**
  * The state of an image editor, as consumers see it. Store it and pass it
