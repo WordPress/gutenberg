@@ -9,7 +9,7 @@ import {
 	Button,
 	__experimentalInputControl as WCInputControl,
 	Spinner as WCSpinner,
-	Popover,
+	Popover as WCPopover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
@@ -26,7 +26,9 @@ import type {
 	URLInputSuggestionsListProps,
 } from './types';
 
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl: WCValidatedInputControl } = unlock(
+	componentsPrivateApis
+);
 
 const noop = () => {};
 
@@ -429,6 +431,7 @@ export default function URLInput( props: URLInputProps ) {
 					isLoading={ isLoading }
 					renderSuggestions={ renderSuggestions }
 					selectedSuggestion={ selectedSuggestion }
+					onSuggestionHover={ setSelectedSuggestion }
 					suggestionNodesRef={ suggestionNodesRef }
 					suggestionOptionIdPrefix={ suggestionOptionIdPrefix }
 					suggestions={ suggestions }
@@ -463,7 +466,7 @@ function Control( {
 	}
 
 	const MaybeValidatedInputControl = isValidated
-		? ValidatedInputControl
+		? WCValidatedInputControl
 		: WCInputControl;
 
 	return (
@@ -492,6 +495,7 @@ function Suggestions( {
 	isLoading,
 	renderSuggestions,
 	selectedSuggestion,
+	onSuggestionHover,
 	suggestionNodesRef,
 	suggestionOptionIdPrefix,
 	suggestions,
@@ -517,6 +521,11 @@ function Suggestions( {
 				suggestionNodesRef.current[ index ] = node;
 			},
 			'aria-selected': index === selectedSuggestion ? true : undefined,
+			onMouseMove: () => {
+				if ( ! isLoading ) {
+					onSuggestionHover( index );
+				}
+			},
 		};
 	};
 
@@ -534,7 +543,7 @@ function Suggestions( {
 	}
 
 	return (
-		<Popover placement="bottom" focusOnMount={ false }>
+		<WCPopover placement="bottom" focusOnMount={ false }>
 			<div
 				{ ...suggestionsListProps }
 				className={ clsx( 'block-editor-url-input__suggestions', {
@@ -558,6 +567,6 @@ function Suggestions( {
 					</Button>
 				) ) }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

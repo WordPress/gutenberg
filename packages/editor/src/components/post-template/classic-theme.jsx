@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Dropdown, Button, Notice } from '@wordpress/components';
+import { Dropdown, Button, Notice as WCNotice } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -155,9 +155,9 @@ function PostTemplateDropdownContent( { onClose } ) {
 				onClose={ onClose }
 			/>
 			{ ! allowSwitchingTemplate ? (
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __( 'The posts page template cannot be changed.' ) }
-				</Notice>
+				</WCNotice>
 			) : (
 				<SelectControl
 					hideLabelFromVision
