@@ -224,6 +224,7 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $with_desc_id );
 		wp_set_post_terms( $with_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $with_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
 
 		$empty_desc_id = wp_insert_post(
 			array(
@@ -238,6 +239,7 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $empty_desc_id );
 		wp_set_post_terms( $empty_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $empty_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
 
 		$variations = call_user_func( $build_variations );
 
