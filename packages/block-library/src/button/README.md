@@ -54,7 +54,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- `transform`:
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
   - `rotate`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `["horizontal","vertical"]`

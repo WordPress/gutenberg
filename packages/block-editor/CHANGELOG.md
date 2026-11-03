@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Bug Fixes
 
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).

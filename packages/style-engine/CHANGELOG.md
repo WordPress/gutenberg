@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Bug Fixes
 
 -   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).

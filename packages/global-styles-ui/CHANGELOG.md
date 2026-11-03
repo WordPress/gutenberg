@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show the Transform panel on block screens for blocks that support a rotation ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Bug Fixes
 
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
