@@ -17,7 +17,7 @@ type Item = {
 	longName: string;
 	customEditWrapping: string;
 	customEditFixedWidth: string;
-	listFilter: string;
+	elements: string;
 };
 
 const data: Item[] = [
@@ -29,7 +29,7 @@ const data: Item[] = [
 		longName: 'a',
 		customEditWrapping: 'Token 1',
 		customEditFixedWidth: 'Token 1',
-		listFilter: 'published',
+		elements: 'published',
 	},
 ];
 
@@ -109,10 +109,10 @@ const fields: Field< Item >[] = [
 		Edit: FixedWidthEdit,
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
-	// A list filter keeps the default width.
+	// A field with elements gets a list popover, which keeps the default width.
 	{
-		id: 'listFilter',
-		label: 'List filter',
+		id: 'elements',
+		label: 'Elements',
 		elements: [
 			{ value: 'published', label: 'Published' },
 			{ value: 'draft', label: 'Draft' },
