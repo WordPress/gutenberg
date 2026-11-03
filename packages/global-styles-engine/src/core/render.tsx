@@ -1004,6 +1004,7 @@ const STYLE_KEYS = [
 	'outline',
 	'shadow',
 	'background',
+	'transform',
 ];
 
 function pickStyleKeys(
