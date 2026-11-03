@@ -114,4 +114,91 @@ test.describe( 'Group', () => {
 			.toBe( 'core/group' );
 		await expect.poll( editor.getBlocks ).toMatchObject( expectedBlocks );
 	} );
+
+	test.describe( 'Layout', () => {
+		// The Layout panel is only shown for themes that support layout.
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test( 'resets the content width toggle to the variation default', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( { name: 'core/group' } );
+			// The default Group variation uses a constrained layout.
+			await editor.canvas
+				.getByRole( 'button', {
+					name: 'Group: Gather blocks in a container.',
+				} )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const contentWidthToggle = settings.getByRole( 'checkbox', {
+				name: 'Inner blocks use content width',
+			} );
+			const layoutOptions = settings.getByRole( 'button', {
+				name: 'Layout options',
+			} );
+			const expectedLayout = [
+				{
+					name: 'core/group',
+					attributes: { layout: { type: 'constrained' } },
+				},
+			];
+
+			await test.step( 'the variation default is not reported as a change', async () => {
+				await expect( contentWidthToggle ).toBeChecked();
+				await layoutOptions.click();
+				await expect(
+					page.getByRole( 'menuitem', { name: 'Reset all' } )
+				).toHaveAttribute( 'aria-disabled', 'true' );
+				await expect(
+					page.getByRole( 'menuitemcheckbox', {
+						name: 'Use content width',
+					} )
+				).toHaveAttribute( 'aria-disabled', 'true' );
+				await page.keyboard.press( 'Escape' );
+			} );
+
+			await test.step( 'Reset all restores the content width', async () => {
+				await contentWidthToggle.click();
+				await expect( contentWidthToggle ).not.toBeChecked();
+
+				await layoutOptions.click();
+				await page
+					.getByRole( 'menuitem', { name: 'Reset all' } )
+					.click();
+
+				await expect( contentWidthToggle ).toBeChecked();
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( expectedLayout );
+			} );
+
+			await test.step( 'resetting the control restores the content width', async () => {
+				await contentWidthToggle.click();
+				await expect( contentWidthToggle ).not.toBeChecked();
+
+				await layoutOptions.click();
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Use content width, reset to default',
+					} )
+					.click();
+
+				await expect( contentWidthToggle ).toBeChecked();
+				await expect
+					.poll( editor.getBlocks )
+					.toMatchObject( expectedLayout );
+			} );
+		} );
+	} );
 } );
