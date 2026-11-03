@@ -19,20 +19,22 @@
  *
  * @access private
  *
- * @param array    $props   Validated props.
- * @param string[] $classes Class names from the component's recipe.
- * @param string   $content Unused.
- * @param array    $parts   Class names of the other elements, by part.
+ * @param array $props Validated props.
  * @return string HTML.
  */
-function gutenberg_ui_render_switch_control( $props, $classes, $content, $parts ) {
+function _gutenberg_ui_render_switch_control( $props ) {
 	static $count = 0;
 	++$count;
 	$id = 'wp-ui-switch-control-' . $count;
 
-	if ( '' !== $props['class'] ) {
-		$classes[] = $props['class'];
-	}
+	$styles = gutenberg_ui_components_get_styles( 'form/switch-control/style' );
+	$switch = gutenberg_ui_components_get_styles( 'form/primitives/switch/style' );
+	$stack  = gutenberg_ui_components_get_styles( 'stack/style' );
+	$resets = gutenberg_ui_components_get_styles( 'utils/css/resets' );
+	$field  = gutenberg_ui_components_get_styles( 'utils/css/field' );
+
+	// The same classes as React, on each element.
+	$classes = array_filter( array( $resets['box-sizing'], $stack['stack'], $styles['root'], $props['class'] ) );
 
 	$state = ( $props['disabled'] ? 'data-disabled="" ' : '' ) . ( $props['checked'] ? 'data-checked=""' : 'data-unchecked=""' );
 
@@ -44,19 +46,19 @@ function gutenberg_ui_render_switch_control( $props, $classes, $content, $parts 
 			'</div>' .
 			'<label id="%6$s-label" for="%6$s-field" class="%13$s">%14$s</label>' .
 		'</div>',
-		gutenberg_ui_components_esc_plain_text( implode( ' ', $classes ) ),
-		esc_attr( implode( ' ', $parts['wrapper'] ) ),
+		esc_attr( implode( ' ', $classes ) ),
+		esc_attr( $styles['switch-wrapper'] ),
 		$state,
 		$props['disabled'] ? '-1' : '0',
 		$props['disabled'] ? ' aria-disabled="true"' : '',
 		esc_attr( $id ),
 		$props['checked'] ? 'true' : 'false',
-		esc_attr( implode( ' ', $parts['switch'] ) ),
-		esc_attr( implode( ' ', $parts['thumb'] ) ),
+		esc_attr( implode( ' ', array( $resets['box-sizing'], $switch['root'], $styles['switch'] ) ) ),
+		esc_attr( $switch['thumb'] ),
 		$props['disabled'] ? ' disabled=""' : '',
-		gutenberg_ui_components_esc_plain_text( $props['name'] ),
+		esc_attr( $props['name'] ),
 		$props['checked'] ? ' checked=""' : '',
-		esc_attr( implode( ' ', $parts['label'] ) ),
-		gutenberg_ui_components_esc_plain_text( $props['label'] )
+		esc_attr( implode( ' ', array( $field['label'], $field['is-plain'], $styles['label'] ) ) ),
+		esc_html( $props['label'] )
 	);
 }

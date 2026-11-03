@@ -4,7 +4,7 @@
  *
  * The build renders every combination of each component's variants with
  * React. These tests check that PHP renders the same markup, so a change to
- * the React component that the PHP template or recipe doesn't follow fails
+ * the React component that the PHP template doesn't follow fails
  * here. They also check how props are validated and escaped.
  *
  * @package gutenberg
@@ -35,7 +35,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$cases = array();
 		foreach ( json_decode( file_get_contents( $file ), true ) as $fixture ) {
-			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . $fixture['content'] ] = array( $fixture );
+			$cases[ $fixture['component'] . ': ' . wp_json_encode( $fixture['props'] ) . ' ' . ( $fixture['content'] ?? '' ) ] = array( $fixture );
 		}
 		return $cases;
 	}
@@ -46,13 +46,9 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $fixture Props, content and React's render.
 	 */
 	public function test_renders_the_same_markup_as_react( $fixture ) {
-		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] );
+		$html = gutenberg_get_ui_component( $fixture['component'], $fixture['props'], $fixture['content'] ?? null );
 
-		$this->assertSame(
-			self::normalize_html( $fixture['html'] ),
-			self::normalize_html( $html ),
-			"React:\n{$fixture['html']}\nPHP:\n{$html}"
-		);
+		$this->assertEqualHTML( self::normalize_html( $fixture['html'] ), self::normalize_html( $html ) );
 	}
 
 	public function test_escapes_text_and_attributes() {
@@ -67,10 +63,10 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * What PHP prints and the props React mounts with both keep entities
-	 * literal, so the text doesn't change when React takes over.
+	 * What PHP prints and the props React mounts with read entities the same
+	 * way, so the text doesn't change when React takes over.
 	 */
-	public function test_keeps_entities_literal_in_a_native_fallback_and_react_props() {
+	public function test_reads_entities_the_same_in_a_native_fallback_and_react_props() {
 		$processor = new WP_HTML_Tag_Processor(
 			gutenberg_get_ui_component(
 				'searchable-select-control',
@@ -90,21 +86,21 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 
 		$processor->next_tag( 'wp-ui-interactive' );
 		$interactive = json_decode( $processor->get_attribute( 'data-interactive' ), true );
-		$this->assertSame( 'A &amp; B', $interactive['props']['label'] );
-		$this->assertSame( 'C &amp; D', $interactive['props']['items'][0]['label'] );
+		$this->assertSame( 'A & B', $interactive['props']['label'] );
+		$this->assertSame( 'C & D', $interactive['props']['items'][0]['label'] );
 
 		$processor->next_tag( 'label' );
 		$processor->next_token();
-		$this->assertSame( 'A &amp; B', $processor->get_modifiable_text() );
+		$this->assertSame( 'A & B', $processor->get_modifiable_text() );
 
 		$processor->next_tag( 'select' );
-		$this->assertSame( 'a&amp;b', $processor->get_attribute( 'name' ) );
-		$this->assertSame( 'is-&amp;', $processor->get_attribute( 'class' ) );
+		$this->assertSame( 'a&b', $processor->get_attribute( 'name' ) );
+		$this->assertSame( 'is-&', $processor->get_attribute( 'class' ) );
 
 		$processor->next_tag( 'option' );
-		$this->assertSame( 'c&amp;d', $processor->get_attribute( 'value' ) );
+		$this->assertSame( 'c&d', $processor->get_attribute( 'value' ) );
 		$processor->next_token();
-		$this->assertSame( 'C &amp; D', $processor->get_modifiable_text() );
+		$this->assertSame( 'C & D', $processor->get_modifiable_text() );
 	}
 
 	public function test_invalid_props_fall_back_to_their_default() {
@@ -226,68 +222,33 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Turns HTML into a list of tokens to compare, ignoring the order of
-	 * attributes and classes, the wrappers for interactive components, and
-	 * generated IDs, which differ between React and PHP.
+	 * Removes what differs between React and PHP and isn't markup: the wrapper
+	 * of interactive components, and generated IDs, which are numbered in the
+	 * order they appear.
 	 *
 	 * @param string $html HTML.
-	 * @return array Tokens.
+	 * @return string HTML.
 	 */
 	private static function normalize_html( $html ) {
-		$tokens    = array();
+		$html      = preg_replace( '#</?wp-ui-interactive[^>]*>#', '', $html );
 		$ids       = array();
 		$processor = new WP_HTML_Tag_Processor( $html );
 
-		while ( $processor->next_token() ) {
-			$type = $processor->get_token_type();
-
-			if ( '#text' === $type ) {
-				$text = trim( $processor->get_modifiable_text() );
-				if ( '' !== $text ) {
-					$tokens[] = $text;
-				}
-				continue;
-			}
-
-			if ( '#tag' !== $type || 'WP-UI-INTERACTIVE' === $processor->get_tag() ) {
-				continue;
-			}
-
-			if ( $processor->is_tag_closer() ) {
-				$tokens[] = '</' . strtolower( $processor->get_tag() ) . '>';
-				continue;
-			}
-
-			$attributes = array();
-			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+		while ( $processor->next_tag() ) {
+			foreach ( array( 'id', 'for', 'aria-controls', 'aria-describedby', 'aria-labelledby' ) as $name ) {
 				$value = $processor->get_attribute( $name );
-				if ( 'class' === $name ) {
-					$classes = preg_split( '/\s+/', trim( (string) $value ) );
-					sort( $classes );
-					$value = implode( ' ', $classes );
+				if ( ! is_string( $value ) ) {
+					continue;
 				}
-				if ( in_array( $name, array( 'id', 'for', 'aria-controls', 'aria-describedby', 'aria-labelledby' ), true ) ) {
-					$value = implode(
-						' ',
-						array_map(
-							static function ( $id ) use ( &$ids ) {
-								$ids[ $id ] = $ids[ $id ] ?? '#' . count( $ids );
-								return $ids[ $id ];
-							},
-							preg_split( '/\s+/', trim( (string) $value ) )
-						)
-					);
+				$renumbered = array();
+				foreach ( preg_split( '/\s+/', trim( $value ) ) as $id ) {
+					$ids[ $id ]   = $ids[ $id ] ?? 'id-' . count( $ids );
+					$renumbered[] = $ids[ $id ];
 				}
-				$attributes[ $name ] = true === $value ? '' : $value;
+				$processor->set_attribute( $name, implode( ' ', $renumbered ) );
 			}
-			ksort( $attributes );
-
-			$tokens[] = array(
-				'tag'        => strtolower( $processor->get_tag() ),
-				'attributes' => $attributes,
-			);
 		}
 
-		return $tokens;
+		return $processor->get_updated_html();
 	}
 }
