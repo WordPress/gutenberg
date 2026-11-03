@@ -1,6 +1,6 @@
 # Image Editor Architecture
 
-How the image editor works inside, for people changing this package. To use it, see the [README](../../README.md) and the [recipes](recipes.md).
+How the image editor works inside, for people changing this package. To use it, see the [README](../README.md) and the [recipes](recipes.md).
 
 ## Layers
 

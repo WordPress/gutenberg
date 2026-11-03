@@ -108,8 +108,8 @@ The first version covers what the media editor needs. Two additions are likely n
 
 ## More
 
--   [src/docs/architecture.md](src/docs/architecture.md)
--   [src/docs/recipes.md](src/docs/recipes.md)
+-   [docs/architecture.md](docs/architecture.md)
+-   [docs/recipes.md](docs/recipes.md)
 
 ## Contributing to this package
 
