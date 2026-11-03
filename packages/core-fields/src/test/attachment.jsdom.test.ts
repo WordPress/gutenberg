@@ -93,12 +93,19 @@ describe( 'attachment', () => {
 		).toBe( 'photo.jpg' );
 	} );
 
-	it( 'reads the decoded title, with a fallback', () => {
+	it( 'reads the raw title, without a fallback', () => {
 		const { getValue } = attachment.title;
 		expect(
-			getValue?.( { item: { title: { rendered: 'Tom &amp; Jerry' } } } )
+			getValue?.( {
+				item: {
+					title: {
+						raw: 'Tom & Jerry',
+						rendered: 'Tom &amp; Jerry',
+					},
+				},
+			} )
 		).toBe( 'Tom & Jerry' );
 		expect( getValue?.( { item: { title: 'Plain' } } ) ).toBe( 'Plain' );
-		expect( getValue?.( { item: {} } ) ).toBe( '(no title)' );
+		expect( getValue?.( { item: {} } ) ).toBe( '' );
 	} );
 } );

@@ -1,5 +1,5 @@
 import type { FieldsScriptParts } from '../../types';
-import { getItemTitle } from '../../shared/title/get-item-title';
+import { getRawContent } from '../get-raw-content';
 import TitleView from '../../shared/title/view';
 import type { MediaItem } from '../types';
 
@@ -7,6 +7,6 @@ import type { MediaItem } from '../types';
  * The JavaScript parts of the title field; its data is in `field.php`.
  */
 export const fieldExtensions: FieldsScriptParts< MediaItem >[ string ] = {
-	getValue: ( { item } ) => getItemTitle( item ),
+	getValue: ( { item } ) => getRawContent( item.title ),
 	render: TitleView,
 };
