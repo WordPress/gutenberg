@@ -26,5 +26,5 @@
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
-	"exclude": [ "build", "node_modules" ]
+	"exclude": [ "**/test/**", "build", "node_modules" ]
 }

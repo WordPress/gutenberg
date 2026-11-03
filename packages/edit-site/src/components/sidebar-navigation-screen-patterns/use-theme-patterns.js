@@ -22,13 +22,15 @@ export default function useThemePatterns() {
 
 	const patterns = useMemo(
 		() =>
-			[ ...( blockPatterns || [] ), ...( restBlockPatterns || [] ) ]
-				.filter(
+			filterOutDuplicatesByName(
+				[
+					...( blockPatterns || [] ),
+					...( restBlockPatterns || [] ),
+				].filter(
 					( pattern ) =>
 						! EXCLUDED_PATTERN_SOURCES.includes( pattern.source )
 				)
-				.filter( filterOutDuplicatesByName )
-				.filter( ( pattern ) => pattern.inserter !== false ),
+			).filter( ( pattern ) => pattern.inserter !== false ),
 		[ blockPatterns, restBlockPatterns ]
 	);
 

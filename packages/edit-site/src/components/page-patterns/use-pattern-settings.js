@@ -36,10 +36,10 @@ export default function usePatternSettings() {
 
 	const blockPatterns = useMemo(
 		() =>
-			[
+			filterOutDuplicatesByName( [
 				...( settingsBlockPatterns || [] ),
 				...( restBlockPatterns || [] ),
-			].filter( filterOutDuplicatesByName ),
+			] ),
 		[ settingsBlockPatterns, restBlockPatterns ]
 	);
 

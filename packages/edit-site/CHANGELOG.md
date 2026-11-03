@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The Patterns screen opens faster on sites with many patterns: it parses a pattern's blocks only when its preview is shown ([#85234](https://github.com/WordPress/gutenberg/pull/85234)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
