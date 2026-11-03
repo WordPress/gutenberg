@@ -700,11 +700,13 @@ function MediaEditorContent( {
 				ATTACHMENT_EMBED_QUERY
 			);
 			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					activeId
-				) as Media,
+				// The selector returns `false` until the attachment loads.
+				media:
+					getEditedEntityRecord(
+						'postType',
+						'attachment',
+						activeId
+					) || undefined,
 				hasEdits: hasEditsForEntityRecord(
 					'postType',
 					'attachment',
@@ -901,7 +903,7 @@ function MediaEditorContent( {
 
 	const children = (
 		<MediaEditorProvider
-			value={ media ?? undefined }
+			value={ media }
 			onChange={ handleChange }
 			settings={ {
 				// Disable the fields while saving, so the guard in
