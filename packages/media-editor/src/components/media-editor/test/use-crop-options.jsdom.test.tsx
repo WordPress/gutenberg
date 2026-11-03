@@ -76,7 +76,7 @@ describe( 'useCropOptions', () => {
 		).toHaveTextContent( '0,-1,1,1.3333333333333333' );
 	} );
 
-	it( 'resolves the Original aspect ratio from the cropper image dimensions', () => {
+	it( 'resolves the Original aspect ratio from the loaded image dimensions', () => {
 		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Original' } ) );

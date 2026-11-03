@@ -13,7 +13,7 @@ import {
 /**
  * Pure reducer for the media editor.
  *
- * The cropper works out its own next state (through the controller from
+ * The image editor works out its own next state (through the controller from
  * `@wordpress/image-editor`) and this reducer stores it. The reducer
  * also owns the sidebar crop options and the named edits.
  *
@@ -28,10 +28,10 @@ export function mediaEditorReducer(
 	action: MediaEditorAction
 ): MediaEditorState {
 	switch ( action.type ) {
-		case 'SET_CROPPER':
-			return action.payload === state.cropper
+		case 'SET_IMAGE_EDITOR':
+			return action.payload === state.imageEditor
 				? state
-				: { ...state, cropper: action.payload };
+				: { ...state, imageEditor: action.payload };
 		case 'SET_ASPECT_RATIO_VALUE':
 			return state.cropOptions.aspectRatioValue === action.payload
 				? state
@@ -59,7 +59,7 @@ export function mediaEditorReducer(
 		}
 		case 'RESET': {
 			const next = buildInitialMediaEditorState(
-				createImageEditorState( state.cropper.image )
+				createImageEditorState( state.imageEditor.image )
 			);
 			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}
@@ -84,24 +84,24 @@ export function areMediaEditorStatesEqual(
 		return true;
 	}
 	return (
-		areImageEditorStatesEqual( a.cropper, b.cropper ) &&
+		areImageEditorStatesEqual( a.imageEditor, b.imageEditor ) &&
 		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
 		fastDeepEqual( a.edits, b.edits )
 	);
 }
 
 /**
- * Build the state a session starts from: the given cropper state,
+ * Build the state a session starts from: the given image editor state,
  * default crop options, and no edits.
  *
- * @param cropper The cropper state.
+ * @param imageEditor The image editor state.
  * @return Initial state.
  */
 export function buildInitialMediaEditorState(
-	cropper: ImageEditorState
+	imageEditor: ImageEditorState
 ): MediaEditorState {
 	return {
-		cropper,
+		imageEditor,
 		cropOptions: { ...DEFAULT_CROP_OPTIONS },
 		edits: {},
 	};

@@ -27,7 +27,8 @@ export default function MediaEditorFineRotation( {
 	onPlacementControlInteraction,
 	disabled = false,
 }: MediaEditorFineRotationProps ) {
-	const { state, setRotation, maxRotationOffset } = useMediaEditor().cropper;
+	const { state, setRotation, maxRotationOffset } =
+		useMediaEditor().imageEditor;
 	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
 	// into one undo entry via the gesture idle window. Pointer-up still
 	// closes pointer drags immediately.

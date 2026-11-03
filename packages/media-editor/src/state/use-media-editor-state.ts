@@ -27,7 +27,7 @@ import type {
 
 /**
  * Resolve an aspect-ratio preset value (the string the dropdown
- * round-trips) into a numeric width/height ratio for the cropper.
+ * round-trips) into a numeric width/height ratio for the image editor.
  *
  * - `'0'` → `undefined` (Free; no lock)
  * - `'-1'` (Original) → image's natural width / height, or `undefined`
@@ -37,25 +37,21 @@ import type {
  * Centralizing here means the dropdown, the action dispatcher, and
  * the test harness all resolve the same way.
  *
- * @param presetKey    Preset value from the dropdown.
- * @param cropperImage The cropper's loaded image, or `null`.
+ * @param presetKey Preset value from the dropdown.
+ * @param image     The image editor's loaded image, or `null`.
  * @return The resolved ratio, or `undefined` for Free / unresolvable.
  */
 export function resolveAspectRatio(
 	presetKey: string,
-	cropperImage: ImageEditorState[ 'image' ] | null
+	image: ImageEditorState[ 'image' ] | null
 ): number | undefined {
 	const num = parseFloat( presetKey );
 	if ( num === 0 || Number.isNaN( num ) ) {
 		return undefined;
 	}
 	if ( num === ORIGINAL_ASPECT_RATIO ) {
-		if (
-			cropperImage &&
-			cropperImage.naturalWidth > 0 &&
-			cropperImage.naturalHeight > 0
-		) {
-			return cropperImage.naturalWidth / cropperImage.naturalHeight;
+		if ( image && image.naturalWidth > 0 && image.naturalHeight > 0 ) {
+			return image.naturalWidth / image.naturalHeight;
 		}
 		return undefined;
 	}
@@ -65,7 +61,7 @@ export function resolveAspectRatio(
 	return undefined;
 }
 
-function areCropperImagesEqual(
+function areImagesEqual(
 	a: ImageEditorState[ 'image' ],
 	b: ImageEditorState[ 'image' ]
 ): boolean {
@@ -82,18 +78,18 @@ function areCropperImagesEqual(
  * The session owns what is being edited and how: the source image,
  * every editing slice, the shared undo/redo history, gesture
  * boundaries, and whether the edits change the saved image. The
- * cropper is one participant in the session — `cropper` is the
- * controller a `<ImageEditorCanvas>` takes via its `controller` prop — rather
+ * image editor is one participant in the session — `imageEditor` is the
+ * controller an `<ImageEditorCanvas>` takes via its `controller` prop — rather
  * than the session itself.
  */
 export interface MediaEditorSession {
 	/**
-	 * Controller for the cropper. Its setters record history in the
+	 * Controller for the image editor. Its setters record history in the
 	 * session; its `isDirty` covers the crop only. Its `setImage` is
 	 * `setSourceImage`, so the `<ImageEditorCanvas>` reporting a newly loaded
 	 * image starts a fresh session.
 	 */
-	cropper: ImageEditorController;
+	imageEditor: ImageEditorController;
 	/** The cropOptions slice. */
 	cropOptions: CropOptionsSlice;
 	/** Set the aspect-ratio preset and reshape the crop in one undo entry. */
@@ -148,9 +144,9 @@ export interface MediaEditorSession {
 /**
  * The media editor session.
  *
- * Owns the only undo/redo history for the editor. The cropper's state,
+ * Owns the only undo/redo history for the editor. The image editor's state,
  * the sidebar crop options and named edits are slices of one state, so
- * one history stack covers them all. The cropper works out its own
+ * one history stack covers them all. The image editor works out its own
  * changes and reports each next state through `onChange`.
  *
  * History semantics:
@@ -160,7 +156,7 @@ export interface MediaEditorSession {
  * - During a gesture (`beginGesture` → `endGesture`) changes coalesce:
  *   only the pre-gesture snapshot is pushed, at gesture end. Undo and
  *   redo close an open gesture first.
- * - Changes the cropper marks as not edits (an image loading, a refit
+ * - Changes the image editor marks as not edits (an image loading, a refit
  *   after a window resize) are never recorded.
  *
  * `isDirty` tracks the full session, including undoable UI state. Use
@@ -271,9 +267,7 @@ export function useMediaEditorState(): MediaEditorSession {
 
 	const setSourceImage = useCallback(
 		( image: ImageEditorState[ 'image' ] ) => {
-			if (
-				areCropperImagesEqual( stateRef.current.cropper.image, image )
-			) {
+			if ( areImagesEqual( stateRef.current.imageEditor.image, image ) ) {
 				return;
 			}
 			// New image = fresh session: default crop and crop options, a
@@ -295,28 +289,28 @@ export function useMediaEditorState(): MediaEditorSession {
 		[]
 	);
 
-	const handleCropperChange = useCallback(
-		( nextCropper: ImageEditorState, { isEdit }: { isEdit: boolean } ) => {
+	const handleImageEditorChange = useCallback(
+		( nextState: ImageEditorState, { isEdit }: { isEdit: boolean } ) => {
 			if (
-				! areCropperImagesEqual(
-					stateRef.current.cropper.image,
-					nextCropper.image
+				! areImagesEqual(
+					stateRef.current.imageEditor.image,
+					nextState.image
 				)
 			) {
-				setSourceImage( nextCropper.image );
+				setSourceImage( nextState.image );
 				return;
 			}
 			dispatchWithHistory(
-				{ type: 'SET_CROPPER', payload: nextCropper },
+				{ type: 'SET_IMAGE_EDITOR', payload: nextState },
 				isEdit
 			);
 		},
 		[ dispatchWithHistory, setSourceImage ]
 	);
 
-	const cropperController = useImageEditor( {
-		state: state.cropper,
-		onChange: handleCropperChange,
+	const imageEditorController = useImageEditor( {
+		state: state.imageEditor,
+		onChange: handleImageEditorChange,
 	} );
 
 	const setAspectRatioValue = useCallback(
@@ -326,15 +320,15 @@ export function useMediaEditorState(): MediaEditorSession {
 					type: 'SET_ASPECT_RATIO_VALUE',
 					payload: presetKey,
 				} );
-				cropperController.setAspectRatio(
+				imageEditorController.setAspectRatio(
 					resolveAspectRatio(
 						presetKey,
-						stateRef.current.cropper.image
+						stateRef.current.imageEditor.image
 					)
 				);
 			} );
 		},
-		[ asOneUndoEntry, dispatchWithHistory, cropperController ]
+		[ asOneUndoEntry, dispatchWithHistory, imageEditorController ]
 	);
 
 	const reset = useCallback( () => {
@@ -379,16 +373,16 @@ export function useMediaEditorState(): MediaEditorSession {
 		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
 	}, [ endGesture ] );
 
-	const cropper = useMemo< ImageEditorController >(
-		() => ( { ...cropperController, setImage: setSourceImage } ),
-		[ cropperController, setSourceImage ]
+	const imageEditor = useMemo< ImageEditorController >(
+		() => ( { ...imageEditorController, setImage: setSourceImage } ),
+		[ imageEditorController, setSourceImage ]
 	);
 
 	const isDirty = ! areMediaEditorStatesEqual( state, initialBaseline );
 
 	return useMemo(
 		() => ( {
-			cropper,
+			imageEditor,
 			cropOptions: state.cropOptions,
 			setAspectRatioValue,
 			edits: state.edits,
@@ -397,7 +391,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			reset,
 			isDirty,
 			// Only the crop changes the saved image so far.
-			hasOutputEdits: cropper.isDirty,
+			hasOutputEdits: imageEditor.isDirty,
 			hasUndo,
 			hasRedo,
 			undo,
@@ -406,7 +400,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			endGesture,
 		} ),
 		[
-			cropper,
+			imageEditor,
 			state.cropOptions,
 			setAspectRatioValue,
 			state.edits,

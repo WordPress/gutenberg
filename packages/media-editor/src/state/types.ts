@@ -1,14 +1,14 @@
 import type { ImageEditorState } from '@wordpress/image-editor';
 
 /**
- * Sidebar control state for the cropper, kept in the same undo history
+ * Sidebar control state for the image editor, kept in the same undo history
  * as the crop.
  */
 export interface CropOptionsSlice {
 	/**
 	 * Selected aspect-ratio preset as a string (round-trippable through
 	 * `<SelectControl>`). `'0'` = Free, `'-1'` = Original, any positive
-	 * decimal = fixed ratio. The cropper holds the resolved ratio itself.
+	 * decimal = fixed ratio. The image editor holds the resolved ratio itself.
 	 */
 	aspectRatioValue: string;
 }
@@ -44,22 +44,22 @@ export type EditValue =
 export type EditsSlice = Record< string, EditValue >;
 
 /**
- * The full state of the media editor: the cropper's state, the sidebar
+ * The full state of the media editor: the image editor's state, the sidebar
  * crop options and named edits.
  *
  * Every undo/redo snapshot is a full `MediaEditorState`. Slices stay
  * referentially equal across actions that don't touch them.
  */
 export interface MediaEditorState {
-	cropper: ImageEditorState;
+	imageEditor: ImageEditorState;
 	cropOptions: CropOptionsSlice;
 	edits: EditsSlice;
 }
 
 /** Actions the media editor reducer handles. */
 export type MediaEditorAction =
-	/** Replace the cropper's state with the next one it reports. */
-	| { type: 'SET_CROPPER'; payload: ImageEditorState }
+	/** Replace the image editor's state with the next one it reports. */
+	| { type: 'SET_IMAGE_EDITOR'; payload: ImageEditorState }
 	/** Set the aspect-ratio preset the dropdown shows. */
 	| { type: 'SET_ASPECT_RATIO_VALUE'; payload: string }
 	/** Set a named edit, or remove it when `value` is `undefined`. */

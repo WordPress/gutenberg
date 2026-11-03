@@ -16,7 +16,7 @@ import type { MediaEditorSession } from '../../state';
  * Shape/units:
  *   - `flip`:   booleans per axis.
  *   - `rotate`: `angle` in degrees, clockwise-positive (matches the
- *     cropper's own convention; Core negates it internally for
+ *     image editor's own convention; Core negates it internally for
  *     `WP_Image_Editor::rotate`, which is counterclockwise-positive).
  *   - `crop`:   percentages (0–100) of the image's dimensions **at the
  *     moment the crop is applied**. Because modifiers are applied in
@@ -91,7 +91,7 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	}
 	// The edits already follow Core's order and frames; only the shape and
 	// the crop's units (fractions to percentages) differ.
-	return mapEditToOriginal( session.cropper.state ).map(
+	return mapEditToOriginal( session.imageEditor.state ).map(
 		( edit ): Modifier => {
 			if ( edit.type === 'flip' ) {
 				return {
@@ -242,7 +242,7 @@ export function useSaveMediaEditor( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					session.cropper.reset();
+					session.imageEditor.reset();
 				}
 				onSaved?.( {
 					id: next.id,

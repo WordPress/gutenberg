@@ -19,7 +19,7 @@ const IMAGE = {
 	naturalHeight: 999,
 };
 
-function CropperWithHistory( {
+function ImageEditorWithHistory( {
 	onController,
 }: {
 	onController: ( controller: MediaEditorSession ) => void;
@@ -32,7 +32,7 @@ function CropperWithHistory( {
 		<div style={ { width: 648, height: 448 } }>
 			<ImageEditorCanvas
 				src={ IMAGE.src }
-				controller={ controller.cropper }
+				controller={ controller.imageEditor }
 				freeformCrop
 				onGestureStart={ controller.beginGesture }
 				onGestureEnd={ controller.endGesture }
@@ -47,7 +47,9 @@ describe( 'useMediaEditorState with the canvas', () => {
 		const onController = ( next: MediaEditorSession ) => {
 			controller = next;
 		};
-		await render( <CropperWithHistory onController={ onController } /> );
+		await render(
+			<ImageEditorWithHistory onController={ onController } />
+		);
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from bottom-right corner',
 		} );
@@ -62,11 +64,14 @@ describe( 'useMediaEditorState with the canvas', () => {
 				'{/Shift}'
 		);
 		await waitFor( () =>
-			expect( controller.cropper.state.zoom ).toBeGreaterThan( 1 )
+			expect( controller.imageEditor.state.zoom ).toBeGreaterThan( 1 )
 		);
 
 		act( () =>
-			controller.cropper.setFlip( { horizontal: true, vertical: false } )
+			controller.imageEditor.setFlip( {
+				horizontal: true,
+				vertical: false,
+			} )
 		);
 
 		for ( let i = 0; i < 10 && controller.hasUndo; i++ ) {

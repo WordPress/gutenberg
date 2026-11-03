@@ -21,7 +21,7 @@ export const ORIGINAL_ASPECT_RATIO = -1;
 
 /**
  * The presets the editor offers by default. The labels live here rather
- * than in the cropper core, which has no user-facing strings.
+ * than in the image editor package, which has no user-facing strings.
  */
 export const DEFAULT_ASPECT_RATIOS: AspectRatioPreset[] = [
 	{ label: __( 'Free' ), value: 0 },

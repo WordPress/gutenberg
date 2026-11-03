@@ -37,7 +37,7 @@ export function getAspectRatioOptions(
 /**
  * Thin selector over the composite media-editor store for the Crop
  * sidebar tab. Reads the cropOptions slice (preset key) and exposes
- * the corresponding setters plus the ratio the cropper has locked.
+ * the corresponding setters plus the ratio the image editor has locked.
  *
  * No local React state, no refs, no synchronization effects — the
  * composite store is the single source of truth.
@@ -56,9 +56,9 @@ export function useCropOptions( {
 		[ aspectRatioPresets ]
 	);
 
-	// The cropper owns the locked ratio; the preset is what the
+	// The image editor owns the locked ratio; the preset is what the
 	// dropdown shows.
-	const resolvedAspectRatio = controller.cropper.state.aspectRatio;
+	const resolvedAspectRatio = controller.imageEditor.state.aspectRatio;
 
 	return {
 		aspectRatioValue,

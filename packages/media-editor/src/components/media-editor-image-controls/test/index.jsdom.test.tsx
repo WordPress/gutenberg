@@ -19,7 +19,7 @@ function setup(
 
 function CurrentState( { zoom }: { zoom?: number | 'max' } ) {
 	const {
-		cropper: { state, setZoom, maxZoom },
+		imageEditor: { state, setZoom, maxZoom },
 		cropOptions,
 	} = useMediaEditor();
 	// Start the cases that need it zoomed in. `setZoom` is a session edit,
