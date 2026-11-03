@@ -6,6 +6,7 @@ import type {
 	GridSibling,
 	GridTrack,
 } from './types';
+import { getRotatedBoundingRect } from '../../utils/rotation';
 
 export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );
@@ -262,8 +263,8 @@ export function getGridTrackPositions( gridElement: Element ): {
 /**
  * Gets the position of a grid item in pixels, relative to the grid's content
  * box. Offsets ignore CSS transforms, such as the ones the editor uses to
- * animate block moves, so an item is measured by the area it takes up in the
- * grid.
+ * animate block moves, and the `rotate` property, so an item is measured by
+ * the area it takes up in the grid, without its rotation.
  *
  * @param gridItemElement The grid item element.
  * @param padding         The grid's padding, when it is already known.
@@ -298,6 +299,70 @@ export function getGridItemPixelRect(
 }
 
 /**
+ * A CSS property of an element's inline style that takes a string, in camel
+ * case.
+ */
+type CSSStringProperty = {
+	[
+		Key in keyof CSSStyleDeclaration
+	]: CSSStyleDeclaration[ Key ] extends string ? Key : never;
+}[ keyof CSSStyleDeclaration ] &
+	string;
+
+const DEGREES_PER_UNIT: Record< string, number > = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
+
+/**
+ * Gets the rotation in degrees from a value of the CSS `rotate` property,
+ * such as its computed value.
+ *
+ * @param value The `rotate` value, such as `45deg`.
+ *
+ * @return The rotation in degrees, or 0 when there is none in the page's plane.
+ */
+export function getRotationFromCSS( value: string | undefined ): number {
+	const match = value
+		?.trim()
+		.match( /^(?:z\s+)?(-?[\d.]+(?:e-?\d+)?)(deg|grad|rad|turn)$/ );
+	if ( ! match ) {
+		return 0;
+	}
+	return parseFloat( match[ 1 ] ) * DEGREES_PER_UNIT[ match[ 2 ] ];
+}
+
+/**
+ * Gets the rotation of a grid item as it is rendered, in degrees.
+ *
+ * @param gridItemElement The grid item element.
+ *
+ * @return The rotation in degrees.
+ */
+export function getGridItemRotation( gridItemElement: Element ): number {
+	return getRotationFromCSS( getComputedCSS( gridItemElement, 'rotate' ) );
+}
+
+/**
+ * Sets an inline style on an element, or removes it when the value is empty.
+ * Used for previews that should not go through block attributes, such as the
+ * rotation while the rotate handle is dragged.
+ *
+ * @param element  The element.
+ * @param property The CSS property, in camel case.
+ * @param value    The value, or an empty string to remove it.
+ */
+export function setInlineStyle(
+	element: HTMLElement,
+	property: CSSStringProperty,
+	value: string
+): void {
+	element.style[ property ] = value;
+}
+
+/**
  * Gets a grid's left and top padding, in pixels.
  *
  * @param gridElement The grid element.
@@ -314,7 +379,8 @@ function getGridPadding( gridElement: Element ) {
 /**
  * Measures a grid's tracks and the blocks in it, once, when a drag starts.
  * Blocks are measured in the canvas, so that the result matches what is on
- * screen in every viewport. Hidden blocks are left out.
+ * screen in every viewport. Hidden blocks are left out, and other blocks take
+ * up the cells they reach with their rotation.
  *
  * @param gridElement The grid element.
  * @param srcClientId Client ID of the dragged block, or null when it isn't in
@@ -338,16 +404,28 @@ export function getGridItemMeasurements(
 			continue;
 		}
 		const pixelRect = getGridItemPixelRect( child, padding );
-		const rect = getGridRectFromPixelRect(
-			pixelRect,
-			columnTracks,
-			rowTracks
-		);
+		const angle = getGridItemRotation( child );
 		if ( childClientId === srcClientId ) {
-			src = { pixelRect, rect };
-		} else {
-			siblings.push( { pixelRect, rect } );
+			src = {
+				pixelRect,
+				rect: getGridRectFromPixelRect(
+					pixelRect,
+					columnTracks,
+					rowTracks
+				),
+				angle,
+			};
+			continue;
 		}
+		const rotatedPixelRect = getRotatedBoundingRect( pixelRect, angle );
+		siblings.push( {
+			pixelRect: rotatedPixelRect,
+			rect: getGridRectFromPixelRect(
+				rotatedPixelRect,
+				columnTracks,
+				rowTracks
+			),
+		} );
 	}
 	return { columnTracks, rowTracks, siblings, src };
 }

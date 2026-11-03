@@ -1,3 +1,5 @@
+import type { CleanedObject } from '../hooks/types';
+
 type AnyObject = Record< string, unknown >;
 type ObjectOrArray = AnyObject | unknown[];
 type ObjectPathKey = number | string;
@@ -83,3 +85,29 @@ export function isPlainObject( value: unknown ): value is AnyObject {
 		typeof value === 'object' && value !== null && ! Array.isArray( value )
 	);
 }
+
+/**
+ * Removed falsy values from nested object.
+ *
+ * @param object
+ * @return Object cleaned from falsy values
+ */
+export const cleanEmptyObject = < T >(
+	object: T
+): CleanedObject< T > | undefined => {
+	if ( ! isPlainObject( object ) ) {
+		// Only plain objects are cleaned, so anything else keeps its type.
+		return object as CleanedObject< T >;
+	}
+
+	const cleanedNestedObjects: [ string, unknown ][] = Object.entries( object )
+		.map( ( [ key, value ] ): [ string, unknown ] => [
+			key,
+			cleanEmptyObject( value ),
+		] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	// The cleaned object keeps the shape, with the empty values left out.
+	return ! cleanedNestedObjects.length
+		? undefined
+		: ( Object.fromEntries( cleanedNestedObjects ) as CleanedObject< T > );
+};

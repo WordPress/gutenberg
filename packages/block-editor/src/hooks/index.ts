@@ -25,6 +25,7 @@ import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
 import position from './position';
+import transform from './transform';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
@@ -71,6 +72,7 @@ createBlockListBlockFilter( [
 	border,
 	customCSS,
 	position,
+	transform,
 	blockStyleVariation,
 	childLayout,
 	layout,

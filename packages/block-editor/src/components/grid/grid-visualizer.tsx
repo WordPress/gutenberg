@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useRef,
 	forwardRef,
+	memo,
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -26,8 +27,10 @@ import {
 	getBoundingGridRect,
 	getGridItemMeasurements,
 	getGridTrackPositions,
+	getGridRectFromPixelRect,
 	getInserterDragBlockNames,
 } from './utils';
+import { getRotatedBoundingRect } from '../../utils/rotation';
 import { useInserterDragBlockNames } from './use-inserter-drag-block-names';
 import { parseDropEvent } from '../use-on-block-drop';
 import {
@@ -69,7 +72,7 @@ import type {
 	ManualGridVisualizerProps,
 } from './types';
 
-export function GridVisualizer( {
+function GridVisualizerPure( {
 	clientId,
 	contentRef,
 	parentLayout,
@@ -104,6 +107,11 @@ export function GridVisualizer( {
 		/>
 	);
 }
+
+// Memoized, as it does work for every cell and grid item on each render,
+// while the grid item tools around it re-render often, for example for each
+// degree of a rotation preview.
+export const GridVisualizer = memo( GridVisualizerPure );
 
 const GridVisualizerGrid = forwardRef(
 	(
@@ -606,6 +614,7 @@ function GridVisualizerDropLayer( {
 		}
 		const srcSpan = src?.rect ?? null;
 		const srcPixelRect = src?.pixelRect ?? null;
+		const srcAngle = src?.angle ?? 0;
 		// Blocks from an inserter get the size of a block inserted into
 		// the grid, as do blocks inserted any other way.
 		const srcLayout = srcClientId
@@ -647,9 +656,10 @@ function GridVisualizerDropLayer( {
 			};
 		}
 
-		// The block is measured by the area it takes up in the grid. Blocks
-		// dragged in from elsewhere are the size of the cells they span, up
-		// to the size of the grid.
+		// The block is measured by the area it takes up in the grid, without
+		// its rotation, so a rotated block lands by the cells it takes up.
+		// Blocks dragged in from elsewhere are the size of the cells they
+		// span, up to the size of the grid.
 		const landing = getGridDropTarget( {
 			x,
 			y,
@@ -678,34 +688,55 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const landingPixelRect = getPixelRectFromGridRect(
+		const landingCellsPixelRect = getPixelRectFromGridRect(
 			landing,
 			columnTracks,
 			rowTracks
 		);
-		if ( ! landingPixelRect ) {
+		if ( ! landingCellsPixelRect ) {
 			clearDropTarget();
 			return;
 		}
 
+		// The block lands by its cells, but the cells shown are the ones it
+		// reaches with its rotation, around the same center.
+		const footprint = srcAngle
+			? getGridRectFromPixelRect(
+					getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+					columnTracks,
+					rowTracks
+				)
+			: landing;
+		// The footprint is snapped to the grid's tracks, so it is inside them.
+		const landingPixelRect = srcAngle
+			? ( getPixelRectFromGridRect(
+					footprint,
+					columnTracks,
+					rowTracks
+				) ?? landingCellsPixelRect )
+			: landingCellsPixelRect;
+
 		const overlaps = siblings
-			.filter( ( sibling ) => sibling.rect.intersectsRect( landing ) )
+			.filter( ( sibling ) => sibling.rect.intersectsRect( footprint ) )
 			.map( ( sibling ) =>
 				getPixelRectFromGridRect(
 					new GridRect( {
 						columnStart: Math.max(
 							sibling.rect.columnStart,
-							landing.columnStart
+							footprint.columnStart
 						),
 						columnEnd: Math.min(
 							sibling.rect.columnEnd,
-							landing.columnEnd
+							footprint.columnEnd
 						),
 						rowStart: Math.max(
 							sibling.rect.rowStart,
-							landing.rowStart
+							footprint.rowStart
 						),
-						rowEnd: Math.min( sibling.rect.rowEnd, landing.rowEnd ),
+						rowEnd: Math.min(
+							sibling.rect.rowEnd,
+							footprint.rowEnd
+						),
 					} ),
 					columnTracks,
 					rowTracks

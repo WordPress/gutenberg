@@ -16,8 +16,8 @@ import {
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import {
+	cleanEmptyObject,
 	getValueFromObjectPath,
-	isPlainObject,
 	setImmutably,
 } from '../utils/object';
 import { store as blockEditorStore } from '../store';
@@ -32,35 +32,10 @@ import type {
 	BlockListBlockHookProps,
 	BlockSaveFeature,
 	BlockWrapperProps,
-	CleanedObject,
 	StyleOverrideOptions,
 } from './types';
 
-/**
- * Removed falsy values from nested object.
- *
- * @param object
- * @return Object cleaned from falsy values
- */
-export const cleanEmptyObject = < T, >(
-	object: T
-): CleanedObject< T > | undefined => {
-	if ( ! isPlainObject( object ) ) {
-		// Only plain objects are cleaned, so anything else keeps its type.
-		return object as CleanedObject< T >;
-	}
-
-	const cleanedNestedObjects: [ string, unknown ][] = Object.entries( object )
-		.map( ( [ key, value ] ): [ string, unknown ] => [
-			key,
-			cleanEmptyObject( value ),
-		] )
-		.filter( ( [ , value ] ) => value !== undefined );
-	// The cleaned object keeps the shape, with the empty values left out.
-	return ! cleanedNestedObjects.length
-		? undefined
-		: ( Object.fromEntries( cleanedNestedObjects ) as CleanedObject< T > );
-};
+export { cleanEmptyObject };
 
 export function transformStyles(
 	activeSupports: Record< string, unknown >,
@@ -334,6 +309,7 @@ export function useBlockSettings(
 		customTextShadowPresets,
 		defaultTextShadowPresets,
 		themeTextShadowPresets,
+		rotate,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -403,7 +379,8 @@ export function useBlockSettings(
 		'typography.defaultTextShadowPresets',
 		'typography.textShadowPresets.custom',
 		'typography.textShadowPresets.default',
-		'typography.textShadowPresets.theme'
+		'typography.textShadowPresets.theme',
+		'transform.rotate'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -504,6 +481,9 @@ export function useBlockSettings(
 			layout,
 			parentLayout,
 			shadow,
+			transform: {
+				rotate,
+			},
 		};
 	}, [
 		backgroundImage,
@@ -576,6 +556,7 @@ export function useBlockSettings(
 		isHeadingEnabled,
 		isButtonEnabled,
 		shadow,
+		rotate,
 	] );
 
 	// Theme.json settings arrive untyped.

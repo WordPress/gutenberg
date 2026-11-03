@@ -539,6 +539,8 @@ export type ChildLayoutBlockStyle = BlockStyle & { layout?: ChildLayout };
 
 export interface ChildLayoutControlsPureProps {
 	clientId: string;
+	/** Block name. */
+	name: string;
 	style?: ChildLayoutBlockStyle;
 }
 
@@ -710,6 +712,21 @@ export type DimensionsAttributes = {
 };
 
 export interface DimensionsHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+}
+
+/**
+ * The block attributes the transform support reads.
+ */
+export type TransformAttributes = {
+	style?: PanelStyle;
+	className?: string;
+};
+
+export interface TransformHookPanelProps {
 	clientId: string;
 	name: string;
 	setAttributes: ( attributes: Record< string, unknown > ) => void;
