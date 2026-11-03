@@ -109,6 +109,8 @@ declare module '@wordpress/core-data' {
 	// interface properties have to have identical types.
 	interface PostTypeEntityRecordTypes< C extends Context > {
 		product: Product< C >;
+		voucher: Coupon< C >;
+		brochure: Order< C >;
 	}
 	interface TaxonomyEntityRecordTypes< C extends Context > {
 		genre: Term< C >;
@@ -119,10 +121,11 @@ declare module '@wordpress/core-data' {
 	}
 
 	// The same shape for the context each pair is fetched in. `product`
-	// declares one; `order` deliberately does not, so it exercises the
-	// fallback.
+	// declares one, `voucher` declares `view`; `order` and `brochure`
+	// deliberately do not, so they exercise the fallback.
 	interface PostTypeEntityContexts {
 		product: 'edit';
+		voucher: 'view';
 	}
 	interface EntityContextDefaults {
 		myShop: { coupon: 'view' };
@@ -1164,6 +1167,42 @@ describe( 'Entity record types', () => {
 				'icon'
 			);
 			icons?.[ 0 ].collection satisfies string | undefined;
+		};
+	} );
+
+	it( 'a plugin post type declares its own context', () => {
+		() => {
+			// A post type registered with `addEntities` in the view context
+			// resolves to the view record.
+			const voucher = select( coreStore ).getEntityRecord(
+				'postType',
+				'voucher',
+				1
+			);
+			true satisfies Expect<
+				typeof voucher,
+				Coupon< 'view' > | undefined
+			>;
+			// @ts-expect-error -- `secret` is edit-only, so a view record omits it.
+			voucher?.secret;
+
+			// One that declares no context resolves to every context, rather
+			// than being assumed to be fetched in `edit`.
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'brochure' >,
+				Context
+			>;
+
+			// The built-in post types keep the `edit` context they are
+			// registered with.
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'post' >,
+				'edit'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'wp_template' >,
+				'edit'
+			>;
 		};
 	} );
 

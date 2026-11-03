@@ -339,12 +339,22 @@ export interface RootEntityContexts {
 /**
  * The context a post type is fetched in when the call names none.
  *
- * `loadPostTypeEntities` registers every post type with `context: 'edit'`.
+ * `loadPostTypeEntities` registers every post type with `context: 'edit'`, so
+ * each post type the map knows about is listed with it. A post type a plugin
+ * adds declares its own, since it may be registered with `addEntities` in
+ * another context. One that declares none resolves to every context.
  *
  * @see EntityContextDefaults
  */
 export interface PostTypeEntityContexts {
-	[ name: string ]: 'edit';
+	attachment: 'edit';
+	page: 'edit';
+	post: 'edit';
+	wp_block: 'edit';
+	wp_font_family: 'edit';
+	wp_navigation: 'edit';
+	wp_template: 'edit';
+	wp_template_part: 'edit';
 }
 
 /**
