@@ -207,11 +207,12 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 /**
  * The taxonomies the map knows about, and the record each one returns.
  *
- * `loadTaxonomyEntities` registers every taxonomy the REST API lists, and the
- * terms controller serves each of them, so any taxonomy name resolves to
- * `Term`. That includes a name only known at runtime, such as one read from a
- * block attribute. A plugin can merge in a taxonomy whose record extends
- * `Term` with fields of its own.
+ * `loadTaxonomyEntities` registers every taxonomy the REST API lists, and
+ * unless a taxonomy sets its own `rest_controller_class`, the terms controller
+ * serves it. So any taxonomy name resolves to `Term`, including a name only
+ * known at runtime, such as one read from a block attribute. A plugin whose
+ * taxonomy adds fields merges in a record that extends `Term`. One served by a
+ * controller that returns a different shape is not described by `Term`.
  *
  * @see RootEntityRecordTypes
  */
