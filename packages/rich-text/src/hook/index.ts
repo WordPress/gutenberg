@@ -13,7 +13,7 @@ import { apply, getDomPosition } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
 import { setDefaultStyle } from './default-style';
-import { useBoundaryStyle } from './use-boundary-style';
+import { addBoundaryStyle } from './boundary-style';
 import { addField, useEventListenerProps } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 import type {
@@ -218,21 +218,19 @@ function useRichTextBase( {
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	// Remove the format boundary once the selection leaves the element. The
-	// editing host may be an ancestor that keeps focus, so it would remain
-	// visible.
+	// Show the format boundary while the element has the selection, and remove
+	// it once the selection leaves. The editing host may be an ancestor that
+	// keeps focus, so it would remain visible.
 	useLayoutEffect( () => {
 		if ( ! isSelected ) {
 			return;
 		}
 
+		addBoundaryStyle( ref.current!.ownerDocument );
+
 		return () => applyRecord( recordRef.current!, { domOnly: true } );
 	}, [ isSelected ] );
 
-	useBoundaryStyle( {
-		record: recordRef as RefObject< RichTextRecord >,
-		ref,
-	} );
 	const eventListenerProps = useEventListenerProps( {
 		record: recordRef as RefObject< RichTextRecord >,
 		handleChange,
