@@ -941,14 +941,19 @@ describe( 'Entity record types', () => {
 			// @ts-expect-error -- `title` was not requested.
 			post?.title;
 
-			// Spaces around the names and the array form name the same fields.
+			// The runtime does not trim the names, so a space makes `' slug'`
+			// a different field, and `slug` is not on the record.
 			const spaced = select( coreStore ).getEntityRecord(
 				'postType',
 				'post',
 				1,
 				{ _fields: 'id, slug' }
 			);
-			true satisfies Expect< typeof spaced, typeof post >;
+			true satisfies Expect< typeof spaced, { id: number } | undefined >;
+			// @ts-expect-error -- `' slug'` is not `slug`.
+			spaced?.slug;
+
+			// The array form names the same fields as the string.
 			const listed = select( coreStore ).getEntityRecord(
 				'postType',
 				'post',

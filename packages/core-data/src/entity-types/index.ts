@@ -510,16 +510,14 @@ type DeepPartial< T > = T extends readonly unknown[]
 		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
 		: T;
 
-type TrimField< S extends string > = S extends ` ${ infer Rest }`
-	? TrimField< Rest >
-	: S extends `${ infer Rest } `
-		? TrimField< Rest >
-		: S;
-
+/**
+ * Splits a comma-separated `_fields` string the way the runtime does: on the
+ * commas alone, without trimming, so `'id, slug'` names `' slug'`.
+ */
 type SplitFields< S extends string > =
 	S extends `${ infer Head },${ infer Tail }`
-		? TrimField< Head > | SplitFields< Tail >
-		: TrimField< S >;
+		? Head | SplitFields< Tail >
+		: S;
 
 /**
  * The field paths a `_fields` value names, as a comma-separated string or an
