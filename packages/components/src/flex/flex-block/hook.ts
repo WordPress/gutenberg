@@ -5,7 +5,7 @@ import type { FlexBlockProps } from '../types';
 
 export function useFlexBlock(
 	props: WordPressComponentProps< FlexBlockProps, 'div' >
-) {
+): ReturnType< typeof useFlexItem > {
 	const otherProps = useContextSystem( props, 'FlexBlock' );
 	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
 

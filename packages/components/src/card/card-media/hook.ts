@@ -1,12 +1,16 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import styles from '../style.module.scss';
 import type { MediaProps } from '../types';
 
 export function useCardMedia(
 	props: WordPressComponentProps< MediaProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< MediaProps, 'div' >,
+	never,
+	{ className: string }
+> {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 
 	const classes = clsx(

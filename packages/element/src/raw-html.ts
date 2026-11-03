@@ -28,7 +28,10 @@ export type RawHTMLProps = {
  *
  * @return Dangerously-rendering component.
  */
-export default function RawHTML( { children, ...props }: RawHTMLProps ) {
+export default function RawHTML( {
+	children,
+	...props
+}: RawHTMLProps ): React.ReactElement {
 	let rawHtml = '';
 
 	// Cast children as an array, and concatenate each element if it is a string.
