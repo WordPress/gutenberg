@@ -10,7 +10,7 @@
 
 -   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
--   `LinkControl`: Bind a typed or pasted URL of a post, page, category or tag on the site to it when the link is saved, as if it was picked from the search results. The editor provides the lookup; without it, links save unbound as before.
+-   `LinkControl`: Bind a typed or pasted URL of a post, page, category or tag on the site to it when the link is saved, as if it was picked from the search results. The editor provides the lookup; without it, links save unbound as before ([#86273](https://github.com/WordPress/gutenberg/pull/86273)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
 -   Block alignment: Name the containing block whose layout withholds wide and full alignments in the alignment menu itself, and offer to select it so the setting can be changed where it lives ([#82607](https://github.com/WordPress/gutenberg/pull/82607)).
