@@ -103,9 +103,10 @@ test.describe( 'Template rendered inside another template', () => {
 		await heading.click();
 		await page.keyboard.type( '!' );
 
-		await expect(
-			editor.canvas.getByRole( 'heading', { name: 'Nothing here!' } )
-		).toBeVisible();
+		// The block carries the `document` role while it is edited, which stands
+		// in for the role of the heading it renders, so the text is read from the
+		// block rather than from a heading.
+		await expect( heading ).toHaveText( 'Nothing here!' );
 	} );
 
 	test( 'renders the template on its own when it names none', async ( {
@@ -124,7 +125,11 @@ test.describe( 'Template rendered inside another template', () => {
 		await page.getByRole( 'option', { name: 'None' } ).click();
 		await page.keyboard.press( 'Escape' );
 
-		await editor.saveSiteEditorEntities();
+		// The template is the only entity the change dirties, so it is saved
+		// without the panel that lists several.
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		await page.goto( '/a-page-that-does-not-exist/' );
 
