@@ -70,3 +70,66 @@ TIMEZONES.forEach( ( timezone ) => {
 		} );
 	} );
 } );
+
+test.describe( 'Datepicker: events', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'should mark the days that have published or scheduled posts', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Dates in the site time zone, which the calendar displays.
+		const now = new Date();
+		const thisMonth = new Date( now.getFullYear(), now.getMonth(), 1 );
+		const nextMonth = new Date( now.getFullYear(), now.getMonth() + 1, 1 );
+		const toPostDate = ( date ) =>
+			`${ date.getFullYear() }-${ String( date.getMonth() + 1 ).padStart(
+				2,
+				'0'
+			) }-01T10:00:00`;
+		const toDayLabel = ( date ) =>
+			date.toLocaleDateString( 'en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			} );
+
+		await requestUtils.createPost( {
+			title: 'Published',
+			status: 'publish',
+			date: toPostDate( thisMonth ),
+		} );
+		await requestUtils.createPost( {
+			title: 'Scheduled',
+			status: 'future',
+			date: toPostDate( nextMonth ),
+		} );
+
+		await admin.createNewPost();
+		const summary = await openPostSummary( { editor, page } );
+		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
+
+		await expect(
+			page.getByRole( 'button', {
+				// The first day of the month can be today.
+				name: new RegExp( `${ toDayLabel( thisMonth ) }, 1 event$` ),
+			} )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'Next month' } ).click();
+		await expect(
+			page.getByRole( 'button', {
+				name: new RegExp( `${ toDayLabel( nextMonth ) }, 1 event$` ),
+			} )
+		).toBeVisible();
+	} );
+} );
