@@ -254,7 +254,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
-	 * @since 7.2.0 Added `text-wrap` property.
+	 * @since 7.3.0 Added `text-wrap` property.
 	 *
 	 * @var array
 	 */
@@ -553,7 +553,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
-	 * @since 7.2.0 Added `typography.textWrap`.
+	 * @since 7.3.0 Added `typography.textWrap`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
