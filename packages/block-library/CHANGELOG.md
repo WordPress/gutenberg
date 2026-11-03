@@ -18,6 +18,8 @@
 
 ### Bug Fixes
 
+-   Template Part: Fix boolean operator in instance variation description fallback to preserve template part descriptions and use a non-breaking space when empty ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
+
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
 -   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
