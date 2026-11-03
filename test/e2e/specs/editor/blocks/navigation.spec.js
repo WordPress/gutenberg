@@ -2627,7 +2627,6 @@ test.describe( 'Navigation block', () => {
 			editor,
 			page,
 			navigation,
-			pageUtils,
 		} ) => {
 			await navigation
 				.getNavBlock()
@@ -2643,7 +2642,6 @@ test.describe( 'Navigation block', () => {
 
 			const searchInput = navigation.getLinkControlSearch();
 			await expect( searchInput ).toBeFocused();
-			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.type( 'https://example.com' );
 			await navigation
 				.getLinkPopover()

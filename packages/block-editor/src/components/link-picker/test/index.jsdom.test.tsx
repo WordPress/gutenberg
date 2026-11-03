@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
 import type { LinkSuggestionsQuery } from '../../link-control/types';
-import { VALIDATED_INPUT_CONTROL_DEPRECATION } from '../../url-input/test/fixtures/validated-input-control-deprecation';
+import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockScrollIntoView();
@@ -391,7 +391,7 @@ describe( 'LinkPicker', () => {
 	} );
 
 	describe( 'Apply', () => {
-		it( 'should save and close the URL edit popover when the Apply button is pressed with a valid URL', async () => {
+		async function typeAndApply( typedValue: string ) {
 			const user = userEvent.setup();
 			const onSelect = vi.fn();
 
@@ -408,64 +408,32 @@ describe( 'LinkPicker', () => {
 			const searchInput = await screen.findByRole( 'combobox', {
 				name: 'Search or type URL',
 			} );
-			await user.type( searchInput, 'https://wordpress.org' );
+			await user.type( searchInput, typedValue );
 			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
 
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
-				expect.objectContaining( { url: 'https://wordpress.org' } )
-			);
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Search or type URL',
-				} )
-			).not.toBeInTheDocument();
-			expect( button ).toHaveFocus();
-		} );
+			return { button, onSelect };
+		}
 
-		it( 'should save a bare domain as an https URL when the Apply button is pressed', async () => {
-			const user = userEvent.setup();
-			const onSelect = vi.fn();
+		it.each( [ 'https://wordpress.org', 'wordpress.org' ] )(
+			'should save "%s" as https://wordpress.org and close the URL edit popover',
+			async ( typedValue ) => {
+				const { button, onSelect } = await typeAndApply( typedValue );
 
-			render(
-				<LinkPicker
-					preview={ createMockPreview() }
-					onSelect={ onSelect }
-					label="Link"
-				/>
-			);
+				expect( onSelect ).toHaveBeenCalledTimes( 1 );
+				expect( onSelect ).toHaveBeenCalledWith(
+					expect.objectContaining( { url: 'https://wordpress.org' } )
+				);
+				expect(
+					screen.queryByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).not.toBeInTheDocument();
+				expect( button ).toHaveFocus();
+			}
+		);
 
-			await user.click( screen.getByRole( 'button' ) );
-			const searchInput = await screen.findByRole( 'combobox', {
-				name: 'Search or type URL',
-			} );
-			await user.type( searchInput, 'wordpress.org' );
-			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
-
-			expect( onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( onSelect ).toHaveBeenCalledWith(
-				expect.objectContaining( { url: 'https://wordpress.org' } )
-			);
-		} );
-
-		it( 'should keep the URL edit popover open when the Apply button is pressed with an invalid URL', async () => {
-			const user = userEvent.setup();
-			const onSelect = vi.fn();
-
-			render(
-				<LinkPicker
-					preview={ createMockPreview() }
-					onSelect={ onSelect }
-					label="Link"
-				/>
-			);
-
-			await user.click( screen.getByRole( 'button' ) );
-			const searchInput = await screen.findByRole( 'combobox', {
-				name: 'Search or type URL',
-			} );
-			await user.type( searchInput, 'invalid url' );
-			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+		it( 'should keep the URL edit popover open with an invalid URL', async () => {
+			const { onSelect } = await typeAndApply( 'invalid url' );
 
 			expect( onSelect ).not.toHaveBeenCalled();
 			// The input remounts once validation fails, so query it again.
@@ -475,9 +443,7 @@ describe( 'LinkPicker', () => {
 			expect(
 				await screen.findByText( 'Please enter a valid URL.' )
 			).toBeVisible();
-			expect( console ).toHaveWarnedWith(
-				VALIDATED_INPUT_CONTROL_DEPRECATION
-			);
+			expectValidatedInputControlDeprecationIfCalled();
 		} );
 	} );
 
