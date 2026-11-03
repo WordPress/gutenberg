@@ -25,8 +25,9 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
+							'type'                   => 'panel',
+							'labelPosition'          => 'top',
+							'showPlaceholderIfEmpty' => true,
 						),
 					),
 					array(

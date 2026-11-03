@@ -233,6 +233,23 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The `description` row of templates shows the field's placeholder when
+	 * the description is empty, like the excerpt of posts and patterns.
+	 */
+	public function test_wp_template_description_layout_shows_placeholder_if_empty() {
+		$config = gutenberg_get_entity_view_config( 'postType', 'wp_template' );
+
+		$this->assertSame(
+			array(
+				'type'                   => 'panel',
+				'labelPosition'          => 'top',
+				'showPlaceholderIfEmpty' => true,
+			),
+			$this->get_form_field( $config, 'description' )['layout']
+		);
+	}
+
+	/**
 	 * The `author` row shows the field's placeholder when the post has no
 	 * author, for every post type using the default form.
 	 *
