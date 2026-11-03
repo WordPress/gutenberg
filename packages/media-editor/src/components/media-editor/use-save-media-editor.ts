@@ -4,12 +4,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { buildModifiers, type Modifier } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
-import {
-	buildModifiers,
-	type Modifier,
-} from '../media-editor-modal/build-modifiers';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.

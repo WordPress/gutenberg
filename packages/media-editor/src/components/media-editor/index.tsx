@@ -45,6 +45,7 @@ import type {
 	ReactElement,
 	ReactNode,
 } from 'react';
+import type { AspectRatioPreset } from '@wordpress/image-editor';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -55,7 +56,6 @@ import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 import {

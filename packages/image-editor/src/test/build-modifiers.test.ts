@@ -57,12 +57,9 @@ import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import { buildModifiers } from '../build-modifiers';
 import type { Modifier } from '../build-modifiers';
-import {
-	createExportCamera,
-	getRotatedBBox,
-} from '../../../image-editor/core/camera';
-import { DEFAULT_STATE } from '../../../image-editor/core/constants';
-import type { CropperState, Size } from '../../../image-editor/core/types';
+import { createExportCamera, getRotatedBBox } from '../core/camera';
+import { DEFAULT_STATE } from '../core/constants';
+import type { CropperState, Size } from '../core/types';
 
 const IMAGE: Size = { width: 1600, height: 900 };
 

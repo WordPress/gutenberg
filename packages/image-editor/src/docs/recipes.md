@@ -1,11 +1,11 @@
 # Image Editor Recipes
 
-> **Status: internal.** Import from `../image-editor` only inside `@wordpress/media-editor`.
+> **Status: experimental.** This API may change in any release.
 
 ## Mount a Cropper
 
 ```tsx
-import { Cropper, useCropperController } from '../image-editor';
+import { Cropper, useCropperController } from '@wordpress/image-editor';
 
 function ImageCropper( { src }: { src: string } ) {
 	const controller = useCropperController();
@@ -54,7 +54,7 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 When internal controls are split across components, use `CropperProvider`.
 
 ```tsx
-import { Cropper, CropperProvider, useCropper } from '../image-editor';
+import { Cropper, CropperProvider, useCropper } from '@wordpress/image-editor';
 
 function Editor( { src }: { src: string } ) {
 	return (
@@ -82,7 +82,7 @@ Use the media editor session when cropper state must share history with controls
 
 ```tsx
 import { resolveAspectRatio, useMediaEditor } from '../../state';
-import { Cropper } from '../image-editor';
+import { Cropper } from '@wordpress/image-editor';
 
 function MediaEditorCanvas( { src }: { src: string } ) {
 	const session = useMediaEditor();
@@ -109,7 +109,7 @@ function MediaEditorCanvas( { src }: { src: string } ) {
 Use source-region helpers when saving crop data instead of rendering a `Blob`.
 
 ```ts
-import { getSourceRegion, getSourceRegionPercent } from '../image-editor';
+import { getSourceRegion, getSourceRegionPercent } from '@wordpress/image-editor';
 
 const imageSize = { width: naturalWidth, height: naturalHeight };
 const region = getSourceRegion( controller.state, imageSize );
@@ -127,7 +127,7 @@ const blob = await controller.getCroppedImage( 'image/jpeg', 0.9 );
 For a custom canvas pipeline, use `applyToCanvas()`.
 
 ```ts
-import { applyToCanvas } from '../image-editor';
+import { applyToCanvas } from '@wordpress/image-editor';
 
 const output = applyToCanvas(
 	processedCanvas,
@@ -143,7 +143,7 @@ Canvas export is browser-only. Cross-origin images need valid CORS headers or th
 `TransformOperation` values are plain JSON. Apply them one at a time or replay them from scratch.
 
 ```ts
-import { stateFromPipeline, type TransformOperation } from '../image-editor';
+import { stateFromPipeline, type TransformOperation } from '@wordpress/image-editor';
 
 const operations: TransformOperation[] = [
 	{ type: 'crop', rect: { x: 0.1, y: 0.1, width: 0.8, height: 0.8 } },
@@ -172,7 +172,7 @@ const finalState = stateFromPipeline( operations );
 Run focused unit tests with:
 
 ```bash
-npm run test:unit packages/media-editor/src/image-editor -- --runInBand
+npm run test:unit -- packages/image-editor
 ```
 
 Useful test areas:

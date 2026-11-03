@@ -24,7 +24,7 @@ import {
 	MAX_ROTATION_OFFSET,
 	ORIGINAL_ASPECT_RATIO,
 } from '../core/constants';
-import { DEFAULT_ASPECT_RATIOS } from '../../state';
+import { DEFAULT_ASPECT_RATIOS } from '../presets/aspect-ratio-presets';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
@@ -133,8 +133,8 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
-	id: 'mediaeditor-imageeditor',
-	title: 'Editor/Media Editor/ImageEditor',
+	id: 'imageeditor-cropper',
+	title: 'Editor/Image Editor/Cropper',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
 };

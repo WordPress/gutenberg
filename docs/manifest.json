@@ -2550,6 +2550,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-editor",
+		"slug": "packages-image-editor",
+		"markdown_source": "../packages/image-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",

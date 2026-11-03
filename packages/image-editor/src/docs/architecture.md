@@ -4,8 +4,8 @@
 
 | Layer | Files | Responsibility |
 | --- | --- | --- |
-| Core cropper | `src/image-editor/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
-| React cropper | `src/image-editor/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
+| Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
+| React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
 | Media editor state | `src/state/` | Composite state for the media editor: cropper state, crop options, undo/redo, and gesture boundaries. |
 
 The cropper layer does not own editor history. History belongs to the media editor session because sidebar controls and cropper gestures need one shared undo stack.

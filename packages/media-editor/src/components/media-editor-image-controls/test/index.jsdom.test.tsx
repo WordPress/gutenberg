@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect, useState } from '@wordpress/element';
+import { MAX_ZOOM } from '@wordpress/image-editor';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
-import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
 function setup( props: MediaEditorImageControlsProps = {}, zoom?: number ) {
 	render(

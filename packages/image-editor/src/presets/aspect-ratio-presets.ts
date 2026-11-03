@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { ORIGINAL_ASPECT_RATIO, type AspectRatioPreset } from '../image-editor';
+import { ORIGINAL_ASPECT_RATIO, type AspectRatioPreset } from '../core';
 
 /**
  * The presets the editor offers by default. The labels live here rather

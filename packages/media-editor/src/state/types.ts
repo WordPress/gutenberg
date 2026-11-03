@@ -1,5 +1,9 @@
-import type { CropperState, NormalizedRect, Size } from '../image-editor';
-import type { CropperAction } from '../image-editor/core';
+import type {
+	CropperState,
+	NormalizedRect,
+	Size,
+	CropperAction,
+} from '@wordpress/image-editor';
 
 /**
  * Sidebar control state for the cropper. Lives in the composite store

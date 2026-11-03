@@ -45,7 +45,7 @@ export function GridOverlay( {
 
 	return (
 		<div
-			className="wp-media-editor-image-editor__grid"
+			className="wp-image-editor__grid"
 			data-testid="cropper-grid"
 			style={ {
 				left,
@@ -56,20 +56,20 @@ export function GridOverlay( {
 		>
 			{ /* Horizontal lines at 1/3 and 2/3 */ }
 			<div
-				className="wp-media-editor-image-editor__grid-line wp-media-editor-image-editor__grid-line--horizontal"
+				className="wp-image-editor__grid-line wp-image-editor__grid-line--horizontal"
 				style={ { top: thirdH } }
 			/>
 			<div
-				className="wp-media-editor-image-editor__grid-line wp-media-editor-image-editor__grid-line--horizontal"
+				className="wp-image-editor__grid-line wp-image-editor__grid-line--horizontal"
 				style={ { top: thirdH * 2 } }
 			/>
 			{ /* Vertical lines at 1/3 and 2/3 */ }
 			<div
-				className="wp-media-editor-image-editor__grid-line wp-media-editor-image-editor__grid-line--vertical"
+				className="wp-image-editor__grid-line wp-image-editor__grid-line--vertical"
 				style={ { left: thirdW } }
 			/>
 			<div
-				className="wp-media-editor-image-editor__grid-line wp-media-editor-image-editor__grid-line--vertical"
+				className="wp-image-editor__grid-line wp-image-editor__grid-line--vertical"
 				style={ { left: thirdW * 2 } }
 			/>
 		</div>

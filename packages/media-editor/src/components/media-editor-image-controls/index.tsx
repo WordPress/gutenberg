@@ -13,12 +13,12 @@ import {
 	lineSolid,
 	plus,
 } from '@wordpress/icons';
-import { useMediaEditor } from '../../state';
 import {
 	MAX_ZOOM,
 	type AspectRatioPreset,
-} from '../../image-editor/core/constants';
-import { getMinZoom } from '../../image-editor/core/containment';
+	getMinZoom,
+} from '@wordpress/image-editor';
+import { useMediaEditor } from '../../state';
 import { useCropOptions } from '../media-editor/use-crop-options';
 
 /**

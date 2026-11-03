@@ -1,5 +1,5 @@
-import type { CropperController } from '../../image-editor';
-import { getRotatedBBox } from '../../image-editor/core/camera';
+import type { CropperController } from './react/hooks';
+import { getRotatedBBox } from './core/camera';
 
 /**
  * A single modifier in the Core REST `/edit` payload. Order is

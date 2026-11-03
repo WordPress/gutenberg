@@ -1,10 +1,10 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-import type { CropperState } from '../image-editor';
 import {
+	type CropperState,
 	cropperReducer,
 	areCropperStatesEqual,
 	computeInscribedRect,
-} from '../image-editor/core';
+} from '@wordpress/image-editor';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropOptionsSlice,
