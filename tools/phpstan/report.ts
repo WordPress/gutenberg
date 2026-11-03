@@ -14,14 +14,13 @@
  * and explains the most common of those: a baseline entry that no longer
  * matches, because the error it recorded was fixed.
  *
- * Usage:
- *
- *     node tools/phpstan/report.ts <report.json>
+ * Usage: `npm run --workspace @wordpress/phpstan-tools report -- <report.json>`
  *
  * The report is the output of `phpstan analyse --error-format=json`.
  */
 
 import { appendFileSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const {
 	GITHUB_REPOSITORY,
@@ -29,7 +28,17 @@ const {
 	GITHUB_SHA,
 	GITHUB_STEP_SUMMARY,
 	GITHUB_WORKSPACE,
+	INIT_CWD,
 } = process.env;
+
+/*
+ * `npm run` runs the script in the workspace directory, so the paths in the
+ * report are made relative to the repository root, and a relative path to the
+ * report is resolved from the directory that npm was run in.
+ */
+const REPOSITORY_ROOT =
+	GITHUB_WORKSPACE || resolve( import.meta.dirname, '../..' );
+const INVOCATION_DIRECTORY = INIT_CWD || process.cwd();
 
 /**
  * An error that PHPStan reported.
@@ -160,7 +169,7 @@ function readErrors( reportPath: string ): PhpstanError[] | null {
 		// PHPStan also exits with 1 when it cannot load the configuration, writing to stderr only.
 		return null;
 	}
-	const workspace = `${ GITHUB_WORKSPACE || process.cwd() }/`;
+	const workspace = `${ REPOSITORY_ROOT }/`;
 
 	/*
 	 * Errors that are not specific to a file come first, so that the limits on
@@ -340,12 +349,12 @@ function buildSummary( errors: PhpstanError[] ): string {
 const reportPath = process.argv[ 2 ];
 if ( ! reportPath ) {
 	process.stderr.write(
-		'Usage: node tools/phpstan/report.ts <report.json>\n'
+		'Usage: npm run --workspace @wordpress/phpstan-tools report -- <report.json>\n'
 	);
 	process.exit( 2 );
 }
 
-const errors = readErrors( reportPath );
+const errors = readErrors( resolve( INVOCATION_DIRECTORY, reportPath ) );
 if ( errors === null ) {
 	process.stdout.write(
 		'::error title=PHPStan did not complete::The report is missing or is not valid JSON, so the code was not checked. See the output of the previous step for the reason.\n'

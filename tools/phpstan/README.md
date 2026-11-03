@@ -12,10 +12,10 @@ Tooling for the [PHPStan](https://phpstan.org/) static analysis of the PHP in th
 
 ## Reporting in CI
 
-The `PHP static analysis` job in `.github/workflows/unit-test.yml` writes the PHPStan report as JSON and passes it to `report.ts`:
+The `PHP static analysis` job in `.github/workflows/unit-test.yml` writes the PHPStan report as JSON and passes it to `report.ts` with the workspace's `report` script:
 
 ```bash
-node tools/phpstan/report.ts <report.json>
+npm run --workspace @wordpress/phpstan-tools report -- <report.json>
 ```
 
-The script imports nothing outside Node, which runs it by stripping the types, so it needs no build step and no installed dependencies. It is type checked by `npm run typecheck` and linted by `npm run lint:js`.
+The script imports nothing outside Node, which runs it by stripping the types, so it needs no build step and no installed dependencies. A relative path to the report is resolved from the directory that npm is run in. The script is type checked by `npm run typecheck` and linted by `npm run lint:js`.
