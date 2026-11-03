@@ -18,7 +18,7 @@
 
 ### Bug Fixes
 
--   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control
+-   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 

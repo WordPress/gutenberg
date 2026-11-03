@@ -32,7 +32,7 @@
 
 ### Bug Fixes
 
--   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control
+-   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 -   `ToolsPanel`: Keep the "Reset" label visible on the highlighted menu item ([#86045](https://github.com/WordPress/gutenberg/pull/86045)).
 -   `MenuItem`: Keep the menu width stable when a checkbox or radio item is checked or unchecked ([#85831](https://github.com/WordPress/gutenberg/pull/85831)).
