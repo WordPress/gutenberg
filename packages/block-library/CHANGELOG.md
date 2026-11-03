@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
 -   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
 -   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).
 -   Audio: Use the UI SelectControl for the Preload setting ([#86194](https://github.com/WordPress/gutenberg/pull/86194)).
