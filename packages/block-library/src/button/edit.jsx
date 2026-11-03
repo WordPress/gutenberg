@@ -9,7 +9,7 @@ import {
 import {
 	TextControl,
 	ToolbarButton,
-	Popover,
+	Popover as WCPopover,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -533,7 +533,7 @@ function ButtonEdit( props ) {
 				</BlockControls>
 			) }
 			{ isLinkTag && isSelected && isEditingURL && ! lockUrlControls && (
-				<Popover
+				<WCPopover
 					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
@@ -557,7 +557,7 @@ function ButtonEdit( props ) {
 						withCreateSuggestion={ userCanCreatePages }
 						createSuggestionButtonText={ createButtonText }
 					/>
-				</Popover>
+				</WCPopover>
 			) }
 			{ hasContentControls && (
 				<InspectorControls group="content">
