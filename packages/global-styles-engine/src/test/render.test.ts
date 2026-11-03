@@ -1228,6 +1228,35 @@ describe( 'global styles renderer', () => {
 					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
 				);
 			} );
+
+			it( 'reads the default pseudo state clip for a breakpoint pseudo state', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									':hover': textGradient,
+									'@mobile': {
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
 		} );
 
 		describe( 'block style variation instances over a block type text clip', () => {
