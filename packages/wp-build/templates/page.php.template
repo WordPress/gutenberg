@@ -161,34 +161,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
-		// This script serves two purposes:
-		// 1. It ensures all the globals that are made available to the modules are loaded.
-		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-prerequisites', false, $asset['dependencies'], $asset['version'], true );
-
-		// Add inline script to initialize the app
-		$init_modules = {{INIT_MODULES_JSON}};
-		wp_add_inline_script(
-			'{{PAGE_SLUG}}-prerequisites',
-			sprintf(
-				'import("@wordpress/boot").then(mod => mod.init({mountId: "%s", menuItems: %s, routes: %s, initModules: %s, dashboardLink: "%s"}));',
-				'{{PAGE_SLUG}}-app',
-				wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				esc_url( admin_url( '/' ) )
-			)
-		);
-
-		// Register prerequisites style by filtering script dependencies to find registered styles
-		$style_dependencies = array_filter(
-			$asset['dependencies'],
-			function ( $handle ) {
-				return wp_style_is( $handle, 'registered' );
-			}
-		);
-		wp_register_style( '{{PAGE_SLUG}}-prerequisites', false, $style_dependencies, $asset['version'] );
-
 		// Build dependencies for {{PAGE_SLUG}} module
 		$boot_dependencies = array(
 			array(
@@ -230,6 +202,54 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			'{{PAGE_SLUG}}_boot_dependencies',
 			$boot_dependencies
 		);
+
+		/*
+		 * Boot and the modules it loads read classic scripts, like
+		 * `wp-components`, from `window.wp`. Script modules cannot depend on
+		 * classic scripts, so this page loads them: the ones boot needs, and
+		 * the ones the page's other modules need.
+		 */
+		$script_dependencies = $asset['dependencies'];
+		if ( function_exists( '{{PREFIX}}_get_script_module_classic_dependencies' ) ) {
+			$script_dependencies = array_values(
+				array_unique(
+					array_merge(
+						$script_dependencies,
+						{{PREFIX}}_get_script_module_classic_dependencies(
+							wp_list_pluck( $boot_dependencies, 'id' )
+						)
+					)
+				)
+			);
+		}
+
+		// This script serves two purposes:
+		// 1. It ensures all the globals that are made available to the modules are loaded.
+		// 2. It initializes the boot module as an inline script.
+		wp_register_script( '{{PAGE_SLUG}}-prerequisites', false, $script_dependencies, $asset['version'], true );
+
+		// Add inline script to initialize the app
+		$init_modules = {{INIT_MODULES_JSON}};
+		wp_add_inline_script(
+			'{{PAGE_SLUG}}-prerequisites',
+			sprintf(
+				'import("@wordpress/boot").then(mod => mod.init({mountId: "%s", menuItems: %s, routes: %s, initModules: %s, dashboardLink: "%s"}));',
+				'{{PAGE_SLUG}}-app',
+				wp_json_encode( $menu_items, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				esc_url( admin_url( '/' ) )
+			)
+		);
+
+		// Register prerequisites style by filtering script dependencies to find registered styles
+		$style_dependencies = array_filter(
+			$script_dependencies,
+			function ( $handle ) {
+				return wp_style_is( $handle, 'registered' );
+			}
+		);
+		wp_register_style( '{{PAGE_SLUG}}-prerequisites', false, $style_dependencies, $asset['version'] );
 
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(

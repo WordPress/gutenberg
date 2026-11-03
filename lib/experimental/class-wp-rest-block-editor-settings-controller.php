@@ -398,7 +398,9 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'after'
 			);
 
-			// Enqueue editor assets.
+			// Enqueue editor assets. Pages built on `@wordpress/boot` do not load
+			// `wp-editor` up front, so it has to come from here.
+			wp_enqueue_script( 'wp-editor' );
 			wp_enqueue_script( 'wp-format-library' );
 			wp_enqueue_script( 'wp-block-library' );
 			wp_enqueue_style( 'wp-editor' );

@@ -7,6 +7,62 @@
  * @package {{PREFIX}}
  */
 
+/**
+ * Gets the classic scripts that script modules of this build need.
+ *
+ * Script modules read classic scripts, like `wp-components`, from `window.wp`
+ * but cannot depend on them, so a page has to load them itself. This collects
+ * the classic scripts the given modules need, and the ones needed by every
+ * module they import statically. A module this build does not know about is
+ * skipped.
+ *
+ * @param string[] $module_ids Script module IDs.
+ * @return string[] Classic script handles.
+ */
+function {{PREFIX}}_get_script_module_classic_dependencies( $module_ids ) {
+	static $module_asset_files = null;
+	if ( null === $module_asset_files ) {
+		$module_asset_files = array();
+		$modules_file       = __DIR__ . '/modules/registry.php';
+		if ( file_exists( $modules_file ) ) {
+			foreach ( require $modules_file as $module ) {
+				$module_asset_files[ $module['id'] ] = __DIR__ . '/modules/' . $module['asset'];
+			}
+		}
+	}
+	$asset_files = array_merge(
+		$module_asset_files,
+		$GLOBALS['{{PREFIX}}_route_module_asset_files'] ?? array()
+	);
+
+	$dependencies = array();
+	$visited      = array();
+	$queue        = array_values( $module_ids );
+	while ( ! empty( $queue ) ) {
+		$id = array_shift( $queue );
+		if ( ! is_string( $id ) || isset( $visited[ $id ] ) ) {
+			continue;
+		}
+		$visited[ $id ] = true;
+		if ( ! isset( $asset_files[ $id ] ) || ! file_exists( $asset_files[ $id ] ) ) {
+			continue;
+		}
+		$asset = require $asset_files[ $id ];
+		foreach ( $asset['dependencies'] ?? array() as $handle ) {
+			$dependencies[ $handle ] = true;
+		}
+		foreach ( $asset['module_dependencies'] ?? array() as $module_dependency ) {
+			if ( is_string( $module_dependency ) ) {
+				$queue[] = $module_dependency;
+			} elseif ( isset( $module_dependency['id'] ) && 'dynamic' !== ( $module_dependency['import'] ?? 'static' ) ) {
+				$queue[] = $module_dependency['id'];
+			}
+		}
+	}
+
+	return array_keys( $dependencies );
+}
+
 // Load routes registry
 $routes_file = __DIR__ . '/routes/registry.php';
 if ( ! file_exists( $routes_file ) ) {
@@ -52,6 +108,7 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 			if ( file_exists( $content_asset_path ) ) {
 				$content_asset = require $content_asset_path;
 				$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
+				$GLOBALS['{{PREFIX}}_route_module_asset_files'][ $content_handle ] = $content_asset_path;
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
@@ -71,6 +128,7 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 			if ( file_exists( $route_asset_path ) ) {
 				$route_asset = require $route_asset_path;
 				$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
+				$GLOBALS['{{PREFIX}}_route_module_asset_files'][ $route_handle ] = $route_asset_path;
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).

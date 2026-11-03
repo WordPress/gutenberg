@@ -5,7 +5,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
-import { UnsavedChangesWarning } from '@wordpress/editor';
+import UnsavedChangesWarning from '../unsaved-changes-warning';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import PluginArea from '../plugin-area';

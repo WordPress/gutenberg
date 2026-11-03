@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
@@ -63,12 +62,15 @@ export default function useNavigateToEntityRecord() {
 			 * Stash the block selected in the entity being left, so returning to
 			 * it can restore the user's place. The edits hold the external
 			 * client ID, which `onChangeSelection` has already resolved.
+			 *
+			 * Only the editor calls this, so its store is registered by now.
+			 * It is looked up by name so that boot does not load the editor.
 			 */
 			const currentPostType = (
-				registry.select( editorStore ) as any
+				registry.select( 'core/editor' ) as any
 			 ).getCurrentPostType();
 			const currentPostId = (
-				registry.select( editorStore ) as any
+				registry.select( 'core/editor' ) as any
 			 ).getCurrentPostId();
 			const edits = registry
 				.select( coreStore )

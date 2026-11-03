@@ -4,9 +4,8 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 const shortcutName = 'core/boot/save';
 
@@ -23,9 +22,7 @@ export default function useSaveShortcut( {
 } ) {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
-	const { hasNonPostEntityChanges, isPostSavingLocked } =
-		useSelect( editorStore );
-	const { savePost } = useDispatch( editorStore );
+	const registry = useRegistry();
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
@@ -54,10 +51,22 @@ export default function useSaveShortcut( {
 		if ( ! hasDirtyEntities || isSaving ) {
 			return;
 		}
-		if ( hasNonPostEntityChanges() ) {
+		/*
+		 * The editor store is only there once the editor has loaded. It is
+		 * looked up by name so that boot does not load the editor for it.
+		 * Without an editor, there is no post to save on its own, so every
+		 * change goes through the save panel.
+		 */
+		const editorSelectors = registry.select( 'core/editor' ) as
+			| {
+					hasNonPostEntityChanges: () => boolean;
+					isPostSavingLocked: () => boolean;
+			  }
+			| undefined;
+		if ( ! editorSelectors || editorSelectors.hasNonPostEntityChanges() ) {
 			openSavePanel();
-		} else if ( ! isPostSavingLocked() ) {
-			savePost();
+		} else if ( ! editorSelectors.isPostSavingLocked() ) {
+			registry.dispatch( 'core/editor' ).savePost();
 		}
 	} );
 }

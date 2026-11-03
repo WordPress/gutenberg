@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Skip scripts that are already on the page, so loading the same assets twice no longer runs a script a second time ([#86275](https://github.com/WordPress/gutenberg/pull/86275)).
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes

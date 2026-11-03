@@ -50,6 +50,51 @@ test.describe( 'Connectors', () => {
 		);
 	} );
 
+	test( 'should not load the editor until the save panel opens', async ( {
+		page,
+		admin,
+	} ) => {
+		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
+		await expect(
+			page.getByRole( 'heading', { name: 'Connectors', level: 1 } )
+		).toBeVisible();
+
+		// The page has no editor, so it should not load one.
+		expect( await page.evaluate( () => !! window.wp.editor ) ).toBe(
+			false
+		);
+
+		// Saving a change loads the editor for the save panel.
+		await page.evaluate( async () => {
+			const { dispatch, resolveSelect } = window.wp.data;
+			await resolveSelect( 'core' ).getEntityRecord( 'root', 'site' );
+			dispatch( 'core' ).editEntityRecord( 'root', 'site', undefined, {
+				title: 'Connectors e2e',
+			} );
+		} );
+		await page
+			.getByRole( 'heading', { name: 'Connectors', level: 1 } )
+			.click();
+		await page.keyboard.press( 'ControlOrMeta+s' );
+
+		const savePanel = page.getByRole( 'dialog', {
+			name: 'Review changes',
+		} );
+		await expect(
+			savePanel.getByRole( 'button', { name: 'Save', exact: true } )
+		).toBeVisible();
+		expect( await page.evaluate( () => !! window.wp.editor ) ).toBe( true );
+
+		// Leave the site title unchanged.
+		await savePanel.getByRole( 'button', { name: 'Cancel' } ).click();
+		await page.evaluate( () => {
+			const { dispatch, select } = window.wp.data;
+			dispatch( 'core' ).editEntityRecord( 'root', 'site', undefined, {
+				title: select( 'core' ).getEntityRecord( 'root', 'site' ).title,
+			} );
+		} );
+	} );
+
 	test( 'should display default providers with install buttons', async ( {
 		page,
 		admin,

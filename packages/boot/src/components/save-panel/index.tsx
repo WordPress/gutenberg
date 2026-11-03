@@ -1,7 +1,7 @@
 import { useState } from '@wordpress/element';
 import { Modal } from '@wordpress/components';
-import { EntitiesSavedStates } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import EntitiesSavedStates from '../entities-saved-states';
 import useSaveShortcut from './use-save-shortcut';
 import styles from './style.module.scss';
 
