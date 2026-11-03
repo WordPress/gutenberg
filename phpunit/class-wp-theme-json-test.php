@@ -3292,8 +3292,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( ':root :where(.wp-block-image img){rotate: 0.25turn;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img){rotate: 0;}}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-tilted img){rotate: -5deg;}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-button:hover){rotate: 3deg;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button:hover){rotate: 6deg;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
 	}
 

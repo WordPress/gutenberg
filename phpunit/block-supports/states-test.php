@@ -1629,7 +1629,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 	/**
 	 * Tests that a rotation in a state outputs the individual `rotate` property
-	 * under the block's transform feature selector.
+	 * under the block's transform feature selector, or its root selector.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 *
@@ -1669,13 +1669,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'core/button',
 				$button,
 				array( ':hover' => array( 'transform' => array( 'rotate' => '10deg' ) ) ),
-				'.%s:hover{rotate:10deg !important;}',
+				'.%s .wp-block-button__link:hover{rotate:10deg !important;}',
 			),
 			'hover viewport' => array(
 				'core/button',
 				$button,
 				array( '@mobile' => array( ':hover' => array( 'transform' => array( 'rotate' => '-10deg' ) ) ) ),
-				'@media (width <= 480px){.%s:hover{rotate:-10deg !important;}}',
+				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:-10deg !important;}}',
 			),
 			'viewport'       => array(
 				'core/image',
