@@ -36,6 +36,7 @@ const translationMap: TranslationMap = {
 	'styles.outline': __( 'Outline' ),
 	'styles.filter': __( 'Filter' ),
 	'styles.dimensions': __( 'Dimensions' ),
+	'styles.transform': __( 'Transform' ),
 };
 const getBlockNames = memoize( (): BlockNamesMap =>
 	getBlockTypes().reduce< BlockNamesMap >(
@@ -148,6 +149,7 @@ const COMPARED_STYLE_KEYS = [
 	'outline',
 	'filter',
 	'dimensions',
+	'transform',
 ] as const;
 
 /**
