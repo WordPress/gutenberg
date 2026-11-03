@@ -49,11 +49,10 @@ $navigation-icon-size: 24px;
 		z-index: 1;
 	}
 
-	// This rule needs extra specificity so that it inherits the correct color from its parent.
-	// Otherwise, a link color set by a parent group can override the value.
-	// This also fixes an issue where a navigation with an explicitly set color is overridden
-	// by link colors defined in Global Styles.
-	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+	// This rule uses low specificity (0, 1, 0) so that it inherits the correct color from its parent,
+	// prevents generic global link styles (0, 0, 1) from bleeding into navigation menus,
+	// but allows block-level link colors and :hover states defined in theme.json (0, 1, 0) to override it.
+	& :where(.wp-block-navigation-item__content) {
 		color: inherit;
 	}
 
