@@ -21,6 +21,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 		orientation,
 		isManualGrid,
 		isAutoGrid,
+		isAutoFit,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -70,6 +71,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 					parentLayout?.type === 'grid' &&
 					! parentLayout.isManualPlacement &&
 					!! layoutSupport?.allowSizingOnChildren,
+				isAutoFit: parentLayout?.autoFit === true,
 			};
 		},
 		[ clientIds ]
@@ -116,6 +118,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 						Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 					}
 					gridClientId={ rootClientId }
+					isAutoFit={ isAutoFit }
 				/>
 			) : (
 				! isManualGrid && (

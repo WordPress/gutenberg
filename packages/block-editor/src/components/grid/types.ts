@@ -86,6 +86,7 @@ export interface GridItemResizerInnerProps extends Omit<
 	blockElement: HTMLElement;
 	rootBlockElement: HTMLElement;
 	isManualGrid?: boolean;
+	collapseEmptyColumnGaps?: boolean;
 }
 
 export interface GridItemMoversProps {

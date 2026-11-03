@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import type { CSSProperties, PointerEvent } from 'react';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getGridTracks, getClosestTrack } from './utils';
+import { getGridMeasurement, getClosestTrack } from './utils';
 import type {
 	GridItemResizerInnerProps,
 	GridItemResizerProps,
@@ -19,7 +19,7 @@ export function GridItemResizer( {
 	// Block wrappers are HTML elements.
 	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
 	const rootBlockElement = blockElement?.parentElement;
-	const { isManualPlacement } = parentLayout;
+	const { autoFit, isManualPlacement } = parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -36,6 +36,7 @@ export function GridItemResizer( {
 				isManualPlacement &&
 				window.__experimentalEnableGridInteractivity
 			}
+			collapseEmptyColumnGaps={ autoFit === true }
 		/>
 	);
 }
@@ -47,6 +48,7 @@ function GridItemResizerInner( {
 	rootBlockElement,
 	onChange,
 	isManualGrid = false,
+	collapseEmptyColumnGaps,
 }: GridItemResizerInnerProps ) {
 	const [ resizeDirection, setResizeDirection ] = useState< string | null >(
 		null
@@ -172,14 +174,15 @@ function GridItemResizerInner( {
 					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const gridColumnTracks = getGridTracks(
+					const measurement = getGridMeasurement(
 						rootBlockElement,
-						'column'
+						collapseEmptyColumnGaps
 					);
-					const gridRowTracks = getGridTracks(
-						rootBlockElement,
-						'row'
-					);
+					if ( ! measurement ) {
+						return;
+					}
+					const { columns: gridColumnTracks, rows: gridRowTracks } =
+						measurement;
 					const rect = new window.DOMRect(
 						blockElement.offsetLeft + boxElement.offsetLeft,
 						blockElement.offsetTop + boxElement.offsetTop,

@@ -112,6 +112,17 @@ export function getComputedCSS( element: Element, property: string ) {
 		.getPropertyValue( property );
 }
 
+interface GridMeasurement {
+	columns: GridTrack[];
+	rows: GridTrack[];
+	bounds: DOMRect;
+	scaleX: number;
+	scaleY: number;
+	isRightToLeft: boolean;
+	inlineOffset: number;
+	topOffset: number;
+}
+
 /**
  * Converts a computed `column-gap` or `row-gap` value to pixels. Lengths
  * compute to pixels, but percentages are preserved and `normal` is 0 in grids.
@@ -137,42 +148,104 @@ function getGapInPixels( gap: string, contentSize: number ): number {
  *
  * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
  *
- * @param gridElement The grid element.
- * @param axis        Either 'column' or 'row'.
+ * @param gridElement                 The grid element.
+ * @param axis                        Either 'column' or 'row'.
+ * @param options                     Options.
+ * @param options.collapseEmptyTracks Whether auto-fit gutters collapse.
+ * @param options.computedStyle       A previously read style declaration.
  *
  * @return An array of objects with the start and end
  *         position in pixels of each grid track.
  */
 export function getGridTracks(
 	gridElement: HTMLElement,
-	axis: 'column' | 'row'
+	axis: 'column' | 'row',
+	options: {
+		collapseEmptyTracks?: boolean;
+		computedStyle?: CSSStyleDeclaration;
+	} = {}
 ): GridTrack[] {
 	const isColumn = axis === 'column';
+	const computedStyle =
+		options.computedStyle ??
+		gridElement.ownerDocument.defaultView!.getComputedStyle( gridElement );
 	const padding = ( isColumn ? [ 'left', 'right' ] : [ 'top', 'bottom' ] )
 		.map( ( side ) =>
-			parseFloat( getComputedCSS( gridElement, `padding-${ side }` ) )
+			parseFloat( computedStyle.getPropertyValue( `padding-${ side }` ) )
 		)
 		.reduce( ( total, value ) => total + value, 0 );
 	const contentSize =
 		( isColumn ? gridElement.clientWidth : gridElement.clientHeight ) -
 		padding;
 	const gapInPixels = getGapInPixels(
-		getComputedCSS( gridElement, `${ axis }-gap` ),
+		computedStyle.getPropertyValue( `${ axis }-gap` ),
 		contentSize
 	);
-	const template = getComputedCSS(
-		gridElement,
+	const template = computedStyle.getPropertyValue(
 		isColumn ? 'grid-template-columns' : 'grid-template-rows'
 	);
+	const sizes = template.split( ' ' ).map( ( size ) => parseFloat( size ) );
 
 	const tracks: GridTrack[] = [];
-	for ( const size of template.split( ' ' ) ) {
+	for ( const [ index, size ] of sizes.entries() ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
-		const start = previousTrack ? previousTrack.end + gapInPixels : 0;
-		const end = start + parseFloat( size );
+		const previousSize = sizes[ index - 1 ];
+		// Empty auto-fit tracks and the gutters on either side collapse.
+		// The caller opts in because an ordinary zero-width track keeps its gaps.
+		const isGapCollapsed =
+			options.collapseEmptyTracks && ( size === 0 || previousSize === 0 );
+		const start = previousTrack
+			? previousTrack.end + ( isGapCollapsed ? 0 : gapInPixels )
+			: 0;
+		const end = start + size;
 		tracks.push( { start, end } );
 	}
 	return tracks;
+}
+
+/**
+ * Measures the grid values shared while locating each of its children.
+ *
+ * @param gridElement             The grid element.
+ * @param collapseEmptyColumnGaps Whether zero-width auto-fit columns have
+ *                                collapsed gutters.
+ *
+ * @return The measurement, or undefined when the grid can't be measured.
+ */
+export function getGridMeasurement(
+	gridElement: HTMLElement,
+	collapseEmptyColumnGaps = false
+): GridMeasurement | undefined {
+	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
+		return undefined;
+	}
+	const bounds = gridElement.getBoundingClientRect();
+	const scaleX = bounds.width / gridElement.offsetWidth;
+	const scaleY = bounds.height / gridElement.offsetHeight;
+	if ( ! scaleX || ! scaleY ) {
+		return undefined;
+	}
+	const computedStyle =
+		gridElement.ownerDocument.defaultView!.getComputedStyle( gridElement );
+	const inset = ( side: string ) =>
+		parseFloat(
+			computedStyle.getPropertyValue( `border-${ side }-width` )
+		) + parseFloat( computedStyle.getPropertyValue( `padding-${ side }` ) );
+	const isRightToLeft = computedStyle.direction === 'rtl';
+
+	return {
+		columns: getGridTracks( gridElement, 'column', {
+			collapseEmptyTracks: collapseEmptyColumnGaps,
+			computedStyle,
+		} ),
+		rows: getGridTracks( gridElement, 'row', { computedStyle } ),
+		bounds,
+		scaleX,
+		scaleY,
+		isRightToLeft,
+		inlineOffset: inset( isRightToLeft ? 'right' : 'left' ),
+		topOffset: inset( 'top' ),
+	};
 }
 
 /**
@@ -240,44 +313,38 @@ export function getTrackRange(
  *
  * @param gridElement The grid element.
  * @param element     The grid item element.
+ * @param measurement A previously read grid measurement.
  *
  * @return The item's bounds, or undefined if the grid can't be measured.
  */
 export function getRectInGrid(
 	gridElement: HTMLElement,
-	element: Element
+	element: Element,
+	measurement = getGridMeasurement( gridElement )
 ): { left: number; right: number; top: number; bottom: number } | undefined {
-	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
+	if ( ! measurement ) {
 		return undefined;
 	}
-	const gridBounds = gridElement.getBoundingClientRect();
-	const scaleX = gridBounds.width / gridElement.offsetWidth;
-	const scaleY = gridBounds.height / gridElement.offsetHeight;
-	if ( ! scaleX || ! scaleY ) {
-		return undefined;
-	}
-	const isRightToLeft = getComputedCSS( gridElement, 'direction' ) === 'rtl';
-	const inset = ( side: string ) =>
-		parseFloat( getComputedCSS( gridElement, `border-${ side }-width` ) ) +
-		parseFloat( getComputedCSS( gridElement, `padding-${ side }` ) );
-	const inlineOffset = inset( isRightToLeft ? 'right' : 'left' );
-	const topOffset = inset( 'top' );
 	const bounds = element.getBoundingClientRect();
 	return {
 		left:
-			( isRightToLeft
-				? gridBounds.right - bounds.right
-				: bounds.left - gridBounds.left ) /
-				scaleX -
-			inlineOffset,
+			( measurement.isRightToLeft
+				? measurement.bounds.right - bounds.right
+				: bounds.left - measurement.bounds.left ) /
+				measurement.scaleX -
+			measurement.inlineOffset,
 		right:
-			( isRightToLeft
-				? gridBounds.right - bounds.left
-				: bounds.right - gridBounds.left ) /
-				scaleX -
-			inlineOffset,
-		top: ( bounds.top - gridBounds.top ) / scaleY - topOffset,
-		bottom: ( bounds.bottom - gridBounds.top ) / scaleY - topOffset,
+			( measurement.isRightToLeft
+				? measurement.bounds.right - bounds.left
+				: bounds.right - measurement.bounds.left ) /
+				measurement.scaleX -
+			measurement.inlineOffset,
+		top:
+			( bounds.top - measurement.bounds.top ) / measurement.scaleY -
+			measurement.topOffset,
+		bottom:
+			( bounds.bottom - measurement.bounds.top ) / measurement.scaleY -
+			measurement.topOffset,
 	};
 }
 
