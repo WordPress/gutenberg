@@ -1,7 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
-
 const LAYOUT_CONTENT = `<!-- wp:paragraph --><p>Shared header</p><!-- /wp:paragraph -->
 <!-- wp:post-content /-->
 <!-- wp:paragraph --><p>Shared footer</p><!-- /wp:paragraph -->`;
@@ -139,7 +137,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await expect( page.getByText( 'Shared footer' ) ).toBeHidden();
 	} );
 
-	test( 'edits a template that names none once the template of one that does has been shown', async ( {
+	test( 'edits a template on its own once it names none', async ( {
 		admin,
 		editor,
 		page,
@@ -156,36 +154,32 @@ test.describe( 'Template rendered inside another template', () => {
 			.click();
 		await page.keyboard.press( 'Escape' );
 
-		/*
-		 * Leaving through the back button is a client-side navigation, which
-		 * keeps the editor store, and with it the rendering mode, intact. The
-		 * layout template names no template to render inside, so it is edited
-		 * on its own rather than waiting for one that never arrives.
-		 */
-		await page
-			.getByRole( 'button', {
-				name: isSiteEditorV2 ? 'Back' : 'Open Navigation',
-			} )
-			.click();
-		/*
-		 * The preview of a card and its title are both buttons that open the
-		 * template, and they carry the same name, so the title is named by its
-		 * own class rather than by role.
-		 */
-		await page
-			.locator( '.dataviews-view-grid__title-field', {
-				hasText: /^Layout$/,
-			} )
-			.click();
+		await expect(
+			editor.canvas.getByText( 'Shared footer' )
+		).toBeVisible();
 
-		const paragraph = editor.canvas.getByText( 'Shared header' );
-		await expect( paragraph ).toBeVisible();
-		await paragraph.click();
+		/*
+		 * Naming no template leaves the canvas nothing to render around it, so
+		 * the template is edited on its own rather than waiting for a template
+		 * to render it inside that never arrives. The choice of showing the
+		 * template is saved for every template, so it outlives the one that had
+		 * one to show.
+		 */
+		await page.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
+		await page.getByRole( 'option', { name: 'None' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( editor.canvas.getByText( 'Shared footer' ) ).toBeHidden();
+
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await expect( heading ).toBeVisible();
+		await heading.click();
 		await page.keyboard.type( '!' );
 
-		await expect(
-			editor.canvas.getByText( 'Shared header!' )
-		).toBeVisible();
+		await expect( heading ).toHaveText( 'Nothing here!' );
 	} );
 
 	test( 'leaves the blocks of the template around it to that template', async ( {
