@@ -143,4 +143,59 @@ test.describe( 'Collaboration - Sync', () => {
 			)
 			.toBe( 'New Title from User A' );
 	} );
+
+	test( 'Editing one block does not rewrite the markup of another block', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		// `&nbsp;` and `&gt;` survive block parsing but are written
+		// differently when rich text is serialized again, so they show
+		// whether an untouched block is rewritten.
+		const untouchedParagraph = '<p>Hello&nbsp;world, 5 &gt; 3</p>';
+		const post = await requestUtils.createPost( {
+			title: 'Sync Test - Untouched markup',
+			content: `<!-- wp:paragraph -->${ untouchedParagraph }<!-- /wp:paragraph --><!-- wp:paragraph --><p>Edit me</p><!-- /wp:paragraph -->`,
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+
+		const { editor2, page2 } = collaborationUtils;
+
+		// Each user types at the end of the second paragraph, in turn, so
+		// that each one edits after receiving the other's change.
+		for ( const [ userEditor, userPage, text, expected ] of [
+			[ editor2, page2, ' B', 'Edit me B' ],
+			[ editor, page, ' A', 'Edit me B A' ],
+		] as const ) {
+			await userEditor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.nth( 1 )
+				.click();
+			await userPage.keyboard.press( 'End' );
+			await userPage.keyboard.type( text );
+
+			for ( const peerEditor of [ editor, editor2 ] ) {
+				await expect
+					.poll( () => peerEditor.getBlocks(), { timeout: 5000 } )
+					.toMatchObject( [
+						{ name: 'core/paragraph' },
+						{
+							name: 'core/paragraph',
+							attributes: { content: expected },
+						},
+					] );
+			}
+		}
+
+		// Neither user edited the first paragraph, so its markup is unchanged
+		// for both of them.
+		for ( const peerEditor of [ editor, editor2 ] ) {
+			await expect
+				.poll( () => peerEditor.getEditedPostContent() )
+				.toContain( untouchedParagraph );
+		}
+	} );
 } );
