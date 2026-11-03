@@ -18,14 +18,18 @@ function block_core_accordion_item_render( array $attributes, string $content ):
 	$p         = new WP_HTML_Tag_Processor( $content );
 	$unique_id = wp_unique_id( 'accordion-item-' );
 
-	// Initialize the state of the item on the server using a closure,
+	// Initialize the state of the item on the server using closures,
 	// since we need to get derived state based on the current context.
 	wp_interactivity_state(
 		'core/accordion',
 		array(
-			'isOpen' => function () {
+			'isOpen'   => function () {
 				$context = wp_interactivity_get_context();
 				return $context['openByDefault'];
+			},
+			'isHidden' => function () {
+				$context = wp_interactivity_get_context();
+				return $context['openByDefault'] ? null : 'until-found';
 			},
 		)
 	);

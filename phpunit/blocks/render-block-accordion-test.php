@@ -108,4 +108,50 @@ class Tests_Blocks_Render_Accordion extends WP_UnitTestCase {
 
 		$this->assertFalse( $processor->next_tag( array( 'className' => 'wp-block-accordion' ) ) );
 	}
+
+	/**
+	 * Collapsed panels must be hidden in the server-rendered markup, otherwise the
+	 * browser lays the page out with every panel expanded and the subsequent
+	 * client-side collapse shifts the content out from under the anchor target.
+	 *
+	 * @covers ::block_core_accordion_item_render
+	 */
+	public function test_should_hide_collapsed_panels_in_server_rendered_markup(): void {
+		$accordion_block = <<<'BLOCK_CONTENT'
+			<!-- wp:accordion -->
+			<div role="group" class="wp-block-accordion"><!-- wp:accordion-item -->
+			<div class="wp-block-accordion-item"><!-- wp:accordion-heading -->
+			<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Closed</span></button></h3>
+			<!-- /wp:accordion-heading -->
+
+			<!-- wp:accordion-panel -->
+			<div role="region" class="wp-block-accordion-panel"><!-- wp:paragraph -->
+			<p>Closed panel content</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:accordion-panel --></div>
+			<!-- /wp:accordion-item -->
+
+			<!-- wp:accordion-item {"openByDefault":true} -->
+			<div class="wp-block-accordion-item is-open"><!-- wp:accordion-heading -->
+			<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Open</span></button></h3>
+			<!-- /wp:accordion-heading -->
+
+			<!-- wp:accordion-panel -->
+			<div role="region" class="wp-block-accordion-panel"><!-- wp:paragraph -->
+			<p>Open panel content</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:accordion-panel --></div>
+			<!-- /wp:accordion-item --></div>
+			<!-- /wp:accordion -->
+		BLOCK_CONTENT;
+
+		$rendered_block = do_blocks( $accordion_block );
+
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-accordion-panel' ) ) );
+		$this->assertSame( 'until-found', $processor->get_attribute( 'hidden' ), 'Expected the collapsed panel to be rendered with hidden="until-found".' );
+
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-accordion-panel' ) ) );
+		$this->assertNull( $processor->get_attribute( 'hidden' ), 'Expected the panel opened by default not to be rendered as hidden.' );
+	}
 }

@@ -235,4 +235,59 @@ test.describe( 'Accordion', () => {
 		await expect( accordionPanel ).toBeVisible();
 		await expect( targetParagraph ).toBeInViewport();
 	} );
+
+	test( 'should scroll to an anchor target below the accordion', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert a tall spacer block to ensure anchor scrolling behaves as expected.
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '1000px' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: { title: 'Accordion Title' },
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/spacer',
+									attributes: { height: '2000px' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+		// The anchor target sits after the accordion, so collapsing the panel
+		// after the page has been laid out would move it out of the viewport.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { anchor: 'target', content: 'Target' },
+		} );
+		// Keep the page scrollable past the target, so the browser cannot clamp
+		// the scroll position back to the target when the page gets shorter.
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '3000px' },
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }#target` );
+
+		const accordionPanel = page.getByRole( 'region', {
+			name: 'Accordion Title',
+		} );
+		await expect( accordionPanel ).toBeHidden();
+		await expect( page.locator( '#target' ) ).toBeInViewport();
+	} );
 } );
