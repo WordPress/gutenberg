@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Open the "View revisions" action in the site editor revisions view instead of the `revision.php` screen. ([#81366](https://github.com/WordPress/gutenberg/pull/81366))
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
