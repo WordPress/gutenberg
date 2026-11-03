@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `CustomGradientPicker`: Use the WordPress UI select for choosing the gradient type ([#85750](https://github.com/WordPress/gutenberg/pull/85750)).
 -   `Spinner`: Use a neutral half-circle arc with a stroke that scales with its size ([#85859](https://github.com/WordPress/gutenberg/pull/85859)).
 -   `Tooltip`: Match the dark gray background of the design system tooltip ([#85858](https://github.com/WordPress/gutenberg/pull/85858)).
 -   `Modal`: Adapt colors and rounded corners to the design system theme ([#85855](https://github.com/WordPress/gutenberg/pull/85855)).
@@ -34,6 +35,7 @@
 
 ### Bug Fixes
 
+-   `MenuItem` and `DropdownMenu`: Stop showing a focus ring when a disabled item is hovered with a pointer ([#86125](https://github.com/WordPress/gutenberg/pull/86125)).
 -   `PaletteEdit`: Avoid existing preset slugs when deduplicating palette items ([#85817](https://github.com/WordPress/gutenberg/pull/85817)).
 -   `Modal`: Keep dialog boundaries visible in forced-colors mode ([#85888](https://github.com/WordPress/gutenberg/pull/85888)).
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
