@@ -503,7 +503,6 @@ async function getCopyFiles( packageDir, packageJson ) {
  * @param {string} packageDir  Package directory.
  * @param {string} packageName Package name (short name).
  * @param {Object} packageJson Package's package.json.
- * @return {Promise<string>} Path the file was written to.
  */
 async function copyPackageFile(
 	sourceFile,
@@ -521,7 +520,7 @@ async function copyPackageFile(
 	if ( ! sourceFile.endsWith( '.php' ) || ! transforms.php ) {
 		await mkdir( path.dirname( destPath ), { recursive: true } );
 		await copyFile( sourceFile, destPath );
-		return destPath;
+		return;
 	}
 
 	const content = await readFile( sourceFile, 'utf8' );
@@ -549,7 +548,6 @@ async function copyPackageFile(
 
 	await mkdir( path.dirname( destPath ), { recursive: true } );
 	await writeFile( destPath, transformed );
-	return destPath;
 }
 
 /**
@@ -2814,17 +2812,16 @@ async function watchMode() {
 	/**
 	 * Copy a changed PHP file to the build, without rebuilding its package.
 	 *
-	 * @param {string} filename Absolute path of the PHP file.
+	 * @param {string} packageName Package name (short name).
+	 * @param {string} filename    Absolute path of the PHP file.
 	 */
-	async function recopyPhpFile( filename ) {
-		const packageName = getPackageName( filename );
+	async function recopyPhpFile( packageName, filename ) {
 		const relativePath = path.relative( PACKAGES_DIR, filename );
 		try {
 			const startTime = Date.now();
-			const packageDir = path.join( PACKAGES_DIR, packageName );
 			await copyPackageFile(
 				filename,
-				packageDir,
+				path.join( PACKAGES_DIR, packageName ),
 				packageName,
 				fullToPackageJson.get( shortToFull.get( packageName ) )
 			);
@@ -2878,7 +2875,9 @@ async function watchMode() {
 				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
 				await rebuildWidget( widgetDirName );
 			} else if ( item.startsWith( 'php:' ) ) {
-				await recopyPhpFile( item.slice( 4 ) ); // Remove 'php:' prefix
+				// Split 'php:{package}:{file}'; the file may contain colons.
+				const [ , packageName, ...file ] = item.split( ':' );
+				await recopyPhpFile( packageName, file.join( ':' ) );
 			} else {
 				await rebuildPackage( item );
 			}
@@ -2939,7 +2938,7 @@ async function watchMode() {
 		const file = normalizePath( path.resolve( filename ) );
 		const item =
 			event === 'change' && copiedPhpFiles.get( packageName )?.has( file )
-				? `php:${ file }`
+				? `php:${ packageName }:${ file }`
 				: packageName;
 
 		// Queue the item, so that it is not written while a rebuild is running.
