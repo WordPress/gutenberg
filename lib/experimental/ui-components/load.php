@@ -77,7 +77,7 @@ function gutenberg_ui_components_enqueue_assets() {
  */
 function gutenberg_get_ui_component( $name, $props = array(), $content = null ) {
 	$components = gutenberg_ui_components_get_manifest();
-	$render     = 'gutenberg_ui_render_' . str_replace( '-', '_', $name );
+	$render     = '_gutenberg_ui_render_' . str_replace( '-', '_', $name );
 
 	if ( ! isset( $components[ $name ] ) || ! function_exists( $render ) ) {
 		_doing_it_wrong(
@@ -115,6 +115,20 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	gutenberg_ui_components_enqueue_assets();
 
 	return $render( $props, $classes, (string) $content );
+}
+
+/**
+ * Prints a `@wordpress/ui` component.
+ *
+ * See `gutenberg_get_ui_component()`, which returns the HTML instead.
+ *
+ * @param string      $name    Component name, such as `button`.
+ * @param array       $props   Component props.
+ * @param string|null $content Component content, such as a button's label.
+ */
+function gutenberg_ui_component( $name, $props = array(), $content = null ) {
+	// Components escape their own output.
+	echo gutenberg_get_ui_component( $name, $props, $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /**

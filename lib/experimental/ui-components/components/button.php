@@ -23,7 +23,7 @@
  * @param string   $content Label, as plain text.
  * @return string HTML.
  */
-function gutenberg_ui_render_button( $props, $classes, $content ) {
+function _gutenberg_ui_render_button( $props, $classes, $content ) {
 	if ( '' !== $props['class'] ) {
 		$classes[] = $props['class'];
 	}
