@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-	fromPickerAngle,
 	getRotatedBoundingRect,
 	getRotatedOverlayStyle,
+	getRotateForState,
+	getRotateValue,
 	getRotationFromPointer,
+	getUpdatedRotateStyle,
 	normalizeAngle,
 	roundAngle,
 	snapAngle,
-	toPickerAngle,
 } from '../rotation';
 import type { PixelRect } from '../rotation';
 import {
@@ -46,36 +47,99 @@ describe( 'roundAngle', () => {
 	} );
 } );
 
-describe( 'toPickerAngle', () => {
-	it( 'converts a stored rotation to the picker range', () => {
-		expect( toPickerAngle( undefined ) ).toBe( 0 );
-		expect( toPickerAngle( 0 ) ).toBe( 0 );
-		expect( toPickerAngle( 45 ) ).toBe( 45 );
-		expect( toPickerAngle( 180 ) ).toBe( 180 );
-		expect( toPickerAngle( -90 ) ).toBe( 270 );
+describe( 'getRotateValue', () => {
+	it( 'reads the CSS angle the transform support stores, in degrees', () => {
+		expect( getRotateValue( '45deg' ) ).toBe( 45 );
+		expect( getRotateValue( '-90DEG' ) ).toBe( -90 );
+		expect( getRotateValue( '0.25turn' ) ).toBe( 90 );
+		expect( getRotateValue( '100grad' ) ).toBe( 90 );
+		expect( getRotateValue( '3.14159rad' ) ).toBe( 180 );
+		expect( getRotateValue( '0' ) ).toBe( 0 );
+	} );
+
+	it( 'wraps into (-180, 180] and rounds to two decimals', () => {
+		expect( getRotateValue( '270deg' ) ).toBe( -90 );
+		expect( getRotateValue( '12.345deg' ) ).toBe( 12.35 );
+		expect( getRotateValue( 200 ) ).toBe( -160 );
+	} );
+
+	it( 'ignores anything that is not a single angle', () => {
+		expect( getRotateValue( undefined ) ).toBeUndefined();
+		expect( getRotateValue( '45' ) ).toBeUndefined();
+		expect( getRotateValue( 'x 45deg' ) ).toBeUndefined();
+		expect( getRotateValue( 'calc(45deg)' ) ).toBeUndefined();
+		expect( getRotateValue( { rotate: '45deg' } ) ).toBeUndefined();
 	} );
 } );
 
-describe( 'fromPickerAngle', () => {
-	it( 'converts a picker value to a stored rotation', () => {
-		expect( fromPickerAngle( 0 ) ).toBe( 0 );
-		expect( fromPickerAngle( 90 ) ).toBe( 90 );
-		expect( fromPickerAngle( 180 ) ).toBe( 180 );
-		expect( fromPickerAngle( 270 ) ).toBe( -90 );
-		expect( fromPickerAngle( 360 ) ).toBe( 0 );
+describe( 'getRotateForState', () => {
+	const style = {
+		transform: { rotate: '30deg' },
+		'@mobile': { transform: { rotate: '0deg' } },
+	};
+
+	it( 'reads the default rotation', () => {
+		expect( getRotateForState( style, { viewport: 'default' } ) ).toBe(
+			30
+		);
+		expect( getRotateForState( undefined, { viewport: 'default' } ) ).toBe(
+			0
+		);
 	} );
 
-	it( 'accepts strings and rounds to two decimals', () => {
-		expect( fromPickerAngle( '45' ) ).toBe( 45 );
-		expect( fromPickerAngle( '12.5' ) ).toBe( 12.5 );
-		expect( fromPickerAngle( 12.6 ) ).toBe( 12.6 );
-		expect( fromPickerAngle( 12.345 ) ).toBe( 12.35 );
-		expect( fromPickerAngle( 359.999 ) ).toBe( 0 );
+	it( 'reads a viewport rotation, falling back to the default', () => {
+		expect( getRotateForState( style, { viewport: '@mobile' } ) ).toBe( 0 );
+		expect( getRotateForState( style, { viewport: '@tablet' } ) ).toBe(
+			30
+		);
+	} );
+} );
+
+describe( 'getUpdatedRotateStyle', () => {
+	it( 'stores the default rotation in transform.rotate, and none for 0', () => {
+		expect(
+			getUpdatedRotateStyle( { layout: { columnStart: 1 } }, 45, {
+				viewport: 'default',
+			} )
+		).toEqual( {
+			layout: { columnStart: 1 },
+			transform: { rotate: '45deg' },
+		} );
+		expect(
+			getUpdatedRotateStyle( { transform: { rotate: '45deg' } }, 0, {
+				viewport: 'default',
+			} )
+		).toBeUndefined();
 	} );
 
-	it( 'treats values that are not numbers as no rotation', () => {
-		expect( fromPickerAngle( 'abc' ) ).toBe( 0 );
-		expect( fromPickerAngle( undefined ) ).toBe( 0 );
+	it( 'keeps 0deg in a viewport state and removes the rotation for undefined', () => {
+		expect(
+			getUpdatedRotateStyle( { transform: { rotate: '45deg' } }, 0, {
+				viewport: '@mobile',
+			} )
+		).toEqual( {
+			transform: { rotate: '45deg' },
+			'@mobile': { transform: { rotate: '0deg' } },
+		} );
+		expect(
+			getUpdatedRotateStyle(
+				{
+					transform: { rotate: '45deg' },
+					'@mobile': { transform: { rotate: '0deg' } },
+				},
+				undefined,
+				{ viewport: '@mobile' }
+			)
+		).toEqual( { transform: { rotate: '45deg' } } );
+	} );
+
+	it( 'rotates per viewport only, so a pseudo state writes to its viewport', () => {
+		expect(
+			getUpdatedRotateStyle( undefined, 15, {
+				viewport: '@mobile',
+				pseudo: ':hover',
+			} )
+		).toEqual( { '@mobile': { transform: { rotate: '15deg' } } } );
 	} );
 } );
 

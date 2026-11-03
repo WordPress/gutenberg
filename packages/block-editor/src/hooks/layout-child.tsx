@@ -33,7 +33,7 @@ import {
 	hasViewportBlockStyleState,
 } from './block-style-state';
 import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
-import { hasRotateSupport } from './rotation';
+import { hasTransformSupport } from './transform';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -600,9 +600,9 @@ function GridTools( {
 	const rotate = stackedLayouts
 		? 0
 		: getRotateForState( style, selectedState );
-	// Like the Rotation control in the block settings, the handle is only
-	// offered for blocks that can be fully edited, and not in a state such as
-	// `:hover`, since rotation is stored per viewport.
+	// The handle is only offered for blocks that opt in to the transform
+	// support's rotation and can be fully edited, and not in a state such as
+	// `:hover`, since the canvas rotates blocks per viewport.
 	// The resizer sizes the block from pointer movement along the screen's
 	// axes, not the block's, so it is hidden while the block is rotated.
 	const isRotated = !! ( previewRotate ?? rotate );
@@ -611,7 +611,7 @@ function GridTools( {
 		! isBlockItselfCurrentlyHidden &&
 		blockEditingMode === 'default' &&
 		! hasPseudoBlockStyleState( selectedState ) &&
-		hasRotateSupport( name );
+		hasTransformSupport( name, 'rotate' );
 
 	// Text blocks can't be dragged by their body, so every block that can be
 	// moved gets a handle that drags it the way a body drag does.

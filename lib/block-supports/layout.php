@@ -1471,7 +1471,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * publishes as `--wp--grid-item--row-span`. Stacked rows are as tall as their content,
 		 * so the span doesn't make blocks taller; it keeps the rows numbered like the editor's
 		 * stacked layouts. The selector is repeated so that the rules beat the grid's and each
-		 * child's own rules, such as rotation, whatever order the stylesheets end up in.
+		 * child's own rules, whatever order the stylesheets end up in.
 		 */
 		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
 		$mobile_layout      = array_replace(
@@ -1488,7 +1488,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		) {
 			// Stacked blocks are sized by their content again, so their cells are no longer fixed.
 			$stacking_selector = ".$container_class.$container_class";
-			$stacking_styles   = gutenberg_style_engine_get_stylesheet_from_css_rules(
+			/*
+			 * The transform block support rotates blocks with an inline style, and its
+			 * state rules are important, so unrotating the stacked blocks is important too.
+			 */
+			$stacked_child_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg(
+				array(
+					'grid-column' => '1 / -1',
+					'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
+				)
+			);
+			$stacked_child_declarations->add_declaration( 'rotate', '0deg', array( 'important' => true ) );
+			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(
 					array(
 						'rules_group'  => $mobile_media_query,
@@ -1503,11 +1514,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 					array(
 						'rules_group'  => $mobile_media_query,
 						'selector'     => "$stacking_selector > *",
-						'declarations' => array(
-							'grid-column' => '1 / -1',
-							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
-							'rotate'      => 'none',
-						),
+						'declarations' => $stacked_child_declarations,
 					),
 				),
 				array(
