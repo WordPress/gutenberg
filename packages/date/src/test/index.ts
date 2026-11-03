@@ -1,5 +1,5 @@
 import momentLib from 'moment';
-import { describe, expect, it, test } from 'vitest';
+import { afterEach, describe, expect, it, test } from 'vitest';
 import {
 	getSettings,
 	date as dateNoI18n,
@@ -805,5 +805,139 @@ describe( 'WP timezone zone recovery', () => {
 		expect( result ).toBe( 'an hour ago' );
 
 		setSettings( settings );
+	} );
+} );
+
+describe( 'zoneless ISO strings with an explicit output timezone', () => {
+	const original = getSettings();
+	const setSiteTimezone = ( string: string, offset: number ) =>
+		setSettings( {
+			...original,
+			timezone: {
+				offset,
+				offsetFormatted: String( offset ),
+				string,
+				abbr: '',
+			},
+		} );
+	afterEach( () => setSettings( original ) );
+
+	it( 'reads a zoneless datetime in site time before converting', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		expect( dateI18n( 'c', '2026-10-26T12:00:00', 'UTC' ) ).toBe(
+			'2026-10-26T16:00:00+00:00'
+		);
+		expect( dateI18n( 'c', '2026-10-26 12:00', '+03:00' ) ).toBe(
+			'2026-10-26T19:00:00+03:00'
+		);
+	} );
+
+	it( 'reads a date-only string as midnight in site time', () => {
+		setSiteTimezone( 'Europe/Paris', 1 );
+		expect( dateI18n( 'c', '2026-10-26', 'UTC' ) ).toBe(
+			'2026-10-25T23:00:00+00:00'
+		);
+	} );
+
+	it( 'supports sites configured with a UTC offset only', () => {
+		setSiteTimezone( '', -5 );
+		expect( dateI18n( 'c', '2026-10-26T12:00:00', 'UTC' ) ).toBe(
+			'2026-10-26T17:00:00+00:00'
+		);
+		setSiteTimezone( '', 5.5 );
+		expect( dateI18n( 'c', '2026-10-26T12:00:00' ) ).toBe(
+			'2026-10-26T12:00:00+05:30'
+		);
+	} );
+
+	it( 'leaves strings with an explicit zone designator unchanged', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		expect( dateI18n( 'c', '2026-10-26T12:00:00Z', 'UTC' ) ).toBe(
+			'2026-10-26T12:00:00+00:00'
+		);
+		expect( dateI18n( 'c', '2026-10-26T12:00:00+02:00', 'UTC' ) ).toBe(
+			'2026-10-26T10:00:00+00:00'
+		);
+	} );
+
+	it( 'leaves Date objects and timestamps unchanged', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		const ms = Date.UTC( 2026, 9, 26, 12 );
+		expect( dateI18n( 'c', new Date( ms ), 'UTC' ) ).toBe(
+			'2026-10-26T12:00:00+00:00'
+		);
+		expect( dateI18n( 'c', ms, 'UTC' ) ).toBe(
+			'2026-10-26T12:00:00+00:00'
+		);
+	} );
+
+	it( 'agrees with getDate() for the same zoneless input', () => {
+		const inputs = [
+			'2026-10-26T12:00:00',
+			'2026-10-26 12:00',
+			'2026-10-26',
+			'2026-10-26T24:00:00',
+		];
+		const sites: [ string, number ][] = [
+			[ 'America/New_York', -5 ],
+			[ 'Europe/Paris', 1 ],
+			[ '', 5.5 ],
+			[ '', -5 ],
+		];
+		for ( const [ string, offset ] of sites ) {
+			setSiteTimezone( string, offset );
+			for ( const input of inputs ) {
+				expect( dateI18n( 'c', input, 'UTC' ) ).toBe(
+					gmdate( 'c', getDate( input ) )
+				);
+			}
+		}
+	} );
+
+	it( 'resolves DST gaps and overlaps the way getDate() does', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		// Spring forward gap: 02:30 does not exist on 2026-03-08.
+		// Fall back overlap: 01:30 occurs twice on 2026-11-01.
+		for ( const input of [
+			'2026-03-08T02:30:00',
+			'2026-11-01T01:30:00',
+		] ) {
+			expect( dateI18n( 'c', input, 'UTC' ) ).toBe(
+				gmdate( 'c', getDate( input ) )
+			);
+		}
+	} );
+
+	it( 'leaves other string shapes on the previous parsing path', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		// Compact, week, ordinal and padded shapes are not zoneless ISO
+		// calendar strings in the sense above, so they are not rerouted.
+		// Moment falls back to the Date constructor, and warns, for some of
+		// these, so silence its deprecation warning for the comparison.
+		const suppressed = momentLib.suppressDeprecationWarnings;
+		momentLib.suppressDeprecationWarnings = true;
+		try {
+			for ( const input of [
+				'20261026T120000',
+				'2026-W44-1',
+				'2026-299',
+				' 2026-10-26T12:00:00',
+				'2026-10-26T12:00:00 ',
+			] ) {
+				expect( dateI18n( 'c', input, 'UTC' ) ).toBe(
+					dateI18n( 'c', momentLib( input ), 'UTC' )
+				);
+			}
+		} finally {
+			momentLib.suppressDeprecationWarnings = suppressed;
+		}
+	} );
+
+	it( 'still returns an invalid date for impossible calendar dates', () => {
+		setSiteTimezone( 'America/New_York', -5 );
+		expect( dateI18n( 'c', '2026-02-30', 'UTC' ) ).toBe( 'Invalid date' );
+		expect( dateI18n( 'c', '2026-13-01T10:00', 'UTC' ) ).toBe(
+			'Invalid date'
+		);
 	} );
 } );

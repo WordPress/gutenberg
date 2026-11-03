@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Parse timezoneless ISO date strings passed to `date()` and `dateI18n()` in the site timezone instead of the browser timezone, matching `getDate()` ([#85540](https://github.com/WordPress/gutenberg/pull/85540)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
