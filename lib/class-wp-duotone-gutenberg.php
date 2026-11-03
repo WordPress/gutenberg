@@ -172,10 +172,7 @@ class WP_Duotone_Gutenberg {
 			'rad'  => 360 / ( M_PI * 2 ),
 		);
 
-		$factor = $angle_units[ $unit ];
-		if ( ! $factor ) {
-			$factor = 1;
-		}
+		$factor = $angle_units[ $unit ] ?? 1;
 
 		return (float) $value * $factor;
 	}
@@ -410,7 +407,7 @@ class WP_Duotone_Gutenberg {
 
 		$hsla = self::colord_clamp_hsla(
 			array(
-				'h' => self::colord_parse_hue( $match[1], $match[2] ),
+				'h' => self::colord_parse_hue( (float) $match[1], $match[2] ),
 				's' => (float) $match[3],
 				'l' => (float) $match[4],
 				'a' => '' === $match[5] ? 1 : (float) $match[5] / ( $match[6] ? 100 : 1 ),
