@@ -31,7 +31,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
-import { isEmail, prependHTTPS } from '@wordpress/url';
+import { getProtocol, isEmail, prependHTTPS } from '@wordpress/url';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import ViewLinkButton from '../utils/view-link-button';
@@ -80,6 +80,9 @@ function useLinkValidity( url ) {
  * email address becomes a `mailto:` link, and a link without a protocol uses
  * HTTPS.
  *
+ * Keep this in sync with how `render_block_core_social_link()` in `index.php`
+ * builds the link, so View opens the same URL as the front end.
+ *
  * @param {string} url The link.
  * @return {string|undefined} The rendered link.
  */
@@ -88,7 +91,10 @@ const getRenderedLink = ( url ) => {
 	if ( ! url || ! isValidLink( url ) ) {
 		return undefined;
 	}
-	return isEmail( url ) ? `mailto:${ url }` : prependHTTPS( url );
+	// Unlike PHP's `is_email()`, `isEmail()` also matches `mailto:` links.
+	return isEmail( url ) && ! getProtocol( url )
+		? `mailto:${ url }`
+		: prependHTTPS( url );
 };
 
 const SocialLinkURLPopover = ( {
