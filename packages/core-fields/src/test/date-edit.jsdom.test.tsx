@@ -8,7 +8,7 @@ import {
 import { speak } from '@wordpress/a11y';
 import DateEdit from '../post_type_supports/date/edit';
 
-vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 // The date picker measures its layout.
 globalThis.wpVitest.mockResizeObserver();
