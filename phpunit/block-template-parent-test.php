@@ -489,6 +489,14 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_the_rendered_template_content_is_resolved_on_template_include() {
+		$this->assertSame(
+			10,
+			has_filter( 'template_include', 'gutenberg_render_block_template_inside_parent' ),
+			'The template of the request is resolved as it is included, which is when its content is in the global the canvas renders.'
+		);
+	}
+
 	public function test_the_rendered_template_content_is_resolved() {
 		global $_wp_current_template_content, $_wp_current_template_id;
 
@@ -506,7 +514,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$_wp_current_template_id      = $child->id;
 		$_wp_current_template_content = $child->content;
 
-		apply_filters( 'template_include', ABSPATH . WPINC . '/template-canvas.php' );
+		gutenberg_render_block_template_inside_parent( ABSPATH . WPINC . '/template-canvas.php' );
 
 		$this->assertSame(
 			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
@@ -527,7 +535,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$_wp_current_template_id      = $child->id;
 		$_wp_current_template_content = $child->content;
 
-		apply_filters( 'template_include', ABSPATH . WPINC . '/template-canvas.php' );
+		gutenberg_render_block_template_inside_parent( ABSPATH . WPINC . '/template-canvas.php' );
 
 		$this->assertSame(
 			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} /-->',
