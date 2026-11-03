@@ -117,6 +117,8 @@ function splitDirectiveName( directiveName: string ): {
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
+export const hydratedIslands = new WeakSet();
+
 /**
  * Parses the namespace and value from a directive attribute value.
  *
@@ -324,6 +326,10 @@ export function toVdom( root: Node ): ComponentChild {
 					}
 				);
 			}
+		}
+
+		if ( island ) {
+			hydratedIslands.add( elementNode );
 		}
 
 		if ( props.__directives?.html ) {
