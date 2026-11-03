@@ -31,6 +31,13 @@
 		border-radius: var(--wpds-border-radius-md);
 	}
 
+	// A custom field control can be wider than the default ones: let the
+	// popover grow to fit it, rather than overflow.
+	.components-popover__content:has(.dataviews-filters__user-input-widget) {
+		width: max-content;
+		max-width: none;
+	}
+
 	&.components-dropdown__content {
 		.components-popover__content {
 			padding: 0;
