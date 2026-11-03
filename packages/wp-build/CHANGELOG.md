@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Load the classic scripts that a page's script modules need, including the modules they import, not only the ones `@wordpress/boot` needs. A route can now use a script, like `wp-editor`, that boot does not load.
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `EntitiesSavedStates`, so that a page that loads this module on demand can show the save panel without loading `@wordpress/editor` up front.
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes

@@ -8,7 +8,6 @@ import {
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
 import {
 	KeyboardShortcutDescription,
@@ -16,6 +15,7 @@ import {
 	Tooltip,
 	useKeyboardShortcutProps,
 } from '@wordpress/ui';
+import EntitiesSavedStates from '../entities-saved-states';
 import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 

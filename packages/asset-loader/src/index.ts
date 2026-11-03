@@ -279,6 +279,15 @@ async function loadAssets(
 	const scriptElements: HTMLScriptElement[] = [];
 
 	for ( const handle of orderedScripts ) {
+		/*
+		 * Skip a script that is already on the page, whether WordPress printed
+		 * it or an earlier call loaded it. Running it again would register its
+		 * stores and blocks a second time.
+		 */
+		if ( document.getElementById( handle + '-js' ) ) {
+			continue;
+		}
+
 		const beforeInline = inlineScripts.before?.[ handle ];
 		if ( beforeInline ) {
 			scriptElements.push(

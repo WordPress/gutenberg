@@ -167,56 +167,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
-		// This script serves two purposes:
-		// 1. It ensures all the globals that are made available to the modules are loaded.
-		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $asset['dependencies'], $asset['version'], true );
-
-		$init_modules = {{INIT_MODULES_JSON}};
-
-		/*
-		 * Add inline script to initialize the app using initSinglePage (no menuItems).
-		 * The dynamic import is deferred until DOMContentLoaded so that all classic
-		 * script dependencies of @wordpress/boot (wp-private-apis, wp-components,
-		 * wp-theme, etc.) have finished parsing and executing before the boot module
-		 * evaluates. Otherwise, a modulepreloaded @wordpress/boot can win the race
-		 * against the classic-script-printing pass on fast CDN-fronted hosts in
-		 * Chrome, evaluating before wp.theme.privateApis is defined and throwing
-		 * "Cannot unlock an undefined object". See <https://core.trac.wordpress.org/ticket/65103>.
-		 */
-		$init_js_function = <<<'JS'
-		( mountId, routes, initModules ) => {
-			const run = async () => {
-				const mod = await import( "@wordpress/boot" );
-				mod.initSinglePage( { mountId, routes, initModules } );
-			};
-			if ( document.readyState === "loading" ) {
-				document.addEventListener( "DOMContentLoaded", run );
-			} else {
-				run();
-			}
-		}
-		JS;
-		wp_add_inline_script(
-			'{{PAGE_SLUG}}-wp-admin-prerequisites',
-			sprintf(
-				'( %s )( %s, %s, %s );',
-				$init_js_function,
-				wp_json_encode( '{{PAGE_SLUG}}-wp-admin-app', JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
-				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
-			)
-		);
-
-		// Register prerequisites style by filtering script dependencies to find registered styles
-		$style_dependencies = array_filter(
-			$asset['dependencies'],
-			function ( $handle ) {
-				return wp_style_is( $handle, 'registered' );
-			}
-		);
-		wp_register_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $style_dependencies, $asset['version'] );
-
 		// Build dependencies for {{PAGE_SLUG}}-wp-admin module
 		$boot_dependencies = array(
 			array(
@@ -258,6 +208,76 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 			'{{PAGE_SLUG}}-wp-admin_boot_dependencies',
 			$boot_dependencies
 		);
+
+		/*
+		 * Boot and the modules it loads read classic scripts, like
+		 * `wp-components`, from `window.wp`. Script modules cannot depend on
+		 * classic scripts, so this page loads them: the ones boot needs, and
+		 * the ones the page's other modules need.
+		 */
+		$script_dependencies = $asset['dependencies'];
+		if ( function_exists( '{{PREFIX}}_get_script_module_classic_dependencies' ) ) {
+			$script_dependencies = array_values(
+				array_unique(
+					array_merge(
+						$script_dependencies,
+						{{PREFIX}}_get_script_module_classic_dependencies(
+							wp_list_pluck( $boot_dependencies, 'id' )
+						)
+					)
+				)
+			);
+		}
+
+		// This script serves two purposes:
+		// 1. It ensures all the globals that are made available to the modules are loaded.
+		// 2. It initializes the boot module as an inline script.
+		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $script_dependencies, $asset['version'], true );
+
+		$init_modules = {{INIT_MODULES_JSON}};
+
+		/*
+		 * Add inline script to initialize the app using initSinglePage (no menuItems).
+		 * The dynamic import is deferred until DOMContentLoaded so that all classic
+		 * script dependencies of @wordpress/boot (wp-private-apis, wp-components,
+		 * wp-theme, etc.) have finished parsing and executing before the boot module
+		 * evaluates. Otherwise, a modulepreloaded @wordpress/boot can win the race
+		 * against the classic-script-printing pass on fast CDN-fronted hosts in
+		 * Chrome, evaluating before wp.theme.privateApis is defined and throwing
+		 * "Cannot unlock an undefined object". See <https://core.trac.wordpress.org/ticket/65103>.
+		 */
+		$init_js_function = <<<'JS'
+		( mountId, routes, initModules ) => {
+			const run = async () => {
+				const mod = await import( "@wordpress/boot" );
+				mod.initSinglePage( { mountId, routes, initModules } );
+			};
+			if ( document.readyState === "loading" ) {
+				document.addEventListener( "DOMContentLoaded", run );
+			} else {
+				run();
+			}
+		}
+		JS;
+		wp_add_inline_script(
+			'{{PAGE_SLUG}}-wp-admin-prerequisites',
+			sprintf(
+				'( %s )( %s, %s, %s );',
+				$init_js_function,
+				wp_json_encode( '{{PAGE_SLUG}}-wp-admin-app', JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $routes, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				wp_json_encode( $init_modules, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+			)
+		);
+
+		// Register prerequisites style by filtering script dependencies to find registered styles
+		$style_dependencies = array_filter(
+			$script_dependencies,
+			function ( $handle ) {
+				return wp_style_is( $handle, 'registered' );
+			}
+		);
+		wp_register_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $style_dependencies, $asset['version'] );
 
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(

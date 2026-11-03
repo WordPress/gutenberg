@@ -13,6 +13,7 @@ import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
 import { getDeviceType } from './viewport';
+import loadLazyEditor from '../../utils/load-lazy-editor';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -111,8 +112,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	);
 
 	useEffect( () => {
-		// Dynamically import the lazy-editor module
-		import( '@wordpress/lazy-editor' )
+		loadLazyEditor()
 			.then( ( module ) => {
 				setEditor( () => module.Editor );
 			} )
