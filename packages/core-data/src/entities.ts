@@ -11,6 +11,7 @@ import {
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	taxonomySyncConfig,
 } from './utils/crdt';
+import isDefaultAutoDraftTitle from './utils/is-default-auto-draft-title';
 import type { Post } from './entity-types/post';
 import type { EntityConfigLoader, RestTypeDescription } from './private-types';
 import type { EntityConfig, TransientEditConfig } from './types';
@@ -301,12 +302,15 @@ export const prePersistPostType = async (
 			newEdits.status = 'draft';
 		}
 
-		// Fix the auto-draft default title.
+		// Fix the auto-draft default title. The database still contains the
+		// placeholder even when the store title is empty, so an explicit empty
+		// title must be sent or promoting the auto-draft to a draft would
+		// resurrect "Auto Draft" as the real title.
 		if (
-			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			( ! edits.title || isDefaultAutoDraftTitle( edits.title ) ) &&
 			! newEdits.title &&
 			( ! persistedRecord?.title ||
-				persistedRecord?.title === 'Auto Draft' )
+				isDefaultAutoDraftTitle( persistedRecord?.title ) )
 		) {
 			newEdits.title = '';
 		}
