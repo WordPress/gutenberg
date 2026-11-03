@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-import { getBlockTypes } from '@wordpress/blocks';
+import {
+	getBlockType,
+	getBlockTypes,
+	getUnregisteredTypeHandlerName,
+} from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 import {
@@ -227,6 +231,42 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 			attributes: newAttributes,
 			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
+	} );
+}
+
+/**
+ * Check whether a block tree was captured under a different set of registered
+ * block types than the ones registered now.
+ *
+ * A persisted CRDT document stores the blocks the editor had at the time. When
+ * a block type was unavailable then (for example, its plugin was deactivated),
+ * the document holds a missing block in its place. A missing block serializes
+ * back to the original markup of the block it stands in for, so a comparison
+ * of serialized content cannot tell it apart from the real block once the type
+ * is registered again. The reverse also applies: a block whose type is no
+ * longer registered cannot be edited or serialized by this client.
+ *
+ * @param blocks Blocks as stored in the CRDT document, as plain objects.
+ * @return True when at least one block should be re-parsed from the content.
+ */
+export function hasStaleBlockRegistration( blocks: Block[] ): boolean {
+	const missingBlockName = getUnregisteredTypeHandlerName();
+
+	return blocks.some( ( block ) => {
+		if ( block.name === missingBlockName ) {
+			const { originalName } = block.attributes ?? {};
+
+			if (
+				'string' === typeof originalName &&
+				getBlockType( originalName )
+			) {
+				return true;
+			}
+		} else if ( ! getBlockType( block.name ) ) {
+			return true;
+		}
+
+		return hasStaleBlockRegistration( block.innerBlocks ?? [] );
 	} );
 }
 
