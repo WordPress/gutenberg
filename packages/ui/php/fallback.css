@@ -1,0 +1,31 @@
+/*
+ * Native fields PHP prints for mounted components, until React replaces them.
+ * They match the size and spacing of the component's closed state, so the
+ * layout doesn't move when it does.
+ */
+@layer wp-ui {
+	.wp-ui-fallback {
+		display: flex;
+		flex-direction: column;
+		gap: var(--wpds-dimension-gap-sm);
+	}
+
+	.wp-ui-fallback label {
+		color: var(--wpds-color-foreground-content-neutral);
+		font-size: var(--wpds-typography-font-size-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: var(--wpds-typography-line-height-xs);
+		text-transform: uppercase;
+	}
+
+	.wp-ui-fallback select {
+		box-sizing: border-box;
+		min-height: 40px;
+		margin: 0;
+		padding: 4px 32px 4px 12px;
+		border: 1px solid #8d8d8d;
+		border-radius: 2px;
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: normal;
+	}
+}

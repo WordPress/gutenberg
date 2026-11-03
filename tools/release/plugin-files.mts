@@ -14,6 +14,7 @@ export const PLUGIN_FILES = [
 	'packages/ui/build-php/manifest.json',
 	'packages/ui/build-php/style.css',
 	'packages/ui/build-php/examples.json',
+	'packages/ui/build-php/interactive.js',
 	'build',
 	'build-module',
 	'readme.txt',

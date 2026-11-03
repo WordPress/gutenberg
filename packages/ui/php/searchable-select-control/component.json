@@ -1,0 +1,37 @@
+{
+	"name": "searchable-select-control",
+	"props": {
+		"label": { "type": "string", "required": true },
+		"name": { "type": "string", "required": true },
+		"items": {
+			"type": "array",
+			"required": true,
+			"items": {
+				"type": "object",
+				"properties": {
+					"value": { "type": "string" },
+					"label": { "type": "string" },
+					"disabled": { "type": "boolean" }
+				},
+				"required": [ "value", "label" ]
+			}
+		},
+		"value": { "type": "string", "default": "" },
+		"class": { "type": "string", "default": "" }
+	},
+	"example": {
+		"props": {
+			"label": "Base country",
+			"name": "country",
+			"items": [
+				{ "value": "ES", "label": "Spain" },
+				{ "value": "FR", "label": "France" },
+				{ "value": "PT", "label": "Portugal" }
+			],
+			"value": "ES"
+		}
+	},
+	"interactive": true,
+	"nativeFallback": true,
+	"react": { "component": "SearchableSelectControl" }
+}
