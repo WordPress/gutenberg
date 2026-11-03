@@ -79,36 +79,13 @@ ln -s "$ROOT" "$WP_DIR/wp-content/plugins/gutenberg"
 wp plugin activate gutenberg
 # The editor opens without the welcome guide or fullscreen mode.
 wp user meta update 1 wp_persisted_preferences --format=json \
-	"{\"core/edit-post\":{\"welcomeGuide\":false,\"fullscreenMode\":false},\"core/edit-widgets\":{\"welcomeGuide\":false},\"_modified\":\"$( date -u +%Y-%m-%dT%H:%M:%S+00:00 )\"}"
-# The widgets screen needs a classic theme.
-wp theme activate twentytwentyone
+	"{\"core/edit-post\":{\"welcomeGuide\":false,\"fullscreenMode\":false},\"_modified\":\"$( date -u +%Y-%m-%dT%H:%M:%S+00:00 )\"}"
 mkdir -p "$WP_DIR/wp-content/mu-plugins"
 # A new post starts with the content argument of post-new.php, unescaped.
 cat > "$WP_DIR/wp-content/mu-plugins/new-post-content.php" <<'PHP'
 <?php
 add_filter( 'default_content', function ( $content ) {
 	return isset( $_GET['content'] ) ? wp_unslash( $_GET['content'] ) : $content;
-} );
-PHP
-# The widgets screen starts with a widget for each block of its content
-# argument. Set before the widgets are loaded, which keeps a copy.
-cat > "$WP_DIR/wp-content/mu-plugins/widgets-content.php" <<'PHP'
-<?php
-add_action( 'plugins_loaded', function () {
-	if ( 'widgets.php' !== $GLOBALS['pagenow'] || ! isset( $_GET['content'] ) ) {
-		return;
-	}
-	$widgets = array( '_multiwidget' => 1 );
-	$ids = array();
-	foreach ( parse_blocks( wp_unslash( $_GET['content'] ) ) as $block ) {
-		if ( $block['blockName'] ) {
-			$number = count( $ids ) + 2;
-			$widgets[ $number ] = array( 'content' => serialize_block( $block ) );
-			$ids[] = "block-$number";
-		}
-	}
-	update_option( 'widget_block', $widgets );
-	update_option( 'sidebars_widgets', array( 'sidebar-1' => $ids, 'array_version' => 3 ) );
 } );
 PHP
 # Every request is the administrator's.
