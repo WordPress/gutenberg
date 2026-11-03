@@ -113,8 +113,10 @@ $transition-duration: 0.2s;
 			}
 		}
 
+		// A light track reads as "off" next to unchecked toggles, so keep the
+		// enabled shape (dark track, light thumb) in gray.
 		&.is-checked .components-form-toggle__track {
-			background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
+			background-color: var(--wpds-color-stroke-interactive-neutral);
 			border-color: transparent;
 
 			@media ( forced-colors: active ) {
@@ -123,7 +125,7 @@ $transition-duration: 0.2s;
 		}
 
 		&.is-checked .components-form-toggle__thumb {
-			background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+			background-color: var(--wpds-color-foreground-interactive-brand-strong);
 
 			@media ( forced-colors: active ) {
 				background-color: Canvas;
