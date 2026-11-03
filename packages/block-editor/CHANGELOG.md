@@ -17,10 +17,12 @@
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 -   DimensionsTool: Show an icon in the shape of each ratio next to the aspect ratio options and the selected value ([#85812](https://github.com/WordPress/gutenberg/pull/85812)).
+-   Block Inspector: Slide the inspector in for a Social Icon inside a Navigation block, as it does for its Social Icons parent ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
 -   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
+-   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
@@ -34,6 +36,7 @@
 -   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 -   Typography panel: "Reset all" also clears the link color that follows the text color ([#85376](https://github.com/WordPress/gutenberg/pull/85376)).
+-   Block Inspector: While a style state is edited, show the regular style panels for a template part instead of empty section style panels ([#86084](https://github.com/WordPress/gutenberg/pull/86084)).
 
 ### Internal
 
