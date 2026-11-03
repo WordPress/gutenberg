@@ -172,10 +172,18 @@ export const isDirectiveMap = ( value: unknown ): boolean =>
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
- * @param root The root element or node to start traversing on.
+ * @param root               The root element or node to start traversing on.
+ * @param inheritedNamespace Namespace to inherit for directives on elements
+ *                           without an enclosing
+ *                           attribute. Used by  when building
+ *                           vDOM from detached markup that is inserted into
+ *                           an existing island.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): ComponentChild {
+export function toVdom(
+	root: Node,
+	inheritedNamespace: string | null = null
+): ComponentChild {
 	const nodesToRemove = new Set< Node >();
 	const nodesToReplace = new Set< Node >();
 
@@ -184,7 +192,7 @@ export function toVdom( root: Node ): ComponentChild {
 		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
-	function walk( node: Node ): ComponentChild | null {
+	function walk( node: Node, isRoot = false ): ComponentChild | null {
 		const { nodeType } = node;
 
 		// TEXT_NODE (3)
@@ -283,6 +291,18 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
+		/*
+		 * If this element starts an island, its namespace was already pushed
+		 * above. Otherwise, if this is the walk root and a namespace was
+		 * inherited (e.g. the vDOM was built from detached markup that is
+		 * being inserted into an existing island), push it too so directives
+		 * on this element and its descendants resolve against it.
+		 */
+		let inherited = false;
+		if ( ! island && isRoot && inheritedNamespace ) {
+			namespaces.push( inheritedNamespace );
+			inherited = true;
+		}
 		if ( directives.length ) {
 			// Keyed by directive names from the markup, so it has no prototype.
 			props.__directives = directives.reduce<
@@ -358,7 +378,9 @@ export function toVdom( root: Node ): ComponentChild {
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			].map( ( childNode ) =>
+				toVdom( childNode, namespaces[ namespaces.length - 1 ] ?? null )
+			);
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
@@ -374,14 +396,14 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		// Restore previous namespace.
-		if ( island ) {
+		if ( island || inherited ) {
 			namespaces.pop();
 		}
 
 		return h( localName, props, children );
 	}
 
-	const vdom = walk( treeWalker.currentNode );
+	const vdom = walk( treeWalker.currentNode, true );
 
 	nodesToRemove.forEach( ( node: Node ) =>
 		( node as Comment | ProcessingInstruction ).remove()
