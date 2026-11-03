@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { act, screen } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
@@ -9,6 +9,7 @@ import {
 	getStepsForOriginal,
 	useImageEditor,
 	type ImageEditorController,
+	type ImageEditorState,
 } from '..';
 // Browser Mode needs the package's real styles for layout.
 import '../style.scss';
@@ -21,10 +22,14 @@ const IMAGE = {
 
 function ConsumerEditor( {
 	onController,
+	initialState = createImageEditorState(),
+	freeformCrop = true,
 }: {
 	onController: ( controller: ImageEditorController ) => void;
+	initialState?: ImageEditorState;
+	freeformCrop?: boolean;
 } ) {
-	const [ state, setState ] = useState( () => createImageEditorState() );
+	const [ state, setState ] = useState( initialState );
 	const controller = useImageEditor( { state, onChange: setState } );
 	const { setImage } = controller;
 	useEffect( () => setImage( IMAGE ), [ setImage ] );
@@ -34,7 +39,7 @@ function ConsumerEditor( {
 			<ImageEditorCanvas
 				src={ IMAGE.src }
 				controller={ controller }
-				freeformCrop
+				freeformCrop={ freeformCrop }
 			/>
 		</div>
 	);
@@ -85,5 +90,26 @@ describe( 'the public API', () => {
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
 		expect( getStepsForOriginal( controller.state ) ).toEqual( [] );
+	} );
+
+	it( 'starts with the crop locked to a ratio', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		await render(
+			<ConsumerEditor
+				onController={ onController }
+				initialState={ { ...createImageEditorState(), aspectRatio: 1 } }
+				freeformCrop={ false }
+			/>
+		);
+
+		await waitFor( () =>
+			expect( cropSize( controller ) ).toEqual( {
+				width: 600,
+				height: 600,
+			} )
+		);
 	} );
 } );

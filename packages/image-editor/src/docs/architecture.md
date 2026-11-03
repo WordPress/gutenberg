@@ -10,7 +10,22 @@ How the cropper works inside, for people changing this package. To use it, see t
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
 | Steps for the original | `src/get-steps-for-original.ts` | Turns the edit into the flip, rotate and crop steps that make the full-size original match it. |
 
-The cropper keeps no undo history. History belongs to the code that uses the cropper, because it covers everything that code edits, not only the crop. To put the crop in an undo history, keep the cropper state yourself: `useCropperController( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
+The editor keeps no undo history. History belongs to the code that uses the editor, because it covers everything that code edits, not only the crop. The consumer keeps the state: `useImageEditor( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
+
+## Public Names
+
+`src/image-editor.ts` gives the public names and types, and points them at the cropper code, which keeps the names it had in the media editor:
+
+| Public | Inside the package |
+| --- | --- |
+| `ImageEditorCanvas` | `Cropper` |
+| `useImageEditor` | `useCropperController` |
+| `ImageEditorState` | `CropperState` |
+| `ImageEditorController` | `CropperController` |
+| `createImageEditorState` | `createCropperState` |
+| `areImageEditorStatesEqual` | `areCropperStatesEqual` |
+
+The public types are narrower. `ImageEditorState` leaves out the base pan, zoom and rotation the reducer keeps for fine rotation, though they stay on the stored object. `ImageEditorController` leaves out the methods the canvas calls (`setVisualSize`, `adjustCropRectForViewport`, `settleCrop`, `setZoomAtPoint`), and `getCroppedImage`. `useCropperController` can still keep its own state, which the package's tests and debug story use; the public hook always takes the state from the consumer.
 
 ## Coordinate Spaces
 
@@ -23,7 +38,7 @@ The cropper keeps no undo history. History belongs to the code that uses the cro
 
 ## Data Flow
 
-Every change goes through `cropperReducer()` in `src/core/state.ts`. `useCropperController` runs it, either on its own state or on the state a consumer keeps (`state` and `onChange`). Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
+Every change goes through `cropperReducer()` in `src/core/state.ts`. `useCropperController` runs it on the state the consumer keeps (`state` and `onChange`), or on its own state in the package's tests. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
 
 ## Design Decisions
 
@@ -48,8 +63,8 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 | Task | API |
 | --- | --- |
 | Save the edit to the original image | `getStepsForOriginal()`. |
-| Export in the browser | `controller.getCroppedImage()`. |
-| Keep the crop in your own undo history | `useCropperController( { state, onChange } )`, `createCropperState()` and `areCropperStatesEqual()`. |
+| Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
+| Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 
 ## Tests
 

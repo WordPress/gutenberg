@@ -2,21 +2,28 @@
 
 > **Status: experimental.** This API may change in any release.
 
-## Mount a Cropper
+## Mount the Canvas
+
+Keep the editor's state in your own state, and pass it to `useImageEditor` with a function that stores the next one.
 
 ```tsx
-import { Cropper, useCropperController } from '@wordpress/image-editor';
+import { useState } from '@wordpress/element';
+import {
+	ImageEditorCanvas,
+	createImageEditorState,
+	useImageEditor,
+} from '@wordpress/image-editor';
 
 function ImageCropper( { src }: { src: string } ) {
-	const controller = useCropperController();
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const controller = useImageEditor( { state, onChange: setState } );
 
 	return (
 		<div style={ { width: 600, height: 400 } }>
-			<Cropper
+			<ImageEditorCanvas
 				src={ src }
 				controller={ controller }
 				freeformCrop
-				showDimming
 				showGrid="interactive"
 			/>
 		</div>
@@ -24,31 +31,35 @@ function ImageCropper( { src }: { src: string } ) {
 }
 ```
 
-The cropper fills its parent. Always render it inside a sized container.
+The canvas fills its parent. Always render it inside a sized container. The canvas loads the image into the state itself, through the controller.
 
 ## Add Controls
 
-```tsx
-function ImageCropperWithControls( { src }: { src: string } ) {
-	const controller = useCropperController();
-	const { state, setZoom, snapRotate90, toggleFlip, reset } = controller;
+Read the limits from the controller, so your controls stop where the editor does.
 
-	return (
-		<>
-			<button onClick={ () => setZoom( state.zoom + 0.5 ) }>
-				Zoom in
-			</button>
-			<button onClick={ () => snapRotate90( 1 ) }>Rotate right</button>
-			<button onClick={ () => toggleFlip( 'horizontal' ) }>
-				Flip horizontal
-			</button>
-			<button onClick={ () => reset() } disabled={ ! controller.isDirty }>
-				Reset
-			</button>
-			<Cropper src={ src } controller={ controller } freeformCrop />
-		</>
-	);
-}
+```tsx
+const { state, setZoom, snapRotate90, toggleFlip, reset } = controller;
+
+return (
+	<>
+		<button
+			disabled={ state.zoom >= controller.maxZoom }
+			onClick={ () =>
+				setZoom( Math.min( controller.maxZoom, state.zoom + 0.5 ) )
+			}
+		>
+			Zoom in
+		</button>
+		<button onClick={ () => snapRotate90( 1 ) }>Rotate right</button>
+		<button onClick={ () => toggleFlip( 'horizontal' ) }>
+			Flip horizontal
+		</button>
+		<button onClick={ () => reset() } disabled={ ! controller.isDirty }>
+			Reset
+		</button>
+		<ImageEditorCanvas src={ src } controller={ controller } freeformCrop />
+	</>
+);
 ```
 
 ## Offer Aspect-Ratio Presets
@@ -56,9 +67,6 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 The controller takes a width / height ratio, or `undefined` for a free crop. Keep your own list of presets, and keep the selected one in your own state. To offer the image's own ratio, work it out from `controller.state.image`.
 
 ```tsx
-import { useState } from '@wordpress/element';
-import { Cropper, useCropperController } from '@wordpress/image-editor';
-
 const PRESETS = [
 	{ label: 'Free', value: 'free' },
 	{ label: 'Original', value: 'original' },
@@ -66,89 +74,85 @@ const PRESETS = [
 	{ label: 'Landscape (16:9)', value: String( 16 / 9 ) },
 ];
 
-function CropperWithPresets( { src }: { src: string } ) {
-	const controller = useCropperController();
+function PresetPicker( { controller }: { controller: ImageEditorController } ) {
 	const [ preset, setPreset ] = useState( 'free' );
 	const { image } = controller.state;
 
 	return (
-		<>
-			<select
-				value={ preset }
-				onChange={ ( event ) => {
-					const { value } = event.target;
-					setPreset( value );
-					if ( value === 'free' ) {
-						controller.setAspectRatio( undefined );
-					} else if ( value === 'original' ) {
-						controller.setAspectRatio(
-							image
-								? image.naturalWidth / image.naturalHeight
-								: undefined
-						);
-					} else {
-						controller.setAspectRatio( parseFloat( value ) );
-					}
-				} }
-			>
-				{ PRESETS.map( ( { label, value } ) => (
-					<option key={ value } value={ value }>
-						{ label }
-					</option>
-				) ) }
-			</select>
-			<Cropper src={ src } controller={ controller } freeformCrop />
-		</>
+		<select
+			value={ preset }
+			onChange={ ( event ) => {
+				const { value } = event.target;
+				setPreset( value );
+				if ( value === 'free' ) {
+					controller.setAspectRatio( undefined );
+				} else if ( value === 'original' ) {
+					controller.setAspectRatio(
+						image ? image.naturalWidth / image.naturalHeight : undefined
+					);
+				} else {
+					controller.setAspectRatio( parseFloat( value ) );
+				}
+			} }
+		>
+			{ PRESETS.map( ( { label, value } ) => (
+				<option key={ value } value={ value }>
+					{ label }
+				</option>
+			) ) }
+		</select>
 	);
 }
 ```
 
 ## Lock the Crop to a Ratio
 
-For a fixed shape, such as a square site icon, start with a locked ratio and leave out `freeformCrop`. The crop area stays centred at the largest square that fits, and the person pans and zooms the image under it.
+For a fixed shape, such as a square site icon, start from a state with a locked ratio and leave out `freeformCrop`. The crop area stays centred at the largest square that fits, and the person pans and zooms the image under it.
 
 ```tsx
-const controller = useCropperController( {
-	initialState: { aspectRatio: 1 },
-} );
+const [ state, setState ] = useState( () => ( {
+	...createImageEditorState(),
+	aspectRatio: 1,
+} ) );
+const controller = useImageEditor( { state, onChange: setState } );
 
-return <Cropper src={ src } controller={ controller } />;
+return <ImageEditorCanvas src={ src } controller={ controller } />;
 ```
 
-## Start From a Saved Crop
+## Start From a Saved Edit
 
-Pass a crop you saved earlier from `controller.state` as `initialState`. It is kept when the image loads.
+Store the whole state object, and start from it next time. It is kept when the image loads.
 
 ```tsx
-const controller = useCropperController( { initialState: savedCrop } );
+const [ state, setState ] = useState< ImageEditorState >( () => savedState );
 ```
 
-## Keep the State Yourself
+## Keep an Undo History
 
-To put the crop in your own undo history, alongside anything else your editor changes, keep the cropper state in your own state and pass it to the controller. The controller works out each change and hands you the next state. A minimal history, with a drag recorded as one entry:
+Because you keep the state, you can keep earlier states too. A minimal history, with a drag recorded as one entry:
 
 ```tsx
 import { useRef, useState } from '@wordpress/element';
 import {
-	Cropper,
-	areCropperStatesEqual,
-	createCropperState,
-	useCropperController,
-	type CropperState,
+	ImageEditorCanvas,
+	areImageEditorStatesEqual,
+	createImageEditorState,
+	useImageEditor,
+	type ImageEditorState,
 } from '@wordpress/image-editor';
 
-function CropperWithHistory( { src }: { src: string } ) {
-	const [ crop, setCrop ] = useState( () => createCropperState() );
-	const [ past, setPast ] = useState< CropperState[] >( [] );
-	const gestureStart = useRef< CropperState | null >( null );
+function ImageCropperWithHistory( { src }: { src: string } ) {
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const [ past, setPast ] = useState< ImageEditorState[] >( [] );
+	const gestureStart = useRef< ImageEditorState | null >( null );
 
-	const controller = useCropperController( {
-		state: crop,
+	const controller = useImageEditor( {
+		state,
 		onChange: ( next, { isEdit } ) => {
 			if ( isEdit && ! gestureStart.current ) {
-				setPast( ( entries ) => [ ...entries, crop ] );
+				setPast( ( entries ) => [ ...entries, state ] );
 			}
-			setCrop( next );
+			setState( next );
 		},
 	} );
 
@@ -157,23 +161,23 @@ function CropperWithHistory( { src }: { src: string } ) {
 			<button
 				disabled={ ! past.length }
 				onClick={ () => {
-					setCrop( past[ past.length - 1 ] );
+					setState( past[ past.length - 1 ] );
 					setPast( past.slice( 0, -1 ) );
 				} }
 			>
 				Undo
 			</button>
-			<Cropper
+			<ImageEditorCanvas
 				src={ src }
 				controller={ controller }
 				freeformCrop
 				onGestureStart={ () => {
-					gestureStart.current = crop;
+					gestureStart.current = state;
 				} }
 				onGestureEnd={ () => {
 					const start = gestureStart.current;
 					gestureStart.current = null;
-					if ( start && ! areCropperStatesEqual( start, crop ) ) {
+					if ( start && ! areImageEditorStatesEqual( start, state ) ) {
 						setPast( ( entries ) => [ ...entries, start ] );
 					}
 				} }
@@ -184,14 +188,6 @@ function CropperWithHistory( { src }: { src: string } ) {
 ```
 
 `isEdit` is `false` for an image loading or the crop being refitted after a window resize, so those do not get an undo entry. The media editor's session (`packages/media-editor/src/state`) is a fuller version of this, with redo and other edits in the same history.
-
-## Export a Cropped Image
-
-```ts
-const blob = await controller.getCroppedImage( 'image/jpeg', 0.9 );
-```
-
-Canvas export is browser-only. Cross-origin images need valid CORS headers or the canvas will be tainted.
 
 ## Save the Edit
 

@@ -17,6 +17,8 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
+import { ImageEditorCanvas, createImageEditorState, useImageEditor } from '..';
+// The debug story shows the cropper's internals, so it uses them directly.
 import { Cropper } from '../react/components/cropper';
 import { useCropperController } from '../react/hooks/use-cropper-controller';
 import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
@@ -34,6 +36,7 @@ import {
 	getVisibleBounds,
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
+import type { CropperState } from '../core/types';
 import styles from './style.module.css';
 
 // "-1" stands for the image's own ratio, worked out once it loads.
@@ -111,27 +114,28 @@ function useUploadableImage() {
 	return { src, isCustom, handleFileChange, resetToSample };
 }
 
-const meta: Meta< typeof Cropper > = {
+const meta: Meta< typeof ImageEditorCanvas > = {
 	id: 'mediaeditor-imageeditor',
 	title: 'Editor/Media Editor/ImageEditor',
-	component: Cropper,
+	component: ImageEditorCanvas,
 	tags: [ 'status-experimental' ],
 };
 
 export default meta;
 
-type Story = StoryObj< typeof Cropper >;
+type Story = StoryObj< typeof ImageEditorCanvas >;
 
 /**
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperController();
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const controller = useImageEditor( { state, onChange: setState } );
 
 	return (
 		<div>
 			<div className={ styles.container }>
-				<Cropper
+				<ImageEditorCanvas
 					src={ SAMPLE_IMAGE }
 					controller={ controller }
 					showDimming
@@ -155,7 +159,13 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperController();
+	const [ editorState, setEditorState ] = useState( () =>
+		createImageEditorState()
+	);
+	const controller = useImageEditor( {
+		state: editorState,
+		onChange: setEditorState,
+	} );
 	const {
 		state,
 		setRotation,
@@ -164,6 +174,9 @@ const WithControlsComponent = () => {
 		snapRotate90,
 		reset,
 		isDirty,
+		minZoom,
+		maxZoom,
+		maxRotationOffset,
 	} = controller;
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
@@ -187,9 +200,10 @@ const WithControlsComponent = () => {
 		}
 	}, [ src, reset ] );
 
-	// Compute the crop dimensions in source pixels.
+	// Compute the crop dimensions in source pixels. `getSourceRegion` is
+	// internal, and the public state is the internal one underneath.
 	const cropDimensions = state.image
-		? getSourceRegion( state, {
+		? getSourceRegion( state as unknown as CropperState, {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
 			} )
@@ -224,8 +238,8 @@ const WithControlsComponent = () => {
 			// events then spiral because they're added to the NEW base.
 			const EPS = 0.01;
 			const clamped = Math.max(
-				-MAX_ROTATION_OFFSET + EPS,
-				Math.min( MAX_ROTATION_OFFSET - EPS, value )
+				-maxRotationOffset + EPS,
+				Math.min( maxRotationOffset - EPS, value )
 			);
 			setRotation( baseAngle + clamped * visualDir );
 		},
@@ -405,16 +419,16 @@ const WithControlsComponent = () => {
 				<div className={ styles.sliders }>
 					<RangeControl
 						label="Fine rotation"
-						min={ -MAX_ROTATION_OFFSET }
-						max={ MAX_ROTATION_OFFSET }
+						min={ -maxRotationOffset }
+						max={ maxRotationOffset }
 						step={ 0.5 }
 						value={ fineOffset }
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
 						label="Zoom"
-						min={ getMinZoom( state ) }
-						max={ MAX_ZOOM }
+						min={ minZoom }
+						max={ maxZoom }
 						step={ 0.1 }
 						value={ state.zoom }
 						onChange={ handleZoomChange }
@@ -423,7 +437,7 @@ const WithControlsComponent = () => {
 			</div>
 
 			<div className={ styles.resizable }>
-				<Cropper
+				<ImageEditorCanvas
 					src={ src }
 					controller={ controller }
 					showGrid={ GRID_MODES[ gridMode ] }
