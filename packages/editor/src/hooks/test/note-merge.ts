@@ -1,8 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Block, BlockType } from '@wordpress/blocks';
 import { addNoteMergeCallback, keepNotesOnTransform } from '../note-merge';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 type Attributes = Record< string, any >;
 
