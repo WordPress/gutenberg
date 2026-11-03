@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../lib/block-supports/states.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../lib/block-supports/typography.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
@@ -43,156 +31,6 @@ parameters:
 			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:compute_spacing_sizes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_block_name_from_metadata_path\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_block_nodes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_feature_selector\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:get_viewport_breakpoint_value_in_pixels\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:is_valid_viewport_breakpoint_size\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:merge_spacing_sizes\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:remove_indirect_properties\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:resolve_custom_css_format\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:sanitize_viewport_settings\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:unwrap_shared_block_style_variations\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_button_width_declarations\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 4
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_paragraph_text_indent_selector\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 4
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Gutenberg\:\:update_separator_declarations\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$core \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$i18n_schema \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$theme \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user_custom_post_type_id \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:inject_variations_from_block_style_variation_files\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:inject_variations_from_block_styles_registry\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:recursively_iterate_json\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:remove_json_comments\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 2
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Unsafe call to private method WP_Theme_JSON_Resolver_Gutenberg\:\:style_variation_has_scope\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
 			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -221,18 +59,6 @@ parameters:
 			identifier: offsetAssign.valueType
 			count: 2
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
 
 		-
 			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
@@ -319,12 +145,6 @@ parameters:
 			path: ../../packages/block-library/src/avatar/index.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/categories/index.php
-
-		-
 			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -341,12 +161,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/comment-date/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 2
-			path: ../../packages/block-library/src/comments-title/index.php
 
 		-
 			message: '#^Cannot access property \$context on array\.$#'
@@ -411,12 +225,6 @@ parameters:
 		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
 			path: ../../packages/block-library/src/navigation/index.php
 
@@ -509,15 +317,3 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page-wp-admin.php.template
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page.php.template
