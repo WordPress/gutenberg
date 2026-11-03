@@ -332,6 +332,13 @@
 	}
 }
 
+// The primary column shows the primary actions below the title, so the actions
+// column only needs room for the actions menu.
+.dataviews-view-table__primary-actions {
+	// Line up the first button's label with the title.
+	margin-inline-start: calc(-1 * var(--wpds-dimension-padding-xs));
+}
+
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: var(--wpds-typography-font-weight-emphasis);
