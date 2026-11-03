@@ -1207,6 +1207,12 @@ test.describe( 'Registered sources', () => {
 				} )
 				.getByRole( 'textbox' )
 				.click();
+			// The Button inspector opens on its Content tab; the bindings
+			// panel is on the Settings tab.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'tab', { name: 'Settings' } )
+				.click();
 			await page.getByLabel( 'Attributes options' ).click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
 				name: 'url, show',
