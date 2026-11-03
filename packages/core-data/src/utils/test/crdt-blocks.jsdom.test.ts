@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { RichTextData } from '@wordpress/rich-text';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
@@ -231,6 +232,58 @@ describe( 'crdt-blocks', () => {
 			 ).get( 'content' ) as Y.Text;
 			expect( content.toString() ).toBe( 'Updated content' );
 		} );
+
+		it.each( [
+			'Hello&nbsp;world',
+			'5 &gt; 3',
+			'line<br/>break',
+			"<a href='https://example.com'>link</a>",
+		] )(
+			'does not rewrite an untouched rich-text block received from the shared document when another block changes: %s',
+			( html ) => {
+				mergeCrdtBlocks(
+					yblocks,
+					[
+						{
+							name: 'core/paragraph',
+							attributes: { content: html },
+							innerBlocks: [],
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Edit me' },
+							innerBlocks: [],
+						},
+					],
+					null
+				);
+
+				// Read the blocks back the way a peer receives them.
+				const receivedBlocks = deserializeBlockAttributes(
+					yblocks.toJSON() as Block[]
+				);
+				const untouchedContent = (
+					yblocks.get( 0 ).get( 'attributes' ) as YBlockAttributes
+				 ).get( 'content' ) as Y.Text;
+				const onUntouchedChange = vi.fn();
+				untouchedContent.observe( onUntouchedChange );
+
+				mergeCrdtBlocks(
+					yblocks,
+					[
+						receivedBlocks[ 0 ],
+						{
+							...receivedBlocks[ 1 ],
+							attributes: { content: 'Edit me!' },
+						},
+					],
+					null
+				);
+
+				expect( onUntouchedChange ).not.toHaveBeenCalled();
+				expect( untouchedContent.toString() ).toBe( html );
+			}
+		);
 
 		it( 'updates the clientId when an updated block arrives with a different clientId', () => {
 			const initialBlocks: Block[] = [
@@ -3106,6 +3159,21 @@ describe( 'getCachedRichTextData', () => {
 
 		expect( spy ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it.each( [
+		'Hello&nbsp;world',
+		'5 &gt; 3',
+		'line<br/>break',
+		"<a href='https://example.com'>link</a>",
+	] )(
+		'serializes back to the exact HTML string it was created from: %s',
+		( html ) => {
+			const richTextData = getCachedRichTextData( html );
+
+			expect( richTextData.toHTMLString() ).toBe( html );
+			expect( richTextData.valueOf() ).toBe( html );
+		}
+	);
 
 	it( 'calls fromHTMLString for each unique HTML string', () => {
 		getCachedRichTextData( '<strong>cached-miss-a</strong>' );
