@@ -1,5 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react';
-import type { MenuItem } from '@wordpress/components';
+import type { ComponentProps, MouseEventHandler, ReactNode } from 'react';
 import type { Icon } from '@wordpress/icons';
 import type { Badge } from '@wordpress/ui';
 import type {
@@ -420,7 +419,7 @@ export interface LinkControlSearchItemProps {
 	itemProps?: SuggestionItemProps;
 	suggestion: LinkControlSuggestion;
 	searchTerm?: string | null;
-	onClick?: ComponentProps< typeof MenuItem >[ 'onClick' ];
+	onClick?: MouseEventHandler< HTMLButtonElement >;
 	isURL?: boolean;
 	shouldShowType?: boolean;
 	index?: number;
@@ -434,7 +433,7 @@ export interface LinkControlSearchItemProps {
  */
 export interface LinkControlSearchCreateProps {
 	searchTerm?: string | null;
-	onClick?: ComponentProps< typeof MenuItem >[ 'onClick' ];
+	onClick?: MouseEventHandler< HTMLButtonElement >;
 	itemProps?: SuggestionItemProps;
 	buttonText?: CreateSuggestionButtonText;
 	isSelected?: boolean;
