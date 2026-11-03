@@ -15,6 +15,7 @@ import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
+import useCalendarEvents from './utils/use-calendar-events';
 import getCustomValidity from './utils/get-custom-validity';
 import getCalendarLocale from './utils/get-calendar-locale';
 import getTimezoneDescription from './utils/get-timezone-description';
@@ -37,7 +38,7 @@ function CalendarDateTimeControl< Item >( {
 	validity,
 	config,
 }: DataFormControlProps< Item > ) {
-	const { compact } = config || {};
+	const { compact, getEvents } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
@@ -64,6 +65,12 @@ function CalendarDateTimeControl< Item >( {
 			);
 		}
 	}, [ timeZone, value ] );
+
+	const events = useCalendarEvents(
+		compact ? undefined : getEvents,
+		data,
+		calendarMonth
+	);
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -210,6 +217,7 @@ function CalendarDateTimeControl< Item >( {
 						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
+						events={ events }
 					/>
 				) }
 			</Stack>

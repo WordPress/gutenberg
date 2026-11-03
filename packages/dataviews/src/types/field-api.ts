@@ -282,7 +282,7 @@ export type EditConfigText = {
 /**
  * Edit configuration for datetime controls.
  */
-export type EditConfigDatetime = {
+export type EditConfigDatetime< Item = any > = {
 	/**
 	 * The control to render.
 	 */
@@ -291,7 +291,41 @@ export type EditConfigDatetime = {
 	 * Whether to render a compact version without the calendar widget.
 	 */
 	compact?: boolean;
+	/**
+	 * Loads the events to mark on the calendar widget.
+	 */
+	getEvents?: GetCalendarEvents< Item >;
 };
+
+/**
+ * An event to mark on a calendar day, such as content already scheduled.
+ */
+export type CalendarEvent = {
+	/**
+	 * When the event happens.
+	 */
+	date: Date;
+};
+
+/**
+ * Loads the events to mark on the calendar widget of a datetime control. It is
+ * called with the item being edited and the bounds of the month the calendar
+ * displays, and again each time the user navigates to another month.
+ */
+export type GetCalendarEvents< Item = any > = ( args: {
+	/**
+	 * The item being edited.
+	 */
+	item: Item;
+	/**
+	 * The start of the displayed month, in the calendar's time zone.
+	 */
+	from: Date;
+	/**
+	 * The end of the displayed month, in the calendar's time zone.
+	 */
+	to: Date;
+} ) => Promise< CalendarEvent[] >;
 
 /**
  * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
@@ -307,10 +341,10 @@ export type EditConfigGeneric = {
  * Edit configuration object with type-safe control options.
  * Each control type has its own specific configuration properties.
  */
-export type EditConfig =
+export type EditConfig< Item = any > =
 	| EditConfigTextarea
 	| EditConfigText
-	| EditConfigDatetime
+	| EditConfigDatetime< Item >
 	| EditConfigGeneric;
 
 /**
@@ -358,7 +392,10 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | string | EditConfig;
+	Edit?:
+		| ComponentType< DataFormControlProps< Item > >
+		| string
+		| EditConfig< Item >;
 
 	/**
 	 * Callback used to sort the field.
@@ -803,6 +840,10 @@ export type DataFormControlProps< Item > = {
 		 * (datetime control).
 		 */
 		compact?: boolean;
+		/**
+		 * Loads the events to mark on the calendar widget (datetime control).
+		 */
+		getEvents?: GetCalendarEvents< Item >;
 	};
 };
 

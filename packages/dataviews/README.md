@@ -1630,6 +1630,23 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+`compact` renders the control without the calendar widget. `getEvents` loads the events to mark on the calendar, such as the posts already published or scheduled on a day. It receives the item and the start and end of the month the calendar displays (`{ item, from, to }`), runs again each time the user navigates to another month, and returns a promise of `{ date }` objects:
+
+```js
+{
+	id: 'date',
+	type: 'datetime',
+	label: 'Date',
+	Edit: {
+		control: 'datetime',
+		getEvents: async ( { item, from, to } ) => {
+			const posts = await fetchPosts( { after: from, before: to } );
+			return posts.map( ( post ) => ( { date: new Date( post.date ) } ) );
+		},
+	}
+}
+```
+
 Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
 
 -   `data`: the item to be processed
@@ -1646,6 +1663,7 @@ Finally, the field author can always provide its own custom `Edit` control. It r
     -   `suffixPadding`: the padding of the suffix slot, `default` (the default) or `minimal` (text control)
     -   `rows`: the number of rows to display (e.g., in the text area component)
     -   `compact`: whether to render a compact version without the calendar widget (datetime control)
+    -   `getEvents`: a function that loads the events to mark on the calendar widget (datetime control)
 
 ```js
 {

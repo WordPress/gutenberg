@@ -364,4 +364,63 @@ describe( 'DateTime control', () => {
 			}
 		} );
 	} );
+
+	describe( 'calendar events', () => {
+		it( 'marks the events of the displayed month and loads them again on navigation', async () => {
+			const user = userEvent.setup();
+			const getEvents = vi.fn( async ( { from }: { from: Date } ) =>
+				from.getUTCMonth() === 2
+					? [ { date: new Date( '2024-03-20T08:00:00.000Z' ) } ]
+					: []
+			);
+			const item = { published: '2024-03-15T10:30:00.000Z' };
+
+			render(
+				<DateTime
+					data={ item }
+					field={ field }
+					onChange={ noop }
+					config={ { getEvents } }
+				/>
+			);
+
+			expect(
+				await screen.findByRole( 'button', {
+					name: 'Wednesday, March 20, 2024, 1 event',
+				} )
+			).toBeVisible();
+			expect( getEvents ).toHaveBeenCalledTimes( 1 );
+			expect( getEvents ).toHaveBeenLastCalledWith( {
+				item,
+				from: new Date( '2024-03-01T00:00:00.000Z' ),
+				to: new Date( '2024-03-31T23:59:59.999Z' ),
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Next month' } )
+			);
+
+			expect( getEvents ).toHaveBeenCalledTimes( 2 );
+			expect( getEvents ).toHaveBeenLastCalledWith(
+				expect.objectContaining( {
+					from: new Date( '2024-04-01T00:00:00.000Z' ),
+				} )
+			);
+		} );
+
+		it( 'does not load events without the calendar', () => {
+			const getEvents = vi.fn( async () => [] );
+
+			render(
+				<DateTime
+					data={ { published: '2024-03-15T10:30:00.000Z' } }
+					field={ field }
+					onChange={ noop }
+					config={ { compact: true, getEvents } }
+				/>
+			);
+
+			expect( getEvents ).not.toHaveBeenCalled();
+		} );
+	} );
 } );
