@@ -92,6 +92,132 @@ test.describe( 'Image', () => {
 		).toBe( '12' );
 	} );
 
+	test( 'should keep a caption typed while the image uploads', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		// Hold the upload until the caption is typed.
+		let releaseUpload;
+		const uploadReleased = new Promise( ( resolve ) => {
+			releaseUpload = resolve;
+		} );
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() === 'POST' ) {
+				await uploadReleased;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		await expect( image ).toHaveAttribute( 'src', /^blob:/ );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await page.keyboard.type( 'Typed while uploading' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: { caption: 'Typed while uploading' },
+			},
+		] );
+		const [ uploadingImage ] = await editor.getBlocks();
+		expect( uploadingImage.attributes.id ).toBeUndefined();
+		releaseUpload();
+
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: expect.any( Number ),
+					url: expect.stringMatching( /^https?:\/\// ),
+					caption: 'Typed while uploading',
+				},
+			},
+		] );
+	} );
+
+	test( 'should hide an empty caption when the image is deselected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const caption = imageBlock.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await expect( caption ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( caption ).toBeHidden();
+
+		await editor.selectBlocks( imageBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add caption' } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( caption ).toBeHidden();
+	} );
+
+	test( 'should show the caption again when removing it is undone', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+				caption: 'Caption',
+			},
+		} );
+		const caption = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'textbox', { name: 'Image caption text' } );
+		await expect( caption ).toHaveText( 'Caption' );
+
+		await editor.clickBlockToolbarButton( 'Remove caption' );
+		await expect( caption ).toBeHidden();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: undefined } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( caption ).toHaveText( 'Caption' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: 'Caption' } },
+			] );
+	} );
+
 	test( 'should allow soft line breaks in caption', async ( {
 		editor,
 		page,
