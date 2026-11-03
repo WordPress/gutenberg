@@ -25,13 +25,24 @@ export type WidthOptionsResolution =
 	| { kind: 'invalid' };
 
 /**
- * Dev-only hint; the warning package is a no-op in production builds.
+ * Dev-only hint for an invalid list; the warning package is a no-op in
+ * production builds.
  *
  * @param reason What is wrong with the configuration.
  */
 function warnInvalid( reason: string ): void {
 	warning(
 		`WidgetDashboard: ${ reason } Width changes and insertions now fail closed for width governance instead of restoring the unrestricted choices.`
+	);
+}
+
+/**
+ * Dev-only hint for a list the masonry model cannot consume. The
+ * dashboard keeps its current behavior, so this is not a failure.
+ */
+function warnIgnoredOnMasonry(): void {
+	warning(
+		'WidgetDashboard: widthOptions applies to the grid model only; the masonry model stores numeric widths only, so the list is ignored there.'
 	);
 }
 
@@ -73,9 +84,7 @@ export function resolveWidthOptions(
 		return { kind: 'default' };
 	}
 	if ( model === 'masonry' ) {
-		warnInvalid(
-			'widthOptions applies to the grid model only; the masonry model stores numeric widths only, so the list is ignored there.'
-		);
+		warnIgnoredOnMasonry();
 		return { kind: 'default' };
 	}
 	if ( ! Array.isArray( options ) || options.length === 0 ) {

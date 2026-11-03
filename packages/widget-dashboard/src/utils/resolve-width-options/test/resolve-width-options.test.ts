@@ -71,7 +71,9 @@ describe( 'resolveWidthOptions', () => {
 				'masonry'
 			)
 		).toEqual( { kind: 'default' } );
-		expect( warningMock ).toHaveBeenCalledTimes( 1 );
+		expect( warningMock ).toHaveBeenCalledWith(
+			'WidgetDashboard: widthOptions applies to the grid model only; the masonry model stores numeric widths only, so the list is ignored there.'
+		);
 	} );
 } );
 
