@@ -137,6 +137,9 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	}
 
 	$content = preg_replace( '/<br\s*\/?>/i', ' ', $rendered_heading );
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the ToC entry.
+	$content = preg_replace( '/<annotation(?:\s[^>]*)?>.*?<\/annotation>/is', '', $content );
 	// Decode entities from rendered heading HTML before the ToC escapes them
 	// once. Use html_entity_decode() because wp_specialchars_decode() only
 	// handles special HTML characters, while headings can contain other named
