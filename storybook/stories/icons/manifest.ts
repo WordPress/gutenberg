@@ -5,8 +5,6 @@ const { Icon, ...availableIcons } = iconsPackage;
 
 export { availableIcons };
 
-export type IconComponent =
-	( typeof availableIcons )[ keyof typeof availableIcons ];
 
 export const ALL_ICONS_MANIFEST = new Map(
 	manifest.map(
