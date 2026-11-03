@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the `transform.rotate` setting ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Add the `transform.rotate` setting ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
 ### Bug Fixes
