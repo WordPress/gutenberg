@@ -1,7 +1,15 @@
 import { test, expect } from './fixtures';
 
 test.describe( 'Router script modules', () => {
-	test.beforeAll( async ( { interactivityUtils: utils } ) => {
+	let originalSiteTitle: string;
+
+	test.beforeAll( async ( { requestUtils, interactivityUtils: utils } ) => {
+		// The page title assertions below include the site title, which
+		// wp-env derives from the checkout directory name. Pin it so the
+		// tests do not depend on where the repository was cloned.
+		originalSiteTitle = ( await requestUtils.getSiteSettings() ).title;
+		await requestUtils.updateSiteSettings( { title: 'gutenberg' } );
+
 		await utils.activatePlugins();
 		const alpha = await utils.addPostWithBlock(
 			'test/router-script-modules-wrapper',
@@ -47,9 +55,10 @@ test.describe( 'Router script modules', () => {
 		await page.goto( utils.getLink( 'none' ) );
 	} );
 
-	test.afterAll( async ( { interactivityUtils: utils } ) => {
+	test.afterAll( async ( { requestUtils, interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();
+		await requestUtils.updateSiteSettings( { title: originalSiteTitle } );
 	} );
 
 	for ( const [ testId, buttonId, expectedValues ] of [

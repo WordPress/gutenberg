@@ -13,17 +13,16 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { unlock } from '../lock-unlock';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const sizeOptions = [
-	{ label: __( 'Default' ), value: '' },
+const sizeItems = [
+	{ label: __( 'Default' ), value: null },
 	{ label: __( 'Small' ), value: 'has-small-icon-size' },
 	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
 	{ label: __( 'Large' ), value: 'has-large-icon-size' },
@@ -56,8 +55,8 @@ export function SocialLinksEdit( props ) {
 				const {
 					getBlockCount,
 					hasSelectedInnerBlock,
-					hasSelectedStyleState: hasSelectedBlockStyleState,
-				} = unlock( select( blockEditorStore ) );
+					hasSelectedBlockStyleState,
+				} = select( blockEditorStore );
 				return {
 					hasSocialIcons: getBlockCount( clientId ) > 0,
 					hasSelectedChild: hasSelectedInnerBlock( clientId ),
@@ -178,15 +177,20 @@ export function SocialLinksEdit( props ) {
 							setAttributes( { size: undefined } )
 						}
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Icon size' ) }
-							onChange={ ( newSize ) => {
+							onValueChange={ ( item ) =>
+								item &&
 								setAttributes( {
-									size: newSize === '' ? undefined : newSize,
-								} );
-							} }
-							value={ size ?? '' }
-							options={ sizeOptions }
+									size: item.value ?? undefined,
+								} )
+							}
+							value={
+								sizeItems.find(
+									( item ) => item.value === ( size || null )
+								) ?? sizeItems[ 0 ]
+							}
+							items={ sizeItems }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem

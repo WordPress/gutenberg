@@ -157,18 +157,12 @@ HTML
 
 	public function data_different_get_value_callbacks() {
 		return array(
-			'pass arguments to source'        => array(
+			'pass arguments to source' => array(
 				function ( $source_args, $block_instance, $attribute_name ) {
 					$value = $source_args['key'];
 					return "The attribute name is '$attribute_name' and its binding has argument 'key' with value '$value'.";
 				},
 				"<p class=\"wp-block-paragraph\">The attribute name is 'content' and its binding has argument 'key' with value 'test'.</p>",
-			),
-			'unsafe HTML should be sanitized' => array(
-				function () {
-					return '<script>alert("Unsafe HTML")</script>';
-				},
-				'<p class="wp-block-paragraph">alert("Unsafe HTML")</p>',
 			),
 			'symbols and numbers should be rendered correctly' => array(
 				function () {
@@ -209,6 +203,35 @@ HTML;
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
 		);
+	}
+
+	/**
+	 * Tests that unsafe HTML returned by the source is sanitized.
+	 *
+	 * @covers ::register_block_bindings_source
+	 */
+	public function test_unsafe_html_from_source_is_sanitized() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return '<script>alert("Unsafe HTML")</script>';
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
+<p>This should not appear</p>
+<!-- /wp:paragraph -->
+HTML;
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = $block->render();
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$this->assertFalse( $processor->next_tag( 'SCRIPT' ), 'The SCRIPT element should be removed.' );
 	}
 
 	/**
@@ -313,6 +336,36 @@ HTML;
 			'<figure class="wp-block-image"><img src="https://example.com/image.jpg" alt=""/><figcaption class="wp-element-caption">Example Image</figcaption></figure>',
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
+		);
+	}
+
+	/**
+	 * Tests if the Icon block's icon attribute is updated with the value returned by the source.
+	 *
+	 * @covers ::register_block_bindings_source
+	 */
+	public function test_update_icon_block_with_value_from_source() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return 'core/arrow-right';
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:icon {"icon":"core/plus","metadata":{"bindings":{"icon":{"source":"test/source"}}}} /-->
+HTML;
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$block->render();
+
+		$this->assertSame(
+			'core/arrow-right',
+			$block->attributes['icon'],
+			"The 'icon' attribute should be updated with the value returned by the source."
 		);
 	}
 
@@ -470,9 +523,10 @@ HTML;
 			$block_content
 		);
 
-		$this->assertMatchesRegularExpression(
-			'#<li>Bound <img[^>]*class="wp-image-42"[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?></li>#',
+		$this->assertEqualHTML(
+			'<li>Bound <img class="wp-image-42" src="https://example.com/inline-image.jpg" alt="Inline image"></li>',
 			$result,
+			'<body>',
 			'The source image should render in the list item content after sanitization.'
 		);
 	}
@@ -489,7 +543,7 @@ HTML;
 <!-- /wp:list-item -->
 HTML;
 		$result        = $this->render_list_item_with_source_value(
-			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /> <script>alert("Unsafe HTML")</script>',
+			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /><script>alert("Unsafe HTML")</script>',
 			$block_content
 		);
 
@@ -503,11 +557,14 @@ HTML;
 			$result,
 			'Event handler attributes should be stripped from list item source content.'
 		);
-		$this->assertMatchesRegularExpression(
-			'#<img[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?>#',
-			$result,
-			'Safe image markup should remain after sanitization.'
-		);
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$this->assertTrue( $processor->next_tag( 'IMG' ), 'Safe image markup should remain after sanitization.' );
+		$this->assertSame( 'https://example.com/inline-image.jpg', $processor->get_attribute( 'src' ), 'The image src should be preserved.' );
+		$this->assertSame( 'Inline image', $processor->get_attribute( 'alt' ), 'The image alt should be preserved.' );
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$this->assertFalse( $processor->next_tag( 'SCRIPT' ), 'The SCRIPT element should be removed.' );
 	}
 
 	/**

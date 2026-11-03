@@ -2,7 +2,6 @@
 @use "@wordpress/base-styles/colors";
 @use "@wordpress/base-styles/mixins";
 @use "./font-library/style.scss" as *;
-@use "./pagination/style.scss" as *;
 @use "./screen-revisions/style.scss" as *;
 @use "./size-control/style.scss" as *;
 @use "./variations/style.scss" as *;
@@ -28,6 +27,25 @@
 	overflow: hidden;
 }
 
+.global-styles-ui-element-preview {
+	// The screen is a scrolling flex column, and this box hides its overflow,
+	// so without this it collapses when the panels below are taller than the
+	// screen.
+	flex-shrink: 0;
+	height: 120px;
+	margin: 0 variables.$grid-unit-20 20px;
+	border-radius: 2px;
+	overflow: hidden;
+	background: #f0f0f0;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+}
+
 .global-styles-ui-font-size__item {
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -50,7 +68,7 @@
 }
 
 .global-styles-ui-block-types-filter {
-	margin-bottom: variables.$grid-unit-15;
+	margin-bottom: variables.$grid-unit-20;
 	padding: 0 variables.$grid-unit-20;
 }
 
@@ -59,8 +77,20 @@
 }
 
 .global-styles-ui-block-types-item-list {
+	// Inset the rows, and their focus rings, from the edges of the sidebar,
+	// like List View. Icons have about 4px of space inside their 24px box, so
+	// with the small item padding the icon itself lines up with the 16px inset
+	// of the header, search field and headings.
+	margin-inline: variables.$grid-unit-05;
+
 	.global-styles-ui-block-types-item__icon {
 		min-width: variables.$grid-unit-30;
+	}
+
+	// Bordered and already inside the screen padding, so it lines up with its
+	// heading without the inset.
+	&.global-styles-ui-element-block-overrides__list {
+		margin-inline: 0;
 	}
 }
 
@@ -68,13 +98,21 @@
 	padding-top: variables.$grid-unit-20;
 }
 
-.global-styles-ui-block-types-item__indicator {
-	background: var(--wp-admin-theme-color);
-	border-radius: 50%;
-	flex: none;
-	height: 6px;
-	margin-left: auto;
-	width: 6px;
+// The rows above and below a group title already have about 5px of padding,
+// so these margins are smaller than the space they appear to leave.
+.global-styles-ui-block-types-group + .global-styles-ui-block-types-group {
+	margin-top: variables.$grid-unit-15;
+}
+
+// Keep the last row clear of the bottom of the scroll container. Padding
+// rather than margin, so it is kept at the end of the scrollable area.
+.global-styles-ui-block-types-group:last-child {
+	padding-bottom: variables.$grid-unit-15;
+}
+
+.global-styles-ui-block-types-group__title {
+	margin-bottom: variables.$grid-unit-15;
+	padding: 0 variables.$grid-unit-20;
 }
 
 .global-styles-ui-screen-typography__font-variants-count {

@@ -13,6 +13,9 @@
 	],
 	"supports": {
 		"anchor": true,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"background": true,
 			"gradients": true
@@ -45,6 +48,7 @@
 				"letterSpacing"
 			],
 			"fontSize": true,
+			"lineHeight": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

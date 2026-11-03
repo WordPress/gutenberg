@@ -402,6 +402,10 @@ test.describe( 'Cover', () => {
 		).toBeVisible();
 
 		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
+
+		// The focal point picker is in the Settings tab of the block inspector.
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 
 		// The focal point picker renders as a `legend`-labelled group, so both
 		// spinbuttons are resolved through it.
@@ -592,10 +596,10 @@ test.describe( 'Cover', () => {
 		await expect( overlayControl ).toBeVisible();
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
-		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
 		await page.keyboard.press( 'Escape' );
 
 		await expect( overlayControl ).toBeHidden();

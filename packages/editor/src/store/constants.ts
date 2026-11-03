@@ -14,6 +14,10 @@ export const STORE_NAME = 'core/editor';
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 export const ONE_MINUTE_IN_MS = 60 * 1000;
 export const AUTOSAVE_PROPERTIES = [ 'title', 'excerpt', 'content' ];
+/**
+ * ID of the notice that offers the browser backup.
+ */
+export const BROWSER_BACKUP_NOTICE_ID = 'wpEditorAutosaveRestore';
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
@@ -37,3 +41,9 @@ export const DESIGN_POST_TYPES = [
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 ];
+
+/**
+ * Slot after the message of the autosave failure notice, filled with the
+ * countdown to the next autosave.
+ */
+export const AUTOSAVE_RETRY_SLOT = Symbol( 'AutosaveRetry' );

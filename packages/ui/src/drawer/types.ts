@@ -158,7 +158,7 @@ export interface DescriptionProps extends ComponentProps< 'p' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps extends Omit<
+export interface CloseIconButtonProps extends Omit<
 	ComponentProps< typeof IconButton >,
 	'label' | 'icon' | 'loading' | 'loadingAnnouncement'
 > {

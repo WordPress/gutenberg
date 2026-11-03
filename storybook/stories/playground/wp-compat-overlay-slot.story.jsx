@@ -55,7 +55,9 @@ function UiPopoverFixture() {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
@@ -154,7 +156,9 @@ export const InsideComponentsModal = {
 														key={ item.value }
 														value={ item }
 													>
-														{ item.label }
+														<Combobox.ItemLabel>
+															{ item.label }
+														</Combobox.ItemLabel>
 													</Combobox.Item>
 												) }
 											</Combobox.Collection>
@@ -189,7 +193,9 @@ export const InsideComponentsModal = {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Autocomplete.ItemLabel>
+															{ item.value }
+														</Autocomplete.ItemLabel>
 													</Autocomplete.Item>
 												) }
 											</Autocomplete.Collection>
@@ -281,7 +287,9 @@ export const InsideComponentsPopover = {
 															key={ item.value }
 															value={ item }
 														>
-															{ item.label }
+															<Combobox.ItemLabel>
+																{ item.label }
+															</Combobox.ItemLabel>
 														</Combobox.Item>
 													) }
 												</Combobox.Collection>
@@ -316,7 +324,9 @@ export const InsideComponentsPopover = {
 															key={ item.id }
 															value={ item }
 														>
-															{ item.value }
+															<Autocomplete.ItemLabel>
+																{ item.value }
+															</Autocomplete.ItemLabel>
 														</Autocomplete.Item>
 													) }
 												</Autocomplete.Collection>

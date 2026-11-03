@@ -1,6 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import styled from '@emotion/styled';
 import type {
 	ComponentPropsWithoutRef,
 	ForwardedRef,
@@ -15,8 +14,6 @@ import { useContextSystem } from '../use-context-system';
 
 vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
-const View = styled.div``;
-
 type TestComponentProps = ComponentPropsWithoutRef< 'div' > & {
 	quote?: ReactNode;
 };
@@ -25,7 +22,7 @@ function TestComponent(
 	props: TestComponentProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	return <View { ...useContextSystem( props, 'Component' ) } ref={ ref } />;
+	return <div { ...useContextSystem( props, 'Component' ) } ref={ ref } />;
 }
 
 function TestComponentWithQuote(
@@ -34,9 +31,9 @@ function TestComponentWithQuote(
 ) {
 	const { quote, ...otherProps } = useContextSystem( props, 'Component' );
 	return (
-		<View { ...otherProps } ref={ ref }>
+		<div { ...otherProps } ref={ ref }>
 			{ quote }
-		</View>
+		</div>
 	);
 }
 
@@ -124,7 +121,10 @@ describe( 'props', () => {
 
 		const element = screen.getByText( 'Code is Poetry' );
 		expect( element ).toBeVisible();
-		expect( element ).toHaveClass( 'test-component' );
+		expect( element ).toHaveClass(
+			'components-component',
+			'test-component'
+		);
 
 		expect( screen.queryByText( 'WordPress.org' ) ).not.toBeInTheDocument();
 	} );
@@ -164,9 +164,9 @@ describe( 'children', () => {
 			props: TestComponentProps,
 			ref: ForwardedRef< HTMLDivElement >
 		) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
+			<div { ...useContextSystem( props, 'Component' ) } ref={ ref }>
 				Inherent
-			</View>
+			</div>
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
 		const NormalComponent = (

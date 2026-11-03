@@ -12,5 +12,10 @@
 	// but is maintained for backwards compatibility.
 	--wp-bound-block-color: var(--wp-block-synced-color);
 	--wp-editor-canvas-background: #{colors.$gray-300};
+	@include mixins.admin-scheme(#3858e9);
+}
+
+// Fresh has no rule in the admin-schemes.css shipped by older WordPress versions, so it would inherit the :root default above. Plugins bundle these defaults while WordPress supplies the scheme stylesheet, so the rule must travel with them.
+body.admin-color-fresh {
 	@include mixins.admin-scheme(#007cba);
 }

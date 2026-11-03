@@ -10,14 +10,23 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
-/* eslint-disable @wordpress/use-recommended-components */
-import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Card,
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	IconButton,
+	Link,
+	Stack,
+} from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
+import { useWidgetIdentity } from '../../../widget-identity';
 import { HostLink, WidgetHostProvider } from '../../../widget-host';
 import type { WidgetHost, WidgetHostLinks } from '../../../widget-host';
 import type {
@@ -150,7 +159,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -208,6 +218,81 @@ The minimal contract between a host and a widget:
 - The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
+`,
+			},
+		},
+	},
+};
+
+function IdentityWidget() {
+	const { title } = useWidgetIdentity();
+	const accessibleName = title
+		? sprintf(
+				/* translators: %s: widget title */
+				__( 'Chart: %s' ),
+				title
+			)
+		: __( 'Chart' );
+
+	return (
+		<figure
+			aria-label={ accessibleName }
+			style={ {
+				background: 'var(--wpds-color-background-surface-info-weak)',
+				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
+				borderRadius: 'var(--wpds-border-radius-md)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				justifyItems: 'center',
+				margin: 0,
+				padding: 'var(--wpds-dimension-padding-xl)',
+			} }
+		>
+			<strong style={ { fontSize: '1.25em' } }>
+				{ title ?? 'Untitled' }
+			</strong>
+			<span style={ { opacity: 0.75 } }>
+				{ title
+					? `Accessible name: ${ accessibleName }`
+					: 'No identity provided' }
+			</span>
+		</figure>
+	);
+}
+
+const identityWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/sales-by-device',
+	title: 'Sales by device',
+	description:
+		'Demo widget that reads its type title through useWidgetIdentity.',
+	renderModule: 'demo/widgets/sales-by-device/render',
+};
+
+const resolveIdentityModule = async () => ( {
+	default: IdentityWidget as ComponentType< WidgetRenderProps< unknown > >,
+} );
+
+function WithIdentityStory() {
+	return (
+		<Suspense fallback={ null }>
+			<WidgetRender
+				widgetType={ identityWidgetType }
+				attributes={ {} }
+				resolveWidgetModule={ resolveIdentityModule }
+			/>
+		</Suspense>
+	);
+}
+
+export const WithIdentity: StoryObj = {
+	render: () => <WithIdentityStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+\`WidgetRender\` lends the type's identity into the subtree. The widget reads the translated \`title\` with \`useWidgetIdentity\`: it names a \`figure\` for assistive technology and shows the same string in the body.
 `,
 			},
 		},
@@ -849,7 +934,7 @@ const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
 const RouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function RouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
 			ref={ ref }
@@ -1017,7 +1102,7 @@ The widget declares where to go; the application decides how to get there. \`Hos
 
 **Takeaway**
 
-Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`LinkButton\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`ButtonLink\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
 `,
 			},
 		},

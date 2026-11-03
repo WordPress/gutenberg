@@ -7,8 +7,8 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis" },
-		{ "path": "../url" }
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../url/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [

@@ -5,7 +5,7 @@ import { Flex } from '../../flex';
 
 const meta: Meta< typeof Divider > = {
 	component: Divider,
-	title: 'Components/Deprecated/Divider',
+	title: 'Components/@wordpress-components/Deprecated/Divider',
 	id: 'components-divider',
 	argTypes: {
 		margin: {

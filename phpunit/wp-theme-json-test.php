@@ -43,6 +43,7 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+		_gutenberg_clean_theme_json_caches();
 		parent::tear_down();
 	}
 
@@ -130,5 +131,66 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 
 		$this->assertFalse( $default );
 		$this->assertTrue( $block_theme );
+	}
+
+	/**
+	 * @covers gutenberg_get_global_styles
+	 */
+	public function test_gutenberg_get_global_styles_reflects_blocks_registered_after_a_previous_call() {
+		gutenberg_get_global_styles();
+
+		register_block_type(
+			'test/block-gap',
+			array(
+				'supports' => array(
+					'__experimentalStyle' => array(
+						'spacing' => array( 'blockGap' => '77px' ),
+					),
+				),
+			)
+		);
+
+		$styles = gutenberg_get_global_styles();
+
+		unregister_block_type( 'test/block-gap' );
+
+		$this->assertSame(
+			'77px',
+			$styles['blocks']['test/block-gap']['spacing']['blockGap'] ?? null,
+			'Styles for a block registered after a previous call should be present.'
+		);
+	}
+
+	/**
+	 * @covers gutenberg_get_global_settings
+	 */
+	public function test_gutenberg_get_global_settings_reflects_theme_data_changed_after_a_previous_call() {
+		gutenberg_get_global_settings();
+
+		// Block registration adds no settings, so inject one through the theme data
+		// filter: registering a block refreshes the theme data, which reapplies the filter.
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'custom' => array( 'cacheProbe' => 'fresh' ),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		register_block_type( 'test/block-settings' );
+
+		$settings = gutenberg_get_global_settings();
+
+		unregister_block_type( 'test/block-settings' );
+		remove_filter( 'wp_theme_json_data_theme', $filter );
+
+		$this->assertSame(
+			'fresh',
+			$settings['custom']['cacheProbe'] ?? null,
+			'Settings from theme data changed after a previous call should be present.'
+		);
 	}
 }

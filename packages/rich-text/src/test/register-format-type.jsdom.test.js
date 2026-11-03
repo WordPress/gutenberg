@@ -233,4 +233,16 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 		} );
 	} );
+
+	it( 'should register format with undefined keywords', () => {
+		const settings = registerFormatType( validName, {
+			...validSettings,
+			keywords: undefined,
+		} );
+		expect( settings ).toEqual( {
+			...validSettings,
+			keywords: undefined,
+			name: validName,
+		} );
+	} );
 } );

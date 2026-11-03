@@ -18,6 +18,9 @@ test.use( {
 } );
 
 test.describe( 'Style Revisions', () => {
+	// Later tests use the revisions that earlier tests save.
+	test.describe.configure( { mode: 'serial' } );
+
 	let stylesPostId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -129,11 +132,10 @@ test.describe( 'Style Revisions', () => {
 			.last();
 		await expect( lastRevisionItem ).toContainText( 'Default styles' );
 		await lastRevisionItem.click();
+		// The footer action relabels for the reset entry.
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-		).toBeVisible();
+			page.getByRole( 'button', { name: 'Reset' } )
+		).toBeEnabled();
 	} );
 
 	test( 'should access from the site editor sidebar', async ( {
@@ -485,11 +487,9 @@ test.describe( 'Style Revisions', () => {
 			.last()
 			.click();
 
-		await page
-			.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-			.click();
+		// The last entry is the theme defaults, for which the picker footer
+		// action reads "Reset".
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
@@ -562,10 +562,38 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel( 'Global Styles pagination' );
-		await expect( pagination ).toContainText( '1 of 2' );
-		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
-		await expect( pagination ).toContainText( '2 of 2' );
+		// The page select is the screen's only pagination control.
+		const currentPageSelect = page.getByRole( 'combobox', {
+			name: 'Current page',
+		} );
+		await expect( currentPageSelect ).toHaveText( '1' );
+		await currentPageSelect.click();
+		// Specs that ran earlier can leave revisions behind, so go to the last
+		// page rather than assuming there are exactly two. Every page but the
+		// current one is named by its number alone.
+		const lastPageOption = page
+			.getByRole( 'option', { name: /^\d+$/ } )
+			.last();
+		const lastPageNumber = ( await lastPageOption.textContent() ).trim();
+		await lastPageOption.click();
+		await expect( currentPageSelect ).toHaveText( lastPageNumber );
+		// The theme defaults entry closes the last page.
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Reset the styles to the theme defaults',
+			} )
+		).toBeVisible();
+		// The default selection is the first entry of page one, so this page
+		// holds no selection and nothing to apply. Scope the check to the
+		// listbox: the pagination select has a selected option of its own.
+		await expect(
+			page
+				.getByLabel( 'Global styles revisions list' )
+				.getByRole( 'option', { selected: true } )
+		).toHaveCount( 0 );
+		await expect(
+			page.getByRole( 'button', { name: 'Apply' } )
+		).toBeDisabled();
 	} );
 } );
 

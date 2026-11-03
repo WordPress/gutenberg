@@ -10,7 +10,7 @@ import type { FieldsetDescriptionProps } from './types';
 export const FieldsetDescription = forwardRef<
 	HTMLParagraphElement,
 	FieldsetDescriptionProps
->( function FieldsetDescription(
+>( function UnforwardedFieldsetDescription(
 	{ className, id: idProp, render, ...restProps },
 	ref
 ) {

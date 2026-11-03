@@ -62,15 +62,14 @@ describe( 'KeyboardShortcuts', () => {
 		const spy = vi.fn();
 
 		render(
-			<div>
-				<KeyboardShortcuts
-					eventName="keyup"
-					shortcuts={ {
-						d: spy,
-					} }
-				/>
+			<KeyboardShortcuts
+				eventName="keyup"
+				shortcuts={ {
+					d: spy,
+				} }
+			>
 				<textarea></textarea>
-			</div>
+			</KeyboardShortcuts>
 		);
 
 		keyPress( 68, screen.getByRole( 'textbox' ) );

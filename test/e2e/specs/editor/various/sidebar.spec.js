@@ -145,21 +145,23 @@ test.describe( 'Sidebar', () => {
 		] );
 		// Also check 'panels' that are not rendered as TabPanels.
 		const postExcerptPanel = page.getByRole( 'button', {
-			name: 'Add an excerpt…',
+			name: 'Edit Excerpt',
 		} );
 		const postFeaturedImagePanel = page.getByRole( 'button', {
 			name: 'Set featured image',
 		} );
 		const postDiscussionPanel = page.getByRole( 'button', {
-			name: 'Change discussion options',
+			name: 'Edit Discussion',
 		} );
 		const postAuthorPanel = page.getByRole( 'button', {
-			name: 'admin',
+			name: 'Edit Author',
 		} );
 
 		await expect( postExcerptPanel ).toBeVisible();
 		await expect( postFeaturedImagePanel ).toBeVisible();
 		await expect( postAuthorPanel ).toBeVisible();
+		// The description also carries the alt text of the author's avatar.
+		await expect( postAuthorPanel ).toHaveAccessibleDescription( /admin$/ );
 		await expect( postDiscussionPanel ).toHaveCount( 1 );
 
 		await page.evaluate( () => {

@@ -10,7 +10,7 @@ import { __, isRTL } from '@wordpress/i18n';
 import {
 	RangeControl,
 	ResizableBox,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	ToolbarButton,
 	Placeholder,
@@ -129,7 +129,7 @@ const SiteLogo = ( {
 					} );
 				} }
 			/>
-			{ isBlobURL( logoUrl ) && <Spinner /> }
+			{ isBlobURL( logoUrl ) && <WCSpinner /> }
 		</>
 	);
 
@@ -542,15 +542,13 @@ export default function LogoEdit( {
 	let logoImage;
 	const isLoading = siteLogoId === undefined || isRequestingMediaItem;
 	if ( isLoading ) {
-		logoImage = <Spinner />;
+		logoImage = <WCSpinner />;
 	}
 
 	// Reset temporary url when logoUrl is available.
-	useEffect( () => {
-		if ( logoUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ logoUrl, temporaryURL ] );
+	if ( logoUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
@@ -661,7 +659,7 @@ export default function LogoEdit( {
 				<Placeholder className="site-logo_placeholder" withIllustration>
 					{ isLoading && (
 						<span className="components-placeholder__preview">
-							<Spinner />
+							<WCSpinner />
 						</span>
 					) }
 				</Placeholder>

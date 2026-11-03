@@ -3,7 +3,7 @@ import { forwardRef, useContext, useEffect, useId } from '@wordpress/element';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderDescriptionProps } from './types';
 import { Text } from '../text';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 const DEFAULT_TAG = <div />;
 

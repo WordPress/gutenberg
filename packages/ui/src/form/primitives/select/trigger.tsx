@@ -10,7 +10,7 @@ import { Icon } from '../../../icon';
 import type { SelectTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
-	function Trigger(
+	function UnforwardedTrigger(
 		{
 			className,
 			size,

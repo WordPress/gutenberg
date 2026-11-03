@@ -218,6 +218,8 @@ describe( 'actions', () => {
 					.select( interfaceStore )
 					.isFeatureActive( 'test', 'feature2' )
 			).toBe( false );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -251,6 +253,8 @@ describe( 'actions', () => {
 					.select( interfaceStore )
 					.isFeatureActive( 'test', 'feature1' )
 			).toBe( true );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 } );

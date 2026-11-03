@@ -16,6 +16,8 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
+import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline';
+import mediaEditorRtl from '../package-styles/media-editor-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
@@ -29,6 +31,11 @@ import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
  * stylesheet dependencies for each story group.
  */
 const CONFIG = [
+	{
+		componentIdMatcher: /.*/,
+		ltr: [ designTokens ],
+		rtl: [ designTokens ],
+	},
 	{
 		componentIdMatcher: /^playground-/,
 		ltr: [
@@ -71,8 +78,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^dataviews-/,
-		ltr: [ designTokens, componentsLtr, dataviewsLtr ],
-		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
 	},
 	{
 		componentIdMatcher: /^fields-/,
@@ -81,13 +88,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^admin-ui-/,
-		ltr: [ designTokens, componentsLtr ],
-		rtl: [ designTokens, componentsRtl ],
-	},
-	{
-		componentIdMatcher: /^grid-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
+		ltr: [ componentsLtr ],
+		rtl: [ componentsRtl ],
 	},
 	{
 		// Dashboard stories include form controls and the command palette.
@@ -96,19 +98,9 @@ const CONFIG = [
 		rtl: [ componentsRtl, commandsRtl, dataviewsRtl ],
 	},
 	{
-		componentIdMatcher: /^tokens-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
-	},
-	{
 		componentIdMatcher: /^mediaeditor-/,
-		ltr: [ componentsLtr ],
-		rtl: [ componentsRtl ],
-	},
-	{
-		componentIdMatcher: /^design-system-/,
-		ltr: [ designTokens ],
-		rtl: [ designTokens ],
+		ltr: [ componentsLtr, mediaEditorLtr ],
+		rtl: [ componentsRtl, mediaEditorRtl ],
 	},
 	{
 		componentIdMatcher: /^design-system-patterns-/,

@@ -6,14 +6,19 @@ import { useState } from '@wordpress/element';
 import { Menu } from '..';
 import Modal from '../../modal';
 
-const waitForFocusedMenu = () =>
-	expect.element( page.getByRole( 'menu' ) ).toHaveFocus();
+const waitForFocusedMenu = () => {
+	return expect.element( page.getByRole( 'menu' ) ).toHaveFocus();
+};
 
-const waitForFocusedMenuItem = ( name: string ) =>
-	expect.element( page.getByRole( 'menuitem', { name } ) ).toHaveFocus();
+const waitForFocusedMenuItem = ( name: string ) => {
+	return expect
+		.element( page.getByRole( 'menuitem', { name } ) )
+		.toHaveFocus();
+};
 
-const waitForClosedMenu = () =>
-	expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
+const waitForClosedMenu = () => {
+	return expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
+};
 
 const MenuWithModal = () => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );

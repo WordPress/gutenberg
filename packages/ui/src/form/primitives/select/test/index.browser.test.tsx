@@ -56,6 +56,7 @@ describe( 'Select', () => {
 		const user = userEvent;
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
+		const separatorRef = createRef< HTMLDivElement >();
 		const itemRef = createRef< HTMLDivElement >();
 
 		await render(
@@ -65,6 +66,7 @@ describe( 'Select', () => {
 					<Select.Item ref={ itemRef } value="Item 1">
 						<Select.ItemLabel>Item 1</Select.ItemLabel>
 					</Select.Item>
+					<Select.Separator ref={ separatorRef } />
 					<Select.Item value="Item 2">
 						<Select.ItemLabel>Item 2</Select.ItemLabel>
 					</Select.Item>
@@ -80,6 +82,7 @@ describe( 'Select', () => {
 
 		// Now test that the popup and item refs are also available
 		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( separatorRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 

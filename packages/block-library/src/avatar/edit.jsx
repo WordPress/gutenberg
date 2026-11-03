@@ -3,6 +3,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
@@ -11,11 +12,46 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
+import { Link, Text } from '@wordpress/ui';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
+
+/**
+ * Returns the help text explaining where avatars come from, with a link to the
+ * Discussion settings where the default avatar is chosen. Only users who can
+ * manage the site's settings get it, since nobody else can act on it.
+ *
+ * @return {React.ReactNode|null} Help text, or `null` when the user can't manage settings.
+ */
+function useAvatarHelpText() {
+	const canManageSettings = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'update', {
+				kind: 'root',
+				name: 'site',
+			} ),
+		[]
+	);
+
+	if ( ! canManageSettings ) {
+		return null;
+	}
+
+	return createInterpolateElement(
+		__(
+			'Avatars use the Gravatar service. Go to <a>Discussion settings</a> to change the default avatar.'
+		),
+		{
+			a: <Link href="options-discussion.php" openInNewTab />,
+		}
+	);
+}
 
 /**
  * Renders the inspector controls for the `core/avatar` block.
@@ -35,6 +71,7 @@ const AvatarInspectorControls = ( {
 	selectUser,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const helpText = useAvatarHelpText();
 	return (
 		<InspectorControls>
 			<ToolsPanel
@@ -49,6 +86,11 @@ const AvatarInspectorControls = ( {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
+				{ helpText && (
+					<Text className="wp-block-avatar__help-text">
+						{ helpText }
+					</Text>
+				) }
 				<ToolsPanelItem
 					label={ __( 'Image size' ) }
 					isShownByDefault
@@ -156,7 +198,7 @@ const AvatarLinkWrapper = ( { children, isLink } ) =>
  *
  * @param {Object}   props               React props.
  * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {Object}   props.attributes    Block attributes: `size` and `isLink`, plus the border support values read by `useBorderProps`.
+ * @param {Object}   props.attributes    Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
  * @param {Object}   props.avatar        Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
  * @param {Object}   props.blockProps    Props returned by `useBlockProps`, applied to the wrapper element.
  * @param {boolean}  props.isSelected    Whether the block is selected. Resize handles are only shown when it is.
@@ -171,6 +213,7 @@ const ResizableAvatar = ( {
 	isSelected,
 } ) => {
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const doubledSizedSrc = addQueryArgs(
 		removeQueryArgs( avatar?.src, [ 's' ] ),
 		{
@@ -215,7 +258,10 @@ const ResizableAvatar = ( {
 							'wp-block-avatar__image',
 							borderProps.className
 						) }
-						style={ borderProps.style }
+						style={ {
+							...borderProps.style,
+							...shadowProps.style,
+						} }
 					/>
 				</ResizableBox>
 			</AvatarLinkWrapper>

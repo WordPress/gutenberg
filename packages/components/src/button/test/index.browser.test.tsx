@@ -361,7 +361,10 @@ describe( 'Button', () => {
 			// Move focus to the button
 			await userEvent.tab();
 
-			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+			expect( screen.getByRole( 'button' ) ).toHaveFocus();
+			await expect
+				.element( page.getByRole( 'tooltip', { name: 'WordPress' } ) )
+				.toBeVisible();
 		} );
 
 		it( 'should support explicit aria-label override', async () => {
@@ -396,7 +399,10 @@ describe( 'Button', () => {
 			// Move focus to the button
 			await userEvent.tab();
 
-			expect( screen.getByText( 'Label' ) ).toBeVisible();
+			expect( screen.getByRole( 'button' ) ).toHaveFocus();
+			await expect
+				.element( page.getByRole( 'tooltip', { name: 'Label' } ) )
+				.toBeVisible();
 
 			await cleanupTooltip();
 		} );
@@ -421,11 +427,12 @@ describe( 'Button', () => {
 
 			await userEvent.tab();
 
-			expect(
-				screen.getByRole( 'tooltip', {
-					name: 'Description text',
-				} )
-			).toBeVisible();
+			expect( screen.getByRole( 'button' ) ).toHaveFocus();
+			await expect
+				.element(
+					page.getByRole( 'tooltip', { name: 'Description text' } )
+				)
+				.toBeVisible();
 
 			await cleanupTooltip();
 		} );
@@ -461,7 +468,10 @@ describe( 'Button', () => {
 			// Move focus to the button
 			await userEvent.tab();
 
-			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+			expect( screen.getByRole( 'button' ) ).toHaveFocus();
+			await expect
+				.element( page.getByRole( 'tooltip', { name: 'WordPress' } ) )
+				.toBeVisible();
 
 			await cleanupTooltip();
 		} );
@@ -493,7 +503,10 @@ describe( 'Button', () => {
 			// Move focus to the button
 			await userEvent.tab();
 
-			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+			expect( screen.getByRole( 'button' ) ).toHaveFocus();
+			await expect
+				.element( page.getByRole( 'tooltip', { name: 'WordPress' } ) )
+				.toBeVisible();
 
 			await cleanupTooltip();
 		} );

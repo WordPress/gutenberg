@@ -6,6 +6,7 @@ import type {
 	MouseEvent,
 	ReactElement,
 	ReactNode,
+	FragmentProps,
 } from 'react';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -40,11 +41,16 @@ const hasRenderableChildren = ( children: ReactNode ): boolean =>
 		}
 
 		if ( child.type === Fragment ) {
-			return hasRenderableChildren( child.props.children );
+			return hasRenderableChildren(
+				( child as ReactElement< FragmentProps > ).props.children
+			);
 		}
 
 		// A tooltip should not be considered as a child.
-		return child.props.className !== 'components-tooltip';
+		return (
+			( child as ReactElement< { className: string } > ).props
+				.className !== 'components-tooltip'
+		);
 	} );
 
 function useDeprecatedProps( {

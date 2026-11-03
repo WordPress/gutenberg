@@ -4,9 +4,8 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect, ContextSystemProvider } from '../../context';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
-import * as styles from '../styles';
+import styles from '../style.module.scss';
 import { useCard } from './hook';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
 function UnconnectedCard(
@@ -21,8 +20,6 @@ function UnconnectedCard(
 		size,
 		...otherProps
 	} = useCard( props );
-
-	const cx = useCx();
 
 	const contextProviderValue = useMemo( () => {
 		const contextProps = {
@@ -39,7 +36,7 @@ function UnconnectedCard(
 	return (
 		<ContextSystemProvider value={ contextProviderValue }>
 			<View { ...otherProps } ref={ forwardedRef }>
-				<View className={ cx( styles.Content ) }>{ children }</View>
+				<View className={ styles.content }>{ children }</View>
 				<Elevation
 					isInteractive={ false }
 					value={ elevation ? 1 : 0 }

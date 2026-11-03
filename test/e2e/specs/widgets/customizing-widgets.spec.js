@@ -299,7 +299,9 @@ test.describe( 'Widgets Customizer', () => {
 		const headingBlock = page.locator(
 			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
-		await expect( headingBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( headingBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should clear block selection', async ( {
@@ -372,8 +374,11 @@ test.describe( 'Widgets Customizer', () => {
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator( 'role=combobox[name="Legacy widget"i]' )
-			.selectOption( 'test_widget' );
+			.getByRole( 'combobox', { name: 'Legacy widget', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Test Widget', exact: true } )
+			.click();
 
 		await expect(
 			legacyWidgetBlock.locator(
@@ -583,7 +588,7 @@ test.describe( 'Widgets Customizer', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).click();

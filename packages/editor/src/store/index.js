@@ -4,6 +4,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as privateActions from './private-actions';
 import * as privateSelectors from './private-selectors';
+import * as privateResolvers from '../dataviews/store/private-resolvers';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
@@ -25,6 +26,8 @@ export const storeConfig = {
  */
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
+	// The resolvers of private selectors, registered below.
+	resolvers: privateResolvers,
 } );
 
 register( store );

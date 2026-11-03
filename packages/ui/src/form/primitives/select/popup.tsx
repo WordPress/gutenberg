@@ -10,7 +10,7 @@ import type { SelectPopupProps } from './types';
 import styles from './style.module.css';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
-	function Popup(
+	function UnforwardedPopup(
 		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
