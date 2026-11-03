@@ -20,6 +20,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `linkLabel` | `boolean` | `false` | — |
 | `arrow` | `string` | `"none"` | — |
 | `taxonomy` | `string` | `""` | — |
+| `linkTarget` | `string` | `"_self"` | — |
 
 ## Supports
 
