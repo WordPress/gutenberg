@@ -2,7 +2,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
 // synthesizes from it. Other engines place it in the mousedown's default
@@ -23,16 +24,64 @@ export default function useClickSelection() {
 		__unstableIsFullySelected,
 		canMoveBlocks,
 		getSelectedBlockClientIds,
-	} = useSelect( blockEditorStore );
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			let pointerType: string | undefined;
 			// The block to collapse a multi-selection to on click, recorded
 			// on mousedown. See the comment in `onMouseDown`.
 			let clickCollapseClientId: string | undefined;
+			// The field given focus back on a touch. See `onPointerDown`.
+			let handedBackField: HTMLElement | undefined;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
+				handedBackField = undefined;
+
+				const target = event.target as Element;
+				const clientId = getBlockClientId( target );
+
+				// A touch on a field of a block that edits on its own element:
+				// on iOS, a tap inside the focused editing host places the
+				// caret there and then loses it once focus moves to the field.
+				// Give focus back to the field with the caret before iOS
+				// handles the touch, so it handles a tap into another field.
+				if (
+					! placesCaretOnTap ||
+					pointerType !== 'touch' ||
+					node.contentEditable !== 'true' ||
+					! node.matches( ':focus' ) ||
+					hasMultiSelection() ||
+					! clientId ||
+					clientId === getBlockSelectionStart() ||
+					canHostEditableRoot( clientId ) ||
+					target.closest( '[contenteditable="true"]' ) === node
+				) {
+					return;
+				}
+
+				const field = getSelectionEditableElement(
+					// A mounted element's window has a selection.
+					node.ownerDocument.defaultView!.getSelection()!,
+					node
+				) as HTMLElement | undefined;
+
+				if ( ! field ) {
+					return;
+				}
+
+				setContentEditableWrapper( node, false );
+				field.focus( { preventScroll: true } );
+				handedBackField = field;
+			}
+
+			// The touch became a scroll: the wrapper hosts the field again.
+			function onPointerCancel() {
+				if ( handedBackField?.matches( ':focus' ) ) {
+					setContentEditableWrapper( node, true );
+				}
+				handedBackField = undefined;
 			}
 
 			function onMouseDown( event: MouseEvent ) {
@@ -194,11 +243,13 @@ export default function useClickSelection() {
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );
+			node.addEventListener( 'pointercancel', onPointerCancel );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'click', onClick );
 
 			return () => {
 				node.removeEventListener( 'pointerdown', onPointerDown );
+				node.removeEventListener( 'pointercancel', onPointerCancel );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'click', onClick );
 			};
@@ -214,6 +265,7 @@ export default function useClickSelection() {
 			__unstableIsFullySelected,
 			canMoveBlocks,
 			getSelectedBlockClientIds,
+			canHostEditableRoot,
 		]
 	);
 }
