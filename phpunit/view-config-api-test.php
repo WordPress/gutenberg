@@ -251,9 +251,9 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * The `author` row shows the field's placeholder when the post has no
-	 * author, for every post type using the default form.
+	 * author, for every post type whose form lists the field.
 	 *
-	 * @dataProvider data_default_form_post_types
+	 * @dataProvider data_post_types_with_author_in_form
 	 *
 	 * @param string $post_type The post type.
 	 */
@@ -272,23 +272,51 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			$this->get_form_field( $config, 'author' )['layout']
 		);
 
-		if ( 'page' !== $post_type && 'post' !== $post_type ) {
+		if ( ! in_array( $post_type, array( 'page', 'post', 'attachment' ), true ) ) {
 			unregister_post_type( $post_type );
 		}
 	}
 
 	/**
-	 * Post types with their own form do not get an `author` member appended
-	 * by the `author` layout patch.
+	 * Data provider.
 	 *
-	 * @dataProvider data_post_types_with_own_form
+	 * @return array[]
+	 */
+	public function data_post_types_with_author_in_form() {
+		return array(
+			'page'             => array( 'page' ),
+			'post'             => array( 'post' ),
+			'attachment'       => array( 'attachment' ),
+			'custom post type' => array( 'summaries_cpt' ),
+		);
+	}
+
+	/**
+	 * Post types whose own form does not list the `author` field do not get
+	 * one appended by the `author` layout patch.
+	 *
+	 * @dataProvider data_post_types_without_author_in_form
 	 *
 	 * @param string $post_type The post type.
 	 */
 	public function test_author_layout_is_not_appended_to_own_forms( $post_type ) {
 		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
 
+		$this->assertNotContains( 'author', $config['form']['fields'] );
 		$this->assertNull( $this->get_form_field( $config, 'author' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_without_author_in_form() {
+		return array(
+			'wp_block'         => array( 'wp_block' ),
+			'wp_template'      => array( 'wp_template' ),
+			'wp_template_part' => array( 'wp_template_part' ),
+		);
 	}
 
 	/**
@@ -323,7 +351,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 					'layout' => $regular_layout,
 				),
 				'date',
-				'author',
+				array(
+					'id'     => 'author',
+					'layout' => array(
+						'type'                   => 'panel',
+						'showPlaceholderIfEmpty' => true,
+					),
+				),
 				'filename',
 				'mime_type',
 				'filesize',

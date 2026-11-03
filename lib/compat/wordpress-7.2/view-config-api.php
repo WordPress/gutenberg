@@ -410,14 +410,20 @@ function _gutenberg_update_author_layout_in_view_config( $data ) {
 
 /**
  * Layers the `author` layout on top of the view configuration of every post
- * type using the default form, the only form listing the `author` field at its
- * top level. Post types providing their own form are skipped, since the patch
- * would append the member there.
+ * type whose form lists the `author` field at its top level: those using the
+ * default form, including custom post types registered at any point, and
+ * attachments.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
  *
  * @param string $post_type The post type being registered.
  */
 function gutenberg_register_author_layout_7_2( $post_type ) {
-	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+	if (
+		'attachment' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
 		return;
 	}
 
