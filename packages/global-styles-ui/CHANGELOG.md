@@ -11,7 +11,7 @@
 
 ### Bug Fixes
 
--   Blocks & Elements: preserve the search term and filters when a block is opened and the user returns to the list ([Trac #66105](https://core.trac.wordpress.org/ticket/66105)).
+-   Blocks & Elements: preserve the search term and filters when a block is opened and the user returns to the list ([#86226](https://github.com/WordPress/gutenberg/pull/86226)).
 
 ## 2.0.0 (2026-10-20)
 
