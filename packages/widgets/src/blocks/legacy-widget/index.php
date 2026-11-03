@@ -11,13 +11,15 @@
  * @since 5.8.0
  *
  * @global WP_Widget_Factory $wp_widget_factory.
+ * @global array             $wp_registered_sidebars
+ * @global int|string        $_sidebar_being_rendered
  *
  * @param array $attributes The block attributes.
  *
  * @return string Rendered block.
  */
 function render_block_core_legacy_widget( $attributes ) {
-	global $wp_widget_factory;
+	global $wp_widget_factory, $wp_registered_sidebars, $_sidebar_being_rendered;
 
 	if ( isset( $attributes['id'] ) ) {
 		$sidebar_id = wp_find_widgets_sidebar( $attributes['id'] );
@@ -50,6 +52,13 @@ function render_block_core_legacy_widget( $attributes ) {
 		'widget_id'   => $widget_object->id,
 		'widget_name' => $widget_object->name,
 	);
+
+	$is_rendering_sidebar = did_action( 'dynamic_sidebar_before' ) > did_action( 'dynamic_sidebar_after' );
+
+	if ( $is_rendering_sidebar && isset( $_sidebar_being_rendered, $wp_registered_sidebars[ $_sidebar_being_rendered ] ) ) {
+		$args['before_title'] = $wp_registered_sidebars[ $_sidebar_being_rendered ]['before_title'];
+		$args['after_title']  = $wp_registered_sidebars[ $_sidebar_being_rendered ]['after_title'];
+	}
 
 	ob_start();
 	the_widget( $widget_key, $instance, $args );
