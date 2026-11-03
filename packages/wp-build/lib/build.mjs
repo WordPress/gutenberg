@@ -2877,7 +2877,10 @@ async function watchMode() {
 			} else if ( item.startsWith( 'php:' ) ) {
 				// Split 'php:{package}:{file}'; the file may contain colons.
 				const [ , packageName, ...file ] = item.split( ':' );
-				await recopyPhpFile( packageName, file.join( ':' ) );
+				// A rebuild of the package copies the file too.
+				if ( ! itemsToRebuild.includes( packageName ) ) {
+					await recopyPhpFile( packageName, file.join( ':' ) );
+				}
 			} else {
 				await rebuildPackage( item );
 			}
