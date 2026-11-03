@@ -1854,6 +1854,49 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/image': {
+							transform: {
+								rotate: '0.25turn',
+							},
+							'@mobile': {
+								transform: {
+									rotate: '-15deg',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-block-image',
+					featureSelectors: {
+						transform: '.wp-block-image img',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-image img){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-image img){rotate: -15deg;}}'
+			);
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},
