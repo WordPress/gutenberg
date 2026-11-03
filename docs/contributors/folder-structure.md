@@ -128,7 +128,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Configuration files for the ESLint linter.
     │
     ├── tools/phpstan
-    │   Configuration files for the PHPStan analysis.
+    │   Configuration files for the PHPStan analysis, and the script that reports its results in CI.
     │
     ├── tools/webpack
     │   Configuration files for the webpack build.

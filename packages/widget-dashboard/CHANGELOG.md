@@ -18,6 +18,11 @@
 
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
