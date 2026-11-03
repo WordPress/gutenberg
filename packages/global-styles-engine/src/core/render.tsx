@@ -263,6 +263,11 @@ function getPresetsClasses(
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach(
 						( { slug }: { slug: string } ) => {
+							// A preset without a slug can't produce a usable
+							// class name or custom property, so skip it.
+							if ( typeof slug !== 'string' ) {
+								return;
+							}
 							classes!.forEach(
 								( {
 									classSuffix,
@@ -1614,6 +1619,11 @@ function getPresetVarDeclarations(
 			continue;
 		}
 		for ( const value of presetByOrigin[ origin ] ) {
+			// A preset without a slug can't produce a usable custom property
+			// name, so skip it.
+			if ( typeof value?.slug !== 'string' ) {
+				continue;
+			}
 			const slug = kebabCase( value.slug );
 			if ( valueKey && ! valueFunc ) {
 				declarations.push(
