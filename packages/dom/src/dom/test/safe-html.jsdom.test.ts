@@ -66,6 +66,20 @@ describe( 'safeHTML', () => {
 		).toBe( '<svg><a><animate attributeName="href"></animate></a></svg>' );
 	} );
 
+	it( 'should strip script URLs from svg links', () => {
+		expect(
+			safeHTML(
+				'<svg><a xlink:href="javascript:alert(1)"><text>Link</text></a></svg>'
+			)
+		).toBe( '<svg><a><text>Link</text></a></svg>' );
+	} );
+
+	it( 'should keep attributes that are not URLs', () => {
+		const input =
+			'<a title="javascript: the good parts" data-note="javascript:x" href="#">Link</a>';
+		expect( safeHTML( input ) ).toBe( input );
+	} );
+
 	it( 'should keep regular URLs', () => {
 		const input = '<a href="https://example.com/javascript:">Link</a>';
 		expect( safeHTML( input ) ).toBe( input );
