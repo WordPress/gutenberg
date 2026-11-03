@@ -170,12 +170,23 @@ const getGalleryDetailsMediaFrame = () => {
 		/**
 		 * Handle the edit state requirements of selected media item.
 		 *
+		 * Uses the selection of the currently active state (e.g. `gallery`,
+		 * `gallery-edit`, or `gallery-library` when adding more images to an
+		 * existing gallery) rather than always assuming the `gallery` state,
+		 * since the selected image may live in a different state's selection.
+		 *
 		 * @return {void}
 		 */
 		editState() {
-			const selection = this.state( 'gallery' ).get( 'selection' );
+			const selection = this.state().get( 'selection' );
+			const model = selection && selection.single();
+
+			if ( ! model ) {
+				return;
+			}
+
 			const view = new wp.media.view.EditImage( {
-				model: selection.single(),
+				model,
 				controller: this,
 			} ).render();
 
