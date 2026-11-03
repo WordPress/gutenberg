@@ -1,4 +1,4 @@
-import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
+import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES, SIZED_LAYOUTS } from './constants';
 
 /**
  * Evaluates a CSS aspect-ratio property value as a number.
@@ -93,4 +93,35 @@ export function isValidFileType( file ) {
 
 export function mediaPosition( { x, y } = { x: 0.5, y: 0.5 } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
+
+/**
+ * Determines which dimension tools to provide for an Image block.
+ *
+ * In sized layouts (flex or grid), dimensions are controlled by the container
+ * unless custom width or height dimensions are currently active, in which case
+ * the widthHeight tool is provided so the user can inspect or reset them.
+ *
+ * @param {Object}  options                     Options object.
+ * @param {string=} options.parentLayoutType    The layout type of the parent block.
+ * @param {boolean} options.hasCustomDimensions Whether custom width or height dimensions are active.
+ * @param {boolean} options.isWideAligned       Whether the image is wide or full aligned.
+ * @return {string[]} Array of active dimension tool keys.
+ */
+export function getDimensionsTools( {
+	parentLayoutType,
+	hasCustomDimensions,
+	isWideAligned,
+} ) {
+	if ( parentLayoutType && SIZED_LAYOUTS.includes( parentLayoutType ) ) {
+		return hasCustomDimensions
+			? [ 'aspectRatio', 'widthHeight' ]
+			: [ 'aspectRatio' ];
+	}
+
+	if ( isWideAligned ) {
+		return [ 'aspectRatio', 'scale' ];
+	}
+
+	return [ 'aspectRatio', 'widthHeight', 'scale' ];
 }
