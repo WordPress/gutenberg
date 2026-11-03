@@ -91,6 +91,13 @@
 		}
 	}
 
+	// Prevent the block from shrinking below the minimum
+	// placholder dimensions when no featured image is present.
+	&[style*="height"]:has(.components-placeholder) {
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+	}
+
 	// Provide a minimum size for the placeholder when resized.
 	// Note, this should be as small as we can afford it, and exists only
 	// to ensure there's room for the upload button.
