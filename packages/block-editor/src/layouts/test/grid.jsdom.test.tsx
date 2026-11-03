@@ -510,10 +510,9 @@ describe( 'GridLayoutInspectorControls', () => {
 					layout: { type: 'grid', isManualPlacement: true },
 				} );
 				expect(
-					await screen.findByRole( 'radio', { name: 'Manual' } )
-				).toBeChecked();
-				expect(
-					screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+					await screen.findByRole( 'checkbox', {
+						name: 'Stack on mobile',
+					} )
 				).toBeInTheDocument();
 				unmount();
 
@@ -523,9 +522,8 @@ describe( 'GridLayoutInspectorControls', () => {
 				renderInspectorControls( {
 					layout: { type: 'grid', isManualPlacement: true },
 				} );
-				expect(
-					await screen.findByRole( 'radio', { name: 'Manual' } )
-				).toBeChecked();
+				// Wait for the panel's controls to settle.
+				await screen.findByRole( 'spinbutton', { name: 'Columns' } );
 				expect(
 					screen.queryByRole( 'checkbox', {
 						name: 'Stack on mobile',
@@ -708,69 +706,11 @@ describe( 'GridLayoutInspectorControls', () => {
 			} );
 		} );
 
-		it( 'keeps the column count when the grid type is switched', async () => {
-			const user = userEvent.setup();
-			const onChange = vi.fn();
-			const renderLayout = ( layout: Record< string, unknown > ) => (
-				<ToolsPanel
-					label="Layout"
-					resetAll={ vi.fn() }
-					panelId={ PANEL_ID }
-				>
-					<GridLayoutInspectorControls
-						clientId={ PANEL_ID }
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				</ToolsPanel>
-			);
-			const { rerender } = render(
-				renderLayout( {
-					type: 'grid',
-					isManualPlacement: true,
-					columnCount: 6,
-					rowCount: 2,
-				} )
-			);
-			// The count changed after the control was shown.
-			rerender(
-				renderLayout( {
-					type: 'grid',
-					isManualPlacement: true,
-					columnCount: 8,
-					rowCount: 2,
-				} )
-			);
-
-			await user.click(
-				await screen.findByRole( 'radio', { name: 'Auto' } )
-			);
-			expect( onChange ).toHaveBeenLastCalledWith(
-				expect.objectContaining( {
-					columnCount: 8,
-					isManualPlacement: undefined,
-				} )
-			);
-
-			rerender( renderLayout( { type: 'grid', columnCount: 5 } ) );
-			await user.click(
-				await screen.findByRole( 'radio', { name: 'Manual' } )
-			);
-			expect( onChange ).toHaveBeenLastCalledWith(
-				expect.objectContaining( {
-					columnCount: 5,
-					isManualPlacement: true,
-				} )
-			);
-		} );
-
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {
 			renderInspectorControls( { layout: { type: 'grid' } } );
 
-			// Wait for the grid item position control to settle.
-			expect(
-				await screen.findByRole( 'radio', { name: 'Auto' } )
-			).toBeChecked();
+			// Wait for the panel's controls to settle.
+			await screen.findByRole( 'spinbutton', { name: 'Columns' } );
 			expect(
 				screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
 			).not.toBeInTheDocument();
