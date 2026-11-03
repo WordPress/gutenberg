@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Group: Behind the `gutenberg-grid-interactivity` experiment, make the Canvas variation a full width 12 by 12 grid with an example of placed blocks, and register it when the block is registered, so it does not depend on the order in which the experiment's flag is set ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
+-   Group: Behind the `gutenberg-grid-interactivity` experiment, make the Canvas variation a full width 32 by 32 grid with an example of placed blocks, and register it when the block is registered, so it does not depend on the order in which the experiment's flag is set ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
 -   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
 -   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
 -   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).

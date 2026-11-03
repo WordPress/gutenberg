@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode, Ref, RefObject } from 'react';
+import type { CSSProperties, Ref, RefObject } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { AlignmentGuide } from './get-alignment-guides';
 import type { GridItemBox, GridPlacement } from './free-placement';
@@ -140,74 +140,8 @@ export interface GridVisualizerGridProps {
 }
 
 export interface GridVisualizerCellProps {
-	/** The grid's text color. */
+	/** The color of the cell's lines. */
 	color: string;
-	/**
-	 * Lines in the grid's text color, a square that stands out on any
-	 * background while a block is dragged into the grid, or no lines.
-	 */
-	lineStyle?: 'color' | 'contrasting' | 'none';
-	/** The cell's content. */
-	children?: ReactNode;
-}
-
-/**
- * A cell of a manual grid.
- */
-export interface GridVisualizerCellPosition {
-	column: number;
-	row: number;
-	gridClientId: string;
-	gridInfo: GridInfo;
-}
-
-/**
- * The inserter of a cell of a manual grid, or of cells selected by drawing
- * across the grid.
- */
-export interface GridVisualizerAppenderProps extends GridVisualizerCellPosition {
-	/** Number of columns the inserted block covers. */
-	columnSpan?: number;
-	/** Number of rows the inserted block covers. */
-	rowSpan?: number;
-	/** The grid element in the canvas. */
-	gridElement: Element;
-	/** Whether the inserter opens as soon as it renders. */
-	isInitiallyOpen?: boolean;
-	/** Called when the inserter closes, with or without a block inserted. */
-	onClose?: () => void;
-}
-
-export interface GridVisualizerMarqueeProps {
-	/** Client ID of the grid block. */
-	gridClientId: string;
-	/** The grid element in the canvas. */
-	gridElement: Element;
-	/** Grid info, from `getGridInfo`. */
-	gridInfo: GridInfo;
-}
-
-/**
- * Cells selected by drawing across a manual grid.
- */
-export interface GridMarquee {
-	/** The selected cells. */
-	rect: GridRect;
-	/** Whether the press is over and the inserter for the cells is open. */
-	isInserting: boolean;
-}
-
-/**
- * A press that draws across the cells of a manual grid.
- */
-export interface GridMarqueeDrag {
-	pointerId: number;
-	/** The cell the press started on. */
-	start: GridRect;
-	/** Whether the pointer has left the cell it was pressed on. */
-	isMoving: boolean;
-	/** Whether Escape was pressed during the press. */
-	isCancelled?: boolean;
 }
 
 /**
@@ -317,7 +251,21 @@ export interface AutoGridVisualizerProps {
 	childGridRect: GridRect | null;
 }
 
-export interface ManualGridVisualizerProps extends AutoGridVisualizerProps {
+export interface ManualGridVisualizerProps {
 	gridClientId: string;
 	gridElement: Element;
+	gridInfo: GridInfo;
+	/** Whether a dragged block can land in the grid. */
+	isDroppingAllowed: boolean;
+}
+
+export interface GridCellTilesOptions {
+	/** Client ID of the grid block. */
+	gridClientId: string;
+	/** The grid element in the canvas. */
+	gridElement: Element;
+	/** Grid info, from `getGridInfo`. */
+	gridInfo: GridInfo;
+	/** Whether the cells are shown. */
+	isShown: boolean;
 }
