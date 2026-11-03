@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Real-time collaboration: Stop rewriting the markup of untouched rich-text blocks in the shared document, such as `&nbsp;` becoming a literal non-breaking space, when a collaborator edits another block ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Real-time collaboration: Stop rewriting the markup of untouched rich-text blocks in the shared document, such as `&nbsp;` becoming a literal non-breaking space, when a collaborator edits another block ([#86270](https://github.com/WordPress/gutenberg/pull/86270)).
 
 ### Internal
 
