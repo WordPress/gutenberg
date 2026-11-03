@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#ISSUE](https://github.com/WordPress/gutenberg/pull/ISSUE)).
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
 -   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).

@@ -84,9 +84,10 @@ function block_core_table_of_contents_get_heading_link( $id, $context = array() 
  */
 function block_core_table_of_contents_normalize_nextpage_blocks( $content ) {
 	// Collapse already-wrapped nextpage blocks first so the replacement below
-	// never nests a page break inside another nextpage wrapper.
+	// never nests a page break inside another nextpage wrapper. A locked or
+	// renamed Page Break saves attributes in its opening comment.
 	$content = preg_replace(
-		'/<!--\s+wp:(?:core\/)?nextpage\s+-->\s*<!--nextpage-->\s*<!--\s+\/wp:(?:core\/)?nextpage\s+-->/',
+		'/<!--\s+wp:(?:core\/)?nextpage\s+(?:\{.*?\}\s+)?-->\s*<!--nextpage-->\s*<!--\s+\/wp:(?:core\/)?nextpage\s+-->/',
 		'<!--nextpage-->',
 		$content
 	);
