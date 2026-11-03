@@ -51,6 +51,69 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 }
 ```
 
+## Offer Aspect-Ratio Presets
+
+`DEFAULT_ASPECT_RATIOS` is a list of `{ label, value }` presets; pass your own list to offer different ones. `resolveAspectRatio` turns a preset value into the ratio `setAspectRatio` takes, working out "Original" from the loaded image. Keep the selected preset in your own state, since the controller only stores the resolved ratio.
+
+```tsx
+import { useState } from '@wordpress/element';
+import {
+	Cropper,
+	DEFAULT_ASPECT_RATIOS,
+	resolveAspectRatio,
+	useCropperController,
+} from '@wordpress/image-editor';
+
+function CropperWithPresets( { src }: { src: string } ) {
+	const controller = useCropperController();
+	const [ preset, setPreset ] = useState( '0' );
+
+	return (
+		<>
+			<select
+				value={ preset }
+				onChange={ ( event ) => {
+					setPreset( event.target.value );
+					controller.setAspectRatio(
+						resolveAspectRatio(
+							event.target.value,
+							controller.state.image
+						)
+					);
+				} }
+			>
+				{ DEFAULT_ASPECT_RATIOS.map( ( { label, value } ) => (
+					<option key={ value } value={ String( value ) }>
+						{ label }
+					</option>
+				) ) }
+			</select>
+			<Cropper src={ src } controller={ controller } freeformCrop />
+		</>
+	);
+}
+```
+
+## Lock the Crop to a Ratio
+
+For a fixed shape, such as a square site icon, start with a locked ratio and leave out `freeformCrop`. The crop area stays centred at the largest square that fits, and the person pans and zooms the image under it.
+
+```tsx
+const controller = useCropperController( {
+	initialState: { aspectRatio: 1 },
+} );
+
+return <Cropper src={ src } controller={ controller } />;
+```
+
+## Start From a Saved Crop
+
+Pass a crop you saved earlier from `controller.state` as `initialState`. It is kept when the image loads.
+
+```tsx
+const controller = useCropperController( { initialState: savedCrop } );
+```
+
 ## Keep the State Yourself
 
 To put the crop in your own undo history, alongside anything else your editor changes, keep the cropper state in your own state and pass it to the controller. The controller works out each change and hands you the next state. A minimal history, with a drag recorded as one entry:
@@ -143,27 +206,9 @@ An unedited image returns an empty list.
 
 ## Accessibility Notes
 
--   The crop area is focusable and keyboard-operable.
--   Resize handles are native buttons.
--   Arrow keys pan the image or resize the focused handle.
--   Shift increases keyboard pan/resize distance.
--   `R` performs a 90 degree rotation.
--   State changes are announced through an ARIA live region.
-
-## Tests
-
-Run focused unit tests with:
-
-```bash
-npm run test:unit -- packages/image-editor
-```
-
-Useful test areas:
-
--   `src/core/test/camera.ts` for containment and camera invariants.
--   `src/core/test/state.ts` for reducer behavior.
--   `src/core/export/test/canvas-renderer.jsdom.test.ts` for canvas export.
--   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
--   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
--   `src/react/hooks/test/use-cropper-controller.jsdom.test.ts` for the controller, including keeping the state yourself.
--   `src/test/build-modifiers.test.ts` for the server instructions.
+-   The crop area is focusable and keyboard-operable, and changes are announced through an ARIA live region.
+-   Arrow keys pan the image. Hold Shift for bigger steps.
+-   `+` or `=` zooms in, and `-` or `_` zooms out.
+-   `R` rotates 90 degrees clockwise, and Shift+`R` rotates counter-clockwise.
+-   `H` flips horizontally, and `V` flips vertically.
+-   With `freeformCrop`, the resize handles are buttons. Arrow keys resize from the focused handle; hold Shift for bigger steps.

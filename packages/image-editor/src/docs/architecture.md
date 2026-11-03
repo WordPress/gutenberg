@@ -1,5 +1,7 @@
 # Image Editor Architecture
 
+How the cropper works inside, for people changing this package. To use it, see the [README](../../README.md) and the [recipes](recipes.md).
+
 ## Layers
 
 | Layer | Files | Responsibility |
@@ -22,7 +24,7 @@ The cropper keeps no undo history. History belongs to the code that uses the cro
 
 ## Data Flow
 
-State code that wraps the cropper delegates cropper actions to `cropperReducer()`. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
+Every change goes through `cropperReducer()` in `src/core/state.ts`. `useCropperController` runs it, either on its own state or on the state a consumer keeps (`state` and `onChange`). Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
 
 ## Design Decisions
 
@@ -49,3 +51,21 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 | Crop data for REST requests | `buildModifiers()`. |
 | Export in the browser | `controller.getCroppedImage()`. |
 | Keep the crop in your own undo history | `useCropperController( { state, onChange } )`, `createCropperState()` and `areCropperStatesEqual()`. |
+
+## Tests
+
+Run focused unit tests with:
+
+```bash
+npm run test:unit -- packages/image-editor
+```
+
+Useful test areas:
+
+-   `src/core/test/camera.ts` for containment and camera invariants.
+-   `src/core/test/state.ts` for reducer behavior.
+-   `src/core/export/test/canvas-renderer.jsdom.test.ts` for canvas export.
+-   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
+-   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
+-   `src/react/hooks/test/use-cropper-controller.jsdom.test.ts` for the controller, including keeping the state yourself.
+-   `src/test/build-modifiers.test.ts` for the server instructions.
