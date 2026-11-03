@@ -1,6 +1,7 @@
 import type {
 	GlobalStylesSettings,
 	GlobalStylesStyles,
+	ThemeFileLink,
 } from '@wordpress/global-styles-engine';
 import type { Context, ContextualField, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
@@ -38,13 +39,17 @@ declare module './base-entity-records' {
 			/**
 			 * Links the REST response attaches to the record. `version-history`
 			 * carries the revision count, which is how consumers tell whether
-			 * the record has revisions without fetching them.
+			 * the record has revisions without fetching them. `wp:theme-file`
+			 * lists the theme files the styles reference, and
+			 * `wp:action-edit-css` is present when the user can edit CSS.
 			 */
 			_links?: {
 				'version-history'?: Array< {
 					href: string;
 					count: number;
 				} >;
+				'wp:theme-file'?: ThemeFileLink[];
+				'wp:action-edit-css'?: Array< { href: string } >;
 				[ key: string ]: Array< { href: string } > | undefined;
 			};
 		}

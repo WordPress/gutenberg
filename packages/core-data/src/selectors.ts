@@ -535,6 +535,68 @@ export function __experimentalGetEntityRecordNoResolver<
 }
 
 /**
+ * GetRawEntityRecord is declared as a callable interface for the same reason
+ * as GetEntityRecord: a generic selector loses its overloads when curried.
+ *
+ * @see GetEntityRecord
+ */
+export interface GetRawEntityRecord {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Raw
+	 * attributes such as a post's `title` hold their raw string.
+	 */
+	< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+		state: State,
+		kind: Kind,
+		name: Name,
+		recordId?: EntityRecordKey
+	):
+		| ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > >
+		| undefined;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
+	< EntityRecord extends ET.EntityRecord< any > >(
+		state: State,
+		kind: string,
+		name: string,
+		recordId?: EntityRecordKey
+	): EntityRecord | undefined;
+
+	CurriedSignature: {
+		< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey
+		):
+			| ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > >
+			| undefined;
+		< EntityRecord extends ET.EntityRecord< any > >(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey
+		): EntityRecord | undefined;
+	};
+	PromiseCurriedSignature: {
+		< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey
+		): Promise<
+			| ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > >
+			| undefined
+		>;
+		< EntityRecord extends ET.EntityRecord< any > >(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey
+		): Promise< EntityRecord | undefined >;
+	};
+}
+
+/**
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
@@ -546,7 +608,7 @@ export function __experimentalGetEntityRecordNoResolver<
  * @return Object with the entity's raw attributes.
  */
 export const getRawEntityRecord = createSelector(
-	< EntityRecord extends ET.EntityRecord< any > >(
+	( < EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
 		kind: string,
 		name: string,
@@ -580,7 +642,7 @@ export const getRawEntityRecord = createSelector(
 				return [ key, record[ key ] ];
 			} )
 		) as EntityRecord;
-	},
+	} ) as GetRawEntityRecord,
 	(
 		state: State,
 		kind: string,
@@ -1021,6 +1083,67 @@ export function hasEditsForEntityRecord(
 }
 
 /**
+ * GetEditedEntityRecord is declared as a callable interface for the same
+ * reason as GetEntityRecord: a generic selector loses its overloads when
+ * curried.
+ *
+ * @see GetEntityRecord
+ */
+export interface GetEditedEntityRecord {
+	/*
+	 * Infers the record type from the `kind` and `name` arguments. Raw
+	 * attributes such as a post's `title` hold their raw string.
+	 */
+	< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+		state: State,
+		kind: Kind,
+		name: Name,
+		recordId?: EntityRecordKey
+	): ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > > | false;
+
+	/*
+	 * Retained so call sites that name the record type explicitly, and any
+	 * type not reachable through the map, continue to compile.
+	 */
+	< EntityRecord extends ET.EntityRecord< any > >(
+		state: State,
+		kind: string,
+		name: string,
+		recordId?: EntityRecordKey
+	): ET.Updatable< EntityRecord > | false;
+
+	CurriedSignature: {
+		< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey
+		):
+			| ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > >
+			| false;
+		< EntityRecord extends ET.EntityRecord< any > >(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey
+		): ET.Updatable< EntityRecord > | false;
+	};
+	PromiseCurriedSignature: {
+		< Kind extends ET.EntityKind, Name extends ET.EntityNameOf< Kind > >(
+			kind: Kind,
+			name: Name,
+			recordId?: EntityRecordKey
+		): Promise<
+			| ET.Updatable< ET.EntityRecordOfQuery< Kind, Name, undefined > >
+			| false
+		>;
+		< EntityRecord extends ET.EntityRecord< any > >(
+			kind: string,
+			name: string,
+			recordId?: EntityRecordKey
+		): Promise< ET.Updatable< EntityRecord > | false >;
+	};
+}
+
+/**
  * Returns the specified entity record, merged with its edits.
  *
  * @param state    State tree.
@@ -1031,7 +1154,7 @@ export function hasEditsForEntityRecord(
  * @return The entity record, merged with its edits.
  */
 export const getEditedEntityRecord = createSelector(
-	< EntityRecord extends ET.EntityRecord< any > >(
+	( < EntityRecord extends ET.EntityRecord< any > >(
 		state: State,
 		kind: string,
 		name: string,
@@ -1051,7 +1174,7 @@ export const getEditedEntityRecord = createSelector(
 			...raw,
 			...edited,
 		};
-	},
+	} ) as GetEditedEntityRecord,
 	(
 		state: State,
 		kind: string,

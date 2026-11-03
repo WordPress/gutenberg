@@ -16,6 +16,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
 /* eslint-disable vitest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { describe, it } from 'vitest';
 import {
 	store as coreStore,
@@ -32,6 +33,7 @@ import type {
 	EntityRecordOf,
 	EntityRecordOfQuery,
 	OmitNevers,
+	Updatable,
 } from '../index';
 import type { Attachment } from '../attachment';
 import type { Comment, CommentStatus } from '../comment';
@@ -1259,6 +1261,97 @@ describe( 'Entity record types', () => {
 				Order< 'view' > | Order< 'edit' > | Order< 'embed' > | undefined
 			>;
 			order?.total satisfies string | undefined;
+		};
+	} );
+	it( 'the edited and raw record selectors infer the record', () => {
+		async () => {
+			const edited = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect<
+				typeof edited,
+				Updatable< Post< 'edit' > > | false
+			>;
+			if ( edited ) {
+				// Raw attributes hold their raw string, not `{ raw, rendered }`.
+				edited.title satisfies string;
+				edited.status satisfies string;
+			}
+
+			const raw = select( coreStore ).getRawEntityRecord(
+				'postType',
+				'wp_template',
+				'theme//index'
+			);
+			true satisfies Expect<
+				typeof raw,
+				Updatable< WpTemplate< 'edit' > > | undefined
+			>;
+			raw?.content satisfies string | undefined;
+
+			const resolved = await resolveSelect(
+				coreStore
+			).getEditedEntityRecord( 'postType', 'page', 1 );
+			true satisfies Expect<
+				typeof resolved,
+				Updatable< Page< 'edit' > > | false
+			>;
+
+			// A keyless entity needs no record ID.
+			const site = select( coreStore ).getEditedEntityRecord(
+				'root',
+				'site'
+			);
+			if ( site ) {
+				site.title satisfies string | undefined;
+			}
+		};
+	} );
+
+	it( 'a global styles record is assignable to the global styles config', () => {
+		() => {
+			const record = select( coreStore ).getEditedEntityRecord(
+				'root',
+				'globalStyles',
+				1
+			);
+			if ( record ) {
+				record satisfies GlobalStylesConfig;
+			}
+		};
+	} );
+
+	it( 'the edited and raw record selectors fall back for an unknown pair', () => {
+		() => {
+			const edited = select( coreStore ).getEditedEntityRecord(
+				'myPlugin',
+				'order',
+				1
+			);
+			true satisfies Expect<
+				typeof edited,
+				Updatable< EntityRecord< any > > | false
+			>;
+
+			// Naming the record type keeps the original signature.
+			const named = select( coreStore ).getEditedEntityRecord< Post >(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect< typeof named, Updatable< Post > | false >;
+
+			const raw = select( coreStore ).getRawEntityRecord(
+				'myPlugin',
+				'order',
+				1
+			);
+			true satisfies Expect<
+				typeof raw,
+				EntityRecord< any > | undefined
+			>;
 		};
 	} );
 } );

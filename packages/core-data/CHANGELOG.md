@@ -24,6 +24,8 @@
 -   A call that names no `context` resolves the built-in post types and every taxonomy in the `edit` context they are fetched in. A post type added by a plugin declares its own context in `PostTypeEntityContexts` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `useEntityRecord` no longer needs a record ID for an entity without a key, such as `useEntityRecord( 'root', 'site' )` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `Updatable` accepts any record type ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `getEditedEntityRecord` and `getRawEntityRecord` now infer the record type from their `kind` and `name` arguments, matching `getEntityRecord`, with raw attributes such as a post's `title` typed as strings. Naming the record type, as in `getEditedEntityRecord< Post >()`, now also works through `select()`.
+-   `GlobalStyles._links` declares the `wp:theme-file` and `wp:action-edit-css` links the REST API returns, so a global styles record is assignable to `GlobalStylesConfig`.
 
 ### Internal
 
