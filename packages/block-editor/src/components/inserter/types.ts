@@ -12,7 +12,7 @@ import type {
 	BlockCollection,
 	BlockTypeIconRender,
 } from '@wordpress/blocks';
-import type { Popover } from '@wordpress/components';
+import type { Popover as WCPopover } from '@wordpress/components';
 import type {
 	BlockPattern,
 	InserterItem,
@@ -274,7 +274,7 @@ export interface InserterProps {
 	rootClientId?: string | null;
 	disabled?: boolean;
 	isAppender?: boolean;
-	position?: ComponentProps< typeof Popover >[ 'position' ];
+	position?: ComponentProps< typeof WCPopover >[ 'position' ];
 	selectBlockOnInsert?: boolean;
 	shouldDirectInsert?: boolean;
 	showInserterHelpPanel?: boolean;
