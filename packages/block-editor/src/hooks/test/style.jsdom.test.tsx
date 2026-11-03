@@ -4,6 +4,7 @@ import type { BlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
+	getGlobalBlockBaseStyle,
 	getInlineStyles,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
@@ -669,6 +670,64 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'escapes a Global Styles text clip for a viewport box clip', () => {
+		registerBlockType( 'test/state-text', {
+			apiVersion: 3,
+			title: 'State Text',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { background: { backgroundClip: 'border-box' } } },
+			'test/state-text',
+			'.wp-elements-1',
+			undefined,
+			{ background: { backgroundClip: 'text' } }
+		);
+		unregisterBlockType( 'test/state-text' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }\n.wp-elements-1 { background-image: unset !important; }}',
+		] );
+	} );
+
+	it( 'escapes the default pseudo state text clip for a viewport pseudo state', () => {
+		registerBlockType( 'core/button', {
+			apiVersion: 3,
+			title: 'Button',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				':hover': {
+					background: {
+						gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+						backgroundClip: 'text',
+					},
+				},
+				'@mobile': {
+					':hover': { background: { backgroundClip: 'border-box' } },
+				},
+			},
+			'core/button',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'core/button' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1:hover { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }\n.wp-elements-1:hover { background-image: unset !important; }}',
+		] );
+	} );
+
 	it( 'generates media-query scoped element styles for viewport states', () => {
 		expect(
 			getResponsiveStateCSSRules(
@@ -687,6 +746,34 @@ describe( 'getResponsiveStateCSSRules', () => {
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
 		] );
+	} );
+} );
+
+describe( 'getGlobalBlockBaseStyle', () => {
+	it( 'layers the first applied variation with styles over the block type', () => {
+		expect(
+			getGlobalBlockBaseStyle(
+				{
+					background: { backgroundClip: 'border-box' },
+					color: { text: 'red' },
+					'@mobile': { color: { text: 'blue' } },
+					variations: {
+						empty: {},
+						flashy: {
+							background: { backgroundClip: 'text' },
+							':hover': { color: { text: 'green' } },
+						},
+					},
+				} as unknown as Parameters<
+					typeof getGlobalBlockBaseStyle
+				>[ 0 ],
+				'wp-block-paragraph is-style-empty is-style-flashy',
+				[ ':hover', '@mobile' ]
+			)
+		).toEqual( {
+			background: { backgroundClip: 'text' },
+			color: { text: 'red' },
+		} );
 	} );
 } );
 
