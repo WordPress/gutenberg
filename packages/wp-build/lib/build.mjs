@@ -489,11 +489,11 @@ async function getCopyFiles( packageDir, packageJson ) {
 	if ( ! packageJson.wpCopyFiles ) {
 		return [];
 	}
-	return glob(
-		packageJson.wpCopyFiles.files.map( ( filePattern ) =>
-			normalizePath( path.join( packageDir, filePattern ) )
-		)
-	);
+	// Glob relative to the package, so that its path is not read as a pattern.
+	return glob( packageJson.wpCopyFiles.files, {
+		cwd: packageDir,
+		absolute: true,
+	} );
 }
 
 /**
