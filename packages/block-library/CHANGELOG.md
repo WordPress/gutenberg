@@ -39,7 +39,7 @@
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
--   Pullquote: Convert pullquote markup in a Classic block to a Pullquote block with its citation, instead of leaving it in a Custom HTML block.
+-   Pullquote: Convert pullquote markup in a Classic block to a Pullquote block with its citation, instead of leaving it in a Custom HTML block ([#86210](https://github.com/WordPress/gutenberg/pull/86210)).
 
 ## 12.0.0 (2026-10-20)
 
