@@ -1,7 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
@@ -38,6 +38,8 @@ import type { WritingBlock, WritingStyle } from './types';
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const PRESET_ORIGINS = [ 'default', 'theme', 'custom' ] as const;
+
+const EMPTY_ARRAY: never[] = [];
 
 type WritingToolbarAttributes = {
 	fontFamily?: string;
@@ -85,39 +87,56 @@ function WritingToolbarControls( {
 	const { replaceBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const { writingBlocks, transformNames, blocks } = useSelect(
+	const registry = useRegistry();
+
+	/*
+	 * Every value a `useSelect` returns has to keep its identity while the
+	 * state behind it is unchanged, or the toolbar re-renders on every store
+	 * change. `getBlock` hands back the block's own tree entry, and
+	 * `getBlockTransformItems` memoizes on that entry, so both stay stable;
+	 * arrays derived inside the selector would not.
+	 */
+	const { block, rootClientId, blockTypes } = useSelect(
 		( select ) => {
-			const { getBlockTypes, getBlockVariations } = select( blocksStore );
-			const {
-				getBlockTransformItems,
-				getBlockRootClientId,
-				getBlocksByClientId,
-			} = select( blockEditorStore );
-			const selectedBlocks = getBlocksByClientId( [
-				clientId,
-			] ) as Block[];
+			const { getBlock, getBlockRootClientId } =
+				select( blockEditorStore );
 
 			return {
-				writingBlocks: getBlockTypes()
-					.filter( ( blockType ) =>
-						hasBlockSupport( blockType, 'writing', false )
-					)
-					.map( ( blockType ): WritingBlock => ( {
-						name: blockType.name,
-						title: blockType.title,
-						variations:
-							getBlockVariations( blockType.name, 'transform' ) ??
-							[],
-					} ) ),
-				transformNames: getBlockTransformItems(
-					selectedBlocks,
-					getBlockRootClientId( clientId )
-				).map( ( item: { name: string } ) => item.name ),
-				blocks: selectedBlocks,
+				block: getBlock( clientId ) as Block | null,
+				rootClientId: getBlockRootClientId( clientId ),
+				blockTypes: select( blocksStore ).getBlockTypes(),
 			};
 		},
 		[ clientId ]
 	);
+
+	const transformItems = useSelect(
+		( select ) =>
+			block
+				? select( blockEditorStore ).getBlockTransformItems(
+						block,
+						rootClientId
+					)
+				: EMPTY_ARRAY,
+		[ block, rootClientId ]
+	);
+
+	const writingBlocks = useMemo( () => {
+		// Variations are registration data, which only changes alongside the
+		// block types themselves, so they are read rather than subscribed to.
+		const { getBlockVariations } = registry.select( blocksStore );
+
+		return blockTypes
+			.filter( ( blockType ) =>
+				hasBlockSupport( blockType, 'writing', false )
+			)
+			.map( ( blockType ): WritingBlock => ( {
+				name: blockType.name,
+				title: blockType.title,
+				variations:
+					getBlockVariations( blockType.name, 'transform' ) ?? [],
+			} ) );
+	}, [ blockTypes, registry ] );
 
 	const fontFamilies = useMemo(
 		() =>
@@ -139,7 +158,10 @@ function WritingToolbarControls( {
 	const groups = useMemo( () => {
 		// A style the block cannot be turned into is still listed, so the menu
 		// reads as the whole set the theme offers, but it cannot be chosen.
-		const reachable = new Set( [ name, ...transformNames ] );
+		const reachable = new Set( [
+			name,
+			...transformItems.map( ( item: { name: string } ) => item.name ),
+		] );
 
 		return groupWritingStylesByFont(
 			getWritingStyles( {
@@ -151,7 +173,7 @@ function WritingToolbarControls( {
 				disabled: ! reachable.has( style.blockName ),
 			} ) )
 		);
-	}, [ writingBlocks, transformNames, globalStyles, fontFamilies, name ] );
+	}, [ writingBlocks, transformItems, globalStyles, fontFamilies, name ] );
 
 	const activeStyle = useMemo(
 		() =>
@@ -173,7 +195,11 @@ function WritingToolbarControls( {
 			return;
 		}
 
-		const transformed = switchToBlockType( blocks, style.blockName );
+		if ( ! block ) {
+			return;
+		}
+
+		const transformed = switchToBlockType( block, style.blockName );
 
 		if ( ! transformed ) {
 			return;
@@ -189,16 +215,16 @@ function WritingToolbarControls( {
 		replaceBlocks(
 			clientId,
 			style.attributes
-				? transformed.map( ( block ) =>
-						block.name === style.blockName
+				? transformed.map( ( transformedBlock ) =>
+						transformedBlock.name === style.blockName
 							? {
-									...block,
+									...transformedBlock,
 									attributes: {
-										...block.attributes,
+										...transformedBlock.attributes,
 										...style.attributes,
 									},
 								}
-							: block
+							: transformedBlock
 					)
 				: transformed
 		);
