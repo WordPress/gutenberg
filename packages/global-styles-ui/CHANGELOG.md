@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Style variations: switching back to Default no longer keeps the custom CSS (`styles.css`) of the previously selected variation.
+
 ### Enhancements
 
 -   Element screens: add an "Overridden by" list of the block types whose own styles override the element, linking to each block's screen ([#84671](https://github.com/WordPress/gutenberg/pull/84671)).
