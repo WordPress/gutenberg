@@ -32,10 +32,16 @@
 	}
 
 	// A custom field control can be wider than the default ones: let the
-	// popover grow to fit it, rather than overflow.
+	// popover grow to the control's narrowest width, rather than overflow.
+	// Text that wraps or truncates (help text, the filter name) doesn't count.
 	.components-popover__content:has(.dataviews-filters__user-input-widget) {
-		width: max-content;
+		width: min-content;
+		min-width: 230px;
 		max-width: none;
+
+		.dataviews-filters__summary-operators-container {
+			contain: inline-size;
+		}
 	}
 
 	&.components-dropdown__content {
@@ -58,7 +64,7 @@
 		display: none;
 	}
 
-	.dataviews-filters__summary-operators-filter-name {
+	.dataviews-filters__summary-operators-container {
 		color: var(--wpds-color-foreground-content-neutral-weak);
 		white-space: nowrap;
 		overflow: hidden;
