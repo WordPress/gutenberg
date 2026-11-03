@@ -65,6 +65,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `enhancedPagination`
 - `postType`
 - `postId`
+- `useAlphabeticalPagination`
 
 ## Block Markup
 

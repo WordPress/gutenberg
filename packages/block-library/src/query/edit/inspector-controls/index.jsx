@@ -34,9 +34,14 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
-		props;
-	const { query } = attributes;
+	const {
+		attributes,
+		setAttributes,
+		setQuery,
+		isSingular,
+		shouldExcludeCurrentPost,
+	} = props;
+	const { query, useAlphabeticalPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -131,11 +136,36 @@ export default function QueryInspectorControls( props ) {
 		! inherit &&
 		showSticky &&
 		isControlAllowed( allowedControls, 'sticky' );
+	/*
+	 * Letters only line up with the list when it is sorted by title, and the
+	 * query has to be a custom one: an inherited query is the global query,
+	 * which the block cannot filter.
+	 */
+	const showAlphabeticalPaginationControl =
+		! inherit &&
+		orderBy === 'title' &&
+		isControlAllowed( allowedControls, 'useAlphabeticalPagination' );
+	const setAlphabeticalPagination = ( value ) => {
+		if ( !! useAlphabeticalPagination !== value ) {
+			setAttributes( { useAlphabeticalPagination: value } );
+		}
+	};
+	/*
+	 * Letters are meaningless once the list is no longer sorted by title, so
+	 * they are turned off rather than left on with the control out of sight.
+	 */
+	const onOrderChange = ( value ) => {
+		setQuery( value );
+		if ( value.orderBy !== 'title' ) {
+			setAlphabeticalPagination( false );
+		}
+	};
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
 		showOrderControl ||
-		showStickyControl;
+		showStickyControl ||
+		showAlphabeticalPaginationControl;
 	const showTaxControl =
 		!! taxonomies?.length &&
 		isControlAllowed( allowedControls, 'taxQuery' );
@@ -214,6 +244,7 @@ export default function QueryInspectorControls( props ) {
 							sticky: '',
 							inherit: true,
 						} );
+						setAlphabeticalPagination( false );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -310,14 +341,15 @@ export default function QueryInspectorControls( props ) {
 								order !== 'desc' || orderBy !== 'date'
 							}
 							label={ __( 'Order by' ) }
-							onDeselect={ () =>
-								setQuery( { order: 'desc', orderBy: 'date' } )
-							}
+							onDeselect={ () => {
+								setQuery( { order: 'desc', orderBy: 'date' } );
+								setAlphabeticalPagination( false );
+							} }
 							isShownByDefault
 						>
 							<OrderControl
 								{ ...{ order, orderBy, orderByOptions } }
-								onChange={ setQuery }
+								onChange={ onOrderChange }
 							/>
 						</ToolsPanelItem>
 					) }
@@ -334,6 +366,25 @@ export default function QueryInspectorControls( props ) {
 								onChange={ ( value ) =>
 									setQuery( { sticky: value } )
 								}
+							/>
+						</ToolsPanelItem>
+					) }
+
+					{ showAlphabeticalPaginationControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! useAlphabeticalPagination }
+							label={ __( 'Alphabetical pagination' ) }
+							onDeselect={ () =>
+								setAlphabeticalPagination( false )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Alphabetical pagination' ) }
+								help={ __(
+									'Show letters instead of page numbers. Visitors filter the list by the first letter of each title.'
+								) }
+								checked={ !! useAlphabeticalPagination }
+								onChange={ setAlphabeticalPagination }
 							/>
 						</ToolsPanelItem>
 					) }
