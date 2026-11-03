@@ -40,7 +40,7 @@ import {
 } from '../../utils/style-state';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import PosterImage from '../../utils/poster-image';
-import { MediaControl } from '../../utils/media-control';
+import { MediaPanel, MediaPanelItem } from '../../utils/media-control';
 
 const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
 	blockEditorPrivateApis
@@ -296,37 +296,26 @@ export default function CoverInspectorControls( {
 	 * configure until there is media to configure.
 	 */
 	const mediaInspectorPanel = isSelected ? (
-		<InspectorControls group="content">
-			<ToolsPanel
-				label={ __( 'Media' ) }
-				resetAll={ onClearMedia }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				<ToolsPanelItem
-					label={ __( 'Media' ) }
-					hasValue={ () => !! url || !! useFeaturedImage }
-					onDeselect={ onClearMedia }
-					isShownByDefault
-				>
-					<MediaControl
-						mediaId={ id }
-						mediaUrl={ url }
-						filename={
-							image?.media_details?.sizes?.full?.file ||
-							image?.slug ||
-							getFilename( url )
-						}
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onSelect={ onSelectMedia }
-						onError={ onUploadError }
-						onReset={ onClearMedia }
-						useFeaturedImage={ useFeaturedImage }
-						onToggleFeaturedImage={ toggleUseFeaturedImage }
-						emptyLabel={ __( 'Add media' ) }
-					/>
-				</ToolsPanelItem>
-			</ToolsPanel>
-		</InspectorControls>
+		<MediaPanel resetAll={ onClearMedia }>
+			<MediaPanelItem
+				hasValue={ () => !! url || !! useFeaturedImage }
+				onDeselect={ onClearMedia }
+				mediaId={ id }
+				mediaUrl={ url }
+				filename={
+					image?.media_details?.sizes?.full?.file ||
+					image?.slug ||
+					getFilename( url )
+				}
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onSelect={ onSelectMedia }
+				onError={ onUploadError }
+				onReset={ onClearMedia }
+				useFeaturedImage={ useFeaturedImage }
+				onToggleFeaturedImage={ toggleUseFeaturedImage }
+				emptyLabel={ __( 'Add media' ) }
+			/>
+		</MediaPanel>
 	) : null;
 
 	return (
