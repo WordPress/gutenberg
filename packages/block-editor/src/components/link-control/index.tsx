@@ -176,8 +176,11 @@ function LinkControl( {
 	] = useInternalValue( value );
 
 	// Wrapper for input changes that calls both internal and external handlers
-	const handleInputChange = ( newValue: string ) => {
-		setInternalURLInputValue( newValue );
+	const handleInputChange = (
+		newValue: string,
+		suggestion?: LinkControlSuggestion
+	) => {
+		setInternalURLInputValue( newValue, suggestion );
 		onInputChange?.( newValue );
 	};
 
@@ -407,21 +410,18 @@ function LinkControl( {
 			return false;
 		}
 
-		const trimmedValue = currentUrlInputValue.trim();
-
-		// If the current value is an entity link (has id and type not in LINK_ENTRY_TYPES)
-		// and the URL hasn't changed from the original value, skip validation.
-		// This allows entity links with permalink formats like "?p=2" to work without
-		// requiring URL validation when only settings are being changed.
+		// If the input holds an entity link (has id and type not in LINK_ENTRY_TYPES),
+		// skip validation. Typing clears the entity fields, so they remain only for the
+		// original value or a suggestion chosen with the Tab key. This allows entity
+		// links with permalink formats like "?p=2" to work without URL validation.
 		const isEntityLink =
 			internalControlValue &&
 			internalControlValue.id &&
 			internalControlValue.type &&
 			! LINK_ENTRY_TYPES.includes( internalControlValue.type );
-		const urlUnchanged = value?.url === trimmedValue;
 
-		if ( isEntityLink && urlUnchanged ) {
-			// Entity link with unchanged URL - skip validation
+		if ( isEntityLink ) {
+			// Entity link - skip validation
 			setCustomValidity( undefined );
 			return true;
 		}

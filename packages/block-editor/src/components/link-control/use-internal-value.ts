@@ -1,6 +1,6 @@
 import { useState } from '@wordpress/element';
 import fastDeepEqual from 'fast-deep-equal';
-import type { LinkControlValue } from './types';
+import type { LinkControlSuggestion, LinkControlValue } from './types';
 
 export default function useInternalValue(
 	value: LinkControlValue | undefined
@@ -19,9 +19,17 @@ export default function useInternalValue(
 		setInternalValue( value );
 	}
 
-	const setInternalURLInputValue = ( nextValue: string | undefined ) => {
+	const setInternalURLInputValue = (
+		nextValue: string | undefined,
+		suggestion?: LinkControlSuggestion
+	) => {
+		// The entity fields describe the URL in the input, so a suggestion
+		// chosen with the Tab key brings its own, and a typed URL has none.
 		setInternalValue( {
 			...internalValue,
+			id: suggestion?.id,
+			kind: suggestion?.kind,
+			type: suggestion?.type,
 			url: nextValue,
 		} );
 	};

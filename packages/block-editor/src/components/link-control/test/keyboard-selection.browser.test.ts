@@ -111,3 +111,141 @@ describe( 'LinkControl keyboard selection', () => {
 		}
 	);
 } );
+
+describe( 'LinkControl Apply after editing a bound link', () => {
+	const boundLink = {
+		id: 99,
+		kind: 'post-type',
+		type: 'page',
+		url: 'https://example.com/old-page/',
+		title: 'Old Page',
+	};
+	const pageSuggestion = {
+		id: 7,
+		title: 'Test Page',
+		type: 'page',
+		kind: 'post-type',
+		url: 'https://example.com/test-page/',
+	};
+
+	beforeEach( () => {
+		mockFetchSearchSuggestions.mockResolvedValue( [ pageSuggestion ] );
+	} );
+
+	async function renderBoundLink( onChange: ( value: unknown ) => void ) {
+		await render(
+			createElement(
+				SlotFillProvider,
+				null,
+				createElement( LinkControl, {
+					value: boundLink,
+					onChange,
+					forceIsEditingLink: true,
+					settings: [],
+				} )
+			)
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await userEvent.clear( searchInput );
+		return searchInput;
+	}
+
+	async function pressApply() {
+		// Cancel comes before Apply in the actions row.
+		await userEvent.click( page.getByRole( 'button', { name: 'Apply' } ) );
+	}
+
+	it( 'should submit the suggestion chosen with the arrow keys and Tab', async () => {
+		const onChange = vi.fn();
+		const searchInput = await renderBoundLink( onChange );
+
+		await userEvent.type( searchInput, 'Test' );
+		await screen.findByRole( 'listbox', {
+			name: 'Search results for "Test"',
+		} );
+		await userEvent.keyboard( '{ArrowDown}' );
+		await expect
+			.element( page.getByRole( 'option', { selected: true } ) )
+			.toHaveTextContent( pageSuggestion.title );
+		await userEvent.keyboard( '{Tab}{Tab}' );
+		await expect
+			.element( page.getByRole( 'button', { name: 'Apply' } ) )
+			.toHaveFocus();
+		await userEvent.keyboard( '{Enter}' );
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				id: pageSuggestion.id,
+				kind: pageSuggestion.kind,
+				type: pageSuggestion.type,
+				url: pageSuggestion.url,
+			} )
+		);
+	} );
+
+	it( 'should submit a suggestion with a plain permalink chosen with the arrow keys and Tab', async () => {
+		const plainPermalinkSuggestion = { ...pageSuggestion, url: '?p=7' };
+		mockFetchSearchSuggestions.mockResolvedValue( [
+			plainPermalinkSuggestion,
+		] );
+		const onChange = vi.fn();
+		const searchInput = await renderBoundLink( onChange );
+
+		await userEvent.type( searchInput, 'Test' );
+		await screen.findByRole( 'listbox', {
+			name: 'Search results for "Test"',
+		} );
+		await userEvent.keyboard( '{ArrowDown}{Tab}' );
+		await pressApply();
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				id: plainPermalinkSuggestion.id,
+				url: plainPermalinkSuggestion.url,
+			} )
+		);
+	} );
+
+	it( 'should submit a typed URL without the previous page', async () => {
+		const onChange = vi.fn();
+		const searchInput = await renderBoundLink( onChange );
+
+		await userEvent.type( searchInput, 'https://wordpress.org' );
+		await pressApply();
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		const [ submitted ] = onChange.mock.calls[ 0 ];
+		expect( submitted ).toMatchObject( { url: 'https://wordpress.org' } );
+		expect( submitted.id ).toBeUndefined();
+		expect( submitted.kind ).toBeUndefined();
+		expect( submitted.type ).toBeUndefined();
+	} );
+
+	it( 'should submit a typed URL without the suggestion chosen before it', async () => {
+		const onChange = vi.fn();
+		const searchInput = await renderBoundLink( onChange );
+
+		await userEvent.type( searchInput, 'Test' );
+		await screen.findByRole( 'listbox', {
+			name: 'Search results for "Test"',
+		} );
+		await userEvent.keyboard( '{ArrowDown}{Tab}' );
+		// Return to the input and replace the chosen URL.
+		await userEvent.click( searchInput );
+		await userEvent.clear( searchInput );
+		await userEvent.type( searchInput, 'https://wordpress.org' );
+		await pressApply();
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		const [ submitted ] = onChange.mock.calls[ 0 ];
+		expect( submitted ).toMatchObject( { url: 'https://wordpress.org' } );
+		expect( submitted.id ).toBeUndefined();
+		expect( submitted.kind ).toBeUndefined();
+		expect( submitted.type ).toBeUndefined();
+	} );
+} );

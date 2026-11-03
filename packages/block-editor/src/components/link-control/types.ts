@@ -365,9 +365,10 @@ export interface LinkControlSearchInputProps {
 		title?: string
 	) => LinkControlSuggestion | void | Promise< LinkControlSuggestion | void >;
 	/**
-	 * Value change handler passed to the underlying `<URLInput />`.
+	 * Value change handler passed to the underlying `<URLInput />`. Receives
+	 * the suggestion as well when one is chosen with the Tab key.
 	 */
-	onChange?: ( value: string ) => void;
+	onChange?: ( value: string, suggestion?: LinkControlSuggestion ) => void;
 	/**
 	 * Suggestion selection handler, called when the user chooses one of the
 	 * suggested items.
