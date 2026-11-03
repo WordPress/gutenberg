@@ -12,7 +12,7 @@ describe( 'getAngleInDegrees', () => {
 		[ '-15deg', -15 ],
 		[ '0.25turn', 90 ],
 		[ '100grad', 90 ],
-		[ '1rad', 57.3 ],
+		[ '1rad', 57 ],
 		[ '0', 0 ],
 	] )( 'reads %s as %s degrees', ( value, degrees ) => {
 		expect( getAngleInDegrees( value ) ).toBe( degrees );
@@ -40,6 +40,25 @@ describe( 'TransformPanel', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Rotation' } )
 		).toHaveValue( 90 );
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves a fractional angle unchanged when the field loses focus', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { rotate: '1rad' } } }
+				settings={ settings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'spinbutton', { name: 'Rotation' } )
+		);
+		await user.tab();
+
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
