@@ -8,4 +8,4 @@
 
 ### Bug Fixes
 
-- Allow attachment titles to be cleared in the media editor ([#86219](https://github.com/WordPress/gutenberg/pull/86219)).
+- Read raw attachment titles for editing and require a title containing a non-space character ([#86219](https://github.com/WordPress/gutenberg/pull/86219)).
