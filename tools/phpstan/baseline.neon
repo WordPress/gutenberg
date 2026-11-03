@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGURE'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/block-supports/layout.php
-
-		-
-			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../lib/block-supports/states.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
@@ -43,42 +31,6 @@ parameters:
 			path: ../../lib/class-wp-theme-json-gutenberg.php
 
 		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$core \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$i18n_schema \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$theme \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user_custom_post_type_id \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
 			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -89,12 +41,6 @@ parameters:
 			identifier: empty.property
 			count: 1
 			path: ../../lib/compat/wordpress-7.1/block-bindings.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SPAN'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/block-comments.php
 
 		-
 			message: '#^Cannot assign offset ''media_type'' to WP_REST_Request\.$#'
@@ -113,24 +59,6 @@ parameters:
 			identifier: offsetAssign.valueType
 			count: 2
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/icons.php
 
 		-
 			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
@@ -211,34 +139,10 @@ parameters:
 			path: ../../lib/media/load.php
 
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''SCRIPT'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../lib/media/load.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/accordion-item/index.php
-
-		-
 			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/avatar/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/categories/index.php
-
-		-
-			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
 
 		-
 			message: '#^Variable \$spacing_string might not be defined\.$#'
@@ -253,33 +157,9 @@ parameters:
 			path: ../../packages/block-library/src/comment-date/index.php
 
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IFRAME'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/cover/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/details/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''OBJECT'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/file/index.php
-
-		-
 			message: '#^Cannot access property \$context on array\.$#'
 			identifier: property.nonObject
 			count: 3
-			path: ../../packages/block-library/src/gallery/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
-			identifier: argument.type
-			count: 1
 			path: ../../packages/block-library/src/gallery/index.php
 
 		-
@@ -287,30 +167,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/gallery/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/icon/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''FIGCAPTION'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/image/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/image/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
-			identifier: argument.type
-			count: 4
-			path: ../../packages/block-library/src/image/index.php
 
 		-
 			message: '#^Parameter \#1 \$author_id of function get_author_posts_url expects int, string given\.$#'
@@ -323,12 +179,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/latest-comments/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''input'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/loginout/index.php
 
 		-
 			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
@@ -367,18 +217,6 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''IMG'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''LI'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
@@ -391,28 +229,10 @@ parameters:
 			path: ../../packages/block-library/src/navigation/index.php
 
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''p'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/paragraph/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''figure'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/playlist/index.php
-
-		-
 			message: '#^Property WP_Block\:\:\$inner_blocks \(WP_Block_List\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
 			path: ../../packages/block-library/src/playlist/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''img'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/post-featured-image/index.php
 
 		-
 			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\.$#'
@@ -463,36 +283,6 @@ parameters:
 			path: ../../packages/block-library/src/search/index.php
 
 		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/site-logo/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''a'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/social-link/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''button'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/tab-list/index.php
-
-		-
-			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''nav'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/table-of-contents/index.php
-
-		-
-			message: '#^Parameter \#1 \$args of function wp_tag_cloud expects array\{number\?\: int, link\?\: string, post_type\?\: string, echo\?\: bool, smallest\?\: int, largest\?\: int, unit\?\: string, format\?\: string, \.\.\.\}, array\{echo\: false, unit\: non\-empty\-string, taxonomy\: mixed, show_count\: mixed, number\: mixed, smallest\: float, largest\: float\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/tag-cloud/index.php
-
-		-
 			message: '#^Right side of \|\| is always true\.$#'
 			identifier: booleanOr.rightAlwaysTrue
 			count: 1
@@ -515,15 +305,3 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page-wp-admin.php.template
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page.php.template

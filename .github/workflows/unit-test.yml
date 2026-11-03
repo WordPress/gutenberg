@@ -611,10 +611,25 @@ jobs:
                   path: .cache/phpstan
                   key: ${{ steps.restore-phpstan-cache.outputs.cache-primary-key }}
 
+            # The report script is TypeScript, which Node runs by stripping the types, so it needs the
+            # repository's Node version rather than the runner's default, and the npm version that
+            # package.json requires to run it. It imports nothing outside Node, so the dependencies
+            # are not installed.
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+
             # Annotates the errors and lists all of them in the job summary, including those on lines
             # the pull request did not change and those with no line, such as an out-of-date baseline.
             - name: Report the PHPStan results
-              run: node .github/workflows/scripts/phpstan-report.js "${RUNNER_TEMP}/phpstan-report.json"
+              run: npm run --workspace @wordpress/phpstan-tools report -- "${RUNNER_TEMP}/phpstan-report.json"
 
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
