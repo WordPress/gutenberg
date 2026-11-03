@@ -16,12 +16,12 @@
  *
  * Usage:
  *
- *     node phpstan-report.js <report.json>
+ *     node tools/phpstan/report.ts <report.json>
  *
  * The report is the output of `phpstan analyse --error-format=json`.
  */
 
-const fs = require( 'node:fs' );
+import { appendFileSync, readFileSync } from 'node:fs';
 
 const {
 	GITHUB_REPOSITORY,
@@ -32,14 +32,52 @@ const {
 } = process.env;
 
 /**
+ * An error that PHPStan reported.
+ */
+interface PhpstanError {
+	/** Path relative to the workspace, if any. */
+	file: string | null;
+	/** Line number, if any. */
+	line: number | null;
+	/** Error message. */
+	message: string;
+	/** Error identifier, if any. */
+	identifier: string | null;
+	/** Tip shown with the error, if any. */
+	tip: string | null;
+}
+
+/**
+ * An error in a file, as a report written by `phpstan analyse
+ * --error-format=json` has it.
+ */
+interface PhpstanReportMessage {
+	message: string;
+	line?: number | null;
+	identifier?: string;
+	tip?: string;
+}
+
+/**
+ * The part of a report written by `phpstan analyse --error-format=json` that
+ * this script reads.
+ */
+interface PhpstanReport {
+	/** Errors that are not specific to a file. */
+	errors: string[];
+	/** Errors per file, keyed by the file's absolute path. */
+	files: Record< string, { messages: PhpstanReportMessage[] } >;
+}
+
+/**
  * Whether an error means a baseline entry records more occurrences of an error
  * than there are now, because some were fixed. Regenerating the baseline fixes
  * it.
  *
- * @param {PhpstanError} error The error.
- * @return {boolean} Whether the baseline entry is stale.
+ * @param error The error.
+ * @return Whether the baseline entry is stale.
  */
-function isStaleBaselineEntry( error ) {
+function isStaleBaselineEntry( error: PhpstanError ): boolean {
 	return (
 		error.identifier === 'ignore.unmatched' ||
 		( error.identifier === 'ignore.count' &&
@@ -52,10 +90,10 @@ function isStaleBaselineEntry( error ) {
  * than there are now, because more were added. Regenerating the baseline would
  * record the new ones too, so they should be fixed instead.
  *
- * @param {PhpstanError} error The error.
- * @return {boolean} Whether the baseline entry is exceeded.
+ * @param error The error.
+ * @return Whether the baseline entry is exceeded.
  */
-function isExceededBaselineEntry( error ) {
+function isExceededBaselineEntry( error: PhpstanError ): boolean {
 	return (
 		error.identifier === 'ignore.count' && ! isStaleBaselineEntry( error )
 	);
@@ -72,21 +110,12 @@ const ANNOTATION_LIMIT = 10;
 const SUMMARY_LIMIT = 500;
 
 /**
- * @typedef {Object} PhpstanError
- * @property {string|null} file       Path relative to the workspace, if any.
- * @property {number|null} line       Line number, if any.
- * @property {string}      message    Error message.
- * @property {string|null} identifier Error identifier, if any.
- * @property {string|null} tip        Tip shown with the error, if any.
- */
-
-/**
  * Escapes the message of a workflow command.
  *
- * @param {string} value The message.
- * @return {string} The escaped message.
+ * @param value The message.
+ * @return The escaped message.
  */
-function escapeData( value ) {
+function escapeData( value: string ): string {
 	return value
 		.replace( /%/g, '%25' )
 		.replace( /\r/g, '%0D' )
@@ -96,20 +125,20 @@ function escapeData( value ) {
 /**
  * Escapes a property value of a workflow command.
  *
- * @param {string} value The property value.
- * @return {string} The escaped property value.
+ * @param value The property value.
+ * @return The escaped property value.
  */
-function escapeProperty( value ) {
+function escapeProperty( value: string ): string {
 	return escapeData( value ).replace( /:/g, '%3A' ).replace( /,/g, '%2C' );
 }
 
 /**
  * Escapes text for inclusion in HTML.
  *
- * @param {string} value The text.
- * @return {string} The escaped text.
+ * @param value The text.
+ * @return The escaped text.
  */
-function escapeHtml( value ) {
+function escapeHtml( value: string ): string {
 	return value
 		.replace( /&/g, '&amp;' )
 		.replace( /</g, '&lt;' )
@@ -120,13 +149,13 @@ function escapeHtml( value ) {
 /**
  * Reads the errors from a PHPStan JSON report.
  *
- * @param {string} reportPath Path to the report.
- * @return {PhpstanError[]|null} The errors, or null if the report could not be read.
+ * @param reportPath Path to the report.
+ * @return The errors, or null if the report could not be read.
  */
-function readErrors( reportPath ) {
-	let report;
+function readErrors( reportPath: string ): PhpstanError[] | null {
+	let report: PhpstanReport;
 	try {
-		report = JSON.parse( fs.readFileSync( reportPath, 'utf8' ) );
+		report = JSON.parse( readFileSync( reportPath, 'utf8' ) );
 	} catch {
 		// PHPStan also exits with 1 when it cannot load the configuration, writing to stderr only.
 		return null;
@@ -138,8 +167,7 @@ function readErrors( reportPath ) {
 	 * annotations and summary rows never drop them. They are about the run
 	 * itself, such as an internal error, and are the hardest to find otherwise.
 	 */
-	/** @type {PhpstanError[]} */
-	const errors = report.errors.map( ( message ) => ( {
+	const errors: PhpstanError[] = report.errors.map( ( message ) => ( {
 		file: null,
 		line: null,
 		message,
@@ -170,9 +198,9 @@ function readErrors( reportPath ) {
 /**
  * Prints an error annotation for each error.
  *
- * @param {PhpstanError[]} errors The errors.
+ * @param errors The errors.
  */
-function annotate( errors ) {
+function annotate( errors: PhpstanError[] ): void {
 	for ( const error of errors ) {
 		const properties = [
 			`title=${ escapeProperty(
@@ -197,10 +225,10 @@ function annotate( errors ) {
 /**
  * Formats the location of an error, linked to the analyzed commit.
  *
- * @param {PhpstanError} error The error.
- * @return {string} The location as HTML.
+ * @param error The error.
+ * @return The location as HTML.
  */
-function formatLocation( error ) {
+function formatLocation( error: PhpstanError ): string {
 	if ( ! error.file ) {
 		return '';
 	}
@@ -221,10 +249,10 @@ function formatLocation( error ) {
 /**
  * Builds the job summary.
  *
- * @param {PhpstanError[]} errors The errors.
- * @return {string} The summary as Markdown.
+ * @param errors The errors.
+ * @return The summary as Markdown.
  */
-function buildSummary( errors ) {
+function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.length === 0 ) {
 		return '## PHPStan\n\nNo errors were found.\n';
 	}
@@ -311,7 +339,9 @@ function buildSummary( errors ) {
 
 const reportPath = process.argv[ 2 ];
 if ( ! reportPath ) {
-	process.stderr.write( 'Usage: node phpstan-report.js <report.json>\n' );
+	process.stderr.write(
+		'Usage: node tools/phpstan/report.ts <report.json>\n'
+	);
 	process.exit( 2 );
 }
 
@@ -321,7 +351,7 @@ if ( errors === null ) {
 		'::error title=PHPStan did not complete::The report is missing or is not valid JSON, so the code was not checked. See the output of the previous step for the reason.\n'
 	);
 	if ( GITHUB_STEP_SUMMARY ) {
-		fs.appendFileSync(
+		appendFileSync(
 			GITHUB_STEP_SUMMARY,
 			'## PHPStan did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “Run PHPStan” step for the reason, such as an error in the configuration.\n'
 		);
@@ -330,6 +360,6 @@ if ( errors === null ) {
 }
 annotate( errors );
 if ( GITHUB_STEP_SUMMARY ) {
-	fs.appendFileSync( GITHUB_STEP_SUMMARY, buildSummary( errors ) );
+	appendFileSync( GITHUB_STEP_SUMMARY, buildSummary( errors ) );
 }
 process.exitCode = errors.length > 0 ? 1 : 0;
