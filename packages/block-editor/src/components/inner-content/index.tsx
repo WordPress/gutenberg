@@ -6,10 +6,10 @@ import {
 	useState,
 } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { safeHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import BlockListBlock from '../block-list/block';
 import { LayoutProvider } from '../block-list/layout';
+import { setSafeHTML } from '../safe-raw-html';
 
 const SLOT_TAG_NAME = 'wp-inner-block-slot';
 
@@ -67,7 +67,7 @@ export default function InnerContent( { clientId }: { clientId: string } ) {
 		const container = containerRef.current!;
 
 		// The canvas shares the editor's origin, so nothing else isolates this.
-		container.innerHTML = safeHTML( html );
+		setSafeHTML( container, html );
 
 		setSlots(
 			Array.from(

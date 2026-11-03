@@ -3,20 +3,23 @@ import {
 	BlockIcon,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { safeHTML } from '@wordpress/dom';
 import {
 	Button,
 	Placeholder,
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useMemo, useState, useRef, RawHTML } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
+import { unlock } from '../lock-unlock';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 import ModalEdit from './modal';
+
+const { SafeRawHTML } = unlock( blockEditorPrivateApis );
 
 export default function FreeformEdit( {
 	attributes,
@@ -24,10 +27,6 @@ export default function FreeformEdit( {
 	clientId,
 } ) {
 	const { content } = attributes;
-	const safeContent = useMemo(
-		() => content && safeHTML( content ),
-		[ content ]
-	);
 	const [ isOpen, setOpen ] = useState( false );
 	const editButtonRef = useRef( null );
 
@@ -57,7 +56,7 @@ export default function FreeformEdit( {
 			</BlockControls>
 			<div { ...useBlockProps() }>
 				{ content ? (
-					<RawHTML>{ safeContent }</RawHTML>
+					<SafeRawHTML html={ content } />
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
