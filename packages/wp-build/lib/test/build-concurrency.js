@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	enqueueBuild,
+	getBuildConcurrency,
 	getDefaultBuildConcurrency,
 	setBuildConcurrency,
 } from '../build-concurrency.mjs';
@@ -23,6 +24,30 @@ describe( 'getDefaultBuildConcurrency()', () => {
 		expect( getDefaultBuildConcurrency( 5 ) ).toBe( 3 );
 		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
 		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 32 );
+	} );
+} );
+
+describe( 'getBuildConcurrency()', () => {
+	it( 'uses the default when WP_BUILD_CONCURRENCY is not set', () => {
+		expect( getBuildConcurrency( undefined ) ).toBe(
+			getDefaultBuildConcurrency()
+		);
+		expect( getBuildConcurrency( '' ) ).toBe(
+			getDefaultBuildConcurrency()
+		);
+	} );
+
+	it( 'uses WP_BUILD_CONCURRENCY when set', () => {
+		expect( getBuildConcurrency( '1' ) ).toBe( 1 );
+		expect( getBuildConcurrency( '4' ) ).toBe( 4 );
+	} );
+
+	it( 'rejects values that are not a whole number of 1 or more', () => {
+		for ( const value of [ '0', '-1', '2.5', 'abc' ] ) {
+			expect( () => getBuildConcurrency( value ) ).toThrow(
+				`WP_BUILD_CONCURRENCY must be a whole number of 1 or more, not "${ value }".`
+			);
+		}
 	} );
 } );
 
