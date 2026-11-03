@@ -14,6 +14,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import NavigationDraftBadge from './navigation-draft-badge';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -111,6 +112,8 @@ const MenuInspectorControls = ( props ) => {
 	const { isOpened, expandRevision, handleToggle } =
 		useListViewPanelState( clientId );
 
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
+
 	if ( ! showBlockTitle ) {
 		return (
 			<InspectorControls group="list">
@@ -154,6 +157,9 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled
 						}
 					/>
+				) }
+				{ navigationMenu?.status === 'draft' && (
+					<NavigationDraftBadge />
 				) }
 				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
