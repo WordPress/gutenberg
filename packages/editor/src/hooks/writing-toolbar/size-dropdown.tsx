@@ -21,8 +21,23 @@ const POPOVER_PROPS = {
 };
 
 /**
- * Lists the sizes the theme offers, shown at their real size with the number
- * beside them, and a box for typing a size of your own.
+ * Names a theme size by its number, the way a word processor's size box does.
+ * A fluid size has no single number to show, so it keeps its name.
+ *
+ * @param preset A font size preset.
+ *
+ * @return What to call the size.
+ */
+function getSizeLabel( preset: FontSizePreset ): string {
+	const px = parseFontSizeToPx( preset.size );
+	// A theme's rem size lands on a fraction of a pixel, which is no use as a
+	// label, and the size box only takes whole pixels anyway.
+	return px === undefined ? preset.name : String( Math.round( px ) );
+}
+
+/**
+ * Lists the sizes the theme offers by their number, each shown at its real
+ * size, and a box for typing a size of your own.
  *
  * @param props                Component props.
  * @param props.fontSizes      The theme's font size presets.
@@ -52,7 +67,7 @@ export default function WritingSizeDropdown( {
 	// An asterisk marks a size of your own, as the experiment's size box does.
 	let text: string = __( 'Size' );
 	if ( active ) {
-		text = active.name;
+		text = getSizeLabel( active );
 	} else if ( customPx !== undefined ) {
 		text = `${ customPx }*`;
 	}
@@ -110,19 +125,12 @@ export default function WritingSizeDropdown( {
 												fontSize:
 													preset.size ?? undefined,
 											} }
-											suffix={
-												<span className="editor-writing-toolbar__size-value">
-													{ parseFontSizeToPx(
-														preset.size
-													) }
-												</span>
-											}
 											onClick={ () => {
 												onSelectPreset( preset.slug );
 												onClose();
 											} }
 										>
-											{ preset.name }
+											{ getSizeLabel( preset ) }
 										</MenuItem>
 									) ) }
 								</MenuGroup>

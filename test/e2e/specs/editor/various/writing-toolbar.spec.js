@@ -231,8 +231,10 @@ test.describe( 'Writing toolbar', () => {
 		await toolbar
 			.getByRole( 'button', { name: 'Size', exact: true } )
 			.click();
-		// The size menu shows each name with its pixel value beside it.
-		await page.getByRole( 'menuitemradio', { name: /^Large/ } ).click();
+		// The size menu names each size by its number; Large is 36px.
+		await page
+			.getByRole( 'menuitemradio', { name: '36', exact: true } )
+			.click();
 		await expect
 			.poll( editor.getBlocks )
 			.toMatchObject( [

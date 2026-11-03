@@ -11,7 +11,6 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
-import { getSetting } from '@wordpress/global-styles-engine';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -19,6 +18,7 @@ import type {
 } from '@wordpress/global-styles-engine';
 import {
 	BlockControls,
+	useSettings,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -55,24 +55,6 @@ type WritingToolbarProps = {
 	attributes: WritingToolbarAttributes;
 	setAttributes: ( attributes: Partial< WritingToolbarAttributes > ) => void;
 };
-
-/**
- * Reads a preset setting across its origins, the way the typography inspector
- * does, so the toolbar offers the same fonts and sizes.
- *
- * @param globalStyles The merged global styles.
- * @param path         The setting path.
- *
- * @return The presets.
- */
-function getPresets< T >(
-	globalStyles: GlobalStylesConfig,
-	path: string
-): T[] {
-	const presets =
-		getSetting< Record< string, T[] > >( globalStyles, path ) ?? {};
-	return PRESET_ORIGINS.flatMap( ( origin ) => presets[ origin ] ?? [] );
-}
 
 function WritingToolbarControls( {
 	clientId,
@@ -138,21 +120,27 @@ function WritingToolbarControls( {
 			} ) );
 	}, [ blockTypes, registry ] );
 
+	/*
+	 * Font sizes come back as one origin's worth, because a theme's sizes
+	 * replace the default ones rather than adding to them. Font families are
+	 * not treated that way, so they are gathered across the origins, as the
+	 * typography inspector gathers them.
+	 */
+	const [ fontFamilyOrigins, fontSizePresets ] = useSettings(
+		'typography.fontFamilies',
+		'typography.fontSizes'
+	) as [
+		Record< string, FontFamilyPreset[] > | undefined,
+		FontSizePreset[] | undefined,
+	];
+	const fontSizes: FontSizePreset[] = fontSizePresets ?? EMPTY_ARRAY;
+
 	const fontFamilies = useMemo(
 		() =>
-			getPresets< FontFamilyPreset >(
-				globalStyles,
-				'typography.fontFamilies'
+			PRESET_ORIGINS.flatMap(
+				( origin ) => fontFamilyOrigins?.[ origin ] ?? []
 			),
-		[ globalStyles ]
-	);
-	const fontSizes = useMemo(
-		() =>
-			getPresets< FontSizePreset >(
-				globalStyles,
-				'typography.fontSizes'
-			),
-		[ globalStyles ]
+		[ fontFamilyOrigins ]
 	);
 
 	const groups = useMemo( () => {
