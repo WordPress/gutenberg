@@ -59,5 +59,5 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 // A background, not a pseudo-element: generated content adds a caret stop in
 // Firefox.
 .is-selected .non-breaking-space {
-	background: radial-gradient(circle, $alert-red 2px, transparent 2.5px) center / 100% 100% no-repeat;
+	background: radial-gradient(circle, var(--wp-admin-theme-color) 2px, transparent 2.5px) center / 100% 100% no-repeat;
 }
