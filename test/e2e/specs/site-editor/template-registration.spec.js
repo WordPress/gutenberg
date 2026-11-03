@@ -187,8 +187,9 @@ test.describe( 'Block template registration', () => {
 				.filter( { visible: true } )
 				.first()
 		).toBeVisible();
-		// Verify the theme template shows the theme name as the author.
-		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
+		// Verify the theme template shows the theme name as the author. The
+		// count waits for the search to filter out the theme's other templates.
+		await expect( page.getByText( 'AuthorEmptytheme' ) ).toHaveCount( 1 );
 	} );
 
 	test( 'templates can be deleted if the registered plugin is deactivated', async ( {
