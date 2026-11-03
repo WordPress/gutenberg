@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import type { HandlePosition, Size, NormalizedRect } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-controller';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
-import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { getImageCropBounds } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
 	PIXEL_SNAP_DISPLAY_SCALE,
@@ -65,16 +65,10 @@ export interface CropperProps {
 	controller: CropperController;
 	/** Show the rule-of-thirds grid overlay, or only during interactions. */
 	showGrid?: boolean | 'interactive';
-	/** Whether external placement activity should keep the grid visible. */
-	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Show the live output dimensions tooltip during a resize. */
 	showDimensions?: boolean;
-	/** Minimum zoom level override. Defaults to the coverage-aware minimum. */
-	minZoom?: number;
-	/** Maximum zoom level. */
-	maxZoom?: number;
 	/**
 	 * Enable freeform crop mode with resizable handles.
 	 * When false (default), the crop area is fixed and centered.
@@ -112,35 +106,29 @@ export interface CropperProps {
  * The component fills its parent container (100% width and height).
  * Wrap it in a sized container to control its dimensions.
  *
- * @param root0                   Component props implementing CropperProps.
- * @param root0.src               Image source URL.
- * @param root0.controller        The cropper controller from `useCropperController` or a composite store.
- * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
- * @param root0.isPlacementActive Keep grid visible during external placement activity.
- * @param root0.showDimming       Show dimming overlay outside crop.
- * @param root0.showDimensions    Show live dimensions tooltip during resize.
- * @param root0.minZoom           Minimum zoom level override.
- * @param root0.maxZoom           Maximum zoom level.
- * @param root0.freeformCrop      Enable resize handles.
- * @param root0.focusOnMount      Focus the crop area on mount.
- * @param root0.disabled          Ignore all crop interaction.
- * @param root0.onImageLoaded     Image load callback.
- * @param root0.onImageError      Image error callback.
- * @param root0.onGestureStart    Gesture boundary start.
- * @param root0.onGestureEnd      Gesture boundary end.
- * @param root0.className         Additional CSS class.
- * @param ref                     Forwarded ref for the container div.
+ * @param root0                Component props implementing CropperProps.
+ * @param root0.src            Image source URL.
+ * @param root0.controller     The cropper controller from `useCropperController` or a composite store.
+ * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
+ * @param root0.showDimming    Show dimming overlay outside crop.
+ * @param root0.showDimensions Show live dimensions tooltip during resize.
+ * @param root0.freeformCrop   Enable resize handles.
+ * @param root0.focusOnMount   Focus the crop area on mount.
+ * @param root0.disabled       Ignore all crop interaction.
+ * @param root0.onImageLoaded  Image load callback.
+ * @param root0.onImageError   Image error callback.
+ * @param root0.onGestureStart Gesture boundary start.
+ * @param root0.onGestureEnd   Gesture boundary end.
+ * @param root0.className      Additional CSS class.
+ * @param ref                  Forwarded ref for the container div.
  */
 function CropperInner(
 	{
 		src,
 		controller,
 		showGrid = false,
-		isPlacementActive = false,
 		showDimming = true,
 		showDimensions = true,
-		minZoom,
-		maxZoom,
 		freeformCrop = false,
 		focusOnMount = false,
 		disabled = false,
@@ -323,8 +311,6 @@ function CropperInner(
 		}
 		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
-	const effectiveMinZoom =
-		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
@@ -531,8 +517,8 @@ function CropperInner(
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
 	} = useInteraction( state, controller, canvasSize, scaledVisualSize, {
-		minZoom: effectiveMinZoom,
-		maxZoom,
+		minZoom: controller.minZoom,
+		maxZoom: controller.maxZoom,
 		onGestureStart,
 		onGestureEnd,
 		disabled,
@@ -720,8 +706,7 @@ function CropperInner(
 
 	const isInteractiveGrid = showGrid === 'interactive';
 	const showInteractiveGrid =
-		isInteractiveGrid &&
-		( isInteractionPlacementActive || isResizing || isPlacementActive );
+		isInteractiveGrid && ( isInteractionPlacementActive || isResizing );
 
 	// Output crop size in source pixels — drives the live tooltip
 	// overlay. Only computed during pointer drags, so the per-frame

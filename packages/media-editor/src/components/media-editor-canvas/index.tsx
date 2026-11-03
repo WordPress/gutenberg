@@ -137,8 +137,9 @@ export default function MediaEditorCanvas( {
 					src={ mediaUrl }
 					controller={ session.cropper }
 					freeformCrop
-					showGrid="interactive"
-					isPlacementActive={ isPlacementActive }
+					// Keep the grid up while a sidebar placement control is in
+					// use; otherwise show it only while the crop is changing.
+					showGrid={ isPlacementActive ? true : 'interactive' }
 					onGestureStart={ handleGestureStart }
 					onGestureEnd={ handleGestureEnd }
 					onImageLoaded={ handleImageLoaded }

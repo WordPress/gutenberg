@@ -235,24 +235,6 @@ describe( 'Cropper', () => {
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
 	} );
 
-	it( 'shows the interactive grid when a placement control is active', async () => {
-		await renderCropper(
-			<Cropper
-				src="test.jpg"
-				controller={ createController() }
-				showGrid="interactive"
-				showDimming={ false }
-				isPlacementActive
-			/>
-		);
-
-		await screen.findByTestId( GRID_TEST_ID );
-
-		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
-		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
-		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
-	} );
-
 	it( 'preserves a free crop when freeform handles are toggled off', async () => {
 		const controller = createController();
 		controller.state = {
