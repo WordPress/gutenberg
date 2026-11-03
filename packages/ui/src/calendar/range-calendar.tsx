@@ -4,6 +4,7 @@ import { forwardRef, useMemo, useState, useCallback } from '@wordpress/element';
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
+import { useEvents } from './utils/use-events';
 import { useLocalizationProps } from './utils/use-localization-props';
 import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
@@ -162,6 +163,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			role = 'application',
 			'aria-label': ariaLabel,
 			labels: customLabels,
+			events,
 			...props
 		},
 		ref
@@ -173,13 +175,14 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 				mode: 'range',
 			} );
 
-		const labels = useMemo(
+		const mergedLabels = useMemo(
 			() =>
 				customLabels
 					? { ...localizationProps.labels, ...customLabels }
 					: localizationProps.labels,
 			[ localizationProps.labels, customLabels ]
 		);
+		const { eventsMatcher, labels } = useEvents( events, mergedLabels );
 		const onChange: OnValueChangeHandler< DateRange | null | undefined > =
 			useCallback(
 				( selected, triggerDate, modifiers, e ) => {
@@ -222,8 +225,9 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 				preview: previewRange,
 				preview_start: previewRange?.from,
 				preview_end: previewRange?.to,
+				...( eventsMatcher ? { events: eventsMatcher } : {} ),
 			};
-		}, [ previewRange ] );
+		}, [ previewRange, eventsMatcher ] );
 
 		const rootContextValue = useMemo(
 			() => ( {

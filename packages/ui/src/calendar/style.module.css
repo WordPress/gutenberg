@@ -184,6 +184,29 @@
 			border: 2px solid currentColor;
 		}
 
+		/*
+		 * Days with events: show a dot below the day number. Like the today dot, it
+		 * follows the text color, so it stays visible on selected days and in
+		 * forced-colors (high-contrast) mode.
+		 */
+		.events::before {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset-block-end: 3px;
+			inset-inline-start: 50%;
+			translate: -50% 0;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			border: 2px solid currentColor;
+			pointer-events: none;
+		}
+
+		.root[dir="rtl"] .events::before {
+			translate: 50% 0;
+		}
+
 		/* Selected date button (individual date, range start, and range end) */
 		.selected:not(.range-middle) {
 			&:has(.day-button, .day-button:hover:not(:disabled)) {

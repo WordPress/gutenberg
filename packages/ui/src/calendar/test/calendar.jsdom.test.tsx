@@ -853,6 +853,54 @@ describe( 'Calendar', () => {
 		} );
 	} );
 
+	describe( 'Events', () => {
+		it( 'should mark the days that have events and announce how many', () => {
+			render(
+				<Calendar
+					events={ [
+						{ date: addHours( tomorrow, 9 ) },
+						{ date: addHours( tomorrow, 17 ) },
+						{ date: yesterday },
+					] }
+				/>
+			);
+
+			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
+				/, 2 events$/
+			);
+			expect( getDateButton( yesterday ) ).toHaveAccessibleName(
+				/, 1 event$/
+			);
+			expect( getDateButton( today ) ).not.toHaveAccessibleName(
+				/event/
+			);
+		} );
+
+		it( 'should match events to days in the calendar time zone', () => {
+			// 20:00 UTC on May 15 is already May 16 (today) in Tokyo.
+			const timeZone = 'Asia/Tokyo';
+			render(
+				<Calendar
+					timeZone={ timeZone }
+					events={ [ { date: new Date( 1747339200000 ) } ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: new RegExp(
+						`^Today, ${ new Intl.DateTimeFormat( 'en-US', {
+							weekday: 'long',
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+						} ).format( new Date( 2025, 4, 16 ) ) }, 1 event$`
+					),
+				} )
+			).toBeVisible();
+		} );
+	} );
+
 	describe( 'Disabled states', () => {
 		it( 'should support disabling all dates via the `disabled` prop', async () => {
 			const user = setupUserEvent();

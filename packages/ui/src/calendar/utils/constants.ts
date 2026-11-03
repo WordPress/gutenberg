@@ -47,12 +47,13 @@ const CLASSNAMES = {
 };
 
 /*
- * Only `preview` carries styles — the shape of the dashed preview border is
+ * Classes for the custom modifiers. The shape of the dashed preview border is
  * picked by the `Day` component from the `preview_start` / `preview_end`
  * modifiers themselves, not from a class.
  */
 export const MODIFIER_CLASSNAMES = {
 	preview: styles.preview,
+	events: styles.events,
 };
 
 export const COMMON_PROPS = {

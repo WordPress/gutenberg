@@ -232,6 +232,14 @@ export interface BaseProps extends Omit<
 	 */
 	disabled?: Matcher | Matcher[] | undefined;
 	/**
+	 * Events to mark on the calendar, such as content already scheduled on a
+	 * day. Each day with at least one event shows a marker, and its accessible
+	 * label includes the number of events.
+	 *
+	 * Days are matched in the calendar's `timeZone`.
+	 */
+	events?: { date: Date }[];
+	/**
 	 * Disable the navigation buttons.
 	 */
 	disableNavigation?: boolean;

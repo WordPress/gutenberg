@@ -42,6 +42,21 @@ export const DisabledDates: Story = {
 	},
 };
 
+/**
+ * Use `events` to mark days that already have something on them, such as
+ * scheduled posts. Each marked day shows a dot, and its accessible label
+ * includes the number of events.
+ */
+export const WithEvents: Story = {
+	args: {
+		events: [ 3, 10, 10, 18, 24 ].map( ( day ) => {
+			const date = new Date();
+			date.setDate( day );
+			return { date };
+		} ),
+	},
+};
+
 export const WithSelectedDateAndMonth: Story = {
 	args: {
 		defaultValue: firstDayOfNextMonth,

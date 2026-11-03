@@ -1326,6 +1326,24 @@ describe( 'RangeCalendar', () => {
 		} );
 	} );
 
+	describe( 'Events', () => {
+		it( 'should mark the days that have events and announce how many', () => {
+			render(
+				<RangeCalendar
+					value={ { from: yesterday, to: tomorrow } }
+					events={ [ { date: addHours( tomorrow, 9 ) } ] }
+				/>
+			);
+
+			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
+				/, 1 event$/
+			);
+			expect( getDateButton( today ) ).not.toHaveAccessibleName(
+				/event/
+			);
+		} );
+	} );
+
 	describe( 'Disabled states', () => {
 		it( 'should support disabling all dates via the `disabled` prop', async () => {
 			const user = setupUserEvent();

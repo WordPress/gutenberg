@@ -1,8 +1,9 @@
 import { DayPicker } from '@daypicker/react';
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
-import { COMMON_PROPS } from './utils/constants';
+import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
+import { useEvents } from './utils/use-events';
 import { useLocalizationProps } from './utils/use-localization-props';
 import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
@@ -30,6 +31,7 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			role = 'application',
 			'aria-label': ariaLabel,
 			labels: customLabels,
+			events,
 			...props
 		},
 		ref
@@ -41,12 +43,17 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 				mode: 'single',
 			} );
 
-		const labels = useMemo(
+		const mergedLabels = useMemo(
 			() =>
 				customLabels
 					? { ...localizationProps.labels, ...customLabels }
 					: localizationProps.labels,
 			[ localizationProps.labels, customLabels ]
+		);
+		const { eventsMatcher, labels } = useEvents( events, mergedLabels );
+		const eventsModifiers = useMemo(
+			() => ( eventsMatcher ? { events: eventsMatcher } : undefined ),
+			[ eventsMatcher ]
 		);
 		const onChange: OnValueChangeHandler< Date | null | undefined > =
 			useCallback(
@@ -95,6 +102,8 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 					onSelect={ setSelected }
 					onDayFocus={ dayFocusProps.onDayFocus }
 					onDayBlur={ dayFocusProps.onDayBlur }
+					modifiers={ eventsModifiers }
+					modifiersClassNames={ MODIFIER_CLASSNAMES }
 				/>
 			</RootContext.Provider>
 		);
