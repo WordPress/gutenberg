@@ -21,7 +21,7 @@ const UnforwardedValidatedToggleGroupControl = (
 		markWhenOptional,
 		...restProps
 	}: ValidatedToggleGroupControlProps,
-	forwardedRef: React.ForwardedRef< HTMLInputElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	// The error describes the group, like its `help` text, because the item
@@ -67,6 +67,6 @@ const UnforwardedValidatedToggleGroupControl = (
 
 export const ValidatedToggleGroupControl: React.ForwardRefExoticComponent<
 	React.PropsWithoutRef< ValidatedToggleGroupControlProps > &
-		React.RefAttributes< HTMLInputElement >
+		React.RefAttributes< HTMLDivElement >
 > = forwardRef( UnforwardedValidatedToggleGroupControl );
 ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';

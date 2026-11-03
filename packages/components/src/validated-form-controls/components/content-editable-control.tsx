@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import ContentEditableControl from '../../content-editable-control';
@@ -30,10 +31,9 @@ const UnforwardedValidatedContentEditableControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-	const getInteractiveTarget = () =>
-		validityTargetRef.current?.previousElementSibling?.querySelector< HTMLElement >(
-			'[role="textbox"]'
-		);
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ editableRef, forwardedRef ] );
+	const getInteractiveTarget = () => editableRef.current;
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -46,7 +46,7 @@ const UnforwardedValidatedContentEditableControl = (
 				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<ContentEditableControl
-					ref={ forwardedRef }
+					ref={ mergedRef }
 					className={ clsx(
 						'components-validated-control__content-editable',
 						className
