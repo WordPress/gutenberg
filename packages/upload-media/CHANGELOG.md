@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+-   Finish uploading an image that wasm-vips can process but the browser cannot decode. The big image size threshold check let the `createImageBitmap()` rejection escape, leaving the upload stuck in thumbnail generation ([#83530](https://github.com/WordPress/gutenberg/pull/83530)).
 
 ## 0.43.0 (2026-10-20)
 
