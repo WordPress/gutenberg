@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { Component } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { Component, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { caution } from '@wordpress/icons';
+import { caution, check, copy, error as errorIcon } from '@wordpress/icons';
 import styles from './style.module.scss';
 
 interface Props {
@@ -15,11 +16,56 @@ interface State {
 	error: Error | null;
 }
 
+const COPY_FEEDBACK_TIMEOUT = 2000;
+
+type CopyResult = 'idle' | 'copied' | 'error';
+
+const RESULT_ICON = {
+	idle: copy,
+	copied: check,
+	error: errorIcon,
+};
+
 function CopyErrorButton( { error }: { error: Error } ) {
-	const ref = useCopyToClipboard( () => error.stack ?? String( error ) );
+	// Bump the id on every result so a repeat of the same outcome restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
+		result: CopyResult;
+		id: number;
+	} >( { result: 'idle', id: 0 } );
+
+	useEffect( () => {
+		if ( feedback.result === 'idle' ) {
+			return;
+		}
+		const timeoutId = setTimeout(
+			() => setFeedback( { result: 'idle', id: 0 } ),
+			COPY_FEEDBACK_TIMEOUT
+		);
+		return () => clearTimeout( timeoutId );
+	}, [ feedback ] );
+
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
+		setFeedback( ( current ) => ( {
+			result,
+			id: current.id + 1,
+		} ) );
+		speak( message );
+	}
+
+	const ref = useCopyToClipboard(
+		() => error.stack ?? String( error ),
+		() => report( 'copied', __( 'Copied to clipboard' ) ),
+		() => report( 'error', __( "Couldn't copy to clipboard." ) )
+	);
 
 	return (
-		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
+		<Button
+			__next40pxDefaultSize
+			variant="secondary"
+			ref={ ref }
+			icon={ RESULT_ICON[ feedback.result ] }
+		>
 			{ __( 'Copy error' ) }
 		</Button>
 	);

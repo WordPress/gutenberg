@@ -282,7 +282,7 @@ async function main(): Promise< void > {
 
 	/*
 	 * This script runs in Node, so it reads the real environment. The rules
-	 * below point at the globals esbuild defines for bundled sources instead.
+	 * below point at the globals the build defines for bundled sources instead.
 	 */
 	// eslint-disable-next-line @wordpress/no-wp-process-env, @wordpress/wp-global-usage
 	const isWordPressCore = process.env.IS_WORDPRESS_CORE === 'true';
