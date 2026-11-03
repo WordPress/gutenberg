@@ -6,7 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 import {
 	ImageEditorCanvas,
 	createImageEditorState,
-	getStepsForOriginal,
+	mapEditToOriginal,
 	useImageEditor,
 	type ImageEditorController,
 	type ImageEditorState,
@@ -56,7 +56,7 @@ function cropSize( controller: ImageEditorController ) {
 }
 
 describe( 'the public API', () => {
-	it( 'crops and builds the steps for the original from the package exports alone', async () => {
+	it( 'crops and maps the edit to the original from the package exports alone', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {
 			controller = next;
@@ -84,12 +84,12 @@ describe( 'the public API', () => {
 		act( () => controller.snapRotate90( 1 ) );
 		act( () => controller.toggleFlip( 'horizontal' ) );
 		expect(
-			getStepsForOriginal( controller.state ).map( ( { type } ) => type )
+			mapEditToOriginal( controller.state ).map( ( { type } ) => type )
 		).toEqual( [ 'flip', 'rotate', 'crop' ] );
 
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
-		expect( getStepsForOriginal( controller.state ) ).toEqual( [] );
+		expect( mapEditToOriginal( controller.state ) ).toEqual( [] );
 	} );
 
 	it( 'starts with the crop locked to a ratio', async () => {

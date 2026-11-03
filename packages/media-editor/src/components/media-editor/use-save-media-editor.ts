@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { getStepsForOriginal } from '@wordpress/image-editor';
+import { mapEditToOriginal } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
 
@@ -89,31 +89,31 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	if ( ! session.hasOutputEdits ) {
 		return [];
 	}
-	// The steps already follow Core's order and frames; only the shape and
+	// The edits already follow Core's order and frames; only the shape and
 	// the crop's units (fractions to percentages) differ.
-	return getStepsForOriginal( session.cropper.state ).map(
-		( step ): Modifier => {
-			if ( step.type === 'flip' ) {
+	return mapEditToOriginal( session.cropper.state ).map(
+		( edit ): Modifier => {
+			if ( edit.type === 'flip' ) {
 				return {
 					type: 'flip',
 					args: {
 						flip: {
-							horizontal: step.horizontal,
-							vertical: step.vertical,
+							horizontal: edit.horizontal,
+							vertical: edit.vertical,
 						},
 					},
 				};
 			}
-			if ( step.type === 'rotate' ) {
-				return { type: 'rotate', args: { angle: step.angle } };
+			if ( edit.type === 'rotate' ) {
+				return { type: 'rotate', args: { angle: edit.angle } };
 			}
 			return {
 				type: 'crop',
 				args: {
-					left: step.x * 100,
-					top: step.y * 100,
-					width: step.width * 100,
-					height: step.height * 100,
+					left: edit.x * 100,
+					top: edit.y * 100,
+					width: edit.width * 100,
+					height: edit.height * 100,
 				},
 			};
 		}

@@ -191,33 +191,33 @@ function ImageCropperWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-`getStepsForOriginal( state )` returns the flip, rotate and crop steps that make the full-size original image match what the person framed, in the order to apply them. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
+The editor's state describes what the canvas shows, not the file you save. To save, map the edit onto the original image with `mapEditToOriginal( state )`. It returns flip, rotate and crop edits for the full-size original, in the order to apply them, so the saved image matches what the person framed. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
 
 The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { getStepsForOriginal } from '@wordpress/image-editor';
+import { mapEditToOriginal } from '@wordpress/image-editor';
 
-const modifiers = getStepsForOriginal( controller.state ).map( ( step ) => {
-	if ( step.type === 'flip' ) {
+const modifiers = mapEditToOriginal( controller.state ).map( ( edit ) => {
+	if ( edit.type === 'flip' ) {
 		return {
 			type: 'flip',
 			args: {
-				flip: { horizontal: step.horizontal, vertical: step.vertical },
+				flip: { horizontal: edit.horizontal, vertical: edit.vertical },
 			},
 		};
 	}
-	if ( step.type === 'rotate' ) {
-		return { type: 'rotate', args: { angle: step.angle } };
+	if ( edit.type === 'rotate' ) {
+		return { type: 'rotate', args: { angle: edit.angle } };
 	}
 	return {
 		type: 'crop',
 		args: {
-			left: step.x * 100,
-			top: step.y * 100,
-			width: step.width * 100,
-			height: step.height * 100,
+			left: edit.x * 100,
+			top: edit.y * 100,
+			width: edit.width * 100,
+			height: edit.height * 100,
 		},
 	};
 } );

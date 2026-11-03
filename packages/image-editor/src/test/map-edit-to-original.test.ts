@@ -1,12 +1,12 @@
 /**
- * getStepsForOriginal ↔ Export-camera parity.
+ * mapEditToOriginal ↔ Export-camera parity.
  *
  * WHAT THIS TEST GUARANTEES
  *
  * "What the user framed in the stencil is what the server crops from the
  * source." The cropper shows the user a live preview via the *export
- * camera* (`createExportCamera`); the server receives the steps from
- * `getStepsForOriginal` and applies them sequentially in the order
+ * camera* (`createExportCamera`); the server receives the edits from
+ * `mapEditToOriginal` and applies them sequentially in the order
  * `[flip, rotate, crop]` (as Core's `WP_REST_Attachments_Controller
  * ::edit_media_item` does with the media editor's `modifiers`). Both paths must land on the same source pixel for
  * the same spot in the output, otherwise the saved image drifts from
@@ -35,7 +35,7 @@
  *
  * The cropper's export camera composes the source-to-screen chain as
  * `flip · R(θ)` on the (centered) source — rotate first, then flip.
- * The steps apply `flip` first, then `R(θ')`. For
+ * The edits apply `flip` first, then `R(θ')`. For
  * these two chains to land on the same pixel, when exactly one flip
  * axis is set we must send `θ' = -θ` (since `flip_h · R(θ) = R(-θ) ·
  * flip_h`). Both-or-neither flips leave `θ' = θ` because `flip_h · flip_v
@@ -43,20 +43,20 @@
  *
  * MAINTENANCE NOTES
  *
- * - If you change `getStepsForOriginal`, this test is the primary safety net.
+ * - If you change `mapEditToOriginal`, this test is the primary safety net.
  *   Run it after any edit to that file or to `createExportCamera`.
  * - If Core's pipeline operation order ever changes, update
  *   `serverSourcePixel` to match — it mirrors the server exactly.
  * - Adding a new cropper operation (e.g. skew) means: extend
- *   `CropperState`, teach `getStepsForOriginal` to emit it, extend
+ *   `CropperState`, teach `mapEditToOriginal` to emit it, extend
  *   `serverSourcePixel` to undo it, and add values to the grid in
  *   `buildRows`. The probes don't need to change.
  */
 
 import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
-import { getStepsForOriginal } from '../get-steps-for-original';
-import type { OriginalImageStep } from '../get-steps-for-original';
+import { mapEditToOriginal } from '../map-edit-to-original';
+import type { OriginalImageEdit } from '../map-edit-to-original';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
 import type { CropperState, Size } from '../core/types';
@@ -106,14 +106,14 @@ function exportSourcePixel(
 }
 
 /**
- * Extract the pieces of the pipeline we need to simulate from the steps.
+ * Extract the pieces of the pipeline we need to simulate from the edits.
  * `flip` and `rotate` may be absent (identity-pruned), `crop` may also be
  * absent when the full-frame is framed; in that case the output canvas
  * equals the full rotated AABB.
  *
- * @param steps Ordered steps as emitted by `getStepsForOriginal`.
+ * @param edits Ordered edits as emitted by `mapEditToOriginal`.
  */
-function readSteps( steps: OriginalImageStep[] ): {
+function readEdits( edits: OriginalImageEdit[] ): {
 	flip: { horizontal: boolean; vertical: boolean };
 	rotation: number;
 	crop: { x: number; y: number; width: number; height: number } | null;
@@ -127,18 +127,18 @@ function readSteps( steps: OriginalImageStep[] ): {
 		height: number;
 	} | null = null;
 
-	for ( const step of steps ) {
-		if ( step.type === 'flip' ) {
-			flip.horizontal = step.horizontal;
-			flip.vertical = step.vertical;
-		} else if ( step.type === 'rotate' ) {
-			rotation = step.angle;
-		} else if ( step.type === 'crop' ) {
+	for ( const edit of edits ) {
+		if ( edit.type === 'flip' ) {
+			flip.horizontal = edit.horizontal;
+			flip.vertical = edit.vertical;
+		} else if ( edit.type === 'rotate' ) {
+			rotation = edit.angle;
+		} else if ( edit.type === 'crop' ) {
 			crop = {
-				x: step.x,
-				y: step.y,
-				width: step.width,
-				height: step.height,
+				x: edit.x,
+				y: edit.y,
+				width: edit.width,
+				height: edit.height,
 			};
 		}
 	}
@@ -154,18 +154,18 @@ function readSteps( steps: OriginalImageStep[] ): {
  *   3. Undo rotation about the source center to reach the flipped frame.
  *   4. Undo flip about the source center.
  *
- * @param steps     Ordered steps the client sends.
+ * @param edits     Ordered edits the client sends.
  * @param imageSize Natural dimensions of the source image.
  * @param u         Horizontal probe in [0, 1] across the output.
  * @param v         Vertical probe in [0, 1] across the output.
  */
 function serverSourcePixel(
-	steps: OriginalImageStep[],
+	edits: OriginalImageEdit[],
 	imageSize: Size,
 	u: number,
 	v: number
 ): { x: number; y: number } {
-	const { flip, rotation, crop } = readSteps( steps );
+	const { flip, rotation, crop } = readEdits( edits );
 
 	const fullBBox = getRotatedBBox(
 		imageSize.width,
@@ -304,15 +304,15 @@ function buildRows(): ParityRow[] {
 }
 
 /**
- * Output size the server would produce, computed from the steps.
+ * Output size the server would produce, computed from the edits.
  * With a crop: the crop's pixel dims in the full-AABB frame. Without a
  * crop: the full rotated AABB.
  *
- * @param steps     Steps the server will apply.
+ * @param edits     Edits the server will apply.
  * @param imageSize Natural dimensions of the source image.
  */
-function outputSizeFor( steps: OriginalImageStep[], imageSize: Size ): Size {
-	const { rotation, crop } = readSteps( steps );
+function outputSizeFor( edits: OriginalImageEdit[], imageSize: Size ): Size {
+	const { rotation, crop } = readEdits( edits );
 	const full = getRotatedBBox( imageSize.width, imageSize.height, rotation );
 	if ( ! crop ) {
 		return { width: full.width, height: full.height };
@@ -323,17 +323,17 @@ function outputSizeFor( steps: OriginalImageStep[], imageSize: Size ): Size {
 	};
 }
 
-describe( 'getStepsForOriginal ↔ Export-camera parity', () => {
+describe( 'mapEditToOriginal ↔ Export-camera parity', () => {
 	const rows = buildRows();
 
 	for ( const { label, state, u, v } of rows ) {
 		it( label, () => {
-			const steps = getStepsForOriginal( state );
+			const edits = mapEditToOriginal( state );
 
 			// Output canvas is whatever the server would emit: the crop rect
 			// if present, otherwise the full rotated AABB. This makes (u, v)
 			// map to the same *output* pixel on both paths.
-			const outputSize = outputSizeFor( steps, IMAGE );
+			const outputSize = outputSizeFor( edits, IMAGE );
 
 			const exported = exportSourcePixel(
 				state,
@@ -342,7 +342,7 @@ describe( 'getStepsForOriginal ↔ Export-camera parity', () => {
 				u,
 				v
 			);
-			const server = serverSourcePixel( steps, IMAGE, u, v );
+			const server = serverSourcePixel( edits, IMAGE, u, v );
 
 			// Tolerance of 1 source pixel. The two paths compose rotations
 			// and scales in different orders, so sub-pixel disagreement is
@@ -353,10 +353,10 @@ describe( 'getStepsForOriginal ↔ Export-camera parity', () => {
 	}
 } );
 
-describe( 'getStepsForOriginal without a loaded image', () => {
-	it( 'returns no steps, whatever the edit', () => {
+describe( 'mapEditToOriginal without a loaded image', () => {
+	it( 'returns no edits, whatever the edit', () => {
 		const state = makeState( { image: null, rotation: 45 } );
 
-		expect( getStepsForOriginal( state ) ).toEqual( [] );
+		expect( mapEditToOriginal( state ) ).toEqual( [] );
 	} );
 } );

@@ -8,7 +8,7 @@ How the cropper works inside, for people changing this package. To use it, see t
 | --- | --- | --- |
 | Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
-| Steps for the original | `src/get-steps-for-original.ts` | Turns the edit into the flip, rotate and crop steps that make the full-size original match it. |
+| Saving | `src/map-edit-to-original.ts` | Maps the edit onto the full-size original image as flip, rotate and crop edits, for saving. |
 
 The editor keeps no undo history. History belongs to the code that uses the editor, because it covers everything that code edits, not only the crop. The consumer keeps the state: `useImageEditor( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 
@@ -62,7 +62,7 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 
 | Task | API |
 | --- | --- |
-| Save the edit to the original image | `getStepsForOriginal()`. |
+| Save the edit to the original image | `mapEditToOriginal()`. |
 | Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
 | Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 
@@ -82,4 +82,4 @@ Useful test areas:
 -   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
 -   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
 -   `src/react/hooks/test/use-cropper-controller.jsdom.test.ts` for the controller, including keeping the state yourself.
--   `src/test/get-steps-for-original.test.ts` for the steps for the original: what the preview shows is what the steps produce.
+-   `src/test/map-edit-to-original.test.ts` for mapping the edit onto the original: what the preview shows is what the saved image gets.

@@ -20,5 +20,5 @@ export type {
 } from './image-editor';
 
 // The steps that make the original image match the edit, for saving it.
-export { getStepsForOriginal } from './get-steps-for-original';
-export type { OriginalImageStep } from './get-steps-for-original';
+export { mapEditToOriginal } from './map-edit-to-original';
+export type { OriginalImageEdit } from './map-edit-to-original';

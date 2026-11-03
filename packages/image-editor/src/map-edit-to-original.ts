@@ -2,8 +2,8 @@ import type { CropperState } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * One step that makes the original image match what the person framed.
- * Apply the steps in order, to the full-size original.
+ * One edit to apply to the full-size original image. `mapEditToOriginal`
+ * returns them in the order to apply them.
  *
  *   - `flip`:   mirror along each axis that is `true`.
  *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
@@ -12,7 +12,7 @@ import { getRotatedBBox } from './core/camera';
  *     point**, after any `rotate` before it. Position and size are
  *     fractions (0–1) of that image's width and height, from the top-left.
  */
-export type OriginalImageStep =
+export type OriginalImageEdit =
 	| { type: 'flip'; horizontal: boolean; vertical: boolean }
 	| { type: 'rotate'; angle: number }
 	| { type: 'crop'; x: number; y: number; width: number; height: number };
@@ -26,14 +26,20 @@ export type OriginalImageStep =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * The steps that make the original image match what the person framed,
- * for saving the edit: send them to a server, or run them with an image
- * library in the browser.
+ * Map the person's edit onto the original image, for saving it.
+ *
+ * The editor's state describes what the canvas shows: where the image sits
+ * under the crop, how far it is zoomed, and a crop area measured against
+ * the view. Whatever saves the result, such as a server or an image
+ * library in the browser, works on the full-size original file and cannot
+ * use those values. This turns them into flip, rotate and crop edits on
+ * the original, in the order to apply them, so the saved image matches
+ * what the person framed.
  *
  * Emits `[flip, rotate, crop]` in that order. Identity operations are
  * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
  * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no step. An identity state (fresh image, no edits) returns
+ * produce no edit. An identity state (fresh image, no edits) returns
  * an empty array; callers can use that to skip saving.
  *
  * Frames and math:
@@ -42,7 +48,7 @@ const CROP_TOLERANCE = 0.001;
  * bounding box (the stencil-reference frame — see `createCamera` /
  * `createExportCamera`). Pan is in that frame; zoom scales the image
  * beneath a fixed stencil. Two conversions are needed to reach the frame
- * the crop step applies against:
+ * the crop edit applies against:
  *
  *   1. Express the stencil rect in snap-AABB **pixels**:
  *      Image screen-normalized top-left with zoom/pan is
@@ -55,7 +61,7 @@ const CROP_TOLERANCE = 0.001;
  *      translated rect as fractions of the full AABB.
  *
  * Rotation sign: the cropper composes `flip · R(θ)` on the source (see
- * `createExportCamera` — rotate then flip). The steps' `[flip, rotate]`
+ * `createExportCamera` — rotate then flip). The edits' `[flip, rotate]`
  * order is the opposite: `R(θ') · flip`. For both to land on the
  * same pixels we invert the rotation sign when exactly one flip axis
  * is set (`flip_h · R(θ) = R(-θ) · flip_h`). Both-or-neither flips
@@ -64,20 +70,20 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return Ordered steps; empty when nothing changes the original or no
+ * @return Ordered edits; empty when nothing changes the original or no
  *         image has loaded.
  */
-export function getStepsForOriginal(
+export function mapEditToOriginal(
 	state: Pick<
 		CropperState,
 		'image' | 'pan' | 'zoom' | 'rotation' | 'flip' | 'cropRect'
 	>
-): OriginalImageStep[] {
-	const steps: OriginalImageStep[] = [];
+): OriginalImageEdit[] {
+	const edits: OriginalImageEdit[] = [];
 	const { image } = state;
 
 	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
-		return steps;
+		return edits;
 	}
 
 	const imageSize = {
@@ -89,7 +95,7 @@ export function getStepsForOriginal(
 	const hasFlipV = flip.vertical;
 
 	if ( hasFlipH || hasFlipV ) {
-		steps.push( {
+		edits.push( {
 			type: 'flip',
 			horizontal: hasFlipH,
 			vertical: hasFlipV,
@@ -97,12 +103,12 @@ export function getStepsForOriginal(
 	}
 
 	const rawAngle = ( ( state.rotation % 360 ) + 360 ) % 360;
-	// Invert the sign for single-axis flips so the steps' `flip → rotate`
+	// Invert the sign for single-axis flips so the edits' `flip → rotate`
 	// order matches the cropper's `rotate → flip` composition.
 	const singleAxisFlip = hasFlipH !== hasFlipV;
 	const signedAngle = singleAxisFlip ? ( 360 - rawAngle ) % 360 : rawAngle;
 	if ( signedAngle !== 0 ) {
-		steps.push( { type: 'rotate', angle: signedAngle } );
+		edits.push( { type: 'rotate', angle: signedAngle } );
 	}
 
 	const snapRotation = Math.round( state.rotation / 90 ) * 90;
@@ -146,8 +152,8 @@ export function getStepsForOriginal(
 		height >= 1 - CROP_TOLERANCE;
 
 	if ( ! coversFullFrame ) {
-		steps.push( { type: 'crop', x, y, width, height } );
+		edits.push( { type: 'crop', x, y, width, height } );
 	}
 
-	return steps;
+	return edits;
 }

@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that turns the result into steps for saving it. Cropping is the first thing it does. The media editor is built on it.
+An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that maps the result onto the original image for saving it. Cropping is the first thing it does. The media editor is built on it.
 
 ## Installation
 
@@ -90,9 +90,11 @@ The editor's state, and the state an editor starts from for an image (or for no 
 
 Whether two states describe the same edit, ignoring tiny floating-point differences. Use it to skip entries that change nothing in your own undo history.
 
-### `getStepsForOriginal( state )`
+### `mapEditToOriginal( state )`
 
-Call it when saving. It returns the flip, rotate and crop steps that make the full-size original image match what the person framed, in the order to apply them. Send them to a server, or run them with an image library in the browser. An unedited image returns an empty list.
+Use it when saving. The editor's state describes what the canvas shows: where the image sits under the crop, how far it is zoomed, and a crop area measured against the view. Whatever saves the result, such as a server or an image library in the browser, works on the full-size original file and cannot use those values.
+
+`mapEditToOriginal` maps the edit onto the original image: a list of flip, rotate and crop edits, in the order to apply them, so the saved image matches what the person framed. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
 
 ## Not Yet Included
 
