@@ -39,20 +39,28 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isDraggingBlocks,
+				isDragging: isDraggingAnything,
 				getTemplateLock,
 				getBlockEditingMode,
 				getBlockAttributes,
 				getBlockRootClientId,
 				getBlockName,
 				getSettings,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
+			// Blocks dragged from the canvas can be dropped in any grid, and
+			// with grid interactivity, so can blocks dragged from an inserter,
+			// which the grid tells apart by the drag's data types.
+			const isDragging =
+				isDraggingBlocks() ||
+				( !! window.__experimentalEnableGridInteractivity &&
+					isDraggingAnything() );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.
 			// Also hide if a child block is selected, because layout-child.tsx will render
 			// the visualizer in that case (with proper childGridClientId handling).
 			if (
-				( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
+				( ! isDragging && ! isBlockSelected( clientId ) ) ||
 				getTemplateLock( clientId ) ||
 				getBlockEditingMode( clientId ) !== 'default' ||
 				hasSelectedInnerBlock( clientId )
@@ -94,7 +102,7 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 				showRowResizer:
 					!! window.__experimentalEnableGridInteractivity &&
 					!! layout?.isManualPlacement &&
-					! isDraggingBlocks() &&
+					! isDragging &&
 					isBlockSelected( clientId ) &&
 					! isSizedByParentGrid,
 				blockVisibility: attributes?.metadata?.blockVisibility,
