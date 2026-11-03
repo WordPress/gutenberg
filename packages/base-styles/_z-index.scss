@@ -71,6 +71,12 @@ $z-layers: (
 	// selected block, so that it gets every `dragover` over the grid.
 	".block-editor-grid-visualizer.is-dropping-allowed": 32,
 
+	// The drag and rotate handles of a manual grid item sit just outside the
+	// block, where the toolbar of a grid item, shown at the top of the grid,
+	// can cover them. Level with the block toolbar, and after it in the
+	// page, so that they stay on top.
+	".block-editor-grid-item-handles": 31,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 

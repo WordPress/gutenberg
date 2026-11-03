@@ -14,6 +14,7 @@ import type { CurriedSelectorsOf } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	__experimentalUseDropZone as useDropZone,
+	useEvent,
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -34,9 +35,15 @@ import { getRotatedBoundingRect } from '../../utils/rotation';
 import { useInserterDragBlockNames } from './use-inserter-drag-block-names';
 import { parseDropEvent } from '../use-on-block-drop';
 import {
+	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
+import {
+	isGridItemHandleDrag,
+	subscribeToGridItemPointerDrag,
+} from './start-grid-item-drag';
+import type { GridItemPointerDragEvent } from './start-grid-item-drag';
 import { getAlignmentGuides } from './get-alignment-guides';
 import type { GridBlockStyle, GridStyleLayout } from './mobile-stacking';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
@@ -585,11 +592,14 @@ function GridVisualizerDropLayer( {
 	 * Whether the drag is of blocks from an inserter, which haven't been
 	 * inserted yet, that can all be inserted into the grid.
 	 *
-	 * @param event A drag event.
+	 * @param event              A drag event, or a touch drag's position.
+	 * @param event.dataTransfer The drag's data, which a touch drag doesn't have.
 	 *
 	 * @return Whether they can be dropped in the grid.
 	 */
-	function isInserterDragToGrid( event: DragEvent ) {
+	function isInserterDragToGrid( event: {
+		dataTransfer?: DragEvent[ 'dataTransfer' ];
+	} ) {
 		return canInsertBlockNamesInGrid(
 			blockEditorSelectors,
 			getInserterDragBlockNames( event.dataTransfer ),
@@ -597,7 +607,11 @@ function GridVisualizerDropLayer( {
 		);
 	}
 
-	function updateDropTarget( event: DragEvent ) {
+	function updateDropTarget(
+		event: Pick< DragEvent, 'clientX' | 'clientY' > &
+			Partial< Pick< DragEvent, 'dataTransfer' > >,
+		isHandleDrag: boolean
+	) {
 		const srcClientId = getDraggedBlock();
 		const isInserterDrag = ! srcClientId && isInserterDragToGrid( event );
 		const layer = layerRef.current;
@@ -633,26 +647,16 @@ function GridVisualizerDropLayer( {
 		const x = ( event.clientX - layerRect.left ) * scale;
 		const y = ( event.clientY - layerRect.top ) * scale;
 
-		// A block dragged by its body keeps the point it was grabbed at
-		// under the pointer, which the first move over the grid finds inside
-		// it. A block dragged by its handle, or from outside the grid, is
-		// centered on the pointer.
+		// The first move over the grid finds where the block was grabbed.
 		if ( grabRef.current?.srcClientId !== srcClientId ) {
-			const isGrabbed =
-				srcPixelRect &&
-				x >= srcPixelRect.left &&
-				x <= srcPixelRect.right &&
-				y >= srcPixelRect.top &&
-				y <= srcPixelRect.bottom;
 			grabRef.current = {
 				srcClientId,
-				grab:
-					isGrabbed && srcPixelRect
-						? {
-								grabX: x - srcPixelRect.left,
-								grabY: y - srcPixelRect.top,
-							}
-						: {},
+				grab: getGrabPoint( {
+					x,
+					y,
+					pixelRect: srcPixelRect,
+					isHandleDrag,
+				} ),
 			};
 		}
 
@@ -769,6 +773,63 @@ function GridVisualizerDropLayer( {
 	}
 
 	/**
+	 * Drops the dragged blocks on the drop target.
+	 *
+	 * @param event The `drop` event, which a touch drag from a drag handle
+	 *              doesn't have.
+	 */
+	function dropOnTarget( event?: DragEvent ) {
+		const target = lastTargetRef.current;
+		clearDropTarget();
+		if ( target?.isInserterDrag ) {
+			// The blocks dragged from an inserter are in the drop's data.
+			const { type, blocks } = event
+				? parseDropEvent( event )
+				: { type: null, blocks: null };
+			if (
+				type === 'inserter' &&
+				blocks?.length &&
+				canInsertBlockNamesInGrid(
+					blockEditorSelectors,
+					blocks.map( ( block ) => block.name ),
+					gridClientId
+				)
+			) {
+				insertInserterBlocks( blocks, target.landing );
+			}
+			return;
+		}
+		const srcClientId = getDraggedBlock();
+		if ( ! target || ! srcClientId || target.srcClientId !== srcClientId ) {
+			return;
+		}
+		const { landing, span } = target;
+		const { columnStart, rowStart } = landing;
+		// A block bigger than the grid is shrunk to fit, as shown by the
+		// landing cells.
+		const layout = {
+			columnStart,
+			rowStart,
+			...( landing.columnSpan < span.columnSpan && {
+				columnSpan: landing.columnSpan,
+			} ),
+			...( landing.rowSpan < span.rowSpan && {
+				rowSpan: landing.rowSpan,
+			} ),
+		};
+		// The grid is given to the updater because a block dropped in
+		// from elsewhere isn't in it yet.
+		updateGridChildLayout( srcClientId, layout, gridClientId );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ srcClientId ],
+			getBlockRootClientId( srcClientId ),
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart, rowStart )
+		);
+	}
+
+	/**
 	 * Inserts blocks dragged from an inserter where they were dropped. The
 	 * first block takes the landing cells, and any others, such as the rest
 	 * of a pattern, go one after the other next to it.
@@ -848,62 +909,33 @@ function GridVisualizerDropLayer( {
 	}
 
 	const dropZoneRef = useDropZone( {
-		onDragOver: updateDropTarget,
+		onDragOver: ( event ) =>
+			updateDropTarget( event, isGridItemHandleDrag( event ) ),
 		onDragLeave: clearDropTarget,
 		onDragEnd: clearDropTarget,
-		onDrop( event: DragEvent ) {
-			const target = lastTargetRef.current;
-			clearDropTarget();
-			if ( target?.isInserterDrag ) {
-				// The blocks dragged from an inserter are in the drop's data.
-				const { type, blocks } = parseDropEvent( event );
-				if (
-					type === 'inserter' &&
-					blocks?.length &&
-					canInsertBlockNamesInGrid(
-						blockEditorSelectors,
-						blocks.map( ( block ) => block.name ),
-						gridClientId
-					)
-				) {
-					insertInserterBlocks( blocks, target.landing );
-				}
-				return;
-			}
-			const srcClientId = getDraggedBlock();
-			if (
-				! target ||
-				! srcClientId ||
-				target.srcClientId !== srcClientId
-			) {
-				return;
-			}
-			const { landing, span } = target;
-			const { columnStart, rowStart } = landing;
-			// A block bigger than the grid is shrunk to fit, as shown by the
-			// landing cells.
-			const layout = {
-				columnStart,
-				rowStart,
-				...( landing.columnSpan < span.columnSpan && {
-					columnSpan: landing.columnSpan,
-				} ),
-				...( landing.rowSpan < span.rowSpan && {
-					rowSpan: landing.rowSpan,
-				} ),
-			};
-			// The grid is given to the updater because a block dropped in
-			// from elsewhere isn't in it yet.
-			updateGridChildLayout( srcClientId, layout, gridClientId );
-			__unstableMarkNextChangeAsNotPersistent();
-			moveBlocksToPosition(
-				[ srcClientId ],
-				getBlockRootClientId( srcClientId ),
-				gridClientId,
-				getNumberOfBlocksBeforeCell( columnStart, rowStart )
-			);
-		},
+		onDrop: dropOnTarget,
 	} );
+
+	// A touch drag from a drag handle doesn't use the browser's drag and
+	// drop, so it is followed here. The layer of the innermost grid under the
+	// touch takes it, as a drop zone would.
+	const onPointerDrag = useEvent(
+		( { type, clientX, clientY, dropLayer }: GridItemPointerDragEvent ) => {
+			const isOverLayer =
+				!! layerRef.current && dropLayer === layerRef.current;
+			if ( type === 'move' && isOverLayer ) {
+				updateDropTarget( { clientX, clientY }, true );
+			} else if ( type === 'drop' && isOverLayer ) {
+				dropOnTarget();
+			} else {
+				clearDropTarget();
+			}
+		}
+	);
+	useEffect(
+		() => subscribeToGridItemPointerDrag( onPointerDrag ),
+		[ onPointerDrag ]
+	);
 
 	return (
 		<div
