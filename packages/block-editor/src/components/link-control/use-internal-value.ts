@@ -2,6 +2,8 @@ import { useState } from '@wordpress/element';
 import fastDeepEqual from 'fast-deep-equal';
 import type { LinkControlSuggestion, LinkControlValue } from './types';
 
+const ENTITY_KEYS = [ 'id', 'kind', 'type' ] as const;
+
 export default function useInternalValue(
 	value: LinkControlValue | undefined
 ) {
@@ -23,15 +25,29 @@ export default function useInternalValue(
 		nextValue: string | undefined,
 		suggestion?: LinkControlSuggestion
 	) => {
-		// The entity fields describe the URL in the input, so a suggestion
-		// chosen with the Tab key brings its own, and a typed URL has none.
-		setInternalValue( {
+		// The entity fields describe the URL in the input. A suggestion chosen
+		// with the Tab key brings its own, typing back the original URL restores
+		// the original's, and any other typed URL has none.
+		const source =
+			suggestion ?? ( nextValue === value?.url ? value : undefined );
+		const nextInternalValue: LinkControlValue = {
 			...internalValue,
-			id: suggestion?.id,
-			kind: suggestion?.kind,
-			type: suggestion?.type,
 			url: nextValue,
-		} );
+		};
+		for ( const key of ENTITY_KEYS ) {
+			if ( source?.[ key ] !== undefined ) {
+				nextInternalValue[ key ] = source[ key ];
+			} else if ( value && key in value ) {
+				// Explicitly `undefined`, so that it replaces the original's
+				// field when the two are merged on submit.
+				nextInternalValue[ key ] = undefined;
+			} else {
+				// Leave out a field the original never had, so that the
+				// value is unchanged when the original URL is typed back.
+				delete nextInternalValue[ key ];
+			}
+		}
+		setInternalValue( nextInternalValue );
 	};
 
 	const setInternalTextInputValue = ( nextValue: string ) => {
