@@ -22,11 +22,12 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 import type { Post } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
@@ -244,42 +245,32 @@ function PostListView( {
 		},
 	} );
 
-	const quickEditAction = useMemo(
-		() => ( {
-			id: 'quick-edit',
-			label: ( items: Post[] ) =>
-				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
-			icon: drawerRight,
-			isPrimary: true,
-			supportsBulk: true,
-			isEligible( post: Post ) {
-				// PostStatus only includes assignable statuses. 'trash' is managed
-				// internally by WordPress, but the REST API can still return it.
-				if ( ( post.status as string ) === 'trash' ) {
-					return false;
-				}
-				return post.type === 'page';
-			},
-			callback( items: Post[] ) {
+	// The "Quick edit" action comes from the server, and opens the quick edit
+	// form with this opener: it adds the posts to the URL, which shows the
+	// form next to the list.
+	const { setQuickEditOpener } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setQuickEditOpener(
+			( { postIds }: { postIds: Array< number | string > } ) => {
 				navigate( {
 					search: {
 						...searchParams,
 						quickEdit: true,
-						postIds: items.map( ( item ) => item.id.toString() ),
+						postIds: postIds.map( ( id ) => id.toString() ),
 					},
 				} );
-			},
-		} ),
-		[ navigate, searchParams ]
-	);
+			}
+		);
+		return () => setQuickEditOpener( undefined );
+	}, [ setQuickEditOpener, navigate, searchParams ] );
 
 	const actions = useMemo( () => {
-		const _actions = [ ...postTypeActions ];
-		if ( view.type !== LAYOUT_LIST ) {
-			_actions.unshift( quickEditAction );
-		}
-		return _actions;
-	}, [ quickEditAction, postTypeActions, view.type ] );
+		// The list layout shows the post next to the list, not the quick edit
+		// form.
+		return view.type === LAYOUT_LIST
+			? postTypeActions.filter( ( action ) => action.id !== 'quick-edit' )
+			: postTypeActions;
+	}, [ postTypeActions, view.type ] );
 
 	const handleTabChange = useCallback(
 		( status: string ) => {

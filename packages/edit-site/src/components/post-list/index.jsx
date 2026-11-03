@@ -21,10 +21,7 @@ import {
 } from '../../utils/constants';
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import {
-	useEditPostAction,
-	useQuickEditPostAction,
-} from '../dataviews-actions';
+import useSetQuickEditOpener from './use-set-quick-edit-opener';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -226,16 +223,27 @@ export default function PostList( { postType } ) {
 		postType,
 		context: 'list',
 	} );
-	const editAction = useEditPostAction();
-	const quickEditAction = useQuickEditPostAction();
+	// The "Edit" and "Quick edit" actions come from the server, first. They
+	// open the page with the entity navigator the app sets, see
+	// `useSetEntityNavigator`, and the quick edit form with the opener set
+	// here.
+	useSetQuickEditOpener();
 	const actions = useMemo( () => {
-		if ( view.type === LAYOUT_LIST ) {
-			const editActionPrimary = { ...editAction, isPrimary: true };
-			return [ editActionPrimary, ...postTypeActions ];
+		if ( view.type !== LAYOUT_LIST ) {
+			return postTypeActions;
 		}
-
-		return [ editAction, quickEditAction, ...postTypeActions ];
-	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
+		// The list layout shows the page next to the list, not the quick edit
+		// form, and makes "Edit" its primary action.
+		return postTypeActions.flatMap( ( action ) => {
+			switch ( action.id ) {
+				case 'quick-edit':
+					return [];
+				case 'edit-post':
+					return [ { ...action, isPrimary: true } ];
+			}
+			return [ action ];
+		} );
+	}, [ view.type, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
