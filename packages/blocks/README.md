@@ -184,7 +184,16 @@ _Returns_
 
 ### getBlockFromExample
 
-Undocumented declaration.
+Create a block object from the example API.
+
+_Parameters_
+
+- _name_ `string`:
+- _example_ `BlockExample`:
+
+_Returns_
+
+- `Block`: block.
 
 ### getBlockMenuDefaultClassName
 
