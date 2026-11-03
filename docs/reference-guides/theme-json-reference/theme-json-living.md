@@ -193,6 +193,16 @@ Settings related to spacing.
 
 ---
 
+### transform
+
+Settings related to transforms.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| rotate | Allow users to set a rotation. | `boolean` | `true` |
+
+---
+
 ### typography
 
 Settings related to typography.
@@ -347,6 +357,16 @@ Spacing styles.
 | blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now. | `string`, `{ ref }`, `{ top, left }` |
 | margin | Margin styles. | `{ top, right, bottom, left }` |
 | padding | Padding styles. | `{ top, right, bottom, left }` |
+
+---
+
+### transform
+
+Transform styles. Only blocks and block style variations support them.
+
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| rotate | Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`. | `string` |
 
 ---
 

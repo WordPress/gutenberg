@@ -481,6 +481,23 @@
 				}
 			}
 		},
+		"settingsTransformProperties": {
+			"type": "object",
+			"properties": {
+				"transform": {
+					"description": "Settings related to transforms.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Allow users to set a rotation.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsSpacingProperties": {
 			"type": "object",
 			"properties": {
@@ -979,6 +996,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsViewportProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
@@ -996,6 +1014,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
 			]
@@ -1013,6 +1032,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"viewport",
 				"custom"
@@ -1030,6 +1050,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"custom"
 			]
@@ -1922,6 +1943,17 @@
 					},
 					"additionalProperties": false
 				},
+				"transform": {
+					"description": "Transform styles. Only blocks and block style variations support them.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
+				},
 				"typography": {
 					"description": "Typography styles.",
 					"type": "object",
@@ -2040,6 +2072,7 @@
 				"outline",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography"
 			]
 		},
@@ -2638,6 +2671,7 @@
 					"additionalProperties": {
 						"type": "object",
 						"properties": {
+							"transform": false,
 							"spacing": {
 								"type": "object",
 								"properties": {
@@ -3880,6 +3914,7 @@
 			"styles": {
 				"type": "object",
 				"properties": {
+					"transform": false,
 					"spacing": {
 						"type": "object",
 						"properties": {
