@@ -261,59 +261,6 @@ test.describe( 'Writing toolbar', () => {
 		] );
 	} );
 
-	test( 'stepping the size moves to the next theme size up', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Writing', fontSize: 'medium' },
-		} );
-
-		const toolbar = getToolbar( page );
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-		await toolbar.getByRole( 'button', { name: 'Increase size' } ).click();
-
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { fontSize: 'large' } },
-			] );
-
-		await toolbar.getByRole( 'button', { name: 'Decrease size' } ).click();
-
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { fontSize: 'medium' } },
-			] );
-	} );
-
-	test( 'stepping the size of a block that sets none starts from the size it renders at', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Writing' },
-		} );
-
-		const toolbar = getToolbar( page );
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-		await toolbar.getByRole( 'button', { name: 'Increase size' } ).click();
-
-		// The paragraph renders at 17px, so the next theme size up is Medium.
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { fontSize: 'medium' } },
-			] );
-	} );
-
 	test( 'goes back to designing when another block is selected', async ( {
 		editor,
 		page,

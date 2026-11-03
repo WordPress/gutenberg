@@ -2,9 +2,6 @@ import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp } from '@wordpress/icons';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import {
 	hasBlockSupport,
 	switchToBlockType,
@@ -29,7 +26,6 @@ import WritingFontDropdown from './font-dropdown';
 import WritingSizeDropdown from './size-dropdown';
 import {
 	findActiveWritingStyle,
-	getSteppedFontSize,
 	getWritingStyles,
 	groupWritingStylesByFont,
 } from './utils';
@@ -239,21 +235,6 @@ function WritingToolbarControls( {
 		} );
 	};
 
-	const onStepFontSize = ( direction: number ) => {
-		// A block that sets no size of its own still steps from the size it
-		// renders at, which is the one its text style resolves to.
-		const current =
-			customFontSize ??
-			fontSizes.find( ( preset ) => preset.slug === attributes.fontSize )
-				?.size ??
-			activeStyle?.fontSize;
-		const stepped = getSteppedFontSize( current, fontSizes, direction );
-
-		if ( stepped ) {
-			setFontSize( { fontSize: stepped.slug } );
-		}
-	};
-
 	return (
 		<BlockControls group="writing">
 			<WritingStyleDropdown
@@ -275,18 +256,6 @@ function WritingToolbarControls( {
 					setFontSize( { customSize: `${ size }px` } )
 				}
 			/>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ chevronUp }
-					label={ __( 'Increase size' ) }
-					onClick={ () => onStepFontSize( 1 ) }
-				/>
-				<ToolbarButton
-					icon={ chevronDown }
-					label={ __( 'Decrease size' ) }
-					onClick={ () => onStepFontSize( -1 ) }
-				/>
-			</ToolbarGroup>
 		</BlockControls>
 	);
 }

@@ -4,7 +4,6 @@ import {
 	MIN_CUSTOM_FONT_SIZE,
 	clampCustomFontSize,
 	findActiveWritingStyle,
-	getSteppedFontSize,
 	getWritingStyles,
 	groupWritingStylesByFont,
 	parseFontSizeToPx,
@@ -269,37 +268,6 @@ describe( 'findActiveWritingStyle', () => {
 	it( 'returns nothing for a block that is not a writing style', () => {
 		expect(
 			findActiveWritingStyle( styles, 'core/image', {} )
-		).toBeUndefined();
-	} );
-} );
-
-describe( 'getSteppedFontSize', () => {
-	it( 'steps up and down through the theme sizes', () => {
-		expect( getSteppedFontSize( '17px', FONT_SIZES, 1 )?.slug ).toBe(
-			'large'
-		);
-		expect( getSteppedFontSize( '17px', FONT_SIZES, -1 )?.slug ).toBe(
-			'small'
-		);
-	} );
-
-	it( 'steps from a size of your own to the nearest theme size beyond it', () => {
-		expect( getSteppedFontSize( '20px', FONT_SIZES, 1 )?.slug ).toBe(
-			'large'
-		);
-		expect( getSteppedFontSize( '20px', FONT_SIZES, -1 )?.slug ).toBe(
-			'medium'
-		);
-	} );
-
-	it( 'stops at the ends', () => {
-		expect( getSteppedFontSize( '40px', FONT_SIZES, 1 ) ).toBeUndefined();
-		expect( getSteppedFontSize( '14px', FONT_SIZES, -1 ) ).toBeUndefined();
-	} );
-
-	it( 'does nothing when the current size cannot be measured', () => {
-		expect(
-			getSteppedFontSize( 'clamp(1rem, 2vw, 2rem)', FONT_SIZES, 1 )
 		).toBeUndefined();
 	} );
 } );

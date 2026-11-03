@@ -1,7 +1,6 @@
 import { getStyle } from '@wordpress/global-styles-engine';
 import type {
 	FontFamilyPreset,
-	FontSizePreset,
 	GlobalStylesConfig,
 } from '@wordpress/global-styles-engine';
 import type { WritingBlock, WritingStyle, WritingStyleGroup } from './types';
@@ -271,47 +270,4 @@ export function findActiveWritingStyle(
 				)
 		) ?? candidates.find( ( style ) => ! style.attributes )
 	);
-}
-
-/**
- * Finds the theme size one step up or down from the size in use, so the
- * toolbar's size steps walk the theme's sizes rather than counting pixels.
- *
- * @param currentSize The size in use.
- * @param fontSizes   The theme's font size presets.
- * @param direction   1 to step up, -1 to step down.
- *
- * @return The preset to step to, if there is one.
- */
-export function getSteppedFontSize(
-	currentSize: string | number | null | undefined,
-	fontSizes: FontSizePreset[] | undefined,
-	direction: number
-): FontSizePreset | undefined {
-	const current = parseFontSizeToPx( currentSize );
-
-	if ( current === undefined ) {
-		return undefined;
-	}
-
-	const measured = ( fontSizes ?? [] )
-		.map( ( preset ) => ( {
-			preset,
-			size: parseFontSizeToPx( preset.size ),
-		} ) )
-		.filter(
-			(
-				measurement
-			): measurement is { preset: FontSizePreset; size: number } =>
-				measurement.size !== undefined
-		)
-		.sort( ( a, b ) => a.size - b.size );
-
-	if ( direction < 0 ) {
-		measured.reverse();
-	}
-
-	return measured.find( ( { size } ) =>
-		direction > 0 ? size > current : size < current
-	)?.preset;
 }
