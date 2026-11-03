@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getQueryArgs`: Do not write nested query arguments onto inherited built-in functions such as `Object.prototype.toString` ([#86268](https://github.com/WordPress/gutenberg/pull/86268)).
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes
