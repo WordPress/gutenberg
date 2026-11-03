@@ -318,6 +318,14 @@ interface ViewBase {
 	fields?: string[];
 
 	/**
+	 * The order of the fields the user can show or hide, hidden ones
+	 * included. `fields` only lists the visible fields, so this is what lets
+	 * a hidden field keep its place and come back to it when shown again.
+	 * Visible fields always render in the order `fields` gives them.
+	 */
+	fieldOrder?: string[];
+
+	/**
 	 * Title field
 	 */
 	titleField?: string;

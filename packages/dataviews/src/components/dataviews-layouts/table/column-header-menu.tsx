@@ -19,6 +19,7 @@ import type {
 } from '../../../types';
 import DataViewsContext from '../../dataviews-context';
 import getHideableFields from '../../../utils/get-hideable-fields';
+import { getFieldOrder } from '../../../utils/field-order';
 import getTableColumns from '../utils/get-table-columns';
 
 interface HeaderMenuProps< Item > {
@@ -357,6 +358,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 											...view,
 											fields: visibleFieldIds.filter(
 												( id ) => id !== fieldId
+											),
+											// Remember where the column was,
+											// so showing it again puts it back.
+											fieldOrder: getFieldOrder(
+												view,
+												fields
 											),
 										} );
 									} }
