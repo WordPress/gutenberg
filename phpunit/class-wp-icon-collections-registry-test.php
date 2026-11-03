@@ -210,8 +210,8 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage WP_Icon_Collections_Registry_Gutenberg::unregister
 	 */
 	public function test_unregister_core_admin_collection_is_rejected() {
+		$icons = WP_Icons_Registry_Gutenberg::get_instance();
 		gutenberg_register_default_icons();
-		$icons          = WP_Icons_Registry_Gutenberg::get_instance();
 		$admin_icons    = wp_list_filter( $icons->get_registered_icons(), array( 'collection' => 'core-admin' ) );
 		$expected_names = array_column( $admin_icons, 'name' );
 
