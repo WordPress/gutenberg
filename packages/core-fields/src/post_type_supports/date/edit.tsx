@@ -51,6 +51,7 @@ export default function DateEdit( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	operator,
 }: DataFormControlProps< Item > ) {
 	const value = field.getValue( { item: data } ) ?? undefined;
 
@@ -108,10 +109,16 @@ export default function DateEdit( {
 
 	const disabled = field.isDisabled( { item: data, field } );
 
+	// Only DataViews filters pass an operator. A filter picks a date to compare
+	// against, so resetting the post date means nothing there.
+	const isFilter = !! operator;
+
 	// The picker shows a date even when the post has none of its own: the save
 	// time of a floating draft, or now once the date is reset.
 	let note;
-	if ( isFloating ) {
+	if ( isFilter ) {
+		// The notes describe the post's date, not the date a filter picks.
+	} else if ( isFloating ) {
 		note = __( 'Publishes immediately.' );
 	} else if ( isReset ) {
 		note = __( 'Changes to the time you save.' );
@@ -149,17 +156,19 @@ export default function DateEdit( {
 			{ /* The button stays in place, focusable, when there is no date to
 			     reset, rather than disappearing under the focus that just
 			     activated it. */ }
-			<Button
-				className={ styles.reset }
-				variant="secondary"
-				__next40pxDefaultSize
-				accessibleWhenDisabled
-				disabled={ disabled || isReset }
-				onClick={ onReset }
-				aria-describedby={ note ? noteId : undefined }
-			>
-				{ __( 'Reset' ) }
-			</Button>
+			{ ! isFilter && (
+				<Button
+					className={ styles.reset }
+					variant="secondary"
+					__next40pxDefaultSize
+					accessibleWhenDisabled
+					disabled={ disabled || isReset }
+					onClick={ onReset }
+					aria-describedby={ note ? noteId : undefined }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			) }
 			{ note && (
 				<Fieldset.Description id={ noteId }>
 					{ note }
