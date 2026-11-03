@@ -27,6 +27,12 @@ export const CUSTOM_VALUE_SETTINGS = {
 	svmax: { max: 100, step: 1 },
 	lvmax: { max: 100, step: 1 },
 	dvmax: { max: 100, step: 1 },
+	cqw: { max: 100, step: 1 },
+	cqh: { max: 100, step: 1 },
+	cqi: { max: 100, step: 1 },
+	cqb: { max: 100, step: 1 },
+	cqmin: { max: 100, step: 1 },
+	cqmax: { max: 100, step: 1 },
 };
 
 export interface ShadowObject {

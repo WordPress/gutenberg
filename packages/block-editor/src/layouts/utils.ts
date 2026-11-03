@@ -86,7 +86,7 @@ export function getAlignmentsInfo( layout: Layout ): AlignmentsInfo {
 	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo: AlignmentsInfo = {};
 	const sizeRegex =
-		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax|cqw|cqh|cqi|cqb|cqmin|cqmax)?$/i;
 	// `test` reads a missing size as 'undefined', which never matches.
 	if ( sizeRegex.test( contentSize! ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)

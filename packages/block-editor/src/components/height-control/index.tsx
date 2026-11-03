@@ -46,6 +46,12 @@ const RANGE_CONTROL_CUSTOM_SETTINGS: Record<
 	svmax: { max: 100, step: 1 },
 	lvmax: { max: 100, step: 1 },
 	dvmax: { max: 100, step: 1 },
+	cqw: { max: 100, step: 1 },
+	cqh: { max: 100, step: 1 },
+	cqi: { max: 100, step: 1 },
+	cqb: { max: 100, step: 1 },
+	cqmin: { max: 100, step: 1 },
+	cqmax: { max: 100, step: 1 },
 };
 
 /**
@@ -145,10 +151,16 @@ export default function HeightControl( {
 				'svmax',
 				'lvmax',
 				'dvmax',
+				'cqw',
+				'cqh',
+				'cqi',
+				'cqb',
+				'cqmin',
+				'cqmax',
 			].includes( newUnit! ) &&
 			currentValue > 100
 		) {
-			// When converting to `%` or viewport-relative units, cap the new value at 100.
+			// When converting to `%`, viewport-relative or container-relative units, cap the new value at 100.
 			onChange( 100 + newUnit! );
 		}
 	};

@@ -51,6 +51,12 @@ const RANGE_CONTROL_MAX_VALUES: Record< string, number > = {
 	svmax: 100,
 	lvmax: 100,
 	dvmax: 100,
+	cqw: 100,
+	cqh: 100,
+	cqi: 100,
+	cqb: 100,
+	cqmin: 100,
+	cqmax: 100,
 };
 
 const units = [

@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list.
 -   `CustomGradientPicker`: Use the WordPress UI select for choosing the gradient type ([#85750](https://github.com/WordPress/gutenberg/pull/85750)).
 -   `Spinner`: Use a neutral half-circle arc with a stroke that scales with its size ([#85859](https://github.com/WordPress/gutenberg/pull/85859)).
 -   `Tooltip`: Match the dark gray background of the design system tooltip ([#85858](https://github.com/WordPress/gutenberg/pull/85858)).
