@@ -51,8 +51,16 @@ $navigation-icon-size: 24px;
 
 	// This rule uses low specificity (0, 1, 0) so that it inherits the correct color from its parent,
 	// prevents generic global link styles (0, 0, 1) from bleeding into navigation menus,
-	// but allows block-level link colors and :hover states defined in theme.json (0, 1, 0) to override it.
+	// but allows block-level link colors (0, 1, 1) and :hover states (0, 2, 1) defined in theme.json to override it.
 	& :where(.wp-block-navigation-item__content) {
+		color: inherit;
+	}
+
+	// Shield navigation links against ancestor block element link colors (e.g. parent Group block).
+	// Ancestor link styles use `.wp-elements-<id> a:where(...)` with specificity (0, 1, 1).
+	// This rule ensures unstyled navigation links inherit text color from the navigation block
+	// rather than inheriting the parent container's link color.
+	:is(.has-link-color, [class*="wp-elements-"]) &:not(.has-link-color) .wp-block-navigation-item__content {
 		color: inherit;
 	}
 
@@ -505,6 +513,10 @@ button.wp-block-navigation-item__content {
 	.wp-block-navigation__submenu-container {
 		// Set a default color for submenu text if none is selected
 		color: #000;
+
+		.wp-block-navigation-item__content {
+			color: inherit;
+		}
 	}
 }
 
