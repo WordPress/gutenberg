@@ -245,12 +245,14 @@ function WritingToolbarControls( {
 			<WritingFontDropdown
 				fontFamilies={ fontFamilies }
 				value={ attributes.fontFamily }
+				defaultName={ activeStyle?.fontFamilyName }
 				onChange={ ( slug ) => setAttributes( { fontFamily: slug } ) }
 			/>
 			<WritingSizeDropdown
 				fontSizes={ fontSizes }
 				value={ attributes.fontSize }
 				customSize={ customFontSize }
+				defaultSize={ activeStyle?.fontSize }
 				onSelectPreset={ ( slug ) => setFontSize( { fontSize: slug } ) }
 				onSetCustom={ ( size ) =>
 					setFontSize( { customSize: `${ size }px` } )

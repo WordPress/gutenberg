@@ -37,7 +37,7 @@ describe( 'WritingSizeDropdown', () => {
 			screen
 				.getAllByRole( 'menuitemradio' )
 				.map( ( item ) => item.textContent )
-		).toEqual( [ 'Theme size', '13', '20', '36' ] );
+		).toEqual( [ 'Default', '13', '20', '36' ] );
 	} );
 
 	it( 'rounds a size the theme gives in rem to whole pixels', async () => {
@@ -59,7 +59,7 @@ describe( 'WritingSizeDropdown', () => {
 			screen
 				.getAllByRole( 'menuitemradio' )
 				.map( ( item ) => item.textContent )
-		).toEqual( [ 'Theme size', '22' ] );
+		).toEqual( [ 'Default', '22' ] );
 	} );
 
 	it( 'falls back to the name for a size that has no number', async () => {
@@ -78,7 +78,38 @@ describe( 'WritingSizeDropdown', () => {
 			screen
 				.getAllByRole( 'menuitemradio' )
 				.map( ( item ) => item.textContent )
-		).toEqual( [ 'Theme size', '13', 'Headline' ] );
+		).toEqual( [ 'Default', '13', 'Headline' ] );
+	} );
+
+	it( 'shows the size the block renders at when it sets none of its own', () => {
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				defaultSize="17px"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Size' } )
+		).toHaveTextContent( '17' );
+	} );
+
+	it( 'prefers the size the block sets over the one it would render at', () => {
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				value="large"
+				defaultSize="17px"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Size' } )
+		).toHaveTextContent( '36' );
 	} );
 
 	it( 'shows the number of the size in use on the toolbar', () => {

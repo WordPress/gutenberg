@@ -19,16 +19,19 @@ const POPOVER_PROPS = {
  * @param props              Component props.
  * @param props.fontFamilies The theme's font family presets.
  * @param props.value        The slug of the font in use, if the block sets one.
+ * @param props.defaultName  The font the block renders in when it sets none.
  * @param props.onChange     Called with the slug of the chosen font, or
  *                           undefined to follow the theme.
  */
 export default function WritingFontDropdown( {
 	fontFamilies,
 	value,
+	defaultName,
 	onChange,
 }: {
 	fontFamilies: FontFamilyPreset[];
 	value?: string;
+	defaultName?: string;
 	onChange: ( slug?: string ) => void;
 } ) {
 	const active = fontFamilies.find( ( preset ) => preset.slug === value );
@@ -41,7 +44,7 @@ export default function WritingFontDropdown( {
 						className="editor-writing-toolbar__font"
 						icon={ null }
 						label={ __( 'Font' ) }
-						text={ active?.name ?? __( 'Font' ) }
+						text={ active?.name ?? defaultName ?? __( 'Font' ) }
 						popoverProps={ POPOVER_PROPS }
 						toggleProps={ toggleProps }
 					>
@@ -55,7 +58,7 @@ export default function WritingFontDropdown( {
 										onClose();
 									} }
 								>
-									{ __( 'Theme font' ) }
+									{ __( 'Default' ) }
 								</MenuItem>
 								{ fontFamilies.map( ( preset ) => (
 									<MenuItem

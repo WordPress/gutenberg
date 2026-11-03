@@ -44,6 +44,7 @@ function getSizeLabel( preset: FontSizePreset ): string {
  * @param props.value          The slug of the preset in use, if the block sets
  *                             one.
  * @param props.customSize     The size the block sets of its own.
+ * @param props.defaultSize    The size the block renders at when it sets none.
  * @param props.onSelectPreset Called with the slug of the chosen preset, or
  *                             undefined to follow the theme.
  * @param props.onSetCustom    Called with a size in pixels.
@@ -52,17 +53,20 @@ export default function WritingSizeDropdown( {
 	fontSizes,
 	value,
 	customSize,
+	defaultSize,
 	onSelectPreset,
 	onSetCustom,
 }: {
 	fontSizes: FontSizePreset[];
 	value?: string;
 	customSize?: string;
+	defaultSize?: string;
 	onSelectPreset: ( slug?: string ) => void;
 	onSetCustom: ( size: number ) => void;
 } ) {
 	const active = fontSizes.find( ( preset ) => preset.slug === value );
 	const customPx = parseFontSizeToPx( customSize );
+	const defaultPx = parseFontSizeToPx( defaultSize );
 
 	// An asterisk marks a size of your own, as the experiment's size box does.
 	let text: string = __( 'Size' );
@@ -70,6 +74,8 @@ export default function WritingSizeDropdown( {
 		text = getSizeLabel( active );
 	} else if ( customPx !== undefined ) {
 		text = `${ customPx }*`;
+	} else if ( defaultPx !== undefined ) {
+		text = String( Math.round( defaultPx ) );
 	}
 
 	return (
@@ -114,7 +120,7 @@ export default function WritingSizeDropdown( {
 											onClose();
 										} }
 									>
-										{ __( 'Theme size' ) }
+										{ __( 'Default' ) }
 									</MenuItem>
 									{ fontSizes.map( ( preset ) => (
 										<MenuItem
