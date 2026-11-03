@@ -422,16 +422,7 @@ export function mergeCrdtBlocks(
 	attributeCursor: MergeCursorPosition,
 	options: MergeCrdtBlocksOptions = {}
 ): void {
-	// Ensure we are working with serializable block data.
-	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
-		serializableBlocksCache.set(
-			incomingBlocks,
-			makeBlocksSerializable( incomingBlocks )
-		);
-	}
-
-	const incomingBlocksToSync =
-		serializableBlocksCache.get( incomingBlocks ) ?? [];
+	const incomingBlocksToSync = getSerializableBlocks( incomingBlocks );
 
 	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
 	// approach.
@@ -650,7 +641,33 @@ export function mergeCrdtBlocks(
 		yblocks.insert( left, newBlock );
 	}
 
-	// remove duplicate clientids
+	deduplicateClientIds( yblocks );
+}
+
+/**
+ * Serializable copies of a block list, cached per list so repeated merges of
+ * the same list do not redo the work.
+ *
+ * @param blocks Blocks as the block editor holds them.
+ * @return Blocks without unserializable properties.
+ */
+function getSerializableBlocks( blocks: Block[] ): Block[] {
+	let serializable = serializableBlocksCache.get( blocks );
+
+	if ( ! serializable ) {
+		serializable = makeBlocksSerializable( blocks );
+		serializableBlocksCache.set( blocks, serializable );
+	}
+
+	return serializable;
+}
+
+/**
+ * Give every block in the Y.Array a distinct client ID.
+ *
+ * @param yblocks The block list to fix up.
+ */
+function deduplicateClientIds( yblocks: YBlocks ): void {
 	const knownClientIds = new Set< string >();
 	for ( let j = 0; j < yblocks.length; j++ ) {
 		const yblock: YBlock = yblocks.get( j );
@@ -667,6 +684,388 @@ export function mergeCrdtBlocks(
 		}
 		knownClientIds.add( clientId );
 	}
+}
+
+/**
+ * Rebase the editor's own change onto the live block list.
+ *
+ * `mergeCrdtBlocks` reconciles the editor's whole block list against the
+ * Y.Array by position. That is correct only when the list derives from the
+ * Y.Array's current state. The block editor renders a remote change
+ * asynchronously, so a keystroke made while a remote update is still on its
+ * way to it sends a list that lacks the update, and a positional merge then
+ * deletes the peer's block, or reverts the peer's text.
+ *
+ * Given the list the change was made against (`baselineBlocks`), this
+ * function applies only the difference between the baseline and the incoming
+ * list, matching blocks by client ID. Blocks the editor has never seen stay
+ * untouched, and a rich-text edit is transformed over the text peers added to
+ * the same field since. It falls back to the positional merge when the
+ * baseline does not match the Y.Array, for example right after a load, when
+ * the editor's parsed blocks carry client IDs the document does not know yet.
+ *
+ * @param yblocks         The blocks in the local Y.Doc.
+ * @param baselineBlocks  The blocks the editor rendered when the change was made.
+ * @param incomingBlocks  The blocks the editor holds after the change.
+ * @param attributeCursor See `mergeCrdtBlocks`.
+ */
+export function rebaseCrdtBlocks(
+	yblocks: YBlocks,
+	baselineBlocks: Block[],
+	incomingBlocks: Block[],
+	attributeCursor: MergeCursorPosition
+): void {
+	if ( baselineBlocks === incomingBlocks ) {
+		return;
+	}
+
+	const baseline = getSerializableBlocks( baselineBlocks );
+	const incoming = getSerializableBlocks( incomingBlocks );
+	const yBlocksById = indexYBlocksByClientId( yblocks );
+
+	// Every baseline block must be in the Y.Array under its client ID, and
+	// the editor's lists must carry distinct client IDs. An empty baseline
+	// against a non-empty Y.Array means the editor's view did not come from
+	// the document, so there is nothing to rebase onto.
+	const canRebase =
+		yBlocksById !== null &&
+		( baseline.length > 0 || yblocks.length === 0 ) &&
+		hasDistinctClientIds( baseline ) &&
+		hasDistinctClientIds( incoming ) &&
+		baseline.every( ( block ) =>
+			yBlocksById.has( block.clientId as string )
+		);
+
+	if ( ! canRebase ) {
+		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
+		return;
+	}
+
+	const baselineById = new Map(
+		baseline.map( ( block ) => [ block.clientId as string, block ] )
+	);
+	const incomingIds = new Set(
+		incoming.map( ( block ) => block.clientId as string )
+	);
+
+	// Deletions: blocks the editor had and no longer has.
+	for ( const block of baseline ) {
+		const clientId = block.clientId as string;
+		if ( incomingIds.has( clientId ) ) {
+			continue;
+		}
+		const yblock = yBlocksById.get( clientId );
+		const index = yblock ? indexOfYBlock( yblocks, yblock ) : -1;
+		if ( index !== -1 ) {
+			yblocks.delete( index, 1 );
+		}
+		yBlocksById.delete( clientId );
+	}
+
+	// Updates and insertions, in the editor's order. A new block goes right
+	// after the nearest preceding block the editor and the document share.
+	incoming.forEach( ( block, i ) => {
+		const clientId = block.clientId as string;
+		const existing = yBlocksById.get( clientId );
+
+		if ( existing ) {
+			const base =
+				baselineById.get( clientId ) ??
+				( existing.toJSON() as unknown as Block );
+			rebaseYBlock( existing, base, block, attributeCursor );
+			return;
+		}
+
+		let insertAt = 0;
+		for ( let j = i - 1; j >= 0; j-- ) {
+			const previous = yBlocksById.get(
+				incoming[ j ].clientId as string
+			);
+			if ( previous ) {
+				insertAt = indexOfYBlock( yblocks, previous ) + 1;
+				break;
+			}
+		}
+
+		const newYBlock = createNewYBlock( block );
+		yblocks.insert( insertAt, [ newYBlock ] );
+		yBlocksById.set( clientId, newYBlock );
+	} );
+
+	// Moves: keep the editor's order among the blocks it knows about. A moved
+	// block is re-created at its new place; blocks the editor has not seen
+	// keep their position relative to their neighbours.
+	let previousIndex = -1;
+	for ( const block of incoming ) {
+		const yblock = yBlocksById.get( block.clientId as string );
+		if ( ! yblock ) {
+			continue;
+		}
+		let index = indexOfYBlock( yblocks, yblock );
+		if ( index < previousIndex ) {
+			const moved = createNewYBlock(
+				yblock.toJSON() as unknown as Block
+			);
+			yblocks.delete( index, 1 );
+			// The deletion shifted the previous block down by one, so this
+			// index is right after it.
+			yblocks.insert( previousIndex, [ moved ] );
+			yBlocksById.set( block.clientId as string, moved );
+			index = previousIndex;
+		}
+		previousIndex = index;
+	}
+
+	deduplicateClientIds( yblocks );
+}
+
+/**
+ * Index the blocks of a Y.Array by client ID.
+ *
+ * @param yblocks The block list.
+ * @return The index, or null when a block has no client ID or two share one.
+ */
+function indexYBlocksByClientId(
+	yblocks: YBlocks
+): Map< string, YBlock > | null {
+	const byClientId = new Map< string, YBlock >();
+	for ( let i = 0; i < yblocks.length; i++ ) {
+		const yblock = yblocks.get( i );
+		const clientId = yblock.get( 'clientId' );
+		if ( ! clientId || byClientId.has( clientId ) ) {
+			return null;
+		}
+		byClientId.set( clientId, yblock );
+	}
+	return byClientId;
+}
+
+function hasDistinctClientIds( blocks: Block[] ): boolean {
+	const clientIds = new Set< string >();
+	for ( const block of blocks ) {
+		if ( ! block.clientId || clientIds.has( block.clientId ) ) {
+			return false;
+		}
+		clientIds.add( block.clientId );
+	}
+	return true;
+}
+
+function indexOfYBlock( yblocks: YBlocks, yblock: YBlock ): number {
+	for ( let i = 0; i < yblocks.length; i++ ) {
+		if ( yblocks.get( i ) === yblock ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+const BLOCK_STRUCTURE_KEYS = new Set( [
+	'attributes',
+	'innerBlocks',
+	'clientId',
+] );
+
+/**
+ * Apply the change from `base` to `block` onto a Y.Map block the editor knows.
+ *
+ * @param yblock          The block in the Y.Doc.
+ * @param base            The block as the editor rendered it before the change.
+ * @param block           The block after the change.
+ * @param attributeCursor See `mergeCrdtBlocks`.
+ */
+function rebaseYBlock(
+	yblock: YBlock,
+	base: Block,
+	block: Block,
+	attributeCursor: MergeCursorPosition
+): void {
+	const yAttributes = yblock.get( 'attributes' );
+	const baseAttributes = base.attributes ?? {};
+	const attributes = block.attributes ?? {};
+
+	if ( ! ( yAttributes instanceof Y.Map ) ) {
+		yblock.set(
+			'attributes',
+			createNewYAttributeMap( block.name, attributes )
+		);
+	} else {
+		for ( const [ name, value ] of Object.entries( attributes ) ) {
+			const unchanged =
+				Object.prototype.hasOwnProperty.call( baseAttributes, name ) &&
+				fastDeepEqual( baseAttributes[ name ], value );
+			if ( unchanged ) {
+				continue;
+			}
+			rebaseYBlockAttribute(
+				block.name,
+				block.clientId,
+				name,
+				baseAttributes[ name ],
+				value,
+				yAttributes,
+				attributeCursor
+			);
+		}
+
+		// Attributes the editor removed. Ones it never had, such as an
+		// attribute a peer added since, are left alone.
+		for ( const name of Object.keys( baseAttributes ) ) {
+			if (
+				! Object.prototype.hasOwnProperty.call( attributes, name ) &&
+				yAttributes.has( name )
+			) {
+				yAttributes.delete( name );
+			}
+		}
+	}
+
+	const yInnerBlocks = yblock.get( 'innerBlocks' );
+	const innerBlocks = block.innerBlocks ?? [];
+	if ( yInnerBlocks instanceof Y.Array ) {
+		rebaseCrdtBlocks(
+			yInnerBlocks,
+			base.innerBlocks ?? [],
+			innerBlocks,
+			attributeCursor
+		);
+	} else if ( innerBlocks.length > 0 ) {
+		const created = new Y.Array< YBlock >();
+		yblock.set( 'innerBlocks', created );
+		mergeCrdtBlocks( created, innerBlocks, attributeCursor );
+	}
+
+	const baseRecord = base as unknown as Record< string, unknown >;
+	const record = block as unknown as Record< string, unknown >;
+	for ( const key of Object.keys( record ) ) {
+		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
+			continue;
+		}
+		if ( ! fastDeepEqual( baseRecord[ key ], record[ key ] ) ) {
+			yblock.set( key, record[ key ] );
+		}
+	}
+	for ( const key of Object.keys( baseRecord ) ) {
+		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
+			continue;
+		}
+		if (
+			! Object.prototype.hasOwnProperty.call( record, key ) &&
+			yblock.has( key )
+		) {
+			yblock.delete( key );
+		}
+	}
+}
+
+/**
+ * Apply one changed attribute. A rich-text edit is rebased over concurrent
+ * edits to the same text; every other attribute takes the editor's value.
+ *
+ * @param blockName       The block's name, used to look up the attribute schema.
+ * @param clientId        The block's client ID, used to scope the cursor hint.
+ * @param attributeName   The attribute to update.
+ * @param baseValue       The attribute's value as the editor rendered it before the change.
+ * @param attributeValue  The attribute's value after the change.
+ * @param yAttributes     The block's attributes in the Y.Doc.
+ * @param attributeCursor See `mergeCrdtBlocks`.
+ */
+function rebaseYBlockAttribute(
+	blockName: string,
+	clientId: string | undefined,
+	attributeName: string,
+	baseValue: unknown,
+	attributeValue: unknown,
+	yAttributes: YBlockAttributes,
+	attributeCursor: MergeCursorPosition
+): void {
+	const schema = getBlockAttributeSchema( blockName, attributeName );
+	const currentValue = yAttributes.get( attributeName );
+
+	if (
+		schema?.type === 'rich-text' &&
+		typeof attributeValue === 'string' &&
+		typeof baseValue === 'string' &&
+		currentValue instanceof Y.Text
+	) {
+		rebaseRichTextUpdate(
+			currentValue,
+			baseValue,
+			attributeValue,
+			resolveRichTextCursorPosition(
+				attributeCursor,
+				{ attributeKey: attributeName, clientId },
+				attributeValue
+			)
+		);
+		return;
+	}
+
+	updateYBlockAttribute(
+		blockName,
+		clientId,
+		attributeName,
+		attributeValue,
+		yAttributes,
+		attributeCursor
+	);
+}
+
+/**
+ * Apply the edit from `baselineValue` to `updatedValue` onto a Y.Text that
+ * may have moved on since the editor read `baselineValue`.
+ *
+ * The editor's edit is computed as a delta against the baseline, the peers'
+ * edits as a delta from the baseline to the current text, and the first is
+ * transformed over the second so both survive. When the text has not moved,
+ * this is the ordinary cursor-aware merge.
+ *
+ * @param blockYText      The Y.Text to update.
+ * @param baselineValue   The value the editor rendered before the edit.
+ * @param updatedValue    The value after the edit.
+ * @param htmlCursorIndex The cursor index in the updated HTML string.
+ */
+export function rebaseRichTextUpdate(
+	blockYText: Y.Text,
+	baselineValue: string,
+	updatedValue: string,
+	htmlCursorIndex: HtmlStringIndex | null = null
+): void {
+	const currentValue = blockYText.toString();
+
+	if ( currentValue === baselineValue ) {
+		mergeRichTextUpdate( blockYText, updatedValue, htmlCursorIndex );
+		return;
+	}
+
+	const baselineDelta = new Delta().insert( baselineValue );
+	const updatedDelta = new Delta().insert( updatedValue );
+	const cursorDiff = baselineDelta.diffWithCursor(
+		updatedDelta,
+		htmlCursorIndex
+	);
+
+	// `diffWithCursor()` can produce a corrupt diff in some cases (see
+	// `mergeRichTextUpdate`). Check it against the baseline, which is the
+	// text it was computed from, and fall back to the plain diff otherwise.
+	const localDiff =
+		htmlCursorIndex === null ||
+		deltaToString( baselineDelta.compose( cursorDiff ) ) === updatedValue
+			? cursorDiff
+			: baselineDelta.diff( updatedDelta );
+
+	const remoteDiff = baselineDelta.diff( new Delta().insert( currentValue ) );
+
+	// Treat the peers' edits as having happened first.
+	const rebasedDiff = remoteDiff.transform( localDiff, true );
+
+	blockYText.applyDelta( rebasedDiff.ops );
+}
+
+function deltaToString( delta: Delta ): string {
+	return delta.ops
+		.map( ( op ) => ( typeof op.insert === 'string' ? op.insert : '' ) )
+		.join( '' );
 }
 
 /**

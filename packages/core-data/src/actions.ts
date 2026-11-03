@@ -404,6 +404,7 @@ export const deleteEntityRecord =
  * @param options.isCached   Whether the edit is transient (e.g. typing). Transient
  *                           edits are staged and eventually merged into the
  *                           preceding undo level instead of creating a new one.
+ * @param options.baseline   The record values the edit was computed against, for the fields where the caller knows them. See `EditEntityRecordOptions`.
  *
  * @return Action object.
  */
@@ -413,7 +414,7 @@ export const editEntityRecord =
 		name: string,
 		recordId: number | string | undefined,
 		edits: object,
-		{ undoIgnore, isCached }: EditEntityRecordOptions = {}
+		{ undoIgnore, isCached, baseline }: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
@@ -471,6 +472,7 @@ export const editEntityRecord =
 			{
 				isCached: Boolean( isCached ),
 				undoIgnore: Boolean( undoIgnore ),
+				...( baseline ? { baseline } : {} ),
 			}
 		);
 		// A record the sync manager has loaded has its undo history tracked

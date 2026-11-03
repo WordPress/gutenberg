@@ -312,6 +312,13 @@ export interface EditEntityRecordOptions {
 	 * a new one.
 	 */
 	isCached?: boolean;
+	/**
+	 * The record values the edit was computed against, for the fields where
+	 * the caller knows them. `useEntityBlockEditor` passes the blocks the
+	 * block editor rendered, so the sync layer can apply only the editor's
+	 * own change when a remote change arrived in the meantime.
+	 */
+	baseline?: Record< string, unknown >;
 }
 
 /**

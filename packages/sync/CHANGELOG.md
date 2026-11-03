@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   \`SyncManager\.update\(\)\`\ accepts\ a\ \`baseline\`\ option\,\ the\ record\ values\ a\ change\ was\ computed\ against\,\ and\ passes\ it\ to\ the\ sync\ config\'s\ \`applyChangesToCRDTDoc\(\ ydoc\,\ changes\,\ \{\ baseline\ \}\ \)\`\ as\ a\ new\ third\ argument\.\ Configs\ that\ ignore\ the\ argument\ keep\ their\ current\ behavior\.
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

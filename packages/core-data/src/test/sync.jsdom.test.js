@@ -342,6 +342,13 @@ describe( 'the default entity sync manager', () => {
 				{ title: 'c' },
 				{ isCached: false, undoIgnore: true }
 			);
+			manager.update(
+				'postType',
+				'post',
+				1,
+				{ blocks: [] },
+				{ isCached: true, undoIgnore: false, baseline: { blocks: [] } }
+			);
 
 			expect( mockSyncManager.update.mock.calls ).toEqual( [
 				[
@@ -364,6 +371,13 @@ describe( 'the default entity sync manager', () => {
 					{ title: 'c' },
 					'local-undo-ignored',
 					{ isNewUndoLevel: false },
+				],
+				[
+					'postType/post',
+					1,
+					{ blocks: [] },
+					'local-editor',
+					{ isNewUndoLevel: false, baseline: { blocks: [] } },
 				],
 			] );
 		} );
