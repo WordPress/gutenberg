@@ -102,10 +102,8 @@ export default function DateEdit( {
 	// Reset is available whenever there is a date, so there is nothing to
 	// reset only once the date is `null`: the post takes its date on save.
 	const isReset = ! value;
-	const isFloating = isDateFloating( {
-		...data,
-		status: savedStatus ?? data.status,
-	} );
+	const status = savedStatus ?? data.status;
+	const isFloating = isDateFloating( { ...data, status } );
 
 	// Only DataViews filters pass an operator. A filter picks a date to compare
 	// against, so resetting the post date means nothing there.
@@ -118,6 +116,10 @@ export default function DateEdit( {
 		// The notes describe the post's date, not the date a filter picks.
 	} else if ( isFloating ) {
 		note = __( 'Publishes immediately.' );
+	} else if ( isReset && status === 'future' ) {
+		// A scheduled post takes the save time as its date, which is no
+		// longer in the future, so saving publishes it.
+		note = __( 'Publishes when you save.' );
 	} else if ( isReset ) {
 		note = __( 'Changes to the time you save.' );
 	}

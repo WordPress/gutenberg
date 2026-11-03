@@ -135,6 +135,23 @@ describe( 'DateEdit', () => {
 		);
 	} );
 
+	it( 'says a scheduled post whose date was reset publishes when it is saved', async () => {
+		render(
+			<DateEdit
+				data={ {
+					status: 'future',
+					date: null,
+					modified: '2026-10-20T10:00:00',
+				} }
+				field={ field }
+				onChange={ () => {} }
+			/>
+		);
+		expect(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		).toHaveAccessibleDescription( 'Publishes when you save.' );
+	} );
+
 	it( 'announces the date picked for a post', async () => {
 		render(
 			<DateEdit
