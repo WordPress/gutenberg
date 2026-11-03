@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WritingSizeDropdown from '../size-dropdown';
 
@@ -140,6 +140,61 @@ describe( 'WritingSizeDropdown', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Size' } )
 		).toHaveTextContent( '33*' );
+	} );
+
+	it( 'offers a slider for a size of your own, as the inspector does', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		expect(
+			screen.getByRole( 'slider', { name: 'Custom size' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'sets a size of your own from the slider', async () => {
+		const user = userEvent.setup();
+		const onSetCustom = vi.fn();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				onSelectPreset={ noop }
+				onSetCustom={ onSetCustom }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+		fireEvent.change(
+			screen.getByRole( 'slider', { name: 'Custom size' } ),
+			{ target: { value: '40' } }
+		);
+
+		expect( onSetCustom ).toHaveBeenCalledWith( 40 );
+	} );
+
+	it( 'starts the slider at the size the block renders at', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				defaultSize="17px"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		expect(
+			screen.getByRole( 'slider', { name: 'Custom size' } )
+		).toHaveValue( '17' );
 	} );
 
 	it( 'hands back the preset that was chosen', async () => {

@@ -5,6 +5,7 @@ import {
 	MenuItem,
 	ToolbarGroup,
 	ToolbarItem,
+	RangeControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import type { FontSizePreset } from '@wordpress/global-styles-engine';
@@ -104,7 +105,22 @@ export default function WritingSizeDropdown( {
 												clampCustomFontSize( next );
 											if ( size !== undefined ) {
 												onSetCustom( size );
-												onClose();
+											}
+										} }
+									/>
+									<RangeControl
+										label={ __( 'Custom size' ) }
+										hideLabelFromVision
+										value={ customPx ?? defaultPx }
+										initialPosition={ defaultPx }
+										min={ MIN_CUSTOM_FONT_SIZE }
+										max={ MAX_CUSTOM_FONT_SIZE }
+										withInputField={ false }
+										onChange={ ( next ) => {
+											const size =
+												clampCustomFontSize( next );
+											if ( size !== undefined ) {
+												onSetCustom( size );
 											}
 										} }
 									/>
