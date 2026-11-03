@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
+-   Show the Transform panel on block screens for blocks that support a rotation ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
 
 ### Bug Fixes
 

@@ -1080,6 +1080,43 @@ supports: {
 }
 ```
 
+## transform
+
+_**Note:** Since WordPress 7.3._
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties:
+    -   `rotate`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, which is `true` by default.
+
+Each feature is output as its own CSS property, such as `rotate`, and never as the `transform` shorthand. This way a rotation combines with any `transform` a theme or block already applies.
+
+```js
+supports: {
+	transform: {
+		rotate: true, // Enable the rotation control.
+	}
+}
+```
+
+The rotation is applied to the block wrapper. A block can apply it to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies the rotation itself can opt out of its output with `__experimentalSkipSerialization`.
+
+When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
+
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. For example:
+
+```js
+attributes: {
+    style: {
+        transform: {
+            rotate: "15deg",
+        }
+    }
+}
+```
+
 ## typography
 
 -   Type: `Object`

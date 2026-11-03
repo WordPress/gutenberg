@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
 
 ### Bug Fixes
 
