@@ -24,7 +24,7 @@ async function readImageMatrix(
 // Integration smoke tests: unit tests cover the reducer / camera math;
 // these verify the browser event pipeline (passive-wheel, pointer capture,
 // keyboard focus) actually reaches it and the CSS transform is applied.
-test.describe( 'MediaEditor ImageEditor', () => {
+test.describe( 'Image Editor Canvas', () => {
 	test( 'default crop should render correctly', async ( { page } ) => {
 		await gotoStoryId( page, 'image-editor-canvas--default' );
 		await page.waitForSelector( '.wp-image-editor' );
@@ -53,7 +53,7 @@ test.describe( 'MediaEditor ImageEditor', () => {
 		// Wheel up (negative deltaY) zooms in.
 		const box = await page.locator( '.wp-image-editor' ).boundingBox();
 		if ( ! box ) {
-			throw new Error( 'Cropper container has no bounding box' );
+			throw new Error( 'Canvas has no bounding box' );
 		}
 		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
 		await page.mouse.wheel( 0, -500 );
@@ -124,7 +124,7 @@ test.describe( 'MediaEditor ImageEditor', () => {
 		// Drag from center of container by +50, +30 pixels.
 		const box = await container.boundingBox();
 		if ( ! box ) {
-			throw new Error( 'Cropper container has no bounding box' );
+			throw new Error( 'Canvas has no bounding box' );
 		}
 		const cx = box.x + box.width / 2;
 		const cy = box.y + box.height / 2;

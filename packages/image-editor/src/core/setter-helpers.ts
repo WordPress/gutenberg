@@ -16,9 +16,7 @@ import { getMinZoom, restrictPanZoom } from './containment';
  * the crop center. Returns `null` when the clamped zoom matches the
  * current zoom (no-op).
  *
- * Extracted so multiple hooks (the pure `useInternalImageEditor` and the
- * composite `useMediaEditorState`) can share the math without
- * duplicating it.
+ * Kept apart from the setters so the zoom math lives in one place.
  *
  * @param state         The current editor state.
  * @param requestedZoom The zoom value the caller asked for.

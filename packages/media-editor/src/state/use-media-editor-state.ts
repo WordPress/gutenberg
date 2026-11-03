@@ -34,14 +34,11 @@ import type {
  *   if no image is loaded.
  * - Any positive decimal → the parsed number.
  *
- * Centralizing here means the dropdown, the action dispatcher, and
- * the test harness all resolve the same way.
- *
  * @param presetKey Preset value from the dropdown.
  * @param image     The image editor's loaded image, or `null`.
  * @return The resolved ratio, or `undefined` for Free / unresolvable.
  */
-export function resolveAspectRatio(
+function resolveAspectRatio(
 	presetKey: string,
 	image: ImageEditorState[ 'image' ] | null
 ): number | undefined {

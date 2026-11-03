@@ -20,8 +20,9 @@ export interface AspectRatioPreset {
 export const ORIGINAL_ASPECT_RATIO = -1;
 
 /**
- * The presets the editor offers by default. The labels live here rather
- * than in the image editor package, which has no user-facing strings.
+ * The presets the editor offers by default. They live here rather than
+ * in the image editor package, because which ratios to offer, and what
+ * to call them, is a product choice. The package takes a plain number.
  */
 export const DEFAULT_ASPECT_RATIOS: AspectRatioPreset[] = [
 	{ label: __( 'Free' ), value: 0 },

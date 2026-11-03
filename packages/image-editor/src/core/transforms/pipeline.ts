@@ -3,7 +3,7 @@ import { DEFAULT_STATE } from '../constants';
 import { imageEditorReducer } from '../state';
 
 /**
- * Apply a single transform operation to a editor state, returning
+ * Apply a single transform operation to an editor state, returning
  * a new state with the containment invariant enforced.
  *
  * Delegates to the reducer via APPLY_OPERATION so pipeline replay

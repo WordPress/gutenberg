@@ -217,8 +217,9 @@ export type ViewportAction =
 export type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 
 /**
- * The contract for a pluggable stencil component.
- * Stencils render the crop area overlay and handle resize interactions.
+ * What the stencil takes. The stencil draws the crop area over the image
+ * and handles resizing it. `RectangleStencil` is the only one today; the
+ * canvas does not take one as a prop.
  */
 export interface StencilProps {
 	/** The current crop rectangle in normalized coordinates. */
@@ -232,9 +233,8 @@ export interface StencilProps {
 	/**
 	 * Callback when a resize interaction starts — pointerdown on a handle
 	 * or the first arrow-key press on a focused handle. The handle direction
-	 * is passed so downstream overlays can anchor to it. The argument is
-	 * optional to keep custom stencils that don't track a direction
-	 * backward-compatible.
+	 * is passed so overlays can anchor to it, and is left out by a
+	 * stencil that does not track one.
 	 */
 	onResizeStart?: ( handle?: HandlePosition ) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
