@@ -215,15 +215,19 @@ function useRichTextBase( {
 			hasFocus( ref.current! )
 		) {
 			applyRecord( recordRef.current! );
-		} else if (
-			recordRef.current!.start === undefined &&
-			ref.current!.querySelector( '[data-rich-text-format-boundary]' )
-		) {
-			// The editing host may be an ancestor that keeps focus, so the
-			// boundary would remain visible.
-			applyRecord( recordRef.current! );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
+
+	// Remove the format boundary once the selection leaves the element. The
+	// editing host may be an ancestor that keeps focus, so it would remain
+	// visible.
+	useLayoutEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		return () => applyRecord( recordRef.current!, { domOnly: true } );
+	}, [ isSelected ] );
 
 	useBoundaryStyle( {
 		record: recordRef as RefObject< RichTextRecord >,
