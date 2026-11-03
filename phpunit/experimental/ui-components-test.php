@@ -4,7 +4,7 @@
  *
  * The build renders every combination of each component's variants with
  * React. These tests check that PHP renders the same markup, so a change to
- * the React component that the PHP template or recipe doesn't follow fails
+ * the React component that the PHP template doesn't follow fails
  * here. They also check how props are validated and escaped.
  *
  * @package gutenberg

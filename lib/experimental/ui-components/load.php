@@ -3,11 +3,11 @@
  * Server-rendered `@wordpress/ui` components, behind the
  * `gutenberg-ui-php-components` experiment.
  *
- * Each component renders from a small PHP template. Its classes come from the
- * recipe in `packages/ui/php/<name>/component.json`, resolved by the build to
- * the same scoped class names the React component uses, and its styles from
- * the stylesheet the build compiles from the package's CSS modules. Parity
- * tests check every combination of variants against React's own render.
+ * Each component renders from a small PHP template, which picks its classes as
+ * the React component does, from the stylesheets listed in
+ * `packages/ui/php/<name>/component.json`. The build compiles those stylesheets
+ * with the same scoped class names as React. Parity tests check every
+ * combination of variants against React's own render.
  *
  * Only the component name and its props are a contract. The markup and class
  * names follow React, and may change between releases.
@@ -19,21 +19,46 @@ require_once __DIR__ . '/components/button.php';
 require_once __DIR__ . '/preview-page.php';
 
 /**
+ * Reads what the build generated in `packages/ui/build-php`.
+ *
+ * @return array Manifest, or an empty array when it hasn't been built.
+ */
+function gutenberg_ui_components_read_manifest() {
+	static $manifest = null;
+
+	if ( null === $manifest ) {
+		$file     = gutenberg_dir_path() . 'packages/ui/build-php/manifest.json';
+		$decoded  = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null;
+		$manifest = is_array( $decoded ) ? $decoded : array();
+	}
+
+	return $manifest;
+}
+
+/**
  * Returns the components the build generated, or an empty array when
  * `packages/ui/build-php` hasn't been built.
  *
  * @return array Components, by name.
  */
 function gutenberg_ui_components_get_manifest() {
-	static $components = null;
+	return gutenberg_ui_components_read_manifest()['components'] ?? array();
+}
 
-	if ( null === $components ) {
-		$file       = gutenberg_dir_path() . 'packages/ui/build-php/manifest.json';
-		$manifest   = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null;
-		$components = $manifest['components'] ?? array();
-	}
-
-	return $components;
+/**
+ * Returns the scoped class names of a stylesheet a component uses, as React
+ * gets them when it imports the stylesheet.
+ *
+ * Internal: for component templates.
+ *
+ * @access private
+ *
+ * @param string $stylesheet Stylesheet listed in the component's
+ *                           `component.json`, such as `button/style`.
+ * @return string[] Scoped class names, by their name in the stylesheet.
+ */
+function gutenberg_ui_components_get_styles( $stylesheet ) {
+	return gutenberg_ui_components_read_manifest()['styles'][ $stylesheet ] ?? array();
 }
 
 /**
@@ -105,16 +130,9 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 		return '';
 	}
 
-	$classes = $component['classes']['base'];
-	foreach ( $component['classes']['variants'] as $prop => $values ) {
-		// Recipes are JSON, so their keys are strings, including `"true"` and `"false"`.
-		$value   = is_bool( $props[ $prop ] ) ? wp_json_encode( $props[ $prop ] ) : (string) $props[ $prop ];
-		$classes = array_merge( $classes, $values[ $value ] ?? array() );
-	}
-
 	gutenberg_ui_components_enqueue_assets();
 
-	return $render( $props, $classes, (string) $content );
+	return $render( $props, (string) $content );
 }
 
 /**

@@ -18,15 +18,30 @@
  *
  * @access private
  *
- * @param array    $props   Validated props.
- * @param string[] $classes Class names from the component's recipe.
- * @param string   $content Label, as plain text.
+ * @param array  $props   Validated props.
+ * @param string $content Label, as plain text.
  * @return string HTML.
  */
-function _gutenberg_ui_render_button( $props, $classes, $content ) {
-	if ( '' !== $props['class'] ) {
-		$classes[] = $props['class'];
-	}
+function _gutenberg_ui_render_button( $props, $content ) {
+	$styles  = gutenberg_ui_components_get_styles( 'button/style' );
+	$defense = gutenberg_ui_components_get_styles( 'utils/css/global-css-defense' );
+	$resets  = gutenberg_ui_components_get_styles( 'utils/css/resets' );
+	$focus   = gutenberg_ui_components_get_styles( 'utils/css/focus' );
+
+	// The same classes as React, in the same order.
+	$classes = array_filter(
+		array(
+			$defense['button'],
+			$resets['box-sizing'],
+			$focus['outset-ring--focus-except-active'],
+			'unstyled' !== $props['variant'] ? $styles['button'] : '',
+			$styles[ 'is-' . $props['tone'] ],
+			$styles[ 'is-' . $props['variant'] ],
+			// There's no `is-default` class, as in React.
+			$styles[ 'is-' . $props['size'] ] ?? '',
+			$props['class'],
+		)
+	);
 
 	return sprintf(
 		'<button type="%1$s" tabindex="0" class="%2$s"%3$s>%4$s</button>',
