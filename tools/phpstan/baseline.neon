@@ -7,12 +7,6 @@ parameters:
 			path: ../../lib/block-supports/layout.php
 
 		-
-			message: '#^Property WP_Block_Type\:\:\$selectors \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: ../../lib/block-supports/states.php
-
-		-
 			message: '#^Method WP_Duotone_Gutenberg\:\:get_all_global_style_block_names\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
@@ -41,42 +35,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../lib/class-wp-theme-json-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$blocks \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$core \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$i18n_schema \(array\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$theme \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user \(WP_Theme_JSON_Gutenberg\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
-
-		-
-			message: '#^Static property WP_Theme_JSON_Resolver_Gutenberg\:\:\$user_custom_post_type_id \(int\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../../lib/class-wp-theme-json-resolver-gutenberg.php
 
 		-
 			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
@@ -113,18 +71,6 @@ parameters:
 			identifier: offsetAssign.valueType
 			count: 2
 			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between array\{\} and non\-empty\-array\<mixed, mixed\> will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-view-config-data.php
-
-		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$_request$#'
-			identifier: parameter.notFound
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php
 
 		-
 			message: '#^Parameter \#1 \$query of method WP_HTML_Tag_Processor\:\:next_tag\(\) expects array\{tag_name\?\: string\|null, match_offset\?\: int\|null, class_name\?\: string\|null, tag_closers\?\: string\|null\}\|null, ''svg'' given\.$#'
@@ -515,15 +461,3 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/style-engine/src/class-wp-style-engine.php
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page-wp-admin.php.template
-
-		-
-			message: '#^Parameter \#2 \$src of function wp_register_script expects non\-empty\-string\|false, '''' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/wp-build/templates/page.php.template
