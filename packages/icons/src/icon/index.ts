@@ -1,5 +1,5 @@
 import { cloneElement, forwardRef } from '@wordpress/element';
-import type { CSSProperties, ReactElement } from 'react';
+import type { CSSProperties, ReactElement, RefAttributes } from 'react';
 import type { SVGProps } from '@wordpress/primitives';
 
 export interface IconProps extends SVGProps {
@@ -22,7 +22,7 @@ export interface IconProps extends SVGProps {
  *
  * @return Icon component
  */
-export default forwardRef< HTMLElement, IconProps >(
+export default forwardRef< Element, IconProps >(
 	( { icon, size = 24, style, ...props }: IconProps, ref ) => {
 		const intrinsicStyle = ( icon.props as { style?: CSSProperties } )
 			.style;
@@ -31,7 +31,7 @@ export default forwardRef< HTMLElement, IconProps >(
 				? { ...intrinsicStyle, ...style }
 				: undefined;
 
-		return cloneElement( icon, {
+		return cloneElement( icon as ReactElement< RefAttributes< Element > >, {
 			width: size,
 			height: size,
 			...props,

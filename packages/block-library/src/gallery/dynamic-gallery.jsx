@@ -2,10 +2,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
-	Notice,
+	Notice as WCNotice,
 	PanelBody,
 	Placeholder,
-	Spinner,
+	Spinner as WCSpinner,
 	ToolbarButton,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -112,7 +112,7 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 						</Button>
 					</div>
 					{ hasMoreImagesThanCap && (
-						<Notice
+						<WCNotice
 							className="wp-block-gallery__source-notice"
 							status="warning"
 							isDismissible={ false }
@@ -125,7 +125,7 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 								MAX_IMAGES,
 								dynamicMediaTotal
 							) }
-						</Notice>
+						</WCNotice>
 					) }
 				</PanelBody>
 				{ isConfirmingDetach && (
@@ -351,7 +351,7 @@ export function GalleryDynamicView( {
 						label={ __( 'Gallery' ) }
 						instructions={ emptyInstructions }
 					>
-						{ isResolvingDynamic && <Spinner /> }
+						{ isResolvingDynamic && <WCSpinner /> }
 					</Placeholder>
 				) }
 				<Caption

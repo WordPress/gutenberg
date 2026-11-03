@@ -6,7 +6,11 @@ import {
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
-import { InputLayout, ValidatedInputControl } from '@wordpress/ui';
+import {
+	InputLayout,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ValidatedInputControl,
+} from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { DataFormControlProps } from '../../types';

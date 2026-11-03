@@ -150,6 +150,7 @@ test.describe( 'Widgets screen', () => {
 	} );
 
 	test( 'Should insert content using the inline inserter', async ( {
+		editor,
 		page,
 		widgetsScreen,
 	} ) => {
@@ -222,11 +223,15 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
-		await expect(
-			firstWidgetArea.getByRole( 'document', {
-				name: 'Block: Heading',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					firstWidgetArea.getByRole( 'document', {
+						name: 'Block: Heading',
+					} )
+				)
+			)
+			.toBe( true );
 		await page.keyboard.type( 'My Heading' );
 
 		await widgetsScreen.saveWidgets();

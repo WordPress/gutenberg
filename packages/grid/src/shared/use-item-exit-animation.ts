@@ -28,9 +28,7 @@ type UseItemExitAnimationOptions = {
 		string,
 		RectSnapshot
 	> | null;
-	childrenCacheRef: React.MutableRefObject<
-		Map< string, React.ReactElement >
-	>;
+	childrenCacheRef: React.RefObject< Map< string, React.ReactElement > >;
 };
 
 type UseItemExitAnimationResult = {

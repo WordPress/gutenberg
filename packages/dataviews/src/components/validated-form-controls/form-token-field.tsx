@@ -1,6 +1,9 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';
-import { ControlWithError } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type FormTokenFieldProps = React.ComponentProps< typeof FormTokenField >;

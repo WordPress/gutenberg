@@ -7,7 +7,7 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
 
-vi.mock( '@wordpress/block-editor', async () => {
+vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
 		await import( '../../../../block-editor/src/components/plain-text' );
 
@@ -44,11 +44,11 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	} );
 } );
 
-vi.mock( '@wordpress/notices', () => ( {
+vi.mock( import( '@wordpress/notices' ), () => ( {
 	store: 'core/notices',
 } ) );
 
-vi.mock( '../../utils/hooks', () => ( {
+vi.mock( import( '../../utils/hooks' ), () => ( {
 	useUploadMediaFromBlobURL: vi.fn(),
 } ) );
 
@@ -284,15 +284,17 @@ describe( 'PlaylistTrackEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'preserves the current track source when a replacement upload fails', () => {
+	it( 'preserves the current track when a replacement upload fails', () => {
 		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect();
 
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
-		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
-			'src'
-		);
+		// Strict, so keys set to `undefined`, which would clear the track's
+		// details, also fail the assertion.
+		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).toStrictEqual( {
+			blob: undefined,
+		} );
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {

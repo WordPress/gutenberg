@@ -1,64 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, type Element as ReactElement } from '@wordpress/element';
+import { useArgs } from 'storybook/preview-api';
+import {
+	useEffect,
+	useState,
+	type Element as ReactElement,
+} from '@wordpress/element';
 import {
 	SearchControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalGrid as Grid,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import * as iconsPackage from '@wordpress/icons';
-import manifest from '../../../packages/icons/src/manifest.json';
-
-const { Icon, ...availableIcons } = iconsPackage;
-
-const keywords: Partial< Record< string, string[] > > = {
-	archive: [ 'folder' ],
-	atSymbol: [ 'email' ],
-	audio: [ 'music' ],
-	cancelCircleFilled: [ 'close' ],
-	caution: [ 'alert', 'warning' ],
-	cautionFilled: [ 'alert', 'warning' ],
-	create: [ 'add', 'new', 'plus' ],
-	envelope: [ 'email' ],
-	error: [ 'alert', 'caution', 'warning' ],
-	file: [ 'folder' ],
-	lifesaver: [ 'buoy' ],
-	seen: [ 'show', 'visible', 'eye' ],
-	starFilled: [ 'favorite' ],
-	pencil: [ 'edit' ],
-	thumbsDown: [ 'dislike' ],
-	thumbsUp: [ 'like' ],
-	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
-	trash: [ 'delete' ],
-	unseen: [ 'hide' ],
-};
-
-const ALL_ICONS_MANIFEST = new Map(
-	manifest.map( ( entry: { slug: string; collections?: string[] } ) => [
-		entry.slug,
-		{ slug: entry.slug, collections: entry.collections ?? [] },
-	] )
-);
-
-const COLLECTIONS = [ 'all', 'core', 'core-admin' ] as const;
-
-type Collection = ( typeof COLLECTIONS )[ number ];
-
-function nameToSlug( name: string ): string {
-	return (
-		name
-			// Protect acronyms before conversion
-			.replace( /RTL/g, '-rtl' )
-			.replace( /LTR/g, '-ltr' )
-			.replace( /NE/g, '-ne' )
-			// Insert hyphen before each uppercase and convert to lowercase
-			.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` )
-			// Insert hyphen before digit when preceded by letter (e.g. Level1 -> level-1)
-			.replace( /([a-zA-Z])([0-9])/g, '$1-$2' )
-	);
-}
+import { Icon } from '@wordpress/icons';
+import { Link, Notice, Stack } from '@wordpress/ui';
+import { IconDetails } from './icon-details';
+import { IconGrid } from './icon-grid';
+import {
+	COLLECTIONS,
+	ICON_NAMES,
+	nameToSlug,
+	type Collection,
+} from './manifest';
+import styles from './library.module.scss';
 
 const meta: Meta = {
 	component: Icon,
@@ -67,150 +29,153 @@ const meta: Meta = {
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
+		layout: 'fullscreen',
 	},
 	argTypes: {
 		filter: { control: false },
-		size: { control: false },
 		collection: { control: false },
+		icon: { control: false },
 	},
 };
 export default meta;
 
+const COLLECTION_DESCRIPTIONS: Record< Collection, ReactElement > = {
+	all: (
+		<>
+			All icons are available. Import them from the npm package in
+			JavaScript.{ ' ' }
+			<Link
+				href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-icons/#usage"
+				openInNewTab
+			>
+				See the usage example
+			</Link>
+			.
+		</>
+	),
+	core: (
+		<>
+			These icons are registered in WordPress. Render them in PHP with{ ' ' }
+			<Link
+				href="https://developer.wordpress.org/reference/functions/wp_get_icon/"
+				openInNewTab
+			>
+				wp_get_icon()
+			</Link>
+			. They are also available through the Icons REST API and in the Icon
+			block.
+		</>
+	),
+	'core-admin': (
+		<>
+			These icons are registered in WordPress for the admin interface.
+			Render them in PHP with{ ' ' }
+			<Link
+				href="https://developer.wordpress.org/reference/functions/wp_get_icon/"
+				openInNewTab
+			>
+				wp_get_icon()
+			</Link>
+			. They are not available through the Icons REST API or in the Icon
+			block.
+		</>
+	),
+};
+
 type LibraryArgs = {
 	filter: string;
-	size: string | number;
 	collection: Collection;
+	/**
+	 * Slug of the selected icon. Storybook keeps changed args in the URL, so
+	 * the selection can be shared as a link.
+	 */
+	icon?: string;
 };
 
 const LibraryExample = ( {
 	filter: initialFilter,
-	size: initialSize,
 	collection: initialCollection,
-}: LibraryArgs ): ReactElement => {
+	icon,
+	onSelectIcon,
+}: LibraryArgs & {
+	onSelectIcon: ( slug: string ) => void;
+} ): ReactElement => {
 	const [ filter, setFilter ] = useState( initialFilter );
-	const [ size, setSize ] = useState( initialSize );
 	const [ collection, setCollection ] = useState( initialCollection );
-	const normalizedFilter = filter.toLowerCase();
-	const filteredIcons = Object.fromEntries(
-		Object.entries( availableIcons ).filter( ( [ name ] ) => {
-			if ( collection !== 'all' ) {
-				const iconInfo = ALL_ICONS_MANIFEST.get( nameToSlug( name ) );
-				if ( ! iconInfo?.collections.includes( collection ) ) {
-					return false;
-				}
-			}
-
-			if ( ! normalizedFilter.length ) {
-				return true;
-			}
-
-			return (
-				name.toLowerCase().includes( normalizedFilter ) ||
-				keywords[ name ]?.some( ( keyword: string ) =>
-					keyword.toLowerCase().includes( normalizedFilter )
-				)
-			);
-		} )
-	);
-
-	const hasResults = Object.keys( filteredIcons ).length > 0;
+	// Select locally first, so the grid updates without waiting for the
+	// args round trip through the Storybook manager.
+	const [ selectedSlug, setSelectedSlug ] = useState( icon );
+	useEffect( () => setSelectedSlug( icon ), [ icon ] );
+	const selectedName =
+		ICON_NAMES.find( ( name ) => nameToSlug( name ) === selectedSlug ) ??
+		null;
 
 	return (
-		<div style={ { padding: 10 } }>
-			<VStack spacing={ 8 }>
-				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
-					<SearchControl
-						label="Icon name"
-						hideLabelFromVision={ false }
-						value={ filter }
-						onChange={ ( value: string | undefined ) =>
-							setFilter( value ?? '' )
-						}
-					/>
+		<Stack gap="3xl" className={ styles.layout }>
+			<Stack direction="column" gap="md" className={ styles.details }>
+				<SearchControl
+					label="Icon name"
+					hideLabelFromVision={ false }
+					value={ filter }
+					onChange={ ( value: string | undefined ) =>
+						setFilter( value ?? '' )
+					}
+				/>
+				{ selectedName && <IconDetails name={ selectedName } /> }
+			</Stack>
+			<Stack direction="column" gap="lg" className={ styles.browser }>
+				<div style={ { width: 500, maxWidth: '100%' } }>
 					<ToggleGroupControl
-						label="Icon size"
-						isBlock
-						value={ size }
-						onChange={ ( value: string | number | undefined ) =>
-							setSize( value ?? '24' )
-						}
-					>
-						{ [ '16', '24', '32' ].map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ option }
-							/>
-						) ) }
-					</ToggleGroupControl>
-					<ToggleGroupControl
-						label="Collection"
+						label="Available in"
 						isBlock
 						value={ collection }
 						onChange={ ( value: string | number | undefined ) =>
 							setCollection( ( value ?? 'all' ) as Collection )
 						}
 					>
-						{ COLLECTIONS.map( ( option ) => (
+						{ COLLECTIONS.map( ( { value, label } ) => (
 							<ToggleGroupControlOption
-								key={ option }
-								value={ option }
-								label={ option === 'all' ? 'All' : option }
+								key={ value }
+								value={ value }
+								label={ label }
 							/>
 						) ) }
 					</ToggleGroupControl>
-				</HStack>
-				{ hasResults ? (
-					<Grid templateColumns="repeat(auto-fill, minmax(100px, 1fr))">
-						{ Object.entries( filteredIcons ).map(
-							( [ name, icon ] ) => {
-								const slug = nameToSlug( name );
-								if ( ! ALL_ICONS_MANIFEST.has( slug ) ) {
-									throw new Error(
-										`Icon "${ name }" (slug: ${ slug }) is not found in the manifest. Add it to packages/icons/src/manifest.json.`
-									);
-								}
-								return (
-									<div
-										key={ name }
-										style={ {
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-											gap: 8,
-										} }
-									>
-										<Icon
-											icon={ icon }
-											size={ Number( size ) }
-										/>
-										<span
-											style={ {
-												fontSize: 11,
-												textAlign: 'center',
-												wordBreak: 'break-all',
-											} }
-										>
-											{ name }
-										</span>
-									</div>
-								);
-							}
-						) }
-					</Grid>
-				) : (
-					<p>No icons found.</p>
-				) }
-			</VStack>
-		</div>
+				</div>
+				<Notice.Root intent="info">
+					<Notice.Description>
+						{ COLLECTION_DESCRIPTIONS[ collection ] }
+					</Notice.Description>
+				</Notice.Root>
+				<div className={ styles.grid }>
+					<IconGrid
+						filter={ filter }
+						collection={ collection }
+						selectedName={ selectedName }
+						onSelect={ ( name ) => {
+							const slug = nameToSlug( name );
+							setSelectedSlug( slug );
+							onSelectIcon( slug );
+						} }
+					/>
+				</div>
+			</Stack>
+		</Stack>
 	);
 };
 
 export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
-		size: '24',
 		collection: 'all',
 	},
-	render: ( args ) => <LibraryExample { ...args } />,
+	render: function Render( args ) {
+		const [ , updateArgs ] = useArgs< LibraryArgs >();
+		return (
+			<LibraryExample
+				{ ...args }
+				onSelectIcon={ ( slug ) => updateArgs( { icon: slug } ) }
+			/>
+		);
+	},
 };

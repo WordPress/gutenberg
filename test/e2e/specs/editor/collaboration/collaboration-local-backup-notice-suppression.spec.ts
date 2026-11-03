@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 
 const NOTICE_TEXT =
-	'The backup of this post in your browser is different from the version below.';
+	/The backup of this post in your browser (from .+ )?is different from the version below\./;
 
 async function getCurrentPostId( page: Page ): Promise< number > {
 	return page.evaluate( () =>
@@ -136,7 +136,7 @@ test.describe( 'Collaboration - browser backup notice suppression', () => {
 		await page.waitForTimeout( 3_500 );
 
 		await expect(
-			page.locator( '.components-notice__content' ).filter( {
+			page.locator( '.notices-inline-notices__notice' ).filter( {
 				hasText: NOTICE_TEXT,
 			} )
 		).toHaveCount( 0 );
@@ -202,7 +202,7 @@ test.describe( 'Collaboration - browser backup notice suppression', () => {
 		} );
 
 		await expect(
-			page.locator( '.components-notice__content' ).filter( {
+			page.locator( '.notices-inline-notices__notice' ).filter( {
 				hasText: NOTICE_TEXT,
 			} )
 		).toBeVisible( { timeout: 30_000 } );

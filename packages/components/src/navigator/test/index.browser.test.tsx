@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import type { ComponentPropsWithoutRef } from 'react';
 import { screen, waitFor } from '@testing-library/react';
@@ -62,12 +62,6 @@ const DEPRECATION_MESSAGES = {
 beforeEach( () => {
 	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
 		logged[ message ] = true;
-	}
-} );
-
-afterEach( () => {
-	for ( const message of Object.values( DEPRECATION_MESSAGES ) ) {
-		delete logged[ message ];
 	}
 } );
 

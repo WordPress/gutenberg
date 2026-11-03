@@ -1,7 +1,13 @@
-import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
+import type {
+	FocusEvent,
+	ForwardedRef,
+	KeyboardEvent,
+	MouseEvent,
+} from 'react';
 import clsx from 'clsx';
 import { useIsPresent } from 'framer-motion';
 import { speak } from '@wordpress/a11y';
+import { useMergeRefs } from '@wordpress/compose';
 import {
 	useEffect,
 	useLayoutEffect,
@@ -18,6 +24,9 @@ import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
 const NOTICE_TIMEOUT = 6000;
+// Snackbars with an action stay up longer, so there is time to read the
+// message and then use the action.
+const NOTICE_TIMEOUT_WITH_ACTIONS = 10000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -59,14 +68,36 @@ function UnforwardedSnackbar(
 	ref: ForwardedRef< any >
 ) {
 	const isPresent = useIsPresent();
+	const snackbarRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ snackbarRef, ref ] );
+	const focusReturnRef = useRef< HTMLElement | SVGElement | null >( null );
+
+	function onFocus(
+		event: FocusEvent< HTMLDivElement, HTMLElement | SVGElement >
+	) {
+		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+			focusReturnRef.current = event.relatedTarget;
+		}
+	}
 
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
 
-		// Prevent focus loss by moving it to the list element.
-		listRef?.current?.focus();
+		if ( listRef?.current ) {
+			// Prevent focus loss by moving it to the list element.
+			listRef.current.focus();
+		} else if (
+			snackbarRef.current?.contains(
+				snackbarRef.current.ownerDocument.activeElement
+			)
+		) {
+			// DOM order does not identify a meaningful return target for portals.
+			if ( focusReturnRef.current?.isConnected ) {
+				focusReturnRef.current.focus( { preventScroll: true } );
+			}
+		}
 
 		onDismiss?.();
 		onRemove?.();
@@ -94,6 +125,9 @@ function UnforwardedSnackbar(
 		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
+	const timeout =
+		actions.length > 0 ? NOTICE_TIMEOUT_WITH_ACTIONS : NOTICE_TIMEOUT;
+
 	useEffect( () => {
 		if ( explicitDismiss || ! isPresent ) {
 			return;
@@ -102,10 +136,10 @@ function UnforwardedSnackbar(
 		const timeoutHandle = setTimeout( () => {
 			callbacksRef.current.onDismiss?.();
 			callbacksRef.current.onRemove?.();
-		}, NOTICE_TIMEOUT );
+		}, timeout );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss, isPresent ] );
+	}, [ explicitDismiss, isPresent, timeout ] );
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
@@ -125,7 +159,8 @@ function UnforwardedSnackbar(
 
 	return (
 		<div
-			ref={ ref }
+			ref={ mergedRef }
+			onFocus={ onFocus }
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }

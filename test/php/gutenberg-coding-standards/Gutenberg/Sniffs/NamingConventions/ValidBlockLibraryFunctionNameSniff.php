@@ -92,6 +92,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 
 		$wrapping_tokens_to_check = array(
 			T_CLASS,
+			T_ANON_CLASS,
 			T_INTERFACE,
 			T_TRAIT,
 		);

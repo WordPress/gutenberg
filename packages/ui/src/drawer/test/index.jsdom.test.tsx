@@ -1,9 +1,13 @@
 import process from 'node:process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Drawer from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
@@ -667,5 +671,61 @@ describe( 'Drawer', () => {
 				'data-wp-ui-overlay-scrolled-from-bottom'
 			);
 		} );
+	} );
+} );
+
+describe( 'Drawer.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'renders the popup in the compatibility overlay slot when no container is provided', async () => {
+		render(
+			<Drawer.Root defaultOpen>
+				<Drawer.Popup>
+					<Drawer.Title>Title</Drawer.Title>
+					Portal content
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		const popup = await screen.findByRole( 'dialog' );
+		expect( popup ).toBeVisible();
+		expect(
+			within( getWpCompatOverlaySlot()! ).getByRole( 'dialog' )
+		).toBe( popup );
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Drawer.Root defaultOpen>
+				<div data-testid="portal-target" />
+				<Drawer.Popup
+					portal={ <Drawer.Portal container={ container } /> }
+				>
+					<Drawer.Title>Title</Drawer.Title>
+					Portal content
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		expect(
+			await within( target ).findByText( 'Portal content' )
+		).toBeVisible();
 	} );
 } );

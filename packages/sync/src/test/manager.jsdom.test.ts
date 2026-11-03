@@ -93,7 +93,7 @@ describe( 'SyncManager', () => {
 			editRecord: vi.fn(),
 			getEditedRecord: vi.fn( async () => Promise.resolve( mockRecord ) ),
 			onStatusChange: vi.fn(),
-			onUndoStackChange: undefined,
+			onUndoLevelOpened: undefined,
 			persistCRDTDoc: vi.fn(),
 			refetchRecord: vi.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: vi.fn(),
@@ -506,8 +506,11 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
-		it( 'clears the undo manager after unloading all entities', async () => {
+		it( 'keeps the same undo manager before, during, and after entities are loaded', async () => {
 			const manager = createSyncManager();
+			const { undoManager } = manager;
+
+			expect( undoManager ).toBeDefined();
 
 			await manager.load(
 				mockSyncConfig,
@@ -524,11 +527,32 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			expect( manager.undoManager ).toBeDefined();
+			expect( manager.undoManager ).toBe( undoManager );
 
 			manager.unloadAll();
 
-			expect( manager.undoManager ).toBeUndefined();
+			expect( manager.undoManager ).toBe( undoManager );
+		} );
+
+		it( 'reports which entities are loaded', async () => {
+			const manager = createSyncManager();
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( true );
+			expect( manager.isLoaded( 'post', '456' ) ).toBe( false );
+
+			manager.unload( 'post', '123' );
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
 		} );
 
 		it( 'destroys providers and skips initialization when unload runs during load', async () => {
@@ -595,6 +619,171 @@ describe( 'SyncManager', () => {
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc
 			).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'undo history', () => {
+		async function loadEntities() {
+			const ydocs = new Map< string, Y.Doc >();
+			mockProviderCreator.mockImplementation(
+				async ( { objectId, ydoc } ) => {
+					if ( objectId ) {
+						ydocs.set( objectId, ydoc );
+					}
+
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+			const onFirstLevelOpened = vi.fn();
+			const onSecondLevelOpened = vi.fn();
+
+			await manager.load( mockSyncConfig, 'post', '1', mockRecord, {
+				...mockHandlers,
+				onUndoLevelOpened: onFirstLevelOpened,
+			} );
+			await manager.load( mockSyncConfig, 'post', '2', mockRecord, {
+				...mockHandlers,
+				onUndoLevelOpened: onSecondLevelOpened,
+			} );
+
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const getTitle = ( objectId: string ) =>
+				ydocs
+					.get( objectId )
+					?.getMap( CRDT_RECORD_MAP_KEY )
+					.get( 'title' );
+
+			// Changes are deferred when editing alone. Closing the level
+			// lands them, and makes the next change open a new level.
+			const change = ( objectId: string, title: string ) => {
+				manager.update(
+					'post',
+					objectId,
+					{ title },
+					LOCAL_EDITOR_ORIGIN
+				);
+				manager.undoManager.stopCapturing();
+			};
+
+			return {
+				manager,
+				change,
+				getTitle,
+				onFirstLevelOpened,
+				onSecondLevelOpened,
+			};
+		}
+
+		it( 'only moves the levels of the entity it is asked for', async () => {
+			const { manager, change, getTitle } = await loadEntities();
+
+			change( '1', 'First changed' );
+			change( '2', 'Second changed' );
+
+			// The second entity has the most recent level, but the first is asked.
+			expect( manager.undoManager.undo( 'post', '1' ) ).toBe( true );
+			expect( getTitle( '1' ) ).toBeUndefined();
+			expect( getTitle( '2' ) ).toBe( 'Second changed' );
+		} );
+
+		it( 'does not move another entity when the entity asked for was unloaded', async () => {
+			const { manager, change, getTitle } = await loadEntities();
+
+			change( '1', 'First changed' );
+			change( '2', 'Second changed' );
+			manager.unload( 'post', '2' );
+
+			expect( manager.undoManager.undo( 'post', '2' ) ).toBe( false );
+			expect( getTitle( '1' ) ).toBe( 'First changed' );
+			expect( manager.undoManager.hasUndo() ).toBe( true );
+		} );
+
+		it( 'closes the levels of other entities when one opens a level', async () => {
+			const { manager, onFirstLevelOpened } = await loadEntities();
+
+			// These changes land together, without closing a level in between.
+			manager.update(
+				'post',
+				'1',
+				{ title: 'First' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.update(
+				'post',
+				'2',
+				{ title: 'Second' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.update(
+				'post',
+				'1',
+				{ title: 'First again' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.undoManager.stopCapturing();
+
+			// Without closing, the last change would merge into the first
+			// entity's level, which now sits below the second entity's level.
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'drops the redo levels of other entities when one opens a level', async () => {
+			const { manager, change } = await loadEntities();
+
+			change( '1', 'First' );
+			change( '2', 'Second' );
+
+			expect( manager.undoManager.undo( 'post', '2' ) ).toBe( true );
+			expect( manager.undoManager.hasRedo() ).toBe( true );
+
+			// A new level anywhere ends the redo history of every entity.
+			change( '1', 'First again' );
+
+			expect( manager.undoManager.hasRedo() ).toBe( false );
+			expect( manager.undoManager.redo( 'post', '2' ) ).toBe( false );
+		} );
+
+		it( 'closes the levels and drops the redo levels of every entity', async () => {
+			const { manager, change, onFirstLevelOpened, onSecondLevelOpened } =
+				await loadEntities();
+
+			change( '1', 'First' );
+			change( '2', 'Second' );
+
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 1 );
+			expect( onSecondLevelOpened ).toHaveBeenCalledTimes( 1 );
+
+			manager.undoManager.undo( 'post', '2' );
+			manager.undoManager.clearRedo();
+
+			expect( manager.undoManager.hasRedo() ).toBe( false );
+		} );
+
+		it( 'lands deferred changes before moving the history', async () => {
+			const { manager, getTitle, onFirstLevelOpened } =
+				await loadEntities();
+
+			manager.update(
+				'post',
+				'1',
+				{ title: 'Deferred' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			// Undo applies to the deferred change, not to what came before it.
+			expect( manager.undoManager.undo( 'post', '1' ) ).toBe( true );
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 1 );
+			expect( getTitle( '1' ) ).toBeUndefined();
 		} );
 	} );
 

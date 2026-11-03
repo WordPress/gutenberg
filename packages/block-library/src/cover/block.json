@@ -123,6 +123,8 @@
 		"color": {
 			"heading": true,
 			"text": true,
+			"link": true,
+			"button": true,
 			"background": false,
 			"__experimentalSkipSerialization": [ "gradients" ],
 			"enableContrastChecker": false
@@ -130,6 +132,7 @@
 		"dimensions": {
 			"aspectRatio": true,
 			"minHeight": true,
+			"minWidth": true,
 			"__experimentalDefaultControls": {
 				"minHeight": true
 			}
@@ -151,7 +154,8 @@
 			"allowJustification": false
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
 		},
 		"filter": {
 			"duotone": true

@@ -1,0 +1,39 @@
+@mixin highlight($priority: null) {
+	background-color: var(--wpds-color-background-interactive-brand-strong-active) $priority;
+	color: var(--wpds-color-foreground-interactive-brand-strong-active) $priority;
+	outline: none;
+	box-shadow: none;
+
+	@media ( forced-colors: active ) {
+		forced-color-adjust: none;
+		background-color: Highlight $priority;
+		color: HighlightText $priority;
+	}
+}
+
+@mixin menu-item {
+	&:is(:focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) {
+		// Popup colors take precedence over the underlying Button variant.
+		@include highlight(!important);
+
+		.components-menu-item__info {
+			color: inherit;
+		}
+	}
+
+	&[aria-expanded="true"]:not(:focus, [aria-selected="true"], :disabled, [aria-disabled="true"]) {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active) !important;
+		color: var(--wpds-color-foreground-interactive-neutral-active) !important;
+		outline: none;
+		box-shadow: none;
+
+		@media ( forced-colors: active ) {
+			outline: var(--wpds-border-width-xs) solid GrayText;
+			outline-offset: 0;
+		}
+
+		.components-menu-item__info {
+			color: inherit;
+		}
+	}
+}

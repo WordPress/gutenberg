@@ -432,4 +432,151 @@ test.describe( 'Columns', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'reordering with drag and drop', () => {
+		// Playwright requires two moves before all browsers dispatch `dragover`.
+		// See: https://playwright.dev/docs/input#dragging-manually
+		async function dragTo( page, x, y ) {
+			for ( let i = 0; i < 2; i += 1 ) {
+				await page.mouse.move( x, y );
+			}
+		}
+
+		async function startDragging( { editor, page }, block ) {
+			await editor.selectBlocks( block );
+			await editor.showBlockToolbar();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Drag', includeHidden: true } )
+				.hover();
+			await page.mouse.down();
+		}
+
+		async function insertColumns( editor ) {
+			await editor.insertBlock( {
+				name: 'core/columns',
+				innerBlocks: [ '1', '2', '3' ].map( ( content ) => ( {
+					name: 'core/column',
+					innerBlocks: [
+						{ name: 'core/paragraph', attributes: { content } },
+					],
+				} ) ),
+			} );
+		}
+
+		test( 'can drop a column before the first one', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertColumns( editor );
+
+			const columns = editor.canvas.getByRole( 'document', {
+				name: /^Block: Column \(/,
+			} );
+			await expect( columns ).toHaveText( [ '1', '2', '3' ] );
+
+			await startDragging( { editor, page }, columns.last() );
+
+			// Hover over the leading edge of the first column.
+			const firstColumn = await columns.first().boundingBox();
+			await dragTo(
+				page,
+				firstColumn.x + 5,
+				firstColumn.y + firstColumn.height / 2
+			);
+
+			const indicator = page.getByTestId(
+				'block-list-insertion-point-indicator'
+			);
+			await expect( indicator ).toBeVisible();
+			await expect
+				.poll( () => indicator.boundingBox().then( ( { x } ) => x ) )
+				.toBeLessThan( firstColumn.x + firstColumn.width / 2 );
+
+			await page.mouse.up();
+
+			await expect( columns ).toHaveText( [ '3', '1', '2' ] );
+		} );
+
+		test( 'can drop a column after the last one', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertColumns( editor );
+
+			const columns = editor.canvas.getByRole( 'document', {
+				name: /^Block: Column \(/,
+			} );
+			await expect( columns ).toHaveText( [ '1', '2', '3' ] );
+
+			await startDragging( { editor, page }, columns.first() );
+
+			// Hover over the trailing edge of the last column.
+			const lastColumn = await columns.last().boundingBox();
+			await dragTo(
+				page,
+				lastColumn.x + lastColumn.width - 5,
+				lastColumn.y + lastColumn.height / 2
+			);
+
+			const indicator = page.getByTestId(
+				'block-list-insertion-point-indicator'
+			);
+			await expect( indicator ).toBeVisible();
+			await expect
+				.poll( () => indicator.boundingBox().then( ( { x } ) => x ) )
+				.toBeGreaterThan( lastColumn.x + lastColumn.width / 2 );
+
+			await page.mouse.up();
+
+			await expect( columns ).toHaveText( [ '2', '3', '1' ] );
+		} );
+
+		test( 'keeps a block the Columns block disallows inside the column', async ( {
+			editor,
+			page,
+		} ) => {
+			// Inserted first so its block toolbar doesn't overlay the columns.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'drag me' },
+			} );
+			await insertColumns( editor );
+
+			await startDragging(
+				{ editor, page },
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.first()
+			);
+
+			// Only columns are allowed before the first column, so the
+			// paragraph has to land inside it.
+			const firstColumn = await editor.canvas
+				.getByRole( 'document', { name: /^Block: Column \(/ } )
+				.first()
+				.boundingBox();
+			await dragTo(
+				page,
+				firstColumn.x + 5,
+				firstColumn.y + firstColumn.height / 2
+			);
+
+			await expect(
+				page.getByTestId( 'block-list-insertion-point-indicator' )
+			).toBeVisible();
+
+			await page.mouse.up();
+
+			// The drop isn't a no-op, and it doesn't add a fourth column.
+			await expect
+				.poll( async () => ( await editor.getBlocks() ).length )
+				.toBe( 1 );
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: /^Block: Column \(/,
+				} )
+			).toHaveCount( 3 );
+		} );
+	} );
 } );

@@ -6,6 +6,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import {
 	InspectorControls,
 	store as blockEditorStore,
@@ -130,6 +131,8 @@ export default function CoverInspectorControls( {
 
 	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
+	const prefersReducedMotion = useReducedMotion();
+
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
 			? [ mediaElement.current.style, 'objectPosition' ]
@@ -253,8 +256,15 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
+									// `autoPlay` only applies when the
+									// video loads, so remount the picker
+									// to stop a preview that is already
+									// playing when the user turns on
+									// reduced motion.
+									key={ prefersReducedMotion }
 									label={ __( 'Focal point' ) }
 									url={ url }
+									autoPlay={ ! prefersReducedMotion }
 									value={ focalPoint }
 									onDragStart={ imperativeFocalPointPreview }
 									onDrag={ imperativeFocalPointPreview }

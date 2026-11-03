@@ -5,12 +5,13 @@ import { Icon } from '../../../icon';
 import { Input as InputPrimitive } from '../input';
 import { InputLayout } from '../input-layout';
 import type { ComboboxInputProps } from './types';
+import styles from './style.module.css';
 
 const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
 	<InputPrimitive
 		prefix={
 			<InputLayout.Slot padding="minimal">
-				<Icon icon={ search } />
+				<Icon icon={ search } className={ styles[ 'search-icon' ] } />
 			</InputLayout.Slot>
 		}
 		{ ...props }
@@ -18,7 +19,10 @@ const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
 );
 
 export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
-	function Input( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedInput(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return (
 			<_Combobox.Input ref={ ref } render={ render } { ...restProps } />
 		);

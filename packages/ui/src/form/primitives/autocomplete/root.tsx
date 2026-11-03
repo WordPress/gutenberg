@@ -12,7 +12,9 @@ import { AutocompleteGridContext } from './context';
  * Use the primitives directly, and remember to label the input field,
  * usually by using the `Field` component.
  */
-export function Root( props: AutocompleteRootProps ) {
+export const Root: typeof _Autocomplete.Root = function Root(
+	props: AutocompleteRootProps
+) {
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
@@ -20,4 +22,4 @@ export function Root( props: AutocompleteRootProps ) {
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);
-}
+};

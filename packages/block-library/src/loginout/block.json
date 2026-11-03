@@ -38,6 +38,10 @@
 			"gradients": true,
 			"link": true
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -68,7 +72,8 @@
 		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"contentRole": true
 	},
 	"style": "wp-block-loginout"
 }

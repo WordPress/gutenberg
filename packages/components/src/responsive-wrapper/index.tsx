@@ -45,16 +45,20 @@ function ResponsiveWrapper( {
 		aspectRatio = `${ naturalWidth } / ${ naturalHeight }`;
 	}
 
+	const ch = children as React.ReactElement<
+		Pick< React.HTMLAttributes< Element >, 'className' | 'style' >
+	>;
+
 	return (
 		<TagName className="components-responsive-wrapper">
 			<div>
-				{ cloneElement( children, {
+				{ cloneElement( ch, {
 					className: clsx(
 						'components-responsive-wrapper__content',
-						children.props.className
+						ch.props.className
 					),
 					style: {
-						...children.props.style,
+						...ch.props.style,
 						aspectRatio,
 					},
 				} ) }

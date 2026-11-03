@@ -12,41 +12,37 @@ import { unlock } from '../../lock-unlock';
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
 function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
-	const block = useSelect(
+	const { blockName, isValid, shortcut } = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId );
+			const { getBlockName, isBlockValid } = select( blockEditorStore );
+			return {
+				blockName: getBlockName( clientId ),
+				isValid: isBlockValid( clientId ),
+				shortcut: select(
+					keyboardShortcutsStore
+				).getShortcutRepresentation( 'core/editor/new-note' ),
+			};
 		},
 		[ clientId ]
 	);
-	const shortcut = useSelect(
-		( select ) =>
-			select( keyboardShortcutsStore ).getShortcutRepresentation(
-				'core/editor/new-note'
-			),
-		[]
-	);
 
-	if (
-		! block?.isValid ||
-		block?.name === getUnregisteredTypeHandlerName()
-	) {
+	if ( ! isValid || blockName === getUnregisteredTypeHandlerName() ) {
 		return null;
 	}
 
-	const isDisabled = isDistractionFree || block?.name === 'core/freeform';
+	const isDisabled = isDistractionFree || blockName === 'core/freeform';
 
 	let infoText;
 
 	if ( isDistractionFree ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
-	} else if ( block?.name === 'core/freeform' ) {
+	} else if ( blockName === 'core/freeform' ) {
 		infoText = __( 'Convert to blocks to add notes.' );
 	}
 
 	return (
 		<MenuItem
 			onClick={ onClick }
-			aria-haspopup="dialog"
 			disabled={ isDisabled }
 			info={ infoText }
 			shortcut={ shortcut }

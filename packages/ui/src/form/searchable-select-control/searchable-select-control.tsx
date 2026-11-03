@@ -8,7 +8,7 @@ import type { SearchableSelectControlProps } from './types';
 export const SearchableSelectControl = forwardRef<
 	HTMLButtonElement,
 	SearchableSelectControlProps
->( function SearchableSelectControl(
+>( function UnforwardedSearchableSelectControl(
 	{
 		className,
 		label,

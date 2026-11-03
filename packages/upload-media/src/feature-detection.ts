@@ -209,27 +209,28 @@ const BYTES_PER_PIXEL = 4;
 /**
  * Memory budget (in bytes) for processing interlaced images client-side.
  *
- * wasm-vips is hard-capped at 1 GiB of WASM memory. Progressive JPEGs and
- * Adam7-interlaced PNGs cannot be decoded with shrink-on-load, so the entire
- * image must be buffered at once. A tighter ~0.5 GiB budget leaves headroom
- * for the encode step and avoids the out-of-memory failures these images hit.
+ * wasm-vips can grow its WASM memory up to 2 GiB, but growth can fail on
+ * memory-constrained devices. Progressive JPEGs and Adam7-interlaced PNGs
+ * cannot be decoded with shrink-on-load, so the entire image must be buffered
+ * at once. A tighter ~0.75 GiB budget leaves headroom for the encode step and
+ * avoids the out-of-memory failures these images hit.
  */
-const INTERLACED_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+const INTERLACED_MEMORY_BUDGET = 0.75 * 1024 * 1024 * 1024;
 
 /**
  * Memory budget (in bytes) for processing non-interlaced images client-side.
  *
  * Baseline images can be shrunk during decode, so vips needs far less peak
- * memory. A generous ~0.9 GiB budget acts as a backstop against extreme sizes
+ * memory. A generous ~1.5 GiB budget acts as a backstop against extreme sizes
  * while leaving the vast majority of real-world uploads on the client.
  */
-const BASELINE_MEMORY_BUDGET = 0.9 * 1024 * 1024 * 1024;
+const BASELINE_MEMORY_BUDGET = 1.5 * 1024 * 1024 * 1024;
 
 /**
  * Determines whether an image is too large to process client-side.
  *
  * Very large images, especially interlaced/progressive ones, can exceed the
- * 1 GiB wasm-vips memory cap and fail to process. Such images are better
+ * 2 GiB wasm-vips memory ceiling and fail to process. Such images are better
  * handled by the server, which has no comparable per-image memory ceiling.
  *
  * @param dimensions The image's parsed dimensions and interlacing.

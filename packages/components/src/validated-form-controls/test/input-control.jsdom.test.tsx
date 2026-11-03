@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { logged } from '@wordpress/deprecated';
@@ -11,10 +11,6 @@ const DEPRECATION_MESSAGE =
 
 beforeEach( () => {
 	logged[ DEPRECATION_MESSAGE ] = true;
-} );
-
-afterEach( () => {
-	delete logged[ DEPRECATION_MESSAGE ];
 } );
 
 describe( 'Shows a deprecation warning', () => {

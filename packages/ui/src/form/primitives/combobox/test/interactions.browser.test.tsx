@@ -17,8 +17,12 @@ describe( 'Combobox interactions', () => {
 				<Combobox.Popup>
 					<Combobox.Input aria-label="Search fruit" />
 					<Combobox.List>
-						<Combobox.Item value="Apple">Apple</Combobox.Item>
-						<Combobox.Item value="Banana">Banana</Combobox.Item>
+						<Combobox.Item value="Apple">
+							<Combobox.ItemLabel>Apple</Combobox.ItemLabel>
+						</Combobox.Item>
+						<Combobox.Item value="Banana">
+							<Combobox.ItemLabel>Banana</Combobox.ItemLabel>
+						</Combobox.Item>
 					</Combobox.List>
 				</Combobox.Popup>
 			</Combobox.Root>

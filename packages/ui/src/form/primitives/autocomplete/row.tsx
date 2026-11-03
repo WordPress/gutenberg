@@ -9,7 +9,7 @@ import { useAutocompleteGridContext } from './context';
  * grid and use two-dimensional keyboard navigation.
  */
 export const Row = forwardRef< HTMLDivElement, AutocompleteRowProps >(
-	function Row( { children, ...restProps }, ref ) {
+	function UnforwardedRow( { children, ...restProps }, ref ) {
 		const isGrid = useAutocompleteGridContext();
 		if ( process.env.NODE_ENV !== 'production' && ! isGrid ) {
 			throw new Error(

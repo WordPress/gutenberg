@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -42,17 +42,20 @@ export default function MediaEditorCanvas( {
 	disabled = false,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
-	const controller = useMediaEditor();
-	const { aspectRatioValue } = controller.cropOptions;
-	const cropperImage = controller.state.image;
-	const { beginGesture, endGesture, setImage } = controller;
+	const session = useMediaEditor();
+	const { aspectRatioValue } = session.cropOptions;
+	const cropperImage = session.cropper.state.image;
+	const { beginGesture, endGesture, setSourceImage } = session;
 
 	// Tracks whether the image pixels have actually loaded. The cropper's
 	// geometry is driven by the known media dimensions, so its handles and
 	// overlays would otherwise appear before the image finishes streaming in.
-	const [ status, setStatus ] = useState< 'loading' | 'loaded' | 'error' >(
-		'loading'
-	);
+	// Stored with the URL it is for, so a new URL (restoring the original
+	// swaps it in place) counts as loading until the cropper reports back.
+	const [ settled, setSettled ] = useState< {
+		url: string | undefined;
+		status: 'loaded' | 'error';
+	} >();
 
 	// Resolved aspect ratio is derived from the preset key + the
 	// loaded image (for the "Original" preset). The reducer doesn't
@@ -80,7 +83,6 @@ export default function MediaEditorCanvas( {
 
 	useEffect( () => {
 		if (
-			cropperImage ||
 			! mediaUrl ||
 			! Number.isFinite( mediaWidth ) ||
 			! Number.isFinite( mediaHeight ) ||
@@ -89,37 +91,22 @@ export default function MediaEditorCanvas( {
 		) {
 			return;
 		}
-		setImage( {
+		setSourceImage( {
 			src: mediaUrl,
 			naturalWidth: mediaWidth,
 			naturalHeight: mediaHeight,
 		} );
-	}, [ cropperImage, mediaUrl, mediaWidth, mediaHeight, setImage ] );
+	}, [ mediaUrl, mediaWidth, mediaHeight, setSourceImage ] );
 
 	const isImage = mediaType.type === 'image';
-
-	// Probe the image to know when its pixels have loaded (or failed),
-	// independent of the cropper. The browser shares one fetch/cache with the
-	// cropper's own `<img>`, so this adds no network cost. The cropper stays
-	// framework-pure — load/error handling lives here in the wrapper layer.
-	useEffect( () => {
-		if ( ! mediaUrl || ! isImage ) {
-			return;
-		}
-		setStatus( 'loading' );
-		const probe = new window.Image();
-		probe.onload = () => setStatus( 'loaded' );
-		probe.onerror = () => setStatus( 'error' );
-		probe.src = mediaUrl;
-		// Cached images may already be complete before listeners attach.
-		if ( probe.complete ) {
-			setStatus( probe.naturalWidth > 0 ? 'loaded' : 'error' );
-		}
-		return () => {
-			probe.onload = null;
-			probe.onerror = null;
-		};
-	}, [ mediaUrl, isImage ] );
+	const status =
+		settled && settled.url === mediaUrl ? settled.status : 'loading';
+	const handleImageLoaded = useCallback( () => {
+		setSettled( { url: mediaUrl, status: 'loaded' } );
+	}, [ mediaUrl ] );
+	const handleImageError = useCallback( () => {
+		setSettled( { url: mediaUrl, status: 'error' } );
+	}, [ mediaUrl ] );
 
 	if ( ! mediaUrl || ! isImage ) {
 		return null;
@@ -139,7 +126,7 @@ export default function MediaEditorCanvas( {
 		<div className="media-editor-canvas">
 			{ status === 'loading' && (
 				<div className="media-editor-canvas__spinner">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ /*
@@ -159,13 +146,15 @@ export default function MediaEditorCanvas( {
 			>
 				<Cropper
 					src={ mediaUrl }
-					controller={ controller }
+					controller={ session.cropper }
 					aspectRatio={ aspectRatio }
 					freeformCrop
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }
 					onGestureStart={ handleGestureStart }
 					onGestureEnd={ handleGestureEnd }
+					onImageLoaded={ handleImageLoaded }
+					onImageError={ handleImageError }
 					disabled={ disabled }
 				/>
 			</div>
