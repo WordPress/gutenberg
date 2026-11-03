@@ -11,11 +11,47 @@ const UNSAFE_ELEMENTS = new Set( [
 const IFRAME_SANDBOX = 'allow-scripts allow-presentation';
 const MAX_PASSES = 8;
 
-function isScriptURL( value: string ): boolean {
-	// Browsers ignore control characters and whitespace in a URL's scheme.
-	return /(?:^|;)(?:javascript|vbscript):/i.test(
-		value.replace( /[\p{Cc}\s]/gu, '' )
-	);
+// Mirrors `wp_kses_uri_attributes()`, as the Interactivity API's URL check
+// does, plus the attributes that set the value of an SVG animation.
+const URL_ATTRIBUTES = new Set( [
+	'action',
+	'archive',
+	'background',
+	'by',
+	'cite',
+	'classid',
+	'codebase',
+	'data',
+	'formaction',
+	'from',
+	'href',
+	'icon',
+	'longdesc',
+	'manifest',
+	'poster',
+	'profile',
+	'src',
+	'to',
+	'usemap',
+	'values',
+	'xlink:href',
+	'xlinkhref',
+	'xmlns',
+] );
+
+// Same pattern as the Interactivity API: browsers ignore leading C0 controls
+// and spaces, and tabs and newlines anywhere, in a URL's scheme.
+const JAVASCRIPT_URL =
+	/^[\u0000-\u001F ]*j[\r\n\t]*a[\r\n\t]*v[\r\n\t]*a[\r\n\t]*s[\r\n\t]*c[\r\n\t]*r[\r\n\t]*i[\r\n\t]*p[\r\n\t]*t[\r\n\t]*\:/i;
+
+function isJavaScriptURL( key: string, value: string ): boolean {
+	if ( ! URL_ATTRIBUTES.has( key ) ) {
+		return false;
+	}
+
+	// SVG animation values are a semicolon separated list.
+	const urls = key === 'values' ? value.split( ';' ) : [ value ];
+	return urls.some( ( url ) => JAVASCRIPT_URL.test( url ) );
 }
 
 function isCrossOriginURL( src: string | null ): boolean {
@@ -51,7 +87,7 @@ function sanitize( html: string ): string {
 		for ( const key of getAttributeNames.call( element ) ) {
 			const value = getAttribute.call( element, key ) ?? '';
 
-			if ( key.startsWith( 'on' ) || isScriptURL( value ) ) {
+			if ( key.startsWith( 'on' ) || isJavaScriptURL( key, value ) ) {
 				removeAttribute.call( element, key );
 			}
 		}

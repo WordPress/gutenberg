@@ -12,7 +12,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useState, useRef, RawHTML } from '@wordpress/element';
+import { useMemo, useState, useRef, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
 import ConvertToBlocksButton from './convert-to-blocks-button';
@@ -24,6 +24,10 @@ export default function FreeformEdit( {
 	clientId,
 } ) {
 	const { content } = attributes;
+	const safeContent = useMemo(
+		() => content && safeHTML( content ),
+		[ content ]
+	);
 	const [ isOpen, setOpen ] = useState( false );
 	const editButtonRef = useRef( null );
 
@@ -53,7 +57,7 @@ export default function FreeformEdit( {
 			</BlockControls>
 			<div { ...useBlockProps() }>
 				{ content ? (
-					<RawHTML>{ safeHTML( content ) }</RawHTML>
+					<RawHTML>{ safeContent }</RawHTML>
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
