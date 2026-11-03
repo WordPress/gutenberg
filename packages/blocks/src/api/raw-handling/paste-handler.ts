@@ -15,6 +15,7 @@ import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import divNormaliser from './div-normaliser';
+import tableNormaliser from './table-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
@@ -212,6 +213,7 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser(),
 				divNormaliser,
+				tableNormaliser,
 				headingTransformer,
 			];
 
