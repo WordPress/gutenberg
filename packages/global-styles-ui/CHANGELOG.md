@@ -9,6 +9,10 @@
 -   Element screens: add an "Overridden by" list of the block types whose own styles override the element, linking to each block's screen ([#84671](https://github.com/WordPress/gutenberg/pull/84671)).
 -   Show icons for elements in the Blocks & Elements list, and rename Input, Select and Button (element) to Form input, Form select and Form button ([#85363](https://github.com/WordPress/gutenberg/pull/85363)).
 
+### Bug Fixes
+
+-   Blocks & Elements: preserve the search term and filters when a block is opened and the user returns to the list ([Trac #66105](https://core.trac.wordpress.org/ticket/66105)).
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes
