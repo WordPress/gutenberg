@@ -45,6 +45,8 @@ The session also holds named edits other than crop: `session.edits`, set with `s
 
 `session.reset()` puts every slice back to its starting state in one undo entry: default geometry and crop options, no edits, same image. The Reset button calls it; it does not compose per-slice resets itself.
 
+Panels drive the editor through the session itself: `useMediaEditor()` gives them the cropper controller, crop options, edits, the source image, reset and history, so a plugin can offer its own crop tools or load new pixels and the canvas follows. What stays with Core is everything outside the session: the canvas component, the modal shell, Save and Cancel, keyboard shortcuts, notices, persistence, and the undo stacks themselves. `useMediaEditorEdit( name, defaultValue )` is a shortcut for the common case of a panel that owns one value: it returns `{ value, setValue, beginGesture, endGesture }`, applies the panel's default, and removes the edit when the value returns to it so the session reads as clean.
+
 ### Viewport
 
 Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
