@@ -39,7 +39,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
-- `rotation`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`, `"wide"`, `"full"`
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
@@ -51,6 +50,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
+  - `rotate`: `true`
 
 ## Context
 
@@ -83,6 +84,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 - **dimensions**: `.wp-block-image img, .wp-block-image .components-placeholder`
 - **border**: `.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder`
 - **shadow**: `.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder`
+- **transform**: `.wp-block-image img`
 - **filter**:
   - duotone: `.wp-block-image img, .wp-block-image .components-placeholder`
 

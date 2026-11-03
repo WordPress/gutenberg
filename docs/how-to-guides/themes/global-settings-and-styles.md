@@ -261,6 +261,9 @@ The settings section has the following structure:
 			},
 			"spacingSizes": []
 		},
+		"transform": {
+			"rotate": true
+		},
 		"typography": {
 			"customFontSize": true,
 			"dropCap": true,

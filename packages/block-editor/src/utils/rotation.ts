@@ -53,33 +53,18 @@ export function roundAngle( angle: number ): number {
 	);
 }
 
-/**
- * Converts a stored rotation to the [0, 360) range used by `AnglePickerControl`.
- *
- * @param rotate Stored rotation in degrees.
- *
- * @return The angle in [0, 360).
- */
-export function toPickerAngle( rotate: number | undefined ): number {
-	return ( ( ( rotate ?? 0 ) % 360 ) + 360 ) % 360;
-}
+// A single CSS angle, as the transform block support stores it in
+// `style.transform.rotate`. Mirror of `WP_Style_Engine::VALID_ANGLE_PATTERN`
+// in PHP, with the number and the unit captured.
+const ANGLE_PATTERN =
+	/^(?:([+-]?(?:\d+(?:\.\d+)?|\.\d+))(deg|grad|rad|turn)|0)$/i;
 
-/**
- * Converts an `AnglePickerControl` value to a stored rotation.
- *
- * @param value Angle in degrees, in [0, 360].
- *
- * @return The rotation in (-180, 180], rounded to two decimals.
- */
-export function fromPickerAngle( value: number | string | undefined ): number {
-	const angle = Number( value );
-	return Number.isFinite( angle ) ? normalizeAngle( roundAngle( angle ) ) : 0;
-}
-
-// A number in decimal notation, as PHP's `is_numeric()` accepts it. Hex,
-// binary and octal strings such as `0x10`, which `Number()` would read, are
-// not rotations.
-const DECIMAL_NUMBER_PATTERN = /^\s*[+-]?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?\s*$/i;
+const DEGREES_PER_UNIT: Record< string, number > = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
 
 /**
  * Returns a block style attribute when it is an object, which is the only
@@ -94,23 +79,45 @@ export function getStyleObject( style: unknown ): BlockStyle | undefined {
 }
 
 /**
- * Reads a stored rotation, which is a number of degrees. Anything that is not
- * a finite number, or a string holding one in decimal notation, is ignored.
- * Matches `gutenberg_get_rotate_value()` in PHP.
+ * Reads a rotation in degrees from the value the transform block support
+ * stores, a single CSS angle such as `45deg` or `0.25turn`. A number is taken
+ * as degrees. Anything else, such as a list of angles or a `calc()`, is
+ * ignored, as the style engine ignores it.
  *
  * @param value Stored rotation.
  *
  * @return The rotation in (-180, 180], rounded to two decimals, or undefined.
  */
 export function getRotateValue( value: unknown ): number | undefined {
-	const angle =
-		typeof value === 'string' && DECIMAL_NUMBER_PATTERN.test( value )
-			? Number( value )
-			: value;
-	if ( typeof angle !== 'number' || ! Number.isFinite( angle ) ) {
+	let angle: number | undefined;
+	if ( typeof value === 'number' ) {
+		angle = value;
+	} else if ( typeof value === 'string' ) {
+		const match = ANGLE_PATTERN.exec( value.trim() );
+		if ( ! match ) {
+			return undefined;
+		}
+		angle = match[ 1 ]
+			? Number( match[ 1 ] ) *
+				DEGREES_PER_UNIT[ match[ 2 ].toLowerCase() ]
+			: 0;
+	}
+	if ( angle === undefined || ! Number.isFinite( angle ) ) {
 		return undefined;
 	}
 	return normalizeAngle( roundAngle( angle ) );
+}
+
+/**
+ * Formats a rotation in degrees as the CSS angle the transform block support
+ * stores.
+ *
+ * @param angle Rotation in degrees.
+ *
+ * @return The angle, such as `45deg`.
+ */
+export function toCSSAngle( angle: number ): string {
+	return `${ angle }deg`;
 }
 
 /**
@@ -164,22 +171,24 @@ export function getRotateForState(
 	selectedState: BlockStyleState
 ): number {
 	const defaultRotate =
-		getRotateValue( getStyleObject( style )?.rotate ) ?? 0;
+		getRotateValue( getStyleObject( style )?.transform?.rotate ) ?? 0;
 	if ( ! hasViewportBlockStyleState( selectedState ) ) {
 		return defaultRotate;
 	}
 	return (
-		getRotateValue( getRotateStateStyle( style, selectedState )?.rotate ) ??
-		defaultRotate
+		getRotateValue(
+			getRotateStateStyle( style, selectedState )?.transform?.rotate
+		) ?? defaultRotate
 	);
 }
 
 /**
- * Returns a block style attribute with the rotation of a style state set.
+ * Returns a block style attribute with the rotation of a style state set, in
+ * `transform.rotate`, where the transform block support reads it.
  *
  * In the default state, no rotation is stored as no value. In a viewport
- * state, 0 is kept, because it undoes the default rotation on that viewport.
- * An undefined angle removes the state's rotation.
+ * state, `0deg` is kept, because it undoes the default rotation on that
+ * viewport. An undefined angle removes the state's rotation.
  *
  * @param style         Block style attribute.
  * @param angle         Rotation in degrees.
@@ -206,15 +215,23 @@ export function getUpdatedRotateStyle(
 	if ( rotate === 0 && ! isViewportState ) {
 		rotate = undefined;
 	}
+	const withRotate = ( stateStyle: BlockStyle | undefined ): BlockStyle => ( {
+		...stateStyle,
+		transform: cleanEmptyObject( {
+			...getStyleObject( stateStyle?.transform ),
+			rotate: rotate === undefined ? undefined : toCSSAngle( rotate ),
+		} ),
+	} );
 
 	if ( ! isViewportState ) {
-		return cleanEmptyObject( { ...baseStyle, rotate } );
+		return cleanEmptyObject( withRotate( baseStyle ) );
 	}
 
-	return setStyleForState( baseStyle ?? {}, rotateState, {
-		...getRotateStateStyle( baseStyle, rotateState ),
-		rotate,
-	} );
+	return setStyleForState(
+		baseStyle ?? {},
+		rotateState,
+		withRotate( getRotateStateStyle( baseStyle, rotateState ) )
+	);
 }
 
 /** A rectangle, in pixels. */
