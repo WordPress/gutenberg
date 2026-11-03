@@ -437,6 +437,29 @@ describe( 'UnitControl', () => {
 				expect.anything()
 			);
 		} );
+
+		it( 'should step with fractional spinFactor without floating-point inaccuracies', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = vi.fn();
+			render(
+				<UnitControl
+					value="0.1vw"
+					spinFactor={ 0.2 }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton' );
+			await user.click( input );
+			await user.keyboard( '[ArrowUp]' );
+
+			expect( input ).toHaveValue( 0.12 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'0.12vw',
+				expect.anything()
+			);
+		} );
 	} );
 
 	describe( 'Unit', () => {

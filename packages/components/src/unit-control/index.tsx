@@ -14,6 +14,7 @@ import {
 	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { multiply } from '../utils/math';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 
@@ -207,7 +208,7 @@ function UnforwardedUnitControl(
 		const unitStep = activeUnit?.step ?? 1;
 
 		step = 'any';
-		spinFactor = ( props.spinFactor ?? 1 ) * unitStep;
+		spinFactor = multiply( props.spinFactor ?? 1, unitStep );
 	}
 
 	return (

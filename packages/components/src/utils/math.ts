@@ -85,7 +85,17 @@ export function multiply( ...args: Array< number | string > ) {
  * @return The number of decimal places.
  */
 function getPrecision( value: number ) {
-	const split = ( value + '' ).split( '.' );
+	const [ base, exponent ] = ( value + '' ).split( /[eE]/ );
+
+	if ( exponent !== undefined ) {
+		const baseDecimals = base.includes( '.' )
+			? base.split( '.' )[ 1 ].length
+			: 0;
+		const precision = baseDecimals - parseInt( exponent, 10 );
+		return precision > 0 ? precision : 0;
+	}
+
+	const split = base.split( '.' );
 	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
 }
 

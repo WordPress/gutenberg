@@ -16,6 +16,12 @@ describe( 'add', () => {
 	it( 'should add multiple arguments', () => {
 		expect( add( '105', '30', 10, 5 ) ).toBe( 150 );
 	} );
+
+	it( 'should handle scientific notation without losing precision', () => {
+		expect( add( 0.1, 1e-7 ) ).toBe( 0.1000001 );
+		expect( add( 0.1, '1e-7' ) ).toBe( 0.1000001 );
+		expect( add( 0.1, 1.25e-7 ) ).toBe( 0.100000125 );
+	} );
 } );
 
 describe( 'subtract', () => {
@@ -33,6 +39,12 @@ describe( 'subtract', () => {
 	it( 'should subtract multiple arguments', () => {
 		expect( subtract( '105', '30', 10, 5 ) ).toBe( 60 );
 	} );
+
+	it( 'should handle scientific notation without losing precision', () => {
+		expect( subtract( 0.1, 1e-7 ) ).toBe( 0.0999999 );
+		expect( subtract( 0.1, '1e-7' ) ).toBe( 0.0999999 );
+		expect( subtract( 0.1, 1.25e-7 ) ).toBe( 0.099999875 );
+	} );
 } );
 
 describe( 'multiply', () => {
@@ -49,6 +61,11 @@ describe( 'multiply', () => {
 
 	it( 'should multiply multiple arguments', () => {
 		expect( multiply( '2', '3', 4, 5 ) ).toBe( 120 );
+	} );
+
+	it( 'should handle scientific notation in arguments', () => {
+		expect( multiply( 2, 1e-7 ) ).toBe( 2e-7 );
+		expect( multiply( 0.1, 1e-7 ) ).toBe( 1e-8 );
 	} );
 
 	it( 'should normalize floating-point precision on multiplication', () => {
