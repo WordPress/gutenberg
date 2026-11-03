@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, ReactElement, ReactNode } from 'react';
 import { Stack } from '@wordpress/ui';
 import type { MediaAspectRatio, NormalizedField } from '../../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
@@ -13,6 +13,7 @@ function ColumnPrimary< Item >( {
 	onClickItem,
 	renderItemLink,
 	isItemClickable,
+	actions,
 }: {
 	item: Item;
 	level?: number;
@@ -27,6 +28,7 @@ function ColumnPrimary< Item >( {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
+	actions?: ReactNode;
 } ) {
 	// Srcset/size hint for the media render. The preview box is 32px square
 	// by default; when the view configures `layout.aspectRatio`, the box
@@ -94,6 +96,7 @@ function ColumnPrimary< Item >( {
 						field={ descriptionField }
 					/>
 				) }
+				{ actions }
 			</Stack>
 		</Stack>
 	);

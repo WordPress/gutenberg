@@ -748,6 +748,91 @@ describe( 'DataViews component', () => {
 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();
 		} );
 
+		describe( 'primary actions', () => {
+			const primaryActions: Action< Data >[] = [
+				{
+					id: 'edit',
+					label: 'Edit',
+					isPrimary: true,
+					callback: vi.fn(),
+				},
+				{
+					id: 'view',
+					label: 'View',
+					isPrimary: true,
+					isEligible: ( item ) => item.id !== 1,
+					callback: vi.fn(),
+				},
+			];
+
+			function getFirstRowCells() {
+				const [ , firstRow ] = screen.getAllByRole( 'row' );
+				return within( firstRow ).getAllByRole( 'cell' );
+			}
+
+			it( 'should render the eligible primary actions below the title and only the menu in the actions column', () => {
+				render(
+					<DataViewWrapper
+						view={ {
+							...DEFAULT_VIEW,
+							fields: [ 'order' ],
+							titleField: 'title',
+						} }
+						actions={ primaryActions }
+					/>
+				);
+				const cells = getFirstRowCells();
+				const titleCell = cells[ 0 ];
+				const actionsCell = cells[ cells.length - 1 ];
+				expect(
+					within( titleCell ).getByText( 'Hello World' )
+				).toBeInTheDocument();
+				expect(
+					within( titleCell ).getByRole( 'button', { name: 'Edit' } )
+				).toBeInTheDocument();
+				// Not eligible for the first item.
+				expect(
+					within( titleCell ).queryByRole( 'button', {
+						name: 'View',
+					} )
+				).not.toBeInTheDocument();
+				expect(
+					within( actionsCell ).getAllByRole( 'button' )
+				).toHaveLength( 1 );
+				expect(
+					within( actionsCell ).getByRole( 'button', {
+						name: 'Actions',
+					} )
+				).toBeInTheDocument();
+			} );
+
+			it( 'should render the primary actions in the actions column when there is no primary column', () => {
+				render(
+					<DataViewWrapper
+						view={ {
+							...DEFAULT_VIEW,
+							fields: [ 'order' ],
+							titleField: 'title',
+							showTitle: false,
+						} }
+						actions={ primaryActions }
+					/>
+				);
+				const cells = getFirstRowCells();
+				const actionsCell = cells[ cells.length - 1 ];
+				expect(
+					within( actionsCell ).getByRole( 'button', {
+						name: 'Edit',
+					} )
+				).toBeInTheDocument();
+				expect(
+					within( actionsCell ).queryByRole( 'button', {
+						name: 'Actions',
+					} )
+				).not.toBeInTheDocument();
+			} );
+		} );
+
 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
 			const onClickItemCallback = vi.fn();
 
