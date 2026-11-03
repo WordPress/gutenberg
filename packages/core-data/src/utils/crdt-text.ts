@@ -25,6 +25,13 @@ export function createRichTextDataCache(
 
 		const result = RichTextData.fromHTMLString( value );
 
+		// The HTML string comes from the shared document, so serialize the
+		// value back to exactly that string. Re-serializing from the parsed
+		// value can normalize the markup (e.g. `&nbsp;` or `<br/>`), which
+		// makes untouched blocks look changed and rewrites them in the shared
+		// document. It also lets `toHTMLString()` skip re-serialization.
+		Object.defineProperty( result, 'originalHTML', { value } );
+
 		if ( cache.size >= maxSize ) {
 			// Evict the oldest entry (Map preserves insertion order).
 			cache.delete( cache.keys().next().value! );

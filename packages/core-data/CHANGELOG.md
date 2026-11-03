@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Real-time collaboration: Stop rewriting the markup of untouched rich-text blocks in the shared document, such as `&nbsp;` becoming a literal non-breaking space, when a collaborator edits another block ([#86270](https://github.com/WordPress/gutenberg/pull/86270)).
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
