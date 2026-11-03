@@ -12,11 +12,7 @@ const componentsPrivateApis = resolve(
 );
 
 // Collisions that still lack an alias. Remove an entry when its rename lands.
-const PENDING_ALIASES = new Set( [
-	// Renaming the existing imports touches about 287 files, so it is done in
-	// a separate PR.
-	'Button',
-] );
+const PENDING_ALIASES = new Set( [ 'Button' ] );
 
 const ALIAS_FILE = 'tools/eslint/components-import-aliases.mjs';
 
@@ -84,9 +80,8 @@ const [ uiExports, componentsExports ] = getModuleExports( [
 ] );
 const uiNames = new Set( uiExports );
 
-// `__experimentalText` and `__experimentalInputControl` are already aliased to
-// `WCText` and `WCInputControl`, so a `@wordpress/components` name collides
-// when it matches a `@wordpress/ui` name after removing the prefix.
+// Compare names without the `__experimental` prefix, so that, for example,
+// `__experimentalText` collides with `Text` and needs the `WCText` alias.
 const collisions = [
 	...componentsExports,
 	...getPrivateApiNames( componentsPrivateApis ),
