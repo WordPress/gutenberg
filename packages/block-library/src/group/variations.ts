@@ -53,8 +53,8 @@ const example = {
 // A full width grid of 12 by 12 cells in manual placement mode, where blocks
 // are placed, sized and rotated on the canvas. Manual grids can only be edited
 // that way with the grid interactivity experiment, so the variation is only
-// registered with it. It sets no padding, so that it gets the theme's padding
-// for Groups.
+// registered with it, in `registerCanvasVariation` rather than at module load.
+// It sets no padding, so that it gets the theme's padding for Groups.
 const canvasVariation: BlockVariation = {
 	name: 'group-canvas',
 	title: __( 'Canvas' ),

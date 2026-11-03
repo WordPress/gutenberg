@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { action } from 'storybook/actions';
 import { Fragment } from '@wordpress/element';
 import { Badge } from '../index';
+import * as Popover from '../../popover';
+import { VisuallyHidden } from '../../visually-hidden';
+import { Link } from '../../link';
+import { Button } from '../../button';
+import { Stack } from '../../stack';
 
 const meta: Meta< typeof Badge > = {
 	tags: [ 'manifest' ],
@@ -24,73 +30,129 @@ export const Default: Story = {
 	},
 };
 
-export const High: Story = {
-	...Default,
+/**
+ * Use an infotip sparingly when a status needs a short explanation.
+ * The whole badge opens the popup on hover or activation.
+ */
+export const WithInfotip: Story = {
 	args: {
-		...Default.args,
-		intent: 'high',
-	},
-};
-
-export const Medium: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'medium',
-	},
-};
-
-export const Low: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'low',
-	},
-};
-
-export const Stable: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		intent: 'stable',
-	},
-};
-
-export const Informational: Story = {
-	...Default,
-	args: {
-		...Default.args,
+		children: 'Special requirements',
 		intent: 'informational',
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						Special requirements
+					</VisuallyHidden>
+					<Popover.Description>
+						This domain requires a local address in the country
+						where it is registered.
+					</Popover.Description>
+				</Popover.Popup>
+			),
+		},
 	},
 };
 
-export const Draft: Story = {
-	...Default,
+/**
+ * A related link can follow the explanation. Keep important recovery actions
+ * available elsewhere in the interface too.
+ */
+export const InfotipWithLink: Story = {
 	args: {
-		...Default.args,
-		intent: 'draft',
+		children: 'HSTS required',
+		intent: 'medium',
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						HSTS required
+					</VisuallyHidden>
+					<Popover.Description>
+						This domain requires HTTPS for every connection.{ ' ' }
+						<Link href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security">
+							Learn about HSTS
+						</Link>
+					</Popover.Description>
+				</Popover.Popup>
+			),
+		},
 	},
 };
 
-export const None: Story = {
-	...Default,
+/**
+ * Prefer at most one related action. Use a detail view or dialog for longer
+ * workflows, and make essential recovery actions available outside the infotip.
+ */
+export const InfotipWithButton: Story = {
 	args: {
-		...Default.args,
-		intent: 'none',
+		children: 'Failed',
+		intent: 'high',
+		infotip: {
+			popover: Popover,
+			popup: (
+				<Popover.Popup
+					style={ {
+						maxWidth:
+							'min(var(--wpds-dimension-surface-width-sm), var(--available-width))',
+					} }
+				>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						Upload failed
+					</VisuallyHidden>
+					<Stack direction="column" gap="sm">
+						<Popover.Description>
+							The upload was interrupted. Check your connection
+							and try again.
+						</Popover.Description>
+						<Stack direction="row" justify="flex-end">
+							<Button
+								variant="minimal"
+								tone="neutral"
+								size="compact"
+								onClick={ action( 'Retry upload' ) }
+							>
+								Retry upload
+							</Button>
+						</Stack>
+					</Stack>
+				</Popover.Popup>
+			),
+		},
 	},
 };
 
 export const AllIntents: Story = {
-	...Default,
+	args: {
+		...WithInfotip.args,
+		children: 'Status',
+	},
 	render: ( args ) => (
 		<div
 			style={ {
 				display: 'grid',
-				gridTemplateColumns: 'max-content min-content',
-				gap: '1rem',
+				gridTemplateColumns: 'repeat(3, max-content)',
+				justifyItems: 'start',
+				gap: 'var(--wpds-dimension-gap-lg)',
+				alignItems: 'center',
 				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
+			<strong>Intent</strong>
+			<strong>Static</strong>
+			<strong>With infotip</strong>
 			{ (
 				[
 					'high',
@@ -103,24 +165,13 @@ export const AllIntents: Story = {
 				] as const
 			 ).map( ( intent ) => (
 				<Fragment key={ intent }>
-					<div
-						style={ {
-							paddingInlineEnd: '1rem',
-							display: 'flex',
-							alignItems: 'center',
-						} }
-					>
-						{ intent }
-					</div>
-					<div
-						style={ {
-							padding: '0.5rem 1rem',
-							display: 'flex',
-							alignItems: 'center',
-						} }
-					>
-						<Badge { ...args } intent={ intent } />
-					</div>
+					<span>{ intent }</span>
+					<Badge
+						{ ...args }
+						intent={ intent }
+						infotip={ undefined }
+					/>
+					<Badge { ...args } intent={ intent } />
 				</Fragment>
 			) ) }
 		</div>
