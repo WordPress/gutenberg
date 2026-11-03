@@ -30,6 +30,10 @@ const UnforwardedValidatedContentEditableControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector< HTMLElement >(
+			'[role="textbox"]'
+		);
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -39,6 +43,7 @@ const UnforwardedValidatedContentEditableControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<ContentEditableControl
 					ref={ forwardedRef }
@@ -62,11 +67,7 @@ const UnforwardedValidatedContentEditableControl = (
 				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
 				onChange={ () => {} }
-				onFocus={ ( e ) => {
-					e.target.previousElementSibling
-						?.querySelector< HTMLElement >( '[role="textbox"]' )
-						?.focus();
-				} }
+				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>
 		</div>
 	);

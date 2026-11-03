@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { __experimentalToggleGroupControlOption as ToggleGroupControlOption } from '@wordpress/components';
 import { ValidatedToggleGroupControl } from '../toggle-group-control';
 
-// The `help` prop is rendered visually by BaseControl but is not
-// programmatically associated with the toggle group via aria-describedby.
-// Additionally, the validity target is a hidden delegate radio input, not the
-// toggle group itself. These are pre-existing bugs, not caused by ControlWithError.
+globalThis.wpVitest.mockResizeObserver();
+
 describe( 'ValidatedToggleGroupControl', () => {
-	it.skip( 'should preserve the help description', () => {
+	it( 'should preserve the help description', async () => {
 		render(
 			<ValidatedToggleGroupControl
 				label="Alignment"
@@ -21,8 +20,44 @@ describe( 'ValidatedToggleGroupControl', () => {
 			</ValidatedToggleGroupControl>
 		);
 
-		expect(
-			screen.getByRole( 'radiogroup', { name: 'Alignment' } )
-		).toHaveAccessibleDescription( 'Choose text alignment.' );
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'radiogroup', { name: 'Alignment' } )
+			).toHaveAccessibleDescription( 'Choose text alignment.' );
+		} );
+	} );
+
+	it( 'should append the validation error alongside the help description', async () => {
+		const user = userEvent.setup();
+		render(
+			<form>
+				<ValidatedToggleGroupControl
+					label="Alignment"
+					help="Choose text alignment."
+					value={ undefined }
+					onChange={ () => {} }
+					required
+				>
+					<ToggleGroupControlOption label="Left" value="left" />
+					<ToggleGroupControlOption label="Center" value="center" />
+				</ValidatedToggleGroupControl>
+				<button type="submit">Submit</button>
+			</form>
+		);
+
+		const radiogroup = screen.getByRole( 'radiogroup', {
+			name: /^Alignment/,
+		} );
+
+		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
+
+		await waitFor( () => {
+			expect( radiogroup ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Constraints not satisfied' )
+			);
+		} );
+		expect( radiogroup ).toHaveAccessibleDescription(
+			expect.stringContaining( 'Choose text alignment.' )
+		);
 	} );
 } );
