@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/image-editor",
 	"version": "0.1.0-prerelease",
-	"description": "An image editor: a canvas to pan, zoom, rotate, flip and crop an image, and a helper to save the result.",
+	"description": "An image editor: a canvas to pan, zoom, rotate, flip and crop an image, and a helper that describes the edits to apply when saving it.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -29,6 +29,7 @@
 		"build-module",
 		"build-style",
 		"build-types",
+		"docs",
 		"*.md",
 		"!**/stories/**",
 		"!**/test/**"

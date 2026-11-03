@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that maps the result onto the original image for saving it. Cropping is the first thing it does. The media editor is built on it.
+An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that describes the edits to apply when saving it. Cropping is the first thing it does. The media editor is built on it.
 
 ## Installation
 
@@ -82,7 +82,7 @@ The controller has:
 -   `state`: the current state.
 -   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. Positions and sizes are fractions from 0 to 1. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. While a ratio is locked, the crop always has that ratio: a crop that does not match, from `setCropRect` or a state you pass in, keeps its centre and width and takes the height the ratio needs.
 -   `setImage( image )` to load an image. The canvas calls it when `src` loads. The first image keeps the state you started from, such as an edit you saved earlier. Replacing or clearing a loaded image starts fresh: no pan, zoom, rotation, flip or crop from the old image, but a locked ratio stays.
--   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the person has changed anything since then. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. `reset()` keeps a locked ratio.
+-   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the pan, zoom, rotation, flip or crop differs from that state. Changing only the ratio lock does not make the edit dirty. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. `reset()` keeps a locked ratio.
 -   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit.
 
 ### `ImageEditorState`, `createImageEditorState( image? )`
@@ -95,9 +95,9 @@ Whether two states describe the same edit, ignoring tiny floating-point differen
 
 ### `mapEditToOriginal( state )`
 
-Use it when saving. The editor's state describes what the canvas shows: where the image sits under the crop, how far it is zoomed, and a crop area measured against the view. Whatever saves the result, such as a server or an image library in the browser, works on the full-size original file and cannot use those values.
+Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `mapEditToOriginal` turns that state into operations for the full-size image loaded in `state.image`. Here, "original" means the image loaded into this editor, even if that file was edited before.
 
-`mapEditToOriginal` maps the edit onto the original image: a list of flip, rotate and crop edits, in the order to apply them, so the saved image matches what the person framed. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
+The returned list contains flip, rotate and crop operations as needed, in the order to apply them. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A locked ratio can produce a crop operation before the person edits anything. The caller applies the operations and saves the result.
 
 ## Not Yet Included
 
@@ -108,8 +108,8 @@ The first version covers what the media editor needs. Two additions are likely n
 
 ## More
 
--   [docs/architecture.md](docs/architecture.md)
--   [docs/recipes.md](docs/recipes.md)
+-   [Architecture](/packages/image-editor/docs/architecture.md)
+-   [Recipes](/packages/image-editor/docs/recipes.md)
 
 ## Contributing to this package
 

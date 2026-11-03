@@ -2,8 +2,8 @@ import type { ImageEditorState } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * One edit to apply to the full-size original image. `mapEditToOriginal`
- * returns them in the order to apply them.
+ * One edit to apply to the full-size image loaded in `state.image`.
+ * `mapEditToOriginal` returns them in the order to apply them.
  *
  *   - `flip`:   mirror along each axis that is `true`.
  *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
@@ -26,21 +26,22 @@ export type OriginalImageEdit =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * Map the person's edit onto the original image, for saving it.
+ * Map the person's edit onto the full-size image loaded in `state.image`.
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. Whatever saves the result, such as a server or an image
- * library in the browser, works on the full-size original file and cannot
- * use those values. This turns them into flip, rotate and crop edits on
- * the original, in the order to apply them, so the saved image matches
- * what the person framed.
+ * the view. A server or an image library in the browser needs operations
+ * on the full-size loaded image instead. This turns the state into flip,
+ * rotate and crop edits in the order to apply them, so the saved image
+ * matches what the person framed. The loaded image may itself be a
+ * previously edited file; "original" refers to that image for this call.
  *
  * Emits `[flip, rotate, crop]` in that order. Identity operations are
  * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
  * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no edit. An identity state (fresh image, no edits) returns
- * an empty array; callers can use that to skip saving.
+ * produce no edit. An empty array means no image has loaded or there is
+ * no flip, rotation or crop to apply. A locked ratio can produce a crop
+ * edit even before the person edits anything.
  *
  * Frames and math:
  *

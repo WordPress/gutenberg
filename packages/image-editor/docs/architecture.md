@@ -1,6 +1,6 @@
 # Image Editor Architecture
 
-How the image editor works inside, for people changing this package. To use it, see the [README](../README.md) and the [recipes](recipes.md).
+How the image editor works inside, for people changing this package. To use it, see the [README](/packages/image-editor/README.md) and the [recipes](/packages/image-editor/docs/recipes.md).
 
 ## Layers
 
@@ -8,7 +8,7 @@ How the image editor works inside, for people changing this package. To use it, 
 | --- | --- | --- |
 | Core | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React | `src/react/` | The canvas (`ImageEditorCanvas`), DOM measurement, interaction hooks, overlays, stencil rendering, and the `useImageEditor` hook. |
-| Saving | `src/map-edit-to-original.ts` | Maps the edit onto the full-size original image as flip, rotate and crop edits, for saving. |
+| Saving | `src/map-edit-to-original.ts` | Describes the flip, rotate and crop operations to apply to the full-size loaded image. |
 
 The editor keeps no undo history. History belongs to the code that uses the editor, because it covers everything that code edits, not only the crop. The consumer keeps the state: `useImageEditor( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 
@@ -29,7 +29,8 @@ The internal types fit where the public ones are expected, so there are only two
 
 | Space | What lives here | Coordinates |
 | --- | --- | --- |
-| World | Image and crop rectangle | Normalized 0-1, origin at the top-left of the image. |
+| World | Points on the loaded image | Normalized 0-1, origin at the top-left of the image. |
+| Crop view | `cropRect` and pan | Fractions of the image's bounding box at the nearest 90° rotation, before zoom and pan. |
 | Camera | Pan, zoom, rotation, and flip transform | `mat2d` mapping world to screen. |
 | Screen | DOM container, pointer events, CSS transforms | Pixels relative to the canvas. |
 | Viewport | Display-only pan/zoom of the canvas stage | CSS pixels; does not affect export. |
@@ -60,7 +61,7 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 
 | Task | API |
 | --- | --- |
-| Save the edit to the original image | `mapEditToOriginal()`. |
+| Describe the operations to apply to the loaded image when saving | `mapEditToOriginal()`. |
 | Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
 | Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 

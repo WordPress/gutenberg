@@ -191,7 +191,7 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-The editor's state describes what the canvas shows, not the file you save. To save, map the edit onto the original image with `mapEditToOriginal( state )`. It returns flip, rotate and crop edits for the full-size original, in the order to apply them, so the saved image matches what the person framed. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
+The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `mapEditToOriginal( state )` turns that state into flip, rotate and crop operations for the full-size image loaded in `state.image`, in the order to apply them. This loaded image is the "original" for this call, even if the file was edited before. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A crop fitted to a locked ratio can produce an operation before the person edits anything. Apply the operations to the loaded image to save what the person framed.
 
 The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
