@@ -880,6 +880,13 @@ test.describe( 'Table of Contents', () => {
 				'Headings from the post being viewed appear here'
 			);
 
+			// The list style applies to the viewed post, so it can be set in a template.
+			await getTableOfContentsEditorBlock( editor ).click();
+			await editor.clickBlockToolbarButton( 'Unordered' );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+
 			await openPostOnFrontend( page, post.id );
 			await expect(
 				page
@@ -890,6 +897,12 @@ test.describe( 'Table of Contents', () => {
 						name: 'Template preview section',
 					} )
 			).toBeVisible();
+			await expect(
+				page
+					.getByRole( 'navigation', { name: 'Table of Contents' } )
+					.getByRole( 'list' )
+					.first()
+			).toHaveCSS( 'list-style-type', 'disc' );
 		} );
 
 		test( 'only lists headings from the viewed post content boundary', async ( {
