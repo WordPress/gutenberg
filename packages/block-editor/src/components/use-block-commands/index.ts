@@ -15,6 +15,7 @@ import {
 	ungroup,
 	seen,
 	unseen,
+	layout,
 	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
 import type { ReactElement } from 'react';
@@ -22,6 +23,10 @@ import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
+import {
+	canConvertToCanvas,
+	useConvertToCanvas,
+} from '../grid/convert-to-canvas';
 import type { TransformCommandItem, TransformCommandsSelection } from './types';
 
 const getTransformCommands = () =>
@@ -157,6 +162,7 @@ const getQuickActionsCommands = () =>
 			isUngroupable,
 			isGroupable,
 			blockVisibilitySetting,
+			canConvert,
 		} = useSelect( ( select ) => {
 			const {
 				getSelectedBlockClientIds,
@@ -170,6 +176,9 @@ const getQuickActionsCommands = () =>
 				clientIds: selectedBlockClientIds,
 				isUngroupable: _isUngroupable(),
 				isGroupable: _isGroupable(),
+				canConvert:
+					selectedBlockClientIds.length === 1 &&
+					canConvertToCanvas( select, selectedBlockClientIds[ 0 ] ),
 				blockVisibilitySetting: (
 					getSettings().__experimentalFeatures as
 						| { blockVisibility?: { allowEditing?: boolean } }
@@ -191,6 +200,7 @@ const getQuickActionsCommands = () =>
 		const blocks = getBlocksByClientId( clientIds );
 
 		const blockEditorDispatch = useDispatch( blockEditorStore );
+		const convertToCanvas = useConvertToCanvas();
 		const {
 			removeBlocks,
 			replaceBlocks,
@@ -303,6 +313,15 @@ const getQuickActionsCommands = () =>
 				label: __( 'Ungroup' ),
 				callback: onUngroup,
 				icon: ungroup,
+			} );
+		}
+
+		if ( canConvert ) {
+			commands.push( {
+				name: 'convert-to-canvas',
+				label: __( 'Convert to canvas' ),
+				callback: () => convertToCanvas( clientIds[ 0 ] ),
+				icon: layout,
 			} );
 		}
 
