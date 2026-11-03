@@ -175,6 +175,8 @@ export default function AutoGridItemMovers( {
 		);
 	}, [ blockElement, blockOrder, isAutoFit, refsMap ] );
 
+	// Style and style-state changes can reposition the selected item without
+	// resizing it, so they intentionally invalidate this measurement effect.
 	useEffect( () => {
 		const gridElement = blockElement?.parentElement;
 		if ( ! gridElement ) {
@@ -202,7 +204,14 @@ export default function AutoGridItemMovers( {
 			cancelAnimationFrame( frame );
 			observer.disconnect();
 		};
-	}, [ blockElement, blockOrder, refsMap, readSnapshot ] );
+	}, [
+		blockElement,
+		blockOrder,
+		blockStyle,
+		refsMap,
+		readSnapshot,
+		styleState,
+	] );
 
 	const selected = snapshot?.items.find(
 		( item ) => item.clientId === blockClientId
