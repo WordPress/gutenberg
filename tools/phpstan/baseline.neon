@@ -289,12 +289,6 @@ parameters:
 			path: ../../packages/block-library/src/search/index.php
 
 		-
-			message: '#^Parameter \#1 \$args of function wp_tag_cloud expects array\{number\?\: int, link\?\: string, post_type\?\: string, echo\?\: bool, smallest\?\: int, largest\?\: int, unit\?\: string, format\?\: string, \.\.\.\}, array\{echo\: false, unit\: non\-empty\-string, taxonomy\: mixed, show_count\: mixed, number\: mixed, smallest\: float, largest\: float\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/tag-cloud/index.php
-
-		-
 			message: '#^Right side of \|\| is always true\.$#'
 			identifier: booleanOr.rightAlwaysTrue
 			count: 1
