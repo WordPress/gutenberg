@@ -26,7 +26,8 @@ const DEGREES_PER_UNIT: Record< string, number > = {
 };
 
 /**
- * Converts a CSS angle to degrees, rounded to two decimals.
+ * Converts a CSS angle to whole degrees, the step the angle picker accepts.
+ * A fraction would fail the field's validation and be rewritten on blur.
  *
  * @param value A CSS angle, such as `45deg` or `0.25turn`.
  * @return The angle in degrees, or `undefined` when the value is not an angle.
@@ -43,7 +44,7 @@ export function getAngleInDegrees( value: unknown ): number | undefined {
 	const degrees =
 		Number( match[ 1 ] ) * DEGREES_PER_UNIT[ match[ 2 ].toLowerCase() ];
 	// Adding 0 turns -0 into 0.
-	return Math.round( degrees * 100 ) / 100 + 0;
+	return Math.round( degrees ) + 0;
 }
 
 export function useHasTransformPanel( settings: StyleSettings | undefined ) {
