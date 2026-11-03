@@ -13,6 +13,8 @@ export default {
 	Menu: 'WCMenu',
 	Notice: 'WCNotice',
 	Popover: 'WCPopover',
+	__experimentalRadio: 'WCRadio',
+	__experimentalRadioGroup: 'WCRadioGroup',
 	SelectControl: 'WCSelectControl',
 	Spinner: 'WCSpinner',
 	Tabs: 'WCTabs',
