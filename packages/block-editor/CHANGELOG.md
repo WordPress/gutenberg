@@ -20,7 +20,7 @@
 
 ### Bug Fixes
 
--   `LinkControl`: Apply now saves the post or page chosen from the suggestions with the arrow keys and Tab, and a typed URL replaces a post or page link instead of keeping its ID ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+-   `LinkControl`: Apply now saves the post or page chosen from the suggestions with the arrow keys and Tab, and a typed URL replaces a post or page link instead of keeping its ID ([#86265](https://github.com/WordPress/gutenberg/pull/86265)).
 -   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
