@@ -86,6 +86,14 @@ test.describe( 'Social Icons', () => {
 			settings.getByRole( 'link', { name: 'View' } )
 		).toHaveAttribute( 'href', 'mailto:me@example.com' );
 
+		// A host and port isn't a protocol, so it opens over HTTPS, as on the
+		// front end.
+		await urlInput.fill( 'localhost:8080/news' );
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://localhost:8080/news' );
+
 		// A link without a protocol opens over HTTPS, as on the front end.
 		await urlInput.fill( 'wordpress.org/news' );
 		await page.keyboard.press( 'Tab' );

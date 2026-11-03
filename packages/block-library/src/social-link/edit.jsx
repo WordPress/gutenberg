@@ -92,9 +92,15 @@ const getRenderedLink = ( url ) => {
 		return undefined;
 	}
 	// Unlike PHP's `is_email()`, `isEmail()` also matches `mailto:` links.
-	return isEmail( url ) && ! getProtocol( url )
-		? `mailto:${ url }`
-		: prependHTTPS( url );
+	if ( isEmail( url ) && ! getProtocol( url ) ) {
+		return `mailto:${ url }`;
+	}
+	// PHP's `parse_url()` reads up to five digits after the colon, as in
+	// `localhost:8080`, as a port rather than a protocol, so it adds HTTPS.
+	if ( /^[^:/?#]+:\d{1,5}(?:\/|$)/.test( url ) ) {
+		return `https://${ url }`;
+	}
+	return prependHTTPS( url );
 };
 
 const SocialLinkURLPopover = ( {
