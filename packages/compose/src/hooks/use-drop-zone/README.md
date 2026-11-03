@@ -59,11 +59,11 @@ const WithoutWrapperDropZoneElement = () => {
 -   _props_ `Object`: Named parameters.
 -   _props.dropZoneElement_ `HTMLElement`: Optional element to be used as the drop zone.
 -   _props.isDisabled_ `boolean`: Whether or not to disable the drop zone.
--   _props.onDragStart_ `( e: DragEvent ) => void`: Called when dragging has started.
+-   _props.onDragStart_ `( e: DragEvent ) => void`: Called when dragging has started, on the first `dragenter` or `dragover` in the document. A drag can start on a `dragover`, as browsers can skip the `dragenter` in an iframe.
 -   _props.onDragEnter_ `( e: DragEvent ) => void`: Called when the zone is entered.
 -   _props.onDragOver_ `( e: DragEvent ) => void`: Called when the zone is moved within.
 -   _props.onDragLeave_ `( e: DragEvent ) => void`: Called when the zone is left.
--   _props.onDragEnd_ `( e: MouseEvent ) => void`: Called when dragging has ended.
+-   _props.onDragEnd_ `( e: MouseEvent ) => void`: Called when dragging has ended, on a `dragend` or a drop in the zone, or on the first `mousemove` with no button held, for drags that end outside the document.
 -   _props.onDrop_ `( e: DragEvent ) => void`: Called when dropping in the zone.
 
 _Returns_
