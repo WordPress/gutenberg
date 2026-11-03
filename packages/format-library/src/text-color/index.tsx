@@ -114,46 +114,62 @@ function TextColorEdit( {
 
 	return (
 		<>
-			{ CONTROLS.map( ( { name: controlName, property, title: controlTitle, icon } ) => {
-				const isPropertyActive = !! activeColors[ property ];
-				// Show the active color in place of the icon.
-				const indicatorColor = isPropertyActive
-					? ( colorIndicatorStyle?.[ property ] ??
-						activeColors[ property ] )
-					: undefined;
+			{ CONTROLS.map(
+				( {
+					name: controlName,
+					property,
+					title: controlTitle,
+					icon,
+				} ) => {
+					const isPropertyActive = !! activeColors[ property ];
+					if ( ! hasColorsToChoose && ! isPropertyActive ) {
+						return null;
+					}
 
-				return (
-					<RichTextToolbarButton
-						key={ property }
-						name={ controlName }
-						className="format-library-text-color-button"
-						isActive={ isPropertyActive }
-						icon={
-							indicatorColor ? (
-								<ColorIndicatorIcon
-									colorValue={ indicatorColor }
-								/>
-							) : (
-								icon
-							)
-						}
-						title={ controlTitle }
-						// If has no colors to choose but a color is active
-						// remove that color onClick.
-						onClick={
-							hasColorsToChoose
-								? () => setEditingProperty( property )
-								: () =>
-										onChange(
-											setColors( value, name, colors, {
-												[ property ]: undefined,
-											} )
-										)
-						}
-						role="menuitemcheckbox"
-					/>
-				);
-			} ) }
+					// Show the active color in place of the icon.
+					const indicatorColor = isPropertyActive
+						? ( colorIndicatorStyle?.[ property ] ??
+							activeColors[ property ] )
+						: undefined;
+
+					return (
+						<RichTextToolbarButton
+							key={ property }
+							name={ controlName }
+							className="format-library-text-color-button"
+							isActive={ isPropertyActive }
+							icon={
+								indicatorColor ? (
+									<ColorIndicatorIcon
+										colorValue={ indicatorColor }
+									/>
+								) : (
+									icon
+								)
+							}
+							title={ controlTitle }
+							// If has no colors to choose but a color is active
+							// remove that color onClick.
+							onClick={
+								hasColorsToChoose
+									? () => setEditingProperty( property )
+									: () =>
+											onChange(
+												setColors(
+													value,
+													name,
+													colors,
+													{
+														[ property ]: undefined,
+													}
+												)
+											)
+							}
+							role="menuitemcheckbox"
+						/>
+					);
+				}
+			) }
 			{ editingProperty && (
 				<InlineColorUI
 					name={ name }
