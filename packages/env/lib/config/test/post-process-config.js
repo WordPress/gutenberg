@@ -4,9 +4,14 @@ const require = createRequire( import.meta.url );
 const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 
+const LEGACY_TESTS_CONFIG = {
+	testsEnvironment: true,
+};
+
 describe( 'postProcessConfig', () => {
 	it( 'should merge relevant root options into environment options', async () => {
 		const processed = await postProcessConfig( {
+			...LEGACY_TESTS_CONFIG,
 			port: 123,
 			testsPort: 456,
 			coreSource: {
@@ -149,6 +154,7 @@ describe( 'postProcessConfig', () => {
 
 	it( 'should not merge some root options into environment options', async () => {
 		const processed = await postProcessConfig( {
+			...LEGACY_TESTS_CONFIG,
 			port: 8888,
 			testsPort: 8889,
 			lifecycleScripts: {
@@ -180,6 +186,7 @@ describe( 'postProcessConfig', () => {
 	describe( 'appendPortToWPConfigs', () => {
 		it( 'should add port to certain environment config options', async () => {
 			const processed = await postProcessConfig( {
+				...LEGACY_TESTS_CONFIG,
 				port: 123,
 				config: {
 					WP_TESTS_DOMAIN: 'localhost',
@@ -228,6 +235,7 @@ describe( 'postProcessConfig', () => {
 
 		it( 'should not overwrite port in WP_HOME', async () => {
 			const processed = await postProcessConfig( {
+				...LEGACY_TESTS_CONFIG,
 				env: {
 					development: {
 						port: 123,
@@ -272,6 +280,7 @@ describe( 'postProcessConfig', () => {
 
 		it( 'should not append port to URLs when port is null', async () => {
 			const processed = await postProcessConfig( {
+				...LEGACY_TESTS_CONFIG,
 				port: null,
 				testsPort: null,
 				config: {
@@ -299,6 +308,7 @@ describe( 'postProcessConfig', () => {
 		it( 'should fail when two environments have the same port', async () => {
 			await expect(
 				postProcessConfig( {
+					...LEGACY_TESTS_CONFIG,
 					env: {
 						development: {
 							port: 123,
@@ -330,6 +340,7 @@ describe( 'postProcessConfig', () => {
 
 		it( 'should not fail when both environments have null ports', async () => {
 			const processed = await postProcessConfig( {
+				...LEGACY_TESTS_CONFIG,
 				port: null,
 				testsPort: null,
 				env: {

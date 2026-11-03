@@ -39,7 +39,7 @@ module.exports = function downloadSources( config, spinner ) {
 	};
 
 	for ( const envName of Object.keys( config.env ) ) {
-		if ( envName === 'tests' && config.testsEnvironment === false ) {
+		if ( envName === 'tests' && ! config.testsEnvironment ) {
 			continue;
 		}
 		const env = config.env[ envName ];
