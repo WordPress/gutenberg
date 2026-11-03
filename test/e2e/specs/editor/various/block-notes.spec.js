@@ -1592,24 +1592,30 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
-		for ( const { name, label } of [
-			{ name: 'core/paragraph', label: 'Block: Paragraph' },
-			{ name: 'core/heading', label: 'Block: Heading' },
+		for ( const { first, second } of [
+			{
+				first: { name: 'core/paragraph', label: 'Block: Paragraph' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+			{
+				first: { name: 'core/heading', label: 'Block: Heading' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
 		] ) {
-			test( `keeps the notes of both blocks when a paragraph is merged into a ${ name } block`, async ( {
+			test( `keeps the notes of both blocks when a ${ second.name } block is merged into a ${ first.name } block`, async ( {
 				editor,
 				page,
 				blockNoteUtils,
 			} ) => {
 				const firstBlock = editor.canvas
-					.getByRole( 'document', { name: label } )
+					.getByRole( 'document', { name: first.label } )
 					.first();
 				const secondBlock = editor.canvas
-					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.getByRole( 'document', { name: second.label } )
 					.last();
 
 				await blockNoteUtils.insertBlockWithNote( {
-					name,
+					name: first.name,
 					content: 'One',
 					note: 'First block note',
 				} );
@@ -1617,17 +1623,17 @@ test.describe( 'Block Notes', () => {
 				await blockNoteUtils.selectBlockText();
 				await blockNoteUtils.addNote( 'First block inline note' );
 				await blockNoteUtils.insertBlockWithNote( {
+					name: second.name,
 					content: 'two',
 					note: 'Second block note',
 				} );
 				await secondBlock.click();
 				await blockNoteUtils.selectBlockText();
 				await blockNoteUtils.addNote( 'Second block inline note' );
-				const [ first, second ] = await editor.getBlocks();
-				const noteId = [
-					...first.attributes.metadata.noteId,
-					...second.attributes.metadata.noteId,
-				];
+				const blocks = await editor.getBlocks();
+				const noteId = blocks.flatMap(
+					( { attributes } ) => attributes.metadata.noteId
+				);
 				expect( noteId ).toHaveLength( 4 );
 
 				await secondBlock.click();
@@ -1636,16 +1642,17 @@ test.describe( 'Block Notes', () => {
 				await page.keyboard.press( 'Backspace' );
 
 				await expect(
-					editor.canvas.getByRole( 'document', { name: label } )
+					editor.canvas.getByRole( 'document', { name: first.label } )
 				).toHaveText( 'Onetwo' );
 				await expect(
 					editor.canvas.locator( 'mark.wp-note' )
 				).toHaveText( [ 'One', 'two' ] );
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						{ name, attributes: { metadata: { noteId } } },
-					] );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: first.name,
+						attributes: { metadata: { noteId } },
+					},
+				] );
 				for ( const note of [
 					'First block note',
 					'First block inline note',
