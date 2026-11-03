@@ -12,6 +12,21 @@ class MockResizeObserver {
 	disconnect() {}
 }
 
+// jsdom has no PointerEvent; dnd-kit's PointerSensor reads `isPrimary`,
+// `button`, and the client coordinates off the native event.
+class MockPointerEvent extends MouseEvent {
+	pointerId: number;
+	pointerType: string;
+	isPrimary: boolean;
+
+	constructor( type: string, init: PointerEventInit = {} ) {
+		super( type, init );
+		this.pointerId = init.pointerId ?? 1;
+		this.pointerType = init.pointerType ?? 'mouse';
+		this.isPrimary = init.isPrimary ?? true;
+	}
+}
+
 function rect( left: number, top: number, width: number, height: number ) {
 	return {
 		left,
@@ -32,6 +47,51 @@ function rect( left: number, top: number, width: number, height: number ) {
 // steps round to one column.
 const CONTAINER_RECT = rect( 0, 0, 240, 600 );
 const ITEM_RECT = rect( 0, 0, 100, 100 );
+
+function pointerEvent(
+	type: string,
+	init: PointerEventInit
+): MockPointerEvent {
+	return new MockPointerEvent( type, {
+		bubbles: true,
+		cancelable: true,
+		pointerId: 1,
+		isPrimary: true,
+		pointerType: 'mouse',
+		...init,
+	} );
+}
+
+function resizeWithPointer( handle: Element, delta: { x: number; y: number } ) {
+	const start = { x: 50, y: 50 };
+	const end = { x: start.x + delta.x, y: start.y + delta.y };
+	act( () => {
+		handle.dispatchEvent(
+			pointerEvent( 'pointerdown', {
+				clientX: start.x,
+				clientY: start.y,
+				button: 0,
+				buttons: 1,
+			} )
+		);
+	} );
+	act( () => {
+		document.dispatchEvent(
+			pointerEvent( 'pointermove', {
+				clientX: end.x,
+				clientY: end.y,
+			} )
+		);
+	} );
+	act( () => {
+		document.dispatchEvent(
+			pointerEvent( 'pointerup', {
+				clientX: end.x,
+				clientY: end.y,
+			} )
+		);
+	} );
+}
 
 // Space picks the handle up, the arrow keys move the pointer in 25px
 // steps, Space drops. dnd-kit binds its keyboard listener after a
@@ -54,6 +114,7 @@ async function resizeWithKeyboard( handle: Element, keys: string[] ) {
 beforeEach( () => {
 	vi.useFakeTimers();
 	vi.stubGlobal( 'ResizeObserver', MockResizeObserver );
+	vi.stubGlobal( 'PointerEvent', MockPointerEvent );
 	vi.spyOn(
 		HTMLElement.prototype,
 		'getBoundingClientRect'
@@ -230,6 +291,38 @@ describe( 'DashboardGrid item resize widths', () => {
 			expect( committedWidth( onChangeLayout ) ).toBe( expected );
 		}
 	);
+
+	it( 'snaps a pointer resize to a declared token', () => {
+		const onChangeLayout =
+			vi.fn< ( layout: DashboardGridLayoutItem[] ) => void >();
+		const { handle } = renderGrid( {
+			itemResizeWidths: { a: [ 'full' ] },
+			onChangeLayout,
+		} );
+
+		resizeWithPointer( handle, { x: 200, y: 0 } );
+
+		expect( onChangeLayout ).toHaveBeenCalledTimes( 1 );
+		expect( committedWidth( onChangeLayout ) ).toBe( 'full' );
+	} );
+
+	it( 'freezes the width during a pointer resize with an empty entry', () => {
+		const onChangeLayout =
+			vi.fn< ( layout: DashboardGridLayoutItem[] ) => void >();
+		const { handle } = renderGrid( {
+			rowHeight: 20,
+			itemResizeWidths: { a: [] },
+			onChangeLayout,
+		} );
+
+		resizeWithPointer( handle, { x: 200, y: 60 } );
+
+		expect( onChangeLayout ).toHaveBeenCalledTimes( 1 );
+		const [ committed ] = onChangeLayout.mock.calls[ 0 ];
+		const item = committed.find( ( entry ) => entry.key === 'a' );
+		expect( item?.width ).toBe( 1 );
+		expect( item?.height ).toBe( 2 );
+	} );
 
 	it( 'retains a stored token outside the choices until the pointer moves it', async () => {
 		const onChangeLayout =

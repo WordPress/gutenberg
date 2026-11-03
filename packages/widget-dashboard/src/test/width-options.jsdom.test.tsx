@@ -228,6 +228,25 @@ describe( 'WidgetDashboard width options', () => {
 		expect( stagedWidth() ).toBe( 1 );
 	} );
 
+	it( 'keeps widths supplied by a controlled reset', () => {
+		const { rerender } = render(
+			<Harness widthOptions={ widthOptions } />
+		);
+
+		const resetLayout: DashboardWidget[] = [
+			{
+				uuid: 'reset',
+				type: 'core/test',
+				placement: { width: 4, height: 1 },
+			},
+		];
+		rerender(
+			<Harness layout={ resetLayout } widthOptions={ widthOptions } />
+		);
+
+		expect( stagedWidth( 'reset' ) ).toBe( 4 );
+	} );
+
 	it( 'publishes the restored width, not the staged one, on commit', () => {
 		const onLayoutChange = vi.fn();
 		const { rerender } = render(
