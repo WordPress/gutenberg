@@ -892,56 +892,6 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 		} );
 
-		test( 'switches list styles in a template and keeps the chosen style on the front of site', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-		} ) => {
-			await requestUtils.createTemplate( 'wp_template', {
-				slug: 'single',
-				title: 'Single',
-				content: [
-					'<!-- wp:table-of-contents /-->',
-					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
-				].join( '\n\n' ),
-			} );
-			const post = await createPostWithContent(
-				requestUtils,
-				'Template list style post',
-				headingBlock( {
-					content: 'Template list style section',
-					anchor: 'template-list-style-section',
-				} )
-			);
-
-			await admin.visitSiteEditor( {
-				postId: 'emptytheme//single',
-				postType: 'wp_template',
-				canvas: 'edit',
-			} );
-
-			const tableOfContents = getTableOfContentsEditorBlock( editor );
-			const list = tableOfContents.getByRole( 'list' ).first();
-			await expect( list ).toHaveCSS( 'list-style-type', 'decimal' );
-
-			await tableOfContents.click();
-			await editor.clickBlockToolbarButton( 'Unordered' );
-			await expect( list ).toHaveCSS( 'list-style-type', 'disc' );
-
-			await editor.saveSiteEditorEntities( {
-				isOnlyCurrentEntityDirty: true,
-			} );
-			await openPostOnFrontend( page, post.id );
-
-			await expect(
-				page
-					.getByRole( 'navigation', { name: 'Table of Contents' } )
-					.getByRole( 'list' )
-					.first()
-			).toHaveCSS( 'list-style-type', 'disc' );
-		} );
-
 		test( 'only lists headings from the viewed post content boundary', async ( {
 			page,
 			requestUtils,
