@@ -59,7 +59,7 @@ export function mediaEditorReducer(
 		}
 		case 'RESET': {
 			const next = buildInitialMediaEditorState(
-				createImageEditorState( state.imageEditor.image )
+				createImageEditorState( { image: state.imageEditor.image } )
 			);
 			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}

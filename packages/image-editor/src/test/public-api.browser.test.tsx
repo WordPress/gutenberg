@@ -6,6 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 import {
 	ImageEditorCanvas,
 	createImageEditorState,
+	getOutputSize,
 	mapEditToOriginal,
 	useImageEditor,
 	type ImageEditorController,
@@ -132,7 +133,7 @@ describe( 'the public API', () => {
 		await render(
 			<ConsumerEditor
 				onController={ onController }
-				initialState={ { ...createImageEditorState(), aspectRatio: 1 } }
+				initialState={ createImageEditorState( { aspectRatio: 1 } ) }
 				freeformCrop={ false }
 			/>
 		);
@@ -145,6 +146,11 @@ describe( 'the public API', () => {
 		);
 		// Fitting the crop to the locked ratio is not an edit.
 		expect( controller.isDirty ).toBe( false );
+		// The square is 600 px of the 1200x600 image, in both directions.
+		expect( getOutputSize( controller.state ) ).toEqual( {
+			width: 600,
+			height: 600,
+		} );
 	} );
 
 	it( 'keeps a locked ratio for a state that starts with its image, and for the crop setter', async () => {
@@ -155,10 +161,10 @@ describe( 'the public API', () => {
 		await render(
 			<ConsumerEditor
 				onController={ onController }
-				initialState={ {
-					...createImageEditorState( IMAGE ),
+				initialState={ createImageEditorState( {
+					image: IMAGE,
 					aspectRatio: 1,
-				} }
+				} ) }
 			/>
 		);
 
@@ -185,7 +191,7 @@ describe( 'the public API', () => {
 		await render(
 			<ConsumerEditor
 				onController={ onController }
-				initialState={ { ...createImageEditorState(), aspectRatio: 1 } }
+				initialState={ createImageEditorState( { aspectRatio: 1 } ) }
 			/>
 		);
 

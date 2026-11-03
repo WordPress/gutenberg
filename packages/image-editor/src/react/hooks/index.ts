@@ -4,6 +4,7 @@ export {
 	createImageEditorState,
 } from './use-image-editor';
 export type {
+	CreateImageEditorStateOptions,
 	ImageEditorController,
 	ImageEditorOptions,
 	InternalImageEditorController,

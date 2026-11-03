@@ -1006,9 +1006,9 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 	const IMAGE = { src: 'photo.jpg', naturalWidth: 1200, naturalHeight: 600 };
 
 	function useControlled(
-		initialState: InternalImageEditorState = createImageEditorState(
-			IMAGE
-		) as InternalImageEditorState
+		initialState: InternalImageEditorState = createImageEditorState( {
+			image: IMAGE,
+		} ) as InternalImageEditorState
 	) {
 		const [ state, setState ] = useState( initialState );
 		const changes = useRef< Array< { isEdit: boolean } > >( [] );
@@ -1143,10 +1143,12 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 
 		it( 'fits the crop when the state starts with its image and a lock', () => {
 			const { result } = renderHook( () =>
-				useControlled( {
-					...createImageEditorState( IMAGE ),
-					aspectRatio: 1,
-				} as InternalImageEditorState )
+				useControlled(
+					createImageEditorState( {
+						image: IMAGE,
+						aspectRatio: 1,
+					} ) as InternalImageEditorState
+				)
 			);
 
 			// The canvas reports the image it loaded, which the state has.

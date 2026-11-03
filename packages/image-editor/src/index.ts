@@ -9,7 +9,11 @@
 export { ImageEditorCanvas } from './react/components';
 export type { ImageEditorCanvasProps } from './react/components';
 export { useImageEditor, createImageEditorState } from './react/hooks';
-export type { ImageEditorController, ImageEditorOptions } from './react/hooks';
+export type {
+	CreateImageEditorStateOptions,
+	ImageEditorController,
+	ImageEditorOptions,
+} from './react/hooks';
 export type {
 	Flip,
 	ImageEditorState,
@@ -18,6 +22,9 @@ export type {
 	Size,
 } from './core/types';
 export { areImageEditorStatesEqual } from './core/state';
+
+// The size of the image the edit produces.
+export { getOutputSize } from './get-output-size';
 
 // Map the edit onto the original image, for saving it.
 export { mapEditToOriginal } from './map-edit-to-original';

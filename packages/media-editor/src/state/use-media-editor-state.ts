@@ -274,7 +274,7 @@ export function useMediaEditorState(): MediaEditorSession {
 			// clean baseline, and no history. Edits made against one
 			// image must not survive onto another.
 			const next = buildInitialMediaEditorState(
-				createImageEditorState( image )
+				createImageEditorState( { image } )
 			);
 			stateRef.current = next;
 			dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );

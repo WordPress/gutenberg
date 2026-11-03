@@ -17,7 +17,12 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
-import { ImageEditorCanvas, createImageEditorState, useImageEditor } from '..';
+import {
+	ImageEditorCanvas,
+	createImageEditorState,
+	getOutputSize,
+	useImageEditor,
+} from '..';
 // The debug story shows the editor's internals, so it uses them directly.
 import { useInternalImageEditor } from '../react/hooks/use-image-editor';
 import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
@@ -35,7 +40,6 @@ import {
 	getVisibleBounds,
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
-import type { InternalImageEditorState } from '../core/types';
 import styles from './style.module.css';
 
 // "-1" stands for the image's own ratio, worked out once it loads.
@@ -199,14 +203,7 @@ const WithControlsComponent = () => {
 		}
 	}, [ src, reset ] );
 
-	// Compute the crop dimensions in source pixels. `getSourceRegion` is
-	// internal, and the public state is the internal one underneath.
-	const cropDimensions = state.image
-		? getSourceRegion( state as unknown as InternalImageEditorState, {
-				width: state.image.naturalWidth,
-				height: state.image.naturalHeight,
-			} )
-		: null;
+	const cropDimensions = getOutputSize( state );
 
 	// The base cardinal angle (nearest 90° step) and the fine offset.
 	// `setRotation` is a raw state setter (absolute-angle assignment), so

@@ -95,16 +95,38 @@ function areImagesEqual(
 }
 
 /**
- * Build the state an editor starts from for an image: default pan, zoom,
- * rotation, flip and crop, no locked aspect ratio.
+ * What an editor can start from.
+ */
+export interface CreateImageEditorStateOptions {
+	/** The image to start with, if you already have it. */
+	image?: ImageEditorState[ 'image' ];
+	/**
+	 * A width / height ratio in source pixels to lock the crop to from the
+	 * start. With an image, the crop starts as the largest box of that
+	 * ratio.
+	 */
+	aspectRatio?: number;
+}
+
+/**
+ * Build the state an editor starts from: default pan, zoom, rotation,
+ * flip and crop, and no locked ratio unless you ask for one.
  *
- * @param image The loaded image, or `null` before one loads.
+ * @param options The image and the locked ratio to start with.
  * @return The starting state.
  */
 export function createImageEditorState(
-	image: ImageEditorState[ 'image' ] = null
+	options: CreateImageEditorStateOptions = {}
 ): ImageEditorState {
-	return enforceContainment( { ...DEFAULT_STATE, image } );
+	const { image = null, aspectRatio } = options;
+	return enforceContainment(
+		fitCropToLockedRatio( {
+			...DEFAULT_STATE,
+			image,
+			aspectRatio:
+				aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
+		} )
+	);
 }
 
 /**
@@ -344,7 +366,11 @@ export interface ImageEditorController {
 	 * loaded image starts fresh, keeping only the locked ratio.
 	 */
 	setImage: ( image: ImageEditorState[ 'image' ] ) => void;
-	/** Go back to the clean state, keeping the locked ratio. */
+	/**
+	 * Go back to the clean state: the state you started from, as the
+	 * editor settled it before the first edit. A ratio locked after that
+	 * is an edit, so reset undoes it.
+	 */
 	reset: () => void;
 	/** Move the image under the crop, in fractions of the image. */
 	setPan: ( pan: NormalizedPoint ) => void;

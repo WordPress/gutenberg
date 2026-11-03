@@ -16,13 +16,20 @@ npm install @wordpress/image-editor --save
 
 ## Styles
 
-The editor's styles ship in `build-style/style.css`. Load them in your stylesheet:
+The canvas needs the editor's styles to lay out at all, so load them. They ship in `build-style/style.css`:
 
 ```scss
 @use "@wordpress/image-editor/build-style/style.css";
 ```
 
 The focus ring and the focused resize handle use the admin theme colour. Set `--wp-image-editor-focus-color` on an ancestor to change it.
+
+## Outside WordPress
+
+The package needs no WordPress site, and nothing it imports talks to one. Two things to know:
+
+-   The examples import React hooks from `@wordpress/element`, which re-exports React. Import them from `react` instead if you prefer.
+-   The editor's own text, such as the labels on the resize handles and what a screen reader announces, is in English unless you give `@wordpress/i18n` your translations.
 
 ## Quick Start
 
@@ -80,14 +87,14 @@ React hook that returns the editor's controller. Pass the current state and a fu
 The controller has:
 
 -   `state`: the current state.
--   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. Positions and sizes are fractions from 0 to 1. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. While a ratio is locked, the crop always has that ratio: a crop that does not match, from `setCropRect` or a state you pass in, keeps its centre and width and takes the height the ratio needs.
+-   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. The crop area is in fractions of the view, from 0 to 1. The pan is an offset from the centre, so it is signed, and how far it can go depends on the zoom and the crop, because the image has to cover the crop. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. While a ratio is locked, the crop always has that ratio: a crop that does not match, from `setCropRect` or a state you pass in, keeps its centre and width and takes the height the ratio needs.
 -   `setImage( image )` to load an image. The canvas calls it when `src` loads. The first image keeps the state you started from, such as an edit you saved earlier. Replacing or clearing a loaded image starts fresh: no pan, zoom, rotation, flip or crop from the old image, but a locked ratio stays.
--   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the pan, zoom, rotation, flip or crop differs from that state. Changing only the ratio lock does not make the edit dirty. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. `reset()` keeps a locked ratio.
+-   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the pan, zoom, rotation, flip or crop differs from that state. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. So `reset()` keeps a locked ratio only when the state you started from had one; a ratio locked later is an edit, and reset undoes it along with the rest. Locking a ratio usually makes the edit dirty, because it reshapes the crop. Unlocking does not, and nor does locking a ratio the crop already has.
 -   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit.
 
-### `ImageEditorState`, `createImageEditorState( image? )`
+### `ImageEditorState`, `createImageEditorState( options? )`
 
-The editor's state, and the state an editor starts from for an image (or for no image yet). Read the state, store it and pass it back, but create it with `createImageEditorState` and change it only through the controller: it also carries values the editor keeps for itself.
+The editor's state, and the state an editor starts from. Pass `image` when you already have one, and `aspectRatio` to lock the crop from the start; both are optional. Read the state, store it and pass it back, but create it with `createImageEditorState` and change it only through the controller: it also carries values the editor keeps for itself.
 
 ### `areImageEditorStatesEqual( a, b )`
 
