@@ -16,6 +16,43 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
+### npm v11+ / npm v12 compatibility
+
+Starting with **npm v11.16.0**, running `npm install` may display warnings like:
+
+```
+npm warn allow-scripts @parcel/watcher@2.x.x (install: node-gyp rebuild)
+npm warn allow-scripts core-js@3.x.x (postinstall: ...)
+npm warn allow-scripts core-js-pure@3.x.x (postinstall: ...)
+npm warn allow-scripts unrs-resolver@1.x.x (postinstall: node postinstall.js)
+```
+
+These are transitive dependencies of `@wordpress/scripts` that run install-time scripts.
+The warnings are advisory today but will become blocking errors in **npm v12** (expected
+July 2026). To silence them and prepare for npm v12, add an `allowScripts` field to your
+project's root `package.json`:
+
+```json
+{
+  "allowScripts": {
+    "@parcel/watcher": true,
+    "core-js": true,
+    "core-js-pure": true,
+    "unrs-resolver": true
+  }
+}
+```
+
+Alternatively, run:
+
+```bash
+npm approve-scripts @parcel/watcher core-js core-js-pure unrs-resolver
+```
+
+This command will write the allowlist into your `package.json` automatically. Do **not**
+run `npm install --ignore-scripts` as a workaround — it breaks the native file-system
+watcher used by webpack and silently degrades `wp-scripts start` watch performance.
+
 **Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Setup
