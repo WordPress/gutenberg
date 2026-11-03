@@ -75,7 +75,6 @@ export default function DimensionsPanel() {
 			settings={ settings }
 			includeLayoutControls
 			defaultControls={ DEFAULT_CONTROLS }
-			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }
