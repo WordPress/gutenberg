@@ -17,7 +17,6 @@ type Metadata = Record< string, unknown >;
 export function addMergeCallback( settings: BlockType ): BlockType {
 	const { merge } = settings;
 
-	// Blocks without `merge` can't be merged, so leave them as they are.
 	if ( ! merge ) {
 		return settings;
 	}
@@ -33,8 +32,6 @@ export function addMergeCallback( settings: BlockType ): BlockType {
 				return result;
 			}
 
-			// The merged attributes are shallowly spread over the first block's
-			// attributes, so build on its metadata to keep the rest of it.
 			const metadata = ( result.metadata ??
 				attributes.metadata ??
 				{} ) as Metadata;
