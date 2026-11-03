@@ -193,15 +193,39 @@ const blob = await controller.getCroppedImage( 'image/jpeg', 0.9 );
 
 Canvas export is browser-only. Cross-origin images need valid CORS headers or the canvas will be tainted.
 
-## Send the Crop to WordPress
+## Save the Edit
 
-`buildModifiers()` turns the controller's crop into the rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
+`getStepsForOriginal( state )` returns the flip, rotate and crop steps that make the full-size original image match what the person framed, in the order to apply them. Crop positions and sizes are fractions of the image after the rotation. An unedited image returns an empty list, so you can skip saving.
+
+The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { buildModifiers } from '@wordpress/image-editor';
+import { getStepsForOriginal } from '@wordpress/image-editor';
 
-const modifiers = buildModifiers( controller );
+const modifiers = getStepsForOriginal( controller.state ).map( ( step ) => {
+	if ( step.type === 'flip' ) {
+		return {
+			type: 'flip',
+			args: {
+				flip: { horizontal: step.horizontal, vertical: step.vertical },
+			},
+		};
+	}
+	if ( step.type === 'rotate' ) {
+		return { type: 'rotate', args: { angle: step.angle } };
+	}
+	return {
+		type: 'crop',
+		args: {
+			left: step.x * 100,
+			top: step.y * 100,
+			width: step.width * 100,
+			height: step.height * 100,
+		},
+	};
+} );
+
 if ( modifiers.length ) {
 	await apiFetch( {
 		path: `/wp/v2/media/${ attachmentId }/edit`,
@@ -210,8 +234,6 @@ if ( modifiers.length ) {
 	} );
 }
 ```
-
-An unedited image returns an empty list.
 
 ## Accessibility Notes
 

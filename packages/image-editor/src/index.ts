@@ -16,7 +16,6 @@ export { areCropperStatesEqual } from './core';
 export { MAX_ZOOM, MAX_ROTATION_OFFSET } from './core/constants';
 export { getMinZoom } from './core/containment';
 
-// The rotate, flip and crop instructions the WordPress media REST endpoint
-// expects.
-export { buildModifiers } from './build-modifiers';
-export type { Modifier } from './build-modifiers';
+// The steps that make the original image match the edit, for saving it.
+export { getStepsForOriginal } from './get-steps-for-original';
+export type { OriginalImageStep } from './get-steps-for-original';

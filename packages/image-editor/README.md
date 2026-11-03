@@ -90,9 +90,9 @@ The state a cropper starts from for an image. Use it to build your starting stat
 
 Whether two cropper states are the same crop, ignoring tiny floating-point differences. Use it to skip no-op entries in your own undo history.
 
-### `buildModifiers( controller )`
+### `getStepsForOriginal( state )`
 
-The rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
+Call it when saving. It returns the flip, rotate and crop steps that make the full-size original image match what the person framed, in the order to apply them. Send them to a server, or run them with an image library in the browser. An unedited image returns an empty list.
 
 ### `MAX_ZOOM`, `MAX_ROTATION_OFFSET`, `getMinZoom`
 

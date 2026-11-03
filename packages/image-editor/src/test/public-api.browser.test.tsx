@@ -5,7 +5,7 @@ import { useEffect } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
 import {
 	Cropper,
-	buildModifiers,
+	getStepsForOriginal,
 	useCropperController,
 	type CropperController,
 } from '..';
@@ -67,11 +67,11 @@ describe( 'the public API', () => {
 		act( () => controller.snapRotate90( 1 ) );
 		act( () => controller.toggleFlip( 'horizontal' ) );
 		expect(
-			buildModifiers( controller ).map( ( { type } ) => type )
+			getStepsForOriginal( controller.state ).map( ( { type } ) => type )
 		).toEqual( [ 'flip', 'rotate', 'crop' ] );
 
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
-		expect( buildModifiers( controller ) ).toEqual( [] );
+		expect( getStepsForOriginal( controller.state ) ).toEqual( [] );
 	} );
 } );

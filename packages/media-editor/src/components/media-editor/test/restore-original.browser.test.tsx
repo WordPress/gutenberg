@@ -259,10 +259,18 @@ describe( 'Restore original', () => {
 		const editWrite = withTransform
 			? writes.mock.calls[ 0 ][ 1 ]
 			: undefined;
-		expect( { src: editWrite?.src, post: editWrite?.post } ).toEqual(
+		expect( {
+			src: editWrite?.src,
+			post: editWrite?.post,
+			modifiers: editWrite?.modifiers,
+		} ).toEqual(
 			withTransform
-				? { src: original.source_url, post: original.post }
-				: { src: undefined, post: undefined }
+				? {
+						src: original.source_url,
+						post: original.post,
+						modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
+					}
+				: { src: undefined, post: undefined, modifiers: undefined }
 		);
 	} );
 } );
