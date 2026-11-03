@@ -119,6 +119,12 @@ const meta: Meta< typeof ImageEditorCanvas > = {
 	title: 'Editor/Media Editor/ImageEditor',
 	component: ImageEditorCanvas,
 	tags: [ 'status-experimental' ],
+	argTypes: {
+		// The table reads the type from the canvas inside the package.
+		controller: {
+			table: { type: { summary: 'ImageEditorController' } },
+		},
+	},
 };
 
 export default meta;

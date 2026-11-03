@@ -56,43 +56,48 @@ const SETTLE_STENCIL_TRANSITION = [
 ].join( ', ' );
 
 /**
- * Props for the Cropper component.
+ * Props for the canvas, which the package exports as `ImageEditorCanvas`.
  */
 export interface CropperProps {
-	/** Image source URL. */
+	/** The image URL. */
 	src: string;
-	/** The cropper controller from `useCropperController` or a composite store. */
+	/** The controller from `useImageEditor`. */
 	controller: CropperController;
-	/** Show the rule-of-thirds grid overlay, or only during interactions. */
+	/**
+	 * Show the rule-of-thirds grid: `true`, `false` or `'interactive'`
+	 * (only while the crop is being changed). Defaults to `false`.
+	 */
 	showGrid?: boolean | 'interactive';
-	/** Show the dimming overlay outside the crop area. */
+	/** Dim the image outside the crop area. Defaults to `true`. */
 	showDimming?: boolean;
-	/** Show the live output dimensions tooltip during a resize. */
+	/** Show the crop size in pixels while resizing. Defaults to `true`. */
 	showDimensions?: boolean;
 	/**
-	 * Enable freeform crop mode with resizable handles.
-	 * When false (default), the crop area is fixed and centered.
-	 * When true, the crop area has resize handles and can be freely repositioned.
+	 * Show resize handles so the crop area can be resized and moved. When
+	 * `false` (the default), the crop area is fixed and centred, and the
+	 * image pans and zooms under it.
 	 */
 	freeformCrop?: boolean;
-	/** Focus the crop area when the cropper mounts. */
+	/** Focus the crop area when it mounts. Defaults to `false`. */
 	focusOnMount?: boolean;
 	/**
-	 * Ignore all crop interaction: pointer drags, wheel zoom, keyboard
-	 * pan/zoom and the stencil's resize handles. Any gesture already in
-	 * flight is cancelled. Used while the edit is being saved, so the
-	 * modifiers sent to the server cannot change after the request starts.
+	 * Ignore all crop interaction, for example while saving, so the edit
+	 * cannot change after saving starts. A gesture already in progress is
+	 * cancelled. Defaults to `false`.
 	 */
 	disabled?: boolean;
-	/** Callback fired when the image is loaded. */
+	/** Called with the image's natural size when the image loads. */
 	onImageLoaded?: ( size: Size ) => void;
-	/** Callback fired when the image fails to load. */
+	/** Called when the image fails to load. */
 	onImageError?: () => void;
-	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
+	/**
+	 * Called when a drag, resize or pinch starts. Use it with
+	 * `onGestureEnd` to record a gesture as one undo entry.
+	 */
 	onGestureStart?: () => void;
-	/** Fires when a continuous gesture ends (pointerup, resize settle). */
+	/** Called when a drag, resize or pinch ends. */
 	onGestureEnd?: () => void;
-	/** Additional className for the container. */
+	/** An extra class for the container. */
 	className?: string;
 }
 
@@ -108,7 +113,7 @@ export interface CropperProps {
  *
  * @param root0                Component props implementing CropperProps.
  * @param root0.src            Image source URL.
- * @param root0.controller     The cropper controller from `useCropperController` or a composite store.
+ * @param root0.controller     The controller from `useImageEditor`.
  * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
  * @param root0.showDimming    Show dimming overlay outside crop.
  * @param root0.showDimensions Show live dimensions tooltip during resize.

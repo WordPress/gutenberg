@@ -61,14 +61,16 @@ The canvas the person edits the image on. It fills its parent, so render it insi
 
 -   `src` (required): the image URL.
 -   `controller` (required): the controller from `useImageEditor`.
--   `freeformCrop`: show resize handles so the crop area can be resized and moved. When `false` (the default), the crop area is fixed and centred, and the image pans and zooms under it.
--   `showGrid`: show the rule-of-thirds grid, `true`, `false` or `'interactive'` (only while the crop is being changed).
+-   `showGrid`: show the rule-of-thirds grid: `true`, `false` or `'interactive'` (only while the crop is being changed). Defaults to `false`.
 -   `showDimming`: dim the image outside the crop area. Defaults to `true`.
 -   `showDimensions`: show the crop size in pixels while resizing. Defaults to `true`.
--   `focusOnMount`: focus the crop area when it mounts.
--   `disabled`: ignore all crop interaction, for example while saving.
--   `onImageLoaded( size )`, `onImageError()`: called when the image loads or fails to load.
--   `onGestureStart()`, `onGestureEnd()`: called when a drag, resize or pinch starts and ends. Use them to record a gesture as one undo entry.
+-   `freeformCrop`: show resize handles so the crop area can be resized and moved. When `false` (the default), the crop area is fixed and centred, and the image pans and zooms under it.
+-   `focusOnMount`: focus the crop area when it mounts. Defaults to `false`.
+-   `disabled`: ignore all crop interaction, for example while saving, so the edit cannot change after saving starts. A gesture already in progress is cancelled. Defaults to `false`.
+-   `onImageLoaded( size )`: called with the image's natural size when the image loads.
+-   `onImageError()`: called when the image fails to load.
+-   `onGestureStart()`: called when a drag, resize or pinch starts. Use it with `onGestureEnd` to record a gesture as one undo entry.
+-   `onGestureEnd()`: called when a drag, resize or pinch ends.
 -   `className`: an extra class for the container.
 
 ### `useImageEditor( { state, onChange } )`
