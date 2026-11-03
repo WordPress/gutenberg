@@ -261,6 +261,173 @@ test.describe( 'Writing toolbar', () => {
 		] );
 	} );
 
+	test( 'puts the switch at the right of the toolbar, where the formatting tools were', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		const toolbar = getToolbar( page );
+		const switchButton = toolbar.getByRole( 'button', {
+			name: 'Write',
+			exact: true,
+		} );
+		const labels = () =>
+			toolbar
+				.getByRole( 'button' )
+				.evaluateAll( ( buttons ) =>
+					buttons.map( ( button ) =>
+						button.getAttribute( 'aria-label' )
+					)
+				);
+
+		await expect( switchButton ).toBeVisible();
+		const design = await labels();
+		expect( design.indexOf( 'Write' ) ).toBeGreaterThan(
+			design.indexOf( 'Align text' )
+		);
+		expect( design.indexOf( 'Write' ) ).toBeLessThan(
+			design.indexOf( 'Options' )
+		);
+
+		await switchButton.click();
+
+		// The switch stays put when the writing tools take over.
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+		const writing = await labels();
+		expect( writing.indexOf( 'Write' ) ).toBeGreaterThan(
+			writing.indexOf( 'Bold' )
+		);
+		expect( writing.indexOf( 'Write' ) ).toBeLessThan(
+			writing.indexOf( 'Options' )
+		);
+	} );
+
+	test( 'moves the formatting tools out of the design tools', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		const toolbar = getToolbar( page );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+
+		await toolbar
+			.getByRole( 'button', { name: 'Write', exact: true } )
+			.click();
+
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+	} );
+
+	test( 'moves text alignment out of the design tools, leaving block alignment', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		const toolbar = getToolbar( page );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align block' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align text' } )
+		).toBeHidden();
+
+		await toolbar
+			.getByRole( 'button', { name: 'Write', exact: true } )
+			.click();
+
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align text' } )
+		).toBeVisible();
+	} );
+
+	test( 'offers the switch to a block whose only writing tools are the formatting ones', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'Press' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+
+		const toolbar = getToolbar( page );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+
+		await toolbar
+			.getByRole( 'button', { name: 'Write', exact: true } )
+			.click();
+
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+		// The block has no text styles of its own to offer.
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Style', exact: true } )
+		).toBeHidden();
+	} );
+
+	test( 'leaves the formatting tools in place for a selection across blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click();
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		// The switch belongs to one block, so a selection spanning two keeps
+		// its formatting tools where they have always been.
+		const toolbar = getToolbar( page );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Write', exact: true } )
+		).toBeHidden();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+	} );
+
 	test( 'goes back to designing when another block is selected', async ( {
 		editor,
 		page,
@@ -307,6 +474,9 @@ test.describe( 'Writing toolbar', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Writing' },
 		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
 
 		await expect(
 			getToolbar( page ).getByRole( 'button', {
@@ -314,6 +484,14 @@ test.describe( 'Writing toolbar', () => {
 				exact: true,
 			} )
 		).toBeHidden();
+		// With nowhere else to put them, the formatting tools and text
+		// alignment stay where they have always been.
+		await expect(
+			getToolbar( page ).getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+		await expect(
+			getToolbar( page ).getByRole( 'button', { name: 'Align text' } )
+		).toBeVisible();
 
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-writing-toolbar',

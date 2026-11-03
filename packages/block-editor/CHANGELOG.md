@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Block toolbar: Add a `writing` `BlockControls` group and a switch that shows it in place of the design tools, for blocks that declare the new `writing` block support. Behind the `gutenberg-writing-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
+-   Block toolbar: Add `writing` and `text-align` `BlockControls` groups and a switch that shows them, together with the `inline` group, in place of the design tools. Blocks that declare the new `writing` block support fill the writing group with a text style, font and size; any other block is offered the switch while its rich text holds the selection, so the formatting tools and text alignment are reached the same way. The `typography.textAlign` support fills the `text-align` group rather than `block` while the experiment is on. Behind the `gutenberg-writing-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
 -   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).

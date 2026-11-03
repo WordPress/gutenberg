@@ -22,6 +22,7 @@ import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import NavigableToolbar from '../navigable-toolbar';
+import useHasBlockControls from '../block-controls/use-has-block-controls';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
@@ -75,7 +76,8 @@ export function PrivateBlockToolbar( {
 		areSelectedBlocksHiddenOnViewport,
 		showStyleStateSlot,
 		canEdit,
-		showWritingSwitch,
+		allowsWriting,
+		hasWritingTools,
 	} = useSelect( ( select ) => {
 		const { canEditBlock } = select( blockEditorStore );
 		const {
@@ -140,7 +142,7 @@ export function PrivateBlockToolbar( {
 			selectedBlockClientIds.every( ( id: string ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
-		const _showWritingSwitch =
+		const _allowsWriting =
 			!! window.__experimentalWritingToolbar &&
 			selectedBlockClientIds.length === 1 &&
 			_isDefaultEditingMode &&
@@ -148,8 +150,7 @@ export function PrivateBlockToolbar( {
 			! _isSectionBlock &&
 			! _isZoomOut &&
 			isValid &&
-			isVisual &&
-			hasBlockSupport( _blockName, 'writing', false );
+			isVisual;
 
 		const _isEditingResponsiveStyleState =
 			!! selectedBlockClientId &&
@@ -189,9 +190,21 @@ export function PrivateBlockToolbar( {
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
 			canEdit: _canEditBlock,
-			showWritingSwitch: _showWritingSwitch,
+			allowsWriting: _allowsWriting,
+			hasWritingTools:
+				_allowsWriting &&
+				hasBlockSupport( _blockName, 'writing', false ),
 		};
 	}, [] );
+
+	/*
+	 * A block that supports writing brings its own writing tools. Any other
+	 * block has a writing mode only while there are formatting tools to put in
+	 * it, which is whenever a rich text field of it holds the selection.
+	 */
+	const hasFormatTools = useHasBlockControls( 'inline' );
+	const showWritingSwitch =
+		allowsWriting && ( hasWritingTools || hasFormatTools );
 
 	const [ toolbarMode, setToolbarMode ] = useToolbarMode( blockClientId );
 	const isWriting = showWritingSwitch && toolbarMode === 'write';
@@ -247,12 +260,6 @@ export function PrivateBlockToolbar( {
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
-				) }
-				{ showWritingSwitch && (
-					<ToolbarModeSwitch
-						mode={ toolbarMode }
-						onChange={ setToolbarMode }
-					/>
 				) }
 				{ ! isWriting &&
 					( shouldShowVisualToolbar ||
@@ -323,6 +330,10 @@ export function PrivateBlockToolbar( {
 										className="block-editor-block-toolbar__slot"
 									/>
 									<BlockControls.Slot
+										group="text-align"
+										className="block-editor-block-toolbar__slot"
+									/>
+									<BlockControls.Slot
 										group="block"
 										className="block-editor-block-toolbar__slot"
 									/>
@@ -340,11 +351,19 @@ export function PrivateBlockToolbar( {
 												group="block"
 												className="block-editor-block-toolbar__slot"
 											/>
+											{ ! showWritingSwitch && (
+												<BlockControls.Slot
+													group="text-align"
+													className="block-editor-block-toolbar__slot"
+												/>
+											) }
 											<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-											<BlockControls.Slot
-												group="inline"
-												className="block-editor-block-toolbar__slot"
-											/>
+											{ ! showWritingSwitch && (
+												<BlockControls.Slot
+													group="inline"
+													className="block-editor-block-toolbar__slot"
+												/>
+											) }
 										</>
 									) }
 									{ showStyleStateSlot && (
@@ -366,6 +385,12 @@ export function PrivateBlockToolbar( {
 							) }
 						</>
 					) }
+				{ showWritingSwitch && (
+					<ToolbarModeSwitch
+						mode={ toolbarMode }
+						onChange={ setToolbarMode }
+					/>
+				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>

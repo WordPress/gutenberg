@@ -32,7 +32,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-writing-toolbar',
 					'label'       => __( 'Writing toolbar', 'gutenberg' ),
-					'description' => __( 'Splits the block toolbar in two for blocks you write prose in. A switch at its left swaps the design tools for a text style, font and size.', 'gutenberg' ),
+					'description' => __( 'Splits the block toolbar in two for blocks you write prose in. A switch at its right swaps the design tools for a text style, font and size, alongside the formatting tools and text alignment.', 'gutenberg' ),
 				),
 			),
 		),
