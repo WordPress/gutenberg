@@ -690,8 +690,8 @@ export function MediaUploadModal( {
 
 	const paginationInfo = useMemo(
 		() => ( {
-			totalItems,
-			totalPages,
+			totalItems: totalItems ?? 0,
+			totalPages: totalPages ?? 1,
 		} ),
 		[ totalItems, totalPages ]
 	);
