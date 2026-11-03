@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `@wordpress/image-editor` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-image-editor` script.
+-   Add `@wordpress/image-editor` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-image-editor` script ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ## 7.1.0 (2026-11-04)
 
