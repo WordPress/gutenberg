@@ -63,6 +63,9 @@ export interface Style {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
 	};
+	transform?: {
+		rotate?: CSSProperties[ 'rotate' ];
+	};
 	typography?: {
 		fontSize?: CSSProperties[ 'fontSize' ];
 		fontFamily?: CSSProperties[ 'fontFamily' ];
