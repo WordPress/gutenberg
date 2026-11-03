@@ -12,8 +12,7 @@ export type {
 } from './types';
 
 // Constants
-export { DEFAULT_STATE, ORIGINAL_ASPECT_RATIO } from './constants';
-export type { AspectRatioPreset } from './constants';
+export { DEFAULT_STATE } from './constants';
 
 // Reducer + state helpers. `CropperAction` and `cropperReducer` are
 // exported so composite stores can delegate cropper actions through the

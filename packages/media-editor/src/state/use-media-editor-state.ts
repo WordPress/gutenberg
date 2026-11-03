@@ -7,11 +7,11 @@ import {
 } from '@wordpress/element';
 import {
 	createCropperState,
-	resolveAspectRatio,
 	useCropperController,
 	type CropperController,
 	type CropperState,
 } from '@wordpress/image-editor';
+import { ORIGINAL_ASPECT_RATIO } from './aspect-ratio-presets';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
@@ -24,6 +24,46 @@ import type {
 	MediaEditorAction,
 	MediaEditorState,
 } from './types';
+
+/**
+ * Resolve an aspect-ratio preset value (the string the dropdown
+ * round-trips) into a numeric width/height ratio for the cropper.
+ *
+ * - `'0'` → `undefined` (Free; no lock)
+ * - `'-1'` (Original) → image's natural width / height, or `undefined`
+ *   if no image is loaded.
+ * - Any positive decimal → the parsed number.
+ *
+ * Centralizing here means the dropdown, the action dispatcher, and
+ * the test harness all resolve the same way.
+ *
+ * @param presetKey    Preset value from the dropdown.
+ * @param cropperImage The cropper's loaded image, or `null`.
+ * @return The resolved ratio, or `undefined` for Free / unresolvable.
+ */
+export function resolveAspectRatio(
+	presetKey: string,
+	cropperImage: CropperState[ 'image' ] | null
+): number | undefined {
+	const num = parseFloat( presetKey );
+	if ( num === 0 || Number.isNaN( num ) ) {
+		return undefined;
+	}
+	if ( num === ORIGINAL_ASPECT_RATIO ) {
+		if (
+			cropperImage &&
+			cropperImage.naturalWidth > 0 &&
+			cropperImage.naturalHeight > 0
+		) {
+			return cropperImage.naturalWidth / cropperImage.naturalHeight;
+		}
+		return undefined;
+	}
+	if ( num > 0 ) {
+		return num;
+	}
+	return undefined;
+}
 
 function areCropperImagesEqual(
 	a: CropperState[ 'image' ],

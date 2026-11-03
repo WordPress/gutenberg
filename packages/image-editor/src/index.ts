@@ -12,11 +12,6 @@ export type { CropperController } from './react/hooks';
 export type { CropperState } from './core';
 export { areCropperStatesEqual } from './core';
 
-// Aspect-ratio presets.
-export { DEFAULT_ASPECT_RATIOS } from './presets/aspect-ratio-presets';
-export { resolveAspectRatio } from './presets/resolve-aspect-ratio';
-export type { AspectRatioPreset } from './core';
-
 // Limits for building your own zoom and rotation controls.
 export { MAX_ZOOM, MAX_ROTATION_OFFSET } from './core/constants';
 export { getMinZoom } from './core/containment';

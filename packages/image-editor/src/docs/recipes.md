@@ -53,37 +53,46 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 
 ## Offer Aspect-Ratio Presets
 
-`DEFAULT_ASPECT_RATIOS` is a list of `{ label, value }` presets; pass your own list to offer different ones. `resolveAspectRatio` turns a preset value into the ratio `setAspectRatio` takes, working out "Original" from the loaded image. Keep the selected preset in your own state, since the controller only stores the resolved ratio.
+The controller takes a width / height ratio, or `undefined` for a free crop. Keep your own list of presets, and keep the selected one in your own state. To offer the image's own ratio, work it out from `controller.state.image`.
 
 ```tsx
 import { useState } from '@wordpress/element';
-import {
-	Cropper,
-	DEFAULT_ASPECT_RATIOS,
-	resolveAspectRatio,
-	useCropperController,
-} from '@wordpress/image-editor';
+import { Cropper, useCropperController } from '@wordpress/image-editor';
+
+const PRESETS = [
+	{ label: 'Free', value: 'free' },
+	{ label: 'Original', value: 'original' },
+	{ label: 'Square', value: '1' },
+	{ label: 'Landscape (16:9)', value: String( 16 / 9 ) },
+];
 
 function CropperWithPresets( { src }: { src: string } ) {
 	const controller = useCropperController();
-	const [ preset, setPreset ] = useState( '0' );
+	const [ preset, setPreset ] = useState( 'free' );
+	const { image } = controller.state;
 
 	return (
 		<>
 			<select
 				value={ preset }
 				onChange={ ( event ) => {
-					setPreset( event.target.value );
-					controller.setAspectRatio(
-						resolveAspectRatio(
-							event.target.value,
-							controller.state.image
-						)
-					);
+					const { value } = event.target;
+					setPreset( value );
+					if ( value === 'free' ) {
+						controller.setAspectRatio( undefined );
+					} else if ( value === 'original' ) {
+						controller.setAspectRatio(
+							image
+								? image.naturalWidth / image.naturalHeight
+								: undefined
+						);
+					} else {
+						controller.setAspectRatio( parseFloat( value ) );
+					}
 				} }
 			>
-				{ DEFAULT_ASPECT_RATIOS.map( ( { label, value } ) => (
-					<option key={ value } value={ String( value ) }>
+				{ PRESETS.map( ( { label, value } ) => (
+					<option key={ value } value={ value }>
 						{ label }
 					</option>
 				) ) }

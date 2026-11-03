@@ -94,10 +94,6 @@ Whether two cropper states are the same crop, ignoring tiny floating-point diffe
 
 The rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
 
-### `DEFAULT_ASPECT_RATIOS`, `resolveAspectRatio( presetKey, image )`
-
-The default aspect-ratio presets, and a function that turns a preset value into the ratio to pass to `controller.setAspectRatio`, resolving "Original" from the loaded image.
-
 ### `MAX_ZOOM`, `MAX_ROTATION_OFFSET`, `getMinZoom`
 
 Limits for building your own zoom and rotation controls.

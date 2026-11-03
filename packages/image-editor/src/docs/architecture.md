@@ -8,7 +8,6 @@ How the cropper works inside, for people changing this package. To use it, see t
 | --- | --- | --- |
 | Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
-| Presets | `src/presets/` | The default aspect-ratio presets and `resolveAspectRatio`. |
 | Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
 
 The cropper keeps no undo history. History belongs to the code that uses the cropper, because it covers everything that code edits, not only the crop. To put the crop in an undo history, keep the cropper state yourself: `useCropperController( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.

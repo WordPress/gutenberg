@@ -20,8 +20,6 @@ import {
 import { Cropper } from '../react/components/cropper';
 import { useCropperController } from '../react/hooks/use-cropper-controller';
 import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
-import { DEFAULT_ASPECT_RATIOS } from '../presets/aspect-ratio-presets';
-import { resolveAspectRatio } from '../presets/resolve-aspect-ratio';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,
@@ -38,10 +36,16 @@ import {
 import { getSourceRegion } from '../core/source-region';
 import styles from './style.module.css';
 
-const aspectRatioItems = DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
-	label: preset.label,
-	value: preset.value.toString(),
-} ) );
+// "-1" stands for the image's own ratio, worked out once it loads.
+const aspectRatioItems = [
+	{ label: 'Free', value: '0' },
+	{ label: 'Original', value: '-1' },
+	{ label: 'Square (1:1)', value: '1' },
+	{ label: 'Landscape (16:9)', value: String( 16 / 9 ) },
+	{ label: 'Portrait (9:16)', value: String( 9 / 16 ) },
+	{ label: 'Classic (4:3)', value: String( 4 / 3 ) },
+	{ label: 'Photo (3:2)', value: String( 3 / 2 ) },
+];
 const gridItems = [
 	{ label: 'Grid: off', value: 'off' },
 	{ label: 'Grid: always on', value: 'on' },
@@ -255,9 +259,11 @@ const WithControlsComponent = () => {
 	const handleAspectRatioChange = useCallback(
 		( value: string ) => {
 			setAspectRatioValue( value );
-			controller.setAspectRatio(
-				resolveAspectRatio( value, state.image )
-			);
+			const ratio =
+				value === '-1' && state.image
+					? state.image.naturalWidth / state.image.naturalHeight
+					: parseFloat( value );
+			controller.setAspectRatio( ratio > 0 ? ratio : undefined );
 		},
 		[ controller, state.image ]
 	);

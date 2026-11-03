@@ -6,7 +6,6 @@ import { useEffect } from '@wordpress/element';
 import {
 	Cropper,
 	buildModifiers,
-	resolveAspectRatio,
 	useCropperController,
 	type CropperController,
 } from '..';
@@ -61,11 +60,7 @@ describe( 'the public API', () => {
 			height: 600,
 		} );
 
-		act( () =>
-			controller.setAspectRatio(
-				resolveAspectRatio( '1', controller.state.image )
-			)
-		);
+		act( () => controller.setAspectRatio( 1 ) );
 		expect( controller.state.aspectRatio ).toBe( 1 );
 		expect( cropSize( controller ) ).toEqual( { width: 600, height: 600 } );
 

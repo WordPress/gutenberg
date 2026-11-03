@@ -45,7 +45,7 @@ import type {
 	ReactElement,
 	ReactNode,
 } from 'react';
-import type { AspectRatioPreset } from '@wordpress/image-editor';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';

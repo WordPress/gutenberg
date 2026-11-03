@@ -1,6 +1,6 @@
 import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-import type { AspectRatioPreset } from '@wordpress/image-editor';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
 
