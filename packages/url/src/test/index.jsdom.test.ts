@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import {
 	addQueryArgs,
 	buildQueryString,
@@ -851,6 +859,87 @@ describe( 'getQueryArgs', () => {
 
 		expect( getQueryArgs( url ) ).toEqual( {
 			foo: 'bar',
+		} );
+	} );
+
+	describe( 'inherited members', () => {
+		type BuiltIn = ( ...args: unknown[] ) => unknown;
+
+		const inheritedFunctions = [
+			'hasOwnProperty',
+			'isPrototypeOf',
+			'propertyIsEnumerable',
+			'toLocaleString',
+			'toString',
+			'valueOf',
+		];
+		const getBuiltIn = ( name: string ) =>
+			( Object.prototype as unknown as Record< string, BuiltIn > )[
+				name
+			];
+
+		afterEach( () => {
+			// Undo any write to a shared built-in, so that a regression fails
+			// only these tests instead of every test that runs after them.
+			for ( const name of inheritedFunctions ) {
+				for ( const property of [
+					'call',
+					'apply',
+					'bind',
+					'polluted',
+				] ) {
+					Reflect.deleteProperty( getBuiltIn( name ), property );
+				}
+			}
+			Reflect.deleteProperty( Function.prototype.bind, 'polluted' );
+		} );
+
+		it.each( inheritedFunctions )(
+			'should not write onto the inherited %s function',
+			( name ) => {
+				const url = `https://andalouses.example/beach?a[${ name }][call]=x`;
+				const builtIn = getBuiltIn( name );
+
+				const result = getQueryArgs( url );
+
+				expect( Object.hasOwn( builtIn, 'call' ) ).toBe( false );
+				expect( result ).toEqual( { a: { [ name ]: { call: 'x' } } } );
+				expect( () => builtIn.call( {} ) ).not.toThrow();
+			}
+		);
+
+		it( 'should not write onto a function reached through another inherited function', () => {
+			const url =
+				'https://andalouses.example/beach?a[toString][bind][polluted]=x';
+
+			getQueryArgs( url );
+
+			expect( Object.hasOwn( Function.prototype.bind, 'polluted' ) ).toBe(
+				false
+			);
+			expect( Object.hasOwn( Object.prototype.toString, 'bind' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should keep nested values on the object they were written to', () => {
+			const url =
+				'https://andalouses.example/beach?a[toString][b]=1&a[toString][c]=2';
+
+			expect( getQueryArgs( url ) ).toEqual( {
+				a: { toString: { b: '1', c: '2' } },
+			} );
+		} );
+
+		it( 'should not pollute Object.prototype through blocked key names', () => {
+			const url =
+				'https://andalouses.example/beach?a[__proto__][polluted]=x&b[constructor][prototype][polluted]=x';
+
+			getQueryArgs( url );
+
+			expect( ( {} as Record< string, unknown > ).polluted ).toBe(
+				undefined
+			);
 		} );
 	} );
 

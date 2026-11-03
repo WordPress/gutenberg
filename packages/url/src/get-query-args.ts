@@ -37,8 +37,12 @@ function setPath( object: Record< string, any >, path: string[], value: any ) {
 				? // If at end of path, assign the intended value.
 					value
 				: // Otherwise, advance to the next object in the path, creating
-					// it if it does not yet exist.
-					object[ key ] || ( isNextKeyArrayIndex ? [] : {} );
+					// it if it does not yet exist. Only own properties count as
+					// existing: reading through the prototype chain would return
+					// inherited built-ins such as `Object.prototype.toString`,
+					// and the rest of the path would be written onto them.
+					( Object.hasOwn( object, key ) && object[ key ] ) ||
+					( isNextKeyArrayIndex ? [] : {} );
 
 		if ( Array.isArray( object[ key ] ) && ! isNextKeyArrayIndex ) {
 			// If we current key is non-numeric, but the next value is an
