@@ -2,10 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useMediaEditorState } from '../use-media-editor-state';
 
-// The canvas reports its size and refits the crop through these. They are
-// on the controller, but not on its public type.
+// The canvas refits the crop through this. It is on the controller, but
+// not on its public type.
 interface CanvasOnlyMethods {
-	setVisualSize: ( size: { width: number; height: number } ) => void;
 	adjustCropRectForViewport: ( rect: {
 		x: number;
 		y: number;
@@ -26,12 +25,9 @@ const IMAGE = {
 
 // Loading the image through the session, as the canvas does, so the
 // baseline and history start from the loaded image.
-function setupHook( visualSize = { width: 600, height: 400 } ) {
+function setupHook() {
 	const view = renderHook( () => useMediaEditorState() );
-	act( () => {
-		view.result.current.setSourceImage( IMAGE );
-		asCanvas( view.result.current.imageEditor ).setVisualSize( visualSize );
-	} );
+	act( () => view.result.current.setSourceImage( IMAGE ) );
 	return view;
 }
 
@@ -55,12 +51,11 @@ describe( 'useMediaEditorState', () => {
 
 	describe( 'session edits versus image output edits', () => {
 		it( 'counts an aspect-ratio preset change as a session edit only', () => {
-			// No visual size is reported, so picking a ratio changes the
-			// preset without reshaping the crop.
-			const { result } = renderHook( () => useMediaEditorState() );
-			act( () => result.current.setSourceImage( IMAGE ) );
+			// Original locks the image's own 2:1 ratio, whose largest box is
+			// the whole image, so the preset changes but the crop does not.
+			const { result } = setupHook();
 
-			act( () => result.current.setAspectRatioValue( '1' ) );
+			act( () => result.current.setAspectRatioValue( '-1' ) );
 
 			expect( result.current.isDirty ).toBe( true );
 			expect( result.current.imageEditor.isDirty ).toBe( false );
@@ -226,17 +221,16 @@ describe( 'useMediaEditorState', () => {
 	} );
 
 	describe( 'SET_ASPECT_RATIO_VALUE atomicity', () => {
-		it( 'reshapes cropRect when a fixed ratio is selected with visualSize > 0', () => {
-			const { result } = setupHook( { width: 600, height: 400 } );
+		it( 'reshapes cropRect when a fixed ratio is selected', () => {
+			const { result } = setupHook();
 
 			act( () => result.current.setAspectRatioValue( '1' ) ); // Square
 
-			// At visualSize 600x400, the inscribed square has w/h such that
-			// pixel ratio = 1. normalizedRatio = 1 * 400 / 600 = 0.666...
-			// So normalized w = 0.666..., h = 1.
+			// The image is 1200x600, so the largest square is half its
+			// width and all of its height.
 			expect(
 				result.current.imageEditor.state.cropRect.width
-			).toBeCloseTo( 2 / 3, 5 );
+			).toBeCloseTo( 0.5, 5 );
 			expect(
 				result.current.imageEditor.state.cropRect.height
 			).toBeCloseTo( 1, 5 );
@@ -271,14 +265,15 @@ describe( 'useMediaEditorState', () => {
 
 			act( () => result.current.setAspectRatioValue( '-1' ) ); // Original
 
-			// Image is 1200x600 = ratio 2. inscribedRect at visualSize 600x400:
-			// normalizedRatio = 2 * 400 / 600 = 1.333... > 1, so h = 1/1.333 = 0.75.
+			// Image is 1200x600, so Original locks a 2:1 ratio, and the
+			// largest 2:1 box is the whole image.
+			expect( result.current.imageEditor.state.aspectRatio ).toBe( 2 );
 			expect(
 				result.current.imageEditor.state.cropRect.width
 			).toBeCloseTo( 1, 5 );
 			expect(
 				result.current.imageEditor.state.cropRect.height
-			).toBeCloseTo( 0.75, 5 );
+			).toBeCloseTo( 1, 5 );
 		} );
 	} );
 

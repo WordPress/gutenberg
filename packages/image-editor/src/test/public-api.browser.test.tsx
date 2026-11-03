@@ -114,4 +114,25 @@ describe( 'the public API', () => {
 		// Fitting the crop to the locked ratio is not an edit.
 		expect( controller.isDirty ).toBe( false );
 	} );
+
+	it( 'starts with the crop locked to a ratio in freeform mode too', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		await render(
+			<ConsumerEditor
+				onController={ onController }
+				initialState={ { ...createImageEditorState(), aspectRatio: 1 } }
+			/>
+		);
+
+		await waitFor( () =>
+			expect( cropSize( controller ) ).toEqual( {
+				width: 600,
+				height: 600,
+			} )
+		);
+		expect( controller.isDirty ).toBe( false );
+	} );
 } );

@@ -45,7 +45,6 @@ function createController(): InternalImageEditorController {
 		maxZoom: MAX_ZOOM,
 		maxRotationOffset: MAX_ROTATION_OFFSET,
 		getCroppedImage: vi.fn(),
-		setVisualSize: vi.fn(),
 		adjustCropRectForViewport: vi.fn(),
 	};
 }
@@ -1161,11 +1160,13 @@ describe( 'ImageEditorCanvas', () => {
 			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
+		// The crop overlay is laid out once the canvas has measured itself.
 		await waitFor( () =>
-			expect( controller.setVisualSize ).toHaveBeenLastCalledWith( {
-				width: expect.closeTo( 400 / 3, 2 ),
-				height: 400,
-			} )
+			expect(
+				parseFloat(
+					screen.getByTestId( 'image-editor-stencil' ).style.width
+				)
+			).toBeGreaterThan( 0 )
 		);
 		// viewScale = 1, so the leading scale is identity (no magnification).
 		expect( imageScale() ).toBe( 1 );
@@ -1464,11 +1465,13 @@ describe( 'ImageEditorCanvas', () => {
 			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
+		// The crop overlay is laid out once the canvas has measured itself.
 		await waitFor( () =>
-			expect( controller.setVisualSize ).toHaveBeenLastCalledWith( {
-				width: expect.closeTo( 400 / 3, 2 ),
-				height: 400,
-			} )
+			expect(
+				parseFloat(
+					screen.getByTestId( 'image-editor-stencil' ).style.width
+				)
+			).toBeGreaterThan( 0 )
 		);
 		expect( imageRendering() ).not.toBe( 'pixelated' );
 	} );

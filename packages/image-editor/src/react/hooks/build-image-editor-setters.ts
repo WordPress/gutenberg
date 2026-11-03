@@ -4,7 +4,6 @@ import type {
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
-	Size,
 } from '../../core/types';
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
 
@@ -34,8 +33,8 @@ export interface ImageEditorSetters {
 }
 
 /**
- * Build the named editor setters from a dispatch function and getters
- * for the latest state and the rendered size.
+ * Build the named editor setters from a dispatch function and a getter
+ * for the latest state.
  *
  * @param dispatchAction Apply a `ImageEditorAction` to the
  *                       underlying reducer.
@@ -43,16 +42,11 @@ export interface ImageEditorSetters {
  *                       Used by setters that need to read
  *                       the latest state to compute their
  *                       payload (focal-point zoom, flip toggle).
- * @param getVisualSize  Return the rendered image size the
- *                       `<ImageEditorCanvas>` last reported, which
- *                       `setAspectRatio` needs to reshape the
- *                       crop.
  * @return The named editor setters.
  */
 export function buildImageEditorSetters(
 	dispatchAction: ( action: ImageEditorAction ) => void,
-	getState: () => InternalImageEditorState,
-	getVisualSize: () => Size
+	getState: () => InternalImageEditorState
 ): ImageEditorSetters {
 	return {
 		setPan: ( pan ) => dispatchAction( { type: 'SET_PAN', payload: pan } ),
@@ -94,7 +88,7 @@ export function buildImageEditorSetters(
 		setAspectRatio: ( aspectRatio ) =>
 			dispatchAction( {
 				type: 'SET_ASPECT_RATIO',
-				payload: { aspectRatio, visualSize: getVisualSize() },
+				payload: aspectRatio,
 			} ),
 		settleCrop: () => dispatchAction( { type: 'SETTLE_CROP' } ),
 	};

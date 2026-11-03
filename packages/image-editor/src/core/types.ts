@@ -175,13 +175,9 @@ export type ImageEditorAction =
 	/**
 	 * Locks the crop to a width / height ratio, or unlocks it with
 	 * `undefined`. Locking reshapes the crop to the largest box of that
-	 * ratio for the rendered image size. The caller passes that size
-	 * because the reducer has no DOM access.
+	 * ratio once an image is loaded.
 	 */
-	| {
-			type: 'SET_ASPECT_RATIO';
-			payload: { aspectRatio: number | undefined; visualSize: Size };
-	  }
+	| { type: 'SET_ASPECT_RATIO'; payload: number | undefined }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */

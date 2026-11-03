@@ -892,43 +892,93 @@ describe( 'imageEditorReducer — SET_ROTATION', () => {
 } );
 
 describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
-	const VISUAL_SIZE: Size = { width: 800, height: 450 };
-
 	it( 'stores the ratio and reshapes the crop to the largest box of that ratio', () => {
 		const next = imageEditorReducer( makeState(), {
 			type: 'SET_ASPECT_RATIO',
-			payload: { aspectRatio: 1, visualSize: VISUAL_SIZE },
+			payload: 1,
 		} );
 
 		expect( next.aspectRatio ).toBe( 1 );
-		expect( next.cropRect ).toEqual(
-			computeInscribedRect( 1, VISUAL_SIZE )
-		);
+		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
+	} );
+
+	it( 'reshapes against the image turned a quarter turn at 90 degrees', () => {
+		const next = imageEditorReducer( makeState( { rotation: 90 } ), {
+			type: 'SET_ASPECT_RATIO',
+			payload: 1,
+		} );
+		const expected = computeInscribedRect( 1, PORTRAIT_IMAGE );
+
+		expect( next.cropRect.width ).toBeCloseTo( expected.width, 10 );
+		expect( next.cropRect.height ).toBeCloseTo( expected.height, 10 );
 	} );
 
 	it( 'keeps the crop where it is when the ratio is unlocked', () => {
 		const cropRect = { x: 0.1, y: 0.2, width: 0.5, height: 0.4 };
 		const next = imageEditorReducer(
 			makeState( { aspectRatio: 1, cropRect } ),
-			{
-				type: 'SET_ASPECT_RATIO',
-				payload: { aspectRatio: undefined, visualSize: VISUAL_SIZE },
-			}
+			{ type: 'SET_ASPECT_RATIO', payload: undefined }
 		);
 
 		expect( next.aspectRatio ).toBeUndefined();
 		expect( next.cropRect ).toEqual( cropRect );
 	} );
 
-	it( 'stores the ratio without reshaping before the visual size is known', () => {
-		const state = makeState();
+	it( 'stores the ratio without reshaping before an image loads', () => {
+		const state = makeState( { image: null } );
 		const next = imageEditorReducer( state, {
 			type: 'SET_ASPECT_RATIO',
-			payload: { aspectRatio: 1, visualSize: { width: 0, height: 0 } },
+			payload: 1,
 		} );
 
 		expect( next.aspectRatio ).toBe( 1 );
 		expect( next.cropRect ).toEqual( state.cropRect );
+	} );
+
+	it( 'fits a full-frame crop to the locked ratio when an image loads', () => {
+		const next = imageEditorReducer(
+			makeState( { image: null, aspectRatio: 1 } ),
+			{
+				type: 'SET_IMAGE',
+				payload: {
+					src: 'test.jpg',
+					naturalWidth: IMAGE.width,
+					naturalHeight: IMAGE.height,
+				},
+			}
+		);
+
+		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
+	} );
+
+	it( 'leaves a crop the person shaped when an image loads', () => {
+		const cropRect = { x: 0.2, y: 0.2, width: 0.3, height: 0.3 };
+		const next = imageEditorReducer(
+			makeState( { image: null, aspectRatio: 1, cropRect } ),
+			{
+				type: 'SET_IMAGE',
+				payload: {
+					src: 'test.jpg',
+					naturalWidth: IMAGE.width,
+					naturalHeight: IMAGE.height,
+				},
+			}
+		);
+
+		expect( next.cropRect ).toEqual( cropRect );
+	} );
+
+	it( 'fits the crop to a ratio RESET keeps', () => {
+		const next = imageEditorReducer(
+			makeState( {
+				rotation: 30,
+				cropRect: { x: 0.1, y: 0.1, width: 0.5, height: 0.5 },
+			} ),
+			{ type: 'RESET', payload: { aspectRatio: 1 } }
+		);
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
 	} );
 
 	it( 'is unlocked again by RESET', () => {

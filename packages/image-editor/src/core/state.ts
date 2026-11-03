@@ -2,6 +2,7 @@ import type {
 	ImageEditorAction,
 	ImageEditorState,
 	InternalImageEditorState,
+	NormalizedRect,
 	TransformOperation,
 } from './types';
 import {
@@ -13,12 +14,63 @@ import {
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
 import { computeInscribedRect } from './crop-rect';
+import { getRotatedBBox } from './camera';
 
 /** Small tolerance for editor floating-point comparisons. */
 const STATE_EPSILON = 1e-6;
 
 function nearlyEqual( a: number, b: number ): boolean {
 	return Math.abs( a - b ) < STATE_EPSILON;
+}
+
+/**
+ * The crop rect for the locked ratio: the largest centred box of that
+ * ratio. The crop rect is measured against the view the canvas shows,
+ * which has the image's shape turned by its rotation snapped to a quarter
+ * turn, so the image is enough to work it out. `undefined` when no ratio
+ * is locked or no image is loaded.
+ *
+ * @param state The editor state.
+ * @return The crop rect for the locked ratio, or `undefined`.
+ */
+function getLockedCropRect(
+	state: InternalImageEditorState
+): NormalizedRect | undefined {
+	const { image, aspectRatio, rotation } = state;
+	if ( ! image || ! aspectRatio || aspectRatio <= 0 ) {
+		return undefined;
+	}
+	const viewShape = getRotatedBBox(
+		image.naturalWidth,
+		image.naturalHeight,
+		Math.round( rotation / 90 ) * 90
+	);
+	if ( viewShape.width === 0 || viewShape.height === 0 ) {
+		return undefined;
+	}
+	return computeInscribedRect( aspectRatio, viewShape );
+}
+
+/**
+ * Fit a full-frame crop to the locked ratio. A full frame is what a state
+ * starts with and what a reset or a new image goes back to, so this makes
+ * a locked ratio hold from the start in freeform mode too. A crop the
+ * person shaped, or saved earlier, is left alone.
+ *
+ * @param state The editor state.
+ * @return The state, with the crop fitted when it was the full frame.
+ */
+function fitFullFrameToLockedRatio(
+	state: InternalImageEditorState
+): InternalImageEditorState {
+	const { cropRect } = state;
+	const isFullFrame =
+		nearlyEqual( cropRect.x, 0 ) &&
+		nearlyEqual( cropRect.y, 0 ) &&
+		nearlyEqual( cropRect.width, 1 ) &&
+		nearlyEqual( cropRect.height, 1 );
+	const lockedCropRect = isFullFrame ? getLockedCropRect( state ) : undefined;
+	return lockedCropRect ? { ...state, cropRect: lockedCropRect } : state;
 }
 
 /**
@@ -237,10 +289,12 @@ export function imageEditorReducer(
 	switch ( action.type ) {
 		case 'SET_IMAGE':
 			return commitBase(
-				enforceContainment( {
-					...state,
-					image: action.payload,
-				} )
+				enforceContainment(
+					fitFullFrameToLockedRatio( {
+						...state,
+						image: action.payload,
+					} )
+				)
 			);
 
 		case 'SET_PAN':
@@ -396,24 +450,12 @@ export function imageEditorReducer(
 			);
 
 		case 'SET_ASPECT_RATIO': {
-			const { aspectRatio, visualSize } = action.payload;
-			const shouldReshape =
-				aspectRatio !== undefined &&
-				aspectRatio > 0 &&
-				visualSize.width > 0 &&
-				visualSize.height > 0;
-			if ( ! shouldReshape ) {
-				return state.aspectRatio === aspectRatio
-					? state
-					: { ...state, aspectRatio };
+			const next = { ...state, aspectRatio: action.payload };
+			const cropRect = getLockedCropRect( next );
+			if ( ! cropRect ) {
+				return state.aspectRatio === action.payload ? state : next;
 			}
-			return commitBase(
-				enforceContainment( {
-					...state,
-					aspectRatio,
-					cropRect: computeInscribedRect( aspectRatio, visualSize ),
-				} )
-			);
+			return commitBase( enforceContainment( { ...next, cropRect } ) );
 		}
 
 		case 'SETTLE_CROP': {
@@ -483,11 +525,13 @@ export function imageEditorReducer(
 
 		case 'RESET':
 			return commitBase(
-				enforceContainment( {
-					...DEFAULT_STATE,
-					image: state.image,
-					...action.payload,
-				} )
+				enforceContainment(
+					fitFullFrameToLockedRatio( {
+						...DEFAULT_STATE,
+						image: state.image,
+						...action.payload,
+					} )
+				)
 			);
 	}
 }

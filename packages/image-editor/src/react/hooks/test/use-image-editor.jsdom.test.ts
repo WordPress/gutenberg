@@ -983,16 +983,21 @@ describe( 'useInternalImageEditor', () => {
 		} );
 	} );
 
-	it( 'locks the aspect ratio and reshapes the crop for the reported visual size', () => {
-		const visualSize = { width: 800, height: 450 };
+	it( 'locks the aspect ratio and reshapes the crop for the loaded image', () => {
 		const { result } = renderHook( () => useInternalImageEditor() );
 
-		act( () => result.current.setVisualSize( visualSize ) );
+		act( () =>
+			result.current.setImage( {
+				src: 'photo.jpg',
+				naturalWidth: 800,
+				naturalHeight: 450,
+			} )
+		);
 		act( () => result.current.setAspectRatio( 1 ) );
 
 		expect( result.current.state.aspectRatio ).toBe( 1 );
 		expect( result.current.state.cropRect ).toEqual(
-			computeInscribedRect( 1, visualSize )
+			computeInscribedRect( 1, { width: 800, height: 450 } )
 		);
 	} );
 } );
@@ -1068,16 +1073,13 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 			...createImageEditorState(),
 			aspectRatio: 1,
 		} as InternalImageEditorState;
-		// The square the canvas fits a 2:1 image's crop to.
-		const FITTED = computeInscribedRect( 1, { width: 600, height: 300 } );
+		// The square crop for the 2:1 image.
+		const FITTED = computeInscribedRect( 1, { width: 1200, height: 600 } );
 
-		it( 'is clean once the image loads and the canvas fits the crop', () => {
+		it( 'fits the crop to the lock when the image loads, and is clean', () => {
 			const { result } = renderHook( () => useControlled( LOCKED ) );
 
 			act( () => result.current.controller.setImage( IMAGE ) );
-			act( () =>
-				result.current.controller.adjustCropRectForViewport( FITTED )
-			);
 
 			expect( result.current.controller.state.cropRect ).toEqual(
 				FITTED
@@ -1088,9 +1090,6 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		it( 'returns to the fitted square, still locked, on reset', () => {
 			const { result } = renderHook( () => useControlled( LOCKED ) );
 			act( () => result.current.controller.setImage( IMAGE ) );
-			act( () =>
-				result.current.controller.adjustCropRectForViewport( FITTED )
-			);
 
 			act( () => result.current.controller.snapRotate90( 1 ) );
 			expect( result.current.controller.isDirty ).toBe( true );

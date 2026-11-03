@@ -12,7 +12,6 @@ import type {
 	InternalImageEditorState,
 	NormalizedPoint,
 	NormalizedRect,
-	Size,
 } from '../../core/types';
 import {
 	DEFAULT_STATE,
@@ -65,11 +64,6 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	 * `exportCroppedImage` for error semantics.
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
-	/**
-	 * Called by `ImageEditorCanvas` whenever its rendered image size changes; not for
-	 * consumers to call. `setAspectRatio` uses the size to reshape the crop.
-	 */
-	setVisualSize: ( size: Size ) => void;
 	/**
 	 * Called by `ImageEditorCanvas` when the viewport changes (window or canvas
 	 * resize); not for consumers to call. Like `setCropRect`, except that
@@ -239,16 +233,13 @@ export function useInternalImageEditor(
 		[ apply, baseline ]
 	);
 
-	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
-
 	const setters = useMemo(
 		() =>
 			buildImageEditorSetters(
 				( action ) => {
 					apply( action );
 				},
-				() => latestRef.current,
-				() => visualSizeRef.current
+				() => latestRef.current
 			),
 		[ apply ]
 	);
@@ -272,11 +263,6 @@ export function useInternalImageEditor(
 		[ state ]
 	);
 
-	// `setAspectRatio` needs the rendered size to reshape the crop.
-	const setVisualSize = useCallback( ( size: Size ) => {
-		visualSizeRef.current = size;
-	}, [] );
-
 	// A refit after a window resize is not something the person did.
 	const adjustCropRectForViewport = useCallback(
 		( rect: NormalizedRect ) => {
@@ -298,7 +284,6 @@ export function useInternalImageEditor(
 			maxZoom: MAX_ZOOM,
 			maxRotationOffset: MAX_ROTATION_OFFSET,
 			getCroppedImage,
-			setVisualSize,
 			adjustCropRectForViewport,
 		} ),
 		[
@@ -309,7 +294,6 @@ export function useInternalImageEditor(
 			isDirty,
 			minZoom,
 			getCroppedImage,
-			setVisualSize,
 			adjustCropRectForViewport,
 		]
 	);

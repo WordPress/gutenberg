@@ -156,7 +156,6 @@ function ImageEditorCanvasInner(
 		setImage,
 		setCropRect,
 		settleCrop,
-		setVisualSize,
 		adjustCropRectForViewport,
 	} = controller;
 	// The controller owns the locked ratio (`setAspectRatio`).
@@ -268,13 +267,6 @@ function ImageEditorCanvasInner(
 			),
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
-
-	// Report the rendered image size to the controller, which needs it
-	// to reshape the crop when the aspect ratio is locked (the reducer
-	// has no DOM access).
-	useEffect( () => {
-		setVisualSize( visualSize );
-	}, [ visualSize, setVisualSize ] );
 
 	// In fixed-crop mode, keep the crop the largest box of the locked
 	// ratio as the rendered size changes. With no ratio locked, turning
