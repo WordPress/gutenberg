@@ -28,27 +28,14 @@ const {
  * @return {Component} Wrapped component.
  */
 const withPatternOverrideControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const isSupportedBlock = useSelect(
-			( select ) => {
-				const { __experimentalBlockBindingsSupportedAttributes } =
-					select( blockEditorStore ).getSettings();
-				return !! __experimentalBlockBindingsSupportedAttributes?.[
-					props.name
-				];
-			},
-			[ props.name ]
-		);
-
-		return (
-			<>
-				<BlockEdit key="edit" { ...props } />
-				{ props.isSelected && isSupportedBlock && (
-					<ControlsWithStoreSubscription { ...props } />
-				) }
-			</>
-		);
-	},
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit key="edit" { ...props } />
+			{ props.isSelected && (
+				<ControlsWithStoreSubscription { ...props } />
+			) }
+		</>
+	),
 	'withPatternOverrideControls'
 );
 
@@ -56,12 +43,22 @@ const withPatternOverrideControls = createHigherOrderComponent(
 // on every block.
 function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
-	const { hasPatternOverridesSource, isEditingSyncedPattern } = useSelect(
+	const {
+		isSupportedBlock,
+		hasPatternOverridesSource,
+		isEditingSyncedPattern,
+	} = useSelect(
 		( select ) => {
 			const { getCurrentPostType, getEditedPostAttribute } =
 				select( editorStore );
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
 
 			return {
+				isSupportedBlock:
+					!! __experimentalBlockBindingsSupportedAttributes?.[
+						props.name
+					],
 				// For editing link to the site editor if the theme and user permissions support it.
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
@@ -74,7 +71,7 @@ function ControlsWithStoreSubscription( props ) {
 						PATTERN_SYNC_TYPES.unsynced,
 			};
 		},
-		[]
+		[ props.name ]
 	);
 
 	const bindings = props.attributes.metadata?.bindings;
@@ -92,7 +89,7 @@ function ControlsWithStoreSubscription( props ) {
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
-	if ( ! hasPatternOverridesSource ) {
+	if ( ! isSupportedBlock || ! hasPatternOverridesSource ) {
 		return null;
 	}
 

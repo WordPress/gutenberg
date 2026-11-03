@@ -45,6 +45,8 @@ const SocialLinkURLPopover = ( {
 				setPopover( false );
 				popoverAnchor?.focus();
 			} }
+			// Leave focus where it moved, such as a field in the inspector.
+			onFocusOutside={ () => setPopover( false ) }
 		>
 			<form
 				className="block-editor-url-popover__link-editor"

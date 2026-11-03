@@ -4,10 +4,10 @@ import type {
 	ReactNode,
 	RefObject,
 } from 'react';
-import type { Popover } from '@wordpress/components';
+import type { Popover as WCPopover } from '@wordpress/components';
 
 type PopoverProps = Omit<
-	ComponentPropsWithoutRef< typeof Popover >,
+	ComponentPropsWithoutRef< typeof WCPopover >,
 	'children'
 >;
 
@@ -22,7 +22,7 @@ export interface BlockPopoverProps extends PopoverProps {
 	/**
 	 * The client ID of the block representing the bottom position of the popover.
 	 */
-	bottomClientId?: string;
+	bottomClientId?: string | null;
 	/**
 	 * Whether the block popover always shifts into the viewport or remains at
 	 * its original position.

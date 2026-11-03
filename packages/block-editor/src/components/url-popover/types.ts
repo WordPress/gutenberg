@@ -5,13 +5,13 @@ import type {
 	ReactNode,
 	RefAttributes,
 } from 'react';
-import type { MenuItem, Popover } from '@wordpress/components';
+import type { MenuItem, Popover as WCPopover } from '@wordpress/components';
 import type { URLInputProps } from '../url-input/types';
 
 /**
  * Props of `URLPopover`.
  */
-export type URLPopoverProps = ComponentProps< typeof Popover > & {
+export type URLPopoverProps = ComponentProps< typeof WCPopover > & {
 	/**
 	 * Controls rendered below the input row, hidden while the settings are
 	 * shown.
