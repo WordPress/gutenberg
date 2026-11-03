@@ -83,15 +83,15 @@
 			align-items: center;
 			position: absolute;
 			right: 100%;
-			top: -$grid-unit-15;
-			bottom: -$grid-unit-15;
-			gap: $grid-unit-05;
+			top: calc(-1 * var(--wpds-dimension-padding-md));
+			bottom: calc(-1 * var(--wpds-dimension-padding-md));
+			gap: var(--wpds-dimension-gap-xs);
 			opacity: 0;
 			pointer-events: none;
 			white-space: nowrap;
-			background-color: var(--wp-dataviews-color-background, $white);
-			padding-inline: $grid-unit-10;
-			border-left: 1px solid $gray-100;
+			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+			padding-inline: var(--wpds-dimension-padding-sm);
+			border-left: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		}
 
 		@media (hover: none) {
@@ -116,7 +116,7 @@
 			}
 
 			.dataviews-primary-actions {
-				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			}
 		}
 
@@ -288,8 +288,8 @@
 		}
 
 		tr .dataviews-primary-actions {
-			top: -$grid-unit-05;
-			bottom: -$grid-unit-05;
+			top: calc(-1 * var(--wpds-dimension-padding-xs));
+			bottom: calc(-1 * var(--wpds-dimension-padding-xs));
 		}
 	}
 
@@ -300,8 +300,8 @@
 		}
 
 		tr .dataviews-primary-actions {
-			top: -$grid-unit-20;
-			bottom: -$grid-unit-20;
+			top: calc(-1 * var(--wpds-dimension-padding-lg));
+			bottom: calc(-1 * var(--wpds-dimension-padding-lg));
 		}
 	}
 
