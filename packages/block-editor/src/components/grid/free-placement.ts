@@ -33,6 +33,27 @@ export interface PixelRect {
 export type PixelRectEdge = keyof PixelRect;
 
 /**
+ * A corner of a pixel rectangle, combining two perpendicular edges.
+ */
+export type PixelRectCorner =
+	'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+
+/**
+ * A corner or an edge of a pixel rectangle.
+ */
+export type PixelRectHandle = PixelRectEdge | PixelRectCorner;
+
+/**
+ * Maps a corner to its two constituent edges.
+ */
+const CORNER_EDGES: Record< PixelRectCorner, PixelRectEdge[] > = {
+	topLeft: [ 'left', 'top' ],
+	topRight: [ 'right', 'top' ],
+	bottomLeft: [ 'left', 'bottom' ],
+	bottomRight: [ 'right', 'bottom' ],
+};
+
+/**
  * Where a block is inside its cells, as fractions of the cells' area. The
  * offsets are fractions of the area's width, because that is what CSS
  * resolves margin percentages against.
@@ -372,11 +393,11 @@ export function snapPixelRectEdges(
  *
  * @param options
  * @param options.pixelRect    The resized block's rectangle.
- * @param options.direction    The edge being dragged.
+ * @param options.direction    The handle being dragged (edge or corner).
  * @param options.columnTracks Column tracks.
  * @param options.rowTracks    Row tracks.
  * @param options.rowGap       Row gap in pixels.
- * @param options.snap         Whether to snap the dragged edge.
+ * @param options.snap         Whether to snap the dragged handle.
  *
  * @return The block's place.
  */
@@ -389,7 +410,7 @@ export function getResizedGridPlacement( {
 	snap,
 }: {
 	pixelRect: PixelRect;
-	direction: PixelRectEdge;
+	direction: PixelRectHandle;
 	columnTracks: GridTrack[];
 	rowTracks: GridTrack[];
 	rowGap: number;
@@ -402,19 +423,24 @@ export function getResizedGridPlacement( {
 		right: Math.min( pixelRect.right, gridRight ),
 		bottom: pixelRect.bottom,
 	};
-	const extendedRowTracks = extendTracks( rowTracks, rect.bottom, rowGap );
+	// A corner maps to both of its edges, so both snap together.
+	const edges: PixelRectEdge[] = (
+		( direction as PixelRectCorner ) in CORNER_EDGES
+			? CORNER_EDGES[ direction as PixelRectCorner ]
+			: [ direction ]
+	) as PixelRectEdge[];
 	if ( snap ) {
 		rect = snapPixelRectEdges(
 			rect,
-			[ direction ],
+			edges,
 			columnTracks,
-			extendedRowTracks
+			extendTracks( rowTracks, rect.bottom, rowGap )
 		);
 	}
 	return getGridPlacementFromPixelRect(
 		rect,
 		columnTracks,
-		extendedRowTracks
+		extendTracks( rowTracks, rect.bottom, rowGap )
 	);
 }
 

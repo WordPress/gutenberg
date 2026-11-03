@@ -8,6 +8,7 @@ import {
 	getResizedGridPlacement,
 	snapPixelRectEdges,
 	snapPixelRectPosition,
+	type PixelRectCorner,
 	type PixelRectEdge,
 } from '../free-placement';
 import { getGridTracks } from '../utils';
@@ -287,5 +288,71 @@ describe( 'getResizedGridPlacement', () => {
 				snap: false,
 			} )
 		).toEqual( { columnStart: 1, columnSpan: 1, rowStart: 1, rowSpan: 1 } );
+	} );
+
+	it( 'resizes from a corner', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: {
+					left: 110,
+					top: 0,
+					right: 260,
+					bottom: 100,
+				},
+				direction: 'bottomRight',
+				snap: false,
+			} )
+		).toEqual( {
+			columnStart: 2,
+			columnSpan: 2,
+			rowStart: 1,
+			rowSpan: 1,
+			box: { left: 0, top: 0, width: 0.7143, height: 1 },
+		} );
+	} );
+
+	it( 'resizes from the top-left corner', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: {
+					left: 220,
+					top: 100,
+					right: 320,
+					bottom: 200,
+				},
+				direction: 'topLeft' as PixelRectCorner,
+				snap: false,
+			} )
+		).toEqual( {
+			columnStart: 3,
+			columnSpan: 1,
+			rowStart: 1,
+			rowSpan: 2,
+			box: { left: 0, top: 1, width: 1, height: 0.4762 },
+		} );
+	} );
+
+	it( 'snaps both edges of a corner with Shift', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: {
+					left: 50,
+					top: 50,
+					right: 260,
+					bottom: 200,
+				},
+				direction: 'topLeft' as PixelRectCorner,
+				snap: true,
+			} )
+		).toEqual( {
+			columnStart: 1,
+			columnSpan: 3,
+			rowStart: 1,
+			rowSpan: 2,
+			box: { left: 0, top: 0, width: 0.8125, height: 0.9524 },
+		} );
 	} );
 } );
