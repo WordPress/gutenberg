@@ -617,3 +617,18 @@ describe( 'getCSSRules', () => {
 		] );
 	} );
 } );
+
+describe( 'rotate', () => {
+	it( 'should output the individual rotate property for a single angle', () => {
+		expect( compileCSS( { transform: { rotate: '-0.25turn' } } ) ).toEqual(
+			'rotate: -0.25turn;'
+		);
+	} );
+
+	it.each( [ '45', 'calc(10deg + 5deg)', 'var(--angle)', 'x 45deg' ] )(
+		'should output nothing for %s',
+		( rotate ) => {
+			expect( compileCSS( { transform: { rotate } } ) ).toEqual( '' );
+		}
+	);
+} );

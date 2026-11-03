@@ -305,6 +305,31 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_transform_rotate_style'          => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'rotate:-0.25turn;',
+					'declarations' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+			),
+
+			'inline_invalid_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '1 0 0 45deg',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(
