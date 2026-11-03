@@ -14,7 +14,7 @@ type Metadata = Record< string, unknown >;
  * @param settings Block type settings.
  * @return Filtered block type settings.
  */
-export function addNoteMergeCallback( settings: BlockType ): BlockType {
+export function addMergeCallback( settings: BlockType ): BlockType {
 	const { merge } = settings;
 
 	// Blocks without `merge` can't be merged, so leave them as they are.
@@ -60,10 +60,7 @@ export function addNoteMergeCallback( settings: BlockType ): BlockType {
  * @param source Source block or blocks.
  * @return Transformed block with the source block's notes.
  */
-export function keepNotesOnTransform(
-	result: Block,
-	source: Block | Block[]
-): Block {
+export function addTransforms( result: Block, source: Block | Block[] ): Block {
 	if ( Array.isArray( source ) ) {
 		return result;
 	}
@@ -91,12 +88,12 @@ export function keepNotesOnTransform(
 
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',
-	'core/editor/notes/keep-notes-on-transform',
-	keepNotesOnTransform
+	'core/notes/addTransforms',
+	addTransforms
 );
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/editor/notes/merge',
-	addNoteMergeCallback
+	'core/notes/addMergeCallback',
+	addMergeCallback
 );

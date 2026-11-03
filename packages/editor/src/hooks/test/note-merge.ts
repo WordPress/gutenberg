@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Block, BlockType } from '@wordpress/blocks';
-import { addNoteMergeCallback, keepNotesOnTransform } from '../note-merge';
+import { addMergeCallback, addTransforms } from '../note-merge';
 
 type Attributes = Record< string, any >;
 
@@ -9,17 +9,15 @@ const merge = ( attributes: Attributes, attributesToMerge: Attributes ) => ( {
 } );
 
 function withNotes( settings: Record< string, unknown > ) {
-	return addNoteMergeCallback(
-		settings as unknown as BlockType
-	) as unknown as {
+	return addMergeCallback( settings as unknown as BlockType ) as unknown as {
 		merge: ( a: Attributes, b: Attributes ) => Attributes;
 	};
 }
 
-describe( 'addNoteMergeCallback', () => {
+describe( 'addMergeCallback', () => {
 	it( 'leaves block types without a merge callback unchanged', () => {
 		const settings = { name: 'core/foo' } as unknown as BlockType;
-		expect( addNoteMergeCallback( settings ) ).toBe( settings );
+		expect( addMergeCallback( settings ) ).toBe( settings );
 	} );
 
 	it( 'adds the note IDs of the merged block', () => {
@@ -63,12 +61,12 @@ describe( 'addNoteMergeCallback', () => {
 	} );
 } );
 
-describe( 'keepNotesOnTransform', () => {
+describe( 'addTransforms', () => {
 	const block = ( name: string, attributes: Attributes ) =>
 		( { name, attributes, innerBlocks: [] } ) as unknown as Block;
 
 	it( 'adds the note IDs of a single source block', () => {
-		const result = keepNotesOnTransform(
+		const result = addTransforms(
 			block( 'core/heading', { content: 'two', level: 2 } ),
 			block( 'core/paragraph', {
 				content: 'two',
@@ -85,7 +83,7 @@ describe( 'keepNotesOnTransform', () => {
 	it( 'leaves the result unchanged when the source blocks are an array', () => {
 		const result = block( 'core/heading', { content: 'two' } );
 		expect(
-			keepNotesOnTransform( result, [
+			addTransforms( result, [
 				block( 'core/paragraph', {
 					content: 'two',
 					metadata: { noteId: [ 2 ] },
@@ -97,7 +95,7 @@ describe( 'keepNotesOnTransform', () => {
 	it( 'leaves the result unchanged when the source block has no notes', () => {
 		const result = block( 'core/heading', { content: 'two' } );
 		expect(
-			keepNotesOnTransform(
+			addTransforms(
 				result,
 				block( 'core/paragraph', { content: 'two' } )
 			)
