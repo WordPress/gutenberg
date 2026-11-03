@@ -179,6 +179,46 @@ describe( 'registerFormatType', () => {
 		expect( duplicateTagNameFormat ).toBeUndefined();
 	} );
 
+	it( 'should register a format identified by a style property next to a bare format for the same tag', () => {
+		registerFormatType( validName, validSettings );
+		const settings = registerFormatType( 'plugin/second', {
+			...validSettings,
+			styleProperty: 'color',
+		} );
+		expect( settings ).toEqual( {
+			...validSettings,
+			styleProperty: 'color',
+			name: 'plugin/second',
+		} );
+		expect( console ).not.toHaveErrored();
+	} );
+
+	it( 'should error on already registered style property for a tag', () => {
+		registerFormatType( validName, {
+			...validSettings,
+			styleProperty: 'color',
+		} );
+		const duplicateStyleFormat = registerFormatType( 'plugin/second', {
+			...validSettings,
+			styleProperty: 'color',
+		} );
+		expect( console ).toHaveErroredWith(
+			'Format "plugin/test" is already registered to handle bare tag name "test" with style property "color".'
+		);
+		expect( duplicateStyleFormat ).toBeUndefined();
+	} );
+
+	it( 'should error if the style property is not a string', () => {
+		const format = registerFormatType( validName, {
+			...validSettings,
+			styleProperty: 42,
+		} );
+		expect( console ).toHaveErroredWith(
+			'Format style properties must be strings.'
+		);
+		expect( format ).toBeUndefined();
+	} );
+
 	it( 'should error on already registered className', () => {
 		registerFormatType( validName, {
 			...validSettings,

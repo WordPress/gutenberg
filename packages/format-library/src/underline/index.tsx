@@ -14,6 +14,7 @@ export const underline = {
 	title,
 	tagName: 'span',
 	className: null,
+	styleProperty: 'text-decoration',
 	attributes: {
 		style: 'style',
 	},

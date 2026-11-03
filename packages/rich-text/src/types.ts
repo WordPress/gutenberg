@@ -73,6 +73,13 @@ export type FormatType = {
 	 */
 	className: string | null;
 	/**
+	 * A CSS property (e.g. `color`) that identifies the format on a bare
+	 * element through its inline `style` attribute. Only applies when
+	 * `className` is `null`. Allows multiple formats to share a tag name
+	 * when they are identified by different style properties.
+	 */
+	styleProperty?: string;
+	/**
 	 * Name of the format.
 	 */
 	title: string;

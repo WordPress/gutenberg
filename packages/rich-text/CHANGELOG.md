@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `styleProperty` setting for format types, allowing a format to be identified on a bare element by a CSS property in its inline `style` attribute (e.g. `color`), so multiple formats can share the same tag name. Includes a new `getFormatTypeForStyleProperty` store selector. ([#85425](https://github.com/WordPress/gutenberg/pull/85425))
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
