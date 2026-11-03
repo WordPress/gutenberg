@@ -1,14 +1,16 @@
 import { afterEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useInteraction } from '../use-interaction';
-import type { CropperInteractionActions } from '../../../core/interaction-controller';
-import type { CropperState, Size } from '../../../core/types';
+import type { ImageEditorInteractionActions } from '../../../core/interaction-controller';
+import type { InternalImageEditorState, Size } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';
 
 const CONTAINER_SIZE: Size = { width: 500, height: 300 };
 const IMAGE_SIZE: Size = { width: 500, height: 300 };
 
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -21,7 +23,7 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	};
 }
 
-function createActions(): Mocked< CropperInteractionActions > {
+function createActions(): Mocked< ImageEditorInteractionActions > {
 	return {
 		setPan: vi.fn(),
 		setZoom: vi.fn(),

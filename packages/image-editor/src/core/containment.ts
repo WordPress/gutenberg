@@ -1,11 +1,11 @@
 import { mat2d, vec2 } from 'gl-matrix';
-import type { CropperState, NormalizedRect, Size } from './types';
+import type { InternalImageEditorState, NormalizedRect, Size } from './types';
 import { ABSOLUTE_MIN_ZOOM, MAX_ZOOM, MIN_ZOOM } from './constants';
 import { degreesToRadians } from './math/rotation';
 import {
 	isValidSize,
 	safeBoundedNumber,
-	sanitizeCropperState,
+	sanitizeImageEditorState,
 	sanitizeRect,
 } from './math/sanitize';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
@@ -89,13 +89,13 @@ function getMinZoomForCover(
 /**
  * Resolves the effective minimum zoom for the current state — the coverage-
  * aware floor when an image is loaded, falling back to `MIN_ZOOM` otherwise.
- * Used by both the cropper's interaction layer and the zoom slider so the
+ * Used by both the canvas's interaction layer and the zoom slider so the
  * floor stays consistent across surfaces.
  *
- * @param state The current cropper state.
+ * @param state The current editor state.
  * @return The minimum zoom factor.
  */
-export function getMinZoom( state: CropperState ): number {
+export function getMinZoom( state: InternalImageEditorState ): number {
 	if ( ! state.image ) {
 		return MIN_ZOOM;
 	}
@@ -106,7 +106,7 @@ export function getMinZoom( state: CropperState ): number {
 	if ( ! isValidSize( imageSize ) ) {
 		return MIN_ZOOM;
 	}
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 	const aspectRatio = imageSize.width / imageSize.height;
 	return Math.max(
 		ABSOLUTE_MIN_ZOOM,
@@ -124,7 +124,7 @@ export function getMinZoom( state: CropperState ): number {
  * current pan/zoom/rotation.
  *
  * Returns the full image AABB without intersecting with the container
- * viewport. The viewport pan mechanism in the Cropper component allows
+ * viewport. The viewport pan mechanism in the ImageEditorCanvas component allows
  * the canvas to scroll so handles can reach the image edge even when it
  * lies outside the visible canvas area.
  *
@@ -132,13 +132,13 @@ export function getMinZoom( state: CropperState ): number {
  * current pan position — if the user pans right, the left bound tightens
  * because the image's left edge has moved right.
  *
- * @param state       The current cropper state (crop, zoom, rotation, flip).
+ * @param state       The current editor state (crop, zoom, rotation, flip).
  * @param elementSize The fitted (unrotated) image element dimensions in pixels.
  * @param visualSize  The visual (rotated) image bounding box in pixels.
  * @return The min/max x and y that a crop rect edge can reach in normalized space.
  */
 export function getImageCropBounds(
-	state: CropperState,
+	state: InternalImageEditorState,
 	elementSize: Size,
 	visualSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -146,7 +146,7 @@ export function getImageCropBounds(
 		return { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 	}
 
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 
 	// Build the same CSS matrix as use-transform-style: flip * rotate * zoom.
 	// Flip is outside rotation so it acts in viewport axes (see createCamera).
@@ -295,13 +295,13 @@ const _scratchVec = vec2.create();
  * space via the inverse camera, and checks that all world points lie within
  * [0,1]×[0,1]. If any point is outside, computes the minimal pan correction.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural size of the image in pixels.
  * @param cropRect  The crop rectangle in normalized coordinates.
  * @return The restricted crop pan and zoom values.
  */
 export function restrictPanZoom(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	cropRect: NormalizedRect
 ): { pan: { x: number; y: number }; zoom: number } {
@@ -319,7 +319,7 @@ export function restrictPanZoom(
 	// 6. Convert the world-space correction to a pan-field correction by
 	//    mapping it through the camera's linear part back to screen space,
 	//    then dividing by the visual bounds.
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 	const safeCropRect = sanitizeRect( cropRect );
 	// Use `isValidSize` rather than a bare `> 0` check so Infinity dims
 	// don't drive `Infinity / Infinity = NaN` into `getMinZoomForCover`

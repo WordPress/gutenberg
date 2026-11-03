@@ -476,7 +476,7 @@ describe( 'per-axis minCropSize', () => {
 	// Cover the explicit per-axis floor introduced for the source-pixel
 	// minimum. The defaults (0.05, 0.05) are already covered by the
 	// suites above; these tests pass `minCropSize` explicitly to lock in
-	// the math the cropper relies on.
+	// the math the editor relies on.
 	const IMAGE_NON_SQUARE: Size = { width: 1000, height: 500 };
 
 	describe( 'computeFreeResizeRect', () => {

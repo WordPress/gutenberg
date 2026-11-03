@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import type { CropperState, Size } from '../../core/types';
+import type { InternalImageEditorState, Size } from '../../core/types';
 import {
 	InteractionController,
-	type CropperInteractionActions,
+	type ImageEditorInteractionActions,
 } from '../../core/interaction-controller';
 
 /**
@@ -88,16 +88,16 @@ function isHandledKeyboardZoom( event: KeyboardEvent ): boolean {
  * Uses requestAnimationFrame for drag/pinch updates to avoid
  * layout thrashing.
  *
- * @param state         The current cropper state.
- * @param actions       Named state updates for cropper interactions.
+ * @param state         The current editor state.
+ * @param actions       Named state updates for editor interactions.
  * @param containerSize The container dimensions in pixels.
  * @param imageSize     The rendered image dimensions in pixels.
  * @param options       Optional configuration for zoom and keyboard behavior.
  * @return Event handler props for the container element.
  */
 export function useInteraction(
-	state: CropperState,
-	actions: CropperInteractionActions,
+	state: InternalImageEditorState,
+	actions: ImageEditorInteractionActions,
 	containerSize: Size,
 	imageSize?: Size,
 	options?: UseInteractionOptions
@@ -214,7 +214,7 @@ export function useInteraction(
 	// It does not signal the end of the gesture it just cut short, so that
 	// is done here: a caller told a gesture began is otherwise left waiting
 	// for an end that never comes, which keeps undo/redo disabled and leaves
-	// the cropper's history batch open after a failed save.
+	// the editor's history batch open after a failed save.
 	const isDisabled = options?.disabled ?? false;
 	useEffect( () => {
 		if ( ! isDisabled ) {

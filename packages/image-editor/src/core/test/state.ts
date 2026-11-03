@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { CropperState, Size } from '../types';
+import type { InternalImageEditorState, Size } from '../types';
 import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import {
-	areCropperStatesEqual,
-	cropperReducer,
+	areImageEditorStatesEqual,
+	imageEditorReducer,
 	enforceContainment,
 	isStateDirty,
 } from '../state';
@@ -19,7 +19,9 @@ const IMAGE: Size = { width: 1600, height: 900 };
 const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 const CONTAINER: Size = { width: 800, height: 600 };
 
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	const merged = {
 		...DEFAULT_STATE,
 		image: {
@@ -53,13 +55,13 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
  * box. This tells us exactly what part of the image the user sees
  * inside the crop area.
  *
- * @param state         The cropper state to inspect.
+ * @param state         The editor state to inspect.
  * @param imageSize     The natural image dimensions.
  * @param containerSize The container dimensions.
  * @return The world-space AABB of the visible region.
  */
 function getCropWorldRegion(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	containerSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -157,7 +159,7 @@ describe( 'isStateDirty', () => {
 		expect( isStateDirty( current, initial ) ).toBe( false );
 	} );
 
-	it( 'detects visible cropper state changes', () => {
+	it( 'detects visible editor state changes', () => {
 		const initial = makeState();
 		const current = makeState( {
 			pan: { x: initial.pan.x, y: initial.pan.y + 0.01 },
@@ -167,7 +169,7 @@ describe( 'isStateDirty', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SETTLE_CROP', () => {
+describe( 'imageEditorReducer — SETTLE_CROP', () => {
 	/**
 	 * Assert that the world-space region visible through the crop is
 	 * the same before and after SETTLE_CROP, within a tolerance.
@@ -177,8 +179,8 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	 * @param tolerance Allowed difference per axis (default 0.02).
 	 */
 	function expectSameVisibleRegion(
-		before: CropperState,
-		after: CropperState,
+		before: InternalImageEditorState,
+		after: InternalImageEditorState,
 		tolerance = 0.02
 	) {
 		const regionBefore = getCropWorldRegion( before, IMAGE, CONTAINER );
@@ -208,7 +210,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		// Crop rect should expand to fill the visual area.
 		expect( settled.cropRect.width ).toBeGreaterThan( 0.9 );
@@ -224,7 +226,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1.5,
 			pan: { x: 0.05, y: -0.02 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.zoom ).toBeGreaterThan( 0 );
 		expectSameVisibleRegion( state, settled );
@@ -237,7 +239,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		// Aspect ratio of crop should be preserved.
 		const ratioBefore = state.cropRect.width / state.cropRect.height;
@@ -253,7 +255,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		const ratioBefore = state.cropRect.width / state.cropRect.height;
 		const ratioAfter = settled.cropRect.width / settled.cropRect.height;
@@ -268,7 +270,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 2,
 			pan: { x: 0.1, y: -0.05 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.zoom ).toBeGreaterThan( 0 );
 		expectSameVisibleRegion( state, settled );
@@ -283,7 +285,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			rotation: 20,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.zoom ).toBeGreaterThan( 0 );
 		expectSameVisibleRegion( state, settled );
@@ -300,7 +302,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.zoom ).toBeCloseTo( MAX_ZOOM, 5 );
 		// The scale was capped at MAX_ZOOM/zoom (=10), not at the uncapped
@@ -323,7 +325,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		expect( settled.cropRect.height ).toBeCloseTo( 1, 5 );
 		expect( settled.zoom ).toBeLessThan( 1 );
@@ -351,7 +353,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			zoom: 1,
 			pan: { x: 0, y: 0 },
 		} );
-		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
 
 		// Crop should remain the same.
 		expect( settled.cropRect.x ).toBeCloseTo( 0, 5 );
@@ -386,7 +388,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 				} )
 			);
 
-			const settled = cropperReducer( state, {
+			const settled = imageEditorReducer( state, {
 				type: 'SETTLE_CROP',
 			} );
 
@@ -432,7 +434,9 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			} )
 		);
 
-		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( afterDrag, {
+			type: 'SETTLE_CROP',
+		} );
 
 		// The settled crop should fill the visual area.
 		expect(
@@ -466,7 +470,9 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			} )
 		);
 
-		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( afterDrag, {
+			type: 'SETTLE_CROP',
+		} );
 
 		const regionBefore = getCropWorldRegion( afterDrag, IMAGE, CONTAINER );
 		const regionAfter = getCropWorldRegion( settled, IMAGE, CONTAINER );
@@ -491,7 +497,9 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			} )
 		);
 
-		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( afterDrag, {
+			type: 'SETTLE_CROP',
+		} );
 
 		// Zoom should be proportional to 1/0.1 = 10.
 		// But MAX_ZOOM may cap it.
@@ -514,7 +522,9 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 			} )
 		);
 
-		const settled = cropperReducer( afterDrag, { type: 'SETTLE_CROP' } );
+		const settled = imageEditorReducer( afterDrag, {
+			type: 'SETTLE_CROP',
+		} );
 
 		expect( settled.zoom ).toBe( MAX_ZOOM );
 
@@ -526,7 +536,7 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SET_ZOOM_AT_POINT', () => {
+describe( 'imageEditorReducer — SET_ZOOM_AT_POINT', () => {
 	it( 'focal-point zoom preserves the focal point position', () => {
 		const state = makeState( { zoom: 1, pan: { x: 0, y: 0 } } );
 		const { elementSize, visualSize } = getImageFit( CONTAINER, IMAGE, 0 );
@@ -553,7 +563,7 @@ describe( 'cropperReducer — SET_ZOOM_AT_POINT', () => {
 		const newCropX = state.pan.x + ( focalNormX - state.pan.x ) * zoomRatio;
 		const newCropY = state.pan.y + ( focalNormY - state.pan.y ) * zoomRatio;
 
-		const zoomed = cropperReducer( state, {
+		const zoomed = imageEditorReducer( state, {
 			type: 'SET_ZOOM_AT_POINT',
 			payload: { zoom: newZoom, pan: { x: newCropX, y: newCropY } },
 		} );
@@ -571,7 +581,7 @@ describe( 'cropperReducer — SET_ZOOM_AT_POINT', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SNAP_ROTATE_90', () => {
+describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
 	it( 'swaps crop width and height around the same center', () => {
 		const state = makeState( {
 			cropRect: { x: 0.1, y: 0.2, width: 0.6, height: 0.4 },
@@ -581,7 +591,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 			y: state.cropRect.y + state.cropRect.height / 2,
 		};
 
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SNAP_ROTATE_90',
 			payload: { direction: 1 },
 		} );
@@ -605,7 +615,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 			pan: { x: 0.1, y: 0.2 },
 		} );
 
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SNAP_ROTATE_90',
 			payload: { direction: 1 },
 		} );
@@ -621,7 +631,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 			pan: { x: 0.1, y: 0.2 },
 		} );
 
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SNAP_ROTATE_90',
 			payload: { direction: -1 },
 		} );
@@ -638,7 +648,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 		} );
 		let result = state;
 		for ( let i = 0; i < 4; i++ ) {
-			result = cropperReducer( result, {
+			result = imageEditorReducer( result, {
 				type: 'SNAP_ROTATE_90',
 				payload: { direction: 1 },
 			} );
@@ -660,7 +670,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 			flip: { horizontal: true, vertical: false },
 		} );
 
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SNAP_ROTATE_90',
 			payload: { direction: 1 },
 		} );
@@ -679,7 +689,7 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 			flip: { horizontal: true, vertical: true },
 		} );
 
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SNAP_ROTATE_90',
 			payload: { direction: 1 },
 		} );
@@ -690,13 +700,13 @@ describe( 'cropperReducer — SNAP_ROTATE_90', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SET_FLIP', () => {
+describe( 'imageEditorReducer — SET_FLIP', () => {
 	it( 'mirrors cropRect horizontally on horizontal flip', () => {
 		const state = makeState( {
 			cropRect: { x: 0.1, y: 0.2, width: 0.3, height: 0.4 },
 		} );
 
-		const flipped = cropperReducer( state, {
+		const flipped = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: false },
 		} );
@@ -713,7 +723,7 @@ describe( 'cropperReducer — SET_FLIP', () => {
 			cropRect: { x: 0.1, y: 0.2, width: 0.3, height: 0.4 },
 		} );
 
-		const flipped = cropperReducer( state, {
+		const flipped = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: false, vertical: true },
 		} );
@@ -730,7 +740,7 @@ describe( 'cropperReducer — SET_FLIP', () => {
 			pan: { x: 0.15, y: 0.07 },
 		} );
 
-		const flipped = cropperReducer( state, {
+		const flipped = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: false },
 		} );
@@ -746,11 +756,11 @@ describe( 'cropperReducer — SET_FLIP', () => {
 			cropRect: { x: 0.2, y: 0.3, width: 0.5, height: 0.4 },
 		} );
 
-		const once = cropperReducer( state, {
+		const once = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: true },
 		} );
-		const twice = cropperReducer( once, {
+		const twice = imageEditorReducer( once, {
 			type: 'SET_FLIP',
 			payload: { horizontal: false, vertical: false },
 		} );
@@ -769,7 +779,7 @@ describe( 'cropperReducer — SET_FLIP', () => {
 			flip: { horizontal: true, vertical: false },
 		} );
 
-		const result = cropperReducer( state, {
+		const result = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: false },
 		} );
@@ -788,7 +798,7 @@ describe( 'cropperReducer — SET_FLIP', () => {
 			rotation: 90,
 		} );
 
-		const flipped = cropperReducer( state, {
+		const flipped = imageEditorReducer( state, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: false },
 		} );
@@ -798,7 +808,7 @@ describe( 'cropperReducer — SET_FLIP', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SET_ROTATION', () => {
+describe( 'imageEditorReducer — SET_ROTATION', () => {
 	it( 'rotates pan by the angle delta', () => {
 		const state = makeState( {
 			zoom: 2,
@@ -809,7 +819,7 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 		// 90° rotation via SET_ROTATION: same math as SNAP_ROTATE_90
 		// pan: (0.1, 0) → (0, 0.1) after 90° CCW in standard math
 		// (positive rotation in our sin/cos convention)
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SET_ROTATION',
 			payload: 90,
 		} );
@@ -823,7 +833,7 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 
 	it( 'preserves zoom (no reset)', () => {
 		const state = makeState( { zoom: 3, rotation: 0 } );
-		const rotated = cropperReducer( state, {
+		const rotated = imageEditorReducer( state, {
 			type: 'SET_ROTATION',
 			payload: 30,
 		} );
@@ -842,13 +852,13 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 
 		let stepwise = state;
 		for ( let i = 1; i <= 9; i++ ) {
-			stepwise = cropperReducer( stepwise, {
+			stepwise = imageEditorReducer( stepwise, {
 				type: 'SET_ROTATION',
 				payload: i * 5,
 			} );
 		}
 
-		const direct = cropperReducer( state, {
+		const direct = imageEditorReducer( state, {
 			type: 'SET_ROTATION',
 			payload: 45,
 		} );
@@ -869,7 +879,7 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 
 		let result = state;
 		for ( const angle of [ 10, 25, 40, 45, 30, 15, 0 ] ) {
-			result = cropperReducer( result, {
+			result = imageEditorReducer( result, {
 				type: 'SET_ROTATION',
 				payload: angle,
 			} );
@@ -881,11 +891,11 @@ describe( 'cropperReducer — SET_ROTATION', () => {
 	} );
 } );
 
-describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
+describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 	const VISUAL_SIZE: Size = { width: 800, height: 450 };
 
 	it( 'stores the ratio and reshapes the crop to the largest box of that ratio', () => {
-		const next = cropperReducer( makeState(), {
+		const next = imageEditorReducer( makeState(), {
 			type: 'SET_ASPECT_RATIO',
 			payload: { aspectRatio: 1, visualSize: VISUAL_SIZE },
 		} );
@@ -898,7 +908,7 @@ describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
 
 	it( 'keeps the crop where it is when the ratio is unlocked', () => {
 		const cropRect = { x: 0.1, y: 0.2, width: 0.5, height: 0.4 };
-		const next = cropperReducer(
+		const next = imageEditorReducer(
 			makeState( { aspectRatio: 1, cropRect } ),
 			{
 				type: 'SET_ASPECT_RATIO',
@@ -912,7 +922,7 @@ describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
 
 	it( 'stores the ratio without reshaping before the visual size is known', () => {
 		const state = makeState();
-		const next = cropperReducer( state, {
+		const next = imageEditorReducer( state, {
 			type: 'SET_ASPECT_RATIO',
 			payload: { aspectRatio: 1, visualSize: { width: 0, height: 0 } },
 		} );
@@ -922,7 +932,7 @@ describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
 	} );
 
 	it( 'is unlocked again by RESET', () => {
-		const next = cropperReducer( makeState( { aspectRatio: 1 } ), {
+		const next = imageEditorReducer( makeState( { aspectRatio: 1 } ), {
 			type: 'RESET',
 		} );
 
@@ -933,7 +943,7 @@ describe( 'cropperReducer — SET_ASPECT_RATIO', () => {
 		const state = makeState();
 		const locked = { ...state, aspectRatio: 1 };
 
-		expect( areCropperStatesEqual( state, locked ) ).toBe( false );
+		expect( areImageEditorStatesEqual( state, locked ) ).toBe( false );
 		expect( isStateDirty( locked, state ) ).toBe( false );
 	} );
 } );

@@ -18,9 +18,8 @@ import {
 	download as downloadIcon,
 } from '@wordpress/icons';
 import { ImageEditorCanvas, createImageEditorState, useImageEditor } from '..';
-// The debug story shows the cropper's internals, so it uses them directly.
-import { Cropper } from '../react/components/cropper';
-import { useCropperController } from '../react/hooks/use-cropper-controller';
+// The debug story shows the editor's internals, so it uses them directly.
+import { useInternalImageEditor } from '../react/hooks/use-image-editor';
 import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
@@ -36,7 +35,7 @@ import {
 	getVisibleBounds,
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
-import type { CropperState } from '../core/types';
+import type { InternalImageEditorState } from '../core/types';
 import styles from './style.module.css';
 
 // "-1" stands for the image's own ratio, worked out once it loads.
@@ -115,16 +114,10 @@ function useUploadableImage() {
 }
 
 const meta: Meta< typeof ImageEditorCanvas > = {
-	id: 'mediaeditor-imageeditor',
-	title: 'Editor/Media Editor/ImageEditor',
+	id: 'image-editor-canvas',
+	title: 'Editor/Image Editor/Canvas',
 	component: ImageEditorCanvas,
 	tags: [ 'status-experimental' ],
-	argTypes: {
-		// The table reads the type from the canvas inside the package.
-		controller: {
-			table: { type: { summary: 'ImageEditorController' } },
-		},
-	},
 };
 
 export default meta;
@@ -132,7 +125,7 @@ export default meta;
 type Story = StoryObj< typeof ImageEditorCanvas >;
 
 /**
- * Default story. Basic cropper with a sample image, no controls.
+ * Default story. Basic canvas with a sample image, no controls.
  */
 const DefaultComponent = () => {
 	const [ state, setState ] = useState( () => createImageEditorState() );
@@ -209,7 +202,7 @@ const WithControlsComponent = () => {
 	// Compute the crop dimensions in source pixels. `getSourceRegion` is
 	// internal, and the public state is the internal one underneath.
 	const cropDimensions = state.image
-		? getSourceRegion( state as unknown as CropperState, {
+		? getSourceRegion( state as unknown as InternalImageEditorState, {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
 			} )
@@ -249,7 +242,7 @@ const WithControlsComponent = () => {
 			);
 			setRotation( baseAngle + clamped * visualDir );
 		},
-		[ baseAngle, setRotation, visualDir ]
+		[ baseAngle, maxRotationOffset, setRotation, visualDir ]
 	);
 
 	const handleFlipHorizontal = useCallback( () => {
@@ -504,7 +497,7 @@ export const WithControls: Story = {
 
 /**
  * Debug visualization showing camera internals, export preview, and
- * image info alongside the cropper.
+ * image info alongside the canvas.
  *
  * Displays the camera matrix, crop corner world-space coordinates,
  * restriction values, source region, and a live export preview --
@@ -512,7 +505,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperController();
+	const controller = useInternalImageEditor();
 	const {
 		state,
 		setRotation,
@@ -866,7 +859,7 @@ const DebugComponent = () => {
 					style={ { flex: '1 1 60%', minWidth: 0 } }
 				>
 					<div className={ styles.container }>
-						<Cropper
+						<ImageEditorCanvas
 							src={ src }
 							controller={ controller }
 							showGrid

@@ -1,7 +1,7 @@
-import type { CropperState, NormalizedRect, Size } from '../types';
+import type { InternalImageEditorState, NormalizedRect, Size } from '../types';
 
 /**
- * Magnitude beyond which any cropper-math input is treated as corrupt.
+ * Magnitude beyond which any editor-math input is treated as corrupt.
  * Picks a value well above any realistic image/rotation/zoom/pan but far
  * below `Number.MAX_VALUE`, so multiplications inside trig and matrix code
  * can't overflow to `Infinity`.
@@ -16,7 +16,7 @@ const MAX_SAFE_MAGNITUDE = 1e6;
  *
  * Note: sub-normal denormals (e.g. `Number.MIN_VALUE`) are accepted by this
  * function — they don't overflow on their own. Protection against divisions
- * by sub-normal values lives in `sanitizeCropperState`'s zoom guard.
+ * by sub-normal values lives in `sanitizeImageEditorState`'s zoom guard.
  *
  * @param value    The candidate value.
  * @param fallback The replacement to return when `value` is unsafe.
@@ -92,7 +92,7 @@ export function sanitizeRect( rect: NormalizedRect ): NormalizedRect {
 }
 
 /**
- * Returns a copy of `state` with the cropper-math numeric fields replaced
+ * Returns a copy of `state` with the editor-math numeric fields replaced
  * by safe defaults. Covers `pan`, `zoom`, `rotation`, the matching base
  * pose, and `cropRect`. The `state.image` numeric fields (naturalWidth /
  * naturalHeight) are intentionally NOT sanitized — image dimensions reach
@@ -106,10 +106,12 @@ export function sanitizeRect( rect: NormalizedRect ): NormalizedRect {
  * (`pan`, `basePan`, `cropRect`) are also preserved when their fields
  * are individually clean.
  *
- * @param state The cropper state to sanitize.
- * @return A cropper state with the math-relevant numeric fields finite.
+ * @param state The editor state to sanitize.
+ * @return A editor state with the math-relevant numeric fields finite.
  */
-export function sanitizeCropperState( state: CropperState ): CropperState {
+export function sanitizeImageEditorState(
+	state: InternalImageEditorState
+): InternalImageEditorState {
 	const panX = safeBoundedNumber( state.pan.x, 0 );
 	const panY = safeBoundedNumber( state.pan.y, 0 );
 	const basePanX = safeBoundedNumber( state.basePan.x, 0 );

@@ -8,7 +8,7 @@ import {
 export interface UseViewportStateReturn {
 	viewport: ViewportState;
 	/**
-	 * Unused in the current Cropper implementation — scaffolded for the
+	 * Unused in the current ImageEditorCanvas implementation — scaffolded for the
 	 * upcoming navigator panel (viewport zoom slider).
 	 */
 	setViewportZoom: ( zoom: number ) => void;

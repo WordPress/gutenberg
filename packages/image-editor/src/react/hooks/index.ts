@@ -1,10 +1,13 @@
 export {
-	useCropperController,
-	createCropperState,
-} from './use-cropper-controller';
+	useImageEditor,
+	useInternalImageEditor,
+	createImageEditorState,
+} from './use-image-editor';
 export type {
-	CropperController,
-	CropperControllerOptions,
-} from './use-cropper-controller';
-export { buildCropperSetters } from './build-cropper-setters';
-export type { CropperSetters } from './build-cropper-setters';
+	ImageEditorController,
+	ImageEditorOptions,
+	InternalImageEditorController,
+	InternalImageEditorOptions,
+} from './use-image-editor';
+export { buildImageEditorSetters } from './build-image-editor-setters';
+export type { ImageEditorSetters } from './build-image-editor-setters';

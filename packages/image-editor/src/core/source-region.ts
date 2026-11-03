@@ -1,12 +1,12 @@
 import { mat2d, vec2 } from 'gl-matrix';
 import type {
-	CropperState,
+	InternalImageEditorState,
 	HandlePosition,
 	NormalizedRect,
 	Size,
 } from './types';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
-import { isValidSize, sanitizeCropperState } from './math/sanitize';
+import { isValidSize, sanitizeImageEditorState } from './math/sanitize';
 import { normalizeRotation } from './math/rotation';
 
 /**
@@ -34,7 +34,7 @@ export interface SourceRegion {
  *
  * Converts the current crop state (normalized visual space) to the actual
  * region of the original image that's selected. This is the bridge between
- * the cropper's internal coordinate system and external tools (image
+ * the editor's internal coordinate system and external tools (image
  * processing libraries, AI APIs, server-side processing) that work in
  * source-pixel coordinates.
  *
@@ -43,19 +43,19 @@ export interface SourceRegion {
  * and flip are included as separate fields since they represent transforms,
  * not a region.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
  * @return The selected region in source pixels plus rotation/flip metadata.
  */
 export function getSourceRegion(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size
 ): SourceRegion {
 	// Sanitize before the zero-size short-circuit so the early return
 	// doesn't leak raw non-finite state.rotation or state.zoom out
 	// through the metadata fields. (state.flip is boolean and isn't
 	// at risk of NaN propagation.)
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 
 	if ( ! isValidSize( imageSize ) ) {
 		return {
@@ -127,19 +127,19 @@ export function getSourceRegion(
 }
 
 /**
- * Convert a source-pixel region back to the cropper's normalized crop rect.
+ * Convert a source-pixel region back to the editor's normalized crop rect.
  *
  * The math intentionally mirrors `getSourceRegion`: map the requested source
  * center through the current camera, then express that screen point inside the
  * same base visible bounds used to position crop overlays.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
  * @param region    The source-pixel region to represent as a crop rect.
  * @return The normalized crop rect, or null when inputs cannot be mapped.
  */
 function getCropRectFromSourceRegion(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	region: SourceRegion
 ): NormalizedRect | null {
@@ -151,7 +151,7 @@ function getCropRectFromSourceRegion(
 		return null;
 	}
 
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 	const syntheticContainer: Size = { width: 1000, height: 1000 };
 	const baseCamera = createCamera(
 		{ ...safeState, pan: { x: 0, y: 0 }, zoom: 1 },
@@ -226,19 +226,19 @@ function isCardinalRotation( rotation: number ): boolean {
  * This is a display-time affordance for visible pixel grids; it does not alter
  * pan/zoom/rotation. Callers decide when snapping is appropriate.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
  * @param cropRect  The candidate crop rect from resize math.
  * @param handle    The active resize handle. Only edges moved by the handle snap.
  * @return A crop rect whose selected source-region edges are whole pixels.
  */
 export function snapCropRectToSourcePixels(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	cropRect: NormalizedRect,
 	handle: HandlePosition
 ): NormalizedRect {
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 	if ( ! isCardinalRotation( safeState.rotation ) ) {
 		return cropRect;
 	}
@@ -254,13 +254,13 @@ export function snapCropRectToSourcePixels(
 /**
  * Snap all source-region edges for a crop rect to the nearest whole pixels.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
  * @param cropRect  The crop rect to align to the source-pixel grid.
  * @return A crop rect whose source-region edges are whole pixels.
  */
 export function snapCropRectToSourcePixelGrid(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	cropRect: NormalizedRect
 ): NormalizedRect {
@@ -273,7 +273,7 @@ export function snapCropRectToSourcePixelGrid(
 }
 
 function snapCropRectEdgesToSourcePixels(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	cropRect: NormalizedRect,
 	edges: SourcePixelSnapEdges
@@ -282,7 +282,7 @@ function snapCropRectEdgesToSourcePixels(
 		return cropRect;
 	}
 
-	const stateWithCrop = sanitizeCropperState( { ...state, cropRect } );
+	const stateWithCrop = sanitizeImageEditorState( { ...state, cropRect } );
 	const region = getSourceRegion( stateWithCrop, imageSize );
 	const shouldSnapX = edges.left || edges.right;
 	const shouldSnapY = edges.top || edges.bottom;
@@ -346,12 +346,12 @@ export interface SourceRegionPercent {
  * Internally delegates to `getSourceRegion` and divides by the image
  * dimensions, so accuracy is identical.
  *
- * @param state     The current cropper state.
+ * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
  * @return The crop region as percentages (0–100).
  */
 export function getSourceRegionPercent(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size
 ): SourceRegionPercent {
 	if ( ! isValidSize( imageSize ) ) {

@@ -11270,7 +11270,7 @@
 			"count": 5
 		}
 	},
-	"packages/image-editor/src/stories/rectangle-crop.story.tsx": {
+	"packages/image-editor/src/stories/image-editor-canvas.story.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}

@@ -62,7 +62,7 @@ describe( 'the public API', () => {
 			controller = next;
 		};
 		await render( <ConsumerEditor onController={ onController } /> );
-		// The handles render once the cropper has measured itself.
+		// The handles render once the canvas has measured itself.
 		await screen.findByRole( 'button', {
 			name: 'Resize from bottom-right corner',
 		} );

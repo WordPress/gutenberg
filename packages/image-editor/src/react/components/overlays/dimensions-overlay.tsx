@@ -169,7 +169,7 @@ export function DimensionsOverlay( {
 	const [ tooltipSize, setTooltipSize ] = useState< Size | null >( null );
 
 	// Measure the rendered tooltip so we can flip its anchor when it
-	// would otherwise be clipped by the cropper's `overflow: hidden`
+	// would otherwise be clipped by the canvas's `overflow: hidden`
 	// root. Runs synchronously before paint, so the user never sees
 	// the un-flipped position. Tracks `outputWidth`/`outputHeight`
 	// because they drive the digit count, the only thing that changes
@@ -243,8 +243,8 @@ export function DimensionsOverlay( {
 	return (
 		<div
 			ref={ tooltipRef }
-			className="wp-media-editor-image-editor__dimensions-tooltip"
-			data-testid="cropper-dimensions-tooltip"
+			className="wp-image-editor__dimensions-tooltip"
+			data-testid="image-editor-dimensions-tooltip"
 			style={ {
 				left: handleX + GAP_DIRECTION[ anchor.x ] * HANDLE_GAP_PX,
 				top: handleY + GAP_DIRECTION[ anchor.y ] * HANDLE_GAP_PX,

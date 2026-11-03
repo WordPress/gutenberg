@@ -11,7 +11,7 @@ $handle-touch-target-size: 44px;
 // Mirrored, `nw` would resize the right edge and the image would pin to the
 // stage edge. ResizableBox ignores its own handle offsets for the same reason.
 /*!rtl:begin:ignore*/
-.wp-media-editor-image-editor {
+.wp-image-editor {
 	position: relative;
 	overflow: hidden;
 	width: 100%;
@@ -184,7 +184,7 @@ $handle-touch-target-size: 44px;
 		// keyboard-active class so that mouse interactions after a
 		// keyboard session — e.g., clicking a handle to start a drag —
 		// don't leave the active ring stuck on the handle.
-		.wp-media-editor-image-editor__canvas--focus-visible &:focus {
+		.wp-image-editor__canvas--focus-visible &:focus {
 			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
 			border-color: transparent;
 			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));

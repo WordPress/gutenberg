@@ -4,7 +4,7 @@
  * WHAT THIS TEST GUARANTEES
  *
  * "What the user framed in the stencil is what the server crops from the
- * source." The cropper shows the user a live preview via the *export
+ * source." The editor shows the user a live preview via the *export
  * camera* (`createExportCamera`); the server receives the edits from
  * `mapEditToOriginal` and applies them sequentially in the order
  * `[flip, rotate, crop]` (as Core's `WP_REST_Attachments_Controller
@@ -13,15 +13,15 @@
  * what the user framed.
  *
  * This test asserts that invariant holds for every combination of
- * rotation, zoom, pan, flip, and crop rect the cropper can produce.
+ * rotation, zoom, pan, flip, and crop rect the editor can produce.
  *
  * STRATEGY
  *
- * For each cropper state and each probe point (u, v) ∈ [0, 1]² inside
+ * For each editor state and each probe point (u, v) ∈ [0, 1]² inside
  * the cropped output:
  *
  *   1. `exportSourcePixel` — inverts the export-camera matrix to find
- *      the source pixel the cropper draws at (u, v). Ground truth:
+ *      the source pixel the editor draws at (u, v). Ground truth:
  *      it's literally what the user sees on screen.
  *   2. `serverSourcePixel` — simulates the Core pipeline
  *      (`flip → rotate → crop`) in reverse to find the source pixel the
@@ -33,7 +33,7 @@
  *
  * ORDER / SIGN NOTES
  *
- * The cropper's export camera composes the source-to-screen chain as
+ * The editor's export camera composes the source-to-screen chain as
  * `flip · R(θ)` on the (centered) source — rotate first, then flip.
  * The edits apply `flip` first, then `R(θ')`. For
  * these two chains to land on the same pixel, when exactly one flip
@@ -47,8 +47,8 @@
  *   Run it after any edit to that file or to `createExportCamera`.
  * - If Core's pipeline operation order ever changes, update
  *   `serverSourcePixel` to match — it mirrors the server exactly.
- * - Adding a new cropper operation (e.g. skew) means: extend
- *   `CropperState`, teach `mapEditToOriginal` to emit it, extend
+ * - Adding a new editor operation (e.g. skew) means: extend
+ *   `InternalImageEditorState`, teach `mapEditToOriginal` to emit it, extend
  *   `serverSourcePixel` to undo it, and add values to the grid in
  *   `buildRows`. The probes don't need to change.
  */
@@ -59,11 +59,13 @@ import { mapEditToOriginal } from '../map-edit-to-original';
 import type { OriginalImageEdit } from '../map-edit-to-original';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
-import type { CropperState, Size } from '../core/types';
+import type { InternalImageEditorState, Size } from '../core/types';
 
 const IMAGE: Size = { width: 1600, height: 900 };
 
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -76,18 +78,18 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 }
 
 /**
- * Source pixel the cropper draws at output position (u, v). Inverts the
+ * Source pixel the editor draws at output position (u, v). Inverts the
  * export-camera matrix — the same one the preview uses — so whatever the
  * user sees on-screen is exactly what this returns.
  *
- * @param state      Cropper state (rotation/zoom/pan/flip/cropRect).
+ * @param state      ImageEditorCanvas state (rotation/zoom/pan/flip/cropRect).
  * @param imageSize  Natural dimensions of the source image.
  * @param outputSize Output canvas dimensions the camera renders into.
  * @param u          Horizontal probe in [0, 1] across the output.
  * @param v          Vertical probe in [0, 1] across the output.
  */
 function exportSourcePixel(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	outputSize: Size,
 	u: number,
@@ -223,7 +225,7 @@ const PROBES: { label: string; u: number; v: number }[] = [
 
 interface ParityRow {
 	label: string;
-	state: CropperState;
+	state: InternalImageEditorState;
 	probeLabel: string;
 	u: number;
 	v: number;

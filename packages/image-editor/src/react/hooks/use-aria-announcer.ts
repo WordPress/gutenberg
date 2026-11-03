@@ -1,15 +1,15 @@
 import { speak } from '@wordpress/a11y';
 import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import type { CropperState } from '../../core/types';
+import type { InternalImageEditorState } from '../../core/types';
 import { getSourceRegion } from '../../core/source-region';
 
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
 
 function getFlipAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: InternalImageEditorState,
+	previousState: InternalImageEditorState | null
 ): string | undefined {
 	if (
 		! previousState ||
@@ -32,8 +32,8 @@ function getFlipAnnouncement(
 }
 
 function getRotationAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: InternalImageEditorState,
+	previousState: InternalImageEditorState | null
 ): string | undefined {
 	if (
 		previousState &&
@@ -73,8 +73,8 @@ function getRotationAnnouncement(
 }
 
 function getCropAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: InternalImageEditorState,
+	previousState: InternalImageEditorState | null
 ): string | undefined {
 	if ( ! state.image ) {
 		return undefined;
@@ -109,8 +109,8 @@ function getCropAnnouncement(
 }
 
 function getZoomAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: InternalImageEditorState,
+	previousState: InternalImageEditorState | null
 ): string | undefined {
 	if (
 		previousState &&
@@ -127,8 +127,8 @@ function getZoomAnnouncement(
 }
 
 function buildAnnouncement(
-	state: CropperState,
-	previousState: CropperState | null
+	state: InternalImageEditorState,
+	previousState: InternalImageEditorState | null
 ): string {
 	// Flip changes are announced alone.
 	const flip = getFlipAnnouncement( state, previousState );
@@ -147,21 +147,21 @@ function buildAnnouncement(
 
 /**
  * Debounce and dedupe ARIA-live announcements for screen readers as the
- * cropper state changes. Calls `speak()` from `@wordpress/a11y` to use the
+ * editor state changes. Calls `speak()` from `@wordpress/a11y` to use the
  * centralized, persistent live region instead of a local one that may be
  * dynamically mounted.
  *
  * Debouncing avoids flooding announcements during drag/pointermove bursts;
  * deduping avoids re-announcing the same state.
  *
- * @param state The current cropper state to announce.
+ * @param state The current editor state to announce.
  */
-export function useAriaAnnouncer( state: CropperState ): void {
+export function useAriaAnnouncer( state: InternalImageEditorState ): void {
 	const timerRef = useRef< ReturnType< typeof setTimeout > | undefined >(
 		undefined
 	);
 	const prevMessageRef = useRef( '' );
-	const prevStateRef = useRef< CropperState | null >( null );
+	const prevStateRef = useRef< InternalImageEditorState | null >( null );
 	const latestStateRef = useRef( state );
 	useLayoutEffect( () => {
 		latestStateRef.current = state;

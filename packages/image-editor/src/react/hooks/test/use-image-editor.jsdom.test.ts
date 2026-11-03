@@ -2,23 +2,25 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useRef, useState } from '@wordpress/element';
 import {
-	createCropperState,
-	useCropperController,
-} from '../use-cropper-controller';
-import type { CropperState } from '../../../core/types';
+	createImageEditorState,
+	useInternalImageEditor,
+} from '../use-image-editor';
+import type { InternalImageEditorState } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';
 import { computeInscribedRect } from '../../../core/crop-rect';
 
-describe( 'useCropperController', () => {
+describe( 'useInternalImageEditor', () => {
 	it( 'should initialize with DEFAULT_STATE', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		expect( result.current.state ).toEqual( DEFAULT_STATE );
 	} );
 
 	it( 'should initialize with merged partial state', () => {
 		const { result } = renderHook( () =>
-			useCropperController( { initialState: { zoom: 2, rotation: 45 } } )
+			useInternalImageEditor( {
+				initialState: { zoom: 2, rotation: 45 },
+			} )
 		);
 
 		expect( result.current.state.zoom ).toBe( 2 );
@@ -28,7 +30,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_CROP via setCrop', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		// At zoom=1, crop is clamped to (0,0) — no panning possible.
 		// Zoom in first to allow panning.
@@ -45,7 +47,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_ZOOM via setZoom', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 3 );
@@ -59,7 +61,7 @@ describe( 'useCropperController', () => {
 		// center coincides with the image center and the crop-center
 		// focal-point correction degenerates to "no pan change."
 		// Guards against regressions where setZoom accidentally pans.
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 4 );
@@ -81,7 +83,7 @@ describe( 'useCropperController', () => {
 		// crop center as zoom decreases — otherwise `enforceContainment`
 		// would translate the image toward the nearest viewport corner
 		// (the original bug this method fixes).
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 4 );
@@ -114,7 +116,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoomAtPoint( 3, { x: 0.2, y: 0.1 } );
@@ -125,7 +127,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should clamp zoom to valid range via SET_ZOOM', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 15 );
@@ -145,7 +147,7 @@ describe( 'useCropperController', () => {
 		// minimum drops below 1, so `setZoom` (slider / keyboard path)
 		// must honour values below 1 rather than clamping at MIN_ZOOM.
 		const { result } = renderHook( () =>
-			useCropperController( {
+			useInternalImageEditor( {
 				initialState: {
 					image: {
 						src: 'portrait.jpg',
@@ -167,7 +169,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_ROTATION via setRotation', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setRotation( 90 );
@@ -177,7 +179,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should normalize rotation via SET_ROTATION', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setRotation( -90 );
@@ -193,7 +195,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_FLIP via setFlip', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setFlip( {
@@ -209,7 +211,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'toggleFlip should toggle horizontal flip', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.toggleFlip( 'horizontal' );
@@ -231,7 +233,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'toggleFlip should toggle vertical flip independently', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.toggleFlip( 'vertical' );
@@ -244,7 +246,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should dispatch SET_CROP_RECT via setCropRect', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		const rect = { x: 0.1, y: 0.2, width: 0.5, height: 0.6 };
 		act( () => {
@@ -255,7 +257,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should reset to DEFAULT_STATE', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 5 );
@@ -272,7 +274,7 @@ describe( 'useCropperController', () => {
 	} );
 
 	it( 'should reset to a custom state', () => {
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => {
 			result.current.setZoom( 5 );
@@ -288,13 +290,13 @@ describe( 'useCropperController', () => {
 
 	describe( 'isDirty', () => {
 		it( 'should be false initially', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			expect( result.current.isDirty ).toBe( false );
 		} );
 
 		it( 'should be true after changing crop', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			// Zoom in first so crop change isn't clamped to (0,0).
 			act( () => {
@@ -309,7 +311,7 @@ describe( 'useCropperController', () => {
 		} );
 
 		it( 'should be true after changing zoom', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setZoom( 2 );
@@ -319,7 +321,7 @@ describe( 'useCropperController', () => {
 		} );
 
 		it( 'should be true after changing rotation', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setRotation( 45 );
@@ -329,7 +331,7 @@ describe( 'useCropperController', () => {
 		} );
 
 		it( 'should be true after changing flip', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setFlip( {
@@ -342,7 +344,7 @@ describe( 'useCropperController', () => {
 		} );
 
 		it( 'should be false after reset', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setZoom( 5 );
@@ -358,7 +360,7 @@ describe( 'useCropperController', () => {
 		} );
 
 		it( 'should be false after manually resetting fields to initial values', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			// Zoom in and pan.
 			act( () => {
@@ -388,7 +390,7 @@ describe( 'useCropperController', () => {
 		// non-square images. The initial snapshot must be refreshed so
 		// isDirty still reports false at a "clean" post-load state.
 		it( 'should be false after setImage on a non-square image', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setImage( {
@@ -407,7 +409,7 @@ describe( 'useCropperController', () => {
 				naturalWidth: 1600,
 				naturalHeight: 900,
 			};
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setImage( image );
@@ -430,7 +432,7 @@ describe( 'useCropperController', () => {
 		// (preserving the image, re-enforcing containment). Otherwise
 		// isDirty reports true right after reset.
 		it( 'should be false after reset on a loaded image', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			act( () => {
 				result.current.setImage( {
@@ -459,7 +461,7 @@ describe( 'useCropperController', () => {
 		// For these tests, we need a loaded image so the reducer can
 		// compute minZoomForCover and restrict position.
 		function setupWithImage() {
-			const view = renderHook( () => useCropperController() );
+			const view = renderHook( () => useInternalImageEditor() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -702,7 +704,7 @@ describe( 'useCropperController', () => {
 
 	describe( 'SETTLE_CROP', () => {
 		function setupWithImage() {
-			const view = renderHook( () => useCropperController() );
+			const view = renderHook( () => useInternalImageEditor() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -803,7 +805,7 @@ describe( 'useCropperController', () => {
 
 	describe( 'SNAP_ROTATE_90', () => {
 		function setupWithImage() {
-			const view = renderHook( () => useCropperController() );
+			const view = renderHook( () => useInternalImageEditor() );
 			act( () => {
 				view.result.current.setImage( {
 					src: 'test.jpg',
@@ -899,17 +901,17 @@ describe( 'useCropperController', () => {
 
 	describe( 'public controller contract', () => {
 		it( 'does not expose the raw reducer dispatch', () => {
-			const { result } = renderHook( () => useCropperController() );
+			const { result } = renderHook( () => useInternalImageEditor() );
 
 			expect( '__dispatch' in result.current ).toBe( false );
 		} );
 	} );
 
 	describe( 'isStateDirty coverage guard', () => {
-		// This test ensures that isStateDirty checks ALL fields in CropperState.
-		// If you add a field to CropperState/DEFAULT_STATE and this test fails,
-		// you MUST also update isStateDirty() in use-cropper-controller.ts.
-		it( 'should track all CropperState fields', () => {
+		// This test ensures that isStateDirty checks ALL fields in InternalImageEditorState.
+		// If you add a field to InternalImageEditorState/DEFAULT_STATE and this test fails,
+		// you MUST also update isStateDirty() in use-image-editor.ts.
+		it( 'should track all InternalImageEditorState fields', () => {
 			// Flatten DEFAULT_STATE keys into dot-notation paths.
 			// e.g., { pan: { x: 0, y: 0 } } → ['crop.x', 'crop.y']
 			function flattenKeys(
@@ -939,7 +941,7 @@ describe( 'useCropperController', () => {
 			}
 
 			// The fields that isStateDirty currently checks.
-			// Keep this in sync — if you add a field to CropperState,
+			// Keep this in sync — if you add a field to InternalImageEditorState,
 			// add it here AND in isStateDirty().
 			const dirtyCheckedFields = [
 				'pan.x',
@@ -983,7 +985,7 @@ describe( 'useCropperController', () => {
 
 	it( 'locks the aspect ratio and reshapes the crop for the reported visual size', () => {
 		const visualSize = { width: 800, height: 450 };
-		const { result } = renderHook( () => useCropperController() );
+		const { result } = renderHook( () => useInternalImageEditor() );
 
 		act( () => result.current.setVisualSize( visualSize ) );
 		act( () => result.current.setAspectRatio( 1 ) );
@@ -995,17 +997,17 @@ describe( 'useCropperController', () => {
 	} );
 } );
 
-describe( 'useCropperController with the state kept by the caller', () => {
+describe( 'useInternalImageEditor with the state kept by the caller', () => {
 	const IMAGE = { src: 'photo.jpg', naturalWidth: 1200, naturalHeight: 600 };
 
 	function useControlled() {
 		const [ state, setState ] = useState( () =>
-			createCropperState( IMAGE )
+			createImageEditorState( IMAGE )
 		);
 		const changes = useRef< Array< { isEdit: boolean } > >( [] );
-		const controller = useCropperController( {
+		const controller = useInternalImageEditor( {
 			state,
-			onChange: ( next: CropperState, details ) => {
+			onChange: ( next: InternalImageEditorState, details ) => {
 				changes.current.push( details );
 				setState( next );
 			},

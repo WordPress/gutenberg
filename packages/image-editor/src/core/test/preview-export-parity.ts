@@ -1,5 +1,5 @@
 /**
- * Preview ↔ Export parity — the load-bearing invariant of an image cropper.
+ * Preview ↔ Export parity — the load-bearing invariant of an image editor.
  *
  * "What you see in the stencil is what you get in the exported file."
  * If this ever breaks silently, users can't trust the tool.
@@ -37,12 +37,14 @@ import {
 	getVisibleBounds,
 } from '../camera';
 import { DEFAULT_STATE } from '../constants';
-import type { CropperState, Size } from '../types';
+import type { InternalImageEditorState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
 
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -56,7 +58,7 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 
 // (u, v) = (0, 0) is the stencil's top-left, (1, 1) is bottom-right.
 function stencilScreenPoint(
-	state: CropperState,
+	state: InternalImageEditorState,
 	container: Size,
 	imageSize: Size,
 	u: number,
@@ -85,7 +87,7 @@ function stencilScreenPoint(
 }
 
 function previewSourcePixel(
-	state: CropperState,
+	state: InternalImageEditorState,
 	container: Size,
 	imageSize: Size,
 	screen: { x: number; y: number }
@@ -99,7 +101,7 @@ function previewSourcePixel(
 }
 
 function exportSourcePixel(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	outputSize: Size,
 	outputPoint: { x: number; y: number }
@@ -131,7 +133,7 @@ const PROBES: { label: string; u: number; v: number }[] = [
 // disagreed.
 interface ParityRow {
 	label: string;
-	state: CropperState;
+	state: InternalImageEditorState;
 	outputSize: Size;
 	probeLabel: string;
 	u: number;

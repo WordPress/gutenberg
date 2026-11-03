@@ -12,7 +12,10 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { HandlePosition, Size, NormalizedRect } from '../../core/types';
-import type { CropperController } from '../hooks/use-cropper-controller';
+import type {
+	ImageEditorController,
+	InternalImageEditorController,
+} from '../hooks/use-image-editor';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
 import {
@@ -58,11 +61,11 @@ const SETTLE_STENCIL_TRANSITION = [
 /**
  * Props for the canvas, which the package exports as `ImageEditorCanvas`.
  */
-export interface CropperProps {
+export interface ImageEditorCanvasProps {
 	/** The image URL. */
 	src: string;
 	/** The controller from `useImageEditor`. */
-	controller: CropperController;
+	controller: ImageEditorController;
 	/**
 	 * Show the rule-of-thirds grid: `true`, `false` or `'interactive'`
 	 * (only while the crop is being changed). Defaults to `false`.
@@ -102,7 +105,7 @@ export interface CropperProps {
 }
 
 /**
- * The main image cropper component.
+ * The main image editor component.
  *
  * Renders an image within a container with interactive crop overlays.
  * Creates the camera once per render via getImageFit, then passes
@@ -111,7 +114,7 @@ export interface CropperProps {
  * The component fills its parent container (100% width and height).
  * Wrap it in a sized container to control its dimensions.
  *
- * @param root0                Component props implementing CropperProps.
+ * @param root0                Component props implementing ImageEditorCanvasProps.
  * @param root0.src            Image source URL.
  * @param root0.controller     The controller from `useImageEditor`.
  * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
@@ -127,10 +130,10 @@ export interface CropperProps {
  * @param root0.className      Additional CSS class.
  * @param ref                  Forwarded ref for the container div.
  */
-function CropperInner(
+function ImageEditorCanvasInner(
 	{
 		src,
-		controller,
+		controller: publicController,
 		showGrid = false,
 		showDimming = true,
 		showDimensions = true,
@@ -142,9 +145,12 @@ function CropperInner(
 		onGestureStart,
 		onGestureEnd,
 		className,
-	}: CropperProps,
+	}: ImageEditorCanvasProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
+	// `useImageEditor` returns the full controller; its public type leaves
+	// out the methods only the canvas calls.
+	const controller = publicController as InternalImageEditorController;
 	const {
 		state,
 		setImage,
@@ -206,7 +212,7 @@ function CropperInner(
 				setIsCropAreaFocused( false );
 			}
 			// Reset keyboard-active styling only when focus leaves the
-			// cropper entirely. Moves between the canvas and a handle (or
+			// canvas entirely. Moves between the canvas and a handle (or
 			// between handles) keep the keyboard-active state intact.
 			if (
 				! event.currentTarget.contains(
@@ -842,7 +848,7 @@ function CropperInner(
 		const centerX = ( canvasSize.width - elementSize.width ) / 2;
 		const centerY = ( canvasSize.height - elementSize.height ) / 2;
 		// Above 1:1 the image is upscaled, so render nearest-neighbour to keep
-		// pixel boundaries crisp (e.g. small images the cropper magnifies);
+		// pixel boundaries crisp (e.g. small images the canvas magnifies);
 		// below 1:1 leave smoothing on for downscaled large images.
 		return {
 			width: elementSize.width,
@@ -899,8 +905,8 @@ function CropperInner(
 		<div
 			ref={ ref }
 			className={ clsx(
-				'wp-media-editor-image-editor',
-				isDragging && 'wp-media-editor-image-editor--dragging',
+				'wp-image-editor',
+				isDragging && 'wp-image-editor--dragging',
 				className
 			) }
 		>
@@ -919,20 +925,17 @@ function CropperInner(
 			<div
 				ref={ canvasRef }
 				className={ clsx(
-					'wp-media-editor-image-editor__canvas',
+					'wp-image-editor__canvas',
 					isInteractiveGrid &&
-						'wp-media-editor-image-editor__canvas--grid-interactive',
-					showInteractiveGrid &&
-						'wp-media-editor-image-editor__canvas--show-grid',
-					settling &&
-						'wp-media-editor-image-editor__canvas--settling',
-					// Marks the cropper as in keyboard-interaction mode.
+						'wp-image-editor__canvas--grid-interactive',
+					showInteractiveGrid && 'wp-image-editor__canvas--show-grid',
+					settling && 'wp-image-editor__canvas--settling',
+					// Marks the canvas as in keyboard-interaction mode.
 					// CSS uses :focus on the canvas to show the stencil
 					// outline and :focus on a handle to show its ring,
-					// so the class applies whenever any cropper element
+					// so the class applies whenever any editor element
 					// has keyboard focus.
-					isFocusVisible &&
-						'wp-media-editor-image-editor__canvas--focus-visible'
+					isFocusVisible && 'wp-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }
 				role="group"
@@ -960,15 +963,15 @@ function CropperInner(
 				 * never exposed when the stage is panned during a resize drag.
 				 */ }
 				<div
-					className="wp-media-editor-image-editor__stage"
-					data-testid="cropper-stage"
+					className="wp-image-editor__stage"
+					data-testid="image-editor-stage"
 					style={ stageStyle }
 					onTransitionEnd={ handleSettleTransitionEnd }
 				>
 					{ /* The image layer */ }
 					<img
-						className="wp-media-editor-image-editor__image"
-						data-testid="cropper-image"
+						className="wp-image-editor__image"
+						data-testid="image-editor-image"
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
@@ -1032,14 +1035,16 @@ function CropperInner(
 	);
 }
 
-const CropperInnerWithRef = forwardRef< HTMLDivElement, CropperProps >(
-	CropperInner
-);
+const ImageEditorCanvasInnerWithRef = forwardRef<
+	HTMLDivElement,
+	ImageEditorCanvasProps
+>( ImageEditorCanvasInner );
 
-export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
-	( props, ref ) => (
-		<ViewportProvider>
-			<CropperInnerWithRef { ...props } ref={ ref } />
-		</ViewportProvider>
-	)
-);
+export const ImageEditorCanvas = forwardRef<
+	HTMLDivElement,
+	ImageEditorCanvasProps
+>( ( props, ref ) => (
+	<ViewportProvider>
+		<ImageEditorCanvasInnerWithRef { ...props } ref={ ref } />
+	</ViewportProvider>
+) );

@@ -1,4 +1,4 @@
-import type { CropperState } from '../types';
+import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
@@ -27,12 +27,12 @@ export function loadImage( src: string ): Promise< HTMLImageElement > {
  * it in a single ctx.setTransform call before drawing the image.
  *
  * @param image - The source image element.
- * @param state - The full cropper state containing crop, rotation, and flip settings.
+ * @param state - The full editor state containing crop, rotation, and flip settings.
  * @return A canvas element containing the transformed and cropped image.
  */
 export function renderToCanvas(
 	image: HTMLImageElement,
-	state: CropperState
+	state: InternalImageEditorState
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
 	const { rotation, cropRect } = state;
@@ -131,7 +131,7 @@ export function canvasToDataURL(
  * Only works in browser environments (needs DOM / HTMLCanvasElement).
  *
  * @param src      - The image URL to load.
- * @param state    - The cropper state with all transform settings.
+ * @param state    - The editor state with all transform settings.
  * @param mimeType - The output MIME type. Defaults to 'image/png'.
  * @param quality  - The quality parameter for lossy formats (0-1). Defaults to DEFAULT_QUALITY.
  * @return A promise that resolves to the exported Blob.
@@ -140,7 +140,7 @@ export function canvasToDataURL(
  */
 export async function exportCroppedImage(
 	src: string,
-	state: CropperState,
+	state: InternalImageEditorState,
 	mimeType: string = 'image/png',
 	quality: number = DEFAULT_QUALITY
 ): Promise< Blob > {
@@ -150,7 +150,7 @@ export async function exportCroppedImage(
 }
 
 /**
- * Apply the cropper's transform (crop, rotation, flip, zoom) to an existing
+ * Apply the editor's transform (crop, rotation, flip, zoom) to an existing
  * canvas or image source. This is the bridge for multi-step editing pipelines
  * where an upstream tool (e.g., brightness/color adjustment) has already
  * processed the image and you want to apply the crop on top.
@@ -162,7 +162,7 @@ export async function exportCroppedImage(
  * @param sourceSize        - The dimensions of the source (natural width/height).
  * @param sourceSize.width  - The width of the source in pixels.
  * @param sourceSize.height - The height of the source in pixels.
- * @param state             - The cropper state with all transform settings.
+ * @param state             - The editor state with all transform settings.
  * @param outputSize        - Optional output size. Defaults to the crop region's natural pixel size.
  * @param outputSize.width  - The width of the output in pixels.
  * @param outputSize.height - The height of the output in pixels.
@@ -171,7 +171,7 @@ export async function exportCroppedImage(
 export function applyToCanvas(
 	source: CanvasImageSource,
 	sourceSize: { width: number; height: number },
-	state: CropperState,
+	state: InternalImageEditorState,
 	outputSize?: { width: number; height: number }
 ): HTMLCanvasElement {
 	// Use snap-rotation bbox for default sizing so the default output
@@ -226,7 +226,7 @@ export function applyToCanvas(
  * Throws on export failure (see `exportCroppedImage`).
  *
  * @param src      - The image URL to load.
- * @param state    - The cropper state with all transform settings.
+ * @param state    - The editor state with all transform settings.
  * @param filename - The download filename. Defaults to 'cropped-image'.
  * @param mimeType - The output MIME type. Defaults to 'image/png'.
  * @param quality  - The quality parameter for lossy formats (0-1). Defaults to DEFAULT_QUALITY.
@@ -234,7 +234,7 @@ export function applyToCanvas(
  */
 export async function downloadCroppedImage(
 	src: string,
-	state: CropperState,
+	state: InternalImageEditorState,
 	filename: string = 'cropped-image',
 	mimeType: string = 'image/png',
 	quality: number = DEFAULT_QUALITY

@@ -1,7 +1,7 @@
 // Types
 export type {
-	CropperState,
-	CropperAction,
+	InternalImageEditorState,
+	ImageEditorAction,
 	TransformOperation,
 	NormalizedPoint,
 	NormalizedRect,
@@ -14,14 +14,14 @@ export type {
 // Constants
 export { DEFAULT_STATE } from './constants';
 
-// Reducer + state helpers. `CropperAction` and `cropperReducer` are
-// exported so composite stores can delegate cropper actions through the
+// Reducer + state helpers. `ImageEditorAction` and `imageEditorReducer` are
+// exported so composite stores can delegate editor actions through the
 // pure reducer (see `useMediaEditorState`). Most consumers should
-// instead drive state through the named setters on `CropperController`.
+// instead drive state through the named setters on `InternalImageEditorController`.
 export {
-	cropperReducer,
+	imageEditorReducer,
 	enforceContainment,
-	areCropperStatesEqual,
+	areImageEditorStatesEqual,
 	isStateDirty,
 } from './state';
 

@@ -1,4 +1,4 @@
-import type { NormalizedRect, Flip, CropperState } from './types';
+import type { NormalizedRect, Flip, InternalImageEditorState } from './types';
 
 /**
  * Default/resting zoom. A full, unrotated crop needs at least 1x to cover the
@@ -29,7 +29,7 @@ export const MIN_CROP_PIXELS = 16;
  * too small to grab the resize handles. This floor keeps the crop operable
  * regardless of display scale; it binds when zoomed out and yields to the
  * source-pixel floor once the image is shown large enough. Sized to one
- * handle touch target (`$handle-touch-target-size` in `cropper.scss`).
+ * handle touch target (`$handle-touch-target-size` in `image-editor-canvas.scss`).
  */
 export const MIN_CROP_SCREEN_PX = 44;
 
@@ -57,11 +57,11 @@ export const PIXEL_SNAP_DISPLAY_SCALE = 1;
 
 /**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
- * This could be made configurable as a prop to the Cropper component.
+ * This could be made configurable as a prop to the ImageEditorCanvas component.
  */
 export const DEFAULT_WHEEL_ZOOM_SPEED = 0.0025;
 
-/** Fine step for keyboard-driven cropper movement, in normalized coordinates. */
+/** Fine step for keyboard-driven editor movement, in normalized coordinates. */
 export const DEFAULT_KEYBOARD_STEP = 0.01;
 
 /** Coarse keyboard movement multiplier when Shift is held. */
@@ -90,7 +90,7 @@ const DEFAULT_PAN: { x: number; y: number } = {
 	y: 0,
 };
 
-export const DEFAULT_STATE: CropperState = {
+export const DEFAULT_STATE: InternalImageEditorState = {
 	image: null,
 	pan: { ...DEFAULT_PAN },
 	zoom: MIN_ZOOM,

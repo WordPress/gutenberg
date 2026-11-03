@@ -1,6 +1,6 @@
 import type {
-	CropperAction,
-	CropperState,
+	ImageEditorAction,
+	InternalImageEditorState,
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
@@ -9,12 +9,12 @@ import type {
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
 
 /**
- * The named cropper setters `useCropperController` exposes.
+ * The named editor setters `useInternalImageEditor` exposes.
  *
  * `setImage` and `reset` are not included: the controller has extra
  * bookkeeping for them (its dirty baseline).
  */
-export interface CropperSetters {
+export interface ImageEditorSetters {
 	setPan: ( pan: NormalizedPoint ) => void;
 	setZoom: ( zoom: number ) => void;
 	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
@@ -26,7 +26,7 @@ export interface CropperSetters {
 	/**
 	 * Lock the crop to a width / height ratio in source pixels, or
 	 * unlock it with `undefined`. Locking reshapes the crop to the
-	 * largest box of that ratio. `<Cropper>` reads the ratio from the
+	 * largest box of that ratio. `<ImageEditorCanvas>` reads the ratio from the
 	 * state to lock its resize handles.
 	 */
 	setAspectRatio: ( aspectRatio: number | undefined ) => void;
@@ -34,69 +34,68 @@ export interface CropperSetters {
 }
 
 /**
- * Build the named cropper setters from a dispatch function and getters
+ * Build the named editor setters from a dispatch function and getters
  * for the latest state and the rendered size.
  *
- * @param dispatchCropperAction Apply a `CropperAction` to the
- *                              underlying reducer.
- * @param getCropperState       Return the current `CropperState`.
- *                              Used by setters that need to read
- *                              the latest state to compute their
- *                              payload (focal-point zoom, flip toggle).
- * @param getVisualSize         Return the rendered image size the
- *                              `<Cropper>` last reported, which
- *                              `setAspectRatio` needs to reshape the
- *                              crop.
- * @return The named cropper setters.
+ * @param dispatchAction Apply a `ImageEditorAction` to the
+ *                       underlying reducer.
+ * @param getState       Return the current `InternalImageEditorState`.
+ *                       Used by setters that need to read
+ *                       the latest state to compute their
+ *                       payload (focal-point zoom, flip toggle).
+ * @param getVisualSize  Return the rendered image size the
+ *                       `<ImageEditorCanvas>` last reported, which
+ *                       `setAspectRatio` needs to reshape the
+ *                       crop.
+ * @return The named editor setters.
  */
-export function buildCropperSetters(
-	dispatchCropperAction: ( action: CropperAction ) => void,
-	getCropperState: () => CropperState,
+export function buildImageEditorSetters(
+	dispatchAction: ( action: ImageEditorAction ) => void,
+	getState: () => InternalImageEditorState,
 	getVisualSize: () => Size
-): CropperSetters {
+): ImageEditorSetters {
 	return {
-		setPan: ( pan ) =>
-			dispatchCropperAction( { type: 'SET_PAN', payload: pan } ),
+		setPan: ( pan ) => dispatchAction( { type: 'SET_PAN', payload: pan } ),
 		setZoom: ( zoom ) => {
-			const action = buildFocalPointZoomAction( getCropperState(), zoom );
+			const action = buildFocalPointZoomAction( getState(), zoom );
 			if ( action ) {
-				dispatchCropperAction( action );
+				dispatchAction( action );
 			}
 		},
 		setZoomAtPoint: ( zoom, pan ) =>
-			dispatchCropperAction( {
+			dispatchAction( {
 				type: 'SET_ZOOM_AT_POINT',
 				payload: { zoom, pan },
 			} ),
 		setRotation: ( rotation ) =>
-			dispatchCropperAction( {
+			dispatchAction( {
 				type: 'SET_ROTATION',
 				payload: rotation,
 			} ),
 		setFlip: ( flip ) =>
-			dispatchCropperAction( { type: 'SET_FLIP', payload: flip } ),
+			dispatchAction( { type: 'SET_FLIP', payload: flip } ),
 		toggleFlip: ( direction ) => {
-			const { flip } = getCropperState();
-			dispatchCropperAction( {
+			const { flip } = getState();
+			dispatchAction( {
 				type: 'SET_FLIP',
 				payload: { ...flip, [ direction ]: ! flip[ direction ] },
 			} );
 		},
 		snapRotate90: ( direction ) =>
-			dispatchCropperAction( {
+			dispatchAction( {
 				type: 'SNAP_ROTATE_90',
 				payload: { direction },
 			} ),
 		setCropRect: ( rect ) =>
-			dispatchCropperAction( {
+			dispatchAction( {
 				type: 'SET_CROP_RECT',
 				payload: rect,
 			} ),
 		setAspectRatio: ( aspectRatio ) =>
-			dispatchCropperAction( {
+			dispatchAction( {
 				type: 'SET_ASPECT_RATIO',
 				payload: { aspectRatio, visualSize: getVisualSize() },
 			} ),
-		settleCrop: () => dispatchCropperAction( { type: 'SETTLE_CROP' } ),
+		settleCrop: () => dispatchAction( { type: 'SETTLE_CROP' } ),
 	};
 }

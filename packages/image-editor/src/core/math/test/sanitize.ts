@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
 	isValidSize,
 	safeBoundedNumber,
-	sanitizeCropperState,
+	sanitizeImageEditorState,
 	sanitizeRect,
 } from '../sanitize';
 import { DEFAULT_STATE } from '../../constants';
-import type { CropperState } from '../../types';
+import type { InternalImageEditorState } from '../../types';
 
 describe( 'safeBoundedNumber', () => {
 	it( 'returns the value when it is finite and in range', () => {
@@ -39,7 +39,7 @@ describe( 'safeBoundedNumber', () => {
 
 	it( 'accepts sub-normal values (sub-normal protection lives elsewhere)', () => {
 		// Sub-normals don't overflow on their own; they only cause trouble
-		// when used as divisors. That guard lives in sanitizeCropperState's
+		// when used as divisors. That guard lives in sanitizeImageEditorState's
 		// zoom check, not here.
 		expect( safeBoundedNumber( Number.MIN_VALUE, 0 ) ).toBe(
 			Number.MIN_VALUE
@@ -110,10 +110,10 @@ describe( 'sanitizeRect', () => {
 	} );
 } );
 
-describe( 'sanitizeCropperState', () => {
+describe( 'sanitizeImageEditorState', () => {
 	function makeBaseState(
-		overrides: Partial< CropperState > = {}
-	): CropperState {
+		overrides: Partial< InternalImageEditorState > = {}
+	): InternalImageEditorState {
 		return {
 			...DEFAULT_STATE,
 			...overrides,
@@ -126,7 +126,7 @@ describe( 'sanitizeCropperState', () => {
 			zoom: 1.5,
 			rotation: 30,
 		} );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out.pan ).toEqual( { x: 0.1, y: -0.05 } );
 		expect( out.zoom ).toBe( 1.5 );
 		expect( out.rotation ).toBe( 30 );
@@ -136,40 +136,43 @@ describe( 'sanitizeCropperState', () => {
 		const state = makeBaseState( {
 			pan: { x: Number.NaN, y: Number.NaN },
 		} );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out.pan ).toEqual( { x: 0, y: 0 } );
 	} );
 
 	it( 'replaces non-finite zoom with 1 (identity)', () => {
 		expect(
-			sanitizeCropperState( makeBaseState( { zoom: Number.NaN } ) ).zoom
+			sanitizeImageEditorState( makeBaseState( { zoom: Number.NaN } ) )
+				.zoom
 		).toBe( 1 );
 		expect(
-			sanitizeCropperState(
+			sanitizeImageEditorState(
 				makeBaseState( { zoom: Number.POSITIVE_INFINITY } )
 			).zoom
 		).toBe( 1 );
 		expect(
-			sanitizeCropperState( makeBaseState( { zoom: -2 } ) ).zoom
+			sanitizeImageEditorState( makeBaseState( { zoom: -2 } ) ).zoom
 		).toBe( 1 );
 	} );
 
 	it( 'replaces sub-normal zoom with 1 (prevents division explosion)', () => {
 		expect(
-			sanitizeCropperState( makeBaseState( { zoom: Number.MIN_VALUE } ) )
-				.zoom
+			sanitizeImageEditorState(
+				makeBaseState( { zoom: Number.MIN_VALUE } )
+			).zoom
 		).toBe( 1 );
 	} );
 
 	it( 'replaces extreme rotation magnitudes with 0', () => {
 		expect(
-			sanitizeCropperState(
+			sanitizeImageEditorState(
 				makeBaseState( { rotation: Number.MAX_VALUE } )
 			).rotation
 		).toBe( 0 );
 		expect(
-			sanitizeCropperState( makeBaseState( { rotation: Number.NaN } ) )
-				.rotation
+			sanitizeImageEditorState(
+				makeBaseState( { rotation: Number.NaN } )
+			).rotation
 		).toBe( 0 );
 	} );
 
@@ -182,7 +185,7 @@ describe( 'sanitizeCropperState', () => {
 				height: 0.5,
 			},
 		} );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out.cropRect ).toEqual( {
 			x: 0,
 			y: 0.1,
@@ -197,7 +200,7 @@ describe( 'sanitizeCropperState', () => {
 			baseZoom: Number.NEGATIVE_INFINITY,
 			baseRotation: Number.MAX_VALUE,
 		} );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out.basePan ).toEqual( { x: 0, y: 0 } );
 		expect( out.baseZoom ).toBe( 1 );
 		expect( out.baseRotation ).toBe( 0 );
@@ -212,7 +215,7 @@ describe( 'sanitizeCropperState', () => {
 			zoom: 1.5,
 			rotation: 30,
 		} );
-		expect( sanitizeCropperState( state ) ).toBe( state );
+		expect( sanitizeImageEditorState( state ) ).toBe( state );
 	} );
 
 	it( 'preserves sub-object references when only some fields change', () => {
@@ -220,7 +223,7 @@ describe( 'sanitizeCropperState', () => {
 		// reference even though the parent state must be a new object.
 		const pan = { x: 0.1, y: -0.05 };
 		const state = makeBaseState( { pan, zoom: Number.NaN } );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out ).not.toBe( state );
 		expect( out.pan ).toBe( pan );
 		expect( out.zoom ).toBe( 1 );
@@ -236,7 +239,7 @@ describe( 'sanitizeCropperState', () => {
 			naturalHeight: 900,
 		};
 		const state = makeBaseState( { image } );
-		const out = sanitizeCropperState( state );
+		const out = sanitizeImageEditorState( state );
 		expect( out.image ).toBe( image );
 	} );
 } );

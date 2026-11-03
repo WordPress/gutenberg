@@ -1,6 +1,6 @@
 import { mat2d, vec2 } from 'gl-matrix';
 import type {
-	CropperState,
+	InternalImageEditorState,
 	NormalizedPoint,
 	NormalizedRect,
 	Size,
@@ -11,7 +11,7 @@ import {
 	isSafeNumber,
 	isValidSize,
 	safeBoundedNumber,
-	sanitizeCropperState,
+	sanitizeImageEditorState,
 } from './math/sanitize';
 
 // Pre-allocated scratch buffers for `screenToWorld`, which is called per
@@ -59,7 +59,7 @@ export function getRotatedBBox(
  * (rotated) bounding box dimensions for a given container, image, and rotation.
  *
  * This is the same "contain" fit logic used by createCamera, extracted so
- * cropper.tsx can size the <img> element and position overlays without
+ * image-editor-canvas.tsx can size the <img> element and position overlays without
  * duplicating the math.
  *
  * @param containerSize The container dimensions in pixels.
@@ -164,7 +164,7 @@ export function getViewScale(
 }
 
 /**
- * Compose a camera matrix from cropper state, container, and image dimensions.
+ * Compose a camera matrix from editor state, container, and image dimensions.
  *
  * The matrix maps normalized world coordinates [0,1] x [0,1] to screen pixels.
  * Input (0,0) = image top-left, (1,1) = image bottom-right.
@@ -176,13 +176,13 @@ export function getViewScale(
  * are viewport-relative: the image mirrors across the viewport's vertical /
  * horizontal axis regardless of current rotation.
  *
- * @param state         The current cropper state (zoom, rotation, flip, crop).
+ * @param state         The current editor state (zoom, rotation, flip, crop).
  * @param containerSize The size of the container in pixels.
  * @param imageSize     The natural size of the image in pixels.
  * @return The composed camera matrix.
  */
 export function createCamera(
-	state: CropperState,
+	state: InternalImageEditorState,
 	containerSize: Size,
 	imageSize: Size
 ): Camera {
@@ -192,7 +192,7 @@ export function createCamera(
 		return m;
 	}
 
-	const safeState = sanitizeCropperState( state );
+	const safeState = sanitizeImageEditorState( state );
 
 	// Use the nearest 90° multiple for layout sizing so the stencil
 	// and visual bounds are stable through fine rotation. The actual
@@ -374,13 +374,13 @@ export function getVisibleBounds( camera: Camera ): VisualBounds {
  * The transform chain mirrors the `renderToCanvas` function in canvas-renderer.ts:
  *   translate(visualCenter - cropOffset + outCenter) → flip → rotate → zoom → translate(-imgCenter)
  *
- * @param state      The current cropper state.
+ * @param state      The current editor state.
  * @param imageSize  The natural size of the source image in pixels.
  * @param outputSize The desired output canvas size in pixels.
  * @return The composed export camera matrix.
  */
 export function createExportCamera(
-	state: CropperState,
+	state: InternalImageEditorState,
 	imageSize: Size,
 	outputSize: Size
 ): Camera {
@@ -389,7 +389,7 @@ export function createExportCamera(
 		return m;
 	}
 	const { rotation, flip, cropRect, zoom, pan } =
-		sanitizeCropperState( state );
+		sanitizeImageEditorState( state );
 	// Reference frame for cropRect/pan is the snap-rotation bbox — that's
 	// what the stencil and CSS matrix use in the preview (see createCamera
 	// and getImageFit). Using the true rotation here would position the

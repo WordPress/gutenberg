@@ -1,4 +1,8 @@
-import type { CropperState, NormalizedPoint, CropperAction } from './types';
+import type {
+	InternalImageEditorState,
+	NormalizedPoint,
+	ImageEditorAction,
+} from './types';
 import { MAX_ZOOM } from './constants';
 import { getMinZoom, restrictPanZoom } from './containment';
 
@@ -12,18 +16,18 @@ import { getMinZoom, restrictPanZoom } from './containment';
  * the crop center. Returns `null` when the clamped zoom matches the
  * current zoom (no-op).
  *
- * Extracted so multiple hooks (the pure `useCropperController` and the
+ * Extracted so multiple hooks (the pure `useInternalImageEditor` and the
  * composite `useMediaEditorState`) can share the math without
  * duplicating it.
  *
- * @param state         The current cropper state.
+ * @param state         The current editor state.
  * @param requestedZoom The zoom value the caller asked for.
  * @return A `SET_ZOOM_AT_POINT` action, or `null` if no change is required.
  */
 export function buildFocalPointZoomAction(
-	state: CropperState,
+	state: InternalImageEditorState,
 	requestedZoom: number
-): CropperAction | null {
+): ImageEditorAction | null {
 	const clampedZoom = Math.min(
 		MAX_ZOOM,
 		Math.max( getMinZoom( state ), requestedZoom )

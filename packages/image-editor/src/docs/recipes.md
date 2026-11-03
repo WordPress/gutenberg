@@ -14,7 +14,7 @@ import {
 	useImageEditor,
 } from '@wordpress/image-editor';
 
-function ImageCropper( { src }: { src: string } ) {
+function MyImageEditor( { src }: { src: string } ) {
 	const [ state, setState ] = useState( () => createImageEditorState() );
 	const controller = useImageEditor( { state, onChange: setState } );
 
@@ -141,7 +141,7 @@ import {
 	type ImageEditorState,
 } from '@wordpress/image-editor';
 
-function ImageCropperWithHistory( { src }: { src: string } ) {
+function ImageEditorWithHistory( { src }: { src: string } ) {
 	const [ state, setState ] = useState( () => createImageEditorState() );
 	const [ past, setPast ] = useState< ImageEditorState[] >( [] );
 	const gestureStart = useRef< ImageEditorState | null >( null );

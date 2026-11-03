@@ -41,8 +41,8 @@ export function DimmingOverlay( {
 
 	return (
 		<div
-			className="wp-media-editor-image-editor__dimming"
-			data-testid="cropper-dimming"
+			className="wp-image-editor__dimming"
+			data-testid="image-editor-dimming"
 			style={ {
 				left,
 				top,

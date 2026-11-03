@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { CropperState, TransformOperation } from '../../types';
+import type { InternalImageEditorState, TransformOperation } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import { applyOperationToState, stateFromPipeline } from '../pipeline';
-import { cropperReducer } from '../../state';
+import { imageEditorReducer } from '../../state';
 
 describe( 'applyOperationToState', () => {
-	let baseState: CropperState;
+	let baseState: InternalImageEditorState;
 
 	beforeEach( () => {
 		baseState = {
@@ -73,7 +73,7 @@ describe( 'applyOperationToState', () => {
 	} );
 
 	it( 'should handle flip horizontal: toggle off', () => {
-		const flippedState: CropperState = {
+		const flippedState: InternalImageEditorState = {
 			...baseState,
 			flip: { horizontal: true, vertical: false },
 		};
@@ -154,7 +154,7 @@ describe( 'stateFromPipeline', () => {
 		// The custom initial represents a user who committed to this
 		// pose via UI actions. Sync base fields so the pipeline replay
 		// (which routes through the reducer) doesn't relax them.
-		const customInitial: CropperState = {
+		const customInitial: InternalImageEditorState = {
 			...DEFAULT_STATE,
 			rotation: 90,
 			baseRotation: 90,
@@ -201,7 +201,7 @@ describe( 'pipeline / reducer parity', () => {
 		} );
 		// Pipeline op is additive, reducer action is absolute, so use
 		// the resolved absolute angle in the reducer call.
-		const reducerResult = cropperReducer( stateWithImage, {
+		const reducerResult = imageEditorReducer( stateWithImage, {
 			type: 'SET_ROTATION',
 			payload: 30,
 		} );
@@ -216,7 +216,7 @@ describe( 'pipeline / reducer parity', () => {
 			type: 'zoom',
 			factor: 3,
 		} );
-		const reducerResult = cropperReducer( stateWithImage, {
+		const reducerResult = imageEditorReducer( stateWithImage, {
 			type: 'SET_ZOOM',
 			payload: 3,
 		} );
@@ -229,7 +229,7 @@ describe( 'pipeline / reducer parity', () => {
 			type: 'flip',
 			direction: 'horizontal',
 		} );
-		const reducerResult = cropperReducer( stateWithImage, {
+		const reducerResult = imageEditorReducer( stateWithImage, {
 			type: 'SET_FLIP',
 			payload: { horizontal: true, vertical: false },
 		} );
@@ -242,7 +242,7 @@ describe( 'pipeline / reducer parity', () => {
 			type: 'crop',
 			rect,
 		} );
-		const reducerResult = cropperReducer( stateWithImage, {
+		const reducerResult = imageEditorReducer( stateWithImage, {
 			type: 'SET_CROP_RECT',
 			payload: rect,
 		} );

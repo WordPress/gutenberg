@@ -1,4 +1,9 @@
-import type { CropperAction, CropperState, TransformOperation } from './types';
+import type {
+	ImageEditorAction,
+	ImageEditorState,
+	InternalImageEditorState,
+	TransformOperation,
+} from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,
 	DEFAULT_STATE,
@@ -9,7 +14,7 @@ import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
 import { computeInscribedRect } from './crop-rect';
 
-/** Small tolerance for cropper floating-point comparisons. */
+/** Small tolerance for editor floating-point comparisons. */
 const STATE_EPSILON = 1e-6;
 
 function nearlyEqual( a: number, b: number ): boolean {
@@ -17,19 +22,19 @@ function nearlyEqual( a: number, b: number ): boolean {
 }
 
 /**
- * Value-equality check for two cropper states.
+ * Value-equality check for two editor states.
  *
  * Used by history machinery to dedup snapshots and detect no-op
  * transitions. Compares every field that participates in the rendered
  * output; ignores reference identity.
  *
- * @param a First cropper state.
- * @param b Second cropper state.
+ * @param a First editor state.
+ * @param b Second editor state.
  * @return Whether the two states are value-equal across all tracked fields.
  */
-export function areCropperStatesEqual(
-	a: CropperState,
-	b: CropperState
+export function areImageEditorStatesEqual(
+	a: ImageEditorState,
+	b: ImageEditorState
 ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
@@ -51,7 +56,10 @@ export function areCropperStatesEqual(
 	);
 }
 
-function clampRequestedZoom( state: CropperState, zoom: number ): number {
+function clampRequestedZoom(
+	state: InternalImageEditorState,
+	zoom: number
+): number {
 	// With an image, enforceContainment raises zoom to the coverage-aware
 	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
 	// the conservative resting default.
@@ -72,14 +80,14 @@ function clampRequestedZoom( state: CropperState, zoom: number ): number {
  * reducer) so that pipeline replay produces identical bounded
  * state to UI interaction or direct setters.
  *
- * @param state The current cropper state.
+ * @param state The current editor state.
  * @param op    The pipeline operation.
  * @return The equivalent reducer action.
  */
 function operationToAction(
-	state: CropperState,
+	state: InternalImageEditorState,
 	op: TransformOperation
-): CropperAction {
+): ImageEditorAction {
 	switch ( op.type ) {
 		case 'crop':
 			return { type: 'SET_CROP_RECT', payload: { ...op.rect } };
@@ -119,7 +127,9 @@ function operationToAction(
  * @param state The state to enforce containment on.
  * @return The state with cropRect, zoom, and position restricted.
  */
-export function enforceContainment( state: CropperState ): CropperState {
+export function enforceContainment(
+	state: InternalImageEditorState
+): InternalImageEditorState {
 	if ( ! state.image ) {
 		return state;
 	}
@@ -182,7 +192,9 @@ export function enforceContainment( state: CropperState ): CropperState {
  * @param next The post-containment state to commit.
  * @return The state with base fields synced to current.
  */
-function commitBase( next: CropperState ): CropperState {
+function commitBase(
+	next: InternalImageEditorState
+): InternalImageEditorState {
 	if (
 		next.basePan.x === next.pan.x &&
 		next.basePan.y === next.pan.y &&
@@ -200,7 +212,7 @@ function commitBase( next: CropperState ): CropperState {
 }
 
 /**
- * Reducer function for cropper state management.
+ * Reducer function for editor state management.
  *
  * Every state transition that could invalidate the containment invariant
  * (crop, zoom, rotation, cropRect, flip) is followed by enforceContainment
@@ -212,14 +224,14 @@ function commitBase( next: CropperState ): CropperState {
  * it, which prevents accumulated-clamp drift during continuous fine
  * rotation.
  *
- * @param state  The current cropper state.
+ * @param state  The current editor state.
  * @param action The action to process.
- * @return The new cropper state.
+ * @return The new editor state.
  */
-export function cropperReducer(
-	state: CropperState,
-	action: CropperAction
-): CropperState {
+export function imageEditorReducer(
+	state: InternalImageEditorState,
+	action: ImageEditorAction
+): InternalImageEditorState {
 	// Every action runs through enforceContainment to maintain the invariant:
 	// the image always fully covers the crop area.
 	switch ( action.type ) {
@@ -464,7 +476,7 @@ export function cropperReducer(
 			// yields the same bounded state as the matching UI/setter
 			// path (containment, baseZoom relaxation, pan rotation
 			// around crop center, etc.).
-			return cropperReducer(
+			return imageEditorReducer(
 				state,
 				operationToAction( state, action.payload )
 			);
@@ -481,16 +493,16 @@ export function cropperReducer(
 }
 
 /**
- * Shallow comparison of key cropper state fields to determine if
+ * Shallow comparison of key editor state fields to determine if
  * the state has been modified from an initial snapshot.
  *
- * @param current The current cropper state.
- * @param initial The initial cropper state snapshot.
+ * @param current The current editor state.
+ * @param initial The initial editor state snapshot.
  * @return True if any tracked field differs.
  */
 export function isStateDirty(
-	current: CropperState,
-	initial: CropperState
+	current: ImageEditorState,
+	initial: ImageEditorState
 ): boolean {
 	return (
 		! nearlyEqual( current.pan.x, initial.pan.x ) ||

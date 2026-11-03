@@ -1,7 +1,7 @@
 /**
  * Render–Camera Bridge Tests
  *
- * The image cropper has two parallel code paths that must agree:
+ * The image editor has two parallel code paths that must agree:
  *
  * 1. **Render path** — manual cos/sin math in `computeTransformStyle`
  *    (CSS matrix) and stencil positioning (offset + cropRect × visualSize).
@@ -33,7 +33,7 @@ import {
 } from '../camera';
 import { computeTransformStyle } from '../transform-style';
 import { DEFAULT_STATE } from '../constants';
-import type { CropperState, Size } from '../types';
+import type { InternalImageEditorState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
@@ -42,9 +42,11 @@ const IMAGE: Size = { width: 1600, height: 900 };
  * Create a test state with an image loaded.
  *
  * @param overrides Partial state overrides.
- * @return A complete CropperState with image set.
+ * @return A complete InternalImageEditorState with image set.
  */
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -64,13 +66,13 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
  *   left = offsetX + cropRect.x * visualW
  *   top = offsetY + cropRect.y * visualH
  *
- * @param state         The cropper state.
+ * @param state         The editor state.
  * @param containerSize The container dimensions.
  * @param imageSize     The natural image dimensions.
  * @return The four stencil corners in screen pixels.
  */
 function stencilCornersViaCssPath(
-	state: CropperState,
+	state: InternalImageEditorState,
 	containerSize: Size,
 	imageSize: Size
 ): { x: number; y: number }[] {
@@ -111,13 +113,13 @@ function stencilCornersViaCssPath(
  *   visibleBounds = getVisibleBounds(baseCamera)
  *   stencilX = visibleBounds.left + cropRect.x * visibleBounds.width
  *
- * @param state         The cropper state.
+ * @param state         The editor state.
  * @param containerSize The container dimensions.
  * @param imageSize     The natural image dimensions.
  * @return The four stencil corners in screen pixels.
  */
 function stencilCornersViaCameraPath(
-	state: CropperState,
+	state: InternalImageEditorState,
 	containerSize: Size,
 	imageSize: Size
 ): { x: number; y: number }[] {
@@ -157,7 +159,7 @@ function stencilCornersViaCameraPath(
  * relative to the element. The element is centered in the container.
  * So screen position = containerCenter + matrix × (point - elementCenter).
  *
- * @param state         The cropper state.
+ * @param state         The editor state.
  * @param containerSize The container dimensions.
  * @param imageSize     The natural image dimensions.
  * @param normPoint     The point in normalized [0,1] image space.
@@ -166,7 +168,7 @@ function stencilCornersViaCameraPath(
  * @return The screen pixel position.
  */
 function pointViaCssPath(
-	state: CropperState,
+	state: InternalImageEditorState,
 	containerSize: Size,
 	imageSize: Size,
 	normPoint: { x: number; y: number }
@@ -178,7 +180,7 @@ function pointViaCssPath(
 	);
 
 	// computeTransformStyle receives visualSize (the rotated bounding box),
-	// matching what cropper.tsx passes in production.
+	// matching what image-editor-canvas.tsx passes in production.
 	const matrixStr = computeTransformStyle( state, visualSize );
 	const match = matrixStr.match(
 		/matrix\(([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)/
@@ -206,7 +208,7 @@ function pointViaCssPath(
 /**
  * Compute where an image point ends up on screen using the camera path.
  *
- * @param state         The cropper state.
+ * @param state         The editor state.
  * @param containerSize The container dimensions.
  * @param imageSize     The natural image dimensions.
  * @param normPoint     The point in normalized [0,1] image space.
@@ -215,7 +217,7 @@ function pointViaCssPath(
  * @return The screen pixel position.
  */
 function pointViaCameraPath(
-	state: CropperState,
+	state: InternalImageEditorState,
 	containerSize: Size,
 	imageSize: Size,
 	normPoint: { x: number; y: number }

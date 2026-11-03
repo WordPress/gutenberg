@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useTransformStyle } from '../use-transform-style';
-import type { CropperState, Size } from '../../../core/types';
+import type { InternalImageEditorState, Size } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';
 
 /**
  * Create a mock state with optional overrides.
  * @param overrides
  */
-function createState( overrides: Partial< CropperState > = {} ): CropperState {
+function createState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return { ...DEFAULT_STATE, ...overrides };
 }
 

@@ -10,9 +10,9 @@ import {
 } from 'vitest';
 import {
 	InteractionController,
-	type CropperInteractionActions,
+	type ImageEditorInteractionActions,
 } from '../interaction-controller';
-import type { CropperState, Size } from '../types';
+import type { InternalImageEditorState, Size } from '../types';
 import {
 	DEFAULT_STATE,
 	DEFAULT_WHEEL_ZOOM_SPEED,
@@ -31,12 +31,14 @@ if ( typeof globalThis.Element === 'undefined' ) {
 }
 
 /**
- * Create a cropper state with an image set so restrictPanZoom works.
+ * Create a editor state with an image set so restrictPanZoom works.
  *
  * @param overrides Partial state overrides.
- * @return A complete CropperState.
+ * @return A complete InternalImageEditorState.
  */
-function makeState( overrides: Partial< CropperState > = {} ): CropperState {
+function makeState(
+	overrides: Partial< InternalImageEditorState > = {}
+): InternalImageEditorState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -218,7 +220,7 @@ function createMockDocument(): Document & {
 describe( 'InteractionController', () => {
 	const containerSize: Size = { width: 500, height: 300 };
 	const imageSize: Size = { width: 500, height: 300 };
-	let actionMocks: Mocked< CropperInteractionActions >;
+	let actionMocks: Mocked< ImageEditorInteractionActions >;
 
 	// Store original requestAnimationFrame so we can restore it.
 	const originalRAF = globalThis.requestAnimationFrame;
@@ -251,12 +253,12 @@ describe( 'InteractionController', () => {
 	/**
 	 * Create an InteractionController with sensible test defaults.
 	 *
-	 * @param state   The cropper state to return from getState.
+	 * @param state   The editor state to return from getState.
 	 * @param options Additional InteractionControllerOptions overrides.
 	 * @return The controller instance and the options object (for lazy mutation).
 	 */
 	function createController(
-		state: CropperState,
+		state: InternalImageEditorState,
 		options: Record< string, unknown > = {}
 	) {
 		const opts = {

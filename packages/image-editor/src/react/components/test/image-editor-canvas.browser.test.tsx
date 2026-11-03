@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { Cropper } from '../cropper';
-import type { CropperController } from '../../hooks/use-cropper-controller';
+import { ImageEditorCanvas } from '../image-editor-canvas';
+import type { InternalImageEditorController } from '../../hooks/use-image-editor';
 import {
 	DEFAULT_STATE,
 	MAX_ROTATION_OFFSET,
@@ -14,12 +14,11 @@ import { getSourceRegion } from '../../../core/source-region';
 // Browser Mode needs the package's real styles for layout and transitions.
 import '../../../style.scss';
 
-const GRID_TEST_ID = 'cropper-grid';
-const GRID_INTERACTIVE_CLASS =
-	'wp-media-editor-image-editor__canvas--grid-interactive';
-const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
+const GRID_TEST_ID = 'image-editor-grid';
+const GRID_INTERACTIVE_CLASS = 'wp-image-editor__canvas--grid-interactive';
+const SHOW_GRID_CLASS = 'wp-image-editor__canvas--show-grid';
 
-function createController(): CropperController {
+function createController(): InternalImageEditorController {
 	return {
 		state: {
 			...DEFAULT_STATE,
@@ -51,17 +50,17 @@ function createController(): CropperController {
 	};
 }
 
-function CropperFixture( { children }: { children: React.ReactNode } ) {
+function CanvasFixture( { children }: { children: React.ReactNode } ) {
 	return <div style={ { width: 648, height: 448 } }>{ children }</div>;
 }
 
-async function renderCropper( cropper: React.ReactElement ) {
-	const view = await render( <CropperFixture>{ cropper }</CropperFixture> );
+async function renderCanvas( canvas: React.ReactElement ) {
+	const view = await render( <CanvasFixture>{ canvas }</CanvasFixture> );
 	return {
 		...view,
-		rerender: async ( nextCropper: React.ReactElement ) =>
+		rerender: async ( nextCanvas: React.ReactElement ) =>
 			await view.rerender(
-				<CropperFixture>{ nextCropper }</CropperFixture>
+				<CanvasFixture>{ nextCanvas }</CanvasFixture>
 			),
 	};
 }
@@ -79,10 +78,10 @@ afterEach( () => {
 	vi.useRealTimers();
 } );
 
-describe( 'Cropper', () => {
+describe( 'ImageEditorCanvas', () => {
 	it( 'does not render the grid when showGrid is false', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showGrid={ false }
@@ -94,8 +93,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'renders the grid always visible when showGrid is true', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showGrid
@@ -111,8 +110,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'describes and focuses the crop area when requested', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -128,8 +127,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'does not expose crop area keyboard hints while resize handles are focused', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -155,8 +154,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears the keyboard-active class when a pointer drag starts on a handle', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -169,8 +168,7 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
-		const focusVisibleClass =
-			'wp-media-editor-image-editor__canvas--focus-visible';
+		const focusVisibleClass = 'wp-image-editor__canvas--focus-visible';
 
 		// Simulate keyboard resize on a handle — the canvas should pick up
 		// the keyboard-active class via the capture-phase keydown listener.
@@ -195,8 +193,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -219,8 +217,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'renders the grid hidden by default in interactive mode', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showGrid="interactive"
@@ -241,8 +239,8 @@ describe( 'Cropper', () => {
 			...controller.state,
 			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
 		};
-		const { rerender } = await renderCropper(
-			<Cropper
+		const { rerender } = await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming={ false }
@@ -257,7 +255,7 @@ describe( 'Cropper', () => {
 		( controller.adjustCropRectForViewport as Mock ).mockClear();
 
 		await rerender(
-			<Cropper
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming={ false }
@@ -281,8 +279,8 @@ describe( 'Cropper', () => {
 			cropRect: { x: 0.1, y: 0.2, width: 0.5, height: 0.4 },
 			aspectRatio: 1,
 		};
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming={ false }
@@ -303,8 +301,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears settling state when a new resize starts before the settle fallback fires', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -318,7 +316,7 @@ describe( 'Cropper', () => {
 		vi.useFakeTimers();
 		// The settle transition and viewport pan live on the stage, not the
 		// canvas (which stays fixed so the root background is never exposed).
-		const stage = screen.getByTestId( 'cropper-stage' );
+		const stage = screen.getByTestId( 'image-editor-stage' );
 
 		// Start and end a resize to trigger the settle animation.
 		fireEvent.pointerDown( handle, {
@@ -354,8 +352,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'keeps settling active until the settle transform transition ends', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -367,7 +365,7 @@ describe( 'Cropper', () => {
 			name: 'Resize from top-left corner',
 		} );
 		vi.useFakeTimers();
-		const stage = screen.getByTestId( 'cropper-stage' );
+		const stage = screen.getByTestId( 'image-editor-stage' );
 
 		fireEvent.pointerDown( handle, {
 			button: 0,
@@ -384,7 +382,7 @@ describe( 'Cropper', () => {
 
 		// The transform transition runs on the image and bubbles up to the
 		// stage handler, so fire from the image to exercise the real path.
-		const image = screen.getByTestId( 'cropper-image' );
+		const image = screen.getByTestId( 'image-editor-image' );
 		const transitionEndEvent = new Event( 'transitionend', {
 			bubbles: true,
 		} );
@@ -399,8 +397,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'clears settling via the fallback timer when no transitionend fires', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -412,7 +410,7 @@ describe( 'Cropper', () => {
 			name: 'Resize from top-left corner',
 		} );
 		vi.useFakeTimers();
-		const stage = screen.getByTestId( 'cropper-stage' );
+		const stage = screen.getByTestId( 'image-editor-stage' );
 
 		fireEvent.pointerDown( handle, {
 			button: 0,
@@ -436,8 +434,8 @@ describe( 'Cropper', () => {
 	} );
 
 	it( 'ignores non-transform transitionend events while settling', async () => {
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ createController() }
 				showDimming={ false }
@@ -449,7 +447,7 @@ describe( 'Cropper', () => {
 			name: 'Resize from top-left corner',
 		} );
 		vi.useFakeTimers();
-		const stage = screen.getByTestId( 'cropper-stage' );
+		const stage = screen.getByTestId( 'image-editor-stage' );
 
 		fireEvent.pointerDown( handle, {
 			button: 0,
@@ -481,8 +479,8 @@ describe( 'Cropper', () => {
 		const controller = createController();
 		controller.state = { ...controller.state, zoom: 2 };
 
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming={ false }
@@ -495,7 +493,7 @@ describe( 'Cropper', () => {
 			name: 'Resize from right edge',
 		} );
 		vi.useFakeTimers();
-		const stage = screen.getByTestId( 'cropper-stage' );
+		const stage = screen.getByTestId( 'image-editor-stage' );
 
 		// cropRect starts at {x:0, y:0, width:1, height:1} (right edge = 1.0).
 		// Pixel snapping is active at zoom:2, so one ArrowRight step is one
@@ -516,8 +514,8 @@ describe( 'Cropper', () => {
 
 	it( 'ignores wheel zoom while a crop resize is active', async () => {
 		const controller = createController();
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming={ false }
@@ -555,8 +553,8 @@ describe( 'Cropper', () => {
 
 	it( 'does not start canvas drag from touch pointer events', async () => {
 		const controller = createController();
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming
@@ -594,7 +592,7 @@ describe( 'Cropper', () => {
 	it( 'ignores pointer drags on the canvas while disabled', async () => {
 		const controller = createController();
 		await render(
-			<Cropper
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming
@@ -641,13 +639,15 @@ describe( 'Cropper', () => {
 			showGrid: 'interactive' as const,
 			freeformCrop: true,
 		};
-		const { rerender } = await render( <Cropper { ...props } disabled /> );
+		const { rerender } = await render(
+			<ImageEditorCanvas { ...props } disabled />
+		);
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 
-		await rerender( <Cropper { ...props } /> );
+		await rerender( <ImageEditorCanvas { ...props } /> );
 
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		fireEvent.pointerDown( canvas, {
@@ -681,7 +681,7 @@ describe( 'Cropper', () => {
 			onGestureStart,
 			onGestureEnd,
 		};
-		const { rerender } = await render( <Cropper { ...props } /> );
+		const { rerender } = await render( <ImageEditorCanvas { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -704,7 +704,7 @@ describe( 'Cropper', () => {
 		} );
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 
-		await rerender( <Cropper { ...props } disabled /> );
+		await rerender( <ImageEditorCanvas { ...props } disabled /> );
 
 		// Without this the caller is left believing a gesture is still
 		// running, which keeps undo/redo disabled after a failed save.
@@ -723,13 +723,13 @@ describe( 'Cropper', () => {
 			freeformCrop: true,
 			onGestureEnd,
 		};
-		const { rerender } = await render( <Cropper { ...props } /> );
+		const { rerender } = await render( <ImageEditorCanvas { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
 
-		await rerender( <Cropper { ...props } disabled /> );
+		await rerender( <ImageEditorCanvas { ...props } disabled /> );
 
 		expect( onGestureEnd ).not.toHaveBeenCalled();
 	} );
@@ -745,7 +745,9 @@ describe( 'Cropper', () => {
 			freeformCrop: true,
 			onGestureStart,
 		};
-		const { rerender } = await renderCropper( <Cropper { ...props } /> );
+		const { rerender } = await renderCanvas(
+			<ImageEditorCanvas { ...props } />
+		);
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -757,8 +759,8 @@ describe( 'Cropper', () => {
 		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
 
 		// Saving cancels it, then the save fails and tools come back.
-		await rerender( <Cropper { ...props } disabled /> );
-		await rerender( <Cropper { ...props } /> );
+		await rerender( <ImageEditorCanvas { ...props } disabled /> );
+		await rerender( <ImageEditorCanvas { ...props } /> );
 		onGestureStart.mockClear();
 
 		// The next wheel zoom must open a gesture of its own.
@@ -768,8 +770,8 @@ describe( 'Cropper', () => {
 
 	it( 'ignores wheel zoom while disabled', async () => {
 		const controller = createController();
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming
@@ -800,8 +802,8 @@ describe( 'Cropper', () => {
 
 	it( 'ignores keyboard pan while disabled', async () => {
 		const controller = createController();
-		await renderCropper(
-			<Cropper
+		await renderCanvas(
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming
@@ -828,7 +830,7 @@ describe( 'Cropper', () => {
 			showGrid: 'interactive' as const,
 			freeformCrop: true,
 		};
-		const { rerender } = await render( <Cropper { ...props } /> );
+		const { rerender } = await render( <ImageEditorCanvas { ...props } /> );
 
 		await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
@@ -843,7 +845,7 @@ describe( 'Cropper', () => {
 			isPrimary: true,
 		} );
 
-		await rerender( <Cropper { ...props } disabled /> );
+		await rerender( <ImageEditorCanvas { ...props } disabled /> );
 		vi.mocked( controller.setPan ).mockClear();
 
 		fireEvent.pointerMove( canvas, {
@@ -865,7 +867,7 @@ describe( 'Cropper', () => {
 	it( 'does not resize the crop from a handle drag while disabled', async () => {
 		const controller = createController();
 		await render(
-			<Cropper
+			<ImageEditorCanvas
 				src="test.jpg"
 				controller={ controller }
 				showDimming
@@ -912,8 +914,8 @@ describe( 'Cropper', () => {
 		try {
 			const controller = createController();
 			const onGestureEnd = vi.fn();
-			await renderCropper(
-				<Cropper
+			await renderCanvas(
+				<ImageEditorCanvas
 					src="test.jpg"
 					controller={ controller }
 					showDimming={ false }
@@ -1034,13 +1036,15 @@ describe( 'Cropper', () => {
 	// leading `scale(...)`, always present (identity `scale(1)` at rest) so the
 	// transform's function list stays structurally constant for transitions.
 	function imageScale(): number {
-		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		const img =
+			screen.getByTestId< HTMLImageElement >( 'image-editor-image' );
 		const match = img.style.transform.match( /^scale\(\s*([\d.]+)/ );
 		return match ? parseFloat( match[ 1 ] ) : 1;
 	}
 
 	function imageTransformParts(): { viewScale: number; matrix: number[] } {
-		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		const img =
+			screen.getByTestId< HTMLImageElement >( 'image-editor-image' );
 		const match = img.style.transform.match(
 			/^scale\(\s*([^)]+?)\s*\)\s+matrix\(([^)]+)\)/
 		);
@@ -1063,8 +1067,8 @@ describe( 'Cropper', () => {
 			// 1/3 of 400 = 133px. On-screen 133x133, well below 0.8 * 400.
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } />
+		await renderCanvas(
+			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
 		// Footprint is 133.33x400. The square crop's binding axis (height) fills
@@ -1080,8 +1084,8 @@ describe( 'Cropper', () => {
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 			pan: { x: 0.1, y: -0.05 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } />
+		await renderCanvas(
+			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
 		await waitFor( () => expect( imageScale() ).toBeCloseTo( 2.4, 2 ) );
@@ -1103,8 +1107,12 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } showGrid />
+		await renderCanvas(
+			<ImageEditorCanvas
+				src="tall.jpg"
+				controller={ controller }
+				showGrid
+			/>
 		);
 
 		await waitFor( () => expect( imageScale() ).toBeCloseTo( 2.4, 2 ) );
@@ -1136,8 +1144,8 @@ describe( 'Cropper', () => {
 			);
 		};
 
-		expectOverlayRect( screen.getByTestId( 'cropper-stencil' ) );
-		expectOverlayRect( screen.getByTestId( 'cropper-dimming' ) );
+		expectOverlayRect( screen.getByTestId( 'image-editor-stencil' ) );
+		expectOverlayRect( screen.getByTestId( 'image-editor-dimming' ) );
 		expectOverlayRect( screen.getByTestId( GRID_TEST_ID ) );
 	} );
 
@@ -1149,8 +1157,8 @@ describe( 'Cropper', () => {
 			// Full-frame crop already fills the canvas height (footprint == 400).
 			cropRect: { x: 0, y: 0, width: 1, height: 1 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } />
+		await renderCanvas(
+			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
 		await waitFor( () =>
@@ -1170,8 +1178,12 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } freeformCrop />
+		await renderCanvas(
+			<ImageEditorCanvas
+				src="tall.jpg"
+				controller={ controller }
+				freeformCrop
+			/>
 		);
 
 		const handle = await screen.findByRole( 'button', {
@@ -1206,8 +1218,12 @@ describe( 'Cropper', () => {
 			{ ...controller.state, cropRect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
 		);
-		await renderCropper(
-			<Cropper src="tiny.png" controller={ controller } freeformCrop />
+		await renderCanvas(
+			<ImageEditorCanvas
+				src="tiny.png"
+				controller={ controller }
+				freeformCrop
+			/>
 		);
 
 		const handle = await screen.findByRole( 'button', {
@@ -1248,8 +1264,12 @@ describe( 'Cropper', () => {
 			{ ...controller.state, cropRect },
 			{ width: image.naturalWidth, height: image.naturalHeight }
 		);
-		await renderCropper(
-			<Cropper src="wide.png" controller={ controller } freeformCrop />
+		await renderCanvas(
+			<ImageEditorCanvas
+				src="wide.png"
+				controller={ controller }
+				freeformCrop
+			/>
 		);
 
 		const handle = await screen.findByRole( 'button', {
@@ -1283,8 +1303,12 @@ describe( 'Cropper', () => {
 			image,
 			cropRect,
 		};
-		await renderCropper(
-			<Cropper src="large.png" controller={ controller } freeformCrop />
+		await renderCanvas(
+			<ImageEditorCanvas
+				src="large.png"
+				controller={ controller }
+				freeformCrop
+			/>
 		);
 
 		const handle = await screen.findByRole( 'button', {
@@ -1325,20 +1349,20 @@ describe( 'Cropper', () => {
 			cropRect,
 			zoom: 0.5,
 		};
-		const { rerender } = await renderCropper(
-			<Cropper
+		const { rerender } = await renderCanvas(
+			<ImageEditorCanvas
 				src="crossing.png"
 				controller={ controller }
 				freeformCrop
 			/>
 		);
 
-		await screen.findByTestId( 'cropper-image' );
+		await screen.findByTestId( 'image-editor-image' );
 		expect( controller.adjustCropRectForViewport ).not.toHaveBeenCalled();
 
 		controller.state = { ...controller.state, zoom: 3 };
 		await rerender(
-			<Cropper
+			<ImageEditorCanvas
 				src="crossing.png"
 				controller={ controller }
 				freeformCrop
@@ -1385,18 +1409,18 @@ describe( 'Cropper', () => {
 			zoom: 0.5,
 			aspectRatio: 1,
 		};
-		const { rerender } = await renderCropper(
-			<Cropper
+		const { rerender } = await renderCanvas(
+			<ImageEditorCanvas
 				src="locked-ratio.png"
 				controller={ controller }
 				freeformCrop
 			/>
 		);
 
-		await screen.findByTestId( 'cropper-image' );
+		await screen.findByTestId( 'image-editor-image' );
 		controller.state = { ...controller.state, zoom: 3 };
 		await rerender(
-			<Cropper
+			<ImageEditorCanvas
 				src="locked-ratio.png"
 				controller={ controller }
 				freeformCrop
@@ -1408,7 +1432,7 @@ describe( 'Cropper', () => {
 
 	function imageRendering(): string {
 		return getComputedStyle(
-			screen.getByTestId< HTMLImageElement >( 'cropper-image' )
+			screen.getByTestId< HTMLImageElement >( 'image-editor-image' )
 		).imageRendering;
 	}
 
@@ -1420,8 +1444,8 @@ describe( 'Cropper', () => {
 			// upscale — so the display scale exceeds 1:1.
 			image: { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 },
 		};
-		await renderCropper(
-			<Cropper src="tiny.png" controller={ controller } />
+		await renderCanvas(
+			<ImageEditorCanvas src="tiny.png" controller={ controller } />
 		);
 
 		await waitFor( () => expect( imageRendering() ).toBe( 'pixelated' ) );
@@ -1436,8 +1460,8 @@ describe( 'Cropper', () => {
 			image: TALL_IMAGE,
 			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
 		};
-		await renderCropper(
-			<Cropper src="tall.jpg" controller={ controller } />
+		await renderCanvas(
+			<ImageEditorCanvas src="tall.jpg" controller={ controller } />
 		);
 
 		await waitFor( () =>

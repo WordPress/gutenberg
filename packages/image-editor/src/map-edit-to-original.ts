@@ -1,4 +1,4 @@
-import type { CropperState } from './core/types';
+import type { ImageEditorState } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
@@ -44,7 +44,7 @@ const CROP_TOLERANCE = 0.001;
  *
  * Frames and math:
  *
- * The cropper's `cropRect` is stored as fractions of the **snap-rotation**
+ * The editor's `cropRect` is stored as fractions of the **snap-rotation**
  * bounding box (the stencil-reference frame — see `createCamera` /
  * `createExportCamera`). Pan is in that frame; zoom scales the image
  * beneath a fixed stencil. Two conversions are needed to reach the frame
@@ -60,7 +60,7 @@ const CROP_TOLERANCE = 0.001;
  *      translation by `(fullCenter - snapCenter)`. Finally, express the
  *      translated rect as fractions of the full AABB.
  *
- * Rotation sign: the cropper composes `flip · R(θ)` on the source (see
+ * Rotation sign: the editor composes `flip · R(θ)` on the source (see
  * `createExportCamera` — rotate then flip). The edits' `[flip, rotate]`
  * order is the opposite: `R(θ') · flip`. For both to land on the
  * same pixels we invert the rotation sign when exactly one flip axis
@@ -74,10 +74,7 @@ const CROP_TOLERANCE = 0.001;
  *         image has loaded.
  */
 export function mapEditToOriginal(
-	state: Pick<
-		CropperState,
-		'image' | 'pan' | 'zoom' | 'rotation' | 'flip' | 'cropRect'
-	>
+	state: ImageEditorState
 ): OriginalImageEdit[] {
 	const edits: OriginalImageEdit[] = [];
 	const { image } = state;
@@ -104,7 +101,7 @@ export function mapEditToOriginal(
 
 	const rawAngle = ( ( state.rotation % 360 ) + 360 ) % 360;
 	// Invert the sign for single-axis flips so the edits' `flip → rotate`
-	// order matches the cropper's `rotate → flip` composition.
+	// order matches the editor's `rotate → flip` composition.
 	const singleAxisFlip = hasFlipH !== hasFlipV;
 	const signedAngle = singleAxisFlip ? ( 360 - rawAngle ) % 360 : rawAngle;
 	if ( signedAngle !== 0 ) {

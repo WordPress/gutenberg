@@ -36,7 +36,7 @@ import {
 	useImageEditor,
 } from '@wordpress/image-editor';
 
-function ImageCropper( { src }: { src: string } ) {
+function MyImageEditor( { src }: { src: string } ) {
 	const [ state, setState ] = useState( () => createImageEditorState() );
 	const controller = useImageEditor( { state, onChange: setState } );
 

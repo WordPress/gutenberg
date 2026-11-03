@@ -8,7 +8,7 @@ import type { mat2d } from 'gl-matrix';
  * screen pixels. It composes pan, rotation, flip, zoom, and contain-fit
  * into a single transform.
  *
- * Use `createCamera()` to build one from `CropperState`, then pass it to
+ * Use `createCamera()` to build one from `InternalImageEditorState`, then pass it to
  * `worldToScreen()` / `screenToWorld()` for coordinate conversion.
  *
  * A 3D camera would use `mat4`; this is strictly 2D (no perspective).
@@ -60,9 +60,40 @@ export type TransformOperation =
 	| { type: 'zoom'; factor: number };
 
 /**
- * Full cropper state.
+ * The state of an image editor, as consumers see it. Store it and pass it
+ * back, but create it with `createImageEditorState` and change it only
+ * through the controller: the stored object also carries values the
+ * editor keeps for itself (see `InternalImageEditorState`).
  */
-export interface CropperState {
+export interface ImageEditorState {
+	/** The loaded image, or `null` before one loads. */
+	readonly image: {
+		readonly src: string;
+		readonly naturalWidth: number;
+		readonly naturalHeight: number;
+	} | null;
+	/** Where the image sits under the crop, as fractions of the image. */
+	readonly pan: Readonly< NormalizedPoint >;
+	/** Zoom level. 1 = no zoom. */
+	readonly zoom: number;
+	/** Rotation in degrees, clockwise, from 0 to 360. */
+	readonly rotation: number;
+	/** Whether the image is mirrored along each axis. */
+	readonly flip: Readonly< Flip >;
+	/** The crop area, as fractions of the view the canvas shows. */
+	readonly cropRect: Readonly< NormalizedRect >;
+	/**
+	 * Locked width / height ratio of the crop, in source pixels.
+	 * `undefined` means free: the crop can take any shape.
+	 */
+	readonly aspectRatio?: number;
+}
+
+/**
+ * The full state the editor stores: what consumers see, plus the base
+ * pan, zoom and rotation the reducer keeps for fine rotation.
+ */
+export interface InternalImageEditorState {
 	/** The source image information. Null until an image is loaded. */
 	image: {
 		src: string;
@@ -114,12 +145,12 @@ export interface CropperState {
  *
  * This type is intentionally not exported from the image-editor public barrel.
  * Consumers should drive state through the controller returned by
- * `useCropperController()` (or a composite store) or through serializable
+ * `useInternalImageEditor()` (or a composite store) or through serializable
  * `TransformOperation` values.
  */
-export type CropperAction =
+export type ImageEditorAction =
 	/** Sets the loaded image metadata (natural size, src). */
-	| { type: 'SET_IMAGE'; payload: CropperState[ 'image' ] }
+	| { type: 'SET_IMAGE'; payload: InternalImageEditorState[ 'image' ] }
 	/** Sets the image pan offset. (Crop rectangle is SET_CROP_RECT.) */
 	| { type: 'SET_PAN'; payload: NormalizedPoint }
 	/** Sets the zoom level, clamped to [coverage-aware min, MAX_ZOOM]. */
@@ -156,7 +187,7 @@ export type CropperAction =
 	/** Applies a single pipeline transform via the reducer. */
 	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
-	| { type: 'RESET'; payload?: Partial< CropperState > };
+	| { type: 'RESET'; payload?: Partial< InternalImageEditorState > };
 
 /**
  * Viewport camera state — display-only, does not affect export or undo.

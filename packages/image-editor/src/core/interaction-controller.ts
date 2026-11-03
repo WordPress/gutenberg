@@ -1,4 +1,4 @@
-import type { CropperState, NormalizedPoint, Size } from './types';
+import type { InternalImageEditorState, NormalizedPoint, Size } from './types';
 import {
 	DEFAULT_KEYBOARD_STEP,
 	DEFAULT_WHEEL_ZOOM_SPEED,
@@ -16,12 +16,12 @@ const DOUBLE_TAP_DISTANCE = 30;
 const ZOOM_ANIMATION_DURATION = 200;
 
 /**
- * Get the natural image dimensions from cropper state, falling back to 1x1.
+ * Get the natural image dimensions from editor state, falling back to 1x1.
  *
- * @param state The current cropper state.
+ * @param state The current editor state.
  * @return The image dimensions.
  */
-function getImageSizeFromState( state: CropperState ): {
+function getImageSizeFromState( state: InternalImageEditorState ): {
 	width: number;
 	height: number;
 } {
@@ -56,7 +56,7 @@ export interface InteractionStatus {
 /**
  * State updates the interaction controller can request from its host UI.
  */
-export interface CropperInteractionActions {
+export interface ImageEditorInteractionActions {
 	/** Set the image pan offset in normalized coordinates. */
 	setPan: ( pan: NormalizedPoint ) => void;
 	/**
@@ -81,10 +81,10 @@ export interface CropperInteractionActions {
  * without recreating the controller.
  */
 export interface InteractionControllerOptions {
-	/** Returns the current cropper state. Called on every interaction. */
-	getState: () => CropperState;
+	/** Returns the current editor state. Called on every interaction. */
+	getState: () => InternalImageEditorState;
 	/** State updates the interaction controller can request from its host UI. */
-	actions: CropperInteractionActions;
+	actions: ImageEditorInteractionActions;
 	/** Returns the container dimensions in pixels. */
 	getContainerSize: () => Size;
 	/** Returns the rendered image dimensions in pixels, if available. */
@@ -111,7 +111,7 @@ export interface InteractionControllerOptions {
 }
 
 /**
- * Framework-agnostic imperative controller for image cropper interactions.
+ * Framework-agnostic imperative controller for image editor interactions.
  *
  * Handles mouse, touch, and keyboard event processing for pan, zoom,
  * and crop manipulation. Uses requestAnimationFrame for drag/pinch
