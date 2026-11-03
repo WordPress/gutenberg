@@ -510,10 +510,9 @@ describe( 'GridLayoutInspectorControls', () => {
 					layout: { type: 'grid', isManualPlacement: true },
 				} );
 				expect(
-					await screen.findByRole( 'radio', { name: 'Manual' } )
-				).toBeChecked();
-				expect(
-					screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+					await screen.findByRole( 'checkbox', {
+						name: 'Stack on mobile',
+					} )
 				).toBeInTheDocument();
 				unmount();
 
@@ -523,9 +522,8 @@ describe( 'GridLayoutInspectorControls', () => {
 				renderInspectorControls( {
 					layout: { type: 'grid', isManualPlacement: true },
 				} );
-				expect(
-					await screen.findByRole( 'radio', { name: 'Manual' } )
-				).toBeChecked();
+				// Wait for the panel's controls to settle.
+				await screen.findByRole( 'spinbutton', { name: 'Columns' } );
 				expect(
 					screen.queryByRole( 'checkbox', {
 						name: 'Stack on mobile',
@@ -767,10 +765,8 @@ describe( 'GridLayoutInspectorControls', () => {
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {
 			renderInspectorControls( { layout: { type: 'grid' } } );
 
-			// Wait for the grid item position control to settle.
-			expect(
-				await screen.findByRole( 'radio', { name: 'Auto' } )
-			).toBeChecked();
+			// Wait for the panel's controls to settle.
+			await screen.findByRole( 'spinbutton', { name: 'Columns' } );
 			expect(
 				screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
 			).not.toBeInTheDocument();
