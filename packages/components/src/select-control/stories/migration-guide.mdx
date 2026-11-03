@@ -202,7 +202,7 @@ The primitive accepts string values directly. With string item values as in this
 
 The legacy `onChange` receives the selected string and an optional `{ event }` envelope containing a select change event. The new `onValueChange` receives the selected item and event details. That event comes from the popup interaction and is not a native select change event. Read the value from the callback's first argument, not `event.target.value`.
 
-The legacy control calls `onChange` only when the selection changes. The new control also calls `onValueChange` when the user selects the item that is already selected. If the callback does more than store the value, such as resetting pagination or other view state, compare the new item with the current selection before acting on it.
+The legacy control calls `onChange` only when the selection changes. The new control also calls `onValueChange` when the user selects the item that is already selected. If the callback does more than store the value, such as resetting view state, compare the new item with the current selection before acting on it.
 
 When migrating a component that exposes its own callback to plugins, preserve its documented value and argument shape where possible. If forwarding an event is required, adapt the envelope explicitly and document the change in event semantics.
 
