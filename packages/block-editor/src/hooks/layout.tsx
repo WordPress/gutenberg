@@ -316,27 +316,16 @@ export function getResponsiveLayoutStyles( {
 				// A style state holds the layout it overrides.
 				viewportStyle?.layout as Layout | undefined
 			);
-			const hasViewportLayout = Object.keys( viewportLayout ).length > 0;
-			const hasViewportBlockGap =
-				viewportStyle?.spacing &&
-				Object.hasOwn( viewportStyle.spacing, 'blockGap' );
-			const hasViewportPadding =
-				viewportStyle?.spacing &&
-				Object.hasOwn( viewportStyle.spacing, 'padding' );
-			if (
-				! hasViewportLayout &&
-				! hasViewportBlockGap &&
-				! hasViewportPadding
-			) {
-				return '';
-			}
-
+			// Layout types only output what changes in the viewport, which
+			// can be more than its overrides, such as a grid that stacks on
+			// mobile, so they are asked even when nothing is overridden.
 			const layoutType = getLayoutType( layout?.type || 'default' );
 			const viewportCSS = layoutType?.getLayoutStyle?.( {
 				blockName,
 				selector,
 				layout,
 				viewportOverrides: viewportLayout,
+				viewport,
 				style: viewportStyle,
 				hasBlockGapSupport,
 				globalBlockGapValue,

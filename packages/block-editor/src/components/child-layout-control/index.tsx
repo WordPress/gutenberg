@@ -14,8 +14,11 @@ import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
+import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
 import type {
+	ChildLayout,
 	ChildLayoutControlProps,
 	ChildLayoutControlsProps,
 	ParentLayout,
@@ -261,11 +264,36 @@ function GridControls( {
 	panelId,
 	showGridSpanDefaults,
 }: ChildLayoutControlsProps ) {
-	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
+	// On mobile, a stacked grid shows every block full width, one after
+	// another, so the controls show the block's place in the stack. The grid
+	// needs its own mobile layout before an edit to one of its blocks can have
+	// an effect, so edits go through the grid updater, which creates it from
+	// the stack.
+	const stackedLayouts = useSelect(
+		( select ) =>
+			// A block without a parent isn't in a grid, and grids only stack
+			// with the grid interactivity experiment.
+			rootClientId && window.__experimentalEnableGridInteractivity
+				? unlock( select( blockEditorStore ) ).getStackedGridLayouts(
+						rootClientId
+					)
+				: null,
+		[ rootClientId ]
+	);
+	const isStackedOnMobile = !! stackedLayouts;
+	const { columnStart, rowStart, columnSpan, rowSpan } =
+		stackedLayouts?.children[ panelId ] ?? childLayout;
+	const { columnCount, rowCount } = {
+		...parentLayout,
+		...stackedLayouts?.grid,
+	};
+	const updateGridChildLayout = useUpdateGridChildLayout();
+	const onChangeLayout = isStackedOnMobile
+		? ( changes: ChildLayout ) => updateGridChildLayout( panelId, changes )
+		: onChange;
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
@@ -275,13 +303,13 @@ function GridControls( {
 	const hasStartValue = () => !! columnStart || !! rowStart;
 	const hasSpanValue = () => !! columnSpan || !! rowSpan;
 	const resetGridStarts = () => {
-		onChange( {
+		onChangeLayout( {
 			columnStart: undefined,
 			rowStart: undefined,
 		} );
 	};
 	const resetGridSpans = () => {
-		onChange( {
+		onChangeLayout( {
 			columnSpan: undefined,
 			rowSpan: undefined,
 		} );
@@ -326,7 +354,7 @@ function GridControls( {
 								? Math.min( newColumnSpan, maxColumnSpan )
 								: newColumnSpan;
 
-							onChange( {
+							onChangeLayout( {
 								columnStart,
 								rowStart,
 								rowSpan,
@@ -353,7 +381,7 @@ function GridControls( {
 								? Math.min( newRowSpan, maxRowSpan )
 								: newRowSpan;
 
-							onChange( {
+							onChangeLayout( {
 								columnStart,
 								rowStart,
 								columnSpan,
@@ -391,7 +419,7 @@ function GridControls( {
 									value === ''
 										? 1
 										: parseInt( value as string, 10 );
-								onChange( {
+								onChangeLayout( {
 									columnStart: newColumnStart,
 									rowStart,
 									columnSpan,
@@ -430,7 +458,7 @@ function GridControls( {
 									value === ''
 										? 1
 										: parseInt( value as string, 10 );
-								onChange( {
+								onChangeLayout( {
 									columnStart,
 									rowStart: newRowStart,
 									columnSpan,
