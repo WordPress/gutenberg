@@ -53,8 +53,9 @@ function getVisibleTextColor(
 	) {
 		clipElement = clipElement.parentElement;
 	}
+	// Nothing shows through, so report the fill for the transparency warning.
 	if ( ! clipElement ) {
-		return undefined;
+		return fill;
 	}
 
 	const backgroundImage = getComputedValue( clipElement, 'background-image' );

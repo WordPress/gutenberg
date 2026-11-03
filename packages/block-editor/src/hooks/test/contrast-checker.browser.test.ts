@@ -63,6 +63,16 @@ describe( 'getBlockElementColors()', () => {
 		} );
 	} );
 
+	it( 'reads a transparent fill that nothing clips a background to', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="color: rgb(0, 0, 0); -webkit-text-fill-color: transparent">Text</p>'
+		);
+
+		expect( getBlockElementColors( blockEl, blockType ) ).toMatchObject( {
+			textColor: 'rgba(0, 0, 0, 0)',
+		} );
+	} );
+
 	it( 'reads the text color when the fill is given back', () => {
 		const blockEl = renderBlock(
 			`<div style="background-image: linear-gradient(rgb(255, 255, 0), rgb(255, 224, 224)); ${ TEXT_GRADIENT }"><p class="wp-block-paragraph" style="color: rgb(221, 221, 221); -webkit-text-fill-color: currentColor">Text</p></div>`
