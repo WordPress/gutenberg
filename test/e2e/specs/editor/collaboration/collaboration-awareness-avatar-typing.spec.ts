@@ -38,15 +38,6 @@ async function openSessionWithUserAInFirstParagraph(
 
 	const { page2, editor2 } = collaborationUtils;
 
-	// These tests are about the avatar that sits on a collaborator's caret.
-	// With block outlines on (the default), that avatar moves above the
-	// block instead, so User B turns the outlines off.
-	await page2.evaluate( () => {
-		window.wp.data
-			.dispatch( 'core/preferences' )
-			.set( 'core', 'showCollaborationBlockHighlight', false );
-	} );
-
 	// Dock both users' block toolbars at the top so the floating popover
 	// doesn't sit over a paragraph and swallow the clicks below.
 	await editor.setIsFixedToolbar( true );

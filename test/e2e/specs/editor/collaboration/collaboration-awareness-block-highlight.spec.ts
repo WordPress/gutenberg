@@ -17,12 +17,15 @@ const PARAGRAPH_B = 'Paragraph where User B is working';
  * @param requestUtils       - The request fixture, used to seed the post.
  * @param editor             - User A's editor.
  * @param title              - Draft title, so a failure names the case.
+ * @param highlight          - Whether User B turns the block outline
+ *                           preference on first. It is off by default.
  */
 async function openSessionWithUserAInFirstParagraph(
 	collaborationUtils: CollaborationUtils,
 	requestUtils: RequestUtils,
 	editor: Editor,
-	title: string
+	title: string,
+	highlight = true
 ) {
 	const post = await requestUtils.createPost( {
 		title,
@@ -32,6 +35,10 @@ async function openSessionWithUserAInFirstParagraph(
 	await collaborationUtils.openCollaborativeSession( post.id );
 
 	const { page2, editor2 } = collaborationUtils;
+
+	if ( highlight ) {
+		await setBlockHighlight( page2, true );
+	}
 
 	// Dock both users' block toolbars at the top so the floating popover
 	// doesn't sit over a paragraph and swallow the clicks below.
@@ -81,16 +88,17 @@ function overlayLocators( page: Page ) {
 }
 
 /**
- * Turns the block outline preference off for the user on the given page.
+ * Sets the block outline preference for the user on the given page.
  *
- * @param page - The page of the user whose preference changes.
+ * @param page    - The page of the user whose preference changes.
+ * @param enabled - Whether collaborators' blocks get outlined.
  */
-async function disableBlockHighlight( page: Page ) {
-	await page.evaluate( () => {
+async function setBlockHighlight( page: Page, enabled: boolean ) {
+	await page.evaluate( ( value ) => {
 		window.wp.data
 			.dispatch( 'core/preferences' )
-			.set( 'core', 'showCollaborationBlockHighlight', false );
-	} );
+			.set( 'core', 'showCollaborationBlockHighlight', value );
+	}, enabled );
 }
 
 test.describe( 'Collaboration - Awareness Block Highlight', () => {
@@ -159,6 +167,8 @@ test.describe( 'Collaboration - Awareness Block Highlight', () => {
 				'Block highlight per collaborator'
 			);
 
+		await setBlockHighlight( page, true );
+
 		// User B parks a caret in the second paragraph.
 		await editor2.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -180,7 +190,7 @@ test.describe( 'Collaboration - Awareness Block Highlight', () => {
 		);
 	} );
 
-	test( 'keeps the avatar on the caret when the preference is off', async ( {
+	test( 'keeps the avatar on the caret until the preference is turned on', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
@@ -190,18 +200,29 @@ test.describe( 'Collaboration - Awareness Block Highlight', () => {
 				collaborationUtils,
 				requestUtils,
 				editor,
-				'Block highlight preference off'
+				'Block highlight preference off by default',
+				false
 			);
 
-		await expect( outlinedBlocks ).toHaveCount( 1, { timeout: 15000 } );
+		// The default: no outline, no block avatar, and the avatar sits on
+		// the caret.
+		await expect( caretAvatars.first() ).toBeVisible( { timeout: 15000 } );
+		await expect( carets.first() ).toBeVisible();
+		await expect( outlinedBlocks ).toHaveCount( 0 );
+		await expect( blockAvatars ).toHaveCount( 0 );
 
-		await disableBlockHighlight( page2 );
+		await setBlockHighlight( page2, true );
 
-		// Back to the caret-only treatment: no outline, no block avatar,
-		// and the avatar sits on the caret again.
+		// Turning it on moves the avatar above the outlined block.
+		await expect( outlinedBlocks ).toHaveCount( 1 );
+		await expect( blockAvatars.first() ).toBeVisible();
+		await expect( caretAvatars ).toHaveCount( 0 );
+
+		await setBlockHighlight( page2, false );
+
+		// And turning it off puts everything back.
 		await expect( outlinedBlocks ).toHaveCount( 0 );
 		await expect( blockAvatars ).toHaveCount( 0 );
 		await expect( caretAvatars.first() ).toBeVisible();
-		await expect( carets.first() ).toBeVisible();
 	} );
 } );

@@ -63,6 +63,5 @@ export async function init() {
 		allowRightClickOverrides: true,
 		enableChoosePatternModal: true,
 		showBlockBreadcrumbs: true,
-		showCollaborationBlockHighlight: true,
 	} );
 }
