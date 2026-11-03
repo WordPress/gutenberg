@@ -5,7 +5,10 @@ import {
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import DateEdit from '../post_type_supports/date/edit';
+
+vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
 
 // The date picker measures its layout.
 globalThis.wpVitest.mockResizeObserver();
@@ -130,5 +133,42 @@ describe( 'DateEdit', () => {
 		expect( reset ).toHaveAccessibleDescription(
 			'Changes to the time you save.'
 		);
+	} );
+
+	it( 'announces the date picked for a post', async () => {
+		render(
+			<DateEdit
+				data={ {
+					status: 'publish',
+					date: '2026-10-13T21:45:00',
+					modified: '2026-10-20T10:00:00',
+				} }
+				field={ field }
+				onChange={ () => {} }
+			/>
+		);
+		fireEvent.click(
+			await screen.findByRole( 'button', { name: /October 15, 2026/ } )
+		);
+		expect( speak ).toHaveBeenCalledWith(
+			expect.stringMatching( /^Publish date set to .*2026.*\.$/ ),
+			'assertive'
+		);
+	} );
+
+	it( "doesn't announce the date picked in a filter", async () => {
+		vi.mocked( speak ).mockClear();
+		render(
+			<DateEdit
+				data={ { date: '2026-10-13T21:45:00' } }
+				field={ field }
+				onChange={ () => {} }
+				operator="is"
+			/>
+		);
+		fireEvent.click(
+			await screen.findByRole( 'button', { name: /October 15, 2026/ } )
+		);
+		expect( speak ).not.toHaveBeenCalled();
 	} );
 } );

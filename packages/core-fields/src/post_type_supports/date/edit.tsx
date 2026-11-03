@@ -3,9 +3,9 @@ import { Button, DateTimePicker } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { getSettings } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { useId, useMemo, useState } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
 import type { PostWithDate } from './types';
 import { isDateFloating } from './is-date-floating';
@@ -123,6 +123,24 @@ export default function DateEdit( {
 	}
 	const noteId = useId();
 
+	const onPick = ( newValue: string | null ) => {
+		onChange( field.setValue( { item: data, value: newValue } ) );
+		// A filter's date isn't the post's publish date.
+		if ( ! isFilter && newValue ) {
+			speak(
+				sprintf(
+					// translators: %s: The new publish date and time, e.g. "June 3, 2025 12:00 pm".
+					__( 'Publish date set to %s.' ),
+					dateI18n(
+						getSettings().formats.datetime,
+						getDate( newValue )
+					)
+				),
+				'assertive'
+			);
+		}
+	};
+
 	const onReset = () => {
 		onChange( field.setValue( { item: data, value: null } ) );
 		speak( __( 'Publish date set to now.' ), 'assertive' );
@@ -135,11 +153,7 @@ export default function DateEdit( {
 			</Fieldset.Legend>
 			<DateTimePicker
 				currentDate={ value }
-				onChange={ ( newValue ) =>
-					onChange(
-						field.setValue( { item: data, value: newValue } )
-					)
-				}
+				onChange={ onPick }
 				is12Hour={ is12HourTime() }
 				dateOrder={
 					/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
