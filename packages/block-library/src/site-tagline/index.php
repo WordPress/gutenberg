@@ -17,7 +17,7 @@
 function render_block_core_site_tagline( $attributes ) {
 	$site_tagline = get_bloginfo( 'description' );
 	if ( ! $site_tagline ) {
-		return;
+		return '';
 	}
 
 	$tag_name           = 'p';

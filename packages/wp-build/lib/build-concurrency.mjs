@@ -1,5 +1,5 @@
 import os from 'node:os';
-import esbuild from 'esbuild';
+import { build } from 'rolldown';
 
 /**
  * @typedef {Object} QueuedBuild
@@ -37,13 +37,13 @@ export function setBuildConcurrency( concurrency ) {
 }
 
 /**
- * Runs an esbuild build while respecting the global wp-build concurrency limit.
+ * Runs a Rolldown build while respecting the global wp-build concurrency limit.
  *
- * @param {import('esbuild').BuildOptions} buildOptions Esbuild build options.
- * @return {Promise<import('esbuild').BuildResult>} Esbuild build result.
+ * @param {import('rolldown').BuildOptions} buildOptions Rolldown build options.
+ * @return {Promise<import('rolldown').RolldownOutput>} Rolldown build output.
  */
 export function buildWithConcurrency( buildOptions ) {
-	return enqueueBuild( () => esbuild.build( buildOptions ) );
+	return enqueueBuild( () => build( buildOptions ) );
 }
 
 /**
