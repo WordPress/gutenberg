@@ -2,16 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `WpTemplate` and `WpTemplatePart` now match the REST schema: `has_theme_file` and `is_custom` are `boolean` instead of `Record< string, string >`, `modified` can be `null`, and `original_source` is added. `WpTemplatePart` also gains `author_text`, `plugin`, `is_custom` and `modified`.
+-   `GlobalStyles` types `settings` and `styles` with the theme.json shapes from `@wordpress/global-styles-engine` instead of `Record< string, Object >`, so reads such as `settings.typography.fontFamilies` type check without naming `GlobalStylesConfig` by hand.
+-   A query whose `_fields` is a literal string or array now infers a record with exactly those fields, so `{ _fields: 'id,slug' }` returns `{ id, slug }`. Reading a field that was not requested is a type error. `_fields` that is not known at compile time still returns a recursively partial record.
+-   `CommentStatus` lists the statuses the REST API reports, `'approved'`, `'hold'`, `'spam'` and `'trash'`, and accepts any other string. Compare against `'approved'` rather than `'approve'`, `'1'` or `'0'`.
+-   `NavMenu` no longer has `object_id`, which belongs to menu items and is not returned for menus.
+-   `WpFontFamily` now matches the REST schema: `id` is a `number`, `theme_json_version` and `font_faces` are added, and the top-level `slug` and `name` are removed. Read them from `font_family_settings`.
+-   `Taxonomy.visibility` is only available in the edit context.
+-   `useEntityRecord` types `editedRecord`, `edits` and the `edit()` argument with `Updatable`, so fields edited as raw markup, such as a post's `title` and `content`, are strings. Read `editedRecord.title` instead of `editedRecord.title.raw`.
+-   Every taxonomy name resolves to `Term`, so a taxonomy merged into `TaxonomyEntityRecordTypes` must use a record that extends `Term`.
+
 ### Enhancements
 
 -   `useEntityRecord`, `useEntityRecords` and `useEntityRecordsWithPermissions` now infer the record type from their `kind` and `name` arguments, matching `getEntityRecord`. Pairs the map does not cover, and calls that name the record type explicitly, behave as before.
 -   The entity record map now covers templates and template parts, so `postType`/`wp_template` and `postType`/`wp_template_part` infer `WpTemplate` and `WpTemplatePart`.
 -   The entity record map now covers font collections, so `root`/`fontCollection` infers `FontCollection`. Its `description`, `font_families` and `categories` are no longer optional, since the REST API always returns them.
-
-### Breaking Changes
-
--   `WpTemplate` and `WpTemplatePart` now match the REST schema: `has_theme_file` and `is_custom` are `boolean` instead of `Record< string, string >`, `modified` can be `null`, and `original_source` is added. `WpTemplatePart` also gains `author_text`, `plugin`, `is_custom` and `modified`.
--   `GlobalStyles` types `settings` and `styles` with the theme.json shapes from `@wordpress/global-styles-engine` instead of `Record< string, Object >`, so reads such as `settings.typography.fontFamilies` type check without naming `GlobalStylesConfig` by hand.
+-   The entity record map now covers comments, menus, taxonomy definitions, widget types, font families and site settings. Site settings registered by plugins are readable as `unknown`.
+-   Any taxonomy name, including one only known at runtime, resolves to `Term`.
+-   A call that names no `context` resolves every post type and taxonomy in the `edit` context they are fetched in.
+-   `useEntityRecord` no longer needs a record ID for an entity without a key, such as `useEntityRecord( 'root', 'site' )`.
+-   `Updatable` accepts any record type.
 
 ### Internal
 
