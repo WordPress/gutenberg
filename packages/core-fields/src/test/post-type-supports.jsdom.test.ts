@@ -1,5 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { EditConfigDatetime } from '@wordpress/dataviews';
 import postTypeSupports from '../post_type_supports';
+
+const { getEntityRecords } = vi.hoisted( () => ( {
+	getEntityRecords: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		resolveSelect: ( () => ( {
+			getEntityRecords,
+		} ) ) as unknown as typeof actual.resolveSelect,
+	};
+} );
 
 describe( 'post_type_supports', () => {
 	it( 'provides the JavaScript parts of the fields that have some', () => {
@@ -116,6 +130,36 @@ describe( 'post_type_supports', () => {
 			true
 		);
 		expect( isVisible?.( { _links: {} } ) ).toBe( false );
+	} );
+
+	it( 'marks the days with published or scheduled posts of the same type in the date calendar', async () => {
+		const { getEvents } = postTypeSupports.date.Edit as EditConfigDatetime;
+		const from = new Date( '2026-11-01T00:00:00.000Z' );
+		const to = new Date( '2026-11-30T23:59:59.999Z' );
+		getEntityRecords.mockResolvedValue( [
+			{ id: 2, date: '2026-11-05T10:00:00' },
+		] );
+
+		await expect(
+			getEvents?.( { item: { id: 1, type: 'post' }, from, to } )
+		).resolves.toEqual( [
+			{ date: new Date( '2026-11-05T10:00:00.000Z' ) },
+		] );
+		expect( getEntityRecords ).toHaveBeenCalledWith( 'postType', 'post', {
+			status: 'publish,future',
+			after: '2026-11-01T00:00:00.000Z',
+			before: '2026-11-30T23:59:59.999Z',
+			exclude: [ 1 ],
+			per_page: 100,
+			_fields: 'id,date',
+		} );
+
+		// A filter or a bulk edit form has no post type to look up.
+		getEntityRecords.mockClear();
+		await expect( getEvents?.( { item: {}, from, to } ) ).resolves.toEqual(
+			[]
+		);
+		expect( getEntityRecords ).not.toHaveBeenCalled();
 	} );
 
 	it( 'treats an auto-draft as a draft', () => {
