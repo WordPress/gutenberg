@@ -46,7 +46,10 @@
 	},
 	"wpScript": false,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
