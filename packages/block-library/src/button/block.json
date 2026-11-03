@@ -121,9 +121,6 @@
 		"shadow": {
 			"__experimentalSkipSerialization": true
 		},
-		"transform": {
-			"rotate": true
-		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -162,7 +159,6 @@
 		"dimensions": {
 			"root": ".wp-block-button",
 			"width": ".wp-block-button"
-		},
-		"transform": ".wp-block-button"
+		}
 	}
 }

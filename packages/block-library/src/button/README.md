@@ -54,8 +54,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
-  - `rotate`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `["horizontal","vertical"]`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
@@ -80,7 +78,6 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 - **dimensions**:
   - root: `.wp-block-button`
   - width: `.wp-block-button`
-- **transform**: `.wp-block-button`
 
 ## Block Markup
 
