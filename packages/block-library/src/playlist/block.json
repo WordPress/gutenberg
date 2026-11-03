@@ -101,6 +101,7 @@
 			"minWidth": true
 		},
 		"interactivity": true,
+		"listView": true,
 		"shadow": true,
 		"spacing": {
 			"margin": true,
