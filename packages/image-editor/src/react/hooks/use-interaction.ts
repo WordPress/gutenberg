@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import type { CropperControllerState, Size } from '../../core/types';
+import type { CropperState, Size } from '../../core/types';
 import {
 	InteractionController,
 	type CropperInteractionActions,
@@ -96,7 +96,7 @@ function isHandledKeyboardZoom( event: KeyboardEvent ): boolean {
  * @return Event handler props for the container element.
  */
 export function useInteraction(
-	state: CropperControllerState,
+	state: CropperState,
 	actions: CropperInteractionActions,
 	containerSize: Size,
 	imageSize?: Size,

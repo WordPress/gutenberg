@@ -2,7 +2,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
 	areCropperStatesEqual,
 	createCropperState,
-	type CropperControllerState,
+	type CropperState,
 } from '@wordpress/image-editor';
 import {
 	DEFAULT_CROP_OPTIONS,
@@ -98,7 +98,7 @@ export function areMediaEditorStatesEqual(
  * @return Initial state.
  */
 export function buildInitialMediaEditorState(
-	cropper: CropperControllerState
+	cropper: CropperState
 ): MediaEditorState {
 	return {
 		cropper,

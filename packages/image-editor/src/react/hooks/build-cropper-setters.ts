@@ -1,6 +1,6 @@
 import type {
 	CropperAction,
-	CropperControllerState,
+	CropperState,
 	Flip,
 	NormalizedPoint,
 	NormalizedRect,
@@ -41,7 +41,7 @@ export interface CropperSetters {
  *
  * @param dispatchCropperAction Apply a `CropperAction` to the
  *                              underlying reducer.
- * @param getCropperState       Return the current `CropperControllerState`.
+ * @param getCropperState       Return the current `CropperState`.
  *                              Used by setters that need to read
  *                              the latest state to compute their
  *                              payload (focal-point zoom, flip toggle).
@@ -53,7 +53,7 @@ export interface CropperSetters {
  */
 export function buildCropperSetters(
 	dispatchCropperAction: ( action: CropperAction ) => void,
-	getCropperState: () => CropperControllerState,
+	getCropperState: () => CropperState,
 	getVisualSize: () => Size
 ): CropperSetters {
 	return {

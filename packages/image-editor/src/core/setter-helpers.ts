@@ -1,8 +1,4 @@
-import type {
-	CropperControllerState,
-	NormalizedPoint,
-	CropperAction,
-} from './types';
+import type { CropperState, NormalizedPoint, CropperAction } from './types';
 import { MAX_ZOOM } from './constants';
 import { getMinZoom, restrictPanZoom } from './containment';
 
@@ -25,7 +21,7 @@ import { getMinZoom, restrictPanZoom } from './containment';
  * @return A `SET_ZOOM_AT_POINT` action, or `null` if no change is required.
  */
 export function buildFocalPointZoomAction(
-	state: CropperControllerState,
+	state: CropperState,
 	requestedZoom: number
 ): CropperAction | null {
 	const clampedZoom = Math.min(

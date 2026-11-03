@@ -10,7 +10,7 @@ import {
 	resolveAspectRatio,
 	useCropperController,
 	type CropperController,
-	type CropperControllerState,
+	type CropperState,
 } from '@wordpress/image-editor';
 import {
 	mediaEditorReducer,
@@ -26,8 +26,8 @@ import type {
 } from './types';
 
 function areCropperImagesEqual(
-	a: CropperControllerState[ 'image' ],
-	b: CropperControllerState[ 'image' ]
+	a: CropperState[ 'image' ],
+	b: CropperState[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -76,7 +76,7 @@ export interface MediaEditorSession {
 	 * fresh session: default crop and crop options, a clean baseline,
 	 * and no history. Reporting the same image again is a no-op.
 	 */
-	setSourceImage: ( image: CropperControllerState[ 'image' ] ) => void;
+	setSourceImage: ( image: CropperState[ 'image' ] ) => void;
 	/**
 	 * Whether anything in the session differs from its baseline,
 	 * including editor-only state such as the aspect-ratio preset.
@@ -229,37 +229,29 @@ export function useMediaEditorState(): MediaEditorSession {
 		[ beginGesture, endGesture ]
 	);
 
-	const setSourceImage = useCallback(
-		( image: CropperControllerState[ 'image' ] ) => {
-			if (
-				areCropperImagesEqual( stateRef.current.cropper.image, image )
-			) {
-				return;
-			}
-			// New image = fresh session: default crop and crop options, a
-			// clean baseline, and no history. Edits made against one
-			// image must not survive onto another.
-			const next = buildInitialMediaEditorState(
-				createCropperState( image )
-			);
-			stateRef.current = next;
-			dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
-			setInitialBaseline( next );
-			isGestureOpenRef.current = false;
-			gestureSnapshotRef.current = null;
-			historyRef.current = [];
-			redoStackRef.current = [];
-			setHasUndo( false );
-			setHasRedo( false );
-		},
-		[]
-	);
+	const setSourceImage = useCallback( ( image: CropperState[ 'image' ] ) => {
+		if ( areCropperImagesEqual( stateRef.current.cropper.image, image ) ) {
+			return;
+		}
+		// New image = fresh session: default crop and crop options, a
+		// clean baseline, and no history. Edits made against one
+		// image must not survive onto another.
+		const next = buildInitialMediaEditorState(
+			createCropperState( image )
+		);
+		stateRef.current = next;
+		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
+		setInitialBaseline( next );
+		isGestureOpenRef.current = false;
+		gestureSnapshotRef.current = null;
+		historyRef.current = [];
+		redoStackRef.current = [];
+		setHasUndo( false );
+		setHasRedo( false );
+	}, [] );
 
 	const handleCropperChange = useCallback(
-		(
-			nextCropper: CropperControllerState,
-			{ isEdit }: { isEdit: boolean }
-		) => {
+		( nextCropper: CropperState, { isEdit }: { isEdit: boolean } ) => {
 			if (
 				! areCropperImagesEqual(
 					stateRef.current.cropper.image,

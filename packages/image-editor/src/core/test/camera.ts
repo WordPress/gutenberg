@@ -24,15 +24,13 @@ import {
 } from '../source-region';
 import { computeTransformStyle } from '../transform-style';
 import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM } from '../constants';
-import type { CropperControllerState, Size } from '../types';
+import type { CropperState, Size } from '../types';
 
 const CONTAINER: Size = { width: 800, height: 600 };
 const IMAGE: Size = { width: 1600, height: 900 };
 const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 
-function makeState(
-	overrides: Partial< CropperControllerState > = {}
-): CropperControllerState {
+function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
 		...DEFAULT_STATE,
 		image: {
@@ -44,10 +42,7 @@ function makeState(
 	};
 }
 
-function expectImageCoversCrop(
-	state: CropperControllerState,
-	imageSize: Size
-): void {
+function expectImageCoversCrop( state: CropperState, imageSize: Size ): void {
 	const container: Size = { width: 1000, height: 1000 };
 	const camera = createCamera( state, container, imageSize );
 	const snapRotation = Math.round( state.rotation / 90 ) * 90;
@@ -411,7 +406,7 @@ describe( 'containment invariant (property-based)', () => {
 	 * @param imageSize The natural image dimensions.
 	 */
 	function verifyImageCoversCrop(
-		state: CropperControllerState,
+		state: CropperState,
 		imageSize: Size
 	): void {
 		const container: Size = { width: 1000, height: 1000 };
@@ -587,7 +582,7 @@ describe( 'getSourceRegion', () => {
 } );
 
 describe( 'snapCropRectToSourcePixels', () => {
-	const getSourceEdges = ( state: CropperControllerState ) => {
+	const getSourceEdges = ( state: CropperState ) => {
 		const region = getSourceRegion( state, IMAGE );
 		return {
 			left: region.x,
@@ -813,7 +808,7 @@ describe( 'getImageCropBounds', () => {
 // These tests pin the defense-in-depth guards in place.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const HOSTILE_STATE: CropperControllerState = makeState( {
+const HOSTILE_STATE: CropperState = makeState( {
 	pan: { x: Number.NaN, y: Number.NEGATIVE_INFINITY },
 	zoom: Number.POSITIVE_INFINITY,
 	rotation: Number.NaN,

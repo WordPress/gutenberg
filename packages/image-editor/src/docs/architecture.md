@@ -1,4 +1,4 @@
-# Cropper Architecture
+# Image Editor Architecture
 
 ## Layers
 

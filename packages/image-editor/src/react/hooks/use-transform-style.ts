@@ -1,5 +1,5 @@
 import { useMemo } from '@wordpress/element';
-import type { CropperControllerState, Size } from '../../core/types';
+import type { CropperState, Size } from '../../core/types';
 import { computeTransformStyle } from '../../core/transform-style';
 
 /**
@@ -13,7 +13,7 @@ import { computeTransformStyle } from '../../core/transform-style';
  * @return A CSS transform string.
  */
 export function useTransformStyle(
-	state: CropperControllerState,
+	state: CropperState,
 	imageSize: Size
 ): string {
 	return useMemo(

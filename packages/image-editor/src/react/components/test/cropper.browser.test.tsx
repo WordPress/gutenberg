@@ -10,8 +10,9 @@ import { getSourceRegion } from '../../../core/source-region';
 import '../../../style.scss';
 
 const GRID_TEST_ID = 'cropper-grid';
-const GRID_INTERACTIVE_CLASS = 'wp-image-editor__canvas--grid-interactive';
-const SHOW_GRID_CLASS = 'wp-image-editor__canvas--show-grid';
+const GRID_INTERACTIVE_CLASS =
+	'wp-media-editor-image-editor__canvas--grid-interactive';
+const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
 
 function createController(): CropperController {
 	return {
@@ -161,7 +162,8 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from top-left corner',
 		} );
-		const focusVisibleClass = 'wp-image-editor__canvas--focus-visible';
+		const focusVisibleClass =
+			'wp-media-editor-image-editor__canvas--focus-visible';
 
 		// Simulate keyboard resize on a handle — the canvas should pick up
 		// the keyboard-active class via the capture-phase keydown listener.

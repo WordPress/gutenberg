@@ -243,7 +243,7 @@ export function DimensionsOverlay( {
 	return (
 		<div
 			ref={ tooltipRef }
-			className="wp-image-editor__dimensions-tooltip"
+			className="wp-media-editor-image-editor__dimensions-tooltip"
 			data-testid="cropper-dimensions-tooltip"
 			style={ {
 				left: handleX + GAP_DIRECTION[ anchor.x ] * HANDLE_GAP_PX,

@@ -11,7 +11,7 @@ import { act, renderHook } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
 import { useAriaAnnouncer } from '../use-aria-announcer';
 import { DEFAULT_STATE } from '../../../core/constants';
-import type { CropperControllerState } from '../../../core/types';
+import type { CropperState } from '../../../core/types';
 
 vi.mock(
 	import( '@wordpress/a11y' ),
@@ -21,9 +21,7 @@ vi.mock(
 		} ) as unknown as typeof import( '@wordpress/a11y' )
 );
 
-function makeState(
-	overrides: Partial< CropperControllerState > = {}
-): CropperControllerState {
+function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
 		...DEFAULT_STATE,
 		...overrides,

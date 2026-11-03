@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { CropperControllerState, Size } from '../types';
+import type { CropperState, Size } from '../types';
 import { ABSOLUTE_MIN_ZOOM, DEFAULT_STATE, MAX_ZOOM } from '../constants';
 import {
 	areCropperStatesEqual,
@@ -19,9 +19,7 @@ const IMAGE: Size = { width: 1600, height: 900 };
 const PORTRAIT_IMAGE: Size = { width: 900, height: 1600 };
 const CONTAINER: Size = { width: 800, height: 600 };
 
-function makeState(
-	overrides: Partial< CropperControllerState > = {}
-): CropperControllerState {
+function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	const merged = {
 		...DEFAULT_STATE,
 		image: {
@@ -61,7 +59,7 @@ function makeState(
  * @return The world-space AABB of the visible region.
  */
 function getCropWorldRegion(
-	state: CropperControllerState,
+	state: CropperState,
 	imageSize: Size,
 	containerSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
@@ -179,8 +177,8 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 	 * @param tolerance Allowed difference per axis (default 0.02).
 	 */
 	function expectSameVisibleRegion(
-		before: CropperControllerState,
-		after: CropperControllerState,
+		before: CropperState,
+		after: CropperState,
 		tolerance = 0.02
 	) {
 		const regionBefore = getCropWorldRegion( before, IMAGE, CONTAINER );

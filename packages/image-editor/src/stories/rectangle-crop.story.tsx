@@ -108,8 +108,8 @@ function useUploadableImage() {
 }
 
 const meta: Meta< typeof Cropper > = {
-	id: 'imageeditor-cropper',
-	title: 'Editor/Image Editor/Cropper',
+	id: 'mediaeditor-imageeditor',
+	title: 'Editor/Media Editor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
 };

@@ -1,4 +1,4 @@
-# Cropper Recipes
+# Image Editor Recipes
 
 > **Status: experimental.** This API may change in any release.
 
@@ -62,13 +62,13 @@ import {
 	areCropperStatesEqual,
 	createCropperState,
 	useCropperController,
-	type CropperControllerState,
+	type CropperState,
 } from '@wordpress/image-editor';
 
 function CropperWithHistory( { src }: { src: string } ) {
 	const [ crop, setCrop ] = useState( () => createCropperState() );
-	const [ past, setPast ] = useState< CropperControllerState[] >( [] );
-	const gestureStart = useRef< CropperControllerState | null >( null );
+	const [ past, setPast ] = useState< CropperState[] >( [] );
+	const gestureStart = useRef< CropperState | null >( null );
 
 	const controller = useCropperController( {
 		state: crop,

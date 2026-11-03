@@ -1,4 +1,4 @@
-import { ORIGINAL_ASPECT_RATIO, type CropperControllerState } from '../core';
+import { ORIGINAL_ASPECT_RATIO, type CropperState } from '../core';
 
 /**
  * Resolve an aspect-ratio preset value (the string a dropdown
@@ -15,7 +15,7 @@ import { ORIGINAL_ASPECT_RATIO, type CropperControllerState } from '../core';
  */
 export function resolveAspectRatio(
 	presetKey: string,
-	cropperImage: CropperControllerState[ 'image' ] | null
+	cropperImage: CropperState[ 'image' ] | null
 ): number | undefined {
 	const num = parseFloat( presetKey );
 	if ( num === 0 || Number.isNaN( num ) ) {

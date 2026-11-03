@@ -1,4 +1,4 @@
-import type { CropperControllerState } from '@wordpress/image-editor';
+import type { CropperState } from '@wordpress/image-editor';
 
 /**
  * Sidebar control state for the cropper, kept in the same undo history
@@ -51,7 +51,7 @@ export type EditsSlice = Record< string, EditValue >;
  * referentially equal across actions that don't touch them.
  */
 export interface MediaEditorState {
-	cropper: CropperControllerState;
+	cropper: CropperState;
 	cropOptions: CropOptionsSlice;
 	edits: EditsSlice;
 }
@@ -59,7 +59,7 @@ export interface MediaEditorState {
 /** Actions the media editor reducer handles. */
 export type MediaEditorAction =
 	/** Replace the cropper's state with the next one it reports. */
-	| { type: 'SET_CROPPER'; payload: CropperControllerState }
+	| { type: 'SET_CROPPER'; payload: CropperState }
 	/** Set the aspect-ratio preset the dropdown shows. */
 	| { type: 'SET_ASPECT_RATIO_VALUE'; payload: string }
 	/** Set a named edit, or remove it when `value` is `undefined`. */

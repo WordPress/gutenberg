@@ -2,15 +2,13 @@ import { afterEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useInteraction } from '../use-interaction';
 import type { CropperInteractionActions } from '../../../core/interaction-controller';
-import type { CropperControllerState, Size } from '../../../core/types';
+import type { CropperState, Size } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';
 
 const CONTAINER_SIZE: Size = { width: 500, height: 300 };
 const IMAGE_SIZE: Size = { width: 500, height: 300 };
 
-function makeState(
-	overrides: Partial< CropperControllerState > = {}
-): CropperControllerState {
+function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
 		...DEFAULT_STATE,
 		image: {

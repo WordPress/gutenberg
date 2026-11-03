@@ -6,7 +6,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import type {
-	CropperControllerState,
+	CropperState,
 	CropperAction,
 	NormalizedRect,
 	Size,
@@ -33,11 +33,11 @@ import {
  */
 export interface CropperController extends CropperSetters {
 	/** The current cropper state (read-only). */
-	state: CropperControllerState;
+	state: CropperState;
 	/** Set the loaded image (natural size and src). */
-	setImage: ( image: CropperControllerState[ 'image' ] ) => void;
+	setImage: ( image: CropperState[ 'image' ] ) => void;
 	/** Reset the state. Optionally merge partial state overrides. */
-	reset: ( resetState?: Partial< CropperControllerState > ) => void;
+	reset: ( resetState?: Partial< CropperState > ) => void;
 	/** Whether the current state differs from the initial state. */
 	isDirty: boolean;
 	/**
@@ -60,8 +60,8 @@ export interface CropperController extends CropperSetters {
 }
 
 function areCropperImagesEqual(
-	a: CropperControllerState[ 'image' ],
-	b: CropperControllerState[ 'image' ]
+	a: CropperState[ 'image' ],
+	b: CropperState[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -78,8 +78,8 @@ function areCropperImagesEqual(
  * @return The starting state.
  */
 export function createCropperState(
-	image: CropperControllerState[ 'image' ] = null
-): CropperControllerState {
+	image: CropperState[ 'image' ] = null
+): CropperState {
 	return enforceContainment( { ...DEFAULT_STATE, image } );
 }
 
@@ -92,9 +92,9 @@ export function createCropperState(
  */
 export interface CropperControllerOptions {
 	/** Starting state when the controller keeps its own state. */
-	initialState?: Partial< CropperControllerState >;
+	initialState?: Partial< CropperState >;
 	/** The cropper state, when you keep it yourself. */
-	state?: CropperControllerState;
+	state?: CropperState;
 	/**
 	 * Called with the next state, when you keep it yourself. `isEdit` is
 	 * `false` for changes the person did not make, such as an image
@@ -102,7 +102,7 @@ export interface CropperControllerOptions {
 	 * usually should not get an undo entry.
 	 */
 	onChange?: (
-		nextState: CropperControllerState,
+		nextState: CropperState,
 		details: { isEdit: boolean }
 	) => void;
 }
@@ -122,7 +122,7 @@ export function useCropperController(
 	const { initialState, state: controlledState, onChange } = options;
 	const isControlled = controlledState !== undefined;
 
-	const [ ownState, setOwnState ] = useState< CropperControllerState >( () =>
+	const [ ownState, setOwnState ] = useState< CropperState >( () =>
 		enforceContainment( { ...DEFAULT_STATE, ...initialState } )
 	);
 	const state = isControlled ? controlledState : ownState;
@@ -130,7 +130,7 @@ export function useCropperController(
 	// The "clean" snapshot the controller's own state is compared against
 	// for `isDirty`. `setImage` and `reset` refresh it. A controlled
 	// state is compared against the starting state for its image.
-	const [ ownBaseline, setOwnBaseline ] = useState< CropperControllerState >(
+	const [ ownBaseline, setOwnBaseline ] = useState< CropperState >(
 		() => ownState
 	);
 
@@ -165,7 +165,7 @@ export function useCropperController(
 	);
 
 	const setImage = useCallback(
-		( image: CropperControllerState[ 'image' ] ) => {
+		( image: CropperState[ 'image' ] ) => {
 			if ( areCropperImagesEqual( latestRef.current.image, image ) ) {
 				return;
 			}
@@ -178,7 +178,7 @@ export function useCropperController(
 	);
 
 	const reset = useCallback(
-		( resetState?: Partial< CropperControllerState > ) => {
+		( resetState?: Partial< CropperState > ) => {
 			const next = apply( { type: 'RESET', payload: resetState } );
 			setOwnBaseline( next );
 		},

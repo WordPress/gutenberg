@@ -1,4 +1,4 @@
-import type { CropperControllerState, Size } from './types';
+import type { CropperState, Size } from './types';
 import { degreesToRadians } from './math/rotation';
 import { isValidSize, sanitizeCropperState } from './math/sanitize';
 
@@ -23,7 +23,7 @@ const IDENTITY_MATRIX_STYLE = 'matrix(1, 0, 0, 1, 0, 0)';
  * @return A CSS transform string.
  */
 export function computeTransformStyle(
-	state: CropperControllerState,
+	state: CropperState,
 	imageSize: Size
 ): string {
 	// Match the identity short-circuit used by `createCamera` and

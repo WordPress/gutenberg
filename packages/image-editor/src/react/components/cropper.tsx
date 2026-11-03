@@ -909,8 +909,8 @@ function CropperInner(
 		<div
 			ref={ ref }
 			className={ clsx(
-				'wp-image-editor',
-				isDragging && 'wp-image-editor--dragging',
+				'wp-media-editor-image-editor',
+				isDragging && 'wp-media-editor-image-editor--dragging',
 				className
 			) }
 		>
@@ -929,17 +929,20 @@ function CropperInner(
 			<div
 				ref={ canvasRef }
 				className={ clsx(
-					'wp-image-editor__canvas',
+					'wp-media-editor-image-editor__canvas',
 					isInteractiveGrid &&
-						'wp-image-editor__canvas--grid-interactive',
-					showInteractiveGrid && 'wp-image-editor__canvas--show-grid',
-					settling && 'wp-image-editor__canvas--settling',
+						'wp-media-editor-image-editor__canvas--grid-interactive',
+					showInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--show-grid',
+					settling &&
+						'wp-media-editor-image-editor__canvas--settling',
 					// Marks the cropper as in keyboard-interaction mode.
 					// CSS uses :focus on the canvas to show the stencil
 					// outline and :focus on a handle to show its ring,
 					// so the class applies whenever any cropper element
 					// has keyboard focus.
-					isFocusVisible && 'wp-image-editor__canvas--focus-visible'
+					isFocusVisible &&
+						'wp-media-editor-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }
 				role="group"
@@ -967,14 +970,14 @@ function CropperInner(
 				 * never exposed when the stage is panned during a resize drag.
 				 */ }
 				<div
-					className="wp-image-editor__stage"
+					className="wp-media-editor-image-editor__stage"
 					data-testid="cropper-stage"
 					style={ stageStyle }
 					onTransitionEnd={ handleSettleTransitionEnd }
 				>
 					{ /* The image layer */ }
 					<img
-						className="wp-image-editor__image"
+						className="wp-media-editor-image-editor__image"
 						data-testid="cropper-image"
 						src={ src }
 						alt=""

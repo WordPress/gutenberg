@@ -9,7 +9,7 @@
 export { Cropper } from './react/components';
 export { useCropperController, createCropperState } from './react/hooks';
 export type { CropperController } from './react/hooks';
-export type { CropperControllerState } from './core';
+export type { CropperState } from './core';
 export { areCropperStatesEqual } from './core';
 
 // Aspect-ratio presets.
