@@ -13,6 +13,11 @@ import PluginSidebar from '../plugin-sidebar';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
+import {
+	DEFAULT_NOTES_FILTERS,
+	NotesFilters,
+	hasActiveNotesFilters,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { AddNoteToolbarButton } from './add-note-toolbar-button';
@@ -75,6 +80,8 @@ function NotesSidebar( { postId, drafts } ) {
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
 	const areNotesHidden = notesDisplayMode === 'hidden';
+	const [ filters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
@@ -152,8 +159,8 @@ function NotesSidebar( { postId, drafts } ) {
 			{ notes.length > 0 && (
 				<AddNoteToolbarButton
 					count={
-						notes.filter(
-							( thread ) => thread.blockClientId === clientId
+						notes.filter( ( thread ) =>
+							thread.blockClientIds.includes( clientId )
 						).length
 					}
 					onClick={ addNewNoteForBlock }
@@ -177,8 +184,19 @@ function NotesSidebar( { postId, drafts } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
+					{ ( notes.length > 0 ||
+						hasActiveNotesFilters( filters ) ) && (
+						<NotesFilters
+							filters={ filters }
+							onChange={ setFilters }
+						/>
+					) }
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<Notes
+							notes={ notes }
+							sidebarRef={ sidebarRef }
+							filters={ filters }
+						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }

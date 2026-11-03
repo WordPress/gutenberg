@@ -44,6 +44,26 @@
 	gap: var(--wpds-dimension-gap-xs);
 	// The Button's four-character minimum pads out a short count.
 	min-width: 0;
+
+	// Forced colors draw the outline and minimal variants alike, so the
+	// pressed pill needs its own fill.
+	&[aria-pressed="true"] {
+		@media (forced-colors: active) {
+			background-color: SelectedItem;
+			color: SelectedItemText;
+
+			// A resolved note's pills stay in the disabled `GrayText`.
+			&[data-disabled] {
+				background-color: GrayText;
+				color: Canvas;
+			}
+
+			// Otherwise the text sits on a `Canvas` backplate.
+			> * {
+				forced-color-adjust: none;
+			}
+		}
+	}
 }
 
 // Closing the picker after a pointer open leaves focus on the trigger.
@@ -72,6 +92,12 @@
 
 		@media (forced-colors: active) {
 			background-color: SelectedItem;
+			color: SelectedItemText;
+
+			// Otherwise the emoji sits on a `Canvas` backplate.
+			> * {
+				forced-color-adjust: none;
+			}
 		}
 	}
 }
