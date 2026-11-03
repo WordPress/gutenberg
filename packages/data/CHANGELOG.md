@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useSelect`: Keep less memory per mounted hook, which also makes mounting it faster ([#85803](https://github.com/WordPress/gutenberg/pull/85803)).
+
 ### Bug Fixes
 
 -   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).

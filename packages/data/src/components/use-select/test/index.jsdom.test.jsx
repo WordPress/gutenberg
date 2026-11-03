@@ -1486,6 +1486,43 @@ describe( 'useSelect', () => {
 				await screen.findByText( '6', { selector: '[role="note"]' } )
 			).toBeInTheDocument();
 		} );
+
+		it( 'moves a store read after subscribing over on a mode switch', () => {
+			registry.registerStore( 'other', counterStore() );
+
+			const TestComponent = ( { readOther } ) => {
+				const value = useSelect(
+					( select ) =>
+						readOther
+							? `${ select( 'counter' ).get() }:${ select(
+									'other'
+								).get() }`
+							: `${ select( 'counter' ).get() }`,
+					[ readOther ]
+				);
+				return <div role="status">{ value }</div>;
+			};
+
+			const App = ( { async, readOther } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<TestComponent readOther={ readOther } />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const { rerender } = render( <App async readOther={ false } /> );
+			// Subscribed to `counter` only; start reading `other` too.
+			rerender( <App async readOther /> );
+			rerender( <App async={ false } readOther /> );
+
+			act( () => {
+				registry.dispatch( 'other' ).inc();
+			} );
+
+			// Synchronous: the store added later moved to the sync tier too.
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:1' );
+		} );
 	} );
 
 	describe( 'usage without dependencies array', () => {
