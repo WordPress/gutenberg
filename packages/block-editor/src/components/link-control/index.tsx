@@ -441,7 +441,8 @@ function LinkControl( {
 
 	// Centralized submission function
 	const submitUrlValue = () => {
-		if ( valueHasChanges ) {
+		// Without a value, any typed URL is a new link.
+		if ( ! value || valueHasChanges ) {
 			// Submit the original value with new stored values applied
 			// on top. URL is a special case as it may also be a prop.
 			onChange( {
