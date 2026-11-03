@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `Cropper`, `useCropperController`, `CropperProvider` and `useCropper`: the cropper the media editor uses, with pan, zoom, rotation, flip and a resizable crop area. Also add `buildModifiers`, which turns a crop into the instructions the WordPress media REST endpoint expects, helpers for where the crop lands in the source image, and `useCropSession`, which adds undo and redo, gesture boundaries and aspect-ratio presets. This API is experimental. Its styles ship in `build-style/style.css`.
+-   Add `Cropper` and `useCropperController`: the cropper the media editor uses, with pan, zoom, rotation, flip, a resizable crop area and a lockable aspect ratio. Keep its state yourself (`state` and `onChange`) to put it in your own undo history. Also add `buildModifiers`, which turns a crop into the instructions the WordPress media REST endpoint expects, and the default aspect-ratio presets. This API is experimental. Its styles ship in `build-style/style.css`.
 
 ### Deprecations
 

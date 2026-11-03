@@ -1,6 +1,6 @@
 # Media Editor Session
 
-The media editor's session is a `useCropSession` from `@wordpress/image-cropper`, which provides undo and redo, gesture boundaries and the crop options. The media editor adds named edits to the same history through its own reducer, and decides whether the edits change the saved image.
+The media editor's session owns its undo and redo history. The cropper's state from `@wordpress/image-cropper` is one slice of the session's state, next to the sidebar crop options and named edits, kept through `useCropperController( { state, onChange } )`, so one history covers them all.
 
 `useMediaEditorState()` returns the media editor session. The session owns the source image, every editing slice, the shared undo/redo history, gesture boundaries, and whether the edits change the saved image (`hasOutputEdits`). The cropper is one participant: `session.cropper` is a geometry-only `CropperController` that a `<Cropper>` takes via its `controller` prop, and its `isDirty` covers geometry alone. Replacing the source image (`setSourceImage`, which the cropper's `setImage` also calls) starts a fresh session with default geometry and crop options, a clean baseline, and no history. Save code asks the session, not the cropper, whether image output needs saving.
 

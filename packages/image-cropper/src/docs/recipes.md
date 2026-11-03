@@ -51,90 +51,67 @@ function ImageCropperWithControls( { src }: { src: string } ) {
 }
 ```
 
-When controls are split across components, use `CropperProvider`.
+## Keep the State Yourself
+
+To put the crop in your own undo history, alongside anything else your editor changes, keep the cropper state in your own state and pass it to the controller. The controller works out each change and hands you the next state. A minimal history, with a drag recorded as one entry:
 
 ```tsx
-import { Cropper, CropperProvider, useCropper } from '@wordpress/image-cropper';
-
-function Editor( { src }: { src: string } ) {
-	return (
-		<CropperProvider>
-			<Toolbar />
-			<CropperPanel src={ src } />
-		</CropperProvider>
-	);
-}
-
-function Toolbar() {
-	const { snapRotate90 } = useCropper();
-	return <button onClick={ () => snapRotate90( 1 ) }>Rotate right</button>;
-}
-
-function CropperPanel( { src }: { src: string } ) {
-	const controller = useCropper();
-	return <Cropper src={ src } controller={ controller } freeformCrop />;
-}
-```
-
-## Add Undo and Redo
-
-`useCropSession` records every change in one history, and groups a drag or pinch into one undo entry through the gesture callbacks.
-
-```tsx
+import { useRef, useState } from '@wordpress/element';
 import {
 	Cropper,
-	DEFAULT_ASPECT_RATIOS,
-	useCropSession,
+	areCropperStatesEqual,
+	createCropperState,
+	useCropperController,
+	type CropperControllerState,
 } from '@wordpress/image-cropper';
 
 function CropperWithHistory( { src }: { src: string } ) {
-	const session = useCropSession();
+	const [ crop, setCrop ] = useState( () => createCropperState() );
+	const [ past, setPast ] = useState< CropperControllerState[] >( [] );
+	const gestureStart = useRef< CropperControllerState | null >( null );
+
+	const controller = useCropperController( {
+		state: crop,
+		onChange: ( next, { isEdit } ) => {
+			if ( isEdit && ! gestureStart.current ) {
+				setPast( ( entries ) => [ ...entries, crop ] );
+			}
+			setCrop( next );
+		},
+	} );
 
 	return (
 		<>
-			<select
-				value={ session.cropOptions.aspectRatioValue }
-				onChange={ ( event ) =>
-					session.setAspectRatioValue( event.target.value )
-				}
+			<button
+				disabled={ ! past.length }
+				onClick={ () => {
+					setCrop( past[ past.length - 1 ] );
+					setPast( past.slice( 0, -1 ) );
+				} }
 			>
-				{ DEFAULT_ASPECT_RATIOS.map( ( preset ) => (
-					<option key={ preset.value } value={ String( preset.value ) }>
-						{ preset.label }
-					</option>
-				) ) }
-			</select>
-			<button onClick={ session.undo } disabled={ ! session.hasUndo }>
 				Undo
-			</button>
-			<button onClick={ session.redo } disabled={ ! session.hasRedo }>
-				Redo
 			</button>
 			<Cropper
 				src={ src }
-				controller={ session.cropper }
+				controller={ controller }
 				freeformCrop
-				onGestureStart={ session.beginGesture }
-				onGestureEnd={ session.endGesture }
+				onGestureStart={ () => {
+					gestureStart.current = crop;
+				} }
+				onGestureEnd={ () => {
+					const start = gestureStart.current;
+					gestureStart.current = null;
+					if ( start && ! areCropperStatesEqual( start, crop ) ) {
+						setPast( ( entries ) => [ ...entries, start ] );
+					}
+				} }
 			/>
 		</>
 	);
 }
 ```
 
-## Get Source Coordinates
-
-Use source-region helpers when saving crop data instead of rendering a `Blob`.
-
-```ts
-import { getSourceRegion, getSourceRegionPercent } from '@wordpress/image-cropper';
-
-const imageSize = { width: naturalWidth, height: naturalHeight };
-const region = getSourceRegion( controller.state, imageSize );
-const percent = getSourceRegionPercent( controller.state, imageSize );
-```
-
-`getSourceRegionPercent()` matches the crop data shape used by the WordPress attachments `/edit` endpoint.
+`isEdit` is `false` for an image loading or the crop being refitted after a window resize, so those do not get an undo entry. The media editor's session (`packages/media-editor/src/state`) is a fuller version of this, with redo and other edits in the same history.
 
 ## Export a Cropped Image
 
@@ -188,5 +165,5 @@ Useful test areas:
 -   `src/core/export/test/canvas-renderer.jsdom.test.ts` for canvas export.
 -   `src/react/components/test/cropper.browser.test.tsx` for React cropper behavior.
 -   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
--   `src/state/test/use-crop-session.jsdom.test.ts` for undo, redo and gestures.
+-   `src/react/hooks/test/use-cropper-controller.jsdom.test.ts` for the controller, including keeping the state yourself.
 -   `src/test/build-modifiers.test.ts` for the server instructions.

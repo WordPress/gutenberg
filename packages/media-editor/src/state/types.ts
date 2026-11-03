@@ -1,7 +1,24 @@
-import type {
-	CropSessionAction,
-	CropSessionState,
-} from '@wordpress/image-cropper';
+import type { CropperControllerState } from '@wordpress/image-cropper';
+
+/**
+ * Sidebar control state for the cropper, kept in the same undo history
+ * as the crop.
+ */
+export interface CropOptionsSlice {
+	/**
+	 * Selected aspect-ratio preset as a string (round-trippable through
+	 * `<SelectControl>`). `'0'` = Free, `'-1'` = Original, any positive
+	 * decimal = fixed ratio. The cropper holds the resolved ratio itself.
+	 */
+	aspectRatioValue: string;
+}
+
+/**
+ * The crop options a session starts from.
+ */
+export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
+	aspectRatioValue: '0',
+};
 
 /**
  * A value an edit can hold: plain data only, because the session
@@ -27,26 +44,33 @@ export type EditValue =
 export type EditsSlice = Record< string, EditValue >;
 
 /**
- * The full state of the media editor: the crop session (cropper
- * geometry and crop options) plus named edits.
+ * The full state of the media editor: the cropper's state, the sidebar
+ * crop options and named edits.
  *
  * Every undo/redo snapshot is a full `MediaEditorState`. Slices stay
  * referentially equal across actions that don't touch them.
  */
-export interface MediaEditorState extends CropSessionState {
+export interface MediaEditorState {
+	cropper: CropperControllerState;
+	cropOptions: CropOptionsSlice;
 	edits: EditsSlice;
 }
 
-/**
- * The media editor's own action. Everything else is a crop session
- * action, handled by `cropSessionReducer` from `@wordpress/image-cropper`.
- */
-export type MediaEditAction = {
-	/** Set a named edit, or remove it when `value` is `undefined`. */
-	type: 'SET_EDIT';
-	payload: { name: string; value: EditValue | undefined };
-};
-
-/** Every action the media editor reducer handles. */
+/** Actions the media editor reducer handles. */
 export type MediaEditorAction =
-	MediaEditAction | CropSessionAction< MediaEditorState >;
+	/** Replace the cropper's state with the next one it reports. */
+	| { type: 'SET_CROPPER'; payload: CropperControllerState }
+	/** Set the aspect-ratio preset the dropdown shows. */
+	| { type: 'SET_ASPECT_RATIO_VALUE'; payload: string }
+	/** Set a named edit, or remove it when `value` is `undefined`. */
+	| {
+			type: 'SET_EDIT';
+			payload: { name: string; value: EditValue | undefined };
+	  }
+	/**
+	 * Put every slice back to its starting state, keeping the image. One
+	 * action, so one undo entry.
+	 */
+	| { type: 'RESET' }
+	/** Replace the whole state with a snapshot (undo/redo). */
+	| { type: 'RESTORE_SNAPSHOT'; payload: MediaEditorState };

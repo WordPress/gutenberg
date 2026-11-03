@@ -6,9 +6,9 @@ import { useEffect } from '@wordpress/element';
 import {
 	Cropper,
 	buildModifiers,
-	getSourceRegion,
-	useCropSession,
-	type CropSession,
+	resolveAspectRatio,
+	useCropperController,
+	type CropperController,
 } from '..';
 // Browser Mode needs the package's real styles for layout.
 import '../style.scss';
@@ -18,71 +18,65 @@ const IMAGE = {
 	naturalWidth: 1200,
 	naturalHeight: 600,
 };
-const IMAGE_SIZE = { width: 1200, height: 600 };
 
-function CropperWithHistory( {
-	onSession,
+function ConsumerCropper( {
+	onController,
 }: {
-	onSession: ( session: CropSession ) => void;
+	onController: ( controller: CropperController ) => void;
 } ) {
-	const session = useCropSession();
-	const { setSourceImage } = session;
-	useEffect( () => setSourceImage( IMAGE ), [ setSourceImage ] );
-	useEffect( () => onSession( session ), [ session, onSession ] );
+	const controller = useCropperController();
+	const { setImage } = controller;
+	useEffect( () => setImage( IMAGE ), [ setImage ] );
+	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
-			<Cropper
-				src={ IMAGE.src }
-				controller={ session.cropper }
-				freeformCrop
-				onGestureStart={ session.beginGesture }
-				onGestureEnd={ session.endGesture }
-			/>
+			<Cropper src={ IMAGE.src } controller={ controller } freeformCrop />
 		</div>
 	);
 }
 
-function cropSize( session: CropSession ) {
-	const { width, height } = getSourceRegion(
-		session.cropper.state,
-		IMAGE_SIZE
-	);
-	return { width: Math.round( width ), height: Math.round( height ) };
+// Crop size in source pixels, from the normalized crop of an unrotated,
+// unzoomed image.
+function cropSize( controller: CropperController ) {
+	const { width, height } = controller.state.cropRect;
+	return {
+		width: Math.round( width * IMAGE.naturalWidth ),
+		height: Math.round( height * IMAGE.naturalHeight ),
+	};
 }
 
 describe( 'the public API', () => {
-	it( 'crops, undoes and builds the server instructions from the package exports alone', async () => {
-		let session!: CropSession;
-		const onSession = ( next: CropSession ) => {
-			session = next;
+	it( 'crops and builds the server instructions from the package exports alone', async () => {
+		let controller!: CropperController;
+		const onController = ( next: CropperController ) => {
+			controller = next;
 		};
-		await render( <CropperWithHistory onSession={ onSession } /> );
+		await render( <ConsumerCropper onController={ onController } /> );
 		// The handles render once the cropper has measured itself.
 		await screen.findByRole( 'button', {
 			name: 'Resize from bottom-right corner',
 		} );
-		expect( cropSize( session ) ).toEqual( { width: 1200, height: 600 } );
+		expect( cropSize( controller ) ).toEqual( {
+			width: 1200,
+			height: 600,
+		} );
 
-		act( () => session.setAspectRatioValue( '1' ) );
-		expect( cropSize( session ) ).toEqual( { width: 600, height: 600 } );
+		act( () =>
+			controller.setAspectRatio(
+				resolveAspectRatio( '1', controller.state.image )
+			)
+		);
+		expect( controller.state.aspectRatio ).toBe( 1 );
+		expect( cropSize( controller ) ).toEqual( { width: 600, height: 600 } );
 
-		act( () => session.cropper.snapRotate90( 1 ) );
-		act( () => session.cropper.toggleFlip( 'horizontal' ) );
+		act( () => controller.snapRotate90( 1 ) );
+		act( () => controller.toggleFlip( 'horizontal' ) );
 		expect(
-			buildModifiers( session.cropper ).map( ( { type } ) => type )
+			buildModifiers( controller ).map( ( { type } ) => type )
 		).toEqual( [ 'flip', 'rotate', 'crop' ] );
 
-		act( () => session.undo() );
-		expect( session.cropper.state.flip.horizontal ).toBe( false );
-		act( () => session.undo() );
-		expect( session.cropper.state.rotation ).toBe( 0 );
-		act( () => session.undo() );
-		expect( session.cropOptions.aspectRatioValue ).toBe( '0' );
-		expect( cropSize( session ) ).toEqual( { width: 1200, height: 600 } );
-		expect( session.hasUndo ).toBe( false );
-
-		act( () => session.redo() );
-		expect( session.cropOptions.aspectRatioValue ).toBe( '1' );
-		expect( cropSize( session ) ).toEqual( { width: 600, height: 600 } );
+		act( () => controller.reset() );
+		expect( controller.state.aspectRatio ).toBeUndefined();
+		expect( buildModifiers( controller ) ).toEqual( [] );
 	} );
 } );

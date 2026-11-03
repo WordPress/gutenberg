@@ -44,7 +44,7 @@ function ImageCropper() {
 }
 ```
 
-`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It does not provide undo and redo; use `useCropSession` for that.
+`useCropperController` returns a controller with the current `state`, named setters, `reset`, `isDirty` and `getCroppedImage`. It keeps no undo history; to add one, keep the state yourself (see below).
 
 ## API
 
@@ -52,37 +52,27 @@ function ImageCropper() {
 
 Fills its parent container. Required props are `src` and `controller`. Common options include `freeformCrop`, `showGrid`, `showDimming`, `showDimensions`, `onGestureStart` and `onGestureEnd`.
 
-### `useCropperController( initialState? )`
+### `useCropperController( options? )`
 
-React state hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`. Lock the crop to a ratio with `controller.setAspectRatio( ratio )`, or unlock it with `undefined`; the ratio lives in `controller.state.aspectRatio`, and `<Cropper>` reads it from there.
+React hook for the cropper. Returns a `CropperController`: the current state, named setters, `reset`, `isDirty` and `getCroppedImage`. Lock the crop to a ratio with `controller.setAspectRatio( ratio )`, or unlock it with `undefined`; the ratio lives in `controller.state.aspectRatio`, and `<Cropper>` reads it from there.
 
-### `useCropSession( options? )`
+With no options, the controller keeps its own state (pass `initialState` to start from something other than the default). To keep the state yourself, for example in an editor's own undo history, pass `state` and `onChange`. The controller works out each change and calls `onChange( nextState, { isEdit } )`. `isEdit` is `false` for changes the person did not make, such as an image loading or the crop being refitted after a window resize, which usually should not get an undo entry. Use `onGestureStart` and `onGestureEnd` on `<Cropper>` to group a drag into one undo entry.
 
-A cropper controller with undo and redo, gesture boundaries, crop options and aspect-ratio presets that reshape the crop in one step. Pass its `cropper` to `<Cropper>` along with `onGestureStart={ session.beginGesture }` and `onGestureEnd={ session.endGesture }`. To keep more state in the same undo history, pass a `reducer` that handles your own actions and hands the rest to `cropSessionReducer`, plus `areStatesEqual` and `createInitialState`.
+### `createCropperState( image? )`
 
-### `resolveAspectRatio( presetKey, image )`
+The state a cropper starts from for an image. Use it to build your starting state when you keep the state yourself.
 
-Turns a preset value from `DEFAULT_ASPECT_RATIOS` into a width / height ratio, resolving "Original" from the loaded image. Use it with `controller.setAspectRatio` when you keep your own preset; `useCropSession`'s `setAspectRatioValue` does it for you.
+### `areCropperStatesEqual( a, b )`
 
-### `CropperProvider` / `useCropper`
-
-A context wrapper around `useCropperController` for component trees that share one cropper.
-
-### `getSourceRegion` / `getSourceRegionPercent`
-
-Where the crop lands in the source image, in pixels or in percentages.
+Whether two cropper states are the same crop, ignoring tiny floating-point differences. Use it to skip no-op entries in your own undo history.
 
 ### `buildModifiers( controller )`
 
 The rotate, flip and crop instructions the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) expects, in the order the server applies them.
 
-### `exportCroppedImage`
+### `DEFAULT_ASPECT_RATIOS`, `resolveAspectRatio( presetKey, image )`
 
-Draws the crop to a canvas and returns a `Blob`. The image must be served with cross-origin (CORS) headers.
-
-### `DEFAULT_ASPECT_RATIOS`, `ORIGINAL_ASPECT_RATIO`
-
-The default aspect-ratio presets, and the preset value that means "the image's own ratio".
+The default aspect-ratio presets, and a function that turns a preset value into the ratio to pass to `controller.setAspectRatio`, resolving "Original" from the loaded image.
 
 ### `MAX_ZOOM`, `MAX_ROTATION_OFFSET`, `getMinZoom`
 

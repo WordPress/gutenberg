@@ -20,8 +20,8 @@ import {
 import { Cropper } from '../react/components/cropper';
 import { useCropperController } from '../react/hooks/use-cropper-controller';
 import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
-import { DEFAULT_ASPECT_RATIOS } from '../state/aspect-ratio-presets';
-import { resolveAspectRatio } from '../state/resolve-aspect-ratio';
+import { DEFAULT_ASPECT_RATIOS } from '../presets/aspect-ratio-presets';
+import { resolveAspectRatio } from '../presets/resolve-aspect-ratio';
 import { getMinZoom, restrictPanZoom } from '../core/containment';
 import {
 	loadImage,

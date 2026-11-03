@@ -1,38 +1,21 @@
 /**
- * The cropper. Keep this list explicit so files in `core/` and `react/` do
- * not become supported API by accident.
+ * The cropper. Export only what a consumer imports, so files in `core/`
+ * and `react/` do not become supported API by accident.
  */
 
-// React components and hooks.
-export { useCropperController } from './react/hooks';
-export { Cropper, CropperProvider, useCropper } from './react/components';
+// The cropper and its controller. Keep the state yourself
+// (`useCropperController( { state, onChange } )`) to put it in your own
+// undo history.
+export { Cropper } from './react/components';
+export { useCropperController, createCropperState } from './react/hooks';
 export type { CropperController } from './react/hooks';
-export type { CropperProps } from './react/components';
+export type { CropperControllerState } from './core';
+export { areCropperStatesEqual } from './core';
 
-// State and extension types.
-export type {
-	CropperControllerState,
-	NormalizedPoint,
-	NormalizedRect,
-	Size,
-	Flip,
-	StencilProps,
-	HandlePosition,
-} from './core';
-
-// Where the crop lands in the source image, and export in the browser.
-export {
-	ORIGINAL_ASPECT_RATIO,
-	getSourceRegion,
-	getSourceRegionPercent,
-	exportCroppedImage,
-} from './core';
-export type {
-	AspectRatioPreset,
-	SourceRegion,
-	SourceRegionPercent,
-} from './core';
-export { DEFAULT_ASPECT_RATIOS } from './state/aspect-ratio-presets';
+// Aspect-ratio presets.
+export { DEFAULT_ASPECT_RATIOS } from './presets/aspect-ratio-presets';
+export { resolveAspectRatio } from './presets/resolve-aspect-ratio';
+export type { AspectRatioPreset } from './core';
 
 // Limits for building your own zoom and rotation controls.
 export { MAX_ZOOM, MAX_ROTATION_OFFSET } from './core/constants';
@@ -42,22 +25,6 @@ export { getMinZoom } from './core/containment';
 // expects.
 export { buildModifiers } from './build-modifiers';
 export type { Modifier } from './build-modifiers';
-
-// A crop session: undo and redo, gestures, and aspect-ratio presets that
-// reshape the crop in one step. A wider state can share its history.
-export { useCropSession } from './state/use-crop-session';
-export type { CropSession, CropSessionOptions } from './state/use-crop-session';
-export {
-	cropSessionReducer,
-	areCropSessionStatesEqual,
-	buildInitialCropSessionState,
-} from './state/reducer';
-export { resolveAspectRatio } from './state/resolve-aspect-ratio';
-export type {
-	CropOptions,
-	CropSessionAction,
-	CropSessionState,
-} from './state/types';
 
 // Deprecated: the `react-easy-crop` based cropper. Everything it needs lives
 // in `./legacy`, so removing that folder and these exports removes it.
@@ -70,6 +37,7 @@ export type {
 	Point,
 	Area,
 	MediaSize,
+	Flip,
 	ImageCropperState,
 	CropperState,
 	ImageCropperProps,

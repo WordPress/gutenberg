@@ -1,20 +1,23 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
-	cropSessionReducer,
-	areCropSessionStatesEqual,
-	buildInitialCropSessionState,
+	areCropperStatesEqual,
+	createCropperState,
 	type CropperControllerState,
 } from '@wordpress/image-cropper';
-import type { MediaEditorAction, MediaEditorState } from './types';
+import {
+	DEFAULT_CROP_OPTIONS,
+	type MediaEditorAction,
+	type MediaEditorState,
+} from './types';
 
 /**
  * Pure reducer for the media editor.
  *
- * Owns the named edits and passes every other action to the crop
- * session reducer from `@wordpress/image-cropper`. `RESET` also clears
- * the edits, so it stays one undo entry.
+ * The cropper works out its own next state (through the controller from
+ * `@wordpress/image-cropper`) and this reducer stores it. The reducer
+ * also owns the sidebar crop options and the named edits.
  *
- * This reducer keeps no history; `useCropSession` does.
+ * This reducer keeps no history; `useMediaEditorState` does.
  *
  * @param state  Current state.
  * @param action Action to apply.
@@ -25,6 +28,20 @@ export function mediaEditorReducer(
 	action: MediaEditorAction
 ): MediaEditorState {
 	switch ( action.type ) {
+		case 'SET_CROPPER':
+			return action.payload === state.cropper
+				? state
+				: { ...state, cropper: action.payload };
+		case 'SET_ASPECT_RATIO_VALUE':
+			return state.cropOptions.aspectRatioValue === action.payload
+				? state
+				: {
+						...state,
+						cropOptions: {
+							...state.cropOptions,
+							aspectRatioValue: action.payload,
+						},
+					};
 		case 'SET_EDIT': {
 			const { name, value } = action.payload;
 			if ( value === undefined ) {
@@ -41,14 +58,13 @@ export function mediaEditorReducer(
 			return { ...state, edits: { ...state.edits, [ name ]: value } };
 		}
 		case 'RESET': {
-			const next = cropSessionReducer( state, action );
-			if ( Object.keys( state.edits ).length === 0 ) {
-				return next;
-			}
-			return { ...next, edits: {} };
+			const next = buildInitialMediaEditorState(
+				createCropperState( state.cropper.image )
+			);
+			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}
-		default:
-			return cropSessionReducer( state, action );
+		case 'RESTORE_SNAPSHOT':
+			return action.payload;
 	}
 }
 
@@ -68,7 +84,9 @@ export function areMediaEditorStatesEqual(
 		return true;
 	}
 	return (
-		areCropSessionStatesEqual( a, b ) && fastDeepEqual( a.edits, b.edits )
+		areCropperStatesEqual( a.cropper, b.cropper ) &&
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
+		fastDeepEqual( a.edits, b.edits )
 	);
 }
 
@@ -82,5 +100,9 @@ export function areMediaEditorStatesEqual(
 export function buildInitialMediaEditorState(
 	cropper: CropperControllerState
 ): MediaEditorState {
-	return { ...buildInitialCropSessionState( cropper ), edits: {} };
+	return {
+		cropper,
+		cropOptions: { ...DEFAULT_CROP_OPTIONS },
+		edits: {},
+	};
 }

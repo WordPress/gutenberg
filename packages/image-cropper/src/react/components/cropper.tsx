@@ -11,12 +11,7 @@ import {
 	flushSync,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type {
-	HandlePosition,
-	StencilProps,
-	Size,
-	NormalizedRect,
-} from '../../core/types';
+import type { HandlePosition, Size, NormalizedRect } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-controller';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
@@ -68,8 +63,6 @@ export interface CropperProps {
 	src: string;
 	/** The cropper controller from `useCropperController` or a composite store. */
 	controller: CropperController;
-	/** Stencil component for the crop area. Defaults to RectangleStencil. */
-	stencil?: React.ComponentType< StencilProps >;
 	/** Show the rule-of-thirds grid overlay, or only during interactions. */
 	showGrid?: boolean | 'interactive';
 	/** Whether external placement activity should keep the grid visible. */
@@ -122,7 +115,6 @@ export interface CropperProps {
  * @param root0                   Component props implementing CropperProps.
  * @param root0.src               Image source URL.
  * @param root0.controller        The cropper controller from `useCropperController` or a composite store.
- * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
@@ -143,7 +135,6 @@ function CropperInner(
 	{
 		src,
 		controller,
-		stencil: StencilComponent = RectangleStencil,
 		showGrid = false,
 		isPlacementActive = false,
 		showDimming = true,
@@ -1005,7 +996,7 @@ function CropperInner(
 					) }
 
 					{ /* The stencil (crop area with handles) */ }
-					<StencilComponent
+					<RectangleStencil
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
 						imageSize={ scaledVisualSize }

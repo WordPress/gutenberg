@@ -6,11 +6,11 @@
 | --- | --- | --- |
 | Core cropper | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React cropper | `src/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperController` hook. |
-| Crop session | `src/state/` | `useCropSession`: undo and redo, gesture boundaries, crop options and the default aspect-ratio presets. |
+| Presets | `src/presets/` | The default aspect-ratio presets and `resolveAspectRatio`. |
 | Server instructions | `src/build-modifiers.ts` | Turns the crop into the rotate, flip and crop instructions the WordPress media REST endpoint expects. |
 | Deprecated cropper | `src/legacy/` | The older cropper built on `react-easy-crop`. Nothing outside this folder imports it. |
 
-`useCropperController` has no undo and redo. `useCropSession` adds them: the cropper state and crop options go through one reducer and one history stack, so a control such as the aspect-ratio preset and a crop gesture share one undo stack. A wider state can join the same history by passing its own reducer, which handles its own actions and passes the rest to `cropSessionReducer`. The media editor does this for its named edits.
+The cropper keeps no undo history. History belongs to the code that uses the cropper, because it covers everything that code edits, not only the crop. To put the crop in an undo history, keep the cropper state yourself: `useCropperController( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 
 ## Coordinate Spaces
 
@@ -37,7 +37,7 @@ The render path uses focused calculations for CSS transforms, stencil placement,
 
 ### State
 
-The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. `useCropSession` adds undo and redo on top. Saving and editor UI state belong to the code that uses the cropper.
+The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. Undo and redo, saving, and editor UI state belong to the code that uses the cropper.
 
 ### Viewport
 
@@ -47,7 +47,6 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 
 | Task | API |
 | --- | --- |
-| Alternate crop area shape | `stencil` prop implementing `StencilProps`. |
-| Crop data for REST requests | `getSourceRegion()`, `getSourceRegionPercent()` and `buildModifiers()`. |
-| Export in the browser | `controller.getCroppedImage()` or `exportCroppedImage()`. |
-| Shared cropper state across components | `CropperProvider` / `useCropper()`. |
+| Crop data for REST requests | `buildModifiers()`. |
+| Export in the browser | `controller.getCroppedImage()`. |
+| Keep the crop in your own undo history | `useCropperController( { state, onChange } )`, `createCropperState()` and `areCropperStatesEqual()`. |
