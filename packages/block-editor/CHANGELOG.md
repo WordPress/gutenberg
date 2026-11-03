@@ -6,6 +6,10 @@
 
 - `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 
+### New Features
+
+-   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Enhancements
 
 -   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).

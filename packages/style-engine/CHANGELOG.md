@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

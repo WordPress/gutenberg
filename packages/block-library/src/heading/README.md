@@ -40,7 +40,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `minHeight`: `true`
   - `minWidth`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- `transform`:
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
   - `rotate`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
