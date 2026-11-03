@@ -130,8 +130,8 @@ function gutenberg_register_packages_styles( $styles ) {
 	$components_style->deps[] = 'dashicons';
 	$components_style->deps[] = 'wp-theme';
 
-	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
-	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
+	// wp-edit-post: add block editor styles for the UI outside the canvas
+	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-block-library-editor';
 
 	// wp-edit-site: add core WP styles and custom handles
 	$edit_site_style         = $styles->query( 'wp-edit-site', 'registered' );
