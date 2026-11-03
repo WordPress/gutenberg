@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getFreeGridDropTarget,
 	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
@@ -206,5 +207,134 @@ describe( 'getGrabPoint()', () => {
 				isHandleDrag: true,
 			} )
 		).toEqual( {} );
+	} );
+} );
+
+describe( 'getFreeGridDropTarget', () => {
+	// Four 100px columns and rows, with 10px gaps: the grid ends at 430.
+	const freeColumnTracks = getGridTracks( '100px 100px 100px 100px', 10 );
+	const freeRowTracks = getGridTracks( '100px 100px 100px 100px', 10 );
+	const options = {
+		columnTracks: freeColumnTracks,
+		rowTracks: freeRowTracks,
+		width: 100,
+		height: 80,
+		grabX: 50,
+		grabY: 40,
+	};
+
+	it( 'drops at the exact point without Shift', () => {
+		const { placement, pixelRect } = getFreeGridDropTarget( {
+			...options,
+			x: 160,
+			y: 60,
+		} );
+		expect( pixelRect ).toEqual( {
+			left: 110,
+			top: 20,
+			right: 210,
+			bottom: 100,
+		} );
+		expect( placement ).toEqual( {
+			columnStart: 2,
+			columnSpan: 1,
+			rowStart: 1,
+			rowSpan: 1,
+			box: { left: 0, top: 0.2, width: 1, height: 0.8 },
+		} );
+	} );
+
+	it( 'snaps the corner and keeps the size with Shift', () => {
+		const { placement, pixelRect } = getFreeGridDropTarget( {
+			...options,
+			x: 160,
+			y: 60,
+			snap: true,
+		} );
+		expect( pixelRect ).toEqual( {
+			left: 110,
+			top: 0,
+			right: 210,
+			bottom: 80,
+		} );
+		expect( placement.box ).toEqual( {
+			left: 0,
+			top: 0,
+			width: 1,
+			height: 0.8,
+		} );
+	} );
+
+	it( 'returns cells without a box when the block fills them', () => {
+		expect(
+			getFreeGridDropTarget( {
+				...options,
+				height: 100,
+				grabY: 50,
+				x: 160,
+				y: 160,
+				snap: true,
+			} ).placement
+		).toEqual( { columnStart: 2, columnSpan: 1, rowStart: 2, rowSpan: 1 } );
+	} );
+
+	it( 'stays inside the grid', () => {
+		const { pixelRect } = getFreeGridDropTarget( {
+			...options,
+			x: 1000,
+			y: -50,
+		} );
+		expect( pixelRect.right ).toBe( 430 );
+		expect( pixelRect.top ).toBe( 0 );
+	} );
+
+	it( 'block from outside uses span size', () => {
+		const { pixelRect } = getFreeGridDropTarget( {
+			columnTracks: freeColumnTracks,
+			rowTracks: freeRowTracks,
+			columnSpan: 2,
+			x: 215,
+			y: 50,
+		} );
+		expect( pixelRect ).toEqual( {
+			left: 110,
+			top: 0,
+			right: 320,
+			bottom: 100,
+		} );
+	} );
+
+	it( 'clamps a rotated block by its outline', () => {
+		// A 100×20 block rotated 90° reaches 40px above and below its box.
+		const { pixelRect } = getFreeGridDropTarget( {
+			columnTracks: freeColumnTracks,
+			rowTracks: freeRowTracks,
+			width: 100,
+			height: 20,
+			grabX: 50,
+			grabY: 10,
+			angle: 90,
+			x: 50,
+			y: 10,
+		} );
+		expect( pixelRect.top ).toBeCloseTo( 40 );
+	} );
+
+	it( 'keeps a rotated block inside the grid without its rotation too', () => {
+		// A 300×100 block rotated 90° at the left edge would need to start
+		// before the grid for its outline to touch the edge.
+		const { pixelRect, placement } = getFreeGridDropTarget( {
+			columnTracks: freeColumnTracks,
+			rowTracks: freeRowTracks,
+			width: 300,
+			height: 100,
+			grabX: 150,
+			grabY: 50,
+			angle: 90,
+			x: 0,
+			y: 200,
+		} );
+		expect( pixelRect.left ).toBeGreaterThanOrEqual( 0 );
+		expect( placement.box?.left ?? 0 ).toBeGreaterThanOrEqual( 0 );
 	} );
 } );

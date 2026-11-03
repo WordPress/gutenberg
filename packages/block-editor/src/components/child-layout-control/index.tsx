@@ -17,6 +17,9 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
+import { getGridItemBox } from '../grid/free-placement';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import type { GridItemAttributes } from '../grid/types';
 import type {
 	ChildLayout,
 	ChildLayoutControlProps,
@@ -283,9 +286,41 @@ function GridControls( {
 				: null,
 		[ rootClientId ]
 	);
+	// In a viewport state, the control shows that viewport's own layout. A
+	// block placed freely keeps the box of the place it has there, which can
+	// be its default place.
+	const defaultPlaceBox = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSelectedBlockStyleState } =
+				select( blockEditorStore );
+			if (
+				// The viewport is the same for every block.
+				! hasViewportBlockStyleState(
+					getSelectedBlockStyleState( panelId )
+				)
+			) {
+				return undefined;
+			}
+			return getGridItemBox(
+				// The block's style attribute is an object when set.
+				( getBlockAttributes( panelId ) as GridItemAttributes | null )
+					?.style?.layout,
+				childLayout
+			);
+		},
+		[ panelId, childLayout ]
+	);
 	const isStackedOnMobile = !! stackedLayouts;
-	const { columnStart, rowStart, columnSpan, rowSpan } =
-		stackedLayouts?.children[ panelId ] ?? childLayout;
+	// A block placed freely in a manual grid has a box inside its cells.
+	// Moving it by whole cells keeps its box, so it keeps its shape, while
+	// typing a span snaps it to the cells, so its box goes.
+	const {
+		columnStart,
+		rowStart,
+		columnSpan,
+		rowSpan,
+		box = defaultPlaceBox,
+	} = stackedLayouts?.children[ panelId ] ?? childLayout;
 	const { columnCount, rowCount } = {
 		...parentLayout,
 		...stackedLayouts?.grid,
@@ -306,12 +341,14 @@ function GridControls( {
 		onChangeLayout( {
 			columnStart: undefined,
 			rowStart: undefined,
+			box: undefined,
 		} );
 	};
 	const resetGridSpans = () => {
 		onChangeLayout( {
 			columnSpan: undefined,
 			rowSpan: undefined,
+			box: undefined,
 		} );
 	};
 
@@ -359,6 +396,7 @@ function GridControls( {
 								rowStart,
 								rowSpan,
 								columnSpan: constrainedValue,
+								box: undefined,
 							} );
 						} }
 						// The input renders the number as is.
@@ -386,6 +424,7 @@ function GridControls( {
 								rowStart,
 								columnSpan,
 								rowSpan: constrainedValue,
+								box: undefined,
 							} );
 						} }
 						// The input renders the number as is.
@@ -424,6 +463,7 @@ function GridControls( {
 									rowStart,
 									columnSpan,
 									rowSpan,
+									box,
 								} );
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
@@ -463,6 +503,7 @@ function GridControls( {
 									rowStart: newRowStart,
 									columnSpan,
 									rowSpan,
+									box,
 								} );
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
