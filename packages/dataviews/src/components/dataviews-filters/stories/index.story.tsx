@@ -109,13 +109,18 @@ const fields: Field< Item >[] = [
 		Edit: FixedWidthEdit,
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
-	// A field with elements gets a list popover, which keeps the default width.
+	// A field with elements gets a list popover, which keeps the default width:
+	// a long element label is truncated, with the full label in a tooltip.
 	{
 		id: 'elements',
 		label: 'Elements',
 		elements: [
 			{ value: 'published', label: 'Published' },
 			{ value: 'draft', label: 'Draft' },
+			{
+				value: 'pending',
+				label: 'Pending review by an editor before it can be published on the site',
+			},
 		],
 		filterBy: { isPrimary: true },
 	},
