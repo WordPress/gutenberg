@@ -256,6 +256,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	rotate: {
+		value: [ 'transform', 'rotate' ],
+		support: [ 'transform', 'rotate' ],
+		useEngine: true,
+	},
 	textAlign: {
 		value: [ 'typography', 'textAlign' ],
 		support: [ 'typography', 'textAlign' ],

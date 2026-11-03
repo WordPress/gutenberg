@@ -30,6 +30,7 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
+import { TRANSFORM_SUPPORT_KEY, TransformPanel } from './transform';
 import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
@@ -88,6 +89,7 @@ const styleSupportKeys = [
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	SHADOW_SUPPORT_KEY,
+	TRANSFORM_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType: string | BlockType ) =>
@@ -831,6 +833,8 @@ const skipSerializationPathsEdit: Record< string, string[] > = {
 	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		BACKGROUND_SUPPORT_KEY,
 	],
+	// The transform support outputs its own styles.
+	[ TRANSFORM_SUPPORT_KEY ]: [ TRANSFORM_SUPPORT_KEY ],
 };
 
 /**
@@ -855,6 +859,7 @@ const skipSerializationPathsSave: Record< string, string[] > = {
 const skipSerializationPathsSaveChecks: Record< string, boolean > = {
 	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
+	[ TRANSFORM_SUPPORT_KEY ]: true,
 };
 
 /**
@@ -1162,6 +1167,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<TransformPanel { ...passedProps } />
 		</BlockStyleStateProvider>
 	);
 }
