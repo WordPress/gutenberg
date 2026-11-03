@@ -142,6 +142,14 @@ describe( 'theme.json schema', () => {
 			'element',
 			{ elements: { link: { transform: { rotate: '5deg' } } } },
 		],
+		[
+			'element state',
+			{
+				elements: {
+					link: { ':hover': { transform: { rotate: '5deg' } } },
+				},
+			},
+		],
 	] )( 'rejects a rotation in %s styles', ( _, styles ) => {
 		expect( ajv.validate( themeSchema, { version: 3, styles } ) ).toBe(
 			false
