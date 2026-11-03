@@ -2,8 +2,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 export default function CopyContentMenuItem() {

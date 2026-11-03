@@ -383,13 +383,20 @@ function block_core_table_of_contents_render( $attributes, $content, $block = nu
 		return block_core_table_of_contents_add_aria_label( $attributes, $legacy_content );
 	}
 
-	// Outside post content rendering, there is no reliable current post to scan.
-	if ( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) {
-		return block_core_table_of_contents_add_aria_label( $attributes, $content );
+	if ( empty( $block->context['postId'] ) ) {
+		return '';
 	}
 
-	$post = get_post();
-	if ( ! $post ) {
+	// Outside post content, e.g. in a template, `postId` falls back to the
+	// global post. That is only the post being viewed on singular views; on
+	// archives it would be the first post of the list.
+	$is_in_post_content = is_array( $wp_current_filter ) && in_array( 'the_content', $wp_current_filter, true );
+	if ( ! $is_in_post_content && ! is_singular() ) {
+		return '';
+	}
+
+	$post = get_post( $block->context['postId'] );
+	if ( ! $post || post_password_required( $post ) ) {
 		return '';
 	}
 
