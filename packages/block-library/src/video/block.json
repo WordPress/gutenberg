@@ -109,6 +109,9 @@
 		"shadow": {
 			"__experimentalSkipSerialization": true
 		},
+		"transform": {
+			"rotate": true
+		},
 		"dimensions": {
 			"minWidth": true,
 			"minHeight": true,
@@ -118,6 +121,7 @@
 	"selectors": {
 		"dimensions": ".wp-block-video video",
 		"shadow": ".wp-block-video video",
+		"transform": ".wp-block-video video",
 		"filter": {
 			"duotone": ".wp-block-video video"
 		}
