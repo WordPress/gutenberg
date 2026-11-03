@@ -89,7 +89,6 @@
 		}
 	},
 	"supports": {
-		"rotation": true,
 		"anchor": true,
 		"align": true,
 		"filter": {

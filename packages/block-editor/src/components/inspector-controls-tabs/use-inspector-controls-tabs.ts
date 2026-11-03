@@ -45,9 +45,7 @@ export default function useInspectorControlsTabs(
 		dimensions: dimensionsGroup,
 		list: listGroup,
 		position: positionGroup,
-		'position-tools': positionToolsGroup,
 		styles: stylesGroup,
-		transform: transformGroup,
 		typography: typographyGroup,
 		effects: effectsGroup,
 	} = InspectorControlsGroups;
@@ -67,10 +65,8 @@ export default function useInspectorControlsTabs(
 		...( useSlotFills( colorGroup.name ) || [] ),
 		...( useSlotFills( layoutGroup.name ) || [] ),
 		...( useSlotFills( positionGroup.name ) || [] ),
-		...( useSlotFills( positionToolsGroup.name ) || [] ),
 		...( useSlotFills( dimensionsGroup.name ) || [] ),
 		...( useSlotFills( stylesGroup.name ) || [] ),
-		...( useSlotFills( transformGroup.name ) || [] ),
 		...( useSlotFills( typographyGroup.name ) || [] ),
 		...( useSlotFills( effectsGroup.name ) || [] ),
 	];

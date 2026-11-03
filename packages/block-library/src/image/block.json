@@ -112,7 +112,6 @@
 		}
 	},
 	"supports": {
-		"rotation": true,
 		"interactivity": true,
 		"align": [ "left", "center", "right", "wide", "full" ],
 		"anchor": true,

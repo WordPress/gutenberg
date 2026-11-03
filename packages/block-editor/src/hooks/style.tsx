@@ -59,7 +59,6 @@ import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
-import { hasRotateSupport } from './rotation';
 import { unlock } from '../lock-unlock';
 import type {
 	PanelBorderSide,
@@ -783,8 +782,6 @@ export function getCanvasStateStyleValue(
 
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
- * Rotation is stored in it too, so it is added here rather than in the rotate
- * hook, which keeps the attribute in the same place among the others.
  *
  * @param settings Original block settings.
  *
@@ -793,8 +790,7 @@ export function getCanvasStateStyleValue(
 function addAttribute( settings: BlockType ): BlockType {
 	if (
 		! hasStyleSupport( settings ) &&
-		! hasBlockSupport( settings, 'customCSS', true ) &&
-		! hasRotateSupport( settings )
+		! hasBlockSupport( settings, 'customCSS', true )
 	) {
 		return settings;
 	}

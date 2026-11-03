@@ -583,7 +583,7 @@ describe( 'getLayoutStyle in the mobile viewport', () => {
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
-				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }'
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: 0deg !important; }'
 		);
 	} );
 
