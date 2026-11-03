@@ -810,20 +810,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 		BlockListBlock: ComponentType<
 			BlockListBlockHookProps & Record< string, unknown >
 		>
-	) =>
+	) => {
 		function WithLayoutStyles(
 			props: BlockListBlockHookProps & { attributes: LayoutAttributes }
 		) {
 			const { clientId, name, attributes } = props;
-			const blockSupportsLayout = hasLayoutBlockSupport( name );
 			const layoutClasses = useLayoutClasses( attributes, name );
 			const extraProps = useSelect(
 				( select ) => {
-					// The callback returns early to avoid block editor subscription.
-					if ( ! blockSupportsLayout ) {
-						return;
-					}
-
 					const { getSettings, getBlockSettings } = unlock(
 						select( blockEditorStore )
 					);
@@ -873,16 +867,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 							settings?.__experimentalFeatures?.viewport,
 					};
 				},
-				[ blockSupportsLayout, clientId, attributes?.className, name ]
+				[ clientId, attributes?.className, name ]
 			);
 
 			if ( ! extraProps ) {
 				return (
 					<BlockListBlock
 						{ ...props }
-						__unstableLayoutClassNames={
-							blockSupportsLayout ? layoutClasses : undefined
-						}
+						__unstableLayoutClassNames={ layoutClasses }
 					/>
 				);
 			}
@@ -895,7 +887,20 @@ export const withLayoutStyles = createHigherOrderComponent(
 					{ ...extraProps }
 				/>
 			);
-		},
+		}
+
+		return function WithLayoutSupport(
+			props: BlockListBlockHookProps & { attributes: LayoutAttributes }
+		) {
+			// Blocks without layout support skip the layout hooks, which every
+			// block would otherwise mount for nothing.
+			if ( ! hasLayoutBlockSupport( props.name ) ) {
+				return <BlockListBlock { ...props } />;
+			}
+
+			return <WithLayoutStyles { ...props } />;
+		};
+	},
 	'withLayoutStyles'
 );
 

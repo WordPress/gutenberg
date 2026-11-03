@@ -1,6 +1,9 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { PanelBody, useNavigator } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type {
 	GlobalStylesSettings,
@@ -8,6 +11,7 @@ import type {
 } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
 import ElementPreview from './element-preview';
+import ElementBlockOverrides from './element-block-overrides';
 import { useSetting, useStyle, useCanEditCSS } from './hooks';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates } from './utils';
@@ -29,6 +33,7 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 	TypographyPanel: StylesTypographyPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	getBlockTypesForElement,
 } = unlock( blockEditorPrivateApis );
 
 /*
@@ -161,7 +166,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -171,7 +175,6 @@ function ElementStylePanels( {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -180,7 +183,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -189,7 +191,6 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ canEditCSS && ! isRoot && (
@@ -224,6 +225,25 @@ function ScreenElement( {
 	const pseudoStates = useMemo(
 		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
 		[ element, showStateControls ]
+	);
+	const allBlockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+	const elementBlockTypes = useMemo(
+		() =>
+			getBlockTypesForElement( element )
+				.map( ( name: string ) =>
+					allBlockTypes.find(
+						( blockType ) => blockType.name === name
+					)
+				)
+				.filter(
+					(
+						blockType: BlockType | undefined
+					): blockType is BlockType => !! blockType
+				),
+		[ element, allBlockTypes ]
 	);
 	const state =
 		selectedPseudoState === 'default' ? undefined : selectedPseudoState;
@@ -270,6 +290,10 @@ function ScreenElement( {
 				style={ style }
 				inheritedStyle={ inheritedStyle }
 				setStyle={ setStyle }
+			/>
+			<ElementBlockOverrides
+				element={ element }
+				blockTypes={ elementBlockTypes }
 			/>
 		</>
 	);

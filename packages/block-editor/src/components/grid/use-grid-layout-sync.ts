@@ -117,6 +117,9 @@ export function useGridLayoutSync( {
 		const updates: Record< string, Record< string, unknown > > = {};
 
 		if ( gridLayout.isManualPlacement ) {
+			// Manual grids need explicit counts; variations may not define them.
+			const columnCount = gridLayout.columnCount ?? 3;
+			const rowCount = gridLayout.rowCount ?? 3;
 			const occupiedRects: GridRect[] = [];
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
@@ -158,8 +161,7 @@ export function useGridLayoutSync( {
 						attributes.style?.layout ?? {};
 					const [ newColumnStart, newRowStart ] = placeBlock(
 						occupiedRects,
-						// A manual grid has a column count.
-						gridLayout.columnCount!,
+						columnCount,
 						columnSpan,
 						rowSpan,
 						previouslySelectedBlockRect?.columnEnd,
@@ -190,9 +192,12 @@ export function useGridLayoutSync( {
 					rowTracks,
 				}: { columnTracks?: GridTrack[]; rowTracks?: GridTrack[] } =
 					gridElement ? getGridTrackPositions( gridElement ) : {};
-				const columnCount =
-					gridLayout.columnCount || columnTracks?.length || 1;
-				const rowCount = gridLayout.rowCount || rowTracks?.length || 1;
+				const placementColumnCount =
+					gridLayout.columnCount ||
+					columnTracks?.length ||
+					columnCount;
+				const placementRowCount =
+					gridLayout.rowCount || rowTracks?.length || rowCount;
 				const size = getInsertionSize( { columnTracks, rowTracks } );
 
 				// The block that was selected, if it is in the grid, is where
@@ -306,12 +311,12 @@ export function useGridLayoutSync( {
 						size: {
 							columnSpan: Math.min(
 								layout.columnSpan ?? defaultSize.columnSpan,
-								columnCount
+								placementColumnCount
 							),
 							rowSpan: layout.rowSpan ?? defaultSize.rowSpan,
 						},
-						columnCount,
-						rowCount,
+						columnCount: placementColumnCount,
+						rowCount: placementRowCount,
 						occupiedRects,
 						reference,
 					} );
@@ -363,14 +368,16 @@ export function useGridLayoutSync( {
 			const bottomMostRow = Math.max(
 				...occupiedRects.map( ( r ) => r.rowEnd )
 			);
+			const newRowCount = Math.max( rowCount, bottomMostRow );
 			if (
-				! gridLayout.rowCount ||
-				gridLayout.rowCount < bottomMostRow
+				gridLayout.columnCount !== columnCount ||
+				gridLayout.rowCount !== newRowCount
 			) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,
-						rowCount: bottomMostRow,
+						columnCount,
+						rowCount: newRowCount,
 					},
 				};
 			}

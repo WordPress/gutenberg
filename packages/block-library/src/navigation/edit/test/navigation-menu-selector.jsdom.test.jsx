@@ -309,12 +309,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				// Simulate the menu being created and component being re-rendered.
-				rerender(
-					<NavigationMenuSelector
-						onCreateNew={ handler }
-						createNavigationMenuIsSuccess
-					/>
-				);
+				rerender( <NavigationMenuSelector onCreateNew={ handler } /> );
 
 				// Check the button is enabled again.
 				expect(
@@ -637,11 +632,7 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				// Simulate the menu being created and component being re-rendered.
-				rerender(
-					<NavigationMenuSelector
-						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
-					/>
-				);
+				rerender( <NavigationMenuSelector /> );
 
 				// Todo: fix bug where aria label is not updated.
 				// expect(
