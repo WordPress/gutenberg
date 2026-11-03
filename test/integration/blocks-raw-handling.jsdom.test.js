@@ -215,6 +215,16 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should keep the value of list items', () => {
+		const [ block ] = rawHandler( {
+			HTML: '<ol><li value="5">Five</li><li value="8">Eight</li></ol>',
+		} );
+
+		expect(
+			block.innerBlocks.map( ( { attributes } ) => attributes.value )
+		).toEqual( [ '5', '8' ] );
+	} );
+
 	it( 'should parse bulleted list', () => {
 		const filtered = pasteHandler( {
 			HTML: '• one<br>• two<br>• three',

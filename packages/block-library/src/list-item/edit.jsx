@@ -3,10 +3,15 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	BlockControls,
+	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarButton,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import {
 	formatOutdent,
 	formatOutdentRTL,
@@ -16,6 +21,8 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { InputControl } from '@wordpress/ui';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useEnter, useTab, useMultiSelectTab, useMerge } from './hooks';
 import {
 	indentListItems,
@@ -23,6 +30,10 @@ import {
 	getIndentTarget,
 	getOutdentTarget,
 } from './utils';
+
+// A number input also accepts these characters, none of which belong in a
+// whole number.
+const BLOCKED_KEYS = [ 'e', 'E', '+', '.', ',' ];
 
 export function IndentUI( { clientId } ) {
 	const registry = useRegistry();
@@ -65,8 +76,18 @@ export default function ListItemEdit( {
 	clientId,
 	mergeBlocks,
 } ) {
-	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps();
+	const { placeholder, content, value } = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const isOrdered = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockAttributes } =
+				select( blockEditorStore );
+			return !! getBlockAttributes( getBlockRootClientId( clientId ) )
+				?.ordered;
+		},
+		[ clientId ]
+	);
+	const blockProps = useBlockProps( { value: value || undefined } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
@@ -99,6 +120,62 @@ export default function ListItemEdit( {
 			<BlockControls group="block">
 				<IndentUI clientId={ clientId } />
 			</BlockControls>
+			{ isOrdered && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => setAttributes( { value: undefined } ) }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							label={ __( 'Custom number' ) }
+							isShownByDefault
+							hasValue={ () => !! value }
+							onDeselect={ () =>
+								setAttributes( { value: undefined } )
+							}
+						>
+							<InputControl
+								label={ __( 'Custom number' ) }
+								description={ __(
+									'The following items continue counting from here.'
+								) }
+								type="number"
+								step={ 1 }
+								value={ value ?? '' }
+								onKeyDown={ ( event ) => {
+									if ( BLOCKED_KEYS.includes( event.key ) ) {
+										event.preventDefault();
+									}
+								} }
+								onBlur={ ( event ) => {
+									if ( event.target.validity.badInput ) {
+										event.target.value = '';
+									}
+								} }
+								onValueChange={ ( nextValue ) => {
+									// Clearing the field unsets the value.
+									if ( nextValue === '' ) {
+										setAttributes( { value: undefined } );
+										return;
+									}
+									// Ignore anything that is not a whole number.
+									// Comparing with the number's own string form also
+									// rejects input like "1e3" and "05" that would
+									// otherwise parse as whole numbers.
+									const number = Number( nextValue );
+									if (
+										Number.isInteger( number ) &&
+										String( number ) === nextValue
+									) {
+										setAttributes( { value: nextValue } );
+									}
+								} }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 		</>
 	);
 }
