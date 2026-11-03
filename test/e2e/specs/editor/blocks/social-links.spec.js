@@ -1,8 +1,14 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Social Icons', () => {
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test( 'manages focus when the canvas popover closes', async ( {
+		editor,
+		page,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/social-links',
 			innerBlocks: [
@@ -15,46 +21,33 @@ test.describe( 'Social Icons', () => {
 				},
 			],
 		} );
-	} );
-
-	test( 'keeps focus in the inspector when the canvas popover closes', async ( {
-		editor,
-		page,
-	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas
-			.getByRole( 'button', { name: 'WordPress' } )
-			.click();
-		await expect(
-			page.getByRole( 'combobox', { name: 'Enter social link' } )
-		).toBeVisible();
-
-		// Clicking a field in the inspector closes the popover, but keeps focus.
-		const textInput = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'textbox', { name: 'Text' } );
-		await textInput.click();
-
-		await expect(
-			page.getByRole( 'combobox', { name: 'Enter social link' } )
-		).toBeHidden();
-		await expect( textInput ).toBeFocused();
-	} );
-
-	test( 'returns focus to the icon when the canvas popover is closed with Escape', async ( {
-		editor,
-		page,
-	} ) => {
 		const icon = editor.canvas.getByRole( 'button', { name: 'WordPress' } );
-		await icon.click();
 		const urlInput = page.getByRole( 'combobox', {
 			name: 'Enter social link',
 		} );
-		await expect( urlInput ).toBeFocused();
 
-		await page.keyboard.press( 'Escape' );
+		await test.step( 'returns focus to the icon when closed with Escape', async () => {
+			await icon.click();
+			await expect( urlInput ).toBeFocused();
 
-		await expect( urlInput ).toBeHidden();
-		await expect( icon ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+
+			await expect( urlInput ).toBeHidden();
+			await expect( icon ).toBeFocused();
+		} );
+
+		await test.step( 'keeps focus in the inspector when closed by clicking a field there', async () => {
+			await icon.click();
+			await expect( urlInput ).toBeFocused();
+
+			const textInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } );
+			await textInput.click();
+
+			await expect( urlInput ).toBeHidden();
+			await expect( textInput ).toBeFocused();
+		} );
 	} );
 } );
