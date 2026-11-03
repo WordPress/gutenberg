@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `prependHTTP`, `prependHTTPS`: Don't prepend a protocol to a URL whose scheme contains digits, `+` or `-`, such as `chrome-extension://` or `web+demo://` ([#85515](https://github.com/WordPress/gutenberg/pull/85515)).
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes
