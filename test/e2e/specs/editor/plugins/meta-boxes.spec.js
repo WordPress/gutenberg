@@ -45,11 +45,10 @@ test.describe( 'Meta boxes', () => {
 			.click();
 		await page.keyboard.type( 'canvas text' );
 
-		// Click near the label, away from the resize handle overlaying the
-		// center of the toggle.
-		await page
-			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
-			.click( { position: { x: 40, y: 10 } } );
+		// The meta box pane is open by default.
+		await expect(
+			page.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+		).toHaveAttribute( 'aria-expanded', 'true' );
 		const field = page.getByRole( 'textbox', {
 			name: 'Test meta box field',
 		} );
