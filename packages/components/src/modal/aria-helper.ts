@@ -6,7 +6,8 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-const hiddenElementsByDepth: Element[][] = [];
+const modalElements: Element[] = [];
+const hiddenElements = new Set< Element >();
 
 /**
  * Hides all elements in the body element from screen-readers except
@@ -20,18 +21,16 @@ const hiddenElementsByDepth: Element[][] = [];
  *
  * @param modalElement The element that should not be hidden.
  */
-export function modalize( modalElement?: HTMLDivElement ) {
-	const elements = Array.from( document.body.children );
-	const hiddenElements: Element[] = [];
-	hiddenElementsByDepth.push( hiddenElements );
-	for ( const element of elements ) {
-		if ( element === modalElement ) {
-			continue;
-		}
-
-		if ( elementShouldBeHidden( element ) ) {
+export function modalize( modalElement: HTMLDivElement ) {
+	modalElements.push( modalElement );
+	// A modal opened in the same commit may have hidden this one.
+	if ( hiddenElements.delete( modalElement ) ) {
+		modalElement.removeAttribute( 'aria-hidden' );
+	}
+	for ( const element of Array.from( document.body.children ) ) {
+		if ( element !== modalElement && elementShouldBeHidden( element ) ) {
 			element.setAttribute( 'aria-hidden', 'true' );
-			hiddenElements.push( element );
+			hiddenElements.add( element );
 		}
 	}
 }
@@ -55,15 +54,18 @@ export function elementShouldBeHidden( element: Element ) {
 }
 
 /**
- * Accessibly reveals the elements hidden by the latest modal.
+ * Accessibly reveals the topmost remaining modal, or all hidden elements once
+ * the last modal closes.
+ *
+ * @param modalElement The element of the closing modal.
  */
-export function unmodalize() {
-	const hiddenElements = hiddenElementsByDepth.pop();
-	if ( ! hiddenElements ) {
-		return;
-	}
-
+export function unmodalize( modalElement: HTMLDivElement ) {
+	modalElements.splice( modalElements.indexOf( modalElement ), 1 );
+	const topModalElement = modalElements[ modalElements.length - 1 ];
 	for ( const element of hiddenElements ) {
-		element.removeAttribute( 'aria-hidden' );
+		if ( ! topModalElement || element === topModalElement ) {
+			element.removeAttribute( 'aria-hidden' );
+			hiddenElements.delete( element );
+		}
 	}
 }

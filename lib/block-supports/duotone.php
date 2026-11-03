@@ -80,7 +80,7 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
 	$n = min( $max, max( 0, (float) $n ) );
 
 	// Automatically convert percentage into number.
-	// @phpstan-ignore identical.alwaysFalse, booleanAnd.alwaysFalse ($n was already cast to a number, so percentages are never converted as in TinyColor. Not fixed since the function is deprecated.)
+	// Since $n was already cast to a number, percentages are never converted as in TinyColor. Not fixed since the function is deprecated.
 	if ( 'string' === gettype( $n ) && str_contains( $n, '%' ) ) {
 		$n = (int) ( $n * $max ) / 100;
 	}
@@ -187,7 +187,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	$s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
 	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
 
-	// @phpstan-ignore identical.alwaysFalse (The saturation is a float, so this is never true, but the formula below yields the same gray when it is 0. Not fixed since the function is deprecated.)
+	// The saturation is a float, so this is never true, but the formula below yields the same gray when it is 0. Not fixed since the function is deprecated.
 	if ( 0 === $s ) {
 		// Achromatic.
 		$r = $l;

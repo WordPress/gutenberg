@@ -29,7 +29,7 @@ How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) 
 
 ### Discovery
 
-`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
+`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module when it declares one (a record without one resolves from its own fields), and returns:
 
 -   `WidgetType[]`
 -   `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
@@ -50,9 +50,13 @@ See **Field Types** for the full pipeline.
 
 See **Widget Host** for the contract.
 
+### Widget identity
+
+`useWidgetIdentity()` is how a render reads the type's identity consistently — today the translated `title`. `<WidgetRender />` provides it from the `widgetType` it already holds. See **Widget Identity**.
+
 ### Rendering
 
-`<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract.
+`<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. It also lends the subtree the type's identity for `useWidgetIdentity`.
 
 Error handling and chrome stay with the host. Because the module is mounted lazily, the host must wrap it in a Suspense boundary.
 
