@@ -2347,6 +2347,53 @@ test.describe( 'Block Notes', () => {
 				.toMatchObject( [ { attributes: { metadata: { noteId } } } ] );
 		} );
 
+		test( 'keeps both block-level and inline notes when blocks are merged', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'two' },
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+
+			await paragraph.last().click();
+			await blockNoteUtils.addNote( 'Block note' );
+			await paragraph.last().click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+			const [ , { attributes } ] = await editor.getBlocks();
+			const { noteId } = attributes.metadata;
+			expect( noteId ).toHaveLength( 2 );
+
+			await paragraph.last().click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'Backspace' );
+
+			await expect( paragraph ).toHaveCount( 1 );
+			await expect( paragraph ).toHaveText( 'Onetwo' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
+				'two'
+			);
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ { attributes: { metadata: { noteId } } } ] );
+			await expect(
+				blockNoteUtils.getThread( 'Block note' )
+			).toBeVisible();
+			await expect(
+				blockNoteUtils.getThread( 'Inline note' )
+			).toBeVisible();
+		} );
+
 		test( 'keeps an inline note when its block is merged into a block of a different type', async ( {
 			editor,
 			page,
