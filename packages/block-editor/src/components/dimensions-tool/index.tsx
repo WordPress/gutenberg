@@ -20,6 +20,8 @@ function DimensionsTool( {
 	scaleOptions, // Default options handled by ScaleTool.
 	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
+	naturalWidth,
+	naturalHeight,
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
 }: DimensionsToolProps ) {
 	// Coerce undefined and CSS default values to be null.
@@ -114,6 +116,8 @@ function DimensionsTool( {
 				<WidthHeightTool
 					panelId={ panelId }
 					units={ unitsOptions }
+					naturalWidth={ naturalWidth }
+					naturalHeight={ naturalHeight }
 					value={ { width, height } }
 					onChange={ ( { width: nextWidth, height: nextHeight } ) => {
 						const nextValue: Dimensions = { ...value };
