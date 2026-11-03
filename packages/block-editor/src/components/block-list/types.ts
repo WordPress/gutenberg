@@ -75,6 +75,8 @@ export interface PrivateBlockContextValue {
 		string,
 		Omit< BlockBindingsSource, 'name' >
 	>;
+	// The values of the block's bound attributes, if it has any.
+	boundAttributes?: Record< string, unknown >;
 	supportsSplitting?: boolean;
 	wrapperProps?: BlockListWrapperProps;
 	isAligned?: boolean;

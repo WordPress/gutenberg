@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo, useRef } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -18,6 +18,7 @@ import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type { ComponentType, ReactNode } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
 import BlockEdit from '../block-edit';
@@ -29,6 +30,13 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import BlockContext from '../block-context';
+import {
+	getBlockBindingsContext,
+	replacePatternOverridesDefaultBinding,
+	selectBoundAttributes,
+} from '../../utils/block-bindings';
+import type { Bindings } from '../../utils/block-bindings';
 import {
 	getAttributeChanges,
 	applyAttributeChanges,
@@ -692,6 +700,10 @@ const FilteredBlockListBlock = compose(
 // component, and useBlockProps.
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	const { clientId, rootClientId, ghostBlock } = props;
+	const blockContext = useContext( BlockContext );
+	const lastBoundAttributesRef = useRef<
+		Record< string, unknown > | undefined
+	>( undefined );
 	// Stable fallback so the selector returns referentially equal values.
 	const ghostBlockWithoutAttributes = useMemo(
 		() =>
@@ -771,7 +783,48 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 			} = settings;
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			const bindings = attributes?.metadata?.bindings as
+				Bindings | undefined;
+			const blockBindingsSources = getAllBlockBindingsSources();
 			const blockVisibility = attributes?.metadata?.blockVisibility;
+			// Only blocks with bindings read their sources, here rather than
+			// in a subscription of their own.
+			let boundAttributes =
+				bindings &&
+				selectBoundAttributes(
+					select,
+					clientId,
+					replacePatternOverridesDefaultBinding(
+						bindings,
+						// Blocks with pattern overrides have bindable
+						// attributes.
+						bindableAttributes as string[]
+					)!,
+					bindableAttributes,
+					blockBindingsSources,
+					getBlockBindingsContext(
+						blockContext,
+						blockType?.usesContext,
+						Object.values( bindings ).map(
+							// An absent source looks up nothing.
+							( binding ) =>
+								blockBindingsSources[
+									binding?.source as string
+								]
+						)
+					)
+				);
+			// Keep the previous values while equal, so the block's attributes
+			// don't change when it re-renders for other reasons.
+			if (
+				isShallowEqual(
+					boundAttributes,
+					lastBoundAttributesRef.current
+				)
+			) {
+				boundAttributes = lastBoundAttributesRef.current;
+			}
+			lastBoundAttributesRef.current = boundAttributes;
 
 			// A missing version compares false.
 			const hasLightBlockWrapper =
@@ -795,11 +848,12 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					: undefined,
 				blockTitle: blockType?.title,
 				bindableAttributes,
-				blockBindingsSources: getAllBlockBindingsSources(),
+				blockBindingsSources,
 				blockVisibility,
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
+				boundAttributes,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -900,7 +954,13 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				),
 			};
 		},
-		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
+		[
+			clientId,
+			rootClientId,
+			ghostBlock,
+			ghostBlockWithoutAttributes,
+			blockContext,
+		]
 	);
 
 	const currentViewport = useContext( CurrentViewport );
@@ -965,6 +1025,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		originalBlockClientId,
 		bindableAttributes,
 		blockBindingsSources,
+		boundAttributes,
 		supportsSplitting,
 	} = selectedProps;
 
@@ -1011,6 +1072,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isBlockCurrentlyHidden,
 		bindableAttributes,
 		blockBindingsSources,
+		boundAttributes,
 		supportsSplitting,
 	};
 
