@@ -26,3 +26,18 @@
 		@include caption-style();
 	}
 }
+
+// In a grid whose cells have a fixed size, the video fills its cell, cropped as
+// needed, below any caption.
+@container style(--wp--style--grid-cells: fixed) {
+	.is-layout-grid > .wp-block-video {
+		display: flex;
+		flex-direction: column;
+
+		> video {
+			flex: 1 1 0;
+			min-height: 0;
+			object-fit: cover;
+		}
+	}
+}

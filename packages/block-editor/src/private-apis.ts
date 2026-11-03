@@ -30,6 +30,7 @@ import {
 	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
+import { useIsInFixedGridCell } from './components/grid';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
 import { usesContextKey } from './components/rich-text/format-edit';
@@ -114,6 +115,7 @@ lock( privateApis, {
 	useLayoutClasses,
 	useLayoutStyles,
 	DimensionsTool,
+	useIsInFixedGridCell,
 	ResolutionTool,
 	TabbedSidebar,
 	TextAlignmentControl,
