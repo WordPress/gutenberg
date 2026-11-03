@@ -8,19 +8,11 @@
  *
  * Note that the generated files are ignored by Git.
  */
-
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { readdir, readFile, writeFile } = require( 'fs' ).promises;
 const { execFile } = require( 'child_process' );
 const { promisify } = require( 'util' );
 const { camelCase } = require( 'change-case' );
-
-/**
- * Internal dependencies
- */
 const { validateCollection } = require( './validate-collection.cjs' );
 
 const execFileAsync = promisify( execFile );
@@ -262,6 +254,24 @@ function svgToTsx( svgContent ) {
 		}
 	);
 
+	// Convert the source convention `style="fill: none"` into JSX style object
+	// syntax. Reject other inline styles so this targeted conversion cannot
+	// silently generate an incomplete JSX style object.
+	const openingTagWithStyleRe =
+		/(<[A-Za-z][\w:-]*\b(?:[^>"']|"[^"]*"|'[^']*')*?)\sstyle=(["'])(.*?)\2/gs;
+	jsxContent = jsxContent.replace(
+		openingTagWithStyleRe,
+		( _, openingTag, _quote, cssString ) => {
+			if ( ! /^fill\s*:\s*none\s*;?$/.test( cssString.trim() ) ) {
+				throw new Error(
+					`Unsupported inline SVG style: "${ cssString }". Only "fill: none" is supported.`
+				);
+			}
+
+			return `${ openingTag } style={ { fill: "none" } }`;
+		}
+	);
+
 	// Tags that ought to be converted to WordPress primitives when converting
 	// SVGs to React elements
 	const primitives = {
@@ -306,10 +316,7 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/**
- * WordPress dependencies
- */
-import { ${ Array.from( usedPrimitives )
+	return `import { ${ Array.from( usedPrimitives )
 		.sort()
 		.join( ', ' ) } } from '@wordpress/primitives';
 
@@ -325,4 +332,5 @@ if ( module === require.main ) {
 
 module.exports = {
 	generateTsxFiles,
+	svgToTsx,
 };

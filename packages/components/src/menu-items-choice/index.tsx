@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import MenuItem from '../menu-item';
 import type { MenuItemsChoiceProps } from './types';
 

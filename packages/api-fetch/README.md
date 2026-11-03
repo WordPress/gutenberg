@@ -58,7 +58,7 @@ Shorthand to be used in place of `url`, appended to the REST API root URL for th
 
 #### `url` (`string`)
 
-Absolute URL to the endpoint from which to fetch.
+Absolute URL to the endpoint from which to fetch. The request still goes through the registered middlewares, so see [Requests to other sites](#requests-to-other-sites) before pointing it at another site.
 
 #### `parse` (`boolean`, default `true`)
 
@@ -67,6 +67,29 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 #### `data` (`object`)
 
 Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+
+### Requests to other sites
+
+`apiFetch` is meant for the REST API of the WordPress site the script runs on. Whenever WordPress loads the package it registers the root URL and nonce middlewares, so with the default fetch handler every request, including one made with a full `url`, is sent with the current user's `X-WP-Nonce` header and with cookies (`credentials: 'include'`). A WordPress site on another origin cannot validate that nonce and rejects the request with a `403` `rest_cookie_invalid_nonce` error, even for public endpoints, and other origins may refuse a credentialed cross-origin request altogether.
+
+Use `window.fetch` for requests to other sites, or make them from the server. A browser request to another site still needs that site to allow the cross-origin request; a WordPress site does so through the CORS headers its REST API sends by default.
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+// Same site: goes through the middlewares.
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
+	console.log( posts );
+} );
+
+// Another site: use fetch directly.
+window
+	.fetch( 'https://example.com/wp-json/wp/v2/posts' )
+	.then( ( response ) => response.json() )
+	.then( ( posts ) => {
+		console.log( posts );
+	} );
+```
 
 ### Aborting a request
 
@@ -115,6 +138,19 @@ apiFetch.use( ( options, next ) => {
 } );
 ```
 
+### Removing middlewares
+
+`apiFetch.unregister` removes a middleware by reference, and returns whether it was registered. Built-in middlewares can be removed too, as long as they are exposed on `apiFetch`.
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+// Send `DELETE` as `DELETE`, rather than as a `POST` carrying an `X-HTTP-Method-Override` header.
+apiFetch.unregister( apiFetch.httpV1Middleware );
+```
+
+Removal is global. Every `apiFetch` call on the page loses the middleware, so only remove a middleware you registered yourself, or a built-in whose behavior the whole page can do without. `httpV1Middleware` in particular exists so that requests keep working on servers and firewalls that reject `PATCH`, `PUT` and `DELETE`; removing it can break saving on those sites.
+
 ### Built-in middlewares
 
 The `api-fetch` package provides built-in middlewares you can use to provide a `nonce` and a custom `rootURL`.
@@ -160,6 +196,12 @@ apiFetch.setFetchHandler( ( options ) => {
 		data,
 	} );
 } );
+```
+
+The default handler remains available, so it can be restored later.
+
+```js
+apiFetch.setFetchHandler( apiFetch.defaultFetchHandler );
 ```
 
 ## Contributing to this package

@@ -1,0 +1,175 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+import * as BadgeStories from './index.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Badge usage guidelines
+
+## Keep badge actions limited to infotips
+
+Badges communicate status or metadata. They should not perform actions or navigate to another page. A badge with an `infotip` is the one exception to the non-interactive pattern: it opens a popover that explains the status.
+
+### ❌ Don't
+
+-   **Use badges as links or buttons.** Do not add click handlers or make badges focusable to trigger actions or navigation. Use the `infotip` prop to open additional context.
+
+### ✅ Do
+
+-   **Use badges to communicate status or metadata.** Keep any related action separate from the badge.
+-   **Use the appropriate interactive component.** Use [Button](?path=/docs/design-system-components-button--docs) for actions and [Link](?path=/docs/design-system-components-link--docs) for navigation.
+
+## Choose badge intent based on the attention a status needs
+
+<Canvas of={ UsageGuidelinesStories.AllIntents } />
+
+It can be difficult to determine which badge intent to use because the component's properties are not tied to any specific product view. Those properties should be balanced against the requirements of the view in which the badge appears, all while keeping an eye on high-level consistency (global statuses that appear across multiple views).
+
+Here is a decision tree to help identify which badge to use.
+
+### 1. Ask first: should this draw the eye?
+
+If the user scans this screen, should their attention be drawn to this badge?
+
+-   If **no** → use `none` (or even just plain text; no badge), even if the state is positive or "stable".
+-   If **yes** → pick an intent based on how important the action or awareness is.
+
+### 2. High / Medium / Low = action priority
+
+Use when there's something for the user to act on.
+
+#### `high` – Critical / top priority
+
+-   Needs attention as soon as possible
+-   _E.g. "Payment declined", "Security issue"_
+
+<Canvas of={ UsageGuidelinesStories.High } />
+
+#### `medium` – Important / blocks progress
+
+-   Blocks a key task, should be handled soon
+-   _E.g. "Approval required", "Review needed"_
+
+<Canvas of={ UsageGuidelinesStories.Medium } />
+
+#### `low` – Worth noticing / non‑urgent
+
+-   Good to be aware of; action may be optional or later
+-   _E.g. "Pending", "Queued", "Minor issues", "Optional setup"_
+
+<Canvas of={ UsageGuidelinesStories.Low } />
+
+### 3. Informational / draft = special non-final states
+
+#### `informational` – Notable, no action / fix needed
+
+-   Context only; no clear action
+-   _E.g. "Scheduled", "Beta", "Internal only"_
+
+<Canvas of={ UsageGuidelinesStories.Informational } />
+
+#### `draft` – Not final / work in progress
+
+-   _E.g. "Draft", "Unpublished", "Work in progress"_
+
+<Canvas of={ UsageGuidelinesStories.Draft } />
+
+### 4. Stable / none = normal states
+
+#### `stable` – Positive / "healthy" state
+
+-   Use when confirming success or "all good" is important in that view
+-   _E.g. "Healthy", "Active", "Live"_
+
+<Canvas of={ UsageGuidelinesStories.Stable } />
+
+#### `none` – Default for normal / background states
+
+-   Especially in dense lists where too much color creates visual noise
+-   _E.g. "Inactive", "Expired"_
+
+<Canvas of={ UsageGuidelinesStories.None } />
+
+### Examples
+
+#### Comment status
+
+-   "Approved" → `none`
+-   "Approval required" → `medium`
+
+<Canvas of={ UsageGuidelinesStories.CommentStatus } />
+
+#### Page status
+
+-   "Published" → `none`
+-   "Pending" → `low`
+-   "Draft" → `draft`
+-   "Scheduled" → `informational`
+-   "Private" → `informational`
+
+<Canvas of={ UsageGuidelinesStories.PageStatus } />
+
+#### Plugin status
+
+-   "Active" → `stable`
+-   "Inactive" → `none`
+
+<Canvas of={ UsageGuidelinesStories.PluginStatus } />
+
+### 5. When in doubt…
+
+Use the least attention‑grabbing intent that still:
+
+-   Makes it clear what needs attention,
+-   Marks what isn't final, or
+-   Confirms a key success state in that context.
+
+## Keep icons outside badges
+
+`Badge` is text-only by default. Intent is communicated through color and label. A badge with an `infotip` adds a fixed trailing help icon. This icon signals that more context is available; it does not represent the status. Do not add other icons.
+
+### ❌ Don't
+
+-   **Put status icons inside badges.** A status icon duplicates what the intent color and label already convey.
+
+<Canvas of={ UsageGuidelinesStories.IncorrectBadgeWithIcon } />
+
+### ✅ Do
+
+-   **Use text-only badges.** In most cases, the intent color and label are enough. Adding a status icon inside the badge duplicates information and adds visual noise, especially in dense lists.
+
+<Canvas of={ UsageGuidelinesStories.TextOnlyBadges } />
+
+-   **Keep nearby icons separate.** When a row already includes a content icon (e.g. post type, plugin), use that icon for identity and let the badge communicate status on its own.
+
+<Canvas of={ UsageGuidelinesStories.WithAdjacentContentIcon } />
+
+## Use infotips sparingly to explain a status
+
+Use `infotip` when a status needs a short explanation that does not fit in the label. Choose the intent as usual, then add an infotip only if the status needs explaining.
+
+<Canvas of={ BadgeStories.WithInfotip } />
+
+-   Rewrite an unclear label first. Self-explanatory statuses such as "Draft", "Active", or "Scheduled" usually do not need an infotip.
+-   Reserve infotips for statuses that need context. If every badge needs an explanation, show the information directly in the interface.
+-   Keep essential information visible. Users who do not open the infotip should still understand the status and what to do next. Use inline text or a Notice for critical messages.
+-   Keep essential recovery actions available elsewhere in the interface. The infotip must not be the only way to retry a failed upload or fix a publishing error.
+-   Keep content brief, usually one to three sentences. Prefer at most one related link or button. Use a detail view or dialog for long explanations or workflows with several actions.
+
+### Compose the popup
+
+Pass the `Popover` export and a complete `Popover.Popup` composition to `infotip` as `{ popover: Popover, popup: <Popover.Popup>…</Popover.Popup> }`. Use the same `Popover` import for the supplied component family and every popup part so they share context. Supplying `Popover` lets bundlers omit its code when only static badges are used. Include a meaningful `Popover.Title`, which can be visually hidden, and use `Popover.Description` for explanatory text. Popover's positioning, portal, and focus options remain available on the supplied popup. Constrain the popup width for readable lines and narrow layouts, as shown in these examples.
+
+A popup can contain a related link or button. Prefer one action that directly relates to the explanation. For buttons, use `variant="minimal"`, `tone="neutral"`, and `size="compact"`, and align the action to the inline end of the popup.
+
+<Canvas of={ BadgeStories.InfotipWithLink } />
+
+<Canvas of={ BadgeStories.InfotipWithButton } />
+
+### Interaction and accessibility
+
+Keep the badge's visible label in its accessible name.
+
+Do not place a badge with an infotip inside a link, button, or another interactive trigger. If you customize the badge's `render` prop, preserve its button element when an infotip is present.
+
+If you remove the `infotip` while the badge or its popup has focus, move focus to a relevant control in the surrounding interface.

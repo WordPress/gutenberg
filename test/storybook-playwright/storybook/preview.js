@@ -1,8 +1,5 @@
-/**
- * Internal dependencies
- */
-
-import * as basePreviewConfig from '../../../storybook/preview';
+import * as basePreviewConfig from '@wordpress/storybook/preview';
+import { WithTextOverflowContainers } from '../../../storybook/decorators/with-text-overflow-containers';
 import { WithCustomControls } from './decorators/with-custom-controls';
 
 export const globalTypes = {
@@ -23,6 +20,7 @@ export const globalTypes = {
 };
 export const decorators = [
 	...basePreviewConfig.decorators,
+	WithTextOverflowContainers,
 	WithCustomControls,
 ];
 export const parameters = { ...basePreviewConfig.parameters };

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 
@@ -74,6 +71,7 @@ export interface CollectionFontVariantProps {
 	font: FontFamily;
 	handleToggleVariant: ( font: FontFamily, face?: FontFace ) => void;
 	selected: boolean;
+	installed: boolean;
 }
 
 export interface FontUploadResult {
@@ -99,15 +97,7 @@ export interface GoogleFontsAPIResponse {
 }
 
 export type FontWeight =
-	| '100'
-	| '200'
-	| '300'
-	| '400'
-	| '500'
-	| '600'
-	| '700'
-	| '800'
-	| '900';
+	'100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type FontStyle = 'normal' | 'italic';
 export type FontDisplay = 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
 export type FontStretch =

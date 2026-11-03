@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { SyntheticEvent, ChangeEvent, PointerEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { InputState, StateReducer } from './state';
 import { initialInputControlState, initialStateReducer } from './state';
 import * as actions from './actions';

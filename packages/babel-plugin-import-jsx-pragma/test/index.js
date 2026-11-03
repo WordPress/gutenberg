@@ -1,12 +1,9 @@
-/**
- * External dependencies
- */
+import { createRequire } from 'node:module';
 import { transformSync } from '@babel/core';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import plugin from '../';
+
+const require = createRequire( import.meta.url );
 
 describe( 'babel-plugin-import-jsx-pragma', () => {
 	it( 'does nothing if there is no jsx', () => {
@@ -159,7 +156,10 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 function getTransformedCode( source, options = {} ) {
 	const { code } = transformSync( source, {
 		configFile: false,
-		plugins: [ [ plugin, options ], '@babel/plugin-syntax-jsx' ],
+		plugins: [
+			[ plugin, options ],
+			require.resolve( '@babel/plugin-syntax-jsx' ),
+		],
 	} );
 
 	return code;

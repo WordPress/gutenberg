@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 
 export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
@@ -13,10 +10,17 @@ export type ConnectorAuthentication =
 			keySource?: ApiKeySource;
 			isConnected?: boolean;
 	  }
+	| {
+			method: 'application_password';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 export interface ConnectorPlugin {
-	slug: string;
+	file: string;
 	isInstalled: boolean;
 	isActivated: boolean;
 }
@@ -25,6 +29,7 @@ export interface ConnectorRenderProps {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;
@@ -34,6 +39,7 @@ export interface ConnectorConfig {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;

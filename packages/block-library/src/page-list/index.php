@@ -9,7 +9,7 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * @since 6.9.0
+ * @since 7.0.0
  *
  * @param array $context Block context from parent Navigation block.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
@@ -36,8 +36,8 @@ function block_core_page_list_get_submenu_visibility( $context ) {
  *
  * @since 5.8.0
  *
- * @param  array $attributes Block attributes.
- * @param  array $context    Navigation block context.
+ * @param array $attributes Block attributes.
+ * @param array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
 function block_core_page_list_build_css_colors( $attributes, $context ) {
@@ -123,63 +123,25 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	return $colors;
 }
-
-/**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
- *
- * @since 5.8.0
- *
- * @param  array $context Navigation block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_page_list_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf(
-			'font-size: %s;',
-			wp_get_typography_font_size_value(
-				array(
-					'size' => $context['style']['typography']['fontSize'],
-				)
-			)
-		);
-	}
-
-	return $font_sizes;
-}
-
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
  * @since 5.8.0
  *
- * @param string  $submenu_visibility The submenu visibility mode: 'hover', 'click', or 'always'.
- * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
- * @param boolean $is_navigation_child If block is a child of Navigation block.
- * @param array   $nested_pages The array of nested pages.
- * @param boolean $is_nested Whether the submenu is nested or not.
+ * @param string  $submenu_visibility       The submenu visibility mode: 'hover', 'click', or 'always'.
+ * @param boolean $show_submenu_icons       Whether to show submenu indicator icons.
+ * @param boolean $is_navigation_child      If block is a child of Navigation block.
+ * @param array   $nested_pages             The array of nested pages.
+ * @param boolean $is_nested                Whether the submenu is nested or not.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
- * @param array   $colors Color information for overlay styles.
- * @param integer $depth The nesting depth.
+ * @param array   $colors                   Color information for overlay styles.
+ * @param integer $depth                    The nesting depth.
  *
  * @return string List markup.
  */
 function block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
-		return;
+		return '';
 	}
 	$front_page_id = (int) get_option( 'page_on_front' );
 	$markup        = '';
@@ -265,13 +227,13 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
  * @since 5.8.0
  *
  * @param array $current_level The level being iterated through.
- * @param array $children The children grouped by parent post ID.
+ * @param array $children      The children grouped by parent post ID.
  *
  * @return array The nested array of pages.
  */
 function block_core_page_list_nest_pages( $current_level, $children ) {
 	if ( empty( $current_level ) ) {
-		return;
+		return array();
 	}
 	foreach ( (array) $current_level as $key => $current ) {
 		if ( isset( $children[ $key ] ) ) {
@@ -296,8 +258,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
-	$parent_page_id = $attributes['parentPageID'];
-	$is_nested      = $attributes['isNested'];
+	$parent_page_id_attr = $attributes['parentPageID'] ?? null;
+	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
+	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
 	$all_pages = get_pages(
 		array(
@@ -308,7 +271,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	// If there are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {
-		return;
+		return '';
 	}
 
 	$top_level_pages = array();
@@ -342,13 +305,12 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
-	$colors          = block_core_page_list_build_css_colors( $attributes, $block->context );
-	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
+	$colors  = block_core_page_list_build_css_colors( $attributes, $block->context );
+	$classes = array_merge(
+		$colors['css_classes']
 	);
-	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
+
+	$style_attribute = $colors['inline_styles'];
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
@@ -356,7 +318,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	if ( 0 !== $parent_page_id ) {
 		// If the parent page has no child pages, there is nothing to show.
 		if ( ! array_key_exists( $parent_page_id, $pages_with_children ) ) {
-			return;
+			return '';
 		}
 
 		$nested_pages = block_core_page_list_nest_pages(

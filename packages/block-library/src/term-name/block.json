@@ -9,9 +9,6 @@
 	"textdomain": "default",
 	"usesContext": [ "termId", "taxonomy" ],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 0
@@ -28,6 +25,15 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -37,12 +43,19 @@
 				"link": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"shadow": true,
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"margin": true
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

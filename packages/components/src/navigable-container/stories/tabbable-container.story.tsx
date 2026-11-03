@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import { TabbableContainer } from '..';
 
 const meta: Meta< typeof TabbableContainer > = {
-	title: 'Components/Containers/TabbableContainer',
+	title: 'Components/@wordpress-components/Deprecated/TabbableContainer',
 	id: 'components-tabbablecontainer',
 	component: TabbableContainer,
 	argTypes: {
@@ -28,7 +21,7 @@ const meta: Meta< typeof TabbableContainer > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
 		},
 	},
 };

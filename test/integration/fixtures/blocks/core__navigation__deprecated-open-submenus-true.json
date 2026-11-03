@@ -26,7 +26,8 @@
 				"isValid": true,
 				"attributes": {
 					"label": "Submenu",
-					"opensInNewTab": false
+					"opensInNewTab": false,
+					"isParentSubmenu": true
 				},
 				"innerBlocks": [
 					{

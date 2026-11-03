@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
 import type { CompositeRowProps } from './types';
@@ -18,7 +7,7 @@ import type { CompositeRowProps } from './types';
 export const CompositeRow = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeRowProps, 'div', false >
->( function CompositeRow( props, ref ) {
+>( function UnforwardedCompositeRow( props, ref ) {
 	const context = useCompositeContext();
 
 	// @ts-expect-error The store prop is undocumented and only used by the

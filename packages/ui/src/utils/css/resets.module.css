@@ -1,13 +1,15 @@
-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
 
-@layer wp-ui-utilities {
-	.box-sizing {
-		box-sizing: border-box;
+	@layer utilities {
+		.box-sizing {
+			box-sizing: border-box;
 
-		*,
-		*::before,
-		*::after {
-			box-sizing: inherit;
+			*,
+			*::before,
+			*::after {
+				box-sizing: inherit;
+			}
 		}
 	}
 }

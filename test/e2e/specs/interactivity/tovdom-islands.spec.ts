@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'toVdom - islands', () => {
@@ -8,9 +5,11 @@ test.describe( 'toVdom - islands', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/tovdom-islands' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/tovdom-islands' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();
@@ -37,13 +36,11 @@ test.describe( 'toVdom - islands', () => {
 		await expect( el ).toBeHidden();
 	} );
 
-	test( 'directives that are inside inner blocks of isolated islands should not be hydrated', async ( {
+	test( 'directives inside an element with data-wp-ignore should be hydrated', async ( {
 		page,
 	} ) => {
-		const el = page.getByTestId(
-			'inside an inner block of an isolated island'
-		);
-		await expect( el ).toBeVisible();
+		const el = page.getByTestId( 'inside an element with data-wp-ignore' );
+		await expect( el ).toBeHidden();
 	} );
 
 	test( 'directives inside islands should not be hydrated twice', async ( {
@@ -54,11 +51,11 @@ test.describe( 'toVdom - islands', () => {
 		await expect( templates ).toHaveCount( 1 );
 	} );
 
-	test( 'islands inside inner blocks of isolated islands should be hydrated', async ( {
+	test( 'islands nested in inner elements of other islands should be hydrated', async ( {
 		page,
 	} ) => {
 		const el = page.getByTestId(
-			'island inside inner block of isolated island'
+			'island inside an inner element of another island'
 		);
 		await expect( el ).toBeHidden();
 	} );

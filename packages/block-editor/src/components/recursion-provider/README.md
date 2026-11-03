@@ -7,9 +7,6 @@ To help with detecting infinite loops on the client, the `RecursionProvider` com
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import {
 	RecursionProvider,
 	useHasRecursion,

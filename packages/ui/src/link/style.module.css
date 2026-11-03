@@ -1,68 +1,81 @@
-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
 
-@layer wp-ui-components {
-	.link {
-		text-underline-offset: 0.2em;
-		text-decoration-thickness: 0.5px;
-	}
+	@layer components {
+		.link {
+			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
-	/* Brand tone */
-	.is-brand,
-	.is-brand:visited {
-		color: var(--wpds-color-fg-interactive-brand);
-	}
+			border-radius: var(--wpds-border-radius-sm);
+			text-underline-offset: 0.2em;
+			text-decoration-thickness: from-font;
+		}
 
-	.is-brand:hover,
-	.is-brand:active {
-		color: var(--wpds-color-fg-interactive-brand-active);
-	}
+		.link-with-icon {
+			text-decoration-line: none;
+		}
 
-	/* Neutral tone */
-	.is-neutral,
-	.is-neutral:visited {
-		color: var(--wpds-color-fg-interactive-neutral);
-		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
-	}
+		.link-contents {
+			text-decoration: inherit;
+			text-decoration-line: underline;
+		}
 
-	.is-neutral:hover,
-	.is-neutral:active {
-		color: var(--wpds-color-fg-interactive-neutral-active);
-	}
+		/* Brand tone */
+		.is-brand,
+		.is-brand:visited {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand);
 
-	/* Unstyled variant */
-	.is-unstyled {
-		color: inherit;
-		text-decoration: none;
-	}
+			color: var(--wpds-color-foreground-interactive-brand);
+		}
 
-	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
-	 * Twemoji replacement and text-selection issues. Root <a> gets
-	 * text-decoration:none; the link-contents span re-applies it.
-	 * text-underline-offset is inherited and propagates from .link
-	 * automatically. text-decoration-thickness and text-decoration-color
-	 * are NOT inherited, so they are explicitly redeclared on
-	 * .link-contents (the latter via `inherit` to carry the neutral
-	 * tone's custom color token through). */
-	.has-link-icon {
-		text-decoration: none;
-	}
+		.is-brand:hover,
+		.is-brand:active {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-active);
 
-	.link-contents {
-		text-decoration: underline;
-		text-decoration-color: inherit;
-		text-decoration-thickness: 0.5px;
-	}
+			color: var(--wpds-color-foreground-interactive-brand-active);
+		}
 
-	.link-icon {
-		margin-inline-start: var(--wpds-dimension-padding-xs);
-		font-weight: var(--wpds-font-weight-regular);
-	}
+		/* Neutral tone */
+		.is-neutral,
+		.is-neutral:visited {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral);
 
-	.link-icon::after {
-		content: "\2197";
-	}
+			color: var(--wpds-color-foreground-interactive-neutral);
+			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+		}
 
-	.link-icon:dir(rtl)::after {
-		content: "\2196";
+		.is-neutral:hover,
+		.is-neutral:active {
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+		}
+
+		/* Unstyled variant */
+		.is-unstyled {
+			--_gcd-a-border-radius: 0;
+			--_gcd-a-color: inherit;
+
+			color: inherit;
+			text-decoration: none;
+		}
+
+		/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
+		 * Twemoji replacement and text-selection issues. */
+
+		.link-icon {
+			line-height: 1;
+			margin-inline-start: var(--wpds-dimension-padding-xs);
+			font-weight: var(--wpds-typography-font-weight-default);
+			text-decoration: none;
+		}
+
+		.link-icon::after {
+			/* WORD JOINER prevents a break before the arrow, including in CJK text. */
+			content: "\2060\2197";
+		}
+
+		.link-icon:dir(rtl)::after {
+			content: "\2060\2196";
+		}
 	}
 }

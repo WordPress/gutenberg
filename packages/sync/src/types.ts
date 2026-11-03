@@ -1,23 +1,11 @@
-/**
- * WordPress dependencies
- */
-import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
-		_wpCollaborationEnabled?: string;
+		__experimentalEnableRealTimeCollaboration?: boolean;
 	}
 }
 
@@ -80,6 +68,12 @@ export interface ConnectionStatusDisconnected {
 	/** Whether the error condition is retryable via user action. */
 	canManuallyRetry?: boolean;
 
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
 	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
 	willAutoRetryInMs?: number;
 }
@@ -101,6 +95,15 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * The Yjs module used by the editor. Providers must use this instance
+	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
+	 * on the same document cause silent data corruption:
+	 *
+	 * https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (
@@ -113,6 +116,7 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
+	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
 }
@@ -128,6 +132,8 @@ export interface RecordHandlers {
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	// Called when a local change to the record opened a new undo level.
+	onUndoLevelOpened?: () => void;
 }
 
 export interface SyncConfig {
@@ -144,6 +150,11 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
+	supportsPersistence?: boolean;
 }
 
 export interface SyncManager {
@@ -153,8 +164,19 @@ export interface SyncManager {
 	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
+	// Whether the entity was loaded for syncing and has not been unloaded.
+	isLoaded: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -167,9 +189,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
-	// undoManager is undefined until the first entity is loaded.
-	undoManager: SyncUndoManager | undefined;
+	// The undo history of the loaded entities. See `SyncUndoManager`.
+	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	unloadAll: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -179,10 +202,19 @@ export interface SyncManager {
 	) => void;
 }
 
-export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: (
-		ymap: Y.Map< any >,
-		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
-	) => void;
+/**
+ * The undo history of the entities a sync manager has loaded, one Yjs undo
+ * manager per entity. Yjs tracks their changes, one level per stack item, and
+ * reports each new level through the record's `onUndoLevelOpened` handler. It
+ * is not an undo manager for the editor: the consumer keeps its own, in which
+ * each level names its entity, and delegates the level to that entity here
+ * when it is the one to undo or redo.
+ */
+export interface SyncUndoManager {
+	clearRedo: () => void;
+	hasRedo: () => boolean;
+	hasUndo: () => boolean;
+	redo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	stopCapturing: () => void;
+	undo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 }

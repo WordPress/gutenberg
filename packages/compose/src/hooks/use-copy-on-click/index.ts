@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import type { RefObject } from 'react';
-
-/**
- * Internal dependencies
- */
-import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
+import { restoreFocus, copyToClipboard } from '../use-copy-to-clipboard';
 
 /**
  * Copies the text to the clipboard when the element is clicked.
@@ -22,7 +15,7 @@ import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
  *           timeout.
  */
 export default function useCopyOnClick(
-	ref: RefObject< string | Element | NodeListOf< Element > >,
+	ref: RefObject< string | Element | NodeListOf< Element > | null >,
 	text: string | ( () => string ),
 	timeout: number = 4000
 ): boolean {
@@ -73,7 +66,7 @@ export default function useCopyOnClick(
 				return;
 			}
 			if ( success ) {
-				clearSelection( trigger );
+				restoreFocus( trigger );
 				if ( timeout ) {
 					setHasCopied( true );
 					clearTimeout( timeoutId );

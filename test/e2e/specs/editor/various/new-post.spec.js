@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'new editor state', () => {
@@ -40,7 +37,7 @@ test.describe( 'new editor state', () => {
 		// Should display the Post Formats UI.
 		await editor.openDocumentSettingsSidebar();
 		await expect(
-			page.locator( 'role=button[name="Change Format: Standard"i]' )
+			page.getByRole( 'button', { name: 'Edit Format' } )
 		).toBeVisible();
 	} );
 

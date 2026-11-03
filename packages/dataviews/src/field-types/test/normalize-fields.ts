@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import normalizeFields from '../index';
 import type { Field } from '../../types';
 
@@ -294,7 +292,7 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'user',
 					filterBy: {
-						// @ts-ignore
+						// @ts-expect-error `invalid` and `operator` are not members of the `Operator` union.
 						operators: [ 'invalid', 'operator' ],
 					},
 				},
@@ -325,7 +323,7 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'integer',
 					filterBy: {
 						isPrimary: true,
-						// @ts-ignore
+						// @ts-expect-error `invalid` is not a member of the `Operator` union.
 						operators: [ 'invalid', 'lessThan' ],
 					},
 				},
@@ -336,6 +334,90 @@ describe( 'normalizeFields: default getValue', () => {
 				isPrimary: true,
 				operators: [ 'lessThan' ],
 			} );
+		} );
+
+		it.each( [
+			'integer',
+			'number',
+			'text',
+			'email',
+			'url',
+			'telephone',
+		] as const )(
+			'removes the isAll operator for %s fields, whose values are scalars',
+			( type ) => {
+				const fields: Field< {} >[] = [
+					{
+						id: 'author',
+						type,
+						filterBy: {
+							operators: [ 'isAny', 'isNone', 'isAll' ],
+						},
+					},
+				];
+				const normalizedFields = normalizeFields( fields );
+				expect( normalizedFields[ 0 ].filterBy ).toStrictEqual( {
+					isPrimary: false,
+					operators: [ 'isAny', 'isNone' ],
+				} );
+				expect( normalizedFields[ 0 ].filter ).not.toHaveProperty(
+					'isAll'
+				);
+			}
+		);
+	} );
+
+	describe( 'validation normalization', () => {
+		it( 'ignores string min/max rules on numeric fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						min: '1',
+						max: '10',
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
+		} );
+
+		it( 'ignores numeric min/max rules on date-like fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
+				{
+					id: 'publishedAt',
+					type: 'datetime',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
+			expect( normalizedFields[ 1 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 1 ].isValid.max ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.max ).toBeUndefined();
 		} );
 	} );
 
@@ -463,6 +545,51 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( normalizedFields[ 0 ].format ).toEqual( {
 				separatorThousand: '.',
 			} );
+		} );
+	} );
+
+	describe( 'sort', () => {
+		it( 'uses field.sort when provided and passes extracted values', () => {
+			const itemA = { measurements: { height: 120 } };
+			const itemB = { measurements: { height: 80 } };
+			const customSort = vi.fn( ( a, b, direction ) =>
+				direction === 'asc' ? a - b : b - a
+			);
+			const fields: Field< typeof itemA >[] = [
+				{
+					id: 'height',
+					type: 'number',
+					getValue: ( { item } ) => item.measurements.height,
+					sort: customSort,
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+
+			const result = normalizedFields[ 0 ].sort( itemA, itemB, 'asc' );
+			expect( customSort ).toHaveBeenCalledWith( 120, 80, 'asc' );
+			expect( result ).toBe( 40 );
+		} );
+
+		it( 'falls back to fieldType.sort when field.sort is not provided', () => {
+			const itemA = { score: 10 };
+			const itemB = { score: 25 };
+			const fields: Field< typeof itemA >[] = [
+				{
+					id: 'score',
+					type: 'number',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+
+			const resultAsc = normalizedFields[ 0 ].sort( itemA, itemB, 'asc' );
+			expect( resultAsc ).toBe( -15 );
+
+			const resultDesc = normalizedFields[ 0 ].sort(
+				itemA,
+				itemB,
+				'desc'
+			);
+			expect( resultDesc ).toBe( 15 );
 		} );
 	} );
 } );

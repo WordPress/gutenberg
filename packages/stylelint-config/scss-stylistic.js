@@ -1,8 +1,10 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
-module.exports = {
-	extends: [ './stylistic', './scss' ].map( require.resolve ),
+export default {
+	extends: [ './stylistic', './scss' ].map( ( m ) =>
+		fileURLToPath( import.meta.resolve( m ) )
+	),
 	rules: {
 		'@stylistic/block-opening-brace-space-before': 'always',
 		'@stylistic/block-closing-brace-newline-after': [

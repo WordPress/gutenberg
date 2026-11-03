@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Duplicating blocks', () => {
@@ -18,7 +15,7 @@ test.describe( 'Duplicating blocks', () => {
 
 		// Test: Duplicate using the block settings menu.
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name=/Duplicate/i]' );
+		await page.getByRole( 'menuitem', { name: /Duplicate/i } ).click();
 
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->

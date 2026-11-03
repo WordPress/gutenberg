@@ -1,0 +1,74 @@
+<svg viewBox="0 0 920 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Each attribute may carry a relevance hint. The widget declares importance; the host may promote high-relevance fields to a prominent surface and edit the rest through a settings surface built from the schema.">
+  <defs>
+    <marker id="arrow-relevance" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrow-relevance-high" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#1d6b5a"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="908" height="388" rx="12" fill="#ffffff"/>
+
+  <g transform="translate(460 205) scale(1.1) translate(-460 -205)">
+    <text x="460" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">The widget declares importance; the host chooses the surface.</text>
+
+    <!-- Attribute schema -->
+    <rect x="48" y="80" width="260" height="180" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+    <text x="68" y="110" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">attributes</text>
+    <text x="68" y="128" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#855317" opacity="0.8">declarative schema</text>
+
+    <rect x="68" y="144" width="220" height="46" rx="5" fill="#ffffff" stroke="#b07020" stroke-width="1.2"/>
+    <text x="80" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#855317">location</text>
+    <text x="80" y="180" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#1d6b5a">relevance: high</text>
+
+    <rect x="68" y="200" width="220" height="46" rx="5" fill="#ffffff" stroke="#e2c88a" stroke-width="1.2"/>
+    <text x="80" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#855317">perPage</text>
+    <text x="80" y="236" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#94a3b8">low (default)</text>
+
+    <!-- Host: prominent surface -->
+    <rect x="368" y="96" width="184" height="88" rx="9" fill="#fafbfc" stroke="#1d6b5a" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <text x="460" y="122" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#1d6b5a">prominent surface</text>
+    <text x="460" y="138" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">host may promote</text>
+    <rect x="392" y="152" width="136" height="18" rx="3" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.2"/>
+    <text x="460" y="165" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" fill="#1d6b5a">high fields</text>
+
+    <!-- Host: settings surface -->
+    <rect x="368" y="204" width="184" height="108" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <text x="460" y="230" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#64748b">settings surface</text>
+    <text x="460" y="246" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#64748b">full schema form</text>
+    <rect x="392" y="260" width="136" height="16" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+    <rect x="392" y="282" width="136" height="16" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+    <!-- Connections from schema to surfaces -->
+    <path d="M 288 167 L 364 136" fill="none" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-relevance-high)"/>
+    <rect x="318" y="144" width="28" height="14" rx="3" fill="#ffffff"/>
+    <text x="332" y="155" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#1d6b5a">high</text>
+
+    <path d="M 288 223 L 364 262" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-relevance)"/>
+    <rect x="318" y="236" width="26" height="14" rx="3" fill="#ffffff"/>
+    <text x="331" y="247" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#64748b">low</text>
+
+    <!-- Tile context (read-only) -->
+    <rect x="624" y="112" width="184" height="168" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <path d="M 633 114 H 799 Q 806 114 806 121 V 151 H 626 V 121 Q 626 114 633 114 Z" fill="#f1f5f9"/>
+    <line x1="624" y1="151" x2="808" y2="151" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="642" y="122" width="18" height="18" rx="4" fill="#2f54a5"/>
+    <text x="668" y="135" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">Events</text>
+    <rect x="734" y="124" width="58" height="16" rx="4" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1"/>
+    <text x="763" y="136" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8.5" fill="#1d6b5a">location</text>
+    <rect x="642" y="168" width="12" height="12" rx="3" fill="#e2e8f0"/>
+    <line x1="662" y1="174" x2="758" y2="174" stroke="#cbd5e1" stroke-width="1.5"/>
+    <rect x="642" y="190" width="12" height="12" rx="3" fill="#e2e8f0"/>
+    <line x1="662" y1="196" x2="728" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="716" y="256" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-style="italic" fill="#94a3b8">widget render</text>
+
+    <!-- Gutter between prominent surface and widget -->
+    <rect x="566" y="100" width="44" height="26" rx="3" fill="#ffffff"/>
+    <text x="588" y="111" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8.5" fill="#1d6b5a">near</text>
+    <text x="588" y="121" text-anchor="middle" font-family="ui-monospace, monospace" font-size="8.5" fill="#1d6b5a">instance</text>
+    <line x1="552" y1="135" x2="620" y2="135" stroke="#1d6b5a" stroke-width="1.5" marker-end="url(#arrow-relevance-high)"/>
+
+    <text x="460" y="360" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">importance, not surface. absent means low</text>
+  </g>
+</svg>

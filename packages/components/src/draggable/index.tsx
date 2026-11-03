@@ -1,23 +1,24 @@
-/**
- * External dependencies
- */
 import type { DragEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { throttle } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
+import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import type { DraggableProps } from './types';
+import styles from './style.module.scss';
 
-const dragImageClass = 'components-draggable__invisible-drag-image';
-const cloneWrapperClass = 'components-draggable__clone';
-const clonePadding = 0;
+// Legacy class names preserved alongside the CSS-module hashed ones for
+// backwards compatibility. `filter(Boolean)` strips `undefined` from the
+// CSS-module mock.
+const dragImageClasses = [
+	styles[ 'invisible-drag-image' ],
+	'components-draggable__invisible-drag-image',
+].filter( Boolean );
+const cloneWrapperClasses = [
+	styles.clone,
+	'components-draggable__clone',
+].filter( Boolean );
+// Global class — shared with external code (e.g. block-editor keyboard drag).
 const bodyClass = 'is-dragging-components-draggable';
+const clonePadding = 0;
 
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
@@ -70,8 +71,13 @@ export function Draggable( {
 	__experimentalTransferDataType: transferDataType = 'text',
 	__experimentalDragComponent: dragComponent,
 }: DraggableProps ) {
-	const dragComponentRef = useRef< HTMLDivElement >( null );
 	const cleanupRef = useRef( () => {} );
+	// The clone wrapper `dragComponent` is portalled into while a drag is in
+	// progress. Nothing is rendered for it outside of a drag, so a long list
+	// of draggables (the inserter) does not pay for one hidden preview per
+	// item.
+	const [ dragComponentContainer, setDragComponentContainer ] =
+		useState< HTMLDivElement | null >( null );
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
@@ -81,10 +87,7 @@ export function Draggable( {
 	function end( event: DragEvent ) {
 		event.preventDefault();
 		cleanupRef.current();
-
-		if ( onDragEnd ) {
-			onDragEnd( event );
-		}
+		onDragEnd?.( event );
 	}
 
 	/**
@@ -99,6 +102,10 @@ export function Draggable( {
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;
+		// Only use the slot when it lives in the same document as the
+		// dragged element, so coordinate resolution stays in one space.
+		const slot = getWpCompatOverlaySlot();
+		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
 
 		event.dataTransfer.setData(
 			transferDataType,
@@ -116,12 +123,18 @@ export function Draggable( {
 		// right after. event.dataTransfer.setDragImage is not supported yet in
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			dragImage.classList.add( dragImageClass );
+			dragImage.classList.add( ...dragImageClasses );
+			// Invisible — stays at the document body, no slot needed.
 			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 		}
 
-		cloneWrapper.classList.add( cloneWrapperClass );
+		cloneWrapper.classList.add( ...cloneWrapperClasses );
+
+		const inSlotClass = styles[ 'is-in-compat-slot' ];
+		if ( compatSlot && inSlotClass ) {
+			cloneWrapper.classList.add( inSlotClass );
+		}
 
 		if ( cloneClassname ) {
 			cloneWrapper.classList.add( cloneClassname );
@@ -129,20 +142,16 @@ export function Draggable( {
 
 		let x = 0;
 		let y = 0;
-		// If a dragComponent is defined, the following logic will clone the
-		// HTML node and inject it into the cloneWrapper.
-		if ( dragComponentRef.current ) {
-			// Position dragComponent at the same position as the cursor.
+		if ( dragComponent ) {
+			// Position dragComponent at the same position as the cursor. The
+			// component itself is rendered into the wrapper by the portal
+			// below.
 			x = event.clientX;
 			y = event.clientY;
 			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
-			const clonedDragComponent = ownerDocument.createElement( 'div' );
-			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
-			cloneWrapper.appendChild( clonedDragComponent );
-
-			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
+			( compatSlot ?? ownerDocument.body ).appendChild( cloneWrapper );
+			setDragComponentContainer( cloneWrapper );
 		} else {
 			const element = ownerDocument.getElementById(
 				elementId
@@ -173,8 +182,9 @@ export function Draggable( {
 
 			cloneWrapper.appendChild( clone );
 
-			// Inject the cloneWrapper into the DOM.
-			if ( appendToOwnerDocument ) {
+			if ( compatSlot ) {
+				compatSlot.appendChild( cloneWrapper );
+			} else if ( appendToOwnerDocument ) {
 				ownerDocument.body.appendChild( cloneWrapper );
 			} else {
 				elementWrapper?.appendChild( cloneWrapper );
@@ -197,14 +207,12 @@ export function Draggable( {
 			cursorTop = e.clientY;
 			x = nextX;
 			y = nextY;
-			if ( onDragOver ) {
-				onDragOver( e );
-			}
+			onDragOver?.( e );
 		}
 
 		// Aim for 60fps (16 ms per frame) for now. We can potentially use requestAnimationFrame (raf) instead,
 		// note that browsers may throttle raf below 60fps in certain conditions.
-		// @ts-ignore
+		// @ts-expect-error `throttle` expects a `(...args: unknown[]) => unknown` callback.
 		const throttledDragOver = throttle( over, 16 );
 
 		ownerDocument.addEventListener( 'dragover', throttledDragOver );
@@ -212,33 +220,22 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
-		if ( onDragStart ) {
-			onDragStart( event );
-		}
+		onDragStart?.( event );
 
 		cleanupRef.current = () => {
-			// Remove drag clone.
-			if ( cloneWrapper && cloneWrapper.parentNode ) {
-				cloneWrapper.parentNode.removeChild( cloneWrapper );
-			}
-
-			if ( dragImage && dragImage.parentNode ) {
-				dragImage.parentNode.removeChild( dragImage );
-			}
+			cloneWrapper.remove();
+			dragImage.remove();
+			setDragComponentContainer( null );
 
 			// Reset cursor.
 			ownerDocument.body.classList.remove( bodyClass );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
+			cleanupRef.current = () => {};
 		};
 	}
 
-	useEffect(
-		() => () => {
-			cleanupRef.current();
-		},
-		[]
-	);
+	useEffect( () => () => cleanupRef.current(), [] );
 
 	return (
 		<>
@@ -246,15 +243,8 @@ export function Draggable( {
 				onDraggableStart: start,
 				onDraggableEnd: end,
 			} ) }
-			{ dragComponent && (
-				<div
-					className="components-draggable-drag-component-root"
-					style={ { display: 'none' } }
-					ref={ dragComponentRef }
-				>
-					{ dragComponent }
-				</div>
-			) }
+			{ dragComponentContainer &&
+				createPortal( dragComponent, dragComponentContainer ) }
 		</>
 	);
 }

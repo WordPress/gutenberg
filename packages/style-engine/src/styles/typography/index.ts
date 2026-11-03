@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Style, StyleOptions } from '../../types';
 import { generateRule } from '../utils';
 
@@ -136,6 +133,18 @@ const writingMode = {
 	},
 };
 
+const textShadow = {
+	name: 'textShadow',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textShadow' ],
+			'textShadow'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -146,6 +155,7 @@ export default [
 	textColumns,
 	textDecoration,
 	textIndent,
+	textShadow,
 	textTransform,
 	writingMode,
 ];

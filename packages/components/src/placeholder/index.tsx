@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
 import { useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import Icon from '../icon';
 import type { PlaceholderProps } from './types';
 import type { WordPressComponentProps } from '../context';

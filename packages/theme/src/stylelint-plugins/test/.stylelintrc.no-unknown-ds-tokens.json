@@ -1,6 +1,0 @@
-{
-	"plugins": [ "../no-unknown-ds-tokens.mjs" ],
-	"rules": {
-		"plugin-wpds/no-unknown-ds-tokens": true
-	}
-}

@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import type { WPFormat } from '../register-format-type';
+import type { FormatType } from '../types';
+import { ownsSelection } from '../owns-selection';
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -61,6 +55,11 @@ function getFormatElement(
 	}
 
 	const selector = tagName + ( className ? '.' + className : '' );
+
+	// Element#matches will throw SyntaxError on an empty selector
+	if ( ! selector ) {
+		return;
+	}
 
 	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
@@ -151,18 +150,14 @@ function getAnchor(
 		return;
 	}
 
-	const formatElement = getFormatElement(
-		range,
-		editableContentElement,
-		tagName,
-		className
-	);
-
-	if ( formatElement ) {
-		return formatElement;
+	if ( ! tagName && ! className ) {
+		return createVirtualAnchorElement( range, editableContentElement );
 	}
 
-	return createVirtualAnchorElement( range, editableContentElement );
+	return (
+		getFormatElement( range, editableContentElement, tagName, className ) ??
+		createVirtualAnchorElement( range, editableContentElement )
+	);
 }
 
 const DEFAULT_SETTINGS = {
@@ -186,11 +181,11 @@ export function useAnchor( {
 	settings,
 }: {
 	editableContentElement: HTMLElement | null;
-	settings?: WPFormat;
+	settings?: FormatType;
 } ): Element | VirtualAnchorElement | undefined | null {
 	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
 
-	// `isActive` is not a property of `WPFormat`, but it has made its way into
+	// `isActive` is not a property of `FormatType`, but it has made its way into
 	// `settings` in certain cases (see `core/link` format). Avoid making this
 	// exception "public" in the function signature: tell TS how to look for it
 	// dynamically.
@@ -227,7 +222,7 @@ export function useAnchor( {
 		const { ownerDocument } = editableContentElement;
 
 		if (
-			editableContentElement === ownerDocument.activeElement ||
+			ownsSelection( editableContentElement ) ||
 			// When a link is created, we need to attach the popover to the newly created anchor.
 			( ! wasActive && isActive ) ||
 			// Sometimes we're _removing_ an active anchor, such as the inline color popover.

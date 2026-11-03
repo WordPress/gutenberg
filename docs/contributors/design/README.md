@@ -2,6 +2,9 @@
 
 A guide on how to get started contributing design to the Gutenberg project.
 
+For guidance on consuming or maintaining the WordPress Design System packages,
+see [Working with WordPress Design System packages](/docs/contributors/design/design-system-packages.md).
+
 ## Discussions
 
 The [Make WordPress Design blog](https://make.wordpress.org/design/) is the primary spot for the latest information around WordPress Design Team: including announcements, product goals, meeting notes, meeting agendas, and more.
@@ -20,7 +23,7 @@ The [WordPress Design team](https://make.wordpress.org/design/) uses [Figma](htt
 
 This section outlines the design principles and patterns of the editor interface—to explain the background of the design, inform future improvements, and help people design great blocks.
 
-<img width="200" src="https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg" alt="Gutenberg Logo" />
+<img width="200" src="https://developer.wordpress.org/files/2026/06/gutenberg-logo-black.png" alt="Gutenberg Logo" />
 
 The Gutenberg logo was made by [Cristel Rossignol](https://twitter.com/cristelrossi), and is released under the GPL license. [Download the SVG logo](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg).
 

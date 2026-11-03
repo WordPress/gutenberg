@@ -1,13 +1,7 @@
-/**
- * Internal dependencies
- */
+import type { ReactElement } from 'react';
 import { useResizeObserver as _useResizeObserver } from './use-resize-observer';
 import type { ObservedSize } from './legacy';
 import _useLegacyResizeObserver from './legacy';
-/**
- * External dependencies
- */
-import type { ReactElement } from 'react';
 
 /**
  * Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API)

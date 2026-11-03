@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { Navigator as TopLevelNavigator } from './navigator/component';
 import { NavigatorScreen } from './navigator-screen/component';
 import { NavigatorButton } from './navigator-button/component';

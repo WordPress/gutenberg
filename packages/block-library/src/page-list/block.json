@@ -12,10 +12,6 @@
 		"parentPageID": {
 			"type": "integer",
 			"default": 0
-		},
-		"isNested": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"usesContext": [
@@ -32,7 +28,8 @@
 		"showSubmenuIcon",
 		"style",
 		"openSubmenusOnClick",
-		"submenuVisibility"
+		"submenuVisibility",
+		"core/isInsideSubmenu"
 	],
 	"supports": {
 		"anchor": true,
@@ -53,6 +50,15 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
 		},
 		"color": {
 			"text": true,
@@ -78,6 +84,11 @@
 				"padding": false,
 				"margin": false
 			}
+		},
+		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"contentRole": true
 	},

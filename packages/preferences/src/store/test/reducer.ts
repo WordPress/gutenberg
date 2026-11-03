@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import { preferences } from '../reducer';
 
 describe( 'withPersistenceLayer( preferences )', () => {
@@ -12,15 +10,20 @@ describe( 'withPersistenceLayer( preferences )', () => {
 
 		const action = {
 			type: 'SET_PERSISTENCE_LAYER',
+			persistenceLayer: {
+				get: async () => persistedData,
+				set() {},
+			},
 			persistedData,
-		};
+		} as const;
 
 		expect( preferences( {}, action ) ).toEqual( persistedData );
 	} );
 
 	it( 'calls the persistence layer `set` function with the updated store state whenever the `SET_PREFERENCE_VALUE` action is dispatched', () => {
-		const set = jest.fn();
+		const set = vi.fn();
 		const persistenceLayer = {
+			get: async () => ( {} ),
 			set,
 		};
 
@@ -28,7 +31,7 @@ describe( 'withPersistenceLayer( preferences )', () => {
 			type: 'SET_PERSISTENCE_LAYER',
 			persistenceLayer,
 			persistedData: {},
-		};
+		} as const;
 
 		// Set the persistence layer.
 		preferences( {}, setPersistenceLayerAction );
@@ -36,9 +39,10 @@ describe( 'withPersistenceLayer( preferences )', () => {
 		// Update a value.
 		const setPreferenceValueAction = {
 			type: 'SET_PREFERENCE_VALUE',
+			scope: 'test-scope',
 			name: 'myPreference',
 			value: 'myValue',
-		};
+		} as const;
 
 		const state = preferences( {}, setPreferenceValueAction );
 

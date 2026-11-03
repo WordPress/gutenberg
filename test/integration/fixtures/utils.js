@@ -1,15 +1,12 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
 
-const FIXTURES_DIR = path.join( __dirname, 'blocks' );
+const FIXTURES_DIR = path.join( import.meta.dirname, 'blocks' );
 
 function readFixtureFile( fixturesDir, filename ) {
 	try {
 		return fs.readFileSync( path.join( fixturesDir, filename ), 'utf8' );
-	} catch ( err ) {
+	} catch {
 		return null;
 	}
 }

@@ -27,7 +27,7 @@ const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
 );
 ```
 
-**NOTE:** The justfify toolbar does not add any classes to your component, you must do this using the `setAttributes` function. The toolbar does define the following classnames you should use:
+**NOTE:** The justify toolbar does not add any classes to your component, you must do this using the `setAttributes` function. The toolbar does define the following classnames you should use:
 
     items-justified-left
     items-justified-center

@@ -1,24 +1,14 @@
-/**
- * WordPress dependencies
- */
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import deprecated from './deprecated';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
-import { unlock } from '../lock-unlock';
-
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -63,79 +53,10 @@ export const settings = {
 		},
 	},
 
-	deprecated: [
-		{
-			isEligible( attributes ) {
-				return attributes.nofollow;
-			},
-
-			attributes: {
-				label: {
-					type: 'string',
-				},
-				type: {
-					type: 'string',
-				},
-				nofollow: {
-					type: 'boolean',
-				},
-				description: {
-					type: 'string',
-				},
-				id: {
-					type: 'number',
-				},
-				opensInNewTab: {
-					type: 'boolean',
-					default: false,
-				},
-				url: {
-					type: 'string',
-				},
-			},
-
-			migrate( { nofollow, ...rest } ) {
-				return {
-					rel: nofollow ? 'nofollow' : '',
-					...rest,
-				};
-			},
-
-			save() {
-				return <InnerBlocks.Content />;
-			},
-		},
-	],
+	deprecated,
 	transforms,
+	variations,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'label',
-			label: __( 'Label' ),
-			type: 'text',
-			Edit: 'rich-text',
-		},
-		{
-			id: 'link',
-			label: __( 'Link' ),
-			type: 'url',
-			Edit: 'link',
-			getValue: ( { item } ) => ( {
-				url: item.url,
-				rel: item.rel,
-			} ),
-			setValue: ( { value } ) => ( {
-				url: value.url,
-				rel: value.rel,
-			} ),
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'label', 'link' ],
-	};
-}
 
 export const init = () => {
 	addFilter(

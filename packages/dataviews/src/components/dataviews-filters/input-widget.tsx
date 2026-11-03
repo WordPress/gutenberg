@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { Flex } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	NormalizedFilter,
@@ -64,6 +53,10 @@ export default function InputWidget( {
 				...currentField,
 				// Deactivate validation for filters.
 				isValid: {} satisfies NormalizedRules< any >,
+				// Filter controls are always enabled.
+				isDisabled: () => false,
+				// Filter controls are always visible.
+				isVisible: () => true,
 				// Configure getValue/setValue as if Item was a plain object.
 				getValue: ( { item }: { item: any } ) =>
 					item[ currentField.id ],
@@ -110,7 +103,7 @@ export default function InputWidget( {
 							//
 							// In practice, this means the filter will not be able to find an empty string as the value.
 							value: nextValue === '' ? undefined : nextValue,
-					  }
+						}
 					: _filter
 			),
 		} );

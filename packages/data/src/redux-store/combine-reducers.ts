@@ -11,7 +11,7 @@ export function combineReducers< M >(
 	? Reducer<
 			StateFromReducersMapObject< M >,
 			ActionFromReducersMapObject< M >
-	  >
+		>
 	: never;
 
 export function combineReducers( reducers: {

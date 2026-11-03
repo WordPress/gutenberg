@@ -1,5 +1,5 @@
-// When typeRoots is set in tsconfig, TypeScript only includes
-// type definitions found in the specified directories.
-// To ensure that global types are included, we need to
-// explicitly reference them here.
-import '@testing-library/jest-dom';
+/*
+ * With typeRoots set in tsconfig, global types outside those directories,
+ * like the jest-dom matchers, must be referenced explicitly.
+ */
+import '@testing-library/jest-dom/vitest';

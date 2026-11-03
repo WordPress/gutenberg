@@ -66,8 +66,8 @@ function gutenberg_register_colors_support( $block_type ) {
  * Add CSS classes and inline styles for colors to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
  *
  * @return array Colors CSS classes and inline styles.
  */
@@ -106,8 +106,17 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	// Gradients.
+	// Suppress color.gradient CSS when background.gradient is supported and
+	// explicitly set. background.php owns CSS generation in that case, and
+	// emitting the background shorthand here would conflict with it.
+	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
+	$has_background_gradient_value   = ! empty( $block_attributes['style']['background']['gradient'] );
 
-	if ( $has_gradients_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
+	if (
+		$has_gradients_support &&
+		! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) &&
+		! ( $has_background_gradient_support && $has_background_gradient_value )
+	) {
 		$preset_gradient_color          = array_key_exists( 'gradient', $block_attributes ) ? "var:preset|gradient|{$block_attributes['gradient']}" : null;
 		$custom_gradient_color          = $block_attributes['style']['color']['gradient'] ?? null;
 		$color_block_styles['gradient'] = $preset_gradient_color ? $preset_gradient_color : $custom_gradient_color;
@@ -115,6 +124,18 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 
 	$attributes = array();
 	$styles     = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+
+	/*
+	 * Mirror of the background support: a color clipped to the text paints the
+	 * glyphs, not the box, so only a gradient still adds `has-background`.
+	 */
+	$clips_to_text = 'text' === ( $block_attributes['style']['background']['backgroundClip'] ?? null ) &&
+		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) &&
+		! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
+
+	if ( $clips_to_text && ! empty( $styles['classnames'] ) && empty( $color_block_styles['gradient'] ) ) {
+		$styles['classnames'] = implode( ' ', array_diff( explode( ' ', $styles['classnames'] ), array( 'has-background' ) ) );
+	}
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];

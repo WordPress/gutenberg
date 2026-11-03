@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
