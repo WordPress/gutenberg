@@ -1,7 +1,7 @@
 import { Page } from '@wordpress/admin-ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, type Settings } from '@wordpress/core-data';
 import { DataForm, type Field } from '@wordpress/dataviews';
 import { useViewConfig } from '@wordpress/views';
 import { MediaEdit } from '@wordpress/fields';
@@ -10,13 +10,6 @@ import { useEffect, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { inertValue } from '@wordpress/react-inert-value';
 import styles from './style.module.scss';
-
-type SiteSettings = {
-	title?: string;
-	description?: string;
-	site_logo?: number;
-	site_icon?: number;
-};
 
 /*
  * The media fields open the WordPress media modal, which needs the media
@@ -52,7 +45,7 @@ function MediaEditWithEditorAssets( props: any ) {
 	);
 }
 
-const fields: Field< SiteSettings >[] = [
+const fields: Field< Settings >[] = [
 	{
 		id: 'title',
 		type: 'text',
@@ -109,12 +102,7 @@ const VIEW_CONFIG_FIELDS = [ 'form' ];
 function Identity() {
 	const data = useSelect(
 		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
-				'root',
-				'site',
-				// The site entity is a singleton and has no record key.
-				undefined
-			) as SiteSettings,
+			select( coreStore ).getEditedEntityRecord( 'root', 'site' ),
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -129,9 +117,10 @@ function Identity() {
 		editEntityRecord( 'root', 'site', undefined, edits );
 	};
 
-	if ( ! form ) {
-		// The route loader resolves the form configuration before the stage
-		// mounts, so this only guards against the store being reset.
+	if ( ! form || ! data ) {
+		// The route loader resolves the site settings and the form
+		// configuration before the stage mounts, so this only guards against
+		// the store being reset.
 		return null;
 	}
 
