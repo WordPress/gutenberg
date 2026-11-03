@@ -219,16 +219,18 @@ async function main() {
 			);
 		};
 		for ( const { props: phpProps, content: text } of cases ) {
+			// A component without content renders without it.
+			const fixtureContent = content ? text : undefined;
 			fixtures.push( {
 				component: name,
 				props: phpProps,
-				content: text,
-				html: renderReact( phpProps, text ),
+				content: fixtureContent,
+				html: renderReact( phpProps, fixtureContent ),
 			} );
 		}
 
 		// For the preview page: the default, then each value on its own.
-		const exampleContent = 'Save changes';
+		const exampleContent = content ? 'Save changes' : undefined;
 		examples.push( {
 			component: name,
 			name: 'example',
