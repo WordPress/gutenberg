@@ -1,4 +1,16 @@
-export function orderEntityRecordsBySearch( records = [], search = '' ) {
+/**
+ * The title fields used to prioritize entity search results.
+ */
+interface SearchableEntityRecord {
+	title?: {
+		raw?: string;
+	};
+}
+
+export function orderEntityRecordsBySearch< T extends SearchableEntityRecord >(
+	records: T[] | null = [],
+	search = ''
+) {
 	if ( ! Array.isArray( records ) || ! records.length ) {
 		return [];
 	}
@@ -7,8 +19,8 @@ export function orderEntityRecordsBySearch( records = [], search = '' ) {
 		return records;
 	}
 
-	const priority = [];
-	const nonPriority = [];
+	const priority: T[] = [];
+	const nonPriority: T[] = [];
 
 	for ( let i = 0; i < records.length; i++ ) {
 		const record = records[ i ];
