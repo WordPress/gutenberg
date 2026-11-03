@@ -80,11 +80,18 @@ final class SelectionTests: XCTestCase {
 		}
 		XCTAssertTrue( focused.waitForExistence( timeout: 10 ), "The tap did not focus the paragraph" )
 
-		// Wait for the keyboard and for the canvas to stop moving under it,
-		// so the frames below are where the words are now. Without a
-		// software keyboard the canvas does not move, so this does not
-		// assert.
-		_ = app.keyboards.firstMatch.waitForExistence( timeout: Self.settleTimeout )
+		// Focus that shows long after the tap no longer counts as the
+		// tap's, and WebKit then focuses the paragraph without the
+		// keyboard. The next tap brings the keyboard up without moving the
+		// caret, so spend a tap on it here, not the double tap below.
+		let keyboard = app.keyboards.firstMatch
+		if !keyboard.waitForExistence( timeout: Self.settleTimeout ) {
+			lineEnd.tap()
+		}
+		XCTAssertTrue( keyboard.waitForExistence( timeout: Self.settleTimeout ), "No software keyboard" )
+
+		// Wait for the canvas to stop moving under the keyboard, so the
+		// frames below are where the words are now.
 		let target = stableFrame( of: second )
 
 		// The emphasis makes "bravo" a text element of its own, with its
