@@ -1007,6 +1007,34 @@ describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 		);
 	} );
 
+	it( 'keeps a locked crop square when SET_ROTATION crosses a quarter turn', () => {
+		const square = computeInscribedRect( 1, IMAGE );
+		const next = imageEditorReducer(
+			makeState( { aspectRatio: 1, cropRect: square } ),
+			{ type: 'SET_ROTATION', payload: 90 }
+		);
+
+		// The view is now the image turned a quarter: 900 wide, 1600 tall.
+		expect(
+			( next.cropRect.width * PORTRAIT_IMAGE.width ) /
+				( next.cropRect.height * PORTRAIT_IMAGE.height )
+		).toBeCloseTo( 1, 6 );
+		expect( next.cropRect.x + next.cropRect.width / 2 ).toBeCloseTo(
+			0.5,
+			6
+		);
+	} );
+
+	it( 'leaves a locked crop alone while SET_ROTATION stays within a quarter turn', () => {
+		const square = computeInscribedRect( 1, IMAGE );
+		const next = imageEditorReducer(
+			makeState( { aspectRatio: 1, cropRect: square } ),
+			{ type: 'SET_ROTATION', payload: 30 }
+		);
+
+		expect( next.cropRect ).toEqual( square );
+	} );
+
 	it( 'fits the crop to a ratio RESET keeps', () => {
 		const next = imageEditorReducer(
 			makeState( {

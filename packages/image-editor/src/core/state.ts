@@ -404,15 +404,19 @@ export function imageEditorReducer(
 			const oy = cropCy - 0.5;
 			const dx = state.basePan.x - ox;
 			const dy = state.basePan.y - oy;
-			return enforceContainment( {
-				...state,
-				rotation: newRotation,
-				zoom: state.baseZoom,
-				pan: {
-					x: ox + cos * dx - sin * dy,
-					y: oy + sin * dx + cos * dy,
-				},
-			} );
+			// Rotating past 45° from a quarter turn changes the view's
+			// shape, so a locked crop is refitted around its centre.
+			return enforceContainment(
+				fitCropToLockedRatio( {
+					...state,
+					rotation: newRotation,
+					zoom: state.baseZoom,
+					pan: {
+						x: ox + cos * dx - sin * dy,
+						y: oy + sin * dx + cos * dy,
+					},
+				} )
+			);
 		}
 
 		case 'SNAP_ROTATE_90': {
