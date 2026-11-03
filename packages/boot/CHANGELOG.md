@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Load `@wordpress/editor` only when a page opens the editor or the save panel, not on every page. Pages without an editor, like Connectors, no longer download it.
+-   Load `@wordpress/editor` only when a page opens the editor or the save panel, not on every page. Pages without an editor, like Connectors, no longer download it ([#86275](https://github.com/WordPress/gutenberg/pull/86275)).
 -   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).
 
 ### Bug Fixes
