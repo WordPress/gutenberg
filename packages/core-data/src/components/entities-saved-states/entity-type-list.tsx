@@ -1,7 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
+import { Badge } from '@wordpress/ui';
+import {
+	getGlobalStylesChangeGroups,
+	getGlobalStylesChangeGroupSummary,
+	type GlobalStylesChangeGroup,
+} from '@wordpress/global-styles-engine';
 import EntityRecordItem from './entity-record-item';
 import { STORE_NAME } from '../../name';
 import type { store as coreStore } from '../../';
@@ -24,6 +29,56 @@ function getEntityDescription(
 		case 'post':
 			return __( 'The following has been modified.' );
 	}
+}
+
+function ChangeStates( { states }: { states: string[] } ) {
+	if ( ! states.length ) {
+		return null;
+	}
+
+	return (
+		<span className="entities-saved-states__change-states">
+			{ states.map( ( state ) => (
+				<Badge
+					key={ state }
+					className="entities-saved-states__change-state"
+				>
+					{ state }
+				</Badge>
+			) ) }
+		</span>
+	);
+}
+
+export function GlobalStylesChanges( {
+	changeGroups,
+}: {
+	changeGroups: GlobalStylesChangeGroup[];
+} ) {
+	if ( ! changeGroups.length ) {
+		return null;
+	}
+
+	/*
+	 * Each change gets its own line so that the state badges stay next to the
+	 * block or element they belong to.
+	 */
+	return (
+		<ul className="entities-saved-states__changes">
+			{ changeGroups.map( ( { group, items } ) =>
+				items.map( ( item, index ) => (
+					<li key={ `${ group }-${ item.label }-${ index }` }>
+						{ getGlobalStylesChangeGroupSummary(
+							group,
+							item.label,
+							1
+						) }
+						<ChangeStates states={ item.states } />
+					</li>
+				) )
+			) }
+		</ul>
+	);
 }
 
 function GlobalStylesDescription( {
@@ -52,20 +107,15 @@ function GlobalStylesDescription( {
 		[ record.kind, record.name, record.key ]
 	);
 
-	const globalStylesChanges = getGlobalStylesChanges(
+	const changeGroups = getGlobalStylesChangeGroups(
 		editedRecord,
 		savedRecord,
 		{
 			maxResults: 10,
 		}
 	);
-	return globalStylesChanges.length ? (
-		<ul className="entities-saved-states__changes">
-			{ globalStylesChanges.map( ( change ) => (
-				<li key={ change }>{ change }</li>
-			) ) }
-		</ul>
-	) : null;
+
+	return <GlobalStylesChanges changeGroups={ changeGroups } />;
 }
 
 function EntityDescription( {

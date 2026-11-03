@@ -6,6 +6,10 @@
 
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
+### Enhancements
+
+-   Include viewport and pseudo style states in global styles save confirmation labels, grouping each block/element once with its state labels (e.g. Default, Mobile, Tablet), and export `getGlobalStylesChangeGroups` and `getGlobalStylesChangeGroupSummary` so UIs can render structured change summaries ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ### Bug Fixes
 
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
