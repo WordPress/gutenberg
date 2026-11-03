@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import {
+	flushSync,
 	memo,
 	useCallback,
 	useEffect,
@@ -21,6 +22,8 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
+	MenuGroup,
+	MenuItem,
 	Placeholder,
 	TextControl,
 	ToggleControl,
@@ -43,9 +46,15 @@ import {
 	table,
 } from '@wordpress/icons';
 import {
+	displayShortcut,
+	isKeyboardEvent,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
+import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getClosestCell,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -242,10 +251,12 @@ function TableEdit( {
 	 * Inserts a row at the currently selected row index, plus `delta`.
 	 *
 	 * @param {number} delta Offset for selected row index at which to insert.
+	 *
+	 * @return {?Object} The cell that's selected after the row is inserted.
 	 */
 	function onInsertRow( delta ) {
 		if ( ! selectedCell ) {
-			return;
+			return undefined;
 		}
 
 		const { sectionName, rowIndex } = selectedCell;
@@ -258,53 +269,73 @@ function TableEdit( {
 			} )
 		);
 		// Select the first cell of the new row.
-		setSelectedCell( {
+		const newSelectedCell = {
 			sectionName,
 			rowIndex: newRowIndex,
 			columnIndex: 0,
 			type: 'cell',
-		} );
+		};
+		setSelectedCell( newSelectedCell );
+		return newSelectedCell;
 	}
 
 	/**
 	 * Inserts a row before the currently selected row.
+	 *
+	 * @return {?Object} The cell that's selected after the row is inserted.
 	 */
 	function onInsertRowBefore() {
-		onInsertRow( 0 );
+		return onInsertRow( 0 );
 	}
 
 	/**
 	 * Inserts a row after the currently selected row.
+	 *
+	 * @return {?Object} The cell that's selected after the row is inserted.
 	 */
 	function onInsertRowAfter() {
-		onInsertRow( 1 );
+		return onInsertRow( 1 );
 	}
 
 	/**
 	 * Deletes the currently selected row.
+	 *
+	 * @return {?Object} The cell that's selected after the row is deleted.
 	 */
 	function onDeleteRow() {
 		if ( ! selectedCell ) {
-			return;
+			return undefined;
 		}
 
 		const { sectionName, rowIndex } = selectedCell;
+		const newAttributes = deleteRow( attributes, {
+			sectionName,
+			rowIndex,
+		} );
 
-		setSelectedCell();
-		setAttributes( deleteRow( attributes, { sectionName, rowIndex } ) );
+		setAttributes( newAttributes );
+		// Select the cell that takes the deleted cell's place.
+		const newSelectedCell = getClosestCell(
+			{ ...attributes, ...newAttributes },
+			selectedCell
+		);
+		setSelectedCell( newSelectedCell );
+		return newSelectedCell;
 	}
 
 	/**
 	 * Inserts a column at the currently selected column index, plus `delta`.
 	 *
 	 * @param {number} delta Offset for selected column index at which to insert.
+	 *
+	 * @return {?Object} The cell that's selected after the column is inserted.
 	 */
 	function onInsertColumn( delta = 0 ) {
 		if ( ! selectedCell ) {
-			return;
+			return undefined;
 		}
 
-		const { columnIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
 		const newColumnIndex = columnIndex + delta;
 
 		setAttributes(
@@ -312,42 +343,59 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column.
-		setSelectedCell( {
-			rowIndex: 0,
+		// Select the cell of the new column in the current row.
+		const newSelectedCell = {
+			sectionName,
+			rowIndex,
 			columnIndex: newColumnIndex,
 			type: 'cell',
-		} );
+		};
+		setSelectedCell( newSelectedCell );
+		return newSelectedCell;
 	}
 
 	/**
 	 * Inserts a column before the currently selected column.
+	 *
+	 * @return {?Object} The cell that's selected after the column is inserted.
 	 */
 	function onInsertColumnBefore() {
-		onInsertColumn( 0 );
+		return onInsertColumn( 0 );
 	}
 
 	/**
 	 * Inserts a column after the currently selected column.
+	 *
+	 * @return {?Object} The cell that's selected after the column is inserted.
 	 */
 	function onInsertColumnAfter() {
-		onInsertColumn( 1 );
+		return onInsertColumn( 1 );
 	}
 
 	/**
 	 * Deletes the currently selected column.
+	 *
+	 * @return {?Object} The cell that's selected after the column is deleted.
 	 */
 	function onDeleteColumn() {
 		if ( ! selectedCell ) {
-			return;
+			return undefined;
 		}
 
 		const { sectionName, columnIndex } = selectedCell;
+		const newAttributes = deleteColumn( attributes, {
+			sectionName,
+			columnIndex,
+		} );
 
-		setSelectedCell();
-		setAttributes(
-			deleteColumn( attributes, { sectionName, columnIndex } )
+		setAttributes( newAttributes );
+		// Select the cell that takes the deleted cell's place.
+		const newSelectedCell = getClosestCell(
+			{ ...attributes, ...newAttributes },
+			selectedCell
 		);
+		setSelectedCell( newSelectedCell );
+		return newSelectedCell;
 	}
 
 	// Clear the selected cell when the block is deselected.
@@ -374,38 +422,88 @@ function TableEdit( {
 			title: __( 'Insert row before' ),
 			isDisabled: ! selectedCell,
 			onClick: onInsertRowBefore,
+			shortcutCharacter: 'u',
 		},
 		{
 			icon: tableRowAfter,
 			title: __( 'Insert row after' ),
 			isDisabled: ! selectedCell,
 			onClick: onInsertRowAfter,
+			shortcutCharacter: 'd',
 		},
 		{
 			icon: tableRowDelete,
 			title: __( 'Delete row' ),
 			isDisabled: ! selectedCell,
 			onClick: onDeleteRow,
+			shortcutCharacter: 'x',
 		},
 		{
 			icon: tableColumnBefore,
 			title: __( 'Insert column before' ),
 			isDisabled: ! selectedCell,
 			onClick: onInsertColumnBefore,
+			shortcutCharacter: 'l',
 		},
 		{
 			icon: tableColumnAfter,
 			title: __( 'Insert column after' ),
 			isDisabled: ! selectedCell,
 			onClick: onInsertColumnAfter,
+			shortcutCharacter: 'r',
 		},
 		{
 			icon: tableColumnDelete,
 			title: __( 'Delete column' ),
 			isDisabled: ! selectedCell,
 			onClick: onDeleteColumn,
+			shortcutCharacter: 'c',
 		},
 	];
+
+	/**
+	 * Runs the "Edit table" menu item whose shortcut was pressed in a cell.
+	 *
+	 * @param {KeyboardEvent} event Key down event.
+	 */
+	function onKeyDown( event ) {
+		// The shortcuts follow the rules of the menu, which needs a selected cell
+		// and is only shown in the default editing mode.
+		if (
+			! selectedCell ||
+			blockEditingMode !== 'default' ||
+			! event.target.closest( 'table' )
+		) {
+			return;
+		}
+
+		const control = tableControls.find( ( { shortcutCharacter } ) =>
+			isKeyboardEvent.secondary( event, shortcutCharacter )
+		);
+
+		if ( ! control ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		// A cell only saves typed text while it's selected, so focus has to follow
+		// the selection. Render first, so that the new cell is there to focus.
+		const newSelectedCell = flushSync( control.onClick );
+
+		// Deleting the last cell leaves the table's placeholder.
+		const elementToFocus = newSelectedCell
+			? tableRef.current?.querySelector(
+					`t${ newSelectedCell.sectionName } > tr:nth-child(${
+						newSelectedCell.rowIndex + 1
+					}) > :nth-child(${
+						newSelectedCell.columnIndex + 1
+					}) [contenteditable="true"]`
+				)
+			: tableRef.current;
+
+		elementToFocus?.focus();
+	}
 
 	const renderedSections = sections.map( ( name ) => (
 		<TSection name={ name } key={ name }>
@@ -445,7 +543,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps( { ref: tableRef } ) }>
+		<figure { ...useBlockProps( { ref: tableRef, onKeyDown } ) }>
 			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">
@@ -462,8 +560,44 @@ function TableEdit( {
 						<ToolbarDropdownMenu
 							icon={ table }
 							label={ __( 'Edit table' ) }
-							controls={ tableControls }
-						/>
+						>
+							{ ( { onClose } ) => (
+								<MenuGroup>
+									{ tableControls.map(
+										( {
+											icon: controlIcon,
+											title,
+											isDisabled,
+											onClick,
+											shortcutCharacter,
+										} ) => (
+											<MenuItem
+												key={ title }
+												icon={ controlIcon }
+												iconPosition="left"
+												disabled={ isDisabled }
+												shortcut={ {
+													display:
+														displayShortcut.secondary(
+															shortcutCharacter
+														),
+													ariaLabel:
+														shortcutAriaLabel.secondary(
+															shortcutCharacter
+														),
+												} }
+												onClick={ () => {
+													onClose();
+													onClick();
+												} }
+											>
+												{ title }
+											</MenuItem>
+										)
+									) }
+								</MenuGroup>
+							) }
+						</ToolbarDropdownMenu>
 					</BlockControls>
 				</>
 			) }

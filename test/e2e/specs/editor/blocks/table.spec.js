@@ -185,6 +185,153 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'allows rows and columns to be edited with keyboard shortcuts', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'A1', tag: 'td' },
+							{ content: 'B1', tag: 'td' },
+						],
+					},
+					{
+						cells: [
+							{ content: 'A2', tag: 'td' },
+							{ content: 'B2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const cells = editor.canvas.getByRole( 'textbox', {
+			name: 'Body cell text',
+		} );
+
+		await cells.first().click();
+
+		// Each shortcut moves focus to the new cell, so typing is saved there.
+		await pageUtils.pressKeys( 'secondary+d' );
+		await page.keyboard.type( 'after' );
+		await expect( cells ).toHaveText( [
+			'A1',
+			'B1',
+			'after',
+			'',
+			'A2',
+			'B2',
+		] );
+
+		await pageUtils.pressKeys( 'secondary+u' );
+		await page.keyboard.type( 'before' );
+		await expect( cells ).toHaveText( [
+			'A1',
+			'B1',
+			'before',
+			'',
+			'after',
+			'',
+			'A2',
+			'B2',
+		] );
+
+		// The row below takes the place of the deleted row, and keeps focus.
+		await pageUtils.pressKeys( 'secondary+x' );
+		await expect( cells.nth( 2 ) ).toBeFocused();
+		await expect( cells ).toHaveText( [
+			'A1',
+			'B1',
+			'after',
+			'',
+			'A2',
+			'B2',
+		] );
+
+		await pageUtils.pressKeys( 'secondary+r' );
+		await page.keyboard.type( 'right' );
+		await pageUtils.pressKeys( 'secondary+l' );
+		await page.keyboard.type( 'left' );
+		await expect( cells ).toHaveText( [
+			'A1',
+			'',
+			'',
+			'B1',
+			'after',
+			'left',
+			'right',
+			'',
+			'A2',
+			'',
+			'',
+			'B2',
+		] );
+
+		// The column to the right takes the place of the deleted column.
+		await pageUtils.pressKeys( 'secondary+c' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' moved' );
+
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toContain(
+				'<tr><td>A1</td><td></td><td>B1</td></tr><tr><td>after</td><td>right moved</td><td></td></tr><tr><td>A2</td><td></td><td>B2</td></tr>'
+			);
+	} );
+
+	test( 'keeps focus in the block when a shortcut deletes the last row', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [ { cells: [ { content: 'Only', tag: 'td' } ] } ],
+			},
+		} );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Body cell text' } )
+			.click();
+		await pageUtils.pressKeys( 'secondary+x' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Table' } )
+		).toBeFocused();
+		await expect(
+			editor.canvas.getByRole( 'spinbutton', { name: 'Column count' } )
+		).toBeVisible();
+	} );
+
+	test( 'shows the keyboard shortcuts in the Edit table menu', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [ { cells: [ { content: 'Cell', tag: 'td' } ] } ],
+			},
+		} );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Body cell text' } )
+			.click();
+		await editor.clickBlockToolbarButton( 'Edit table' );
+
+		const menu = page.getByRole( 'menu', { name: 'Edit table' } );
+
+		await expect( menu.getByRole( 'menuitem' ) ).toHaveCount( 6 );
+		await expect(
+			menu.locator( '.components-menu-item__shortcut' )
+		).toHaveCount( 6 );
+	} );
+
 	test( 'allows columns to be aligned', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 

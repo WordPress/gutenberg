@@ -304,6 +304,45 @@ export function deleteColumn( state, { columnIndex } ) {
 }
 
 /**
+ * Finds the cell closest to a location that may no longer exist, such as a cell
+ * in a row or column that was deleted. The location's section is preferred,
+ * falling back to the body, head and foot.
+ *
+ * @param {Object} state                Current table state.
+ * @param {Object} location             The cell location to start from.
+ * @param {string} location.sectionName Section the cell was in.
+ * @param {number} location.rowIndex    Row index the cell was in.
+ * @param {number} location.columnIndex Column index the cell was in.
+ *
+ * @return {?Object} The closest cell location, or undefined if the table has no cells.
+ */
+export function getClosestCell(
+	state,
+	{ sectionName, rowIndex, columnIndex }
+) {
+	const closestSectionName = [ sectionName, 'body', 'head', 'foot' ].find(
+		( name ) => ! isEmptyTableSection( state[ name ] )
+	);
+
+	if ( ! closestSectionName ) {
+		return undefined;
+	}
+
+	const rows = state[ closestSectionName ];
+	const closestRowIndex = Math.min( rowIndex, rows.length - 1 );
+
+	return {
+		sectionName: closestSectionName,
+		rowIndex: closestRowIndex,
+		columnIndex: Math.min(
+			columnIndex,
+			rows[ closestRowIndex ].cells.length - 1
+		),
+		type: 'cell',
+	};
+}
+
+/**
  * Toggles the existence of a section.
  *
  * @param {Object} state       Current table state.
