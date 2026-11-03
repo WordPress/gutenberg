@@ -1,14 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Social Icons', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
-	} );
-
-	test( 'keeps focus in the inspector when the canvas popover closes', async ( {
-		editor,
-		page,
-	} ) => {
 		await editor.insertBlock( {
 			name: 'core/social-links',
 			innerBlocks: [
@@ -21,6 +15,12 @@ test.describe( 'Social Icons', () => {
 				},
 			],
 		} );
+	} );
+
+	test( 'keeps focus in the inspector when the canvas popover closes', async ( {
+		editor,
+		page,
+	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
 			.getByRole( 'button', { name: 'WordPress' } )
@@ -45,18 +45,6 @@ test.describe( 'Social Icons', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/social-links',
-			innerBlocks: [
-				{
-					name: 'core/social-link',
-					attributes: {
-						service: 'wordpress',
-						url: 'https://wordpress.org/',
-					},
-				},
-			],
-		} );
 		const icon = editor.canvas.getByRole( 'button', { name: 'WordPress' } );
 		await icon.click();
 		const urlInput = page.getByRole( 'combobox', {
