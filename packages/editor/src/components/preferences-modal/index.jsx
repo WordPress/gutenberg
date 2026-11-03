@@ -127,6 +127,18 @@ function PreferencesModalContents( { extraSections = {} } ) {
 										label={ __( 'Show avatar in blocks' ) }
 									/>
 								) }
+								{ showCollaborationOptions && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationBlockHighlight"
+										help={ __(
+											'Outline the blocks collaborators are working in, with their avatars above. Their cursors still show where they are typing.'
+										) }
+										label={ __(
+											"Outline collaborators' blocks"
+										) }
+									/>
+								) }
 							</PreferencesModalSection>
 							{ showCollaborationOptions && (
 								<PreferencesModalSection

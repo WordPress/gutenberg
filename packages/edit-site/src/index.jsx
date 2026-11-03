@@ -66,6 +66,7 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: true,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,

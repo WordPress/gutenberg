@@ -70,6 +70,7 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: true,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,
