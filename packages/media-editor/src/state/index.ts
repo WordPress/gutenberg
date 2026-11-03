@@ -13,6 +13,7 @@ export {
 	buildInitialMediaEditorState,
 } from './composite-reducer';
 export { DEFAULT_CROP_OPTIONS } from './types';
+export { DEFAULT_ASPECT_RATIOS } from './aspect-ratio-presets';
 export type {
 	CropOptionsSlice,
 	EditsSlice,
