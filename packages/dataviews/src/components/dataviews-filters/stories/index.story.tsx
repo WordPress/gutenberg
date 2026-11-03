@@ -11,25 +11,25 @@ import type { DataFormControlProps, Field, View } from '../../../types';
 
 type Item = {
 	id: number;
-	title: string;
-	subtitle: string;
+	withoutHelpText: string;
+	withHelpText: string;
 	shortName: string;
 	longName: string;
-	tags: string;
-	badge: string;
-	status: string;
+	customEditWrapping: string;
+	customEditFixedWidth: string;
+	listFilter: string;
 };
 
 const data: Item[] = [
 	{
 		id: 1,
-		title: 'Moon',
-		subtitle: 'Satellite',
+		withoutHelpText: 'Moon',
+		withHelpText: 'Satellite',
 		shortName: 'a',
 		longName: 'a',
-		tags: 'Token 1',
-		badge: 'Token 1',
-		status: 'published',
+		customEditWrapping: 'Token 1',
+		customEditFixedWidth: 'Token 1',
+		listFilter: 'published',
 	},
 ];
 
@@ -37,12 +37,9 @@ const TEXT_OPERATORS = [ 'is', 'isNot' ] as const;
 
 // A control whose items wrap, like a token list. Laid out at `max-content`,
 // it puts every item on one row.
-function WrappingControl( { onChange, field }: DataFormControlProps< Item > ) {
+function WrappingEdit( { onChange, field }: DataFormControlProps< Item > ) {
 	return (
-		<div
-			className="wrapping-control"
-			style={ { display: 'flex', flexWrap: 'wrap', gap: 4 } }
-		>
+		<div style={ { display: 'flex', flexWrap: 'wrap', gap: 4 } }>
 			{ Array.from( { length: 30 }, ( _, index ) => (
 				<button
 					key={ index }
@@ -60,59 +57,62 @@ function WrappingControl( { onChange, field }: DataFormControlProps< Item > ) {
 
 // A control wider than the 250px the popover used to allow, which must not be
 // clipped or overflow.
-function FixedWidthControl() {
-	return (
-		<div
-			className="fixed-width-control"
-			style={ { width: 320, height: 40, background: '#ddd' } }
-		/>
-	);
+function FixedWidthEdit() {
+	return <div style={ { width: 320, height: 40, background: '#ddd' } } />;
 }
 
+// Each pair shows a case next to the one it is compared with. The chips sort
+// by label, so a pair shares a label prefix to stay together.
 const fields: Field< Item >[] = [
+	// Help text should wrap to the control's width, not widen the popover.
 	{
-		id: 'title',
-		label: 'Title',
+		id: 'withoutHelpText',
+		label: 'Help text: none',
 		type: 'text',
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
 	{
-		id: 'subtitle',
-		label: 'Subtitle',
+		id: 'withHelpText',
+		label: 'Help text: long',
 		type: 'text',
 		description:
 			'The text shown under the title, in the language configured in the site settings.',
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
+	// A long name, as in a translation, should be truncated on one line, not
+	// widen the popover or squeeze the operator.
 	{
 		id: 'shortName',
-		label: 'Name',
+		label: 'Name: short',
 		type: 'text',
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
 	{
 		id: 'longName',
-		label: 'Date of the last modification of the content',
+		label: 'Name: long, as a translation that does not fit on one line',
 		type: 'text',
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
+	// A custom control should fit: wrapping its items inside the viewport, or
+	// growing the popover to hold a fixed width.
 	{
-		id: 'tags',
-		label: 'Tags',
+		id: 'customEditWrapping',
+		label: 'Custom edit: wrapping',
 		type: 'text',
-		Edit: WrappingControl,
+		Edit: WrappingEdit,
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
 	{
-		id: 'badge',
-		label: 'Badge',
+		id: 'customEditFixedWidth',
+		label: 'Custom edit: fixed width',
 		type: 'text',
-		Edit: FixedWidthControl,
+		Edit: FixedWidthEdit,
 		filterBy: { isPrimary: true, operators: [ ...TEXT_OPERATORS ] },
 	},
+	// A list filter keeps the default width.
 	{
-		id: 'status',
-		label: 'Status',
+		id: 'listFilter',
+		label: 'List filter',
 		elements: [
 			{ value: 'published', label: 'Published' },
 			{ value: 'draft', label: 'Draft' },
@@ -136,7 +136,7 @@ const FilterPopoverComponent = () => {
 				operator: 'is',
 				value: undefined,
 			} ) ),
-		fields: [ 'title' ],
+		fields: [ 'withoutHelpText' ],
 	} );
 	const { data: shownData, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( data, view, fields ),
