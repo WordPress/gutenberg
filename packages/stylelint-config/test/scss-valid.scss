@@ -41,3 +41,20 @@ b {
 		display: none;
 	}
 }
+
+@function baz($value) {
+	@if $value < 0 {
+		@error "The value must be positive.";
+	}
+	@while $value > 10 {
+		$value: $value - 10;
+	}
+	@return $value;
+}
+
+.qux {
+	display: block;
+	@media (min-width: 600px) {
+		display: flex;
+	}
+}

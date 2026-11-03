@@ -14,18 +14,8 @@ export default {
 			'always',
 			{
 				except: [ 'blockless-after-blockless' ],
-				ignore: [ 'after-comment', 'first-nested' ],
-				ignoreAtRules: [
-					'else',
-					'if',
-					'include',
-					'mixin',
-					'extend',
-					'warn',
-					'for',
-					'each',
-					'content',
-				],
+				ignore: [ 'after-comment', 'inside-block' ],
+				ignoreAtRules: [ 'else' ],
 			},
 		],
 

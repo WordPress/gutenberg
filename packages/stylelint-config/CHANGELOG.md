@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   SCSS: Stop requiring an empty line before Sass directives such as `@if`, `@include` and `@warn`, or before the first nested at-rule, in `at-rule-empty-line-before` ([#69606](https://github.com/WordPress/gutenberg/pull/69606)).
+-   SCSS: Stop checking empty lines before at-rules nested inside a block, such as `@include` in a rule or `@if` in a mixin, in `at-rule-empty-line-before` ([#69606](https://github.com/WordPress/gutenberg/pull/69606)).
 
 ### Internal
 
