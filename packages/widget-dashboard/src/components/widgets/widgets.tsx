@@ -9,6 +9,7 @@ import type {
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { toItemResizeWidths } from '../../utils/resolve-width-options';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -127,8 +128,28 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			gridSettings,
 			widgetTypes,
 			canPerform,
+			widthOptions,
 		} = useDashboardInternalContext();
 		const isMasonry = gridSettings.model === 'masonry';
+
+		/*
+		 * The host's width choices become per-item gesture targets: every
+		 * tile resizes to the declared tokens only. `'fill'` is a menu
+		 * choice, so it is stripped; a failed configuration leaves empty
+		 * lists, which freeze the width (fail closed for width changes)
+		 * while height resizing passes through. Without choices the grid
+		 * keeps its current snapping.
+		 */
+		const itemResizeWidths = useMemo(
+			() =>
+				isMasonry
+					? undefined
+					: toItemResizeWidths(
+							widthOptions,
+							layout.map( ( widget ) => widget.uuid )
+						),
+			[ isMasonry, widthOptions, layout ]
+		);
 
 		const permissionsFor = useCallback< TilePermissionsFor >(
 			( widget ) => {
@@ -260,6 +281,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				columns={ gridSettings.columns }
 				minColumnWidth={ gridSettings.minColumnWidth }
 				rowHeight={ gridSettings.rowHeight }
+				itemResizeWidths={ itemResizeWidths }
 				onChangeLayout={ handleGridChange }
 				{ ...sharedRenderProps }
 			>

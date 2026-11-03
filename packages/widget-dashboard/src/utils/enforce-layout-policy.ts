@@ -1,6 +1,7 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { canonicalizeLayout } from './canonicalize-layout';
+import type { WidthOptionsResolution } from './resolve-width-options';
 import type {
 	CanPerformDashboardOperation,
 	DashboardInstanceOperation,
@@ -12,9 +13,22 @@ import type {
  * Placement fields by facet. `resize` owns the spans; `move` owns the
  * masonry lane pin. Explicit `order` never reaches the diff: both
  * layouts are canonicalized first, so position IS the array position.
+ * Width governance from the host's width choices owns the width alone,
+ * keeping a staged height edit when the width must come back.
  */
 const SIZE_FIELDS = [ 'width', 'height' ] as const;
+const WIDTH_FIELDS = [ 'width' ] as const;
 const POSITION_FIELDS = [ 'lane' ] as const;
+
+/**
+ * The width resolutions the staging boundary acts on: the host's choices
+ * or their failed validation. The `default` resolution never reaches
+ * the enforcement, so the boundary is defined over these two kinds.
+ */
+type EnforceableWidthOptions = Extract<
+	WidthOptionsResolution,
+	{ kind: 'custom' | 'invalid' }
+>;
 
 type PlacementFields = readonly string[];
 
@@ -74,6 +88,36 @@ interface EnforceLayoutPolicyArgs {
 	 * policy request.
 	 */
 	widgetTypes: WidgetType[];
+
+	/**
+	 * The host's validated width choices; `undefined` (the `default`
+	 * resolution) applies none. Present, the widths of changed or newly
+	 * inserted placements must stay within the choices: a staged width
+	 * outside them is restored to the prior (committed) width while
+	 * independent edits survive, a new insertion with no width to
+	 * restore is rejected, and a failed validation — the `invalid`
+	 * resolution — denies every width change.
+	 */
+	widthOptions?: EnforceableWidthOptions;
+}
+
+/**
+ * Whether a width token is storable under the resolved width choices:
+ * an `invalid` configuration allows nothing, and the choices must
+ * include the token (an absent width is not a choice). The token comes
+ * through placement access as `unknown` and compares by value.
+ *
+ * @param width   The placement width token, or undefined when unset.
+ * @param options The validated width choices.
+ */
+function isWidthAllowed(
+	width: unknown,
+	options: EnforceableWidthOptions
+): boolean {
+	if ( options.kind === 'invalid' ) {
+		return false;
+	}
+	return options.options.some( ( option ) => option.value === width );
 }
 
 /**
@@ -91,13 +135,24 @@ interface EnforceLayoutPolicyArgs {
  * for allowed membership changes: the same hold `remove` uses, and the
  * position the grid's pinned items keep.
  *
+ * The host's `widthOptions`, when supplied, govern widths on top of the
+ * policy's own `resize` answer: a changed width must be one of the
+ * choices, or the width alone is re-asserted from `previous` (a staged
+ * height edit survives as an independent allowed change), and a new
+ * instance must arrive with an allowed width or be rejected, since
+ * there is no committed width to restore. A failed validation — the
+ * `invalid` resolution — denies every width change and rejects every
+ * insertion, failing closed rather than restoring unrestricted choices.
+ * Existing unsupported widths pass unchanged, staying visible without
+ * being introduced anew.
+ *
  * Both layouts are canonicalized before the diff (sorted by
  * `order ?? index` with `order` stripped, as the renderer and the
  * commit read them), so a move is a move whichever encoding expressed
  * it. Returns `next` itself when it was already canonical and nothing
  * was re-asserted.
  *
- * @param {EnforceLayoutPolicyArgs} args The layouts to diff and the policy.
+ * @param {EnforceLayoutPolicyArgs} args The layouts to diff, the policy, and the width choices.
  * @return {DashboardWidget[]} The incoming layout with denied changes re-asserted.
  */
 export function enforceLayoutPolicy( {
@@ -105,6 +160,7 @@ export function enforceLayoutPolicy( {
 	next: rawNext,
 	canPerform,
 	widgetTypes,
+	widthOptions,
 }: EnforceLayoutPolicyArgs ): DashboardWidget[] {
 	const previous = canonicalizeLayout( rawPrevious );
 	const next = canonicalizeLayout( rawNext );
@@ -129,6 +185,15 @@ export function enforceLayoutPolicy( {
 				widgetType &&
 				! canPerform( { operation: 'insert', widgetType } )
 			) {
+				continue;
+			}
+			if (
+				widthOptions &&
+				! isWidthAllowed( placementOf( incoming ).width, widthOptions )
+			) {
+				// Reject the insertion: a new instance has no committed
+				// width to restore, so it must arrive with an allowed
+				// width.
 				continue;
 			}
 			free.push( incoming );
@@ -156,6 +221,23 @@ export function enforceLayoutPolicy( {
 			! allows( 'resize' )
 		) {
 			staged = restorePlacementFields( staged, prior, SIZE_FIELDS );
+		}
+
+		// Width governance, independent of the policy's resize answer:
+		// any changed width must be one of the host's choices, or the
+		// width alone is re-asserted from `previous` — keeping the staged
+		// height, attributes, and position as independent allowed edits.
+		// An unchanged width needs no validation, so a legacy stored
+		// width outside the choices stays visible without a new change.
+		if ( widthOptions ) {
+			const priorWidth = placementOf( prior ).width;
+			const stagedWidth = placementOf( staged ).width;
+			if (
+				priorWidth !== stagedWidth &&
+				! isWidthAllowed( stagedWidth, widthOptions )
+			) {
+				staged = restorePlacementFields( staged, prior, WIDTH_FIELDS );
+			}
 		}
 
 		if ( allows( 'move' ) ) {
