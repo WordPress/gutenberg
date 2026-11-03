@@ -61,6 +61,7 @@ const UnforwardedValidatedContentEditableControl = (
 				// text-oriented form field is expected to validate `required`.
 				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling

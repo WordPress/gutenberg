@@ -28,6 +28,22 @@ describe( 'ValidatedCustomSelectControl', () => {
 		} );
 	} );
 
+	it( 'should expose only the combobox to assistive technology', async () => {
+		render(
+			<ValidatedCustomSelectControl
+				label="Font Size"
+				options={ options }
+				value={ options[ 0 ] }
+				onChange={ () => {} }
+				required
+			/>
+		);
+
+		await waitFor( () => {
+			expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 1 );
+		} );
+	} );
+
 	it( 'should preserve the built-in description when validation is active', async () => {
 		const user = userEvent.setup();
 		render(

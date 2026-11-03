@@ -36,8 +36,6 @@ describe( 'ValidatedContentEditableControl', () => {
 			</form>
 		);
 
-		// The hidden validity delegate is also a textbox, so scope the query
-		// to the accessible name only the labeled editable has.
 		const textbox = screen.getByRole( 'textbox', {
 			name: /^Bio/,
 		} );
@@ -54,6 +52,14 @@ describe( 'ValidatedContentEditableControl', () => {
 		);
 	} );
 
+	it( 'should expose only the editable to assistive technology', () => {
+		render(
+			<ValidatedContentEditableControl label="Bio" value="" required />
+		);
+
+		expect( screen.getAllByRole( 'textbox' ) ).toHaveLength( 1 );
+	} );
+
 	it( 'should move focus to the editable when the delegate is focused', async () => {
 		render(
 			<ValidatedContentEditableControl label="Bio" value="" required />
@@ -64,7 +70,7 @@ describe( 'ValidatedContentEditableControl', () => {
 		// Constraint validation lands focus on the hidden delegate; the
 		// wrapper forwards it to the editable the user actually interacts
 		// with.
-		screen.getByRole( 'textbox', { name: '' } ).focus();
+		screen.getByRole( 'textbox', { name: '', hidden: true } ).focus();
 
 		await waitFor( () => expect( textbox ).toHaveFocus() );
 	} );

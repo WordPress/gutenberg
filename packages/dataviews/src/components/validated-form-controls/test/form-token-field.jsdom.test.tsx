@@ -22,6 +22,20 @@ describe( 'ValidatedFormTokenField', () => {
 		);
 	} );
 
+	it( 'should expose only the combobox to assistive technology', () => {
+		render(
+			<ValidatedFormTokenField
+				label="Tags"
+				value={ [] }
+				onChange={ () => {} }
+				required
+			/>
+		);
+
+		expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 1 );
+		expect( screen.queryByRole( 'textbox' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'should preserve the built-in howto description when validation is active', async () => {
 		const user = userEvent.setup();
 		render(

@@ -46,6 +46,7 @@ const UnforwardedValidatedFormTokenField = (
 						: ''
 				}
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling
