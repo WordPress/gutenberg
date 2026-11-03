@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { next, replace, attrs, string } from '../';
+import Shortcode, { next, replace, attrs, string } from '../';
 
 describe( 'shortcode', () => {
 	describe( 'next', () => {
@@ -302,6 +302,29 @@ describe( 'shortcode', () => {
 			};
 
 			expect( result ).toEqual( expected );
+		} );
+	} );
+
+	describe( 'set', () => {
+		it( 'should not change other shortcodes created from the same attribute text', () => {
+			const options = {
+				tag: 'gallery',
+				attrs: 'ids="1,2" 3',
+				type: 'single' as const,
+			};
+
+			const first = new Shortcode( options );
+			first.set( 'ids', '4,5' );
+			first.set( 0, '6' );
+			expect( first.string() ).toBe( '[gallery 6 ids="4,5"]' );
+
+			expect( new Shortcode( options ).string() ).toBe(
+				'[gallery 3 ids="1,2"]'
+			);
+			expect( attrs( 'ids="1,2" 3' ) ).toEqual( {
+				named: { ids: '1,2' },
+				numeric: [ '3' ],
+			} );
 		} );
 	} );
 
