@@ -1924,7 +1924,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;--wp--style--grid-cells:auto;}";
-		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}";
+		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:0deg !important;}";
 
 		if ( $should_stack ) {
 			$this->assertStringContainsString( '@media (width <= 480px){' . $sizing_rule . '}', $stylesheet, 'A stacked grid should be sized by its content.' );
@@ -2397,9 +2397,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check that the stacking rule unrotates the children of a stacked grid, with a
-	 * selector more specific than the rotate support's class rules, inside and outside
-	 * of media queries.
+	 * Check that the stacking rule unrotates the children of a stacked grid: it is important,
+	 * as the transform block support rotates a block with an inline style and its viewport
+	 * rules are important, and its two classes beat a state rule's single class.
 	 *
 	 * @covers ::gutenberg_render_layout_support_flag
 	 */
@@ -2407,22 +2407,19 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
 		switch_theme( 'default' );
 
-		$child_content = '<p>Rotated</p>';
-		$child_output  = gutenberg_render_rotate_support(
+		$child_content = '<h2 class="wp-block-heading">Rotated</h2>';
+		$child_output  = gutenberg_render_transform_support(
 			$child_content,
 			array(
-				'blockName' => 'core/paragraph',
+				'blockName' => 'core/heading',
 				'attrs'     => array(
 					'style' => array(
-						'rotate'  => 30,
-						'@mobile' => array( 'rotate' => 15 ),
+						'transform' => array( 'rotate' => '30deg' ),
 					),
 				),
 			)
 		);
-		$this->assertMatchesRegularExpression( '/wp-rotate-[a-z0-9]+/', $child_output, 'The child should be rotated.' );
-		preg_match( '/wp-rotate-[a-z0-9]+/', $child_output, $rotate_matches );
-		$rotate_class = $rotate_matches[0];
+		$this->assertStringContainsString( 'style="rotate:30deg;"', $child_output, 'The child should be rotated inline.' );
 
 		$block_content = '<div class="wp-block-group"></div>';
 		$output        = gutenberg_render_layout_support_flag(
@@ -2446,10 +2443,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$container_class = $matches[0];
 
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-		$this->assertStringContainsString( ".$rotate_class{rotate:30deg;}", $stylesheet );
-		$this->assertStringContainsString( "@media (width <= 480px){.$rotate_class{rotate:15deg;}}", $stylesheet );
-		// Two classes beat the rotate support's single class, whatever the order of the rules.
-		$this->assertStringContainsString( "@media (width <= 480px){.$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}}", $stylesheet );
+		$this->assertStringContainsString( "@media (width <= 480px){.$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:0deg !important;}}", $stylesheet );
 	}
 
 	/**
@@ -2460,7 +2454,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	public function test_row_span_declarations_survive_sanitization() {
 		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
 		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
-		$this->assertSame( 'rotate:none', safecss_filter_attr( 'rotate:none' ) );
+		$this->assertSame( 'rotate:0deg', safecss_filter_attr( 'rotate:0deg' ) );
 	}
 
 	/**

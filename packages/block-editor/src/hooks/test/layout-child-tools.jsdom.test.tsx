@@ -108,7 +108,7 @@ describe( 'grid item rotate handle', () => {
 			title: 'Grid item',
 			category: 'text',
 			attributes: {},
-			supports: { rotation: true },
+			supports: { transform: { rotate: true } },
 			edit: () => null,
 			save: () => null,
 		} );
@@ -179,7 +179,7 @@ describe( 'grid item resizer', () => {
 			title: 'Grid item',
 			category: 'text',
 			attributes: {},
-			supports: { rotation: true },
+			supports: { transform: { rotate: true } },
 			edit: () => null,
 			save: () => null,
 		} );
@@ -198,7 +198,7 @@ describe( 'grid item resizer', () => {
 	} );
 
 	it( 'is not shown for rotated blocks', () => {
-		renderGridItemTools( { rotate: 45 } );
+		renderGridItemTools( { transform: { rotate: '45deg' } } );
 		expect( queryResizer() ).not.toBeInTheDocument();
 	} );
 

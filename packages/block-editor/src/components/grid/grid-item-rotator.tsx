@@ -25,6 +25,8 @@ interface Rotation {
 	pointerId: number;
 	centerX: number;
 	centerY: number;
+	/** The block element's inline `rotate` before the preview replaced it. */
+	inlineRotate: string;
 	/** The rotation minus the pointer's direction when the drag started. */
 	offset: number;
 	value: number;
@@ -51,8 +53,9 @@ function removeKeyListeners( rotation: Rotation ) {
  * handles.
  *
  * While dragging, the rotation is previewed with an inline `rotate` style on
- * the block element, which wins over the rotate support's class rules, and
- * nothing is written to the block. Releasing the pointer writes the angle
+ * the block element, over the one the transform support sets, and nothing is
+ * written to the block. The support's own value is put back when the preview
+ * ends, since React only writes the style again when the attribute changes. Releasing the pointer writes the angle
  * once, so a rotation is a single undo step. Pressing Escape cancels it.
  *
  * Rotation snaps to multiples of 15°. Holding Shift rotates freely.
@@ -82,7 +85,7 @@ export function GridItemRotator( {
 			rotationRef.current = null;
 			removeKeyListeners( rotation );
 			if ( blockElement ) {
-				setInlineStyle( blockElement, 'rotate', '' );
+				setInlineStyle( blockElement, 'rotate', rotation.inlineRotate );
 			}
 			onPreviewRef.current?.( null );
 		};
@@ -99,7 +102,9 @@ export function GridItemRotator( {
 		setInlineStyle(
 			blockElement,
 			'rotate',
-			nextAngle === null ? '' : `${ nextAngle }deg`
+			nextAngle === null
+				? ( rotationRef.current?.inlineRotate ?? '' )
+				: `${ nextAngle }deg`
 		);
 		setPreviewAngle( nextAngle );
 		onPreview?.( nextAngle );
@@ -157,6 +162,7 @@ export function GridItemRotator( {
 			handle,
 			documents,
 			pointerId: event.pointerId,
+			inlineRotate: blockElement.style.getPropertyValue( 'rotate' ),
 			centerX,
 			centerY,
 			offset:
