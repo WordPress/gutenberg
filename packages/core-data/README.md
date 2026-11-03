@@ -1164,14 +1164,14 @@ via the `edit()` and `save()` mutation helpers provided by
 
 _Parameters_
 
-- _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
-- _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
-- _recordId_ `string | number`: ID of the requested entity record.
+- _kind_ `Kind`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+- _name_ `Name`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+- _recordId_ `string | number`: ID of the requested entity record. Omitted for entities without a key, such as `root`/`site`.
 - _options_ `Options`: Optional hook options.
 
 _Returns_
 
-- `EntityRecordResolution< RecordType >`: Entity record data.
+- `EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >`: Entity record data.
 
 _Changelog_
 
@@ -1212,14 +1212,14 @@ the store state using `getEntityRecords()`, or resolved if missing.
 
 _Parameters_
 
-- _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
-- _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
-- _queryArgs_ `Record< string, unknown >`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+- _kind_ `Kind`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+- _name_ `Name`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+- _queryArgs_ `Query`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
 - _options_ `Options`: Optional hook options.
 
 _Returns_
 
-- `EntityRecordsResolution< RecordType >`: Entity records data.
+- `EntityRecordsResolution< ET.EntityRecordOfQuery< Kind, Name, Query > >`: Entity records data.
 
 _Changelog_
 

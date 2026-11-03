@@ -53,6 +53,7 @@ export type GuidelineQuery = {
 export interface KnowledgeRow {
 	id: number;
 	slug: string;
+	author: number;
 	content?: { raw?: string };
 }
 

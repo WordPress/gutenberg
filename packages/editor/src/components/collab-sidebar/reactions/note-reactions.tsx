@@ -5,7 +5,6 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { Comment } from '@wordpress/core-data';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 	Button,
@@ -99,19 +98,15 @@ function ReactionButton( {
 			if ( ! isShowingNames ) {
 				return null;
 			}
-			return select( coreStore ).getEntityRecords< Comment< 'edit' > >(
-				'root',
-				'comment',
-				{
-					post: select( editorStore ).getCurrentPostId(),
-					parent: noteId,
-					type: 'reaction',
-					// Match `reaction_summary`, which counts approved rows only.
-					status: 'approve',
-					per_page: -1,
-					_fields: 'id,author_name,content',
-				}
-			);
+			return select( coreStore ).getEntityRecords( 'root', 'comment', {
+				post: select( editorStore ).getCurrentPostId(),
+				parent: noteId,
+				type: 'reaction',
+				// Match `reaction_summary`, which counts approved rows only.
+				status: 'approve',
+				per_page: -1,
+				_fields: 'id,author_name,content',
+			} );
 		},
 		[ isShowingNames, noteId ]
 	);

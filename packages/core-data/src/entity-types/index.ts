@@ -170,9 +170,20 @@ export type EntityRecord< C extends Context = 'edit' > =
  * types.
  */
 export interface RootEntityRecordTypes< C extends Context > {
+	comment: Comment< C >;
+	fontCollection: FontCollection< C >;
 	globalStyles: GlobalStyles< C >;
 	icon: Icon< C >;
 	iconCollection: IconCollection< C >;
+	menu: NavMenu< C >;
+	/*
+	 * The settings endpoint returns every setting registered with
+	 * `show_in_rest`, including those added by plugins, so keys beyond the
+	 * core settings are readable as `unknown`.
+	 */
+	site: Settings< C > & { [ setting: string ]: unknown };
+	taxonomy: Taxonomy< C >;
+	widgetType: WidgetType< C >;
 }
 
 /**
@@ -187,20 +198,27 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 	page: Page< C >;
 	post: Post< C >;
 	wp_block: Block< C >;
+	wp_font_family: WpFontFamily< C >;
 	wp_navigation: Navigation< C >;
+	wp_template: WpTemplate< C >;
+	wp_template_part: WpTemplatePart< C >;
 }
 
 /**
  * The taxonomies the map knows about, and the record each one returns.
  *
- * A custom taxonomy is added by merging into this interface.
+ * `loadTaxonomyEntities` registers every taxonomy the REST API lists, and
+ * unless a taxonomy sets its own `rest_controller_class`, the terms controller
+ * serves it. So any taxonomy name resolves to `Term`, including a name only
+ * known at runtime, such as one read from a block attribute. A plugin whose
+ * taxonomy adds fields merges in a record that extends `Term`. One served by a
+ * controller that returns a different shape is not described by `Term`.
  *
  * @see RootEntityRecordTypes
  */
-export interface TaxonomyEntityRecordTypes<
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	C extends Context,
-> {}
+export interface TaxonomyEntityRecordTypes< C extends Context > {
+	[ name: string ]: Term< C >;
+}
 
 /**
  * Maps an entity's `kind` and `name` to the record type it returns.
@@ -278,8 +296,25 @@ export type EntityRecordOf<
 	 * context, but TypeScript cannot see that, so the lookup is re-narrowed
 	 * against the map for the context actually being resolved.
 	 */
-> = EntityRecordTypes< C >[ Kind ][ Name &
+> = EntityRecordTypes< C >[ Kind ][ LookupName<
+	keyof EntityRecordTypes< C >[ Kind ],
+	Name
+> &
 	keyof EntityRecordTypes< C >[ Kind ] ];
+
+/**
+ * The name to look up in a kind's map.
+ *
+ * A JavaScript caller often passes a name typed `any`, such as a block
+ * attribute. When every name of the kind resolves to the same record, as with
+ * taxonomies, `any` is looked up as `string` and resolves to that record.
+ * Otherwise it stays `any`, as before the map existed.
+ */
+type LookupName< Keys, Name > = 0 extends 1 & Name
+	? string extends Keys
+		? string
+		: any
+	: Name;
 
 /**
  * The context a `root` entity is fetched in when the call names none.
@@ -291,15 +326,24 @@ export type EntityRecordOf<
  * @see EntityContextDefaults
  */
 export interface RootEntityContexts {
+	comment: 'edit';
+	fontCollection: 'view';
 	globalStyles: 'edit';
 	icon: 'view';
 	iconCollection: 'view';
+	menu: 'edit';
+	site: 'view';
+	taxonomy: 'edit';
+	widgetType: 'edit';
 }
 
 /**
  * The context a post type is fetched in when the call names none.
  *
- * `loadPostTypeEntities` registers every post type with `context: 'edit'`.
+ * `loadPostTypeEntities` registers every post type with `context: 'edit'`, so
+ * each post type the map knows about is listed with it. A post type a plugin
+ * adds declares its own, since it may be registered with `addEntities` in
+ * another context. One that declares none resolves to every context.
  *
  * @see EntityContextDefaults
  */
@@ -308,7 +352,10 @@ export interface PostTypeEntityContexts {
 	page: 'edit';
 	post: 'edit';
 	wp_block: 'edit';
+	wp_font_family: 'edit';
 	wp_navigation: 'edit';
+	wp_template: 'edit';
+	wp_template_part: 'edit';
 }
 
 /**
@@ -318,7 +365,9 @@ export interface PostTypeEntityContexts {
  *
  * @see EntityContextDefaults
  */
-export interface TaxonomyEntityContexts {}
+export interface TaxonomyEntityContexts {
+	[ name: string ]: 'edit';
+}
 
 /**
  * Maps a `kind`/`name` pair to the context it is fetched in when the call
@@ -352,11 +401,24 @@ export interface EntityContextDefaults {
 export type DefaultContextOf<
 	Kind extends EntityKind,
 	Name extends EntityNameOf< Kind >,
-> = Kind extends keyof EntityContextDefaults
-	? Name extends keyof EntityContextDefaults[ Kind ]
-		? EntityContextDefaults[ Kind ][ Name ] extends Context
-			? EntityContextDefaults[ Kind ][ Name ]
-			: Context
+> = DefaultContextOfName< Kind, Name >;
+
+/*
+ * Kept separate from `DefaultContextOf` so `Name` carries no constraint here:
+ * TypeScript resolves an `any` name against the constraint rather than the
+ * map, which would lose the taxonomy context.
+ */
+type DefaultContextOfName< Kind, Name > =
+	Kind extends keyof EntityContextDefaults
+		? ContextOfName<
+				EntityContextDefaults[ Kind ],
+				LookupName< keyof EntityContextDefaults[ Kind ], Name >
+			>
+		: Context;
+
+type ContextOfName< Contexts, Key > = Key extends keyof Contexts
+	? Contexts[ Key ] extends Context
+		? Contexts[ Key ]
 		: Context
 	: Context;
 
@@ -412,10 +474,10 @@ type EntityRecordInContexts<
  * `context` selects which fields the REST API serialises, so a `'view'`
  * request must not be typed with the edit-context fields.
  *
- * `_fields` can omit any field, including nested fields. The exact selection
- * is not inferred from the query, but a request that includes `_fields`
- * returns a recursively partial record so omitted data cannot be read as if
- * it were present.
+ * `_fields` limits the record to the fields it names. When those names are
+ * literal, as in `{ _fields: 'id,slug' }`, the record is narrowed to exactly
+ * those fields. When they are not known at compile time, any field may be
+ * missing, so the record is recursively partial instead.
  */
 export type EntityRecordOfQuery<
 	Kind extends EntityKind,
@@ -423,12 +485,13 @@ export type EntityRecordOfQuery<
 	Query,
 > = Query extends unknown
 	? '_fields' extends keyof Query
-		? DeepPartial<
+		? ProjectedRecord<
 				EntityRecordInContexts<
 					Kind,
 					Name,
 					ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
-				>
+				>,
+				FieldPathsOf< Query[ '_fields' & keyof Query ] >
 			>
 		: EntityRecordInContexts<
 				Kind,
@@ -447,3 +510,57 @@ type DeepPartial< T > = T extends readonly unknown[]
 	: T extends object
 		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
 		: T;
+
+/**
+ * Splits a comma-separated `_fields` string the way the runtime does: on the
+ * commas alone, without trimming, so `'id, slug'` names `' slug'`.
+ */
+type SplitFields< S extends string > =
+	S extends `${ infer Head },${ infer Tail }`
+		? Head | SplitFields< Tail >
+		: S;
+
+/**
+ * The field paths a `_fields` value names, as a comma-separated string or an
+ * array. Resolves to `never` when the names are not known at compile time.
+ */
+type FieldPathsOf< Fields > = 0 extends 1 & Fields
+	? never
+	: Fields extends string
+		? string extends Fields
+			? never
+			: SplitFields< Fields >
+		: Fields extends readonly ( infer Field )[]
+			? Field extends string
+				? string extends Field
+					? never
+					: Field
+				: never
+			: never;
+
+/**
+ * The top-level field a path such as `_links.version-history.href` reads.
+ */
+type TopLevelField< Path extends string > =
+	Path extends `${ infer Field }.${ string }` ? Field : Path;
+
+/**
+ * Keeps only the fields `_fields` names. A field named in full keeps its
+ * type; a field named only through a nested path keeps just what that path
+ * reaches, so it becomes recursively partial.
+ */
+type ProjectedRecord< RecordType, Paths > = [ Paths ] extends [ never ]
+	? DeepPartial< RecordType >
+	: RecordType extends unknown
+		? {
+				[
+					K in keyof RecordType as K extends TopLevelField<
+						Paths & string
+					>
+						? K
+						: never
+				]: K extends Paths
+					? RecordType[ K ]
+					: DeepPartial< RecordType[ K ] >;
+			}
+		: never;

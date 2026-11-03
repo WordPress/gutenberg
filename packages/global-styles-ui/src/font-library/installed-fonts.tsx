@@ -18,10 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import type {
-	FontFamilyPreset,
-	GlobalStylesConfig,
-} from '@wordpress/global-styles-engine';
+import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import type { FontFamily } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
@@ -95,7 +92,7 @@ function InstalledFonts() {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return __experimentalGetCurrentGlobalStylesId();
 	}, [] );
-	const globalStyles = useEntityRecord< GlobalStylesConfig >(
+	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
 		globalStylesId ?? 0,

@@ -17,7 +17,13 @@
 /* eslint-disable vitest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { describe, it } from 'vitest';
-import { store as coreStore } from '../../index';
+import {
+	store as coreStore,
+	useEntityRecord,
+	useEntityRecords,
+} from '../../index';
+import { useEntityRecordsWithPermissions } from '../../hooks/use-entity-records';
+import type { WithPermissions } from '../../hooks/use-entity-records';
 import type {
 	Context,
 	ContextualField,
@@ -28,14 +34,22 @@ import type {
 	OmitNevers,
 } from '../index';
 import type { Attachment } from '../attachment';
+import type { Comment, CommentStatus } from '../comment';
+import type { WpFontFamily } from '../font-family';
 import type { GlobalStyles } from '../global-styles';
+import type { CollectionFontFamily, FontCollection } from '../font-collection';
 import type { Block } from '../block';
 import type { IconCollection } from '../icon-collection';
+import type { NavMenu } from '../nav-menu';
 import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
+import type { Taxonomy } from '../taxonomy';
 import type { Term } from '../term';
 import type { User } from '../user';
+import type { WidgetType } from '../widget-type';
+import type { WpTemplate } from '../wp-template';
+import type { WpTemplatePart } from '../wp-template-part';
 
 /**
  * Resolves to `true` only when `A` and `B` are mutually assignable, so a
@@ -48,6 +62,11 @@ type Expect< A, B > = [ A ] extends [ B ]
 		? true
 		: never
 	: never;
+
+/**
+ * Resolves to `true` unless `T` is `any`.
+ */
+type IsNotAny< T > = 0 extends 1 & T ? false : true;
 
 /**
  * A post whose context is not known at compile time: one record per context,
@@ -90,6 +109,8 @@ declare module '@wordpress/core-data' {
 	// interface properties have to have identical types.
 	interface PostTypeEntityRecordTypes< C extends Context > {
 		product: Product< C >;
+		voucher: Coupon< C >;
+		brochure: Order< C >;
 	}
 	interface TaxonomyEntityRecordTypes< C extends Context > {
 		genre: Term< C >;
@@ -100,10 +121,11 @@ declare module '@wordpress/core-data' {
 	}
 
 	// The same shape for the context each pair is fetched in. `product`
-	// declares one; `order` deliberately does not, so it exercises the
-	// fallback.
+	// declares one, `voucher` declares `view`; `order` and `brochure`
+	// deliberately do not, so they exercise the fallback.
 	interface PostTypeEntityContexts {
 		product: 'edit';
+		voucher: 'view';
 	}
 	interface EntityContextDefaults {
 		myShop: { coupon: 'view' };
@@ -119,6 +141,120 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'root', 'globalStyles' >,
 				GlobalStyles< 'edit' >
 			>;
+
+			const collection = select( coreStore ).getEntityRecord(
+				'root',
+				'fontCollection',
+				'google-fonts'
+			);
+			true satisfies Expect<
+				typeof collection,
+				FontCollection< 'view' > | undefined
+			>;
+			collection?.font_families satisfies
+				CollectionFontFamily[] | undefined;
+
+			// Comments are fetched in the edit context.
+			const { records: threads } = useEntityRecords( 'root', 'comment', {
+				post: 1,
+				type: 'note',
+			} );
+			true satisfies Expect< typeof threads, Comment< 'edit' >[] | null >;
+			threads?.[ 0 ].content.raw satisfies string | undefined;
+			threads?.[ 0 ].status satisfies CommentStatus | undefined;
+			threads?.[ 0 ].reaction_summary?.[ '1f44d' ]?.count satisfies
+				number | undefined;
+
+			// Menus are fetched in the edit context unless the query names one.
+			const { records: menus } = useEntityRecords( 'root', 'menu', {
+				per_page: -1,
+				context: 'view',
+			} );
+			true satisfies Expect< typeof menus, NavMenu< 'view' >[] | null >;
+			menus?.[ 0 ].locations satisfies string[] | undefined;
+			true satisfies Expect<
+				EntityRecordOf< 'root', 'menu' >,
+				NavMenu< 'edit' >
+			>;
+
+			// Taxonomy definitions, not their terms.
+			const { records: taxonomies } = useEntityRecords(
+				'root',
+				'taxonomy',
+				{
+					per_page: -1,
+				}
+			);
+			true satisfies Expect<
+				typeof taxonomies,
+				Taxonomy< 'edit' >[] | null
+			>;
+			taxonomies?.[ 0 ].visibility.public satisfies boolean | undefined;
+			const viewTaxonomy = select( coreStore ).getEntityRecord(
+				'root',
+				'taxonomy',
+				'category',
+				{ context: 'view' }
+			);
+			// @ts-expect-error -- `visibility` is edit-only.
+			viewTaxonomy?.visibility;
+
+			const { record: widgetType } = useEntityRecord(
+				'root',
+				'widgetType',
+				'text'
+			);
+			true satisfies Expect<
+				typeof widgetType,
+				WidgetType< 'edit' > | null
+			>;
+		};
+	} );
+
+	it( 'site settings need no record ID', () => {
+		() => {
+			// The settings entity has no key, so the hook takes no ID.
+			const { record: site } = useEntityRecord( 'root', 'site' );
+			site?.title satisfies string | undefined;
+			site?.posts_per_page satisfies number | undefined;
+			// Settings registered by plugins are readable, but not typed.
+			site?.[ 'gutenberg-experiments' ] satisfies unknown;
+			// @ts-expect-error -- a core setting keeps its own type.
+			site?.title satisfies number | undefined;
+		};
+	} );
+
+	it( 'every other entity needs a record ID', () => {
+		() => {
+			// Without an ID, `save()` would create a record instead of
+			// updating one, so omitting it is a type error.
+			// @ts-expect-error -- a post has a key.
+			useEntityRecord( 'postType', 'post' );
+			// @ts-expect-error -- naming the record type does not lift it.
+			useEntityRecord< Post >( 'postType', 'post' );
+			// @ts-expect-error -- neither does an unknown pair.
+			useEntityRecord( 'myPlugin', 'order' );
+			// @ts-expect-error -- nor an ID that may be missing.
+			useEntityRecord( 'postType', 'post', undefined );
+		};
+	} );
+
+	it( 'font families follow the REST schema', () => {
+		() => {
+			const { records: families } = useEntityRecords(
+				'postType',
+				'wp_font_family',
+				{ _embed: true, per_page: -1 }
+			);
+			true satisfies Expect<
+				typeof families,
+				WpFontFamily< 'edit' >[] | null
+			>;
+			families?.[ 0 ].id satisfies number | undefined;
+			families?.[ 0 ].font_family_settings.slug satisfies
+				string | undefined;
+			// @ts-expect-error -- the slug lives in `font_family_settings`.
+			families?.[ 0 ].slug;
 		};
 	} );
 
@@ -144,6 +280,85 @@ describe( 'Entity record types', () => {
 				EntityRecordOf< 'postType', 'wp_navigation' >,
 				Navigation< 'edit' >
 			>;
+			true satisfies Expect<
+				EntityRecordOf< 'postType', 'wp_template' >,
+				WpTemplate< 'edit' >
+			>;
+			true satisfies Expect<
+				EntityRecordOf< 'postType', 'wp_template_part' >,
+				WpTemplatePart< 'edit' >
+			>;
+		};
+	} );
+
+	it( 'any taxonomy resolves to a term', () => {
+		( taxonomy: string ) => {
+			true satisfies Expect<
+				EntityRecordOf< 'taxonomy', 'category' >,
+				Term< 'edit' >
+			>;
+
+			// A name only known at runtime, such as a block attribute, still
+			// resolves, because every taxonomy is served as terms.
+			const { records: terms } = useEntityRecords( 'taxonomy', taxonomy, {
+				per_page: -1,
+			} );
+			true satisfies Expect< typeof terms, Term< 'edit' >[] | null >;
+			terms?.[ 0 ].name satisfies string | undefined;
+		};
+	} );
+
+	it( 'a name typed `any` resolves only when the kind has one record type', () => {
+		( name: any ) => {
+			// Every taxonomy is a term, so an `any` name still resolves.
+			const { records: terms } = useEntityRecords( 'taxonomy', name );
+			true satisfies Expect< typeof terms, Term< 'edit' >[] | null >;
+			// `Expect` accepts `any`, so check for it separately.
+			true satisfies IsNotAny< NonNullable< typeof terms >[ number ] >;
+
+			// Post types differ, so an `any` name stays as wide as before.
+			const { records: posts } = useEntityRecords( 'postType', name );
+			false satisfies IsNotAny< NonNullable< typeof posts >[ number ] >;
+		};
+	} );
+
+	it( 'the template fields follow the REST schema', () => {
+		() => {
+			const template = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template',
+				'theme//index'
+			);
+			// Every post type is fetched in the edit context.
+			true satisfies Expect<
+				typeof template,
+				WpTemplate< 'edit' > | undefined
+			>;
+			const { records: parts } = useEntityRecords(
+				'postType',
+				'wp_template_part',
+				{ per_page: -1 }
+			);
+			true satisfies Expect<
+				typeof parts,
+				WpTemplatePart< 'edit' >[] | null
+			>;
+			template?.has_theme_file satisfies boolean | undefined;
+			template?.is_custom satisfies boolean | undefined;
+			template?.original_source satisfies
+				'theme' | 'plugin' | 'site' | 'user' | undefined;
+			// @ts-expect-error -- a template that was never saved has no date.
+			template?.modified satisfies string | undefined;
+
+			const part = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				'theme//header'
+			);
+			part?.area satisfies string | undefined;
+			part?.has_theme_file satisfies boolean | undefined;
+			part?.is_custom satisfies boolean | undefined;
+			part?.author_text satisfies string | undefined;
 		};
 	} );
 
@@ -373,6 +588,11 @@ describe( 'Entity record types', () => {
 			globalStyles?.title.raw satisfies string | undefined;
 			// @ts-expect-error -- the entity record has no revision author.
 			globalStyles?.author;
+			// `settings` and `styles` follow the theme.json shape.
+			globalStyles?.settings.typography?.fontFamilies;
+			globalStyles?.styles.color?.background;
+			// @ts-expect-error -- not a theme.json setting.
+			globalStyles?.settings.typography?.notASetting;
 
 			const actions = dispatch( coreStore );
 			const currentGlobalStylesId =
@@ -553,6 +773,69 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	it( 'the entity record hooks infer the record', () => {
+		() => {
+			const { record, editedRecord } = useEntityRecord(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect< typeof record, Post< 'edit' > | null >;
+			// Raw fields are edited as strings, as `getEditedEntityRecord` returns.
+			editedRecord.title satisfies string | undefined;
+			editedRecord.content satisfies string | undefined;
+			// @ts-expect-error -- the edited title is the raw string, not an object.
+			editedRecord.title?.raw;
+
+			const { records } = useEntityRecords( 'postType', 'post' );
+			true satisfies Expect< typeof records, Post< 'edit' >[] | null >;
+
+			const { records: viewRecords } = useEntityRecords(
+				'postType',
+				'post',
+				{ context: 'view' }
+			);
+			true satisfies Expect<
+				typeof viewRecords,
+				Post< 'view' >[] | null
+			>;
+
+			const { records: withPermissions } =
+				useEntityRecordsWithPermissions( 'postType', 'page' );
+			true satisfies Expect<
+				typeof withPermissions,
+				WithPermissions< Page< 'edit' > >[] | null
+			>;
+		};
+	} );
+
+	it( 'the entity record hooks fall back for an unknown pair', () => {
+		( kind: string, name: string ) => {
+			// Unknown or non-literal pairs keep the previous `unknown` record.
+			const { record } = useEntityRecord( 'myPlugin', 'order', 1 );
+			true satisfies Expect< typeof record, unknown >;
+
+			const { records } = useEntityRecords( kind, name );
+			true satisfies Expect< typeof records, unknown[] | null >;
+
+			// The explicit generic is still honoured, even for a mapped pair.
+			const { record: asserted } = useEntityRecord< Page< 'view' > >(
+				'postType',
+				'post',
+				1
+			);
+			true satisfies Expect< typeof asserted, Page< 'view' > | null >;
+
+			const { records: assertedRecords } = useEntityRecords<
+				Page< 'view' >
+			>( 'postType', 'post' );
+			true satisfies Expect<
+				typeof assertedRecords,
+				Page< 'view' >[] | null
+			>;
+		};
+	} );
+
 	it( 'the selectors resolve the context from the query', () => {
 		async () => {
 			const inline = select( coreStore ).getEntityRecord(
@@ -643,7 +926,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	it( '`_fields` returns a partial record', () => {
+	it( '`_fields` narrows the record to the fields it names', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -651,43 +934,92 @@ describe( 'Entity record types', () => {
 				1,
 				{ _fields: 'id,slug' }
 			);
-			post?.id satisfies number | undefined;
-			post?.title?.raw satisfies string | undefined;
-			// The runtime treats an array as one projected value, so its element
-			// type stays intact while the array field itself becomes optional.
-			post?.categories?.[ 0 ] satisfies number | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			post?.title.raw;
+			true satisfies Expect<
+				typeof post,
+				{ id: number; slug: string } | undefined
+			>;
+			// @ts-expect-error -- `title` was not requested.
+			post?.title;
+
+			// The runtime does not trim the names, so a space makes `' slug'`
+			// a different field, and `slug` is not on the record.
+			const spaced = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: 'id, slug' }
+			);
+			true satisfies Expect< typeof spaced, { id: number } | undefined >;
+			// @ts-expect-error -- `' slug'` is not `slug`.
+			spaced?.slug;
+
+			// The array form names the same fields as the string.
+			const listed = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: [ 'id', 'slug' ] }
+			);
+			true satisfies Expect< typeof listed, typeof post >;
 
 			const posts = select( coreStore ).getEntityRecords(
 				'postType',
 				'post',
-				{ _fields: 'id,slug' }
+				{ _fields: 'id,title' }
 			);
-			posts?.[ 0 ].title?.raw satisfies string | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			posts?.[ 0 ].title.raw;
+			posts?.[ 0 ].title.raw satisfies string | undefined;
+			// @ts-expect-error -- `slug` was not requested.
+			posts?.[ 0 ].slug;
 
 			// `_fields` alongside a context still resolves the context.
 			const view = select( coreStore ).getEntityRecord(
 				'postType',
 				'post',
 				1,
-				{ context: 'view', _fields: 'id,slug' }
+				{ context: 'view', _fields: 'id,title' }
 			);
-			view?.title?.rendered satisfies string | undefined;
-			// @ts-expect-error -- `_fields` can omit `title` entirely.
-			view?.title.rendered;
+			view?.title.rendered satisfies string | undefined;
+			// @ts-expect-error -- `raw` is edit-only.
+			view?.title.raw;
 
+			// A nested path keeps only part of its field, so that field is
+			// recursively partial. The runtime treats an array as one projected
+			// value, so array elements stay intact.
 			const styles = select( coreStore ).getEntityRecord(
 				'root',
 				'globalStyles',
 				1,
 				{ _fields: 'id,_links.version-history.href' }
 			);
-			// Nested `_fields` filtering never returns partially projected array
-			// elements: the array is either complete or empty.
+			styles?.id satisfies number | undefined;
 			styles?._links?.[ 'version-history' ]?.[ 0 ]?.count.toFixed();
+			// @ts-expect-error -- `title` was not requested.
+			styles?.title;
+
+			// The hooks narrow the same way.
+			const { records: collections } = useEntityRecords(
+				'root',
+				'fontCollection',
+				{ _fields: 'slug,name,description' }
+			);
+			true satisfies Expect<
+				typeof collections,
+				{ slug: string; name: string; description: string }[] | null
+			>;
+		};
+	} );
+
+	it( '`_fields` that is not known at compile time returns a partial record', () => {
+		( fields: string ) => {
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: fields }
+			);
+			post?.title?.raw satisfies string | undefined;
+			// @ts-expect-error -- any field may be missing.
+			post?.title.raw;
 		};
 	} );
 
@@ -718,13 +1050,13 @@ describe( 'Entity record types', () => {
 
 			// Built-in pairs stay on the same safe fallback until their legacy
 			// declarations have been verified against the current REST schema.
-			const comment = select( coreStore ).getEntityRecord(
+			const sidebar = select( coreStore ).getEntityRecord(
 				'root',
-				'comment',
-				1
+				'sidebar',
+				'sidebar-1'
 			);
 			true satisfies Expect<
-				typeof comment,
+				typeof sidebar,
 				UnknownEntityRecord | undefined
 			>;
 
@@ -840,6 +1172,42 @@ describe( 'Entity record types', () => {
 				'icon'
 			);
 			icons?.[ 0 ].collection satisfies string | undefined;
+		};
+	} );
+
+	it( 'a plugin post type declares its own context', () => {
+		() => {
+			// A post type registered with `addEntities` in the view context
+			// resolves to the view record.
+			const voucher = select( coreStore ).getEntityRecord(
+				'postType',
+				'voucher',
+				1
+			);
+			true satisfies Expect<
+				typeof voucher,
+				Coupon< 'view' > | undefined
+			>;
+			// @ts-expect-error -- `secret` is edit-only, so a view record omits it.
+			voucher?.secret;
+
+			// One that declares no context resolves to every context, rather
+			// than being assumed to be fetched in `edit`.
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'brochure' >,
+				Context
+			>;
+
+			// The built-in post types keep the `edit` context they are
+			// registered with.
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'post' >,
+				'edit'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'wp_template' >,
+				'edit'
+			>;
 		};
 	} );
 

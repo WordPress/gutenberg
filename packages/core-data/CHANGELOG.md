@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `WpTemplate` and `WpTemplatePart` now match the REST schema: `has_theme_file` and `is_custom` are `boolean` instead of `Record< string, string >`, `modified` can be `null`, and `original_source` is added. `WpTemplatePart` also gains `author_text`, `plugin`, `is_custom` and `modified` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `GlobalStyles` types `settings` and `styles` with the theme.json shapes from `@wordpress/global-styles-engine` instead of `Record< string, Object >`, so reads such as `settings.typography.fontFamilies` type check without naming `GlobalStylesConfig` by hand ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   A query whose `_fields` is a literal string or array now infers a record with exactly those fields, so `{ _fields: 'id,slug' }` returns `{ id, slug }`. Reading a field that was not requested is a type error. `_fields` that is not known at compile time still returns a recursively partial record ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `CommentStatus` lists the statuses the REST API reports, `'approved'`, `'hold'`, `'spam'` and `'trash'`, and accepts any other string. Compare against `'approved'` rather than `'approve'`, `'1'` or `'0'` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `NavMenu` no longer has `object_id`, which belongs to menu items and is not returned for menus ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `WpFontFamily` now matches the REST schema: `id` is a `number`, `theme_json_version` and `font_faces` are added, and the top-level `slug` and `name` are removed. Read them from `font_family_settings` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `Taxonomy.visibility` is only available in the edit context ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `useEntityRecord` types `editedRecord`, `edits` and the `edit()` argument with `Updatable`, so fields edited as raw markup, such as a post's `title` and `content`, are strings. Read `editedRecord.title` instead of `editedRecord.title.raw` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   Every taxonomy name resolves to `Term`, so a taxonomy merged into `TaxonomyEntityRecordTypes` must use a record that extends `Term` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+
+### Enhancements
+
+-   `useEntityRecord`, `useEntityRecords` and `useEntityRecordsWithPermissions` now infer the record type from their `kind` and `name` arguments, matching `getEntityRecord`. Pairs the map does not cover, and calls that name the record type explicitly, behave as before ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   The entity record map now covers templates and template parts, so `postType`/`wp_template` and `postType`/`wp_template_part` infer `WpTemplate` and `WpTemplatePart` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   The entity record map now covers font collections, so `root`/`fontCollection` infers `FontCollection`. Its `description`, `font_families` and `categories` are no longer optional, since the REST API always returns them ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   The entity record map now covers comments, menus, taxonomy definitions, widget types, font families and site settings. Site settings registered by plugins are readable as `unknown` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   Any taxonomy name, including one only known at runtime, resolves to `Term` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   A call that names no `context` resolves the built-in post types and every taxonomy in the `edit` context they are fetched in. A post type added by a plugin declares its own context in `PostTypeEntityContexts` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `useEntityRecord` no longer needs a record ID for an entity without a key, such as `useEntityRecord( 'root', 'site' )` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `Updatable` accepts any record type ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).

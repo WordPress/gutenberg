@@ -2,6 +2,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '../';
+import type * as ET from '../entity-types';
 import type { Status } from './constants';
 import { getResolutionStatus } from './utils';
 
@@ -9,14 +10,17 @@ export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
 	record: RecordType | null;
 
-	/** The edited entity record */
-	editedRecord: Partial< RecordType >;
+	/**
+	 * The edited entity record. Fields edited as raw markup, such as a post's
+	 * `title` and `content`, hold that markup as a string.
+	 */
+	editedRecord: Partial< ET.Updatable< RecordType > >;
 
 	/** The edits to the edited entity record */
-	edits: Partial< RecordType >;
+	edits: Partial< ET.Updatable< RecordType > >;
 
 	/** Apply local (in-browser) edits to the edited entity record */
-	edit: ( diff: Partial< RecordType > ) => void;
+	edit: ( diff: Partial< ET.Updatable< RecordType > > ) => void;
 
 	/** Persist the edits to the server */
 	save: () => Promise< void >;
@@ -63,7 +67,7 @@ const EMPTY_OBJECT = {};
  *
  * @param    kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
  * @param    name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param    recordId ID of the requested entity record.
+ * @param    recordId ID of the requested entity record. Omitted for entities without a key, such as `root`/`site`.
  * @param    options  Optional hook options.
  * @example
  * ```js
@@ -144,10 +148,44 @@ const EMPTY_OBJECT = {};
  * @return Entity record data.
  * @template RecordType
  */
+export default function useEntityRecord<
+	Kind extends ET.EntityKind,
+	Name extends ET.EntityNameOf< Kind >,
+>(
+	kind: Kind,
+	name: Name,
+	recordId: string | number,
+	options?: Options
+): EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >;
+
+/*
+ * The site settings have no key, so they are the one record read without an
+ * ID. Every other entity requires one: without it, `save()` would create a
+ * new record instead of updating the one being edited.
+ */
+export default function useEntityRecord(
+	kind: 'root',
+	name: 'site',
+	recordId?: undefined,
+	options?: Options
+): EntityRecordResolution<
+	ET.EntityRecordOfQuery< 'root', 'site', undefined >
+>;
+
+/*
+ * Retained so call sites that name the record type explicitly, and pairs
+ * absent from the map, continue to compile.
+ */
 export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
 	recordId: string | number,
+	options?: Options
+): EntityRecordResolution< RecordType >;
+export default function useEntityRecord< RecordType >(
+	kind: string,
+	name: string,
+	recordId?: string | number,
 	options: Options = { enabled: true }
 ): EntityRecordResolution< RecordType > {
 	const { editEntityRecord, saveEditedEntityRecord } =
