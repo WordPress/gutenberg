@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Writing toolbar: Fill the block toolbar's `writing` group with a text style, font and size drawn from the theme, so a block of prose is styled by picking a style rather than a block type. Behind the `gutenberg-writing-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements
