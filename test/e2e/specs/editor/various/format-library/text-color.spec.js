@@ -5,7 +5,7 @@ test.describe( 'Format Library - Text color', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should remove highlighting element', async ( {
+	test( 'should set and remove a text color', async ( {
 		editor,
 		page,
 		pageUtils,
