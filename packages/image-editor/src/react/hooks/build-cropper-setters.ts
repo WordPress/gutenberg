@@ -5,7 +5,6 @@ import type {
 	NormalizedPoint,
 	NormalizedRect,
 	Size,
-	TransformOperation,
 } from '../../core/types';
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
 
@@ -32,7 +31,6 @@ export interface CropperSetters {
 	 */
 	setAspectRatio: ( aspectRatio: number | undefined ) => void;
 	settleCrop: () => void;
-	applyOperation: ( op: TransformOperation ) => void;
 }
 
 /**
@@ -100,10 +98,5 @@ export function buildCropperSetters(
 				payload: { aspectRatio, visualSize: getVisualSize() },
 			} ),
 		settleCrop: () => dispatchCropperAction( { type: 'SETTLE_CROP' } ),
-		applyOperation: ( op ) =>
-			dispatchCropperAction( {
-				type: 'APPLY_OPERATION',
-				payload: op,
-			} ),
 	};
 }

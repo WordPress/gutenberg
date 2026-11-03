@@ -35,7 +35,6 @@ function createController(): CropperController {
 		setCropRect: vi.fn(),
 		setAspectRatio: vi.fn(),
 		settleCrop: vi.fn(),
-		applyOperation: vi.fn(),
 		reset: vi.fn(),
 		isDirty: false,
 		getCroppedImage: vi.fn(),
