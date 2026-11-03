@@ -9,6 +9,7 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useContext,
 	useEffect,
 	useMemo,
 	useCallback,
@@ -27,7 +28,16 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import { deviceTypeKey } from '../../store/private-keys';
+import { CanvasWindowContext } from '../iframe/canvas-window-context';
+import { useCurrentViewport } from '../block-visibility/use-block-visibility';
+import type { BlockVisibilityViewport } from '../block-visibility/constants';
 import type { BlockListItemsProps, BlockListProps } from './types';
+
+// The viewport block visibility rules apply to, matched once per canvas.
+export const CurrentViewport =
+	createContext< BlockVisibilityViewport >( 'desktop' );
+CurrentViewport.displayName = 'CurrentViewportContext';
 
 export const IntersectionObserver = createContext<
 	globalThis.IntersectionObserver | undefined
@@ -48,6 +58,8 @@ function Root( { className, ...settings }: BlockListProps ) {
 		isFocusMode,
 		isPreviewMode,
 		editedContentOnlySection,
+		deviceType,
+		viewportSettings,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -55,11 +67,12 @@ function Root( { className, ...settings }: BlockListProps ) {
 			hasBlockSpotlight,
 			getEditedContentOnlySection,
 		} = unlock( select( blockEditorStore ) );
+		const editorSettings = getSettings();
 		const {
 			outlineMode,
 			focusMode,
 			isPreviewMode: _isPreviewMode,
-		} = getSettings();
+		} = editorSettings;
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
 			/*
@@ -71,8 +84,16 @@ function Root( { className, ...settings }: BlockListProps ) {
 				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
 			isPreviewMode: _isPreviewMode,
 			editedContentOnlySection: getEditedContentOnlySection(),
+			deviceType:
+				editorSettings[ deviceTypeKey ]?.toLowerCase() || 'desktop',
+			viewportSettings: editorSettings.__experimentalFeatures?.viewport,
 		};
 	}, [] );
+	const currentViewport = useCurrentViewport( {
+		deviceType,
+		viewportSettings,
+		view: useContext( CanvasWindowContext ),
+	} );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -129,14 +150,16 @@ function Root( { className, ...settings }: BlockListProps ) {
 		settings
 	);
 	return (
-		<IntersectionObserver.Provider value={ intersectionObserver }>
-			<div { ...innerBlocksProps } />
-			{ !! editedContentOnlySection && (
-				<StopEditingContentOnlySectionOnOutsideSelect
-					clientId={ editedContentOnlySection }
-				/>
-			) }
-		</IntersectionObserver.Provider>
+		<CurrentViewport.Provider value={ currentViewport }>
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				<div { ...innerBlocksProps } />
+				{ !! editedContentOnlySection && (
+					<StopEditingContentOnlySectionOnOutsideSelect
+						clientId={ editedContentOnlySection }
+					/>
+				) }
+			</IntersectionObserver.Provider>
+		</CurrentViewport.Provider>
 	);
 }
 

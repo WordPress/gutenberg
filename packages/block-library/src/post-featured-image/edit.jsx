@@ -26,7 +26,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	useMemo,
-	useEffect,
 	useState,
 	createInterpolateElement,
 } from '@wordpress/element';
@@ -227,11 +226,9 @@ export default function PostFeaturedImageEdit( {
 	};
 
 	// Reset temporary url when media is available.
-	useEffect( () => {
-		if ( mediaUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ mediaUrl, temporaryURL ] );
+	if ( mediaUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
