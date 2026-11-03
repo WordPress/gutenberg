@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
 ### Bug Fixes
 

@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the `rotate` style property, for the `transform.rotate` block support ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
 ## 17.1.0 (2026-11-04)
 

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Show the Transform panel on block screens for blocks that support a rotation ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Show the Transform panel on block screens for blocks that support a rotation ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
 ### Bug Fixes
 
