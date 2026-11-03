@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
 -   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
