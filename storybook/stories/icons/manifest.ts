@@ -5,7 +5,6 @@ const { Icon, ...availableIcons } = iconsPackage;
 
 export { availableIcons };
 
-
 export const ALL_ICONS_MANIFEST = new Map(
 	manifest.map(
 		( entry: {
