@@ -15,6 +15,7 @@
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
 -   Playlist: Use the UI SelectControl for the Order and Shape settings ([#86161](https://github.com/WordPress/gutenberg/pull/86161)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Playlist track: Open the block settings on a Content tab with the track file, Track image, Alternative text, Title, Artist and Album. The track can be replaced from there ([#85310](https://github.com/WordPress/gutenberg/pull/85310)).
 
 ### Bug Fixes
 

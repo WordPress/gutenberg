@@ -25,9 +25,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { getFilename } from '@wordpress/url';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -168,32 +170,25 @@ const PlaylistTrackEdit = ( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<PanelBody title={ __( 'Settings' ) }>
 					{ /* Only show if this is a single selection (not multiselect) */ }
 					{ isSelected && (
-						<TextControl
-							label={ __( 'Title' ) }
-							value={ title ? stripHTML( title ) : '' }
-							onChange={ ( titleValue ) => {
-								setAttributes( { title: titleValue } );
-							} }
-						/>
+						<BaseControl>
+							<BaseControl.VisualLabel>
+								{ __( 'Track' ) }
+							</BaseControl.VisualLabel>
+							<MediaControl
+								mediaId={ id }
+								mediaUrl={ src }
+								filename={ getFilename( src ) }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								onSelect={ onSelectTrack }
+								onError={ onUploadError }
+								emptyLabel={ __( 'Add track' ) }
+							/>
+						</BaseControl>
 					) }
-					<TextControl
-						label={ __( 'Artist' ) }
-						value={ artist ? stripHTML( artist ) : '' }
-						onChange={ ( artistValue ) => {
-							setAttributes( { artist: artistValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Album' ) }
-						value={ album ? stripHTML( album ) : '' }
-						onChange={ ( albumValue ) => {
-							setAttributes( { album: albumValue } );
-						} }
-					/>
 					<MediaUploadCheck>
 						<BaseControl>
 							<BaseControl.VisualLabel>
@@ -263,6 +258,29 @@ const PlaylistTrackEdit = ( {
 							}
 						/>
 					) }
+					{ isSelected && (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title ? stripHTML( title ) : '' }
+							onChange={ ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+							} }
+						/>
+					) }
+					<TextControl
+						label={ __( 'Artist' ) }
+						value={ artist ? stripHTML( artist ) : '' }
+						onChange={ ( artistValue ) => {
+							setAttributes( { artist: artistValue } );
+						} }
+					/>
+					<TextControl
+						label={ __( 'Album' ) }
+						value={ album ? stripHTML( album ) : '' }
+						onChange={ ( albumValue ) => {
+							setAttributes( { album: albumValue } );
+						} }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
