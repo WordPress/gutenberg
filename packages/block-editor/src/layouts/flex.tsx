@@ -202,7 +202,7 @@ export default {
 					<Flex
 						align="flex-start"
 						className="block-editor-hooks__flex-layout-controls"
-						gap={ 1 }
+						gap={ 4 }
 						justify="flex-start"
 					>
 						{ allowJustification && (
@@ -608,29 +608,6 @@ function FlexLayoutJustifyContentControl( {
 			label={ __( 'Justification' ) }
 			items={ justificationOptions }
 			value={ selectedOption }
-			trigger={
-				<SelectControl.Trigger>
-					<Stack
-						render={ <span /> }
-						direction="row"
-						align="center"
-						gap="xs"
-					>
-						<Icon
-							icon={ selectedOption.icon }
-							style={ { flexShrink: 0 } }
-						/>
-						<span
-							style={ {
-								overflow: 'hidden',
-								textOverflow: 'ellipsis',
-							} }
-						>
-							{ selectedOption.label }
-						</span>
-					</Stack>
-				</SelectControl.Trigger>
-			}
 			isItemEqualToValue={ ( item, value ) => item.value === value.value }
 			onValueChange={ ( selectedItem ) => {
 				if ( selectedItem && selectedItem.value !== null ) {
