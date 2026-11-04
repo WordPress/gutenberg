@@ -3,35 +3,17 @@ import { Button, DateTimePicker } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { dateI18n, getDate, getSettings, isInTheFuture } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
 import type { PostWithDate } from './types';
 import { isDateFloating } from './is-date-floating';
+import { is12HourTime } from './is-12-hour-time';
+import { isPublishedOnSave } from './is-published-on-save';
 import styles from './style.module.css';
 
 type Item = PostWithDate & { id?: number; type?: string };
-
-// Whether the site's time format is 12-hour: it has an `a` or `A` that is not
-// escaped with a backslash.
-function is12HourTime() {
-	return /a(?!\\)/i.test(
-		getSettings()
-			.formats.time.toLowerCase()
-			.replace( /\\\\/g, '' )
-			.split( '' )
-			.reverse()
-			.join( '' )
-	);
-}
-
-// Whether saving a post with this date publishes it rather than schedules it.
-// Like the editor, a date less than a minute ahead counts as now, which covers
-// the time the save takes.
-function isPublishedOnSave( date: string ) {
-	return ! isInTheFuture( new Date( Number( getDate( date ) ) - 60 * 1000 ) );
-}
 
 function getMonthBounds( date: Date ) {
 	return {
