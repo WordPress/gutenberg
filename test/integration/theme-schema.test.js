@@ -184,6 +184,51 @@ describe( 'theme.json schema', () => {
 		);
 	} );
 
+	test( 'accepts an offset with one or both axes in block styles and states', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/image': {
+						transform: { translate: { x: '10px', y: '-50%' } },
+						variations: {
+							raised: { transform: { translate: { x: '1rem' } } },
+						},
+					},
+					'core/button': {
+						':hover': { transform: { translate: { y: '-4px' } } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test.each( [
+		[ 'a string', '10px 20px' ],
+		[ 'a z axis', { x: '10px', z: '5px' } ],
+	] )( 'rejects an offset given as %s', ( _, translate ) => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: { 'core/image': { transform: { translate } } },
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
+	test( 'rejects an offset in element styles', () => {
+		const styles = {
+			elements: { link: { transform: { translate: { x: '1px' } } } },
+		};
+
+		expect( ajv.validate( themeSchema, { version: 3, styles } ) ).toBe(
+			false
+		);
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(

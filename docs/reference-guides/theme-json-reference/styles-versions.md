@@ -70,3 +70,4 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `filter.duotone`                  |       5.9        |        N/A         |
 | `shadow`                          |       6.1        |        6.2         |
 | `transform.rotate`                |       7.3        |        7.3         |
+| `transform.translate`             |       7.3        |        7.3         |

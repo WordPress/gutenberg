@@ -140,7 +140,8 @@
 			"__experimentalSkipSerialization": true
 		},
 		"transform": {
-			"rotate": true
+			"rotate": true,
+			"translate": true
 		}
 	},
 	"selectors": {
