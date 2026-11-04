@@ -142,6 +142,62 @@ describe( 'WritingSizeDropdown', () => {
 		).toHaveTextContent( '33*' );
 	} );
 
+	it( 'names the default by the size it stands for', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				defaultSize="17px"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		expect(
+			screen
+				.getAllByRole( 'menuitemradio' )
+				.map( ( item ) => item.textContent )
+		).toEqual( [ '17 - default', '13', '20', '36' ] );
+	} );
+
+	it( 'rounds the default to whole pixels too', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				defaultSize="1.38rem"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		expect( screen.getAllByRole( 'menuitemradio' )[ 0 ] ).toHaveTextContent(
+			'22 - default'
+		);
+	} );
+
+	it( 'just says default when the size it stands for has no number', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingSizeDropdown
+				fontSizes={ FONT_SIZES }
+				defaultSize="clamp(2rem, 2vw, 4rem)"
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		expect( screen.getAllByRole( 'menuitemradio' )[ 0 ] ).toHaveTextContent(
+			'Default'
+		);
+	} );
+
 	it( 'offers a slider for a size of your own, as the inspector does', async () => {
 		const user = userEvent.setup();
 		render(

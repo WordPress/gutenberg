@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -79,6 +79,17 @@ export default function WritingSizeDropdown( {
 		text = String( Math.round( defaultPx ) );
 	}
 
+	// Naming the default by the size it stands for saves reading the toolbar
+	// to find out what following the theme actually gives you.
+	const defaultLabel =
+		defaultPx === undefined
+			? __( 'Default' )
+			: sprintf(
+					/* translators: %d: a font size in pixels, e.g. 22. */
+					__( '%d - default' ),
+					Math.round( defaultPx )
+				);
+
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -136,7 +147,7 @@ export default function WritingSizeDropdown( {
 											onClose();
 										} }
 									>
-										{ __( 'Default' ) }
+										{ defaultLabel }
 									</MenuItem>
 									{ fontSizes.map( ( preset ) => (
 										<MenuItem
