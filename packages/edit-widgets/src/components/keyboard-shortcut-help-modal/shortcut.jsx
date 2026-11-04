@@ -1,3 +1,4 @@
+import { VisuallyHidden } from '@wordpress/ui';
 import { Fragment } from '@wordpress/element';
 import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 
@@ -15,24 +16,26 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 	const shortcuts = Array.isArray( shortcut ) ? shortcut : [ shortcut ];
 
 	return (
-		<kbd
-			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
-			aria-label={ forceAriaLabel || ariaLabel }
-		>
-			{ shortcuts.map( ( character, index ) => {
-				if ( character === '+' ) {
-					return <Fragment key={ index }>{ character }</Fragment>;
-				}
+		<kbd className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination">
+			<VisuallyHidden render={ <span /> }>
+				{ forceAriaLabel || ariaLabel }
+			</VisuallyHidden>
+			<span aria-hidden="true">
+				{ shortcuts.map( ( character, index ) => {
+					if ( character === '+' ) {
+						return <Fragment key={ index }>{ character }</Fragment>;
+					}
 
-				return (
-					<kbd
-						key={ index }
-						className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key"
-					>
-						{ character }
-					</kbd>
-				);
-			} ) }
+					return (
+						<kbd
+							key={ index }
+							className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key"
+						>
+							{ character }
+						</kbd>
+					);
+				} ) }
+			</span>
 		</kbd>
 	);
 }
