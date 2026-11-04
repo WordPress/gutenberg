@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import grid from '../grid';
 import type { Layout } from '../types';
 
@@ -24,26 +24,6 @@ function renderInspectorControls( props = {} ) {
 	);
 }
 
-function SyncManualGridLayout( {
-	layout,
-	onChange,
-}: {
-	layout: Layout;
-	onChange: ( layout: Layout ) => void;
-} ) {
-	useEffect( () => {
-		if ( layout.isManualPlacement && layout.rowCount === undefined ) {
-			onChange( {
-				...layout,
-				columnCount: layout.columnCount ?? 3,
-				rowCount: 3,
-			} );
-		}
-	}, [ layout, onChange ] );
-
-	return null;
-}
-
 function GridLayoutTransform( {
 	onInspectorChange,
 }: {
@@ -51,7 +31,7 @@ function GridLayoutTransform( {
 } ) {
 	const [ layout, setLayout ] = useState< Layout >( {
 		type: 'grid',
-		columnCount: 3,
+		columnCount: 4,
 	} );
 	const onChange = ( nextLayout: Layout | undefined ) => {
 		onInspectorChange( nextLayout );
@@ -65,17 +45,28 @@ function GridLayoutTransform( {
 					setLayout( {
 						type: 'grid',
 						isManualPlacement: true,
+						columnCount: 4,
+						rowCount: 3,
 					} )
 				}
 			>
 				Transform to Canvas
 			</button>
-			<SyncManualGridLayout layout={ layout } onChange={ setLayout } />
 			<GridLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ layout }
 				layoutBlockSupport={ { allowSizingOnChildren: true } }
 				onChange={ onChange }
+				resetLayout={
+					layout.isManualPlacement
+						? {
+								type: 'grid',
+								isManualPlacement: true,
+								columnCount: 3,
+								rowCount: 3,
+							}
+						: { type: 'grid' }
+				}
 			/>
 		</>
 	);
@@ -216,7 +207,7 @@ describe( 'GridLayoutInspectorControls', () => {
 		).toHaveDisplayValue( '' );
 	} );
 
-	it( 'does not reset the default row count when switching from auto to manual placement', async () => {
+	it( 'does not reset the layout when transforming a Grid with a column count to Canvas', async () => {
 		const user = userEvent.setup();
 		const onInspectorChange = vi.fn();
 		render(
@@ -237,6 +228,9 @@ describe( 'GridLayoutInspectorControls', () => {
 				screen.getByRole( 'spinbutton', { name: 'Rows' } )
 			).toHaveDisplayValue( '3' )
 		);
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Columns' } )
+		).toHaveDisplayValue( '4' );
 
 		expect( onInspectorChange ).not.toHaveBeenCalled();
 	} );

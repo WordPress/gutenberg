@@ -1,4 +1,4 @@
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, switchToBlockType } from '@wordpress/blocks';
 import type { ComponentProps, ReactElement } from 'react';
 import type {
 	BlockTypeIconDescriptor,
@@ -164,9 +164,11 @@ function VariationsToggleGroupControl( {
 function BlockVariationTransforms( {
 	blockClientId,
 }: BlockVariationTransformsProps ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { replaceBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
+		block,
 		variations,
 		canEdit,
 		isContentOnly,
@@ -177,6 +179,7 @@ function BlockVariationTransforms( {
 				select( blocksStore );
 
 			const {
+				getBlock,
 				getBlockName,
 				getBlockAttributes,
 				getBlockEditingMode,
@@ -190,6 +193,7 @@ function BlockVariationTransforms( {
 			const isContentBlock = hasContentRoleAttribute( name );
 
 			return {
+				block: getBlock( blockClientId ),
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId ),
@@ -227,6 +231,12 @@ function BlockVariationTransforms( {
 	}, [ variations ] );
 
 	const onSelectVariation = ( variationName: string ) => {
+		const transformedBlocks =
+			block && switchToBlockType( block, block.name, variationName );
+		if ( transformedBlocks ) {
+			replaceBlocks( blockClientId, transformedBlocks );
+			return;
+		}
 		updateBlockAttributes( blockClientId, {
 			// The selected variation is one of the listed ones.
 			...( variations as BlockVariation[] ).find(
