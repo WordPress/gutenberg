@@ -437,8 +437,8 @@ function getCoverage( title: string, searchTokens: string[] ): number {
  * Whether a title is exactly what was typed.
  *
  * Compares words, not the strings typed, so punctuation does not count: for the search
- * "coffee beans", "Coffee Beans" and "Coffee Beans." are both exact, and "Coffee Beans, Lightly
- * Roasted" is not.
+ * "coffee beans", "Coffee Beans" and "Coffee Beans." are both exact, and
+ * "Coffee Beans, Lightly Roasted" is not.
  *
  * @param title
  * @param searchTokens
