@@ -385,7 +385,7 @@ The element shows what its reference resolves to, calling it first when it is a 
 -   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
 -   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
 
-To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. When that value is pending or `{ "wpServerHtml": true }`, the element shows the content the new page's server-rendered HTML has for it, without its `<script>` elements, instead of the content it had before navigating. Elements inside [`data-wp-each`](#wp-each) items are the exception: they keep their content, because the client renders the items from its own list.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. When that value is pending or `{ "wpServerHtml": true }`, the element shows the content the new page's server-rendered HTML has for it, without its `<script>` elements, instead of the content it had before navigating. Two kinds of elements keep their content instead: elements outside every [router region](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#router-regions), because navigation doesn't render them, and elements inside [`data-wp-each`](#wp-each) items, because the client renders the items from its own list.
 
 #### Inert content
 
