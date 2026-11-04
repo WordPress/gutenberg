@@ -2687,14 +2687,14 @@ export const tokens = /** @type {const} */ ( {
 		$description: 'Extra small font size',
 		$type: 'dimension',
 		group: 'typography',
-		fallback: '11px',
+		fallback: '10px',
 		modes: {
 			default: {
 				$value: {
-					value: 11,
+					value: 10,
 					unit: 'px',
 				},
-				css: '11px',
+				css: '10px',
 			},
 		},
 	},
@@ -2717,14 +2717,14 @@ export const tokens = /** @type {const} */ ( {
 		$description: 'Medium font size',
 		$type: 'dimension',
 		group: 'typography',
-		fallback: '13px',
+		fallback: '14px',
 		modes: {
 			default: {
 				$value: {
-					value: 13,
+					value: 14,
 					unit: 'px',
 				},
-				css: '13px',
+				css: '14px',
 			},
 		},
 	},
@@ -2732,14 +2732,14 @@ export const tokens = /** @type {const} */ ( {
 		$description: 'Large font size',
 		$type: 'dimension',
 		group: 'typography',
-		fallback: '15px',
+		fallback: '16px',
 		modes: {
 			default: {
 				$value: {
-					value: 15,
+					value: 16,
 					unit: 'px',
 				},
-				css: '15px',
+				css: '16px',
 			},
 		},
 	},

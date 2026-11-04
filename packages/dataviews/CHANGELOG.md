@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the `lg` font size token for the view config section title instead of a hardcoded 15px, so the title follows the design system's scale ([#83073](https://github.com/WordPress/gutenberg/pull/83073)).
+
 ## 22.0.0 (2026-11-04)
 
 ### Breaking Changes

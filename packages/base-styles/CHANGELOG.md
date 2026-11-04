@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update `$font-size-x-small` to 10px, `$font-size-medium` to 14px, and `$font-size-large` to 16px, keeping this scale in step with the design system's font size tokens. `$default-font-size` follows `$font-size-medium` and so resolves to 14px ([#83073](https://github.com/WordPress/gutenberg/pull/83073)).
+
 ## 15.0.0 (2026-11-04)
 
 ### Breaking Changes
