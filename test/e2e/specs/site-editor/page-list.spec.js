@@ -134,10 +134,16 @@ test.describe( 'Page List', () => {
 
 						if ( option !== 'Private' ) {
 							await page
+								.getByRole( 'button', {
+									name: 'Edit Password',
+								} )
+								.click();
+							await page
 								.getByRole( 'checkbox', {
 									name: 'Password protected',
 								} )
 								.check();
+							await page.keyboard.press( 'Escape' );
 						}
 					}
 				},

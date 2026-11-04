@@ -3,6 +3,9 @@
 	border: 0;
 	padding: 0;
 	margin: 0;
+
+	/* Long permalinks have no spaces to wrap at. */
+	overflow-wrap: anywhere;
 }
 
 /* The slug reads as one path after the `/` prefix, as in the editor's slug control. */
