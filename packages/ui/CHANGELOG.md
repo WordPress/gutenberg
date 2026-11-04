@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
+
 ## 0.26.0 (2026-11-04)
 
 ### Breaking Changes
@@ -56,7 +60,6 @@
 
 ### Enhancements
 
--   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding.
 -   `SearchableSelect` and `SearchableSelectControl`: Add a `trigger` slot and `.Trigger` subcomponents for customizing trigger props ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
 -   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
