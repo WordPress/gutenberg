@@ -1191,7 +1191,8 @@ function getElementStylesByName(
 
 export const getNodesWithStyles = (
 	tree: GlobalStylesConfig,
-	blockSelectors: string | BlockSelectors
+	blockSelectors: string | BlockSelectors,
+	textClipBaseBlocks?: Record< string, any >
 ): any[] => {
 	const nodes: StylesNode[] = [];
 
@@ -1277,7 +1278,12 @@ export const getNodesWithStyles = (
 							const blockSelector = blockSelectors[ blockName ];
 							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
-								baseStyles: [ typedNode ],
+								baseStyles: [
+									typedNode,
+									...( textClipBaseBlocks?.[ blockName ]
+										? [ textClipBaseBlocks[ blockName ] ]
+										: [] ),
+								],
 								selector: variationSelector,
 								featureSelectors:
 									blockSelector?.featureSelectors,
@@ -1377,6 +1383,15 @@ export const getNodesWithStyles = (
 									selector: variationBlockSelector,
 									name: variationBlockName,
 									isStyleVariation: true,
+									...( textClipBaseBlocks?.[
+										variationBlockName
+									] && {
+										baseStyles: [
+											textClipBaseBlocks[
+												variationBlockName
+											],
+										],
+									} ),
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
@@ -1897,7 +1912,43 @@ export const transformToStyles = (
 	disableLayoutStyles: boolean = false,
 	disableRootPadding: boolean = false,
 	styleOptions: Record< string, boolean > = {}
-): string => {
+): string =>
+	transformToStylesWithTextClipBase(
+		tree,
+		blockSelectors,
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		disableLayoutStyles,
+		disableRootPadding,
+		styleOptions
+	);
+
+/**
+ * Like `transformToStyles`, but also takes the block type styles that block
+ * style variations layer over. They are read only to escape a text clip set
+ * there, and are never output. Mirror of the PHP `text_clip_base_blocks`
+ * stylesheet option.
+ *
+ * @param tree                  Global styles config.
+ * @param blockSelectors        Block selectors.
+ * @param hasBlockGapSupport    Whether block gap is supported.
+ * @param hasFallbackGapSupport Whether fallback gap is supported.
+ * @param disableLayoutStyles   Whether to disable layout styles.
+ * @param disableRootPadding    Whether to disable root padding.
+ * @param styleOptions          Sets of styles to opt in or out of.
+ * @param textClipBaseBlocks    Block type styles, keyed by block name.
+ * @return The stylesheet.
+ */
+export function transformToStylesWithTextClipBase(
+	tree: GlobalStylesConfig,
+	blockSelectors: string | BlockSelectors,
+	hasBlockGapSupport?: boolean,
+	hasFallbackGapSupport?: boolean,
+	disableLayoutStyles: boolean = false,
+	disableRootPadding: boolean = false,
+	styleOptions: Record< string, boolean > = {},
+	textClipBaseBlocks?: Record< string, any >
+): string {
 	// These allow opting out of certain sets of styles.
 	const options = {
 		blockGap: true,
@@ -1909,7 +1960,11 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
+	const nodesWithStyles = getNodesWithStyles(
+		tree,
+		blockSelectors,
+		textClipBaseBlocks
+	);
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 	const { contentSize, wideSize } = tree?.settings?.layout || {};
@@ -2033,7 +2088,7 @@ export const transformToStyles = (
 	}
 
 	return ruleset;
-};
+}
 
 export function generateSvgFilters(
 	tree: GlobalStylesConfig,
