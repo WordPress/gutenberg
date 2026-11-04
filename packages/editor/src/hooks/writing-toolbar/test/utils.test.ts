@@ -4,6 +4,7 @@ import {
 	MIN_CUSTOM_FONT_SIZE,
 	clampCustomFontSize,
 	findActiveWritingStyle,
+	getFontDisplayName,
 	getWritingStyles,
 	groupWritingStylesByFont,
 	parseFontSizeToPx,
@@ -220,13 +221,41 @@ describe( 'getWritingStyles', () => {
 		} );
 	} );
 
-	it( 'leaves the font unnamed when no preset matches it', () => {
+	it( 'names a font the theme sets outside its presets', () => {
 		expect(
 			styles.find( ( style ) => style.blockName === 'core/quote' )
 		).toMatchObject( {
 			fontFamily: '"Newsreader", serif',
-			fontFamilyName: undefined,
+			fontFamilyName: 'Newsreader',
 		} );
+	} );
+} );
+
+describe( 'getFontDisplayName', () => {
+	it( 'uses the preset\u2019s name when the font is one', () => {
+		expect(
+			getFontDisplayName(
+				'"Bricolage Grotesque", sans-serif',
+				FONT_FAMILIES
+			)
+		).toBe( 'Bricolage Grotesque' );
+	} );
+
+	it( 'reads the first family of a stack the theme sets itself', () => {
+		expect( getFontDisplayName( '"Newsreader", serif', [] ) ).toBe(
+			'Newsreader'
+		);
+		expect( getFontDisplayName( 'Georgia, serif', [] ) ).toBe( 'Georgia' );
+		expect(
+			getFontDisplayName( "'IBM Plex Mono', monospace", undefined )
+		).toBe( 'IBM Plex Mono' );
+	} );
+
+	it( 'has nothing to say about a font it was not given', () => {
+		expect(
+			getFontDisplayName( undefined, FONT_FAMILIES )
+		).toBeUndefined();
+		expect( getFontDisplayName( '', FONT_FAMILIES ) ).toBeUndefined();
 	} );
 } );
 
@@ -257,7 +286,7 @@ describe( 'groupWritingStylesByFont', () => {
 					'Paragraph',
 				],
 			],
-			[ undefined, [ 'Quote' ] ],
+			[ 'Newsreader', [ 'Quote' ] ],
 		] );
 	} );
 } );

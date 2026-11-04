@@ -114,6 +114,40 @@ export function resolveStyleTypography(
 }
 
 /**
+ * Names the font a block renders in. A theme's preset has a name of its own;
+ * anything else is named by the first family in its stack, which is the one
+ * that will actually be used.
+ *
+ * @param fontFamily   A CSS font family.
+ * @param fontFamilies The theme's font family presets.
+ *
+ * @return What to call the font.
+ */
+export function getFontDisplayName(
+	fontFamily: string | undefined,
+	fontFamilies: FontFamilyPreset[] | undefined
+): string | undefined {
+	if ( ! fontFamily ) {
+		return undefined;
+	}
+
+	const preset = fontFamilies?.find(
+		( candidate ) => candidate.fontFamily === fontFamily
+	);
+
+	if ( preset ) {
+		return preset.name;
+	}
+
+	const first = fontFamily
+		.split( ',' )[ 0 ]
+		.trim()
+		.replace( /^["']|["']$/g, '' );
+
+	return first || undefined;
+}
+
+/**
  * The theme.json element a writing style renders as, where that is more
  * specific than the block it belongs to. Only the heading levels are: a level
  * 2 heading takes its font from `styles.elements.h2`.
@@ -156,10 +190,6 @@ export function getWritingStyles( {
 	globalStyles: GlobalStylesConfig | undefined;
 	fontFamilies: FontFamilyPreset[] | undefined;
 } ): WritingStyle[] {
-	const named = ( fontFamily?: string ) =>
-		fontFamilies?.find( ( preset ) => preset.fontFamily === fontFamily )
-			?.name;
-
 	const toStyle = ( {
 		key,
 		label,
@@ -185,7 +215,10 @@ export function getWritingStyles( {
 			variation,
 			attributes,
 			fontFamily: typography.fontFamily,
-			fontFamilyName: named( typography.fontFamily ),
+			fontFamilyName: getFontDisplayName(
+				typography.fontFamily,
+				fontFamilies
+			),
 			fontSize: typography.fontSize,
 		};
 	};
