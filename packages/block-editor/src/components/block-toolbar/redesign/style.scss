@@ -324,3 +324,44 @@ $toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
 	align-items: center;
 	gap: $grid-unit-10;
 }
+
+// With "Show button text labels", buttons show their labels in place of
+// icons. The redesigned toolbar keeps its one surface and hairlines rather
+// than the bordered groups of the regular toolbar.
+.show-icon-labels .block-editor-block-contextual-toolbar.is-redesign:not(.editor-header__toolbar *) {
+	.block-editor-block-toolbar {
+		.components-toolbar-group,
+		.components-toolbar {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: none;
+
+			.components-toolbar-group + .components-toolbar-group {
+				border-left: 0;
+			}
+		}
+	}
+
+	// Labels stay on one line, so the toolbar keeps its height.
+	.components-button::after,
+	.components-button {
+		white-space: nowrap;
+	}
+}
+
+.show-icon-labels .block-editor-block-contextual-toolbar.is-redesign {
+	// The block name already has a text label; its icon stays next to it.
+	.block-editor-block-toolbar__block-name-button .block-editor-block-icon {
+		width: $icon-size !important;
+		height: $icon-size !important;
+		min-width: $icon-size !important;
+	}
+
+	.block-editor-block-toolbar__parent-selector {
+		.components-button::after,
+		.components-button {
+			white-space: nowrap;
+		}
+	}
+}
