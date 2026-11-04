@@ -236,9 +236,7 @@ const PlaylistTrackEdit = ( {
 								filename={
 									image ? getFilename( image ) : undefined
 								}
-								allowedTypes={
-									TRACK_IMAGE_ALLOWED_MEDIA_TYPES
-								}
+								allowedTypes={ TRACK_IMAGE_ALLOWED_MEDIA_TYPES }
 								onSelect={ onSelectTrackImage }
 								onError={ onTrackImageUploadError }
 								onReset={ onRemoveTrackImage }
