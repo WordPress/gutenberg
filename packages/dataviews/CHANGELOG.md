@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).

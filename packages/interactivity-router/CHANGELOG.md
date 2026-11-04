@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
