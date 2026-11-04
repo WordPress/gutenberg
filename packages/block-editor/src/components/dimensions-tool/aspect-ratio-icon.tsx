@@ -9,6 +9,13 @@ const STROKE_WIDTH = 1.5;
 const MIN_RATIO = 1 / 3;
 const MAX_RATIO = 3;
 
+// The 1.5px line is centred on the rectangle's edges. With an edge on .25 or
+// .75, as in the generic icon, the line covers whole pixels on a 2x display
+// instead of being blurred across them.
+function snapToPixels( edge: number ) {
+	return Math.round( ( edge - 0.25 ) * 2 ) / 2 + 0.25;
+}
+
 /**
  * Renders a rounded rectangle with the shape of an aspect ratio, so that a
  * ratio can be recognized without reading its label.
@@ -30,6 +37,10 @@ export default function AspectRatioIcon( { ratio }: { ratio: string } ) {
 	);
 	const width = clampedRatio >= 1 ? MAX_SIDE : MAX_SIDE * clampedRatio;
 	const height = clampedRatio >= 1 ? MAX_SIDE / clampedRatio : MAX_SIDE;
+	// The right and bottom edges mirror the snapped left and top edges, which
+	// keeps the shape centred.
+	const x = snapToPixels( ( BOX_SIZE - width ) / 2 );
+	const y = snapToPixels( ( BOX_SIZE - height ) / 2 );
 
 	return (
 		<svg
@@ -44,10 +55,10 @@ export default function AspectRatioIcon( { ratio }: { ratio: string } ) {
 			focusable="false"
 		>
 			<rect
-				x={ ( BOX_SIZE - width ) / 2 }
-				y={ ( BOX_SIZE - height ) / 2 }
-				width={ width }
-				height={ height }
+				x={ x }
+				y={ y }
+				width={ BOX_SIZE - 2 * x }
+				height={ BOX_SIZE - 2 * y }
 				rx="1.5"
 			/>
 		</svg>
