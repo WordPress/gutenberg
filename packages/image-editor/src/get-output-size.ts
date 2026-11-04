@@ -6,18 +6,21 @@ import {
 } from './map-edit-to-original';
 
 /**
- * The size in pixels of the image this edit produces: the part of the
- * original the crop frames, at full size.
+ * The size in pixels of the part of the image the crop frames, at full
+ * size.
  *
  * Use it for a size readout, or to check an edit against a smallest
  * allowed size before saving.
  *
- * It reads the same edits `mapEditToOriginal` returns, so it cannot
- * disagree with what saving produces. A crop that covers the whole image
- * to within a rounding error is no crop at all, and gives the full size.
+ * It reads the same edits `mapEditToOriginal` returns, so it measures
+ * the region saving keeps and not some other one. The size is in the
+ * pixels of `state.image`, so a save path that applies those edits to a
+ * larger copy of that image writes a larger file, in proportion. A crop
+ * that covers the whole image to within a rounding error is no crop at
+ * all, and gives the full size.
  *
  * @param state The editor state.
- * @return The output size, or `null` when no image has loaded.
+ * @return The size of the framed region, or `null` when no image has loaded.
  */
 export function getOutputSize( state: ImageEditorState ): Size | null {
 	const { image } = state;
