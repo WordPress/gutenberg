@@ -24,6 +24,9 @@ const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
  * group among them (`status`) is split into its members, so each renders as
  * a field of its own. The form config is shared with the editor's document
  * sidebar, which keeps its panels.
+ *
+ * The scheduled date is left out: the date panel edits the same date. The
+ * password is rarely set, so it keeps its panel.
  */
 const fieldsWithRegularLayout = [
 	'status',
@@ -48,10 +51,21 @@ function splitQuickEditForm( form ) {
 			typeof field !== 'string' && field.children
 				? field.children
 				: [ field ];
-		return members.map( ( member ) => ( {
-			...( typeof member === 'string' ? { id: member } : member ),
-			layout: regularLayout,
-		} ) );
+		return members.flatMap( ( member ) => {
+			const memberId = typeof member === 'string' ? member : member.id;
+			if ( memberId === 'scheduled_date' ) {
+				return [];
+			}
+			if ( memberId === 'password' ) {
+				return [ member ];
+			}
+			return [
+				{
+					...( typeof member === 'string' ? { id: member } : member ),
+					layout: regularLayout,
+				},
+			];
+		} );
 	} );
 	const isRegular = ( field ) =>
 		( typeof field === 'string'
