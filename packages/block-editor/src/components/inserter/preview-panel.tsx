@@ -5,12 +5,21 @@ import {
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Notice } from '@wordpress/ui';
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
 import type { InserterItem } from '../../store/types';
 
 function InserterPreviewPanel( { item }: { item: InserterItem } ) {
-	const { name, title, icon, description, initialAttributes, example } = item;
+	const {
+		name,
+		title,
+		icon,
+		description,
+		initialAttributes,
+		example,
+		isDisabled,
+	} = item;
 	const isReusable = isReusableBlock( item );
 	const blocks = useMemo( () => {
 		if ( ! example ) {
@@ -74,6 +83,15 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 					icon={ icon }
 					description={ description }
 				/>
+			) }
+			{ isDisabled && (
+				<Notice.Root intent="info">
+					<Notice.Description>
+						{ __(
+							'This block can only be used once and is already in use.'
+						) }
+					</Notice.Description>
+				</Notice.Root>
 			) }
 		</div>
 	);
