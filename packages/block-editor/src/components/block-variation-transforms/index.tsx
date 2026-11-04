@@ -15,7 +15,7 @@ import {
 	Menu,
 	VisuallyHidden,
 } from '@wordpress/ui';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
@@ -164,11 +164,11 @@ function VariationsToggleGroupControl( {
 function BlockVariationTransforms( {
 	blockClientId,
 }: BlockVariationTransformsProps ) {
+	const registry = useRegistry();
 	const { replaceBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
-		block,
 		variations,
 		canEdit,
 		isContentOnly,
@@ -179,7 +179,6 @@ function BlockVariationTransforms( {
 				select( blocksStore );
 
 			const {
-				getBlock,
 				getBlockName,
 				getBlockAttributes,
 				getBlockEditingMode,
@@ -193,7 +192,6 @@ function BlockVariationTransforms( {
 			const isContentBlock = hasContentRoleAttribute( name );
 
 			return {
-				block: getBlock( blockClientId ),
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId ),
@@ -231,6 +229,9 @@ function BlockVariationTransforms( {
 	}, [ variations ] );
 
 	const onSelectVariation = ( variationName: string ) => {
+		const block = registry
+			.select( blockEditorStore )
+			.getBlock( blockClientId );
 		const transformedBlocks =
 			block && switchToBlockType( block, block.name, variationName );
 		if ( transformedBlocks ) {
