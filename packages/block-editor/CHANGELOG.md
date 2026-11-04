@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Filter inserter items through a private editor-settings callback, using the actual insertion context ([#85438](https://github.com/WordPress/gutenberg/pull/85438)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Post Terms: Offer taxonomy variations only for compatible insertion post types ([#85438](https://github.com/WordPress/gutenberg/pull/85438)).
+
 ## 16.1.0 (2026-11-04)
 
 ### New Features
