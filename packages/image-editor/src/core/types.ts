@@ -16,7 +16,9 @@ import type { mat2d } from 'gl-matrix';
 export type Camera = mat2d;
 
 /**
- * A point with normalized coordinates (0-1 range relative to image dimensions).
+ * A point in fractions rather than pixels. What it is a fraction of
+ * depends on the field that holds it: a pan is a signed offset from the
+ * centre, so it can be negative.
  */
 export interface NormalizedPoint {
 	x: number;
@@ -24,8 +26,10 @@ export interface NormalizedPoint {
 }
 
 /**
- * A rectangle with normalized coordinates (0-1 range).
- * Origin is the top-left corner of the image.
+ * A rectangle in fractions rather than pixels, measured from its
+ * top-left corner. A crop area is a fraction of the view the canvas
+ * shows, which is the image turned by its rotation snapped to a quarter
+ * turn, not of the image itself.
  */
 export interface NormalizedRect {
 	x: number;

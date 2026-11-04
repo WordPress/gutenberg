@@ -56,6 +56,7 @@
 import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import { mapEditToOriginal } from '../map-edit-to-original';
+import { getOutputSize } from '../get-output-size';
 import type { OriginalImageEdit } from '../map-edit-to-original';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
@@ -353,6 +354,43 @@ describe( 'mapEditToOriginal ↔ Export-camera parity', () => {
 			expect( server.y ).toBeCloseTo( exported.y, 0 );
 		} );
 	}
+} );
+
+describe( 'getOutputSize agrees with mapEditToOriginal', () => {
+	// Big enough that a crop just inside the pruning tolerance is still
+	// tens of pixels, which a smallest-size check would act on.
+	const BIG = { src: 'big.jpg', naturalWidth: 20000, naturalHeight: 10000 };
+
+	it( 'reports the full size when the crop is too near full to be saved', () => {
+		const state = makeState( { image: BIG, zoom: 1.0005 } );
+
+		expect( mapEditToOriginal( state ) ).toEqual( [] );
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 20000,
+			height: 10000,
+		} );
+	} );
+
+	it( 'swaps the sides on a quarter turn', () => {
+		const state = makeState( { image: BIG, rotation: 90 } );
+		const size = getOutputSize( state );
+
+		expect( size?.width ).toBeCloseTo( 10000, 6 );
+		expect( size?.height ).toBeCloseTo( 20000, 6 );
+	} );
+
+	it( 'takes the crop out of the image at its rotation', () => {
+		// Half the width and all the height of the quarter-turned image.
+		const state = makeState( {
+			image: BIG,
+			rotation: 90,
+			cropRect: { x: 0.25, y: 0, width: 0.5, height: 1 },
+		} );
+		const size = getOutputSize( state );
+
+		expect( size?.width ).toBeCloseTo( 5000, 6 );
+		expect( size?.height ).toBeCloseTo( 20000, 6 );
+	} );
 } );
 
 describe( 'mapEditToOriginal without a loaded image', () => {

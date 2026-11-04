@@ -100,6 +100,10 @@ The editor's state, and the state an editor starts from. Pass `image` when you a
 
 Whether two states describe the same edit, ignoring tiny floating-point differences. Use it to skip entries that change nothing in your own undo history.
 
+### `getOutputSize( state )`
+
+The size in pixels of the image the edit produces: the part of the original the crop frames, at full size. It is the figure the canvas shows while someone resizes the crop, and it reads the same edits `mapEditToOriginal` returns, so it cannot disagree with what saving produces. Use it for a size readout, or to check an edit against a smallest allowed size before saving. Returns `null` when no image has loaded.
+
 ### `mapEditToOriginal( state )`
 
 Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `mapEditToOriginal` turns that state into operations for the full-size image loaded in `state.image`. Here, "original" means the image loaded into this editor, even if that file was edited before.
