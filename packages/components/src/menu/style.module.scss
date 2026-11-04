@@ -127,7 +127,7 @@
 	&[aria-disabled="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
-		&:is(:focus, [data-focus]) {
+		&:focus-visible {
 			@include outset-ring__focus;
 			outline-offset: 0;
 		}

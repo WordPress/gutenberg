@@ -6,6 +6,8 @@
 
 -   Save only modified post metadata keys, preserving unrelated server updates and values while retaining complete editor and autosave views ([#84673](https://github.com/WordPress/gutenberg/pull/84673)).
 
+## 9.1.0 (2026-11-04)
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
