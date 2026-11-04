@@ -385,7 +385,7 @@ The element shows what its reference resolves to, calling it first when it is a 
 -   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
 -   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
 
-To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. When that value is pending or `{ "wpServerHtml": true }`, the element shows the content the new page's server-rendered HTML has for it, without its `<script>` elements, instead of the content it had before navigating. Elements inside [`data-wp-each`](#wp-each) items are the exception: they keep their content, because the client renders the items from its own list.
 
 #### Inert content
 
@@ -402,7 +402,7 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   The fallback of an element the client creates, such as a [`data-wp-each`](#wp-each) item or an element added by client-side navigation, is copied into the element as nodes, not as a string, so it never goes through a Trusted Types policy, default policy included. A default policy that transforms, filters or rejects HTML doesn't apply to it, and the markup appears as the server rendered it. Don't rely on a policy to prepare fallback markup: it isn't sanitized, apart from leaving out `<script>` elements, so write it as you want it shown, from content you trust. This doesn't change values from `asDangerousHTML()`, which the browser still checks when they are rendered.
+    -   The fallback of an element the client creates, such as a [`data-wp-each`](#wp-each) item or an element added by client-side navigation, and the new page's server-rendered content that an element shows after client-side navigation, are copied into the element as nodes, not as strings, so they never go through a Trusted Types policy, default policy included. A default policy that transforms, filters or rejects HTML doesn't apply to them, and the markup appears as the server rendered it. After client-side navigation, that's the new page as the router parsed it, and the router's parse of the whole page does go through the default policy. Don't rely on a policy to prepare fallback markup: it isn't sanitized, apart from leaving out `<script>` elements, so write it as you want it shown, from content you trust. This doesn't change values from `asDangerousHTML()`, which the browser still checks when they are rendered.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
