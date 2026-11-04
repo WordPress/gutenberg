@@ -24,6 +24,10 @@ const resultsFiles = [
 		file: 'media-processing.performance-results.json',
 		metricsPrefix: 'media-',
 	},
+	{
+		file: 'suggestion-mode.performance-results.json',
+		metricsPrefix: 'suggestion-mode-',
+	},
 ];
 
 const performanceResults = resultsFiles.map( ( { file } ) =>

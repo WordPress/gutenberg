@@ -13,6 +13,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import PostComments from '../post-comments';
 import PostPingbacks from '../post-pingbacks';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 
 const PANEL_NAME = 'discussion-panel';
 
@@ -52,6 +53,7 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 			trackbacksSupported: !! postType.supports.trackbacks,
 		};
 	}, [] );
+	const lockedProps = useLockedPostSettingProps();
 	let label;
 	if ( commentStatus === 'open' ) {
 		if ( pingStatus === 'open' ) {
@@ -74,6 +76,7 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 			aria-label={ __( 'Change discussion options' ) }
 			aria-expanded={ isOpen }
 			onClick={ onClick }
+			{ ...lockedProps }
 		>
 			{ label }
 		</Button>

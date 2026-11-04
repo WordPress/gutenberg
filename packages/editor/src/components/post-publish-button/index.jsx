@@ -1,7 +1,15 @@
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { Text } from '@wordpress/ui';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -29,6 +37,7 @@ export function PostPublishButton( {
 		postStatusHasChanged,
 		postType,
 		postId,
+		isSuggesting,
 	} = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
@@ -48,10 +57,39 @@ export function PostPublishButton( {
 			postStatusHasChanged: store.getPostEdits()?.status,
 			hasNonPostEntityChanges: store.hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: store.isSavingNonPostEntityChanges(),
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggesting:
+				unlock( store ).getEditorIntent() === EDITOR_INTENT_SUGGEST,
 		};
 	}, [] );
 
 	const { editPost, savePost } = useDispatch( editorStore );
+
+	// If the new status has not changed explicitly, we derive it from
+	// other factors, like having a publish action, etc.. We need to preserve
+	// this because it affects when to show the pre and post publish panels.
+	// If it has changed though explicitly, we need to respect that.
+	let publishStatus = 'publish';
+	if ( postStatusHasChanged ) {
+		publishStatus = postStatus;
+	} else if ( ! hasPublishAction ) {
+		publishStatus = 'pending';
+	} else if ( visibility === 'private' ) {
+		publishStatus = 'private';
+	} else if ( isBeingScheduled ) {
+		publishStatus = 'future';
+	}
+
+	/*
+	 * Publishing is the editorial decision Suggest mode exists to withhold,
+	 * and so are scheduling and submitting for review: each moves the post
+	 * along the workflow. A click that leaves the status where it is - the
+	 * "Save" of a published or scheduled post - is a plain save, and suggesting
+	 * has no save lock: suggestions write their markers into the post content,
+	 * so on a published post this button is the only way to persist them.
+	 * Withhold the status change, not the save. See issue #73411 (F-15).
+	 */
+	const isPublishWithheld = isSuggesting && publishStatus !== postStatus;
 
 	const savePostStatus = ( status ) => {
 		editPost( { status }, { undoIgnore: true } );
@@ -112,21 +150,6 @@ export function PostPublishButton( {
 			( ! isPublishable && ! forceIsDirty ) ) &&
 			! hasNonPostEntityChanges );
 
-	// If the new status has not changed explicitly, we derive it from
-	// other factors, like having a publish action, etc.. We need to preserve
-	// this because it affects when to show the pre and post publish panels.
-	// If it has changed though explicitly, we need to respect that.
-	let publishStatus = 'publish';
-	if ( postStatusHasChanged ) {
-		publishStatus = postStatus;
-	} else if ( ! hasPublishAction ) {
-		publishStatus = 'pending';
-	} else if ( visibility === 'private' ) {
-		publishStatus = 'private';
-	} else if ( isBeingScheduled ) {
-		publishStatus = 'future';
-	}
-
 	const onClickButton = () => {
 		if ( isButtonDisabled ) {
 			return;
@@ -163,6 +186,45 @@ export function PostPublishButton( {
 		'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 	};
 	const componentProps = isToggle ? toggleProps : buttonProps;
+
+	/*
+	 * `editPost` would drop the status, but `savePost()` would still write the
+	 * post to the server while the pre-publish flow waits on a status change
+	 * that never comes. Keep the button enabled so the reason is reachable on
+	 * click, by touch and assistive technology alike, and say where to change
+	 * the status instead of running either half.
+	 */
+	if ( isPublishWithheld ) {
+		return (
+			<Dropdown
+				popoverProps={ { placement: 'bottom-end' } }
+				renderToggle={ ( {
+					isOpen: isHintOpen,
+					onToggle: onToggleHint,
+				} ) => (
+					<Button
+						className={ `${ componentProps.className } editor-post-publish-button__button` }
+						variant="primary"
+						size="compact"
+						onClick={ onToggleHint }
+						aria-expanded={ isHintOpen }
+					>
+						<PublishButtonLabel />
+					</Button>
+				) }
+				renderContent={ () => (
+					<DropdownContentWrapper paddingSize="medium">
+						<Text render={ <p /> }>
+							{ __(
+								'Switch to Editing to change the post status.'
+							) }
+						</Text>
+					</DropdownContentWrapper>
+				) }
+			/>
+		);
+	}
+
 	return (
 		<Button
 			{ ...componentProps }

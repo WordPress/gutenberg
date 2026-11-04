@@ -75,7 +75,8 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * A thread is block-level when none of its blocks contains a `core/note`
  * marker with its id. A split can leave a block with the note's id but none
  * of its text, which shouldn't turn an inline note into a block-level one.
- * When a block has several, the first one supplies the color.
+ * When a block has several, the first one supplies the color. Suggestions
+ * are skipped: their own markers already show what they change.
  *
  * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
@@ -89,7 +90,7 @@ export function buildBlockHighlightCss( threads, getBlockAttributes ) {
 			findNoteInBlock( getBlockAttributes( clientId ), thread.id )
 		);
 	const anchors = ( threads ?? [] ).flatMap( ( thread ) =>
-		thread?.id && isBlockLevel( thread )
+		thread?.id && ! thread.meta?._wp_suggestion && isBlockLevel( thread )
 			? thread.blockClientIds.map( ( clientId ) => ( {
 					thread,
 					clientId,

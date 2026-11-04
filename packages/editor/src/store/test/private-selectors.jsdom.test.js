@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
+	getCodeEditorUnavailableReason,
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
@@ -245,5 +246,22 @@ describe( 'getDefaultRenderingMode', () => {
 				'post-only'
 			);
 		} );
+	} );
+} );
+
+describe( 'getCodeEditorUnavailableReason', () => {
+	it( 'returns null in the edit intent', () => {
+		expect(
+			getCodeEditorUnavailableReason( { editorIntent: 'edit' } )
+		).toBeNull();
+		expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
+	} );
+
+	it( 'returns a reason in the suggest intent', () => {
+		expect(
+			getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
+		).toBe(
+			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+		);
 	} );
 } );
