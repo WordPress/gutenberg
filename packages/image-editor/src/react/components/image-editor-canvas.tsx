@@ -718,8 +718,8 @@ function ImageEditorCanvasInner(
 		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
-		// Read the size from the same edits saving sends, so the tooltip
-		// and the saved image cannot frame different regions.
+		// Use the mapper's near-full-crop rule. The size is measured in
+		// state.image pixels, which may differ from the saved file.
 		return getOutputSize( state );
 	}, [ showDimensions, activeHandle, state ] );
 
