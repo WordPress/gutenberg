@@ -1,5 +1,5 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -202,6 +202,14 @@ export function useCollaboratorNotifications(
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
 
+	// The save callback waits for a status lookup before it posts its notice,
+	// and every notice from the same saver shares an ID. These refs let the
+	// callback drop a notice that is stale by the time the lookup finishes:
+	// a newer save has started, the preference was turned off, or the
+	// component unmounted.
+	const latestSaveRef = useRef( 0 );
+	const canNotifyOnSaveRef = useRef( false );
+
 	// Pass null when collaboration is disabled or a notification type is
 	// turned off to prevent the hooks from subscribing to awareness state.
 	const shouldShowJoinNotifications =
@@ -210,6 +218,12 @@ export function useCollaboratorNotifications(
 		isCollaborationEnabled && showLeaveNotifications;
 	const shouldShowPostSaveNotifications =
 		isCollaborationEnabled && showPostSaveNotifications;
+	useEffect( () => {
+		canNotifyOnSaveRef.current = shouldShowPostSaveNotifications;
+		return () => {
+			canNotifyOnSaveRef.current = false;
+		};
+	}, [ shouldShowPostSaveNotifications ] );
 	// A disabled notification type passes null, which unsubscribes its hook;
 	// callback guards handle any events already queued before then.
 	const effectiveTarget = (
@@ -319,6 +333,8 @@ export function useCollaboratorNotifications(
 					return;
 				}
 
+				const saveNumber = ++latestSaveRef.current;
+
 				// Prefer the remote status from Y.Doc (accurate at save time)
 				// over the local Redux value, which may not have synced yet.
 				const effectiveStatus =
@@ -354,6 +370,15 @@ export function useCollaboratorNotifications(
 					previousStatus,
 					getStatusLabel,
 				} );
+
+				// The lookup may have taken a while. Only the newest save gets
+				// to post, and only while notifications are still wanted.
+				if (
+					saveNumber !== latestSaveRef.current ||
+					! canNotifyOnSaveRef.current
+				) {
+					return;
+				}
 
 				void createNotice( 'info', message, {
 					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${

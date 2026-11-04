@@ -618,6 +618,93 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
+		describe( 'while a status lookup is still in flight', () => {
+			// Hands control of the pending lookup to the test. The save that
+			// triggers it returns a promise the test settles later.
+			function startPendingEmbargoSave() {
+				let resolveLookup: (
+					record: PostStatusRecord
+				) => void = () => {};
+				mockGetEntityRecord.mockImplementationOnce(
+					() =>
+						new Promise< PostStatusRecord >( ( resolve ) => {
+							resolveLookup = resolve;
+						} )
+				);
+				const pendingSave = mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: 'embargo',
+					},
+					alice,
+					null
+				);
+				return {
+					pendingSave,
+					finishLookup: () =>
+						resolveLookup( { slug: 'embargo', name: 'Embargoed' } ),
+				};
+			}
+
+			it( 'drops the older notice when a newer save already posted', async () => {
+				renderNotifications( { postStatus: 'draft' } );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				// A publish needs no lookup, so its notice posts right away.
+				await mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: 'publish',
+					},
+					alice,
+					{ savedAt: 0, savedByClientId: 1, postStatus: 'embargo' }
+				);
+				expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+				expect( mockCreateNotice ).toHaveBeenCalledWith(
+					'info',
+					'Post published. By Alice.',
+					expect.anything()
+				);
+
+				// The older lookup finishing must not replace the newer notice.
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			it( 'drops the notice when the preference was turned off', async () => {
+				const { rerender } = renderNotifications( {
+					postStatus: 'draft',
+				} );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				state = {
+					...state,
+					showCollaborationPostSaveNotifications: false,
+				};
+				rerender();
+
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).not.toHaveBeenCalled();
+			} );
+
+			it( 'drops the notice when the component unmounted', async () => {
+				const { unmount } = renderNotifications( {
+					postStatus: 'draft',
+				} );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				unmount();
+
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).not.toHaveBeenCalled();
+			} );
+		} );
+
 		it( 'reports a plain save when the status cannot be resolved', async () => {
 			renderNotifications( {
 				postStatus: 'draft',
