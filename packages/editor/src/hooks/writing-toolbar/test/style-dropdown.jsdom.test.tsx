@@ -63,6 +63,37 @@ describe( 'WritingStyleDropdown', () => {
 		).toHaveTextContent( 'Heading 2' );
 	} );
 
+	it( 'shows the block icon of the style the block is in', () => {
+		render(
+			<WritingStyleDropdown
+				groups={ GROUPS }
+				activeKey="core/heading:1"
+				onSelect={ () => {} }
+			/>
+		);
+
+		expect(
+			within(
+				screen.getByRole( 'button', { name: 'Style' } )
+			).getByTestId( 'heading-icon' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows no icon when the block is in no style the menu lists', () => {
+		render(
+			<WritingStyleDropdown groups={ GROUPS } onSelect={ () => {} } />
+		);
+
+		const toggle = screen.getByRole( 'button', { name: 'Style' } );
+		expect( toggle ).toHaveTextContent( 'Style' );
+		expect(
+			within( toggle ).queryByTestId( 'heading-icon' )
+		).not.toBeInTheDocument();
+		expect(
+			within( toggle ).queryByTestId( 'paragraph-icon' )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'lists every style, grouped by font', async () => {
 		const user = userEvent.setup();
 		render(

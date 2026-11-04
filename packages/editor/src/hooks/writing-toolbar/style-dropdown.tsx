@@ -42,7 +42,14 @@ export default function WritingStyleDropdown( {
 				{ ( toggleProps ) => (
 					<DropdownMenu
 						className="editor-writing-toolbar__style"
-						icon={ null }
+						icon={
+							activeStyle ? (
+								<BlockIcon
+									icon={ activeStyle.icon }
+									showColors
+								/>
+							) : null
+						}
 						label={ __( 'Style' ) }
 						text={ activeStyle?.label ?? __( 'Style' ) }
 						popoverProps={ POPOVER_PROPS }
