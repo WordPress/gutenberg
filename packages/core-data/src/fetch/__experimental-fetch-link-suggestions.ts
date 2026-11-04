@@ -434,6 +434,33 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 }
 
 /**
+ * How much of a title the search accounts for.
+ *
+ * Only breaks ties between titles that already cover the search equally well: for the search
+ * "home", "Home" scores 1, "Home Tips" scores 1/2, and "Home Improvement Tips" scores 1/3.
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return The share of the title's words that hold a word typed, from 0 to 1.
+ */
+function getTitleShare( title: string, searchTokens: string[] ): number {
+	const titleTokens = tokenize( title || '' );
+
+	if ( ! titleTokens.length || ! searchTokens.length ) {
+		return 0;
+	}
+
+	const matched = titleTokens.filter( ( titleToken ) =>
+		searchTokens.some( ( searchToken ) =>
+			titleToken.includes( searchToken )
+		)
+	);
+
+	return matched.length / titleTokens.length;
+}
+
+/**
  * What to sort, and how.
  */
 type SortOptions = {
@@ -463,6 +490,8 @@ type SortOptions = {
  *    beans"
  * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
+ * 6. Share of the title the search accounts for: "Coffee beans" will rank above "Coffee beans,
+ *    lightly roasted"
  *
  * @param options
  * @param options.results
@@ -482,6 +511,7 @@ export function sortResults( {
 		...getTitleMatch( result.title, search ),
 		type: getTypeRank( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
+		share: getTitleShare( result.title, searchTokens ),
 	} ) );
 
 	scored.sort(
@@ -499,7 +529,10 @@ export function sortResults( {
 			// Rank by how much of the matched word the search contains: the search
 			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
 			// and only 27% of "Caterpillar"
-			b.score - a.score
+			b.score - a.score ||
+			// Then by how much of the title the search accounts for: the search "home" ranks the
+			// title "Home" above "Home Improvement Tips"
+			b.share - a.share
 	);
 
 	return scored.map( ( { result } ) => result );
