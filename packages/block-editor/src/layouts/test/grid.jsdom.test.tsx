@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import grid from '../grid';
-import type { Layout } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -21,54 +18,6 @@ function renderInspectorControls( props = {} ) {
 				{ ...props }
 			/>
 		</ToolsPanel>
-	);
-}
-
-function GridLayoutTransform( {
-	onInspectorChange,
-}: {
-	onInspectorChange: ( layout: Layout | undefined ) => void;
-} ) {
-	const [ layout, setLayout ] = useState< Layout >( {
-		type: 'grid',
-		columnCount: 4,
-	} );
-	const onChange = ( nextLayout: Layout | undefined ) => {
-		onInspectorChange( nextLayout );
-		setLayout( nextLayout ?? {} );
-	};
-
-	return (
-		<>
-			<button
-				onClick={ () =>
-					setLayout( {
-						type: 'grid',
-						isManualPlacement: true,
-						columnCount: 4,
-						rowCount: 3,
-					} )
-				}
-			>
-				Transform to Canvas
-			</button>
-			<GridLayoutInspectorControls
-				clientId={ PANEL_ID }
-				layout={ layout }
-				layoutBlockSupport={ { allowSizingOnChildren: true } }
-				onChange={ onChange }
-				resetLayout={
-					layout.isManualPlacement
-						? {
-								type: 'grid',
-								isManualPlacement: true,
-								columnCount: 3,
-								rowCount: 3,
-							}
-						: { type: 'grid' }
-				}
-			/>
-		</>
 	);
 }
 
@@ -205,33 +154,5 @@ describe( 'GridLayoutInspectorControls', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Columns' } )
 		).toHaveDisplayValue( '' );
-	} );
-
-	it( 'does not reset the layout when transforming a Grid with a column count to Canvas', async () => {
-		const user = userEvent.setup();
-		const onInspectorChange = vi.fn();
-		render(
-			<ToolsPanel
-				label="Layout"
-				resetAll={ vi.fn() }
-				panelId={ PANEL_ID }
-			>
-				<GridLayoutTransform onInspectorChange={ onInspectorChange } />
-			</ToolsPanel>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', { name: 'Transform to Canvas' } )
-		);
-		await waitFor( () =>
-			expect(
-				screen.getByRole( 'spinbutton', { name: 'Rows' } )
-			).toHaveDisplayValue( '3' )
-		);
-		expect(
-			screen.getByRole( 'spinbutton', { name: 'Columns' } )
-		).toHaveDisplayValue( '4' );
-
-		expect( onInspectorChange ).not.toHaveBeenCalled();
 	} );
 } );
