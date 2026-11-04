@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Correct control result and generator dispatch types to match existing middleware behavior ([#85121](https://github.com/WordPress/gutenberg/pull/85121)).
