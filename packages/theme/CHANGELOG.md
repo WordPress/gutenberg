@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
