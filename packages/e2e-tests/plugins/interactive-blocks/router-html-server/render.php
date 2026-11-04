@@ -9,6 +9,8 @@ $attributes = get_defined_vars()['attributes'];
 $page       = $attributes['page'];
 $html       = '<p>' . esc_html( ucfirst( $attributes['label'] ?? $page ) ) . '</p>';
 // The value that data-wp-watch callbacks copy from this page's server data.
+// The server doesn't render a context value into its element, so the context
+// element holds this page's HTML in its markup.
 $synced = empty( $attributes['syncedNull'] ) ? wp_interactivity_as_dangerous_html( $html ) : null;
 
 wp_interactivity_state(
