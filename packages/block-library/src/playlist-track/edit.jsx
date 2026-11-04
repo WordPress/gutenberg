@@ -1,9 +1,8 @@
 import { isBlobURL } from '@wordpress/blob';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	MediaUpload,
 	MediaUploadCheck,
 	BlockIcon,
 	useBlockProps,
@@ -12,7 +11,6 @@ import {
 	PlainText,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	TextControl,
 	TextareaControl as WCTextareaControl,
@@ -25,9 +23,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { getFilename } from '@wordpress/url';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -42,9 +42,13 @@ const PlaylistTrackEdit = ( {
 	const { id, src, album, artist, image, imageAlt, length, title } =
 		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	// Temporary object URL while a track image upload is in progress. Matches
+	// the Image block: never persist blob: URLs into attributes (they get
+	// revoked). MediaControl receives the persisted image URL only; this flag
+	// drives isUploading (spinner) during the upload.
+	const [ temporaryImageURL, setTemporaryImageURL ] = useState();
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
-	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
@@ -120,14 +124,42 @@ const PlaylistTrackEdit = ( {
 	}
 
 	function onSelectTrackImage( trackImage ) {
+		if ( ! trackImage ) {
+			// Failed uploads call onSelect( undefined ). Clear only the temporary
+			// preview; onReset handles intentional removal.
+			setTemporaryImageURL();
+			return;
+		}
+
+		const imageSrc =
+			trackImage?.src ?? trackImage?.url ?? trackImage?.source_url;
+
+		// Do not persist blob URLs; keep them in temporary state for isUploading
+		// (same pattern as the Image block's temporaryURL).
+		if ( imageSrc && isBlobURL( imageSrc ) ) {
+			setTemporaryImageURL( imageSrc );
+			return;
+		}
+
+		setTemporaryImageURL();
 		setAttributes( getTrackImageAttributes( trackImage ) );
 	}
 
 	function onRemoveTrackImage() {
+		setTemporaryImageURL();
 		setAttributes( { image: undefined, imageAlt: undefined } );
+	}
 
-		// Move focus back to the Media Upload button.
-		imageButton.current.focus();
+	function onTrackImageUploadError( message ) {
+		/*
+		 * Match the Image block: long server messages stay until dismissed
+		 * instead of timing out like a snackbar success notice.
+		 */
+		createErrorNotice( stripHTML( message ), {
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
+		setTemporaryImageURL();
 	}
 
 	if ( ! hasTrackSource ) {
@@ -199,44 +231,20 @@ const PlaylistTrackEdit = ( {
 							<BaseControl.VisualLabel>
 								{ __( 'Track image' ) }
 							</BaseControl.VisualLabel>
-							<div className="editor-video-poster-control">
-								{ !! image && (
-									<img
-										src={ image }
-										alt={ __(
-											'Preview of the track image'
-										) }
-									/>
-								) }
-								<MediaUpload
-									title={ __( 'Select image' ) }
-									onSelect={ onSelectTrackImage }
-									allowedTypes={
-										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
-									}
-									render={ ( { open } ) => (
-										<Button
-											__next40pxDefaultSize
-											variant="primary"
-											onClick={ open }
-											ref={ imageButton }
-										>
-											{ ! image
-												? __( 'Select' )
-												: __( 'Replace' ) }
-										</Button>
-									) }
-								/>
-								{ !! image && (
-									<Button
-										__next40pxDefaultSize
-										onClick={ onRemoveTrackImage }
-										variant="tertiary"
-									>
-										{ __( 'Remove' ) }
-									</Button>
-								) }
-							</div>
+							<MediaControl
+								mediaUrl={ image }
+								filename={
+									image ? getFilename( image ) : undefined
+								}
+								allowedTypes={
+									TRACK_IMAGE_ALLOWED_MEDIA_TYPES
+								}
+								onSelect={ onSelectTrackImage }
+								onError={ onTrackImageUploadError }
+								onReset={ onRemoveTrackImage }
+								isUploading={ !! temporaryImageURL }
+								emptyLabel={ __( 'Add image' ) }
+							/>
 						</BaseControl>
 					</MediaUploadCheck>
 					{ !! image && (
