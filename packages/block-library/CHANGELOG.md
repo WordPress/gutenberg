@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
+-   Search: Keep the button's accessible name and the collapsed input out of the tab order when the button-only block is rendered without JavaScript ([#86317](https://github.com/WordPress/gutenberg/pull/86317)).
 
 ## 12.1.0 (2026-11-04)
 
