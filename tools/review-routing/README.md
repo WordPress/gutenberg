@@ -43,7 +43,7 @@ It prints a Markdown table of the decisions. `--json` prints them as JSON. `--dr
 
 ### Credentials
 
-The tool works with any API that accepts [System One](https://docs.litellm.ai/docs/decisions) decision requests, such as Jev, or Clef on Cloudflare Workers AI. It reads these from the environment:
+The tool works with any API that accepts [System One](https://docs.typesafe.ai/api/system-one) requests. TypeSafe defined this API for its Jev model, and other providers accept it too, such as Clef on Cloudflare Workers AI. It reads these from the environment:
 
 | Variable           | Required                     | Purpose                                                                                                                                       |
 | ------------------ | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
