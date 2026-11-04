@@ -3405,6 +3405,163 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that block offsets output the individual `translate` property, with
+	 * `0` for a missing axis, for block styles, states and style variations, and
+	 * combine with a rotation.
+	 */
+	public function test_get_stylesheet_outputs_translate_for_block_styles_states_and_variations() {
+		register_block_style(
+			'core/image',
+			array(
+				'name'  => 'raised',
+				'label' => 'Raised',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image'  => array(
+							'transform'  => array(
+								'rotate'    => '5deg',
+								'translate' => array(
+									'x' => '10px',
+									'y' => '-50%',
+								),
+							),
+							'@mobile'    => array(
+								'transform' => array( 'translate' => array( 'x' => '0' ) ),
+							),
+							'variations' => array(
+								'raised' => array(
+									'transform' => array( 'translate' => array( 'y' => '-1rem' ) ),
+								),
+							),
+						),
+						'core/button' => array(
+							':hover'  => array(
+								'transform' => array( 'translate' => array( 'y' => '-4px' ) ),
+							),
+							'@mobile' => array(
+								':hover' => array(
+									'transform' => array( 'translate' => array( 'x' => '2px' ) ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/image', 'raised' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 5deg;translate: 10px -50%;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image){translate: 0 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-raised){translate: 0 -1rem;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){translate: 0 -4px;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){translate: 2px 0;}}', $css );
+		$this->assertStringNotContainsString( 'transform', $css );
+	}
+
+	/**
+	 * Tests that an offset with an axis that is not a single length or percentage is not output.
+	 *
+	 * @dataProvider data_invalid_translate_values
+	 *
+	 * @param mixed $translate Offset value.
+	 */
+	public function test_get_stylesheet_skips_invalid_translate_values( $translate ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'transform' => array( 'translate' => $translate ),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertStringNotContainsString( 'translate', $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_translate_values() {
+		return array(
+			'string'      => array( '10px 20px' ),
+			'bare number' => array( array( 'x' => '10' ) ),
+			'calc()'      => array( array( 'x' => 'calc(1px + 2px)' ) ),
+			'var()'       => array( array( 'y' => 'var(--offset)' ) ),
+			'list'        => array( array( 'x' => '1px 2px' ) ),
+			'angle'       => array( array( 'x' => '5deg' ) ),
+			'number type' => array( array( 'x' => 10 ) ),
+			'z only'      => array( array( 'z' => '5px' ) ),
+		);
+	}
+
+	/**
+	 * Tests that sanitizing keeps the `x` and `y` offset axes only, and drops an
+	 * offset that is not an object.
+	 */
+	public function test_sanitize_keeps_translate_axes_only() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'translate' => false ),
+				),
+				'styles'   => array(
+					'elements' => array(
+						'link' => array( 'transform' => array( 'translate' => array( 'x' => '1px' ) ) ),
+					),
+					'blocks'   => array(
+						'core/image' => array(
+							'transform' => array(
+								'translate' => array(
+									'x' => '10px',
+									'z' => '5px',
+								),
+							),
+						),
+						'core/group' => array(
+							'transform' => array( 'translate' => '10px 20px' ),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEqualSetsWithIndex(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'translate' => false ),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/image' => array(
+							'transform' => array(
+								'translate' => array( 'x' => '10px' ),
+							),
+						),
+					),
+				),
+			),
+			$theme_json->get_raw_data()
+		);
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

@@ -1897,6 +1897,50 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs a translation with a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/image': {
+							transform: {
+								rotate: '5deg',
+								translate: { x: '10px', y: '-50%' },
+							},
+							'@mobile': {
+								transform: {
+									translate: { y: '1rem' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-block-image',
+					featureSelectors: {
+						transform: '.wp-block-image img',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-image img){rotate: 5deg;translate: 10px -50%;}@media (width <= 480px){:root :where(.wp-block-image img){translate: 0 1rem;}}'
+			);
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},

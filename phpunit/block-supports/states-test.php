@@ -1729,6 +1729,84 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an offset in a state outputs the individual `translate`
+	 * property, combined with a rotation, under the block's transform feature
+	 * selector or its root selector.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 *
+	 * @dataProvider data_translation_states
+	 *
+	 * @param string $block_name    Block name.
+	 * @param string $block_content Rendered block content.
+	 * @param array  $style         Block style attribute.
+	 * @param string $expected_css  Expected CSS, with `%s` for the state class.
+	 */
+	public function test_translation_state_generates_translate_css( $block_name, $block_content, $style, $expected_css ) {
+		$actual = gutenberg_render_block_states_support(
+			$block_content,
+			array(
+				'blockName' => $block_name,
+				'attrs'     => array( 'style' => $style ),
+			)
+		);
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( sprintf( $expected_css, $matches[0] ?? '' ), $actual_stylesheet );
+		$this->assertStringNotContainsString( 'transform', $actual_stylesheet );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_translation_states() {
+		$button = '<div class="wp-block-button"><a class="wp-block-button__link">Click</a></div>';
+
+		return array(
+			'hover'          => array(
+				'core/button',
+				$button,
+				array( ':hover' => array( 'transform' => array( 'translate' => array( 'y' => '-4px' ) ) ) ),
+				'.%s .wp-block-button__link:hover{translate:0 -4px !important;}',
+			),
+			'hover viewport' => array(
+				'core/button',
+				$button,
+				array(
+					'@mobile' => array(
+						':hover' => array(
+							'transform' => array(
+								'rotate'    => '2deg',
+								'translate' => array( 'x' => '1rem' ),
+							),
+						),
+					),
+				),
+				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:2deg !important;translate:1rem 0 !important;}}',
+			),
+			'viewport'       => array(
+				'core/image',
+				'<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>',
+				array(
+					'@mobile' => array(
+						'transform' => array(
+							'translate' => array(
+								'x' => '0',
+								'y' => '10%',
+							),
+						),
+					),
+				),
+				'@media (width <= 480px){.%s{translate:0 10%% !important;}}',
+			),
+		);
+	}
+
+	/**
 	 * Tests that a responsive block gap state generates layout spacing CSS.
 	 *
 	 * Responsive layout CSS is owned by gutenberg_render_layout_support_flag()
