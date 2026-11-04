@@ -1,0 +1,491 @@
+/**
+ * Admin typography, from WordPress Design System tokens.
+ *
+ * The scale is not the raw tokens. `@wordpress/ui`'s `Text` component defines
+ * the roles, and its pairings are not index-aligned — `font-size-md` (14px)
+ * pairs with `line-height-sm` (20px), not `line-height-md`. Reading the tokens
+ * alone gives the wrong answer, so the roles below follow `Text`:
+ *
+ *     body-md      14 / 20     the default UI text
+ *     body-lg      16 / 24     reading prose
+ *     heading-xl   20 / 24     emphasis weight
+ *
+ * Line heights are the pixel tokens, set directly, as the design system sets
+ * them. An earlier version of this file derived each one as
+ * `calc(line-height-token / font-size-token)` so it would inherit
+ * proportionally; that pattern is gone. `@wordpress/ui` sets a px line-height
+ * token in 33 places and never divides one by a font size, so the arithmetic
+ * was ours rather than the system's.
+ *
+ * The `body` rule is the one where this is a real change rather than a tidier
+ * spelling, because it is the only line-height here that exists to be
+ * inherited. wp-admin is built the other way around — 250 relative
+ * line-heights against 23 in pixels, and WordPress's own `body` is
+ * `line-height: 1.4em` — so the risk was that pinning the floor hands one
+ * pixel height to every descendant that does not set its own, whatever size it
+ * happens to be.
+ *
+ * Measured, that does not happen: no text on the Dashboard, Posts, Plugins,
+ * Tools, Themes or the post editor ends up with a line box shorter than its own
+ * font size. The reason is those 250 relative line-heights — nearly everything
+ * in wp-admin with a distinctive size already declares one, so the inherited
+ * value rarely reaches text it was not measured against. What is left is
+ * looseness rather than breakage: on the Posts screen 147 elements sit between
+ * 1.5 and 1.8, and 21 above 1.8, mostly 11px and 12px text taking the 20px box.
+ * The About screen's six tight line boxes are `about.css`'s own `line-height: 1`
+ * and predate this file.
+ *
+ * Scope is deliberately small. Bare `h1`, `h2` and `h3` are left alone: WordPress
+ * makes 43 contextual heading rules, and a rule here would outrank all of them
+ * regardless of their specificity. Only the admin page title is touched, which
+ * WordPress already scopes to `.wrap h1`.
+ *
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base
+
+	   All three properties are inherited, so they set the floor without competing
+	   with anything WordPress sizes explicitly. WordPress's own body font-size is 13px;
+	   `font-size-md` is 14px, and taking the role here is what moves the admin's
+	   chrome onto the scale.
+
+	   The floor alone does not finish the job. WordPress declares 13px explicitly in
+	   53 more places, and an inherited value never reaches a declared one, so
+	   the Chrome section below restates those selectors. Together they are what
+	   "the admin is 14px" actually costs.
+	   ----------------------------------------------------------------------- */
+
+	body {
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Chrome — the admin's own 13px tier, taken to `md`
+
+	   These selectors are WordPress's, copied from the stylesheets that declare
+	   `font-size: 13px`, so the set restyled is exactly the set WordPress sizes and
+	   no wider. Only the stylesheets this experiment demotes are listed: a rule
+	   for `media.css`, `customize-controls.css`, `login.css`, `site-health.css`
+	   or `deprecated-media.css` would sit in a layer those sheets never join and
+	   would simply lose. Twelve declarations are out of reach for that reason,
+	   and they are why the admin is not uniformly 14px even with this file
+	   applied — visible as 13px text on the Media library and the Customizer.
+
+	   Nothing here changes a line-height, because none of these rules pairs its
+	   size with a hand-computed ratio. The admin bar does, and is handled
+	   separately below.
+	   ----------------------------------------------------------------------- */
+
+	/* common.css */
+	p,
+	.wp-die-message,
+	kbd,
+	code,
+	.subsubsub,
+	.widefat td,
+	.widefat td p,
+	.widefat td ol,
+	.widefat td ul,
+	.widefat td .notice ul li,
+	.widefat th .notice ul li,
+	.wrap .page-title-action,
+	.wrap .page-title-action:active,
+	.wp-filter,
+	.wp-filter .button.drawer-toggle,
+	.notice p,
+	.notice-title,
+	div.updated p,
+	div.error p,
+	.form-table td .notice p,
+	#screen-options-wrap legend,
+	#contextual-help-wrap h5,
+	.postbox .inside,
+	.stuffbox .inside,
+	#wpfooter p,
+	.plugin-version-author-uri,
+	#template textarea,
+	/* dashboard.css */
+	.welcome-panel .welcome-panel-close,
+	#latest-comments #the-comment-list .comment-item p.row-actions,
+	a.rsswidget,
+	.rss-widget span.rss-date,
+	/* list-tables.css */
+	#replyrow legend,
+	.tablenav-pages .current-page,
+	.row-actions,
+	.plugins .row-actions,
+	.row-actions span a,
+	.row-actions span .button-link,
+	/* edit.css */
+	#editable-post-name input,
+	.tagchecklist > li,
+	p.help,
+	p.description,
+	span.description,
+	.form-wrap p,
+	/* themes.css */
+	.theme-overlay .theme-version,
+	.theme-overlay .theme-tags,
+	.theme-overlay .current-label,
+	.theme-install-overlay .wp-full-overlay-header .button,
+	/* forms.css */
+	table.form-table td .updated,
+	table.form-table td .updated p,
+	/* nav-menus.css */
+	.bulk-select-button,
+	.menu-item-handle .item-title,
+	/* admin-menu.css */
+	#adminmenu .wp-submenu a,
+	/* widgets.css */
+	.widget-top,
+	/* wp-tooltip.css */
+	.wp-tooltip .wp-tooltip__bubble {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+
+	/*
+	 * Separated only because WordPress's ID uses an underscore, which the repo's
+	 * `selector-id-pattern` rule rejects. The markup is WordPress's, so the selector
+	 * cannot be renamed and the rule is disabled for this line alone.
+	 */
+	/* stylelint-disable-next-line selector-id-pattern -- WordPress's own markup; the ID cannot be renamed from here. */
+	#dashboard_primary .rss-widget {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Admin bar
+
+	   The one place in the chrome where the size is load-bearing. WordPress writes
+	   `#wpadminbar *` at 13px with `line-height: 2.46153846`, which is 32 divided
+	   by 13 — the bar's own fixed height expressed as a ratio. At 14px the same
+	   ratio computes to 34.46px and the text no longer fits the bar it was
+	   measured against. The submenu repeats the trick with `line-height: 2`
+	   against `height: 26px`.
+
+	   Both are restated as the heights they were always emulating, which is the
+	   change wordpress-develop needs anyway: a ratio derived from a font size is
+	   silently wrong the moment the size moves. 32px is `line-height-xl`; 26px
+	   is not on the scale and is written as itself, mirroring WordPress's own
+	   `height: 26px` rather than inventing a step.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * The icon carriers are excluded. WordPress sizes them with the `font`
+	 * SHORTHAND — `font: normal 20px/1 dashicons` — which carries a family, a
+	 * size and a line-height in one declaration. A `font-size` or `line-height`
+	 * from this layer replaces those two parts of it and leaves the family,
+	 * so the glyph rendered at 14px on a 32px line inside its own `padding: 4px 0`,
+	 * giving a 40px box in a 32px bar. That is the misalignment, and it is a
+	 * good illustration of why reaching into a stylesheet from a higher layer is
+	 * scaffolding: a shorthand cannot be partially overridden without knowing it
+	 * is a shorthand.
+	 *
+	 * Only `.ab-icon` and `.wp-admin-bar-arrow` need naming. The other dashicon
+	 * carriers are either pseudo-elements, which `*` never matches, or declared
+	 * `!important` — and importance reverses layer order, so WordPress's rule already
+	 * wins there.
+	 */
+	#wpadminbar,
+	#wpadminbar *:not(.ab-icon, .wp-admin-bar-arrow) {
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-xl);
+	}
+
+	#wpadminbar .quicklinks .menupop ul li a,
+	#wpadminbar .quicklinks .menupop ul li a strong,
+	#wpadminbar .quicklinks .menupop.hover ul li .ab-item,
+	#wpadminbar.nojs .quicklinks .menupop:hover ul li .ab-item,
+	#wpadminbar .shortlink-input {
+		/*
+		 * `line-height-md` and the matching `size-sm` height, in place of
+		 * WordPress's 26px. This is a deliberate 2px change, not a token swap: it
+		 * declares a height, which this stylesheet otherwise leaves to wp-admin,
+		 * and it moves every admin bar submenu item — including the ones plugins
+		 * add through `admin_bar_menu`, which all inherit `.ab-item`.
+		 */
+		height: var(--wpds-dimension-size-sm);
+		line-height: var(--wpds-typography-line-height-md);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Page title — the `heading-xl` role
+
+	   WordPress sets 23px at weight 400, which is between `xl` (20px) and `2xl`
+	   (32px) and on neither. Taking the role means the title becomes both
+	   smaller and heavier; adopting half a role would leave it matching nothing.
+	   ----------------------------------------------------------------------- */
+
+	.wrap h1 {
+		/* WordPress gives the page title no margin: it shares a header row with the
+		   page action beside it. */
+		margin-block: 0;
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-xl);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: var(--wpds-typography-line-height-md);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Headings
+
+	   WordPress's heading sizes are the browser defaults with a single edit: 2em,
+	   1.3em, 1em, 0.83em, 0.67em, with h2 and h3 both pushed to 1.3em. That is
+	   not a scale anyone designed, and it has two real problems.
+
+	   h2 and h3 render at exactly the same size, so the two most used heading
+	   levels in wp-admin — 128 and 55 occurrences respectively — are visually
+	   identical. A sighted reader cannot see the structure that a screen reader
+	   announces, which is a genuine accessibility failure rather than an
+	   aesthetic one. Giving them distinct steps is the point of this block.
+
+	   And h6 computes to 8.7px at the 13px base, well below a readable size.
+	   Neither h5 nor h6 is emitted anywhere in wp-admin, so this is latent in
+	   WordPress, but plugins can and do use them.
+
+	   These are bare element rules on purpose. Scoping them to avoid WordPress's
+	   contextual heading rules would hide where the design system's scale and
+	   the admin disagree, and finding those disagreements is the point.
+
+	   h5 and h6 share `heading-sm`. The scale has five heading roles and HTML has
+	   six levels, so one pair must share until the design system grows a sixth
+	   step. Sharing at 10px is better than 8.7px, and inventing a step here would
+	   be adding to the scale rather than adopting it.
+
+	   Meta boxes are excluded. wp-admin uses a heading as a structural handle —
+	   `<h2 class="hndle">` is the draggable header of every postbox, on the
+	   Dashboard and equally on the post, comment and link editing screens, since
+	   they share one template. A scale meant for document headings does not
+	   belong on a drag handle: applied there it took the handle from 14px to
+	   20px and, worse, gave it the 24px top margin of the rhythm below, which
+	   pushed the title down while the order and toggle controls stayed with the
+	   box. The headings inside a widget's body have the same problem in a
+	   smaller way, so the exclusion covers the whole subtree rather than the
+	   handle alone.
+
+	   The exclusion is written `:not(:where(...) *)` rather than `:not(:is(...) *)`
+	   because `:not()` takes the specificity of its argument. With `:is()` these
+	   selectors rose from (0,0,1) to (0,1,1), which tied `.wrap h1` above and won
+	   on source order, taking the page title from 20px to 32px. `:where()` is
+	   specificity-zero, so the exclusion changes what matches without changing
+	   what wins.
+
+	   This leaves meta box typography exactly as WordPress draws it. That is the
+	   conservative choice on purpose: the alternative is to invent values for a
+	   container the design system has no equivalent for, which is a design
+	   decision rather than token adoption. The finding to take upstream is that
+	   a drag handle should probably not be a heading at all.
+	   ----------------------------------------------------------------------- */
+
+	:is(h1, h2, h3, h4, h5, h6):not(:where(.postbox, .stuffbox) *) {
+		font-family: var(--wpds-typography-font-family-heading);
+		/* Already WordPress's value; expressed here as the token it always was. */
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		/*
+		 * WordPress's heading margins are the browser defaults — .67em, 1em, 1.33em,
+		 * 1.67em, 2.33em — and those multipliers were tuned against WordPress's own
+		 * sizes so every level landed on roughly the same 17 to 20px. Changing
+		 * the sizes leaves the multipliers behind: h3 ends up with less space
+		 * than h4, and h6 with the most of any heading.
+		 *
+		 * One rhythm for every level replaces them, from the gap scale, with more
+		 * space above than below so a heading binds to what it introduces rather
+		 * than floating between blocks. The combined space between blocks stays
+		 * close to what WordPress produced; it is distributed differently.
+		 *
+		 * There is nothing to copy from the design system here. `Text` sets
+		 * `margin: 0` and spacing comes from `gap` on a flex container, so this
+		 * is the admin's own rhythm expressed in tokens rather than a rhythm
+		 * adopted from the system.
+		 */
+		margin-block: var(--wpds-dimension-gap-xl) var(--wpds-dimension-gap-sm);
+	}
+
+	h1:not(:where(.postbox, .stuffbox) *) {
+		font-size: var(--wpds-typography-font-size-2xl);
+		line-height: var(--wpds-typography-line-height-2xl);
+	}
+
+	h2:not(:where(.postbox, .stuffbox) *) {
+		font-size: var(--wpds-typography-font-size-xl);
+		line-height: var(--wpds-typography-line-height-md);
+	}
+
+	h3:not(:where(.postbox, .stuffbox) *) {
+		font-size: var(--wpds-typography-font-size-lg);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
+
+	h4:not(:where(.postbox, .stuffbox) *) {
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
+
+	h5:not(:where(.postbox, .stuffbox) *),
+	h6:not(:where(.postbox, .stuffbox) *) {
+		font-size: var(--wpds-typography-font-size-xs);
+		line-height: var(--wpds-typography-line-height-xs);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Reading prose — the `body-md` role
+
+	   These already are `md`. WordPress sets them at 14px, and 14px is now exactly
+	   `font-size-md`, so this block asserts no new value: it names the role the
+	   admin was already using, the way the heading block names a weight WordPress
+	   already had.
+
+	   An earlier version of this file took them to `lg` instead. That was correct
+	   only while 14px had no token: the admin's two tiers were 13 for chrome and
+	   14 for reading, one pixel apart, which reads as an accident rather than a
+	   distinction, and `lg` made the distinction deliberate. With the chrome
+	   itself now on `md`, both tiers land on 14 and inventing a 16px tier would
+	   be adding a step WordPress never had, not adopting the scale.
+
+	   What that costs is worth saying plainly: WordPress did distinguish these two
+	   tiers, and after this change it does not. The distinction has not moved to
+	   a larger step, it has gone. Restoring it means taking the chrome down to
+	   `sm` rather than taking reading up to `lg` — a decision for the scale, not
+	   for this file.
+
+	   One override disappeared with this change. `list-tables.css` pins
+	   `.row-title` with `font-size: 14px !important` — the only `!important`
+	   font-size in that file — so 99-overrides.css carried a rule to cancel it
+	   and reach `lg`. Now that the role resolves to 14px, WordPress's own pin
+	   already lands on it and the cancellation is not needed. The declaration
+	   below is inert while that `!important` stands, and correct the moment it
+	   is removed.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * The controls inside a settings form inherit from it, so the field, its
+	 * label and its help text are one size.
+	 *
+	 * WordPress declares exactly this — `input, select, textarea, button { font-size:
+	 * inherit }` — and then overrides it for every control type: `textarea,
+	 * input` at 14px, `.wp-core-ui select` at 14px, `.wp-core-ui .button` at
+	 * 13px. The declaration is dead as written. This restores it, scoped to the
+	 * form so controls elsewhere keep following their own context.
+	 *
+	 * Buttons are included, but they need two things. `p.submit` sits outside the
+	 * table as a sibling, so it inherits from the page rather than the form and
+	 * has to be brought into the form's size first. Then the buttons inside both
+	 * can inherit like every other control.
+	 *
+	 * This is scoped rather than applied to `.button` generally. Letting every
+	 * button in wp-admin follow its container would be defensible — it is what
+	 * WordPress's own declaration asks for — but it is a far larger change, and the
+	 * React `Button` pins 13px too, so it is a question for the design system
+	 * rather than something to settle here.
+	 */
+	p.submit {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+
+	.form-table input,
+	.form-table select,
+	.form-table textarea,
+	.form-table .button,
+	p.submit .button {
+		font-size: inherit;
+	}
+
+	.form-table,
+	.form-table td,
+	.form-table th,
+	.form-table td p,
+	.form-table label,
+	.form-table span.description,
+	.row-title,
+	.inline-edit-row p.howto {
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Leave the About screens to their own styles
+
+	   SCAFFOLDING. This exists because of how the restyle reaches WordPress's stylesheets, not
+	   because of anything it decides, and it is deleted when the restyle is
+	   moved into WordPress's own stylesheets.
+
+	   About is art-directed per release and is exempt from this work, the same
+	   way it is excluded from the radius consolidation. WordPress protects it with
+	   specificity — `.about-php .about__header-title h1` is (0,2,1) against a
+	   bare `h1` at (0,0,1), which wins comfortably in a normal cascade.
+
+	   It does not win here. Layer order is compared before specificity, so a
+	   bare selector in this layer beats a far more specific one in `wp-legacy`,
+	   and the 64px hero heading collapsed to 20px.
+
+	   `revert-layer` hands those elements back to the layer below rather than
+	   restating any of WordPress's values, so About keeps whatever it is designed to
+	   have, now and after it is redesigned. Once this styling lives in WordPress's own stylesheets there
+	   are no layers, About's specificity works again, and this block goes.
+
+	   The whole subtree, not a list of headings. An earlier version named only
+	   `h1` to `h6`, which left About's paragraphs to the bare `p` rule above:
+	   its introduction dropped from 24px to 14px and its section text from 18px
+	   to 14px. About sizes paragraphs by inheritance — `.about__container p` is
+	   `font-size: inherit` and the size sits on the container, 1.5rem for
+	   `.is-subheading` and 1.125rem for `.about__section` — so a bare `p`
+	   declaration in this layer cuts the chain rather than changing one value.
+	   Reverting everything inside the wrapper is both the fix and the honest
+	   expression of "About is exempt": it needs no updating when About is
+	   redesigned, and it cannot miss an element the way a list can.
+
+	   The class is repeated to raise specificity to (0,2,0). `.about__container`
+	   also carries `.wrap`, so `.wrap h1` above — (0,1,1) — would otherwise
+	   outrank a single-class subtree selector and shrink the hero heading back to
+	   20px. This is the same reason the earlier version had to name
+	   `.about__header-title h1` separately.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * `body` is reverted too, through `:has()`, because it sits outside the
+	 * wrapper. About sizes several things in `em` — the release tabs at 1.4em,
+	 * one section paragraph at 1.6em — and an em resolves against the inherited
+	 * size, so reverting the wrapper alone left those computing against this
+	 * file's 14px floor instead of WordPress's 13px. Measured, that was the
+	 * difference between 18.2px and 19.6px tabs.
+	 */
+	body:has(.about__container),
+	body:has(.about-wrap),
+	.about__container.about__container,
+	.about__container.about__container *,
+	.about-wrap.about-wrap,
+	.about-wrap.about-wrap * {
+		font-family: revert-layer;
+		font-size: revert-layer;
+		font-weight: revert-layer;
+		line-height: revert-layer;
+		margin-block: revert-layer;
+	}
+
+	/*
+	 * STOPGAP, and an admission that exemption-by-specificity cannot be airtight.
+	 * 90-exceptions.css sizes `.wp-core-ui .button.button-hero` at (0,3,0), which
+	 * outranks the (0,2,0) above, so About's own 1.5rem hero button rendered at
+	 * 14px. This rule is (0,4,0) and wins it back.
+	 *
+	 * The real fix is structural: an exemption should not compete on specificity
+	 * at all. A layer declared after `wpds` would beat every rule in it whatever
+	 * the selector, which is exactly what "About is exempt" means. That is a
+	 * change to the layer order in load.php rather than to this file.
+	 * DELETE WHEN: the exemption moves to its own layer, or this styling moves
+	 * into WordPress's own stylesheets and the whole block goes.
+	 */
+	.about__container.about__container .button.button-hero,
+	.about-wrap.about-wrap .button.button-hero {
+		font-size: revert-layer;
+		line-height: revert-layer;
+	}
+}

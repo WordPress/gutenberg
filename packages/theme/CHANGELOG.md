@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Move the font size scale onto an even 2px step, so each step carries a visible difference: `xs` from 11px to 10px, `md` from 13px to 14px, and `lg` from 15px to 16px. `sm` (12px), `xl` (20px), and `2xl` (32px) are unchanged. The scale now names 14px and 16px, the two sizes wp-admin uses most and the two it previously had no token for ([#83073](https://github.com/WordPress/gutenberg/pull/83073)).
+
 ## 4.0.0 (2026-11-04)
 
 ### Breaking Changes
