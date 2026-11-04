@@ -15,6 +15,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
@@ -225,6 +226,7 @@ function Items( {
 		visibleBlocks,
 		ghostBlockName,
 		ghostBlockAttributes,
+		bodyPlaceholder,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -310,6 +312,7 @@ function Items( {
 				// whether or not the block is selected.
 				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
 				ghostBlockAttributes: _ghostBlockAttributes,
+				bodyPlaceholder: getSettings().bodyPlaceholder,
 				shouldRenderAppender:
 					appenderAllowed &&
 					( hasCustomAppender ||
@@ -329,6 +332,17 @@ function Items( {
 				? createBlock( ghostBlockName, ghostBlockAttributes )
 				: null,
 		[ ghostBlockName, ghostBlockAttributes ]
+	);
+	// The ghost shows the empty post placeholder only while it renders: the
+	// block it inserts keeps its own attributes, so the text is never saved.
+	const ghostAttributes = useMemo(
+		() =>
+			ghostBlock && {
+				placeholder:
+					bodyPlaceholder && decodeEntities( bodyPlaceholder ),
+				...ghostBlock.attributes,
+			},
+		[ ghostBlock, bodyPlaceholder ]
 	);
 	const showGhost = !! ghostBlock;
 
@@ -360,6 +374,11 @@ function Items( {
 						ghostBlock={
 							clientId === ghostBlock?.clientId
 								? ghostBlock
+								: undefined
+						}
+						ghostAttributes={
+							clientId === ghostBlock?.clientId
+								? ghostAttributes
 								: undefined
 						}
 					/>

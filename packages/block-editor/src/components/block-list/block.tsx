@@ -17,7 +17,6 @@ import {
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
-import { decodeEntities } from '@wordpress/html-entities';
 import type { ComponentType, ReactNode } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
@@ -682,7 +681,7 @@ const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
-	const { clientId, rootClientId, ghostBlock } = props;
+	const { clientId, rootClientId, ghostBlock, ghostAttributes } = props;
 	const registry = useRegistry();
 	const dispatchProps = useMemo(
 		() =>
@@ -704,24 +703,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					}
 				: undefined,
 		[ ghostBlock ]
-	);
-	const bodyPlaceholder = useSelect(
-		( select ) =>
-			ghostBlock
-				? select( blockEditorStore ).getSettings().bodyPlaceholder
-				: undefined,
-		[ ghostBlock ]
-	);
-	// The ghost shows the empty post placeholder only while it renders: the
-	// block it inserts keeps its own attributes, so the text is never saved.
-	const ghostAttributes = useMemo(
-		() =>
-			ghostBlock && {
-				placeholder:
-					bodyPlaceholder && decodeEntities( bodyPlaceholder ),
-				...ghostBlock.attributes,
-			},
-		[ ghostBlock, bodyPlaceholder ]
 	);
 	const selectedProps = useSelect(
 		( select ): BlockListBlockSelectedProps | undefined => {
