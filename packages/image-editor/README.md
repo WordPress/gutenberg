@@ -102,7 +102,7 @@ Whether two states describe the same edit, ignoring tiny floating-point differen
 
 ### `getOutputSize( state )`
 
-The size in pixels of the part of the image the crop frames, at full size. It reads the same edits `mapEditToOriginal` returns, so it measures the region saving keeps and not some other one. The size is in the pixels of the image loaded in `state.image`, so a save path that applies those edits to a larger copy of that image writes a larger file, in proportion. Use it for a size readout, or to check an edit against a smallest allowed size before saving. Returns `null` when no image has loaded.
+The dimensions that the edits from `mapEditToOriginal` would produce on the image in `state.image`. A nearly full crop that the mapper omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
 
 ### `mapEditToOriginal( state )`
 

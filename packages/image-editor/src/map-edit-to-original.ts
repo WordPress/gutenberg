@@ -30,11 +30,10 @@ const CROP_TOLERANCE = 0.001;
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. A server or an image library in the browser needs operations
- * on the full-size loaded image instead. This turns the state into flip,
- * rotate and crop edits in the order to apply them, so the saved image
- * matches what the person framed. The loaded image may itself be a
- * previously edited file; "original" refers to that image for this call.
+ * the view. An image processor needs operations on the loaded image
+ * instead. This returns flip, rotate and crop edits in application order.
+ * The loaded image may itself be a previously edited file; "original"
+ * refers to that image for this call.
  *
  * Emits `[flip, rotate, crop]` in that order. Identity operations are
  * pruned — an absent flip, a rotation that normalizes to 0°, and a crop

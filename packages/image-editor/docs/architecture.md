@@ -81,4 +81,4 @@ Useful test areas:
 -   `src/react/components/test/image-editor-canvas.browser.test.tsx` for the canvas.
 -   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
 -   `src/react/hooks/test/use-image-editor.jsdom.test.ts` for the controller, including keeping the state yourself.
--   `src/test/map-edit-to-original.test.ts` for mapping the edit onto the original: what the preview shows is what the saved image gets.
+-   `src/test/map-edit-to-original.test.ts` for checking the mapped edits against the preview camera on the same image.

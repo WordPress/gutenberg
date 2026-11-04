@@ -1,56 +1,12 @@
 /**
- * mapEditToOriginal ↔ Export-camera parity.
+ * Compare `mapEditToOriginal` with `createExportCamera` on the same image.
+ * For each edit and output point, invert both paths to source coordinates
+ * and allow less than one pixel of floating-point error. A single-axis
+ * flip reverses the rotation angle because the camera rotates before
+ * flipping while the mapped edits flip before rotating.
  *
- * WHAT THIS TEST GUARANTEES
- *
- * "What the user framed in the stencil is what the server crops from the
- * source." The editor shows the user a live preview via the *export
- * camera* (`createExportCamera`); the server receives the edits from
- * `mapEditToOriginal` and applies them sequentially in the order
- * `[flip, rotate, crop]` (as Core's `WP_REST_Attachments_Controller
- * ::edit_media_item` does with the media editor's `modifiers`). Both paths must land on the same source pixel for
- * the same spot in the output, otherwise the saved image drifts from
- * what the user framed.
- *
- * This test asserts that invariant holds for every combination of
- * rotation, zoom, pan, flip, and crop rect the editor can produce.
- *
- * STRATEGY
- *
- * For each editor state and each probe point (u, v) ∈ [0, 1]² inside
- * the cropped output:
- *
- *   1. `exportSourcePixel` — inverts the export-camera matrix to find
- *      the source pixel the editor draws at (u, v). Ground truth:
- *      it's literally what the user sees on screen.
- *   2. `serverSourcePixel` — simulates the Core pipeline
- *      (`flip → rotate → crop`) in reverse to find the source pixel the
- *      server would place at (u, v).
- *   3. Assert both answers agree to within 1 source pixel (float slop).
- *
- * A wrong crop rect, frame, or rotation sign makes the two paths
- * diverge and pinpoints the offending (state, probe) pair.
- *
- * ORDER / SIGN NOTES
- *
- * The editor's export camera composes the source-to-screen chain as
- * `flip · R(θ)` on the (centered) source — rotate first, then flip.
- * The edits apply `flip` first, then `R(θ')`. For
- * these two chains to land on the same pixel, when exactly one flip
- * axis is set we must send `θ' = -θ` (since `flip_h · R(θ) = R(-θ) ·
- * flip_h`). Both-or-neither flips leave `θ' = θ` because `flip_h · flip_v
- * = -I` commutes with rotation.
- *
- * MAINTENANCE NOTES
- *
- * - If you change `mapEditToOriginal`, this test is the primary safety net.
- *   Run it after any edit to that file or to `createExportCamera`.
- * - If Core's pipeline operation order ever changes, update
- *   `serverSourcePixel` to match — it mirrors the server exactly.
- * - Adding a new editor operation (e.g. skew) means: extend
- *   `InternalImageEditorState`, teach `mapEditToOriginal` to emit it, extend
- *   `serverSourcePixel` to undo it, and add values to the grid in
- *   `buildRows`. The probes don't need to change.
+ * This simulates the edit order in WordPress Core. It does not run the
+ * server, which may edit a different source file and rounds crop pixels.
  */
 
 import { describe, expect, it } from 'vitest';
