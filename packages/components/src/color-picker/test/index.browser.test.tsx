@@ -497,6 +497,42 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should not change the RGB values when only the alpha slider moves', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha
+					initialColor="#f66e04" // rgb(246, 110, 4)
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'RGB' } ) );
+
+			// The alpha slider of the visual picker.
+			const alphaSlider = screen
+				.getAllByRole( 'slider', { name: 'Alpha' } )
+				.at( -1 )!;
+			alphaSlider.focus();
+			await user.keyboard( '{ArrowLeft}' );
+
+			await waitFor( () => expect( onChange ).toHaveBeenCalled() );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Red' } )
+			).toHaveValue( 246 );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Green' } )
+			).toHaveValue( 110 );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Blue' } )
+			).toHaveValue( 4 );
+		} );
+
 		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
 			const user = userEvent.setup();
 

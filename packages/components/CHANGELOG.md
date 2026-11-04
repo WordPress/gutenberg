@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#28758](https://github.com/WordPress/gutenberg/issues/28758)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes
