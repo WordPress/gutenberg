@@ -595,7 +595,7 @@ describe( 'sortResults', () => {
 		expect( order ).toEqual( [
 			'News', // the whole title is the search
 			'News', // Same as the above, ordered by original order since it ranks the same
-			'News Flash News', // begins with 'News', and has the word whole, repeating it does not increase the ranking
+			'News Flash News', // begins with 'News' and has the word whole; repeating it does not increase the ranking
 			'Newspaper', // has the word inside a longer one, not the full word
 		] );
 	} );

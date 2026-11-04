@@ -264,7 +264,7 @@ export default async function fetchLinkSuggestions(
  * @param title
  * @param search
  *
- * @return Whether the title contains the search, whether it begins with it, and whether it is it.
+ * @return Whether the title contains the search, begins with it, and matches it exactly.
  */
 function getTitleMatch(
 	title: string,
