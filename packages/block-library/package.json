@@ -87,6 +87,7 @@
 		"build-style/**",
 		"src/**/*.scss",
 		"src/*/init.js",
+		"src/*/init.ts",
 		"build/*/init.js",
 		"build-module/*/init.mjs"
 	],
