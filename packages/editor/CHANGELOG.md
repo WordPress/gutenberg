@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
+## 16.1.0 (2026-11-04)
+
 ### New Features
 
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
@@ -19,7 +25,6 @@
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
 -   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
 -   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
--   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
 
 ## 16.0.0 (2026-10-20)
 
