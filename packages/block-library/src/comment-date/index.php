@@ -29,8 +29,12 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+		$timestamp = get_comment_date( 'U', $comment );
+		if ( false === $timestamp ) {
+			return '';
+		}
 		// translators: %s: human-readable time difference.
-		$formatted_date = sprintf( __( '%s ago' ), human_time_diff( (int) get_comment_date( 'U', $comment ) ) );
+		$formatted_date = sprintf( __( '%s ago' ), human_time_diff( $timestamp ) );
 	} else {
 		$formatted_date = get_comment_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $comment );
 	}
