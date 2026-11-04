@@ -728,6 +728,21 @@ export function getEditorIntent( state ) {
 }
 
 /**
+ * Whether Undo would withdraw a pending suggestion that the core-data history
+ * does not know about. Only true while suggesting.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether a suggestion is available to undo.
+ */
+export function hasSuggestionUndo( state ) {
+	return (
+		getEditorIntent( state ) === EDITOR_INTENT_SUGGEST &&
+		!! state.hasSuggestionUndo
+	);
+}
+
+/**
  * Why the code editor cannot be opened right now, or `null` when it can.
  *
  * The code editor edits raw `post_content`: there is nowhere in that textarea
