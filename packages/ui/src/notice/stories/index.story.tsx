@@ -139,6 +139,8 @@ export const WithoutActions: Story = {
 
 /**
  * Use the `Link` component for inline links within the description.
+ *
+ * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
  */
 export const WithLinkInDescription: Story = {
 	render: () => (
