@@ -121,16 +121,14 @@ export default function DateEdit( {
 	let note;
 	if ( isFilter ) {
 		// The notes describe the post's date, not the date a filter picks.
-	} else if ( isFloating ) {
-		note = __( 'Publishes immediately.' );
 	} else if (
-		status === 'future' &&
-		( ! value || isPublishedOnSave( value ) )
+		isFloating ||
+		( status === 'future' && ( ! value || isPublishedOnSave( value ) ) )
 	) {
 		// A scheduled post whose date is reset takes the save time, and one
-		// whose date is in the past keeps it: neither is in the future, so
-		// saving publishes the post.
-		note = __( 'Publishes when you save.' );
+		// whose date is in the past keeps it: like a floating draft, neither
+		// is in the future, so publishing makes the post public right away.
+		note = __( 'Publishes immediately.' );
 	} else if ( isReset ) {
 		note = __( 'Changes to the time you save.' );
 	}
