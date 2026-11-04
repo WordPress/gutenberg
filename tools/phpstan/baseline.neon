@@ -103,12 +103,6 @@ parameters:
 			path: ../../packages/block-library/src/avatar/index.php
 
 		-
-			message: '#^Variable \$spacing_string might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
-
-		-
 			message: '#^Parameter \#1 \$from of function human_time_diff expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
