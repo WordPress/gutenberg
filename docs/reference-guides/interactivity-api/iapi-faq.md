@@ -126,7 +126,9 @@ No. The Interactivity API only allows for [References](https://developer.wordpre
 
 ## Does this work with Custom Security Policies?
 
-Yes. The Interactivity API does not use [`eval()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) or the [`Function()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Function) constructor, so it doesn’t violate the [`unsafe-eval`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#unsafe_keyword_values) content security policy. It is also designed to work with any [custom content security policy](https://developer.wordpress.org/apis/security/).
+Yes. The Interactivity API doesn’t use [`eval()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval) or the [`Function()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Function) constructor, and it doesn’t compile WebAssembly, so it works with a [custom content security policy](https://developer.wordpress.org/apis/security/) that allows neither [`unsafe-eval`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy#unsafe_keyword_values) nor `wasm-unsafe-eval`.
+
+During client-side navigation, the `@wordpress/interactivity-router` package imports the script modules that the new page needs, and that the current page hasn’t loaded yet, from `blob:` URLs. A policy based on nonces allows these imports when the import map and the `<script type="module">` tags of the page carry the nonce, because the router’s imports inherit it. You can add the nonce with the `wp_inline_script_attributes` and `wp_script_attributes` filters. Include `'strict-dynamic'` in that policy: WordPress prints `<link rel="modulepreload">` tags without the nonce, and `'strict-dynamic'` lets the browser load them. A policy without nonces must include `blob:` in its `script-src` directive.
 
 ## Can you use directives to make AJAX/REST-API requests?
 
