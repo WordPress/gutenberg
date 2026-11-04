@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InnerBlocks`, `BlockPreview`: Memoize the block list through a wrapper instead of the imported binding, which the circular import with `BlockList` left undefined in the CommonJS build, so rendering them there failed with "Element type is invalid".
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

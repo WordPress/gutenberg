@@ -1,4 +1,5 @@
 import type {
+	ComponentProps,
 	ForwardRefExoticComponent,
 	ReactNode,
 	RefAttributes,
@@ -54,7 +55,13 @@ function BlockContext( {
 	);
 }
 
-const BlockListItemsMemo = memo( BlockListItems );
+// Wrapped rather than `memo( BlockListItems )`: block-list imports this module
+// back, so the CommonJS build runs this line before that binding is set.
+const BlockListItemsMemo = memo( function BlockListItemsMemo(
+	props: ComponentProps< typeof BlockListItems >
+) {
+	return <BlockListItems { ...props } />;
+} );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks

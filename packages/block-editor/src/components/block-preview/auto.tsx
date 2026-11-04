@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
@@ -9,8 +10,14 @@ import { store } from '../../store';
 import type { EditorStylesStyle } from '../editor-styles/types';
 import type { AutoBlockPreviewProps, ScaledBlockPreviewProps } from './types';
 
-// This is used to avoid rendering the block list if the sizes change.
-const MemoizedBlockList = memo( BlockList );
+// Avoids rendering the block list when the sizes change. Wrapped rather than
+// `memo( BlockList )`: block-list imports this module back, so the CommonJS
+// build runs this line before that binding is set.
+const MemoizedBlockList = memo( function MemoizedBlockList(
+	props: ComponentProps< typeof BlockList >
+) {
+	return <BlockList { ...props } />;
+} );
 
 const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES: EditorStylesStyle[] = [];
