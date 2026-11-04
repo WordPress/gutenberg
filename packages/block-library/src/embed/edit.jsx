@@ -75,14 +75,9 @@ const EmbedEdit = ( props ) => {
 			const embedPreview = getEmbedPreview( attributesUrl );
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
-			// No html to show: the external oEmbed provider does not exist, or core
-			// dropped its html (an untrusted provider's html without an iframe).
-			const badEmbedProvider = ! embedPreview?.html;
-			// Some WordPress URLs that can't be embedded will cause the API to return
-			// a valid JSON response with no HTML and `data.status` set to 404, rather
-			// than generating a fallback response as other embeds do.
-			const wordpressCantEmbed = embedPreview?.data?.status === 404;
-			const validPreview = ! badEmbedProvider && ! wordpressCantEmbed;
+			// No html to show: the provider or URL can't be embedded, or core
+			// dropped the html, as it does on the front end.
+			const validPreview = !! embedPreview?.html;
 			return {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isRequestingEmbedPreview( attributesUrl ),

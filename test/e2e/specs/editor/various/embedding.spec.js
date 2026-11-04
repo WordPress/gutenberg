@@ -88,6 +88,7 @@ test.describe( 'Embedding content', () => {
 	} );
 
 	test( 'should render embeds in the correct state', async ( {
+		page,
 		editor,
 		embedUtils,
 	} ) => {
@@ -98,6 +99,8 @@ test.describe( 'Embedding content', () => {
 			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
+			'https://mastodon.social/@Mastodon/117466985005297414':
+				MOCK_UNTRUSTED_NO_IFRAME_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
 				MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
@@ -137,6 +140,25 @@ test.describe( 'Embedding content', () => {
 			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'Provider whose oembed API has gone wrong. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/thatbunty' );
+
+		// The failed state also shows before the preview request starts, so
+		// wait for the response before checking it.
+		const mastodonPreview = page.waitForResponse(
+			( response ) =>
+				new URL( response.url() ).searchParams.get( 'url' ) ===
+				'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await embedUtils.insertEmbed(
+			'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await mastodonPreview;
+		await expect(
+			currentEmbedBlock.getByText(
+				'Sorry, this content could not be embedded.',
+				{ exact: true }
+			),
+			'Untrusted provider whose html core dropped. Should render failed, edit state.'
+		).toBeVisible();
 
 		await embedUtils.insertEmbed(
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/'
@@ -219,46 +241,6 @@ test.describe( 'Embedding content', () => {
 					content:
 						'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 				},
-			},
-		] );
-	} );
-
-	test( 'should not show an empty preview when the provider returns no HTML', async ( {
-		editor,
-		embedUtils,
-	} ) => {
-		await embedUtils.interceptRequests( {
-			'https://mastodon.social/@Mastodon/117466985005297414':
-				MOCK_UNTRUSTED_NO_IFRAME_RESPONSE,
-		} );
-		await embedUtils.insertEmbed(
-			'https://mastodon.social/@Mastodon/117466985005297414'
-		);
-
-		const embedBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Embed',
-		} );
-
-		await expect(
-			embedBlock.getByText(
-				'Sorry, this content could not be embedded.',
-				{ exact: true }
-			)
-		).toBeVisible();
-
-		await embedBlock
-			.getByRole( 'button', { name: 'Convert to link', exact: true } )
-			.click();
-
-		await expect.poll( editor.getBlocks ).toEqual( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'<a href="https://mastodon.social/@Mastodon/117466985005297414">https://mastodon.social/@Mastodon/117466985005297414</a>',
-					dropCap: false,
-				},
-				innerBlocks: [],
 			},
 		] );
 	} );
