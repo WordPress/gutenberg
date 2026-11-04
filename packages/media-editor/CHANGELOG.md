@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
+
 ## 0.22.0 (2026-11-04)
 
 ### Enhancements
@@ -14,10 +18,6 @@
 ### Bug Fixes
 
 -   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
-
-### Internal
-
--   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ## 0.21.0 (2026-10-20)
 
