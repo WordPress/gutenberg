@@ -448,6 +448,17 @@ jobs:
                     fi
                   done
 
+                  # The official PHP images stopped compiling in mbstring along with PECL, but PHPUnit
+                  # requires it. Install it as a regular extension, with the oniguruma headers it needs.
+                  for variant in apache:libonig-dev cli:oniguruma-dev; do
+                    dockerfile="${build_dir}/${variant%%:*}/Dockerfile"
+                    onig_package="${variant#*:}"
+                    ONIG_PACKAGE="${onig_package}" perl -0pi -e 's/^(\s+)libzip-dev \\\n/$1libzip-dev \\\n$1$ENV{ONIG_PACKAGE} \\\n/m; s/^(\s+)zip \\\n/$1mbstring \\\n$1zip \\\n/m' "${dockerfile}"
+                    if ! grep -qE "^[[:space:]]+${onig_package} \\\\$" "${dockerfile}" || ! grep -qE '^[[:space:]]+mbstring \\$' "${dockerfile}"; then
+                      echo "Could not add mbstring to ${dockerfile}." && exit 1
+                    fi
+                  done
+
                   docker build --pull -t "wordpress:php${PHP_VERSION}" "${build_dir}/apache"
                   docker build --pull -t "wordpress:cli-php${PHP_VERSION}" "${build_dir}/cli"
 
