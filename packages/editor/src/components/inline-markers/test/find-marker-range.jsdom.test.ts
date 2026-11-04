@@ -336,4 +336,14 @@ describe( 'markers of several format types', () => {
 			findMarkerText( nested(), { ...options, formatType: INNER, id: 9 } )
 		).toBe( 'de' );
 	} );
+
+	it( 'applies `match` to the marker of each listed type', () => {
+		expect(
+			findMarkerText( nested(), {
+				...both,
+				id: 7,
+				match: { 'data-kind': 'i' },
+			} )
+		).toBe( 'fg' );
+	} );
 } );

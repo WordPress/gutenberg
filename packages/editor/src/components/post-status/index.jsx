@@ -6,6 +6,7 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -19,11 +20,15 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
-import { DESIGN_POST_TYPES } from '../../store/constants';
+import {
+	DESIGN_POST_TYPES,
+	EDITOR_INTENT_SUGGEST,
+} from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const postStatusesInfo = {
 	'auto-draft': { label: __( 'Draft' ), icon: drafts },
@@ -63,8 +68,8 @@ export const STATUS_OPTIONS = [
 ];
 
 export default function PostStatus() {
-	const { status, date, password, postId, postType, canEdit } = useSelect(
-		( select ) => {
+	const { status, date, password, postId, postType, canEdit, isSuggesting } =
+		useSelect( ( select ) => {
 			const {
 				getEditedPostAttribute,
 				getCurrentPostId,
@@ -79,10 +84,12 @@ export default function PostStatus() {
 				postType: getCurrentPostType(),
 				canEdit:
 					getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+				// `getEditorIntent` is private while Suggest mode is experimental.
+				isSuggesting:
+					unlock( select( editorStore ) ).getEditorIntent() ===
+					EDITOR_INTENT_SUGGEST,
 			};
-		},
-		[]
-	);
+		}, [] );
 	const [ showPassword, setShowPassword ] = useState( !! password );
 	const passwordInputId = useInstanceId(
 		PostStatus,
@@ -169,87 +176,112 @@ export default function PostStatus() {
 							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
-					renderContent={ ( { onClose } ) => (
-						<>
-							<InspectorPopoverHeader
-								title={ __( 'Status & visibility' ) }
-								onClose={ onClose }
-							/>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onClose();
-								} }
-							>
-								<VStack spacing={ 4 }>
-									<RadioControl
-										className="editor-change-status__options"
-										hideLabelFromVision
-										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
-										onChange={ handleStatus }
-										selected={
-											status === 'auto-draft'
-												? 'draft'
-												: status
-										}
-									/>
-									{ status === 'future' && (
-										<div className="editor-change-status__publish-date-wrapper">
-											<PrivatePostSchedule
-												showPopoverHeaderActions={
-													false
-												}
-												isCompact
-											/>
-										</div>
+					/*
+					 * A status change is an editorial decision the suggestion
+					 * layer can't hold as pending, so while suggesting the
+					 * popover says where to change it instead of offering the
+					 * controls. See issue #73411 (F-15).
+					 */
+					renderContent={ ( { onClose } ) =>
+						isSuggesting ? (
+							<>
+								<InspectorPopoverHeader
+									title={ __( 'Status & visibility' ) }
+									onClose={ onClose }
+								/>
+								<Text render={ <p /> }>
+									{ __(
+										'The post status cannot be suggested. Switch to Editing to change it.'
 									) }
-									{ status !== 'private' && (
-										<VStack
-											as="fieldset"
-											spacing={ 4 }
-											className="editor-change-status__password-fieldset"
-										>
-											<WCCheckboxControl
-												label={ __(
-													'Password protected'
+								</Text>
+							</>
+						) : (
+							<>
+								<InspectorPopoverHeader
+									title={ __( 'Status & visibility' ) }
+									onClose={ onClose }
+								/>
+								<form
+									onSubmit={ ( event ) => {
+										event.preventDefault();
+										onClose();
+									} }
+								>
+									<VStack spacing={ 4 }>
+										<RadioControl
+											className="editor-change-status__options"
+											hideLabelFromVision
+											label={ __( 'Status' ) }
+											options={ STATUS_OPTIONS }
+											onChange={ handleStatus }
+											selected={
+												status === 'auto-draft'
+													? 'draft'
+													: status
+											}
+										/>
+										{ status === 'future' && (
+											<div className="editor-change-status__publish-date-wrapper">
+												<PrivatePostSchedule
+													showPopoverHeaderActions={
+														false
+													}
+													isCompact
+												/>
+											</div>
+										) }
+										{ status !== 'private' && (
+											<VStack
+												as="fieldset"
+												spacing={ 4 }
+												className="editor-change-status__password-fieldset"
+											>
+												<WCCheckboxControl
+													label={ __(
+														'Password protected'
+													) }
+													help={ __(
+														'Only visible to those who know the password.'
+													) }
+													checked={ showPassword }
+													onChange={
+														handleTogglePassword
+													}
+												/>
+												{ showPassword && (
+													<div className="editor-change-status__password-input">
+														<TextControl
+															label={ __(
+																'Password'
+															) }
+															onChange={ (
+																value
+															) =>
+																updatePost( {
+																	password:
+																		value,
+																} )
+															}
+															value={ password }
+															placeholder={ __(
+																'Use a secure password'
+															) }
+															type="text"
+															id={
+																passwordInputId
+															}
+															maxLength={ 255 }
+														/>
+													</div>
 												) }
-												help={ __(
-													'Only visible to those who know the password.'
-												) }
-												checked={ showPassword }
-												onChange={
-													handleTogglePassword
-												}
-											/>
-											{ showPassword && (
-												<div className="editor-change-status__password-input">
-													<TextControl
-														label={ __(
-															'Password'
-														) }
-														onChange={ ( value ) =>
-															updatePost( {
-																password: value,
-															} )
-														}
-														value={ password }
-														placeholder={ __(
-															'Use a secure password'
-														) }
-														type="text"
-														id={ passwordInputId }
-														maxLength={ 255 }
-													/>
-												</div>
-											) }
-										</VStack>
-									) }
-									<PostSticky />
-								</VStack>
-							</form>
-						</>
-					) }
+											</VStack>
+										) }
+										<PostSticky />
+									</VStack>
+								</form>
+							</>
+						)
+					}
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">

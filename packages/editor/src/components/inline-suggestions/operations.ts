@@ -170,6 +170,7 @@ export function formatsAdditionRunToExtend(
 		return null;
 	}
 	const id = String( rawId );
+	// A replacement's `del` run shares this id; only the `add` run grows.
 	const idAt = ( index: number ) => {
 		const value = additionMarkerAt( formats, index )?.attributes?.[
 			SUGGESTION_ID_ATTRIBUTE
@@ -273,6 +274,7 @@ export function valueAdditionRunToExtend(
  *
  * @param value        Block attribute value (RichTextData or other).
  * @param suggestionId Suggestion (marker) id.
+ * @param [type]       Only remove runs whose marker has this type.
  * @return New RichTextData with the marked run removed, or the original value.
  */
 /**
@@ -446,6 +448,42 @@ export function rejectInlineAddition(
 	suggestionId: number | string
 ) {
 	return removeMarkedRange( value, suggestionId, SUGGESTION_TYPE_ADDITION );
+}
+
+/**
+ * Accept a suggested replacement: the replaced text goes and the new text
+ * stays, both under one note id.
+ *
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to accept.
+ * @return New RichTextData with the replacement applied, or the original value.
+ */
+export function acceptInlineReplacement(
+	value: any,
+	suggestionId: number | string
+) {
+	return acceptInlineAddition(
+		acceptInlineDeletion( value, suggestionId ),
+		suggestionId
+	);
+}
+
+/**
+ * Reject a suggested replacement: the new text goes and the replaced text
+ * stays, both under one note id.
+ *
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to reject.
+ * @return New RichTextData with the original text restored, or the original value.
+ */
+export function rejectInlineReplacement(
+	value: any,
+	suggestionId: number | string
+) {
+	return rejectInlineDeletion(
+		rejectInlineAddition( value, suggestionId ),
+		suggestionId
+	);
 }
 
 /**
@@ -796,4 +834,294 @@ export function growInlineAddition(
 		markerEnd + run.text.length
 	);
 	return new RichTextData( canonicalizeSuggestionStack( formatted ) as any );
+}
+
+/**
+ * Take characters back out of a pending addition: the author correcting text
+ * they proposed. The text was never part of the post, so it is removed, not
+ * marked for deletion. The caller checks that `[start, end)` lies inside the
+ * author's own `add` marker (`valueAdditionRunToExtend`).
+ *
+ * @param value Block attribute value (RichTextData or other).
+ * @param start Range start (inclusive).
+ * @param end   Range end (exclusive).
+ * @return New RichTextData without the range, or the original value.
+ */
+export function removeInlineAdditionRange(
+	value: any,
+	start: number,
+	end: number
+) {
+	if ( ! ( value instanceof RichTextData ) || start >= end ) {
+		return value;
+	}
+	return new RichTextData(
+		remove( toRichTextRecord( value )! as any, start, end ) as any
+	);
+}
+
+/**
+ * Type over a selection that touches the editing author's own pending
+ * addition: the author revising what they proposed rather than editing over
+ * someone else's suggestion.
+ *
+ * - A selection wholly inside the addition loses the selected characters (they
+ *   were never in the post) and the typed run takes their place inside the
+ *   same marker, so the proposal stays one marker and one note.
+ * - A selection that also covers original text on ONE side of the addition
+ *   turns that part into a `del` run carrying the same id, and the typed run
+ *   replaces the selected part of the addition: the note becomes a
+ *   replacement, as a type-over of plain text would have been.
+ *
+ * Declines (null) anything else: no own addition at the selection, original
+ * text on both sides, original text that already carries a suggestion marker,
+ * or a note that already owns a `del` run (a second one would fragment it).
+ *
+ * @param value               Block attribute value (RichTextData or other).
+ * @param options             Options.
+ * @param options.start       Selection start (inclusive).
+ * @param options.end         Selection end (exclusive).
+ * @param options.text        Typed text.
+ * @param options.html        HTML of the typed run when it carries formatting.
+ * @param options.authorToken Id of the author typing, as a string, or null.
+ * @return The revised value, the addition's id and new span, the caret, and
+ *         whether the note became a replacement; or null.
+ */
+export function reviseOwnAddition(
+	value: any,
+	{
+		start,
+		end,
+		text,
+		html,
+		authorToken,
+	}: {
+		start: number;
+		end: number;
+		text?: string;
+		html?: string;
+		authorToken: string | null;
+	}
+): {
+	value: any;
+	id: string;
+	markerStart: number;
+	markerEnd: number;
+	caret: number;
+	isReplacement: boolean;
+} | null {
+	if ( ! ( value instanceof RichTextData ) || start >= end ) {
+		return null;
+	}
+	const typedLength = (
+		html ? create( { html } ) : create( { text: text ?? '' } )
+	).text.length;
+	if ( ! typedLength ) {
+		return null;
+	}
+	const record = toRichTextRecord( value )!;
+	const { formats } = record;
+	// The marker left of `end` covers a selection inside the addition or
+	// starting before it; the one at `start` covers a selection running
+	// past its end.
+	const run =
+		formatsAdditionRunToExtend( formats, end, authorToken ) ??
+		formatsAdditionRunToExtend( formats, start + 1, authorToken );
+	if ( ! run || run.start >= end || run.end <= start ) {
+		return null;
+	}
+	const before = start < run.start;
+	const after = end > run.end;
+	if ( before && after ) {
+		return null;
+	}
+	const outside = before
+		? { start, end: run.start }
+		: { start: run.end, end };
+	if ( before || after ) {
+		if (
+			formatsRangeHasSuggestion( formats, outside.start, outside.end )
+		) {
+			return null;
+		}
+		const ownsDeletion = formats.some(
+			( stack: any ) =>
+				suggestionMarkersAt( stack ).del?.attributes?.[
+					SUGGESTION_ID_ATTRIBUTE
+				] === run.id
+		);
+		if ( ownsDeletion ) {
+			return null;
+		}
+	}
+	const attributes = additionMarkerAt( formats, run.start ).attributes;
+	const ownStart = Math.max( start, run.start );
+	const ownEnd = Math.min( end, run.end );
+	const remainingEnd = run.end - ( ownEnd - ownStart );
+	let next = growInlineAddition(
+		new RichTextData( remove( record as any, ownStart, ownEnd ) as any ),
+		{
+			text,
+			html,
+			attributes,
+			markerStart: run.start,
+			markerEnd: remainingEnd,
+			at: ownStart,
+		}
+	);
+	const markerEnd = remainingEnd + typedLength;
+	if ( before || after ) {
+		// Original text before the addition keeps its offsets; text after it
+		// moved with the addition's new end.
+		const deletionStart = before ? outside.start : markerEnd;
+		next = new RichTextData(
+			canonicalizeSuggestionStack(
+				applyFormat(
+					toRichTextRecord( next )! as any,
+					{
+						type: suggestionFormatNameFor( 'del' ),
+						attributes: {
+							...attributes,
+							[ SUGGESTION_TYPE_ATTRIBUTE ]:
+								SUGGESTION_TYPE_DELETION,
+						},
+					} as any,
+					deletionStart,
+					deletionStart + ( outside.end - outside.start )
+				)
+			) as any
+		);
+	}
+	return {
+		value: next,
+		id: run.id,
+		markerStart: run.start,
+		markerEnd,
+		caret: ownStart + typedLength,
+		isReplacement: before || after,
+	};
+}
+
+/**
+ * Delete a selection that crosses the editing author's own pending markers.
+ *
+ * After a few edits a block is mostly the author's own markers, so a selection
+ * over it nearly always touches several of them (#73411, B7). Each character
+ * is handled by what it already is:
+ *
+ * - In the author's own `add` marker: removed. It was never in the post.
+ * - In the author's own `del` marker: kept. It is already proposed for removal.
+ * - Unmarked: left for the caller to mark as a new deletion. After the
+ *   additions go, these characters must form one run.
+ *
+ * Declines (null) when the range touches no marker of the author's (the plain
+ * selection delete applies), touches any other marker outside the author's
+ * own additions (another author's, a `format` marker), or leaves unmarked
+ * text on both sides of a kept deletion.
+ *
+ * @param value       Block attribute value (RichTextData or other).
+ * @param start       Selection start (inclusive).
+ * @param end         Selection end (exclusive).
+ * @param authorToken Id of the author deleting, as a string, or null.
+ * @return The value with the additions removed, and the range of original
+ *         text to mark as a deletion in that value (null when none is left);
+ *         or null.
+ */
+export function deleteAcrossOwnMarkers(
+	value: any,
+	start: number,
+	end: number,
+	authorToken: string | null
+): { value: any; deletion: { start: number; end: number } | null } | null {
+	if ( ! ( value instanceof RichTextData ) || start >= end ) {
+		return null;
+	}
+	const record = toRichTextRecord( value )!;
+	const { formats } = record;
+	const kinds: Array< 'plain' | 'add' | 'del' > = [];
+	for ( let i = start; i < end; i++ ) {
+		const markers = suggestionMarkersIn( formats[ i ] );
+		if ( markers.length === 0 ) {
+			kinds.push( 'plain' );
+			continue;
+		}
+		const isOwn = ( marker: any ) =>
+			String(
+				marker?.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+			) === ( authorToken ?? '' );
+		/*
+		 * The author's own addition goes, with any other author's marker
+		 * nested in it: that suggestion described text that is no longer
+		 * proposed.
+		 */
+		const { add } = suggestionMarkersAt( formats[ i ] );
+		if ( add && isOwn( add ) ) {
+			kinds.push( 'add' );
+			continue;
+		}
+		if (
+			markers.length > 1 ||
+			! isOwn( markers[ 0 ] ) ||
+			suggestionKindOf( markers[ 0 ] ) !== SUGGESTION_TYPE_DELETION
+		) {
+			return null;
+		}
+		kinds.push( 'del' );
+	}
+	if ( ! kinds.some( ( kind ) => kind !== 'plain' ) ) {
+		return null;
+	}
+	// Offsets of the characters that stay, in the value after removal.
+	const kept = kinds.filter( ( kind ) => kind !== 'add' );
+	const firstPlain = kept.indexOf( 'plain' );
+	const lastPlain = kept.lastIndexOf( 'plain' );
+	if (
+		firstPlain !== -1 &&
+		kept.slice( firstPlain, lastPlain + 1 ).includes( 'del' )
+	) {
+		return null;
+	}
+	let next: any = record;
+	for ( let i = kinds.length - 1; i >= 0; i-- ) {
+		if ( kinds[ i ] === 'add' ) {
+			next = remove( next, start + i, start + i + 1 );
+		}
+	}
+	return {
+		value: new RichTextData( next ),
+		deletion:
+			firstPlain === -1
+				? null
+				: { start: start + firstPlain, end: start + lastPlain + 1 },
+	};
+}
+
+/**
+ * The span of the `add` run carrying a suggestion id. A replacement's id also
+ * marks the `del` run after it, which `findSuggestionRange` would include;
+ * growing that whole span would re-stamp the replaced text as proposed text.
+ *
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id.
+ * @return The `add` run's range, or null when there is none.
+ */
+export function findAdditionRange(
+	value: any,
+	suggestionId: number | string
+): { start: number; end: number } | null {
+	const range = findSuggestionRange( value, suggestionId );
+	if ( ! range || ! ( value instanceof RichTextData ) ) {
+		return range;
+	}
+	const runs = runsCarryingId(
+		value,
+		range,
+		suggestionId,
+		SUGGESTION_TYPE_ADDITION
+	);
+	if ( runs.length === 0 ) {
+		return null;
+	}
+	// Runs come last first.
+	return { start: runs[ runs.length - 1 ][ 0 ], end: runs[ 0 ][ 1 ] };
 }
