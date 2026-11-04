@@ -61,9 +61,20 @@ export function PrivatePostSchedule( {
 		);
 	};
 
-	const [ previewedMonth, setPreviewedMonth ] = useState(
-		startOfMonth( new Date( postDate ) )
+	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
+		startOfMonth( postDate ? new Date( postDate ) : new Date() )
 	);
+
+	// The calendar moves to the month of a new date, from the Month and Year
+	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
+	// markers come from the month on screen.
+	const [ prevPostDate, setPrevPostDate ] = useState( postDate );
+	if ( postDate !== prevPostDate ) {
+		setPrevPostDate( postDate );
+		setPreviewedMonth(
+			startOfMonth( postDate ? new Date( postDate ) : new Date() )
+		);
+	}
 
 	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(

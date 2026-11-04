@@ -241,4 +241,55 @@ describe( 'DateEdit', () => {
 		);
 		expect( speak ).not.toHaveBeenCalled();
 	} );
+	it( 'marks the posts of the month the date moves to', async () => {
+		const queriedMonths: number[] = [];
+		const store = createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getEntityRecord: () => ( { status: 'draft' } ),
+				getEntityRecords: (
+					state: unknown,
+					kind: string,
+					name: string,
+					query: { after: string }
+				) => {
+					queriedMonths.push( new Date( query.after ).getMonth() );
+					return [];
+				},
+			},
+		} );
+		const registry = createRegistry();
+		registry.register( store );
+		const data = {
+			id: 1,
+			type: 'post',
+			status: 'draft',
+			modified: '2026-10-20T10:00:00',
+		};
+		const { rerender } = render(
+			<RegistryProvider value={ registry }>
+				<DateEdit
+					data={ { ...data, date: '2026-11-04T10:00:00' } }
+					field={ field }
+					onChange={ () => {} }
+				/>
+			</RegistryProvider>
+		);
+		expect( queriedMonths.at( -1 ) ).toBe( 10 );
+
+		// A date from outside the calendar, like the Month input.
+		rerender(
+			<RegistryProvider value={ registry }>
+				<DateEdit
+					data={ { ...data, date: '2026-08-04T10:00:00' } }
+					field={ field }
+					onChange={ () => {} }
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			await screen.findByRole( 'button', { name: /August 4, 2026/ } )
+		).toBeInTheDocument();
+		expect( queriedMonths.at( -1 ) ).toBe( 7 );
+	} );
 } );

@@ -48,6 +48,15 @@ export default function DateEdit( {
 		value ? new Date( value ) : new Date()
 	);
 
+	// The calendar moves to the month of a new date, from the Month and Year
+	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
+	// markers come from the month on screen.
+	const [ prevValue, setPrevValue ] = useState( value );
+	if ( value !== prevValue ) {
+		setPrevValue( value );
+		setPreviewedMonth( value ? new Date( value ) : new Date() );
+	}
+
 	// Mark the days with published and scheduled posts of the same type.
 	const otherPosts = useSelect(
 		( select ) =>
