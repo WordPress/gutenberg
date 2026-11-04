@@ -78,8 +78,9 @@ export function PrivateBlockToolbar( {
 		canEdit,
 		allowsWriting,
 		hasWritingTools,
+		isTextSelected,
 	} = useSelect( ( select ) => {
-		const { canEditBlock } = select( blockEditorStore );
+		const { canEditBlock, getSelectionStart } = select( blockEditorStore );
 		const {
 			getBlockName,
 			getBlockMode,
@@ -194,6 +195,12 @@ export function PrivateBlockToolbar( {
 			hasWritingTools:
 				_allowsWriting &&
 				hasBlockSupport( _blockName, 'writing', false ),
+			// A rich text field reports its caret as an attribute key on the
+			// selection, which a block selected any other way does not have.
+			isTextSelected:
+				!! selectedBlockClientId &&
+				getSelectionStart()?.clientId === selectedBlockClientId &&
+				!! getSelectionStart()?.attributeKey,
 		};
 	}, [] );
 
@@ -206,7 +213,10 @@ export function PrivateBlockToolbar( {
 	const showWritingSwitch =
 		allowsWriting && ( hasWritingTools || hasFormatTools );
 
-	const [ toolbarMode, setToolbarMode ] = useToolbarMode( blockClientId );
+	const [ toolbarMode, setToolbarMode ] = useToolbarMode(
+		blockClientId,
+		isTextSelected
+	);
 	const isWriting = showWritingSwitch && toolbarMode === 'write';
 
 	const toolbarWrapperRef = useRef( null );

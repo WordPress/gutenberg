@@ -99,18 +99,8 @@ test.describe( 'Writing toolbar', () => {
 			attributes: { content: 'Second' },
 		} );
 
+		// Inserting a block leaves the caret in its text, which is writing.
 		const toolbar = getToolbar( page );
-		await expect(
-			toolbar.getByRole( 'button', { name: 'Move up' } )
-		).toBeVisible();
-		await expect(
-			toolbar.getByRole( 'button', { name: 'Style', exact: true } )
-		).toBeHidden();
-
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Write', exact: true } )
 		).toHaveAttribute( 'aria-pressed', 'true' );
@@ -126,6 +116,20 @@ test.describe( 'Writing toolbar', () => {
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Move up' } )
 		).toBeHidden();
+
+		await toolbar
+			.getByRole( 'button', { name: 'Write', exact: true } )
+			.click();
+
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Write', exact: true } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Move up' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Style', exact: true } )
+		).toBeHidden();
 	} );
 
 	test( 'a style turns a paragraph into a heading, keeping what was written', async ( {
@@ -138,9 +142,6 @@ test.describe( 'Writing toolbar', () => {
 		} );
 
 		const toolbar = getToolbar( page );
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
 		await toolbar
 			.getByRole( 'button', { name: 'Style', exact: true } )
 			.click();
@@ -164,9 +165,6 @@ test.describe( 'Writing toolbar', () => {
 		} );
 
 		const toolbar = getToolbar( page );
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
 		await toolbar
 			.getByRole( 'button', { name: 'Style', exact: true } )
 			.click();
@@ -199,9 +197,6 @@ test.describe( 'Writing toolbar', () => {
 
 		const toolbar = getToolbar( page );
 		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-		await toolbar
 			.getByRole( 'button', { name: 'Font', exact: true } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Display' } ).click();
@@ -224,10 +219,6 @@ test.describe( 'Writing toolbar', () => {
 		} );
 
 		const toolbar = getToolbar( page );
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-
 		await toolbar
 			.getByRole( 'button', { name: 'Size', exact: true } )
 			.click();
@@ -287,18 +278,8 @@ test.describe( 'Writing toolbar', () => {
 					)
 				);
 
+		// Clicking the text puts the caret in it, which is writing.
 		await expect( switchButton ).toBeVisible();
-		const design = await labels();
-		expect( design.indexOf( 'Write' ) ).toBeGreaterThan(
-			design.indexOf( 'Align text' )
-		);
-		expect( design.indexOf( 'Write' ) ).toBeLessThan(
-			design.indexOf( 'Options' )
-		);
-
-		await switchButton.click();
-
-		// The switch stays put when the writing tools take over.
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
@@ -308,6 +289,20 @@ test.describe( 'Writing toolbar', () => {
 		);
 		expect( writing.indexOf( 'Write' ) ).toBeLessThan(
 			writing.indexOf( 'Options' )
+		);
+
+		await switchButton.click();
+
+		// The switch stays put when the design tools take over.
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+		const design = await labels();
+		expect( design.indexOf( 'Write' ) ).toBeGreaterThan(
+			design.indexOf( 'Align block' )
+		);
+		expect( design.indexOf( 'Write' ) ).toBeLessThan(
+			design.indexOf( 'Options' )
 		);
 	} );
 
@@ -326,7 +321,7 @@ test.describe( 'Writing toolbar', () => {
 		const toolbar = getToolbar( page );
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Bold' } )
-		).toBeHidden();
+		).toBeVisible();
 
 		await toolbar
 			.getByRole( 'button', { name: 'Write', exact: true } )
@@ -334,7 +329,7 @@ test.describe( 'Writing toolbar', () => {
 
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Bold' } )
-		).toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'moves text alignment out of the design tools, leaving block alignment', async ( {
@@ -351,19 +346,19 @@ test.describe( 'Writing toolbar', () => {
 
 		const toolbar = getToolbar( page );
 		await expect(
-			toolbar.getByRole( 'button', { name: 'Align block' } )
-		).toBeVisible();
-		await expect(
 			toolbar.getByRole( 'button', { name: 'Align text' } )
-		).toBeHidden();
+		).toBeVisible();
 
 		await toolbar
 			.getByRole( 'button', { name: 'Write', exact: true } )
 			.click();
 
 		await expect(
-			toolbar.getByRole( 'button', { name: 'Align text' } )
+			toolbar.getByRole( 'button', { name: 'Align block' } )
 		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align text' } )
+		).toBeHidden();
 	} );
 
 	test( 'offers the switch to a block whose only writing tools are the formatting ones', async ( {
@@ -381,14 +376,6 @@ test.describe( 'Writing toolbar', () => {
 			.click();
 
 		const toolbar = getToolbar( page );
-		await expect(
-			toolbar.getByRole( 'button', { name: 'Bold' } )
-		).toBeHidden();
-
-		await toolbar
-			.getByRole( 'button', { name: 'Write', exact: true } )
-			.click();
-
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
@@ -428,7 +415,7 @@ test.describe( 'Writing toolbar', () => {
 		).toBeVisible();
 	} );
 
-	test( 'goes back to designing when another block is selected', async ( {
+	test( 'does not carry a chosen mode over to the next block', async ( {
 		editor,
 		page,
 	} ) => {
@@ -441,13 +428,14 @@ test.describe( 'Writing toolbar', () => {
 			attributes: { content: 'Second' },
 		} );
 
+		// Leave the writing tools for this block only.
 		const toolbar = getToolbar( page );
 		await toolbar
 			.getByRole( 'button', { name: 'Write', exact: true } )
 			.click();
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Style', exact: true } )
-		).toBeVisible();
+		).toBeHidden();
 
 		await editor.selectBlocks(
 			editor.canvas
@@ -455,12 +443,35 @@ test.describe( 'Writing toolbar', () => {
 				.first()
 		);
 
+		// Selecting a paragraph puts the caret in its text, so the next block
+		// starts out writing rather than inheriting the design tools.
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Write', exact: true } )
-		).toHaveAttribute( 'aria-pressed', 'false' );
+		).toHaveAttribute( 'aria-pressed', 'true' );
 		await expect(
 			toolbar.getByRole( 'button', { name: 'Style', exact: true } )
-		).toBeHidden();
+		).toBeVisible();
+	} );
+
+	test( 'starts writing even when the block is selected through the store', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Selected through the store rather than by clicking into the text,
+		// yet the caret still lands there, so this is writing.
+		const toolbar = getToolbar( page );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Write', exact: true } )
+		).toHaveAttribute( 'aria-pressed', 'true' );
 	} );
 
 	test( 'leaves the toolbar alone while the experiment is off', async ( {
