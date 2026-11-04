@@ -641,3 +641,45 @@ function gutenberg_register_block_template_parent_field() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_template_parent_field' );
+
+/**
+ * Adds the `template` field to the form of the template summary.
+ *
+ * The field is merged rather than pinned into the list, so that the view
+ * configuration of `wp_template` stays as the plugin ships it and this feature
+ * adds its own field, which is also what keeps the field out of the summary
+ * while the experiment is off.
+ *
+ * @access private
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function gutenberg_add_block_template_parent_field_to_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array( 'template' ),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Registers the view configuration filter of the `template` field.
+ *
+ * Registered on `init`, after the entity view configuration API has defined the
+ * function naming its hook.
+ *
+ * @access private
+ */
+function gutenberg_register_block_template_parent_view_config_filter() {
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
+		'gutenberg_add_block_template_parent_field_to_view_config',
+		7,
+		1
+	);
+}
+add_action( 'init', 'gutenberg_register_block_template_parent_view_config_filter' );

@@ -7,77 +7,59 @@
  */
 
 /**
- * Adds the `template` and `reading_settings` fields to the `wp_template` form
- * configuration.
+ * Adds the `reading_settings` field to the `wp_template` form configuration.
  *
  * The `fields` list is pinned rather than merged because a merged member is
- * appended to the end of the list, and both belong above the last edited
+ * appended to the end of the list, and the link belongs above the last edited
  * date. Keep it in sync with the list built in
  * _gutenberg_get_entity_view_config_posttype_wp_template().
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_add_form_fields_to_wp_template_view_config( $data ) {
-	$fields = array(
-		array(
-			'id'     => 'description',
-			'layout' => array(
-				'type'          => 'panel',
-				'labelPosition' => 'top',
-			),
-		),
-		array(
-			'id'     => 'description_readonly',
-			'layout' => array(
-				'type'          => 'regular',
-				'labelPosition' => 'none',
-			),
-		),
-	);
-
-	/*
-	 * The template a template is rendered inside is behind an experiment, and
-	 * the field reads a REST field that is only registered with it, so the form
-	 * leaves it out until the experiment is on. The list is pinned as a whole,
-	 * which is why the member is dropped here rather than added by the feature.
-	 */
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-template-inheritance' ) ) {
-		$fields[] = 'template';
-	}
-
-	$fields = array_merge(
-		$fields,
-		array(
-			array(
-				'id'     => 'reading_settings',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'last_edited_date',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'none',
-				),
-			),
-			'revisions',
-			// The following fields are only meaningful in the `home`/`index`
-			// template summary. They edit other entities (`root/site` and the
-			// posts page); the editor merges those records into the form data
-			// under a namespace and controls when the fields are shown.
-			'posts_page_title',
-			'posts_per_page',
-			'default_comment_status',
-		)
-	);
-
+function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 	return $data->replace(
 		array(
 			'form' => array(
-				'fields' => $fields,
+				'fields' => array(
+					array(
+						'id'     => 'description',
+						'layout' => array(
+							'type'                   => 'panel',
+							'labelPosition'          => 'top',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+					array(
+						'id'     => 'description_readonly',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					array(
+						'id'     => 'reading_settings',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					array(
+						'id'     => 'last_edited_date',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'none',
+						),
+					),
+					'revisions',
+					// The following fields are only meaningful in the `home`/`index`
+					// template summary. They edit other entities (`root/site` and the
+					// posts page); the editor merges those records into the form data
+					// under a namespace and controls when the fields are shown.
+					'posts_page_title',
+					'posts_per_page',
+					'default_comment_status',
+				),
 			),
 		),
 		1
@@ -344,6 +326,117 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
 
 /**
+ * Shows the placeholder of the `excerpt` field in its panel row when the
+ * excerpt is empty.
+ *
+ * The field renders nothing for an empty value, so DataViews lists stay empty,
+ * but the panel row then showed only its label. The patch merges into the
+ * existing `excerpt` member by id, leaving the rest of its layout untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_excerpt_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `excerpt` layout on top of the view configuration of every post
+ * type whose form lists the `excerpt` field: those using the default form,
+ * including custom post types registered at any point, and patterns.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_excerpt_layout_7_2( $post_type ) {
+	if (
+		'wp_block' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_excerpt_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_excerpt_layout_7_2' );
+
+/**
+ * Shows the placeholder of the `author` field in its panel row when the post
+ * has no author, as the post summary did before it moved to the form.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_author_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'author',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `author` layout on top of the view configuration of every post
+ * type whose form lists the `author` field at its top level: those using the
+ * default form, including custom post types registered at any point, and
+ * attachments.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_author_layout_7_2( $post_type ) {
+	if (
+		'attachment' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_author_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_author_layout_7_2' );
+
+/**
  * Registers the entity view configuration filters that layer on top of the base
  * definitions, at a priority between those (5) and third-party callbacks (10),
  * and the base definitions for entities that gained one in 7.2, at the base
@@ -370,7 +463,7 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	);
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
-		'_gutenberg_add_form_fields_to_wp_template_view_config',
+		'_gutenberg_add_reading_settings_to_wp_template_view_config',
 		6,
 		1
 	);
