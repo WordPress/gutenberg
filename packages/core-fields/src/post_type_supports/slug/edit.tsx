@@ -1,10 +1,14 @@
-import { Button } from '@wordpress/components';
-import { copy } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
+import { check, copy, error } from '@wordpress/icons';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
-import { useCallback, useRef, useState } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
-import { InputControl, InputLayout, Link } from '@wordpress/ui';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- The Copy to Clipboard pattern specifies IconButton.
+	IconButton,
+	InputControl,
+	InputLayout,
+	Link,
+} from '@wordpress/ui';
 import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
@@ -13,8 +17,19 @@ import styles from './style.module.css';
 
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
+const COPY_FEEDBACK_TIMEOUT = 2000;
+
+const COPY_RESULT_ICON = {
+	idle: copy,
+	copied: check,
+	error,
+};
+
+type CopyResult = keyof typeof COPY_RESULT_ICON;
+
 /*
- * The slug control, built with `InputControl`, `InputLayout`, and `Link` from
+ * The slug control, built with `IconButton`, `InputControl`, `InputLayout`,
+ * and `Link` from
  * `@wordpress/ui`, as `use-recommended-components` asks, and styled with a
  * CSS module.
  */
@@ -67,14 +82,33 @@ const SlugEdit = ( {
 		[ id, onChange ]
 	);
 
-	const { createNotice } = useDispatch( noticesStore );
+	const [ copyFeedback, setCopyFeedback ] = useState< {
+		result: CopyResult;
+	} >( { result: 'idle' } );
 
-	const copyButtonRef = useCopyToClipboard( permalink, () => {
-		createNotice( 'info', __( 'Copied Permalink to clipboard.' ), {
-			isDismissible: true,
-			type: 'snackbar',
-		} );
-	} );
+	useEffect( () => {
+		if ( copyFeedback.result === 'idle' ) {
+			return;
+		}
+		const timeoutId = setTimeout(
+			() => setCopyFeedback( { result: 'idle' } ),
+			COPY_FEEDBACK_TIMEOUT
+		);
+		return () => clearTimeout( timeoutId );
+	}, [ copyFeedback ] );
+
+	const copyButtonRef = useCopyToClipboard(
+		permalink,
+		() => {
+			// A new feedback object restarts the timeout for repeated copies.
+			setCopyFeedback( { result: 'copied' } );
+			speak( __( 'Copied to clipboard' ) );
+		},
+		() => {
+			setCopyFeedback( { result: 'error' } );
+			speak( __( "Couldn't copy to clipboard." ) );
+		}
+	);
 
 	return (
 		<fieldset className={ styles.slug }>
@@ -83,11 +117,13 @@ const SlugEdit = ( {
 					prefix={ <InputLayout.Slot>/</InputLayout.Slot> }
 					suffix={
 						<InputLayout.Slot padding="minimal">
-							<Button
-								size="small"
-								icon={ copy }
+							<IconButton
 								ref={ copyButtonRef }
 								label={ __( 'Copy' ) }
+								icon={ COPY_RESULT_ICON[ copyFeedback.result ] }
+								variant="minimal"
+								tone="neutral"
+								size="compact"
 							/>
 						</InputLayout.Slot>
 					}
