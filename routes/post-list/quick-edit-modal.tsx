@@ -66,7 +66,7 @@ const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
  * sidebar, which keeps its panels.
  *
  * The scheduled date is left out: the date panel edits the same date. The
- * password is rarely set, so it keeps its panel.
+ * password is rarely set, so it keeps its panel, after the discussion.
  */
 const fieldsWithRegularLayout = [
 	'status',
@@ -81,8 +81,31 @@ const regularLayout = {
 	labelPosition: 'top' as const,
 };
 
+function placePasswordAfterDiscussion< T extends string | { id: string } >(
+	formFields: T[]
+) {
+	const getId = ( field: T ) =>
+		typeof field === 'string' ? field : field.id;
+	const password = formFields.find(
+		( field ) => getId( field ) === 'password'
+	);
+	const hasDiscussion = formFields.some(
+		( field ) => getId( field ) === 'discussion'
+	);
+	if ( ! password || ! hasDiscussion ) {
+		return formFields;
+	}
+	return formFields.flatMap( ( field ) => {
+		const id = getId( field );
+		if ( id === 'password' ) {
+			return [];
+		}
+		return id === 'discussion' ? [ field, password ] : [ field ];
+	} );
+}
+
 function splitQuickEditForm( form: Form ) {
-	const formFields = ( form.fields ?? [] ).flatMap( ( field ) => {
+	const splitFields = ( form.fields ?? [] ).flatMap( ( field ) => {
 		const id = typeof field === 'string' ? field : field.id;
 		if ( ! fieldsWithRegularLayout.includes( id ) ) {
 			return [ field ];
@@ -107,6 +130,7 @@ function splitQuickEditForm( form: Form ) {
 			];
 		} );
 	} );
+	const formFields = placePasswordAfterDiscussion( splitFields );
 	const isRegular = ( field: ( typeof formFields )[ number ] ) =>
 		( typeof field === 'string'
 			? form.layout
