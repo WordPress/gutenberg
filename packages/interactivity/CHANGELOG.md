@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `data-wp-html` elements that the client creates instead of hydrating, such as `data-wp-each` items added after hydration or elements added by client-side navigation, now show their fallback while their value is pending or `{ "wpServerHtml": true }`, including on sites enforcing Trusted Types ([#84924](https://github.com/WordPress/gutenberg/pull/84924)).
+
 ### Internal
 
 -   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
