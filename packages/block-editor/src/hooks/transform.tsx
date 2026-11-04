@@ -40,7 +40,7 @@ import type {
 
 export const TRANSFORM_SUPPORT_KEY = 'transform';
 
-const TRANSFORM_FEATURES = [ 'rotate' ];
+const TRANSFORM_FEATURES = [ 'rotate', 'translate' ];
 
 // Used for generating the instance ID.
 const TRANSFORM_BLOCK_PROPS_REFERENCE = {};
@@ -136,7 +136,11 @@ export function TransformPanel( {
 			onChange={ onChange }
 			// Unlike Global Styles, the block inspector hides a control
 			// unless the block shows it by default.
-			defaultControls={ { rotate: false, ...defaultControls } }
+			defaultControls={ {
+				rotate: false,
+				translate: false,
+				...defaultControls,
+			} }
 			inheritedValue={ inheritedValue }
 		/>
 	);

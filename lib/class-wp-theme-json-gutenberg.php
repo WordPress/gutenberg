@@ -255,7 +255,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.3.0 Added `text-wrap` property.
-	 * @since 7.3.0 Added the `transform.rotate` property.
+	 * @since 7.3.0 Added the `transform.rotate` and `transform.translate` properties.
 	 *
 	 * @var array
 	 */
@@ -315,6 +315,7 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
 		'rotate'                            => array( 'transform', 'rotate' ),
+		'translate'                         => array( 'transform', 'translate' ),
 		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
 		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
 		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
@@ -411,7 +412,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0 Added `viewport` property.
 	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
-	 * @since 7.3.0 Added `transform.rotate`.
+	 * @since 7.3.0 Added `transform.rotate` and `transform.translate`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -490,7 +491,8 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'transform'                     => array(
-			'rotate' => null,
+			'rotate'    => null,
+			'translate' => null,
 		),
 		'typography'                    => array(
 			'fluid'                    => null,
@@ -560,7 +562,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.3.0 Added `typography.textWrap`.
-	 * @since 7.3.0 Added `transform.rotate`, for blocks and block style variations only.
+	 * @since 7.3.0 Added `transform.rotate` and `transform.translate`, for blocks and block style variations only.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -611,7 +613,11 @@ class WP_Theme_JSON_Gutenberg {
 			'blockGap' => null,
 		),
 		'transform'  => array(
-			'rotate' => null,
+			'rotate'    => null,
+			'translate' => array(
+				'x' => null,
+				'y' => null,
+			),
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -3285,6 +3291,11 @@ class WP_Theme_JSON_Gutenberg {
 					$background_size = $styles['background']['backgroundSize'] ?? null;
 					$value           = 'contain' === $background_size ? '50% 50%' : null;
 				}
+			}
+
+			// The style engine validates the axes and joins them into one value.
+			if ( 'translate' === $css_property ) {
+				$value = gutenberg_style_engine_get_styles( array( 'transform' => array( 'translate' => $value ) ) )['declarations']['translate'] ?? null;
 			}
 
 			// Skip if empty and not "0" or value represents array of longhand values.

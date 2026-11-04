@@ -3,8 +3,8 @@
  * Transform block support flag.
  *
  * Each transform feature outputs its own individual CSS property, such as
- * `rotate`, never the `transform` shorthand, so features combine with each
- * other and with any transform a block already applies.
+ * `rotate` or `translate`, never the `transform` shorthand, so features
+ * combine with each other and with any transform a block already applies.
  *
  * @package gutenberg
  */
@@ -65,7 +65,7 @@ function gutenberg_render_transform_support( $block_content, $block ) {
 	$inline_styles   = array();
 	$selector_styles = array();
 
-	foreach ( array( 'rotate' ) as $feature ) {
+	foreach ( array( 'rotate', 'translate' ) as $feature ) {
 		if (
 			! isset( $transform[ $feature ] ) ||
 			! block_has_support( $block_type, array( 'transform', $feature ), false ) ||

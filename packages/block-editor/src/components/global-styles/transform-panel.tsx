@@ -1,6 +1,9 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
@@ -51,12 +54,23 @@ export function getAngleInDegrees( value: unknown ): number | undefined {
 }
 
 export function useHasTransformPanel( settings: StyleSettings | undefined ) {
-	return useHasRotateControl( settings );
+	const hasRotate = useHasRotateControl( settings );
+	const hasTranslate = useHasTranslateControl( settings );
+	return hasRotate || hasTranslate;
 }
 
 function useHasRotateControl( settings: StyleSettings | undefined ) {
 	return !! settings?.transform?.rotate;
 }
+
+function useHasTranslateControl( settings: StyleSettings | undefined ) {
+	return !! settings?.transform?.translate;
+}
+
+const TRANSLATE_AXES = [
+	{ axis: 'x', label: __( 'X offset' ) },
+	{ axis: 'y', label: __( 'Y offset' ) },
+] as const;
 
 function TransformToolsPanel( {
 	resetAllFilter,
@@ -85,6 +99,7 @@ function TransformToolsPanel( {
 
 const DEFAULT_CONTROLS: Record< string, boolean > = {
 	rotate: true,
+	translate: true,
 };
 
 export default function TransformPanel( {
@@ -106,6 +121,34 @@ export default function TransformPanel( {
 	const hasRotateValue = () => value?.transform?.rotate !== undefined;
 	const resetRotate = () => setRotate( undefined );
 
+	const showTranslateControl = useHasTranslateControl( settings );
+	const units = useCustomUnits( {
+		availableUnits: settings?.spacing?.units || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+	} );
+	const getTranslate = ( axis: 'x' | 'y' ) =>
+		value?.transform?.translate?.[ axis ] ??
+		inheritedValue?.transform?.translate?.[ axis ];
+	const setTranslate = ( axis: 'x' | 'y', newValue: string | undefined ) => {
+		// A cleared field has no quantity, so it removes the axis.
+		const [ quantity ] = parseQuantityAndUnitFromRawValue( newValue );
+		onChange(
+			setImmutably(
+				value,
+				[ 'transform', 'translate', axis ],
+				quantity === undefined ? undefined : newValue
+			)
+		);
+	};
+	const hasTranslateValue = ( axis: 'x' | 'y' ) =>
+		value?.transform?.translate?.[ axis ] !== undefined;
+
 	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			return {
@@ -113,6 +156,7 @@ export default function TransformPanel( {
 				transform: {
 					...previousValue?.transform,
 					rotate: undefined,
+					translate: undefined,
 				},
 			};
 		},
@@ -150,6 +194,27 @@ export default function TransformPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
+			{ showTranslateControl &&
+				TRANSLATE_AXES.map( ( { axis, label } ) => (
+					<ToolsPanelItem
+						key={ axis }
+						className="single-column"
+						label={ label }
+						hasValue={ () => hasTranslateValue( axis ) }
+						onDeselect={ () => setTranslate( axis, undefined ) }
+						isShownByDefault={ defaultControls.translate }
+						panelId={ panelId }
+					>
+						<UnitControl
+							label={ label }
+							value={ getTranslate( axis ) ?? '' }
+							onChange={ ( newValue ) =>
+								setTranslate( axis, newValue )
+							}
+							units={ units }
+						/>
+					</ToolsPanelItem>
+				) ) }
 		</Wrapper>
 	);
 }
