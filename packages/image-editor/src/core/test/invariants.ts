@@ -15,12 +15,14 @@ import { describe, expect, it } from 'vitest';
 import type {
 	ImageEditorAction,
 	InternalImageEditorState,
+	NormalizedRect,
 	Size,
 } from '../types';
 import { DEFAULT_STATE } from '../constants';
 import { imageEditorReducer } from '../state';
 import { getRotatedBBox } from '../camera';
 import { mapEditToOriginal } from '../../map-edit-to-original';
+import { getOutputSize } from '../../get-output-size';
 
 const IMAGES = [
 	{ src: 'wide.jpg', naturalWidth: 1600, naturalHeight: 900 },
@@ -150,39 +152,142 @@ function everyNumber( state: InternalImageEditorState ): number[] {
 }
 
 describe( 'quarter turns settle rather than shrink', () => {
-	// The bug this guards against only showed on repetition: one turn
-	// looked right, four shrank the crop to a tenth of the view. A turn
-	// may resize the crop once, when the old pixels do not fit the
-	// transposed view, but turning again must not keep taking from it.
+	// Compare the whole crop and output after each pair of turns: equal
+	// area alone can hide a crop that moved or changed shape.
 	const IMAGE = { src: 'w.jpg', naturalWidth: 1600, naturalHeight: 900 };
-
-	for ( const [ name, ratio ] of [
-		[ 'free', undefined ],
-		[ 'original', 1600 / 900 ],
-		[ 'square', 1 ],
-		[ '16:9', 16 / 9 ],
-		[ '9:16', 9 / 16 ],
-	] as [ string, number | undefined ][] ) {
-		it( `settles into a cycle with ${ name }`, () => {
-			let state = imageEditorReducer(
-				{ ...DEFAULT_STATE, image: IMAGE },
-				{ type: 'SET_ASPECT_RATIO', payload: ratio }
-			);
-			const areas: number[] = [];
-			for ( let i = 0; i < 6; i++ ) {
-				state = imageEditorReducer( state, {
-					type: 'SNAP_ROTATE_90',
-					payload: { direction: 1 },
-				} );
-				areas.push( state.cropRect.width * state.cropRect.height );
-			}
-
-			// From the second turn on, every other turn is the same crop.
-			expect( areas[ 3 ] ).toBeCloseTo( areas[ 1 ], 6 );
-			expect( areas[ 4 ] ).toBeCloseTo( areas[ 2 ], 6 );
-			expect( areas[ 5 ] ).toBeCloseTo( areas[ 3 ], 6 );
-		} );
+	function expectSameCrop(
+		actual: NormalizedRect,
+		expected: NormalizedRect
+	) {
+		expect( actual.x ).toBeCloseTo( expected.x, 6 );
+		expect( actual.y ).toBeCloseTo( expected.y, 6 );
+		expect( actual.width ).toBeCloseTo( expected.width, 6 );
+		expect( actual.height ).toBeCloseTo( expected.height, 6 );
 	}
+
+	for ( const direction of [ 1, -1 ] as const ) {
+		for ( const [ name, ratio ] of [
+			[ 'free', undefined ],
+			[ 'original', 1600 / 900 ],
+			[ 'square', 1 ],
+			[ '16:9', 16 / 9 ],
+			[ '9:16', 9 / 16 ],
+		] as [ string, number | undefined ][] ) {
+			it( `restores a maximum ${ name } crop after ${ direction === 1 ? 'clockwise' : 'counter-clockwise' } turns`, () => {
+				let state = imageEditorReducer(
+					{ ...DEFAULT_STATE, image: IMAGE },
+					{ type: 'SET_ASPECT_RATIO', payload: ratio }
+				);
+				const initialCrop = state.cropRect;
+				const initialZoom = state.zoom;
+				const initialOutput = getOutputSize( state )!;
+				const turns: InternalImageEditorState[] = [];
+				for ( let i = 0; i < 6; i++ ) {
+					state = imageEditorReducer( state, {
+						type: 'SNAP_ROTATE_90',
+						payload: { direction },
+					} );
+					turns.push( state );
+				}
+				for ( const index of [ 1, 3, 5 ] ) {
+					const turn = turns[ index ];
+					expectSameCrop( turn.cropRect, initialCrop );
+					expect( turn.zoom ).toBeCloseTo( initialZoom, 6 );
+					const output = getOutputSize( turn )!;
+					expect( output.width ).toBeCloseTo(
+						initialOutput.width,
+						6
+					);
+					expect( output.height ).toBeCloseTo(
+						initialOutput.height,
+						6
+					);
+				}
+				for ( const index of [ 2, 4 ] ) {
+					expectSameCrop(
+						turns[ index ].cropRect,
+						turns[ 0 ].cropRect
+					);
+				}
+			} );
+		}
+	}
+
+	it( 'restores a wide crop on a portrait image after two turns', () => {
+		let state = imageEditorReducer(
+			{ ...DEFAULT_STATE, image: IMAGES[ 1 ] },
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		const originalCrop = state.cropRect;
+		for ( let i = 0; i < 2; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: -1 },
+			} );
+		}
+		expectSameCrop( state.cropRect, originalCrop );
+		expect( state.zoom ).toBeCloseTo( 1, 6 );
+	} );
+
+	it( 'restores the maximum crop after fine rotation and two turns', () => {
+		let state = imageEditorReducer(
+			{ ...DEFAULT_STATE, image: IMAGE },
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		state = imageEditorReducer( state, {
+			type: 'SET_ROTATION',
+			payload: 20,
+		} );
+		const originalCrop = state.cropRect;
+		for ( let i = 0; i < 2; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expectSameCrop( state.cropRect, originalCrop );
+		expect( state.rotation ).toBe( 200 );
+	} );
+
+	it( 'restores the maximum crop at a user-selected zoom after two turns', () => {
+		let state = imageEditorReducer(
+			{ ...DEFAULT_STATE, image: IMAGE },
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		state = imageEditorReducer( state, {
+			type: 'SET_ZOOM',
+			payload: 2,
+		} );
+		const originalCrop = state.cropRect;
+		for ( let i = 0; i < 2; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expect( state.cropRect ).toEqual( originalCrop );
+		expect( state.zoom ).toBe( 2 );
+	} );
+
+	it( 'keeps a smaller crop through two turns', () => {
+		let state = imageEditorReducer(
+			{ ...DEFAULT_STATE, image: IMAGE },
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		state = imageEditorReducer( state, {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
+		} );
+		const originalCrop = state.cropRect;
+		for ( let i = 0; i < 2; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expect( state.cropRect.width ).toBeCloseTo( originalCrop.width );
+		expect( state.cropRect.height ).toBeCloseTo( originalCrop.height );
+	} );
 } );
 
 describe( 'invariants across a run of edits', () => {

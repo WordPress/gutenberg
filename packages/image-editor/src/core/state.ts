@@ -2,6 +2,7 @@ import type {
 	ImageEditorAction,
 	ImageEditorState,
 	InternalImageEditorState,
+	NormalizedPoint,
 	NormalizedRect,
 	Size,
 	TransformOperation,
@@ -153,10 +154,9 @@ export function fitCropToLockedRatio(
  * The crop a quarter turn should leave behind.
  *
  * Without a locked ratio the crop follows the image round, which is the
- * swapped rect the caller passes. With one, the crop is meant to hold a
- * shape in source pixels, and a quarter turn does not change the image,
- * so the crop keeps the pixel size it had. The view transposes, so the
- * same pixels are a different fraction of it.
+ * swapped rect the caller passes. A locked crop at the largest size for
+ * its view stays at the largest size after the turn. A smaller crop keeps
+ * its pixel size, measured as a different fraction of the turned view.
  *
  * When those pixels no longer fit the transposed view, the crop becomes
  * the largest box of the ratio instead.
@@ -174,6 +174,19 @@ function keepCropThroughQuarterTurn(
 	const { aspectRatio, cropRect } = state;
 	if ( ! view || ! aspectRatio || aspectRatio <= 0 ) {
 		return swapped;
+	}
+	const maximum = computeInscribedRect( aspectRatio, view );
+	if (
+		nearlyEqual( cropRect.x, maximum.x ) &&
+		nearlyEqual( cropRect.y, maximum.y ) &&
+		nearlyEqual( cropRect.width, maximum.width ) &&
+		nearlyEqual( cropRect.height, maximum.height )
+	) {
+		// A maximum crop stays maximum after the view turns.
+		return computeInscribedRect( aspectRatio, {
+			width: view.height,
+			height: view.width,
+		} );
 	}
 	// The view transposes, so a width that was a fraction of `view.width`
 	// becomes the same pixels over `view.height`.
@@ -201,8 +214,8 @@ function keepCropThroughQuarterTurn(
  * Value-equality check for two editor states.
  *
  * Used by history machinery to dedup snapshots and detect no-op
- * transitions. Compares every field that participates in the rendered
- * output; ignores reference identity.
+ * transitions. Compares the rendered output and base pose, which can
+ * affect a later rotation even when the current output is identical.
  *
  * @param a First editor state.
  * @param b Second editor state.
@@ -214,6 +227,8 @@ export function areImageEditorStatesEqual(
 ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
+	const aBase = withBaseValues( a );
+	const bBase = withBaseValues( b );
 	return (
 		aImage?.src === bImage?.src &&
 		aImage?.naturalWidth === bImage?.naturalWidth &&
@@ -222,6 +237,10 @@ export function areImageEditorStatesEqual(
 		nearlyEqual( a.pan.y, b.pan.y ) &&
 		nearlyEqual( a.zoom, b.zoom ) &&
 		nearlyEqual( a.rotation, b.rotation ) &&
+		nearlyEqual( aBase.basePan.x, bBase.basePan.x ) &&
+		nearlyEqual( aBase.basePan.y, bBase.basePan.y ) &&
+		nearlyEqual( aBase.baseZoom, bBase.baseZoom ) &&
+		nearlyEqual( aBase.baseRotation, bBase.baseRotation ) &&
 		a.flip.horizontal === b.flip.horizontal &&
 		a.flip.vertical === b.flip.vertical &&
 		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
@@ -243,6 +262,38 @@ function clampRequestedZoom(
 		return Math.min( MAX_ZOOM, Math.max( ABSOLUTE_MIN_ZOOM, zoom ) );
 	}
 	return Math.min( MAX_ZOOM, Math.max( MIN_ZOOM, zoom ) );
+}
+
+/**
+ * Rotate the last committed pan without containment. A quarter turn may
+ * temporarily clamp this position, but a later turn can use it again.
+ *
+ * @param state    The editor state.
+ * @param rotation The angle to rotate the base pan to.
+ * @return The pan before containment at that angle.
+ */
+function getUnclampedPanAtRotation(
+	state: InternalImageEditorState,
+	rotation: number
+): NormalizedPoint {
+	if ( rotation === state.baseRotation ) {
+		return state.basePan;
+	}
+	// A single viewport-relative flip reverses the visual rotation.
+	const singleFlip = state.flip.horizontal !== state.flip.vertical;
+	const deltaRad = degreesToRadians( rotation - state.baseRotation );
+	const cos = Math.cos( deltaRad );
+	const sin = Math.sin( deltaRad ) * ( singleFlip ? -1 : 1 );
+	const cropCx = state.cropRect.x + state.cropRect.width / 2;
+	const cropCy = state.cropRect.y + state.cropRect.height / 2;
+	const ox = cropCx - 0.5;
+	const oy = cropCy - 0.5;
+	const dx = state.basePan.x - ox;
+	const dy = state.basePan.y - oy;
+	return {
+		x: ox + cos * dx - sin * dy,
+		y: oy + sin * dx + cos * dy,
+	};
 }
 
 /**
@@ -356,14 +407,12 @@ export function enforceContainment(
 }
 
 /**
- * Snapshot the current `crop`, `zoom`, and `rotation` into the
- * corresponding `basePan`, `baseZoom`, `baseRotation` fields. Called
- * by every committing action so that the next SET_ROTATION derives
- * its transient pan from a fresh base (not from a drifted one).
+ * Snapshot the current pan, zoom, and rotation into the base pose.
+ * Called by committing actions other than SNAP_ROTATE_90, which keeps
+ * its unclamped pan so later turns can restore it.
  *
- * SET_ROTATION is the only action that does NOT commit base — it
- * reads the base, computes a transient pan, and leaves the base
- * alone. This is what eliminates rotation drift near edges.
+ * SET_ROTATION reads the base without changing it, which prevents
+ * accumulated rotation drift near image edges.
  *
  * @param next The post-containment state to commit.
  * @return The state with base fields synced to current.
@@ -394,11 +443,10 @@ function commitBase(
  * (crop, zoom, rotation, cropRect, flip) is followed by enforceContainment
  * to ensure the image always covers the crop area.
  *
- * Committing actions (everything except SET_ROTATION) also call
- * `commitBase` to snapshot the post-containment state as the new
- * base pose. SET_ROTATION derives from that base without mutating
- * it, which prevents accumulated-clamp drift during continuous fine
- * rotation.
+ * Committing actions update the base pose. SNAP_ROTATE_90 retains its
+ * unclamped pan in the base so later turns can restore it; SET_ROTATION
+ * derives from the base without mutating it, preventing accumulated
+ * clamp drift during continuous fine rotation.
  *
  * @param state  The current editor state.
  * @param action The action to process.
@@ -421,13 +469,17 @@ export function imageEditorReducer(
 				)
 			);
 
-		case 'SET_PAN':
-			return commitBase(
-				enforceContainment( {
-					...state,
-					pan: action.payload,
-				} )
-			);
+		case 'SET_PAN': {
+			const next = enforceContainment( {
+				...state,
+				pan: action.payload,
+			} );
+			// A pan that hits the boundary has not changed the framing.
+			// Keep the unclamped base pan for later rotations.
+			return areImageEditorStatesEqual( state, next )
+				? state
+				: commitBase( next );
+		}
 
 		case 'SET_ZOOM': {
 			const z = clampRequestedZoom( state, action.payload );
@@ -464,22 +516,6 @@ export function imageEditorReducer(
 			// commitBase — the base pose stays pinned at the user's
 			// last committed pan/zoom/rotation.
 			const newRotation = normalizeRotation( action.payload );
-			// With viewport-relative flip, pan rotation is conjugated by
-			// the flip (S * R * S) — which reverses direction when exactly
-			// one axis is flipped. Negate sin in that case so the crop
-			// stays framed on the same image content through rotation.
-			const singleFlip = state.flip.horizontal !== state.flip.vertical;
-			const deltaRad = degreesToRadians(
-				newRotation - state.baseRotation
-			);
-			const cos = Math.cos( deltaRad );
-			const sin = Math.sin( deltaRad ) * ( singleFlip ? -1 : 1 );
-			const cropCx = state.cropRect.x + state.cropRect.width / 2;
-			const cropCy = state.cropRect.y + state.cropRect.height / 2;
-			const ox = cropCx - 0.5;
-			const oy = cropCy - 0.5;
-			const dx = state.basePan.x - ox;
-			const dy = state.basePan.y - oy;
 			// Rotating past 45° from a quarter turn changes the view's
 			// shape, so a locked crop is refitted around its centre.
 			return enforceContainment(
@@ -487,10 +523,7 @@ export function imageEditorReducer(
 					...state,
 					rotation: newRotation,
 					zoom: state.baseZoom,
-					pan: {
-						x: ox + cos * dx - sin * dy,
-						y: oy + sin * dx + cos * dy,
-					},
+					pan: getUnclampedPanAtRotation( state, newRotation ),
 				} )
 			);
 		}
@@ -517,11 +550,16 @@ export function imageEditorReducer(
 			const cx = rect.x + rect.width / 2;
 			const cy = rect.y + rect.height / 2;
 
-			// Rotate pan vector 90° around origin.
+			// Rotate the unclamped pan 90° around origin so a later turn can
+			// restore a position that does not fit at this angle.
 			//   CW  (rawDir=+1): (px, py) → (-py, px)
 			//   CCW (rawDir=-1): (px, py) → (py, -px)
-			const newPanX = rawDir === 1 ? -state.pan.y : state.pan.y;
-			const newPanY = rawDir === 1 ? state.pan.x : -state.pan.x;
+			const panBeforeTurn = getUnclampedPanAtRotation(
+				state,
+				state.rotation
+			);
+			const newPanX = rawDir === 1 ? -panBeforeTurn.y : panBeforeTurn.y;
+			const newPanY = rawDir === 1 ? panBeforeTurn.x : -panBeforeTurn.x;
 
 			// Without a locked ratio, swapping the crop's sides carries it
 			// round with the image. With one, the crop keeps the pixel
@@ -533,15 +571,20 @@ export function imageEditorReducer(
 				width: rect.height,
 				height: rect.width,
 			} );
-			return commitBase(
-				enforceContainment( {
-					...state,
-					rotation: rot90,
-					zoom: state.baseZoom,
-					pan: { x: newPanX, y: newPanY },
-					cropRect: turned,
-				} )
-			);
+			const next = enforceContainment( {
+				...state,
+				rotation: rot90,
+				zoom: state.baseZoom,
+				pan: { x: newPanX, y: newPanY },
+				cropRect: turned,
+			} );
+			return {
+				...next,
+				// This is the position before containment, not the visible pan.
+				basePan: { x: newPanX, y: newPanY },
+				baseZoom: next.zoom,
+				baseRotation: next.rotation,
+			};
 		}
 
 		case 'SET_FLIP': {

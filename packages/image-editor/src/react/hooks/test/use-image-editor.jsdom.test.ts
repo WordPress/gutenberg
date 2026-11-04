@@ -959,10 +959,8 @@ describe( 'useInternalImageEditor', () => {
 			// 'image' is intentionally excluded — it's set once on load
 			// and doesn't represent a user edit.
 			// 'image' is set once on load.
-			// 'basePan', 'baseZoom', 'baseRotation' mirror the user's
-			// committed pose and are redundant for dirty tracking — if
-			// any base field differs from initial, the corresponding
-			// live field (crop/zoom/rotation) will also differ.
+			// Base fields can affect a later rotation, but do not change
+			// the current image output, so they are not dirty fields.
 			const excludedFields = [
 				'image',
 				'basePan',
