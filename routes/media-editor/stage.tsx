@@ -163,6 +163,9 @@ function MediaEditorRoute() {
 		}
 		navigate( { to: MEDIA_LIST_PATH } );
 	};
+	// Replace the history entry so Cancel leaves the editor.
+	const openAttachment = ( newId: number ) =>
+		navigate( { to: `/media-editor/${ newId }`, replace: true } );
 
 	return (
 		<MediaEditor
@@ -172,9 +175,10 @@ function MediaEditorRoute() {
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
-					navigate( { to: `/media-editor/${ savedId }` } );
+					openAttachment( savedId );
 				}
 			} }
+			onEditOriginal={ openAttachment }
 			renderFrame={ ( {
 				children,
 				isImage,
