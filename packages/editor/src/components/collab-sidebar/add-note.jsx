@@ -9,14 +9,14 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread, hasFocusWithin } from './utils';
+import { hasFocusWithin } from './utils';
 import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { clientId, sidebarRef, floating } ) {
+export function AddNote( { clientId, floating } ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -93,11 +93,7 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 								content: inputComment,
 							} );
 							if ( savedRecord ) {
-								selectNote( savedRecord.id );
-								focusNoteThread(
-									savedRecord.id,
-									sidebarRef.current
-								);
+								selectNote( savedRecord.id, { focus: true } );
 							}
 							return savedRecord;
 						} finally {

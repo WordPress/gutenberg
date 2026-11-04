@@ -74,6 +74,7 @@
 		 */
 		.list-chrome {
 			--_wp-ui-popup-selection-offset: 0px;
+			--_wp-ui-popup-item-text-line-height: var(--wpds-typography-line-height-xs);
 
 			grid-area: main;
 			font-family: var(--wpds-typography-font-family-body);
@@ -154,6 +155,7 @@
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
+			line-height: var(--_wp-ui-popup-item-text-line-height);
 			overflow-wrap: anywhere;
 			border-radius: var(--wpds-border-radius-sm);
 			user-select: none;
@@ -219,7 +221,7 @@
 		.item-icon {
 			display: flex;
 			align-items: center;
-			height: var(--wpds-typography-line-height-sm);
+			height: var(--_wp-ui-popup-item-text-line-height);
 			pointer-events: none;
 		}
 
@@ -237,6 +239,7 @@
 		.item-text {
 			display: flex;
 			flex-direction: column;
+			row-gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 		}
 
@@ -282,5 +285,18 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+	}
+
+	/*
+	 * Text variants set line-height in the components layer. This composition
+	 * wins over that, including the global CSS defense bridge in wp-admin.
+	 */
+	@layer compositions {
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--_wp-ui-popup-item-text-line-height);
+
+			line-height: var(--_wp-ui-popup-item-text-line-height);
+		}
 	}
 }
