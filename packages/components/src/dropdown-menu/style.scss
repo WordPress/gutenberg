@@ -47,6 +47,8 @@
 				background: $gray-900;
 				box-shadow: 0 0 0 $border-width $gray-900;
 				border-radius: $border-width;
+				// Dashicons fade their color in wp-admin, which would lag behind the background.
+				transition: none;
 			}
 
 			@include composite-item.when-highlighted {
