@@ -8,7 +8,6 @@ import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
 import type { PostWithDate } from './types';
-import { isDateFloating } from './is-date-floating';
 import styles from './style.module.css';
 
 type Item = PostWithDate & { id?: number; type?: string };
@@ -26,10 +25,13 @@ function is12HourTime() {
 	);
 }
 
-// Whether saving a post with this date publishes it rather than schedules it.
-// Like the editor, a date less than a minute ahead counts as now, which covers
-// the time the save takes.
-function isPublishedOnSave( date: string ) {
+// The statuses of a post that the editor's main button publishes or schedules.
+const UNPUBLISHED_STATUSES = [ 'draft', 'auto-draft', 'pending', 'future' ];
+
+// Whether publishing a post with this date makes it public now rather than
+// schedules it. Like the editor, a date less than a minute ahead counts as now,
+// which covers the time the save takes.
+function isPublishedNow( date: string ) {
 	return ! isInTheFuture( new Date( Number( getDate( date ) ) - 60 * 1000 ) );
 }
 
@@ -93,7 +95,7 @@ export default function DateEdit( {
 	);
 
 	// The saved status, not the edited one: a status picked in the same form
-	// doesn't change whether the date floats until the post is saved.
+	// doesn't change what publishing does until the post is saved.
 	const savedStatus = useSelect(
 		( select ) => {
 			if ( ! data.type || ! data.id ) {
@@ -110,7 +112,7 @@ export default function DateEdit( {
 	// reset only once the date is `null`: the post takes its date on save.
 	const isReset = ! value;
 	const status = savedStatus ?? data.status;
-	const isFloating = isDateFloating( { ...data, status } );
+	const isUnpublished = UNPUBLISHED_STATUSES.includes( status ?? '' );
 
 	// Only DataViews filters pass an operator. A filter picks a date to compare
 	// against, so resetting the post date means nothing there.
@@ -121,16 +123,11 @@ export default function DateEdit( {
 	let note;
 	if ( isFilter ) {
 		// The notes describe the post's date, not the date a filter picks.
-	} else if ( isFloating ) {
+	} else if ( isUnpublished && ( ! value || isPublishedNow( value ) ) ) {
+		// A reset date becomes the save time, and a draft that floats or a
+		// date in the past is no later than it: none is in the future, so
+		// publishing doesn't schedule the post.
 		note = __( 'Publishes immediately.' );
-	} else if (
-		status === 'future' &&
-		( ! value || isPublishedOnSave( value ) )
-	) {
-		// A scheduled post whose date is reset takes the save time, and one
-		// whose date is in the past keeps it: neither is in the future, so
-		// saving publishes the post.
-		note = __( 'Publishes when you save.' );
 	} else if ( isReset ) {
 		note = __( 'Changes to the time you save.' );
 	}
