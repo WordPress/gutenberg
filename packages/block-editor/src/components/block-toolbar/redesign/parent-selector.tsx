@@ -27,7 +27,7 @@ import { unlock } from '../../../lock-unlock';
 /**
  * How far each level of the lineage menu is indented, in pixels.
  */
-const LINEAGE_INDENT = 12;
+const LINEAGE_INDENT = 16;
 
 function LineageItem( {
 	clientId,
@@ -47,25 +47,24 @@ function LineageItem( {
 	return (
 		<Menu.Item
 			onClick={ () => selectBlock( clientId ) }
-			prefix={
-				depth === 0 && (
-					<span className="block-editor-block-toolbar__menu-block-icon">
-						<BlockIcon icon={ blockInformation?.icon } />
-					</span>
-				)
-			}
 			// The block type is only worth repeating next to a custom name.
 			suffix={ name && type && name !== type ? type : undefined }
 		>
 			<Menu.ItemLabel>
-				{ depth > 0 && (
-					<span
-						className="block-editor-block-toolbar__lineage-line"
-						style={ { width: depth * LINEAGE_INDENT } }
-						aria-hidden="true"
-					/>
-				) }
-				{ name ?? type }
+				{ /*
+				 * Every level shows its icon, indented under its parent like a
+				 * tree. The icon is part of the label rather than the item
+				 * prefix, which lines every item up in one column.
+				 */ }
+				<span
+					className="block-editor-block-toolbar__lineage-label"
+					style={ { paddingInlineStart: depth * LINEAGE_INDENT } }
+				>
+					<span className="block-editor-block-toolbar__menu-block-icon">
+						<BlockIcon icon={ blockInformation?.icon } />
+					</span>
+					{ name ?? type }
+				</span>
 			</Menu.ItemLabel>
 		</Menu.Item>
 	);

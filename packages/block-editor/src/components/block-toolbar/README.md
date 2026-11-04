@@ -31,10 +31,10 @@ This section describes the block toolbar of the block toolbar redesign experimen
 
 ### The groups, in order
 
-1. **Block name.** The block's icon and name, which open one menu to transform the block (Heading, List, Quote, and the rest under More), switch between its variations (such as heading levels), and pick a style preset. A locked block shows a lock in place of its icon. Blocks should not add their own transform controls; register transforms, transform variations and block styles instead.
+1. **Block name.** The block's icon and name, which open one menu to transform the block (Heading, List, Quote, and the rest under More) and pick a style preset. The block's own variations, such as heading levels, are part of Transform, in one flyout that shows the current one. A locked block shows a lock in place of its icon. Blocks should not add their own transform controls; register transforms, transform variations and block styles instead.
 2. **Movers.** The drag handle and full-size move buttons.
 3. **Primary actions.** The `block`, `default`, `parent` and `other` groups of `BlockControls`. Container blocks also get a Layout menu, with their width and layout settings, and a button that adds a block inside them. Most atomic blocks, such as Paragraph and Heading, add nothing here.
-4. **Options and Delete.** The options menu, which is searchable, and a Delete button for every block.
+4. **Options and Delete.** The options menu and a Delete button for every block.
 
 The `inline` group of `BlockControls` is not shown: rich text formats appear in the selection toolbar, and inserting formats (Inline image, Footnote, Math) are in the Insert submenu of the options menu.
 
@@ -48,6 +48,8 @@ The `inline` group of `BlockControls` is not shown: rich text formats appear in 
 -   **Actions:** Group or Ungroup, Create pattern, and actions added by other packages.
 -   **More:** Lock, Rename, Hide, Edit as HTML, actions added by other packages, and items added with `BlockSettingsMenuControls`.
 
+Flyouts open on hover, like other editor menus. While the pointer heads for an open flyout, the rows it passes over do not react, so moving diagonally into a flyout does not close it.
+
 ### Does an action earn a place in the primary actions slot?
 
 Ask these questions in order:
@@ -58,7 +60,7 @@ Ask these questions in order:
 
 ### Adding items to the menus
 
-Packages that are part of WordPress can add items to the options menu with the private `BlockOptionsMenuItemFill` and `BlockOptionsMenuItem` components. The menu reads the item's props rather than rendering it, so the item can also be found by searching. Render any UI the item opens, such as a modal, outside the fill, because the menu unmounts its items when it closes.
+Packages that are part of WordPress can add items to the options menu with the private `BlockOptionsMenuItemFill` and `BlockOptionsMenuItem` components. The menu reads the item's props rather than rendering it, so it can lay the item out like its own. Render any UI the item opens, such as a modal, outside the fill, because the menu unmounts its items when it closes.
 
 ```jsx
 const { BlockOptionsMenuItem, BlockOptionsMenuItemFill } = unlock(

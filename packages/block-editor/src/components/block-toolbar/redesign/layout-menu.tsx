@@ -73,9 +73,7 @@ function LayoutMenu( { items }: { items: BlockOptionsMenuItemProps[] } ) {
 									prefix={
 										choice.icon && (
 											<Menu.PrefixIcon
-												// The icons are drawn on a 24px grid.
 												icon={ choice.icon as never }
-												size={ 24 }
 											/>
 										)
 									}

@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	getMenuShortcut,
-	getMenuShortcutFromDisplay,
-	matchesSearch,
-} from '../utils';
+import { getMenuShortcut, getMenuShortcutFromDisplay } from '../utils';
 
 describe( 'getMenuShortcut', () => {
 	it( 'builds the display, ARIA and label forms of a shortcut', () => {
@@ -29,13 +25,5 @@ describe( 'getMenuShortcutFromDisplay', () => {
 			ariaKeyShortcut: undefined,
 			label: '⌘B',
 		} );
-	} );
-} );
-
-describe( 'matchesSearch', () => {
-	it( 'matches labels case-insensitively', () => {
-		expect( matchesSearch( 'Block before', 'before' ) ).toBe( true );
-		expect( matchesSearch( 'Paste styles', 'styles' ) ).toBe( true );
-		expect( matchesSearch( 'Duplicate', 'group' ) ).toBe( false );
 	} );
 } );

@@ -86,6 +86,13 @@ $toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
 			min-width: 0;
 		}
 	}
+
+	// Text buttons, for actions whose icon is not one people know.
+	.components-button.components-button:not(.has-icon) {
+		width: auto;
+		padding-inline: $grid-unit-10;
+		white-space: nowrap;
+	}
 }
 
 // The hairline between two groups, sized to the icons rather than the
@@ -274,48 +281,6 @@ $toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
 	z-index: z-index(".components-popover") + 1;
 }
 
-.block-editor-block-toolbar__options-search {
-	grid-column: 1 / -1;
-	display: flex;
-	align-items: center;
-	gap: $grid-unit-05;
-	height: $toolbar-button-size;
-	margin-block-end: $grid-unit-05;
-	padding-inline: $grid-unit-05;
-	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
-	border-radius: var(--wpds-border-radius-sm);
-	background-color: var(--wpds-color-background-surface-neutral-strong);
-	color: var(--wpds-color-foreground-content-neutral);
-
-	&:focus-within {
-		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 var(--wpds-border-width-xs) var(--wp-admin-theme-color);
-	}
-
-	svg {
-		flex-shrink: 0;
-		fill: currentColor;
-	}
-
-	input[type="search"],
-	input[type="search"]:focus {
-		flex: 1;
-		min-width: 0;
-		height: 100%;
-		padding: 0;
-		border: none;
-		background: none;
-		box-shadow: none;
-		outline: none;
-		font-size: var(--wpds-typography-font-size-md);
-		color: inherit;
-
-		&::-webkit-search-cancel-button {
-			cursor: var(--wpds-cursor-control);
-		}
-	}
-}
-
 .block-editor-block-toolbar__options-no-results {
 	grid-column: 1 / -1;
 	margin: 0;
@@ -340,21 +305,22 @@ $toolbar-group-gap: $grid-unit-10; // Space on each side of a hairline.
 	}
 }
 
-// Block icons in the menus, at the size of the other menu icons.
+// Block icons in the menus, at the 16px size of the other menu icons.
 .block-editor-block-toolbar__menu-block-icon {
 	display: flex;
+	flex-shrink: 0;
 
-	.block-editor-block-icon {
-		width: $icon-size;
-		height: $icon-size;
+	.block-editor-block-icon,
+	.block-editor-block-icon svg {
+		width: 16px;
+		height: 16px;
+		min-width: 16px;
 	}
 }
 
-// The lineage menu indents each level with a line, to show nesting.
-.block-editor-block-toolbar__lineage-line {
-	display: inline-block;
-	vertical-align: middle;
-	height: var(--wpds-border-width-xs);
-	margin-inline-end: $grid-unit-05;
-	background-color: currentColor;
+// The lineage menu indents each level under its parent, like a tree.
+.block-editor-block-toolbar__lineage-label {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-10;
 }

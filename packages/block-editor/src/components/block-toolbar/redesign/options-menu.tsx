@@ -27,10 +27,7 @@ import {
 	unseen,
 } from '@wordpress/icons';
 import type { ReactNode, RefObject } from 'react';
-import SubmenuPopup, {
-	SUBMENU_TRIGGER_PROPS,
-	useFlyoutAim,
-} from './submenu-popup';
+import SubmenuPopup, { useFlyoutAim } from './submenu-popup';
 import BlockActions from '../../block-actions';
 import { BlockLockModal, useBlockLock } from '../../block-lock';
 import { BlockRenameModal, useBlockRename } from '../../block-rename';
@@ -39,18 +36,10 @@ import { RichTextToolbarControlsFills } from '../../rich-text/format-toolbar';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import SearchField from './search-field';
-import BlockIcon from '../../block-icon';
-import { matchesSearchEntry, useTransformsAndStyles } from './block-name-menu';
-import { getBlockIconVariant } from '../block-toolbar-icon';
 import { useNotifyCopy } from '../../../utils/use-notify-copy';
 import { useBlockElement } from '../../block-list/use-block-props/use-block-refs';
 import { groupBlocks } from '../../../utils/group-blocks';
-import {
-	getMenuShortcutFromDisplay,
-	matchesSearch,
-	useMenuShortcuts,
-} from './utils';
+import { getMenuShortcutFromDisplay, useMenuShortcuts } from './utils';
 import type { MenuShortcut } from './utils';
 import type { ToolbarControlFill } from '../../rich-text/types';
 import type {
@@ -133,8 +122,8 @@ function getPrefix( icon?: IconType ) {
 	if ( ! icon ) {
 		return undefined;
 	}
-	// The block editor icons are drawn on a 24px grid.
-	return <Menu.PrefixIcon icon={ icon as never } size={ 24 } />;
+	// At the default size of the menu icons.
+	return <Menu.PrefixIcon icon={ icon as never } />;
 }
 
 function ActionMenuItem( {
@@ -171,7 +160,6 @@ function ChoiceSubmenu( { entry }: { entry: ChoiceEntry } ) {
 	return (
 		<Menu.SubmenuRoot>
 			<Menu.SubmenuTrigger
-				{ ...SUBMENU_TRIGGER_PROPS }
 				prefix={ getPrefix( entry.icon ) }
 				suffix={ current?.label }
 			>
@@ -214,7 +202,7 @@ function ActionsSubmenu( {
 	}
 	return (
 		<Menu.SubmenuRoot>
-			<Menu.SubmenuTrigger { ...SUBMENU_TRIGGER_PROPS }>
+			<Menu.SubmenuTrigger>
 				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 			</Menu.SubmenuTrigger>
 			<SubmenuPopup>
@@ -470,23 +458,8 @@ function OptionsMenuContent( {
 		Parameters< typeof BlockActions >[ 0 ][ 'children' ]
 	>[ 0 ];
 } ) {
-	const [ search, setSearch ] = useState( '' );
 	const shortcuts = useMenuShortcuts( SHORTCUT_NAMES );
 	const firstClientId = clientIds[ 0 ];
-	const blockNameMenuVariant = useSelect(
-		( select ) => getBlockIconVariant( { select, clientIds } ),
-		[ clientIds ]
-	);
-	const { searchEntries: allTransformSearchEntries } = useTransformsAndStyles(
-		clientIds,
-		blockNameMenuVariant === 'switcher'
-	);
-	// Only what the block name menu offers for these blocks.
-	const transformSearchEntries =
-		blockNameMenuVariant === 'switcher' ||
-		blockNameMenuVariant === 'styles-only'
-			? allTransformSearchEntries
-			: [];
 	const isSingleBlock = clientIds.length === 1;
 	const {
 		canCopyStyles,
@@ -793,113 +766,8 @@ function OptionsMenuContent( {
 				...getSlotEntries( items, 'more' ),
 			];
 
-	const normalizedSearch = search.trim().toLocaleLowerCase();
-	if ( normalizedSearch ) {
-		// Search also finds what the block name menu and the Layout menu
-		// offer, so one search reaches everything the block can do.
-		const otherEntries = [
-			...transformSearchEntries,
-			...items
-				.filter( ( item ) => item.group === 'layout' && item.choices )
-				.flatMap( ( item ) =>
-					item
-						.choices!.filter(
-							( choice ) => choice.value !== item.value
-						)
-						.map( ( choice ) => ( {
-							key: `${ item.name }-${ choice.value }`,
-							label: choice.label,
-							icon: choice.icon,
-							context: item.label,
-							onSelect: () => item.onChange?.( choice.value ),
-						} ) )
-				),
-		].filter( ( entry ) => matchesSearchEntry( entry, normalizedSearch ) );
-		const results: { entry: ActionEntry; context?: string }[] = (
-			[
-				...alignEntries.flatMap( ( alignEntry ) =>
-					alignEntry.choices.map( ( choice ) => ( {
-						entry: {
-							key: `${ alignEntry.key }-${ choice.value }`,
-							label: choice.label,
-							icon: choice.icon,
-							onClick: () => alignEntry.onChange( choice.value ),
-						},
-						context: alignEntry.label,
-					} ) )
-				),
-				...formatEntries.map( ( entry ) => ( {
-					entry,
-					context: __( 'Format' ),
-				} ) ),
-				...styleEntries.map( ( entry ) => ( {
-					entry,
-					context: __( 'Styles' ),
-				} ) ),
-				...[ ...inlineInsertEntries, ...blockInsertEntries ].map(
-					( entry ) => ( { entry, context: __( 'Insert' ) } )
-				),
-				...clipboardEntries.map( ( entry ) => ( { entry } ) ),
-				...actionEntries.map( ( entry ) => ( { entry } ) ),
-				...moreEntries.map( ( entry ) => ( {
-					entry,
-					context: __( 'More' ),
-				} ) ),
-			] as { entry: ActionEntry; context?: string }[]
-		 )
-			.filter(
-				( { entry, context } ) =>
-					matchesSearch( entry.label, normalizedSearch ) ||
-					( !! context && matchesSearch( context, normalizedSearch ) )
-			)
-			.concat(
-				otherEntries.map( ( entry ) => ( {
-					entry: {
-						key: entry.key,
-						label: entry.label,
-						// Block and layout icons are block icons, not plain
-						// SVG elements.
-						prefix: entry.icon && (
-							<span className="block-editor-block-toolbar__menu-block-icon">
-								<BlockIcon icon={ entry.icon } />
-							</span>
-						),
-						onClick: entry.onSelect,
-					},
-					context: entry.context,
-				} ) )
-			);
-
-		return (
-			<>
-				<SearchField
-					label={ __( 'Search block options' ) }
-					value={ search }
-					onChange={ setSearch }
-				/>
-				{ results.map( ( { entry, context } ) => (
-					<ActionMenuItem
-						key={ entry.key }
-						entry={ entry }
-						suffix={ context }
-					/>
-				) ) }
-				{ ! results.length && (
-					<p className="block-editor-block-toolbar__options-no-results">
-						{ __( 'No results found.' ) }
-					</p>
-				) }
-			</>
-		);
-	}
-
 	return (
 		<>
-			<SearchField
-				label={ __( 'Search block options' ) }
-				value={ search }
-				onChange={ setSearch }
-			/>
 			{ alignEntries.length > 0 && (
 				<>
 					<Menu.Group>
@@ -957,7 +825,7 @@ function OptionsMenuContent( {
 }
 
 /**
- * The options menu of the redesigned block toolbar: one searchable menu for
+ * The options menu of the redesigned block toolbar: one menu for
  * the block tools, with submenus to keep it organized.
  *
  * @param props           Component props.

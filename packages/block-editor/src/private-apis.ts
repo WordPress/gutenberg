@@ -65,6 +65,7 @@ import useBlockDisplayTitle from './components/block-title/use-block-display-tit
 import TabbedSidebar from './components/tabbed-sidebar';
 import NoteIconSlotFill from './components/collab/note-icon-slot';
 import {
+	BlockOptionsMenuControls,
 	BlockOptionsMenuItem,
 	BlockOptionsMenuItemFill,
 } from './components/block-toolbar/redesign/options-menu-item';
@@ -141,6 +142,7 @@ lock( privateApis, {
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	NoteIconSlotFill,
+	BlockOptionsMenuControls,
 	BlockOptionsMenuItem,
 	BlockOptionsMenuItemFill,
 	NoteIconToolbarSlotFill,

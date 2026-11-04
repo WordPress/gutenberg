@@ -1,8 +1,9 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	AlignmentControl,
 	BlockControls,
+	privateApis as blockEditorPrivateApis,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
@@ -11,9 +12,10 @@ import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { verse } from '@wordpress/icons';
+import { alignCenter, alignLeft, alignRight, verse } from '@wordpress/icons';
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
+import { unlock } from '../lock-unlock';
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -61,6 +63,30 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 	}, [ attributes.value ] );
 };
 
+const { BlockOptionsMenuControls, BlockOptionsMenuItem } = unlock(
+	blockEditorPrivateApis
+);
+
+const isBlockToolbarRedesign = !! window.__experimentalBlockToolbarRedesign;
+
+const TEXT_ALIGNMENTS = [
+	{
+		value: 'left',
+		label: _x( 'Left', 'Text alignment option' ),
+		icon: alignLeft,
+	},
+	{
+		value: 'center',
+		label: _x( 'Center', 'Text alignment option' ),
+		icon: alignCenter,
+	},
+	{
+		value: 'right',
+		label: _x( 'Right', 'Text alignment option' ),
+		icon: alignRight,
+	},
+];
+
 export default function QuoteEdit( {
 	attributes,
 	setAttributes,
@@ -70,6 +96,7 @@ export default function QuoteEdit( {
 	isSelected,
 } ) {
 	const { textAlign, allowedBlocks } = attributes;
+	const currentTextAlign = textAlign ?? ( isRTL() ? 'right' : 'left' );
 
 	const { hasInnerBlocks } = useSelect(
 		( select ) => {
@@ -96,14 +123,36 @@ export default function QuoteEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ isBlockToolbarRedesign ? (
+				// The redesigned toolbar offers text alignment in the options
+				// menu, as it does for paragraphs.
+				<BlockOptionsMenuControls>
+					<BlockOptionsMenuItem
+						group="align"
+						name="text-align"
+						label={ __( 'Text' ) }
+						icon={
+							TEXT_ALIGNMENTS.find(
+								( { value } ) => value === currentTextAlign
+							)?.icon
+						}
+						choices={ TEXT_ALIGNMENTS }
+						value={ currentTextAlign }
+						onChange={ ( nextAlign ) =>
+							setAttributes( { textAlign: nextAlign } )
+						}
+					/>
+				</BlockOptionsMenuControls>
+			) : (
+				<BlockControls group="block">
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<BlockQuotation { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
 				<Caption
@@ -122,6 +171,9 @@ export default function QuoteEdit( {
 					}
 					addLabel={ __( 'Add citation' ) }
 					removeLabel={ __( 'Remove citation' ) }
+					// The redesigned toolbar labels actions whose icon is not
+					// one people know from across the web.
+					showTextLabel={ isBlockToolbarRedesign }
 					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }

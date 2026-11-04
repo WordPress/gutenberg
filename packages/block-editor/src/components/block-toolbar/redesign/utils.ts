@@ -104,14 +104,3 @@ export function useMenuShortcuts< K extends string >(
 		return shortcuts;
 	}, [ combinations ] );
 }
-
-/**
- * Whether a label matches a search.
- *
- * @param label  The label.
- * @param search The search, already trimmed and lower case.
- * @return Whether the label matches.
- */
-export function matchesSearch( label: string, search: string ) {
-	return label.toLocaleLowerCase().includes( search );
-}

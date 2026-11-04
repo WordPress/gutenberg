@@ -6,13 +6,6 @@ import { useRefEffect } from '@wordpress/compose';
 import type { ReactNode } from 'react';
 
 /**
- * Flyouts open on click, Enter or the right arrow key, not on hover. Opened on
- * hover, the menu hands the pointer to its own hover logic, which closes the
- * flyout as soon as the pointer slows down or curves on its way into it.
- */
-export const SUBMENU_TRIGGER_PROPS = { openOnHover: false } as const;
-
-/**
  * How long the pointer can rest while heading for a flyout before the menu
  * treats it as having stopped there, in milliseconds.
  */
@@ -153,6 +146,13 @@ export function useFlyoutAim() {
 		}
 
 		function onPointerEvent( event: MouseEvent ) {
+			// Only pointer events over this menu, including its positioner,
+			// which receives them while the menu's hover logic blocks the
+			// other items.
+			const container = popup.parentElement ?? popup;
+			if ( ! container.contains( event.target as Node ) ) {
+				return;
+			}
 			const open = getOpenFlyout();
 			if ( ! open ) {
 				lastPoint = null;
@@ -178,15 +178,20 @@ export function useFlyoutAim() {
 			}
 		}
 
-		// Listening in the capture phase also catches the enter and leave
-		// events, which do not bubble. React derives its own enter and leave
-		// events from the over and out events, so those are stopped too.
+		// Listen on the window in the capture phase, ahead of every other
+		// listener. That includes the menu's hover logic, which listens on the
+		// document and closes the flyout when the pointer slows down or curves
+		// on its way, so flyouts can open on hover. The capture phase also
+		// catches the enter and leave events, which do not bubble. React
+		// derives its own from the over and out events, so those are stopped
+		// too.
+		const view = ownerDocument.defaultView;
 		for ( const type of AIM_EVENT_TYPES ) {
-			popup.addEventListener( type, onPointerEvent, true );
+			view?.addEventListener( type, onPointerEvent, true );
 		}
 		return () => {
 			for ( const type of AIM_EVENT_TYPES ) {
-				popup.removeEventListener( type, onPointerEvent, true );
+				view?.removeEventListener( type, onPointerEvent, true );
 			}
 		};
 	}, [] );
