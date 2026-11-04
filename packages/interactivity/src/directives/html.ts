@@ -95,8 +95,8 @@ directive(
 		// Only supported default entries own the element's content.
 		const active = !! entry && ! entry.uniqueId;
 		// Pending values and the server token representation keep the content,
-		// apart from the representation showing server content that navigation
-		// brought to a kept host.
+		// apart from showing server content that navigation brought to a kept
+		// host.
 		const serverHTMLRepresentation = isServerHTMLRepresentation( result );
 		const preserveContent =
 			result === PENDING_GETTER || serverHTMLRepresentation;
@@ -156,7 +156,7 @@ directive(
 			if ( ! active ) {
 				return;
 			}
-			if ( serverHTMLRepresentation && owedServerContent.current ) {
+			if ( preserveContent && owedServerContent.current ) {
 				showServerContent( node, owedServerContent.current );
 				owedServerContent.current = undefined;
 				// The shown content differs from what was last applied, so the

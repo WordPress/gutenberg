@@ -1,9 +1,9 @@
 /**
  * A `data-wp-html` element that navigation keeps shows the new page's
- * server-rendered content while its value is `{ "wpServerHtml": true }`. The
- * router is imported once because it registers global listeners; each test
- * uses fresh stores, regions and URLs so its DOM and cached pages are
- * independent.
+ * server-rendered content while its value is `{ "wpServerHtml": true }` or
+ * pending. The router is imported once because it registers global listeners;
+ * each test uses fresh stores, regions and URLs so its DOM and cached pages
+ * are independent.
  */
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
@@ -52,6 +52,18 @@ const regionHtml = ( content: string, context?: object ) =>
 	`<div data-wp-interactive="${ namespace }" data-wp-router-region="${ namespace }/r"${
 		context ? ` data-wp-context='${ JSON.stringify( context ) }'` : ''
 	}>${ content }</div>`;
+
+/**
+ * Builds the server data that declares `state.late` as derived state the
+ * client hasn't defined, so its value is pending.
+ *
+ * @param state Server state of the current test's namespace.
+ * @return Server data, as WordPress serializes it.
+ */
+const pendingServerData = ( state: object = {} ) => ( {
+	state: { [ namespace ]: { ...state, late: {} } },
+	derivedStateClosures: { [ namespace ]: [ 'state.late' ] },
+} );
 
 /**
  * Builds the server data script of a destination page.
@@ -115,12 +127,19 @@ beforeEach( () => {
 
 describe( 'a data-wp-html element kept across navigation', () => {
 	test.each( [
-		[ 'a state path', 'state.html' ],
-		[ 'a context path', 'context.html' ],
-		[ 'a getServerState() getter', 'state.fromServerState' ],
-		[ 'a getServerContext() getter', 'state.fromServerContext' ],
+		[ 'the server representation in a state path', 'state.html' ],
+		[ 'the server representation in a context path', 'context.html' ],
+		[
+			'the server representation from a getServerState() getter',
+			'state.fromServerState',
+		],
+		[
+			'the server representation from a getServerContext() getter',
+			'state.fromServerContext',
+		],
+		[ 'a pending value', 'state.late' ],
 	] )(
-		'shows the new page’s server content for the server representation from %s',
+		'shows the new page’s server content for %s',
 		async ( _, reference ) => {
 			store( namespace, {
 				state: {
@@ -140,19 +159,15 @@ describe( 'a data-wp-html element kept across navigation', () => {
 					`<p class="content">${ name }</p><div data-wp-html="${ reference }"><i>${ name }</i></div>`,
 					{ html: representation }
 				);
-			populateServerData( {
-				state: { [ namespace ]: { html: representation } },
-			} );
+			const serverData = pendingServerData( { html: representation } );
+			populateServerData( serverData );
 			const region = hydrateHtml( page( 'one' ) );
 			const element = region.querySelector( '[data-wp-html]' )!;
 			expect( element.innerHTML ).toBe( '<i>one</i>' );
 
 			await navigate(
 				'two',
-				page( 'two' ) +
-					serverDataHtml( {
-						state: { [ namespace ]: { html: representation } },
-					} )
+				page( 'two' ) + serverDataHtml( serverData )
 			);
 
 			expect( region.querySelector( '[data-wp-html]' ) ).toBe( element );
@@ -160,24 +175,32 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		}
 	);
 
-	test.each( [ 'T', 'null' ] )(
-		'shows the new page’s server content in the update that brings it after %s',
-		async ( previous ) => {
-			store( namespace, {
+	test.each( [
+		[ 'T', 'M' ],
+		[ 'null', 'M' ],
+		[ 'T', 'P' ],
+	] )(
+		'shows the new page’s server content in the update that brings it, from %s to %s',
+		async ( previous, next ) => {
+			populateServerData( pendingServerData() );
+			const { state } = store( namespace, {
 				state: {
 					/** Selects the value from the page's server context. */
-					get html() {
+					get html(): unknown {
 						const { value } = getServerContext< {
 							value: string;
 						} >();
 						if ( value === 'M' ) {
 							return representation;
 						}
+						if ( value === 'P' ) {
+							return state.late;
+						}
 						return value === 'T'
 							? asDangerousHTML( '<p>T</p>' )
 							: null;
 					},
-				},
+				} as { html: unknown; late?: unknown },
 			} );
 			const page = (
 				name: string,
@@ -199,7 +222,7 @@ describe( 'a data-wp-html element kept across navigation', () => {
 			] );
 			const updates = recordUpdates( region, full );
 
-			await navigate( 'two', page( 'two', 'M', '<i>two</i>', '' ) );
+			await navigate( 'two', page( 'two', next, '<i>two</i>', '' ) );
 
 			expect( region.querySelector( '.full' ) ).toBe( full );
 			expect( full.innerHTML ).toBe( '<i>two</i>' );
@@ -265,29 +288,35 @@ describe( 'a data-wp-html element kept across navigation', () => {
 
 	test( 'keeps its nodes when they already equal the new page’s server content', async () => {
 		store( namespace, { state: { html: representation } } );
+		const serverData = pendingServerData();
 		const page = ( name: string ) =>
 			regionHtml(
-				`<p class="content">${ name }</p><div data-wp-html="state.html"><p>Same <b>content</b></p></div>`
-			);
+				`<p class="content">${ name }</p><div data-wp-html="state.html"><p>Same <b>content</b></p></div><div data-wp-html="state.late"><p>Same <b>content</b></p></div>`
+			) + serverDataHtml( serverData );
+		populateServerData( serverData );
 		const region = hydrateHtml( page( 'one' ) );
-		const element = region.querySelector( '[data-wp-html]' )!;
-		const paragraph = element.firstChild;
+		const elements = [ ...region.querySelectorAll( '[data-wp-html]' ) ];
+		const paragraphs = elements.map( ( element ) => element.firstChild );
 		const mutations: MutationRecord[] = [];
 		const observer = new MutationObserver( ( records ) =>
 			mutations.push( ...records )
 		);
-		observer.observe( element, {
-			childList: true,
-			subtree: true,
-			characterData: true,
-		} );
+		for ( const element of elements ) {
+			observer.observe( element, {
+				childList: true,
+				subtree: true,
+				characterData: true,
+			} );
+		}
 
 		await navigate( 'two', page( 'two' ) );
 		// Refreshing the page shown fetches it again.
 		await navigate( 'two', page( 'two' ) );
 
 		expect( region.querySelector( '.content' ) ).toHaveTextContent( 'two' );
-		expect( element.firstChild ).toBe( paragraph );
+		expect( elements.map( ( element ) => element.firstChild ) ).toEqual(
+			paragraphs
+		);
 		expect( mutations ).toHaveLength( 0 );
 		observer.disconnect();
 	} );
@@ -382,6 +411,45 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		await nextFrames();
 		expect( element ).toBeEmptyDOMElement();
 		observer.disconnect();
+	} );
+
+	test( 'writes a token it showed before the navigation once its pending value resolves to it', async () => {
+		const serverData = pendingServerData();
+		populateServerData( serverData );
+		const { state } = store( namespace, {
+			state: {
+				/** Selects the value from the page's server context. */
+				get html(): unknown {
+					return getServerContext< { value: string } >().value === 'T'
+						? asDangerousHTML( '<p>T</p>' )
+						: state.late;
+				},
+			} as { html: unknown; late?: unknown },
+		} );
+		const page = ( name: string, value: string, content: string ) =>
+			regionHtml(
+				`<p class="content">${ name }</p><div data-wp-html="state.html">${ content }</div>`,
+				{ value }
+			);
+		const region = hydrateHtml( page( 'one', 'T', '<p>T</p>' ) );
+		const element = region.querySelector( '[data-wp-html]' )!;
+
+		await navigate(
+			'two',
+			page( 'two', 'P', '<i>two</i>' ) + serverDataHtml( serverData )
+		);
+		expect( element.innerHTML ).toBe( '<i>two</i>' );
+
+		store( namespace, {
+			state: {
+				/** Resolves the pending value to the previous page's token. */
+				get late() {
+					return asDangerousHTML( '<p>T</p>' );
+				},
+			},
+		} );
+		await nextFrames();
+		expect( element.innerHTML ).toBe( '<p>T</p>' );
 	} );
 
 	test( 'keeps its content in a list item, never showing the template’s', async () => {

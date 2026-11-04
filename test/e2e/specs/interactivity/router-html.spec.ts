@@ -108,12 +108,13 @@ test.describe( 'Router HTML content', () => {
 		[ 'T', '<p>T</p>' ],
 		[ 'U', '<p>U</p>' ],
 		[ 'null', '' ],
-		[ 'pending', '<p>T</p>' ],
+		[ 'pending', '<i>two</i>' ],
 	] ) {
-		test( `keeps node identity and follows the ${ value } destination without its fallback`, async ( {
-			page,
-			interactivityUtils: utils,
-		} ) => {
+		test( `keeps node identity and ${
+			value === 'pending'
+				? 'shows the server content of the pending destination'
+				: `follows the ${ value } destination without its fallback`
+		}`, async ( { page, interactivityUtils: utils } ) => {
 			await page.goto( utils.getLink( `kept ${ value } one` ) );
 			const kept = page.getByTestId( 'kept-html' );
 			const never = page.getByTestId( 'never-html' );
@@ -158,7 +159,9 @@ test.describe( 'Router HTML content', () => {
 				)
 			).toBe( true );
 			expect( await contents.jsonValue() ).toEqual(
-				value === 'pending' ? [ '<p>T</p>' ] : expect.any( Array )
+				value === 'pending'
+					? [ '<p>T</p>', '<i>two</i>' ]
+					: expect.any( Array )
 			);
 			if ( value === 'null' || value === 'pending' ) {
 				await page
@@ -176,7 +179,11 @@ test.describe( 'Router HTML content', () => {
 					originalKept
 				)
 			).toBe( true );
-			expect( await contents.jsonValue() ).not.toContain( '<i>two</i>' );
+			expect( await contents.jsonValue() ).toEqual(
+				value === 'pending'
+					? expect.any( Array )
+					: expect.not.arrayContaining( [ '<i>two</i>' ] )
+			);
 			await contents.dispose();
 			await originalKept.dispose();
 		} );
