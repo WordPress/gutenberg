@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+
 ## 3.1.0 (2026-11-04)
 
 ### Bug Fixes

@@ -10,7 +10,12 @@ import {
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
-import { parseDirectiveName, parseDirectiveValue, toVdom } from './vdom';
+import {
+	getInteractiveNamespace,
+	parseDirectiveName,
+	parseDirectiveValue,
+	toVdom,
+} from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { getScope } from './scopes';
@@ -64,6 +69,9 @@ export const privateApis = (
 			parseDirectiveName,
 			// Shares the directive-value interpretation with internal consumers.
 			parseDirectiveValue,
+			// Shares the rules that turn a `data-wp-interactive` value into a
+			// namespace with internal consumers.
+			getInteractiveNamespace,
 			directive,
 			getNamespace,
 			h,

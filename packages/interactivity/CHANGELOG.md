@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   The private `toVdom()` accepts an optional initial namespace for the unprefixed directives that no `data-wp-interactive` within the converted node governs, and expose `getInteractiveNamespace()` through `privateApis()`, so the router can convert a `data-wp-router-region` nested in an interactive element with the namespace of that element ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+
 ## 8.1.0 (2026-11-04)
 
 ### Bug Fixes
