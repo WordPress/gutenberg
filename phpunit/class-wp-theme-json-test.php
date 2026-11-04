@@ -1600,6 +1600,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_variation_rule_from_a_pseudo_node_ignores_the_pseudo_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient' => 'linear-gradient(135deg,#ff0000,#0000ff)',
+							),
+							':hover'     => array(
+								'background' => array( 'backgroundClip' => 'text' ),
+							),
+							'variations' => array(
+								'flashy' => array(
+									'background' => array( 'backgroundClip' => 'padding-box' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button', ':hover' ),
+				'selector'   => '.wp-block-button:hover',
+				'css'        => '.wp-block-button:hover',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringNotContainsString( 'background-image: unset', $actual_styles );
+	}
+
 	public function test_variation_breakpoint_pseudo_state_reads_the_block_clip() {
 		register_block_style(
 			'core/button',
@@ -5030,39 +5082,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
-	}
-
-	public function test_get_templates() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version'   => 1,
-				'templates' => array(
-					array(
-						'name'     => '404',
-						'template' => 'layout',
-					),
-					array(
-						'name' => 'search',
-					),
-				),
-			)
-		);
-
-		$templates = $theme_json->get_templates();
-
-		$this->assertEqualSetsWithIndex(
-			array(
-				'404'    => array( 'template' => 'layout' ),
-				'search' => array( 'template' => '' ),
-			),
-			$templates
-		);
-	}
-
-	public function test_get_templates_without_any() {
-		$theme_json = new WP_Theme_JSON_Gutenberg( array( 'version' => 1 ) );
-
-		$this->assertSame( array(), $theme_json->get_templates() );
 	}
 
 	public function test_get_from_editor_settings() {
