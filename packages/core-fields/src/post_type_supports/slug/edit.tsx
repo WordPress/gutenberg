@@ -93,6 +93,7 @@ const SlugEdit = ( {
 					}
 					label={ __( 'Link' ) }
 					hideLabelFromVision={ hideLabelFromVision }
+					details={ permalink }
 					value={ slug }
 					autoComplete="off"
 					spellCheck="false"
