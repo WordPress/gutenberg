@@ -326,24 +326,21 @@ function Items( {
 	// One ghost per empty period: regenerated when the list empties again
 	// or the default block changes, stable in between so the client ID,
 	// and with it the DOM, survives materialization.
-	const ghostBlock = useMemo(
-		() =>
-			ghostBlockName
-				? createBlock( ghostBlockName, ghostBlockAttributes )
-				: null,
-		[ ghostBlockName, ghostBlockAttributes ]
-	);
 	// The ghost shows the empty post placeholder only while it renders: the
 	// block it inserts keeps its own attributes, so the text is never saved.
-	const ghostAttributes = useMemo(
-		() =>
-			ghostBlock && {
+	const { ghostBlock, ghostAttributes } = useMemo( () => {
+		const block = ghostBlockName
+			? createBlock( ghostBlockName, ghostBlockAttributes )
+			: undefined;
+		return {
+			ghostBlock: block,
+			ghostAttributes: block && {
 				placeholder:
 					bodyPlaceholder && decodeEntities( bodyPlaceholder ),
-				...ghostBlock.attributes,
+				...block.attributes,
 			},
-		[ ghostBlock, bodyPlaceholder ]
-	);
+		};
+	}, [ ghostBlockName, ghostBlockAttributes, bodyPlaceholder ] );
 	const showGhost = !! ghostBlock;
 
 	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
