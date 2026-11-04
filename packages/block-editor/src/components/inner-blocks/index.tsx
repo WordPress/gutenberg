@@ -57,7 +57,7 @@ function BlockContext( {
 
 // Wrapped rather than `memo( BlockListItems )`: block-list imports this module
 // back, so the CommonJS build runs this line before that binding is set.
-const BlockListItemsMemo = memo( function BlockListItemsMemo(
+const BlockListItemsMemo = memo( function BlockListItemsMemoWrapper(
 	props: ComponentProps< typeof BlockListItems >
 ) {
 	return <BlockListItems { ...props } />;

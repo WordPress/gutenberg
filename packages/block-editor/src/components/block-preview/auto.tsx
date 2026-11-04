@@ -13,7 +13,7 @@ import type { AutoBlockPreviewProps, ScaledBlockPreviewProps } from './types';
 // Avoids rendering the block list when the sizes change. Wrapped rather than
 // `memo( BlockList )`: block-list imports this module back, so the CommonJS
 // build runs this line before that binding is set.
-const MemoizedBlockList = memo( function MemoizedBlockList(
+const MemoizedBlockList = memo( function MemoizedBlockListWrapper(
 	props: ComponentProps< typeof BlockList >
 ) {
 	return <BlockList { ...props } />;

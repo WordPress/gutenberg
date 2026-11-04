@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `InnerBlocks`, `BlockPreview`: Memoize the block list through a wrapper instead of the imported binding, which the circular import with `BlockList` left undefined in the CommonJS build, so rendering them there failed with "Element type is invalid".
+-   `InnerBlocks`, `BlockPreview`: Memoize the block list through a wrapper instead of the imported binding, which the circular import with `BlockList` left undefined in the CommonJS build, so rendering them there failed with "Element type is invalid" ([#86323](https://github.com/WordPress/gutenberg/pull/86323)).
 
 ## 20.0.0 (2026-11-04)
 
