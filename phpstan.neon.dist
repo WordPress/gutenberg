@@ -1,0 +1,18 @@
+# PHPStan configuration for Gutenberg
+#
+# To overload this configuration, copy this file to phpstan.neon and adjust as needed.
+#
+# https://phpstan.org/config-reference
+
+includes:
+	# The base configuration file for using PHPStan with the Gutenberg codebase.
+	- tools/phpstan/base.neon
+
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`.
+	# https://phpstan.org/user-guide/baseline
+	- tools/phpstan/baseline.neon
+
+parameters:
+	# https://phpstan.org/user-guide/rule-levels
+	level: 5
+	reportUnmatchedIgnoredErrors: true

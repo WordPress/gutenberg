@@ -921,6 +921,51 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	} );
 } );
 
+describe( 'TypographyPanel — Reset all link color', () => {
+	it( 'clears a link color that tracks the text color', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: DUPLICATE_PALETTE_SETTINGS,
+			onChange,
+			value: {
+				color: { text: 'var:preset|color|dark-text' },
+				elements: {
+					link: { color: { text: 'var:preset|color|dark-text' } },
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
+		expect( result?.color?.text ).toBeUndefined();
+		expect( result?.elements?.link?.color?.text ).toBeUndefined();
+	} );
+
+	it( 'keeps a link color that differs from the text color', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: DUPLICATE_PALETTE_SETTINGS,
+			onChange,
+			value: {
+				color: { text: 'var:preset|color|dark-text' },
+				elements: {
+					link: {
+						color: { text: 'var:preset|color|dark-background' },
+					},
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
+		expect( result?.elements?.link?.color?.text ).toBe(
+			'var:preset|color|dark-background'
+		);
+	} );
+} );
+
 describe( 'TypographyPanel layout className', () => {
 	const inheritedValue = {
 		typography: { lineHeight: '1.5', letterSpacing: '1px' },
@@ -1066,6 +1111,30 @@ describe( 'TypographyPanel text gradient', () => {
 		// The panel called `onChange`.
 		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.color.gradient ).toBeUndefined();
+	} );
+
+	it( 'shows the contrast warning on the gradient control when the text is a gradient', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+			contrastWarning: 'Low contrast gradient',
+		} );
+
+		expect(
+			screen.getAllByRole( 'button', { name: 'Low contrast' } )
+		).toHaveLength( 1 );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		expect(
+			await screen.findByText( 'Low contrast gradient' )
+		).toBeVisible();
 	} );
 
 	it( 'keeps the gradient control usable while a background gradient is set', async () => {

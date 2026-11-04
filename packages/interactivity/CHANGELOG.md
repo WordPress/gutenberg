@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Limit the attributes that `data-wp-bind` can set on `object` elements. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
