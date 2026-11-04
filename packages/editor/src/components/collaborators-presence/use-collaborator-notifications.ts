@@ -38,8 +38,11 @@ const DRAFT_STATUSES = [ 'draft', 'auto-draft' ];
 interface PostUpdatedMessageArgs {
 	/** Display name of the collaborator who saved. */
 	name: string;
-	/** Singular label of the post type, e.g. "Post" or "Story". */
-	postTypeLabel: string;
+	/**
+	 * Labels registered for the post type with `register_post_type()`, such
+	 * as `item_published`. Undefined while the post type is still loading.
+	 */
+	postTypeLabels: Record< string, string > | undefined;
 	/** WordPress post status at the time of save. */
 	status: string;
 	/** Post status before this save, when known. */
@@ -52,6 +55,26 @@ interface PostUpdatedMessageArgs {
 }
 
 /**
+ * Appends the collaborator's name to one of the post type's own save
+ * notices, e.g. "Post published." becomes "Post published. By Alice."
+ *
+ * The post type label is a whole translated sentence rather than a noun
+ * dropped into a verb phrase, so translators can inflect the verb for each
+ * post type, as core's own save notice does.
+ *
+ * @param notice The post type's notice sentence, e.g. `labels.item_published`.
+ * @param name   Display name of the collaborator who saved.
+ */
+function attributeNotice( notice: string, name: string ): string {
+	return sprintf(
+		/* translators: 1: the post type's save notice, e.g. "Post published." 2: collaborator display name. */
+		__( '%1$s By %2$s.' ),
+		notice,
+		name
+	);
+}
+
+/**
  * Returns the snackbar message for a post updated notification.
  *
  * The message is built from the labels a site registers with
@@ -61,14 +84,14 @@ interface PostUpdatedMessageArgs {
  *
  * @param args                Message inputs.
  * @param args.name           Display name of the collaborator who saved.
- * @param args.postTypeLabel  Singular label of the post type, e.g. "Post".
+ * @param args.postTypeLabels Labels registered for the post type, when loaded.
  * @param args.status         WordPress post status at the time of save.
  * @param args.previousStatus Post status before this save, when known.
  * @param args.getStatusLabel Resolves the registered label of the status.
  */
 async function getPostUpdatedMessage( {
 	name,
-	postTypeLabel,
+	postTypeLabels,
 	status,
 	previousStatus,
 	getStatusLabel,
@@ -76,80 +99,52 @@ async function getPostUpdatedMessage( {
 	const wasPublished =
 		!! previousStatus && PUBLISHED_STATUSES.includes( previousStatus );
 
+	// Core registers a full sentence per post type for each of these
+	// transitions, which the editor's own save notice uses too.
+	let notice: string | undefined;
+
 	if ( ! wasPublished && status === 'publish' ) {
-		return sprintf(
-			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-			__( '%1$s published by %2$s.' ),
-			postTypeLabel,
-			name
-		);
+		notice = postTypeLabels?.item_published;
+	} else if ( ! wasPublished && status === 'future' ) {
+		notice = postTypeLabels?.item_scheduled;
+	} else if ( ! wasPublished && status === 'private' ) {
+		notice = postTypeLabels?.item_published_privately;
+	} else if ( PUBLISHED_STATUSES.includes( status ) ) {
+		notice = postTypeLabels?.item_updated;
+	} else if ( wasPublished && DRAFT_STATUSES.includes( status ) ) {
+		notice = postTypeLabels?.item_reverted_to_draft;
 	}
 
-	if ( ! wasPublished && status === 'future' ) {
-		return sprintf(
-			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-			__( '%1$s scheduled by %2$s.' ),
-			postTypeLabel,
-			name
-		);
+	if ( notice ) {
+		return attributeNotice( notice, name );
 	}
 
-	if ( ! wasPublished && status === 'private' ) {
-		return sprintf(
-			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-			__( '%1$s published privately by %2$s.' ),
-			postTypeLabel,
-			name
-		);
-	}
-
-	if ( PUBLISHED_STATUSES.includes( status ) ) {
-		return sprintf(
-			/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-			__( '%1$s updated by %2$s.' ),
-			postTypeLabel,
-			name
-		);
-	}
-
-	if ( DRAFT_STATUSES.includes( status ) ) {
-		if ( wasPublished ) {
-			return sprintf(
-				/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-				__( '%1$s reverted to draft by %2$s.' ),
-				postTypeLabel,
-				name
-			);
-		}
-
+	if ( DRAFT_STATUSES.includes( status ) && ! wasPublished ) {
 		/* translators: %s: collaborator display name */
 		return sprintf( __( 'Draft saved by %s.' ), name );
 	}
 
-	// Any other status, such as "pending" or one a plugin registered: name
-	// the status the collaborator moved the post to, using its registered
-	// label. A save that keeps the status is reported as a plain save, and
-	// so is a status whose label cannot be loaded.
-	if ( status !== previousStatus ) {
+	// Any other status change, such as to "pending" or to a status a plugin
+	// registered, names the status the collaborator moved the post to, using
+	// its registered label. A core transition lands here too when the post
+	// type's labels have not loaded yet. A save that keeps the status is
+	// reported as a plain save, and so is a status whose label cannot be
+	// loaded.
+	if ( status !== previousStatus && ! DRAFT_STATUSES.includes( status ) ) {
 		const statusLabel = await getStatusLabel();
 
 		if ( statusLabel ) {
 			return sprintf(
-				/* translators: 1: post type singular label, e.g. "Post". 2: post status label, e.g. "Pending". 3: collaborator display name. */
-				__( '%1$s status set to %2$s by %3$s.' ),
-				postTypeLabel,
+				/* translators: 1: post status label, e.g. "Pending". 2: collaborator display name. */
+				__( 'Status set to %1$s by %2$s.' ),
 				statusLabel,
 				name
 			);
 		}
 	}
 
-	return sprintf(
-		/* translators: 1: post type singular label, e.g. "Post". 2: collaborator display name. */
-		__( '%1$s saved by %2$s.' ),
-		postTypeLabel,
-		name
-	);
+	/* translators: %s: collaborator display name */
+	return sprintf( __( 'Saved by %s.' ), name );
 }
 
 /**
@@ -165,7 +160,7 @@ export function useCollaboratorNotifications(
 ): void {
 	const {
 		postStatus,
-		postTypeLabel,
+		postTypeLabels,
 		isCollaborationEnabled,
 		showJoinNotifications,
 		showLeaveNotifications,
@@ -186,9 +181,8 @@ export function useCollaboratorNotifications(
 				// The editor loads the post type with the post, so this is
 				// already resolved. `getPostType()` with no slug resolves the
 				// whole collection, so only ask when a post type is known.
-				postTypeLabel: postType
+				postTypeLabels: postType
 					? select( coreStore ).getPostType( postType )?.labels
-							?.singular_name
 					: undefined,
 				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				showJoinNotifications: getNotificationPreference(
@@ -355,9 +349,7 @@ export function useCollaboratorNotifications(
 
 				const message = await getPostUpdatedMessage( {
 					name: getCollaboratorDisplayName( saver.collaboratorInfo ),
-					// The post type is loaded with the post, so the fallback
-					// only covers a save that lands before it resolves.
-					postTypeLabel: postTypeLabel ?? __( 'Post' ),
+					postTypeLabels,
 					status: effectiveStatus,
 					previousStatus,
 					getStatusLabel,
@@ -374,7 +366,7 @@ export function useCollaboratorNotifications(
 			[
 				createNotice,
 				postStatus,
-				postTypeLabel,
+				postTypeLabels,
 				registry,
 				shouldShowPostSaveNotifications,
 			]

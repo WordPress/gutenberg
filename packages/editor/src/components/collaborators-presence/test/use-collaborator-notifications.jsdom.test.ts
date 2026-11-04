@@ -146,8 +146,8 @@ type PostStatusRecord = { slug: string; name: string };
 
 type PreferenceState = {
 	postStatus: string | undefined;
-	// Singular label registered for the post type; undefined mimics a post
-	// type that has not resolved yet.
+	// Singular label the post type's item labels are built from; undefined
+	// mimics a post type that has not resolved yet.
 	postTypeLabel: string | undefined;
 	// Records the statuses endpoint can resolve; undefined mimics a failed
 	// request.
@@ -169,6 +169,23 @@ const CORE_STATUSES: PostStatusRecord[] = [
 	{ slug: 'embargo', name: 'Embargoed' },
 ];
 
+/**
+ * Builds the item labels WordPress registers for a post type, as the
+ * `/wp/v2/types` endpoint returns them.
+ *
+ * @param singular Singular name, e.g. "Post".
+ */
+function makeLabels( singular: string ) {
+	return {
+		singular_name: singular,
+		item_published: `${ singular } published.`,
+		item_published_privately: `${ singular } published privately.`,
+		item_reverted_to_draft: `${ singular } reverted to draft.`,
+		item_scheduled: `${ singular } scheduled.`,
+		item_updated: `${ singular } updated.`,
+	};
+}
+
 const DEFAULT_STATE: PreferenceState = {
 	postStatus: 'draft',
 	postTypeLabel: 'Post',
@@ -187,10 +204,7 @@ function mockSelect( storeKey: string ) {
 			getPostType: ( slug: string ) =>
 				state.postTypeLabel === undefined
 					? undefined
-					: {
-							slug,
-							labels: { singular_name: state.postTypeLabel },
-						},
+					: { slug, labels: makeLabels( state.postTypeLabel ) },
 		};
 	}
 	if ( storeKey === 'core/preferences' ) {
@@ -385,7 +399,7 @@ describe( 'useCollaboratorNotifications', () => {
 				postStatus: 'publish',
 				saveEventStatus: 'publish',
 				prevEvent: null,
-				expected: 'Post updated by Alice.',
+				expected: 'Post updated. By Alice.',
 			},
 			{
 				description:
@@ -393,7 +407,7 @@ describe( 'useCollaboratorNotifications', () => {
 				postStatus: 'draft',
 				saveEventStatus: 'publish',
 				prevEvent: null,
-				expected: 'Post published by Alice.',
+				expected: 'Post published. By Alice.',
 			},
 			{
 				description:
@@ -405,70 +419,70 @@ describe( 'useCollaboratorNotifications', () => {
 					savedByClientId: 1,
 					postStatus: 'draft',
 				},
-				expected: 'Post published by Alice.',
+				expected: 'Post published. By Alice.',
 			},
 			{
 				description: 'a draft is scheduled',
 				postStatus: 'draft',
 				saveEventStatus: 'future',
 				prevEvent: null,
-				expected: 'Post scheduled by Alice.',
+				expected: 'Post scheduled. By Alice.',
 			},
 			{
 				description: 'a draft is published privately',
 				postStatus: 'draft',
 				saveEventStatus: 'private',
 				prevEvent: null,
-				expected: 'Post published privately by Alice.',
+				expected: 'Post published privately. By Alice.',
 			},
 			{
 				description: 'a scheduled post is updated',
 				postStatus: 'future',
 				saveEventStatus: 'future',
 				prevEvent: null,
-				expected: 'Post updated by Alice.',
+				expected: 'Post updated. By Alice.',
 			},
 			{
 				description: 'a published post is reverted to draft',
 				postStatus: 'publish',
 				saveEventStatus: 'draft',
 				prevEvent: null,
-				expected: 'Post reverted to draft by Alice.',
+				expected: 'Post reverted to draft. By Alice.',
 			},
 			{
 				description: 'a draft is submitted for review',
 				postStatus: 'draft',
 				saveEventStatus: 'pending',
 				prevEvent: null,
-				expected: 'Post status set to Pending by Alice.',
+				expected: 'Status set to Pending by Alice.',
 			},
 			{
 				description: 'a pending post is saved again',
 				postStatus: 'pending',
 				saveEventStatus: 'pending',
 				prevEvent: null,
-				expected: 'Post saved by Alice.',
+				expected: 'Saved by Alice.',
 			},
 			{
 				description: 'a draft is moved to a custom status',
 				postStatus: 'draft',
 				saveEventStatus: 'embargo',
 				prevEvent: null,
-				expected: 'Post status set to Embargoed by Alice.',
+				expected: 'Status set to Embargoed by Alice.',
 			},
 			{
 				description: 'a published post is moved to a custom status',
 				postStatus: 'publish',
 				saveEventStatus: 'embargo',
 				prevEvent: null,
-				expected: 'Post status set to Embargoed by Alice.',
+				expected: 'Status set to Embargoed by Alice.',
 			},
 			{
 				description: 'a post in a custom status is saved again',
 				postStatus: 'embargo',
 				saveEventStatus: 'embargo',
 				prevEvent: null,
-				expected: 'Post saved by Alice.',
+				expected: 'Saved by Alice.',
 			},
 			{
 				description: 'a post in a custom status is moved back to draft',
@@ -509,25 +523,19 @@ describe( 'useCollaboratorNotifications', () => {
 				description: 'publishing',
 				postStatus: 'draft',
 				saveEventStatus: 'publish',
-				expected: 'Story published by Alice.',
+				expected: 'Story published. By Alice.',
 			},
 			{
 				description: 'scheduling',
 				postStatus: 'draft',
 				saveEventStatus: 'future',
-				expected: 'Story scheduled by Alice.',
+				expected: 'Story scheduled. By Alice.',
 			},
 			{
 				description: 'updating',
 				postStatus: 'publish',
 				saveEventStatus: 'publish',
-				expected: 'Story updated by Alice.',
-			},
-			{
-				description: 'moving to a custom status',
-				postStatus: 'draft',
-				saveEventStatus: 'embargo',
-				expected: 'Story status set to Embargoed by Alice.',
+				expected: 'Story updated. By Alice.',
 			},
 		] )(
 			'uses the registered post type label when $description',
@@ -585,7 +593,7 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 		} );
 
-		it( 'falls back to "Post" when the post type has not resolved', async () => {
+		it( 'names the status when the post type has not resolved', async () => {
 			renderNotifications( {
 				postStatus: 'draft',
 				postTypeLabel: undefined,
@@ -601,9 +609,11 @@ describe( 'useCollaboratorNotifications', () => {
 				null
 			);
 
+			// Without the post type's "Post published." label, the registered
+			// status label still says what happened.
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
-				'Post published by Alice.',
+				'Status set to Published by Alice.',
 				expect.anything()
 			);
 		} );
@@ -626,7 +636,7 @@ describe( 'useCollaboratorNotifications', () => {
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
-				'Post saved by Alice.',
+				'Saved by Alice.',
 				expect.anything()
 			);
 		} );
