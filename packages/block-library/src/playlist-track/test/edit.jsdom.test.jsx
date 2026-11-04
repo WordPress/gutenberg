@@ -207,7 +207,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'shows the track image as a media control in the sidebar', () => {
-		const { container } = renderEdit( { isSelected: true } );
+		renderEdit( { isSelected: true } );
 
 		expect( mockTrackImageMediaReplaceFlowProps ).toEqual(
 			expect.objectContaining( {
@@ -215,12 +215,9 @@ describe( 'PlaylistTrackEdit', () => {
 				mediaURL: 'https://example.com/cover.jpg',
 			} )
 		);
-		expect( screen.getByText( 'cover.jpg' ) ).toBeInTheDocument();
-		// MediaControl's fixed 20x20 indicator (background-image), not a full-size <img>.
+		// MediaControl shows the filename; the old full-size preview <img> is gone.
 		expect(
-			container.querySelector(
-				'.block-library-utils__media-control__inspector-image-indicator'
-			)
+			screen.getByRole( 'button', { name: /cover\.jpg/ } )
 		).toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'img', { name: 'Preview of the track image' } )
