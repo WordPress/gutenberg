@@ -66,7 +66,9 @@ test.describe( 'Video', () => {
 				buffer: Buffer.from( 'video' ),
 			} );
 		await expect(
-			page.locator( '.components-snackbar__content' )
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Simulated upload failure.' } )
 		).toBeVisible();
 
 		// The failed upload leaves the current video, poster and caption.
@@ -84,11 +86,15 @@ test.describe( 'Video', () => {
 		// Reset still removes the video.
 		await editor.clickBlockToolbarButton( 'Replace' );
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
-		await expect
-			.poll( async () => {
-				const [ { attributes } ] = await editor.getBlocks();
-				return [ attributes.src, attributes.poster ];
-			} )
-			.toEqual( [ undefined, undefined ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/video',
+				attributes: {
+					src: undefined,
+					poster: undefined,
+					caption: undefined,
+				},
+			},
+		] );
 	} );
 } );

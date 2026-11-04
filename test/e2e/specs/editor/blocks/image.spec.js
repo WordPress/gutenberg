@@ -1147,7 +1147,9 @@ test.describe( 'Image - server-side uploads', () => {
 			page.getByRole( 'menu' ).getByTestId( 'form-file-upload-input' )
 		);
 		await expect(
-			page.locator( '.components-snackbar__content' )
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Simulated upload failure.' } )
 		).toBeVisible();
 
 		// The failed upload leaves the current image and its details.
@@ -1167,12 +1169,17 @@ test.describe( 'Image - server-side uploads', () => {
 		// Reset still removes the image.
 		await editor.clickBlockToolbarButton( 'Replace' );
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
-		await expect
-			.poll( async () => {
-				const [ { attributes } ] = await editor.getBlocks();
-				return [ attributes.id, attributes.url ];
-			} )
-			.toEqual( [ undefined, undefined ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: undefined,
+					url: undefined,
+					alt: undefined,
+					caption: undefined,
+				},
+			},
+		] );
 	} );
 } );
 

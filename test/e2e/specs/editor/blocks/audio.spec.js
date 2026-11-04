@@ -59,7 +59,9 @@ test.describe( 'Audio', () => {
 			.getByTestId( 'form-file-upload-input' )
 			.setInputFiles( audioPath );
 		await expect(
-			page.locator( '.components-snackbar__content' )
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Simulated upload failure.' } )
 		).toBeVisible();
 
 		// The failed upload leaves the current audio and its caption.
@@ -77,11 +79,15 @@ test.describe( 'Audio', () => {
 		// Reset still removes the audio.
 		await editor.clickBlockToolbarButton( 'Replace' );
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
-		await expect
-			.poll( async () => {
-				const [ { attributes } ] = await editor.getBlocks();
-				return [ attributes.id, attributes.src ];
-			} )
-			.toEqual( [ undefined, undefined ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/audio',
+				attributes: {
+					id: undefined,
+					src: undefined,
+					caption: undefined,
+				},
+			},
+		] );
 	} );
 } );
