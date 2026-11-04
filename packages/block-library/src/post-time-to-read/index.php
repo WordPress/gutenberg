@@ -25,6 +25,7 @@
  *
  * @return int The number of words or characters in the text.
  *
+ * @phpstan-param 'words'|'characters_excluding_spaces'|'characters_including_spaces' $type
  * @phpstan-return int<0, max>
  */
 function block_core_post_time_to_read_word_count( $text, $type ) {
