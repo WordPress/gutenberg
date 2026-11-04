@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
@@ -10,6 +12,7 @@
 -   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 -   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Load new script modules during client-side navigation without `eval()` or WebAssembly, so the Content Security Policy doesn't need `'unsafe-eval'` or `'wasm-unsafe-eval'`. ([#84056](https://github.com/WordPress/gutenberg/pull/84056))
 
 ## 3.0.0 (2026-10-20)
 
