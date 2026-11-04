@@ -310,6 +310,10 @@ export function useMediaEditorState(): MediaEditorSession {
 		onChange: handleImageEditorChange,
 	} );
 
+	// The locked ratio has two owners: the preset the sidebar shows, and
+	// the number the image editor holds. This is the only path that sets
+	// both, so call it rather than `imageEditor.setAspectRatio`, which
+	// would leave the sidebar showing a ratio the crop no longer has.
 	const setAspectRatioValue = useCallback(
 		( presetKey: string ) => {
 			asOneUndoEntry( () => {
@@ -388,6 +392,14 @@ export function useMediaEditorState(): MediaEditorSession {
 			reset,
 			isDirty,
 			// Only the crop changes the saved image so far.
+			//
+			// This reads the image editor's own clean state, not the
+			// session's. The two agree because the session only ever
+			// replaces the editor's slice with a state the editor handed
+			// out, and because a fresh state for an image matches the
+			// default one on every field `isDirty` compares. Change
+			// either and this has to compare against the session's
+			// baseline instead.
 			hasOutputEdits: imageEditor.isDirty,
 			hasUndo,
 			hasRedo,
