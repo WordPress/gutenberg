@@ -81,7 +81,7 @@ function getViewShape( state: InternalImageEditorState ): Size | undefined {
  * @param state The editor state.
  * @return The crop rect for the locked ratio, or `undefined`.
  */
-function getLockedCropRect(
+export function getLockedCropRect(
 	state: InternalImageEditorState
 ): NormalizedRect | undefined {
 	const viewShape = getViewShape( state );
@@ -89,64 +89,6 @@ function getLockedCropRect(
 		return undefined;
 	}
 	return computeInscribedRect( state.aspectRatio, viewShape );
-}
-
-/**
- * How far a crop's shape may be from the locked ratio, relative to it, and
- * still count as matching. It leaves room for rounding in a handle drag.
- */
-const LOCKED_RATIO_TOLERANCE = 1e-3;
-
-/**
- * Make the crop match the locked ratio, so a locked ratio always means a
- * crop of that ratio. A crop that matches is returned as it is. Otherwise
- * the crop keeps its centre and width and takes the height the ratio
- * needs; if that is taller than the view, it takes the full height and
- * the width the ratio needs. A full frame becomes the largest box of the
- * ratio.
- *
- * @param state The editor state.
- * @return The same state when the crop matches, or a state with a crop
- *         that does.
- */
-export function fitCropToLockedRatio(
-	state: InternalImageEditorState
-): InternalImageEditorState {
-	const { aspectRatio, cropRect } = state;
-	const viewShape = getViewShape( state );
-	if (
-		! viewShape ||
-		! aspectRatio ||
-		aspectRatio <= 0 ||
-		cropRect.width <= 0 ||
-		cropRect.height <= 0
-	) {
-		return state;
-	}
-	// The crop's width / height, in view fractions, that gives the locked
-	// ratio in pixels.
-	const lockedShape = ( aspectRatio * viewShape.height ) / viewShape.width;
-	const shape = cropRect.width / cropRect.height;
-	if ( Math.abs( shape / lockedShape - 1 ) <= LOCKED_RATIO_TOLERANCE ) {
-		return state;
-	}
-	let width = Math.min( cropRect.width, 1 );
-	let height = width / lockedShape;
-	if ( height > 1 ) {
-		height = 1;
-		width = lockedShape;
-	}
-	const centreX = cropRect.x + cropRect.width / 2;
-	const centreY = cropRect.y + cropRect.height / 2;
-	return {
-		...state,
-		cropRect: {
-			x: Math.min( Math.max( centreX - width / 2, 0 ), 1 - width ),
-			y: Math.min( Math.max( centreY - height / 2, 0 ), 1 - height ),
-			width,
-			height,
-		},
-	};
 }
 
 /**
@@ -365,12 +307,10 @@ export function imageEditorReducer(
 	switch ( action.type ) {
 		case 'SET_IMAGE':
 			return commitBase(
-				enforceContainment(
-					fitCropToLockedRatio( {
-						...state,
-						image: action.payload,
-					} )
-				)
+				enforceContainment( {
+					...state,
+					image: action.payload,
+				} )
 			);
 
 		case 'SET_PAN':
@@ -434,17 +374,15 @@ export function imageEditorReducer(
 			const dy = state.basePan.y - oy;
 			// Rotating past 45° from a quarter turn changes the view's
 			// shape, so a locked crop is refitted around its centre.
-			return enforceContainment(
-				fitCropToLockedRatio( {
-					...state,
-					rotation: newRotation,
-					zoom: state.baseZoom,
-					pan: {
-						x: ox + cos * dx - sin * dy,
-						y: oy + sin * dx + cos * dy,
-					},
-				} )
-			);
+			return enforceContainment( {
+				...state,
+				rotation: newRotation,
+				zoom: state.baseZoom,
+				pan: {
+					x: ox + cos * dx - sin * dy,
+					y: oy + sin * dx + cos * dy,
+				},
+			} );
 		}
 
 		case 'SNAP_ROTATE_90': {
@@ -523,12 +461,10 @@ export function imageEditorReducer(
 
 		case 'SET_CROP_RECT':
 			return commitBase(
-				enforceContainment(
-					fitCropToLockedRatio( {
-						...state,
-						cropRect: action.payload,
-					} )
-				)
+				enforceContainment( {
+					...state,
+					cropRect: action.payload,
+				} )
 			);
 
 		case 'SET_ASPECT_RATIO': {
@@ -613,13 +549,11 @@ export function imageEditorReducer(
 
 		case 'RESET':
 			return commitBase(
-				enforceContainment(
-					fitCropToLockedRatio( {
-						...DEFAULT_STATE,
-						image: state.image,
-						...action.payload,
-					} )
-				)
+				enforceContainment( {
+					...DEFAULT_STATE,
+					image: state.image,
+					...action.payload,
+				} )
 			);
 	}
 }

@@ -107,7 +107,9 @@ function PresetPicker( { controller }: { controller: ImageEditorController } ) {
 
 ## Lock the Crop to a Ratio
 
-For a fixed shape, such as a square site icon, start from a state with a locked ratio. When the image loads, the crop becomes the largest square that fits. Leave out `freeformCrop` to keep it centred while the person pans and zooms the image under it, or pass `freeformCrop` to let them move and resize it, keeping the ratio.
+For a fixed shape, such as a square site icon, start from a state with a locked ratio and leave out `freeformCrop`. The crop stays the largest square that fits, centred, while the person pans and zooms the image under it.
+
+Pass the image too if you have it, so the crop starts the right shape rather than waiting for the canvas to fit it.
 
 ```tsx
 const [ state, setState ] = useState( () =>
