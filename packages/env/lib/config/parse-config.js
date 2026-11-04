@@ -8,6 +8,7 @@ const {
 const {
 	ValidationError,
 	checkPort,
+	checkString,
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
@@ -49,6 +50,9 @@ const mergeConfigs = require( './merge-configs' );
  * @property {boolean}                   phpmyadmin     Whether to enable phpMyAdmin.
  * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. Random if empty.
  * @property {boolean}                   multisite      Whether to set up a multisite installation.
+ * @property {string}                    adminUser      The username of the administrator account created on install.
+ * @property {string}                    adminPassword  The password of the administrator account created on install.
+ * @property {string}                    adminEmail     The email of the administrator account created on install.
  * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
@@ -91,6 +95,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
+	adminUser: 'admin',
+	adminPassword: 'password',
+	adminEmail: 'wordpress@example.com',
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -528,6 +535,17 @@ async function parseEnvironmentConfig(
 
 	if ( config.multisite !== undefined ) {
 		parsedConfig.multisite = config.multisite;
+	}
+
+	for ( const key of [ 'adminUser', 'adminPassword', 'adminEmail' ] ) {
+		if ( config[ key ] !== undefined ) {
+			checkString(
+				configFile,
+				`${ environmentPrefix }${ key }`,
+				config[ key ]
+			);
+			parsedConfig[ key ] = config[ key ];
+		}
 	}
 
 	if ( config.phpVersion !== undefined ) {

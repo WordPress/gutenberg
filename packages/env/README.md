@@ -12,7 +12,7 @@ $ npm -g i @wordpress/env
 $ wp-env start
 ```
 
-The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
+The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`). To use different credentials, set `adminUser`, `adminPassword`, and `adminEmail` in [`.wp-env.json`](#wp-envjson).
 
 The database credentials are: user `root`, password `password`. For a comprehensive guide on connecting directly to the database, refer to [Accessing the MySQL Database](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/getting-started-with-code-contribution.md#accessing-the-mysql-database).
 
@@ -629,6 +629,9 @@ To enable editor autocomplete and validation, add a `$schema` key:
 | `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
 | `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| `"adminUser"`        | `string`       | `"admin"`                              | The username of the administrator account. Only applied when WordPress is first installed. The Playground runtime ignores this option. |
+| `"adminPassword"`    | `string`       | `"password"`                           | The password of the administrator account. Only applied when WordPress is first installed. The Playground runtime ignores this option. |
+| `"adminEmail"`       | `string`       | `"wordpress@example.com"`              | The email of the administrator account. Only applied when WordPress is first installed. The Playground runtime ignores this option. |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
 _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
