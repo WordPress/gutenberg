@@ -312,15 +312,17 @@ jobs:
             contents: read
         timeout-minutes: 20
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        # PHP 8.6 support is still in progress, so failures are allowed for now.
+        continue-on-error: ${{ matrix.php == '8.6' }}
         strategy:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
+                    # On PRs: Only test PHP 7.4, 8.5, and 8.6, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
@@ -345,6 +347,9 @@ jobs:
                     - php: '8.3'
                       wordpress: 'previous major version'
                     - php: '8.4'
+                      wordpress: 'previous major version'
+                    # PHP 8.6 support was added in WordPress 7.2.
+                    - php: '8.6'
                       wordpress: 'previous major version'
 
         env:
@@ -513,8 +518,8 @@ jobs:
     #
     # The script reads every job in the run, so `needs` is only about waiting: it must cover
     # every job that would otherwise still be running when the script looks. `--ignore` then
-    # names the jobs whose results do not count. Here that is this job itself, and the
-    # housekeeping that runs alongside it.
+    # names the jobs whose results do not count. Here that is this job itself, the
+    # housekeeping that runs alongside it, and the PHP 8.6 jobs, which are allowed to fail.
     unit-status-check:
         name: Unit Tests - Status Check
         runs-on: 'ubuntu-slim'
@@ -544,4 +549,4 @@ jobs:
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check' --ignore 'PHP 8.6 on Linux' --ignore 'PHP 8.6 multisite on Linux'
