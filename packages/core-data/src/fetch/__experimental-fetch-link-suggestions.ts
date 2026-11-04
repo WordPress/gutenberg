@@ -271,11 +271,12 @@ function getTitleMatch(
 	search: string
 ): { contains: boolean; begins: boolean } {
 	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
-	// written with straight ones. Compare them as the same character.
+	// written with straight ones. Compare them as the same character. A run of spaces counts as one.
 	const plain = ( text: string ) =>
 		( text ?? '' )
 			.toLowerCase()
 			.trim()
+			.replace( /\s+/g, ' ' )
 			.replace( /[\u2018\u2019]/g, "'" )
 			.replace( /[\u201c\u201d]/g, '"' );
 
@@ -434,30 +435,23 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 }
 
 /**
- * How much of a title the search accounts for.
+ * Whether a title is exactly what was typed.
  *
- * Only breaks ties between titles that already cover the search equally well: for the search
- * "home", "Home" scores 1, "Home Tips" scores 1/2, and "Home Improvement Tips" scores 1/3.
+ * Compares words, not the strings typed, so spacing and punctuation do not count: for the search
+ * "home page", "Home  Page" and "Home Page." are both exact, and "Home Page Ideas" is not.
  *
  * @param title
  * @param searchTokens
  *
- * @return The share of the title's words that hold a word typed, from 0 to 1.
+ * @return Whether the title's words are the words typed, in the same order.
  */
-function getTitleShare( title: string, searchTokens: string[] ): number {
+function isExactTitle( title: string, searchTokens: string[] ): boolean {
 	const titleTokens = tokenize( title || '' );
 
-	if ( ! titleTokens.length || ! searchTokens.length ) {
-		return 0;
-	}
-
-	const matched = titleTokens.filter( ( titleToken ) =>
-		searchTokens.some( ( searchToken ) =>
-			titleToken.includes( searchToken )
-		)
+	return (
+		titleTokens.length > 0 &&
+		titleTokens.join( ' ' ) === searchTokens.join( ' ' )
 	);
-
-	return matched.length / titleTokens.length;
 }
 
 /**
@@ -490,8 +484,7 @@ type SortOptions = {
  *    beans"
  * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
- * 6. Share of the title the search accounts for: "Coffee beans" will rank above "Coffee beans,
- *    lightly roasted"
+ * 6. Exact title: "Coffee beans" will rank above "Coffee beans, lightly roasted"
  *
  * @param options
  * @param options.results
@@ -511,7 +504,7 @@ export function sortResults( {
 		...getTitleMatch( result.title, search ),
 		type: getTypeRank( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
-		share: getTitleShare( result.title, searchTokens ),
+		exact: isExactTitle( result.title, searchTokens ),
 	} ) );
 
 	scored.sort(
@@ -530,9 +523,9 @@ export function sortResults( {
 			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
 			// and only 27% of "Caterpillar"
 			b.score - a.score ||
-			// Then by how much of the title the search accounts for: the search "home" ranks the
-			// title "Home" above "Home Improvement Tips"
-			b.share - a.share
+			// Then a title that is exactly the search: the search "home" ranks the title "Home"
+			// above "Home Improvement Tips"
+			Number( b.exact ) - Number( a.exact )
 	);
 
 	return scored.map( ( { result } ) => result );
