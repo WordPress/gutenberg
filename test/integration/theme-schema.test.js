@@ -150,6 +150,34 @@ describe( 'theme.json schema', () => {
 				},
 			},
 		],
+		[
+			'select state',
+			{
+				elements: {
+					select: { ':hover': { transform: { rotate: '5deg' } } },
+				},
+			},
+		],
+		[
+			'text input state',
+			{
+				elements: {
+					textInput: {
+						':focus': { transform: { rotate: '5deg' } },
+					},
+				},
+			},
+		],
+		[
+			'text input placeholder',
+			{
+				elements: {
+					textInput: {
+						'::placeholder': { transform: { rotate: '5deg' } },
+					},
+				},
+			},
+		],
 	] )( 'rejects a rotation in %s styles', ( _, styles ) => {
 		expect( ajv.validate( themeSchema, { version: 3, styles } ) ).toBe(
 			false
