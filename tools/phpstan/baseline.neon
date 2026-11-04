@@ -97,6 +97,12 @@ parameters:
 			path: ../../lib/experimental/navigation-theme-opt-in.php
 
 		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: ../../packages/block-library/src/avatar/index.php
+
+		-
 			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
@@ -137,6 +143,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/latest-comments/index.php
+
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: ../../packages/block-library/src/navigation-submenu/index.php
 
 		-
 			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
@@ -193,6 +205,12 @@ parameters:
 			path: ../../packages/block-library/src/playlist/index.php
 
 		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: ../../packages/block-library/src/post-featured-image/index.php
+
+		-
 			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
@@ -227,6 +245,12 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: ../../packages/block-library/src/post-time-to-read/index.php
+
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: ../../packages/block-library/src/search/index.php
 
 		-
 			message: '#^Parameter \#3 \$side of function apply_block_core_search_border_style expects string, null given\.$#'
