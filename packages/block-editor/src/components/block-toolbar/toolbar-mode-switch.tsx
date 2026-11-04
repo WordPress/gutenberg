@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { pencil } from '@wordpress/icons';
+import { typography } from '@wordpress/icons';
 import type { ToolbarModeSwitchProps } from './types';
 
 /**
@@ -17,7 +17,7 @@ export default function ToolbarModeSwitch( {
 	return (
 		<ToolbarGroup className="block-editor-block-toolbar__mode-switch">
 			<ToolbarButton
-				icon={ pencil }
+				icon={ typography }
 				label={ __( 'Write' ) }
 				isActive={ mode === 'write' }
 				onClick={ () =>
