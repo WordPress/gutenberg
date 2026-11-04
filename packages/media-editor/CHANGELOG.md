@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.22.0 (2026-11-04)
+
 ### Enhancements
 
 -   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
