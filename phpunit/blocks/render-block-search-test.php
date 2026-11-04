@@ -51,4 +51,27 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 		$this->assertTrue( $processor->next_tag( 'button' ) );
 		$this->assertSame( 'border-width: 2px;box-shadow:var(--wp--preset--shadow--natural)', $processor->get_attribute( 'style' ) );
 	}
+
+	public function test_button_only_keeps_collapsed_attributes_after_directive_processing() {
+		$output = wp_interactivity_process_directives(
+			gutenberg_render_block_core_search(
+				array(
+					'label'          => 'Search',
+					'buttonText'     => 'Search',
+					'buttonPosition' => 'button-only',
+					'buttonUseIcon'  => true,
+					'placeholder'    => '',
+				)
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'input' ) );
+		$input_id = $processor->get_attribute( 'id' );
+		$this->assertSame( '-1', $processor->get_attribute( 'tabindex' ) );
+		$this->assertTrue( $processor->next_tag( 'button' ) );
+		$this->assertSame( 'Expand search field', $processor->get_attribute( 'aria-label' ) );
+		$this->assertSame( $input_id, $processor->get_attribute( 'aria-controls' ) );
+		$this->assertSame( 'button', $processor->get_attribute( 'type' ) );
+	}
 }
