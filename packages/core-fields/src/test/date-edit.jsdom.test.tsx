@@ -1,11 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	createReduxStore,
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { getSettings, setSettings } from '@wordpress/date';
 import DateEdit from '../post_type_supports/date/edit';
 
 vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
@@ -291,5 +292,105 @@ describe( 'DateEdit', () => {
 			await screen.findByRole( 'button', { name: /August 4, 2026/ } )
 		).toBeInTheDocument();
 		expect( queriedMonths.at( -1 ) ).toBe( 7 );
+	} );
+	describe( 'without a date', () => {
+		const originalSettings = getSettings();
+
+		afterEach( () => {
+			vi.useRealTimers();
+			setSettings( originalSettings );
+		} );
+
+		// Just after midnight UTC on November 1, it is still October 31 on a
+		// site in New York, so the calendar shows October.
+		function atMonthBoundary() {
+			vi.useFakeTimers( { toFake: [ 'Date' ] } );
+			vi.setSystemTime( new Date( '2026-11-01T00:30:00Z' ) );
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -4,
+					offsetFormatted: '-4',
+					string: 'America/New_York',
+					abbr: 'EDT',
+				},
+			} );
+		}
+
+		function createRecordingRegistry( queriedMonths: number[] ) {
+			const store = createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				selectors: {
+					getEntityRecord: () => ( { status: 'draft' } ),
+					getEntityRecords: (
+						state: unknown,
+						kind: string,
+						name: string,
+						query: { after: string }
+					) => {
+						queriedMonths.push(
+							new Date( query.after ).getMonth()
+						);
+						return [];
+					},
+				},
+			} );
+			const registry = createRegistry();
+			registry.register( store );
+			return registry;
+		}
+
+		const data = {
+			id: 1,
+			type: 'post',
+			status: 'draft',
+			modified: '2026-10-20T10:00:00',
+		};
+
+		it( "marks the posts of today's month in the site's timezone", async () => {
+			atMonthBoundary();
+			const queriedMonths: number[] = [];
+			render(
+				<RegistryProvider
+					value={ createRecordingRegistry( queriedMonths ) }
+				>
+					<DateEdit
+						data={ { ...data, date: null } }
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</RegistryProvider>
+			);
+			await screen.findByRole( 'button', { name: 'Reset' } );
+			expect( queriedMonths.at( -1 ) ).toBe( 9 );
+		} );
+
+		it( "marks the posts of today's month in the site's timezone after a reset", async () => {
+			atMonthBoundary();
+			const queriedMonths: number[] = [];
+			const registry = createRecordingRegistry( queriedMonths );
+			const { rerender } = render(
+				<RegistryProvider value={ registry }>
+					<DateEdit
+						data={ { ...data, date: '2026-08-04T10:00:00' } }
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</RegistryProvider>
+			);
+			await screen.findByRole( 'button', { name: 'Reset' } );
+			expect( queriedMonths.at( -1 ) ).toBe( 7 );
+			rerender(
+				<RegistryProvider value={ registry }>
+					<DateEdit
+						data={ { ...data, date: null } }
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</RegistryProvider>
+			);
+			await screen.findByRole( 'button', { name: 'Reset' } );
+			expect( queriedMonths.at( -1 ) ).toBe( 9 );
+		} );
 	} );
 } );

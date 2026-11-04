@@ -1,6 +1,6 @@
 import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
 import { speak } from '@wordpress/a11y';
-import { getSettings } from '@wordpress/date';
+import { date as formatDate, getSettings } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -12,6 +12,21 @@ import { getFullPostScheduleLabel } from './label';
 import { unlock } from '../../lock-unlock';
 
 const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
+
+/**
+ * Today's month in the site's timezone: the month the date picker shows when
+ * there is no date. The browser's month can differ near a month boundary.
+ *
+ * @return {Date} The first day of the month.
+ */
+function getSiteMonth() {
+	const now = new Date();
+	return new Date(
+		Number( formatDate( 'Y', now ) ),
+		Number( formatDate( 'n', now ) ) - 1,
+		1
+	);
+}
 
 /**
  * Renders the PostSchedule component. It allows the user to schedule a post.
@@ -62,7 +77,7 @@ export function PrivatePostSchedule( {
 	};
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		startOfMonth( postDate ? new Date( postDate ) : new Date() )
+		postDate ? startOfMonth( new Date( postDate ) ) : getSiteMonth()
 	);
 
 	// The calendar moves to the month of a new date, from the Month and Year
@@ -72,7 +87,7 @@ export function PrivatePostSchedule( {
 	if ( postDate !== prevPostDate ) {
 		setPrevPostDate( postDate );
 		setPreviewedMonth(
-			startOfMonth( postDate ? new Date( postDate ) : new Date() )
+			postDate ? startOfMonth( new Date( postDate ) ) : getSiteMonth()
 		);
 	}
 

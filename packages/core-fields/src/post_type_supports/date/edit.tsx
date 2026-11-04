@@ -3,7 +3,12 @@ import { Button, DateTimePicker } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import {
+	date as formatDate,
+	dateI18n,
+	getDate,
+	getSettings,
+} from '@wordpress/date';
 import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
@@ -30,6 +35,19 @@ function getMonthBounds( date: Date ) {
 }
 
 /*
+ * Today's month in the site's timezone: the month the date picker shows when
+ * there is no date. The browser's month can differ near a month boundary.
+ */
+function getSiteMonth() {
+	const now = new Date();
+	return new Date(
+		Number( formatDate( 'Y', now ) ),
+		Number( formatDate( 'n', now ) ) - 1,
+		1
+	);
+}
+
+/*
  * The date control: the date and time picker of the previous publish panel,
  * followed by a button that resets the date. A reset sends `null`, which makes
  * a draft publish immediately again and sets a published post's date to the
@@ -45,7 +63,7 @@ export default function DateEdit( {
 	const value = field.getValue( { item: data } ) ?? undefined;
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		value ? new Date( value ) : new Date()
+		value ? new Date( value ) : getSiteMonth()
 	);
 
 	// The calendar moves to the month of a new date, from the Month and Year
@@ -54,7 +72,7 @@ export default function DateEdit( {
 	const [ prevValue, setPrevValue ] = useState( value );
 	if ( value !== prevValue ) {
 		setPrevValue( value );
-		setPreviewedMonth( value ? new Date( value ) : new Date() );
+		setPreviewedMonth( value ? new Date( value ) : getSiteMonth() );
 	}
 
 	// Mark the days with published and scheduled posts of the same type.
