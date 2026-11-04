@@ -38,7 +38,7 @@ describe( 'saveRecoveryPoint', () => {
 			path: AUTOSAVES_PATH,
 			method: 'POST',
 			data: {
-				crdt_recovery_point: true,
+				as_revision: true,
 				content: SERIALIZED_BLOCKS,
 				title: 'Lost title',
 				excerpt: 'Lost excerpt',
@@ -57,7 +57,7 @@ describe( 'saveRecoveryPoint', () => {
 			path: AUTOSAVES_PATH,
 			method: 'POST',
 			data: {
-				crdt_recovery_point: true,
+				as_revision: true,
 				content: '<p>Lost content</p>',
 				title: 'Lost title',
 			},

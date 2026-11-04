@@ -5,10 +5,10 @@ import { getRawValue } from './crdt';
 
 /**
  * Autosaves request parameter asking for the content to be stored as a
- * permanent revision. Must match `CRDT_RECOVERY_POINT_PARAM` in the
- * Gutenberg autosaves REST controller.
+ * permanent revision instead of the per-user autosave. Must match
+ * `AS_REVISION_PARAM` in the Gutenberg autosaves REST controller.
  */
-export const CRDT_RECOVERY_POINT_KEY = 'crdt_recovery_point';
+export const AS_REVISION_PARAM = 'as_revision';
 
 /**
  * Store the content of a record as a permanent revision of its post.
@@ -38,7 +38,7 @@ export async function saveRecoveryPoint(
 	}
 
 	const data: Record< string, unknown > = {
-		[ CRDT_RECOVERY_POINT_KEY ]: true,
+		[ AS_REVISION_PARAM ]: true,
 		content,
 	};
 	const title = getRawValue( record.title );

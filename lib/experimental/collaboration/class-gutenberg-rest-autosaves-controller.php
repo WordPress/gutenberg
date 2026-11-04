@@ -35,17 +35,17 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * Request parameter asking for the submitted content to be stored as a
 	 * permanent revision instead of an autosave.
 	 *
-	 * A peer whose shared document was replaced by a conflicting one (see
-	 * `onRemoteReplacement` in @wordpress/sync) sends the content it held so
-	 * it can be restored from the revisions screen. The parent post and the
-	 * user's autosave are left untouched: the replacing content is the current
-	 * state of the post, and the next autosave overwrites the autosave anyway.
+	 * An autosave is a single slot per user that the next autosave overwrites,
+	 * and it may update a draft directly. A permanent revision is kept in the
+	 * post's history and changes nothing else: the post and the user's
+	 * autosave are left as they are. This lets a client keep a copy of content
+	 * before it is replaced, so it can be restored from the revisions screen.
 	 *
-	 * This string must match CRDT_RECOVERY_POINT_KEY in @wordpress/core-data.
+	 * This string must match AS_REVISION_PARAM in @wordpress/core-data.
 	 *
 	 * @var string
 	 */
-	public const CRDT_RECOVERY_POINT_PARAM = 'crdt_recovery_point';
+	public const AS_REVISION_PARAM = 'as_revision';
 
 	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
@@ -146,9 +146,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			current_user_can( 'edit_post', $post->ID )
 		);
 
-		$is_recovery_point = rest_sanitize_boolean( $request->get_param( self::CRDT_RECOVERY_POINT_PARAM ) );
+		$store_as_revision = rest_sanitize_boolean( $request->get_param( self::AS_REVISION_PARAM ) );
 
-		if ( $is_recovery_point ) {
+		if ( $store_as_revision ) {
 			$autosave_id = _wp_put_post_revision( $post_data );
 		} elseif ( $should_promote_auto_draft ) {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
@@ -168,9 +168,8 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $autosave_id;
 		}
 
-		// Only save a CRDT snapshot with an autosave (not with parent post or
-		// a recovery point).
-		if ( $autosave_id !== $post->ID && ! $is_recovery_point ) {
+		// Only save a CRDT snapshot with an autosave (not with parent post)
+		if ( $autosave_id !== $post->ID ) {
 			$this->store_crdt_snapshot( $autosave_id, $request );
 		}
 
