@@ -56,16 +56,6 @@ export {
  */
 export const CRDT_AUTOSAVE_SNAPSHOT_KEY = 'crdt_snapshot';
 
-/**
- * Key under which the autosave that promotes an auto-draft to a draft sends
- * the serialized CRDT document, so the server persists it on the parent post
- * in the same request that writes the parent's content.
- *
- * This string must match CRDT_DOCUMENT_PARAM in
- * Gutenberg_REST_Autosaves_Controller on the PHP side.
- */
-export const CRDT_AUTOSAVE_DOCUMENT_KEY = 'crdt_document';
-
 let syncManager: SyncManager;
 
 export function getSyncManager(): SyncManager | undefined {
@@ -461,8 +451,9 @@ async function beforeSave(
 		// manual save, so a post that is never saved manually would have
 		// parent content but no persisted document. A peer loading such a
 		// post builds a new document from the parent content, and that
-		// document can replace the live one on sync. Send the document so
-		// the server writes it together with the parent content.
+		// document can replace the live one on sync. Send the document in
+		// `meta`, exactly as a manual save does, so the server writes it
+		// together with the parent content.
 		const isAutoDraftPromotion =
 			'postType' === kind && 'auto-draft' === persistedRecord?.status;
 
@@ -473,7 +464,10 @@ async function beforeSave(
 			);
 
 			if ( serializedDoc ) {
-				syncEdits[ CRDT_AUTOSAVE_DOCUMENT_KEY ] = serializedDoc;
+				syncEdits.meta = {
+					...( edits.meta as EntitySyncRecord | undefined ),
+					[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+				};
 			}
 		}
 

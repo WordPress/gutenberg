@@ -407,7 +407,7 @@ describe( 'the default entity sync manager', () => {
 				).not.toHaveBeenCalled();
 			} );
 
-			it( 'sends the serialized CRDT document with the autosave that promotes an auto-draft', async () => {
+			it( 'sends the serialized CRDT document as meta with the autosave that promotes an auto-draft', async () => {
 				mockStore( { syncConfig: {} } );
 				const callOrder = [];
 				mockSyncManager.update.mockImplementation( () =>
@@ -427,7 +427,11 @@ describe( 'the default entity sync manager', () => {
 					'postType',
 					'post',
 					10,
-					{ id: 10, content: 'First autosaved content' },
+					{
+						id: 10,
+						content: 'First autosaved content',
+						meta: { footnotes: '[]' },
+					},
 					{
 						persistedRecord: { id: 10, status: 'auto-draft' },
 						isAutosave: true,
@@ -438,9 +442,14 @@ describe( 'the default entity sync manager', () => {
 					mockSyncManager.createPersistedCRDTDoc
 				).toHaveBeenCalledWith( 'postType/post', 10 );
 				expect( callOrder ).toEqual( [ 'update', 'document' ] );
+				// The document joins the edited meta, as it does on a manual
+				// save, so the server persists it with the parent content.
 				expect( result ).toEqual( {
 					crdt_snapshot: 'ENCODED_SNAPSHOT',
-					crdt_document: 'serialized-crdt-doc-data',
+					meta: {
+						footnotes: '[]',
+						_crdt_document: 'serialized-crdt-doc-data',
+					},
 				} );
 			} );
 

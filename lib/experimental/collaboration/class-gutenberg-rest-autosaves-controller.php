@@ -32,16 +32,6 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
 
 	/**
-	 * Request parameter holding the serialized CRDT document to persist on the
-	 * parent post when an autosave promotes an auto-draft to a draft.
-	 *
-	 * This string must match CRDT_AUTOSAVE_DOCUMENT_KEY in @wordpress/core-data.
-	 *
-	 * @var string
-	 */
-	public const CRDT_DOCUMENT_PARAM = 'crdt_document';
-
-	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
 	 *
 	 * A snapshot is a state vector plus a delete set, so it grows with the
@@ -80,6 +70,12 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		}
 
 		$this->gutenberg_parent_controller = $parent_controller;
+
+		// Core's autosaves controller never initializes the meta fields
+		// handler it inherits from the revisions controller, because it does
+		// not call the parent constructor. The handler is needed to write the
+		// request's meta when an autosave updates the parent post.
+		$this->meta = new WP_REST_Post_Meta_Fields( $parent_post_type );
 	}
 
 	/**
@@ -158,8 +154,26 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $autosave_id;
 		}
 
-		if ( $should_promote_auto_draft ) {
-			$this->store_crdt_document( $post->ID, $request );
+		/*
+		 * Core only writes the post fields when an autosave updates the parent
+		 * post, so any meta sent with the request is dropped. Under RTC the
+		 * promotion is the only autosave that writes the parent post, and the
+		 * editor sends the CRDT document in `meta` with it, exactly as it does
+		 * with a manual save. Write the request's meta the way the posts
+		 * controller does on a regular update, so the parent content and the
+		 * document that describes it are stored in the same request.
+		 *
+		 * Without this, a post that is never saved manually has parent content
+		 * but no persisted document. A peer loading such a post builds a new
+		 * document from the parent content, and when that document syncs it
+		 * can replace the live content every other peer is editing.
+		 */
+		if ( $should_promote_auto_draft && isset( $request['meta'] ) ) {
+			$meta_update = $this->meta->update_value( $request['meta'], $post->ID );
+
+			if ( is_wp_error( $meta_update ) ) {
+				return $meta_update;
+			}
 		}
 
 		// Only save a CRDT snapshot with an autosave (not with parent post)
@@ -174,46 +188,6 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
-	}
-
-	/**
-	 * Persists the CRDT document sent with the autosave that promotes an
-	 * auto-draft to a draft.
-	 *
-	 * That autosave is the only one that writes the parent post. Later
-	 * autosaves only create revisions, and the document is otherwise persisted
-	 * only by a manual save. Without this, a post that is never saved manually
-	 * has parent content but no persisted document. A peer loading such a post
-	 * builds a new document from the parent content, and when that document
-	 * syncs it can replace the live content every other peer is editing.
-	 *
-	 * The document is written in the same request as the parent content so
-	 * the two describe the same state. A peer loading the post applies the
-	 * persisted document and then reconciles it against the parent content,
-	 * so a document that is newer or older than the parent would be treated
-	 * as a conflict.
-	 *
-	 * Anything invalid is ignored rather than erroring. A missing document
-	 * leaves the post as it was before this parameter existed.
-	 *
-	 * @param int             $post_id Parent post ID.
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return void
-	 */
-	private function store_crdt_document( $post_id, $request ) {
-		$doc = $request->get_param( self::CRDT_DOCUMENT_PARAM );
-
-		$is_valid_doc = (
-			is_string( $doc ) &&
-			'' !== $doc &&
-			strlen( $doc ) <= WP_Sync_Save_Server::MAX_DOC_LENGTH
-		);
-
-		if ( ! $is_valid_doc ) {
-			return;
-		}
-
-		update_post_meta( $post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, wp_slash( $doc ) );
 	}
 
 	/**

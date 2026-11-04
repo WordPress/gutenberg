@@ -30,6 +30,13 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		wp_set_current_user( self::$author_id );
+
+		// The base test case unregisters all meta keys after each test, so
+		// the registration from the plugin's `init` hook only survives for
+		// the first test in a class. Register the CRDT document meta the way
+		// the plugin does so the controller can write it and the response
+		// exposes it.
+		gutenberg_rest_api_crdt_post_meta();
 	}
 
 	public function tear_down() {
@@ -109,10 +116,9 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	 * @param string      $content       Autosaved post content.
 	 * @param array       $meta          Autosaved post meta.
 	 * @param string|null $crdt_snapshot CRDT snapshot describing the autosaved content.
-	 * @param string|null $crdt_document Serialized CRDT document to persist on an auto-draft promotion.
 	 * @return WP_REST_Response Autosave response.
 	 */
-	private function dispatch_autosave( int $post_id, string $title, string $content, array $meta = array(), ?string $crdt_snapshot = null, ?string $crdt_document = null ): WP_REST_Response {
+	private function dispatch_autosave( int $post_id, string $title, string $content, array $meta = array(), ?string $crdt_snapshot = null ): WP_REST_Response {
 		$request = new WP_REST_Request( 'POST', "/wp/v2/posts/{$post_id}/autosaves" );
 		$request->set_url_params( array( 'id' => $post_id ) );
 		$body_params = array(
@@ -126,9 +132,6 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$request->set_body_params( $body_params );
 		if ( null !== $crdt_snapshot ) {
 			$request->set_param( 'crdt_snapshot', $crdt_snapshot );
-		}
-		if ( null !== $crdt_document ) {
-			$request->set_param( 'crdt_document', $crdt_document );
 		}
 
 		/*
@@ -563,45 +566,20 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( '', get_post_meta( $autosave->ID, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_does_not_overwrite_crdt_doc_meta() {
-		$post_id       = $this->create_auto_draft();
-		$persisted_doc = 'persisted-auto-draft-crdt-doc';
-		$stale_doc     = 'stale-auto-draft-autosave-crdt-doc';
-
-		update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $persisted_doc );
-
-		$response = $this->dispatch_autosave(
-			$post_id,
-			'RTC promoted auto-draft title with stale CRDT meta',
-			'<!-- wp:paragraph --><p>RTC promoted auto-draft content with stale CRDT meta</p><!-- /wp:paragraph -->',
-			array(
-				self::CRDT_DOC_META_KEY => $stale_doc,
-			)
-		);
-
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'draft', get_post_status( $post_id ) );
-		$this->assertSame( $persisted_doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
-	}
-
 	public function test_auto_draft_promotion_persists_the_crdt_document_on_the_parent_post() {
-		// The base test case unregisters all meta keys after each test, so
-		// the registration from the plugin's `init` hook only survives for
-		// the first test in a class. Register the CRDT document meta the way
-		// the plugin does so the response exposes it.
-		gutenberg_rest_api_crdt_post_meta();
-
 		$post_id = $this->create_auto_draft();
 		$content = '<!-- wp:paragraph --><p>Promoted auto-draft content with CRDT document</p><!-- /wp:paragraph -->';
 		$doc     = '{"document":"AQEBAAA=","updateId":1}';
 
+		// The editor sends the document in `meta`, exactly as a manual save does.
 		$response = $this->dispatch_autosave(
 			$post_id,
 			'Promoted auto-draft title with CRDT document',
 			$content,
-			array(),
-			'PROMOTION_SNAPSHOT',
-			$doc
+			array(
+				self::CRDT_DOC_META_KEY => $doc,
+			),
+			'PROMOTION_SNAPSHOT'
 		);
 
 		$this->assertSame( 200, $response->get_status() );
@@ -626,9 +604,9 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 			$post_id,
 			'Promoted auto-draft title replacing CRDT document',
 			'<!-- wp:paragraph --><p>Promoted auto-draft content replacing CRDT document</p><!-- /wp:paragraph -->',
-			array(),
-			null,
-			$doc
+			array(
+				self::CRDT_DOC_META_KEY => $doc,
+			)
 		);
 
 		$this->assertSame( 200, $response->get_status() );
@@ -636,64 +614,56 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_ignores_an_invalid_crdt_document() {
+	public function test_auto_draft_promotion_rejects_an_invalid_crdt_document() {
 		$post_id = $this->create_auto_draft();
 
+		// Meta is validated against its registered schema, as on a regular
+		// post update, so a non-string document is rejected.
 		$response = $this->dispatch_autosave(
 			$post_id,
 			'Promoted auto-draft title with invalid CRDT document',
 			'<!-- wp:paragraph --><p>Promoted auto-draft content with invalid CRDT document</p><!-- /wp:paragraph -->',
-			array(),
-			null,
-			''
+			array(
+				self::CRDT_DOC_META_KEY => array( 'not' => 'a string' ),
+			)
 		);
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'draft', get_post_status( $post_id ), 'Expected the promotion to succeed without a document.' );
+		$this->assertSame( 400, $response->get_status() );
 		$this->assertSame( '', get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_ignores_an_oversize_crdt_document() {
+	public function test_auto_draft_promotion_persists_revisioned_meta_on_the_parent_post() {
+		// Promotion writes the parent post, so every meta value the editor
+		// sends must land on it, as it would on a regular draft update. A
+		// dedicated revisioned key stands in for `footnotes`.
+		$meta_key = 'test_revisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => true,
+				'revisions_enabled' => true,
+			)
+		);
+
 		$post_id = $this->create_auto_draft();
 
 		$response = $this->dispatch_autosave(
 			$post_id,
-			'Promoted auto-draft title with oversize CRDT document',
-			'<!-- wp:paragraph --><p>Promoted auto-draft content with oversize CRDT document</p><!-- /wp:paragraph -->',
-			array(),
-			null,
-			str_repeat( 'A', WP_Sync_Save_Server::MAX_DOC_LENGTH + 1 )
+			'Promoted auto-draft title with revisioned meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with revisioned meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key => 'promoted meta value',
+			)
 		);
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'draft', get_post_status( $post_id ), 'Expected the promotion to succeed without a document.' );
-		$this->assertSame( '', get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
-	}
-
-	public function test_draft_autosave_does_not_persist_a_crdt_document_from_the_request() {
-		$post_id       = $this->create_draft( 'Draft title with CRDT document param', '<!-- wp:paragraph --><p>Draft content with CRDT document param</p><!-- /wp:paragraph -->' );
-		$persisted_doc = 'persisted-draft-crdt-doc';
-
-		update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $persisted_doc );
-
-		$response = $this->dispatch_autosave(
-			$post_id,
-			'Draft autosaved title with CRDT document param',
-			'<!-- wp:paragraph --><p>Draft autosaved content with CRDT document param</p><!-- /wp:paragraph -->',
-			array(),
-			null,
-			'{"document":"AQEBAAA=","updateId":3}'
-		);
+		unregister_post_meta( 'post', $meta_key );
 
 		$this->assertSame( 200, $response->get_status() );
-
-		// Only the promotion writes the parent post, so only the promotion
-		// may replace the document that describes the parent content.
-		$this->assertSame( $persisted_doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
-
-		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
-		$this->assertInstanceOf( WP_Post::class, $autosave );
-		$this->assertSame( '', get_post_meta( $autosave->ID, self::CRDT_DOC_META_KEY, true ) );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( 'promoted meta value', get_post_meta( $post_id, $meta_key, true ) );
 	}
 
 	public function test_autosave_stores_the_crdt_snapshot_on_the_revision() {
