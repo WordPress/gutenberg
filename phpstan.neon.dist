@@ -26,6 +26,11 @@ parameters:
 		-
 			message: '#^Action callback returns .+ but should not return anything\.$#'
 			identifier: return.void
+		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
+			identifier: function.notFound
 
 		# Level 3:
 		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
