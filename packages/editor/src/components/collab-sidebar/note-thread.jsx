@@ -91,7 +91,7 @@ export function NoteThread( {
 } ) {
 	const isFloating = !! floating;
 	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
