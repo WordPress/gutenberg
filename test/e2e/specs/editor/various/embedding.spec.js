@@ -56,6 +56,17 @@ const MOCK_CANT_EMBED_RESPONSE = {
 	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
+// What the proxy returns for an untrusted provider whose HTML has no iframe:
+// core drops the HTML but keeps the type.
+const MOCK_UNTRUSTED_NO_IFRAME_RESPONSE = {
+	url: 'https://mastodon.social/@Mastodon/117466985005297414',
+	html: false,
+	type: 'rich',
+	provider_name: 'mastodon.social',
+	provider_url: 'https://mastodon.social',
+	version: '1.0',
+};
+
 const MOCK_BAD_WORDPRESS_RESPONSE = {
 	code: 'oembed_invalid_url',
 	message: 'Not Found',
@@ -208,6 +219,46 @@ test.describe( 'Embedding content', () => {
 					content:
 						'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 				},
+			},
+		] );
+	} );
+
+	test( 'should not show an empty preview when the provider returns no HTML', async ( {
+		editor,
+		embedUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://mastodon.social/@Mastodon/117466985005297414':
+				MOCK_UNTRUSTED_NO_IFRAME_RESPONSE,
+		} );
+		await embedUtils.insertEmbed(
+			'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+
+		const embedBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Embed',
+		} );
+
+		await expect(
+			embedBlock.getByText(
+				'Sorry, this content could not be embedded.',
+				{ exact: true }
+			)
+		).toBeVisible();
+
+		await embedBlock
+			.getByRole( 'button', { name: 'Convert to link', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://mastodon.social/@Mastodon/117466985005297414">https://mastodon.social/@Mastodon/117466985005297414</a>',
+					dropCap: false,
+				},
+				innerBlocks: [],
 			},
 		] );
 	} );
