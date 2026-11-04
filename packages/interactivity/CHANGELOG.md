@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+-   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
+### Internal
+
+-   Expose `runWithoutScope()` through `privateApis()` for the router ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
 ## 8.1.0 (2026-11-04)
 
 ### Bug Fixes
@@ -23,13 +32,10 @@
 -   Skip `data-wp-bind--on*` directives instead of binding event handler attributes. Bind an event handler with `data-wp-on--*` instead. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag and pollute the store. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   `data-wp-html` elements that the client creates instead of hydrating, such as `data-wp-each` items added after hydration or elements added by client-side navigation, now show their fallback while their value is pending or `{ "wpServerHtml": true }`, including on sites enforcing Trusted Types ([#84924](https://github.com/WordPress/gutenberg/pull/84924)).
--   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
--   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 
 ### Internal
 
 -   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
--   Expose `runWithoutScope()` through `privateApis()` for the router ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 
 ## 8.0.0 (2026-10-20)
 

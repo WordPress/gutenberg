@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
 ## 3.1.0 (2026-11-04)
 
 ### Bug Fixes
@@ -12,7 +16,6 @@
 -   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 -   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 -   Load new script modules during client-side navigation without `eval()` or WebAssembly, so the Content Security Policy doesn't need `'unsafe-eval'` or `'wasm-unsafe-eval'`. ([#84056](https://github.com/WordPress/gutenberg/pull/84056))
--   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 
 ## 3.0.0 (2026-10-20)
 
