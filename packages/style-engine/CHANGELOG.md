@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add `transform.translate`, which outputs the individual `translate` property from `x` and `y` lengths or percentages, with `0` for a missing axis, and nothing for any other value ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ## 3.0.0 (2026-10-20)
 

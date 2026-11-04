@@ -223,12 +223,14 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
-		if ( ! supportedStyles.includes( 'rotate' ) ) {
-			updatedSettings.transform = {
-				...updatedSettings.transform,
-				rotate: false,
-			};
-		}
+		[ 'rotate', 'translate' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.transform = {
+					...updatedSettings.transform,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );

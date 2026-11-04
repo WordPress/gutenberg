@@ -45,7 +45,8 @@
 		},
 		"shadow": true,
 		"transform": {
-			"rotate": true
+			"rotate": true,
+			"translate": true
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],

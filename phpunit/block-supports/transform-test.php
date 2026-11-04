@@ -98,6 +98,160 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Renders a test block with transform styles.
+	 *
+	 * @param array $transform Transform styles.
+	 * @return string Rendered block content.
+	 */
+	private function render_transformed_block( $transform ) {
+		return gutenberg_render_transform_support(
+			'<div class="wp-block-test-transform-block" style="color:red"><img src="x.png" /></div>',
+			array(
+				'blockName' => $this->test_block_name,
+				'attrs'     => array(
+					'style' => array( 'transform' => $transform ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider data_inline_translate_styles
+	 *
+	 * @param array  $transform    Transform styles.
+	 * @param string $expected_css Expected inline CSS after the existing style.
+	 */
+	public function test_translation_is_added_to_the_wrapper_inline_style( $transform, $expected_css ) {
+		$this->register_transform_block(
+			array(
+				'rotate'    => true,
+				'translate' => true,
+			)
+		);
+
+		$this->assertSame(
+			'<div class="wp-block-test-transform-block" style="color:red;' . $expected_css . '"><img src="x.png" /></div>',
+			$this->render_transformed_block( $transform )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_inline_translate_styles() {
+		return array(
+			'both axes'       => array(
+				array(
+					'translate' => array(
+						'x' => '10px',
+						'y' => '-50%',
+					),
+				),
+				'translate:10px -50%;',
+			),
+			'missing axis'    => array( array( 'translate' => array( 'y' => '2rem' ) ), 'translate:0 2rem;' ),
+			'unknown z axis'  => array(
+				array(
+					'translate' => array(
+						'x' => '1px',
+						'z' => '5px',
+					),
+				),
+				'translate:1px 0;',
+			),
+			'with a rotation' => array(
+				array(
+					'rotate'    => '15deg',
+					'translate' => array( 'x' => '1em' ),
+				),
+				'rotate:15deg;translate:1em 0;',
+			),
+		);
+	}
+
+	public function test_translation_and_rotation_are_output_under_the_transform_feature_selector() {
+		$this->register_transform_block(
+			array(
+				'rotate'    => true,
+				'translate' => true,
+			),
+			array( 'transform' => '.wp-block-test-transform-block img' )
+		);
+
+		$actual = $this->render_transformed_block(
+			array(
+				'rotate'    => '0.25turn',
+				'translate' => array( 'x' => '-4px' ),
+			)
+		);
+
+		preg_match( '/wp-transform-[a-z0-9]+/', $actual, $matches );
+		$this->assertStringContainsString( 'style="color:red"', $actual );
+		$this->assertSame(
+			'.' . $matches[0] . ' img{rotate:0.25turn;translate:-4px 0;}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	public function test_translation_skip_serialization_keeps_the_rotation() {
+		$this->register_transform_block(
+			array(
+				'rotate'                          => true,
+				'translate'                       => true,
+				'__experimentalSkipSerialization' => array( 'translate' ),
+			)
+		);
+
+		$this->assertSame(
+			'<div class="wp-block-test-transform-block" style="color:red;rotate:15deg;"><img src="x.png" /></div>',
+			$this->render_transformed_block(
+				array(
+					'rotate'    => '15deg',
+					'translate' => array( 'x' => '10px' ),
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider data_unchanged_translate_content
+	 *
+	 * @param array $supports  Transform block support configuration.
+	 * @param mixed $translate Offset value.
+	 */
+	public function test_block_content_is_unchanged_for_translate( $supports, $translate ) {
+		$this->register_transform_block( $supports );
+
+		$this->assertSame(
+			'<div class="wp-block-test-transform-block" style="color:red"><img src="x.png" /></div>',
+			$this->render_transformed_block( array( 'translate' => $translate ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_unchanged_translate_content() {
+		return array(
+			'no translate support' => array( array( 'rotate' => true ), array( 'x' => '10px' ) ),
+			'skip all'             => array(
+				array(
+					'translate'                       => true,
+					'__experimentalSkipSerialization' => true,
+				),
+				array( 'x' => '10px' ),
+			),
+			'string value'         => array( array( 'translate' => true ), '10px 20px' ),
+			'invalid axis'         => array( array( 'translate' => true ), array( 'x' => 'calc(1px + 2px)' ) ),
+			'z only'               => array( array( 'translate' => true ), array( 'z' => '5px' ) ),
+		);
+	}
+
+	/**
 	 * @dataProvider data_unchanged_block_content
 	 *
 	 * @param array $supports Transform block support configuration.
