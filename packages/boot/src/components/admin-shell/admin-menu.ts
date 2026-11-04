@@ -45,6 +45,15 @@ export function highlightMenuItem( page: AdminShellPage ) {
 	menu.querySelectorAll( '[aria-current="page"]' ).forEach( ( el ) =>
 		el.removeAttribute( 'aria-current' )
 	);
+	// Reset hover flyouts, as a page load would. A flyout that is open while
+	// its item becomes current would otherwise keep the offset that
+	// `common.js` gives it to fit the viewport, and cover the items above.
+	menu.querySelectorAll( 'li.opensub' ).forEach( ( el ) =>
+		el.classList.remove( 'opensub' )
+	);
+	menu.querySelectorAll< HTMLElement >( '.wp-submenu' ).forEach( ( el ) =>
+		el.style.removeProperty( 'margin-top' )
+	);
 
 	menu.querySelectorAll< HTMLElement >( 'li.menu-top' ).forEach( ( item ) => {
 		const isCurrent = item === topItem;

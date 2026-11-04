@@ -82,13 +82,27 @@ export function borrowHeader( source: HTMLElement, title: string ) {
 	}
 	const template = document.createElement( 'template' );
 	template.innerHTML = html;
-	const heading = template.content.querySelector( 'h1, h2' );
-	if ( heading ) {
-		heading.textContent = title;
+	const heading = template.content.querySelector< HTMLElement >(
+		'[role="region"] h1, [role="region"] h2'
+	);
+	if ( ! heading ) {
+		return undefined;
 	}
-	// The other page's actions and section navigation don't belong here.
-	template.content
-		.querySelectorAll( 'nav, button, a' )
-		.forEach( ( el ) => el.remove() );
+	heading.textContent = title;
+	// Keep only the heading of the other page's header: its description,
+	// actions and section navigation don't belong to this page. Remove the
+	// siblings of the heading and of its wrappers, up to the page region.
+	const region = heading.closest( '[role="region"]' );
+	let node: Element = heading;
+	while ( node.parentElement && node !== region ) {
+		const parent: Element = node.parentElement;
+		Array.from( parent.children )
+			.filter( ( child ) => child !== node )
+			.forEach( ( child ) => child.remove() );
+		if ( parent === region ) {
+			break;
+		}
+		node = parent;
+	}
 	return template.innerHTML;
 }
