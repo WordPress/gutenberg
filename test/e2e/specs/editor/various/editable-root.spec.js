@@ -94,3 +94,40 @@ test.describe( 'editableRoot host mode', () => {
 			.toBe( true );
 	} );
 } );
+
+test.describe( 'Post Content root container classes', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'applies custom classes, style variations, and entry-content from template post-content block', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'single',
+			title: 'Single Post',
+			content:
+				'<!-- wp:post-title /-->\n<!-- wp:post-content {"className":"custom-template-editorial is-style-wide-content","layout":{"inherit":true}} /-->',
+		} );
+
+		await admin.createNewPost();
+
+		const rootContainer = editor.canvas.locator( '.is-root-container' );
+		await expect( rootContainer ).toHaveClass(
+			/(?=.*wp-block-post-content)(?=.*entry-content)(?=.*custom-template-editorial)(?=.*is-style-wide-content)/
+		);
+	} );
+} );

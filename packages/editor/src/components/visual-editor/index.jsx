@@ -304,7 +304,11 @@ function VisualEditor( {
 		);
 	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
-	const { layout = {}, align = '' } = newestPostContentAttributes || {};
+	const {
+		layout = {},
+		align = '',
+		className: postContentCustomClassName = '',
+	} = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -572,7 +576,12 @@ function VisualEditor( {
 								renderingMode !== 'post-only' ||
 									isDesignPostType
 									? 'wp-site-blocks'
-									: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+									: clsx(
+											blockListLayoutClass,
+											'wp-block-post-content',
+											'entry-content',
+											postContentCustomClassName
+										), // Ensure root level blocks receive default/flow blockGap styling rules.
 								{
 									'has-global-padding':
 										renderingMode === 'post-only' &&
