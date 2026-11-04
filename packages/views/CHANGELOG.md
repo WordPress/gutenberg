@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useViewConfig` returns the `quick_edit_form` configuration, the form of the quick edit drawer ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

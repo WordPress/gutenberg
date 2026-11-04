@@ -769,9 +769,11 @@ export type DataFormControlProps< Item > = {
 	 */
 	validity?: FieldValidity;
 	/**
-	 * Configuration object for the control.
+	 * Configuration object for the control: the settings of the field's edit
+	 * configuration, and of the form field rendering it. Custom controls can
+	 * read settings of their own.
 	 */
-	config?: {
+	config?: Record< string, unknown > & {
 		/**
 		 * Prefix to display before the input, a string or a component
 		 * (text control).

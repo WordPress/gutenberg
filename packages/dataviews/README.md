@@ -2384,6 +2384,22 @@ Example:
 }
 ```
 
+### `config`
+
+Settings passed to the field's `Edit` control as its `config` prop, merged over the settings of the field's own edit configuration (see `Edit` in the Field API). Use it to ask a control for a variant in one form without changing the field in other forms. Built-in controls read the settings documented for their edit configuration, and custom `Edit` components can read settings of their own.
+
+-   Type: `object`.
+-   Optional.
+
+Example:
+
+```js
+{
+	id: 'date',
+	config: { compact: true },
+}
+```
+
 ### `children`
 
 Groups a set of fields defined within children. For example if you want to display multiple fields within the Panel dropdown you can use children ( see example ).
