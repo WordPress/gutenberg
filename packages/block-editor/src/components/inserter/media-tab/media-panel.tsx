@@ -60,6 +60,8 @@ export function MediaCategoryPanel( {
 	mediaType,
 	onChangeMediaType,
 	sourceMenu,
+	folder,
+	folderControl,
 	footer,
 }: MediaCategoryPanelProps ) {
 	const panelRef = useRef< HTMLDivElement >( null );
@@ -71,8 +73,11 @@ export function MediaCategoryPanel( {
 	// previous page. Mirrors `usePatternsPaging`.
 	const previousCategory = usePrevious( category.name );
 	const previousSearch = usePrevious( search );
+	const previousFolder = usePrevious( folder );
 	if (
-		( previousCategory !== category.name || previousSearch !== search ) &&
+		( previousCategory !== category.name ||
+			previousSearch !== search ||
+			previousFolder !== folder ) &&
 		page !== 1
 	) {
 		setPage( 1 );
@@ -86,13 +91,17 @@ export function MediaCategoryPanel( {
 			setPerPage( nextPerPage );
 		}
 	}
+	// A source that doesn't support folders ignores the filter rather than
+	// being narrowed by a control it never showed.
+	const folderFilter = category.supportsFolders ? folder : undefined;
 	const query = useMemo(
 		() => ( {
 			per_page: perPage,
 			page,
 			search,
+			folder: folderFilter,
 		} ),
-		[ perPage, page, search ]
+		[ perPage, page, search, folderFilter ]
 	);
 	const { actions, attach, handleAttach, refreshKey } = useAttachmentActions(
 		{ category, query }
@@ -135,13 +144,17 @@ export function MediaCategoryPanel( {
 	);
 
 	const searchLabel = category.labels.search_items || __( 'Search' );
-	const emptyMessage =
-		category.emptyMessage && ! search
-			? // For a source with a custom empty message (e.g. Attachments)
-				// and no active search, an empty result means nothing is
-				// attached yet — clearer than the generic "no results found".
-				category.emptyMessage
-			: __( 'No results found.' );
+	// Annotated, since `__` returns a type branded with the literal it was
+	// given and the message is reassigned below.
+	let emptyMessage: string = __( 'No results found.' );
+	if ( ! search && folderFilter ) {
+		emptyMessage = __( 'This folder is empty.' );
+	} else if ( ! search && category.emptyMessage ) {
+		// For a source with a custom empty message (e.g. Attachments) and no
+		// active search, an empty result means nothing is attached yet —
+		// clearer than the generic "no results found".
+		emptyMessage = category.emptyMessage;
+	}
 
 	return (
 		<div ref={ panelRef } className="block-editor-inserter__media-panel">
@@ -182,6 +195,7 @@ export function MediaCategoryPanel( {
 					)
 				}
 				sourceMenu={ sourceMenu }
+				folderControl={ folderControl }
 				mediaTypes={ mediaTypes }
 				mediaType={ mediaType }
 				onChangeMediaType={ onChangeMediaType }

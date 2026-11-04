@@ -29,6 +29,10 @@ type MediaGridProps = {
 	 * Rendered beside the search input (the source menu).
 	 */
 	sourceMenu?: ReactNode;
+	/**
+	 * Rendered beneath the search input (the folder filter).
+	 */
+	folderControl?: ReactNode;
 
 	// Media-type tabs.
 	/**
@@ -164,6 +168,7 @@ export default function MediaGrid( {
 	onChangeSearch,
 	searchLabel,
 	sourceMenu,
+	folderControl,
 	mediaTypes,
 	mediaType,
 	onChangeMediaType,
@@ -275,6 +280,7 @@ export default function MediaGrid( {
 				/>
 				{ sourceMenu }
 			</Stack>
+			{ folderControl }
 			{ hasTabs ? (
 				<Tabs.Root
 					value={ mediaType }
