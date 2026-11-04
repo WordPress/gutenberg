@@ -5,6 +5,7 @@
 ```bash
 # Setup
 nvm use                    # Use the required node version
+npm install --global npm@12 # Install npm explicitly, not the version Node bundles
 npm install && composer install
 npm run wp-env-test status      # Always check status first.
 npm run wp-env-test start       # Only start if not already running.
