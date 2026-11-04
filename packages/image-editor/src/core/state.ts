@@ -475,19 +475,24 @@ export function imageEditorReducer(
 			const newPanX = rawDir === 1 ? -state.pan.y : state.pan.y;
 			const newPanY = rawDir === 1 ? state.pan.x : -state.pan.x;
 
+			// Swapping the crop's sides carries it round with the image.
+			// A locked ratio is about the shape of the result, so fit it
+			// back afterwards, the same as a rotation by angle does.
 			return commitBase(
-				enforceContainment( {
-					...state,
-					rotation: rot90,
-					zoom: state.baseZoom,
-					pan: { x: newPanX, y: newPanY },
-					cropRect: {
-						x: cx - rect.height / 2,
-						y: cy - rect.width / 2,
-						width: rect.height,
-						height: rect.width,
-					},
-				} )
+				enforceContainment(
+					fitCropToLockedRatio( {
+						...state,
+						rotation: rot90,
+						zoom: state.baseZoom,
+						pan: { x: newPanX, y: newPanY },
+						cropRect: {
+							x: cx - rect.height / 2,
+							y: cy - rect.width / 2,
+							width: rect.height,
+							height: rect.width,
+						},
+					} )
+				)
 			);
 		}
 
