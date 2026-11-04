@@ -77,7 +77,7 @@ import { PrivateBlockContext } from './components/block-list/private-block-conte
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
 import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
-import {
+import isURLLike, {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
@@ -157,6 +157,7 @@ lock( privateApis, {
 	useListViewPanelState,
 	isHashLink,
 	isRelativePath,
+	isURLLike,
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Post Terms: Offer taxonomy variations only for compatible insertion post types ([#85438](https://github.com/WordPress/gutenberg/pull/85438)).
+
+## 16.1.0 (2026-11-04)
+
 ### New Features
 
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
@@ -14,7 +20,6 @@
 
 ### Bug Fixes
 
--   Post Terms: Offer taxonomy variations only for compatible insertion post types ([#85438](https://github.com/WordPress/gutenberg/pull/85438)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
