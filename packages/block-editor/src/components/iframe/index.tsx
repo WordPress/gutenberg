@@ -104,19 +104,25 @@ function bubbleEvent(
 }
 
 /**
- * Stops a React synthetic event that bubbled across the portal boundary from
- * the iframe document into the parent React tree.
+ * Whether a React synthetic event bubbled across the portal boundary from the
+ * iframe document into the parent React tree.
  *
  * @param event React synthetic event that may have crossed documents.
  */
-function stopReactPortalPropagation( event: SyntheticEvent ) {
-	if (
-		event.currentTarget.ownerDocument ===
+function hasCrossedPortalBoundary( event: SyntheticEvent ) {
+	return (
+		event.currentTarget.ownerDocument !==
 		( event.target as Element ).ownerDocument
-	) {
-		return;
-	}
+	);
+}
 
+/**
+ * Stops a React synthetic event that bubbled across the portal boundary from
+ * the iframe document into the parent React tree.
+ *
+ * @param event React synthetic event that crossed documents.
+ */
+function stopReactPortalPropagation( event: SyntheticEvent ) {
 	const { stopPropagation } = event.nativeEvent;
 	event.nativeEvent.stopPropagation = () => {};
 	event.stopPropagation();
@@ -125,7 +131,12 @@ function stopReactPortalPropagation( event: SyntheticEvent ) {
 
 /**
  * React props that stop portal bubbles for redispatched events at the outer
- * `<iframe>`. Forwards any matching consumer handler first.
+ * `<iframe>`.
+ *
+ * A canvas interaction reaches these handlers twice: once as the portal
+ * bubble, and once as the copy redispatched on the `<iframe>`. The copy is
+ * what everything outside the canvas handles, so the bubble stops here
+ * without reaching the consumer handler, which would otherwise run twice.
  *
  * @param props Iframe props that may include event handlers.
  */
@@ -137,8 +148,12 @@ function getPortalBoundaryEventProps( props: IframeProps ) {
 
 	for ( const { react: propName } of BRIDGED_EVENTS ) {
 		boundaryProps[ propName ] = ( event ) => {
+			if ( hasCrossedPortalBoundary( event ) ) {
+				stopReactPortalPropagation( event );
+				return;
+			}
+
 			( props[ propName ] as BridgedEventHandler )?.( event );
-			stopReactPortalPropagation( event );
 		};
 	}
 
@@ -158,6 +173,13 @@ function getPortalBoundaryEventProps( props: IframeProps ) {
  * Pair with `getPortalBoundaryEventProps` so React ancestors do not also
  * receive the portal-bubbled synthetic event for those same interactions.
  *
+ * The listeners belong on the document rather than on `documentElement`, so
+ * that the canvas is done with an event before the parent sees it. The canvas
+ * root drop zone sits on `documentElement`, and a drop zone ignores an event
+ * that is already default prevented. Redispatching from that same element
+ * would race it, and a `preventDefault` relayed back from the parent would
+ * reach the original event first.
+ *
  * Ideally, we should remove the `keydown` event bubbling in the future.
  * Keyboard shortcuts should be context dependent, e.g. actions on blocks
  * like Cmd+A should not work globally outside the block editor.
@@ -173,18 +195,20 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 			return;
 		}
 		const { frameElement } = defaultView;
-		const html = iframeDocument!.documentElement;
 		const handlers: Record< string, ( event: Event ) => void > = {};
 		for ( const { native } of BRIDGED_EVENTS ) {
 			handlers[ native ] = ( event ) => {
 				bubbleEvent( event, frameElement as HTMLIFrameElement );
 			};
-			html.addEventListener( native, handlers[ native ] );
+			iframeDocument!.addEventListener( native, handlers[ native ] );
 		}
 
 		return () => {
 			for ( const { native } of BRIDGED_EVENTS ) {
-				html.removeEventListener( native, handlers[ native ] );
+				iframeDocument!.removeEventListener(
+					native,
+					handlers[ native ]
+				);
 			}
 		};
 	} );
