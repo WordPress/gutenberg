@@ -1,7 +1,8 @@
 import { createContext } from '@wordpress/element';
 
-export const HeaderDescriptionIdContext = createContext< {
-	setDescriptionId: ( id: string | undefined ) => void;
-} >( {
-	setDescriptionId: () => {},
-} );
+type HeaderDescriptionIdContextValue = {
+	registerDescriptionId: ( id: string ) => () => void;
+};
+
+export const HeaderDescriptionIdContext =
+	createContext< HeaderDescriptionIdContextValue | null >( null );

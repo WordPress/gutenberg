@@ -61,7 +61,7 @@ function executeLifecycleScript( event, config, spinner ) {
 		childProc.on( 'error', reject );
 
 		// Handle the completion of the command based on whether it was successful or not.
-		childProc.on( 'exit', ( code ) => {
+		childProc.on( 'close', ( code ) => {
 			if ( code === 0 ) {
 				// Keep the output of the command in debug mode.
 				if ( config.debug ) {

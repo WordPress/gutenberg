@@ -1,13 +1,13 @@
 name: 'Report flaky tests'
-description: 'Report flaky tests as a comment on the pull request'
+description: 'Renders a report of flaky E2E tests as markdown'
 inputs:
-    repo-token:
-        description: 'GitHub token'
-        required: true
     artifact-path:
         description: 'The path of the downloaded artifact'
         required: true
         default: 'flaky-tests'
+    output-path:
+        description: 'File to write the rendered markdown to. Nothing is written when no test was flaky.'
+        required: true
 runs:
     # Node 24 strips the types on the fly, so the action runs straight from its
     # TypeScript sources without a build step. This requires every relative

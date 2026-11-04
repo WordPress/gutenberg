@@ -1,7 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 import { Icon, Stack, EmptyState } from '@wordpress/ui';
@@ -33,7 +33,7 @@ function EventsListSection( {
 } ) {
 	if ( error ) {
 		return (
-			<p className={ styles.statusText }>
+			<p className={ styles[ 'status-text' ] }>
 				{ __( 'An error occurred. Please try again.' ) }
 			</p>
 		);
@@ -122,7 +122,7 @@ export default function WordPressEvents( {
 				<Stack
 					align="center"
 					justify="center"
-					className={ styles.noLocationSelected }
+					className={ styles[ 'no-location-selected' ] }
 				>
 					<EmptyState.Root>
 						<EmptyState.Visual>
@@ -139,12 +139,12 @@ export default function WordPressEvents( {
 			) }
 			{ hasSelectedLocation && eventsLoading && (
 				<Stack
-					className={ styles.locationPickerInWidget }
+					className={ styles[ 'location-picker-in-widget' ] }
 					direction="column"
 					align="center"
 					justify="center"
 				>
-					<Spinner />
+					<WCSpinner />
 				</Stack>
 			) }
 			{ hasSelectedLocation && ! eventsLoading && (

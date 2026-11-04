@@ -103,7 +103,7 @@ export function getBlockAttribute(
 	attributeSchema: BlockAttribute,
 	innerDOM: Node,
 	commentAttributes: Record< string, unknown >,
-	innerHTML: string | Node
+	innerHTML: string | Node | undefined
 ): unknown {
 	let value;
 
@@ -249,12 +249,20 @@ export const matcherFromSource = memoize(
 /**
  * Parse a HTML string into DOM tree.
  *
+ * Content is missing whenever there is nothing to parse, such as a self-closing
+ * shortcode, and is treated as empty markup: `hpq` hands anything that is not a
+ * string straight to the matcher, so passing it through would give the matchers
+ * a missing node to work with.
+ *
  * @param innerHTML HTML string or already parsed DOM node.
  *
  * @return Parsed DOM node.
  */
-function parseHtml( innerHTML: string | Node ): Element {
-	return hpqParse( innerHTML as string | Element, ( h: Element ) => h );
+function parseHtml( innerHTML: string | Node | undefined ): Element {
+	return hpqParse(
+		( innerHTML ?? '' ) as string | Element,
+		( h: Element ) => h
+	);
 }
 
 /**
@@ -267,7 +275,7 @@ function parseHtml( innerHTML: string | Node ): Element {
  * @return Attribute value.
  */
 export function parseWithAttributeSchema(
-	innerHTML: string | Node,
+	innerHTML: string | Node | undefined,
 	attributeSchema: BlockAttribute
 ): unknown {
 	return matcherFromSource( attributeSchema )!(
@@ -286,7 +294,7 @@ export function parseWithAttributeSchema(
  */
 export function getBlockAttributes(
 	blockTypeOrName: string | BlockType,
-	innerHTML: string | Node,
+	innerHTML: string | Node | undefined,
 	attributes: Record< string, unknown > = {}
 ): Record< string, unknown > {
 	const doc = parseHtml( innerHTML );

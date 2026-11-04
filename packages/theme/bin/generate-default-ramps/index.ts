@@ -27,8 +27,8 @@ const outputPath = join(
 );
 
 const content = `
-import type { RampResult } from './types';
-import type { DEFAULT_SEED_COLORS } from './constants';
+import type { RampResult } from './types.ts';
+import type { DEFAULT_SEED_COLORS } from './constants.ts';
 
 export const DEFAULT_RAMPS: Record<
 	keyof typeof DEFAULT_SEED_COLORS,

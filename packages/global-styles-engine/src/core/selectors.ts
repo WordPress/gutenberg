@@ -80,7 +80,7 @@ export function getBlockSelector(
 					supports,
 					`${ path }.__experimentalSelector`,
 					null
-			  ) as string | undefined )
+				) as string | undefined )
 			: undefined;
 
 		// If nothing to work with, provide fallback selector if available.

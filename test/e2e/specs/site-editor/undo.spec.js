@@ -10,7 +10,11 @@ test.describe( 'undo', () => {
 	} );
 
 	test( 'does not empty header', async ( { admin, page, editor } ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Check if there's a valid child block with a type (not appender).
 		await expect(

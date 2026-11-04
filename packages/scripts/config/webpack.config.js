@@ -5,6 +5,7 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
+const browserslistConfig = require( '@wordpress/browserslist-config' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
@@ -14,7 +15,6 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
-	fromConfigRoot,
 	hasBabelConfig,
 	hasArgInCLI,
 	hasCssnanoConfig,
@@ -32,7 +32,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
-	target += ':' + fromConfigRoot( '.browserslistrc' );
+	// Pass queries, not a config `extends`, which resolves from the consumer's cwd.
+	target += ':' + browserslistConfig.join( ', ' );
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 const hasBlocksManifest = getAsBooleanFromENV( 'WP_BLOCKS_MANIFEST' );
@@ -80,7 +81,7 @@ const cssLoaders = [
 										],
 									} ),
 								} ),
-						  ]
+							]
 						: postcssPlugins,
 				},
 			} ),
@@ -109,7 +110,16 @@ const baseConfig = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
+		extensions: [
+			'.jsx',
+			'.mjs',
+			'.cjs',
+			'.ts',
+			'.tsx',
+			'.mts',
+			'.cts',
+			'...',
+		],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -153,7 +163,7 @@ const baseConfig = {
 	module: {
 		rules: [
 			{
-				test: /\.m?(j|t)sx?$/,
+				test: /\.[cm]?(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -171,15 +181,11 @@ const baseConfig = {
 								babelrc: false,
 								configFile: false,
 								presets: [
-									require.resolve(
-										'@wordpress/babel-preset-default'
-									),
+									require.resolve( '@wordpress/babel-preset-default' ),
 								],
 								plugins: [
 									hasReactFastRefresh &&
-										require.resolve(
-											'react-refresh/babel'
-										),
+										require.resolve( 'react-refresh/babel' ),
 								].filter( Boolean ),
 							} ),
 						},
@@ -258,7 +264,7 @@ if ( ! isProduction ) {
 // Add source-map-loader if devtool is set, whether in dev mode or not.
 if ( baseConfig.devtool ) {
 	baseConfig.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
+		test: /\.[cm]?(j|t)sx?$/,
 		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
@@ -309,7 +315,7 @@ const scriptConfig = {
 						},
 					},
 				],
-		  },
+			},
 
 	plugins: [
 		new webpack.DefinePlugin( {
@@ -408,7 +414,7 @@ const scriptConfig = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+		// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 		new MiniCSSExtractPlugin( {
 			filename: '[name].css',
 		} ),
@@ -491,7 +497,7 @@ if ( hasExperimentalModulesFlag ) {
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+			// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 			// generated, and the default externals set.

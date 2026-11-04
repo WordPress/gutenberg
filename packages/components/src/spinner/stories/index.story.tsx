@@ -1,9 +1,8 @@
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import Spinner from '../';
-import { space } from '../../utils/space';
 
 const meta: Meta< typeof Spinner > = {
-	title: 'Components/Feedback/Spinner',
+	title: 'Components/@wordpress-components/Feedback/Spinner',
 	id: 'components-spinner',
 	component: Spinner,
 	parameters: {
@@ -26,6 +25,10 @@ const Template: StoryFn< typeof Spinner > = ( args ) => {
 
 export const Default: StoryFn< typeof Spinner > = Template.bind( {} );
 
-// The Spinner can be resized to any size, but the stroke width will remain unchanged.
 export const CustomSize: StoryFn< typeof Spinner > = Template.bind( {} );
-CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };
+CustomSize.args = {
+	style: {
+		width: 'var(--wpds-dimension-size-lg)',
+		height: 'var(--wpds-dimension-size-lg)',
+	},
+};

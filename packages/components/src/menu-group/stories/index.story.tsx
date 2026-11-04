@@ -3,10 +3,11 @@ import { useState } from '@wordpress/element';
 import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuGroup > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Actions/MenuGroup',
+	title: 'Components/@wordpress-components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',
 	argTypes: {
@@ -26,10 +27,12 @@ export default meta;
 
 const Template: StoryFn< typeof MenuGroup > = ( args ) => {
 	return (
-		<MenuGroup { ...args }>
-			<MenuItem>Menu Item 1</MenuItem>
-			<MenuItem>Menu Item 2</MenuItem>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup { ...args }>
+				<MenuItem>Menu Item 1</MenuItem>
+				<MenuItem>Menu Item 2</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 
@@ -49,7 +52,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 	];
 
 	return (
-		<>
+		<NavigableMenu>
 			<MenuGroup label="View">
 				<MenuItem>Top Toolbar</MenuItem>
 				<MenuItem>Spotlight Mode</MenuItem>
@@ -63,7 +66,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 					onHover={ () => {} }
 				/>
 			</MenuGroup>
-		</>
+		</NavigableMenu>
 	);
 };
 

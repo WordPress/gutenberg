@@ -14,7 +14,7 @@ export const START_OF_SELECTED_AREA = '\u0086';
  * @return The name of the block attribute that was previously selected.
  */
 export function retrieveSelectedAttribute(
-	blockAttributes: Record< string, unknown > | undefined
+	blockAttributes: Record< string, unknown > | null | undefined
 ) {
 	if ( ! blockAttributes ) {
 		return;

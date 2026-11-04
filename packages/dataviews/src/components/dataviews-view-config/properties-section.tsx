@@ -46,7 +46,7 @@ export function PropertiesSection( {
 } ) {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
-	// Get all regular fields (non-locked) in their original order from fields prop
+	// Get all regular fields (non-locked), sorted alphabetically by label.
 	const regularFields = getHideableFields( view, fields );
 
 	if ( ! regularFields?.length ) {
@@ -144,7 +144,7 @@ export function PropertiesSection( {
 											? visibleFieldIds.filter(
 													( fieldId ) =>
 														fieldId !== field.id
-											  )
+												)
 											: [ ...visibleFieldIds, field.id ],
 									} );
 								} }

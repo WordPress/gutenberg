@@ -1,18 +1,34 @@
-'use strict';
-const { stat } = require( 'fs' ).promises;
-const { homedir } = require( 'os' );
+import { createRequire } from 'node:module';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const fs = require( 'node:fs' );
+const os = require( 'node:os' );
+let stat = vi
+	.spyOn( fs.promises, 'stat' )
+	.mockImplementation( () => undefined );
+let homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
 const getCacheDirectory = require( '../get-cache-directory' );
 
-jest.mock( 'fs', () => ( {
-	promises: {
-		stat: jest.fn(),
-	},
-} ) );
-jest.mock( 'os', () => ( {
-	homedir: jest.fn(),
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'getCacheDirectory', () => {
+	beforeEach( () => {
+		stat = vi.spyOn( fs.promises, 'stat' );
+		homedir = vi.spyOn( os, 'homedir' );
+		stat.mockReset().mockImplementation( () => undefined );
+		homedir.mockReset().mockImplementation( () => undefined );
+	} );
+
 	afterEach( () => {
 		delete process.env.WP_ENV_HOME;
 	} );

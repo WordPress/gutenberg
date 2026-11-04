@@ -5,7 +5,7 @@ const util = require( 'util' );
 const pipeline = util.promisify( require( 'stream' ).pipeline );
 const got = require( 'got' );
 const AdmZip = require( 'adm-zip' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const { rimraf } = require( 'rimraf' );
 
 /**
@@ -45,7 +45,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 
@@ -54,7 +54,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	};
 
 	log( 'Cloning or getting the repo.' );
-	const git = SimpleGit( { progress: progressHandler } );
+	const git = simpleGit( { progress: progressHandler } );
 
 	const isRepo =
 		fs.existsSync( source.clonePath ) &&
@@ -105,7 +105,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 

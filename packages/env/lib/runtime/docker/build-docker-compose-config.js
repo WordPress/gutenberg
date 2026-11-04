@@ -73,6 +73,41 @@ function getMounts(
 }
 
 /**
+ * The database healthcheck, shared by the development and tests databases.
+ *
+ * MariaDB's `healthcheck.sh` runs when the image can use it: --connect
+ * verifies a TCP connection and that the entrypoint has finished, and
+ * --innodb_initialized ensures InnoDB is fully initialized. It connects as a
+ * healthcheck user whose credentials the entrypoint writes to
+ * `.my-healthcheck.cnf` in the data directory, and the MARIADB_AUTO_UPGRADE env
+ * var ensures that user exists for existing installations.
+ *
+ * Images for older MariaDB versions may predate that user or the script (the
+ * script was added to the images in 2022 and the user in 2023, and older tags
+ * were never rebuilt). The file is in the data volume and the script is in the
+ * image, so an older image can find a file a newer one left behind. The script
+ * is used only when both exist, and the server is pinged over TCP otherwise,
+ * with `mariadb-admin` (11.0+ only ships this name) or `mysqladmin` (versions
+ * before 10.4 only ship this name). The image is checked at runtime rather
+ * than by its tag, so every version, including `lts` and `latest`, uses the
+ * same check. Using 127.0.0.1 rather than localhost avoids the Unix socket,
+ * which the temporary server used to initialize a new volume answers before
+ * the real server is listening.
+ *
+ * Timing is generous to support slow CI environments.
+ */
+const MARIADB_HEALTHCHECK = {
+	test: [
+		'CMD-SHELL',
+		'if [ -f /var/lib/mysql/.my-healthcheck.cnf ] && command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+	],
+	interval: '5s',
+	timeout: '10s',
+	retries: 12,
+	start_period: '60s',
+};
+
+/**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
@@ -100,7 +135,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				config.env.tests,
 				hostUser.name,
 				'tests-wordpress'
-		  )
+			)
 		: [];
 
 	// We use a custom Dockerfile in order to make sure that
@@ -172,23 +207,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.development.phpmyadminPort ?? ''
 	}}:80`;
 
-	// MySQL healthcheck using MariaDB's official healthcheck.sh script.
-	// --connect: verifies TCP connection and that entrypoint has finished
-	// --innodb_initialized: ensures InnoDB storage engine is fully initialized
-	// MARIADB_AUTO_UPGRADE env var ensures healthcheck user exists for existing installations.
-	// Timing is generous to support slow CI environments.
-	const mysqlHealthcheck = {
-		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
-		interval: '5s',
-		timeout: '10s',
-		retries: 12,
-		start_period: '60s',
-	};
-
 	// Build the services object, conditionally including tests services.
 	const services = {
 		mysql: {
-			image: 'mariadb:lts',
+			image: dbEnv.getMariaDBImage(
+				config.env.development.mariadbVersion
+			),
 			ports: [ developmentMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
@@ -198,7 +222,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql:/var/lib/mysql' ],
-			healthcheck: mysqlHealthcheck,
+			healthcheck: MARIADB_HEALTHCHECK,
 		},
 		wordpress: {
 			depends_on: {
@@ -266,7 +290,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		}}:80`;
 
 		services[ 'tests-mysql' ] = {
-			image: 'mariadb:lts',
+			image: dbEnv.getMariaDBImage( config.env.tests.mariadbVersion ),
 			ports: [ testsMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
@@ -276,7 +300,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql-test:/var/lib/mysql' ],
-			healthcheck: mysqlHealthcheck,
+			healthcheck: MARIADB_HEALTHCHECK,
 		};
 		services[ 'tests-wordpress' ] = {
 			depends_on: {

@@ -140,7 +140,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Quote' } )
+				.getByText( 'Quote', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -178,7 +178,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Success Message' } )
+				.getByText( 'Success Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -216,7 +216,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Warning Message' } )
+				.getByText( 'Warning Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );

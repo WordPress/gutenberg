@@ -1,4 +1,5 @@
 import browserslist from 'browserslist';
+import { expect, it } from 'vitest';
 import config from '../';
 
 it( 'should export an array', () => {

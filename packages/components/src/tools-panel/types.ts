@@ -104,6 +104,16 @@ export type ToolsPanelHeaderProps = {
 
 export type ToolsPanelItem = {
 	/**
+	 * For optional items only, this determines whether the item is shown on
+	 * first render even when `hasValue()` returns `false`.
+	 *
+	 * An item is always shown while it has a value, so this only controls the
+	 * initial state of items without one.
+	 *
+	 * @default false
+	 */
+	defaultShown?: boolean;
+	/**
 	 * This is called when building the `ToolsPanel` menu to determine the
 	 * item's initial checked state.
 	 */
@@ -125,6 +135,27 @@ export type ToolsPanelItem = {
 	 * panel.
 	 */
 	label: string;
+	/**
+	 * A callback executed when the user shows or hides the item via the
+	 * `ToolsPanel` menu, passed `true` when it was shown and `false` when it
+	 * was hidden.
+	 *
+	 * Unlike `onDeselect`, this fires whether or not the item has a value, and
+	 * only in response to an explicit menu action. Visibility changes with
+	 * another cause do not trigger it, such as an item becoming visible
+	 * because it received a value or because `defaultShown` was set, or
+	 * hiding because `Reset all` ran.
+	 *
+	 * Items flagged with `isShownByDefault` are always visible and stay so when
+	 * toggled off, so this is never called for them.
+	 *
+	 * A single menu action may also call `onSelect` or `onDeselect`, which are
+	 * unchanged. Showing an item without a value calls this with `true` and
+	 * `onSelect`; hiding an item that has a value calls this with `false` and
+	 * `onDeselect`. Use this callback to track visibility and `onDeselect` to
+	 * reset a value, rather than treating them as interchangeable.
+	 */
+	onShownChange?: ( isShown: boolean ) => void;
 	/**
 	 * Panel items will ensure they are only registering with their intended panel
 	 * by comparing the `panelId` props set on both the item and the panel itself,
@@ -160,6 +191,19 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	resetAllFilter?: ResetAllFilter;
 };
 
+/**
+ * The shape of an item as it is held in `ToolsPanel` state. It extends
+ * `ToolsPanelItem` with the data the panel needs but that isn't part of the
+ * item's own API surface.
+ */
+export type RegisteredToolsPanelItem = ToolsPanelItem & {
+	/**
+	 * The item's `resetAllFilter`, collected at registration time so the panel
+	 * doesn't need a second round of effects to gather them.
+	 */
+	resetAllFilter?: ResetAllFilter;
+};
+
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
 
 export type ToolsPanelMenuItems = {
@@ -170,13 +214,21 @@ export type ToolsPanelContext = {
 	panelId?: string | null;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;
-	registerPanelItem: ( item: ToolsPanelItem ) => void;
-	deregisterPanelItem: ( label: string ) => void;
+	registerPanelItem: ( item: RegisteredToolsPanelItem ) => void;
+	deregisterPanelItem: (
+		label: string,
+		item?: RegisteredToolsPanelItem
+	) => void;
 	registerResetAllFilter: ( filter: ResetAllFilter ) => void;
 	deregisterResetAllFilter: ( filter: ResetAllFilter ) => void;
 	flagItemCustomization: (
 		value: boolean,
 		label: string,
+		/**
+		 * Ignored, and kept only so that existing three argument callers
+		 * still typecheck. The group a value lands in now follows from the
+		 * registered item's `isShownByDefault` rather than from the caller.
+		 */
 		group?: ToolsPanelMenuItemKey
 	) => void;
 	isResetting: boolean;
@@ -192,11 +244,4 @@ export type ToolsPanelControlsGroupProps = {
 	itemClassName?: string;
 	items: [ string, boolean ][];
 	toggleItem: ( label: string ) => void;
-};
-
-export type ToolsPanelMenuItemsConfig = {
-	panelItems: ToolsPanelItem[];
-	shouldReset: boolean;
-	currentMenuItems?: ToolsPanelMenuItems;
-	menuItemOrder: string[];
 };

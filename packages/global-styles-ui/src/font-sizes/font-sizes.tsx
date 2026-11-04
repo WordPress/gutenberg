@@ -74,7 +74,7 @@ export default function FontSizes() {
 												theme.setPresets(
 													theme.basePresets
 												)
-										  )
+											)
 								}
 							/>
 						) }
@@ -95,7 +95,7 @@ export default function FontSizes() {
 												def.setPresets(
 													def.basePresets
 												)
-										  )
+											)
 								}
 							/>
 						) }
@@ -122,7 +122,7 @@ export default function FontSizes() {
 											confirmButtonText: __( 'Remove' ),
 											onConfirm: () =>
 												custom.setPresets( [] ),
-									  }
+										}
 									: undefined
 							}
 						/>

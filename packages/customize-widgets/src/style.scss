@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/default-custom-properties";
 @use "./components/block-inspector-button/style.scss" as *;
+@use "./components/error-boundary/style.scss" as *;
 @use "./components/header/style.scss" as *;
 @use "./components/inserter/style.scss" as *;
 @use "./components/keyboard-shortcut-help-modal/style.scss" as *;

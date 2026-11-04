@@ -4,7 +4,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import type { View } from '@wordpress/dataviews';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { generatePreferenceKey } from './preference-keys';
-import { getUserModifications, resolveView } from './resolve-view';
+import {
+	getApplicablePersistedView,
+	getUserModifications,
+	resolveView,
+} from './resolve-view';
 import type { ViewConfig, ViewOverrides } from './types';
 
 interface UseViewReturn {
@@ -73,8 +77,15 @@ export function useView( config: ViewConfig ): UseViewReturn {
 		]
 	);
 
+	// A persisted `type` the layouts do not offer is ignored on read, so it
+	// does not count as a modification either: there is nothing to reset.
+	const applicablePersistedView = getApplicablePersistedView(
+		persistedView,
+		defaultLayouts
+	);
 	const isModified =
-		!! persistedView && Object.keys( persistedView ).length > 0;
+		!! applicablePersistedView &&
+		Object.keys( applicablePersistedView ).length > 0;
 
 	const updateView = useCallback(
 		( newView: View ) => {
@@ -97,6 +108,8 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				activeViewOverrides,
 				persistedView,
 			} );
+			// Compared against the preference as stored, so a persisted `type`
+			// the layouts do not offer is written out on the first update.
 			if ( ! dequal( modifications, persistedView ) ) {
 				// `undefined` clears the preference: the user reverted every
 				// property they had modified.

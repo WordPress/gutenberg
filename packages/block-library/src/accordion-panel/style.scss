@@ -1,6 +1,9 @@
 .wp-block-accordion-panel {
-	// Prevent blockGap from Accordion Content block from adding extra margin between accordions.
+	// Prevent blockGap, borders, box-shadows, and padding from adding extra spacing or rendering when the panel is closed.
 	&[hidden] {
+		border: none !important;
+		box-shadow: none !important;
 		margin-block-start: 0;
+		padding: 0 !important;
 	}
 }

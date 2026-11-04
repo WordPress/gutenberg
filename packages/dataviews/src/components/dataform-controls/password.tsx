@@ -1,7 +1,5 @@
-import {
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-	Button,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { InputLayout } from '@wordpress/ui';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { seen, unseen } from '@wordpress/icons';
@@ -34,7 +32,7 @@ export default function Password< Item >( {
 				validity,
 				type: isVisible ? 'text' : 'password',
 				suffix: (
-					<InputControlSuffixWrapper variant="control">
+					<InputLayout.Slot padding="minimal">
 						<Button
 							icon={ isVisible ? unseen : seen }
 							onClick={ toggleVisibility }
@@ -47,7 +45,7 @@ export default function Password< Item >( {
 							disabled={ disabled }
 							accessibleWhenDisabled
 						/>
-					</InputControlSuffixWrapper>
+					</InputLayout.Slot>
 				),
 			} }
 		/>

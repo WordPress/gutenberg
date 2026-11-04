@@ -10,12 +10,17 @@ export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 
 export type ProviderProps = _Tooltip.Provider.Props;
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that Tooltip does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Tooltip.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps extends ComponentProps< 'div' > {
 	/**

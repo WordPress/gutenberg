@@ -24,7 +24,7 @@ Blocks in WordPress are encapsulated within special comment tags that serve as u
 
 <details><summary><strong>View an example of static rendering in the Preformatted block</strong></summary>
 <br/>
-The following <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js"><code>save</code> function</a> for the <a href="https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted">Preformatted</a> core block looks like this:
+The following <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.jsx"><code>save</code> function</a> for the <a href="https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted">Preformatted</a> core block looks like this:
 
 ```js
 import { RichText, useBlockProps } from '@wordpress/block-editor';
@@ -66,9 +66,9 @@ WordPress provides mechanisms like the <a href="https://developer.wordpress.org/
 
 Additional examples of WordPress blocks that use static rendering, meaning their output is fixed at the time of saving and doesn't rely on server-side processing, include:
 
-- [Separator](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.js)
-- [Spacer](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js)
-- [Button](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.js)
+- [Separator](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.jsx)
+- [Spacer](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.jsx)
+- [Button](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.jsx)
 
 
 ## Dynamic rendering
@@ -168,8 +168,8 @@ Blocks with dynamic rendering can also save an HTML representation of the block 
 
 In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
 
-- The [Cover](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js) a full HTML representation of the block in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74), which [dynamically injects](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16) the featured image if the "Use featured image" setting is enabled.
-- The [Image](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) block also [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.js) its HTML representation in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363), which [adds additional attributes](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) to the markup if specific conditions are met.
+- The [Cover](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.jsx) a full HTML representation of the block in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74), which [dynamically injects](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16) the featured image if the "Use featured image" setting is enabled.
+- The [Image](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) block also [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.jsx) its HTML representation in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363), which [adds additional attributes](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) to the markup if specific conditions are met.
 
 If you are using [InnerBlocks](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/) in a dynamic block, you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`.
 

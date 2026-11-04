@@ -262,7 +262,7 @@ module.exports = async (
 		info( '' );
 		info( 'You can start WordPress with:' );
 		info( '' );
-		code( '  $ npx wp-env start' );
+		code( '  $ npm run env start' );
 	}
 	info( '' );
 	info( 'Code is Poetry' );

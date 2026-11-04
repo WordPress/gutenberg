@@ -10,6 +10,7 @@ import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall } from '@wordpress/icons';
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
+import styles from '../navigation-item/style.module.scss';
 
 interface DrilldownItemProps {
 	/**
@@ -59,7 +60,7 @@ export default function DrilldownItem( {
 
 	return (
 		<Item
-			className={ clsx( 'boot-navigation-item', className ) }
+			className={ clsx( styles.item, className ) }
 			onClick={ handleClick }
 		>
 			<HStack

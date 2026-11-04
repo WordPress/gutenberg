@@ -4,7 +4,7 @@ import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Color/ColorPalette',
+	title: 'Components/@wordpress-components/Selection & Input/Color/ColorPalette',
 	id: 'components-colorpalette',
 	component: ColorPalette,
 	argTypes: {
@@ -73,6 +73,11 @@ export const InitialValue: ColorPaletteStory = {
 };
 
 export const MultipleOrigins: ColorPaletteStory = {
+	parameters: {
+		// FIXME: Multiple Origins: origin groups are missing required ARIA children (aria-required-children).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: Template,
 	args: {
 		colors: [

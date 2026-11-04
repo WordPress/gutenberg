@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { sprintf } from '../sprintf';
 import type { TransformedText } from '../types';
 

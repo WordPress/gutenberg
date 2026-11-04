@@ -95,6 +95,59 @@ test.describe( 'List View', () => {
 			] );
 	} );
 
+	test( "nests a block dragged downward over the next block's indentation", async ( {
+		editor,
+		page,
+		pageUtils,
+		listViewUtils,
+	} ) => {
+		for ( const name of [ 'Group A', 'Group B', 'Group C' ] ) {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { metadata: { name } },
+			} );
+		}
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// Drag Group A down over the bottom half of Group B, one indentation
+		// level to the right: a nesting gesture. Dragging downward displaces
+		// the target row while the drop indicator shows, which must not cancel
+		// the nesting.
+		await listViewUtils.dragBlockTo( {
+			from: listView.getByRole( 'gridcell', {
+				name: 'Group A',
+				exact: true,
+			} ),
+			to: listView.getByRole( 'gridcell', {
+				name: 'Group B',
+				exact: true,
+			} ),
+			indentation: 2,
+		} );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: { metadata: { name: 'Group B' } },
+				innerBlocks: [
+					{
+						name: 'core/group',
+						attributes: { metadata: { name: 'Group A' } },
+					},
+				],
+			},
+			{
+				name: 'core/group',
+				attributes: { metadata: { name: 'Group C' } },
+			},
+		] );
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/38763.
 	test( 'shows the correct amount of blocks after a block is removed in the canvas', async ( {
 		editor,
@@ -341,11 +394,15 @@ test.describe( 'List View', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Paragraph text' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -1405,8 +1462,10 @@ test.describe( 'List View', () => {
 		await optionsForFileToggle.click();
 		await expect(
 			optionsForFileMenu,
-			'Pressing Space should also open the menu dropdown'
+			'Clicking should also open the menu dropdown'
 		).toBeVisible();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
@@ -1428,6 +1487,8 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
@@ -1445,7 +1506,7 @@ test.describe( 'List View', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should place the caret at the end of the block when activating from List View', async ( {
+	test( 'should place the caret at the start of the block when activating from List View', async ( {
 		editor,
 		page,
 		listViewUtils,
@@ -1465,8 +1526,8 @@ test.describe( 'List View', () => {
 
 		// Click the first paragraph in List View to select it,
 		// then press Enter to activate it (transfer focus to canvas).
-		// Keyboard activation (Enter/Space) places the caret at the end
-		// of the block, while mouse click keeps focus in the list view.
+		// Keyboard activation places the caret at the start of the first
+		// field. Mouse click keeps focus in the list view.
 		await listView
 			.getByRole( 'gridcell', { name: 'Paragraph' } )
 			.first()
@@ -1474,21 +1535,72 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Press Enter to split the block at the caret position.
-		// If the caret is at the end, this creates a new block after the first paragraph.
-		// If the caret is at the start, this creates a new block before the first paragraph.
+		// With the caret at the start, this creates a new block before
+		// the first paragraph.
 		await page.keyboard.press( 'Enter' );
 
-		// Verify the block order: if the caret was at the end, the new empty
-		// block should be after the first paragraph, not before it.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'First paragraph' },
 			},
-			{ name: 'core/paragraph', attributes: { content: '' } },
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Second paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should focus the first cell of a Table when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'R1C1', tag: 'td' },
+							{ content: 'R1C2', tag: 'td' },
+						],
+					},
+					{
+						cells: [
+							{ content: 'R2C1', tag: 'td' },
+							{ content: 'R2C2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'gridcell', { name: 'Table' } ).click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'XR1C1', tag: 'td' },
+								{ content: 'R1C2', tag: 'td' },
+							],
+						},
+						{
+							cells: [
+								{ content: 'R2C1', tag: 'td' },
+								{ content: 'R2C2', tag: 'td' },
+							],
+						},
+					],
+				},
 			},
 		] );
 	} );
@@ -1510,6 +1622,54 @@ class ListViewUtils {
 			name: 'Block navigation structure',
 		} );
 	}
+
+	/**
+	 * Drags a List View row onto the bottom half of another row, with the
+	 * cursor over the given indentation level, and drops it there.
+	 *
+	 * The cursor moves horizontally first, then vertically to the target, the
+	 * way a drag between two rows happens. The drop zone reads the row
+	 * geometry while the drop indicator displaces the rows, so the cursor
+	 * must end on the drop position rather than jump to it.
+	 *
+	 * @param {Object} options
+	 * @param {Object} options.from        Locator of the dragged row's cell.
+	 * @param {Object} options.to          Locator of the target row's cell.
+	 * @param {number} options.indentation Nesting level to hold the cursor over. `1` is the
+	 *                                     target's own level, `2` nests inside it.
+	 */
+	dragBlockTo = async ( { from, to, indentation } ) => {
+		// The drop zone measures the cursor against positions 24px apart from
+		// the row's left edge, one per nesting level, and rounds to the
+		// nearest one. Stay a few pixels right of the requested level's
+		// position so the rounding resolves to that level.
+		const NESTING_LEVEL_INDENTATION = 24;
+		const fromRow = from.locator( 'xpath=ancestor::*[@role="row"][1]' );
+		const toRow = to.locator( 'xpath=ancestor::*[@role="row"][1]' );
+		const fromRect = await fromRow.boundingBox();
+		const toRect = await toRow.boundingBox();
+		const x =
+			toRect.x +
+			NESTING_LEVEL_INDENTATION * indentation +
+			NESTING_LEVEL_INDENTATION / 4;
+		const y = toRect.y + toRect.height * 0.75;
+
+		await from.hover();
+		await this.#page.mouse.down();
+		await this.#page.mouse.move( x, fromRect.y + fromRect.height / 2, {
+			steps: 5,
+		} );
+		await this.#page.mouse.move( x, y, { steps: 20 } );
+		// Dispatch a final dragover at the drop position; see
+		// https://playwright.dev/docs/input#dragging-manually
+		await this.#page.mouse.move( x + 1, y, { steps: 2 } );
+
+		// Wait until the throttle timeout of 250ms has passed and the drop
+		// target has rendered, so the drop uses the final cursor position.
+		await this.#page.waitForTimeout( 300 );
+
+		await this.#page.mouse.up();
+	};
 
 	/**
 	 * @return {Promise<Locator>} The list view locator.
@@ -1537,7 +1697,7 @@ class ListViewUtils {
 			focusedRows.length > 0
 				? await focusedRows[ focusedRows.length - 1 ].getAttribute(
 						'data-block'
-				  )
+					)
 				: null;
 		// Don't use the util to get the unmodified default block when it's empty.
 		const blocks = await this.#page.evaluate( () =>

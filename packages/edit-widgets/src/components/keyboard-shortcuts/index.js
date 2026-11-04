@@ -74,7 +74,7 @@ function KeyboardShortcutsRegister() {
 							modifier: 'primary',
 							character: 'y',
 						},
-				  ],
+					],
 		} );
 
 		registerShortcut( {

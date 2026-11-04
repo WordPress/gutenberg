@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
@@ -13,6 +13,8 @@ const {
 	Editor: PrivateEditor,
 	BackButton,
 	PreferencesModal,
+	ToolsMoreMenuGroup,
+	SiteExport,
 } = unlock( editorPrivateApis );
 
 interface EditorProps {
@@ -21,6 +23,8 @@ interface EditorProps {
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
 	onActionPerformed?: ( actionId: string, items: any[] ) => void;
+	initialViewport?: string;
+	renderingMode?: string;
 }
 
 /**
@@ -32,6 +36,8 @@ interface EditorProps {
  * @param {Object}    props.settings          Optional extra settings to merge with editor settings
  * @param {ReactNode} props.backButton        Optional back button to render in editor header
  * @param {Function}  props.onActionPerformed Optional callback run after a post action
+ * @param {string}    props.initialViewport   Optional device type the entity opens at
+ * @param {string}    props.renderingMode     Optional rendering mode the editor stays in, for a route that shows the site rather than one piece of content
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -40,6 +46,8 @@ export function Editor( {
 	settings,
 	backButton,
 	onActionPerformed,
+	initialViewport,
+	renderingMode,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -113,7 +121,7 @@ export function Editor( {
 					height: '100vh',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
@@ -127,6 +135,8 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 			onActionPerformed={ onActionPerformed }
+			initialViewport={ initialViewport }
+			renderingMode={ renderingMode }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 			{ /*
@@ -135,6 +145,13 @@ export function Editor( {
 			   nothing until one of them opens it.
 			 */ }
 			<PreferencesModal />
+			{ /*
+			   Self-gated: renders only while editing a template or template
+			   part, the entities the exported theme is made of.
+			 */ }
+			<ToolsMoreMenuGroup>
+				<SiteExport />
+			</ToolsMoreMenuGroup>
 		</PrivateEditor>
 	);
 }

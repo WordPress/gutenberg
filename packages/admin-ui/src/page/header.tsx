@@ -46,7 +46,13 @@ export default function Header( {
 				gap="sm"
 				justify="space-between"
 			>
-				<Stack direction="row" gap="sm" align="center" justify="start">
+				<Stack
+					direction="row"
+					gap="sm"
+					align="center"
+					justify="start"
+					className={ styles[ 'header-lockup' ] }
+				>
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
 							bubblesVirtually

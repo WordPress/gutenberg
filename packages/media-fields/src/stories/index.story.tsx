@@ -18,7 +18,8 @@ import {
 } from '../index';
 
 export default {
-	title: 'Fields/Media Fields',
+	id: 'fields-media-fields',
+	title: 'Design System/DataViews/Fields/Media Fields',
 	component: DataForm,
 };
 
@@ -43,6 +44,7 @@ const sampleMediaItem: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -140,6 +142,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -239,6 +242,7 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -396,4 +400,10 @@ export const DataViewsPreview = () => {
 			/>
 		</div>
 	);
+};
+
+DataViewsPreview.parameters = {
+	// FIXME: Preview table has an empty column header (empty-table-header).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
 };

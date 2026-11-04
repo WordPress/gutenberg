@@ -10,7 +10,17 @@
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
+			"button": true,
 			"gradients": true,
 			"heading": true,
 			"link": true,
@@ -18,6 +28,10 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"spacing": {
 			"margin": true,
@@ -27,6 +41,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,

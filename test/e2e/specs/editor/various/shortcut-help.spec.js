@@ -8,10 +8,11 @@ test.describe( 'keyboard shortcut help modal', () => {
 	test( 'opens from the options menu, closes with its close button and returns focus', async ( {
 		page,
 	} ) => {
-		await page
+		const optionsButton = page
 			.locator( 'role=region[name="Editor top bar"]' )
-			.locator( '[aria-label="Options"]' )
-			.click();
+			.locator( '[aria-label="Options"]' );
+
+		await optionsButton.click();
 		const menuItem = page.locator( 'role=menuitem', {
 			hasText: /^Keyboard shortcuts/i,
 		} );
@@ -22,7 +23,8 @@ test.describe( 'keyboard shortcut help modal', () => {
 
 		await page.locator( 'role=button[name="Close"]' ).click();
 		await expect( dialog ).toBeHidden();
-		await expect( menuItem ).toBeFocused();
+		// The menu closes with the item, so focus returns to its trigger.
+		await expect( optionsButton ).toBeFocused();
 	} );
 
 	test( 'toggles open/closed using the keyboard shortcut (access+h)', async ( {

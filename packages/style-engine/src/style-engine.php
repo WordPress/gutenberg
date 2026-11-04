@@ -22,7 +22,7 @@
  * @since 6.1.0
  *
  * @param array $block_styles The style object.
- * @param array $options {
+ * @param array $options      {
  *     Optional. An array of options. Default empty array.
  *
  *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
@@ -89,7 +89,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *                                                                       or a WP_Style_Engine_CSS_Declarations object.
  *     }
  * }
- * @param array $options {
+ * @param array $options   {
  *     Optional. An array of options. Default empty array.
  *
  *     @type string|null $context  An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.

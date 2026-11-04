@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store, STORE_NAME } from '../store';
 import { unlock } from '../lock-unlock';

@@ -108,14 +108,16 @@
 
 		/*
 		 * Pinned chrome: reserve 1px on the inner side for the separator
-		 * border and subtract that same 1px from the adjacent padding. Net
-		 * effect on block-axis height is zero — the chrome's overall
-		 * border-box matches the non-pinned case — while the border provides
-		 * a fixed slot that the scroll-state rules below colorize.
+		 * border and enough scroll-container padding for a descendant's
+		 * focus ring. Subtract both from the adjacent chrome padding. Net
+		 * effect on the block-axis gap is zero, while the border provides a
+		 * fixed slot that the scroll-state rules below colorize.
 		 *
-		 * `.content` then drops its matching block-axis padding on that
-		 * edge, because the chrome already supplies the popup-edge
-		 * `padding-2xl` + inner `gap-lg`.
+		 * The focus ring clearance is twice the focus width because the
+		 * standard ring uses the focus width for both `outline-width` and
+		 * positive `outline-offset`. Keeping that clearance inside the
+		 * scrollport prevents descendant rings from being clipped at its
+		 * block edges.
 		 *
 		 * Sibling relationships intentionally use the general-sibling
 		 * combinator (`~`) and `:has(~ …)` instead of the adjacent
@@ -126,21 +128,25 @@
 		 * tolerated.
 		 */
 		.header:has(~ .content) {
-			padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
+			padding-block-end:
+				calc(var(--wpds-dimension-gap-lg) - 1px -
+				(var(--wpds-border-width-focus) * 2));
 			border-block-end: 1px solid transparent;
 		}
 
 		.header ~ .content {
-			padding-block-start: 0;
+			padding-block-start: calc(var(--wpds-border-width-focus) * 2);
 		}
 
 		.content ~ .footer {
-			padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
+			padding-block-start:
+				calc(var(--wpds-dimension-gap-lg) - 1px -
+				(var(--wpds-border-width-focus) * 2));
 			border-block-start: 1px solid transparent;
 		}
 
 		.content:has(~ .footer) {
-			padding-block-end: 0;
+			padding-block-end: calc(var(--wpds-border-width-focus) * 2);
 		}
 
 		/*

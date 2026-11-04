@@ -6,7 +6,6 @@
 }
 
 .is-line-clamp {
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- -webkit-line-clamp requires this legacy physical value. */
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: var(--wp-components-truncate-lines);
 	display: -webkit-box;

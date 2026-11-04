@@ -35,18 +35,19 @@ function gutenberg_register_background_support( $block_type ) {
  * This block support uses the `render_block` hook to ensure that
  * it is also applied to non-server-rendered blocks.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_background_support( $block_content, $block ) {
 	$block_type                      = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_attributes                = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
 	$has_background_image_support    = block_has_support( $block_type, array( 'background', 'backgroundImage' ), false );
 	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
+	$has_background_clip_support     = block_has_support( $block_type, array( 'background', 'backgroundClip' ), false );
 
 	if (
-		( ! $has_background_image_support && ! $has_background_gradient_support ) ||
+		( ! $has_background_image_support && ! $has_background_gradient_support && ! $has_background_clip_support ) ||
 		! isset( $block_attributes['style']['background'] )
 	) {
 		return $block_content;
@@ -55,8 +56,9 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	// Check serialization skip for each feature individually.
 	$skip_background_image    = ! $has_background_image_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundImage' );
 	$skip_background_gradient = ! $has_background_gradient_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'gradient' );
+	$skip_background_clip     = ! $has_background_clip_support || wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
 
-	if ( $skip_background_image && $skip_background_gradient ) {
+	if ( $skip_background_image && $skip_background_gradient && $skip_background_clip ) {
 		return $block_content;
 	}
 
@@ -81,6 +83,10 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$background_styles['gradient'] = $block_attributes['style']['background']['gradient'] ?? null;
 	}
 
+	if ( ! $skip_background_clip ) {
+		$background_styles['backgroundClip'] = $block_attributes['style']['background']['backgroundClip'] ?? null;
+	}
+
 	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 
 	if ( ! empty( $styles['css'] ) ) {
@@ -97,7 +103,19 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			}
 
 			$tags->set_attribute( 'style', $updated_style );
-			$tags->add_class( 'has-background' );
+
+			/*
+			 * A background clipped to the text paints the glyphs rather than the
+			 * block's box, so there is no block background to announce. Read the
+			 * clip from the serialized styles so an unsupported or skipped value
+			 * left in the block's attributes cannot suppress the class.
+			 */
+			$background_clip = $background_styles['backgroundClip'] ?? null;
+			$has_background  = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
+
+			if ( $has_background && 'text' !== $background_clip ) {
+				$tags->add_class( 'has-background' );
+			}
 		}
 
 		return $tags->get_updated_html();

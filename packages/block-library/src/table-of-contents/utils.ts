@@ -97,7 +97,7 @@ export function createListItemBlocks(
 					content: link
 						? `<a href="${ escapeAttribute(
 								link
-						  ) }">${ escapeEditableHTML( content ) }</a>`
+							) }">${ escapeEditableHTML( content ) }</a>`
 						: escapeEditableHTML( content ),
 				},
 				children?.length
@@ -107,7 +107,7 @@ export function createListItemBlocks(
 								{ ordered },
 								createListItemBlocks( children, ordered )
 							),
-					  ]
+						]
 					: []
 			)
 	);

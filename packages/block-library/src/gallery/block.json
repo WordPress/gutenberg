@@ -127,6 +127,15 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,
@@ -157,18 +166,36 @@
 			"background": true,
 			"gradients": true
 		},
+		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
-			"allowEditing": false,
+			"allowEditing": true,
+			"allowOrientation": false,
+			"allowJustification": false,
+			"allowVerticalAlignment": false,
+			"allowWrap": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}
+		},
+		"filter": {
+			"duotone": true
 		},
 		"interactivity": {
 			"clientNavigation": true
 		},
 		"listView": true
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-gallery :where(img)"
+		}
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"

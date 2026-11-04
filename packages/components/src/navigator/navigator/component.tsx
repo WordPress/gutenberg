@@ -1,15 +1,15 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 import { useMemo, useReducer } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import warning from '@wordpress/warning';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import { patternMatch, findParent } from '../utils/router';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
-import * as styles from '../styles';
+import styles from '../style.module.scss';
 import type {
 	NavigatorProps,
 	NavigatorLocation,
@@ -262,11 +262,7 @@ function UnconnectedNavigator(
 		[ currentLocation, matchedPath, methods ]
 	);
 
-	const cx = useCx();
-	const classes = useMemo(
-		() => cx( styles.navigatorWrapper, className ),
-		[ className, cx ]
-	);
+	const classes = clsx( styles.wrapper, className );
 
 	return (
 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
