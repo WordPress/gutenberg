@@ -34,8 +34,7 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		// The base test case unregisters all meta keys after each test, so
 		// the registration from the plugin's `init` hook only survives for
 		// the first test in a class. Register the CRDT document meta the way
-		// the plugin does so the controller can write it and the response
-		// exposes it.
+		// the plugin does so the response exposes it.
 		gutenberg_rest_api_crdt_post_meta();
 	}
 
@@ -614,28 +613,44 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_rejects_an_invalid_crdt_document() {
-		$post_id = $this->create_auto_draft();
-
-		// Meta is validated against its registered schema, as on a regular
-		// post update, so a non-string document is rejected.
-		$response = $this->dispatch_autosave(
-			$post_id,
-			'Promoted auto-draft title with invalid CRDT document',
-			'<!-- wp:paragraph --><p>Promoted auto-draft content with invalid CRDT document</p><!-- /wp:paragraph -->',
+	public function test_auto_draft_promotion_ignores_meta_that_is_not_revisioned() {
+		// Only the allowlisted keys are persisted to the parent post. A key
+		// that is exposed in the REST API but not revisioned is dropped, as
+		// it is when an autosave is stored as a revision.
+		$meta_key = 'test_unrevisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
 			array(
-				self::CRDT_DOC_META_KEY => array( 'not' => 'a string' ),
+				'single'       => true,
+				'type'         => 'string',
+				'show_in_rest' => true,
 			)
 		);
 
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( '', get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
+		$post_id = $this->create_auto_draft();
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with unrevisioned meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with unrevisioned meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key => 'dropped meta value',
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
 	}
 
 	public function test_auto_draft_promotion_persists_revisioned_meta_on_the_parent_post() {
-		// Promotion writes the parent post, so every meta value the editor
-		// sends must land on it, as it would on a regular draft update. A
-		// dedicated revisioned key stands in for `footnotes`.
+		// Revisioned meta sent with an autosave is stored on the revision when
+		// one is created, so it must also land on the parent post when the
+		// autosave updates the parent directly. A dedicated revisioned key
+		// stands in for `footnotes`.
 		$meta_key = 'test_revisioned_meta';
 		register_post_meta(
 			'post',
