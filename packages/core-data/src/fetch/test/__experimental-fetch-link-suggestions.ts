@@ -600,6 +600,42 @@ describe( 'sortResults', () => {
 		] );
 	} );
 
+	it( 'ranks a title that is the words searched above a longer one, whatever the spacing and punctuation', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Home Page Ideas',
+				url: 'http://wordpress.local/home-page-ideas/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Home  Page',
+				url: 'http://wordpress.local/home-page/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Home Page.',
+				url: 'http://wordpress.local/home-page-2/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( { results, search: 'home page' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Home  Page', // the words searched, with two spaces between them
+			'Home Page.', // the words searched, ending with a period
+			'Home Page Ideas', // begins with the search, but has words the search does not
+		] );
+	} );
+
 	it( 'orders by the start of a title from the first character typed', () => {
 		const results = [
 			{
