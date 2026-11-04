@@ -435,6 +435,19 @@ jobs:
                   grep -qx "FROM php:${PHP_VERSION}-rc-apache" "${build_dir}/apache/Dockerfile"
                   grep -qx "FROM php:${PHP_VERSION}-rc-alpine" "${build_dir}/cli/Dockerfile"
 
+                  # The official PHP images no longer ship PECL as of PHP 8.6, and no PECL extensions
+                  # support PHP 8.6 yet, so skip installing and enabling them.
+                  for dockerfile in "${build_dir}/apache/Dockerfile" "${build_dir}/cli/Dockerfile"; do
+                    extensions="$(sed -nE 's/^[[:space:]]*pecl install ([a-z0-9_]+)-[^;]*;.*$/\1/p' "${dockerfile}")"
+                    sed -i -E '/^[[:space:]]*pecl install /d; /^[[:space:]]*rm -r \/tmp\/pear;/d' "${dockerfile}"
+                    for extension in ${extensions}; do
+                      sed -i -E "/^[[:space:]]*docker-php-ext-enable ${extension};/d" "${dockerfile}"
+                    done
+                    if grep -nE '^[[:space:]]*(pecl |rm -r /tmp/pear)' "${dockerfile}"; then
+                      echo "Could not remove the PECL commands from ${dockerfile}." && exit 1
+                    fi
+                  done
+
                   docker build --pull -t "wordpress:php${PHP_VERSION}" "${build_dir}/apache"
                   docker build --pull -t "wordpress:cli-php${PHP_VERSION}" "${build_dir}/cli"
 
