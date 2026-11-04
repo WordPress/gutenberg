@@ -402,7 +402,7 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
+    -   The fallback of an element the client creates, such as a [`data-wp-each`](#wp-each) item or an element added by client-side navigation, is copied into the element as nodes, not as a string, so it never goes through a Trusted Types policy, default policy included. A default policy that transforms, filters or rejects HTML doesn't apply to it, and the markup appears as the server rendered it. Don't rely on a policy to prepare fallback markup: it isn't sanitized, apart from leaving out `<script>` elements, so write it as you want it shown, from content you trust. This doesn't change values from `asDangerousHTML()`, which the browser still checks when they are rendered.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`

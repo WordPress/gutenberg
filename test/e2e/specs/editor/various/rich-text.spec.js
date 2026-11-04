@@ -154,6 +154,36 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should not highlight the format of a deselected block', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: '<strong>Heading text</strong> end' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a <em>italic</em> b' },
+		} );
+		const italic = editor.canvas.locator( 'em' );
+		await italic.click();
+		await expect( italic ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toHaveClass( /is-selected/ );
+		await expect( italic ).toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
@@ -346,6 +376,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await editor.canvas.locator( ':root' ).evaluate( () => {
 			let called;
+			// Errors thrown here only reach the console, so collect them.
+			window.errors = [];
 			const { body } = document;
 			const config = {
 				attributes: true,
@@ -356,12 +388,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 			const mutationObserver = new MutationObserver( ( records ) => {
 				if ( called || records.length > 1 ) {
-					throw new Error( 'Typing should only mutate once.' );
+					window.errors.push( 'Typing should only mutate once.' );
 				}
 
 				records.forEach( ( record ) => {
 					if ( record.type !== 'characterData' ) {
-						throw new Error(
+						window.errors.push(
 							`Typing mutated more than character data: ${ record.type }`
 						);
 					}
@@ -378,7 +410,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				'selectionchange',
 				() => {
 					function throwMultipleSelectionChange() {
-						throw new Error(
+						window.errors.push(
 							'Typing should only emit one selection change event.'
 						);
 					}
@@ -404,18 +436,28 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		await page.keyboard.type( '4' );
 
-		await editor.canvas.locator( ':root' ).evaluate( () => {
-			// The selection change event should be called once. If there's only
-			// one item in `window.unsubscribes`, it means that only one
-			// function is present to disconnect the `mutationObserver`.
-			if ( window.unsubscribes.length === 1 ) {
-				throw new Error(
-					'The selection change event listener was never called.'
-				);
-			}
+		// The selection change event fires asynchronously, after the key
+		// press. Its listener adds a second item to `window.unsubscribes`,
+		// next to the one that disconnects the `mutationObserver`.
+		await expect
+			.poll(
+				() =>
+					editor.canvas
+						.locator( ':root' )
+						.evaluate( () => window.unsubscribes.length ),
+				{
+					message:
+						'The selection change event listener was never called.',
+				}
+			)
+			.toBe( 2 );
 
+		const errors = await editor.canvas.locator( ':root' ).evaluate( () => {
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+			return window.errors;
 		} );
+
+		expect( errors ).toEqual( [] );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -1094,9 +1136,72 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
+				attributes: { content: 'one two' },
+			},
+		] );
+	} );
+
+	test( 'should remove non-breaking spaces that would collapse when replaced', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'one \u00a0 two' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await pageUtils.pressKeys( 'End' );
+		// After the non-breaking space.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking space',
+				exact: true,
+			} )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
 				attributes: { content: 'one  two' },
 			},
 		] );
+
+		await page.keyboard.type( '!' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one ! two' },
+			},
+		] );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '\u00a0one\u00a0\u00a0two\u00a0' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.last()
+			.click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await editor.showBlockToolbar();
+		await toolbar
+			.getByRole( 'button', {
+				name: 'Replace non-breaking spaces',
+				exact: true,
+			} )
+			.click();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { content: 'one ! two' } },
+				{ attributes: { content: 'one two' } },
+			] );
 	} );
 
 	test( 'should delete all content of a block', async ( {

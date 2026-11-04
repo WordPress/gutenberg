@@ -143,6 +143,8 @@ export interface MediaEditorProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
+	/** Called with the original's id when the user chooses "Edit original". */
+	onEditOriginal?: ( originalId: number ) => void;
 	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
@@ -243,7 +245,7 @@ interface MediaEditorFrameContextValue {
 	onSave: () => void;
 	/**
 	 * When `true`, the media has a lineage root to restore to, so the
-	 * "Restore original image" menu item is shown.
+	 * history menu shows its "Restore original" item.
 	 */
 	canRestoreOriginal: boolean;
 	/**
@@ -252,7 +254,9 @@ interface MediaEditorFrameContextValue {
 	 * disabled.
 	 */
 	isSourceReplaced: boolean;
-	/** Load the lineage root into the cropper as a dirty preview. */
+	/** Whether the frame opens the original itself. */
+	opensOriginal: boolean;
+	/** Load the lineage root into the cropper, or hand it to the frame. */
 	onRestoreOriginal: () => void;
 }
 
@@ -286,20 +290,66 @@ export interface HeaderActionsProps {
 	showCloseButton?: boolean;
 }
 
-function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const {
-		isImage,
-		isSaving,
-		onCancel,
-		isWide,
-		activePanel,
-		onTogglePanel,
-		canRestoreOriginal,
-		isSourceReplaced,
-		onRestoreOriginal,
-	} = useMediaEditorFrameContext();
+function PanelToggle() {
+	const { isWide, activePanel, onTogglePanel } = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
+	// The sidebar holds more than one panel, so this opens and closes the
+	// sidebar rather than naming a panel: reopening returns to whichever tab
+	// was last showing, and the tab strip inside switches between them.
+	return (
+		<Button
+			size="compact"
+			icon={ drawerRight }
+			label={ __( 'Media settings' ) }
+			isPressed={ isPanelOpen }
+			// Only a docked column really expands beside the canvas; below
+			// that the panel replaces the view, which the pressed state
+			// already describes.
+			aria-expanded={ isWide ? isPanelOpen : undefined }
+			onClick={ onTogglePanel }
+		/>
+	);
+}
+
+function MoreMenu() {
+	const { isImage } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
+	if ( ! isImage ) {
+		return null;
+	}
+	return (
+		<>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More options' ) }
+				toggleProps={ { size: 'compact' } }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<MenuGroup>
+						<MenuItem
+							icon={ keyboard }
+							iconPosition="left"
+							onClick={ () => {
+								setIsShortcutsModalOpen( true );
+								closeMenu();
+							} }
+						>
+							{ __( 'Keyboard shortcuts' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
+		</>
+	);
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isSaving, onCancel } = useMediaEditorFrameContext();
 	return (
 		<Stack
 			className="media-editor__header-actions"
@@ -307,65 +357,8 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ /* The sidebar holds more than one panel, so this opens and
-			     closes the sidebar rather than naming a panel: reopening
-			     returns to whichever tab was last showing, and the tab strip
-			     inside switches between them. */ }
-			<Button
-				size="compact"
-				icon={ drawerRight }
-				label={ __( 'Media settings' ) }
-				isPressed={ isPanelOpen }
-				// Only a docked column really expands beside the canvas; below
-				// that the panel replaces the view, which the pressed state
-				// already describes.
-				aria-expanded={ isWide ? isPanelOpen : undefined }
-				onClick={ onTogglePanel }
-			/>
-			{ isImage && (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'More options' ) }
-					toggleProps={ { size: 'compact' } }
-				>
-					{ ( { onClose: closeMenu } ) => (
-						<>
-							{ canRestoreOriginal && (
-								<MenuGroup>
-									<MenuItem
-										icon={ backup }
-										iconPosition="left"
-										disabled={
-											isSourceReplaced || isSaving
-										}
-										info={ __(
-											'Discards unsaved changes and loads the original image.'
-										) }
-										onClick={ () => {
-											onRestoreOriginal();
-											closeMenu();
-										} }
-									>
-										{ __( 'Restore original image' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<MenuGroup>
-								<MenuItem
-									icon={ keyboard }
-									iconPosition="left"
-									onClick={ () => {
-										setIsShortcutsModalOpen( true );
-										closeMenu();
-									} }
-								>
-									{ __( 'Keyboard shortcuts' ) }
-								</MenuItem>
-							</MenuGroup>
-						</>
-					) }
-				</DropdownMenu>
-			) }
+			<PanelToggle />
+			<MoreMenu />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -376,18 +369,22 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					accessibleWhenDisabled
 				/>
 			) }
-			{ isShortcutsModalOpen && (
-				<MediaEditorKeyboardShortcutsModal
-					onClose={ () => setIsShortcutsModalOpen( false ) }
-				/>
-			) }
 		</Stack>
 	);
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, isWide, activePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		isUndoRedoDisabled,
+		isWide,
+		activePanel,
+		canRestoreOriginal,
+		isSourceReplaced,
+		opensOriginal,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -433,15 +430,6 @@ function HistoryActions() {
 		>
 			<Button
 				size="compact"
-				variant="tertiary"
-				disabled={ isUndoRedoDisabled || ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
-			<Button
-				size="compact"
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
@@ -464,6 +452,50 @@ function HistoryActions() {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
+			<DropdownMenu
+				icon={ backup }
+				label={ __( 'History' ) }
+				popoverProps={ { placement: 'top-start' } }
+				toggleProps={ {
+					size: 'compact',
+					disabled:
+						isUndoRedoDisabled ||
+						( ! isDirty && ! canRestoreOriginal ),
+					accessibleWhenDisabled: true,
+				} }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								disabled={ isUndoRedoDisabled || ! isDirty }
+								onClick={ () => {
+									handleReset();
+									closeMenu();
+								} }
+							>
+								{ __( 'Reset image edits' ) }
+							</MenuItem>
+						</MenuGroup>
+						{ canRestoreOriginal && (
+							<MenuGroup>
+								<MenuItem
+									disabled={ isSourceReplaced || isSaving }
+									info={ __( 'Discards unsaved changes.' ) }
+									onClick={ () => {
+										onRestoreOriginal();
+										closeMenu();
+									} }
+								>
+									{ opensOriginal
+										? __( 'Edit original' )
+										: __( 'Restore original' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
 		</Stack>
 	);
 }
@@ -521,6 +553,7 @@ function MediaEditorContent( {
 	aspectRatioPresets,
 	onClose,
 	onSaved,
+	onEditOriginal,
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
@@ -702,8 +735,12 @@ function MediaEditorContent( {
 		// Restoring discards every pending edit, as the menu item says, so
 		// nothing staged against the attachment being replaced reaches a save.
 		clearEntityRecordEdits( 'postType', 'attachment', id );
+		if ( onEditOriginal && originalId ) {
+			onEditOriginal( originalId );
+			return;
+		}
 		setIsSourceReplaced( true );
-	}, [ clearEntityRecordEdits, id ] );
+	}, [ clearEntityRecordEdits, id, onEditOriginal, originalId ] );
 
 	// A bare replacement has no cropper diff, so OR the flag in explicitly.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
@@ -1009,6 +1046,7 @@ function MediaEditorContent( {
 		onSave: saveMediaEditor,
 		canRestoreOriginal,
 		isSourceReplaced,
+		opensOriginal: !! onEditOriginal,
 		onRestoreOriginal: handleRestoreOriginal,
 	};
 
@@ -1041,6 +1079,8 @@ export function MediaEditor( props: MediaEditorProps ) {
 // `DataViewsPicker` exposes its own sub-components. They read what they need
 // from context, so a frame only chooses where they go and how they look.
 MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.PanelToggle = PanelToggle;
+MediaEditor.MoreMenu = MoreMenu;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
 
