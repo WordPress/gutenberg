@@ -1,4 +1,5 @@
 import type { FieldsScriptParts } from '../../types';
+import ScheduledDateEdit from './edit';
 
 interface PostWithDate {
 	date?: string | null;
@@ -17,4 +18,5 @@ export const fieldExtensions: FieldsScriptParts< PostWithDate >[ string ] = {
 	// the REST API resets the date on `null`.
 	setValue: ( { value } ) => ( { date: value ?? null } ),
 	isVisible: ( item ) => item.status === 'future',
+	Edit: ScheduledDateEdit,
 };
