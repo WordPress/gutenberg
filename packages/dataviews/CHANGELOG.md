@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
+
 ## 22.0.0 (2026-11-04)
 
 ### Breaking Changes
