@@ -103,12 +103,6 @@ parameters:
 			path: ../../packages/block-library/src/avatar/index.php
 
 		-
-			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../packages/block-library/src/calendar/index.php
-
-		-
 			message: '#^Variable \$spacing_string might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
