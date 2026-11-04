@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `transform.translate` setting ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ### Bug Fixes
 
