@@ -1,11 +1,5 @@
 import clsx from 'clsx';
-import {
-	memo,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { memo, useCallback, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
@@ -17,7 +11,9 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	useBackgroundProps,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
@@ -92,6 +88,7 @@ function TSection( { name, ...props } ) {
 
 function TableEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	isSelected: isSingleSelected,
@@ -111,8 +108,7 @@ function TableEdit( {
 	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
-	const tableRef = useRef();
-	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+	const { selectionChange } = useDispatch( blockEditorStore );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -148,7 +144,8 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
-		setHasTableCreated( true );
+		// Put the caret in the first cell.
+		selectionChange( clientId, 'body.0.cells.0.content', 0, 0 );
 	}
 
 	/**
@@ -355,15 +352,6 @@ function TableEdit( {
 		setSelectedCell();
 	}
 
-	useEffect( () => {
-		if ( hasTableCreated ) {
-			tableRef?.current
-				?.querySelector( 'td div[contentEditable="true"]' )
-				?.focus();
-			setHasTableCreated( false );
-		}
-	}, [ hasTableCreated ] );
-
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
 	);
@@ -445,7 +433,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps( { ref: tableRef } ) }>
+		<figure { ...useBlockProps() }>
 			{ ! isEmpty && blockEditingMode === 'default' && (
 				<>
 					<BlockControls group="block">

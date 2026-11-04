@@ -23,7 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
@@ -238,9 +238,11 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		} );
 	}
 
-	useEffect( () => {
+	// Keep focus in the popover while its content is swapped.
+	function switchTrackBeingEdited( index ) {
 		dropdownPopoverRef.current?.focus();
-	}, [ trackBeingEdited ] );
+		setTrackBeingEdited( index );
+	}
 
 	if ( ! mediaUpload ) {
 		return null;
@@ -284,7 +286,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 								newTracks[ trackBeingEdited ] = newTrack;
 								onChange( newTracks );
 							} }
-							onClose={ () => setTrackBeingEdited( null ) }
+							onClose={ () => switchTrackBeingEdited( null ) }
 							onRemove={ () => {
 								onChange(
 									tracks.filter(
@@ -292,7 +294,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 											index !== trackBeingEdited
 									)
 								);
-								setTrackBeingEdited( null );
+								switchTrackBeingEdited( null );
 							} }
 							allowSettingDefault={
 								! tracks.some( ( track ) => track.default ) ||
@@ -319,7 +321,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 						<NavigableMenu>
 							<TrackList
 								tracks={ tracks }
-								onEditPress={ setTrackBeingEdited }
+								onEditPress={ switchTrackBeingEdited }
 							/>
 							<MenuGroup
 								className="block-library-video-tracks-editor__add-tracks-container"
