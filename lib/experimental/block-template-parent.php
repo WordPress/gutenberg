@@ -445,91 +445,13 @@ function gutenberg_get_block_template_parent_field( $item ) {
 }
 
 /**
- * Checks that a template may be rendered inside the template a request names.
- *
- * The editor only offers the templates a template may name, but a request may
- * carry any slug, and a chain that loops or names a template that is not there
- * is a template the site cannot show. The resolver stops rather than loops, so
- * this is about not writing data the site has no use for.
- *
- * Whether the template named has a `core/post-content` block to render this one
- * in is deliberately not checked: a template can lose its content block after
- * the fact, and that is a template to fix rather than an assignment to reject.
- *
- * @access private
- *
- * @param string            $slug     Slug of the template to render it inside, or an empty string to render it on its own.
- * @param WP_Block_Template $template Template being written to.
- * @return true|WP_Error True when it may be stored, or a `WP_Error` describing why it may not.
- */
-function gutenberg_validate_block_template_parent_slug( $slug, $template ) {
-	// Rendering the template on its own is always available.
-	if ( '' === $slug ) {
-		return true;
-	}
-
-	if ( $slug === $template->slug ) {
-		return new WP_Error(
-			'rest_template_parent_itself',
-			__( 'A template cannot be rendered inside itself.', 'gutenberg' ),
-			array( 'status' => 400 )
-		);
-	}
-
-	$parent = get_block_template( $template->theme . '//' . $slug, 'wp_template' );
-	if ( ! $parent ) {
-		return new WP_Error(
-			'rest_template_parent_not_found',
-			__( 'The template to render this one inside of does not exist.', 'gutenberg' ),
-			array( 'status' => 400 )
-		);
-	}
-
-	// Walking up from the template named reaches this one only when storing the
-	// slug would close a loop.
-	$seen    = array( $parent->id => true );
-	$current = $parent;
-
-	for ( $depth = 0; $depth < GUTENBERG_TEMPLATE_PARENT_MAX_DEPTH; $depth++ ) {
-		$next_slug = gutenberg_get_block_template_parent_slug( $current );
-		if ( '' === $next_slug ) {
-			return true;
-		}
-
-		$next_id = $current->theme . '//' . $next_slug;
-
-		if ( $next_id === $template->id ) {
-			return new WP_Error(
-				'rest_template_parent_loop',
-				__( 'The template to render this one inside of is already rendered inside of it.', 'gutenberg' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		// A chain that already loops higher up is left to the resolver, which
-		// stops at the template it has seen rather than following it round.
-		if ( isset( $seen[ $next_id ] ) ) {
-			return true;
-		}
-		$seen[ $next_id ] = true;
-
-		$current = get_block_template( $next_id, 'wp_template' );
-		if ( ! $current ) {
-			return true;
-		}
-	}
-
-	return true;
-}
-
-/**
  * Stores the template a template is rendered inside from a REST request.
  *
  * @access private
  *
  * @param string            $value    Slug of the template to render it inside, or an empty string to render it on its own.
  * @param WP_Block_Template $template Template being written to.
- * @return true|WP_Error True on success, or a `WP_Error` when the template has no post to store it on or the slug is not one it may name.
+ * @return true|WP_Error True on success, or a `WP_Error` when the template has no post to store it on.
  */
 function gutenberg_update_block_template_parent_field( $value, $template ) {
 	if ( empty( $template->wp_id ) ) {
@@ -538,11 +460,6 @@ function gutenberg_update_block_template_parent_field( $value, $template ) {
 			__( 'The template could not be saved, so the template to render it inside was not stored.', 'gutenberg' ),
 			array( 'status' => 500 )
 		);
-	}
-
-	$valid = gutenberg_validate_block_template_parent_slug( $value, $template );
-	if ( is_wp_error( $valid ) ) {
-		return $valid;
 	}
 
 	/*

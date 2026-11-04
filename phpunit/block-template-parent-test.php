@@ -11,7 +11,6 @@
  * @covers ::gutenberg_get_block_template_parent_slug
  * @covers ::gutenberg_resolve_block_template_parents
  * @covers ::gutenberg_substitute_template_content_slot
- * @covers ::gutenberg_validate_block_template_parent_slug
  */
 class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
@@ -682,62 +681,6 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		wp_reset_postdata();
 	}
 
-	public function test_rest_request_rejects_a_template_rendered_inside_itself() {
-		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'page-404', '<!-- wp:post-content /-->' );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
-		$request->set_body_params( array( 'template' => 'page-404' ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( 'rest_template_parent_itself', $response->get_data()['code'] );
-		$this->assertSame(
-			'',
-			gutenberg_get_block_template_parent_slug( get_block_template( get_stylesheet() . '//page-404', 'wp_template' ) ),
-			'Nothing is stored when the request is rejected.'
-		);
-	}
-
-	public function test_rest_request_rejects_a_template_that_does_not_exist() {
-		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->' );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
-		$request->set_body_params( array( 'template' => 'does-not-exist' ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( 'rest_template_parent_not_found', $response->get_data()['code'] );
-	}
-
-	public function test_rest_request_rejects_a_loop() {
-		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->', 'page-404' );
-		$this->create_template( 'page-404', '<!-- wp:post-content /-->' );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
-		$request->set_body_params( array( 'template' => 'layout' ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( 'rest_template_parent_loop', $response->get_data()['code'] );
-	}
-
-	public function test_rest_request_rejects_a_loop_further_up_the_chain() {
-		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'base', '<!-- wp:post-content /-->', 'page-404' );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->', 'base' );
-		$this->create_template( 'page-404', '<!-- wp:post-content /-->' );
-
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
-		$request->set_body_params( array( 'template' => 'layout' ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( 'rest_template_parent_loop', $response->get_data()['code'] );
-	}
-
 	public function test_rest_request_stores_a_template_that_has_no_slot_of_its_own() {
 		wp_set_current_user( self::$admin_id );
 		$this->create_template( 'layout', '<!-- wp:template-part {"slug":"header"} /-->' );
@@ -750,7 +693,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame(
 			200,
 			$response->get_status(),
-			'A template that has lost its content block is a template to fix, not an assignment to reject.'
+			'Any slug the request carries is stored; the resolver is what stops at a template it cannot render inside.'
 		);
 	}
 }
