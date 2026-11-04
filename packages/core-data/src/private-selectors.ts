@@ -330,6 +330,7 @@ export function getViewConfig(
 			default_layouts: undefined,
 			view_list: undefined,
 			form: undefined,
+			quick_edit_form: undefined,
 		}
 	);
 }

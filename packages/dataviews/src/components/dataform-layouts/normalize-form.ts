@@ -146,6 +146,7 @@ function normalizeForm( form: Form ): NormalizedForm {
 				...( !! field.description && {
 					description: field.description,
 				} ),
+				...( !! field.config && { config: field.config } ),
 				...( 'children' in field &&
 					Array.isArray( field.children ) && {
 						children: normalizeForm( {

@@ -68,9 +68,10 @@ class Gutenberg_View_Config_Data {
 	 * The documented top-level configuration keys.
 	 *
 	 * @since 7.1.0
+	 * @since 7.3.0 Added `quick_edit_form`.
 	 * @var string[]
 	 */
-	const CONFIG_KEYS = array( 'default_view', 'default_layouts', 'view_list', 'form' );
+	const CONFIG_KEYS = array( 'default_view', 'default_layouts', 'view_list', 'form', 'quick_edit_form' );
 
 	/**
 	 * The configuration being contributed to.

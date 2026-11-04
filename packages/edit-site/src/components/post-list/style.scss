@@ -1,12 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
 
-// Password is a field of its own in the quick edit form, so drop the divider
-// the editor's document sidebar draws above it inside the status group.
-.dataviews-action-modal__quick-edit .fields-controls__password {
-	border-top: 0;
-	padding-top: 0;
-}
-
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
 	align-items: stretch;

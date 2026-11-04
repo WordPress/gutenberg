@@ -160,7 +160,7 @@ test.describe( 'View config extensibility', () => {
 		).toBeVisible();
 	} );
 
-	test( 'applies the filtered form to the Quick Edit DataForm', async ( {
+	test( 'applies the filtered quick edit form to the Quick Edit DataForm', async ( {
 		admin,
 		page,
 	} ) => {
@@ -181,13 +181,14 @@ test.describe( 'View config extensibility', () => {
 		await expect(
 			quickEditModal.getByRole( 'textbox', { name: 'Link' } )
 		).toBeVisible();
-		// The quick edit drawer renders the slug inline on its own, so the
-		// date shows the filtered `regular` layout reaching the form.
+		// The date panel of the default quick edit form shows the filtered
+		// `regular` layout reaching the drawer.
 		await expect(
 			quickEditModal.getByRole( 'button', { name: 'Edit Date' } )
 		).toHaveCount( 0 );
+		// The filtered fields replace the default ones.
 		await expect(
-			quickEditModal.getByRole( 'button', { name: 'Edit Status' } )
+			quickEditModal.getByRole( 'combobox', { name: 'Status' } )
 		).toHaveCount( 0 );
 	} );
 } );

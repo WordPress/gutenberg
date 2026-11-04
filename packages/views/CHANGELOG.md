@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useViewConfig` returns the `quick_edit_form` configuration, the form of the quick edit drawer ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
+
 ## 3.1.0 (2026-11-04)
 
 ### Internal

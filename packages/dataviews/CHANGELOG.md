@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DataForm`: a form field can pass settings to its field's `Edit` control through a new `config` property, so one form can ask a control for a variant without changing the field ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
+
 ### Bug Fixes
 
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).

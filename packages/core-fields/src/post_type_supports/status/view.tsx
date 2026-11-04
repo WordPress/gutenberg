@@ -1,23 +1,7 @@
-import {
-	trash,
-	drafts,
-	published,
-	scheduled,
-	pending,
-	notAllowed,
-} from '@wordpress/icons';
 import { Icon, Stack } from '@wordpress/ui';
 import type { PostWithStatus } from './types';
+import { STATUS_ICONS } from './icons';
 import styles from './style.module.css';
-
-const ICONS: Record< string, typeof drafts > = {
-	draft: drafts,
-	future: scheduled,
-	pending,
-	private: notAllowed,
-	publish: published,
-	trash,
-};
 
 /*
  * The status of a post, laid out with `Stack` and `Icon` from `@wordpress/ui`. The labels come from the elements of the
@@ -39,7 +23,7 @@ export default function StatusView( {
 		( { value } ) => value === currentStatus
 	);
 	const label = status?.label || currentStatus;
-	const icon = ICONS[ currentStatus ];
+	const icon = STATUS_ICONS[ currentStatus ];
 	return (
 		<Stack direction="row" align="flex-start" justify="flex-start">
 			{ icon && (

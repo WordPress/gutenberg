@@ -1,20 +1,7 @@
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import {
-	drafts,
-	notAllowed,
-	pending,
-	published,
-	scheduled,
-} from '@wordpress/icons';
-import { Icon, SelectControl, Stack } from '@wordpress/ui';
-
-const ICONS: Record< string, typeof drafts > = {
-	draft: drafts,
-	future: scheduled,
-	pending,
-	private: notAllowed,
-	publish: published,
-};
+import { Icon, RadioGroupControl, SelectControl, Stack } from '@wordpress/ui';
+import { STATUS_ICONS } from './icons';
+import type { PostWithStatus } from './types';
 
 type StatusItem = {
 	value: string;
@@ -23,7 +10,7 @@ type StatusItem = {
 };
 
 function StatusLabel( { item }: { item: StatusItem } ) {
-	const icon = ICONS[ item.value ];
+	const icon = STATUS_ICONS[ item.value ];
 	return (
 		<Stack direction="row" align="center" gap="xs">
 			{ icon && <Icon icon={ icon } size={ 16 } /> }
@@ -33,24 +20,43 @@ function StatusLabel( { item }: { item: StatusItem } ) {
 }
 
 /*
- * The status control of the quick edit form: a compact alternative to the
- * radio group the editor's document sidebar uses, with the icon of each
- * status next to its label, and its description in the list.
+ * The status control: a radio group with the description of each status, or,
+ * when a form asks for it with the `compact` setting, a select with the icon
+ * of each status next to its label and its description in the list. Trash
+ * is not offered: trashing a post is an action of its own.
  */
-export function StatusSelectEdit( {
+export default function StatusEdit( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
-}: DataFormControlProps< any > ) {
-	const items: StatusItem[] = ( field.elements ?? [] ).map(
-		( { value, label, description } ) => ( {
+	config,
+}: DataFormControlProps< PostWithStatus > ) {
+	const items: StatusItem[] = ( field.elements ?? [] )
+		.filter( ( { value } ) => value !== 'trash' )
+		.map( ( { value, label, description } ) => ( {
 			value: String( value ),
 			label,
 			description,
-		} )
-	);
+		} ) );
 	const value = field.getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
+	const onValueChange = ( newValue: string ) =>
+		onChange( field.setValue( { item: data, value: newValue } ) );
+
+	if ( ! config?.compact ) {
+		return (
+			<RadioGroupControl
+				label={ field.label }
+				hideLabelFromVision={ hideLabelFromVision }
+				items={ items }
+				value={ value ?? '' }
+				onValueChange={ onValueChange }
+				disabled={ disabled }
+			/>
+		);
+	}
+
 	const selectedItem = items.find( ( item ) => item.value === value ) ?? null;
 
 	return (
@@ -61,12 +67,10 @@ export function StatusSelectEdit( {
 			value={ selectedItem }
 			onValueChange={ ( item ) => {
 				if ( item?.value ) {
-					onChange(
-						field.setValue( { item: data, value: item.value } )
-					);
+					onValueChange( item.value );
 				}
 			} }
-			disabled={ field.isDisabled( { item: data, field } ) }
+			disabled={ disabled }
 			// Without a value (a bulk edit), the default trigger shows the
 			// placeholder.
 			trigger={
