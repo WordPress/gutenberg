@@ -718,8 +718,8 @@ function ImageEditorCanvasInner(
 		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
-		// The same figure `getOutputSize` gives a consumer, so the tooltip
-		// cannot disagree with what saving produces.
+		// Read the size from the same edits saving sends, so the tooltip
+		// and the saved image cannot frame different regions.
 		return getOutputSize( state );
 	}, [ showDimensions, activeHandle, state ] );
 
