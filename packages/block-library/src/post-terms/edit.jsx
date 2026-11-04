@@ -91,7 +91,10 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: clsx( term && `taxonomy-${ term }`, layoutClassNames ),
+		className: clsx(
+			term && `taxonomy-${ term }`,
+			layout && layoutClassNames
+		),
 	} );
 
 	return (

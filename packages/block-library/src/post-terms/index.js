@@ -3,7 +3,7 @@ import { addFilter } from '@wordpress/hooks';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
-import enhanceVariations, { withoutUnusedLayoutClasses } from './hooks';
+import enhanceVariations, { hideBlockGapOutsideFlexAndGrid } from './hooks';
 import deprecated from './deprecated';
 
 const { name } = metadata;
@@ -22,13 +22,10 @@ export const init = () => {
 		enhanceVariations
 	);
 
-	// Runs before the layout hook (priority 10), so it wraps inside it and sees
-	// the layout class names that hook passes down.
 	addFilter(
-		'editor.BlockListBlock',
-		'core/post-terms/without-unused-layout-classes',
-		withoutUnusedLayoutClasses,
-		5
+		'blockEditor.useSetting.before',
+		'core/post-terms/hide-block-gap-outside-flex-and-grid',
+		hideBlockGapOutsideFlexAndGrid
 	);
 
 	return initBlock( { name, metadata, settings } );

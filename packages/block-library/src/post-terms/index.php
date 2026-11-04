@@ -91,6 +91,34 @@ function block_core_post_terms_remove_unused_layout_classes( $block_content, $bl
 add_filter( 'render_block_core/post-terms', 'block_core_post_terms_remove_unused_layout_classes', 10, 2 );
 
 /**
+ * Ignores a saved Block spacing value unless the layout is Flex or Grid.
+ *
+ * Block spacing is only offered with those layouts, so a value left over from
+ * another layout is not output.
+ *
+ * @since 7.2.0
+ *
+ * @param array $parsed_block The parsed block.
+ * @return array The parsed block.
+ */
+function block_core_post_terms_ignore_unused_block_gap( $parsed_block ) {
+	if (
+		'core/post-terms' !== $parsed_block['blockName'] ||
+		! isset( $parsed_block['attrs']['style']['spacing']['blockGap'] )
+	) {
+		return $parsed_block;
+	}
+
+	$layout_type = $parsed_block['attrs']['layout']['type'] ?? null;
+	if ( ! in_array( $layout_type, array( 'flex', 'grid' ), true ) ) {
+		unset( $parsed_block['attrs']['style']['spacing']['blockGap'] );
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'block_core_post_terms_ignore_unused_block_gap' );
+
+/**
  * Returns the available variations for the `core/post-terms` block.
  *
  * @since 6.5.0

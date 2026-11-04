@@ -59,6 +59,45 @@ class Tests_Blocks_RenderPostTermsBlock extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Second', $html );
 	}
 
+	/**
+	 * @dataProvider data_layouts_and_block_gap
+	 */
+	public function test_block_gap_only_applies_to_flex_and_grid( $layout, $is_kept ) {
+		$attrs = array( 'style' => array( 'spacing' => array( 'blockGap' => '1rem' ) ) );
+		if ( null !== $layout ) {
+			$attrs['layout'] = $layout;
+		}
+
+		$result = gutenberg_block_core_post_terms_ignore_unused_block_gap(
+			array(
+				'blockName' => 'core/post-terms',
+				'attrs'     => $attrs,
+			)
+		);
+
+		$this->assertSame( $is_kept, isset( $result['attrs']['style']['spacing']['blockGap'] ) );
+	}
+
+	public function data_layouts_and_block_gap() {
+		return array(
+			'no layout'   => array( null, false ),
+			'default'     => array( array( 'type' => 'default' ), false ),
+			'constrained' => array( array( 'type' => 'constrained' ), false ),
+			'string'      => array( 'flex', false ),
+			'flex'        => array( array( 'type' => 'flex' ), true ),
+			'grid'        => array( array( 'type' => 'grid' ), true ),
+		);
+	}
+
+	public function test_block_gap_of_other_blocks_is_untouched() {
+		$block = array(
+			'blockName' => 'core/group',
+			'attrs'     => array( 'style' => array( 'spacing' => array( 'blockGap' => '1rem' ) ) ),
+		);
+
+		$this->assertSame( $block, gutenberg_block_core_post_terms_ignore_unused_block_gap( $block ) );
+	}
+
 	public function test_grid_layout_drops_the_separator() {
 		$html = $this->render( array( 'layout' => array( 'type' => 'grid' ) ) );
 
