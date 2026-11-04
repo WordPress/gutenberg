@@ -133,7 +133,7 @@ export function buildEvidence(
 	);
 
 	const state = [
-		`# ${ pull.title }`,
+		`# Pull request: ${ pull.title }`,
 		pull.labels.length ? `Labels: ${ pull.labels.join( ', ' ) }` : '',
 		'## Description',
 		description || '(none)',
