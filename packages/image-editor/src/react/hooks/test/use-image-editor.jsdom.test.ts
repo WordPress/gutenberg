@@ -1113,6 +1113,34 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		// The square crop for the 2:1 image.
 		const FITTED = computeInscribedRect( 1, { width: 1200, height: 600 } );
 
+		it( 'fits the crop to the lock when the image loads, and is clean', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+
+			act( () => result.current.controller.setImage( IMAGE ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
+		it( 'returns to the fitted square, still locked, on reset', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+			act( () => result.current.controller.setImage( IMAGE ) );
+
+			act( () => result.current.controller.snapRotate90( 1 ) );
+			expect( result.current.controller.isDirty ).toBe( true );
+
+			act( () => result.current.controller.reset() );
+
+			expect( result.current.controller.state.aspectRatio ).toBe( 1 );
+			expect( result.current.controller.state.rotation ).toBe( 0 );
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
 		it( 'fits the crop when the state starts with its image and a lock', () => {
 			const { result } = renderHook( () =>
 				useControlled(

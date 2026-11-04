@@ -23,7 +23,7 @@ import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
 	enforceContainment,
-	getLockedCropRect,
+	fitCropToLockedRatio,
 	isStateDirty,
 	withBaseValues,
 } from '../../core/state';
@@ -119,15 +119,14 @@ export function createImageEditorState(
 	options: CreateImageEditorStateOptions = {}
 ): ImageEditorState {
 	const { image = null, aspectRatio } = options;
-	const start = {
-		...DEFAULT_STATE,
-		image,
-		aspectRatio: aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
-	};
-	// Start a locked crop at the largest box of that ratio, the same shape
-	// `setAspectRatio` gives.
-	const cropRect = getLockedCropRect( start );
-	return enforceContainment( cropRect ? { ...start, cropRect } : start );
+	return enforceContainment(
+		fitCropToLockedRatio( {
+			...DEFAULT_STATE,
+			image,
+			aspectRatio:
+				aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
+		} )
+	);
 }
 
 /**
@@ -226,6 +225,15 @@ export function useInternalImageEditor(
 		( image: InternalImageEditorState[ 'image' ] ) => {
 			const current = latestRef.current;
 			if ( areImagesEqual( current.image, image ) ) {
+				// A state can arrive with its image already in it and a crop
+				// that does not match its locked ratio. Fit the crop now, as
+				// loading the image would have.
+				if ( fitCropToLockedRatio( current ) !== current ) {
+					apply(
+						{ type: 'SET_CROP_RECT', payload: current.cropRect },
+						false
+					);
+				}
 				return;
 			}
 			hasEditedRef.current = false;

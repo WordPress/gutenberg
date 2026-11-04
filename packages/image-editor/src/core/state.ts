@@ -81,7 +81,7 @@ function getViewShape( state: InternalImageEditorState ): Size | undefined {
  * @param state The editor state.
  * @return The crop rect for the locked ratio, or `undefined`.
  */
-export function getLockedCropRect(
+function getLockedCropRect(
 	state: InternalImageEditorState
 ): NormalizedRect | undefined {
 	const viewShape = getViewShape( state );
@@ -89,6 +89,112 @@ export function getLockedCropRect(
 		return undefined;
 	}
 	return computeInscribedRect( state.aspectRatio, viewShape );
+}
+
+/**
+ * How far a crop's shape may be from the locked ratio, relative to it, and
+ * still count as matching. It leaves room for rounding in a handle drag.
+ */
+const LOCKED_RATIO_TOLERANCE = 1e-3;
+
+/**
+ * Make the crop match the locked ratio, so a locked ratio always means a
+ * crop of that ratio. A crop that matches is returned as it is. Otherwise
+ * the crop keeps its centre and width and takes the height the ratio
+ * needs; if that is taller than the view, it takes the full height and
+ * the width the ratio needs. A full frame becomes the largest box of the
+ * ratio.
+ *
+ * @param state The editor state.
+ * @return The same state when the crop matches, or a state with a crop
+ *         that does.
+ */
+export function fitCropToLockedRatio(
+	state: InternalImageEditorState
+): InternalImageEditorState {
+	const { aspectRatio, cropRect } = state;
+	const viewShape = getViewShape( state );
+	if (
+		! viewShape ||
+		! aspectRatio ||
+		aspectRatio <= 0 ||
+		cropRect.width <= 0 ||
+		cropRect.height <= 0
+	) {
+		return state;
+	}
+	// The crop's width / height, in view fractions, that gives the locked
+	// ratio in pixels.
+	const lockedShape = ( aspectRatio * viewShape.height ) / viewShape.width;
+	const shape = cropRect.width / cropRect.height;
+	if ( Math.abs( shape / lockedShape - 1 ) <= LOCKED_RATIO_TOLERANCE ) {
+		return state;
+	}
+	let width = Math.min( cropRect.width, 1 );
+	let height = width / lockedShape;
+	if ( height > 1 ) {
+		height = 1;
+		width = lockedShape;
+	}
+	const centreX = cropRect.x + cropRect.width / 2;
+	const centreY = cropRect.y + cropRect.height / 2;
+	return {
+		...state,
+		cropRect: {
+			x: Math.min( Math.max( centreX - width / 2, 0 ), 1 - width ),
+			y: Math.min( Math.max( centreY - height / 2, 0 ), 1 - height ),
+			width,
+			height,
+		},
+	};
+}
+
+/**
+ * The crop a quarter turn should leave behind.
+ *
+ * Without a locked ratio the crop follows the image round, which is the
+ * swapped rect the caller passes. With one, the crop is meant to hold a
+ * shape in source pixels, and a quarter turn does not change the image,
+ * so the crop keeps the pixel size it had. The view transposes, so the
+ * same pixels are a different fraction of it.
+ *
+ * When those pixels no longer fit the transposed view, the crop becomes
+ * the largest box of the ratio instead.
+ *
+ * @param state   The state before the turn.
+ * @param swapped The crop with its sides swapped, which is what a turn
+ *                does without a lock.
+ * @return The crop to use.
+ */
+function keepCropThroughQuarterTurn(
+	state: InternalImageEditorState,
+	swapped: NormalizedRect
+): NormalizedRect {
+	const view = getViewShape( state );
+	const { aspectRatio, cropRect } = state;
+	if ( ! view || ! aspectRatio || aspectRatio <= 0 ) {
+		return swapped;
+	}
+	// The view transposes, so a width that was a fraction of `view.width`
+	// becomes the same pixels over `view.height`.
+	const width = ( cropRect.width * view.width ) / view.height;
+	const height = ( cropRect.height * view.height ) / view.width;
+	if ( width > 1 || height > 1 ) {
+		// Those pixels do not fit the transposed view, so take the
+		// largest box of the ratio that does.
+		return computeInscribedRect( aspectRatio, {
+			width: view.height,
+			height: view.width,
+		} );
+	}
+	const centreX = swapped.x + swapped.width / 2;
+	const centreY = swapped.y + swapped.height / 2;
+	return {
+		x: Math.min( Math.max( centreX - width / 2, 0 ), 1 - width ),
+		y: Math.min( Math.max( centreY - height / 2, 0 ), 1 - height ),
+		width,
+		height,
+	};
 }
 
 /**
@@ -307,10 +413,12 @@ export function imageEditorReducer(
 	switch ( action.type ) {
 		case 'SET_IMAGE':
 			return commitBase(
-				enforceContainment( {
-					...state,
-					image: action.payload,
-				} )
+				enforceContainment(
+					fitCropToLockedRatio( {
+						...state,
+						image: action.payload,
+					} )
+				)
 			);
 
 		case 'SET_PAN':
@@ -374,15 +482,17 @@ export function imageEditorReducer(
 			const dy = state.basePan.y - oy;
 			// Rotating past 45° from a quarter turn changes the view's
 			// shape, so a locked crop is refitted around its centre.
-			return enforceContainment( {
-				...state,
-				rotation: newRotation,
-				zoom: state.baseZoom,
-				pan: {
-					x: ox + cos * dx - sin * dy,
-					y: oy + sin * dx + cos * dy,
-				},
-			} );
+			return enforceContainment(
+				fitCropToLockedRatio( {
+					...state,
+					rotation: newRotation,
+					zoom: state.baseZoom,
+					pan: {
+						x: ox + cos * dx - sin * dy,
+						y: oy + sin * dx + cos * dy,
+					},
+				} )
+			);
 		}
 
 		case 'SNAP_ROTATE_90': {
@@ -413,18 +523,23 @@ export function imageEditorReducer(
 			const newPanX = rawDir === 1 ? -state.pan.y : state.pan.y;
 			const newPanY = rawDir === 1 ? state.pan.x : -state.pan.x;
 
+			// Without a locked ratio, swapping the crop's sides carries it
+			// round with the image. With one, the crop keeps the pixel
+			// size it had, which is what the lock is about, so only its
+			// fractions change as the view transposes.
+			const turned = keepCropThroughQuarterTurn( state, {
+				x: cx - rect.height / 2,
+				y: cy - rect.width / 2,
+				width: rect.height,
+				height: rect.width,
+			} );
 			return commitBase(
 				enforceContainment( {
 					...state,
 					rotation: rot90,
 					zoom: state.baseZoom,
 					pan: { x: newPanX, y: newPanY },
-					cropRect: {
-						x: cx - rect.height / 2,
-						y: cy - rect.width / 2,
-						width: rect.height,
-						height: rect.width,
-					},
+					cropRect: turned,
 				} )
 			);
 		}
@@ -461,10 +576,12 @@ export function imageEditorReducer(
 
 		case 'SET_CROP_RECT':
 			return commitBase(
-				enforceContainment( {
-					...state,
-					cropRect: action.payload,
-				} )
+				enforceContainment(
+					fitCropToLockedRatio( {
+						...state,
+						cropRect: action.payload,
+					} )
+				)
 			);
 
 		case 'SET_ASPECT_RATIO': {
@@ -549,11 +666,13 @@ export function imageEditorReducer(
 
 		case 'RESET':
 			return commitBase(
-				enforceContainment( {
-					...DEFAULT_STATE,
-					image: state.image,
-					...action.payload,
-				} )
+				enforceContainment(
+					fitCropToLockedRatio( {
+						...DEFAULT_STATE,
+						image: state.image,
+						...action.payload,
+					} )
+				)
 			);
 	}
 }
