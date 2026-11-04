@@ -234,6 +234,52 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		}
 	);
 
+	test.each( [
+		[ 'a token', 'the server representation' ],
+		[ 'null', 'the server representation' ],
+		[ 'a token', 'a pending value' ],
+	] )(
+		'keeps its content when a change on the same page after the navigation turns %s into %s',
+		async ( first, later ) => {
+			populateServerData( pendingServerData() );
+			const { state } = store( namespace, {
+				state: {
+					changed: false,
+					/** Selects the value before and after the same-page change. */
+					get html(): unknown {
+						if ( ! state.changed ) {
+							return first === 'null'
+								? null
+								: asDangerousHTML( '<p>Token</p>' );
+						}
+						return later === 'a pending value'
+							? state.late
+							: representation;
+					},
+				} as { changed: boolean; html: unknown; late?: unknown },
+			} );
+			const page = ( name: string, content: string ) =>
+				regionHtml(
+					`<p class="content">${ name }</p><div data-wp-html="state.html">${ content }</div>`
+				);
+			const shown = first === 'null' ? '' : '<p>Token</p>';
+			const region = hydrateHtml( page( 'one', shown ) );
+			const element = region.querySelector( '[data-wp-html]' )!;
+			const updates = recordUpdates( region, element );
+
+			await navigate( 'two', page( 'two', '<i>two</i>' ) );
+			expect( element.innerHTML ).toBe( shown );
+			state.changed = true;
+			await nextFrames();
+
+			expect( region.querySelector( '[data-wp-html]' ) ).toBe( element );
+			expect( element.innerHTML ).toBe( shown );
+			for ( const [ , html ] of updates ) {
+				expect( html ).not.toContain( '<i>two</i>' );
+			}
+		}
+	);
+
 	test( 'shows each page’s server content on prefetched, cached, restored and refreshed pages', async () => {
 		store( namespace, {
 			state: {

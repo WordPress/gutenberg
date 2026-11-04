@@ -57,7 +57,8 @@ directive(
 		const previousServerContent = useRef< DocumentFragment | undefined >(
 			undefined
 		);
-		// Server content that navigation brought to the kept host, not yet shown.
+		// Server content that the current navigation update brought to the kept
+		// host, not yet shown.
 		const owedServerContent = useRef< DocumentFragment | undefined >(
 			undefined
 		);
@@ -149,7 +150,16 @@ directive(
 				}
 			} else if ( serverContent !== previousServerContent.current ) {
 				// Navigation rendered the kept host from another page's markup.
+				// The content stays owed for the rest of that update, which
+				// includes the render where a getter reading the new page's
+				// server context returns its new value. Later changes on the
+				// same page keep the content, as the value rule says.
 				owedServerContent.current = serverContent;
+				queueMicrotask( () => {
+					if ( owedServerContent.current === serverContent ) {
+						owedServerContent.current = undefined;
+					}
+				} );
 			}
 			previousServerContent.current = serverContent;
 
