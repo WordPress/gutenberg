@@ -2,12 +2,17 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { GridRect, getComputedCSS } from './utils';
+import { GridRect } from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
 function isPositiveInteger( value: unknown ): value is number {
 	return typeof value === 'number' && Number.isInteger( value ) && value > 0;
+}
+
+function getCSSPixelValue( value: string ): number {
+	const number = parseFloat( value );
+	return Number.isFinite( number ) ? number : 0;
 }
 
 function getExpandedColumnRect(
@@ -110,22 +115,30 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
 					?.layout ?? {};
-			const gridHeight = gridElement.clientHeight;
-			const gridWidth = gridElement.clientWidth;
 			if (
 				! isPositiveInteger( rawRowCount ) ||
-				! isPositiveInteger( rawColumnCount ) ||
-				! gridHeight ||
-				! gridWidth
+				! isPositiveInteger( rawColumnCount )
 			) {
 				return;
 			}
 			const rowCount = rawRowCount;
 			const columnCount = rawColumnCount;
-			const rowGap =
-				parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0;
-			const columnGap =
-				parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0;
+			const computedStyle = view.getComputedStyle( gridElement );
+			// Grid tracks occupy the content box, while client dimensions include
+			// padding. Remove it before deriving the size of each track.
+			const gridHeight =
+				gridElement.clientHeight -
+				getCSSPixelValue( computedStyle.paddingTop ) -
+				getCSSPixelValue( computedStyle.paddingBottom );
+			const gridWidth =
+				gridElement.clientWidth -
+				getCSSPixelValue( computedStyle.paddingLeft ) -
+				getCSSPixelValue( computedStyle.paddingRight );
+			if ( gridHeight <= 0 || gridWidth <= 0 ) {
+				return;
+			}
+			const rowGap = getCSSPixelValue( computedStyle.rowGap );
+			const columnGap = getCSSPixelValue( computedStyle.columnGap );
 			const rowHeight =
 				( gridHeight - rowGap * ( rowCount - 1 ) ) / rowCount;
 			const columnWidth =
