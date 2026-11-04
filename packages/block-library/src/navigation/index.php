@@ -129,7 +129,7 @@ class WP_Navigation_Block_Renderer {
 		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
 
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] );
 		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
 	}
 

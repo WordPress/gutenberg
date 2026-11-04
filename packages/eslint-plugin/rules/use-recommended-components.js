@@ -130,6 +130,8 @@ const DENYLIST = {
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 		CheckboxControl:
 			'Use `CheckboxControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
+		CustomGradientPicker:
+			'Use `GradientPicker` with `clearable={ false }` instead.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
@@ -139,6 +141,7 @@ const DENYLIST = {
 			'Use `Switch` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+		Menu: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ProgressBar:
 			'Use `Progress` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide',
