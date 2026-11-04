@@ -1,59 +1,58 @@
-import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { unlock } from '../lock-unlock';
-import { store as editorStore } from '../store';
 
 /**
  * @typedef {import('@wordpress/dataviews').Action} Action
  * @typedef {import('@wordpress/dataviews').Field} Field
  */
 
+/*
+ * The functions below keep their parameters so an existing call still type
+ * checks, and ignore them.
+ */
+/* eslint-disable no-unused-vars */
+
 /**
- * Registers a new DataViews action.
+ * Has no effect: every action of an entity is registered on the server.
  *
- * This is an experimental API and is subject to change.
- * it's only available in the Gutenberg plugin for now.
+ * Register the action in PHP on the `wp_entity_actions_api_init` action instead,
+ * with a script module for the parts PHP cannot serialize (`callback`,
+ * `RenderModal`, `isEligible`…).
+ *
+ * @deprecated since Gutenberg 24.3. Register the action in PHP on the
+ *             `wp_entity_actions_api_init` action instead, with a script module for
+ *             its JavaScript parts.
  *
  * @param {string} kind   Entity kind.
  * @param {string} name   Entity name.
  * @param {Action} config Action configuration.
  */
-
 export function registerEntityAction( kind, name, config ) {
-	const { registerEntityAction: _registerEntityAction } = unlock(
-		dispatch( editorStore )
-	);
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		_registerEntityAction( kind, name, config );
-	}
+	deprecated( 'wp.editor.registerEntityAction', {
+		since: '24.3',
+		plugin: 'Gutenberg',
+		alternative: 'the `wp_entity_actions_api_init` PHP action',
+	} );
 }
 
 /**
- * Unregisters a DataViews action.
+ * Has no effect: every action of an entity is registered on the server.
  *
- * This is an experimental API and is subject to change.
- * it's only available in the Gutenberg plugin for now.
+ * Unregister the action in PHP on the `wp_entity_actions_api_init` action instead.
+ *
+ * @deprecated since Gutenberg 24.3. Unregister the action in PHP on the
+ *             `wp_entity_actions_api_init` action instead.
  *
  * @param {string} kind     Entity kind.
  * @param {string} name     Entity name.
  * @param {string} actionId Action ID.
  */
 export function unregisterEntityAction( kind, name, actionId ) {
-	const { unregisterEntityAction: _unregisterEntityAction } = unlock(
-		dispatch( editorStore )
-	);
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		_unregisterEntityAction( kind, name, actionId );
-	}
+	deprecated( 'wp.editor.unregisterEntityAction', {
+		since: '24.3',
+		plugin: 'Gutenberg',
+		alternative: 'the `wp_entity_actions_api_init` PHP action',
+	} );
 }
-
-/*
- * Both functions below keep their parameters so an existing call still type
- * checks, and ignore them.
- */
-/* eslint-disable no-unused-vars */
 
 /**
  * Has no effect: the fields of an entity are registered on the server.

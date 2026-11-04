@@ -1,10 +1,21 @@
 import { useRef } from 'preact/hooks';
 import type { RefObject } from 'preact';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { useLayoutEffect, warn } from '../utils';
+import { isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
+
+/**
+ * Checks whether a value is `{ wpServerHtml: true }`, the server's
+ * representation of a trusted HTML token in the page's data.
+ *
+ * @param value Value to check.
+ *
+ * @return Whether the value is the server token representation.
+ */
+const isServerHTMLRepresentation = ( value: unknown ): boolean =>
+	isPlainObject( value ) && value.wpServerHtml === true;
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
 directive(
@@ -18,7 +29,7 @@ directive(
 		// Fixed at the first render. Preact writes only when creating the node;
 		// all later writes, including navigation updates, belong to the effect.
 		const preactHtml = useRef< {
-			/** Empty HTML or the pending fallback applied only at creation. */
+			/** Empty HTML or the preserved fallback applied only at creation. */
 			__html: string;
 		} >();
 		// Evaluated value, or undefined when evaluation or its function throws.
@@ -48,8 +59,10 @@ directive(
 
 		// Only supported default entries own the element's content.
 		const active = !! entry && ! entry.uniqueId;
-		// Pending values are the only values that leave content unchanged.
-		const pending = result === PENDING_GETTER;
+		// Pending values and the server token representation keep content as-is.
+		const serverHTMLRepresentation = isServerHTMLRepresentation( result );
+		const preserveContent =
+			result === PENDING_GETTER || serverHTMLRepresentation;
 		// Tokens alone authorize non-empty HTML at the DOM boundary.
 		const trusted = isDangerousHTML( result );
 		// Current token payload or the policy-free removal value.
@@ -58,7 +71,16 @@ directive(
 		// Hydration never writes Preact's __html. Apply the current value only
 		// after commit, adopting exactly matching unwritten server nodes.
 		useLayoutEffect( () => {
-			if ( ! active || pending ) {
+			if ( ! active ) {
+				return;
+			}
+			if ( preserveContent ) {
+				// Content kept for the server representation may differ from
+				// what was last applied, so the next token is compared with the
+				// DOM, as at hydration.
+				if ( serverHTMLRepresentation ) {
+					lastAppliedKey.current = undefined;
+				}
 				return;
 			}
 			if ( ! trusted && result !== null && result !== undefined ) {
@@ -92,11 +114,19 @@ directive(
 				}
 			}
 			lastAppliedKey.current = key;
-		}, [ result, active, pending, trusted, resolvedValue, element.ref ] );
+		}, [
+			result,
+			active,
+			preserveContent,
+			serverHTMLRepresentation,
+			trusted,
+			resolvedValue,
+			element.ref,
+		] );
 
 		if ( active ) {
 			preactHtml.current ??=
-				pending && element.props.dangerouslySetInnerHTML?.__html
+				preserveContent && element.props.dangerouslySetInnerHTML?.__html
 					? element.props.dangerouslySetInnerHTML
 					: { __html: emptyHTML as unknown as string };
 			element.props.dangerouslySetInnerHTML = preactHtml.current;

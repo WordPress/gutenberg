@@ -5,13 +5,13 @@
 		{ "path": "../admin-ui/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../plugins" },
+		{ "path": "../plugins/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
-		{ "path": "../viewport" }
+		{ "path": "../viewport/tsconfig.build.json" }
 	]
 }

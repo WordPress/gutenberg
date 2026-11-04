@@ -1282,6 +1282,89 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		expect( await scrollWatcher ).toEqual( [] );
 	} );
 
+	test( 'should move the caret to the next block when only the block padding is below the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		for ( let i = 1; i <= 20; i++ ) {
+			await editor.insertBlock( {
+				name: 'core/preformatted',
+				attributes: { content: `Block ${ i }` },
+			} );
+		}
+
+		await editor.canvas.getByText( 'Block 10', { exact: true } ).click();
+
+		// Scroll so the block's text is within the viewport and its bottom
+		// edge, just past the text, is 3px below it.
+		const offset = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { bottom } = document.activeElement.getBoundingClientRect();
+			document.documentElement.scrollTop +=
+				bottom - window.innerHeight - 3;
+			return document.getSelection().focusOffset;
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '.' );
+
+		// The text is monospaced, so the caret keeps its offset.
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).slice( 9, 11 ) )
+			.toMatchObject( [
+				{
+					name: 'core/preformatted',
+					attributes: { content: 'Block 10' },
+				},
+				{
+					name: 'core/preformatted',
+					attributes: {
+						content: `${ 'Block 11'.slice( 0, offset ) }.${ 'Block 11'.slice( offset ) }`,
+					},
+				},
+			] );
+	} );
+
+	test( 'should move the caret to the previous block when only the block padding is above the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		for ( let i = 1; i <= 20; i++ ) {
+			await editor.insertBlock( {
+				name: 'core/preformatted',
+				attributes: { content: `Block ${ i }` },
+			} );
+		}
+
+		await editor.canvas.getByText( 'Block 10', { exact: true } ).click();
+
+		// Scroll so the block's text is within the viewport and its top edge,
+		// just before the text, is 3px above it.
+		const offset = await editor.canvas.locator( ':root' ).evaluate( () => {
+			const { top } = document.activeElement.getBoundingClientRect();
+			document.documentElement.scrollTop += top + 3;
+			return document.getSelection().focusOffset;
+		} );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '.' );
+
+		// The text is monospaced, so the caret keeps its offset.
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).slice( 8, 10 ) )
+			.toMatchObject( [
+				{
+					name: 'core/preformatted',
+					attributes: {
+						content: `${ 'Block 9'.slice( 0, offset ) }.${ 'Block 9'.slice( offset ) }`,
+					},
+				},
+				{
+					name: 'core/preformatted',
+					attributes: { content: 'Block 10' },
+				},
+			] );
+	} );
+
 	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
 		page,
 		editor,

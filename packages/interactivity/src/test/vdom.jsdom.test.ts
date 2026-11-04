@@ -43,7 +43,7 @@ describe( 'toVdom', () => {
 			} );
 		} );
 
-		it( 'should keep plain objects and preserve JSON scalar values as strings', () => {
+		it( 'should keep plain objects and preserve other JSON values as strings', () => {
 			expect(
 				parseDirectiveValue( 'myplugin::{"id":"sidebar"}' )
 			).toEqual( {
@@ -53,6 +53,27 @@ describe( 'toVdom', () => {
 			expect( parseDirectiveValue( '123' ) ).toEqual( {
 				namespace: null,
 				value: '123',
+			} );
+			expect( parseDirectiveValue( '[1,2]' ) ).toEqual( {
+				namespace: null,
+				value: '[1,2]',
+			} );
+			expect( parseDirectiveValue( 'null' ) ).toEqual( {
+				namespace: null,
+				value: 'null',
+			} );
+		} );
+
+		it( 'should parse plain objects preceded by whitespace', () => {
+			expect( parseDirectiveValue( ' \n\t{"id":"sidebar"}' ) ).toEqual( {
+				namespace: null,
+				value: { id: 'sidebar' },
+			} );
+			expect(
+				parseDirectiveValue( 'myplugin:: {"id":"sidebar"}' )
+			).toEqual( {
+				namespace: 'myplugin',
+				value: { id: 'sidebar' },
 			} );
 		} );
 	} );
@@ -288,6 +309,15 @@ describe( 'toVdom', () => {
 			);
 			expect( toVdom( element ) ).toMatchVNode(
 				h( 'input', { type: 'text', value: 'hello' }, [] )
+			);
+		} );
+
+		it( 'should preserve the case of SVG attribute names', () => {
+			const element = createElementFromHTML(
+				'<svg viewBox="0 0 24 24"></svg>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'svg', { viewBox: '0 0 24 24' }, [] )
 			);
 		} );
 	} );

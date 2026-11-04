@@ -199,10 +199,12 @@ Private exports:
 ### `core` store
 
 Private actions:
+- `receiveEntityActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
+- `getEntityActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`
@@ -289,18 +291,15 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
 - `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
-- `getEntityActions`
 - `getInserter`
 - `getInserterSidebarToggleRef`
 - `getListViewToggleRef`

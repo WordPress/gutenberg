@@ -1,3 +1,5 @@
+import type { Action } from '@wordpress/dataviews';
+
 /**
  * The types of the posts the actions act on, copied from `@wordpress/fields`.
  */
@@ -97,3 +99,20 @@ export type PostWithPermissions = Post & {
 
 // The rejection of a core-data request: a REST error object, not an `Error`.
 export type CoreDataError = { message?: string; code?: string };
+
+/**
+ * Makes the properties of each member of a union optional, without its `id`.
+ * `Omit` applied to the union itself would only keep the properties all its
+ * members share.
+ */
+type PartialWithoutId< T > = T extends unknown
+	? Partial< Omit< T, 'id' > >
+	: never;
+
+/**
+ * The JavaScript parts of an action, which its script module provides: what
+ * PHP cannot serialize, such as `callback`, `RenderModal`, `isEligible`, or
+ * `icon`. The rest of the action is in the `action.php` next to its
+ * `action.tsx`, and the server registers it.
+ */
+export type ActionScriptParts< Item > = PartialWithoutId< Action< Item > >;

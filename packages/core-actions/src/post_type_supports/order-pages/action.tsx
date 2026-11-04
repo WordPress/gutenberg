@@ -9,8 +9,12 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-import type { Action, RenderModalProps } from '@wordpress/dataviews';
-import type { CoreDataError, BasePost } from '../../shared/types';
+import type { RenderModalProps } from '@wordpress/dataviews';
+import type {
+	CoreDataError,
+	BasePost,
+	ActionScriptParts,
+} from '../../shared/types';
 
 function isItemValid( item: BasePost ): boolean {
 	return (
@@ -114,18 +118,15 @@ function ReorderModal( {
 	);
 }
 
-const reorderPage: Action< BasePost > = {
-	id: 'order-pages',
-	label: __( 'Order…' ),
-	modalHeader: __( 'Order' ),
+const reorderPage: ActionScriptParts< BasePost > = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ReorderModal,
 };
 
 /**
- * Reorder action for BasePost.
+ * The JavaScript parts of the reorder action for BasePost; its data is in
+ * `action.php`.
  */
 export default reorderPage;
