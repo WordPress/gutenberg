@@ -1,4 +1,5 @@
 import { toTree } from './to-tree';
+import { toEditableHTMLString } from './to-html-string';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';
 import type {
@@ -275,6 +276,18 @@ export function apply( {
 	__unstableDomOnly?: boolean;
 	placeholder?: string;
 } ) {
+	// An empty element without the selection gets its content parsed at once,
+	// which is faster than building it node by node.
+	if ( __unstableDomOnly && ! current.firstChild ) {
+		current.innerHTML = toEditableHTMLString( {
+			value: prepareEditableTree
+				? { ...value, formats: prepareEditableTree( value ) }
+				: value,
+			placeholder,
+		} );
+		return;
+	}
+
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,

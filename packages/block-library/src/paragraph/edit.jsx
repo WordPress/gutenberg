@@ -22,16 +22,14 @@ import useDeprecatedAlign from './deprecated-attributes';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
-		isRTL() && (
-			<ToolbarButton
-				icon={ formatLTR }
-				title={ _x( 'Left to right', 'editor button' ) }
-				isActive={ direction === 'ltr' }
-				onClick={ () => {
-					setDirection( direction === 'ltr' ? undefined : 'ltr' );
-				} }
-			/>
-		)
+		<ToolbarButton
+			icon={ formatLTR }
+			title={ _x( 'Left to right', 'editor button' ) }
+			isActive={ direction === 'ltr' }
+			onClick={ () => {
+				setDirection( direction === 'ltr' ? undefined : 'ltr' );
+			} }
+		/>
 	);
 }
 
@@ -54,11 +52,11 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 		[ clientId ]
 	);
 
-	if ( ! isDropCapFeatureEnabled || hasSelectedStyleState ) {
+	const { style, dropCap } = attributes;
+	if ( ( ! isDropCapFeatureEnabled && ! dropCap ) || hasSelectedStyleState ) {
 		return null;
 	}
 
-	const { style, dropCap } = attributes;
 	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
@@ -127,7 +125,8 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
+			{ /* An empty fill would still draw an empty toolbar group. */ }
+			{ blockEditingMode === 'default' && isRTL() && (
 				<BlockControls group="block">
 					<ParagraphRTLControl
 						direction={ direction }
