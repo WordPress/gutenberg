@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { store as noticesStore } from '@wordpress/notices';
-import AutosaveMonitor from '../autosave-monitor';
+import useInterval from '../autosave-monitor/use-interval';
 import {
 	localAutosaveGet,
 	localAutosaveGetSnapshot,
@@ -213,9 +214,14 @@ function useAutosavePurge() {
 
 function LocalAutosaveMonitor() {
 	const { autosave } = useDispatch( editorStore );
-	const deferredAutosave = useCallback( () => {
-		requestIdleCallback( () => autosave( { local: true } ) );
-	}, [] );
+	const {
+		getCurrentPostType,
+		getEditedPostAttribute,
+		isEditedPostDirty,
+		isEditedPostEmpty,
+		isPostAutosavingLocked,
+	} = useSelect( editorStore );
+	const { getPostType, getReferenceByDistinctEdits } = useSelect( coreStore );
 	useAutosaveNotice();
 	useAutosavePurge();
 
@@ -225,12 +231,36 @@ function LocalAutosaveMonitor() {
 		[]
 	);
 
-	return (
-		<AutosaveMonitor
-			interval={ localAutosaveInterval }
-			autosave={ deferredAutosave }
-		/>
-	);
+	const lastEditsReferenceRef = useRef();
+
+	useInterval( () => {
+		const editsReference = getReferenceByDistinctEdits();
+		if (
+			editsReference === lastEditsReferenceRef.current ||
+			! isEditedPostDirty()
+		) {
+			return;
+		}
+
+		// Not `isEditedPostAutosaveable()`: it is false while any save is in
+		// flight, and a hanging remote save is when the backup matters most.
+		const hasSaveableContent =
+			!! getEditedPostAttribute( 'title' ) ||
+			!! getEditedPostAttribute( 'excerpt' ) ||
+			! isEditedPostEmpty();
+		if (
+			! hasSaveableContent ||
+			isPostAutosavingLocked() ||
+			! getPostType( getCurrentPostType() )?.supports?.autosave
+		) {
+			return;
+		}
+
+		lastEditsReferenceRef.current = editsReference;
+		requestIdleCallback( () => autosave( { local: true } ) );
+	}, localAutosaveInterval );
+
+	return null;
 }
 
 /**
@@ -239,7 +269,7 @@ function LocalAutosaveMonitor() {
  * - `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
  * - `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
  * - `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
- * - `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+ * - `LocalAutosaveMonitor` component: Saves a sessionStorage backup of the post at the `localAutosaveInterval`.
  *
  * The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
  *

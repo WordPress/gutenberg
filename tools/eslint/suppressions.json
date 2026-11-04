@@ -8847,9 +8847,6 @@
 	"packages/editor/src/components/local-autosave-monitor/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/editor/src/components/media-categories/index.js": {

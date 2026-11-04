@@ -1,6 +1,6 @@
 # LocalAutosaveMonitor
 
-`LocalAutosaveMonitor` is a component based on `AutosaveMonitor` that ensures that a local copy of the current post is regularly saved in `sessionStorage`. Additionally, it will:
+`LocalAutosaveMonitor` is a component that ensures that a local copy of the current post is regularly saved in `sessionStorage`. Additionally, it will:
 
 -   attempt to clear the local copy if a copy is successful saved on the server;
 -   warn the user upon loading a post that there is a local copy that can be loaded;

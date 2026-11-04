@@ -465,6 +465,68 @@ test.describe( 'Autosave', () => {
 		).toBe( 1 );
 	} );
 
+	test( 'should save to sessionStorage while a remote autosave is in flight', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+
+		let releaseAutosave;
+		const autosaveReleased = new Promise( ( resolve ) => {
+			releaseAutosave = resolve;
+		} );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/autosaves' ),
+			async ( route ) => {
+				if ( route.request().method() !== 'POST' ) {
+					return route.continue();
+				}
+				await autosaveReleased;
+				await route.abort();
+			}
+		);
+
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).autosave();
+		} );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.updateEditorSettings( { localAutosaveInterval: 1 } )
+		);
+
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const postId = window.wp.data
+						.select( 'core/editor' )
+						.getCurrentPostId();
+					const backup = window.sessionStorage.getItem(
+						`wp-autosave-block-editor-post-${ postId }`
+					);
+					return backup && JSON.parse( backup ).content;
+				} )
+			)
+			.toContain( 'before save after save' );
+		expect(
+			await page.evaluate( () =>
+				window.wp.data.select( 'core/editor' ).isAutosavingPost()
+			)
+		).toBe( true );
+
+		releaseAutosave();
+	} );
+
 	test( 'should clear local autosave after successful save', async ( {
 		page,
 		pageUtils,
