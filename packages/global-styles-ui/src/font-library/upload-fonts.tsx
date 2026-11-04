@@ -13,7 +13,7 @@ import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
-import { Font } from './lib/lib-font.browser';
+import type { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
 
@@ -119,7 +119,8 @@ function UploadFonts() {
 	 * @return {boolean} Whether the file is a valid font file.
 	 */
 	async function isFontFile( file: File ) {
-		const font = new Font( 'Uploaded Font' );
+		const { Font: FontClass } = await import( './lib/lib-font.browser' );
+		const font = new FontClass( 'Uploaded Font' );
 		try {
 			const buffer = await readFileAsArrayBuffer( file );
 			await font.fromDataBuffer( buffer, 'font' );
@@ -141,9 +142,10 @@ function UploadFonts() {
 
 	const getFontFaceMetadata = async ( fontFile: File ) => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
+		const { Font: FontClass } = await import( './lib/lib-font.browser' );
 		const fontObj: Font & {
 			onload?: ( val: { detail: { font: any } } ) => void;
-		} = new Font( 'Uploaded Font' );
+		} = new FontClass( 'Uploaded Font' );
 		fontObj.fromDataBuffer( buffer, fontFile.name );
 		// Assuming that fromDataBuffer triggers onload event and returning a Promise
 		const onloadEvent: { detail: { font: any } } = await new Promise(
