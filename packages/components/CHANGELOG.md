@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useBaseControlProps`: Key the generated id on the hook instead of `BaseControl`, whose circular import left it undefined in the CommonJS build, so controls built on the hook such as `ToggleGroupControl` crashed there with "Invalid value used as weak map key".
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes

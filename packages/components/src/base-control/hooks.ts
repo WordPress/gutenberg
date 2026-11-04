@@ -1,5 +1,4 @@
 import { useInstanceId } from '@wordpress/compose';
-import BaseControl from '.';
 import type { BaseControlProps } from './types';
 
 /**
@@ -14,8 +13,10 @@ export function useBaseControlProps(
 ) {
 	const { help, id: preferredId, ...restProps } = props;
 
+	// Keyed on the hook itself: `BaseControl` lives in the entry that re-exports
+	// this hook, and that circular import leaves it undefined in the CommonJS build.
 	const uniqueId = useInstanceId(
-		BaseControl,
+		useBaseControlProps,
 		'wp-components-base-control',
 		preferredId
 	);
