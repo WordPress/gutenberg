@@ -109,29 +109,25 @@ export default function DateEdit( {
 	// Reset is available whenever there is a date, so there is nothing to
 	// reset only once the date is `null`: the post takes its date on save.
 	const isReset = ! value;
-	const status = savedStatus ?? data.status;
-	const isFloating = isDateFloating( { ...data, status } );
+	const isFloating = isDateFloating( {
+		...data,
+		status: savedStatus ?? data.status,
+	} );
 
 	// Only DataViews filters pass an operator. A filter picks a date to compare
 	// against, so resetting the post date means nothing there.
 	const isFilter = !! operator;
 
-	// The picker shows a date even when the post has none of its own: the save
-	// time of a floating draft, or now once the date is reset.
-	let note;
-	if ( isFilter ) {
-		// The notes describe the post's date, not the date a filter picks.
-	} else if (
-		isFloating ||
-		( status === 'future' && ( ! value || isPublishedOnSave( value ) ) )
-	) {
-		// A scheduled post whose date is reset takes the save time, and one
-		// whose date is in the past keeps it: like a floating draft, neither
-		// is in the future, so publishing makes the post public right away.
-		note = __( 'Publishes immediately.' );
-	} else if ( isReset ) {
-		note = __( 'Changes to the time you save.' );
-	}
+	// Only a scheduled post gets a note, and only when it won't wait: its date
+	// is reset, still floats, or is in the past. Publishing it then makes it
+	// public right away. The status is the edited one, so a draft scheduled in
+	// the same form gets the note before it is saved.
+	const note =
+		! isFilter &&
+		data.status === 'future' &&
+		( ! value || isFloating || isPublishedOnSave( value ) )
+			? __( 'Publishes immediately.' )
+			: undefined;
 	const noteId = useId();
 
 	const onPick = ( newValue: string | null ) => {
