@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
+-   Content: Give the blocks of a template rendered inside another template the context of the post that template renders, so a title among them is that post's rather than the template's, and a content block among them is where the post's content goes rather than the template rendering itself ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
 
 ## 12.1.0 (2026-11-04)
 
@@ -48,7 +49,6 @@
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
--   Content: Give the blocks of a template rendered inside another template the context of the post that template renders, so a title among them is that post's rather than the template's, and a content block among them is where the post's content goes rather than the template rendering itself ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
 
 ## 12.0.0 (2026-10-20)
 
