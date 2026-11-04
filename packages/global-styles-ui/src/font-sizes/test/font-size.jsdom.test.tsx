@@ -6,22 +6,22 @@ import { usePresets } from '../../presets/use-presets';
 
 globalThis.wpVitest.mockMatchMedia();
 
-vi.mock( '../../presets/use-presets', () => ( {
-	usePresets: vi.fn(),
+vi.mock( import( '../../presets/use-presets' ), () => ( {
+	usePresets: vi.fn() as never,
 } ) );
-vi.mock( '../../hooks', () => ( {
-	useSetting: vi.fn( () => [ false ] ),
+vi.mock( import( '../../hooks' ), () => ( {
+	useSetting: vi.fn( () => [ false ] ) as never,
 } ) );
-vi.mock( '../font-size-preview', () => ( {
-	default: () => null,
+vi.mock( import( '../font-size-preview' ), () => ( {
+	default: ( () => null ) as never,
 } ) );
-vi.mock( '../../presets/preset-edit-header', () => ( {
-	default: () => null,
+vi.mock( import( '../../presets/preset-edit-header' ), () => ( {
+	default: ( () => null ) as never,
 } ) );
-vi.mock( '../../size-control', async () => {
+vi.mock( import( '../../size-control' ), async () => {
 	const { createElement } = await import( 'react' );
 	return {
-		SizeControl: ( {
+		SizeControl: ( ( {
 			label,
 			value,
 			onChange,
@@ -38,7 +38,7 @@ vi.mock( '../../size-control', async () => {
 				disabled,
 				onChange: ( event: { target: { value: string } } ) =>
 					onChange( event.target.value ),
-			} ),
+			} ) ) as never,
 	};
 } );
 
