@@ -19,9 +19,9 @@ const DEFAULT_EMPTY_GALLERY: number[] = [];
 /**
  * Prepares the Featured Image toolbars and frames.
  *
- * Returns the default media workflow.
+ * @return The default media workflow.
  */
-const getFeaturedImageMediaFrame = () => {
+const getFeaturedImageMediaFrame = (): MediaFrameConstructor => {
 	const { wp } = window as unknown as MediaWindow;
 
 	return wp.media.view.MediaFrame.Select.extend( {
@@ -78,9 +78,9 @@ const getFeaturedImageMediaFrame = () => {
 /**
  * Prepares the default frame for selecting a single media item.
  *
- * Returns the default media workflow.
+ * @return The default media workflow.
  */
-const getSingleMediaFrame = () => {
+const getSingleMediaFrame = (): MediaFrameConstructor => {
 	const { wp } = window as unknown as MediaWindow;
 
 	// Extend the default Select frame, and use the same `createStates` method as in core,
@@ -118,9 +118,9 @@ const getSingleMediaFrame = () => {
 /**
  * Prepares the Gallery toolbars and frames.
  *
- * Returns the default media workflow.
+ * @return The default media workflow.
  */
-const getGalleryDetailsMediaFrame = () => {
+const getGalleryDetailsMediaFrame = (): MediaFrameConstructor => {
 	const { wp } = window as unknown as MediaWindow;
 	/**
 	 * Custom gallery details frame.
