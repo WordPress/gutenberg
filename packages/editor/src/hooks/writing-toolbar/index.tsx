@@ -111,6 +111,7 @@ function WritingToolbarControls( {
 			.map( ( blockType ): WritingBlock => ( {
 				name: blockType.name,
 				title: blockType.title,
+				icon: blockType.icon,
 				variations:
 					getBlockVariations( blockType.name, 'transform' ) ?? [],
 			} ) );

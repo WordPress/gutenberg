@@ -74,14 +74,21 @@ const WRITING_BLOCKS = [
 	{
 		name: 'core/heading',
 		title: 'Heading',
+		icon: 'heading',
 		variations: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			name: `h${ level }`,
 			title: `Heading ${ level }`,
+			icon: `heading-${ level }`,
 			attributes: { level },
 		} ) ),
 	},
-	{ name: 'core/paragraph', title: 'Paragraph', variations: [] },
-	{ name: 'core/quote', title: 'Quote', variations: [] },
+	{
+		name: 'core/paragraph',
+		title: 'Paragraph',
+		icon: 'paragraph',
+		variations: [],
+	},
+	{ name: 'core/quote', title: 'Quote', icon: 'quote', variations: [] },
 ];
 
 describe( 'parseFontSizeToPx', () => {
@@ -190,6 +197,15 @@ describe( 'getWritingStyles', () => {
 			fontFamilyName: 'Bricolage Grotesque',
 			fontSize: '40px',
 		} );
+	} );
+
+	it( 'carries the icon, preferring the variation’s own', () => {
+		expect(
+			styles.find( ( style ) => style.key === 'core/heading:h2' )?.icon
+		).toBe( 'heading-2' );
+		expect(
+			styles.find( ( style ) => style.blockName === 'core/quote' )?.icon
+		).toBe( 'quote' );
 	} );
 
 	it( 'gives every other writing block a single entry', () => {

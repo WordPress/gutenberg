@@ -1,4 +1,4 @@
-import type { BlockVariation } from '@wordpress/blocks';
+import type { BlockTypeIcon, BlockVariation } from '@wordpress/blocks';
 
 /**
  * A block that supports writing, with the variations it can be transformed
@@ -7,6 +7,7 @@ import type { BlockVariation } from '@wordpress/blocks';
 export interface WritingBlock {
 	name: string;
 	title: string;
+	icon?: BlockTypeIcon;
 	variations: BlockVariation[];
 }
 
@@ -21,6 +22,8 @@ export interface WritingStyle {
 	label: string;
 	/** The block it turns the selection into. */
 	blockName: string;
+	/** The icon the block, or the variation, is shown with. */
+	icon?: BlockTypeIcon;
 	/** The block variation, where the style is one. */
 	variation?: string;
 	/** The attributes the variation sets. */

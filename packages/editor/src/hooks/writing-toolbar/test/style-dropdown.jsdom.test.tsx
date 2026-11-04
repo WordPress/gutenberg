@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WritingStyleDropdown from '../style-dropdown';
+
+const HeadingIcon = () => <svg data-testid="heading-icon" />;
+const ParagraphIcon = () => <svg data-testid="paragraph-icon" />;
 
 const GROUPS = [
 	{
@@ -11,6 +14,7 @@ const GROUPS = [
 			{
 				key: 'core/heading:1',
 				label: 'Heading 1',
+				icon: HeadingIcon,
 				blockName: 'core/heading',
 				variation: 'h1',
 				attributes: { level: 1 },
@@ -35,6 +39,7 @@ const GROUPS = [
 			{
 				key: 'core/paragraph',
 				label: 'Paragraph',
+				icon: ParagraphIcon,
 				blockName: 'core/paragraph',
 				fontFamily: '"Instrument Sans", sans-serif',
 				fontSize: '17px',
@@ -121,6 +126,30 @@ describe( 'WritingStyleDropdown', () => {
 			fontFamily: '"Bricolage Grotesque", sans-serif',
 			fontSize: '60px',
 		} );
+	} );
+
+	it( 'shows each style’s block icon, as the transformations menu does', async () => {
+		const user = userEvent.setup();
+		render(
+			<WritingStyleDropdown
+				groups={ GROUPS }
+				activeKey="core/paragraph"
+				onSelect={ () => {} }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Style' } ) );
+
+		expect(
+			within(
+				screen.getByRole( 'menuitemradio', { name: 'Heading 1' } )
+			).getByTestId( 'heading-icon' )
+		).toBeInTheDocument();
+		expect(
+			within(
+				screen.getByRole( 'menuitemradio', { name: 'Paragraph' } )
+			).getByTestId( 'paragraph-icon' )
+		).toBeInTheDocument();
 	} );
 
 	it( 'hands the chosen style back', async () => {

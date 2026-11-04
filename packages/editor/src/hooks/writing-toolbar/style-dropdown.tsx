@@ -6,6 +6,7 @@ import {
 	ToolbarGroup,
 	ToolbarItem,
 } from '@wordpress/components';
+import { BlockIcon } from '@wordpress/block-editor';
 import type { WritingStyle, WritingStyleGroup } from './types';
 
 const POPOVER_PROPS = {
@@ -72,6 +73,10 @@ export default function WritingStyleDropdown( {
 													onClose();
 												} }
 											>
+												<BlockIcon
+													icon={ style.icon }
+													showColors
+												/>
 												{ style.label }
 											</MenuItem>
 										) ) }

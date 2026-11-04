@@ -164,11 +164,12 @@ export function getWritingStyles( {
 		key,
 		label,
 		blockName,
+		icon,
 		variation,
 		attributes,
 	}: Pick<
 		WritingStyle,
-		'key' | 'label' | 'blockName' | 'variation' | 'attributes'
+		'key' | 'label' | 'blockName' | 'icon' | 'variation' | 'attributes'
 	> ): WritingStyle => {
 		const typography = resolveStyleTypography(
 			globalStyles,
@@ -180,6 +181,7 @@ export function getWritingStyles( {
 			key,
 			label,
 			blockName,
+			icon,
 			variation,
 			attributes,
 			fontFamily: typography.fontFamily,
@@ -195,6 +197,7 @@ export function getWritingStyles( {
 					key: blockType.name,
 					label: blockType.title,
 					blockName: blockType.name,
+					icon: blockType.icon,
 				} ),
 			];
 		}
@@ -204,6 +207,9 @@ export function getWritingStyles( {
 				key: `${ blockType.name }:${ variation.name }`,
 				label: variation.title ?? variation.name,
 				blockName: blockType.name,
+				// A heading level has its own icon; other variations fall
+				// back to the block's, as the block switcher does.
+				icon: variation.icon ?? blockType.icon,
 				variation: variation.name,
 				attributes: variation.attributes,
 			} )
