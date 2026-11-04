@@ -132,11 +132,6 @@ parameters:
 			count: 1
 			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
 
-		-
-			message: '#^Action callback returns bool but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: ../../lib/media/load.php
 
 		-
 			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
