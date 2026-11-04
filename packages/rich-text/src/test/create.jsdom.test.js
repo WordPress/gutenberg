@@ -185,6 +185,13 @@ describe( 'create', () => {
 			expect( result.html ).toBe( 'a <strong><em>b</em></strong> c' );
 		} );
 
+		it( 'should not change the element it reads from', () => {
+			const html = ' a  <em> b\n</em> c ';
+			const element = createElement( document, html );
+			RichTextData.fromHTMLElement( element );
+			expect( element.innerHTML ).toBe( html );
+		} );
+
 		it( 'should collapse spaces between multiple sibling elements', () => {
 			const result = fromHTML(
 				'<em>a </em><strong> b </strong><em> c</em>'
