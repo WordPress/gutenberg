@@ -143,21 +143,38 @@ export const WithoutActions: Story = {
 export const WithLinkInDescription: Story = {
 	render: () => (
 		<Stack direction="column" gap="md">
-			{ ( [ 'info', 'warning', 'success', 'error' ] as const ).map(
-				( intent ) => (
-					<Notice.Root key={ intent } intent={ intent }>
-						<Notice.Title>Review your settings</Notice.Title>
-						<Notice.Description>
-							Some changes need your attention.{ ' ' }
-							<Link href="#">
-								Learn more about these settings
-							</Link>
-							.
-						</Notice.Description>
-						<Notice.CloseIconButton />
-					</Notice.Root>
-				)
-			) }
+			<Notice.Root intent="info">
+				<Notice.Title>Autosave is on</Notice.Title>
+				<Notice.Description>
+					Your changes are saved as you work.{ ' ' }
+					<Link href="#">Learn more about autosave</Link>.
+				</Notice.Description>
+				<Notice.CloseIconButton />
+			</Notice.Root>
+			<Notice.Root intent="warning">
+				<Notice.Title>Unsaved changes</Notice.Title>
+				<Notice.Description>
+					Save your changes before leaving this page.{ ' ' }
+					<Link href="#">Learn more about saving</Link>.
+				</Notice.Description>
+				<Notice.CloseIconButton />
+			</Notice.Root>
+			<Notice.Root intent="success">
+				<Notice.Title>Changes saved</Notice.Title>
+				<Notice.Description>
+					Your changes are now live.{ ' ' }
+					<Link href="#">View your changes</Link>.
+				</Notice.Description>
+				<Notice.CloseIconButton />
+			</Notice.Root>
+			<Notice.Root intent="error">
+				<Notice.Title>Changes not saved</Notice.Title>
+				<Notice.Description>
+					Check your connection and try again.{ ' ' }
+					<Link href="#">Learn more about troubleshooting</Link>.
+				</Notice.Description>
+				<Notice.CloseIconButton />
+			</Notice.Root>
 		</Stack>
 	),
 };
