@@ -116,40 +116,6 @@ describe( 'DateEdit', () => {
 		).not.toHaveAccessibleDescription();
 	} );
 
-	it( 'says a draft whose date is in the past publishes immediately', async () => {
-		render(
-			<DateEdit
-				data={ {
-					status: 'draft',
-					date: '2020-01-01T10:00:00',
-					modified: '2026-10-20T10:00:00',
-				} }
-				field={ field }
-				onChange={ () => {} }
-			/>
-		);
-		expect(
-			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAccessibleDescription( 'Publishes immediately.' );
-	} );
-
-	it( "doesn't say a published post whose date is in the past publishes immediately", async () => {
-		render(
-			<DateEdit
-				data={ {
-					status: 'publish',
-					date: '2020-01-01T10:00:00',
-					modified: '2026-10-20T10:00:00',
-				} }
-				field={ field }
-				onChange={ () => {} }
-			/>
-		);
-		expect(
-			await screen.findByRole( 'button', { name: 'Reset' } )
-		).not.toHaveAccessibleDescription();
-	} );
-
 	it( 'disables the reset of a published post whose date was reset', async () => {
 		render(
 			<DateEdit
@@ -169,7 +135,7 @@ describe( 'DateEdit', () => {
 		);
 	} );
 
-	it( 'says a scheduled post whose date was reset publishes immediately', async () => {
+	it( 'says a scheduled post whose date was reset publishes when it is saved', async () => {
 		render(
 			<DateEdit
 				data={ {
@@ -183,10 +149,10 @@ describe( 'DateEdit', () => {
 		);
 		expect(
 			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAccessibleDescription( 'Publishes immediately.' );
+		).toHaveAccessibleDescription( 'Publishes when you save.' );
 	} );
 
-	it( 'says a scheduled post whose date is in the past publishes immediately', async () => {
+	it( 'says a scheduled post whose date is in the past publishes when it is saved', async () => {
 		render(
 			<DateEdit
 				data={ {
@@ -200,10 +166,10 @@ describe( 'DateEdit', () => {
 		);
 		expect(
 			await screen.findByRole( 'button', { name: 'Reset' } )
-		).toHaveAccessibleDescription( 'Publishes immediately.' );
+		).toHaveAccessibleDescription( 'Publishes when you save.' );
 	} );
 
-	it( "doesn't say a scheduled post whose date is in the future publishes immediately", async () => {
+	it( "doesn't say a scheduled post whose date is in the future publishes when it is saved", async () => {
 		render(
 			<DateEdit
 				data={ {
