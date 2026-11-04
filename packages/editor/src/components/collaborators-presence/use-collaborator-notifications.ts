@@ -120,18 +120,23 @@ async function getPostUpdatedMessage( {
 		return attributeNotice( notice, name );
 	}
 
-	if ( DRAFT_STATUSES.includes( status ) && ! wasPublished ) {
+	// A draft saved as a draft is the everyday case and needs no status.
+	const stayedDraft =
+		DRAFT_STATUSES.includes( status ) &&
+		( ! previousStatus || DRAFT_STATUSES.includes( previousStatus ) );
+	if ( stayedDraft ) {
 		/* translators: %s: collaborator display name */
 		return sprintf( __( 'Draft saved by %s.' ), name );
 	}
 
-	// Any other status change, such as to "pending" or to a status a plugin
-	// registered, names the status the collaborator moved the post to, using
-	// its registered label. A core transition lands here too when the post
-	// type's labels have not loaded yet. A save that keeps the status is
-	// reported as a plain save, and so is a status whose label cannot be
-	// loaded.
-	if ( status !== previousStatus && ! DRAFT_STATUSES.includes( status ) ) {
+	// Any other status change names the status the collaborator moved the
+	// post to, using its registered label: into "pending" or a status a
+	// plugin registered, and also out of such a status back to draft, so
+	// leaving a status like "Embargoed" is visible. A core transition lands
+	// here too when the post type's labels have not loaded yet. A save that
+	// keeps the status is reported as a plain save, and so is a status whose
+	// label cannot be loaded.
+	if ( status !== previousStatus ) {
 		const statusLabel = await getStatusLabel();
 
 		if ( statusLabel ) {

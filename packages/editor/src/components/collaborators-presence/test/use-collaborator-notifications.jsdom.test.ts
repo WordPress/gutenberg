@@ -486,7 +486,14 @@ describe( 'useCollaboratorNotifications', () => {
 				postStatus: 'embargo',
 				saveEventStatus: 'draft',
 				prevEvent: null,
-				expected: 'Draft saved by Alice.',
+				expected: 'Status set to Draft by Alice.',
+			},
+			{
+				description: 'a pending post is moved back to draft',
+				postStatus: 'pending',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Status set to Draft by Alice.',
 			},
 		] )(
 			'fires "$expected" when $description',
