@@ -160,10 +160,10 @@ export const WithLinkInDescription: Story = {
 				<Notice.CloseIconButton />
 			</Notice.Root>
 			<Notice.Root intent="success">
-				<Notice.Title>Changes saved</Notice.Title>
+				<Notice.Title>Backup complete</Notice.Title>
 				<Notice.Description>
-					Your changes are now live.{ ' ' }
-					<Link href="#">View your changes</Link>.
+					Your site was backed up successfully.{ ' ' }
+					<Link href="#">Learn more about backups</Link>.
 				</Notice.Description>
 				<Notice.CloseIconButton />
 			</Notice.Root>
