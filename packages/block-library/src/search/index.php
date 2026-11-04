@@ -190,6 +190,7 @@ function render_block_core_search( $attributes ) {
 		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
 
+		// Mirror the derived state from view.js so server-side directive processing keeps the attributes.
 		wp_interactivity_state(
 			'core/search',
 			array(
