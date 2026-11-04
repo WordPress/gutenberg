@@ -1112,6 +1112,31 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		} as InternalImageEditorState;
 		// The square crop for the 2:1 image.
 		const FITTED = computeInscribedRect( 1, { width: 1200, height: 600 } );
+		const MISMATCHED = {
+			...createImageEditorState( { image: IMAGE } ),
+			aspectRatio: 1,
+		} as InternalImageEditorState;
+
+		it( 'fits a supplied locked crop without a canvas or an undo entry', () => {
+			const { result } = renderHook( () => useControlled( MISMATCHED ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+			expect( result.current.changes ).toEqual( [ { isEdit: false } ] );
+		} );
+
+		it( 'keeps a supplied locked crop fitted through the first edit', () => {
+			const { result } = renderHook( () => useControlled( MISMATCHED ) );
+
+			act( () => result.current.controller.setZoom( 2 ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( true );
+		} );
 
 		it( 'fits the crop to the lock when the image loads, and is clean', () => {
 			const { result } = renderHook( () => useControlled( LOCKED ) );

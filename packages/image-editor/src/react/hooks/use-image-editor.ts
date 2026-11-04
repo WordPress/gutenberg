@@ -22,6 +22,7 @@ import { getMinZoom } from '../../core/containment';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
+	areImageEditorStatesEqual,
 	enforceContainment,
 	fitCropToLockedRatio,
 	isStateDirty,
@@ -174,7 +175,16 @@ export function useInternalImageEditor(
 	// A state the consumer passes back is usually one the editor handed
 	// out, which carries the values the editor keeps for itself. One built
 	// by hand does not, so fill them in rather than read them as undefined.
-	const state = isControlled ? withBaseValues( controlledState ) : ownState;
+	const suppliedState = isControlled
+		? withBaseValues( controlledState )
+		: ownState;
+	const state =
+		isControlled && fitCropToLockedRatio( suppliedState ) !== suppliedState
+			? imageEditorReducer( suppliedState, {
+					type: 'SET_CROP_RECT',
+					payload: suppliedState.cropRect,
+				} )
+			: suppliedState;
 
 	// The clean state `isDirty` compares against and `reset` returns to.
 	// It starts as the consumer's starting state, and follows the changes
@@ -198,6 +208,19 @@ export function useInternalImageEditor(
 	useLayoutEffect( () => {
 		onChangeRef.current = onChange;
 	}, [ onChange ] );
+	// Correct a supplied crop before it can be read or edited. Send the
+	// correction back to the consumer without adding an undo entry.
+	useLayoutEffect( () => {
+		if ( ! isControlled || state === suppliedState ) {
+			return;
+		}
+		if ( ! hasEditedRef.current ) {
+			setBaseline( ( current ) =>
+				areImageEditorStatesEqual( current, state ) ? current : state
+			);
+		}
+		onChangeRef.current?.( state, { isEdit: false } );
+	}, [ isControlled, state, suppliedState ] );
 
 	const apply = useCallback(
 		( action: ImageEditorAction, isEdit = true ) => {
