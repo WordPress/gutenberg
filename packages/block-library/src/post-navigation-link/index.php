@@ -197,50 +197,31 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		);
 	}
 
-	$background        = $block_styles['background'] ?? array();
-	$background_styles = array(
-		'backgroundImage'      => $background['backgroundImage'] ?? null,
-		'backgroundSize'       => $background['backgroundSize'] ?? null,
-		'backgroundPosition'   => $background['backgroundPosition'] ?? null,
-		'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,
-		'backgroundAttachment' => $background['backgroundAttachment'] ?? null,
-		'gradient'             => $background['gradient'] ?? null,
-	);
+	$background = $block_styles['background'] ?? null;
 
-	// Mirrors the background image defaults of the background block support.
-	if ( ! empty( $background_styles['backgroundImage'] ) ) {
-		$background_styles['backgroundSize'] ??= 'cover';
-		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
-			$background_styles['backgroundPosition'] = '50% 50%';
-		}
+	// Post Navigation Link has no clip support, so ignore a stale value.
+	if ( is_array( $background ) ) {
+		unset( $background['backgroundClip'] );
 	}
 
-	$styles = wp_style_engine_get_styles(
+	$background_styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
+
+	$styles         = wp_style_engine_get_styles(
 		array(
-			'background' => $background_styles,
 			'border'     => $border_styles,
 			'dimensions' => array(
 				'minHeight' => $block_styles['dimensions']['minHeight'] ?? null,
 				'minWidth'  => $block_styles['dimensions']['minWidth'] ?? null,
 			),
 			'shadow'     => $block_styles['shadow'] ?? null,
-			'spacing'    => array(
-				'margin'  => $block_styles['spacing']['margin'] ?? null,
-				'padding' => $block_styles['spacing']['padding'] ?? null,
-			),
 		)
 	);
+	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
 
-	$class_names = $styles['classnames'] ?? '';
-
-	// The style engine only adds `has-background` for a gradient, the background block support adds it for an image too.
-	if ( ! empty( $background_styles['backgroundImage'] ) && ! in_array( 'has-background', explode( ' ', $class_names ), true ) ) {
-		$class_names = trim( "{$class_names} has-background" );
-	}
-
+	// The style engine outputs background before the other groups, so it leads here too.
 	return array(
-		'class' => $class_names,
-		'style' => $styles['css'] ?? '',
+		'class' => trim( ( $background_styles['class'] ?? '' ) . ' ' . ( $styles['classnames'] ?? '' ) ),
+		'style' => ( $background_styles['style'] ?? '' ) . ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 }
 

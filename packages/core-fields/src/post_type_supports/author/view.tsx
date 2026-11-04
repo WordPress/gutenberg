@@ -22,23 +22,32 @@ export default function AuthorView( { item }: { item: PostWithAuthor } ) {
 	const shouldFetch = Boolean(
 		authorId && ( ! embeddedAuthorId || authorId !== embeddedAuthorId )
 	);
-	const author = useSelect(
+	const { author, hasResolved } = useSelect(
 		( select ) => {
 			if ( ! shouldFetch ) {
-				return null;
+				return { author: null, hasResolved: true };
 			}
-			const { getEntityRecords } = select( coreStore );
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreStore );
 			// Query the collection with `who: 'authors'` instead of calling
 			// `getEntityRecord`, because the single user endpoint denies
 			// access to authors without published posts for users who can't
 			// list users. See https://core.trac.wordpress.org/ticket/56429.
-			return (
-				getEntityRecords< User >( 'root', 'user', {
-					include: [ authorId ],
-					who: 'authors',
-					context: 'view',
-				} )?.[ 0 ] ?? null
-			);
+			const query = {
+				include: [ authorId ],
+				who: 'authors',
+				context: 'view',
+			};
+			return {
+				author:
+					getEntityRecords< User >( 'root', 'user', query )?.[ 0 ] ??
+					null,
+				hasResolved: hasFinishedResolution( 'getEntityRecords', [
+					'root',
+					'user',
+					query,
+				] ),
+			};
 		},
 		[ authorId, shouldFetch ]
 	);
@@ -48,8 +57,11 @@ export default function AuthorView( { item }: { item: PostWithAuthor } ) {
 		author?.avatar_urls?.[ 48 ] ||
 		item?._embedded?.author?.[ 0 ]?.avatar_urls?.[ 48 ];
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	// Some items have no author, like the patterns of themes.
-	if ( ! authorId ) {
+	// Some items have no author, like the patterns of themes, and the author
+	// id of others matches no user listed as an author, like a deleted user
+	// or one whose role can no longer edit posts. A panel row shows the
+	// field's placeholder for both.
+	if ( ! authorId || ( ! text && hasResolved ) ) {
 		return null;
 	}
 	return (

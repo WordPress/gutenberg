@@ -114,15 +114,17 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 	}
 
 	public function test_rendered_link_includes_border_dimensions_shadow_and_spacing() {
-		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
+		$attributes                                      = $this->styled_attributes();
+		$attributes['style']['spacing']['margin']['top'] = 'var:preset|spacing|30';
 
-		$this->assertStringContainsString( 'border-style:dashed', $output );
-		$this->assertStringContainsString( 'border-width:3px', $output );
-		$this->assertStringContainsString( 'min-height:100px', $output );
-		$this->assertStringContainsString( 'min-width:200px', $output );
-		$this->assertStringContainsString( 'box-shadow:10px 10px 5px #000000', $output );
-		$this->assertStringContainsString( 'padding-top:20px', $output );
-		$this->assertStringContainsString( 'margin-top:30px', $output );
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'div' ) );
+		$this->assertSame(
+			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:var(--wp--preset--spacing--30)',
+			$processor->get_attribute( 'style' )
+		);
 		$this->assertStringContainsString( 'has-border-color', $output );
 		$this->assertStringContainsString( 'has-accent-2-border-color', $output );
 	}
@@ -218,6 +220,37 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'has-background', $output );
 	}
 
+	public function test_rendered_link_style_starts_with_the_background() {
+		$attributes                                    = $this->styled_attributes();
+		$attributes['style']['background']['gradient'] = 'linear-gradient(red, blue)';
+
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'div' ) );
+		$this->assertSame(
+			'background-image:linear-gradient(red, blue);border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
+			$processor->get_attribute( 'style' )
+		);
+	}
+
+	public function test_background_ignores_clip() {
+		$attributes = array(
+			'type'  => 'previous',
+			'style' => array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(red, blue)',
+					'backgroundClip' => 'text',
+				),
+			),
+		);
+
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$this->assertStringNotContainsString( 'background-clip', $output );
+		$this->assertSame( 1, substr_count( $output, 'has-background' ) );
+	}
+
 	public function test_null_from_the_post_link_filter_omits_the_styles() {
 		add_filter( 'previous_post_link', '__return_null' );
 		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
@@ -226,5 +259,21 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( '></div>', $output, 'The wrapper should render with no content.' );
 		$this->assertStringNotContainsString( 'style=', $output );
 		$this->assertStringNotContainsString( 'has-border-color', $output );
+	}
+
+	public function test_rendered_link_full_support_classes_and_styles() {
+		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$processor->next_tag( 'div' );
+
+		$this->assertSame(
+			'post-navigation-link-previous has-border-color has-accent-2-border-color wp-block-post-navigation-link',
+			$processor->get_attribute( 'class' )
+		);
+		$this->assertSame(
+			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
+			$processor->get_attribute( 'style' )
+		);
 	}
 }

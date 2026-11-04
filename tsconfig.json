@@ -128,6 +128,7 @@
 		{ "path": "storybook" },
 		{ "path": "tools/build-scripts" },
 		{ "path": "tools/monorepo" },
+		{ "path": "tools/phpstan" },
 		{ "path": "tools/pr-meta" },
 		{ "path": "tools/project-management-automation" },
 		{ "path": "tools/release" },
