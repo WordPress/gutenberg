@@ -4,7 +4,7 @@ import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
-import { getHtmlFallback } from '../vdom';
+import { getHtmlFallback, getHtmlServerContent } from '../vdom';
 import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
 
 /**
@@ -17,6 +17,17 @@ import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
  */
 const isServerHTMLRepresentation = ( value: unknown ): boolean =>
 	isPlainObject( value ) && value.wpServerHtml === true;
+
+/**
+ * Replaces an element's child nodes with a copy of a server content snapshot's
+ * nodes, without writing an HTML string.
+ *
+ * @param node    The element whose content is replaced.
+ * @param content The detached, script-free snapshot, left unmodified.
+ */
+const showServerContent = ( node: HTMLElement, content: DocumentFragment ) => {
+	node.replaceChildren( node.ownerDocument.importNode( content, true ) );
+};
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
 directive(
@@ -32,6 +43,14 @@ directive(
 		// Inputs are compared inside the effect so host replacements can be
 		// detected on every commit without repeating unchanged value-rule work.
 		const previousInputs = useRef< unknown[] | null >( null );
+		// Server content snapshot of the vnode at the host's previous commit.
+		const previousServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
+		// Server content that navigation brought to the kept host, not yet shown.
+		const owedServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
 		// Preact always receives empty HTML; fallback copies and later writes
 		// belong to this directive's layout effect.
 		const preactHtml = useRef< {
@@ -65,7 +84,9 @@ directive(
 
 		// Only supported default entries own the element's content.
 		const active = !! entry && ! entry.uniqueId;
-		// Pending values and the server token representation keep content as-is.
+		// Pending values and the server token representation keep the content,
+		// apart from the representation showing server content that navigation
+		// brought to a kept host.
 		const serverHTMLRepresentation = isServerHTMLRepresentation( result );
 		const preserveContent =
 			result === PENDING_GETTER || serverHTMLRepresentation;
@@ -75,10 +96,13 @@ directive(
 		const resolvedValue = trusted ? getDangerousHTML( result ) : emptyHTML;
 		// The detached fallback captured when this vnode was built.
 		const fallback = getHtmlFallback( element );
+		// The page's server-rendered content, absent for template content.
+		const serverContent = getHtmlServerContent( element );
 
 		// Apply after commit; matching server nodes or content kept for the
 		// representation can be adopted without another innerHTML write. The
-		// vnode dependency makes this run for possible host replacements too.
+		// vnode dependency makes this run for possible host replacements and
+		// for vnodes that navigation brings from another page's markup.
 		useLayoutEffect( () => {
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
 			const hostChanged = previousHost.current !== node;
@@ -102,6 +126,7 @@ directive(
 			if ( hostChanged ) {
 				previousHost.current = node;
 				lastAppliedKey.current = undefined;
+				owedServerContent.current = undefined;
 				if (
 					active &&
 					preserveContent &&
@@ -112,9 +137,21 @@ directive(
 						node.ownerDocument.importNode( fallback, true )
 					);
 				}
+			} else if ( serverContent !== previousServerContent.current ) {
+				// Navigation rendered the kept host from another page's markup.
+				owedServerContent.current = serverContent;
 			}
+			previousServerContent.current = serverContent;
 
 			if ( ! active ) {
+				return;
+			}
+			if ( serverHTMLRepresentation && owedServerContent.current ) {
+				showServerContent( node, owedServerContent.current );
+				owedServerContent.current = undefined;
+				// The shown content differs from what was last applied, so the
+				// next token is compared with the DOM, as at hydration.
+				lastAppliedKey.current = undefined;
 				return;
 			}
 			if ( ! hostChanged && ! inputsChanged ) {
@@ -167,6 +204,7 @@ directive(
 			trusted,
 			resolvedValue,
 			fallback,
+			serverContent,
 			element.ref,
 			element,
 		] );
