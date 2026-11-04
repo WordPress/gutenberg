@@ -38,6 +38,40 @@ export function toHTMLString( {
 	return createChildrenHTML( tree.children );
 }
 
+/**
+ * Creates the HTML of the editable tree of a value: the markup `toDom` builds
+ * as nodes, with the editor-only attributes and the placeholder.
+ *
+ * @param $1             Named arguments.
+ * @param $1.value       The value, with editor-only formats prepared.
+ * @param $1.placeholder Placeholder text.
+ *
+ * @return The HTML.
+ */
+export function toEditableHTMLString( {
+	value,
+	placeholder,
+}: {
+	value: RichTextValue;
+	placeholder?: string;
+} ): string {
+	const tree = toTree< HTMLTreeNode >( {
+		value,
+		createEmpty,
+		append,
+		getLastChild,
+		getParent,
+		isText,
+		getText,
+		remove,
+		appendText,
+		isEditableTree: true,
+		placeholder,
+	} );
+
+	return createChildrenHTML( tree.children );
+}
+
 function createEmpty() {
 	return {};
 }
@@ -105,8 +139,10 @@ function createElementHTML( {
 			continue;
 		}
 
+		// The editable tree marks some attributes with `true`, which
+		// `setAttribute` turns into a string.
 		attributeString += ` ${ key }="${ escapeAttribute(
-			attributes[ key ] as string
+			String( attributes[ key ] )
 		) }"`;
 	}
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.1.0 (2026-11-04)
+
 ### New Features
 
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
