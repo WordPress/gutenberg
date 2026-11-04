@@ -101,15 +101,19 @@ export const getMediaColor = memoize( async ( url ) => {
  * @return {boolean} true if the color combination composite result is dark.
  */
 export function compositeIsDark( dimRatio, overlayColor, backgroundColor ) {
+	const overlay = colord( overlayColor );
 	// Opacity doesn't matter if you're overlaying the same color on top of itself.
 	// And background doesn't matter when overlay is fully opaque.
-	if ( overlayColor === backgroundColor || dimRatio === 100 ) {
-		return colord( overlayColor ).isDark();
+	if (
+		overlayColor === backgroundColor ||
+		( dimRatio === 100 && overlay.alpha() === 1 )
+	) {
+		return overlay.isDark();
 	}
-	const overlay = colord( overlayColor )
-		.alpha( dimRatio / 100 )
-		.toRgb();
 	const background = colord( backgroundColor ).toRgb();
-	const composite = compositeSourceOver( overlay, background );
+	const composite = compositeSourceOver(
+		overlay.alpha( ( overlay.alpha() * dimRatio ) / 100 ).toRgb(),
+		background
+	);
 	return colord( composite ).isDark();
 }
