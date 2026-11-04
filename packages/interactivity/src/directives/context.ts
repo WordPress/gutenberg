@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import { useContext, useRef } from 'preact/hooks';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { warn, isPlainObject, deepClone } from '../utils';
+import { warn, isPlainObject, deepClone, getOwnProperty } from '../utils';
 import { proxifyState, proxifyContext, deepMerge } from '../proxies';
 
 // data-wp-context---[unique-id] — Local state scoping with DOM inheritance.
@@ -30,11 +30,13 @@ directive(
 		const { Provider } = inheritedContext;
 		const { client: inheritedClient, server: inheritedServer } =
 			useContext( inheritedContext );
-		const client = useRef( {} );
-		const server = {};
+		const client = useRef< Record< string, object > >(
+			Object.create( null )
+		);
+		const server: Record< string, object > = Object.create( null );
 		const result = {
-			client: { ...inheritedClient },
-			server: { ...inheritedServer },
+			client: Object.assign( Object.create( null ), inheritedClient ),
+			server: Object.assign( Object.create( null ), inheritedServer ),
 		};
 		const namespaces = new Set< string >();
 
@@ -53,7 +55,7 @@ directive(
 
 			// If the namespace doesn't exist yet, initializes an empty
 			// proxified state for that namespace's client context.
-			if ( ! client.current[ namespace ] ) {
+			if ( ! getOwnProperty( client.current, namespace ) ) {
 				client.current[ namespace ] = proxifyState( namespace, {} );
 			}
 
@@ -71,11 +73,11 @@ directive(
 		namespaces.forEach( ( namespace ) => {
 			result.client[ namespace ] = proxifyContext(
 				client.current[ namespace ],
-				inheritedClient[ namespace ]
+				getOwnProperty( inheritedClient, namespace )
 			);
 			result.server[ namespace ] = proxifyContext(
 				server[ namespace ],
-				inheritedServer[ namespace ]
+				getOwnProperty( inheritedServer, namespace )
 			);
 		} );
 
