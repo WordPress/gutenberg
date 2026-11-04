@@ -1,0 +1,28 @@
+{
+	"name": "straddle",
+	"description": "B bolds across the edge of A's addition: one formatting suggestion, partly inside it.",
+	"phase": "B",
+	"users": { "A": "overlap-anne", "B": "overlap-bob" },
+	"base": "Hello world.",
+	"suggestions": [
+		{ "key": "A", "author": "A", "kind": "add", "text": " big", "at": 5 },
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 3, 9 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		}
+	],
+	"expect": {
+		"all-accepted": "Hel<b>lo big</b> world.",
+		"all-rejected": "Hello world."
+	},
+	"cases": [
+		{
+			"decisions": { "A": "reject", "B": "accept" },
+			"published": "Hel<b>lo</b> world."
+		}
+	]
+}

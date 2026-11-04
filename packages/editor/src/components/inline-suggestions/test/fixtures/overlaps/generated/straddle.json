@@ -1,0 +1,213 @@
+{
+	"name": "straddle",
+	"phase": "B",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob"
+	},
+	"html": "Hel<mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"format\" data-author=\"{{author:B}}\" class=\"wp-suggestion-format\"><strong>lo</strong></mark><mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"add\" data-author=\"{{author:A}}\" class=\"wp-suggestion-add\"><mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"format\" data-author=\"{{author:B}}\" class=\"wp-suggestion-format\"><strong> big</strong></mark></mark> world.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "lo big",
+				"afterHTML": "<strong>lo big</strong>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 6,
+						"added": [
+							{
+								"type": "core/bold"
+							}
+						],
+						"removed": []
+					}
+				]
+			}
+		}
+	],
+	"views": {
+		"displayed": "Hel<b>lo big</b> world.",
+		"acceptedHTML": "Hel<strong>lo big</strong> world.",
+		"rejectedHTML": "Hello world."
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					}
+				],
+				"published": "Hel<b>lo big</b> world.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "Hel<strong>lo big</strong> world."
+			},
+			{
+				"label": "+A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hello big world.",
+						"outdated": []
+					}
+				],
+				"published": "Hello big world.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Hello big world."
+			},
+			{
+				"label": "-A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hel<b>lo</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hel<b>lo</b> world.",
+						"outdated": []
+					}
+				],
+				"published": "Hel<b>lo</b> world.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Hel<strong>lo</strong> world."
+			},
+			{
+				"label": "-A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hel<b>lo</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hello world.",
+						"outdated": []
+					}
+				],
+				"published": "Hello world.",
+				"accepted": [],
+				"publishedHTML": "Hello world."
+			},
+			{
+				"label": "+B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					}
+				],
+				"published": "Hel<b>lo big</b> world.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "Hel<strong>lo big</strong> world."
+			},
+			{
+				"label": "+B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hel<b>lo big</b> world.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hel<b>lo</b> world.",
+						"outdated": []
+					}
+				],
+				"published": "Hel<b>lo</b> world.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Hel<strong>lo</strong> world."
+			},
+			{
+				"label": "-B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hello big world.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hello big world.",
+						"outdated": []
+					}
+				],
+				"published": "Hello big world.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Hello big world."
+			},
+			{
+				"label": "-B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hello big world.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hello world.",
+						"outdated": []
+					}
+				],
+				"published": "Hello world.",
+				"accepted": [],
+				"publishedHTML": "Hello world."
+			}
+		]
+	}
+}

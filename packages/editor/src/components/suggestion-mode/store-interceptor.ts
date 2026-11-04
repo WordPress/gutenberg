@@ -64,9 +64,11 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionSession } from './suggestion-session';
 import {
+	authorMarker,
 	mergeProposedAttributes,
 	proposedAttributes,
 	readSuggestionMarker,
+	withAuthorMarker,
 	withProposedAttributes,
 	withSuggestionMarker,
 } from './marker';
@@ -518,6 +520,29 @@ function captureTreeSnapshot( blockEditor: any ) {
 }
 
 /**
+ * Whether a marker is a pending insertion the author may edit as part of it:
+ * theirs, or one with no recorded author. Another author's suggested block
+ * is suggested content like any other, so edits to it are suggestions.
+ *
+ * @param suggestion `metadata.suggestion` value.
+ * @param authorId   Current author; omitted, any insertion counts.
+ * @return Whether it counts.
+ */
+function isAuthorsInsertion(
+	suggestion: any,
+	authorId?: number | string | null
+): boolean {
+	return (
+		suggestion?.type === 'pending-insert' &&
+		( authorId === undefined ||
+			authorId === null ||
+			suggestion.authorId === undefined ||
+			suggestion.authorId === null ||
+			String( suggestion.authorId ) === String( authorId ) )
+	);
+}
+
+/**
  * Whether a block is part of a pending block-insertion suggestion: either the
  * block itself carries a `pending-insert` marker, or one of its ancestors
  * does (the children of a suggested-in Group are part of the Group's
@@ -525,29 +550,33 @@ function captureTreeSnapshot( blockEditor: any ) {
  *
  * Edits inside such a block are part of the insertion — the block has no
  * "before" state to preserve — so callers let them write through to the real
- * attributes instead of opening a separate suggestion.
+ * attributes instead of opening a separate suggestion. Given an author, only
+ * their own insertions count.
  *
  * @param blockEditor Block-editor selectors (anything exposing
  *                    `getBlockAttributes` and `getBlockParents`).
  * @param clientId    Block client ID.
+ * @param authorId    Current author, when edits by others matter.
  * @return True when the block or an ancestor is a pending insert.
  */
 function isPartOfPendingInsertion(
 	blockEditor: any,
-	clientId: string
+	clientId: string,
+	authorId?: number | string | null
 ): boolean {
 	if ( ! blockEditor ) {
 		return false;
 	}
-	const markerType = ( id: string ) =>
-		blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion?.type;
-	if ( markerType( clientId ) === 'pending-insert' ) {
+	const counts = ( id: string ) =>
+		isAuthorsInsertion(
+			blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion,
+			authorId
+		);
+	if ( counts( clientId ) ) {
 		return true;
 	}
 	const parents = blockEditor.getBlockParents?.( clientId ) ?? [];
-	return parents.some(
-		( id: string ) => markerType( id ) === 'pending-insert'
-	);
+	return parents.some( counts );
 }
 
 /**
@@ -557,17 +586,22 @@ function isPartOfPendingInsertion(
  *
  * @param tree     Tree snapshot from `captureTreeSnapshot`.
  * @param clientId Block client ID.
+ * @param authorId Current author, when only their insertions count.
  * @return True when a recorded ancestor is a pending insert.
  */
 function wasInsidePendingInsertion(
 	tree: ReturnType< typeof captureTreeSnapshot >,
-	clientId: string
+	clientId: string,
+	authorId?: number | string | null
 ): boolean {
 	let parentId = tree.parentByClientId.get( clientId ) ?? null;
 	while ( parentId !== null ) {
 		if (
-			tree.blocksByClientId.get( parentId )?.attributes?.metadata
-				?.suggestion?.type === 'pending-insert'
+			isAuthorsInsertion(
+				tree.blocksByClientId.get( parentId )?.attributes?.metadata
+					?.suggestion,
+				authorId
+			)
 		) {
 			return true;
 		}
@@ -673,15 +707,17 @@ const pendingInsertionsByVersion = new WeakMap< object, Set< string > >();
  *
  * @param blockEditor Block-editor selectors.
  * @param clientId    Block client ID.
+ * @param authorId    Current author, when edits by others matter.
  * @return True when the block or an ancestor is a pending insert.
  */
 function isPartOfPendingInsertionCached(
 	blockEditor: any,
-	clientId: string
+	clientId: string,
+	authorId?: number | string | null
 ): boolean {
 	const version = getBlockTreeVersion( blockEditor );
 	if ( ! version ) {
-		return isPartOfPendingInsertion( blockEditor, clientId );
+		return isPartOfPendingInsertion( blockEditor, clientId, authorId );
 	}
 	let pending = pendingInsertionsByVersion.get( version );
 	if ( ! pending ) {
@@ -701,7 +737,13 @@ function isPartOfPendingInsertionCached(
 		}
 		pendingInsertionsByVersion.set( version, pending );
 	}
-	return pending.has( clientId );
+	if ( ! pending.has( clientId ) ) {
+		return false;
+	}
+	// Rare: a block inside an insertion. Whose it is takes the walk.
+	return authorId === undefined
+		? true
+		: isPartOfPendingInsertion( blockEditor, clientId, authorId );
 }
 
 /**
@@ -1547,7 +1589,11 @@ export default function SuggestionStoreInterceptor() {
 					// an empty child is adopted right away.
 					if (
 						parentClientId !== null &&
-						isPartOfPendingInsertion( blockEditor, parentClientId )
+						isPartOfPendingInsertion(
+							blockEditor,
+							parentClientId,
+							currentUserId
+						)
 					) {
 						adoptInheritedBlock( clientId, current );
 						continue;
@@ -1739,7 +1785,13 @@ export default function SuggestionStoreInterceptor() {
 				// collaborators) instead of being diverted into the overlay,
 				// where it would surface as a second note next to the
 				// "Insert block" one.
-				if ( isPartOfPendingInsertion( blockEditor, clientId ) ) {
+				if (
+					isPartOfPendingInsertion(
+						blockEditor,
+						clientId,
+						currentUserId
+					)
+				) {
 					snapshot.set( clientId, current );
 					continue;
 				}
@@ -1998,6 +2050,41 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 				/*
+				 * A block another author suggested moving keeps their move:
+				 * a second pending move in one sibling list cannot be
+				 * restored (see Known Limitations), so this one goes back.
+				 */
+				const outerMarker = readSuggestionMarker( currentAttrs );
+				if (
+					outerMarker?.type === 'pending-move' &&
+					outerMarker !== authorMarker( currentAttrs, currentUserId )
+				) {
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.moveBlockToPosition(
+							move.clientId,
+							move.toParentClientId ?? '',
+							move.fromParentClientId ?? '',
+							move.fromIndex
+						);
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+					registry
+						.dispatch( noticesStore )
+						?.createInfoNotice(
+							__(
+								'Someone else has already suggested moving this block.'
+							),
+							{
+								id: 'suggestion-move-over-move',
+								type: 'snackbar',
+							}
+						);
+					continue;
+				}
+				/*
 				 * Rearranging a pending insertion is not a move of baseline
 				 * content: it has no published position to go back to, and
 				 * the server leaves it out of the published render only
@@ -2056,6 +2143,20 @@ export default function SuggestionStoreInterceptor() {
 						blockEditor,
 						move.fromParentClientId
 					);
+				/*
+				 * Moving another author's suggested block only changes where
+				 * it is proposed; their marker records the insertion and its
+				 * note follows the block.
+				 */
+				if (
+					ownMarker === 'pending-insert' &&
+					! isAuthorsInsertion(
+						currentAttrs.metadata?.suggestion,
+						currentUserId
+					)
+				) {
+					continue;
+				}
 				if ( ownMarker === 'pending-insert' || leftInsertion ) {
 					if (
 						ownMarker !== 'pending-insert' &&
@@ -2147,12 +2248,18 @@ export default function SuggestionStoreInterceptor() {
 				try {
 					// Programmatic marker write — keep it off the undo stack.
 					blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+					// On another author's suggestion the move takes the
+					// outer place and their suggestion nests under it.
 					blockEditorDispatch.updateBlockAttributes( move.clientId, {
-						metadata: withSuggestionMarker( currentAttrs.metadata, {
-							type: 'pending-move',
-							authorId: currentUserId,
-							...from,
-						} ),
+						metadata: withAuthorMarker(
+							currentAttrs.metadata,
+							currentUserId,
+							{
+								type: 'pending-move',
+								authorId: currentUserId,
+								...from,
+							}
+						),
 					} );
 				} finally {
 					isDispatchingOwnWrite = false;
@@ -2215,14 +2322,22 @@ export default function SuggestionStoreInterceptor() {
 					// Content inside a pending insertion has no published
 					// state to preserve either, so removing it (or the
 					// whole insertion with it) stands.
+					//
+					// Another author's suggested block is theirs: removing
+					// it is a suggestion nested on theirs.
 					const trackedAttributes =
 						tree.blocksByClientId.get( clientId )?.attributes;
-					const trackedMarker =
-						trackedAttributes?.metadata?.suggestion?.type;
 					if (
-						trackedMarker === 'pending-insert' ||
+						isAuthorsInsertion(
+							trackedAttributes?.metadata?.suggestion,
+							currentUserId
+						) ||
 						dissolvedThisFire.has( clientId ) ||
-						wasInsidePendingInsertion( tree, clientId ) ||
+						wasInsidePendingInsertion(
+							tree,
+							clientId,
+							currentUserId
+						) ||
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );
@@ -2289,7 +2404,8 @@ export default function SuggestionStoreInterceptor() {
 					 * proposed from the block's place in the post: rejecting
 					 * it then leaves the post as it was, rather than with the
 					 * block parked where a move nobody accepted put it. The
-					 * restore is the move's own reject plan.
+					 * restore is the move's own reject plan. Another author's
+					 * move is theirs to keep: the removal nests over it.
 					 */
 					for ( const clientId of tops ) {
 						const marker = readSuggestionMarker(
@@ -2297,6 +2413,12 @@ export default function SuggestionStoreInterceptor() {
 						);
 						const moveOp =
 							marker?.type === 'pending-move' &&
+							marker ===
+								authorMarker(
+									tree.blocksByClientId.get( clientId )
+										?.attributes,
+									currentUserId
+								) &&
 							structuralOpFromMarker(
 								clientId,
 								marker,
@@ -2352,9 +2474,11 @@ export default function SuggestionStoreInterceptor() {
 					const block = tree.blocksByClientId.get( clientId );
 					const groupId = groupIds.get( clientId );
 					// An attribute proposal riding on a move the restore above
-					// cleared stays with the block.
+					// cleared stays with the block. Only the author's own:
+					// on another author's suggestion the removal nests, and
+					// their proposal stays theirs.
 					const after = proposedAttributes(
-						readSuggestionMarker( block?.attributes )
+						authorMarker( block?.attributes, currentUserId )
 					);
 					isDispatchingOwnWrite = true;
 					try {
@@ -2362,8 +2486,9 @@ export default function SuggestionStoreInterceptor() {
 						// stack.
 						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
-							metadata: withSuggestionMarker(
+							metadata: withAuthorMarker(
 								currentAttrs.metadata,
+								currentUserId,
 								{
 									type: 'pending-remove',
 									authorId: currentUserId,
