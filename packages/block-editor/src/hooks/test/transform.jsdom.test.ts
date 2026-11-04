@@ -46,6 +46,43 @@ describe( 'getTransformStyleGroups', () => {
 		} );
 	} );
 
+	it( 'outputs a translation and a rotation under the transform feature selector', () => {
+		registerTransformBlock(
+			{ rotate: true, translate: true },
+			{ transform: '.wp-block-test-transform img' }
+		);
+
+		expect(
+			getTransformStyleGroups( 'test/transform', {
+				rotate: '15deg',
+				translate: { x: '10px' },
+			} )
+		).toEqual( {
+			inline: {},
+			bySelector: {
+				'.wp-block-test-transform img': {
+					rotate: '15deg',
+					translate: { x: '10px' },
+				},
+			},
+		} );
+	} );
+
+	it( 'leaves a translation that skips serialization to the block', () => {
+		registerTransformBlock( {
+			rotate: true,
+			translate: true,
+			__experimentalSkipSerialization: [ 'translate' ],
+		} );
+
+		expect(
+			getTransformStyleGroups( 'test/transform', {
+				rotate: '15deg',
+				translate: { x: '10px' },
+			} )
+		).toEqual( { inline: { rotate: '15deg' }, bySelector: {} } );
+	} );
+
 	it( 'leaves a rotation that skips serialization to the block', () => {
 		registerTransformBlock( {
 			rotate: true,
