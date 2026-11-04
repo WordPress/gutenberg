@@ -94,6 +94,9 @@ type PreparePage = (
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map< string, Promise< Page | false > >();
 
+// The page currently rendered in the router regions.
+let currentPage: Page | undefined;
+
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
 const getPagePath = ( url: string ) => {
@@ -363,6 +366,7 @@ const resolveAttachTarget = ( selector: string ): Element | null => {
  * @param page The {@link Page} object to render.
  */
 const renderPage = ( page: Page ) => {
+	currentPage = page;
 	applyStyles( page.styles );
 
 	// Keep skipped attachments out of this render without changing the cache.
@@ -514,8 +518,20 @@ const reloadAndDischarge = ( token: number ) => {
 // whatever scope is ambient at `navigate()` entry: an unwrapped `watch()`
 // callback contributes no scope, while a `withScope()`-wrapped callback
 // contributes the scope it installed.
-window.addEventListener( 'popstate', async () => {
+window.addEventListener( 'popstate', async ( event ) => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
+
+	// Ignore entries that were not created by the Interactivity API and are
+	// not cached. They were created by third-party code using the History API
+	// (e.g., an embedded app saving its state to the URL with
+	// `pushState`/`replaceState`), and the router has not rendered a different
+	// page since, so that code is responsible for handling them. Entries left
+	// by a client-side navigation are tagged and cached in
+	// `rememberCurrentEntry()`, so the router restores them.
+	// See https://github.com/WordPress/gutenberg/issues/60455.
+	if ( ! pages.has( pagePath ) && ! event.state?.wpInteractivityId ) {
+		return;
+	}
 
 	// Claim the lifecycle token (see the `navigationId` comment above
 	// `navigate()`). From here on this handler is responsible for ending the
@@ -617,15 +633,47 @@ window.document
 // Await hydration completion before setting the initial page to ensure initialVdom is populated.
 ( async () => {
 	const initialVdomMap = await initialVdomPromise;
-	pages.set(
+	const initialPage = preparePage(
 		getPagePath( window.location.href ),
-		Promise.resolve(
-			preparePage( getPagePath( window.location.href ), document, {
-				vdom: initialVdomMap,
-			} )
-		)
+		document,
+		{ vdom: initialVdomMap }
 	);
+	pages.set( getPagePath( window.location.href ), initialPage );
+	// A client-side navigation may have rendered another page in the meantime.
+	currentPage ??= await initialPage;
 } )();
+
+/**
+ * Prepares the current history entry to be left by a client-side navigation,
+ * so that going back to it restores the page currently rendered.
+ *
+ * Third-party code can create history entries with the History API (e.g., an
+ * embedded app saving its state to the URL). Those entries are not tagged with
+ * the session ID and their URL is usually not cached, so the router ignores
+ * them on `popstate`. Once the router renders a different page, though, going
+ * back to such an entry must restore the page rendered when it was left.
+ *
+ * To do so, the entry is tagged with the session ID, keeping the state stored
+ * by the code that created it, and the rendered page is cached under its URL.
+ * The tag also makes the Interactivity API reload the page if the entry is
+ * visited again after a full page reload, when the cache is gone.
+ */
+const rememberCurrentEntry = () => {
+	const historyState = window.history.state;
+	const isOwnEntry = historyState?.wpInteractivityId === sessionId;
+	const pagePath = getPagePath( window.location.href );
+
+	if ( currentPage && ( ! isOwnEntry || ! pages.has( pagePath ) ) ) {
+		pages.set( pagePath, Promise.resolve( currentPage ) );
+	}
+
+	if ( ! isOwnEntry ) {
+		window.history.replaceState(
+			{ ...historyState, wpInteractivityId: sessionId },
+			''
+		);
+	}
+};
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -851,6 +899,12 @@ export const { state, actions } = store< Store >( 'core/router', {
 						?.clientNavigationDisabled
 				) {
 					yield importScriptModules( page.scriptModules );
+
+					// Tag and cache the entry being left before the new page
+					// replaces the rendered one.
+					if ( ! options.replace ) {
+						rememberCurrentEntry();
+					}
 
 					// The batch keeps `state.url` and `renderPage()` together so
 					// consumers see the URL and the DOM change at once. Derivation

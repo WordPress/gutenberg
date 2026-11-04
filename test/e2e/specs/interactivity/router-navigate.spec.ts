@@ -358,6 +358,59 @@ test.describe( 'Router navigate', () => {
 		);
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/60455.
+	test( 'should restore the page rendered in a third-party history entry left by a client-side navigation', async ( {
+		page,
+	} ) => {
+		const title = page.getByTestId( 'title' );
+		await expect( title ).toHaveText( 'Main' );
+
+		// Adds a tag to the root element to detect an unexpected page
+		// reload; the tag is lost if any back/forward navigation triggers
+		// one. The root element is used because it is not replaced when
+		// router regions are re-rendered.
+		await page.evaluate( () => {
+			document.documentElement.dataset.tag = 'not-reloaded';
+		} );
+
+		// Simulates an embedded app saving its state to the URL with the
+		// History API, followed by a client-side navigation.
+		await page.evaluate( () => {
+			window.history.pushState( { thirdParty: true }, '', '?spa=3' );
+		} );
+		await page.getByTestId( 'link 1' ).click();
+		await expect( title ).toHaveText( 'Link 1' );
+
+		// Going back lands on the third-party entry, which must show the
+		// page rendered when it was left, without a page reload, and keep
+		// the state stored by the third-party code.
+		await page.goBack();
+		await expect( page ).toHaveURL( /spa=3/ );
+		await expect( title ).toHaveText( 'Main' );
+		await expect( page.locator( 'html' ) ).toHaveAttribute(
+			'data-tag',
+			'not-reloaded'
+		);
+		expect(
+			await page.evaluate( () => window.history.state?.thirdParty )
+		).toBe( true );
+
+		await page.goForward();
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( page.locator( 'html' ) ).toHaveAttribute(
+			'data-tag',
+			'not-reloaded'
+		);
+
+		// After a full page reload the cache is gone, so going back to the
+		// third-party entry must reload the page to show the right content.
+		await page.reload();
+		await expect( title ).toHaveText( 'Link 1' );
+		await page.goBack();
+		await expect( page ).toHaveURL( /spa=3/ );
+		await expect( title ).toHaveText( 'Main' );
+	} );
+
 	test( 'should force a page reload when navigating to a page with `clientNavigationDisabled`', async ( {
 		page,
 	} ) => {
