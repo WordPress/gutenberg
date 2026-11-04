@@ -437,7 +437,8 @@ function getCoverage( title: string, searchTokens: string[] ): number {
  * Whether a title is exactly what was typed.
  *
  * Compares words, not the strings typed, so punctuation does not count: for the search
- * "home page", "Home Page" and "Home Page." are both exact, and "Home Page Ideas" is not.
+ * "coffee beans", "Coffee Beans" and "Coffee Beans." are both exact, and "Coffee Beans, Lightly
+ * Roasted" is not.
  *
  * @param title
  * @param searchTokens
@@ -522,8 +523,8 @@ export function sortResults( {
 			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
 			// and only 27% of "Caterpillar"
 			b.score - a.score ||
-			// Then a title that is exactly the search: the search "home" ranks the title "Home"
-			// above "Home Improvement Tips"
+			// Then a title that is exactly the search: the search "coffee beans" ranks the title
+			// "Coffee Beans" above "Coffee Beans, Lightly Roasted"
 			Number( b.exact ) - Number( a.exact )
 	);
 

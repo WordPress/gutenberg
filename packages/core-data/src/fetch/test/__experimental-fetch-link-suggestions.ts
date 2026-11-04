@@ -604,35 +604,35 @@ describe( 'sortResults', () => {
 		const results = [
 			{
 				id: 1,
-				title: 'Home Page Ideas',
-				url: 'http://wordpress.local/home-page-ideas/',
+				title: 'Coffee Beans, Lightly Roasted',
+				url: 'http://wordpress.local/coffee-beans-lightly-roasted/',
 				type: 'page',
 				kind: 'post-type',
 			},
 			{
 				id: 2,
-				title: 'Home Page',
-				url: 'http://wordpress.local/home-page/',
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/coffee-beans/',
 				type: 'page',
 				kind: 'post-type',
 			},
 			{
 				id: 3,
-				title: 'Home Page.',
-				url: 'http://wordpress.local/home-page-2/',
+				title: 'Coffee Beans.',
+				url: 'http://wordpress.local/coffee-beans-2/',
 				type: 'page',
 				kind: 'post-type',
 			},
 		];
 
 		expect(
-			sortResults( { results, search: 'home page' } ).map(
+			sortResults( { results, search: 'coffee beans' } ).map(
 				( { title } ) => title
 			)
 		).toEqual( [
-			'Home Page', // the words searched
-			'Home Page.', // the words searched, ending with a period
-			'Home Page Ideas', // begins with the search, but has words the search does not
+			'Coffee Beans', // the words searched
+			'Coffee Beans.', // the words searched, ending with a period
+			'Coffee Beans, Lightly Roasted', // begins with the search, but has words the search does not
 		] );
 	} );
 
