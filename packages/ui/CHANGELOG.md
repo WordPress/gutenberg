@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout
+
 ### Enhancements
 
 -   `Spinner`: Scale the stroke width with the rendered size, matching the 1.5px stroke of 24px icons. Spinners at the default size are now thinner, and large spinners are thicker ([#85378](https://github.com/WordPress/gutenberg/pull/85378)).

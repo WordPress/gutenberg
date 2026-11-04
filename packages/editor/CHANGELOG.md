@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Align the Tags field loading status with its suggestions and creation action
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
