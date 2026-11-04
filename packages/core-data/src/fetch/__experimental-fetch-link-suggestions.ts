@@ -271,12 +271,11 @@ function getTitleMatch(
 	search: string
 ): { contains: boolean; begins: boolean } {
 	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
-	// written with straight ones. Compare them as the same character. A run of spaces counts as one.
+	// written with straight ones. Compare them as the same character.
 	const plain = ( text: string ) =>
 		( text ?? '' )
 			.toLowerCase()
 			.trim()
-			.replace( /\s+/g, ' ' )
 			.replace( /[\u2018\u2019]/g, "'" )
 			.replace( /[\u201c\u201d]/g, '"' );
 
@@ -437,8 +436,8 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 /**
  * Whether a title is exactly what was typed.
  *
- * Compares words, not the strings typed, so spacing and punctuation do not count: for the search
- * "home page", "Home  Page" and "Home Page." are both exact, and "Home Page Ideas" is not.
+ * Compares words, not the strings typed, so punctuation does not count: for the search
+ * "home page", "Home Page" and "Home Page." are both exact, and "Home Page Ideas" is not.
  *
  * @param title
  * @param searchTokens

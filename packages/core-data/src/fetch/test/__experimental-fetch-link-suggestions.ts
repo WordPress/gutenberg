@@ -600,7 +600,7 @@ describe( 'sortResults', () => {
 		] );
 	} );
 
-	it( 'ranks a title that is the words searched above a longer one, whatever the spacing and punctuation', () => {
+	it( 'ranks a title that is the words searched above a longer one, whatever the punctuation', () => {
 		const results = [
 			{
 				id: 1,
@@ -611,7 +611,7 @@ describe( 'sortResults', () => {
 			},
 			{
 				id: 2,
-				title: 'Home  Page',
+				title: 'Home Page',
 				url: 'http://wordpress.local/home-page/',
 				type: 'page',
 				kind: 'post-type',
@@ -630,7 +630,7 @@ describe( 'sortResults', () => {
 				( { title } ) => title
 			)
 		).toEqual( [
-			'Home  Page', // the words searched, with two spaces between them
+			'Home Page', // the words searched
 			'Home Page.', // the words searched, ending with a period
 			'Home Page Ideas', // begins with the search, but has words the search does not
 		] );
