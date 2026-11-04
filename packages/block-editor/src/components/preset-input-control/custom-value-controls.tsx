@@ -2,6 +2,7 @@ import {
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { Tooltip } from '@wordpress/ui';
 import type { CustomValueControlsProps } from './types';
 
@@ -55,6 +56,18 @@ export default function CustomValueControls( {
 	onMouseOver,
 	setMinValue,
 }: CustomValueControlsProps ) {
+	// Grow the slider to fit a larger value, but keep its max while the
+	// slider sets the value, so a drag doesn't shrink it.
+	const [ sliderChange, setSliderChange ] = useState< {
+		value: string;
+		max: number;
+	} >();
+	const customValue = [ parsedQuantity, computedUnit ].join( '' );
+	const sliderMax =
+		sliderChange?.value === customValue
+			? sliderChange.max
+			: Math.max( max, parsedQuantity ?? 0 );
+
 	const unitControl = (
 		<UnitControl
 			className="preset-input-control__unit-control"
@@ -69,7 +82,7 @@ export default function CustomValueControls( {
 			onMouseOut={ onMouseOut }
 			onMouseOver={ onMouseOver }
 			units={ units }
-			value={ [ parsedQuantity, computedUnit ].join( '' ) }
+			value={ customValue }
 			// A `null` placeholder renders none.
 			placeholder={ allPlaceholder as string | undefined }
 			onDragStart={ () => {
@@ -113,10 +126,16 @@ export default function CustomValueControls( {
 				hideLabelFromVision
 				initialPosition={ 0 }
 				label={ ariaLabel }
-				max={ max }
+				max={ sliderMax }
 				min={ 0 }
 				onBlur={ onMouseOut }
-				onChange={ onCustomValueSliderChange }
+				onChange={ ( next ) => {
+					setSliderChange( {
+						value: [ next, computedUnit ].join( '' ),
+						max: sliderMax,
+					} );
+					onCustomValueSliderChange( next );
+				} }
 				onFocus={ onMouseOver }
 				onMouseOut={ onMouseOut }
 				onMouseOver={ onMouseOver }

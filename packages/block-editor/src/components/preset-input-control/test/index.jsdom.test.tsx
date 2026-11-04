@@ -177,6 +177,53 @@ describe( 'PresetInputControl', () => {
 		expect( slider ).toHaveAttribute( 'aria-label', 'Spacing control' );
 	} );
 
+	it( 'lets the custom value slider reach a value past its max', () => {
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="1000px"
+			/>
+		);
+
+		const slider = screen.getByRole( 'slider' );
+		expect( slider ).toHaveValue( '1000' );
+
+		fireEvent.change( slider, { target: { value: '999' } } );
+		expect( mockOnChange ).toHaveBeenLastCalledWith( '999px' );
+	} );
+
+	it( 'keeps the custom value slider max only for values the slider sets', () => {
+		const { rerender } = render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="1000px"
+			/>
+		);
+
+		const slider = screen.getByRole( 'slider' );
+		fireEvent.change( slider, { target: { value: '500' } } );
+		rerender(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="500px"
+			/>
+		);
+		expect( slider ).toHaveAttribute( 'max', '1000' );
+
+		// A reset.
+		rerender(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presets }
+				value="100px"
+			/>
+		);
+		expect( slider ).toHaveAttribute( 'max', '300' );
+	} );
+
 	it( 'renders without presets as custom input only', () => {
 		render(
 			<PresetInputControl

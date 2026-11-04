@@ -23,6 +23,7 @@
 
 ### Bug Fixes
 
+-   `SpacingSizesControl`: Let the custom value slider reach a value past its usual max, such as a 1000px Spacer height, instead of showing the max and setting it when the slider is moved.
 -   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).
 -   Block style variations: Show a variation's text color over a text gradient set for its block type in Global Styles ([#86164](https://github.com/WordPress/gutenberg/pull/86164)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
