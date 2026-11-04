@@ -37,7 +37,7 @@ export function Notes( {
 	const { onDiscard } = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
@@ -255,7 +255,6 @@ export function Notes( {
 					<AddNote
 						key={ selectedBlockClientId }
 						clientId={ selectedBlockClientId }
-						sidebarRef={ sidebarRef }
 					/>
 				) }
 				{ threads.map( ( thread, index ) => (

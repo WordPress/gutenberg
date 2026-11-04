@@ -8,9 +8,10 @@
  */
 
 return array(
-	'type'     => 'integer',
-	'label'    => __( 'Author' ),
-	'filterBy' => array(
+	'type'        => 'integer',
+	'label'       => __( 'Author' ),
+	'placeholder' => __( '(No author)' ),
+	'filterBy'    => array(
 		'operators' => array( 'isAny', 'isNone' ),
 	),
 );
