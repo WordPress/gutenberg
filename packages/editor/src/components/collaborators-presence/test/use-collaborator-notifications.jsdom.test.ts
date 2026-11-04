@@ -158,14 +158,11 @@ type PreferenceState = {
 	showCollaborationPostSaveNotifications: boolean;
 };
 
-// Labels as WordPress registers them for core statuses, plus one a plugin
-// registered with `register_post_status()`.
-const CORE_STATUSES: PostStatusRecord[] = [
-	{ slug: 'publish', name: 'Published' },
-	{ slug: 'future', name: 'Scheduled' },
-	{ slug: 'draft', name: 'Draft' },
-	{ slug: 'pending', name: 'Pending' },
-	{ slug: 'private', name: 'Private' },
+// Statuses the REST API can resolve: a plugin-registered one, plus a core
+// status whose REST label differs from the editor's own, to prove core
+// statuses never reach the lookup.
+const REGISTERED_STATUSES: PostStatusRecord[] = [
+	{ slug: 'pending', name: 'Pending review (from REST)' },
 	{ slug: 'embargo', name: 'Embargoed' },
 ];
 
@@ -189,7 +186,7 @@ function makeLabels( singular: string ) {
 const DEFAULT_STATE: PreferenceState = {
 	postStatus: 'draft',
 	postTypeLabel: 'Post',
-	postStatuses: CORE_STATUSES,
+	postStatuses: REGISTERED_STATUSES,
 	isCollaborationEnabled: true,
 	showCollaborationJoinNotifications: true,
 	showCollaborationLeaveNotifications: true,
@@ -560,7 +557,7 @@ describe( 'useCollaboratorNotifications', () => {
 			}
 		);
 
-		it( 'only requests a status when the message names it', async () => {
+		it( 'only requests a status the editor does not know', async () => {
 			renderNotifications( { postStatus: 'draft' } );
 
 			// Core transitions have their own wording and need no label.
@@ -574,6 +571,23 @@ describe( 'useCollaboratorNotifications', () => {
 				null
 			);
 			expect( mockGetEntityRecord ).not.toHaveBeenCalled();
+
+			// A core status the message names uses the editor's own label.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'pending',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).not.toHaveBeenCalled();
+			expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+				'info',
+				'Status set to Pending by Alice.',
+				expect.anything()
+			);
 
 			// A move to another status resolves just that status.
 			await mockRegistered.save?.(

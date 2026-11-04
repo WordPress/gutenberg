@@ -12,6 +12,7 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { STATUS_OPTIONS } from '../post-status/constants';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useOnCollaboratorJoin, useOnCollaboratorLeave, useOnPostSave } =
@@ -344,11 +345,19 @@ export function useCollaboratorNotifications(
 				// accurate status change detection across rapid saves.
 				const previousStatus = prevEvent?.postStatus ?? postStatus;
 
-				// Registered statuses carry the label a site set with
-				// `register_post_status()`. The status is only requested
-				// when a message names it, so editor startup makes no extra
-				// request, and the record is cached for later saves.
+				// Core statuses use the same labels as the editor's status
+				// control, with no request. Any other status is requested
+				// only when a message names it, so editor startup makes no
+				// extra request, and the record is cached for later saves.
+				// Its label is the one a site set with `register_post_status()`.
 				const getStatusLabel = async () => {
+					const coreStatusLabel = STATUS_OPTIONS.find(
+						( option ) => option.value === effectiveStatus
+					)?.label;
+					if ( coreStatusLabel ) {
+						return coreStatusLabel;
+					}
+
 					try {
 						const record = await registry
 							.resolveSelect( coreStore )
