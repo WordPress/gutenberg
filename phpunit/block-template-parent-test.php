@@ -28,6 +28,21 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	 */
 	private $template_post_ids = array();
 
+	/**
+	 * The theme directories of the site, restored on tear down.
+	 *
+	 * @var string[]|null
+	 */
+	private $original_theme_directories = null;
+
+	/**
+	 * The templates the `theme.json` of the active theme names, keyed by the
+	 * slug of the template rendered inside each of them.
+	 *
+	 * @var array<string, string>
+	 */
+	private $theme_templates = array();
+
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 	}
@@ -42,7 +57,80 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		}
 		$this->template_post_ids = array();
 
+		if ( null !== $this->original_theme_directories ) {
+			$GLOBALS['wp_theme_directories']  = $this->original_theme_directories;
+			$this->original_theme_directories = null;
+			remove_filter( 'theme_root', array( $this, 'filter_test_theme_root' ) );
+			remove_filter( 'stylesheet_root', array( $this, 'filter_test_theme_root' ) );
+			remove_filter( 'template_root', array( $this, 'filter_test_theme_root' ) );
+			remove_filter( 'wp_theme_json_data_theme', array( $this, 'filter_theme_json_templates' ) );
+			$this->theme_templates = array();
+			wp_clean_themes_cache();
+			unset( $GLOBALS['wp_themes'] );
+			_gutenberg_clean_theme_json_caches();
+		}
+
 		parent::tear_down();
+	}
+
+	/**
+	 * The directory of the themes of the test data.
+	 *
+	 * @return string The path of the directory.
+	 */
+	public function filter_test_theme_root() {
+		return __DIR__ . '/data/themedir1';
+	}
+
+	/**
+	 * Adds the templates of a `theme.json` to the data of the active theme.
+	 *
+	 * @param WP_Theme_JSON_Data_Gutenberg $theme_json The data of the active theme.
+	 * @return WP_Theme_JSON_Data_Gutenberg The data, with the templates added.
+	 */
+	public function filter_theme_json_templates( $theme_json ) {
+		$templates = array();
+		foreach ( $this->theme_templates as $slug => $rendered_inside ) {
+			$templates[] = array(
+				'name'     => $slug,
+				'template' => $rendered_inside,
+			);
+		}
+
+		return $theme_json->update_with(
+			array(
+				'version'   => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'templates' => $templates,
+			)
+		);
+	}
+
+	/**
+	 * Activates the block theme of the test data and has its `theme.json` name
+	 * the template each of its templates is rendered inside.
+	 *
+	 * The declaration is added to the data of the theme rather than written to
+	 * a theme of its own, so that no fixture theme exists only to carry it.
+	 *
+	 * @param array<string, string> $templates Slug of the template each one is rendered inside, keyed by its own slug.
+	 */
+	private function switch_to_theme_declaring( $templates ) {
+		$this->theme_templates            = $templates;
+		$this->original_theme_directories = $GLOBALS['wp_theme_directories'];
+		// `/themes` is necessary as the theme functions assume it is the root
+		// when there is only one.
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->filter_test_theme_root() );
+
+		add_filter( 'theme_root', array( $this, 'filter_test_theme_root' ) );
+		add_filter( 'stylesheet_root', array( $this, 'filter_test_theme_root' ) );
+		add_filter( 'template_root', array( $this, 'filter_test_theme_root' ) );
+		add_filter( 'wp_theme_json_data_theme', array( $this, 'filter_theme_json_templates' ) );
+
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+		_gutenberg_clean_theme_json_caches();
+
+		switch_theme( 'block-theme' );
 	}
 
 	/**
@@ -591,6 +679,139 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayNotHasKey( 'template', $response->get_data() );
 		$this->assertArrayNotHasKey( 'has_content_slot', $response->get_data() );
+	}
+
+	public function test_a_theme_names_the_template_its_templates_are_rendered_inside() {
+		$this->switch_to_theme_declaring( array( 'custom-hero-template' => 'index' ) );
+
+		$this->assertSame(
+			'index',
+			gutenberg_get_block_template_parent_slug(
+				get_block_template( 'block-theme//custom-hero-template', 'wp_template' )
+			),
+			'A template of the theme is rendered inside the one its theme.json names.'
+		);
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug(
+				get_block_template( 'block-theme//index', 'wp_template' )
+			),
+			'The template it names is rendered on its own.'
+		);
+	}
+
+	public function test_a_theme_declaration_renders_the_template_inside_it() {
+		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
+		$this->create_template(
+			'layout',
+			$this->template_part_block( 'header' ) . '<!-- wp:post-content /-->' . $this->template_part_block( 'footer' )
+		);
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->'
+		);
+
+		$child    = get_block_template( $child_id, 'wp_template' );
+		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
+
+		$this->assertStringContainsString( '"slug":"header"', $resolved );
+		$this->assertStringContainsString( 'Not found', $resolved );
+		$this->assertStringContainsString( '"slug":"footer"', $resolved );
+		$this->assertGreaterThan(
+			strpos( $resolved, '<!-- wp:post-content {"templateSlot":true} -->' ),
+			strpos( $resolved, 'Not found' ),
+			'The blocks of the template go in the content block of the one its theme.json names.'
+		);
+		$this->assertLessThan(
+			strpos( $resolved, '<!-- /wp:post-content -->' ),
+			strpos( $resolved, 'Not found' ),
+			'The blocks of the template go in the content block of the one its theme.json names.'
+		);
+	}
+
+	public function test_the_template_of_the_post_wins_over_the_theme_declaration() {
+		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
+		$this->create_template( 'other-layout', '<!-- wp:post-content /-->' );
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+			'other-layout'
+		);
+
+		$this->assertSame(
+			'other-layout',
+			gutenberg_get_block_template_parent_slug( get_block_template( $child_id, 'wp_template' ) )
+		);
+	}
+
+	public function test_a_template_can_be_rendered_on_its_own_against_the_theme_declaration() {
+		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
+		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+			'default'
+		);
+
+		$template = get_block_template( $child_id, 'wp_template' );
+
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug( $template ),
+			'The template of the post is the default one, so the theme declaration no longer applies.'
+		);
+		$this->assertNull( gutenberg_resolve_block_template_parents( $template->id, $template->content ) );
+	}
+
+	public function test_reverting_a_template_restores_the_theme_declaration() {
+		wp_set_current_user( self::$admin_id );
+		$this->switch_to_theme_declaring( array( 'custom-hero-template' => 'index' ) );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/block-theme//custom-hero-template' );
+		$request->set_body_params( array( 'template' => '' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( '', $response->get_data()['template'], 'The site renders the template on its own.' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/block-theme//custom-hero-template' );
+		$request->set_body_params( array( 'source' => 'theme' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame(
+			'index',
+			$response->get_data()['template'],
+			'Reverting the template to the one of the theme drops the choice of the site with it.'
+		);
+	}
+
+	public function test_the_declaration_of_another_theme_is_not_read() {
+		$this->switch_to_theme_declaring( array( '404' => 'layout' ) );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => '404',
+				'post_title'   => '404',
+				'post_content' => '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+				'post_status'  => 'publish',
+			)
+		);
+		wp_set_post_terms( $post_id, 'another-theme', 'wp_theme' );
+		$this->template_post_ids[] = $post_id;
+
+		$this->assertSame(
+			'',
+			gutenberg_get_block_template_parent_slug( get_block_template( 'another-theme//404', 'wp_template' ) ),
+			'Only the theme.json of the active theme is read.'
+		);
+	}
+
+	public function test_the_rest_response_reports_the_theme_declaration() {
+		wp_set_current_user( self::$admin_id );
+		$this->switch_to_theme_declaring( array( 'custom-hero-template' => 'index' ) );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/block-theme//custom-hero-template' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 'index', $response->get_data()['template'] );
 	}
 
 	public function test_the_slot_keeps_the_attributes_of_the_content_block() {
