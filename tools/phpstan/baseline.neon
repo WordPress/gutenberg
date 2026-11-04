@@ -103,12 +103,6 @@ parameters:
 			path: ../../packages/block-library/src/avatar/index.php
 
 		-
-			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../packages/block-library/src/button/index.php
-
-		-
 			message: '#^Parameter \#1 \$from of function human_time_diff expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -125,12 +119,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../../packages/block-library/src/gallery/index.php
-
-		-
-			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../packages/block-library/src/icon/index.php
 
 		-
 			message: '#^Parameter \#1 \$author_id of function get_author_posts_url expects int, string given\.$#'
@@ -199,12 +187,6 @@ parameters:
 			path: ../../packages/block-library/src/playlist/index.php
 
 		-
-			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../packages/block-library/src/post-navigation-link/index.php
-
-		-
 			message: '#^Function block_core_post_time_to_read_word_count\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
@@ -239,12 +221,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: ../../packages/block-library/src/post-time-to-read/index.php
-
-		-
-			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: ../../packages/block-library/src/search/index.php
 
 		-
 			message: '#^Parameter \#3 \$side of function apply_block_core_search_border_style expects string, null given\.$#'
