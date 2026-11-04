@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+
 ### Enhancements
 
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
