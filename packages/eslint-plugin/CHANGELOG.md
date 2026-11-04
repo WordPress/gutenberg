@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere.
+-   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
 
 ## 28.1.0 (2026-11-04)
 
