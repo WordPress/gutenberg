@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 - `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).

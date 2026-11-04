@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 44.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
