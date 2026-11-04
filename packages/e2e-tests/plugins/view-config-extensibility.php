@@ -16,14 +16,14 @@
 function gutenberg_test_customize_page_view_config( $data ) {
 	$data->merge(
 		array(
-			'default_view' => array(
+			'default_view'    => array(
 				'type' => 'table',
 				'sort' => array(
 					'field'     => 'date',
 					'direction' => 'desc',
 				),
 			),
-			'view_list'    => array(
+			'view_list'       => array(
 				array(
 					'slug'  => 'drafts',
 					'title' => 'In progress',
@@ -59,7 +59,7 @@ function gutenberg_test_customize_page_view_config( $data ) {
 					),
 				),
 			),
-			'form'         => array(
+			'quick_edit_form' => array(
 				'layout' => array( 'type' => 'regular' ),
 			),
 		),
@@ -95,7 +95,7 @@ function gutenberg_test_customize_page_view_config( $data ) {
 
 	$data->replace(
 		array(
-			'form' => array(
+			'quick_edit_form' => array(
 				'fields' => array( 'slug', 'date' ),
 			),
 		),

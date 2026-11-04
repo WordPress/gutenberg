@@ -110,6 +110,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/entity-actions-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-entity-actions-controller-7-2.php';
 
+	// WordPress 7.3 compat.
+	require __DIR__ . '/compat/wordpress-7.3/view-config-api.php';
+	require __DIR__ . '/compat/wordpress-7.3/class-gutenberg-rest-view-config-controller-7-3.php';
+	require __DIR__ . '/compat/wordpress-7.3/rest-api.php';
+
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/experimental/collaboration/rest-api.php';

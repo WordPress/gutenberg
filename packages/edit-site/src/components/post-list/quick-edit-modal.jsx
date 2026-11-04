@@ -11,83 +11,17 @@ import {
 import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import { StatusSelectEdit } from './status-select-edit';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
 /*
- * Opening the modal is already the choice to edit, so the frequently edited
- * fields render their controls inline rather than behind a panel, and the
- * fields that keep one are pinned below them, above the modal's buttons. A
- * group among them (`status`) is split into its members, so each renders as
- * a field of its own. The form config is shared with the editor's document
- * sidebar, which keeps its panels.
- *
- * The scheduled date is left out: the date panel edits the same date. The
- * password is rarely set, so it keeps its panel, after the discussion.
+ * The fields with a regular layout render their controls inline, and the
+ * fields with a panel are pinned below them, above the modal's buttons.
  */
-const fieldsWithRegularLayout = [
-	'status',
-	'slug',
-	'author',
-	'template',
-	'excerpt',
-];
-
-const regularLayout = {
-	type: 'regular',
-	labelPosition: 'top',
-};
-
-function placePasswordAfterDiscussion( formFields ) {
-	const getId = ( field ) => ( typeof field === 'string' ? field : field.id );
-	const password = formFields.find(
-		( field ) => getId( field ) === 'password'
-	);
-	const hasDiscussion = formFields.some(
-		( field ) => getId( field ) === 'discussion'
-	);
-	if ( ! password || ! hasDiscussion ) {
-		return formFields;
-	}
-	return formFields.flatMap( ( field ) => {
-		const id = getId( field );
-		if ( id === 'password' ) {
-			return [];
-		}
-		return id === 'discussion' ? [ field, password ] : [ field ];
-	} );
-}
-
 function splitQuickEditForm( form ) {
-	const splitFields = ( form.fields ?? [] ).flatMap( ( field ) => {
-		const id = typeof field === 'string' ? field : field.id;
-		if ( ! fieldsWithRegularLayout.includes( id ) ) {
-			return [ field ];
-		}
-		const members =
-			typeof field !== 'string' && field.children
-				? field.children
-				: [ field ];
-		return members.flatMap( ( member ) => {
-			const memberId = typeof member === 'string' ? member : member.id;
-			if ( memberId === 'scheduled_date' ) {
-				return [];
-			}
-			if ( memberId === 'password' ) {
-				return [ member ];
-			}
-			return [
-				{
-					...( typeof member === 'string' ? { id: member } : member ),
-					layout: regularLayout,
-				},
-			];
-		} );
-	} );
-	const formFields = placePasswordAfterDiscussion( splitFields );
+	const formFields = form.fields ?? [];
 	const isRegular = ( field ) =>
 		( typeof field === 'string'
 			? form.layout
@@ -157,16 +91,6 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						Edit: StatusSelectEdit,
-						elements: field.elements.filter(
-							( element ) => element.value !== 'trash'
-						),
-					};
-				}
-
 				if ( field.id === 'template' ) {
 					return {
 						...field,
