@@ -6,6 +6,12 @@
 
 -   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
+### Bug Fixes
+
+-   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+
+## 0.27.0 (2026-11-04)
+
 ### Enhancements
 
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
@@ -13,7 +19,6 @@
 
 ### Bug Fixes
 
--   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 -   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 
 ### Internal
