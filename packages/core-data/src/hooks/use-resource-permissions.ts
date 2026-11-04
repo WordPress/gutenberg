@@ -7,8 +7,6 @@ import useQuerySelect from './use-query-select';
 interface GlobalResourcePermissionsResolution {
 	/** Can the current user create new resources of this type? */
 	canCreate: boolean;
-	/** Can the current user read resources of this type? */
-	canRead: boolean;
 }
 interface SpecificResourcePermissionsResolution {
 	/** Can the current user update resources of this type? */
@@ -29,26 +27,19 @@ interface ResolutionDetails {
 
 type ResourcePermissionsResolution< IdType > = ResolutionDetails &
 	GlobalResourcePermissionsResolution &
-	( IdType extends void ? {} : SpecificResourcePermissionsResolution );
+	( IdType extends void ? SpecificResourcePermissionsResolution : {} );
 
 type EntityResource = { kind: string; name: string; id?: string | number };
-
-function useResourcePermissions< IdType >(
-	resource: string,
-	id: IdType
-): ResourcePermissionsResolution< IdType >;
 
 function useResourcePermissions< IdType = void >(
 	resource: string,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType >;
 
-function useResourcePermissions< Resource extends EntityResource >(
-	resource: Resource,
+function useResourcePermissions< IdType = void >(
+	resource: EntityResource,
 	id?: never
-): ResourcePermissionsResolution<
-	'id' extends keyof Resource ? Resource[ 'id' ] : void
->;
+): ResourcePermissionsResolution< IdType >;
 
 /**
  * Resolves resource permissions.

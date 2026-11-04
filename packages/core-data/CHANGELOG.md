@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Correct the `useResourcePermissions` return type to match its permission and resolution object, including permissions for entity resources with an ID ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 
 ### Internal
 
