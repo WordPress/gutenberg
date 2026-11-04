@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-04)
+
 -   Widget footer: keep one strip height (text line plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
 
 ### Breaking Changes

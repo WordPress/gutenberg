@@ -710,9 +710,8 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 export function usePickNote( { drafts, onDiscard } ) {
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { selectBlock, toggleBlockHighlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	return ( noteId, clientId, options ) => {
 		if ( clientId ) {
