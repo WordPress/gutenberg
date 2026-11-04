@@ -52,8 +52,8 @@ function Frame( { children }: MediaEditorFrameProps ) {
 }
 
 async function setup( {
-	onRestoreOriginal,
-}: { onRestoreOriginal?: ( originalId: number ) => void } = {} ) {
+	onEditOriginal,
+}: { onEditOriginal?: ( originalId: number ) => void } = {} ) {
 	await page.viewport( 1000, 800 );
 	const writes = vi.fn();
 	vi.spyOn( window, 'fetch' ).mockImplementation(
@@ -98,7 +98,7 @@ async function setup( {
 			<MediaEditor
 				id={ 11 }
 				onSaved={ onSaved }
-				onRestoreOriginal={ onRestoreOriginal }
+				onEditOriginal={ onEditOriginal }
 				renderFrame={ Frame }
 				fields={ [
 					{
@@ -162,8 +162,8 @@ describe( 'Restore original', () => {
 	} );
 
 	it( 'hands the original to the frame when it opens the original itself', async () => {
-		const onRestoreOriginal = vi.fn();
-		const { registry } = await setup( { onRestoreOriginal } );
+		const onEditOriginal = vi.fn();
+		const { registry } = await setup( { onEditOriginal } );
 		await userEvent.fill(
 			screen.getByRole( 'textbox', { name: 'Alternative text' } ),
 			'Unsaved cropped text'
@@ -179,7 +179,7 @@ describe( 'Restore original', () => {
 			screen.getByRole( 'menuitem', { name: /^Edit original/ } )
 		);
 
-		expect( onRestoreOriginal ).toHaveBeenCalledExactlyOnceWith( 10 );
+		expect( onEditOriginal ).toHaveBeenCalledExactlyOnceWith( 10 );
 		expect(
 			registry
 				.select( coreStore )

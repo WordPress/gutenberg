@@ -143,11 +143,8 @@ export interface MediaEditorProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
-	/**
-	 * When set, the history menu passes the original's id here instead of
-	 * loading the original into the cropper.
-	 */
-	onRestoreOriginal?: ( originalId: number ) => void;
+	/** Called with the original's id when the user chooses "Edit original". */
+	onEditOriginal?: ( originalId: number ) => void;
 	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
@@ -556,7 +553,7 @@ function MediaEditorContent( {
 	aspectRatioPresets,
 	onClose,
 	onSaved,
-	onRestoreOriginal,
+	onEditOriginal,
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
@@ -738,12 +735,12 @@ function MediaEditorContent( {
 		// Restoring discards every pending edit, as the menu item says, so
 		// nothing staged against the attachment being replaced reaches a save.
 		clearEntityRecordEdits( 'postType', 'attachment', id );
-		if ( onRestoreOriginal && originalId ) {
-			onRestoreOriginal( originalId );
+		if ( onEditOriginal && originalId ) {
+			onEditOriginal( originalId );
 			return;
 		}
 		setIsSourceReplaced( true );
-	}, [ clearEntityRecordEdits, id, onRestoreOriginal, originalId ] );
+	}, [ clearEntityRecordEdits, id, onEditOriginal, originalId ] );
 
 	// A bare replacement has no cropper diff, so OR the flag in explicitly.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
@@ -1049,7 +1046,7 @@ function MediaEditorContent( {
 		onSave: saveMediaEditor,
 		canRestoreOriginal,
 		isSourceReplaced,
-		opensOriginal: !! onRestoreOriginal,
+		opensOriginal: !! onEditOriginal,
 		onRestoreOriginal: handleRestoreOriginal,
 	};
 

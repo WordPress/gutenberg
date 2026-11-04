@@ -175,9 +175,12 @@ function MediaEditorRoute() {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			// No block to repoint here, so open the original as its own page.
-			onRestoreOriginal={ ( originalId: number ) =>
-				navigate( { to: `/media-editor/${ originalId }` } )
+			// Replace the history entry so Cancel leaves the editor.
+			onEditOriginal={ ( originalId: number ) =>
+				navigate( {
+					to: `/media-editor/${ originalId }`,
+					replace: true,
+				} )
 			}
 			renderFrame={ ( {
 				children,
