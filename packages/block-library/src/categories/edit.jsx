@@ -35,7 +35,7 @@ const DELIMITER_OPTIONS = [
 const DISPLAY_LAYOUT_OPTIONS = [
 	{ label: __( 'List' ), value: 'list' },
 	{ label: __( 'Dropdown' ), value: 'dropdown' },
-	{ label: __( 'Inline' ), value: 'inline' },
+	{ label: __( 'Horizontal' ), value: 'inline' },
 ];
 
 const DELIMITER_CHARS = {
@@ -148,8 +148,9 @@ export default function CategoriesEdit( {
 			delimiter === 'custom'
 				? customDelimiter || ','
 				: DELIMITER_CHARS[ delimiter ] || DELIMITER_CHARS.comma;
-		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
-		const categoriesList = getCategoriesList( parentId );
+		// Hierarchy does not apply to the horizontal layout: list every term
+		// flat, whatever the (hidden) hierarchy setting still holds.
+		const categoriesList = getCategoriesList( null );
 
 		const items = [];
 		categoriesList.forEach( ( category, index ) => {
@@ -312,7 +313,7 @@ export default function CategoriesEdit( {
 					) }
 					<ToolsPanelItem
 						hasValue={ () => displayLayout !== 'list' }
-						label={ __( 'Display layout' ) }
+						label={ __( 'Layout' ) }
 						onDeselect={ () =>
 							setAttributes( { displayLayout: 'list' } )
 						}
@@ -320,7 +321,7 @@ export default function CategoriesEdit( {
 					>
 						<WCSelectControl
 							__next40pxDefaultSize
-							label={ __( 'Display layout' ) }
+							label={ __( 'Layout' ) }
 							options={ DISPLAY_LAYOUT_OPTIONS }
 							value={ displayLayout }
 							onChange={ ( value ) =>

@@ -40,7 +40,14 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$args['parent'] = 0;
 	}
 
-	$display_layout = isset( $attributes['displayLayout'] ) ? $attributes['displayLayout'] : 'list';
+	if ( isset( $attributes['displayLayout'] ) ) {
+		$display_layout = $attributes['displayLayout'];
+	} elseif ( ! empty( $attributes['displayAsDropdown'] ) ) {
+		// Backward compatibility for blocks saved before the layout option.
+		$display_layout = 'dropdown';
+	} else {
+		$display_layout = 'list';
+	}
 
 	if ( 'dropdown' === $display_layout ) {
 		$id                       = 'wp-block-categories-' . $block_id;
@@ -77,22 +84,22 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$args['title_li']         = '';
 		$args['style']            = 'none';
 
-		$delimiter = isset( $attributes['delimiter'] ) ? $attributes['delimiter'] : 'comma';
+		$delimiter       = isset( $attributes['delimiter'] ) ? $attributes['delimiter'] : 'comma';
 		$delimiter_chars = array(
 			'comma' => ', ',
 			'dot'   => ' · ',
 			'pipe'  => ' | ',
 			'slash' => ' / ',
 		);
-		
+
 		if ( 'custom' === $delimiter ) {
 			$custom_delimiter = isset( $attributes['customDelimiter'] ) ? $attributes['customDelimiter'] : '';
-			$delimiter_char = $custom_delimiter ? $custom_delimiter : ', ';
+			$delimiter_char   = $custom_delimiter ? $custom_delimiter : ', ';
 		} else {
 			$delimiter_char = isset( $delimiter_chars[ $delimiter ] ) ? $delimiter_chars[ $delimiter ] : ', ';
 		}
 
-		$categories = get_categories( $args );
+		$categories   = get_categories( $args );
 		$items_markup = '';
 
 		if ( ! empty( $categories ) ) {
@@ -106,11 +113,11 @@ function render_block_core_categories( $attributes, $content, $block ) {
 				if ( ! empty( $attributes['showPostCounts'] ) ) {
 					$item .= ' (' . esc_html( $category->count ) . ')';
 				}
-				$item .= '</span>';
+				$item   .= '</span>';
 				$items[] = $item;
 			}
 			$delimiter_markup = '<span class="wp-block-categories__inline-delimiter" aria-hidden="true">' . esc_html( trim( $delimiter_char ) ) . '</span>';
-			$items_markup = implode( $delimiter_markup, $items );
+			$items_markup     = implode( $delimiter_markup, $items );
 		} else {
 			$items_markup = esc_html( $taxonomy->labels->no_terms );
 		}

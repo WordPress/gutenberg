@@ -112,10 +112,6 @@
 		},
 		"shadow": true
 	},
-	"styles": [
-		{ "name": "default", "label": "Default", "isDefault": true },
-		{ "name": "tag", "label": "Tag Style" }
-	],
 	"editorStyle": "wp-block-categories-editor",
 	"style": "wp-block-categories"
 }
