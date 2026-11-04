@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   `use-recommended-components`: Flag `CustomGradientPicker` from `@wordpress/components` in favor of `GradientPicker` with `clearable={ false }` ([#85953](https://github.com/WordPress/gutenberg/pull/85953)).

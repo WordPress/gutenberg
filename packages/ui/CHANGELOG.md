@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.26.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).

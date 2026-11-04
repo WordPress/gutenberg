@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
