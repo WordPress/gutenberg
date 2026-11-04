@@ -47,7 +47,7 @@ describe( 'useConstrainedTabbing', () => {
 		await render( <ConstrainedTabbing /> );
 
 		const placeholder = page.getByText( 'Placeholder' );
-		( placeholder.element() as HTMLElement ).focus();
+		placeholder.element().focus();
 		await expect.element( placeholder ).toHaveFocus();
 
 		await userEvent.tab();
