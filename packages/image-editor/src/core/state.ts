@@ -213,9 +213,8 @@ function keepCropThroughQuarterTurn(
 /**
  * Value-equality check for two editor states.
  *
- * Used by history machinery to dedup snapshots and detect no-op
- * transitions. Compares the rendered output and base pose, which can
- * affect a later rotation even when the current output is identical.
+ * Compares the public edit fields to dedup snapshots and detect no-op
+ * transitions. The editor's internal base pose is not part of the edit.
  *
  * @param a First editor state.
  * @param b Second editor state.
@@ -227,8 +226,6 @@ export function areImageEditorStatesEqual(
 ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
-	const aBase = withBaseValues( a );
-	const bBase = withBaseValues( b );
 	return (
 		aImage?.src === bImage?.src &&
 		aImage?.naturalWidth === bImage?.naturalWidth &&
@@ -237,10 +234,6 @@ export function areImageEditorStatesEqual(
 		nearlyEqual( a.pan.y, b.pan.y ) &&
 		nearlyEqual( a.zoom, b.zoom ) &&
 		nearlyEqual( a.rotation, b.rotation ) &&
-		nearlyEqual( aBase.basePan.x, bBase.basePan.x ) &&
-		nearlyEqual( aBase.basePan.y, bBase.basePan.y ) &&
-		nearlyEqual( aBase.baseZoom, bBase.baseZoom ) &&
-		nearlyEqual( aBase.baseRotation, bBase.baseRotation ) &&
 		a.flip.horizontal === b.flip.horizontal &&
 		a.flip.vertical === b.flip.vertical &&
 		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&

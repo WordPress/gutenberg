@@ -696,13 +696,6 @@ describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
 			payload: { direction: 1 },
 		} );
 		const clamped = state;
-		const withoutPanIntent: InternalImageEditorState = {
-			...clamped,
-			basePan: clamped.pan,
-		};
-		expect( areImageEditorStatesEqual( clamped, withoutPanIntent ) ).toBe(
-			false
-		);
 		state = imageEditorReducer( state, {
 			type: 'SET_PAN',
 			payload: { x: -0.1, y: 0 },
@@ -715,6 +708,21 @@ describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
 			} );
 		}
 		expect( state.pan.y ).toBeCloseTo( 0.1, 6 );
+	} );
+
+	it( 'compares the same edit as equal when an unchanged zoom resets the hidden pan', () => {
+		let state = makePannedLockedState();
+		state = imageEditorReducer( state, {
+			type: 'SNAP_ROTATE_90',
+			payload: { direction: 1 },
+		} );
+		const next = imageEditorReducer( state, {
+			type: 'SET_ZOOM',
+			payload: state.zoom,
+		} );
+
+		expect( next.basePan.x ).not.toBeCloseTo( state.basePan.x, 6 );
+		expect( areImageEditorStatesEqual( state, next ) ).toBe( true );
 	} );
 
 	it( 'restores a panned position after fine rotation and four turns', () => {

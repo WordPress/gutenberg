@@ -99,7 +99,7 @@ The editor's state, and the state an editor starts from. Pass `image` when you a
 
 ### `areImageEditorStatesEqual( a, b )`
 
-Whether two states describe the same edit, ignoring tiny floating-point differences. Use it to skip entries that change nothing in your own undo history.
+Whether two states have the same public edit fields, ignoring tiny floating-point differences. The values the editor keeps for later rotations do not count. Use it to skip entries that change nothing in your own undo history.
 
 ### `getOutputSize( state )`
 
