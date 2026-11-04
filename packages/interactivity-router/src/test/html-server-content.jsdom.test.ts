@@ -175,6 +175,9 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		}
 	);
 
+	// Values on the previous and new page: `T`, a token; `null`; `M`, the
+	// server representation; `P`, a pending value. A `getServerContext()`
+	// getter returns the new value in a second render of the same update.
 	test.each( [
 		[ 'T', 'M' ],
 		[ 'null', 'M' ],
