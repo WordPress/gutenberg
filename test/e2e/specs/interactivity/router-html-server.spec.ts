@@ -45,6 +45,21 @@ test.describe( 'Router server-rendered HTML content', () => {
 				attributes: { page: 'one', next: withServerProcessing( two ) },
 			} );
 		}
+		const syncTwo = await utils.addPostWithBlock(
+			'test/router-html-server',
+			{
+				alias: 'sync two',
+				attributes: { page: 'two' },
+			}
+		);
+		await utils.addPostWithBlock( 'test/router-html-server', {
+			alias: 'sync one',
+			attributes: {
+				page: 'one',
+				next: withServerProcessing( syncTwo ),
+				syncedNull: true,
+			},
+		} );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -178,6 +193,58 @@ test.describe( 'Router server-rendered HTML content', () => {
 			await recording.evaluate( ( { sameChanges } ) => sameChanges )
 		).toEqual( [ 0, 0 ] );
 		await recording.dispose();
+	} );
+
+	test( 'shows the new page’s server-rendered content once a data-wp-watch callback syncs the value', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		// One element's state is copied from `getServerState()`, the other's
+		// context from `getServerContext()` alone. Both are null on page one.
+		const synced = [ 'synced-state-html', 'synced-context-html' ];
+		await page.goto( withServerProcessing( utils.getLink( 'sync one' ) ) );
+		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );
+		expect( await contentOf( page, synced ) ).toEqual( [ '', '' ] );
+		const elements = await page.evaluateHandle(
+			( testIds ) =>
+				testIds.map( ( testId ) =>
+					document.querySelector( `[data-testid="${ testId }"]` )
+				),
+			synced
+		);
+		const pageContent = page.getByTestId( 'page-content' );
+
+		for ( const [ move, name, html ] of [
+			[ 'next', 'two', '<p>Two</p>' ],
+			[ 'back', 'one', '' ],
+			[ 'forward', 'two', '<p>Two</p>' ],
+		] ) {
+			if ( move === 'next' ) {
+				await page
+					.getByRole( 'link', { name: 'Next', exact: true } )
+					.click();
+			} else {
+				await ( move === 'back' ? page.goBack() : page.goForward() );
+			}
+			await expect( pageContent ).toHaveText( `content from ${ name }` );
+			await expect
+				.poll( () => contentOf( page, synced ) )
+				.toEqual( [ html, html ] );
+		}
+
+		expect(
+			await elements.evaluate(
+				( kept, testIds ) =>
+					testIds.every(
+						( testId, index ) =>
+							document.querySelector(
+								`[data-testid="${ testId }"]`
+							) === kept[ index ]
+					),
+				synced
+			)
+		).toBe( true );
+		await elements.dispose();
 	} );
 
 	test( 'shows the new page’s server-rendered content without a Trusted Types policy call', async ( {

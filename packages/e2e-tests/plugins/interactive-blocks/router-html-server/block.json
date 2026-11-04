@@ -8,7 +8,8 @@
 	"attributes": {
 		"page": { "type": "string" },
 		"label": { "type": "string" },
-		"next": { "type": "string" }
+		"next": { "type": "string" },
+		"syncedNull": { "type": "boolean" }
 	},
 	"supports": {
 		"interactivity": true

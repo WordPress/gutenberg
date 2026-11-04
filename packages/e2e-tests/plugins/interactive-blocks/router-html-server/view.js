@@ -1,6 +1,12 @@
-import { store, withSyncEvent } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getServerContext,
+	getServerState,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
-store( 'router-html-server', {
+const { state } = store( 'router-html-server', {
 	state: {
 		/** Shows that the page has hydrated. */
 		hydrated: 'yes',
@@ -18,6 +24,16 @@ store( 'router-html-server', {
 			const { actions } =
 				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( window.location.href, { force: true } );
+		},
+	},
+	callbacks: {
+		/** Copies the page's server state into the client state. */
+		syncState() {
+			state.synced = getServerState().synced;
+		},
+		/** Copies the page's server context into the element's context. */
+		syncContext() {
+			getContext().synced = getServerContext().synced;
 		},
 	},
 } );
