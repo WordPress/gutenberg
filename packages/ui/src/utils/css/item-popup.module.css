@@ -6,6 +6,7 @@
 			composes: dropdown-motion from "./dropdown-motion.module.css";
 
 			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+			--_wp-ui-popup-item-text-line-height: var(--wpds-typography-line-height-xs);
 			--_wp-ui-elevation-md:
 				0 2px 3px rgba(0, 0, 0, 0.05),
 				0 4px 5px rgba(0, 0, 0, 0.04),
@@ -154,6 +155,7 @@
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
+			line-height: var(--_wp-ui-popup-item-text-line-height);
 			overflow-wrap: anywhere;
 			border-radius: var(--wpds-border-radius-sm);
 			margin-inline: var(--wp-ui-popup-padding);
@@ -208,6 +210,13 @@
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
+				&:focus-visible {
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+
+					outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+					outline-offset: 0;
+				}
+
 				@media ( forced-colors: active ) {
 					color: GrayText;
 				}
@@ -219,7 +228,7 @@
 			align-items: center;
 			justify-content: center;
 			width: var(--wpds-dimension-size-2xs);
-			height: var(--wpds-typography-line-height-sm);
+			height: var(--_wp-ui-popup-item-text-line-height);
 			pointer-events: none;
 		}
 
@@ -237,6 +246,7 @@
 		.item-text {
 			display: flex;
 			flex-direction: column;
+			row-gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 		}
 
@@ -262,7 +272,6 @@
 
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -296,7 +305,19 @@
 		}
 
 	}
+
 	@layer compositions {
+		/*
+		 * Text variants set line-height in the components layer. This composition
+		 * wins over that, including the global CSS defense bridge in wp-admin.
+		 */
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--_wp-ui-popup-item-text-line-height);
+
+			line-height: var(--_wp-ui-popup-item-text-line-height);
+		}
+
 		.loading-spinner {
 			width: var(--wpds-dimension-size-3xs);
 			height: var(--wpds-dimension-size-3xs);

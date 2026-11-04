@@ -72,24 +72,32 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * Builds CSS that covers each block with a block-level note in a tinted,
  * bordered overlay in its author's color.
  *
- * A thread is block-level when its block contains no `core/note` marker with
- * its id. When a block has several, the first one supplies the color.
+ * A thread is block-level when none of its blocks contains a `core/note`
+ * marker with its id. A split can leave a block with the note's id but none
+ * of its text, which shouldn't turn an inline note into a block-level one.
+ * When a block has several, the first one supplies the color.
  *
- * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
+ * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
 export function buildBlockHighlightCss( threads, getBlockAttributes ) {
 	const rules = [];
 	const highlightedBlocks = new Set();
-	for ( const thread of threads ?? [] ) {
-		const clientId = thread?.blockClientId;
-		if (
-			! thread?.id ||
-			! clientId ||
-			highlightedBlocks.has( clientId ) ||
+	const isBlockLevel = ( thread ) =>
+		! thread.blockClientIds.some( ( clientId ) =>
 			findNoteInBlock( getBlockAttributes( clientId ), thread.id )
-		) {
+		);
+	const anchors = ( threads ?? [] ).flatMap( ( thread ) =>
+		thread?.id && isBlockLevel( thread )
+			? thread.blockClientIds.map( ( clientId ) => ( {
+					thread,
+					clientId,
+				} ) )
+			: []
+	);
+	for ( const { thread, clientId } of anchors ) {
+		if ( highlightedBlocks.has( clientId ) ) {
 			continue;
 		}
 		highlightedBlocks.add( clientId );
