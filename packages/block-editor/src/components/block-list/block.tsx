@@ -17,6 +17,7 @@ import {
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import type { ComponentType, ReactNode } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
@@ -704,6 +705,24 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				: undefined,
 		[ ghostBlock ]
 	);
+	const bodyPlaceholder = useSelect(
+		( select ) =>
+			ghostBlock
+				? select( blockEditorStore ).getSettings().bodyPlaceholder
+				: undefined,
+		[ ghostBlock ]
+	);
+	// The ghost shows the empty post placeholder only while it renders: the
+	// block it inserts keeps its own attributes, so the text is never saved.
+	const ghostAttributes = useMemo(
+		() =>
+			ghostBlock && {
+				placeholder:
+					bodyPlaceholder && decodeEntities( bodyPlaceholder ),
+				...ghostBlock.attributes,
+			},
+		[ ghostBlock, bodyPlaceholder ]
+	);
 	const selectedProps = useSelect(
 		( select ): BlockListBlockSelectedProps | undefined => {
 			const {
@@ -760,7 +779,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				getAllBlockBindingsSources,
 			} = unlock( select( blocksStore ) );
 			const attributes =
-				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
+				getBlockAttributes( clientId ) ?? ghostAttributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
 			const settings = getSettings();
@@ -900,7 +919,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				),
 			};
 		},
-		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
+		[ clientId, rootClientId, ghostAttributes, ghostBlockWithoutAttributes ]
 	);
 
 	const currentViewport = useContext( CurrentViewport );
