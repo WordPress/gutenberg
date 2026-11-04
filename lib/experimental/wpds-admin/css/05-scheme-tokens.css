@@ -23,95 +23,92 @@
 @layer wpds-overrides, wp-legacy, wpds;
 
 @layer wpds {
-	body.admin-color-fresh,
-	body.admin-color-light {
-		--wpds-color-background-interactive-brand-strong: #007cba;
-		--wpds-color-background-interactive-brand-strong-active: #006daa;
+	body.admin-color-fresh {
+		--wpds-color-background-interactive-brand-strong: #0073ad;
+		--wpds-color-background-interactive-brand-strong-active: #00649d;
 		--wpds-color-background-interactive-brand-weak-active: #daecfb;
 		--wpds-color-background-surface-brand: #e4f2fd;
-		--wpds-color-background-thumb-brand: #0073b0;
-		--wpds-color-background-thumb-brand-active: #0073b0;
-		--wpds-color-foreground-interactive-brand: #0073b0;
+		--wpds-color-background-thumb-brand: #0073ad;
+		--wpds-color-background-thumb-brand-active: #0073ad;
+		--wpds-color-foreground-interactive-brand: #0073ad;
 		--wpds-color-foreground-interactive-brand-active: #002041;
-		--wpds-color-foreground-interactive-brand-strong: #fff;
-		--wpds-color-foreground-interactive-brand-strong-active: #fff;
-		--wpds-color-stroke-focus: #0073b0;
-		--wpds-color-stroke-interactive-brand: #0073b0;
-		--wpds-color-stroke-interactive-brand-active: #00558f;
-		--wpds-color-stroke-surface-brand: #a6c7e1;
-		--wpds-color-stroke-surface-brand-strong: #0073b0;
+		--wpds-color-foreground-interactive-brand-strong: #eff1f3;
+		--wpds-color-foreground-interactive-brand-strong-active: #eff1f3;
+		--wpds-color-stroke-focus: #0073ad;
+		--wpds-color-stroke-interactive-brand: #0073ad;
+		--wpds-color-stroke-interactive-brand-active: #00558c;
+		--wpds-color-stroke-surface-brand: #a5c7e1;
+		--wpds-color-stroke-surface-brand-strong: #0073ad;
 	}
 
 	body.admin-color-midnight {
-		--wpds-color-background-interactive-brand-strong: #cf4339;
-		--wpds-color-background-interactive-brand-strong-active: #bf332b;
+		--wpds-color-background-interactive-brand-strong: #c33f36;
+		--wpds-color-background-interactive-brand-strong-active: #b32f28;
 		--wpds-color-background-interactive-brand-weak-active: #f8e5e2;
 		--wpds-color-background-surface-brand: #fbecea;
-		--wpds-color-background-thumb-brand: #c63a31;
-		--wpds-color-background-thumb-brand-active: #c63a31;
-		--wpds-color-foreground-interactive-brand: #c63a31;
+		--wpds-color-background-thumb-brand: #c23e35;
+		--wpds-color-background-thumb-brand-active: #c23e35;
+		--wpds-color-foreground-interactive-brand: #c23e35;
 		--wpds-color-foreground-interactive-brand-active: #470000;
-		--wpds-color-foreground-interactive-brand-strong: #fefdfd;
-		--wpds-color-foreground-interactive-brand-strong-active: #fefdfd;
-		--wpds-color-stroke-focus: #c63a31;
-		--wpds-color-stroke-interactive-brand: #c63a31;
-		--wpds-color-stroke-interactive-brand-active: #a41111;
+		--wpds-color-foreground-interactive-brand-strong: #f3f1f0;
+		--wpds-color-foreground-interactive-brand-strong-active: #f3f1f0;
+		--wpds-color-stroke-focus: #c23e35;
+		--wpds-color-stroke-interactive-brand: #c23e35;
+		--wpds-color-stroke-interactive-brand-active: #a11a18;
 		--wpds-color-stroke-surface-brand: #e0bab4;
-		--wpds-color-stroke-surface-brand-strong: #c63a31;
+		--wpds-color-stroke-surface-brand-strong: #c23e35;
 	}
 
 	body.admin-color-coffee {
-		--wpds-color-background-interactive-brand-strong: #916745;
-		--wpds-color-background-interactive-brand-strong-active: #835a38;
+		--wpds-color-background-interactive-brand-strong: #8e6544;
+		--wpds-color-background-interactive-brand-strong-active: #805837;
 		--wpds-color-background-interactive-brand-weak-active: #f8e6d9;
 		--wpds-color-background-surface-brand: #fbede2;
-		--wpds-color-background-thumb-brand: #8e6442;
-		--wpds-color-background-thumb-brand-active: #8e6442;
-		--wpds-color-foreground-interactive-brand: #8e6442;
-		--wpds-color-foreground-interactive-brand-active: #361300;
-		--wpds-color-foreground-interactive-brand-strong: #f7f5f4;
-		--wpds-color-foreground-interactive-brand-strong-active: #f7f5f4;
-		--wpds-color-stroke-focus: #8e6442;
-		--wpds-color-stroke-interactive-brand: #8e6442;
-		--wpds-color-stroke-interactive-brand-active: #704827;
+		--wpds-color-background-thumb-brand: #8d6443;
+		--wpds-color-background-thumb-brand-active: #8d6443;
+		--wpds-color-foreground-interactive-brand: #8d6443;
+		--wpds-color-foreground-interactive-brand-active: #351300;
+		--wpds-color-foreground-interactive-brand-strong: #f4f2f0;
+		--wpds-color-foreground-interactive-brand-strong-active: #f4f2f0;
+		--wpds-color-stroke-focus: #8d6443;
+		--wpds-color-stroke-interactive-brand: #8d6443;
+		--wpds-color-stroke-interactive-brand-active: #704928;
 		--wpds-color-stroke-surface-brand: #dcbda4;
-		--wpds-color-stroke-surface-brand-strong: #8e6442;
+		--wpds-color-stroke-surface-brand-strong: #8d6443;
 	}
 
 	body.admin-color-ocean {
-		--wpds-color-background-interactive-brand-strong: #567958;
-		--wpds-color-background-interactive-brand-strong-active: #496b4b;
+		--wpds-color-background-interactive-brand-strong: #537555;
+		--wpds-color-background-interactive-brand-strong-active: #466848;
 		--wpds-color-background-interactive-brand-weak-active: #d0f4d2;
 		--wpds-color-background-surface-brand: #ddf7de;
-		--wpds-color-background-thumb-brand: #537655;
-		--wpds-color-background-thumb-brand-active: #537655;
-		--wpds-color-foreground-interactive-brand: #537655;
-		--wpds-color-foreground-interactive-brand-active: #042609;
-		--wpds-color-foreground-interactive-brand-strong: #f5f8f5;
-		--wpds-color-foreground-interactive-brand-strong-active: #f5f8f5;
-		--wpds-color-stroke-focus: #537655;
-		--wpds-color-stroke-interactive-brand: #537655;
-		--wpds-color-stroke-interactive-brand-active: #385a3b;
-		--wpds-color-stroke-surface-brand: #a2cfa4;
-		--wpds-color-stroke-surface-brand-strong: #537655;
+		--wpds-color-background-thumb-brand: #537555;
+		--wpds-color-background-thumb-brand-active: #537555;
+		--wpds-color-foreground-interactive-brand: #537555;
+		--wpds-color-foreground-interactive-brand-active: #05260a;
+		--wpds-color-foreground-interactive-brand-strong: #edf2ed;
+		--wpds-color-foreground-interactive-brand-strong-active: #edf2ed;
+		--wpds-color-stroke-focus: #537555;
+		--wpds-color-stroke-interactive-brand: #537555;
+		--wpds-color-stroke-interactive-brand-active: #38593a;
+		--wpds-color-stroke-surface-brand: #a1cda3;
+		--wpds-color-stroke-surface-brand-strong: #537555;
 	}
 
 	body.admin-color-blue {
-		--wpds-color-background-interactive-brand-strong: #437aa8;
-		--wpds-color-background-interactive-brand-strong-active: #356c99;
+		--wpds-color-background-interactive-brand-strong: #3e719c;
+		--wpds-color-background-interactive-brand-strong-active: #30638e;
 		--wpds-color-background-interactive-brand-weak-active: #dfebf7;
 		--wpds-color-background-surface-brand: #e8f1fa;
-		--wpds-color-background-thumb-brand: #3b729f;
-		--wpds-color-background-thumb-brand-active: #3b729f;
-		--wpds-color-foreground-interactive-brand: #3b729f;
-		--wpds-color-foreground-interactive-brand-active: #001f46;
-		--wpds-color-foreground-interactive-brand-strong: #fff;
-		--wpds-color-foreground-interactive-brand-strong-active: #fff;
-		--wpds-color-stroke-focus: #3b729f;
-		--wpds-color-stroke-interactive-brand: #3b729f;
-		--wpds-color-stroke-interactive-brand-active: #1d5581;
-		--wpds-color-stroke-surface-brand: #afc6db;
-		--wpds-color-stroke-surface-brand-strong: #3b729f;
+		--wpds-color-background-thumb-brand: #3e719c;
+		--wpds-color-background-thumb-brand-active: #3e719c;
+		--wpds-color-foreground-interactive-brand: #3e719c;
+		--wpds-color-foreground-interactive-brand-active: #001f44;
+		--wpds-color-stroke-focus: #3e719c;
+		--wpds-color-stroke-interactive-brand: #3e719c;
+		--wpds-color-stroke-interactive-brand-active: #21557e;
+		--wpds-color-stroke-surface-brand: #aec5da;
+		--wpds-color-stroke-surface-brand-strong: #3e719c;
 	}
 
 	body.admin-color-ectoplasm {
@@ -133,20 +130,38 @@
 	}
 
 	body.admin-color-sunrise {
-		--wpds-color-background-interactive-brand-strong: #ad631e;
-		--wpds-color-background-interactive-brand-strong-active: #9e5505;
+		--wpds-color-background-interactive-brand-strong: #a35d1c;
+		--wpds-color-background-interactive-brand-strong-active: #944f04;
 		--wpds-color-background-interactive-brand-weak-active: #fbe5d5;
 		--wpds-color-background-surface-brand: #feecdf;
-		--wpds-color-background-thumb-brand: #a35a10;
-		--wpds-color-background-thumb-brand-active: #a35a10;
-		--wpds-color-foreground-interactive-brand: #a35a10;
+		--wpds-color-background-thumb-brand: #a15b19;
+		--wpds-color-background-thumb-brand-active: #a15b19;
+		--wpds-color-foreground-interactive-brand: #a15b19;
 		--wpds-color-foreground-interactive-brand-active: #371100;
+		--wpds-color-foreground-interactive-brand-strong: #f6f3f1;
+		--wpds-color-foreground-interactive-brand-strong-active: #f6f3f1;
+		--wpds-color-stroke-focus: #a15b19;
+		--wpds-color-stroke-interactive-brand: #a15b19;
+		--wpds-color-stroke-interactive-brand-active: #823f00;
+		--wpds-color-stroke-surface-brand: #e3ba9c;
+		--wpds-color-stroke-surface-brand-strong: #a15b19;
+	}
+
+	body.admin-color-light {
+		--wpds-color-background-interactive-brand-strong: #007cba;
+		--wpds-color-background-interactive-brand-strong-active: #006daa;
+		--wpds-color-background-interactive-brand-weak-active: #daecfb;
+		--wpds-color-background-surface-brand: #e4f2fd;
+		--wpds-color-background-thumb-brand: #0073b0;
+		--wpds-color-background-thumb-brand-active: #0073b0;
+		--wpds-color-foreground-interactive-brand: #0073b0;
+		--wpds-color-foreground-interactive-brand-active: #002041;
 		--wpds-color-foreground-interactive-brand-strong: #fff;
 		--wpds-color-foreground-interactive-brand-strong-active: #fff;
-		--wpds-color-stroke-focus: #a35a10;
-		--wpds-color-stroke-interactive-brand: #a35a10;
-		--wpds-color-stroke-interactive-brand-active: #843d00;
-		--wpds-color-stroke-surface-brand: #e3ba9c;
-		--wpds-color-stroke-surface-brand-strong: #a35a10;
+		--wpds-color-stroke-focus: #0073b0;
+		--wpds-color-stroke-interactive-brand: #0073b0;
+		--wpds-color-stroke-interactive-brand-active: #00558f;
+		--wpds-color-stroke-surface-brand: #a6c7e1;
+		--wpds-color-stroke-surface-brand-strong: #0073b0;
 	}
 }
