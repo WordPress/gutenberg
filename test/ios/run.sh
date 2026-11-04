@@ -103,6 +103,8 @@ add_action( 'init', function () {
 	wp_set_current_user( 1 );
 }, 0 );
 PHP
+# A block editor without an iframe, like GutenbergKit's.
+cp "$ROOT/test/ios/standalone-editor.php" "$WP_DIR/wp-content/mu-plugins/"
 step "Starting the server"
 # Without the JIT, and with a 120 second request limit: on the CI runner,
 # the first requests can take longer than the default 30 seconds.
