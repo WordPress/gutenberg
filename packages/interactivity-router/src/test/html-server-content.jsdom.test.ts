@@ -8,6 +8,7 @@
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
 	asDangerousHTML,
+	getContext,
 	getServerContext,
 	getServerState,
 	privateApis,
@@ -234,6 +235,97 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		}
 	);
 
+	// Values on the previous page: `null`; `T`, a token an action set there;
+	// `M`, the server representation. On every page, a `data-wp-watch`
+	// callback copies the page's server value into the element's value one
+	// frame after the navigation renders.
+	test.each( [
+		[ 'getServerState()', 'null' ],
+		[ 'getServerState()', 'T' ],
+		[ 'getServerState()', 'M' ],
+		[ 'getServerContext()', 'null' ],
+	] )(
+		'shows the new page’s server content once a data-wp-watch callback copies the server representation from %s, from %s',
+		async ( source, previous ) => {
+			const fromContext = source === 'getServerContext()';
+			const { state } = store( namespace, {
+				state: {} as { html: unknown },
+				callbacks: {
+					/** Copies the page's server value into the element's value. */
+					sync() {
+						if ( fromContext ) {
+							getContext< { html: unknown } >().html =
+								getServerContext< { html: unknown } >().html;
+						} else {
+							state.html = getServerState< {
+								html: unknown;
+							} >().html;
+						}
+					},
+				},
+			} );
+			const page = ( name: string, html: unknown, content: string ) =>
+				`<div data-wp-interactive="${ namespace }" data-wp-router-region="${ namespace }/r"${
+					fromContext
+						? ` data-wp-context='${ JSON.stringify( { html } ) }'`
+						: ''
+				} data-wp-watch="callbacks.sync"><p class="content">${ name }</p><div data-wp-html="${
+					fromContext ? 'context.html' : 'state.html'
+				}">${ content }</div></div>`;
+			const serverData = ( html: unknown ) => ( {
+				state: { [ namespace ]: { html } },
+			} );
+			const previousValue = previous === 'M' ? representation : null;
+			// What the server renders for the value on the previous page.
+			const previousContent = previous === 'M' ? '<p>One</p>' : '';
+			populateServerData( serverData( previousValue ) );
+			const region = hydrateHtml(
+				page( 'zero', previousValue, previousContent )
+			);
+			const element = region.querySelector( '[data-wp-html]' )!;
+			await navigate(
+				'one',
+				page( 'one', previousValue, previousContent ) +
+					serverDataHtml( serverData( previousValue ) )
+			);
+			if ( previous === 'T' ) {
+				state.html = asDangerousHTML( '<p>Client</p>' );
+				await nextFrames();
+			}
+			const shown = previous === 'T' ? '<p>Client</p>' : previousContent;
+			expect( element.innerHTML ).toBe( shown );
+			const updates = recordUpdates( region, element );
+
+			await navigate(
+				'two',
+				page( 'two', representation, '<i>two</i>' ) +
+					serverDataHtml( serverData( representation ) )
+			);
+
+			expect( region.querySelector( '[data-wp-html]' ) ).toBe( element );
+			expect( element.innerHTML ).toBe( '<i>two</i>' );
+			// A synced value arrives in the update after the one that shows the
+			// new page; a value that already was the representation changes
+			// nothing then.
+			expect( updates ).toEqual(
+				previous === 'M'
+					? [ [ 'two', '<i>two</i>' ] ]
+					: [
+							[ 'two', shown ],
+							[ 'two', '<i>two</i>' ],
+						]
+			);
+
+			traverseTo( `${ url }-one` );
+			await nextFrames();
+			expect( element.innerHTML ).toBe( previousContent );
+			traverseTo( `${ url }-two` );
+			await nextFrames();
+			expect( region.querySelector( '[data-wp-html]' ) ).toBe( element );
+			expect( element.innerHTML ).toBe( '<i>two</i>' );
+		}
+	);
+
 	test.each( [
 		[ 'a token', 'the server representation' ],
 		[ 'null', 'the server representation' ],
@@ -267,6 +359,9 @@ describe( 'a data-wp-html element kept across navigation', () => {
 			const element = region.querySelector( '[data-wp-html]' )!;
 			const updates = recordUpdates( region, element );
 
+			// The navigation helper waits for the frames in which the
+			// navigation's `data-wp-watch` callbacks run, so the change comes
+			// after them.
 			await navigate( 'two', page( 'two', '<i>two</i>' ) );
 			expect( element.innerHTML ).toBe( shown );
 			state.changed = true;

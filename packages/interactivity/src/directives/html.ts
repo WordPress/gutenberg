@@ -1,7 +1,7 @@
 import { useRef } from 'preact/hooks';
 import type { RefObject } from 'preact';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { isPlainObject, useLayoutEffect, warn } from '../utils';
+import { afterNextFrame, isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 import { getHtmlFallback, getHtmlServerContent } from '../vdom';
@@ -57,8 +57,8 @@ directive(
 		const previousServerContent = useRef< DocumentFragment | undefined >(
 			undefined
 		);
-		// Server content that the current navigation update brought to the kept
-		// host, not yet shown.
+		// Server content that the current navigation brought to the kept host,
+		// not yet shown.
 		const owedServerContent = useRef< DocumentFragment | undefined >(
 			undefined
 		);
@@ -150,15 +150,22 @@ directive(
 				}
 			} else if ( serverContent !== previousServerContent.current ) {
 				// Navigation rendered the kept host from another page's markup.
-				// The content stays owed for the rest of that update, which
-				// includes the render where a getter reading the new page's
-				// server context returns its new value. Later changes on the
-				// same page keep the content, as the value rule says.
+				// The content stays owed for the rest of that navigation: its
+				// update, which includes the render where a getter reading the
+				// new page's server context returns its new value, and the
+				// `data-wp-watch` callbacks it notifies, which run a frame later
+				// and can copy the new page's server value. Those that read the
+				// server context are notified once the region commits, after
+				// this effect, so the end is queued once the commit is over.
+				// Later changes on the same page keep the content, as the value
+				// rule says.
 				owedServerContent.current = serverContent;
 				queueMicrotask( () => {
-					if ( owedServerContent.current === serverContent ) {
-						owedServerContent.current = undefined;
-					}
+					afterNextFrame( () => {
+						if ( owedServerContent.current === serverContent ) {
+							owedServerContent.current = undefined;
+						}
+					} );
 				} );
 			}
 			previousServerContent.current = serverContent;
