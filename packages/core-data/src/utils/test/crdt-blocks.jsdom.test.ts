@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { RichTextData } from '@wordpress/rich-text';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
@@ -27,7 +28,24 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 	getBlockTypes: ( () => [
 		{
 			name: 'core/paragraph',
-			attributes: { content: { type: 'rich-text' } },
+			attributes: {
+				content: { type: 'rich-text' },
+				levelOptions: { type: 'array' },
+				metadata: {
+					type: 'object',
+					query: { noteId: { type: 'array' } },
+				},
+			},
+		},
+		{
+			name: 'core/test-default-array',
+			attributes: {
+				rows: {
+					type: 'array',
+					default: [],
+					query: { value: { type: 'string' } },
+				},
+			},
 		},
 		{
 			name: 'core/image',
@@ -3085,6 +3103,351 @@ describe( 'crdt-blocks', () => {
 
 				expect( yText.toString() ).toBe( 'a𝄞xb' );
 			} );
+		} );
+	} );
+
+	describe( 'block metadata attribute merging', () => {
+		// The `metadata` attribute is injected for every block type as a
+		// plain `{ type: 'object' }` attribute with no query schema (see
+		// block-editor/src/hooks/metadata.js). Its `noteId` key stores the
+		// note threads attached to a block, so concurrent writes from two
+		// peers must merge instead of last-writer-wins.
+		// See https://github.com/WordPress/gutenberg/issues/74751.
+
+		function makeNoteBlock( metadata?: Record< string, unknown > ): Block {
+			return {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Note target block',
+					...( metadata ? { metadata } : {} ),
+				},
+				innerBlocks: [],
+				clientId: 'block-1',
+			};
+		}
+
+		function getDeserializedMetadata( blocks: YBlocks ) {
+			const [ block ] = deserializeBlockAttributes(
+				blocks.toJSON() as Block[]
+			);
+			return block.attributes.metadata as
+				Record< string, unknown > | undefined;
+		}
+
+		it( 'preserves both notes when two users add a note to the same block concurrently', () => {
+			// Set up doc1 (User A) with a block that has no notes.
+			mergeCrdtBlocks( yblocks, [ makeNoteBlock() ], null );
+
+			// Set up doc2 (User B) by syncing initial state.
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A adds note 101 (concurrently with B, before syncing).
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101 ] } ) ],
+				null
+			);
+
+			// User B adds note 102 (concurrently with A, before syncing).
+			mergeCrdtBlocks(
+				yblocks2,
+				[ makeNoteBlock( { noteId: [ 102 ] } ) ],
+				null
+			);
+
+			// Sync: apply each other's changes.
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			// Both docs should have both notes attached to the block.
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const metadata = getDeserializedMetadata( checkBlocks );
+				const noteIds = ( metadata?.noteId as number[] ) ?? [];
+				expect( [ ...noteIds ].sort() ).toEqual( [ 101, 102 ] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'preserves a concurrent note addition and a custom block name', () => {
+			mergeCrdtBlocks( yblocks, [ makeNoteBlock() ], null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A adds a note.
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101 ] } ) ],
+				null
+			);
+
+			// User B renames the block (metadata.name) concurrently.
+			mergeCrdtBlocks(
+				yblocks2,
+				[ makeNoteBlock( { name: 'Custom name' } ) ],
+				null
+			);
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const metadata = getDeserializedMetadata( checkBlocks );
+				expect( metadata?.noteId ).toEqual( [ 101 ] );
+				expect( metadata?.name ).toBe( 'Custom name' );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'propagates note removal to other peers', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101, 102 ] } ) ],
+				null
+			);
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A removes note 101.
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 102 ] } ) ],
+				null
+			);
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const metadata = getDeserializedMetadata( checkBlocks );
+				expect( metadata?.noteId ).toEqual( [ 102 ] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'removes the metadata attribute when the incoming block has none', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101 ] } ) ],
+				null
+			);
+
+			// The last note was removed: the incoming block carries no
+			// metadata attribute at all.
+			mergeCrdtBlocks( yblocks, [ makeNoteBlock() ], null );
+
+			expect( getDeserializedMetadata( yblocks ) ).toBeUndefined();
+		} );
+
+		it( 'does not expose empty metadata containers on blocks without metadata', () => {
+			mergeCrdtBlocks( yblocks, [ makeNoteBlock() ], null );
+
+			expect( getDeserializedMetadata( yblocks ) ).toBeUndefined();
+		} );
+
+		it( 'round-trips metadata values through the CRDT document', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[
+					makeNoteBlock( {
+						noteId: [ 101 ],
+						name: 'Custom name',
+					} ),
+				],
+				null
+			);
+
+			expect( getDeserializedMetadata( yblocks ) ).toEqual( {
+				noteId: [ 101 ],
+				name: 'Custom name',
+			} );
+		} );
+
+		it( 'upgrades plain-value metadata from older documents on merge', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 7 ] } ) ],
+				null
+			);
+
+			// Simulate an older document where metadata was stored as a
+			// plain value.
+			doc.transact( () => {
+				const attributes = yblocks
+					.get( 0 )
+					.get( 'attributes' ) as YBlockAttributes;
+				attributes.set( 'metadata', { noteId: [ 7 ] } );
+			} );
+
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 7, 8 ] } ) ],
+				null
+			);
+
+			expect( getDeserializedMetadata( yblocks )?.noteId ).toEqual( [
+				7, 8,
+			] );
+		} );
+
+		it( 'does not generate document updates when re-merging unchanged blocks', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101 ] } ) ],
+				null
+			);
+
+			let updates = 0;
+			doc.on( 'update', () => {
+				updates++;
+			} );
+
+			// A fresh, deep-equal copy: the serializable-blocks cache is
+			// keyed by array identity, so this exercises a full re-merge.
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 101 ] } ) ],
+				null
+			);
+
+			expect( updates ).toBe( 0 );
+		} );
+
+		it( 'preserves both notes when users add to a block with a single note id', () => {
+			// Older content stores a single note id instead of a list.
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: [ 5, 101 ] } ) ],
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks2,
+				[ makeNoteBlock( { noteId: [ 5, 102 ] } ) ],
+				null
+			);
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const metadata = getDeserializedMetadata( checkBlocks );
+				const noteIds = ( metadata?.noteId as number[] ) ?? [];
+				expect( [ ...noteIds ].sort() ).toEqual( [ 101, 102, 5 ] );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'keeps a single note id when merging it again', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+			mergeCrdtBlocks(
+				yblocks,
+				[ makeNoteBlock( { noteId: 5 } ) ],
+				null
+			);
+
+			expect( getDeserializedMetadata( yblocks )?.noteId ).toEqual( [
+				5,
+			] );
+		} );
+
+		it( 'keeps empty arrays that have a schema default', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[
+					{
+						name: 'core/test-default-array',
+						attributes: { rows: [] },
+						innerBlocks: [],
+						clientId: 'block-1',
+					},
+				],
+				null
+			);
+
+			const [ block ] = deserializeBlockAttributes(
+				yblocks.toJSON() as Block[]
+			);
+			expect( block.attributes.rows ).toEqual( [] );
+		} );
+
+		it( 'keeps array attributes not declared in a query as plain values', () => {
+			mergeCrdtBlocks(
+				yblocks,
+				[
+					{
+						...makeNoteBlock(),
+						attributes: {
+							content: 'Note target block',
+							levelOptions: [ 1, 2, 3 ],
+						},
+					},
+				],
+				null
+			);
+
+			const attributes = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			expect( attributes.get( 'levelOptions' ) ).toEqual( [ 1, 2, 3 ] );
+			expect( attributes.get( 'levelOptions' ) ).not.toBeInstanceOf(
+				Y.Array
+			);
+		} );
+
+		it( 'keeps one whole value when two users change an undeclared array concurrently', () => {
+			const makeBlock = ( levelOptions: number[] ): Block => ( {
+				...makeNoteBlock(),
+				attributes: { content: 'Note target block', levelOptions },
+			} );
+
+			mergeCrdtBlocks( yblocks, [ makeBlock( [ 1, 2, 3 ] ) ], null );
+
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// Each user removes a different option.
+			mergeCrdtBlocks( yblocks, [ makeBlock( [ 2, 3 ] ) ], null );
+			mergeCrdtBlocks( yblocks2, [ makeBlock( [ 1, 2 ] ) ], null );
+
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+			Y.applyUpdate( doc, Y.encodeStateAsUpdate( doc2 ) );
+
+			// One user's choice wins as a whole instead of being mixed into
+			// a value neither of them chose.
+			const [ block1 ] = yblocks.toJSON() as Block[];
+			const [ block2 ] = yblocks2.toJSON() as Block[];
+			expect( block1.attributes.levelOptions ).toEqual(
+				block2.attributes.levelOptions
+			);
+			expect( [
+				[ 2, 3 ],
+				[ 1, 2 ],
+			] ).toContainEqual( block1.attributes.levelOptions );
+
+			doc2.destroy();
 		} );
 	} );
 } );
