@@ -1,7 +1,7 @@
 import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useMemo, useCallback } from '@wordpress/element';
@@ -134,7 +134,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 							? __( 'Play inline enabled because of Autoplay.' )
 							: __(
 									'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
-							  )
+								)
 					}
 				/>
 			</ToolsPanelItem>
@@ -146,7 +146,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 					setAttributes( { preload: 'metadata' } );
 				} }
 			>
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'Preload' ) }
 					value={ preload }
 					onChange={ onChangePreload }

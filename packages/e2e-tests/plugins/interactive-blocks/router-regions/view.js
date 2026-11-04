@@ -23,9 +23,8 @@ const { state } = store( 'router-regions', {
 		router: {
 			navigate: withSyncEvent( function* ( e ) {
 				e.preventDefault();
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
+				const { actions } =
+					yield import( '@wordpress/interactivity-router' );
 				yield actions.navigate( e.target.href );
 			} ),
 			back: withSyncEvent( function* ( e ) {

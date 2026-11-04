@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
+import { VisuallyHidden } from '../../../visually-hidden';
 import { SearchableChipSelectControl } from '../';
 import {
 	GROUPED_ITEMS,
@@ -18,18 +19,22 @@ import {
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableChipSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableChipSelectControl',
+	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableChipSelectControl { ...args } />,
 	subcomponents: {
+		'SearchableChipSelectControl.LoadingIndicator':
+			SearchableChipSelectControl.LoadingIndicator,
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
+		'SearchableChipSelectControl.Separator':
+			SearchableChipSelectControl.Separator,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
+		'SearchableChipSelectControl.ItemLabel':
+			SearchableChipSelectControl.ItemLabel,
+		'SearchableChipSelectControl.ItemDescription':
+			SearchableChipSelectControl.ItemDescription,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,
 		'SearchableChipSelectControl.Collection':
@@ -58,6 +63,14 @@ export const Default: Story = {
 		...SearchableChipSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const WithItemDescriptions: Story = {
+	...SearchableChipSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableChipSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
 	},
 };
 
@@ -116,8 +129,8 @@ export const WithDisabledOption: Story = {
 
 /**
  * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * It renders in the list footer, not the main list, when it is in the
+ * filtered items. Handle the creation of the item in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
@@ -186,6 +199,70 @@ export const WithCustomEmptyContent: Story = {
 	},
 };
 
+function HiddenResultCount() {
+	const count =
+		SearchableChipSelectControl.useFilteredItems<
+			( typeof ITEMS )[ number ]
+		>().length;
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	return (
+		<VisuallyHidden>
+			{ count === 1 ? '1 result found.' : `${ count } results found.` }
+		</VisuallyHidden>
+	);
+}
+
+/**
+ * Pass `SearchableChipSelectControl.LoadingIndicator` as `statusContent` while fetching
+ * items. Pass `children` to customize its message. After loading, pass a
+ * visually hidden result count as `statusContent` to announce it. Pass
+ * `emptyContent={ null }` while loading.
+ */
+export const AsyncItems: Story = {
+	args: {
+		label: 'Label',
+		description: 'This is a description.',
+	},
+	render: function Template( args ) {
+		const [ loading, setLoading ] = useState( false );
+		const [ items, setItems ] = useState< typeof ITEMS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				statusContent={
+					loading ? (
+						<SearchableChipSelectControl.LoadingIndicator />
+					) : (
+						<HiddenResultCount />
+					)
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( open ) => {
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
+					if ( ! open ) {
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setLoading( false );
+					}, 2000 );
+				} }
+			/>
+		);
+	},
+};
+
 export const WithoutClearButton: Story = {
 	...SearchableChipSelectStories.WithoutClearButton,
 	args: {
@@ -215,8 +292,21 @@ export const Grouped: Story = {
 };
 
 /**
+ * Use `SearchableChipSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableChipSelectStories.WithSeparator,
+	args: {
+		...SearchableChipSelectStories.WithSeparator.args,
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+	},
+};
+
+/**
  * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
+ * `items` as a creatable-only group. Handle the creation of the item in
+ * `onValueChange`.
  */
 export const GroupedCreatable: Story = {
 	args: {
@@ -280,7 +370,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableChipSelectControl.ItemLabel>
 								</SearchableChipSelectControl.Item>
 							) }
 						</SearchableChipSelectControl.Collection>

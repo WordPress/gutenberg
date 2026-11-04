@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // Load block support registration filters.
 import '@wordpress/block-editor';
 import {

@@ -101,7 +101,9 @@ test.describe( 'View config extensibility', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await expect( page.getByLabel( 'Sort by' ) ).toHaveValue( 'date' );
+		await expect(
+			page.getByRole( 'combobox', { name: 'Sort by' } )
+		).toHaveText( 'Date' );
 		await expect(
 			page.getByRole( 'radio', { name: 'Sort descending' } )
 		).toBeChecked();
@@ -158,10 +160,7 @@ test.describe( 'View config extensibility', () => {
 		).toBeVisible();
 	} );
 
-	// v2 gap: the extensible site editor's Pages screen consumes the view
-	// config for its views and layouts, but its Quick Edit form does not
-	// consume the form section yet.
-	test( 'applies the filtered form to the Quick Edit DataForm @site-editor-v1-only', async ( {
+	test( 'applies the filtered form to the Quick Edit DataForm', async ( {
 		admin,
 		page,
 	} ) => {
@@ -172,7 +171,7 @@ test.describe( 'View config extensibility', () => {
 			name: new RegExp( MATCHING_PAGE_TITLE ),
 		} );
 		await matchingPageRow
-			.getByRole( 'button', { name: 'Quick Edit' } )
+			.getByRole( 'button', { name: 'Quick edit' } )
 			.click();
 
 		const quickEditModal = page.locator(

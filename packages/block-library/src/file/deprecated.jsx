@@ -78,7 +78,7 @@ const v3 = {
 					/* translators: %s: filename. */
 					__( 'Embed of %s.' ),
 					fileName
-			  );
+				);
 
 		const hasFilename = ! RichText.isEmpty( fileName );
 
@@ -209,7 +209,7 @@ const v2 = {
 					/* translators: %s: filename. */
 					__( 'Embed of %s.' ),
 					fileName
-			  );
+				);
 
 		const hasFilename = ! RichText.isEmpty( fileName );
 
@@ -329,7 +329,7 @@ const v1 = {
 					/* translators: %s: filename. */
 					__( 'Embed of %s.' ),
 					fileName
-			  );
+				);
 
 		return (
 			href && (

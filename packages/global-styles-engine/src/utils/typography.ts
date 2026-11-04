@@ -63,10 +63,10 @@ export function getFluidTypographyOptionsFromSettings(
 						? typographySettings.fluid
 						: {} ),
 				},
-		  }
+			}
 		: {
 				fluid: typographySettings?.fluid,
-		  };
+			};
 }
 
 /**

@@ -6,7 +6,6 @@ const EVENT_HANDLER_PATTERN = /^on[A-Z]/;
 function isBehaviorProp( propName: string ) {
 	return (
 		propName === 'id' ||
-		propName === 'ref' ||
 		propName === 'tabIndex' ||
 		EVENT_HANDLER_PATTERN.test( propName )
 	);
@@ -15,12 +14,13 @@ function isBehaviorProp( propName: string ) {
 function getMeasurementProps( props: Record< string, unknown > ) {
 	return Object.fromEntries(
 		Object.entries( props ).filter(
-			( [ propName ] ) => ! isBehaviorProp( propName )
+			( [ propName ] ) =>
+				! isBehaviorProp( propName ) && propName !== 'ref'
 		)
 	);
 }
 
-function sanitizeElement( element: ReactElement ) {
+function sanitizeElement( element: ReactElement< Record< string, unknown > > ) {
 	const behaviorOverrides: Record< string, unknown > = { ref: null };
 
 	for ( const propName of Object.keys( element.props ) ) {
@@ -40,7 +40,7 @@ function getMeasurementRender< TRender >( render: TRender ): TRender {
 		const renderFunction = render as (
 			props: Record< string, unknown >,
 			...args: unknown[]
-		) => ReactElement;
+		) => ReactElement< Record< string, unknown > >;
 
 		return ( ( props: Record< string, unknown >, ...args: unknown[] ) =>
 			sanitizeElement(
@@ -48,7 +48,9 @@ function getMeasurementRender< TRender >( render: TRender ): TRender {
 			) ) as TRender;
 	}
 
-	return sanitizeElement( render as ReactElement ) as TRender;
+	return sanitizeElement(
+		render as ReactElement< Record< string, unknown > >
+	) as TRender;
 }
 
 export { getMeasurementProps, getMeasurementRender };

@@ -3,13 +3,15 @@ import { Awareness } from 'y-protocols/awareness';
 import * as buffer from 'lib0/buffer';
 import * as fun from 'lib0/function';
 import {
+	afterEach,
+	beforeEach,
 	describe,
 	expect,
 	it,
-	jest,
-	beforeEach,
-	afterEach,
-} from '@jest/globals';
+	vi,
+	type Mock,
+	type Mocked,
+} from 'vitest';
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
@@ -30,21 +32,22 @@ import type {
 import { serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
-jest.mock( '../providers', () => ( {
-	getProviderCreators: jest.fn(),
+vi.mock( import( '../providers' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getProviderCreators: vi.fn(),
 } ) );
-const mockGetProviderCreators = jest.mocked( getProviderCreators );
+const mockGetProviderCreators = vi.mocked( getProviderCreators );
 
 describe( 'SyncManager', () => {
-	let mockHandlers: jest.MockedObject< RecordHandlers >;
-	let mockProviderCreator: jest.Mock< ProviderCreator >;
+	let mockHandlers: Mocked< RecordHandlers >;
+	let mockProviderCreator: Mock< ProviderCreator >;
 	let mockProviderResult: ProviderCreatorResult;
 	let mockRecord: ObjectData;
-	let mockSyncConfig: jest.MockedObject< SyncConfig >;
+	let mockSyncConfig: Mocked< SyncConfig >;
 
 	beforeEach( () => {
 		// Reset all mocks
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		mockRecord = {
 			id: '123',
@@ -53,17 +56,17 @@ describe( 'SyncManager', () => {
 		};
 
 		mockProviderResult = {
-			destroy: jest.fn(),
-			on: jest.fn(),
+			destroy: vi.fn(),
+			on: vi.fn(),
 		};
-		mockProviderCreator = jest.fn( () =>
+		mockProviderCreator = vi.fn( () =>
 			Promise.resolve( mockProviderResult )
 		);
 		mockGetProviderCreators.mockReturnValue( [ mockProviderCreator ] );
 
 		mockSyncConfig = {
-			applyChangesToCRDTDoc: jest.fn(),
-			getChangesFromCRDTDoc: jest.fn(
+			applyChangesToCRDTDoc: vi.fn(),
+			getChangesFromCRDTDoc: vi.fn(
 				( ydoc: CRDTDoc, editedRecord: ObjectData ) => {
 					const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
@@ -79,27 +82,26 @@ describe( 'SyncManager', () => {
 					);
 				}
 			),
-			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new Awareness( ydoc )
-			),
-			getPersistedCRDTDoc: jest.fn( () => null ),
+			createAwareness: vi.fn( ( ydoc: Y.Doc ) => new Awareness( ydoc ) ),
+			getPersistedCRDTDoc: vi.fn( () => null ),
+			shouldSync: undefined,
+			supportsPersistence: undefined,
 		};
 
 		mockHandlers = {
-			addUndoMeta: jest.fn(),
-			editRecord: jest.fn(),
-			getEditedRecord: jest.fn( async () =>
-				Promise.resolve( mockRecord )
-			),
-			onStatusChange: jest.fn(),
-			persistCRDTDoc: jest.fn(),
-			refetchRecord: jest.fn( async () => Promise.resolve() ),
-			restoreUndoMeta: jest.fn(),
+			addUndoMeta: vi.fn(),
+			editRecord: vi.fn(),
+			getEditedRecord: vi.fn( async () => Promise.resolve( mockRecord ) ),
+			onStatusChange: vi.fn(),
+			onUndoLevelOpened: undefined,
+			persistCRDTDoc: vi.fn(),
+			refetchRecord: vi.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: vi.fn(),
 		};
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'load', () => {
@@ -145,6 +147,7 @@ describe( 'SyncManager', () => {
 				objectId: '123',
 				ydoc: expect.any( Y.Doc ),
 				awareness: expect.any( Awareness ),
+				Y,
 			} );
 		} );
 
@@ -222,7 +225,7 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'only adds undo metadata for the entity that changed', async () => {
-			mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+			mockSyncConfig.applyChangesToCRDTDoc = vi.fn(
 				( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
 					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
@@ -235,19 +238,19 @@ describe( 'SyncManager', () => {
 			const recordB = { id: '456', title: 'Post B', meta: {} };
 			const handlersA = {
 				...mockHandlers,
-				addUndoMeta: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				addUndoMeta: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( recordA )
 				),
-				restoreUndoMeta: jest.fn(),
+				restoreUndoMeta: vi.fn(),
 			};
 			const handlersB = {
 				...mockHandlers,
-				addUndoMeta: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				addUndoMeta: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( recordB )
 				),
-				restoreUndoMeta: jest.fn(),
+				restoreUndoMeta: vi.fn(),
 			};
 
 			const manager = createSyncManager();
@@ -333,7 +336,7 @@ describe( 'SyncManager', () => {
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCRDTDoc: jest.fn( () =>
+					getPersistedCRDTDoc: vi.fn( () =>
 						createPersistedCRDTDoc( mockRecord )
 					),
 				};
@@ -369,7 +372,7 @@ describe( 'SyncManager', () => {
 			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCRDTDoc: jest.fn( () =>
+					getPersistedCRDTDoc: vi.fn( () =>
 						createPersistedCRDTDoc( {
 							...mockRecord,
 							title: 'Invalidated title from persisted CRDT doc',
@@ -453,7 +456,7 @@ describe( 'SyncManager', () => {
 
 			manager.unload( 'post', '123' );
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			await manager.load(
 				mockSyncConfig,
@@ -494,7 +497,7 @@ describe( 'SyncManager', () => {
 			expect( mockProviderResult.destroy ).toHaveBeenCalledTimes( 1 );
 
 			// Should still be able to update the other entity
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
 			// Wait a tick for any async follow-up work.
@@ -503,8 +506,11 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
-		it( 'clears the undo manager after unloading all entities', async () => {
+		it( 'keeps the same undo manager before, during, and after entities are loaded', async () => {
 			const manager = createSyncManager();
+			const { undoManager } = manager;
+
+			expect( undoManager ).toBeDefined();
 
 			await manager.load(
 				mockSyncConfig,
@@ -521,11 +527,32 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			expect( manager.undoManager ).toBeDefined();
+			expect( manager.undoManager ).toBe( undoManager );
 
 			manager.unloadAll();
 
-			expect( manager.undoManager ).toBeUndefined();
+			expect( manager.undoManager ).toBe( undoManager );
+		} );
+
+		it( 'reports which entities are loaded', async () => {
+			const manager = createSyncManager();
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( true );
+			expect( manager.isLoaded( 'post', '456' ) ).toBe( false );
+
+			manager.unload( 'post', '123' );
+
+			expect( manager.isLoaded( 'post', '123' ) ).toBe( false );
 		} );
 
 		it( 'destroys providers and skips initialization when unload runs during load', async () => {
@@ -578,7 +605,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation( () =>
 				Promise.resolve( mockProviderResult )
 			);
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			await manager.load(
 				mockSyncConfig,
@@ -592,6 +619,171 @@ describe( 'SyncManager', () => {
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc
 			).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'undo history', () => {
+		async function loadEntities() {
+			const ydocs = new Map< string, Y.Doc >();
+			mockProviderCreator.mockImplementation(
+				async ( { objectId, ydoc } ) => {
+					if ( objectId ) {
+						ydocs.set( objectId, ydoc );
+					}
+
+					return mockProviderResult;
+				}
+			);
+
+			const manager = createSyncManager();
+			const onFirstLevelOpened = vi.fn();
+			const onSecondLevelOpened = vi.fn();
+
+			await manager.load( mockSyncConfig, 'post', '1', mockRecord, {
+				...mockHandlers,
+				onUndoLevelOpened: onFirstLevelOpened,
+			} );
+			await manager.load( mockSyncConfig, 'post', '2', mockRecord, {
+				...mockHandlers,
+				onUndoLevelOpened: onSecondLevelOpened,
+			} );
+
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const getTitle = ( objectId: string ) =>
+				ydocs
+					.get( objectId )
+					?.getMap( CRDT_RECORD_MAP_KEY )
+					.get( 'title' );
+
+			// Changes are deferred when editing alone. Closing the level
+			// lands them, and makes the next change open a new level.
+			const change = ( objectId: string, title: string ) => {
+				manager.update(
+					'post',
+					objectId,
+					{ title },
+					LOCAL_EDITOR_ORIGIN
+				);
+				manager.undoManager.stopCapturing();
+			};
+
+			return {
+				manager,
+				change,
+				getTitle,
+				onFirstLevelOpened,
+				onSecondLevelOpened,
+			};
+		}
+
+		it( 'only moves the levels of the entity it is asked for', async () => {
+			const { manager, change, getTitle } = await loadEntities();
+
+			change( '1', 'First changed' );
+			change( '2', 'Second changed' );
+
+			// The second entity has the most recent level, but the first is asked.
+			expect( manager.undoManager.undo( 'post', '1' ) ).toBe( true );
+			expect( getTitle( '1' ) ).toBeUndefined();
+			expect( getTitle( '2' ) ).toBe( 'Second changed' );
+		} );
+
+		it( 'does not move another entity when the entity asked for was unloaded', async () => {
+			const { manager, change, getTitle } = await loadEntities();
+
+			change( '1', 'First changed' );
+			change( '2', 'Second changed' );
+			manager.unload( 'post', '2' );
+
+			expect( manager.undoManager.undo( 'post', '2' ) ).toBe( false );
+			expect( getTitle( '1' ) ).toBe( 'First changed' );
+			expect( manager.undoManager.hasUndo() ).toBe( true );
+		} );
+
+		it( 'closes the levels of other entities when one opens a level', async () => {
+			const { manager, onFirstLevelOpened } = await loadEntities();
+
+			// These changes land together, without closing a level in between.
+			manager.update(
+				'post',
+				'1',
+				{ title: 'First' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.update(
+				'post',
+				'2',
+				{ title: 'Second' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.update(
+				'post',
+				'1',
+				{ title: 'First again' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.undoManager.stopCapturing();
+
+			// Without closing, the last change would merge into the first
+			// entity's level, which now sits below the second entity's level.
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'drops the redo levels of other entities when one opens a level', async () => {
+			const { manager, change } = await loadEntities();
+
+			change( '1', 'First' );
+			change( '2', 'Second' );
+
+			expect( manager.undoManager.undo( 'post', '2' ) ).toBe( true );
+			expect( manager.undoManager.hasRedo() ).toBe( true );
+
+			// A new level anywhere ends the redo history of every entity.
+			change( '1', 'First again' );
+
+			expect( manager.undoManager.hasRedo() ).toBe( false );
+			expect( manager.undoManager.redo( 'post', '2' ) ).toBe( false );
+		} );
+
+		it( 'closes the levels and drops the redo levels of every entity', async () => {
+			const { manager, change, onFirstLevelOpened, onSecondLevelOpened } =
+				await loadEntities();
+
+			change( '1', 'First' );
+			change( '2', 'Second' );
+
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 1 );
+			expect( onSecondLevelOpened ).toHaveBeenCalledTimes( 1 );
+
+			manager.undoManager.undo( 'post', '2' );
+			manager.undoManager.clearRedo();
+
+			expect( manager.undoManager.hasRedo() ).toBe( false );
+		} );
+
+		it( 'lands deferred changes before moving the history', async () => {
+			const { manager, getTitle, onFirstLevelOpened } =
+				await loadEntities();
+
+			manager.update(
+				'post',
+				'1',
+				{ title: 'Deferred' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			// Undo applies to the deferred change, not to what came before it.
+			expect( manager.undoManager.undo( 'post', '1' ) ).toBe( true );
+			expect( onFirstLevelOpened ).toHaveBeenCalledTimes( 1 );
+			expect( getTitle( '1' ) ).toBeUndefined();
 		} );
 	} );
 
@@ -614,7 +806,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
@@ -654,7 +846,7 @@ describe( 'SyncManager', () => {
 			};
 			const syncConfig = {
 				...mockSyncConfig,
-				applyChangesToCRDTDoc: jest.fn(
+				applyChangesToCRDTDoc: vi.fn(
 					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
 						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 						Object.entries( changes ).forEach(
@@ -667,8 +859,8 @@ describe( 'SyncManager', () => {
 			};
 			const handlers = {
 				...mockHandlers,
-				editRecord: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				editRecord: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( editedRecord )
 				),
 			};
@@ -731,7 +923,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			manager.update(
 				'post',
@@ -762,7 +954,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// With no remote peers present, the first update is deferred.
 			manager.update(
@@ -839,7 +1031,7 @@ describe( 'SyncManager', () => {
 			expect( capturedDoc ).not.toBeNull();
 
 			// Spy on transact to verify origin is passed
-			const transactSpy = jest.spyOn(
+			const transactSpy = vi.spyOn(
 				capturedDoc as unknown as Y.Doc,
 				'transact'
 			);
@@ -876,7 +1068,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
@@ -946,7 +1138,7 @@ describe( 'SyncManager', () => {
 		it( 'includes updates issued in the same tick in the snapshot', async () => {
 			const { manager } = await loadEntityCapturingDoc();
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
 				( ydoc, changes ) => {
 					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -1030,7 +1222,7 @@ describe( 'SyncManager', () => {
 		it( 'skips loading entity when shouldSync returns false', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => false );
+			mockSyncConfig.shouldSync = vi.fn( () => false );
 
 			await manager.load(
 				mockSyncConfig,
@@ -1053,7 +1245,7 @@ describe( 'SyncManager', () => {
 		it( 'loads entity when shouldSync returns true', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => true );
+			mockSyncConfig.shouldSync = vi.fn( () => true );
 
 			await manager.load(
 				mockSyncConfig,
@@ -1095,11 +1287,11 @@ describe( 'SyncManager', () => {
 		it( 'skips loading collection when shouldSync returns false', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => false );
+			mockSyncConfig.shouldSync = vi.fn( () => false );
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1118,11 +1310,11 @@ describe( 'SyncManager', () => {
 		it( 'loads collection when shouldSync returns true', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => true );
+			mockSyncConfig.shouldSync = vi.fn( () => true );
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1144,8 +1336,8 @@ describe( 'SyncManager', () => {
 			delete mockSyncConfig.shouldSync;
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1267,7 +1459,7 @@ describe( 'SyncManager', () => {
 			const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 			// Clear previous calls
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// Simulate a local update with sync manager origin
 			ydoc.transact( () => {

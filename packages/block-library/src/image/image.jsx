@@ -3,10 +3,10 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
-	Spinner,
+	Spinner as WCSpinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -16,7 +16,7 @@ import {
 	MenuItem,
 	ToolbarItem,
 	DropdownMenu,
-	Popover,
+	Popover as WCPopover,
 } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -73,7 +73,6 @@ import { evalAspectRatio, mediaPosition } from './utils';
 
 const {
 	DimensionsTool,
-	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
@@ -177,7 +176,7 @@ function ContentOnlyControls( {
 				) }
 			</ToolbarItem>
 			{ isAltDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsAltDialogOpen( false ) }
@@ -217,10 +216,10 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 			{ isTitleDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsTitleDialogOpen( false ) }
@@ -256,7 +255,7 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 		</>
 	);
@@ -273,6 +272,7 @@ export default function Image( {
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
+	onResetImage,
 	context,
 	clientId,
 	blockEditingMode,
@@ -331,7 +331,7 @@ export default function Image( {
 							'attachment',
 							id,
 							{ context: 'view' }
-					  )
+						)
 					: null;
 
 			// Check if the attachment resolution failed with a specific error.
@@ -348,7 +348,7 @@ export default function Image( {
 								id,
 								{ context: 'view' },
 							]
-					  )
+						)
 					: null;
 
 			return {
@@ -666,20 +666,23 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const selectedStyleState = useSelect(
+	const { selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
-				return undefined;
+				return {
+					selectedStyleState: undefined,
+					hasSelectedStyleState: false,
+				};
 			}
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
-			return getSelectedBlockStyleState( clientId );
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
+			return {
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
 		},
 		[ clientId, isSingleSelected ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,
@@ -837,7 +840,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							altBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
@@ -851,7 +854,7 @@ export default function Image( {
 							/* translators: %s: Label of the bindings source. */
 							__( 'Connected to %s' ),
 							titleBindingSource.label
-					  )
+						)
 					: __( 'Connected to dynamic data' ),
 			};
 		},
@@ -886,15 +889,12 @@ export default function Image( {
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
-					onReset={ () => onSelectImage( undefined ) }
+					onReset={ onResetImage }
 					variant="toolbar"
 				/>
 			</BlockControls>
 		</>
 	);
-
-	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
 
 	const controls = (
 		<>
@@ -964,12 +964,12 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && isSingleSelected && (
+			{ isSingleSelected && (
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
 						resetAll={ () => {
-							onSelectImage( undefined );
+							onResetImage();
 							setAttributes( { isDecorative: false } );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -978,7 +978,7 @@ export default function Image( {
 							<ToolsPanelItem
 								label={ __( 'Image' ) }
 								hasValue={ () => !! url }
-								onDeselect={ () => onSelectImage( undefined ) }
+								onDeselect={ onResetImage }
 								isShownByDefault
 							>
 								<MediaControl
@@ -995,7 +995,7 @@ export default function Image( {
 									onSelect={ onSelectImage }
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
-									onReset={ () => onSelectImage( undefined ) }
+									onReset={ onResetImage }
 									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>
@@ -1046,7 +1046,7 @@ export default function Image( {
 									setAttributes( { isDecorative: false } )
 								}
 							>
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }
@@ -1159,7 +1159,7 @@ export default function Image( {
 						'This image has been marked as decorative; its file name is %s'
 					),
 					filename
-			  )
+				)
 			: __( 'This image has been marked as decorative.' );
 	} else if ( alt ) {
 		defaultedAlt = alt;
@@ -1188,7 +1188,7 @@ export default function Image( {
 					className="wp-block-image__placeholder"
 					withIllustration
 				>
-					<Spinner />
+					<WCSpinner />
 				</Placeholder>
 			) : (
 				<>
@@ -1212,7 +1212,7 @@ export default function Image( {
 										height:
 											pixelSize.height +
 											resizeDelta.height,
-								  }
+									}
 								: ( () => {
 										const style = {};
 										if ( width === 'auto' ) {
@@ -1245,7 +1245,7 @@ export default function Image( {
 											style.height = 'auto';
 										}
 										return style;
-								  } )() ),
+									} )() ),
 							objectFit: scale,
 							objectPosition:
 								focalPoint && scale
@@ -1255,7 +1255,7 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
+					{ ( isUploading || isSwappingMedia ) && <WCSpinner /> }
 				</>
 			) }
 		</ImageWrapper>

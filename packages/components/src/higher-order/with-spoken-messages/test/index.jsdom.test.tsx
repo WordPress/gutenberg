@@ -1,10 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import withSpokenMessages from '../';
 
 describe( 'withSpokenMessages', () => {
 	it( 'should generate speak and debouncedSpeak props', () => {
-		const testSpeak = jest.fn();
-		const testDebouncedSpeak = jest.fn();
+		const testSpeak = vi.fn();
+		const testDebouncedSpeak = vi.fn();
 		const isFunction = ( maybeFunc: any ) =>
 			typeof maybeFunc === 'function';
 		const DumpComponent = withSpokenMessages(

@@ -1,10 +1,14 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
 import Notice from '../index';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
-const mockedSpeak = jest.mocked( speak );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+const mockedSpeak = vi.mocked( speak );
 
 function getNoticeWrapper( container: HTMLElement ) {
 	return container.firstChild;
@@ -118,7 +122,7 @@ describe( 'Notice', () => {
 					actions={ [
 						{
 							label: 'Disabled action',
-							onClick: jest.fn(),
+							onClick: vi.fn(),
 							disabled: true,
 						},
 					] }
@@ -136,7 +140,7 @@ describe( 'Notice', () => {
 
 		it( 'should call onClick when action with url is clicked', async () => {
 			const user = userEvent.setup();
-			const onClick = jest.fn( ( e ) => e.preventDefault() );
+			const onClick = vi.fn( ( e ) => e.preventDefault() );
 
 			render(
 				<Notice

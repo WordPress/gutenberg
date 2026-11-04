@@ -39,7 +39,7 @@ function PostLastRevision() {
 				href: addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ),
-		  }
+			}
 		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
 
 	return (
@@ -70,7 +70,7 @@ export function PrivatePostLastRevision() {
 				href: addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ),
-		  }
+			}
 		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
 
 	return (

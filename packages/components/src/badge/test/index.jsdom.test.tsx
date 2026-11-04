@@ -1,10 +1,28 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { logged } from '@wordpress/deprecated';
 import _Badge from '..';
+
+const DEPRECATION_MESSAGE =
+	'wp.components.privateApis.Badge is deprecated since version 7.2. Please use Badge from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.';
 
 const testid = 'my-badge';
 const Badge = ( props: React.ComponentProps< typeof _Badge > ) => (
 	<_Badge data-testid={ testid } { ...props } />
 );
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
+
+describe( 'Shows a deprecation warning', () => {
+	it( 'Badge', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
+		render( <Badge>Code is Poetry</Badge> );
+
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
+	} );
+} );
 
 describe( 'Badge', () => {
 	it( 'should render correctly with default props', () => {

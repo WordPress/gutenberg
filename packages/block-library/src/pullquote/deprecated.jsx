@@ -611,7 +611,7 @@ const v2 = {
 			textColor || customTextColor
 				? clsx( 'has-text-color', {
 						[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-				  } )
+					} )
 				: undefined;
 		const blockquoteStyle = blockquoteTextColorClass
 			? undefined

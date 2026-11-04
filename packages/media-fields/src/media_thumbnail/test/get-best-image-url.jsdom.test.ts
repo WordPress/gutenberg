@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getBestImageUrl } from '../view';
 
 type Media = Parameters< typeof getBestImageUrl >[ 0 ];
@@ -19,6 +20,7 @@ const baseMedia: Media = {
 	title: { raw: 'Test Image', rendered: 'Test Image' },
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',

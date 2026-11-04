@@ -1,9 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
 	RevisionsCodeDiff,
 	getCodeDiffDisplayState,
 	getCodeDiffRows,
 } from '../revisions-code-diff';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function renderCodeDiff( {
 	currentContent = '',

@@ -127,7 +127,7 @@ function EditableTemplatePartInnerBlocks( {
 							postId: id,
 							postType: 'wp_template_part',
 						} ),
-			  }
+				}
 			: {};
 
 	return <TagName { ...innerBlocksProps } { ...customProps } />;

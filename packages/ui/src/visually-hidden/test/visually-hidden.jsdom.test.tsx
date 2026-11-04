@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { VisuallyHidden } from '../index';
@@ -47,7 +48,6 @@ describe( 'VisuallyHidden', () => {
 				>
 					My label
 				</VisuallyHidden>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<input id="input-id" />
 			</>
 		);

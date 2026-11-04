@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
 import {
 	createBlockSelectionHistory,
@@ -71,7 +72,7 @@ function createSelection(
 				clientId: end.clientId,
 				attributeKey: end.attributeKey as string,
 				offset: end.offset ?? 0,
-		  }
+			}
 		: selectionStart;
 
 	return {
@@ -90,7 +91,7 @@ describe( 'BlockSelectionHistory', () => {
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'initialization', () => {

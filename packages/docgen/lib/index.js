@@ -8,7 +8,16 @@ const isSymbolIgnore = require( './is-symbol-ignore' );
 /**
  * Helpers functions.
  */
-const extensions = [ '.js', '.jsx', '.ts', '.tsx' ];
+const extensions = [
+	'.js',
+	'.jsx',
+	'.mjs',
+	'.cjs',
+	'.ts',
+	'.tsx',
+	'.mts',
+	'.cts',
+];
 const relativeToAbsolute = ( basePath, relativePath ) => {
 	const target = path.join( path.dirname( basePath ), relativePath );
 	const extension = path.extname( target );
@@ -60,7 +69,7 @@ const processFile = ( rootDir, inputFile ) => {
 		currentFileStack.pop();
 		return result;
 	} catch ( e ) {
-		process.stderr.write( `\n${ e }` );
+		process.stderr.write( `\n${ inputFile }: ${ e }` );
 		process.stderr.write( '\n' );
 		process.exit( 1 );
 	}

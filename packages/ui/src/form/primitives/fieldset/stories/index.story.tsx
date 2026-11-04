@@ -4,13 +4,9 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Fieldset',
+	title: 'Components/@wordpress-ui/Form/Primitives/Fieldset',
+	id: 'design-system-components-form-primitives-fieldset',
 	component: Fieldset.Root,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <Fieldset.Root { ...args } />,
 	subcomponents: {
 		'Fieldset.Legend': Fieldset.Legend,
 		'Fieldset.Description': Fieldset.Description,
@@ -31,15 +27,15 @@ export const Default: Story = {
 	args: {
 		children: [
 			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			<Fieldset.Description key="description">
+				This is a description for the entire fieldset.
+			</Fieldset.Description>,
 			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
 				// eslint-disable-next-line jsx-a11y/label-has-associated-control
 				<label key={ fruit }>
 					<input type="checkbox" /> { fruit }
 				</label>
 			) ),
-			<Fieldset.Description key="description">
-				This is a description for the entire fieldset.
-			</Fieldset.Description>,
 		],
 	},
 };
@@ -78,15 +74,15 @@ export const WithDetails: Story = {
 	args: {
 		children: [
 			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			<Fieldset.Details key="details">
+				{ DETAILS_EXAMPLE }
+			</Fieldset.Details>,
 			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
 				// eslint-disable-next-line jsx-a11y/label-has-associated-control
 				<label key={ fruit }>
 					<input type="checkbox" /> { fruit }
 				</label>
 			) ),
-			<Fieldset.Details key="details">
-				{ DETAILS_EXAMPLE }
-			</Fieldset.Details>,
 		],
 	},
 };

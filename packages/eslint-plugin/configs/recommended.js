@@ -40,14 +40,23 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				'import/resolver': {
 					[ require.resolve( 'eslint-import-resolver-typescript' ) ]:
 						{
-							extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+							extensions: [
+								'.js',
+								'.jsx',
+								'.mjs',
+								'.cjs',
+								'.ts',
+								'.tsx',
+								'.mts',
+								'.cts',
+							],
 						},
 				},
 			},
-			ignores: [ '**/*.d.ts' ],
+			ignores: [ '**/*.d.ts', '**/*.d.mts', '**/*.d.cts' ],
 		},
 		{
-			files: [ '**/*.ts', '**/*.tsx' ],
+			files: [ '**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts' ],
 			languageOptions: {
 				parser: tseslint.parser,
 			},

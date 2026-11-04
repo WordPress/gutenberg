@@ -1,19 +1,40 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { Y } from '@wordpress/sync';
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
+import { parse } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import {
+	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
+	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
+	type PostChanges,
+	type YPostRecord,
+} from '../crdt';
+import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import { updateSelectionHistory } from '../crdt-selection';
+import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
+import type { Post } from '../../entity-types';
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  * Also stub __unstableSerializeAndClean so we can assert how it's invoked
  * (the real implementation returns "" without registered block types, which
  * isn't useful for asserting closure-capture behavior).
  */
-jest.mock( '@wordpress/blocks', () => {
-	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
-		string,
-		unknown
-	>;
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
 		...actual,
-		getBlockTypes: () => [
+		getBlockTypes: ( () => [
 			{
 				name: 'core/paragraph',
 				attributes: { content: { type: 'rich-text' } },
@@ -37,31 +58,15 @@ jest.mock( '@wordpress/blocks', () => {
 					},
 				},
 			},
-		],
+		] ) as unknown as typeof import( '@wordpress/blocks' ).getBlockTypes,
 		// Mocked so tests can control what the Code Editor sync path "parses"
 		// from raw content without needing real block-type registration.
-		parse: jest.fn( () => [] ),
-		__unstableSerializeAndClean: jest.fn(
+		parse: vi.fn( () => [] ),
+		__unstableSerializeAndClean: vi.fn(
 			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
 		),
 	};
 } );
-import { parse } from '@wordpress/blocks';
-import { RichTextData } from '@wordpress/rich-text';
-import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import {
-	applyPostChangesToCRDTDoc,
-	defaultCollectionSyncConfig,
-	defaultSyncConfig,
-	getPostChangesFromCRDTDoc,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-	type PostChanges,
-	type YPostRecord,
-} from '../crdt';
-import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
-import { updateSelectionHistory } from '../crdt-selection';
-import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
-import type { Post } from '../../entity-types';
 
 // Default synced properties matching the base set built in entities.js,
 // plus 'categories' and 'tags' as example taxonomy rest_base values.
@@ -78,7 +83,7 @@ const defaultSyncedProperties = new Set< string >( [
 	'title',
 ] );
 
-describe( 'defaultSyncConfig', () => {
+describe( 'taxonomySyncConfig', () => {
 	// Regression test for https://github.com/WordPress/gutenberg/issues/79907:
 	// reporting unchanged properties as changes marks resolved records
 	// (e.g. taxonomy terms) as dirty whenever a synced update arrives.
@@ -91,11 +96,11 @@ describe( 'defaultSyncConfig', () => {
 			meta: [],
 			_links: { self: [ { href: 'https://example.com' } ] },
 		};
-		defaultSyncConfig.applyChangesToCRDTDoc( doc, record );
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, record );
 
 		// The edited record deep-equals the document contents, but
 		// `Y.Map.toJSON()` returns fresh object instances.
-		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+		const changes = taxonomySyncConfig.getChangesFromCRDTDoc( doc, {
 			...record,
 			meta: [],
 			_links: { self: [ { href: 'https://example.com' } ] },
@@ -107,19 +112,91 @@ describe( 'defaultSyncConfig', () => {
 
 	it( 'getChangesFromCRDTDoc returns only the properties that differ from the edited record', () => {
 		const doc = new Y.Doc();
-		defaultSyncConfig.applyChangesToCRDTDoc( doc, {
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, {
 			id: 1,
 			name: 'Renamed category',
 			slug: 'uncategorized',
 		} );
 
-		const changes = defaultSyncConfig.getChangesFromCRDTDoc( doc, {
+		const changes = taxonomySyncConfig.getChangesFromCRDTDoc( doc, {
 			id: 1,
 			name: 'Uncategorized',
 			slug: 'uncategorized',
 		} );
 
 		expect( changes ).toEqual( { name: 'Renamed category' } );
+		doc.destroy();
+	} );
+
+	it( 'does not put read-only term data into shared documents', () => {
+		const doc = new Y.Doc();
+		const editableFields = {
+			name: 'Renamed category',
+			slug: 'renamed-category',
+			description: 'Category description',
+			parent: 2,
+			meta: { color: 'blue' },
+			custom_field: 'Plugin-provided value',
+		};
+
+		taxonomySyncConfig.applyChangesToCRDTDoc( doc, {
+			...editableFields,
+			id: 1,
+			count: 3,
+			link: 'https://example.com/category/renamed-category/',
+			taxonomy: 'category',
+			_links: { self: [ { href: 'https://example.com' } ] },
+			_embedded: { author: [ { id: 1 } ] },
+		} );
+
+		expect( doc.getMap( CRDT_RECORD_MAP_KEY ).toJSON() ).toEqual(
+			editableFields
+		);
+		doc.destroy();
+	} );
+
+	it( 'ignores stale read-only data from existing shared documents while preserving term edits', () => {
+		const doc = new Y.Doc();
+		const record = {
+			id: 1,
+			count: 3,
+			name: 'Uncategorized',
+			slug: 'uncategorized',
+			description: '',
+			parent: 0,
+			meta: { color: 'red' },
+			custom_field: 'Original value',
+			link: 'https://example.com/category/uncategorized/',
+			taxonomy: 'category',
+			_links: { self: [ { href: 'https://example.com' } ] },
+			_embedded: { author: [ { id: 1 } ] },
+		};
+		const termEdits = {
+			name: 'Renamed category',
+			slug: 'renamed-category',
+			description: 'Category description',
+			parent: 2,
+			meta: { color: 'blue' },
+			custom_field: 'Plugin-provided value',
+		};
+
+		// Seed a document written before read-only fields were excluded.
+		const sharedRecord = {
+			...record,
+			...termEdits,
+			count: 0,
+			link: 'https://old.example.com/category/uncategorized/',
+			_links: { self: [ { href: 'https://old.example.com' } ] },
+			_embedded: { author: [ { id: 2 } ] },
+		};
+		const ymap = doc.getMap( CRDT_RECORD_MAP_KEY );
+		for ( const [ key, value ] of Object.entries( sharedRecord ) ) {
+			ymap.set( key, value );
+		}
+
+		expect(
+			taxonomySyncConfig.getChangesFromCRDTDoc( doc, record )
+		).toEqual( termEdits );
 		doc.destroy();
 	} );
 } );
@@ -166,13 +243,13 @@ describe( 'crdt', () => {
 
 	beforeEach( () => {
 		doc = new Y.Doc();
-		jest.clearAllMocks();
-		jest.useFakeTimers();
+		vi.clearAllMocks();
+		vi.useFakeTimers();
 	} );
 
 	afterEach( () => {
-		jest.runAllTimers();
-		jest.useRealTimers();
+		vi.runAllTimers();
+		vi.useRealTimers();
 		doc.destroy();
 	} );
 
@@ -375,7 +452,7 @@ describe( 'crdt', () => {
 			// only. `parse()` is mocked to return blocks with freshly minted
 			// clientIds — the sync layer must not let those overwrite the
 			// stable clientIds already in the Y.Array.
-			( parse as jest.Mock ).mockReturnValueOnce( [
+			( parse as Mock ).mockReturnValueOnce( [
 				{
 					name: 'core/paragraph',
 					attributes: { content: 'Hello' },

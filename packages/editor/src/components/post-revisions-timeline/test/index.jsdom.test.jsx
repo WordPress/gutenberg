@@ -1,19 +1,23 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
 import PostRevisionsTimeline from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/fields', () => ( {
-	authorField: {
+vi.mock( import( '../author-field' ), () => ( {
+	default: {
 		id: 'author',
 		label: 'Author',
 		getValue: ( { item } ) => item?._embedded?.author?.[ 0 ]?.name,
 		render: ( { item } ) => {
-			const { createElement } = require( '@wordpress/element' );
 			const authorName = item?._embedded?.author?.[ 0 ]?.name;
 
 			return createElement(
@@ -30,7 +34,7 @@ jest.mock( '@wordpress/fields', () => ( {
 	},
 } ) );
 
-jest.mock( '@wordpress/dataviews', () => {
+vi.mock( import( '@wordpress/dataviews' ), async ( importOriginal ) => {
 	const DataViewsPicker = ( { data, fields, getItemId, selection } ) => {
 		const titleField = fields.find( ( field ) => field.id === 'date' );
 
@@ -70,6 +74,7 @@ jest.mock( '@wordpress/dataviews', () => {
 	DataViewsPicker.Footer = () => null;
 
 	return {
+		...( await importOriginal() ),
 		DataViewsPicker,
 		filterSortAndPaginate: ( data ) => ( {
 			data,
@@ -78,17 +83,17 @@ jest.mock( '@wordpress/dataviews', () => {
 	};
 } );
 
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( object ) => {
 		return {
 			...object,
-			registerPrivateActions: jest.fn(),
-			registerPrivateSelectors: jest.fn(),
+			registerPrivateActions: vi.fn(),
+			registerPrivateSelectors: vi.fn(),
 		};
 	},
 } ) );
 
-jest.mock( '../../post-content-information', () => ( {
+vi.mock( import( '../../post-content-information' ), () => ( {
 	PostContentInformationUI: () => null,
 } ) );
 
@@ -127,7 +132,7 @@ describe( 'PostRevisionsTimeline', () => {
 			2: { name: 'Bob' },
 		};
 
-		getCurrentRevision = jest.fn( () => revisions[ 0 ] );
+		getCurrentRevision = vi.fn( () => revisions[ 0 ] );
 
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
@@ -141,7 +146,7 @@ describe( 'PostRevisionsTimeline', () => {
 				getEntityRecord: ( _kind, _name, id ) => users[ id ],
 			} ) )
 		);
-		useDispatch.mockReturnValue( { setCurrentRevisionId: jest.fn() } );
+		useDispatch.mockReturnValue( { setCurrentRevisionId: vi.fn() } );
 	} );
 
 	it( 'keeps the author field intact and labels autosaves', () => {

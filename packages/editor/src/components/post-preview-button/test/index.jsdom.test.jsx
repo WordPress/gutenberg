@@ -1,8 +1,11 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
 function renderMenu( children ) {
@@ -21,12 +24,15 @@ async function openMenu( user ) {
 	await screen.findByRole( 'menu', { name: 'View test menu' } );
 }
 
-jest.useRealTimers();
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
-	jest.fn()
-);
+vi.useRealTimers();
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
+} ) );
 
 function mockUseSelect( overrides ) {
 	useSelect.mockImplementation( ( map ) =>
@@ -46,14 +52,14 @@ function mockUseSelect( overrides ) {
 }
 
 describe( 'PostPreviewButton', () => {
-	const documentWrite = jest.fn();
-	const documentTitle = jest.fn();
-	const documentClose = jest.fn();
-	const setLocation = jest.fn();
+	const documentWrite = vi.fn();
+	const documentTitle = vi.fn();
+	const documentClose = vi.fn();
+	const setLocation = vi.fn();
 
 	beforeEach( () => {
-		global.open = jest.fn( () => ( {
-			focus: jest.fn(),
+		global.open = vi.fn( () => ( {
+			focus: vi.fn(),
 			document: {
 				write: documentWrite,
 				close: documentClose,
@@ -158,7 +164,8 @@ describe( 'PostPreviewButton', () => {
 		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'Preview(opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );

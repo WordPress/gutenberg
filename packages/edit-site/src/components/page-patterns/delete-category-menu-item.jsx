@@ -61,7 +61,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 					? error.message
 					: __(
 							'An error occurred while deleting the pattern category.'
-					  );
+						);
 
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',

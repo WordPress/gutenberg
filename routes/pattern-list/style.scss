@@ -9,7 +9,7 @@
 
 // Colorize synced pattern badges in grid view
 .dataviews-view-grid__badge-fields {
-	.dataviews-view-grid__field-value:has(.routes-pattern-list__field-sync-status-fully) {
+	.dataviews-view-grid__field-value:has(.fields-field__pattern-sync-status-fully) {
 		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 		color: var(--wp-block-synced-color);
 	}

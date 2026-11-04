@@ -1,8 +1,9 @@
-import '@testing-library/jest-dom';
 import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -10,6 +11,12 @@ import type {
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
+
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 type Attrs = { greeting: string };
 
@@ -86,6 +93,39 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard', () => {
+	it( 'announces a widget failure politely', async () => {
+		function CrashingWidget(): never {
+			throw new Error( 'Kaboom' );
+		}
+
+		render(
+			<WidgetDashboard
+				layout={ [ { ...initialLayout[ 0 ], type: 'test/failing' } ] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ [
+					{
+						...widgetTypes[ 0 ],
+						name: 'test/failing',
+						renderModule: 'test-failing-module',
+					},
+				] }
+				resolveWidgetModule={ async () => ( {
+					default: CrashingWidget,
+				} ) }
+			/>
+		);
+
+		expect(
+			await screen.findByText( 'This widget encountered an error.' )
+		).toBeVisible();
+		expect( console ).toHaveErrored();
+		expect( speak ).toHaveBeenCalledExactlyOnceWith(
+			'This widget encountered an error.',
+			'polite'
+		);
+		expect( screen.queryByRole( 'alert' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'resolves the widget module and renders attributes', async () => {
 		render( <Harness /> );
 
@@ -115,7 +155,7 @@ describe( 'WidgetDashboard', () => {
 	} );
 
 	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render( <Harness onLayoutChange={ onChange } /> );
 
 		const button = await screen.findByRole( 'button', {

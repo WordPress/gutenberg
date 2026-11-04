@@ -1,35 +1,38 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { useDispatch } from '@wordpress/data';
+import { useHandleLinkChange } from '../use-handle-link-change';
+import { updateAttributes } from '../update-attributes';
+import { useEntityBinding } from '../use-entity-binding';
 // Mock the entire @wordpress/block-editor module
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: {},
 } ) );
+
 // Mock the entire @wordpress/core-data module
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
+
 // Mock useDispatch specifically to avoid needing to set up full data store
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	createSelector: vi.fn( ( fn ) => fn ),
+	createRegistrySelector: vi.fn( ( fn ) => fn ),
+	createReduxStore: vi.fn( () => ( {} ) ),
+	combineReducers: vi.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
 			newState[ key ] = reducers[ key ]( state[ key ], action );
 		} );
 		return newState;
 	} ),
-	register: jest.fn(),
+	register: vi.fn(),
 } ) );
-import { useDispatch } from '@wordpress/data';
-import { useHandleLinkChange } from '../use-handle-link-change';
-import { updateAttributes } from '../update-attributes';
-import { useEntityBinding } from '../use-entity-binding';
 
 // Mock internal dependencies
-jest.mock( '../update-attributes' );
-jest.mock( '../use-entity-binding' );
+vi.mock( import( '../update-attributes' ) );
+vi.mock( import( '../use-entity-binding' ) );
 
 describe( 'useHandleLinkChange', () => {
 	let mockSetAttributes;
@@ -41,10 +44,10 @@ describe( 'useHandleLinkChange', () => {
 
 	beforeEach( () => {
 		// Reset mocks
-		mockSetAttributes = jest.fn();
-		mockUpdateBlockAttributes = jest.fn();
-		mockCreateBinding = jest.fn();
-		mockClearBinding = jest.fn();
+		mockSetAttributes = vi.fn();
+		mockUpdateBlockAttributes = vi.fn();
+		mockCreateBinding = vi.fn();
+		mockClearBinding = vi.fn();
 
 		// Mock useDispatch
 		useDispatch.mockReturnValue( {
@@ -70,7 +73,7 @@ describe( 'useHandleLinkChange', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'creating new entity links', () => {
@@ -881,6 +884,144 @@ describe( 'useHandleLinkChange', () => {
 				attributes
 			);
 			expect( mockCreateBinding ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'open in new tab setting', () => {
+		it( 'should apply open in new tab when it is checked in the link editing UI', () => {
+			const attributes = {
+				url: 'https://wordpress.org',
+				label: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: false,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://wordpress.org',
+				title: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: true,
+			} );
+
+			expect( mockSetAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( { opensInNewTab: true } )
+			);
+		} );
+
+		it( 'should apply open in new tab when it is unchecked in the link editing UI', () => {
+			const attributes = {
+				url: 'https://wordpress.org',
+				label: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: true,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://wordpress.org',
+				title: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: false,
+			} );
+
+			expect( mockSetAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( { opensInNewTab: false } )
+			);
+		} );
+
+		it( 'should apply open in new tab when changing a bound entity link to a custom URL', () => {
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				createBinding: mockCreateBinding,
+				clearBinding: mockClearBinding,
+			} );
+
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Page',
+				kind: 'post-type',
+				type: 'page',
+				opensInNewTab: false,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://custom-url.com',
+				title: 'Page',
+				opensInNewTab: true,
+			} );
+
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				expect.objectContaining( { opensInNewTab: true } )
+			);
+		} );
+
+		it( 'should not change open in new tab when the link change does not include it', () => {
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				createBinding: mockCreateBinding,
+				clearBinding: mockClearBinding,
+			} );
+
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Page',
+				kind: 'post-type',
+				type: 'page',
+				opensInNewTab: true,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			// A search suggestion, as selected from the sidebar link picker,
+			// carries no link settings.
+			result.current( {
+				url: 'https://custom-url.com',
+				title: 'Custom URL',
+			} );
+
+			// `toHaveBeenCalledWith` treats an `undefined` property as absent,
+			// so check the key directly: dispatching `undefined` would reset
+			// the setting.
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledTimes( 1 );
+			expect(
+				mockUpdateBlockAttributes.mock.calls[ 0 ][ 1 ]
+			).not.toHaveProperty( 'opensInNewTab' );
 		} );
 	} );
 

@@ -1,9 +1,11 @@
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	getStyleForState,
+	setStyleForState,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { unlock } from '../lock-unlock';
 
-const { cleanEmptyObject, getStyleForState, setStyleForState } = unlock(
-	blockEditorPrivateApis
-);
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function getStateStyle( style, selectedState ) {
 	return getStyleForState( style, selectedState ) || {};

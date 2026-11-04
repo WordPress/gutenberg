@@ -18,7 +18,7 @@ export default function InheritControl( { value, onChange, label } ) {
 				value
 					? __(
 							'Display terms based on the current taxonomy archive. For hierarchical taxonomies, shows children of the current term. For non-hierarchical taxonomies, shows all terms.'
-					  )
+						)
 					: __( 'Display terms based on specific criteria.' )
 			}
 			value={ value ? 'default' : 'custom' }

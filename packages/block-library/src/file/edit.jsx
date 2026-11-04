@@ -72,7 +72,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						'attachment',
 						id,
 						{ context: 'view' }
-				  )
+					)
 				: undefined,
 		} ),
 		[ id ]
@@ -114,9 +114,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
 		const pdfAttributes = {
 			displayPreview: isPdf
-				? attributes.displayPreview ?? true
+				? ( attributes.displayPreview ?? true )
 				: undefined,
-			previewHeight: isPdf ? attributes.previewHeight ?? 600 : undefined,
+			previewHeight: isPdf
+				? ( attributes.previewHeight ?? 600 )
+				: undefined,
 		};
 
 		setAttributes( {

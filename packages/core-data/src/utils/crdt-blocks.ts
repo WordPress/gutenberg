@@ -993,7 +993,7 @@ function resolveRichTextCursorPosition(
 		? richTextOffsetToHtmlIndex(
 				updatedValue,
 				asRichTextOffset( cursorPosition.offset )
-		  )
+			)
 		: null;
 }
 

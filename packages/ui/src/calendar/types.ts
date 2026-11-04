@@ -158,11 +158,10 @@ export type OnValueChangeHandler< T > = (
 	e: React.MouseEvent | React.KeyboardEvent
 ) => void;
 
-export interface BaseProps
-	extends Omit<
-		ComponentProps< 'div' >,
-		'onSelect' | 'defaultValue' | 'role'
-	> {
+export interface BaseProps extends Omit<
+	ComponentProps< 'div' >,
+	'onSelect' | 'defaultValue' | 'role'
+> {
 	/**
 	 * The ARIA role for the calendar's root element.
 	 *
@@ -196,7 +195,7 @@ export interface BaseProps
 	 */
 	month?: Date;
 	/**
-	 * The number of months displayed at once.
+	 * The number of months displayed at once, clamped between 1 and 3.
 	 * @default 1
 	 */
 	numberOfMonths?: number;
@@ -359,6 +358,14 @@ export interface RangeProps {
 	 * When `true`, the range will reset when including a disabled day.
 	 */
 	excludeDisabled?: boolean;
+	/**
+	 * When `true`, clicking a day starts a new range if there is no current start
+	 * date or if a range is already complete. In those cases, the clicked day
+	 * becomes the start of the new range. When `required` is `false`, clicking
+	 * the same day of a single-day range clears the selection.
+	 * @default true
+	 */
+	resetOnSelect?: boolean;
 	/**
 	 * The minimum number of nights to include in the range.
 	 */

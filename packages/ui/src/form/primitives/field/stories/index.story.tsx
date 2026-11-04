@@ -7,7 +7,8 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Field',
+	title: 'Components/@wordpress-ui/Form/Primitives/Field',
+	id: 'design-system-components-form-primitives-field',
 	component: Field.Root,
 	subcomponents: {
 		'Field.Item': Field.Item,

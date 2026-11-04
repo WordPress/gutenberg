@@ -1,13 +1,18 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TimeInput from '..';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
 
 describe( 'TimeInput', () => {
 	it( 'should call onChange with updated values | 24-hours format', async () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput
@@ -59,7 +64,7 @@ describe( 'TimeInput', () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput
@@ -106,7 +111,7 @@ describe( 'TimeInput', () => {
 		const user = userEvent.setup();
 
 		const timeInputValue = { hours: 0, minutes: 0 };
-		const onChangeSpy = jest.fn();
+		const onChangeSpy = vi.fn();
 
 		render(
 			<TimeInput

@@ -28,18 +28,18 @@ registerFieldType( {
 
 ## Referencing
 
-The widget declares the name and nothing else:
+The widget declares the name and nothing else, in its `widget.json`:
 
-```ts
+```json
 {
-	id: 'location',
-	type: 'location',
-	label: __( 'Event location' ),
-	relevance: 'high',
+	"id": "location",
+	"type": "location",
+	"label": "Event location",
+	"relevance": "high"
 }
 ```
 
-No imports, no components. The attribute stays pure data, one step away from living in `widget.json`.
+No imports, no components. The attribute is pure data.
 
 ## Resolution
 

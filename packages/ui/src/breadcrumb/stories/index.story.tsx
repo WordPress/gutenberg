@@ -1,14 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import * as Breadcrumb from '../';
 
 const meta: Meta< typeof Breadcrumb.Root > = {
-	title: 'Design System/Components/Breadcrumb',
+	title: 'Components/@wordpress-ui/Breadcrumb',
+	id: 'design-system-components-breadcrumb',
 	component: Breadcrumb.Root,
 	subcomponents: {
 		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,
+		'Breadcrumb.ButtonItem': Breadcrumb.ButtonItem,
 		'Breadcrumb.CurrentItem': Breadcrumb.CurrentItem,
 	},
 	argTypes: {
@@ -140,7 +142,7 @@ export const LongLabelsAndRtl: Story = {
 };
 
 const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
-	function RouterLink( { children, ...props }, ref ) {
+	function UnforwardedRouterLink( { children, ...props }, ref ) {
 		return (
 			<a { ...props } ref={ ref } data-router-link>
 				{ children }
@@ -163,5 +165,45 @@ export const RouterLinkComposition: Story = {
 			</Breadcrumb.LinkItem>
 			<Breadcrumb.CurrentItem>Defaults</Breadcrumb.CurrentItem>
 		</Breadcrumb.Root>
+	),
+};
+
+/**
+ * Use button ancestors to select a position in a hierarchy.
+ */
+export const HierarchySelection: Story = {
+	render: function SelectionExample() {
+		const [ selectedIndex, setSelectedIndex ] = useState( 2 );
+		const labels = [ 'Document', 'Group', 'Paragraph' ];
+		return (
+			<Breadcrumb.Root aria-label="Block hierarchy">
+				{ labels.slice( 0, selectedIndex ).map( ( label, index ) => (
+					<Breadcrumb.ButtonItem
+						key={ label }
+						onClick={ () => setSelectedIndex( index ) }
+					>
+						{ label }
+					</Breadcrumb.ButtonItem>
+				) ) }
+				<Breadcrumb.CurrentItem aria-current="true">
+					{ labels[ selectedIndex ] }
+				</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+		);
+	},
+};
+
+export const CurrentOnly: Story = {
+	render: () => (
+		<>
+			<Breadcrumb.Root aria-label="Page hierarchy">
+				<Breadcrumb.CurrentItem>Dashboard</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+			<Breadcrumb.Root aria-label="Block hierarchy">
+				<Breadcrumb.CurrentItem aria-current="true">
+					Document
+				</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+		</>
 	),
 };

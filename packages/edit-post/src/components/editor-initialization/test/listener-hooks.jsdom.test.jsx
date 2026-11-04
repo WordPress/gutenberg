@@ -1,12 +1,15 @@
 import { render, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { useUpdatePostLinkListener } from '../listener-hooks';
 import { STORE_NAME } from '../../../store/constants';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 describe( 'listener hook tests', () => {
 	const storeConfig = {
 		actions: {
-			forceUpdate: jest.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
+			forceUpdate: vi.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
 		},
 		reducer: ( state = {}, action ) =>
 			action.type === 'FORCE_UPDATE' ? { ...state } : state,
@@ -15,49 +18,49 @@ describe( 'listener hook tests', () => {
 		'core/block-editor': {
 			...storeConfig,
 			selectors: {
-				getBlockSelectionStart: jest.fn(),
+				getBlockSelectionStart: vi.fn(),
 			},
 		},
 		'core/editor': {
 			...storeConfig,
 			selectors: {
-				getCurrentPost: jest.fn(),
-				getCurrentPostType: jest.fn(),
-				getEditedPostAttribute: jest.fn(),
+				getCurrentPost: vi.fn(),
+				getCurrentPostType: vi.fn(),
+				getEditedPostAttribute: vi.fn(),
 			},
 		},
 		core: {
 			...storeConfig,
 			selectors: {
-				getPostType: jest.fn(),
+				getPostType: vi.fn(),
 			},
 		},
 		'core/viewport': {
 			...storeConfig,
 			selectors: {
-				isViewportMatch: jest.fn(),
+				isViewportMatch: vi.fn(),
 			},
 		},
 		'core/preferences': {
 			...storeConfig,
 			selectors: {
-				get: jest.fn(),
+				get: vi.fn(),
 			},
 		},
 		[ STORE_NAME ]: {
 			...storeConfig,
 			actions: {
 				...storeConfig.actions,
-				openGeneralSidebar: jest.fn( () => ( {
+				openGeneralSidebar: vi.fn( () => ( {
 					type: 'OPEN_GENERAL_SIDEBAR',
 				} ) ),
-				closeGeneralSidebar: jest.fn( () => ( {
+				closeGeneralSidebar: vi.fn( () => ( {
 					type: 'CLOSE_GENERAL_SIDEBAR',
 				} ) ),
 			},
 			selectors: {
-				isEditorSidebarOpened: jest.fn(),
-				getActiveGeneralSidebarName: jest.fn(),
+				isEditorSidebarOpened: vi.fn(),
+				getActiveGeneralSidebarName: vi.fn(),
 			},
 		},
 	};
@@ -98,12 +101,12 @@ describe( 'listener hook tests', () => {
 			);
 		};
 
-		const setAttribute = jest.fn();
+		const setAttribute = vi.fn();
 		const mockElement = {
 			setAttribute,
 			style: { display: '' },
 		};
-		const mockSelector = jest.fn();
+		const mockSelector = vi.fn();
 		beforeEach( () => {
 			// Reset the mock element style
 			mockElement.style.display = '';

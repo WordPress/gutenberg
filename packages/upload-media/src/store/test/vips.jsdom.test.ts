@@ -1,15 +1,13 @@
-// Mock the vips worker module.
-// The mock functions must be declared inside the factory to avoid hoisting issues.
-jest.mock( '@wordpress/vips/worker', () => ( {
-	vipsConvertImageFormat: jest.fn(),
-	vipsCompressImage: jest.fn(),
-	vipsHasTransparency: jest.fn(),
-	vipsResizeImage: jest.fn(),
-	vipsRotateImage: jest.fn(),
-	vipsCancelOperations: jest.fn(),
-} ) );
-
-// Import the mocked module to get access to the mock functions.
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
+// Vitest aliases the worker entry point to the repository's worker-code stub.
 import * as vipsWorker from '@wordpress/vips/worker';
 import { ImageFile } from '../../image-file';
 import type { ImageSizeCrop } from '../types';
@@ -17,19 +15,20 @@ import type { ImageSizeCrop } from '../types';
 import {
 	vipsConvertImageFormat,
 	vipsCompressImage,
+	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsCancelOperations,
 } from '../utils';
 
-// Cast to jest.Mock for type safety.
-const mockConvertImageFormat = vipsWorker.vipsConvertImageFormat as jest.Mock;
-const mockCompressImage = vipsWorker.vipsCompressImage as jest.Mock;
-const mockHasTransparency = vipsWorker.vipsHasTransparency as jest.Mock;
-const mockResizeImage = vipsWorker.vipsResizeImage as jest.Mock;
-const mockRotateImage = vipsWorker.vipsRotateImage as jest.Mock;
-const mockCancelOperations = vipsWorker.vipsCancelOperations as jest.Mock;
+const mockConvertImageFormat = vi.mocked( vipsWorker.vipsConvertImageFormat );
+const mockCompressImage = vi.mocked( vipsWorker.vipsCompressImage );
+const mockEncodePixelsAsJpeg = vi.mocked( vipsWorker.vipsEncodePixelsAsJpeg );
+const mockHasTransparency = vi.mocked( vipsWorker.vipsHasTransparency );
+const mockResizeImage = vi.mocked( vipsWorker.vipsResizeImage );
+const mockRotateImage = vi.mocked( vipsWorker.vipsRotateImage );
+const mockCancelOperations = vi.mocked( vipsWorker.vipsCancelOperations );
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
 	type: 'image/jpeg',
@@ -43,7 +42,7 @@ const pngFile = new File( [ 'test-content' ], 'image.png', {
 
 describe( 'vips utilities', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'vipsConvertImageFormat', () => {
@@ -148,12 +147,12 @@ describe( 'vips utilities', () => {
 	} );
 
 	describe( 'vipsHasTransparency', () => {
-		let mockFetch: jest.Mock;
+		let mockFetch: Mock;
 		let originalFetch: typeof window.fetch;
 
 		beforeEach( () => {
 			originalFetch = window.fetch;
-			mockFetch = jest.fn().mockResolvedValue( {
+			mockFetch = vi.fn().mockResolvedValue( {
 				ok: true,
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
@@ -288,7 +287,7 @@ describe( 'vips utilities', () => {
 			expect( mockResizeImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].smartCrop ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.smartCrop ).toBe(
 				true
 			);
 		} );
@@ -311,10 +310,10 @@ describe( 'vips utilities', () => {
 				maxBitdepth: 8,
 			} );
 
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].stripMeta ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.stripMeta ).toBe(
 				false
 			);
-			expect( mockResizeImage.mock.calls[ 0 ][ 4 ].maxBitdepth ).toBe(
+			expect( mockResizeImage.mock.calls[ 0 ][ 4 ]!.maxBitdepth ).toBe(
 				8
 			);
 		} );
@@ -333,8 +332,8 @@ describe( 'vips utilities', () => {
 			expect( result ).toBeInstanceOf( ImageFile );
 			expect( result.name ).toBe( 'test-rotated.jpg' );
 			expect( result.type ).toBe( 'image/jpeg' );
-			expect( result.width ).toBe( 200 );
-			expect( result.height ).toBe( 300 );
+			expect( ( result as ImageFile ).width ).toBe( 200 );
+			expect( ( result as ImageFile ).height ).toBe( 300 );
 
 			expect( mockRotateImage ).toHaveBeenCalledTimes( 1 );
 			expect( mockRotateImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
@@ -366,7 +365,70 @@ describe( 'vips utilities', () => {
 		} );
 	} );
 
+	describe( 'vipsEncodeCanvasAsJpeg', () => {
+		const heicFile = new File( [ 'heic-content' ], 'photo.heic', {
+			type: 'image/heic',
+		} );
+
+		function createCanvas( width: number, height: number ) {
+			const getImageData = vi.fn( () => ( {
+				data: new Uint8ClampedArray( 4 ),
+			} ) );
+			const canvas = {
+				width,
+				height,
+				getContext: () => ( { getImageData } ),
+			} as unknown as OffscreenCanvas;
+			return { canvas, getImageData };
+		}
+
+		it( 'encodes the pixels with the source file as the metadata source', async () => {
+			mockEncodePixelsAsJpeg.mockResolvedValue( new ArrayBuffer( 8 ) );
+			const { canvas } = createCanvas( 4000, 3000 );
+
+			const result = await vipsEncodeCanvasAsJpeg(
+				'item-1',
+				canvas,
+				heicFile,
+				0.8
+			);
+
+			expect( result?.type ).toBe( 'image/jpeg' );
+			expect( mockEncodePixelsAsJpeg ).toHaveBeenCalledTimes( 1 );
+			const [ id, , width, height, options ] =
+				mockEncodePixelsAsJpeg.mock.calls[ 0 ];
+			expect( id ).toBe( 'item-1' );
+			expect( width ).toBe( 4000 );
+			expect( height ).toBe( 3000 );
+			expect( options?.quality ).toBe( 0.8 );
+			expect( options?.metadataSource?.byteLength ).toBe( heicFile.size );
+		} );
+
+		it( 'declines without copying pixels when the image exceeds the interlaced budget', async () => {
+			// 15000 * 15000 * 4 bytes is ~0.84 GiB: over the 0.75 GiB
+			// interlaced budget but under the 1.5 GiB baseline one.
+			const { canvas, getImageData } = createCanvas( 15000, 15000 );
+
+			const result = await vipsEncodeCanvasAsJpeg(
+				'item-1',
+				canvas,
+				heicFile,
+				0.8
+			);
+
+			expect( result ).toBeNull();
+			expect( getImageData ).not.toHaveBeenCalled();
+			expect( mockEncodePixelsAsJpeg ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'vipsCancelOperations', () => {
+		beforeEach( async () => {
+			// Cancellation only delegates to the worker after an image operation loads it.
+			mockCompressImage.mockResolvedValue( new ArrayBuffer( 5 ) );
+			await vipsCompressImage( 'item-1', jpegFile );
+		} );
+
 		it( 'calls worker cancelOperations with item ID', async () => {
 			mockCancelOperations.mockResolvedValue( true );
 
@@ -381,6 +443,7 @@ describe( 'vips utilities', () => {
 
 			const result = await vipsCancelOperations( 'item-456' );
 
+			expect( mockCancelOperations ).toHaveBeenCalledWith( 'item-456' );
 			expect( result ).toBe( false );
 		} );
 	} );

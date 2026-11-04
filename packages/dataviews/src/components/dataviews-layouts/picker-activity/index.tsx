@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { Spinner, Composite } from '@wordpress/components';
+import { Spinner as WCSpinner, Composite } from '@wordpress/components';
 import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -202,7 +202,7 @@ function PickerActivityGroup< Item >( {
 							__( '%1$s: %2$s' ),
 							groupField.label,
 							groupName
-					  )
+						)
 					: groupName }
 			</h3>
 			{ children }
@@ -290,7 +290,7 @@ export default function ViewPickerActivity< Item >( {
 			>
 				{ isLoading ? (
 					<p>
-						<Spinner />
+						<WCSpinner />
 					</p>
 				) : (
 					empty
@@ -335,12 +335,12 @@ export default function ViewPickerActivity< Item >( {
 									{ groupItems.map( renderItem ) }
 								</PickerActivityGroup>
 							)
-					  )
+						)
 					: data.map( renderItem ) }
 			</Composite>
 			{ isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

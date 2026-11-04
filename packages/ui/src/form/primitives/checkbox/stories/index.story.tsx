@@ -2,16 +2,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox } from '../';
 
 const meta: Meta< typeof Checkbox > = {
-	title: 'Design System/Components/Form/Primitives/Checkbox',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Checkbox',
+	id: 'design-system-components-form-primitives-checkbox',
 	component: Checkbox,
+	argTypes: {
+		onCheckedChange: { action: 'onCheckedChange' },
+	},
 	parameters: {
-		// FIXME: Stories show the checkbox primitive without a visible label (aria-toggle-field-name).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -21,29 +22,35 @@ export default meta;
 type Story = StoryObj< typeof Checkbox >;
 
 export const Default: Story = {
-	args: {},
+	args: {
+		'aria-label': 'Option',
+	},
 };
 
 export const Checked: Story = {
 	args: {
+		...Default.args,
 		defaultChecked: true,
 	},
 };
 
 export const Indeterminate: Story = {
 	args: {
+		...Default.args,
 		indeterminate: true,
 	},
 };
 
 export const Disabled: Story = {
 	args: {
+		...Default.args,
 		disabled: true,
 	},
 };
 
 export const DisabledChecked: Story = {
 	args: {
+		...Default.args,
 		disabled: true,
 		defaultChecked: true,
 	},

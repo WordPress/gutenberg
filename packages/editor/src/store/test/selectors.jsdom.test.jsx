@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	registerBlockType,
@@ -78,16 +87,16 @@ selectorNames.forEach( ( name ) => {
 			hasUndo() {
 				return Boolean(
 					state.editor &&
-						state.editor.past &&
-						state.editor.past.length
+					state.editor.past &&
+					state.editor.past.length
 				);
 			},
 
 			hasRedo() {
 				return Boolean(
 					state.editor &&
-						state.editor.future &&
-						state.editor.future.length
+					state.editor.future &&
+					state.editor.future.length
 				);
 			},
 
@@ -2587,6 +2596,26 @@ describe( 'selectors', () => {
 			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
 		} );
 
+		it( 'should return the plain permalink without a slug or a title', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					link: 'http://foo.test/?p=123',
+					status: 'auto-draft',
+					title: '',
+					generated_slug: 'auto-draft',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getPermalink( state ) ).toBe( 'http://foo.test/?p=123' );
+		} );
+
 		it( 'should return null if the post has no permalink template', () => {
 			const state = {
 				currentPost: {},
@@ -2643,6 +2672,53 @@ describe( 'selectors', () => {
 			expect( getPermalinkParts( state ) ).toEqual( parts );
 		} );
 
+		it( 'should use the edited post slug as the post name', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					title: 'Sample Post',
+					generated_slug: 'sample-post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( {
+				prefix: 'http://foo.test/bar/',
+				postName: 'edited-title',
+				suffix: '/',
+			} );
+		} );
+
+		it( 'should leave the post name empty without a slug or a title', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					status: 'auto-draft',
+					title: '',
+					generated_slug: 'auto-draft',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( {
+				prefix: 'http://foo.test/bar/',
+				postName: '',
+				suffix: '/',
+			} );
+		} );
+
 		it( 'should return null if the post has no permalink template', () => {
 			const state = {
 				currentPost: {},
@@ -2692,10 +2768,12 @@ describe( 'selectors', () => {
 			expect( getEditedPostSlug( state ) ).toBe( 'edited-slug' );
 		} );
 
-		it( 'should return the cleaned title as slug if no saved or edited slug exists', () => {
+		it( 'should derive the slug from the title, not the server-generated slug', () => {
 			const state = {
 				currentPost: {
+					status: 'draft',
 					title: 'Sample Post',
+					generated_slug: 'sample-post-2',
 				},
 				editor: {
 					present: {
@@ -2705,6 +2783,45 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostSlug( state ) ).toBe( 'sample-post' );
+		} );
+
+		it( 'should follow the title after an autosave left a stale server-generated slug', () => {
+			// An autosave saves the title to the post but doesn't return a new
+			// `generated_slug`, so it still comes from the `Auto Draft`
+			// placeholder.
+			const state = {
+				currentPost: {
+					status: 'draft',
+					title: 'Hello Slug',
+					generated_slug: 'auto-draft',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'hello-slug' );
+		} );
+
+		it( 'should prefer a saved slug over the edited title', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+					slug: 'custom-slug',
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'custom-slug' );
 		} );
 
 		it( 'should return cleaned, edited title as slug if it has been edited and no saved or edited slug exists', () => {
@@ -2724,9 +2841,14 @@ describe( 'selectors', () => {
 			expect( getEditedPostSlug( state ) ).toBe( 'edited-title' );
 		} );
 
-		it( 'should return the post ID if no slug or post title exists', () => {
+		it( 'should return an empty string if no slug or post title exists', () => {
 			const state = {
 				postId: 123,
+				currentPost: {
+					status: 'auto-draft',
+					title: '',
+					generated_slug: 'auto-draft',
+				},
 				editor: {
 					present: {
 						edits: {},
@@ -2734,7 +2856,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getEditedPostSlug( state ) ).toBe( 123 );
+			expect( getEditedPostSlug( state ) ).toBe( '' );
 		} );
 	} );
 
@@ -2749,7 +2871,7 @@ describe( 'selectors', () => {
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
 		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
+		it( "should return false if the _links object doesn't contain the property wp:action-unfiltered-html", () => {
 			const state = {
 				currentPost: {
 					_links: {},

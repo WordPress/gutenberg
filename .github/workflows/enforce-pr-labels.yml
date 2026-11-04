@@ -18,7 +18,7 @@ permissions: {}
 jobs:
     type-related-labels:
         name: Check the type label
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         if: ${{ github.event.pull_request.state == 'open' }}
         permissions:
             contents: read

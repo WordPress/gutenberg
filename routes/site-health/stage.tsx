@@ -382,7 +382,7 @@ function SiteHealthPage() {
 										'The site health checks could not run: %s'
 									),
 									errorMessage
-							  )
+								)
 							: __( 'The site health checks could not run.' ) }
 					</Text>
 					<Text render={ <p /> }>

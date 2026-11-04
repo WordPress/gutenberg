@@ -45,7 +45,7 @@ export function CollaboratorsPresence( {
 
 	// Always include self in the list sorted first.
 	const collaboratorsForList = useMemo( () => {
-		return [ ...activeCollaborators ].sort( ( a, b ) => {
+		return activeCollaborators.toSorted( ( a, b ) => {
 			if ( a.isMe && ! b.isMe ) {
 				return -1;
 			}
@@ -76,7 +76,7 @@ export function CollaboratorsPresence( {
 		<>
 			<div className="editor-collaborators-presence">
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					className="editor-collaborators-presence__button"
 					onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
 					isPressed={ isPopoverVisible }

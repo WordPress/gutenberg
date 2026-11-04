@@ -5,7 +5,7 @@ import {
 	Button,
 	FlexBlock,
 	FlexItem,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
@@ -134,7 +134,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		<Spacer marginBottom="4">
 			<HStack as="form" onSubmit={ createFromWidgets }>
 				<FlexBlock>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Import widget area' ) }
 						value={ selectedSidebar }
 						options={ options }

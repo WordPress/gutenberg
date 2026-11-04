@@ -1,5 +1,5 @@
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import styled from '@emotion/styled';
 import type {
 	ComponentPropsWithoutRef,
 	ForwardedRef,
@@ -12,9 +12,7 @@ import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';
 
-jest.mock( '@wordpress/warning', () => jest.fn() );
-
-const View = styled.div``;
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 type TestComponentProps = ComponentPropsWithoutRef< 'div' > & {
 	quote?: ReactNode;
@@ -24,7 +22,7 @@ function TestComponent(
 	props: TestComponentProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	return <View { ...useContextSystem( props, 'Component' ) } ref={ ref } />;
+	return <div { ...useContextSystem( props, 'Component' ) } ref={ ref } />;
 }
 
 function TestComponentWithQuote(
@@ -33,15 +31,15 @@ function TestComponentWithQuote(
 ) {
 	const { quote, ...otherProps } = useContextSystem( props, 'Component' );
 	return (
-		<View { ...otherProps } ref={ ref }>
+		<div { ...otherProps } ref={ ref }>
 			{ quote }
-		</View>
+		</div>
 	);
 }
 
 describe( 'props', () => {
 	test( 'should not warn when rerendered without a value', () => {
-		jest.mocked( warn ).mockClear();
+		vi.mocked( warn ).mockClear();
 
 		const { rerender } = render(
 			<ContextSystemProvider>
@@ -60,13 +58,19 @@ describe( 'props', () => {
 
 	test( 'should render correctly', () => {
 		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
-		const { container } = render(
+		render(
 			<ContextSystemProvider>
-				<ConnectedComponent />
+				<ConnectedComponent data-testid="component" />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByTestId( 'component' ) ).toHaveClass(
+			'components-component'
+		);
+		expect( screen.getByTestId( 'component' ) ).toHaveAttribute(
+			'data-wp-component',
+			'Component'
+		);
 	} );
 
 	test( 'should render context props', () => {
@@ -81,13 +85,12 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<ContextSystemProvider value={ contextValue }>
 				<ConnectedComponent />
 			</ContextSystemProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
 	} );
 
@@ -105,7 +108,7 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		render(
 			<>
 				<ContextSystemProvider value={ contextValue }>
 					<ConnectedComponent
@@ -116,11 +119,12 @@ describe( 'props', () => {
 			</>
 		);
 
-		expect( container ).toMatchSnapshot();
-
 		const element = screen.getByText( 'Code is Poetry' );
 		expect( element ).toBeVisible();
-		expect( element ).toHaveClass( 'test-component' );
+		expect( element ).toHaveClass(
+			'components-component',
+			'test-component'
+		);
 
 		expect( screen.queryByText( 'WordPress.org' ) ).not.toBeInTheDocument();
 	} );
@@ -160,9 +164,9 @@ describe( 'children', () => {
 			props: TestComponentProps,
 			ref: ForwardedRef< HTMLDivElement >
 		) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
+			<div { ...useContextSystem( props, 'Component' ) } ref={ ref }>
 				Inherent
-			</View>
+			</div>
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
 		const NormalComponent = (

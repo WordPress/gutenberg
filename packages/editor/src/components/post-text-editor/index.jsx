@@ -1,4 +1,3 @@
-import Textarea from 'react-autosize-textarea';
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -89,7 +88,7 @@ export default function PostTextEditor() {
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
-			<Textarea
+			<textarea
 				autoComplete="off"
 				dir="auto"
 				ref={ textareaRef }

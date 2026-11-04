@@ -47,7 +47,7 @@ export const LayoutTableComponent = ( {
 							field: 'type',
 							direction: 'asc',
 							showLabel: groupByLabel,
-					  }
+						}
 					: undefined,
 				showMedia,
 				// Spread the previous layout so a change made through the

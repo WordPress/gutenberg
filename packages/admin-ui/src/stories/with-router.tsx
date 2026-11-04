@@ -7,7 +7,7 @@ const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =
 /**
  * Storybook decorator that provides a router context.
  *
- * Wraps stories in a minimal tanstack router (via @wordpress/route private
+ * Wraps stories in a minimal tanstack router (via `@wordpress/route` private
  * APIs) so that components consuming `Link` from `@wordpress/route` can
  * render without errors.
  */

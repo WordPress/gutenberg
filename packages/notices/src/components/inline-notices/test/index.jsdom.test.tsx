@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
@@ -33,6 +34,28 @@ describe( 'InlineNotices', () => {
 		} );
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should return null when every one of several children renders nothing', () => {
+		// More than one child arrives as an array, which is itself neither
+		// `false` nor empty, so the array is what has to be looked through.
+		const { container } = renderInlineNotices( {
+			children: [ false, null, undefined, '' ],
+		} );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should render when one of several children renders something', () => {
+		const { container } = renderInlineNotices( {
+			children: [ false, <div key="notice">Extra notice</div> ],
+		} );
+
+		expect(
+			within( getInlineNoticesWrapper( container ) ).getByText(
+				'Extra notice'
+			)
+		).toBeInTheDocument();
 	} );
 
 	it( 'should render the inline notices wrapper with a custom class name', () => {
@@ -111,10 +134,12 @@ describe( 'InlineNotices', () => {
 			</RegistryProvider>
 		);
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const pinned = container.querySelector( '.test-pinned' )!;
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const dismissible = container.querySelector( '.test-dismissible' )!;
+		const pinned =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-pinned' )!;
+		const dismissible =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-dismissible' )!;
 
 		expect(
 			within( pinned ).getByText( 'Pinned notice' )
@@ -136,8 +161,9 @@ describe( 'InlineNotices', () => {
 			dismissibleNoticesClassName: 'test-dismissible',
 		} );
 
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
-		const dismissible = container.querySelector( '.test-dismissible' )!;
+		const dismissible =
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
+			container.querySelector< HTMLElement >( '.test-dismissible' )!;
 
 		expect(
 			within( dismissible ).getByText( 'Extra notice' )

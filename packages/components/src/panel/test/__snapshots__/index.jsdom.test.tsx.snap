@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Panel basic rendering should render an additional className 1`] = `
+exports[`Panel > basic rendering > should render an additional className 1`] = `
 <div>
   <div
     class="the-panel components-panel"
@@ -8,7 +8,7 @@ exports[`Panel basic rendering should render an additional className 1`] = `
 </div>
 `;
 
-exports[`Panel basic rendering should render an empty div without any provided props 1`] = `
+exports[`Panel > basic rendering > should render an empty div without any provided props 1`] = `
 <div>
   <div
     class="components-panel"

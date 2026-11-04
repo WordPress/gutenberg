@@ -1,7 +1,7 @@
 import {
 	TextControl,
-	SelectControl,
-	Notice,
+	SelectControl as WCSelectControl,
+	Notice as WCNotice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -42,7 +42,9 @@ export default function QueryInspectorControls( props ) {
 		orderBy,
 		author: authorIds,
 		pages,
-		postType,
+		// Match `build_query_vars_from_query_block()`, which queries posts when
+		// `query` has no post type.
+		postType = 'post',
 		perPage,
 		offset,
 		sticky,
@@ -172,7 +174,7 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'excludeCurrent' );
 	const postTypeSingularName = useSelect(
 		( select ) =>
-			select( coreStore ).getPostType( postType )?.labels.singular_name,
+			select( coreStore ).getPostType( postType )?.labels?.singular_name,
 		[ postType ]
 	);
 
@@ -235,10 +237,10 @@ export default function QueryInspectorControls( props ) {
 										inherit
 											? __(
 													'Display a list of posts or custom post types based on the current template.'
-											  )
+												)
 											: __(
 													'Display a list of posts or custom post types based on specific criteria.'
-											  )
+												)
 									}
 									value={ !! inherit ? 'default' : 'custom' }
 								>
@@ -252,14 +254,14 @@ export default function QueryInspectorControls( props ) {
 									/>
 								</ToggleGroupControl>
 								{ hasInheritanceWarning && (
-									<Notice
+									<WCNotice
 										status="warning"
 										isDismissible={ false }
 									>
 										{ __(
 											'Cannot inherit the current template query when placed inside the singular content (e.g., post, page, 404, blank).'
 										) }
-									</Notice>
+									</WCNotice>
 								) }
 							</VStack>
 						</ToolsPanelItem>
@@ -273,7 +275,7 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							{ postTypesSelectOptions.length > 2 ? (
-								<SelectControl
+								<WCSelectControl
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }

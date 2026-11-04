@@ -562,6 +562,51 @@ describe( 'InteractionController', () => {
 
 			vi.useRealTimers();
 		} );
+
+		it( 'does not end the gesture mid-drag when the drag starts within the wheel debounce', () => {
+			vi.useFakeTimers( {
+				toFake: [ 'setTimeout', 'clearTimeout' ],
+			} );
+			const state = makeState( { zoom: 2 } );
+			const calls: string[] = [];
+			const { controller } = createController( state, {
+				onGestureStart: () => calls.push( 'start' ),
+				onGestureEnd: () => calls.push( 'end' ),
+			} );
+			const el = createMockElement();
+
+			// Zoom, then start dragging before the 300ms debounce elapses.
+			controller.handleWheel(
+				createWheelEvent( { deltaY: -50, currentTarget: null } )
+			);
+			vi.advanceTimersByTime( 100 );
+			controller.handlePointerDown(
+				createPointerEvent( { clientX: 100, clientY: 100 } ),
+				el
+			);
+			const dragStartIndex = calls.lastIndexOf( 'start' );
+
+			// Keep dragging past the point where the debounce fires.
+			el._fire(
+				'pointermove',
+				createPointerEvent( { clientX: 110, clientY: 100 } )
+			);
+			vi.advanceTimersByTime( 350 );
+			el._fire(
+				'pointermove',
+				createPointerEvent( { clientX: 120, clientY: 100 } )
+			);
+			const callsDuringDrag = calls.slice( dragStartIndex + 1 );
+
+			el._fire( 'pointerup', createPointerEvent() );
+			vi.useRealTimers();
+
+			expect( actionMocks.setPan ).toHaveBeenCalledTimes( 2 );
+			// An end here closes the undo batch, so every later pan frame
+			// records its own undo entry.
+			expect( callsDuringDrag ).not.toContain( 'end' );
+			expect( calls[ calls.length - 1 ] ).toBe( 'end' );
+		} );
 	} );
 
 	describe( 'keyboard', () => {

@@ -93,31 +93,34 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		unset( $data['content'] );
 		unset( $data['_links'] );
 
-		$this->assertSame(
-			array(
-				'id'              => 'default//my_template',
-				'theme'           => 'default',
-				'slug'            => 'my_template',
-				'source'          => 'custom',
-				'origin'          => null,
-				'type'            => 'wp_template',
-				'description'     => 'Description of my template.',
-				'title'           => array(
-					'raw'      => 'My Template',
-					'rendered' => 'My Template',
-				),
-				'status'          => 'publish',
-				'wp_id'           => self::$template_post->ID,
-				'has_theme_file'  => false,
-				'is_custom'       => true,
-				'author'          => 0,
-				'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-				'author_text'     => 'Test Blog',
-				'original_source' => 'site',
-				'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+		$expected = array(
+			'id'              => 'default//my_template',
+			'theme'           => 'default',
+			'slug'            => 'my_template',
+			'source'          => 'custom',
+			'origin'          => null,
+			'type'            => 'wp_template',
+			'description'     => 'Description of my template.',
+			'title'           => array(
+				'raw'      => 'My Template',
+				'rendered' => 'My Template',
 			),
-			$data
+			'status'          => 'publish',
+			'wp_id'           => self::$template_post->ID,
+			'has_theme_file'  => false,
+			'is_custom'       => true,
+			'author'          => 0,
+			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'     => 'Test Blog',
+			'original_source' => 'site',
+			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
 		);
+		$actual   = $data;
+
+		// The REST response is a JSON object, so key order is not part of the contract.
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -129,31 +132,34 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame(
-			array(
-				'id'              => 'default//my_template',
-				'theme'           => 'default',
-				'slug'            => 'my_template',
-				'source'          => 'custom',
-				'origin'          => null,
-				'type'            => 'wp_template',
-				'description'     => 'Description of my template.',
-				'title'           => array(
-					'raw'      => 'My Template',
-					'rendered' => 'My Template',
-				),
-				'status'          => 'publish',
-				'wp_id'           => self::$template_post->ID,
-				'has_theme_file'  => false,
-				'is_custom'       => true,
-				'author'          => 0,
-				'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-				'author_text'     => 'Test Blog',
-				'original_source' => 'site',
-				'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+		$expected = array(
+			'id'              => 'default//my_template',
+			'theme'           => 'default',
+			'slug'            => 'my_template',
+			'source'          => 'custom',
+			'origin'          => null,
+			'type'            => 'wp_template',
+			'description'     => 'Description of my template.',
+			'title'           => array(
+				'raw'      => 'My Template',
+				'rendered' => 'My Template',
 			),
-			$this->find_and_normalize_template_by_id( $data, 'default//my_template' )
+			'status'          => 'publish',
+			'wp_id'           => self::$template_post->ID,
+			'has_theme_file'  => false,
+			'is_custom'       => true,
+			'author'          => 0,
+			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'     => 'Test Blog',
+			'original_source' => 'site',
+			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
 		);
+		$actual   = $this->find_and_normalize_template_by_id( $data, 'default//my_template' );
+
+		// The REST response is a JSON object, so key order is not part of the contract.
+		ksort( $expected );
+		ksort( $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**

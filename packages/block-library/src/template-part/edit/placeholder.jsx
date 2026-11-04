@@ -1,5 +1,9 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { Placeholder, Button, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	Button,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -56,15 +60,15 @@ export default function TemplatePartPlaceholder( {
 							// Translators: %s as template part area title ("Header", "Footer", etc.).
 							__( 'Choose an existing %s or create a new one.' ),
 							areaObject.label.toLowerCase()
-					  )
+						)
 					: sprintf(
 							// Translators: %s as template part area title ("Header", "Footer", etc.).
 							__( 'Choose an existing %s.' ),
 							areaObject.label.toLowerCase()
-					  )
+						)
 			}
 		>
-			{ isResolving && <Spinner /> }
+			{ isResolving && <WCSpinner /> }
 
 			{ ! isResolving &&
 				!! ( templateParts.length || blockPatterns.length ) && (

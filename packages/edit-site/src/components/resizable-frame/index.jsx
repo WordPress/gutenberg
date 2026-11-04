@@ -250,7 +250,7 @@ function ResizableFrame( {
 								duration: disableMotion ? 0 : 0.5,
 								ease: 'easeOut',
 							},
-					  }
+						}
 					: {}
 			}
 			transition={ FRAME_TRANSITION }

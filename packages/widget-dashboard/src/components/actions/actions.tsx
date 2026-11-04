@@ -3,8 +3,11 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Stack,
+} from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { ActionsMenu } from '../actions-menu';
@@ -95,11 +98,11 @@ export function Actions(): React.ReactNode {
 	const menuItems: ActionsMenuItem[] = canPerform( { operation: 'reset' } )
 		? [
 				{
-					label: __( 'Reset to default' ),
+					label: __( 'Reset to default…' ),
 					onClick: () => setResetDialogOpen( true ),
 					disabled: ! onLayoutReset,
 				},
-		  ]
+			]
 		: [];
 
 	if ( ! onEditChange ) {

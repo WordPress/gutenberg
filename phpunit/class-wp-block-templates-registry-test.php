@@ -186,7 +186,7 @@ class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$unregistered_template = self::$registry->unregister( $template_name );
 
-		$this->assertEquals( $template, $unregistered_template, 'Unregistered template should be the same as the registered one.' );
+		$this->assertSame( $template, $unregistered_template, 'Unregistered template should be the same as the registered one.' );
 		$this->assertFalse( self::$registry->is_registered( $template_name ), 'Template should not be registered after unregistering.' );
 	}
 }

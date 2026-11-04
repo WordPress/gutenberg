@@ -184,14 +184,14 @@ export type DataViewsProps< Item > = {
 			 * have a string `id` property, which is used by default.
 			 */
 			getItemId?: ( item: Item ) => string;
-	  }
+		}
 	: {
 			/**
 			 * Returns a unique id for an item. Required when items have no
 			 * string `id` property.
 			 */
 			getItemId: ( item: Item ) => string;
-	  } );
+		} );
 
 /**
  * The filters applied to the dataset.
@@ -645,6 +645,9 @@ interface ActionBase< Item > {
 	 * The label of the action.
 	 * In case we want to adjust the label based on the selected items,
 	 * a function can be provided.
+	 * Provide the label without an ellipsis. Menu items for actions with
+	 * `RenderModal` add a translated ellipsis. Common trailing ellipses in
+	 * legacy labels are preserved in menus and omitted on buttons.
 	 */
 	label: string | ( ( items: Item[] ) => string );
 
@@ -676,10 +679,11 @@ interface ActionBase< Item > {
 	supportsBulk?: boolean;
 
 	/**
-	 * The context in which the action is visible.
-	 * This is only a "meta" information for now.
+	 * The context the action is limited to: `list` for the lists of items.
+	 * Without it, the action shows everywhere. DataViews does not filter
+	 * the actions by context: the consumer does, before passing them.
 	 */
-	context?: 'list' | 'single';
+	context?: 'list';
 }
 
 /**
@@ -734,8 +738,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	 * The focus on mount property of the modal.
 	 */
 	modalFocusOnMount?:
-		| Parameters< typeof useFocusOnMount >[ 0 ]
-		| 'firstContentElement';
+		Parameters< typeof useFocusOnMount >[ 0 ] | 'firstContentElement';
 }
 
 export interface ActionButton< Item > extends ActionBase< Item > {
@@ -903,24 +906,30 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
-export interface ViewPickerGridProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerGridProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker grid layout.
 	 */
 	view: ViewPickerGrid;
 }
 
-export interface ViewPickerTableProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerTableProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker table layout.
 	 */
 	view: ViewPickerTable;
 }
 
-export interface ViewPickerActivityProps< Item >
-	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+export interface ViewPickerActivityProps< Item > extends Omit<
+	ViewPickerBaseProps< Item >,
+	'view'
+> {
 	/**
 	 * The current view configuration, narrowed to the picker activity layout.
 	 */

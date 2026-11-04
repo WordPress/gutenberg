@@ -1,18 +1,15 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import {
-	RichTextToolbarButton,
-	useSettings,
-	// @ts-expect-error Block Editor not fully typed yet.
-} from '@wordpress/block-editor';
+import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
-import type { ColorObject, TextColorEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
+import type { ColorObject } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
@@ -63,11 +60,12 @@ function TextColorEdit( {
 	isActive,
 	activeAttributes,
 	contentRef,
-}: TextColorEditProps ) {
+}: FormatEditProps ) {
+	// The settings hold the custom color flag and the palette.
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
 		'color.palette'
-	);
+	) as [ boolean | undefined, ColorObject[] | undefined ];
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const colorIndicatorStyle = useMemo(
 		() =>
@@ -86,6 +84,7 @@ function TextColorEdit( {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="text-color"
 				className="format-library-text-color-button"
 				isActive={ isActive }
 				icon={

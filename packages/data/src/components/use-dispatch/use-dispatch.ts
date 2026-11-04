@@ -53,9 +53,7 @@ import type {
  */
 const useDispatch = <
 	StoreNameOrDescriptor extends
-		| undefined
-		| string
-		| StoreDescriptor< AnyConfig > = undefined,
+		undefined | string | StoreDescriptor< AnyConfig > = undefined,
 >(
 	storeNameOrDescriptor?: StoreNameOrDescriptor
 ): UseDispatchReturn< StoreNameOrDescriptor > => {

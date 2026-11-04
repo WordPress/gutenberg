@@ -14,6 +14,7 @@
 
 			&.is-plain {
 				font-size: var(--wpds-typography-font-size-md);
+				font-weight: var(--wpds-typography-font-weight-default);
 				text-transform: none;
 			}
 		}

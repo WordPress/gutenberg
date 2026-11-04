@@ -103,7 +103,7 @@ export function PageAttributesParent() {
 							'postType',
 							postTypeSlug,
 							query,
-					  ] )
+						] )
 					: false,
 			};
 		},

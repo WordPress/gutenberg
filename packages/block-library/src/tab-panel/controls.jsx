@@ -3,7 +3,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -39,7 +39,7 @@ export default function Controls( { tabsClientId, blockIndex, isDefaultTab } ) {
 						} }
 						isShownByDefault
 					>
-						<CheckboxControl
+						<WCCheckboxControl
 							label={ __( 'Default tab' ) }
 							checked={ isDefaultTab }
 							onChange={ ( value ) => {

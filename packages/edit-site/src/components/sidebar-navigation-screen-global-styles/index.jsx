@@ -37,10 +37,10 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	}, [ path, history, openGeneralSidebar, setPreference ] );
 
 	const openRevisions = useCallback( async () => {
-		await openGlobalStyles();
-		// Open the global styles revisions once the canvas mode is set to edit,
-		// and the global styles sidebar is open. Set the path to revisions.
+		// Select revisions before opening the sidebar. The sidebar resets its
+		// navigation as it opens, so a path set afterwards would be discarded.
 		setStylesPath( '/revisions' );
+		await openGlobalStyles();
 	}, [ openGlobalStyles, setStylesPath ] );
 
 	// If there are no revisions, do not render a footer.

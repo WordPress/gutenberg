@@ -10,8 +10,8 @@
  *
  * @deprecated 6.6.0 Use `gutenberg_render_elements_class_name` instead.
  *
- * @param  string $block_content Rendered block content.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content ) {
 	_deprecated_function( __FUNCTION__, '6.6.0', 'gutenberg_render_elements_class_name' );
@@ -21,10 +21,10 @@ function gutenberg_render_elements_support( $block_content ) {
 /**
  * Determines whether an elements class name should be added to the block.
  *
- * @param  array $block   Block object.
- * @param  array $options Per element type options e.g. whether to skip serialization.
+ * @param array $block   Block object.
+ * @param array $options Per element type options e.g. whether to skip serialization.
  *
- * @return boolean        Whether the block needs an elements class name.
+ * @return boolean Whether the block needs an elements class name.
  */
 function gutenberg_should_add_elements_class_name( $block, $options ) {
 	if ( ! isset( $block['attrs']['style']['elements'] ) ) {
@@ -152,6 +152,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	// @phpstan-ignore arguments.count (WordPress 7.0 requires the block, which 7.1 no longer takes and ignores.)
 	$class_name         = wp_get_elements_class_name( $parsed_block );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] ) ? $parsed_block['attrs']['className'] . " $class_name" : $class_name;
 
@@ -234,7 +235,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
- * @return string               Filtered block content.
+ * @return string Filtered block content.
  *
  * @phpstan-param array{
  *     attrs: array{

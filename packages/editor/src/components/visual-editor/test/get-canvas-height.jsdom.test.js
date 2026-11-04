@@ -1,4 +1,7 @@
+import { describe, expect, it, vi } from 'vitest';
 import { getCanvasHeight } from '../index';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'getCanvasHeight', () => {
 	it( 'fills the available height at the full container width', () => {
