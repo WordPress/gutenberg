@@ -143,6 +143,8 @@ export interface MediaEditorProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
+	/** Called with the original's id when the user chooses "Edit original". */
+	onEditOriginal?: ( originalId: number ) => void;
 	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
@@ -252,7 +254,9 @@ interface MediaEditorFrameContextValue {
 	 * disabled.
 	 */
 	isSourceReplaced: boolean;
-	/** Load the lineage root into the cropper as a dirty preview. */
+	/** Whether the frame opens the original itself. */
+	opensOriginal: boolean;
+	/** Load the lineage root into the cropper, or hand it to the frame. */
 	onRestoreOriginal: () => void;
 }
 
@@ -378,6 +382,7 @@ function HistoryActions() {
 		activePanel,
 		canRestoreOriginal,
 		isSourceReplaced,
+		opensOriginal,
 		onRestoreOriginal,
 	} = useMediaEditorFrameContext();
 	const {
@@ -482,7 +487,9 @@ function HistoryActions() {
 										closeMenu();
 									} }
 								>
-									{ __( 'Restore original' ) }
+									{ opensOriginal
+										? __( 'Edit original' )
+										: __( 'Restore original' ) }
 								</MenuItem>
 							</MenuGroup>
 						) }
@@ -546,6 +553,7 @@ function MediaEditorContent( {
 	aspectRatioPresets,
 	onClose,
 	onSaved,
+	onEditOriginal,
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
@@ -727,8 +735,12 @@ function MediaEditorContent( {
 		// Restoring discards every pending edit, as the menu item says, so
 		// nothing staged against the attachment being replaced reaches a save.
 		clearEntityRecordEdits( 'postType', 'attachment', id );
+		if ( onEditOriginal && originalId ) {
+			onEditOriginal( originalId );
+			return;
+		}
 		setIsSourceReplaced( true );
-	}, [ clearEntityRecordEdits, id ] );
+	}, [ clearEntityRecordEdits, id, onEditOriginal, originalId ] );
 
 	// A bare replacement has no cropper diff, so OR the flag in explicitly.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
@@ -1034,6 +1046,7 @@ function MediaEditorContent( {
 		onSave: saveMediaEditor,
 		canRestoreOriginal,
 		isSourceReplaced,
+		opensOriginal: !! onEditOriginal,
 		onRestoreOriginal: handleRestoreOriginal,
 	};
 
