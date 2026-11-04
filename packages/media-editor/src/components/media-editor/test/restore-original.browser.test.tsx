@@ -51,7 +51,9 @@ function Frame( { children }: MediaEditorFrameProps ) {
 	);
 }
 
-async function setup() {
+async function setup( {
+	onRestoreOriginal,
+}: { onRestoreOriginal?: ( originalId: number ) => void } = {} ) {
 	await page.viewport( 1000, 800 );
 	const writes = vi.fn();
 	vi.spyOn( window, 'fetch' ).mockImplementation(
@@ -96,6 +98,7 @@ async function setup() {
 			<MediaEditor
 				id={ 11 }
 				onSaved={ onSaved }
+				onRestoreOriginal={ onRestoreOriginal }
 				renderFrame={ Frame }
 				fields={ [
 					{
@@ -156,6 +159,35 @@ describe( 'Restore original', () => {
 				.select( coreStore )
 				.hasEditsForEntityRecord( 'postType', 'attachment', 11 )
 		).toBe( false );
+	} );
+
+	it( 'hands the original to the frame when it opens the original itself', async () => {
+		const onRestoreOriginal = vi.fn();
+		const { registry } = await setup( { onRestoreOriginal } );
+		await userEvent.fill(
+			screen.getByRole( 'textbox', { name: 'Alternative text' } ),
+			'Unsaved cropped text'
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'History' } )
+		);
+		expect(
+			screen.queryByRole( 'menuitem', { name: /^Restore original/ } )
+		).not.toBeInTheDocument();
+		await userEvent.click(
+			screen.getByRole( 'menuitem', { name: /^Edit original/ } )
+		);
+
+		expect( onRestoreOriginal ).toHaveBeenCalledExactlyOnceWith( 10 );
+		expect(
+			registry
+				.select( coreStore )
+				.hasEditsForEntityRecord( 'postType', 'attachment', 11 )
+		).toBe( false );
+		expect( screen.getByRole( 'textbox', { name: 'Title' } ) ).toHaveValue(
+			'Cropped title'
+		);
 	} );
 
 	it( 'saves an untouched restore without writing an attachment', async () => {
