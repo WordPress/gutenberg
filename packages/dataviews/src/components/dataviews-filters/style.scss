@@ -31,6 +31,19 @@
 		border-radius: var(--wpds-border-radius-md);
 	}
 
+	// A custom field control can be wider than the default ones: let the
+	// popover grow to the control's narrowest width, rather than overflow.
+	// Text that wraps or truncates (help text, the filter name) doesn't count.
+	.components-popover__content:has(.dataviews-filters__user-input-widget) {
+		width: min-content;
+		min-width: 230px;
+		max-width: none;
+
+		.dataviews-filters__summary-operators-container {
+			contain: inline-size;
+		}
+	}
+
 	&.components-dropdown__content {
 		.components-popover__content {
 			padding: 0;
