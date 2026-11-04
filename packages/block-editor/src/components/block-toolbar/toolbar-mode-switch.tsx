@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { moreHorizontal } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 import type { ToolbarModeSwitchProps } from './types';
 
 /**
@@ -17,7 +17,7 @@ export default function ToolbarModeSwitch( {
 	return (
 		<ToolbarGroup className="block-editor-block-toolbar__mode-switch">
 			<ToolbarButton
-				icon={ moreHorizontal }
+				icon={ settings }
 				label={ __( 'Write' ) }
 				isActive={ mode === 'write' }
 				onClick={ () =>
