@@ -768,8 +768,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			$actual
 		);
 	}
-
-
 	/**
 	 * Tests that an inner block color in a variation shared by several blocks
 	 * refills the letters over the inner block type text gradient.
@@ -810,8 +808,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			$actual
 		);
 	}
-
-
 	/**
 	 * Tests that a variation breakpoint text color refills the letters over a
 	 * block type text gradient.
