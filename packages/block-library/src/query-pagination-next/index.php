@@ -56,7 +56,18 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	} elseif ( ! $max_page || $max_page > $page ) {
 		$custom_query           = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		$custom_query_max_pages = (int) $custom_query->max_num_pages;
-		if ( $custom_query_max_pages && $custom_query_max_pages !== $page ) {
+		$offset                 = $block->context['query']['offset'] ?? 0;
+		$has_offset             = is_numeric( $offset ) && 0 < absint( $offset );
+		$per_page               = (int) $custom_query->get( 'posts_per_page' );
+		if ( $has_offset && 0 < $custom_query_max_pages && 0 < $per_page ) {
+			// Remove only the initial offset, not the posts skipped by preceding pages.
+			$query_offset   = $custom_query->get( 'offset' );
+			$initial_offset = is_numeric( $query_offset ) ? max( 0, absint( $query_offset ) - $per_page * ( max( 1, $page ) - 1 ) ) : 0;
+			if ( $initial_offset ) {
+				$custom_query_max_pages = (int) ceil( max( 0, $custom_query->found_posts - $initial_offset ) / $per_page );
+			}
+		}
+		if ( $custom_query_max_pages && ( $has_offset ? $page < $custom_query_max_pages : $custom_query_max_pages !== $page ) ) {
 			$content = sprintf(
 				'<a href="%1$s" %2$s>%3$s</a>',
 				esc_url( add_query_arg( $page_key, $page + 1 ) ),
