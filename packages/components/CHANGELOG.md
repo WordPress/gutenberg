@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color.
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes
