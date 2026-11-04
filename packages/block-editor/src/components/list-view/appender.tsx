@@ -14,7 +14,8 @@ import type { ListViewAppenderProps } from './types';
 
 export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { setInsertedBlockClientId } = useListViewContext();
+		const { CustomAppender, setInsertedBlockClientId } =
+			useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
 		const instanceId = useInstanceId( Appender );
@@ -79,6 +80,28 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 			blockCount + 1,
 			nestingLevel
 		);
+
+		if ( CustomAppender ) {
+			return (
+				<div className="list-view-appender">
+					<CustomAppender
+						rootClientId={ clientId }
+						setInsertedBlockClientId={ setInsertedBlockClientId }
+						toggleProps={ {
+							ref,
+							className:
+								'block-editor-list-view-appender__toggle',
+							tabIndex: props.tabIndex,
+							onFocus: props.onFocus,
+							'aria-describedby': descriptionId,
+						} }
+					/>
+					<AriaReferencedText id={ descriptionId }>
+						{ description }
+					</AriaReferencedText>
+				</div>
+			);
+		}
 
 		return (
 			<div className="list-view-appender">

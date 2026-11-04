@@ -1,5 +1,17 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Adds a menu item from the list view appender's menu of tasks.
+ *
+ * @param {import('@playwright/test').Page}    page     The page.
+ * @param {import('@playwright/test').Locator} listView The list view.
+ * @param {string}                             task     The task's menu item name.
+ */
+async function addMenuItem( page, listView, task ) {
+	await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
+	await page.getByRole( 'menuitem', { name: task } ).click();
+}
+
 test.describe( 'Navigation sidebar - list view editing', () => {
 	const navMenuFixture = {
 		title: 'Test Navigation Menu',
@@ -64,13 +76,26 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		).toBeVisible();
 
 		// The appender button should be present to allow adding new items.
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		const appender = listView.getByRole( 'button', {
+			name: 'Add menu item',
+		} );
 		await expect( appender ).toBeVisible();
 
 		const linkControlSearch = linkControl.getLinkControlSearch();
 
-		await test.step( 'can add new menu items', async () => {
+		await test.step( 'lists the tasks for adding a menu item', async () => {
 			await appender.click();
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Add menu item' } )
+					.getByRole( 'menuitem' )
+			).toHaveText( [ 'Add page', 'Custom link', 'Submenu', 'More…' ] );
+			await page.keyboard.press( 'Escape' );
+			await expect( appender ).toBeFocused();
+		} );
+
+		await test.step( 'can add new menu items', async () => {
+			await addMenuItem( page, listView, 'Add page' );
 
 			// The LinkUI popover should open and immediately focus the search input.
 			await expect( linkControlSearch ).toBeFocused();
@@ -87,6 +112,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await test.step( 'can open and close the Link UI without losing focus', async () => {
 			await page.keyboard.press( 'ArrowDown' );
 			await expect( appender ).toBeFocused();
+			// Opening the menu from the keyboard focuses its first task.
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Add page' } )
+			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 			await expect( linkControlSearch ).toBeFocused();
 			await page.keyboard.press( 'Escape' );
@@ -94,7 +124,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 
 		await test.step( 'can create a new page', async () => {
-			await appender.click();
+			await addMenuItem( page, listView, 'Add page' );
 
 			// The search input should be focused immediately.
 			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
@@ -175,7 +205,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		// Select an item, then add a new one from the appender. The edit is
 		// what carries the sidebar's selection over to the entity.
 		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await addMenuItem( page, listView, 'Add page' );
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
 			listView.getByRole( 'link', { name: 'Test Page 2' } )
@@ -338,7 +368,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
 		await expect(
-			listView.getByRole( 'button', { name: 'Add page' } )
+			listView.getByRole( 'button', { name: 'Add menu item' } )
 		).toBeVisible();
 	} );
 
@@ -362,7 +392,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			name: 'Block navigation structure',
 		} );
 
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await addMenuItem( page, listView, 'Add page' );
 		await linkControl.useLinkControlSearch( 'Test Page 1' );
 
 		await expect(
@@ -371,6 +401,92 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeHidden();
+	} );
+
+	test( 'can add a custom link', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await addMenuItem( page, listView, 'Custom link' );
+		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'example.com' } )
+		).toBeVisible();
+	} );
+
+	test( 'can add a submenu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await addMenuItem( page, listView, 'Submenu' );
+		await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 1' } )
+		).toBeVisible();
+		// The preview renders the new item as a submenu.
+		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
+		await expect(
+			canvas
+				.locator( '.wp-block-navigation-submenu' )
+				.getByText( 'Test Page 1' )
+		).toBeVisible();
+	} );
+
+	test( 'removes a new menu item when its link UI closes without a link', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await addMenuItem( page, listView, 'Custom link' );
+		await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
 	test( 'lists the pages of a Page List block', async ( {
