@@ -297,6 +297,8 @@ function _gutenberg_admin_shell_enqueue(): void {
 	}
 	JS;
 
+	add_action( 'admin_print_footer_scripts', '_gutenberg_admin_shell_print_script_module_data' );
+
 	wp_add_inline_script(
 		$pages[ $current ]['script_handle'],
 		sprintf(
@@ -306,6 +308,43 @@ function _gutenberg_admin_shell_enqueue(): void {
 			$max_alive_pages
 		)
 	);
+}
+
+/**
+ * Prints the script module data of the other pages in the shell.
+ *
+ * WordPress prints a script module's data (the `script_module_data_{$module_id}`
+ * filter) only on pages where the module is enqueued or in the import map. A
+ * page's own module is registered only on its own page load, so a page the
+ * shell opens would otherwise miss its data, as the Connectors page does
+ * without the connectors list. This prints it the way WordPress does.
+ *
+ * @access private
+ */
+function _gutenberg_admin_shell_print_script_module_data(): void {
+	$pages   = _gutenberg_admin_shell_get_pages();
+	$current = _gutenberg_admin_shell_current_page();
+
+	foreach ( $pages as $page => $description ) {
+		$module_id = $description['script_module'] ?? $description['page_id'] . '-wp-admin';
+		if ( $page === $current || ! current_user_can( $description['capability'] ?? 'manage_options' ) ) {
+			continue;
+		}
+
+		/** This filter is documented in wp-includes/class-wp-script-modules.php */
+		$data = apply_filters( "script_module_data_{$module_id}", array() );
+		if ( ! is_array( $data ) || array() === $data ) {
+			continue;
+		}
+
+		wp_print_inline_script_tag(
+			wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+			array(
+				'type' => 'application/json',
+				'id'   => "wp-script-module-data-{$module_id}",
+			)
+		);
+	}
 }
 
 /**

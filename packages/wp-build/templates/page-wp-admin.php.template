@@ -119,6 +119,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_describe_page( $pages ) {
 		'render_callback'          => '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page',
 		'mount_id'                 => '{{PAGE_SLUG}}-wp-admin-app',
 		'script_handle'            => '{{PAGE_SLUG}}-wp-admin-prerequisites',
+		'script_module'            => '{{PAGE_SLUG}}-wp-admin',
 		'boot_dependencies_filter' => '{{PAGE_SLUG}}-wp-admin_boot_dependencies',
 		'routes_callback'          => '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_init_routes',
 		'preload_paths_callback'   => '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_paths',
