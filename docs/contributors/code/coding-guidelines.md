@@ -70,6 +70,28 @@ Styles placed in a `style.scss` file will be built into `blocks/build/style.css`
 
 Examples of styles that appear in both the theme and the editor include gallery columns and drop caps.
 
+### Empty lines before at-rules
+
+Add an empty line before a top-level at-rule, such as `@media` or `@mixin`, unless it follows a comment. Consecutive at-rules without a block, such as a run of `@use` or `@import` statements, stay together without empty lines between them. At-rules nested inside a block, such as `@include` in a rule or `@if` in a mixin, can go either way.
+
+**Example:**
+
+```scss
+@use "@wordpress/base-styles/mixins";
+@use "@wordpress/base-styles/variables";
+
+.components-panel {
+	@include mixins.reduce-motion;
+	display: block;
+}
+
+@media (min-width: 600px) {
+	.components-panel {
+		display: flex;
+	}
+}
+```
+
 ## JavaScript
 
 All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax.
