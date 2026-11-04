@@ -6,11 +6,71 @@ import { GridRect, getComputedCSS } from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
+function isPositiveInteger( value: unknown ): value is number {
+	return typeof value === 'number' && Number.isInteger( value ) && value > 0;
+}
+
+function getExpandedColumnRect(
+	childId: string,
+	rect: GridRect,
+	neededSpan: number,
+	columnCount: number,
+	rects: ReadonlyMap< string, GridRect >
+): GridRect {
+	const columnSpan = Math.min(
+		Math.max( rect.columnSpan, neededSpan ),
+		columnCount
+	);
+	const maxGridStart = columnCount - columnSpan + 1;
+	const preferredStart = Math.max(
+		1,
+		Math.min( rect.columnStart, maxGridStart )
+	);
+	const minStart = Math.max( 1, rect.columnEnd - columnSpan + 1 );
+	const preferredRect = new GridRect( {
+		columnStart: preferredStart,
+		rowStart: rect.rowStart,
+		columnSpan,
+		rowSpan: rect.rowSpan,
+	} );
+
+	for (
+		let columnStart = preferredStart;
+		columnStart >= minStart;
+		columnStart--
+	) {
+		const candidate = new GridRect( {
+			columnStart,
+			rowStart: rect.rowStart,
+			columnSpan,
+			rowSpan: rect.rowSpan,
+		} );
+		let intersectsOtherItem = false;
+		for ( const [ otherId, otherRect ] of rects ) {
+			if (
+				otherId !== childId &&
+				otherRect.intersectsRect( candidate )
+			) {
+				intersectsOtherItem = true;
+				break;
+			}
+		}
+		if ( ! intersectsOtherItem ) {
+			return candidate;
+		}
+	}
+
+	// If every placement overlaps another item, keep the item as close as
+	// possible to its current position while ensuring it remains in the grid.
+	return preferredRect;
+}
+
 /**
  * In a manual grid, grows the column and row spans of items whose content
  * overflows their grid area, so that rows can stay square. Spans only ever
  * grow, and may overlap other items. Column spans are capped at the column
- * count, while growing past the last row adds rows.
+ * count and may shift left to stay within the grid, while growing past the
+ * last row adds rows.
  *
  * @param options
  * @param options.clientId The grid block's client ID.
@@ -50,13 +110,18 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
 					?.layout ?? {};
-			const rowCount = Number( rawRowCount );
-			const columnCount = Number( rawColumnCount );
 			const gridHeight = gridElement.clientHeight;
 			const gridWidth = gridElement.clientWidth;
-			if ( ! rowCount || ! columnCount || ! gridHeight || ! gridWidth ) {
+			if (
+				! isPositiveInteger( rawRowCount ) ||
+				! isPositiveInteger( rawColumnCount ) ||
+				! gridHeight ||
+				! gridWidth
+			) {
 				return;
 			}
+			const rowCount = rawRowCount;
+			const columnCount = rawColumnCount;
 			const rowGap =
 				parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0;
 			const columnGap =
@@ -76,14 +141,19 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				const { columnStart, rowStart, columnSpan, rowSpan } =
 					( getBlockAttributes( childId ) as GridItemAttributes )
 						?.style?.layout ?? {};
-				if ( columnStart && rowStart ) {
+				if (
+					isPositiveInteger( columnStart ) &&
+					isPositiveInteger( rowStart )
+				) {
 					rects.set(
 						childId,
 						new GridRect( {
 							columnStart,
 							rowStart,
-							columnSpan: columnSpan ?? 1,
-							rowSpan: rowSpan ?? 1,
+							columnSpan: isPositiveInteger( columnSpan )
+								? columnSpan
+								: 1,
+							rowSpan: isPositiveInteger( rowSpan ) ? rowSpan : 1,
 						} )
 					);
 				}
@@ -104,15 +174,20 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				const overflowsHeight =
 					! overflowsWidth &&
 					element.scrollHeight > element.clientHeight + 1;
-				let { columnSpan, rowSpan } = rect;
+				let { columnStart, columnSpan, rowSpan } = rect;
 				if ( overflowsWidth ) {
 					const neededSpan = Math.ceil(
 						( element.scrollWidth + columnGap ) / columnPitch
 					);
-					columnSpan = Math.min(
-						Math.max( columnSpan, neededSpan ),
-						columnCount - rect.columnStart + 1
+					const expandedRect = getExpandedColumnRect(
+						childId,
+						rect,
+						neededSpan,
+						columnCount,
+						rects
 					);
+					columnStart = expandedRect.columnStart;
+					columnSpan = expandedRect.columnSpan;
 				} else if ( overflowsHeight ) {
 					const neededSpan = Math.ceil(
 						( element.scrollHeight + rowGap ) / rowPitch
@@ -120,6 +195,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					rowSpan = Math.max( rowSpan, neededSpan );
 				}
 				if (
+					columnStart === rect.columnStart &&
 					columnSpan === rect.columnSpan &&
 					rowSpan === rect.rowSpan
 				) {
@@ -128,7 +204,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				rects.set(
 					childId,
 					new GridRect( {
-						columnStart: rect.columnStart,
+						columnStart,
 						rowStart: rect.rowStart,
 						columnSpan,
 						rowSpan,
@@ -142,6 +218,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 						...attributes.style,
 						layout: {
 							...attributes.style?.layout,
+							columnStart,
 							columnSpan,
 							rowSpan,
 						},
