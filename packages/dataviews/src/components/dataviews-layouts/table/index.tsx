@@ -397,7 +397,6 @@ function ViewTable< Item >( {
 		hadSelectionRef.current = showBulkActions;
 	}, [ showBulkActions ] );
 
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const isStickyFirstColumn = !! view.layout?.stickyFirstColumn;
 
 	const {

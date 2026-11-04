@@ -29,7 +29,7 @@ export const LayoutTableComponent = ( {
 		perPage: 10,
 		layout: { stickyFirstColumn },
 		filters: [],
-		fields: [ 'categories' ],
+		fields: [ 'categories', 'type', 'author' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
