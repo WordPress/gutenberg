@@ -141,14 +141,9 @@ export function useAvailableTemplates( {
 
 export function usePostTemplatePanelMode() {
 	return useSelect( ( select ) => {
-		const {
-			getEditorSettings,
-			getCurrentTemplateId,
-			getCurrentPostType,
-			getCurrentPostId,
-		} = select( editorStore );
-		const { getPostType, canUser, getEditedEntityRecord } =
-			select( coreStore );
+		const { getEditorSettings, getCurrentTemplateId, getCurrentPostType } =
+			select( editorStore );
+		const { getPostType, canUser } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const settings = getEditorSettings();
 		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
@@ -156,29 +151,11 @@ export function usePostTemplatePanelMode() {
 		 * A template can name the template it is rendered inside, so that the
 		 * header, the footer and whatever else surrounds it live in one place
 		 * instead of being repeated in every template. It is not a viewable
-		 * post type, so it is answered before the checks below.
-		 *
-		 * The `template` property is the server's answer for whether it can:
-		 * a site whose WordPress does not carry the field leaves the panel to
-		 * the checks below, the same way it behaved before the field existed.
+		 * post type, so it is answered before the checks below. The field is
+		 * only in the form of the summary while the experiment is on.
 		 */
 		if ( postTypeSlug === TEMPLATE_POST_TYPE ) {
-			const template = getEditedEntityRecord(
-				'postType',
-				TEMPLATE_POST_TYPE,
-				getCurrentPostId()
-			);
-
-			if ( template?.template !== undefined ) {
-				const canEditTemplates =
-					canUser( 'create', {
-						kind: 'postType',
-						name: TEMPLATE_POST_TYPE,
-					} ) ?? false;
-				return isBlockTheme && canEditTemplates
-					? 'template-parent'
-					: null;
-			}
+			return isBlockTheme ? 'template-parent' : null;
 		}
 		const postType = getPostType( postTypeSlug );
 		const hasTemplates =
