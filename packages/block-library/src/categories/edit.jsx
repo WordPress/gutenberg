@@ -3,11 +3,9 @@ import {
 	Placeholder,
 	SelectControl as WCSelectControl,
 	Spinner as WCSpinner,
-	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -20,7 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/ui';
+import { InputControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -360,7 +358,7 @@ export default function CategoriesEdit( {
 							}
 							isShownByDefault
 						>
-							<VStack spacing={ 2 }>
+							<Stack gap="sm">
 								<WCSelectControl
 									__next40pxDefaultSize
 									label={ __( 'Delimiter' ) }
@@ -371,19 +369,19 @@ export default function CategoriesEdit( {
 									}
 								/>
 								{ delimiter === 'custom' && (
-									<TextControl
-										__next40pxDefaultSize
+									<InputControl
 										label={ __( 'Custom delimiter' ) }
 										value={ customDelimiter }
-										onChange={ ( value ) =>
+										onChange={ ( event ) =>
 											setAttributes( {
-												customDelimiter: value,
+												customDelimiter:
+													event.target.value,
 											} )
 										}
 										placeholder={ __( 'e.g., •' ) }
 									/>
 								) }
-							</VStack>
+							</Stack>
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem

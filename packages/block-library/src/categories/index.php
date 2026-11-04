@@ -40,13 +40,16 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$args['parent'] = 0;
 	}
 
-	if ( isset( $attributes['displayLayout'] ) ) {
+	// `$attributes` includes defaults, so read the raw attributes to tell an
+	// old block that never had `displayLayout` from one that saved the default.
+	$raw_attributes = $block->parsed_block['attrs'] ?? array();
+	if ( isset( $raw_attributes['displayLayout'] ) ) {
 		$display_layout = $attributes['displayLayout'];
-	} elseif ( ! empty( $attributes['displayAsDropdown'] ) ) {
+	} elseif ( ! empty( $raw_attributes['displayAsDropdown'] ) ) {
 		// Backward compatibility for blocks saved before the layout option.
 		$display_layout = 'dropdown';
 	} else {
-		$display_layout = 'list';
+		$display_layout = isset( $attributes['displayLayout'] ) ? $attributes['displayLayout'] : 'list';
 	}
 
 	if ( 'dropdown' === $display_layout ) {
@@ -83,6 +86,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$args['show_option_none'] = $taxonomy->labels->no_terms;
 		$args['title_li']         = '';
 		$args['style']            = 'none';
+
+		$label_text = '';
 
 		$delimiter       = isset( $attributes['delimiter'] ) ? $attributes['delimiter'] : 'comma';
 		$delimiter_chars = array(
