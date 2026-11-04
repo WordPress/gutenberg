@@ -6,6 +6,8 @@
 
 -   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
 
+## 3.1.0 (2026-11-04)
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes
