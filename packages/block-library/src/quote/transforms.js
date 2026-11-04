@@ -3,7 +3,11 @@ import {
 	createBlock,
 	cloneSanitizedBlock,
 	switchToBlockType,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { isBlockAllowedInParent } = unlock( blocksPrivateApis );
 
 const transforms = {
 	from: [
@@ -77,6 +81,13 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
+				if (
+					! blocks.every( ( { name } ) =>
+						isBlockAllowedInParent( name, 'core/quote' )
+					)
+				) {
+					return false;
+				}
 				// When a single block is selected make the transformation
 				// available only to specific blocks that make sense.
 				if ( blocks.length === 1 ) {

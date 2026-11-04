@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Validate registered direct-parent relationships for structural block wrapping ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Respect direct-parent restrictions when wrapping blocks in Group, Columns, Details, and Quote ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
+
 ## 12.1.0 (2026-11-04)
 
 ### Enhancements

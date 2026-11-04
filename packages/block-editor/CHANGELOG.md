@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent Group commands from creating disallowed direct-parent relationships ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

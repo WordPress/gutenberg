@@ -3,7 +3,11 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	getBlockType,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { isBlockAllowedInParent } = unlock( blocksPrivateApis );
 
 const MAXIMUM_SELECTED_BLOCKS = 6;
 const COLUMN_VERTICAL_ALIGNMENTS = [ 'top', 'center', 'bottom' ];
@@ -276,7 +280,10 @@ const transforms = {
 
 				return (
 					selectedBlocksLength &&
-					selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS
+					selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS &&
+					blocks.every( ( { name } ) =>
+						isBlockAllowedInParent( name, 'core/column' )
+					)
 				);
 			},
 		},

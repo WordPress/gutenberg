@@ -31,6 +31,7 @@ import {
 	getFallbackInsertionRoots,
 } from './utils';
 import { orderBy } from '../utils/sorting';
+import { canGroupBlocks } from '../utils/group-blocks';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -3731,7 +3732,14 @@ export const isGroupable = createRegistrySelector(
 				rootClientId
 			);
 			const _isGroupable = groupingBlockAvailable && _clientIds.length;
-			return _isGroupable && canRemoveBlocks( state, _clientIds );
+			if ( ! _isGroupable || ! canRemoveBlocks( state, _clientIds ) ) {
+				return false;
+			}
+			const blocks = getBlocksByClientId( state, _clientIds );
+			return (
+				blocks.every( ( block ) => !! block ) &&
+				canGroupBlocks( blocks as Block[], groupingBlockName! )
+			);
 		}
 );
 
