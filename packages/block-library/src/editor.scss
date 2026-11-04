@@ -59,6 +59,7 @@
 @use "./post-comments-form/editor.scss" as *;
 @use "./editor-elements.scss" as *;
 @use "./utils/poster-image.scss" as *;
+@use "./utils/media-link-control.scss" as *;
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();
