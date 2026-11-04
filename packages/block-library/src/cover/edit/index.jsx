@@ -25,6 +25,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
+	getGradientValueBySlug,
 	store as blockEditorStore,
 	useBlockEditingMode,
 	privateApis as blockEditorPrivateApis,
@@ -54,6 +55,7 @@ import {
 	DEFAULT_BACKGROUND_COLOR,
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
+import { getAverageGradientColor, getComputedGradient } from './gradient-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
@@ -141,6 +143,46 @@ function CoverEdit( {
 	// avoiding stale values that could overwrite concurrent remote changes.
 	const getLatestProps = useEvent( () => ( { attributes, overlayColor } ) );
 
+	const ref = useRef();
+
+	// A gradient is drawn over the overlay color, so its colors decide the result
+	// when they can be read. This reads the store because the gradient picker
+	// updates the gradient right before clearing the overlay color, which can
+	// reach this before the block has rendered the new gradient.
+	const isOverlayDark = useEvent(
+		( newDimRatio, newOverlayColor, backgroundColor ) => {
+			const { getBlockAttributes, getBlockSettings } = unlock(
+				registry.select( blockEditorStore )
+			);
+			const { gradient, customGradient } = getBlockAttributes( clientId );
+			const gradientValue = gradient
+				? getGradientValueBySlug(
+						getBlockSettings(
+							clientId,
+							'color.gradients.custom',
+							'color.gradients.theme',
+							'color.gradients.default'
+						).flatMap( ( gradients ) => gradients ?? [] ),
+						gradient
+					)
+				: customGradient;
+			const gradientColor =
+				gradientValue &&
+				ref.current &&
+				getAverageGradientColor(
+					getComputedGradient(
+						gradientValue,
+						ref.current.ownerDocument
+					)
+				);
+			return compositeIsDark(
+				newDimRatio,
+				gradientColor || newOverlayColor,
+				backgroundColor
+			);
+		}
+	);
+
 	const { media } = useSelect(
 		( select ) => {
 			return {
@@ -186,7 +228,7 @@ function CoverEdit( {
 				setOverlayColor( newOverlayColor );
 			}
 
-			const newIsDark = compositeIsDark(
+			const newIsDark = isOverlayDark(
 				currentAttrs.dimRatio,
 				newOverlayColor,
 				averageBackgroundColor
@@ -206,6 +248,7 @@ function CoverEdit( {
 		setOverlayColor,
 		useFeaturedImage,
 		getLatestProps,
+		isOverlayDark,
 	] );
 
 	// instead of destructuring the attributes
@@ -282,7 +325,7 @@ function CoverEdit( {
 				? 50
 				: currentAttrs.dimRatio;
 
-		const newIsDark = compositeIsDark(
+		const newIsDark = isOverlayDark(
 			newDimRatio,
 			newOverlayColor,
 			averageBackgroundColor
@@ -342,7 +385,7 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
-		const newIsDark = compositeIsDark(
+		const newIsDark = isOverlayDark(
 			dimRatio,
 			newOverlayColor,
 			DEFAULT_BACKGROUND_COLOR
@@ -366,7 +409,7 @@ function CoverEdit( {
 		// Read latest dimRatio after await to avoid stale closure.
 		const { attributes: currentAttrs } = getLatestProps();
 
-		const newIsDark = compositeIsDark(
+		const newIsDark = isOverlayDark(
 			currentAttrs.dimRatio,
 			newOverlayColor,
 			averageBackgroundColor
@@ -396,7 +439,7 @@ function CoverEdit( {
 		// Read latest overlayColor after await to avoid stale closure.
 		const { overlayColor: currentOverlay } = getLatestProps();
 
-		const newIsDark = compositeIsDark(
+		const newIsDark = isOverlayDark(
 			newDimRatio,
 			currentOverlay.color,
 			averageBackgroundColor
@@ -523,7 +566,6 @@ function CoverEdit( {
 		[ clientId ]
 	);
 
-	const ref = useRef();
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
@@ -618,7 +660,7 @@ function CoverEdit( {
 						__unstableMarkNextChangeAsNotPersistent();
 					}
 
-					nextAttributes.isDark = compositeIsDark(
+					nextAttributes.isDark = isOverlayDark(
 						currentAttrs.dimRatio,
 						newOverlayColor,
 						averageBackgroundColor
@@ -644,6 +686,7 @@ function CoverEdit( {
 	}, [
 		id,
 		getLatestProps,
+		isOverlayDark,
 		openMediaEditorModal,
 		setAttributes,
 		setOverlayColor,
@@ -686,7 +729,7 @@ function CoverEdit( {
 
 		const newDimRatio =
 			currentAttrs.dimRatio === 100 ? 50 : currentAttrs.dimRatio;
-		const newIsDark = compositeIsDark(
+		const newIsDark = isOverlayDark(
 			newDimRatio,
 			newOverlayColor,
 			averageBackgroundColor
