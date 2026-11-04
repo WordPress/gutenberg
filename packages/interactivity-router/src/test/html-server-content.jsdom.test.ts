@@ -263,6 +263,35 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		expect( show() ).toEqual( [ true, '<i>changed</i>' ] );
 	} );
 
+	test( 'keeps its nodes when they already equal the new page’s server content', async () => {
+		store( namespace, { state: { html: representation } } );
+		const page = ( name: string ) =>
+			regionHtml(
+				`<p class="content">${ name }</p><div data-wp-html="state.html"><p>Same <b>content</b></p></div>`
+			);
+		const region = hydrateHtml( page( 'one' ) );
+		const element = region.querySelector( '[data-wp-html]' )!;
+		const paragraph = element.firstChild;
+		const mutations: MutationRecord[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			mutations.push( ...records )
+		);
+		observer.observe( element, {
+			childList: true,
+			subtree: true,
+			characterData: true,
+		} );
+
+		await navigate( 'two', page( 'two' ) );
+		// Refreshing the page shown fetches it again.
+		await navigate( 'two', page( 'two' ) );
+
+		expect( region.querySelector( '.content' ) ).toHaveTextContent( 'two' );
+		expect( element.firstChild ).toBe( paragraph );
+		expect( mutations ).toHaveLength( 0 );
+		observer.disconnect();
+	} );
+
 	test( 'shows only its own server content, inert and without scripts', async () => {
 		let initCalls = 0;
 		const { state } = store( namespace, {

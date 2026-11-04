@@ -20,12 +20,22 @@ const isServerHTMLRepresentation = ( value: unknown ): boolean =>
 
 /**
  * Replaces an element's child nodes with a copy of a server content snapshot's
- * nodes, without writing an HTML string.
+ * nodes, without writing an HTML string. Child nodes that already equal the
+ * snapshot's, compared with `isEqualNode()`, are kept.
  *
  * @param node    The element whose content is replaced.
  * @param content The detached, script-free snapshot, left unmodified.
  */
 const showServerContent = ( node: HTMLElement, content: DocumentFragment ) => {
+	const contentNodes = content.childNodes;
+	if (
+		node.childNodes.length === contentNodes.length &&
+		Array.from( node.childNodes ).every( ( child, index ) =>
+			child.isEqualNode( contentNodes[ index ] )
+		)
+	) {
+		return;
+	}
 	node.replaceChildren( node.ownerDocument.importNode( content, true ) );
 };
 
