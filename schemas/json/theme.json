@@ -2404,16 +2404,40 @@
 			"type": "object",
 			"properties": {
 				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2424,22 +2448,58 @@
 			"type": "object",
 			"properties": {
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":required": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-valid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-invalid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				"::placeholder": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
