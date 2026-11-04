@@ -245,7 +245,6 @@ export function Notes( {
 					<AddNote
 						key={ selectedBlockClientId }
 						clientId={ selectedBlockClientId }
-						sidebarRef={ sidebarRef }
 					/>
 				) }
 				{ threads.map( ( thread, index ) => (
