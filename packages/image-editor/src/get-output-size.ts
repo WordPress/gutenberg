@@ -7,8 +7,7 @@ import {
 
 /**
  * The size in pixels of the image this edit produces: the part of the
- * original the crop frames, at full size. It is the figure the canvas
- * shows while someone resizes the crop.
+ * original the crop frames, at full size.
  *
  * Use it for a size readout, or to check an edit against a smallest
  * allowed size before saving.
