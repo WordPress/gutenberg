@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { tip, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { Button } from '../../button';
+import { Link } from '../../link';
 import { Stack } from '../../stack';
 import * as Notice from '../index';
 
@@ -134,6 +135,31 @@ export const WithoutActions: Story = {
 			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
+};
+
+/**
+ * Use the `Link` component for inline links within the description.
+ */
+export const WithLinkInDescription: Story = {
+	render: () => (
+		<Stack direction="column" gap="md">
+			{ ( [ 'info', 'warning', 'success', 'error' ] as const ).map(
+				( intent ) => (
+					<Notice.Root key={ intent } intent={ intent }>
+						<Notice.Title>Review your settings</Notice.Title>
+						<Notice.Description>
+							Some changes need your attention.{ ' ' }
+							<Link href="#">
+								Learn more about these settings
+							</Link>
+							.
+						</Notice.Description>
+						<Notice.CloseIconButton />
+					</Notice.Root>
+				)
+			) }
+		</Stack>
+	),
 };
 
 /**
