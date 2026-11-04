@@ -152,6 +152,40 @@ describe( 'DateEdit', () => {
 		).toHaveAccessibleDescription( 'Publishes when you save.' );
 	} );
 
+	it( 'says a scheduled post whose date is in the past publishes when it is saved', async () => {
+		render(
+			<DateEdit
+				data={ {
+					status: 'future',
+					date: '2020-01-01T10:00:00',
+					modified: '2026-10-20T10:00:00',
+				} }
+				field={ field }
+				onChange={ () => {} }
+			/>
+		);
+		expect(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		).toHaveAccessibleDescription( 'Publishes when you save.' );
+	} );
+
+	it( "doesn't say a scheduled post whose date is in the future publishes when it is saved", async () => {
+		render(
+			<DateEdit
+				data={ {
+					status: 'future',
+					date: '2999-01-01T10:00:00',
+					modified: '2026-10-20T10:00:00',
+				} }
+				field={ field }
+				onChange={ () => {} }
+			/>
+		);
+		expect(
+			await screen.findByRole( 'button', { name: 'Reset' } )
+		).not.toHaveAccessibleDescription();
+	} );
+
 	it( 'announces the date picked for a post', async () => {
 		render(
 			<DateEdit

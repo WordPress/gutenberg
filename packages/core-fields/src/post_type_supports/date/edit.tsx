@@ -3,7 +3,7 @@ import { Button, DateTimePicker } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { dateI18n, getDate, getSettings, isInTheFuture } from '@wordpress/date';
 import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
@@ -24,6 +24,13 @@ function is12HourTime() {
 			.reverse()
 			.join( '' )
 	);
+}
+
+// Whether saving a post with this date publishes it rather than schedules it.
+// Like the editor, a date less than a minute ahead counts as now, which covers
+// the time the save takes.
+function isPublishedOnSave( date: string ) {
+	return ! isInTheFuture( new Date( Number( getDate( date ) ) - 60 * 1000 ) );
 }
 
 function getMonthBounds( date: Date ) {
@@ -116,9 +123,13 @@ export default function DateEdit( {
 		// The notes describe the post's date, not the date a filter picks.
 	} else if ( isFloating ) {
 		note = __( 'Publishes immediately.' );
-	} else if ( isReset && status === 'future' ) {
-		// A scheduled post takes the save time as its date, which is no
-		// longer in the future, so saving publishes it.
+	} else if (
+		status === 'future' &&
+		( ! value || isPublishedOnSave( value ) )
+	) {
+		// A scheduled post whose date is reset takes the save time, and one
+		// whose date is in the past keeps it: neither is in the future, so
+		// saving publishes the post.
 		note = __( 'Publishes when you save.' );
 	} else if ( isReset ) {
 		note = __( 'Changes to the time you save.' );
