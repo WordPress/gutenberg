@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
@@ -213,7 +213,9 @@ describe( 'the public API', () => {
 				<style>{ `
 					.my-cropper {
 						--wp-image-editor-accent-color: rgb(90, 10, 110);
-						--wp-image-editor-surface-color: rgb(240, 230, 220);
+						--wp-image-editor-handle-background-color: rgb(240, 230, 220);
+						--wp-image-editor-tooltip-background-color: rgb(10, 20, 30);
+						--wp-image-editor-tooltip-text-color: rgb(250, 240, 230);
 						--wp-image-editor-dimming-color: rgba(1, 2, 3, 0.7);
 						--wp-image-editor-canvas-inset: 30px;
 					}
@@ -240,6 +242,22 @@ describe( 'the public API', () => {
 		expect( getComputedStyle( dimming ).boxShadow ).toContain(
 			'rgba(1, 2, 3, 0.7)'
 		);
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		const tooltip = await screen.findByTestId(
+			'image-editor-dimensions-tooltip'
+		);
+		expect( getComputedStyle( tooltip ).backgroundColor ).toBe(
+			'rgb(10, 20, 30)'
+		);
+		expect( getComputedStyle( tooltip ).color ).toBe(
+			'rgb(250, 240, 230)'
+		);
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
 	} );
 
 	it( 'shows the canvas with standalone style defaults', async () => {

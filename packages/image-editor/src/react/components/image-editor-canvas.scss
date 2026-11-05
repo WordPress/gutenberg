@@ -115,8 +115,8 @@ $handle-touch-target-size: 44px;
 	&__dimensions-tooltip {
 		position: absolute;
 		padding: 2px 6px;
-		background: var(--wp-image-editor-surface-color, #fff);
-		color: var(--wp-image-editor-foreground-color, #1e1e1e);
+		background: var(--wp-image-editor-tooltip-background-color, #fff);
+		color: var(--wp-image-editor-tooltip-text-color, #1e1e1e);
 		font-size: 11px;
 		line-height: 1.4;
 		font-variant-numeric: tabular-nums;
@@ -130,7 +130,7 @@ $handle-touch-target-size: 44px;
 		position: absolute;
 		// Dark crop outline, matching the sidebar control/heading text so
 		// the crop boundary stays legible against the light grey wash.
-		border: 1px solid var(--wp-image-editor-foreground-color, #1e1e1e);
+		border: 1px solid var(--wp-image-editor-crop-border-color, #1e1e1e);
 		box-sizing: border-box;
 		pointer-events: none;
 		transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -162,7 +162,7 @@ $handle-touch-target-size: 44px;
 		height: 12px;
 		// Solid white fill with an accent-blue border so the handles read
 		// clearly against the light grey wash.
-		background: var(--wp-image-editor-surface-color, #fff);
+		background: var(--wp-image-editor-handle-background-color, #fff);
 		border: 1px solid var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
 		border-radius: 50%;
 		box-sizing: border-box;
@@ -181,7 +181,7 @@ $handle-touch-target-size: 44px;
 		.wp-image-editor__canvas--focus-visible &:focus {
 			background: var(--wp-image-editor-focus-color, var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9)));
 			border-color: transparent;
-			box-shadow: 0 0 0 2px var(--wp-image-editor-surface-color, #fff), 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9)));
+			box-shadow: 0 0 0 2px var(--wp-image-editor-handle-background-color, #fff), 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9)));
 		}
 
 		// Extend touch target to the minimum accessible hit area.

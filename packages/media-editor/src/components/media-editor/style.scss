@@ -9,8 +9,10 @@
 	--wp-image-editor-canvas-inset: #{$grid-unit-30};
 	--wp-image-editor-dimming-color: #{rgba($gray-200, 0.6)};
 	--wp-image-editor-dimming-color-dragging: #{rgba($gray-200, 0.4)};
-	--wp-image-editor-foreground-color: #{$gray-900};
-	--wp-image-editor-surface-color: #{$white};
+	--wp-image-editor-crop-border-color: #{$gray-900};
+	--wp-image-editor-handle-background-color: #{$white};
+	--wp-image-editor-tooltip-background-color: #{$white};
+	--wp-image-editor-tooltip-text-color: #{$gray-900};
 	--wp-image-editor-grid-color: #{rgba($white, 0.4)};
 
 	display: flex;
