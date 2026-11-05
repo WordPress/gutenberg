@@ -90,9 +90,21 @@ function readVisibleSecondFromDoc( ydoc ) {
 
 function runSequenceWithMergeCrdtBlocks( yblocks ) {
 	mergeCrdtBlocks( yblocks, [ makeBlock( '', INITIAL_SECOND ) ], null );
-	mergeCrdtBlocks( yblocks, [ makeBlock( 'x', HIDDEN_SECOND ) ], 1 );
-	mergeCrdtBlocks( yblocks, [ makeBlock( 'xy', STEP_TWO_SECOND ) ], 2 );
-	mergeCrdtBlocks( yblocks, [ makeBlock( 'xyq', FINAL_SECOND ) ], 3 );
+	mergeCrdtBlocks(
+		yblocks,
+		[ makeBlock( 'x', HIDDEN_SECOND ) ],
+		getSelection( 1 ).selectionStart
+	);
+	mergeCrdtBlocks(
+		yblocks,
+		[ makeBlock( 'xy', STEP_TWO_SECOND ) ],
+		getSelection( 2 ).selectionStart
+	);
+	mergeCrdtBlocks(
+		yblocks,
+		[ makeBlock( 'xyq', FINAL_SECOND ) ],
+		getSelection( 3 ).selectionStart
+	);
 }
 
 function runSequenceWithMergeCrdtBlocksWithoutCursor( yblocks ) {
