@@ -6,7 +6,7 @@ import {
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
@@ -222,9 +222,25 @@ export default function PostList( { postType } ) {
 		[ postType ]
 	);
 
+	// The sidebar counts come with the view config, which is cached per post
+	// type. Fetching it again after a change updates the counts only: the
+	// user's view lives in preferences, which this does not touch.
+	const { invalidateResolution } = useDispatch( coreStore );
+	const refreshViewCounts = useCallback( () => {
+		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
+	}, [ invalidateResolution, postType ] );
+
+	// Leaving the list, such as to publish a draft in the editor, can change
+	// the totals without any action here to report it. Marking the counts stale
+	// on the way out fetches them again on the way back.
+	useEffect( () => refreshViewCounts, [ refreshViewCounts ] );
+
 	const postTypeActions = usePostActions( {
 		postType,
 		context: 'list',
+		// Any action may change the totals, including a plugin's, so refresh
+		// after each one rather than tracking which do.
+		onActionPerformed: refreshViewCounts,
 	} );
 	const editAction = useEditPostAction();
 	const quickEditAction = useQuickEditPostAction();
@@ -319,6 +335,7 @@ export default function PostList( { postType } ) {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						onSave={ refreshViewCounts }
 						quickEditForm={ quickEditForm }
 					/>
 				) }
