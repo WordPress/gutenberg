@@ -119,13 +119,22 @@ describe( 'getTemplatePartsOutsidePostBlocks', () => {
 		getBlockName: ( clientId ) => blocks[ clientId ].name,
 	};
 
+	// `getPostBlocksByName()` is shared with the tests above, which set a
+	// registry of their own, so it is put back after each test here.
+	let postBlocksByNameRegistry;
+
 	beforeEach( () => {
+		postBlocksByNameRegistry = getPostBlocksByName.registry;
 		getPostBlocksByName.registry = {
 			select: () => blockEditorSelectors,
 		};
 		getTemplatePartsOutsidePostBlocks.registry = {
 			select: () => blockEditorSelectors,
 		};
+	} );
+
+	afterEach( () => {
+		getPostBlocksByName.registry = postBlocksByNameRegistry;
 	} );
 
 	it( 'leaves out the template parts inside the post blocks', () => {
