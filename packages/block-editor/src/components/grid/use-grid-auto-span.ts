@@ -6,15 +6,41 @@ import { GridRect } from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
+/**
+ * Checks whether a value is a positive integer.
+ *
+ * @param value Value to check.
+ *
+ * @return Whether the value is a positive integer.
+ */
 function isPositiveInteger( value: unknown ): value is number {
 	return typeof value === 'number' && Number.isInteger( value ) && value > 0;
 }
 
+/**
+ * Parses a computed CSS length, falling back to zero for a nonnumeric value.
+ *
+ * @param value Computed CSS length.
+ *
+ * @return Parsed pixel value.
+ */
 function getCSSPixelValue( value: string ): number {
 	const number = parseFloat( value );
 	return Number.isFinite( number ) ? number : 0;
 }
 
+/**
+ * Expands an item's column span, preferring a collision-free placement that
+ * stays as close as possible to its current position.
+ *
+ * @param childId     Grid item's client ID.
+ * @param rect        Grid item's current rectangle.
+ * @param neededSpan  Minimum column span needed by the item.
+ * @param columnCount Number of columns in the grid.
+ * @param rects       Rectangles occupied by grid items, keyed by client ID.
+ *
+ * @return Expanded grid item rectangle.
+ */
 function getExpandedColumnRect(
 	childId: string,
 	rect: GridRect,
@@ -104,6 +130,11 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			return;
 		}
 
+		/**
+		 * Returns the grid's direct block element children.
+		 *
+		 * @return Grid item elements.
+		 */
 		const getItemElements = () =>
 			Array.from( gridElement.children ).filter(
 				( child ): child is HTMLElement =>
@@ -111,6 +142,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					child.hasAttribute( 'data-block' )
 			);
 
+		/**
+		 * Grows the spans of grid items whose content overflows their grid area.
+		 */
 		const growOverflowingItems = () => {
 			const overflowingItemElements = getItemElements().filter(
 				( element ) =>
@@ -273,6 +307,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		};
 
 		let frame: number | undefined;
+		/**
+		 * Schedules one overflow check for the next animation frame.
+		 */
 		const scheduleCheck = () => {
 			if ( frame === undefined ) {
 				frame = view.requestAnimationFrame( () => {
