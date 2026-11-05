@@ -10,6 +10,10 @@
 
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 
+### Documentation
+
+-   `Notice`: Add a Storybook example showing a `Link` inside `Notice.Description` for each intent ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
+
 ## 0.26.0 (2026-11-04)
 
 ### Breaking Changes
