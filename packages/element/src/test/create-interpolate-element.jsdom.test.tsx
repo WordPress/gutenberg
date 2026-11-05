@@ -67,6 +67,17 @@ describe( 'createInterpolateElement', () => {
 			createInterpolateElement( testString, { 'spaced token': <em /> } )
 		).toEqual( expectedElement );
 	} );
+	it.each( [
+		'This is a <constructor>fun</constructor> string',
+		'This is a <__proto__/> string',
+	] )(
+		'returns same string when the tag in "%s" is not in the conversion map',
+		( testString ) => {
+			expect(
+				createInterpolateElement( testString, { item: <em /> } )
+			).toEqual( <>{ testString }</> );
+		}
+	);
 	it( 'warns and stops interpolating when there is an unmatched closing tag', () => {
 		const testString = 'This is a </item> string';
 		const expectedElement = <>{ testString }</>;
