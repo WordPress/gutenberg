@@ -116,4 +116,27 @@ describe( 'encodeColorValueWithPalette', () => {
 			'#abcabc'
 		);
 	} );
+
+	it( 'matches a palette color written in a different case', () => {
+		expect(
+			encodeColorValueWithPalette(
+				[ { slug: 'accent', color: '#503AA8' } ],
+				'#503aa8'
+			)
+		).toBe( 'var:preset|color|accent' );
+	} );
+
+	it( 'does not match a palette value that is not a plain color', () => {
+		expect(
+			encodeColorValueWithPalette(
+				[
+					{
+						slug: 'mix',
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+					},
+				],
+				'#000000'
+			)
+		).toBe( '#000000' );
+	} );
 } );

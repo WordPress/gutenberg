@@ -41,12 +41,34 @@ export const getColorObjectByAttributeValues = <
 };
 
 /**
+ * Checks whether two values are the same color, however they are written, such
+ * as `#503AA8` and `#503aa8`. Values that aren't plain colors, such as CSS
+ * variables or `color-mix()`, only match when they are written the same.
+ *
+ * @param a A color value.
+ * @param b Another color value.
+ *
+ * @return Whether the values are the same color.
+ */
+function isSameColor( a: unknown, b: unknown ): boolean {
+	if ( a === b ) {
+		return true;
+	}
+	if ( typeof a !== 'string' || typeof b !== 'string' ) {
+		return false;
+	}
+	const colorA = colord( a );
+	const colorB = colord( b );
+	return colorA.isValid() && colorB.isValid() && colorA.isEqual( colorB );
+}
+
+/**
  * Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
  *
  * @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
  * @param {?string} colorValue A string containing the color value.
  *
- * @return {?Object} Color object included in the colors array whose color property equals colorValue.
+ * @return {?Object} Color object included in the colors array whose color property is the same color as colorValue.
  *                   Returns undefined if no color object matches this requirement.
  */
 export const getColorObjectByColorValue = <
@@ -55,7 +77,7 @@ export const getColorObjectByColorValue = <
 	colors: ReadonlyArray< C > | undefined,
 	colorValue: string | null | undefined
 ): C | undefined => {
-	return colors?.find( ( color ) => color.color === colorValue );
+	return colors?.find( ( color ) => isSameColor( color.color, colorValue ) );
 };
 
 /**
