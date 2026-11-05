@@ -271,6 +271,7 @@ directive(
 			trusted,
 			resolvedValue,
 			fallback,
+			serverContent,
 			element.ref,
 			element,
 		] );
