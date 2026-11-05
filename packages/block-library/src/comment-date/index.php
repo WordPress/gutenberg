@@ -34,8 +34,9 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
-		$timestamp = get_comment_date( 'U', $comment );
-		if ( false === $timestamp ) {
+		// The GMT time is needed, since the 'U' format of the local time includes the timezone offset.
+		$timestamp = get_comment_time( 'U', true, false, $comment );
+		if ( ! is_int( $timestamp ) ) {
 			return '';
 		}
 		// translators: %s: human-readable time difference.
