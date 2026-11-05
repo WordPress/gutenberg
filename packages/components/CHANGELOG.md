@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `useBaseControlProps`: Key the generated id on the hook instead of `BaseControl`, whose circular import left it undefined in the CommonJS build, so controls built on the hook such as `ToggleGroupControl` crashed there with "Invalid value used as weak map key" ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
+-   `useBaseControlProps`: Fix a crash in the CommonJS build when no `id` is passed, which also affected controls built on the hook such as `ToggleGroupControl` ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
 
 ## 44.0.0 (2026-11-04)
 
