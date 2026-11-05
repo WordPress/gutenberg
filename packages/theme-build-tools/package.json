@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme-build-tools",
-	"version": "1.0.0-prerelease",
+	"version": "1.0.0",
 	"description": "Build plugins and Stylelint rules for the WordPress Design System design tokens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
