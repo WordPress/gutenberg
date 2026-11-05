@@ -1341,7 +1341,7 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
-		test( 'closes the new note form on focus-out only when empty', async ( {
+		test( 'keeps the new note form open while its block is edited', async ( {
 			editor,
 			page,
 		} ) => {
@@ -1354,12 +1354,12 @@ test.describe( 'Block Notes', () => {
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await expect( newNoteForm ).toBeFocused();
 			await editor.canvas.getByText( 'First block' ).click();
-			await expect( newNoteForm ).toBeHidden();
-
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await newNoteForm.pressSequentially( 'Unsent draft' );
-			await editor.canvas.getByText( 'First block' ).click();
-			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+			await expect(
+				editor.canvas.getByText( 'First block edited' )
+			).toBeVisible();
+			await expect( newNoteForm ).toBeVisible();
 		} );
 
 		test( 'discards a draft when the form is cancelled', async ( {
