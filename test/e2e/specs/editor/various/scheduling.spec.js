@@ -1,5 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { openPostSummary } = require( './post-summary/utils' );
+const { openPostSummary, setPublishDate } = require( './post-summary/utils' );
 
 // The `timezone` setting exposed via REST API only accepts `UTC`
 // and timezone strings by location.
@@ -44,9 +44,13 @@ test.describe( 'Scheduling', () => {
 					.getByRole( 'button', { name: 'Edit Date' } )
 					.click();
 				const nextYear = new Date().getFullYear() + 1;
-				await page
-					.getByLabel( 'Date time' )
-					.fill( `${ nextYear }-03-15T10:00` );
+				await setPublishDate( page, {
+					year: nextYear,
+					month: 3,
+					day: 15,
+					hours: 10,
+					minutes: 0,
+				} );
 
 				// Close the datepicker.
 				await page.keyboard.press( 'Escape' );
@@ -68,13 +72,14 @@ test.describe( 'Scheduling', () => {
 		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
 		const calendar = page.getByRole( 'application', {
-			name: /Date calendar/,
+			name: 'Calendar',
+			exact: true,
 		} );
 		const prevMonth = calendar.getByRole( 'button', {
-			name: 'Previous month',
+			name: 'View previous month',
 		} );
 		const nextMonth = calendar.getByRole( 'button', {
-			name: 'Next month',
+			name: 'View next month',
 		} );
 
 		await prevMonth.click();

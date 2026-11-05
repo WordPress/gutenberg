@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
+
+## 22.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
@@ -11,6 +17,7 @@
 
 -   Fade the trailing edge of a table layout while there are more columns to scroll to, including tables without actions ([#85949](https://github.com/WordPress/gutenberg/pull/85949)).
 -   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
+-   Use the UI SelectControl for Sort by and relative-date Unit settings ([#86167](https://github.com/WordPress/gutenberg/pull/86167)).
 -   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Omit trailing ellipses from action button labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
@@ -18,6 +25,8 @@
 -   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
 -   Use design system focus ring for filter chips & prevent text from touching remove button ([#85374](https://github.com/WordPress/gutenberg/pull/85374)).
+-   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+-   DataForm: The `showPlaceholderIfEmpty` option of the `panel` layout also shows the placeholder when the field's `render` output is empty, like for an id matching no record ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
 
 ### Bug Fixes
 

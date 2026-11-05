@@ -145,12 +145,7 @@ export function ImageEdit( {
 			explicitDismiss: true,
 		} );
 		setTemporaryURL();
-		setAttributes( {
-			src: undefined,
-			id: undefined,
-			url: undefined,
-			blob: undefined,
-		} );
+		setAttributes( { blob: undefined } );
 	}
 
 	function onFilesPreUpload( files ) {
@@ -206,14 +201,9 @@ export function ImageEdit( {
 		}
 
 		if ( ! media || ! media.url ) {
-			setAttributes( {
-				url: undefined,
-				alt: undefined,
-				id: undefined,
-				title: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current image and its details intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 
 			return;
@@ -308,6 +298,18 @@ export function ImageEdit( {
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetImage() {
+		setAttributes( {
+			url: undefined,
+			alt: undefined,
+			id: undefined,
+			title: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -466,6 +468,7 @@ export function ImageEdit( {
 					onSelectImage={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
+					onResetImage={ onResetImage }
 					context={ context }
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
