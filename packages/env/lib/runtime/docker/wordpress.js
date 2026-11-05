@@ -65,10 +65,18 @@ async function configureWordPress( environment, config, spinner ) {
 		echo "  - mod_rewrite"
 	)`;
 
-	const isMultisite = config.env[ environment ].multisite;
+	const {
+		multisite: isMultisite,
+		adminUser,
+		adminPassword,
+		adminEmail,
+	} = config.env[ environment ];
+
+	// Single-quote the admin credentials so the shell passes them through as-is.
+	const quote = ( value ) => `'${ value.replace( /'/g, `'\\''` ) }'`;
 
 	const installMethod = isMultisite ? 'multisite-install' : 'install';
-	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=${ quote( adminUser ) } --admin_password=${ quote( adminPassword ) } --admin_email=${ quote( adminEmail ) } --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [

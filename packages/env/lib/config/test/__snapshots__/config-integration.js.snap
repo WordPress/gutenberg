@@ -8,6 +8,9 @@ exports[`Config Integration > should load local and override configuration files
   "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
@@ -41,6 +44,9 @@ exports[`Config Integration > should load local and override configuration files
       "themeSources": [],
     },
     "tests": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
@@ -95,6 +101,9 @@ exports[`Config Integration > should load local configuration file 1`] = `
   "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
@@ -128,6 +137,9 @@ exports[`Config Integration > should load local configuration file 1`] = `
       "themeSources": [],
     },
     "tests": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
@@ -182,6 +194,9 @@ exports[`Config Integration > should use default configuration 1`] = `
   "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
@@ -215,6 +230,9 @@ exports[`Config Integration > should use default configuration 1`] = `
       "themeSources": [],
     },
     "tests": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,
@@ -269,6 +287,9 @@ exports[`Config Integration > should use environment variables over local and ov
   "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": true,
@@ -303,6 +324,9 @@ exports[`Config Integration > should use environment variables over local and ov
       "themeSources": [],
     },
     "tests": {
+      "adminEmail": "wordpress@example.com",
+      "adminPassword": "password",
+      "adminUser": "admin",
       "config": {
         "FS_METHOD": "direct",
         "SCRIPT_DEBUG": false,

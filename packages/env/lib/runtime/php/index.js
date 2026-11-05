@@ -522,6 +522,9 @@ function install( config, siteDir ) {
 			path.join( __dirname, 'install.php' ),
 			siteDir,
 			config.name,
+			config.env.development.adminUser,
+			config.env.development.adminPassword,
+			config.env.development.adminEmail,
 			...config.env.development.pluginSources.map(
 				( source ) => source.basename
 			),

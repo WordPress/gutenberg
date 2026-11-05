@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `adminUser`, `adminPassword`, and `adminEmail` options to `.wp-env.json` to set the administrator account created when WordPress is installed. They default to `admin`, `password`, and `wordpress@example.com` ([#86320](https://github.com/WordPress/gutenberg/pull/86320)).
+
 ## 12.1.0 (2026-11-04)
 
 ### New Features

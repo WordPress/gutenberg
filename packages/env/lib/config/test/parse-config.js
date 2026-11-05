@@ -48,6 +48,9 @@ const DEFAULT_CONFIG = {
 	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
+	adminUser: 'admin',
+	adminPassword: 'password',
+	adminEmail: 'wordpress@example.com',
 	phpVersion: null,
 	mariadbVersion: null,
 	coreSource: {
@@ -582,6 +585,60 @@ describe( 'parseConfig', () => {
 			tests: DEFAULT_CONFIG.env.tests,
 		};
 		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should parse the admin credentials at the root and per environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					adminUser: 'sysadmin',
+					adminPassword: 'supersecret',
+					adminEmail: 'admin@example.org',
+					env: {
+						tests: {
+							adminUser: 'tester',
+						},
+					},
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed ).toMatchObject( {
+			adminUser: 'sysadmin',
+			adminPassword: 'supersecret',
+			adminEmail: 'admin@example.org',
+		} );
+		expect( parsed.env.tests.adminUser ).toBe( 'tester' );
+	} );
+
+	it( 'throws for a non-string admin credential', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return { adminPassword: 12345 };
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "adminPassword" must be a string.`
+			)
+		);
 	} );
 
 	it( 'should accept testsEnvironment as a boolean', async () => {

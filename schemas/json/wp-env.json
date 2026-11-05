@@ -123,6 +123,21 @@
 				"multisite": {
 					"description": "Whether to set up a multisite installation.",
 					"type": "boolean"
+				},
+				"adminUser": {
+					"description": "The username of the administrator account created when WordPress is installed.",
+					"type": "string",
+					"default": "admin"
+				},
+				"adminPassword": {
+					"description": "The password of the administrator account created when WordPress is installed.",
+					"type": "string",
+					"default": "password"
+				},
+				"adminEmail": {
+					"description": "The email of the administrator account created when WordPress is installed.",
+					"type": "string",
+					"default": "wordpress@example.com"
 				}
 			}
 		},
@@ -139,7 +154,10 @@
 				"mappings",
 				"phpmyadmin",
 				"phpmyadminPort",
-				"multisite"
+				"multisite",
+				"adminUser",
+				"adminPassword",
+				"adminEmail"
 			]
 		}
 	},
