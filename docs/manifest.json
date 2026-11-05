@@ -1452,6 +1452,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "AspectRatioIcon",
+		"slug": "aspect-ratio-icon",
+		"markdown_source": "../packages/components/src/aspect-ratio-icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Autocomplete",
 		"slug": "autocomplete",
 		"markdown_source": "../packages/components/src/autocomplete/README.md",
