@@ -112,6 +112,15 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			);
 
 		const growOverflowingItems = () => {
+			const overflowingItemElements = getItemElements().filter(
+				( element ) =>
+					element.scrollWidth > element.clientWidth + 1 ||
+					element.scrollHeight > element.clientHeight + 1
+			);
+			if ( ! overflowingItemElements.length ) {
+				return;
+			}
+
 			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
 					?.layout ?? {};
@@ -173,7 +182,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			}
 
 			const updates: Record< string, Record< string, unknown > > = {};
-			for ( const element of getItemElements() ) {
+			for ( const element of overflowingItemElements ) {
 				const childId = element.getAttribute( 'data-block' )!;
 				const rect = rects.get( childId );
 				if ( ! rect ) {
