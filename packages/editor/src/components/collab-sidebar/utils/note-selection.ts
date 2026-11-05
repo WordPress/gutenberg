@@ -40,10 +40,13 @@ export function getNoteAtCaret(
 	if ( ! record ) {
 		return undefined;
 	}
-	const value =
-		start <= end
-			? { ...record, start, end }
-			: { ...record, start: end, end: start };
+	const value = {
+		text: record.text,
+		formats: record.formats,
+		replacements: record.replacements,
+		start: Math.min( start, end ),
+		end: Math.max( start, end ),
+	};
 	const id = getActiveFormat( value, NOTE_FORMAT_NAME )?.attributes?.[
 		'data-id'
 	];

@@ -90,14 +90,16 @@ let lastParsed: { html: string | null; record: RichTextValue | null } = {
 /**
  * Record of an attribute value that can hold a note marker. A string is parsed
  * only when it holds a marker, and the last parse is cached: caret moves
- * re-read the same string.
+ * re-read the same string. Rich text data is returned as is, since caret moves
+ * read every attribute; its fields are getters, so read them rather than
+ * spread it.
  *
  * @param value Attribute value.
  * @return Rich text value, or null when the value can't hold a marker.
  */
 export function toNoteRecord( value: unknown ): RichTextValue | null {
 	if ( value instanceof RichTextData ) {
-		return toRecord( value );
+		return value;
 	}
 	if ( typeof value !== 'string' || ! value.includes( 'wp-note' ) ) {
 		return null;

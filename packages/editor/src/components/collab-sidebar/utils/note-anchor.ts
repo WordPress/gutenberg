@@ -34,7 +34,7 @@ export function findNoteInBlock(
 	attributes: BlockAttributes | null | undefined,
 	noteId: NoteId | null | undefined
 ): NoteAnchor | null {
-	if ( ! attributes ) {
+	if ( ! attributes || noteId === undefined || noteId === null ) {
 		return null;
 	}
 	for ( const attributeKey of Object.keys( attributes ) ) {
