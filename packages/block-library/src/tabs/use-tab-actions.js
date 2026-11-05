@@ -65,9 +65,13 @@ export default function useTabActions( tabsClientId ) {
 		const newIndex = atIndex ?? tabPanelBlocks.length;
 
 		// Keep the default tab on the same tab panel when the new tab is
-		// inserted before it.
-		const newDefaultIndex =
-			newIndex <= defaultIndex ? defaultIndex + 1 : defaultIndex;
+		// inserted before it. Fall back to the first tab when the default tab
+		// no longer exists, for example after every tab panel was deleted.
+		let newDefaultIndex = 0;
+		if ( tabPanelBlocks[ defaultIndex ] ) {
+			newDefaultIndex =
+				newIndex <= defaultIndex ? defaultIndex + 1 : defaultIndex;
+		}
 
 		// Batch the changes into a single undo step, so undo restores the
 		// default tab along with removing the new tab. The insertion comes
@@ -106,14 +110,6 @@ export default function useTabActions( tabsClientId ) {
 			return;
 		}
 
-		// Leave the active and default tabs alone when the tab panel can't be
-		// removed, for example when it's locked, as `removeBlock()` would then
-		// do nothing.
-		const { canRemoveBlock } = registry.select( blockEditorStore );
-		if ( ! canRemoveBlock( target.clientId ) ) {
-			return;
-		}
-
 		// Calculate new active index after removal.
 		const newActiveIndex =
 			removeIndex >= tabCount - 1 ? tabCount - 2 : removeIndex;
@@ -130,15 +126,21 @@ export default function useTabActions( tabsClientId ) {
 		// Batch the changes into a single undo step, so undo restores the
 		// default tab along with the removed tab.
 		registry.batch( () => {
-			// Switch editor to the adjacent tab and remove the current one.
-			__unstableMarkNextChangeAsNotPersistent();
+			removeBlock( target.clientId, false );
+
+			// The tab panel stays when it's locked, or while the editor asks
+			// to confirm removing a block inside it, such as a Query Loop in
+			// a template. Only update the tabs once the tab panel is gone.
+			const { getBlock } = registry.select( blockEditorStore );
+			if ( getBlock( target.clientId ) ) {
+				return;
+			}
+
+			// Switch editor to the adjacent tab and keep the default tab.
 			updateBlockAttributes( tabsClientId, {
 				editorActiveTabIndex: newActiveIndex,
-			} );
-			updateBlockAttributes( tabsClientId, {
 				activeTabIndex: newDefaultIndex,
 			} );
-			removeBlock( target.clientId, false );
 		} );
 	};
 
