@@ -25,6 +25,11 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$datetime = get_comment_date( 'c', $comment );
+	if ( false === $datetime ) {
+		return '';
+	}
+
 	$classes = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
@@ -37,6 +42,9 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		$formatted_date = sprintf( __( '%s ago' ), human_time_diff( $timestamp ) );
 	} else {
 		$formatted_date = get_comment_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $comment );
+		if ( false === $formatted_date ) {
+			return '';
+		}
 	}
 	$link = get_comment_link( $comment );
 
@@ -47,7 +55,7 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		esc_attr( get_comment_date( 'c', $comment ) ),
+		esc_attr( $datetime ),
 		$formatted_date
 	);
 }
