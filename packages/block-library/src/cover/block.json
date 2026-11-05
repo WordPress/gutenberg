@@ -166,7 +166,7 @@
 	},
 	"selectors": {
 		"filter": {
-			"duotone": ".wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background"
+			"duotone": ".wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > picture > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background"
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",

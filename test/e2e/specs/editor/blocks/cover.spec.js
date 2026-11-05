@@ -609,6 +609,50 @@ test.describe( 'Cover', () => {
 	} );
 } );
 
+test.describe( 'Cover duotone', () => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'applies to an image wrapped in a picture element', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const imageUrl = '/wp-includes/images/w-logo-blue.png';
+		const { id } = await requestUtils.createPost( {
+			title: 'Cover duotone',
+			status: 'publish',
+			content: `<!-- wp:cover {"url":"${ imageUrl }","dimRatio":0,"style":{"color":{"duotone":["#000000","#ff0000"]}}} -->
+<div class="wp-block-cover"><img class="wp-block-cover__image-background" alt="" src="${ imageUrl }" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim-0 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:cover {"url":"${ imageUrl }","dimRatio":0} -->
+<div class="wp-block-cover"><img class="wp-block-cover__image-background" alt="" src="${ imageUrl }" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim-0 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph -->
+<p>Nested cover</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover --></div></div>
+<!-- /wp:cover -->`,
+		} );
+		await page.goto( `/?p=${ id }` );
+
+		// Wrap the images in a picture element, as image optimization
+		// plugins do to serve WebP.
+		await page.evaluate( () => {
+			for ( const image of document.querySelectorAll(
+				'.wp-block-cover__image-background'
+			) ) {
+				const picture = document.createElement( 'picture' );
+				image.before( picture );
+				picture.append( image );
+			}
+		} );
+
+		const images = page.locator(
+			'picture > .wp-block-cover__image-background'
+		);
+		await expect( images.first() ).toHaveCSS( 'filter', /^url\(/ );
+		// A nested cover without duotone keeps its original colors.
+		await expect( images.last() ).toHaveCSS( 'filter', 'none' );
+	} );
+} );
+
 class CoverBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
