@@ -129,8 +129,11 @@ export function PageAttributesParent( {
 
 			const query = {
 				per_page: 100,
-				exclude: postId,
-				parent_exclude: postId,
+				// A post can't be its own parent or the child of its children.
+				...( postId && {
+					exclude: postId,
+					parent_exclude: postId,
+				} ),
 				orderby: 'menu_order',
 				order: 'asc',
 				_fields: 'id,title,parent',
