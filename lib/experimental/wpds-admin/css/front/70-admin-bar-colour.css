@@ -1,38 +1,22 @@
 /**
- * The admin bar, on the front end, coloured from WordPress Design System
- * tokens.
+ * Front-end admin bar colours from design system tokens.
  *
- * NOT LAYERED, deliberately, and this file must stay that way. On the front end
- * WordPress's `admin-bar.css` is unlayered, and an unlayered declaration beats a
- * layered one whatever the source order or specificity. Measured: a
- * `@layer wpds` rule for `#wpadminbar`, loaded after `admin-bar.css`, loses to
- * it outright. Two unlayered sheets of equal specificity are decided by source
- * order instead, and the loader depends this one on `admin-bar` so ours is
- * second.
+ * This file is not wrapped in `@layer`. Core's admin-bar.css is unlayered on
+ * the front end, and an unlayered declaration always wins over a layered one,
+ * whatever the order or specificity. Between two unlayered sheets of equal
+ * specificity the later one wins, so load.php enqueues this after `admin-bar`.
  *
- * WHAT THIS FIXES. `admin-bar.css` writes `#wpadminbar { background: #1d2327 }`
- * — the pre-7.0 colour — into the file that always loads. In wp-admin the
- * active colour scheme overrides it by loading afterwards. On the front end no
- * scheme loads at all, so that stale value is what every visitor sees,
- * whichever scheme they chose. This replaces the stale default with the current
- * one; a user on a non-default scheme still does not get their scheme's colours
- * out here, exactly as they do not today.
+ * admin-bar.css sets `#wpadminbar { background: #1d2327 }`, which predates 7.0.
+ * In wp-admin the colour scheme stylesheet overrides it, but no scheme loads on
+ * the front end, so visitors see the old colour. These rules replace it with
+ * the default scheme. Users on another scheme still see the default out here,
+ * which is also what happens today.
  *
- * The values duplicate the admin bar half of `../70-chrome-colour.css`, which
- * cannot be shared: that file has to be layered to sit correctly against
- * demoted WordPress CSS in wp-admin, and this one must not be layered at all. The
- * duplication is a symptom of reaching WordPress's stylesheets from outside and disappears with
- * the rest of the layer machinery.
+ * The rules repeat the admin bar part of ../70-chrome-colour.css because that
+ * file has to be layered and this one cannot be.
  *
- * SCOPE: colour only, and only the bar. No geometry, and nothing that could
- * match theme markup — every selector is rooted at `#wpadminbar`.
- *
- * NO `!important` IN THIS FILE.
+ * Colour only, every selector rooted at `#wpadminbar`, no `!important`.
  */
-
-/* -----------------------------------------------------------------------
-   Surfaces
-   ----------------------------------------------------------------------- */
 
 #wpadminbar {
 	background: var(--wpds-color-background-interactive-neutral-strong-active);
@@ -43,22 +27,13 @@
 	background: var(--wpds-color-background-interactive-neutral-strong);
 }
 
-/*
- * The secondary block of a dropdown drops back to the bar's own colour, so the
- * two sections stay distinguishable now that both submenu levels would
- * otherwise share one token.
- */
+/* The secondary block of a dropdown uses the bar colour so it reads as a separate section. */
 #wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
 #wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
 	background: var(--wpds-color-background-interactive-neutral-strong-active);
 }
 
-/* -----------------------------------------------------------------------
-   Text and icons
-
-   WordPress derives icon colour from the scheme base colour's hue, which lands on a
-   faintly warm off-white. Icons and labels take the same neutral foreground.
-   ----------------------------------------------------------------------- */
+/* Text and icons */
 
 #wpadminbar .ab-item,
 #wpadminbar a.ab-item,
@@ -79,12 +54,7 @@
 	color: var(--wpds-color-foreground-interactive-neutral-strong);
 }
 
-/* -----------------------------------------------------------------------
-   Hover
-
-   Only the surface moves. WordPress's hover text is a lightened accent that the
-   design system has no equivalent for, so it is left alone.
-   ----------------------------------------------------------------------- */
+/* Only the background changes on hover. There is no token for core's lightened accent text. */
 
 #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
