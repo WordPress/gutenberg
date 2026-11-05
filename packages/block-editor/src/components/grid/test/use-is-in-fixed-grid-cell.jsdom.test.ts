@@ -94,10 +94,21 @@ describe( 'isInFixedGridCell', () => {
 			'@tablet'
 		);
 		expect( isInFixedGridCell( registry.select, 'image' ) ).toBe( false );
+	} );
 
+	it( 'is false on mobile when the grid stacks its blocks', () => {
+		const registry = setUp( {
+			layout: { ...MANUAL_GRID, stackOnMobile: true },
+		} );
 		unlock( registry.dispatch( blockEditorStore ) ).setStyleStateViewport(
 			'@mobile'
 		);
-		expect( isInFixedGridCell( registry.select, 'image' ) ).toBe( true );
+		expect( isInFixedGridCell( registry.select, 'image' ) ).toBe( false );
+
+		const unstacked = setUp();
+		unlock( unstacked.dispatch( blockEditorStore ) ).setStyleStateViewport(
+			'@mobile'
+		);
+		expect( isInFixedGridCell( unstacked.select, 'image' ) ).toBe( true );
 	} );
 } );

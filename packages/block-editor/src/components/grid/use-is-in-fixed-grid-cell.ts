@@ -5,6 +5,7 @@ import { unlock } from '../../lock-unlock';
 import { getStyleForState } from '../../hooks/block-style-state';
 import type { BlockStyle } from '../../hooks/types';
 import { hasFixedGridCells } from '../../layouts/grid';
+import { isGridStackedOnMobile } from './mobile-stacking';
 import type { Layout } from '../../layouts/types';
 
 /**
@@ -39,6 +40,10 @@ export function isInFixedGridCell(
 		return false;
 	}
 	const viewport = getStyleStateViewport();
+	// Stacked grids size their blocks by their content on mobile.
+	if ( viewport === '@mobile' && isGridStackedOnMobile( layout, style ) ) {
+		return false;
+	}
 	const viewportLayout =
 		viewport === 'default'
 			? undefined
