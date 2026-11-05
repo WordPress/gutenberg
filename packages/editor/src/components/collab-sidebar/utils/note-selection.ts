@@ -4,9 +4,9 @@ import { toNoteId } from './note-format';
 import { toNoteRecord } from './rich-text';
 import type {
 	BlockAttributes,
+	BlockSelection,
 	NoteId,
 	NoteThread,
-	SelectionPoint,
 } from './types';
 
 /**
@@ -21,8 +21,8 @@ import type {
  */
 export function getNoteAtCaret(
 	attributes: BlockAttributes | null | undefined,
-	selectionStart: SelectionPoint | undefined,
-	selectionEnd: SelectionPoint | undefined
+	selectionStart: BlockSelection | undefined,
+	selectionEnd: BlockSelection | undefined
 ): NoteId | undefined | null {
 	const attributeKey = selectionStart?.attributeKey;
 	const start = selectionStart?.offset;
@@ -50,7 +50,7 @@ export function getNoteAtCaret(
 	return id ? toNoteId( id ) : undefined;
 }
 
-const isSamePoint = ( a: SelectionPoint, b: SelectionPoint ) =>
+const isSamePoint = ( a: BlockSelection, b: BlockSelection ) =>
 	a.clientId === b.clientId &&
 	a.attributeKey === b.attributeKey &&
 	a.offset === b.offset;
@@ -64,8 +64,8 @@ export interface CaretSnapshot {
 	 * Block attributes while one block is selected, else undefined.
 	 */
 	attributes: BlockAttributes | null | undefined;
-	selectionStart: SelectionPoint;
-	selectionEnd: SelectionPoint;
+	selectionStart: BlockSelection;
+	selectionEnd: BlockSelection;
 }
 
 /**
@@ -215,7 +215,8 @@ export function pickNoteForCaret( {
 	if (
 		isBlockChange ||
 		( noteAtCaret === undefined &&
-			getInlineNoteIds( attributes ).has( selectedNoteId as NoteId ) )
+			selectedNoteId !== undefined &&
+			getInlineNoteIds( attributes ).has( selectedNoteId ) )
 	) {
 		return getBlockNote( {
 			attributes,

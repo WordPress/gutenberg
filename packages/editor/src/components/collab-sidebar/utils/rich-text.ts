@@ -25,6 +25,26 @@ export function getSoleRichTextAttributeKey(
 }
 
 /**
+ * Key of the block's rich text attribute when the block is only that text:
+ * its sole rich text attribute, see `getSoleRichTextAttributeKey`, and no
+ * inner blocks.
+ *
+ * @param clientId      Block client ID.
+ * @param getBlockName  Block-editor selector.
+ * @param getBlockCount Block-editor selector.
+ * @return Attribute key.
+ */
+export function getTextAttributeKey(
+	clientId: string,
+	getBlockName: ( clientId: string ) => string | null,
+	getBlockCount: ( clientId: string ) => number
+): string | undefined {
+	return getBlockCount( clientId )
+		? undefined
+		: getSoleRichTextAttributeKey( getBlockName( clientId ) );
+}
+
+/**
  * A rich text record from an attribute value, which may be rich text data or
  * an HTML string.
  *

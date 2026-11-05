@@ -127,13 +127,13 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 
 1. Subscribes via `useSyncExternalStore` only while floating; otherwise it passes a no-op subscribe, so the store drops its observer.
 2. Requests a measurement whenever `threads` changes. `threads` is rebuilt on any block insert, removal or move, which can shift anchors without resizing the root.
-3. Derives `notePositions` during render with `useMemo( () => calculateNotePositions(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
-4. `useCanvasRoom`: in a layout effect keyed on `isFloating + canvas + contentHeight`, writes the `contentHeight` from the same `calculateNotePositions` call as `--wp-editor-canvas-min-height` on the canvas root. The canvas margin's CSS (`getCanvasMarginCSS` in `visual-editor/canvas-margin.js`) applies it as the root's `min-height` inside its tiers, so a short post can always scroll to the lowest thread and the room goes away with the margin. The value changes at most twice per selection change (new positions, then the expanded thread's measured height), both before the next paint.
+3. Derives `notePositions` during render with `useMemo( () => getThreadLayout(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
+4. `useCanvasRoom`: in a layout effect keyed on `isFloating + canvas + contentHeight`, writes the `contentHeight` from the same `getThreadLayout` call as `--wp-editor-canvas-min-height` on the canvas root. The canvas margin's CSS (`getCanvasMarginCSS` in `visual-editor/canvas-margin.js`) applies it as the root's `min-height` inside its tiers, so a short post can always scroll to the lowest thread and the room goes away with the margin. The value changes at most twice per selection change (new positions, then the expanded thread's measured height), both before the next paint.
 5. `useMirroredScroll`: in a layout effect keyed on `isFloating + sidebarRef + canvas`, mirrors the panel and the canvas. The floating panel is a real scroller (`overflow-y: auto`, hidden scrollbar) whose `::before` spacer gives it the canvas's scroll range, written as `--canvas-scroll-range` from a `ResizeObserver` on the canvas root, its body and the panel. A `scroll` listener on each side scrolls the other to its position, and the canvas owns the position: when it can't follow the panel, the panel snaps back. The code comments cover the details (instant scrolls, the echo guard, why the observer never sets positions).
 6. `usePanelOffsets`: writes the snapshot's `frameOffset` as `--canvas-offset` and `scrollbarWidth` as `--canvas-scrollbar-width` on the panel.
 7. Returns `{ notePositions, heights, registerThread, unregisterThread }` - the positions and heights flow down as props; the two register callbacks flow to each `NoteThread`.
 
-### 3. `calculateNotePositions` - pure layout math (in `utils/layout.ts`)
+### 3. `getThreadLayout` - pure layout math (in `utils/layout.ts`)
 
 Given the threads, the selected note id, the anchor rects and the floating heights, returns `{ positions: { [noteId]: top }, contentHeight }` in canvas content-space. The selected note (else the first thread) stays beside its anchor, and two sweeps from it push the threads below down and the threads above up until none overlap.
 
@@ -148,5 +148,5 @@ Each layer has one job, so a new anchor type or layout rule touches only one of 
 - DOM reads happen only in `measure()`, inside the `ResizeObserver` callback. It runs after layout and before paint, so reads are cheap, the result is painted in the same frame, and the browser's resize-loop detection covers any feedback between positions and sizes. Don't add rAFs or timers around it.
 - The snapshot is plain data compared by value, so unrelated resizes don't re-render `Notes`.
 - Observer lifetime follows subscriptions, so remounts (and StrictMode's double effects) rebuild it from the registered refs.
-- `calculateNotePositions` is pure and derived during render; anything computable from props, state and the snapshot should stay out of React state.
+- `getThreadLayout` is pure and derived during render; anything computable from props, state and the snapshot should stay out of React state.
 - The scroll listeners mirror scroll positions and the range observer updates a CSS variable, never React state, so scrolling doesn't re-render.

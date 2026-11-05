@@ -1,15 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
-import { calculateNotePositions } from '../utils/layout';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+import { describe, expect, it } from 'vitest';
+import { getThreadLayout } from '../utils/layout';
 
 function makeRect( top: number ) {
 	return { top };
 }
 
-describe( 'calculateNotePositions', () => {
+describe( 'getThreadLayout', () => {
 	it( 'returns empty positions when the anchor thread has no blockRect', () => {
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads: [ { id: 1 } ],
 			selectedNoteId: undefined,
 			blockRects: {},
@@ -28,7 +26,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 2: 50, 3: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: undefined,
 			blockRects,
@@ -44,7 +42,7 @@ describe( 'calculateNotePositions', () => {
 
 	it( 'returns the content height that fits the lowest measured thread', () => {
 		const getContentHeight = ( heights: Record< string, number > ) =>
-			calculateNotePositions( {
+			getThreadLayout( {
 				threads: [ { id: 1 }, { id: 2 }, { id: 3 } ],
 				selectedNoteId: undefined,
 				blockRects: {
@@ -70,7 +68,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 60, 2: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 2,
 			blockRects,
@@ -92,7 +90,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 80, 2: 80, 3: 80 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
@@ -114,7 +112,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 3: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
@@ -137,7 +135,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 90, 2: 90, 3: 90, 4: 230 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 4,
 			blockRects,
@@ -160,7 +158,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 2: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
@@ -181,7 +179,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 2: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
@@ -202,7 +200,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 2: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 2,
 			blockRects,
@@ -224,7 +222,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, 2: 50, 3: 50 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 2,
 			blockRects,
@@ -253,7 +251,7 @@ describe( 'calculateNotePositions', () => {
 		};
 		const heights = { 1: 50, new: 80 };
 
-		const { positions } = calculateNotePositions( {
+		const { positions } = getThreadLayout( {
 			threads,
 			selectedNoteId: 'new',
 			blockRects,

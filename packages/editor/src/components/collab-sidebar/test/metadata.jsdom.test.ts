@@ -1,12 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 } from '../utils/metadata';
 import type { NoteMetadata } from '../utils/metadata';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'getNoteIdsFromMetadata', () => {
 	it( 'returns empty array for null metadata', () => {

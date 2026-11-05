@@ -8,9 +8,9 @@ import {
 import { toAttribute, toNoteRecord, toRecord } from './rich-text';
 import type {
 	BlockAttributes,
+	BlockSelection,
 	NoteAnchor,
 	NoteId,
-	SelectionPoint,
 } from './types';
 
 // Sentinel that sorts a block-level (whole-block) note before any inline note
@@ -114,8 +114,8 @@ export function getNoteRanges( {
 		attributes: BlockAttributes | null | undefined;
 		attributeKey?: string | null;
 	} >;
-	selectionStart: Required< SelectionPoint >;
-	selectionEnd: Required< SelectionPoint >;
+	selectionStart: Required< BlockSelection >;
+	selectionEnd: Required< BlockSelection >;
 } ): Map< string, NoteAnchor > {
 	const clientIds = blocks.map( ( block ) => block.clientId );
 	// Reassign selection start and end based on order, as the block editor does.
@@ -141,12 +141,13 @@ export function getNoteRanges( {
 			attributeKey = last.attributeKey;
 		}
 		if ( attributeKey ) {
-			const value = block.attributes?.[ attributeKey ] as
-				RichTextData | undefined;
 			ranges.set( block.clientId, {
 				attributeKey,
 				start: isFirst ? first.offset : 0,
-				end: isLast ? last.offset : ( value?.text.length ?? 0 ),
+				end: isLast
+					? last.offset
+					: toRecord( block.attributes?.[ attributeKey ] ).text
+							.length,
 			} );
 		}
 	}
@@ -187,17 +188,22 @@ export function wrapInlineNote(
  *
  * @param attributes Block attributes.
  * @param noteId     Note id whose marker to remove.
- * @return Marker range and the new attribute value, or null when no marker.
+ * @return Marker range, the text it wrapped and the new attribute value, or
+ *         null when no marker.
  */
 export function removeInlineNote(
 	attributes: BlockAttributes | null | undefined,
 	noteId: NoteId
-): ( NoteAnchor & { value: string | RichTextData } ) | null {
+): ( NoteAnchor & { text: string; value: string | RichTextData } ) | null {
 	const found = findNoteInBlock( attributes, noteId );
 	const current = found && attributes?.[ found.attributeKey ];
 	if ( ! found || ! ( current instanceof RichTextData ) ) {
 		return null;
 	}
 	const record = removeNoteFormat( toRecord( current ), noteId );
-	return { ...found, value: toAttribute( record, current ) };
+	return {
+		...found,
+		text: record.text.slice( found.start, found.end ),
+		value: toAttribute( record, current ),
+	};
 }

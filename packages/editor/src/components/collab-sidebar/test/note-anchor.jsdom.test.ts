@@ -1,11 +1,5 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { RichTextData, registerFormatType } from '@wordpress/rich-text';
 import {
 	BLOCK_LEVEL_NOTE_START,
 	findNoteInBlock,
@@ -17,7 +11,9 @@ import {
 import { noteFormat } from '../format';
 import { NOTE_FORMAT_NAME } from '../constants';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+beforeAll( () => {
+	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+} );
 
 // Rich-text attributes parsed from post content keep their source HTML.
 function parseRichTextAttribute( html: string ) {
@@ -27,29 +23,6 @@ function parseRichTextAttribute( html: string ) {
 }
 
 describe( 'findNoteInBlock', () => {
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'span',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
-
 	it( 'returns null when attributes are null/undefined', () => {
 		expect( findNoteInBlock( null, 7 ) ).toBeNull();
 		expect( findNoteInBlock( undefined, 7 ) ).toBeNull();
@@ -66,7 +39,7 @@ describe( 'findNoteInBlock', () => {
 	it( 'returns the attribute key and range of the matching marker', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString(
-				'hello <span class="wp-note" data-id="7">marked</span> world'
+				'hello <mark class="wp-note" data-id="7">marked</mark> world'
 			),
 		};
 		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
@@ -79,7 +52,7 @@ describe( 'findNoteInBlock', () => {
 	it( 'finds the marker in a string attribute', () => {
 		const attributes = {
 			content:
-				'hello <span class="wp-note" data-id="7">marked</span> world',
+				'hello <mark class="wp-note" data-id="7">marked</mark> world',
 		};
 		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
 			attributeKey: 'content',
@@ -92,7 +65,7 @@ describe( 'findNoteInBlock', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString( 'no marker here' ),
 			caption: RichTextData.fromHTMLString(
-				'<span class="wp-note" data-id="9">cap</span>'
+				'<mark class="wp-note" data-id="9">cap</mark>'
 			),
 		};
 		expect( findNoteInBlock( attributes, 9 ) ).toEqual( {
@@ -107,7 +80,7 @@ describe( 'findNoteInBlock', () => {
 			level: 2,
 			anchor: '',
 			content: RichTextData.fromHTMLString(
-				'<span class="wp-note" data-id="3">x</span>'
+				'<mark class="wp-note" data-id="3">x</mark>'
 			),
 		};
 		expect( findNoteInBlock( attributes, 3 ) ).toEqual( {
@@ -120,7 +93,7 @@ describe( 'findNoteInBlock', () => {
 	it( 'coerces ids to strings so numeric vs string ids match', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString(
-				'<span class="wp-note" data-id="7">x</span>'
+				'<mark class="wp-note" data-id="7">x</mark>'
 			),
 		};
 		expect( findNoteInBlock( attributes, '7' ) ).toEqual( {
@@ -132,32 +105,6 @@ describe( 'findNoteInBlock', () => {
 } );
 
 describe( 'getInlineMarkerStart', () => {
-	// `findNoteInBlock` (which getInlineMarkerStart delegates to) walks rich-text
-	// values and needs the `core/note` format registered to recognize the marker
-	// elements the tests construct below.
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'mark',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
-
 	it( 'returns the block-level sentinel when the block carries no marker for the note', () => {
 		const attributes = {
 			content: RichTextData.fromHTMLString( 'hello world' ),
@@ -274,6 +221,23 @@ describe( 'getNoteRanges', () => {
 		);
 	} );
 
+	it( 'takes the text of a string attribute', () => {
+		expect(
+			getNoteRanges( {
+				blocks: [
+					{
+						clientId: 'a',
+						attributes: { content: 'abcdef' },
+						attributeKey: 'content',
+					},
+					...blocks( 'b' ),
+				],
+				selectionStart: at( 'a', 2 ),
+				selectionEnd: at( 'b', 3 ),
+			} ).get( 'a' )
+		).toEqual( { attributeKey: 'content', start: 2, end: 6 } );
+	} );
+
 	it( 'takes a block without a sole rich text field as a whole', () => {
 		expect(
 			getNoteRanges( {
@@ -286,21 +250,6 @@ describe( 'getNoteRanges', () => {
 } );
 
 describe( 'inline note writers', () => {
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( NOTE_FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( NOTE_FORMAT_NAME );
-		}
-	} );
-
 	it( 'wraps the selected text in parsed content with collapsible whitespace', () => {
 		const value = parseRichTextAttribute( 'one\n  two three' );
 		expect( String( wrapInlineNote( value, 7, 8, 13 ) ) ).toBe(

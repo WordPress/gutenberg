@@ -1,22 +1,29 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	create,
 	applyFormat,
 	registerFormatType,
-	unregisterFormatType,
 	toHTMLString,
-	store as richTextStore,
 } from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
 import {
 	findNoteRange,
 	applyNoteFormat,
 	removeNoteFormat,
 } from '../utils/note-format';
 import { toRecord } from '../utils/rich-text';
+import { noteFormat } from '../format';
+import { NOTE_FORMAT_NAME } from '../constants';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+beforeAll( () => {
+	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+	registerFormatType( 'core/bold', {
+		title: 'Bold',
+		tagName: 'strong',
+		className: null,
+		edit: () => null,
+	} );
+} );
 
 // Rich-text attributes parsed from post content keep their source HTML.
 function parseRichTextAttribute( html: string ) {
@@ -26,29 +33,6 @@ function parseRichTextAttribute( html: string ) {
 }
 
 describe( 'findNoteRange', () => {
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'span',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
-
 	it( 'returns null when no marker is present', () => {
 		const value = create( { html: 'hello world' } );
 		expect( findNoteRange( value, 7 ) ).toBeNull();
@@ -56,7 +40,7 @@ describe( 'findNoteRange', () => {
 
 	it( 'returns range for a marker matching the note id', () => {
 		const value = create( {
-			html: 'hello <span class="wp-note" data-id="7">marked</span> world',
+			html: 'hello <mark class="wp-note" data-id="7">marked</mark> world',
 		} );
 		expect( findNoteRange( value, 7 ) ).toEqual( {
 			start: 6,
@@ -67,7 +51,7 @@ describe( 'findNoteRange', () => {
 	it( 'returns the range in parsed content with collapsible whitespace', () => {
 		const value = toRecord(
 			parseRichTextAttribute(
-				'one\n  two <span class="wp-note" data-id="7">three</span>'
+				'one\n  two <mark class="wp-note" data-id="7">three</mark>'
 			)
 		);
 		expect( findNoteRange( value, 7 ) ).toEqual( { start: 8, end: 13 } );
@@ -75,21 +59,21 @@ describe( 'findNoteRange', () => {
 
 	it( 'returns null when the marker id does not match', () => {
 		const value = create( {
-			html: '<span class="wp-note" data-id="3">x</span>',
+			html: '<mark class="wp-note" data-id="3">x</mark>',
 		} );
 		expect( findNoteRange( value, 7 ) ).toBeNull();
 	} );
 
 	it( 'coerces ids to strings so numeric vs string ids match', () => {
 		const value = create( {
-			html: '<span class="wp-note" data-id="7">x</span>',
+			html: '<mark class="wp-note" data-id="7">x</mark>',
 		} );
 		expect( findNoteRange( value, '7' ) ).toEqual( { start: 0, end: 1 } );
 	} );
 
 	it( 'returns null when noteId itself is null/undefined', () => {
 		const value = create( {
-			html: '<span class="wp-note" data-id="7">x</span>',
+			html: '<mark class="wp-note" data-id="7">x</mark>',
 		} );
 		expect( findNoteRange( value, null ) ).toBeNull();
 		expect( findNoteRange( value, undefined ) ).toBeNull();
@@ -97,42 +81,8 @@ describe( 'findNoteRange', () => {
 } );
 
 describe( 'applyNoteFormat', () => {
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'mark',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-		if ( ! select( richTextStore ).getFormatType( 'core/bold' ) ) {
-			registerFormatType( 'core/bold', {
-				title: 'Bold',
-				tagName: 'strong',
-				className: null,
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-		if ( select( richTextStore ).getFormatType( 'core/bold' ) ) {
-			unregisterFormatType( 'core/bold' );
-		}
-	} );
-
 	const note = ( id: number ) => ( {
-		type: FORMAT_NAME,
+		type: NOTE_FORMAT_NAME,
 		attributes: { 'data-id': String( id ) },
 	} );
 
@@ -212,31 +162,6 @@ describe( 'applyNoteFormat', () => {
 } );
 
 describe( 'removeNoteFormat', () => {
-	// `create`/`findNoteRange` parse marker elements through the registered
-	// `core/note` format, so register it for the fixtures below.
-	const FORMAT_NAME = 'core/note';
-
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
-	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
-				title: 'Note',
-				tagName: 'mark',
-				className: 'wp-note',
-				attributes: { 'data-id': 'data-id' },
-				edit: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
-
 	it( 'returns the same value when no marker matches the note id', () => {
 		const value = create( {
 			html: 'the <mark class="wp-note" data-id="2">quick</mark> brown fox',

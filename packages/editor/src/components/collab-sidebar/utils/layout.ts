@@ -17,7 +17,7 @@ const OVERLAP_MARGIN = 20;
  * @param params.scrollTop      Current scroll offset of the editor content.
  * @return Computed top positions, and the content height that fits every measured thread.
  */
-export function calculateNotePositions( {
+export function getThreadLayout( {
 	threads,
 	selectedNoteId,
 	blockRects,
@@ -51,12 +51,12 @@ export function calculateNotePositions( {
 	);
 
 	const anchorThread = orderedThreads[ anchorIndex ];
+	const anchorRect = anchorThread && blockRects[ anchorThread.id ];
 
-	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
+	if ( ! anchorRect ) {
 		return { positions: {}, contentHeight: 0 };
 	}
 
-	const anchorRect = blockRects[ anchorThread.id ]!;
 	const anchorTop = anchorRect.top || 0;
 	const anchorHeight = heights[ anchorThread.id ] || 0;
 

@@ -1,8 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { getNoteMarkerSelector, getNoteAnchorRect } from '../utils/dom';
 import { noteFormat } from '../format';
-
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'getNoteMarkerSelector', () => {
 	it( 'targets the note marker by id', () => {

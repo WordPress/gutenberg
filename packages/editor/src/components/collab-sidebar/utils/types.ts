@@ -3,9 +3,15 @@
  */
 export type NoteId = number | string;
 
+/**
+ * Looser than the block editor's `BlockAttributes`, which isn't exported.
+ */
 export type BlockAttributes = Record< string, unknown >;
 
-export interface SelectionPoint {
+/**
+ * The block editor's `BlockSelection`, which isn't exported.
+ */
+export interface BlockSelection {
 	clientId?: string;
 	attributeKey?: string;
 	offset?: number;

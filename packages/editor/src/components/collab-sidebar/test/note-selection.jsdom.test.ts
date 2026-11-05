@@ -1,21 +1,18 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { RichTextData, registerFormatType } from '@wordpress/rich-text';
 import {
 	getNoteAtCaret,
 	getCaretChange,
 	pickNoteForCaret,
 	pickPrimaryNote,
 } from '../utils/note-selection';
-import type { BlockAttributes, SelectionPoint } from '../utils/types';
+import type { BlockAttributes, BlockSelection } from '../utils/types';
 import { noteFormat } from '../format';
+import { NOTE_FORMAT_NAME } from '../constants';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+beforeAll( () => {
+	registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+} );
 
 describe( 'pickPrimaryNote', () => {
 	it( 'returns null for an empty list', () => {
@@ -41,18 +38,11 @@ describe( 'pickPrimaryNote', () => {
 } );
 
 describe( 'Note selection', () => {
-	const FORMAT_NAME = 'core/note';
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
-
 	// "Alpha" is wrapped by note 7 (offsets 0-5), "charlie" by the draft
 	// marker (12-19); note 3 is block-level. Parsed once the format exists.
 	let attributes: BlockAttributes;
 
 	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, noteFormat );
-		}
 		attributes = {
 			content: RichTextData.fromHTMLString(
 				'<mark class="wp-note" data-id="7">Alpha</mark> bravo <mark class="wp-note" data-id="new">charlie</mark> delta.'
@@ -61,11 +51,6 @@ describe( 'Note selection', () => {
 		};
 	} );
 
-	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( FORMAT_NAME );
-		}
-	} );
 	const notes = [
 		{ id: 3, status: 'hold', blockClientId: 'b' },
 		{ id: 7, status: 'hold', blockClientId: 'b' },
@@ -83,7 +68,7 @@ describe( 'Note selection', () => {
 		{
 			selectionStart,
 			selectionEnd,
-		}: { selectionStart: SelectionPoint; selectionEnd: SelectionPoint },
+		}: { selectionStart: BlockSelection; selectionEnd: BlockSelection },
 		{
 			attributes: blockAttributes = attributes,
 			...overrides
@@ -111,7 +96,7 @@ describe( 'Note selection', () => {
 	const blockAttributes = {};
 	const snapshot = (
 		clientIds: string[],
-		start: SelectionPoint,
+		start: BlockSelection,
 		end = start,
 		attrs: BlockAttributes = blockAttributes
 	) => ( {

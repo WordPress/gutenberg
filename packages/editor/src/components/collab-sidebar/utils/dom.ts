@@ -23,7 +23,7 @@ export function getNoteMarkerSelector( noteId: NoteId ): string {
 	const escapedId = String( noteId ).replace( /["\\\n\r\f]/g, ( char ) =>
 		char === '"' || char === '\\'
 			? `\\${ char }`
-			: `\\${ char.codePointAt( 0 )!.toString( 16 ) } `
+			: `\\${ char.charCodeAt( 0 ).toString( 16 ) } `
 	);
 	return `mark.wp-note[data-id="${ escapedId }"]`;
 }
