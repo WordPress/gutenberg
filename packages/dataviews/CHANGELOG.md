@@ -16,6 +16,7 @@
 
 ### Enhancements
 
+-   Fade the trailing edge of a table layout while there are more columns to scroll to, including tables without actions ([#85949](https://github.com/WordPress/gutenberg/pull/85949)).
 -   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
 -   Use the UI SelectControl for Sort by and relative-date Unit settings ([#86167](https://github.com/WordPress/gutenberg/pull/86167)).
 -   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
@@ -30,6 +31,7 @@
 
 ### Bug Fixes
 
+-   Show the divider on the sticky table actions column at the start of the scroll range in RTL, and update it when columns are added or the table resizes ([#85949](https://github.com/WordPress/gutenberg/pull/85949)).
 -   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
