@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes

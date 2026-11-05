@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
