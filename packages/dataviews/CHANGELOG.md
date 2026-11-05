@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Grey out the selection checkbox of items with no eligible bulk action again, as it looked enabled since the switch to the `@wordpress/ui` `Checkbox` ([#86385](https://github.com/WordPress/gutenberg/pull/86385)).
+-   Disable the selection checkbox of items with no eligible bulk action, which looked enabled since it moved to the `@wordpress/ui` `Checkbox` ([#86385](https://github.com/WordPress/gutenberg/pull/86385)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
 

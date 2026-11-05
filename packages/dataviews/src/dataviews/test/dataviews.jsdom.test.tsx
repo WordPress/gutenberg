@@ -1054,6 +1054,7 @@ describe( 'DataViews component', () => {
 							id: 'delete',
 							label: 'Delete',
 							supportsBulk: true,
+							// The second item is not selectable.
 							isEligible: ( item: Data ) => item.id !== 2,
 							callback: vi.fn(),
 						},
