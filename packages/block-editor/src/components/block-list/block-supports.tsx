@@ -7,10 +7,11 @@ import type {
 } from '../../hooks/types';
 import type { BlockListWrapperProps } from './types';
 
-let blockSupports: BlockListBlockFeature[] = [];
+const blockSupports: BlockListBlockFeature[] = [];
 
-export function setBlockListBlockFeatures( features: BlockListBlockFeature[] ) {
-	blockSupports = features;
+// Supports apply to the block list in the order they're registered.
+export function registerBlockSupport( support: BlockListBlockFeature ) {
+	blockSupports.push( support );
 }
 
 // The props of each block support the block uses: one with any of its
