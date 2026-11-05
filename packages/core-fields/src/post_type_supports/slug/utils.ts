@@ -7,9 +7,6 @@ import type { PostWithSlug } from './types';
  * the current title, which is what WordPress uses when the post is published.
  * Empty for a post with neither.
  *
- * WordPress stores a slug with non-Latin characters percent-encoded, so the
- * slug is decoded for display, as the classic slug panel does.
- *
  * The server-generated slug isn't used: it comes from the saved title, so it
  * lags behind title edits, and for a new post it comes from the `Auto Draft`
  * placeholder.
