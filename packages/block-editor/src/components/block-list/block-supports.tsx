@@ -89,7 +89,7 @@ export function selectBlockSupports(
 }
 
 /**
- * Returns the values selected by `selectBlockSupportData` by support index.
+ * Returns the values selected by `selectBlockSupports` by support index.
  *
  * @param selected The selected props.
  *
@@ -110,7 +110,7 @@ export function getBlockSupportData( selected: Record< string, unknown > ) {
 }
 
 /**
- * Returns the settings selected by `selectBlockSupportSettings` by path.
+ * Returns the settings selected by `selectBlockSupports` by path.
  *
  * @param selected The selected props.
  *

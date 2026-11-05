@@ -258,16 +258,6 @@ function CustomCSSEdit( {
 	);
 }
 
-/**
- * Hook to handle custom CSS for a block in the editor.
- * Generates a unique class and applies scoped CSS via style override.
- *
- * @param props          Block props.
- * @param props.style    Block style attribute.
- * @param props.clientId Block client ID.
- * @param props.name     Block name.
- * @return Block props including className for custom CSS scoping.
- */
 // The block's custom CSS, transformed the same way as global styles. Only CSS
 // states that don't contain HTML markup are processed.
 function getCustomCSS(
