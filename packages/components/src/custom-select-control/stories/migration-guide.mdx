@@ -45,6 +45,8 @@ After, with the stored value shown below the control:
 
 In each option, rename `key` to `value`, `name` to `label`, and `hint` (or `__experimentalHint`) to `description`. The selected `value` is still an item object. `onValueChange` receives the selected item, or `null`, instead of an object with a `selectedItem` property. The other fields of the legacy change object, such as `isOpen` and `highlightedIndex`, have no equivalent. Use `onOpenChange` if you need to know when the popup opens or closes.
 
+Unlike the legacy `onChange`, `onValueChange` also fires when the user selects the item that is already selected. Compare the new item with the current selection before running side effects, as described in [Adapt change callbacks](?path=/docs/components-selectcontrol--migration-guide#adapt-change-callbacks).
+
 Object values are compared by identity by default. Pass an object from the current `items` array to `value`, as the example does by looking up the stored key on every render. If you keep a selected object across changes to `items` instead, supply `isItemEqualToValue={ ( item, value ) => item.value === value.value }`.
 
 ## Prop mapping

@@ -116,6 +116,12 @@
             - className
             - render
             - style
+      - name: Autocomplete.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Popup
         props:
             - children
@@ -175,23 +181,10 @@
   props:
       - children
       - className
+      - infotip
       - intent
       - render
       - style
-- name: BaseControl
-  props:
-      - __nextHasNoMarginBottom
-      - children
-      - className
-      - help
-      - hideLabelFromVision
-      - id
-      - label
-  subcomponents:
-      - name: BaseControl.VisualLabel
-        props:
-            - as
-            - children
 - name: Button
   props:
       - __experimentalIsFocusable
@@ -1369,6 +1362,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelect.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelect.Separator
         props:
             - className
@@ -1478,6 +1477,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelectControl.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelectControl.Separator
         props:
             - className
@@ -1573,6 +1578,12 @@
             - render
             - style
       - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.LoadingIndicator
         props:
             - children
             - className

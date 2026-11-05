@@ -1,5 +1,8 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Notice as WCNotice,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
@@ -93,11 +96,11 @@ export default function HTMLElementControl( {
 			/>
 
 			{ tagName === 'main' && hasMainElementElsewhere && (
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __(
 						'Multiple <main> elements detected. The duplicate may be in your content or template. This is not valid HTML and may cause accessibility issues. Please change this HTML element.'
 					) }
-				</Notice>
+				</WCNotice>
 			) }
 		</VStack>
 	);
