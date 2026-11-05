@@ -190,6 +190,7 @@ export const SETTINGS_DEFAULTS = {
 		'core/buttons': { enterDirection: 'rightToLeft' },
 		'core/button': { enterDirection: 'rightToLeft' },
 		'core/social-links': { enterDirection: 'rightToLeft' },
+		'core/social-link': { enterDirection: 'rightToLeft' },
 		'core/page-list': { enterDirection: 'rightToLeft' },
 		'core/spacer': { enterDirection: 'rightToLeft' },
 		'core/home-link': { enterDirection: 'rightToLeft' },

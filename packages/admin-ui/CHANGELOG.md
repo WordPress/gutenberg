@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Admin color schemes: darken the primary color of the Fresh, Midnight, Coffee, Ocean, Ectoplasm, Blue and Sunrise schemes slightly, so filled primary buttons keep white text in the Site Editor instead of switching to black.

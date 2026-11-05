@@ -132,23 +132,12 @@ parameters:
 			count: 1
 			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
 
-		-
-			message: '#^Action callback returns bool but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: ../../lib/media/load.php
 
 		-
 			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/avatar/index.php
-
-		-
-			message: '#^Parameter \#2 \$size of function get_avatar expects int, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
 
 		-
 			message: '#^Variable \$spacing_string might not be defined\.$#'
