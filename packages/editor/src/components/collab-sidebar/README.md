@@ -12,7 +12,7 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 The components are in the hierarchy below. Besides them:
 
 - `hooks.js`: `useNoteThreads`, `useNoteActions`, `useNoteDraft`, `useNoteSelection`, `usePickNote`, `useNoteFocus`, `useFloatingBoard`.
-- `utils/`: pure helpers, one module per concern, each tested in `test/<module>.jsdom.test.ts`. See the table below.
+- `utils/`: pure helpers, one module per concern. See the table below.
 - `board-store.js`: DOM measurement for the floating layout, see "Floating board".
 - `note-highlight-styles.js`: the canvas tint for notes and their markers.
 - `format.js`: the `core/note` format that serializes an inline note's marker.
