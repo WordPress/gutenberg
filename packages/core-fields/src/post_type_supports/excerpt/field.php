@@ -9,7 +9,7 @@
 return array(
 	'type'          => 'text',
 	'label'         => __( 'Excerpt' ),
-	'placeholder'   => __( 'Add an excerpt' ),
+	'placeholder'   => __( '(No excerpt)' ),
 	'Edit'          => array(
 		'control' => 'textarea',
 		'rows'    => 4,
