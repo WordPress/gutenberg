@@ -101,6 +101,17 @@ $color-palette-circle-spacing: 12px;
 		}
 	}
 
+	// Opt back in to color adjustment so that forced colors remove the
+	// `box-shadow`, which would otherwise fill the option with the pressed
+	// Button's text color.
+	&.components-button.is-pressed {
+		@media (forced-colors: active) {
+			forced-color-adjust: auto;
+			background: Canvas !important;
+			color: ButtonText !important;
+		}
+	}
+
 	&::after {
 		content: "";
 		position: absolute;

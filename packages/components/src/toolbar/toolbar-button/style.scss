@@ -22,5 +22,9 @@
 
 	&:not(:disabled).is-pressed[data-subscript]::after {
 		color: $white;
+
+		@media ( forced-colors: active ) {
+			color: inherit;
+		}
 	}
 }

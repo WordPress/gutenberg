@@ -84,6 +84,24 @@
 			&::before {
 				background: $components-color-foreground;
 			}
+
+			@media ( forced-colors: active ) {
+				background: transparent !important;
+
+				&::before {
+					background: SelectedItem;
+				}
+
+				&:disabled::before,
+				&[aria-disabled="true"]::before {
+					background: GrayText;
+				}
+
+				&:focus::before {
+					outline-color: CanvasText;
+					box-shadow: none;
+				}
+			}
 		}
 
 		// Focus style.

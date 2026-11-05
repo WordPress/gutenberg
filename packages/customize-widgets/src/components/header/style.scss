@@ -50,6 +50,10 @@
 
 		&.is-pressed {
 			background: $gray-900;
+
+			@media (forced-colors: active) {
+				background: SelectedItem !important;
+			}
 		}
 
 		&:focus:not(:active) {
