@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Block Styles: Show the active style variation in forced colors mode.
+-   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 
 ## 20.0.0 (2026-11-04)
 
