@@ -58,8 +58,8 @@ const isSameServerContent = (
 
 /**
  * What the directive last did with its host element's content: the HTML it
- * wrote, or adopted from matching content, or the value the browser
- * rejected.
+ * wrote, or adopted from matching content, or the kind and markup of the
+ * value the browser rejected.
  */
 type WriteRecord =
 	| {
@@ -70,8 +70,10 @@ type WriteRecord =
 			applied: string;
 	  }
 	| {
-			/** The rejected string or `TrustedHTML` value. */
-			rejected: ReturnType< typeof getDangerousHTML >;
+			/** The rejected value as a string. */
+			rejected: string;
+			/** Whether the rejected value is a plain string, not `TrustedHTML`. */
+			plainString: boolean;
 	  };
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
@@ -265,15 +267,17 @@ directive(
 				);
 			}
 			const key = String( resolvedValue );
+			const plainString = typeof resolvedValue === 'string';
 			const record = writeRecord.current;
 			// A value matching the record is skipped: by its markup after a
-			// write or an adoption, and only when identical after a rejected
-			// write, so a new token wrapping the rejected string isn't retried
-			// but a `TrustedHTML` value with the same markup is written.
+			// write or an adoption, and by its kind and markup after a
+			// rejected write, so a new token wrapping the rejected string isn't
+			// retried but a `TrustedHTML` value with the same markup is written.
 			if (
 				record &&
 				( 'rejected' in record
-					? record.rejected === resolvedValue
+					? record.rejected === key &&
+						record.plainString === plainString
 					: record.applied === key )
 			) {
 				return;
@@ -295,7 +299,7 @@ directive(
 						`data-wp-html: the browser rejected this HTML value, so the element was emptied. ${ error }`
 					);
 				}
-				writeRecord.current = { rejected: resolvedValue };
+				writeRecord.current = { rejected: key, plainString };
 			}
 		}, [
 			result,
