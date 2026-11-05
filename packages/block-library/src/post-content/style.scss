@@ -1,3 +1,7 @@
 .wp-block-post-content {
 	display: flow-root;
 }
+
+:where(.wp-block-post-content.is-layout-constrained > .more-link) {
+	display: block;
+}
