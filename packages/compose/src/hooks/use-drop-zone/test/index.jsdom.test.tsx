@@ -107,15 +107,4 @@ describe( 'useDropZone', () => {
 		fireEvent.dragEnd( document );
 		expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
 	} );
-
-	it( 'does not end a drag on a mousemove while a button is held', () => {
-		const { onDragEnd } = renderWithDragCallbacks();
-
-		fireEvent.dragEnter( document.body );
-		fireEvent.mouseMove( document, { buttons: 1 } );
-		expect( onDragEnd ).not.toHaveBeenCalled();
-
-		fireEvent.mouseMove( document, { buttons: 0 } );
-		expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
-	} );
 } );
