@@ -262,11 +262,9 @@ function StylesCanvasRevisions( { path }, ref ) {
 					<div className="editor-styles-canvas-revisions__pane is-current">
 						<RevisionPreview
 							{ ...previewProps }
-							config={
-								isComparingRevision
-									? userConfig
-									: selectedRevision || userConfig
-							}
+							// The current version is the styles the editor holds,
+							// unsaved changes included, whichever entry stands for it.
+							config={ userConfig }
 							frameRef={ setCurrentFrame }
 							name={
 								isComparingRevision

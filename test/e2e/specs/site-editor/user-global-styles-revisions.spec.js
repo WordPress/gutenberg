@@ -740,6 +740,49 @@ test.describe( 'Style Revisions', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should keep unsaved changes in the current version after comparing', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
+			.click( { force: true } );
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Compare the saved revision with the unsaved changes.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(252, 185, 0)' );
+
+		// Back on the current version, the unsaved changes still show.
+		await page.getByRole( 'option', { name: /^Unsaved changes/ } ).click();
+		await expect(
+			page.locator( 'iframe[name="revisions-current"]' )
+		).toBeHidden();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(252, 185, 0)' );
+
+		// Later tests start from saved styles.
+		await editor.saveSiteEditorEntities();
+	} );
+
 	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
 		// Create > 10 revisions to display pagination navigation component.
 		for ( let i = 9; i < 21; i++ ) {
