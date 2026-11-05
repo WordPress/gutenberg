@@ -144,6 +144,8 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 
 		/**
 		 * Grows the spans of grid items whose content overflows their grid area.
+		 *
+		 * @return Whether another check is needed after a width change.
 		 */
 		const growOverflowingItems = () => {
 			const overflowingItemElements = getItemElements().filter(
@@ -152,7 +154,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					element.scrollHeight > element.clientHeight + 1
 			);
 			if ( ! overflowingItemElements.length ) {
-				return;
+				return false;
 			}
 
 			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
@@ -162,7 +164,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				! isPositiveInteger( rawRowCount ) ||
 				! isPositiveInteger( rawColumnCount )
 			) {
-				return;
+				return false;
 			}
 			const rowCount = rawRowCount;
 			const columnCount = rawColumnCount;
@@ -178,7 +180,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				getCSSPixelValue( computedStyle.paddingLeft ) -
 				getCSSPixelValue( computedStyle.paddingRight );
 			if ( gridHeight <= 0 || gridWidth <= 0 ) {
-				return;
+				return false;
 			}
 			const rowGap = getCSSPixelValue( computedStyle.rowGap );
 			const columnGap = getCSSPixelValue( computedStyle.columnGap );
@@ -187,7 +189,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			const columnWidth =
 				( gridWidth - columnGap * ( columnCount - 1 ) ) / columnCount;
 			if ( rowHeight <= 0 || columnWidth <= 0 ) {
-				return;
+				return false;
 			}
 			const rowPitch = rowHeight + rowGap;
 			const columnPitch = columnWidth + columnGap;
@@ -216,6 +218,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			}
 
 			const updates: Record< string, Record< string, unknown > > = {};
+			let needsFollowUpCheck = false;
 			for ( const element of overflowingItemElements ) {
 				const childId = element.getAttribute( 'data-block' )!;
 				const rect = rects.get( childId );
@@ -225,12 +228,10 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				// Allow for sub-pixel rounding.
 				const overflowsWidth =
 					element.scrollWidth > element.clientWidth + 1;
-				// A wider item may stop overflowing vertically, so wait for
-				// the next check to measure its height.
 				const overflowsHeight =
-					! overflowsWidth &&
 					element.scrollHeight > element.clientHeight + 1;
 				let { columnStart, columnSpan, rowSpan } = rect;
+				let widthChanged = false;
 				if ( overflowsWidth ) {
 					const neededSpan = Math.ceil(
 						( element.scrollWidth + columnGap ) / columnPitch
@@ -244,7 +245,14 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					);
 					columnStart = expandedRect.columnStart;
 					columnSpan = expandedRect.columnSpan;
-				} else if ( overflowsHeight ) {
+					widthChanged =
+						columnStart !== rect.columnStart ||
+						columnSpan !== rect.columnSpan;
+					needsFollowUpCheck ||= widthChanged;
+				}
+				// Widening can reduce wrapped content's height, so only use the
+				// current height measurement when the width is staying the same.
+				if ( overflowsHeight && ! widthChanged ) {
 					const neededSpan = Math.ceil(
 						( element.scrollHeight + rowGap ) / rowPitch
 					);
@@ -304,6 +312,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					/* uniqueByBlock: */ true
 				);
 			}
+			return needsFollowUpCheck;
 		};
 
 		let frame: number | undefined;
@@ -314,7 +323,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			if ( frame === undefined ) {
 				frame = view.requestAnimationFrame( () => {
 					frame = undefined;
-					growOverflowingItems();
+					if ( growOverflowingItems() ) {
+						scheduleCheck();
+					}
 				} );
 			}
 		};
