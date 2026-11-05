@@ -26,6 +26,7 @@
 
 ### Bug Fixes
 
+-   Open the entity save dialog with the Save keyboard shortcut when a synced pattern has changed, including when the post itself is unchanged ([#85056](https://github.com/WordPress/gutenberg/pull/85056)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
