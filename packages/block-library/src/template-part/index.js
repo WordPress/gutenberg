@@ -46,8 +46,8 @@ export const init = () => {
 		enhanceTemplatePartVariations
 	);
 
-	// Prevent adding template parts inside post templates.
-	const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+	// Prevent adding template parts inside post content.
+	const DISALLOWED_PARENTS = [ 'core/post-content' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
 		'core/block-library/removeTemplatePartsFromPostTemplates',
