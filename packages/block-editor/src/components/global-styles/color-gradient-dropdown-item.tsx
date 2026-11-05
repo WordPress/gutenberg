@@ -177,7 +177,7 @@ function ColorGradientTab( {
 			clearable={ userValue !== undefined }
 			headingLevel={ 3 }
 			noticeProps={
-				! isGradient && contrastWarning
+				contrastWarning
 					? {
 							children: contrastWarning,
 							status: 'warning',

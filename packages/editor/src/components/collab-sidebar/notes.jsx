@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import { focusNoteThread } from './utils/dom';
 import {
 	NoteDraftsContext,
 	useFloatingBoard,
@@ -37,21 +37,23 @@ export function Notes( {
 	const { onDiscard } = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
-	const { selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientIds, orderedBlockIds } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
+			const { getSelectedBlockClientIds, getClientIdsWithDescendants } =
 				select( blockEditorStore );
 			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
+	// A note added to several blocks shows at the first.
+	const [ selectedBlockClientId ] = selectedBlockClientIds;
 	const selectedNote = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -68,6 +70,7 @@ export function Notes( {
 		}
 		const newNoteThread = {
 			id: 'new',
+			blockClientIds: selectedBlockClientIds,
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
@@ -90,6 +93,7 @@ export function Notes( {
 		filters,
 		isFloating,
 		selectedNote,
+		selectedBlockClientIds,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -244,8 +248,7 @@ export function Notes( {
 				{ isAddingNote && (
 					<AddNote
 						key={ selectedBlockClientId }
-						clientId={ selectedBlockClientId }
-						sidebarRef={ sidebarRef }
+						clientIds={ selectedBlockClientIds }
 					/>
 				) }
 				{ threads.map( ( thread, index ) => (
