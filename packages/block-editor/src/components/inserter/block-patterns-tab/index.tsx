@@ -8,6 +8,7 @@ import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import ManagePatternsLink from './manage-patterns-link';
 import type { BlockPatternsTabProps } from '../types';
 
 function BlockPatternsTab( {
@@ -38,14 +39,17 @@ function BlockPatternsTab( {
 					>
 						{ children }
 					</CategoryTabs>
-					<Button
-						__next40pxDefaultSize
-						className="block-editor-inserter__patterns-explore-button"
-						onClick={ () => setShowPatternsExplorer( true ) }
-						variant="secondary"
-					>
-						{ __( 'Explore all patterns' ) }
-					</Button>
+					<div>
+						<Button
+							__next40pxDefaultSize
+							className="block-editor-inserter__patterns-explore-button"
+							onClick={ () => setShowPatternsExplorer( true ) }
+							variant="secondary"
+						>
+							{ __( 'Explore all patterns' ) }
+						</Button>
+						<ManagePatternsLink />
+					</div>
 				</div>
 			) }
 			{ isMobile && (
