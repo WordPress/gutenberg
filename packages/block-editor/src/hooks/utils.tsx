@@ -1,6 +1,15 @@
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { getBlockSupport } from '@wordpress/blocks';
-import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
+import {
+	memo,
+	useCallback,
+	useMemo,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -682,22 +691,39 @@ function BlockProps( {
 	>;
 } & BlockListBlockFeatureProps ) {
 	const wrapperProps = hook( props );
-	const setWrapperProps = ( next: BlockWrapperProps | null | undefined ) =>
-		setAllWrapperProps( ( prev ) => {
-			const nextAll = [ ...prev ];
-			nextAll[ index ] = next;
-			return nextAll;
-		} );
-	// Setting state after every render is fine because this component is
-	// pure and will only re-render when needed props change.
+	const lastWrapperPropsRef = useRef< BlockWrapperProps | null | undefined >(
+		undefined
+	);
+	const setWrapperProps = useCallback(
+		( next: BlockWrapperProps | null | undefined ) =>
+			setAllWrapperProps( ( prev ) => {
+				const nextAll = [ ...prev ];
+				nextAll[ index ] = next;
+				return nextAll;
+			} ),
+		[ index, setAllWrapperProps ]
+	);
+	// The hook can re-render this component through its own store
+	// subscriptions, for example when a global styles edit rebuilds the
+	// settings, so skip the update when the props have not changed. An update
+	// on every render re-renders the block each time, and fast changes then
+	// exceed React's limit on nested updates.
 	useEffect( () => {
-		// We could shallow compare the props, but since this component only
-		// changes when needed attributes change, the benefit is probably small.
+		if ( fastDeepEqual( lastWrapperPropsRef.current, wrapperProps ) ) {
+			return;
+		}
+		lastWrapperPropsRef.current = wrapperProps;
 		setWrapperProps( wrapperProps );
-		return () => {
-			setWrapperProps( undefined );
-		};
 	} );
+	useEffect(
+		() => () => {
+			// Forget the last props so a remount, such as Strict Mode's second
+			// mount in development, sets them again.
+			lastWrapperPropsRef.current = undefined;
+			setWrapperProps( undefined );
+		},
+		[ setWrapperProps ]
+	);
 	return null;
 }
 
