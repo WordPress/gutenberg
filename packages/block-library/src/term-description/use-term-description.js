@@ -44,9 +44,13 @@ function useTemplateBasedTermData() {
 		const { getCurrentPostId, getCurrentPostType, getCurrentTemplateId } =
 			select( 'core/editor' );
 		const currentPostType = getCurrentPostType();
+		// A template being edited is the template, even when the canvas
+		// shows it inside the template it is rendered inside, which is what
+		// the current template names then.
 		const templateId =
-			getCurrentTemplateId() ||
-			( currentPostType === 'wp_template' ? getCurrentPostId() : null );
+			currentPostType === 'wp_template'
+				? getCurrentPostId()
+				: getCurrentTemplateId();
 
 		return templateId
 			? select( coreStore ).getEditedEntityRecord(
