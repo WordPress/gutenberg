@@ -235,6 +235,11 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-disabled-note {
+	padding-top: $grid-unit-05;
+	color: $gray-900;
+}
+
 .block-editor-inserter__insertable-blocks-at-selection:not(:empty) + .block-editor-inserter__all-blocks:not(:empty) {
 	border-top: $border-width solid $gray-200;
 }

@@ -5,7 +5,7 @@ import {
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice } from '@wordpress/ui';
+import { Text } from '@wordpress/ui';
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
 import type { InserterItem } from '../../store/types';
@@ -85,13 +85,15 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 				/>
 			) }
 			{ isDisabled && (
-				<Notice.Root intent="info">
-					<Notice.Description>
-						{ __(
-							'This block can only be used once and is already in use.'
-						) }
-					</Notice.Description>
-				</Notice.Root>
+				<Text
+					render={ <p /> }
+					className="block-editor-inserter__preview-disabled-note"
+				>
+					<strong>{ __( 'Note:' ) }</strong>{ ' ' }
+					{ __(
+						'This block can only be used once, and is already in use.'
+					) }
+				</Text>
 			) }
 		</div>
 	);
