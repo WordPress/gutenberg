@@ -229,7 +229,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_resolution_walks_every_level() {
+	public function test_only_the_template_named_is_rendered_around_it() {
 		$this->create_template(
 			'base',
 			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
@@ -249,12 +249,12 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:group --><div class="wp-block-group"><!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content --></div><!-- /wp:group --><!-- /wp:post-content -->',
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content --></div><!-- /wp:group -->',
 			$resolved
 		);
 	}
 
-	public function test_a_loop_between_two_templates_resolves_once() {
+	public function test_two_templates_naming_each_other_resolve_once() {
 		$this->create_template(
 			'layout',
 			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->',

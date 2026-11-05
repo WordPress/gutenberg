@@ -43,11 +43,65 @@ function hasContentSlot( template: WpTemplate ): boolean {
 }
 
 /**
+ * Whether a template names a template to be rendered inside.
+ *
+ * @param template The template to look at.
+ */
+function namesTemplate( template: WpTemplate ): boolean {
+	return !! ( template as { template?: string } ).template;
+}
+
+/**
  * The templates a template can be rendered inside.
  *
- * Leaves out the template itself and every template already rendered inside
- * it, either of which would make a loop, and every template with no post
+ * Templates nest one level deep, which is all the editor and the front end
+ * render: a template can name one that is rendered on its own, and only when
+ * no other template is rendered inside it. That leaves out the template
+ * itself, every template that names one of its own, every template when the
+ * edited one has templates rendered inside it, and every template with no post
  * content block to render it in.
+ *
+ * @param templates Every template of the site.
+ * @param record    The template being edited.
+ * @return The templates it can name.
+ */
+export function getAvailableTemplates(
+	templates: WpTemplate[],
+	record: Pick< TemplateWithTemplate, 'slug' | 'template' >
+): WpTemplate[] {
+	const slug = record.slug;
+	if ( ! slug ) {
+		return EMPTY_ARRAY;
+	}
+
+	// A template other templates are rendered inside would put them two
+	// levels deep if it named one of its own.
+	const hasTemplatesInside = templates.some(
+		( template ) => ( template as { template?: string } ).template === slug
+	);
+
+	return templates.filter( ( template ) => {
+		if ( template.slug === slug ) {
+			return false;
+		}
+
+		// The template already named stays a choice whatever it holds, so
+		// the control reports what is stored rather than falling back to
+		// showing none.
+		if ( template.slug === record.template ) {
+			return true;
+		}
+
+		return (
+			! hasTemplatesInside &&
+			! namesTemplate( template ) &&
+			hasContentSlot( template )
+		);
+	} );
+}
+
+/**
+ * The templates a template can be rendered inside, see getAvailableTemplates().
  *
  * @param record The template being edited.
  * @return The templates it can name.
@@ -56,48 +110,17 @@ export function useAvailableTemplates(
 	record: TemplateWithTemplate
 ): WpTemplate[] {
 	const templates = useTemplates();
+	const slug = record?.slug;
+	const renderedInside = record?.template;
 
-	return useMemo( () => {
-		const slug = record?.slug;
-		if ( ! slug ) {
-			return EMPTY_ARRAY;
-		}
-
-		const bySlug = new Map(
-			templates.map( ( template ) => [ template.slug, template ] )
-		);
-
-		// Whether the candidate is already rendered inside the edited
-		// template, at any depth, so naming it would make a loop.
-		const isRenderedInsideEditedTemplate = ( candidate: WpTemplate ) => {
-			const seen = new Set< string >();
-			let current: WpTemplate | undefined = candidate;
-			while ( current && ! seen.has( current.slug ) ) {
-				seen.add( current.slug );
-				const renderedInside = ( current as { template?: string } )
-					.template;
-				if ( ! renderedInside ) {
-					return false;
-				}
-				if ( renderedInside === slug ) {
-					return true;
-				}
-				current = bySlug.get( renderedInside );
-			}
-			return false;
-		};
-
-		return templates.filter(
-			( template ) =>
-				template.slug !== slug &&
-				// The template already named stays a choice whatever it
-				// holds, so the control reports what is stored rather than
-				// falling back to showing none.
-				( template.slug === record?.template ||
-					hasContentSlot( template ) ) &&
-				! isRenderedInsideEditedTemplate( template )
-		);
-	}, [ templates, record?.slug, record?.template ] );
+	return useMemo(
+		() =>
+			getAvailableTemplates( templates, {
+				slug,
+				template: renderedInside,
+			} ),
+		[ templates, slug, renderedInside ]
+	);
 }
 
 /**
