@@ -13,6 +13,7 @@ import type { PanelStyle } from '../../components/global-styles/types';
 interface PanelSpyProps {
 	inheritedValue?: PanelStyle;
 	onChange: ( value: PanelStyle ) => void;
+	settings?: unknown;
 }
 
 /**
@@ -39,6 +40,7 @@ const mockPanelRecorder: { calls: Array< [ string, PanelSpyProps ] > } = {
 	calls: [],
 };
 const mockInheritedReturn: { value: PanelStyle } = { value: {} };
+const mockIsInFixedGridCell: { value: boolean } = { value: false };
 
 vi.mock(
 	import( '../../components/global-styles/inherited-value-context' ),
@@ -185,6 +187,11 @@ vi.mock( import( '../../store/private-keys' ), () => ( {
 	selectBlockPatternsKey: Symbol( 'selectBlockPatternsKey' ),
 } ) );
 
+vi.mock( import( '../../components/grid/use-is-in-fixed-grid-cell' ), () => ( {
+	__esModule: true,
+	useIsInFixedGridCell: () => mockIsInFixedGridCell.value,
+} ) );
+
 // Short-circuit the block-editor components barrel (`../../components`),
 // which pulls the data store into its import graph transitively.
 vi.mock( import( '../../components' ), () => ( {} ) );
@@ -217,6 +224,7 @@ beforeEach( () => {
 	mockHookRecorder.calls = [];
 	mockPanelRecorder.calls = [];
 	mockInheritedReturn.value = {};
+	mockIsInFixedGridCell.value = false;
 	mockUseSelectImpl.fn = () => undefined;
 	mockedUseSelect.mockImplementation( ( mapSelect ) => {
 		// Feed mapSelect a synthetic `select()` that returns an object
@@ -541,6 +549,50 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		// user's perspective this matches pre-feature behaviour.
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual(
 			{}
+		);
+	} );
+} );
+
+describe( 'DimensionsPanel in a grid cell with a fixed size', () => {
+	const settings = {
+		dimensions: { minHeight: true, aspectRatio: true, minWidth: true },
+		spacing: { padding: true },
+	};
+
+	test( 'turns off the minimum height and aspect ratio controls', () => {
+		mockIsInFixedGridCell.value = true;
+
+		render(
+			<DimensionsPanel
+				clientId="block-1"
+				name="core/cover"
+				setAttributes={ () => {} }
+				settings={ settings }
+			/>
+		);
+
+		expect( mockPanelRecorder.calls[ 0 ][ 1 ].settings ).toEqual( {
+			dimensions: {
+				minHeight: false,
+				aspectRatio: false,
+				minWidth: true,
+			},
+			spacing: { padding: true },
+		} );
+	} );
+
+	test( 'keeps the controls outside such a cell', () => {
+		render(
+			<DimensionsPanel
+				clientId="block-1"
+				name="core/cover"
+				setAttributes={ () => {} }
+				settings={ settings }
+			/>
+		);
+
+		expect( mockPanelRecorder.calls[ 0 ][ 1 ].settings ).toEqual(
+			settings
 		);
 	} );
 } );
