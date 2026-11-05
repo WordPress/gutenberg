@@ -2,6 +2,7 @@ import {
 	afterAll,
 	afterEach,
 	beforeAll,
+	beforeEach,
 	describe,
 	expect,
 	it,
@@ -878,20 +879,38 @@ describe( 'getQueryArgs', () => {
 				name
 			];
 
+		// Everything a regression could write onto: the built-ins themselves, the
+		// prototypes they inherit from, and a function reachable from them.
+		const getGuardedObjects = (): object[] => [
+			Object.prototype,
+			Function.prototype,
+			Function.prototype.bind,
+			...inheritedFunctions.map( getBuiltIn ),
+		];
+		const ownKeysBefore = new Map< object, Set< string | symbol > >();
+
+		beforeEach( () => {
+			for ( const object of getGuardedObjects() ) {
+				ownKeysBefore.set(
+					object,
+					new Set( Reflect.ownKeys( object ) )
+				);
+			}
+		} );
+
 		afterEach( () => {
-			// Undo any write to a shared built-in, so that a regression fails
-			// only these tests instead of every test that runs after them.
-			for ( const name of inheritedFunctions ) {
-				for ( const property of [
-					'call',
-					'apply',
-					'bind',
-					'polluted',
-				] ) {
-					Reflect.deleteProperty( getBuiltIn( name ), property );
+			// Delete whatever a test added to a shared built-in, so that a
+			// regression fails only these tests instead of every test that runs
+			// after them. Comparing against a snapshot, rather than a fixed list
+			// of names, also covers keys that only a specific test writes.
+			for ( const [ object, keys ] of ownKeysBefore ) {
+				for ( const key of Reflect.ownKeys( object ) ) {
+					if ( ! keys.has( key ) ) {
+						Reflect.deleteProperty( object, key );
+					}
 				}
 			}
-			Reflect.deleteProperty( Function.prototype.bind, 'polluted' );
+			ownKeysBefore.clear();
 		} );
 
 		it.each( inheritedFunctions )(
