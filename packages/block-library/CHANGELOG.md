@@ -10,6 +10,7 @@
 
 ### Enhancements
 
+-   Table: Add keyboard shortcuts for inserting and deleting rows and columns, and show them in the Edit table menu ([#86235](https://github.com/WordPress/gutenberg/pull/86235)).
 -   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
 -   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
 -   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).

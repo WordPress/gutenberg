@@ -4,6 +4,7 @@ import {
 	createTable,
 	getFirstRow,
 	getCellAttribute,
+	getClosestCell,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -934,6 +935,104 @@ describe( 'deleteColumn', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+} );
+
+describe( 'getClosestCell', () => {
+	const getRows = ( rowCount, columnCount ) =>
+		Array.from( { length: rowCount }, () => ( {
+			cells: Array.from( { length: columnCount }, () => ( {
+				content: '',
+				tag: 'td',
+			} ) ),
+		} ) );
+
+	it( 'returns the same location when the cell exists', () => {
+		const state = deepFreeze( { body: getRows( 2, 2 ) } );
+
+		expect(
+			getClosestCell( state, {
+				sectionName: 'body',
+				rowIndex: 1,
+				columnIndex: 1,
+			} )
+		).toEqual( {
+			sectionName: 'body',
+			rowIndex: 1,
+			columnIndex: 1,
+			type: 'cell',
+		} );
+	} );
+
+	it( 'moves to the last row and column when the location is past them', () => {
+		const state = deepFreeze( { body: getRows( 2, 2 ) } );
+
+		expect(
+			getClosestCell( state, {
+				sectionName: 'body',
+				rowIndex: 2,
+				columnIndex: 2,
+			} )
+		).toEqual( {
+			sectionName: 'body',
+			rowIndex: 1,
+			columnIndex: 1,
+			type: 'cell',
+		} );
+	} );
+
+	it( 'falls back to the body when the section has no rows left', () => {
+		const state = deepFreeze( {
+			head: [],
+			body: getRows( 2, 2 ),
+			foot: [],
+		} );
+
+		expect(
+			getClosestCell( state, {
+				sectionName: 'head',
+				rowIndex: 0,
+				columnIndex: 1,
+			} )
+		).toEqual( {
+			sectionName: 'body',
+			rowIndex: 0,
+			columnIndex: 1,
+			type: 'cell',
+		} );
+	} );
+
+	it( 'falls back to the head when the body has no rows left', () => {
+		const state = deepFreeze( {
+			head: getRows( 1, 2 ),
+			body: [],
+			foot: getRows( 1, 2 ),
+		} );
+
+		expect(
+			getClosestCell( state, {
+				sectionName: 'body',
+				rowIndex: 0,
+				columnIndex: 0,
+			} )
+		).toEqual( {
+			sectionName: 'head',
+			rowIndex: 0,
+			columnIndex: 0,
+			type: 'cell',
+		} );
+	} );
+
+	it( 'returns undefined when the table has no cells', () => {
+		const state = deepFreeze( { head: [], body: [], foot: [] } );
+
+		expect(
+			getClosestCell( state, {
+				sectionName: 'body',
+				rowIndex: 0,
+				columnIndex: 0,
+			} )
+		).toBeUndefined();
 	} );
 } );
 
