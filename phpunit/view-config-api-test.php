@@ -163,6 +163,163 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The `excerpt` row shows the field's placeholder when the excerpt is
+	 * empty, for every post type whose form lists the field.
+	 *
+	 * @dataProvider data_post_types_with_excerpt_in_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_excerpt_layout_shows_placeholder_if_empty( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			register_post_type( $post_type );
+		}
+
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertSame(
+			array(
+				'type'                   => 'panel',
+				'labelPosition'          => 'top',
+				'showPlaceholderIfEmpty' => true,
+			),
+			$this->get_form_field( $config, 'excerpt' )['layout']
+		);
+
+		if ( ! in_array( $post_type, array( 'page', 'post', 'wp_block' ), true ) ) {
+			unregister_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_with_excerpt_in_form() {
+		return array(
+			'page'             => array( 'page' ),
+			'post'             => array( 'post' ),
+			'wp_block'         => array( 'wp_block' ),
+			'custom post type' => array( 'excerpt_cpt' ),
+		);
+	}
+
+	/**
+	 * Post types whose own form does not list the `excerpt` field do not get
+	 * one appended by the `excerpt` layout patch.
+	 *
+	 * @dataProvider data_post_types_without_excerpt_in_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_excerpt_layout_is_not_appended_to_own_forms( $post_type ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertNull( $this->get_form_field( $config, 'excerpt' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_without_excerpt_in_form() {
+		return array(
+			'attachment'       => array( 'attachment' ),
+			'wp_template'      => array( 'wp_template' ),
+			'wp_template_part' => array( 'wp_template_part' ),
+		);
+	}
+
+	/**
+	 * The `description` row of templates shows the field's placeholder when
+	 * the description is empty, like the excerpt of posts and patterns.
+	 */
+	public function test_wp_template_description_layout_shows_placeholder_if_empty() {
+		$config = gutenberg_get_entity_view_config( 'postType', 'wp_template' );
+
+		$this->assertSame(
+			array(
+				'type'                   => 'panel',
+				'labelPosition'          => 'top',
+				'showPlaceholderIfEmpty' => true,
+			),
+			$this->get_form_field( $config, 'description' )['layout']
+		);
+	}
+
+	/**
+	 * The `author` row shows the field's placeholder when the post has no
+	 * author, for every post type whose form lists the field.
+	 *
+	 * @dataProvider data_post_types_with_author_in_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_author_layout_shows_placeholder_if_empty( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			register_post_type( $post_type );
+		}
+
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertSame(
+			array(
+				'type'                   => 'panel',
+				'showPlaceholderIfEmpty' => true,
+			),
+			$this->get_form_field( $config, 'author' )['layout']
+		);
+
+		if ( ! in_array( $post_type, array( 'page', 'post', 'attachment' ), true ) ) {
+			unregister_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_with_author_in_form() {
+		return array(
+			'page'             => array( 'page' ),
+			'post'             => array( 'post' ),
+			'attachment'       => array( 'attachment' ),
+			'custom post type' => array( 'summaries_cpt' ),
+		);
+	}
+
+	/**
+	 * Post types whose own form does not list the `author` field do not get
+	 * one appended by the `author` layout patch.
+	 *
+	 * @dataProvider data_post_types_without_author_in_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_author_layout_is_not_appended_to_own_forms( $post_type ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertNotContains( 'author', $config['form']['fields'] );
+		$this->assertNull( $this->get_form_field( $config, 'author' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_post_types_without_author_in_form() {
+		return array(
+			'wp_block'         => array( 'wp_block' ),
+			'wp_template'      => array( 'wp_template' ),
+			'wp_template_part' => array( 'wp_template_part' ),
+		);
+	}
+
+	/**
 	 * The `attachment` post type provides the form of the media editor: the
 	 * editable fields in a regular layout, then the rest in panels.
 	 */
@@ -194,7 +351,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 					'layout' => $regular_layout,
 				),
 				'date',
-				'author',
+				array(
+					'id'     => 'author',
+					'layout' => array(
+						'type'                   => 'panel',
+						'showPlaceholderIfEmpty' => true,
+					),
+				),
 				'filename',
 				'mime_type',
 				'filesize',
@@ -202,6 +365,27 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				'attached_to',
 			),
 			$config['form']['fields']
+		);
+	}
+
+	/**
+	 * The `wp_block` view list renames "My patterns" to "Site patterns" in place,
+	 * keeping its slug, and the table aligns the author column to the start.
+	 */
+	public function test_wp_block_site_patterns_view_and_author_alignment() {
+		$config = gutenberg_get_entity_view_config( 'postType', 'wp_block' );
+
+		$this->assertSame(
+			array( 'all-patterns', 'my-patterns' ),
+			array_slice( array_column( $config['view_list'], 'slug' ), 0, 2 )
+		);
+		$this->assertSame( 'Site patterns', $config['view_list'][1]['title'] );
+		$this->assertSame(
+			array(
+				'width' => '1%',
+				'align' => 'start',
+			),
+			$config['default_layouts']['table']['layout']['styles']['author']
 		);
 	}
 

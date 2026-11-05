@@ -128,14 +128,6 @@ export interface AspectRatioToolProps {
 	 * Additional CSS class on the wrapping panel item.
 	 */
 	className?: string;
-	/**
-	 * Whether the control is displaying an inherited Global Styles value.
-	 */
-	isInherited?: boolean;
-	/**
-	 * Whether a local value is overriding an inherited Global Styles value.
-	 */
-	hasLocalOverride?: boolean;
 }
 
 /**

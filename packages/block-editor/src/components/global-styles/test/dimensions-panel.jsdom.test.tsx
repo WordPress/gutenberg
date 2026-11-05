@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
@@ -6,17 +6,6 @@ import DimensionsPanel from '../dimensions-panel';
 import type { DimensionsPanelProps } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 // `AspectRatioTool` reads its option list from the block-editor data
 // store via `useSettings`. Mock that hook so the tests can render the
@@ -77,8 +66,7 @@ vi.mock( import( '../../use-settings' ), async ( importOriginal ) => {
  *
  * The control's `value` prop reads from local `value` only; inherited values
  * are surfaced through placeholders or at-rest selected options when local
- * paths are empty. The wrapping `ToolsPanelItem` carries the inherited or
- * local-override class hooks for label-level treatment.
+ * paths are empty.
  */
 
 const baseSettings = {
@@ -148,16 +136,6 @@ function renderPanel(
 			{ ...props }
 		/>
 	);
-}
-
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
-function expectLocalOverride() {
-	expect(
-		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} )
-	).toBeInTheDocument();
 }
 
 // Asserts the placeholder treatment for a control. A control can inherit a
@@ -742,7 +720,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	} );
 
 	describe( 'aspectRatio (select control archetype)', () => {
-		it( 'preselects the inherited aspectRatio option as at-rest with inherited-value treatment', () => {
+		it( 'preselects the inherited aspectRatio option at rest', () => {
 			renderPanel( {
 				value: {},
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
@@ -755,7 +733,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( aspectSelect ).toHaveTextContent( /^Wide$/ );
 		} );
 
-		it( 'renders a locally-set aspectRatio as the selected value with the local-override hook', () => {
+		it( 'renders a locally-set aspectRatio as the selected value', () => {
 			renderPanel( {
 				value: { dimensions: { aspectRatio: '1' } },
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
@@ -766,11 +744,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				name: /aspect ratio/i,
 			} );
 			expect( aspectSelect ).toHaveTextContent( /^Square$/ );
-			// A local override now gets the same local-override flag as
-			// every other control, so the inline reset button can attach.
-			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
-			expectLocalOverride();
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest aspectRatio', () => {
@@ -987,7 +960,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( minHeightInput ).toBeDefined();
 			expect( minHeightInput ).toHaveValue( 0 );
 			expect( minHeightInput ).not.toHaveAttribute( 'placeholder' );
-			expectLocalOverride();
 		} );
 
 		it( 'treats a local zero block gap as a local value instead of inherited placeholder', () => {
@@ -1000,7 +972,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const gapInput = screen.getByLabelText( /block spacing/i );
 			expect( gapInput ).toHaveValue( 0 );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
-			expectLocalOverride();
 		} );
 	} );
 } );

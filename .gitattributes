@@ -23,3 +23,6 @@ docs/** linguist-documentation
 
 # TSConfig files use jsonc.
 tsconfig*.json linguist-language=jsonc
+
+# PHPStan stub files are PHP.
+*.stub linguist-language=PHP diff=php
