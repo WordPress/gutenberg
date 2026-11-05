@@ -34,6 +34,7 @@ test.describe( 'Template rendered inside another template', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -239,6 +240,113 @@ test.describe( 'Template rendered inside another template', () => {
 			'core/post-title': 'disabled',
 			'core/post-content': 'contentOnly',
 		} );
+	} );
+
+	test( 'edits the template parts of the template being edited as it does on its own', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'frame-header',
+			title: 'Frame header',
+			content:
+				'<!-- wp:paragraph --><p>Frame header text</p><!-- /wp:paragraph -->',
+		} );
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'archive-sidebar',
+			title: 'Archive sidebar',
+			content:
+				'<!-- wp:paragraph --><p>Archive sidebar text</p><!-- /wp:paragraph -->',
+		} );
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'frame',
+			title: 'Frame',
+			content:
+				'<!-- wp:template-part {"slug":"frame-header","theme":"emptytheme"} /--><!-- wp:post-content /-->',
+		} );
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'archive',
+			title: 'Archive',
+			content:
+				'<!-- wp:heading --><h2 class="wp-block-heading">Archive</h2><!-- /wp:heading --><!-- wp:template-part {"slug":"archive-sidebar","theme":"emptytheme"} /-->',
+			template: 'frame',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//archive',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		// The editing modes of each template part, and of the first block in it,
+		// keyed by the slug of the part.
+		const getTemplatePartEditingModes = () =>
+			page.evaluate( () => {
+				const {
+					getBlocksByName,
+					getBlockAttributes,
+					getBlockOrder,
+					getBlockEditingMode,
+				} = window.wp.data.select( 'core/block-editor' );
+				return Object.fromEntries(
+					getBlocksByName( 'core/template-part' ).map(
+						( clientId ) => [
+							getBlockAttributes( clientId ).slug,
+							{
+								part: getBlockEditingMode( clientId ),
+								content: getBlockEditingMode(
+									getBlockOrder( clientId )[ 0 ]
+								),
+							},
+						]
+					)
+				);
+			} );
+
+		await expect(
+			editor.canvas.getByText( 'Archive sidebar text' )
+		).toBeVisible();
+		const onItsOwn = await getTemplatePartEditingModes();
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			editor.canvas.getByText( 'Frame header text' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByText( 'Archive sidebar text' )
+		).toBeVisible();
+		const insideFrame = await getTemplatePartEditingModes();
+
+		// The part of the template being edited is edited as it is when that
+		// template is edited on its own, rather than locked with the template
+		// around it.
+		expect( insideFrame[ 'archive-sidebar' ] ).toEqual(
+			onItsOwn[ 'archive-sidebar' ]
+		);
+		expect( insideFrame[ 'archive-sidebar' ].content ).not.toBe(
+			'disabled'
+		);
+
+		// The part of the template around it belongs to that template, which
+		// is edited on its own screen.
+		expect( insideFrame[ 'frame-header' ].content ).toBe( 'disabled' );
+
+		const sidebarText = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await sidebarText.filter( { hasText: 'Archive sidebar text' } ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '!' );
+		await expect(
+			editor.canvas.getByText( 'Archive sidebar text!' )
+		).toBeVisible();
 	} );
 
 	test( 'previews the blocks in the slot as the template they belong to', async ( {

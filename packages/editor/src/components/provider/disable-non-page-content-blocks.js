@@ -17,11 +17,17 @@ export default function DisableNonPageContentBlocks( { contentBlockTypes } ) {
 	const postContentBlockTypes = contentBlockTypes ?? defaultBlockTypes;
 	const { contentOnlyIds, templateParts } = useSelect(
 		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			const { getBlocksByName } = select( blockEditorStore );
+			const { getPostBlocksByName, getTemplatePartsOutsidePostBlocks } =
+				unlock( select( editorStore ) );
 			return {
 				contentOnlyIds: getPostBlocksByName( postContentBlockTypes ),
-				templateParts: getBlocksByName( 'core/template-part' ),
+				// A template part inside the content being edited, such as
+				// one in a template rendered inside the template around it,
+				// is left to the editing modes it has in that template on
+				// its own, rather than locked with the template around it.
+				templateParts: getTemplatePartsOutsidePostBlocks(
+					postContentBlockTypes
+				),
 			};
 		},
 		[ postContentBlockTypes ]
