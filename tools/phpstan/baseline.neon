@@ -43,24 +43,6 @@ parameters:
 			path: ../../lib/compat/wordpress-7.1/block-bindings.php
 
 		-
-			message: '#^Cannot assign offset ''media_type'' to WP_REST_Request\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^Cannot assign offset ''mime_type'' to WP_REST_Request\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
-			message: '#^WP_REST_Request does not accept array\<mixed, mixed\>\.$#'
-			identifier: offsetAssign.valueType
-			count: 2
-			path: ../../lib/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php
-
-		-
 			message: '#^Property WP_Post\:\:\$post_date \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
@@ -115,35 +97,10 @@ parameters:
 			path: ../../lib/experimental/navigation-theme-opt-in.php
 
 		-
-			message: '#^Cannot assign offset ''_fields'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
-			message: '#^Cannot assign offset ''context'' to WP_REST_Request\<array\<string, mixed\>\>\.$#'
-			identifier: offsetAssign.dimType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-		-
-			message: '#^WP_REST_Request\<array\<string, mixed\>\> does not accept string\.$#'
-			identifier: offsetAssign.valueType
-			count: 1
-			path: ../../lib/media/class-gutenberg-rest-attachments-controller.php
-
-
-		-
 			message: '#^Property WP_Comment\:\:\$comment_author_url \(string\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
 			path: ../../packages/block-library/src/avatar/index.php
-
-		-
-			message: '#^Variable \$spacing_string might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: ../../packages/block-library/src/comment-author-avatar/index.php
 
 		-
 			message: '#^Parameter \#1 \$from of function human_time_diff expects int, string given\.$#'
