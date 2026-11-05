@@ -67,7 +67,7 @@ A new note is added to the selected blocks, so selecting several blocks, or text
 
 ## Note selection
 
-The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. Three caret events change the selected note, and everything else leaves it alone:
+The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, filtered by `getCaretChange`, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. The tests in `test/utils.jsdom.test.js` have one `describe` per row of this table, so a rule change is a change to both. Three caret events change the selected note, and everything else leaves it alone:
 
 | Caret event | Selected note becomes |
 | --- | --- |

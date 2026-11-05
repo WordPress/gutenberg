@@ -28,6 +28,7 @@ import {
 	findNoteInBlock,
 	getBlockLevelClientIds,
 	focusNoteThread,
+	getCaretChange,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
@@ -646,15 +647,9 @@ export function useNoteDraft( key ) {
 	return { initialValue, setDraft, hasDraft };
 }
 
-const isSamePoint = ( a, b ) =>
-	a.clientId === b.clientId &&
-	a.attributeKey === b.attributeKey &&
-	a.offset === b.offset;
-
 /**
- * Calls back when the caret moves. Skips typing: a selection change batched
- * with a content change moves the caret with the text, never across a marker.
- * A store subscription, not `useSelect`: nothing renders from it.
+ * Calls back when the caret moves, see `getCaretChange`. A store
+ * subscription, not `useSelect`: nothing renders from it.
  *
  * @param {(caret: Object) => void} onChange Receives `{ clientIds, previousClientIds, isBlockChange, attributes, noteAtCaret }`; `attributes` only while one block is selected.
  */
@@ -668,46 +663,33 @@ function useCaretChange( onChange ) {
 			getSelectionStart,
 			getSelectionEnd,
 		} = registry.select( blockEditorStore );
-		// The caret rules read one block's markers.
-		const getCaretAttributes = ( ids ) =>
-			ids.length === 1 ? getBlockAttributes( ids[ 0 ] ) : undefined;
-		let clientIds = getSelectedBlockClientIds();
-		let attributes = getCaretAttributes( clientIds );
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
+		const getSnapshot = () => {
+			const clientIds = getSelectedBlockClientIds();
+			return {
+				clientIds,
+				// The caret rules read one block's markers.
+				attributes:
+					clientIds.length === 1
+						? getBlockAttributes( clientIds[ 0 ] )
+						: undefined,
+				selectionStart: getSelectionStart(),
+				selectionEnd: getSelectionEnd(),
+			};
+		};
+		let snapshot = getSnapshot();
 		return registry.subscribe( () => {
-			const previousClientIds = clientIds;
-			const previousAttributes = attributes;
-			clientIds = getSelectedBlockClientIds();
-			attributes = getCaretAttributes( clientIds );
-			if (
-				getSelectionStart() === selectionStart &&
-				getSelectionEnd() === selectionEnd
-			) {
+			const previous = snapshot;
+			snapshot = getSnapshot();
+			const change = getCaretChange( previous, snapshot );
+			if ( ! change ) {
 				return;
 			}
-			const isSameSelection =
-				isSamePoint( getSelectionStart(), selectionStart ) &&
-				isSamePoint( getSelectionEnd(), selectionEnd );
-			selectionStart = getSelectionStart();
-			selectionEnd = getSelectionEnd();
-			// A selection across blocks is one anchor, so moving either of its
-			// ends moves to another, as entering another block does. The store
-			// can replace the ends without moving them.
-			const isBlockChange =
-				( clientIds.length > 1 && ! isSameSelection ) ||
-				clientIds.length !== previousClientIds.length ||
-				clientIds.some(
-					( clientId, index ) =>
-						clientId !== previousClientIds[ index ]
-				);
-			if ( ! isBlockChange && attributes !== previousAttributes ) {
-				return;
-			}
+			const { clientIds, attributes, selectionStart, selectionEnd } =
+				snapshot;
 			handleChange( {
 				clientIds,
-				previousClientIds,
-				isBlockChange,
+				previousClientIds: previous.clientIds,
+				isBlockChange: change.isBlockChange,
 				attributes,
 				noteAtCaret: getNoteAtCaret(
 					attributes,
