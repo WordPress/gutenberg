@@ -58,7 +58,38 @@ const GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE = 'templateSlot';
  * @return bool Whether it has a slot.
  */
 function gutenberg_block_template_has_content_slot( $content ) {
-	return null !== gutenberg_substitute_template_content_slot( $content, '' );
+	return gutenberg_blocks_have_content_slot( parse_blocks( (string) $content ) );
+}
+
+/**
+ * Returns whether a list of parsed blocks holds the `core/post-content` block
+ * that is the slot.
+ *
+ * Follows the same walk as `gutenberg_substitute_content_slot_in_block()`,
+ * without building or serializing anything, since it answers the REST field of
+ * every template of a collection.
+ *
+ * @access private
+ *
+ * @param array $blocks Parsed blocks to search.
+ * @return bool Whether one of them, at any depth, is the slot.
+ */
+function gutenberg_blocks_have_content_slot( $blocks ) {
+	foreach ( $blocks as $block ) {
+		if ( GUTENBERG_TEMPLATE_CONTENT_SLOT_EXCLUDED_BLOCK === $block['blockName'] ) {
+			continue;
+		}
+
+		if ( 'core/post-content' === $block['blockName'] ) {
+			return true;
+		}
+
+		if ( ! empty( $block['innerBlocks'] ) && gutenberg_blocks_have_content_slot( $block['innerBlocks'] ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
