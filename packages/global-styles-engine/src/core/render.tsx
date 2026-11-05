@@ -2187,8 +2187,16 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 		return processedCSS;
 	}
 
+	// Treat a nested rule without `&` as `& selector`, matching native CSS
+	// nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+	// This must stay in sync with `process_blocks_custom_css()` in PHP.
+	const normalizedCSS = css.replace(
+		/(^|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/g,
+		'$1$2& '
+	);
+
 	// Split CSS nested rules.
-	const parts = css.split( '&' );
+	const parts = normalizedCSS.split( '&' );
 	parts.forEach( ( part: string ) => {
 		if ( ! part || part.trim() === '' ) {
 			return;
@@ -2200,7 +2208,7 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
-			const splitPart = part.replace( '}', '' ).split( '{' );
+			const splitPart = part.replaceAll( '}', '' ).split( '{' );
 			if ( splitPart.length !== 2 ) {
 				return;
 			}
