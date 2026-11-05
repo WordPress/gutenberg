@@ -17,7 +17,7 @@ import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import type { BlockAttributes } from '../../store/types';
-import { getSharedLockValue, getTemplateLockValue } from './utils';
+import { getNewLock, getSharedLockValue, getTemplateLockValue } from './utils';
 import type {
 	BlockLock,
 	BlockLockModalProps,
@@ -70,9 +70,7 @@ function getLockAttributes(
 	chosenLock: BlockLock,
 	applyTemplateLock: SharedLockValue
 ) {
-	const newLock = { ...attributes?.lock, ...chosenLock };
-	// Leaves a block without a lock as it is when every option is mixed.
-	const lock = Object.keys( newLock ).length > 0 ? newLock : undefined;
+	const lock = getNewLock( attributes?.lock, chosenLock );
 	const keepsTemplateLock =
 		applyTemplateLock === null ||
 		! hasTemplateLockSupport( blockName ) ||
@@ -87,7 +85,7 @@ function getLockAttributes(
 	return {
 		lock,
 		templateLock: applyTemplateLock
-			? getTemplateLockValue( newLock )
+			? getTemplateLockValue( lock ?? {} )
 			: undefined,
 	};
 }

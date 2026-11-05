@@ -1,7 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { getSharedLockValue, getTemplateLockValue } from '../utils';
+import { getNewLock, getSharedLockValue, getTemplateLockValue } from '../utils';
 
 describe( 'block-lock utils', () => {
+	describe( 'getNewLock', () => {
+		it( 'applies the chosen options over the saved lock', () => {
+			expect(
+				getNewLock( { move: true, remove: true }, { remove: false } )
+			).toEqual( { move: true, remove: false } );
+		} );
+
+		it( 'returns the saved lock when no value changes', () => {
+			const savedLock = { move: true, remove: false };
+
+			expect( getNewLock( savedLock, {} ) ).toBe( savedLock );
+			expect( getNewLock( savedLock, { move: true } ) ).toBe( savedLock );
+		} );
+
+		it( 'leaves a block without a lock when every option is mixed', () => {
+			expect( getNewLock( undefined, {} ) ).toBeUndefined();
+		} );
+
+		it( 'adds a lock to a block without one', () => {
+			expect( getNewLock( undefined, { move: false } ) ).toEqual( {
+				move: false,
+			} );
+		} );
+	} );
+
 	describe( 'getTemplateLockValue', () => {
 		it( 'returns "all" when movement and removal are locked', () => {
 			expect( getTemplateLockValue( { move: true, remove: true } ) ).toBe(

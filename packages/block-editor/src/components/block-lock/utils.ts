@@ -1,4 +1,22 @@
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type { BlockLock, SharedLockValue } from './types';
+
+/**
+ * Returns a block's lock with the chosen options applied. Returns the saved
+ * lock itself when no value changes, so the block isn't marked as updated.
+ *
+ * @param savedLock  The block's saved lock.
+ * @param chosenLock The lock options that aren't mixed.
+ *
+ * @return The block's new lock.
+ */
+export function getNewLock(
+	savedLock: BlockLock | undefined,
+	chosenLock: BlockLock
+): BlockLock | undefined {
+	const newLock = { ...savedLock, ...chosenLock };
+	return isShallowEqual( newLock, savedLock ?? {} ) ? savedLock : newLock;
+}
 
 /**
  * Returns the `templateLock` value matching a block lock.
