@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataViews: Render a radio instead of a checkbox for single-selection pickers, and honour a consumer-supplied `isItemSelectable` predicate so items can be made non-selectable ([#86184](https://github.com/WordPress/gutenberg/pull/86184)).
+
 ### Bug Fixes
 
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).

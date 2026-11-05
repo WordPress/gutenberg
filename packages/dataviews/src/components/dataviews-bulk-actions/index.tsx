@@ -59,6 +59,7 @@ interface BulkSelectionCheckboxProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	isItemSelectable?: ( item: Item ) => boolean;
 	disableSelectAll?: boolean;
 	checkboxRef?: React.Ref< HTMLSpanElement >;
 }
@@ -69,18 +70,21 @@ export function BulkSelectionCheckbox< Item >( {
 	data,
 	actions,
 	getItemId,
+	isItemSelectable = () => true,
 	disableSelectAll = false,
 	checkboxRef,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
-		return data.filter( ( item ) => {
-			return actions.some(
-				( action ) =>
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ data, actions ] );
+		return data.filter(
+			( item ) =>
+				isItemSelectable( item ) &&
+				actions.some(
+					( action ) =>
+						action.supportsBulk &&
+						( ! action.isEligible || action.isEligible( item ) )
+				)
+		);
+	}, [ data, actions, isItemSelectable ] );
 	const selectedItems = data.filter(
 		( item ) =>
 			selection.includes( getItemId( item ) ) &&

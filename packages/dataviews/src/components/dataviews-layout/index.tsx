@@ -27,6 +27,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		setOpenedFilter,
 		onClickItem,
 		isItemClickable,
+		isItemSelectable,
 		renderItemLink,
 		defaultLayouts,
 		containerRef,
@@ -75,6 +76,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 				onClickItem={ onClickItem }
 				renderItemLink={ renderItemLink }
 				isItemClickable={ isItemClickable }
+				isItemSelectable={ isItemSelectable }
 				view={ view }
 				empty={ empty }
 			/>

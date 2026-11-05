@@ -245,6 +245,11 @@ export default function useSelectionProps< Item >( {
 			// reach here: `onClickCapture` stops them.
 			...( shouldSelectOnClick && {
 				onClick: () => {
+					// A non-selectable item is not part of the selection model,
+					// so a plain click must leave the selection untouched.
+					if ( ! isSelectable ) {
+						return;
+					}
 					if ( allowDeselect && selection.includes( id ) ) {
 						onChangeSelection(
 							selection.filter( ( itemId ) => id !== itemId )

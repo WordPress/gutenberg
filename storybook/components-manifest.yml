@@ -563,6 +563,7 @@
       - empty
       - fields
       - getItemId
+      - isItemSelectable
       - isLoading
       - itemListLabel
       - onChangeSelection

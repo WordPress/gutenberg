@@ -34,6 +34,7 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	isItemSelectable = () => true,
 	disableSelectAll = false,
 }: {
 	selection: string[];
@@ -41,10 +42,22 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	isItemSelectable?: ( item: Item ) => boolean;
 	disableSelectAll?: boolean;
 } ) {
 	const hasSelection = selection.length > 0;
-	const areAllSelected = selectedItems.length === data.length;
+	// Non-selectable items are never part of the selection, so select-all only
+	// considers the items a consumer allowed to be selected.
+	const selectableData = useMemo(
+		() => data.filter( ( item ) => isItemSelectable( item ) ),
+		[ data, isItemSelectable ]
+	);
+	const selectableSelectedItems = selectedItems.filter( ( item ) =>
+		isItemSelectable( item )
+	);
+	const areAllSelected =
+		!! selectableData.length &&
+		selectableSelectedItems.length === selectableData.length;
 
 	if ( disableSelectAll ) {
 		return (
@@ -75,10 +88,11 @@ function BulkSelectionCheckbox< Item >( {
 						)
 					);
 				} else {
-					// Select all - merge the current page into the total selection.
+					// Select all - merge the selectable items of the current page
+					// into the total selection.
 					const selectionSet = new Set( [
 						...selection,
-						...data.map( ( item ) => getItemId( item ) ),
+						...selectableData.map( ( item ) => getItemId( item ) ),
 					] );
 					onChangeSelection( Array.from( selectionSet ) );
 				}
@@ -161,6 +175,7 @@ function PickerBulkSelectionInfo() {
 		onChangeSelection,
 		getItemId,
 		actions = EMPTY_ARRAY,
+		isItemSelectable,
 		paginationInfo,
 		view,
 	} = useContext( DataViewsContext );
@@ -169,8 +184,12 @@ function PickerBulkSelectionInfo() {
 
 	const selectedItems = useMemo(
 		() =>
-			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
-		[ selection, getItemId, data ]
+			data.filter(
+				( item ) =>
+					selection.includes( getItemId( item ) ) &&
+					isItemSelectable( item )
+			),
+		[ selection, getItemId, data, isItemSelectable ]
 	);
 
 	// The count and the selection checkbox belong with the actions, mirroring `DataViews`.
@@ -199,6 +218,7 @@ function PickerBulkSelectionInfo() {
 					onChangeSelection={ onChangeSelection }
 					data={ data }
 					getItemId={ getItemId }
+					isItemSelectable={ isItemSelectable }
 					disableSelectAll={ !! view.infiniteScrollEnabled }
 				/>
 			) }
