@@ -19,7 +19,7 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
-import { DESIGN_POST_TYPES } from '../../store/constants';
+import { DESIGN_POST_TYPES, PATTERN_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
@@ -61,6 +61,13 @@ export const STATUS_OPTIONS = [
 		description: __( 'Visible to everyone.' ),
 	},
 ];
+
+// A synced pattern renders for nobody unless it's published and has no
+// password, so Private ("Only visible to site admins and editors") and
+// password protection would be misleading for patterns.
+const PATTERN_STATUS_OPTIONS = STATUS_OPTIONS.filter(
+	( { value } ) => value !== 'private'
+);
 
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
@@ -105,7 +112,9 @@ export default function PostStatus() {
 		[ popoverAnchor ]
 	);
 
-	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+	const isPattern = postType === PATTERN_POST_TYPE;
+
+	if ( DESIGN_POST_TYPES.includes( postType ) && ! isPattern ) {
 		return null;
 	}
 
@@ -186,7 +195,11 @@ export default function PostStatus() {
 										className="editor-change-status__options"
 										hideLabelFromVision
 										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
+										options={
+											isPattern
+												? PATTERN_STATUS_OPTIONS
+												: STATUS_OPTIONS
+										}
 										onChange={ handleStatus }
 										selected={
 											status === 'auto-draft'
@@ -204,7 +217,7 @@ export default function PostStatus() {
 											/>
 										</div>
 									) }
-									{ status !== 'private' && (
+									{ status !== 'private' && ! isPattern && (
 										<VStack
 											as="fieldset"
 											spacing={ 4 }
