@@ -1,10 +1,4 @@
-import {
-	useContext,
-	useEffect,
-	useState,
-	useMemo,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalText as WCText,
@@ -23,17 +17,10 @@ import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
 	Progress,
-	Select,
 } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
-import {
-	moreVertical,
-	next,
-	previous,
-	chevronLeft,
-	chevronRight,
-} from '@wordpress/icons';
+import { __, _x, isRTL } from '@wordpress/i18n';
+import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
 import type {
 	FontCollection as FontCollectionType,
@@ -43,6 +30,7 @@ import type {
 } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
+import Pagination, { getFontsPerPage } from './pagination';
 import filterFonts from './utils/filter-fonts';
 import { toggleFont } from './utils/toggleFont';
 import {
@@ -61,7 +49,6 @@ const DEFAULT_CATEGORY = {
 };
 
 const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
-const MIN_WINDOW_HEIGHT = 500;
 
 function FontCollection( { slug }: { slug: string } ) {
 	const requiresPermission = slug === 'google-fonts';
@@ -136,10 +123,7 @@ function FontCollection( { slug }: { slug: string } ) {
 		[ collectionFonts, filters ]
 	);
 
-	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
-	// The height of each font family item is 61px.
-	const windowHeight = Math.max( window.innerHeight, MIN_WINDOW_HEIGHT );
-	const pageSize = Math.floor( ( windowHeight - 417 ) / 61 );
+	const pageSize = getFontsPerPage();
 	const totalPages = Math.ceil( fonts.length / pageSize );
 	const itemsStart = ( page - 1 ) * pageSize;
 	const itemsLimit = page * pageSize;
@@ -546,91 +530,11 @@ function FontCollection( { slug }: { slug: string } ) {
 							justify="end"
 							spacing={ 6 }
 						>
-							<HStack
-								justify="flex-start"
-								expanded={ false }
-								spacing={ 1 }
-								className="font-library__page-selection"
-							>
-								{ createInterpolateElement(
-									sprintf(
-										// translators: 1: Current page number, 2: Total number of pages.
-										_x(
-											'<div>Page</div>%1$s<div>of %2$d</div>',
-											'paging'
-										),
-										'<CurrentPage />',
-										totalPages
-									),
-									{
-										div: <div aria-hidden />,
-										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
-										CurrentPage: (
-											<Select.Root
-												value={ page.toString() }
-												onValueChange={ ( newPage ) => {
-													if ( newPage !== null ) {
-														setPage(
-															parseInt( newPage )
-														);
-													}
-												} }
-											>
-												<Select.Trigger
-													className="font-library__page-selection-trigger"
-													size="small"
-													variant="minimal"
-													aria-label={ __(
-														'Current page'
-													) }
-												/>
-												<Select.Popup width="content">
-													{ [
-														...Array( totalPages ),
-													].map( ( e, i ) => {
-														const value = (
-															i + 1
-														).toString();
-														return (
-															<Select.Item
-																key={ value }
-																value={ value }
-																size="small"
-															>
-																<Select.ItemLabel>
-																	{ value }
-																</Select.ItemLabel>
-															</Select.Item>
-														);
-													} ) }
-												</Select.Popup>
-											</Select.Root>
-										),
-									}
-								) }
-							</HStack>
-							<HStack expanded={ false } spacing={ 1 }>
-								<Button
-									onClick={ () => setPage( page - 1 ) }
-									disabled={ page === 1 }
-									accessibleWhenDisabled
-									label={ __( 'Previous page' ) }
-									icon={ isRTL() ? next : previous }
-									showTooltip
-									size="compact"
-									tooltipPosition="top"
-								/>
-								<Button
-									onClick={ () => setPage( page + 1 ) }
-									disabled={ page === totalPages }
-									accessibleWhenDisabled
-									label={ __( 'Next page' ) }
-									icon={ isRTL() ? previous : next }
-									showTooltip
-									size="compact"
-									tooltipPosition="top"
-								/>
-							</HStack>
+							<Pagination
+								page={ page }
+								totalPages={ totalPages }
+								onChange={ setPage }
+							/>
 						</HStack>
 					) }
 				</>
