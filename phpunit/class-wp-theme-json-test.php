@@ -8291,6 +8291,42 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo, .bar)::before{color: yellow;}:root :where(.foo, .bar) ::before{color: purple;}:root :where(.foo.three, .bar.three)::before{color: orange;}:root :where(.foo .four, .bar .four)::before{color: skyblue;}',
 			),
+			// CSS with nested selectors without `&`.
+			'nested without &'             => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			),
+			'only nested without &'        => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo img){color: blue;}',
+			),
+			'mixed nested selectors'       => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; &.one{color: blue;} .two{color: green;} > img{color: yellow;} ::before{color: purple;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}:root :where(.foo > img){color: yellow;}:root :where(.foo) ::before{color: purple;}',
+			),
+			'nested without & inside &'    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '& { color: red; img { color: blue; } }',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			),
+			'nested without & multi root'  => array(
+				'input'    => array(
+					'selector' => '.foo, .bar',
+					'css'      => 'color: red; img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo, .bar){color: red;}:root :where(.foo img, .bar img){color: blue;}',
+			),
 		);
 	}
 
