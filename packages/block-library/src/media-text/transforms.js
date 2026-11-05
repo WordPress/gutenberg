@@ -5,9 +5,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id, anchor } ) =>
+			transform: ( { alt, title, url, id, anchor } ) =>
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
+					mediaTitle: title,
 					mediaId: id,
 					mediaUrl: url,
 					mediaType: 'image',
@@ -103,9 +104,16 @@ const transforms = {
 			isMatch: ( { mediaType, mediaUrl } ) => {
 				return ! mediaUrl || mediaType === 'image';
 			},
-			transform: ( { mediaAlt, mediaId, mediaUrl, anchor } ) => {
+			transform: ( {
+				mediaAlt,
+				mediaTitle,
+				mediaId,
+				mediaUrl,
+				anchor,
+			} ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
+					title: mediaTitle,
 					id: mediaId,
 					url: mediaUrl,
 					anchor,
