@@ -57,24 +57,26 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
  */
 function block_core_tabs_provide_context( array $context, array $parsed_block ): array {
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
-		static $seen_anchors = array();
+		static $seen_ids = array();
 
 		$anchor = $parsed_block['attrs']['anchor'] ?? '';
 		$anchor = is_string( $anchor ) ? $anchor : '';
 
 		/*
-		 * Generate a unique ID for the tabs instance first, so it can be used
-		 * to derive stable tab IDs. The anchor is used the first time it is
-		 * rendered, so links to its tabs keep working. A later render of the
-		 * same anchor, such as a synced pattern inserted twice, gets a unique
-		 * ID instead, so its tabs and panels don't clash with the first one.
+		 * Use the anchor as the tabs ID the first time it is rendered, so links
+		 * to its tabs keep working. A repeat render (e.g. a synced pattern used
+		 * twice) gets a generated ID, so its tab IDs don't clash. Every ID used
+		 * is recorded so generated IDs and anchors never collide.
 		 */
-		if ( '' !== $anchor && ! isset( $seen_anchors[ $anchor ] ) ) {
-			$seen_anchors[ $anchor ] = true;
-			$tabs_id                 = $anchor;
+		if ( '' !== $anchor && ! isset( $seen_ids[ $anchor ] ) ) {
+			$tabs_id = $anchor;
 		} else {
-			$tabs_id = wp_unique_prefixed_id( '' !== $anchor ? $anchor . '-' : 'tabs_' );
+			do {
+				$tabs_id = wp_unique_prefixed_id( '' !== $anchor ? $anchor . '__' : 'tabs_' );
+			} while ( isset( $seen_ids[ $tabs_id ] ) );
 		}
+
+		$seen_ids[ $tabs_id ] = true;
 
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;

@@ -196,7 +196,7 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 				$this->assertSame( 'rendered-twice', $context['tabsId'] ?? '', 'The first render should keep the anchor.' );
 				$this->assertSame( 'rendered-twice-tab-1', $panels[0], 'The first render should keep the anchor-based panel IDs.' );
 			} else {
-				$this->assertStringStartsWith( 'rendered-twice-', $context['tabsId'] ?? '', 'A later render should be prefixed with the anchor.' );
+				$this->assertStringStartsWith( 'rendered-twice__', $context['tabsId'] ?? '', 'A later render should be prefixed with the anchor.' );
 				$this->assertNotSame( 'rendered-twice', $context['tabsId'] ?? '', 'A later render should not reuse the anchor.' );
 			}
 		}
