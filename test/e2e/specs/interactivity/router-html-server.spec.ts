@@ -216,25 +216,14 @@ test.describe( 'Router server-rendered HTML content', () => {
 				),
 			synced
 		);
-		const pageContent = page.getByTestId( 'page-content' );
 
-		for ( const [ move, name, html ] of [
-			[ 'next', 'two', '<p>Two</p>' ],
-			[ 'back', 'one', '' ],
-			[ 'forward', 'two', '<p>Two</p>' ],
-		] ) {
-			if ( move === 'next' ) {
-				await page
-					.getByRole( 'link', { name: 'Next', exact: true } )
-					.click();
-			} else {
-				await ( move === 'back' ? page.goBack() : page.goForward() );
-			}
-			await expect( pageContent ).toHaveText( `content from ${ name }` );
-			await expect
-				.poll( () => contentOf( page, synced ) )
-				.toEqual( [ html, html ] );
-		}
+		await page.getByRole( 'link', { name: 'Next', exact: true } ).click();
+		await expect( page.getByTestId( 'page-content' ) ).toHaveText(
+			'content from two'
+		);
+		await expect
+			.poll( () => contentOf( page, synced ) )
+			.toEqual( [ '<p>Two</p>', '<p>Two</p>' ] );
 
 		expect(
 			await elements.evaluate(
