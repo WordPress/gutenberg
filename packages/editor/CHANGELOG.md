@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
+
 ### Bug Fixes
 
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
