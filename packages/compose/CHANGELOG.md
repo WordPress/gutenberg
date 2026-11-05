@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   `useCopyToClipboard`: Add an optional `onError` callback for a failed copy ([#85269](https://github.com/WordPress/gutenberg/pull/85269)).

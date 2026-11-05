@@ -1,0 +1,86 @@
+{
+	"name": "@wordpress/image-editor",
+	"version": "0.1.0-prerelease",
+	"description": "An image editor: a canvas to pan, zoom, rotate, flip and crop an image, and a helper that describes the edits to apply when saving it.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"image",
+		"cropper",
+		"crop"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/image-editor/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/image-editor"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"docs",
+		"*.md",
+		"!**/stories/**",
+		"!**/test/**"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./build-style/*": "./build-style/*",
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
+	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"clsx": "^2.1.1",
+		"gl-matrix": "^3.4.3"
+	},
+	"devDependencies": {
+		"@storybook/react-vite": "^10.6.5",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
+		"@wordpress/components": "file:../components",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui",
+		"vitest": "^5.0.5",
+		"vitest-browser-react": "^2.3.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

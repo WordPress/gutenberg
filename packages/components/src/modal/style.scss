@@ -43,6 +43,12 @@ body.modal-open {
 	max-height: calc(100% - var(--wpds-dimension-gap-3xl));
 	background: var(--wpds-color-background-surface-neutral-strong);
 	box-shadow: variables.$elevation-large;
+
+	// Keep the window boundary visible when forced-colors mode removes its shadow.
+	@media (forced-colors: active) {
+		outline: var(--wpds-border-width-xs) solid CanvasText;
+	}
+
 	border-radius: var(--wpds-border-radius-lg) var(--wpds-border-radius-lg) 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.

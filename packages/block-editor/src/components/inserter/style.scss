@@ -39,6 +39,13 @@ $block-inserter-tabs-height: 44px;
 		gap: 0;
 	}
 
+	.block-editor-tabbed-sidebar__tabpanel:has(
+		> .block-editor-inserter__search
+	) {
+		// Reserve space for the sticky search control, its padding, and bottom border.
+		scroll-padding-top: $button-size-next-default-40px + $grid-unit-20 * 2 + $border-width;
+	}
+
 	.block-editor-tabbed-sidebar {
 		@include break-medium() {
 			width: $secondary-sidebar-width;

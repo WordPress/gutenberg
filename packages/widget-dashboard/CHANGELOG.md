@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-04)
+
 -   Widget footer: keep one strip height (text line plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
 
 ### Breaking Changes
@@ -13,6 +15,15 @@
 
 -   Honor `gridSettings.minColumnWidth` as a per-column floor: the surface fits as many columns as the container allows at that width, capped by `columns` when set ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
 -   `WidgetHeader`: Use the help icon for infotips ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ## 0.10.0 (2026-10-20)
 

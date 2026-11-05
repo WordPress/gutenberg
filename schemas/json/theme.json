@@ -1788,10 +1788,34 @@
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
+							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now.",
 							"oneOf": [
 								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
+								{ "$ref": "#/definitions/refComplete" },
+								{
+									"type": "object",
+									"properties": {
+										"top": {
+											"description": "Sets the row gap.",
+											"oneOf": [
+												{ "type": "string" },
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										},
+										"left": {
+											"description": "Sets the column gap.",
+											"oneOf": [
+												{ "type": "string" },
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										}
+									},
+									"additionalProperties": false
+								}
 							]
 						},
 						"margin": {
@@ -2569,7 +2593,31 @@
 					]
 				}
 			},
-			"additionalProperties": false
+			"additionalProperties": false,
+			"allOf": [
+				{
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"spacing": {
+								"type": "object",
+								"properties": {
+									"blockGap": {
+										"description": "Elements only support a single block gap value.",
+										"oneOf": [
+											{ "type": "string" },
+											{
+												"$ref": "#/definitions/refComplete"
+											}
+										]
+									}
+								}
+							}
+						}
+					}
+				}
+			]
 		},
 		"stylesBlocksPropertiesComplete": {
 			"description": "Styles defined on a per-block basis using the block's selector.",
@@ -3751,6 +3799,20 @@
 		"properties": {
 			"styles": {
 				"type": "object",
+				"properties": {
+					"spacing": {
+						"type": "object",
+						"properties": {
+							"blockGap": {
+								"description": "Root styles only support a single block gap value for now.",
+								"oneOf": [
+									{ "type": "string" },
+									{ "$ref": "#/definitions/refComplete" }
+								]
+							}
+						}
+					}
+				},
 				"propertyNames": {
 					"anyOf": [
 						{

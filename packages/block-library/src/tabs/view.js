@@ -76,7 +76,7 @@ const { actions, state } = store(
 		},
 		actions: {
 			/**
-			 * Handles the keydown events for the tab label and tabs controller.
+			 * Handles the keydown events for the tab buttons.
 			 *
 			 * @param {KeyboardEvent} event The keydown event.
 			 */

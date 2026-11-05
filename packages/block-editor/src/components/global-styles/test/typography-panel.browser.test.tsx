@@ -1113,6 +1113,30 @@ describe( 'TypographyPanel text gradient', () => {
 		expect( result.color.gradient ).toBeUndefined();
 	} );
 
+	it( 'shows the contrast warning on the gradient control when the text is a gradient', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+			contrastWarning: 'Low contrast gradient',
+		} );
+
+		expect(
+			screen.getAllByRole( 'button', { name: 'Low contrast' } )
+		).toHaveLength( 1 );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		expect(
+			await screen.findByText( 'Low contrast gradient' )
+		).toBeVisible();
+	} );
+
 	it( 'keeps the gradient control usable while a background gradient is set', async () => {
 		await renderPanel( {
 			settings: gradientSettings,

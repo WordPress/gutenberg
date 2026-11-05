@@ -59,6 +59,19 @@ function GridItemResizerInner( {
 	} );
 
 	useEffect( () => {
+		// In a manual grid every side is always available: a side on the
+		// grid's edge can still shrink the block, and the resize is kept
+		// inside the grid by its bounds. Checking the edges here would also
+		// go stale when the block moves without changing size.
+		if ( isManualGrid ) {
+			setEnableSide( {
+				top: true,
+				bottom: true,
+				left: true,
+				right: true,
+			} );
+			return;
+		}
 		const observer = new window.ResizeObserver( () => {
 			const blockClientRect = blockElement.getBoundingClientRect();
 			const rootBlockClientRect =
@@ -73,13 +86,9 @@ function GridItemResizerInner( {
 				blockClientRect.right < rootBlockClientRect.right;
 
 			setEnableSide( {
-				top: !! isManualGrid
-					? topAvailable
-					: ! bottomAvailable && topAvailable,
+				top: ! bottomAvailable && topAvailable,
 				bottom: bottomAvailable,
-				left: !! isManualGrid
-					? leftAvailable
-					: ! rightAvailable && leftAvailable,
+				left: ! rightAvailable && leftAvailable,
 				right: rightAvailable,
 			} );
 		} );
