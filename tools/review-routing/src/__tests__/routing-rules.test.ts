@@ -46,6 +46,8 @@ describe( 'loadRoutingRules', () => {
 	it( 'reads the routing files in the repository', async () => {
 		const rules = await loadRoutingRules();
 
-		expect( rules.map( ( rule ) => rule.id ) ).toContain( 'design-system' );
+		expect( rules.map( ( rule ) => rule.id ) ).toContain(
+			'design-system-api'
+		);
 	} );
 } );

@@ -1,6 +1,6 @@
 # Review routing
 
-Decides which teams to ask for review on a pull request. It sends the pull request to a decision model with one yes or no question for each team, and a team gets a review request when the probability reaches its threshold.
+Decides which teams to ask for review on a pull request. It sends the pull request to a decision model with one yes or no question for each rule, and a team gets a review request when the probability of one of its rules reaches that rule's threshold.
 
 Unlike `.github/CODEOWNERS`, which asks a team about every change under a path, a rule describes the kind of change that a team should review. A dependency update that touches a team's package does not need that team, and a change outside the package can.
 
@@ -14,10 +14,12 @@ team: WordPress/gutenberg-components
 threshold: 0.7
 ---
 
-Should the design system team review this change? Answer yes when ...
+Does this change add or change a public API of the design system packages? ...
 ```
 
-`threshold` is optional and defaults to 0.7. Write the body in plain language, and say when to answer no as well as when to answer yes. To add a team, add a file.
+`threshold` is optional and defaults to 0.7. Write the body in plain language, and say when to answer no if the boundary is not clear.
+
+Ask about one kind of change in each file. A question that combines several conditions gives a less useful probability, and the model can let one condition hide another. To route several kinds of change to a team, add a file for each kind with the same `team`. The team gets one request if any of its rules passes, and the report shows which rules did. To add a team, add a file.
 
 ## What the model reads
 
