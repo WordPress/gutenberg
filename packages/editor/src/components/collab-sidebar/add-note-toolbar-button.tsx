@@ -25,13 +25,18 @@ function NoteToolbarButton( {
 }: NoteToolbarButtonProps ) {
 	const { canAddNote, shortcut } = useSelect(
 		( select ) => {
-			const { getBlockName, isBlockValid } = select( blockEditorStore );
+			const { getBlockName, isBlockValid, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 			const blockName = getBlockName( clientId );
 			return {
 				canAddNote:
 					isBlockValid( clientId ) &&
 					blockName !== 'core/freeform' &&
-					blockName !== getUnregisteredTypeHandlerName(),
+					blockName !== getUnregisteredTypeHandlerName() &&
+					! getBlockParentsByBlockName(
+						clientId,
+						'core/template-part'
+					).length,
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
