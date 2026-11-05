@@ -64,7 +64,6 @@ const EmbedEdit = ( props ) => {
 			const {
 				getEmbedPreview,
 				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
 				getThemeSupports,
 				hasFinishedResolution,
 			} = select( coreStore );
@@ -78,15 +77,18 @@ const EmbedEdit = ( props ) => {
 			// No html to show: the provider or URL can't be embedded, or core
 			// dropped the html, as it does on the front end.
 			const validPreview = !! embedPreview?.html;
+			const hasResolved = hasFinishedResolution( 'getEmbedPreview', [
+				attributesUrl,
+			] );
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isRequestingEmbedPreview( attributesUrl ),
+				// Also loading before the request starts, which is a tick
+				// after the URL is set.
+				fetching: ! hasResolved,
 				themeSupportsResponsive:
 					getThemeSupports()[ 'responsive-embeds' ],
 				cannotEmbed: ! validPreview || previewIsFallback,
-				hasResolved: hasFinishedResolution( 'getEmbedPreview', [
-					attributesUrl,
-				] ),
+				hasResolved,
 			};
 		},
 		[ attributesUrl ]

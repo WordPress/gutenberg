@@ -141,8 +141,7 @@ test.describe( 'Embedding content', () => {
 			'Provider whose oembed API has gone wrong. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/thatbunty' );
 
-		// The failed state also shows before the preview request starts, so
-		// wait for the response before checking it.
+		// Check the result once the preview response is handled.
 		const mastodonPreview = page.waitForResponse(
 			( response ) =>
 				new URL( response.url() ).searchParams.get( 'url' ) ===
