@@ -1,7 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { check, copy, error as errorIcon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import Warning from '../warning';
@@ -17,29 +17,36 @@ const RESULT_ICON = {
 };
 
 function CopyErrorButton( { error }: { error: Error } ) {
-	const [ result, setResult ] = useState< CopyResult >( 'idle' );
+	// Bump the id on every result so a repeat of the same outcome restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
+		result: CopyResult;
+		id: number;
+	} >( { result: 'idle', id: 0 } );
 
 	useEffect( () => {
-		if ( result === 'idle' ) {
+		if ( feedback.result === 'idle' ) {
 			return;
 		}
 		const timeoutId = setTimeout(
-			() => setResult( 'idle' ),
+			() => setFeedback( { result: 'idle', id: 0 } ),
 			COPY_FEEDBACK_TIMEOUT
 		);
 		return () => clearTimeout( timeoutId );
-	}, [ result ] );
+	}, [ feedback ] );
+
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
+		setFeedback( ( current ) => ( {
+			result,
+			id: current.id + 1,
+		} ) );
+		speak( message );
+	}
 
 	const ref = useCopyToClipboard(
 		() => error.stack ?? String( error ),
-		() => {
-			setResult( 'copied' );
-			speak( __( 'Copied to clipboard' ) );
-		},
-		() => {
-			setResult( 'error' );
-			speak( __( "Couldn't copy to clipboard." ) );
-		}
+		() => report( 'copied', __( 'Copied to clipboard' ) ),
+		() => report( 'error', __( "Couldn't copy to clipboard." ) )
 	);
 
 	return (
@@ -47,9 +54,9 @@ function CopyErrorButton( { error }: { error: Error } ) {
 			ref={ ref }
 			variant="secondary"
 			size="compact"
-			icon={ RESULT_ICON[ result ] }
+			icon={ RESULT_ICON[ feedback.result ] }
 		>
-			{ __( 'Copy error' ) }
+			{ _x( 'Copy error', 'button label' ) }
 		</Button>
 	);
 }
