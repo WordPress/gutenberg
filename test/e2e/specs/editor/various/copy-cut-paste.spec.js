@@ -37,6 +37,17 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
+		// The editor learns of the caret move from an asynchronous selection
+		// change, so only cut once it selects the first block.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getBlockIndex, getSelectedBlockClientId } =
+						window.wp.data.select( 'core/block-editor' );
+					return getBlockIndex( getSelectedBlockClientId() );
+				} )
+			)
+			.toBe( 0 );
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 

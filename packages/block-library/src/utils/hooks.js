@@ -2,7 +2,7 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useEvent, useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -21,6 +21,22 @@ export function useCanEditEntity( kind, name, recordId ) {
 				id: recordId,
 			} ),
 		[ kind, name, recordId ]
+	);
+}
+
+/**
+ * Returns the comments query of a post: `totalItems` is its comment count once
+ * known, and stays null when the request fails.
+ *
+ * @param {number} postId Post ID. Nothing is fetched without one.
+ */
+export function usePostCommentsCount( postId ) {
+	// The view context lets users who can't moderate comments read the count.
+	return useEntityRecords(
+		'root',
+		'comment',
+		{ post: postId, per_page: 1, _fields: 'id', context: 'view' },
+		{ enabled: !! postId }
 	);
 }
 
