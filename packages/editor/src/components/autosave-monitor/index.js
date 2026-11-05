@@ -3,34 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import AutosaveRetry from '../autosave-retry';
-
-/**
- * Calls `callback` every `intervalInSeconds`. The latest `callback` is always
- * invoked without resetting the timer.
- *
- * @param {Function} callback          Function to call on each tick.
- * @param {number}   intervalInSeconds Seconds between ticks.
- */
-function useInterval( callback, intervalInSeconds ) {
-	const callbackRef = useRef( callback );
-
-	useEffect( () => {
-		callbackRef.current = callback;
-	}, [ callback ] );
-
-	useEffect( () => {
-		// Interval can be undefined before editor settings are populated.
-		if ( ! intervalInSeconds ) {
-			return;
-		}
-
-		const id = setInterval(
-			() => callbackRef.current(),
-			intervalInSeconds * 1000
-		);
-		return () => clearInterval( id );
-	}, [ intervalInSeconds ] );
-}
+import useInterval from './use-interval';
 
 /**
  * Autosaves through a custom `autosave` function, checking the post every
