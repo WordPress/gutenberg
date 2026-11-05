@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "../utils/composite-item";
 
 .components-dropdown-menu__toggle {
 	vertical-align: top;
@@ -46,6 +47,23 @@
 				background: $gray-900;
 				box-shadow: 0 0 0 $border-width $gray-900;
 				border-radius: $border-width;
+				// Dashicons fade their color in wp-admin, which would lag behind the background.
+				transition: none;
+			}
+
+			@include composite-item.when-highlighted {
+				svg,
+				.dashicon {
+					color: var(--wpds-color-background-interactive-brand-strong-active);
+					background: var(--wpds-color-foreground-interactive-brand-strong-active);
+					box-shadow: 0 0 0 $border-width var(--wpds-color-foreground-interactive-brand-strong-active);
+
+					@media ( forced-colors: active ) {
+						color: Highlight;
+						background: HighlightText;
+						box-shadow: 0 0 0 $border-width HighlightText;
+					}
+				}
 			}
 		}
 
