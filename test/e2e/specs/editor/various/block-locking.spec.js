@@ -459,6 +459,108 @@ test.describe( 'Block Locking', () => {
 		] );
 	} );
 
+	test( 'keeps the template lock of a block whose lock options are left mixed', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { templateLock: 'insert' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside a template locked group' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { lock: { move: true, remove: true } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside a locked group' },
+				},
+			],
+		} );
+		const groups = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		await editor.selectBlocks( groups.first(), groups.last() );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
+			name: 'Apply to all blocks inside',
+			exact: true,
+		} );
+		await expect( applyToInnerBlocks ).toBeChecked( {
+			indeterminate: true,
+		} );
+		await applyToInnerBlocks.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ attributes: { templateLock: 'insert' } },
+			{
+				attributes: {
+					lock: { move: true, remove: true },
+					templateLock: 'all',
+				},
+			},
+		] );
+	} );
+
+	test( 'follows lock changes made while the modal is open', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Some paragraph' },
+		} );
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock Paragraph' } );
+		await expect(
+			modal.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+		).not.toBeChecked();
+
+		// Another user locks the block while the modal is open.
+		await page.evaluate( () => {
+			const { getSelectedBlockClientId } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientId(), {
+					lock: { move: true, remove: true },
+				} );
+		} );
+
+		await expect(
+			modal.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+		).toBeChecked();
+		await expect(
+			modal.getByRole( 'button', { name: 'Apply', exact: true } )
+		).toBeDisabled();
+
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock removal', exact: true } )
+			.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { lock: { move: true, remove: false } } },
+			] );
+	} );
+
 	test( 'keeps a contentOnly template lock', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/group',
