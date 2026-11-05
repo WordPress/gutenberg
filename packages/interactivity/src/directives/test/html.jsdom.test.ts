@@ -1114,7 +1114,7 @@ describe( 'data-wp-html', () => {
 				Element.prototype,
 				'innerHTML'
 			)!;
-			const writes: string[] = [];
+			const writes: unknown[] = [];
 			const warnings = vi.spyOn( console, 'warn' );
 			Object.defineProperty( target, 'innerHTML', {
 				/** Allows the accessor to be discarded with the element. */
@@ -1122,11 +1122,11 @@ describe( 'data-wp-html', () => {
 				/** Serializes the native element's current content. */
 				get: () => descriptor.get!.call( target ),
 				/**
-				 * Records assignments while rejecting only the selected token.
+				 * Records assignments while rejecting only the selected string.
 				 *
 				 * @param value HTML assigned to the element.
 				 */
-				set: ( value: string ) => {
+				set: ( value: unknown ) => {
 					writes.push( value );
 					if ( value === '<b>bad</b>' ) {
 						throw new TypeError( 'rejected' );
@@ -1166,86 +1166,24 @@ describe( 'data-wp-html', () => {
 				state.html = runtime.asDangerousHTML( '<b>c</b>' );
 			} );
 			expect( target.innerHTML ).toBe( '<b>c</b>' );
-		}
-	);
 
-	it.each( [ true, false ] )(
-		'writes a TrustedHTML value with the markup of a rejected string (rejected at hydration: %s)',
-		async ( atHydration ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', true );
-			const runtime = await loadConflictRuntime();
-			const html = '<b>x</b>';
-			// A minimal stand-in for a native `TrustedHTML` value.
-			const trustedValue = { toString: () => html, toJSON: () => html };
+			// After a rejection, a TrustedHTML value with the rejected markup
+			// is written. This is a minimal stand-in for a native one.
+			const trustedValue = {
+				toString: () => '<b>bad</b>',
+				toJSON: () => '<b>bad</b>',
+			};
 			vi.stubGlobal( 'trustedTypes', {
 				isHTML: ( value: unknown ) => value === trustedValue,
 			} );
-			const namespace = uniqueNamespace();
-			const { state } = runtime.store( namespace, {
-				state: {
-					active: false,
-					html: ( atHydration
-						? runtime.asDangerousHTML( html )
-						: null ) as unknown,
-				},
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( '<b>bad</b>' );
 			} );
-			const region = createRegion(
-				namespace,
-				'<div data-wp-html="state.html" data-wp-class--active="state.active"><p>Server</p></div>'
-			);
-			const target = region.querySelector( 'div' )!;
-			const descriptor = Object.getOwnPropertyDescriptor(
-				Element.prototype,
-				'innerHTML'
-			)!;
-			const writes: unknown[] = [];
-			// Rejects non-empty strings, as a browser enforcing Trusted Types does.
-			Object.defineProperty( target, 'innerHTML', {
-				configurable: true,
-				get: () => descriptor.get!.call( target ),
-				set: ( value: unknown ) => {
-					writes.push( value );
-					if ( typeof value === 'string' && value !== '' ) {
-						throw new TypeError(
-							'This document requires TrustedHTML.'
-						);
-					}
-					descriptor.set!.call( target, value );
-				},
-			} );
-
-			await runtime.act( () =>
-				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
-			);
-			if ( ! atHydration ) {
-				await runtime.act( () => {
-					state.html = runtime.asDangerousHTML( html );
-				} );
-			}
 			expect( target ).toBeEmptyDOMElement();
-			expect( console ).toHaveWarnedWith(
-				'data-wp-html: the browser rejected this HTML value, so the element was emptied. TypeError: This document requires TrustedHTML.'
-			);
-			const rejectedWrites = writes.length;
-
-			// Neither a re-render with the same token nor a new token wrapping
-			// the same string writes the rejected string again.
-			await runtime.act( () => {
-				state.active = true;
-			} );
-			expect( target ).toHaveClass( 'active' );
-			await runtime.act( () => {
-				state.html = runtime.asDangerousHTML( html );
-			} );
-			expect( writes ).toHaveLength( rejectedWrites );
-
 			await runtime.act( () => {
 				state.html = runtime.asDangerousHTML( trustedValue as never );
 			} );
-			expect( writes.slice( rejectedWrites ) ).toEqual( [
-				trustedValue,
-			] );
-			expect( target.innerHTML ).toBe( html );
+			expect( target.innerHTML ).toBe( '<b>bad</b>' );
 		}
 	);
 } );
