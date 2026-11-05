@@ -8,6 +8,7 @@ import {
 	transformToStyles,
 	getBlockSelectors,
 	generateGlobalStyles,
+	processCSSNesting,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -2584,6 +2585,55 @@ describe( 'global styles renderer', () => {
 			);
 			expect( result ).toContain(
 				':root :where(.wp-block-button){width: 200px;}'
+			);
+		} );
+	} );
+
+	describe( 'processCSSNesting', () => {
+		it.each( [
+			[ 'no css', '', '' ],
+			[
+				'no nested selectors',
+				'color: red; margin: auto;',
+				':root :where(.foo){color: red; margin: auto;}',
+			],
+			[
+				'nested selectors with &',
+				'color: red; &.one{color: blue;} & .two{color: green;}',
+				':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}',
+			],
+			[
+				'nested selector without &',
+				'color: red; img{color: blue;}',
+				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			],
+			[
+				'only nested selector without &',
+				'img{color: blue;}',
+				':root :where(.foo img){color: blue;}',
+			],
+			[
+				'mixed nested selectors',
+				'color: red; &.one{color: blue;} .two{color: green;} > img{color: yellow;} ::before{color: purple;}',
+				':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}:root :where(.foo > img){color: yellow;}:root :where(.foo) ::before{color: purple;}',
+			],
+			[
+				'nested selector without & inside &',
+				'& { color: red; img { color: blue; } }',
+				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			],
+		] )( '%s', ( _description, css, expected ) => {
+			expect( processCSSNesting( css, '.foo' ) ).toBe( expected );
+		} );
+
+		it( 'scopes a nested selector without & to every root selector', () => {
+			expect(
+				processCSSNesting(
+					'color: red; img{color: blue;}',
+					'.foo, .bar'
+				)
+			).toBe(
+				':root :where(.foo, .bar){color: red;}:root :where(.foo img, .bar img){color: blue;}'
 			);
 		} );
 	} );
