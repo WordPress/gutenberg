@@ -4,12 +4,10 @@ import {
 	useStyleOverride,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	getAvatarBorderColor,
-	getNoteMarkerSelector,
-	getBlockLevelClientIds,
-	getSoleRichTextAttributeKey,
-} from './utils';
+import { getAvatarBorderColor } from './utils/display';
+import { getSoleRichTextAttributeKey } from './utils/rich-text';
+import { getBlockLevelClientIds } from './utils/note-anchor';
+import { getNoteMarkerSelector } from './utils/dom';
 
 // Hex alpha (~25%) for the note tint, kept low to preserve text contrast.
 const TINT_ALPHA = '40';

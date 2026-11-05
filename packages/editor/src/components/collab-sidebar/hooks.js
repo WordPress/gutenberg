@@ -24,23 +24,27 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
-	calculateNotePositions,
-	findNoteInBlock,
-	getBlockLevelClientIds,
-	focusNoteThread,
-	getCaretChange,
-	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	getNoteAtCaret,
+	removeNoteIdFromMetadata,
+} from './utils/metadata';
+import { getSoleRichTextAttributeKey } from './utils/rich-text';
+import {
+	findNoteInBlock,
+	getBlockLevelClientIds,
+	getInlineMarkerStart,
 	getNoteRanges,
-	getSoleRichTextAttributeKey,
+	removeInlineNote,
+	wrapInlineNote,
+} from './utils/note-anchor';
+import {
+	getCaretChange,
+	getNoteAtCaret,
 	hasBlockDraft,
 	pickNoteForCaret,
-	removeInlineNote,
-	removeNoteIdFromMetadata,
-	wrapInlineNote,
-} from './utils';
+} from './utils/note-selection';
+import { focusNoteThread } from './utils/dom';
+import { calculateNotePositions } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
