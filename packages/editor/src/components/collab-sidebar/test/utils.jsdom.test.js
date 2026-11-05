@@ -26,6 +26,7 @@ import {
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
 	getNoteRanges,
+	getCaretChange,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -345,7 +346,7 @@ describe( 'pickPrimaryNote', () => {
 	} );
 } );
 
-describe( 'pickNoteForCaret', () => {
+describe( 'Note selection', () => {
 	const FORMAT_NAME = 'core/note';
 	const isRegistered = () =>
 		!! select( richTextStore ).getFormatType( FORMAT_NAME );
@@ -375,6 +376,10 @@ describe( 'pickNoteForCaret', () => {
 		{ id: 3, status: 'hold', blockClientId: 'b' },
 		{ id: 7, status: 'hold', blockClientId: 'b' },
 	];
+	const several = [
+		{ id: 3, status: 'hold', blockClientId: 'b' },
+		{ id: 9, status: 'hold', blockClientId: 'b' },
+	];
 	const caret = ( offset, end = offset ) => ( {
 		selectionStart: { attributeKey: 'content', offset },
 		selectionEnd: { attributeKey: 'content', offset: end },
@@ -398,64 +403,174 @@ describe( 'pickNoteForCaret', () => {
 			...overrides,
 		} );
 
-	it( 'enters a marker: selects that note', () => {
-		expect( pick( caret( 2 ) ) ).toBe( 7 );
-		expect( pick( caret( 14 ) ) ).toBe( 'new' );
-		expect( pick( caret( 2 ), { hasDraft: true } ) ).toBe( 7 );
+	const at = ( clientId, offset ) => ( {
+		clientId,
+		attributeKey: 'content',
+		offset,
+	} );
+	const blockAttributes = {};
+	const snapshot = (
+		clientIds,
+		start,
+		end = start,
+		attrs = blockAttributes
+	) => ( {
+		clientIds,
+		attributes: clientIds.length === 1 ? attrs : undefined,
+		selectionStart: start,
+		selectionEnd: end,
 	} );
 
-	it( "enters another block: selects the block's note", () => {
-		expect( pick( caret( 8 ) ) ).toBe( 3 );
-		expect( pick( noCaret ) ).toBe( 3 );
-		expect( pick( caret( 8 ), { hasDraft: true } ) ).toBe( 'new' );
-		expect(
-			pick( caret( 8 ), {
-				blockThreads: [ { id: 7, status: 'hold', blockClientId: 'b' } ],
-			} )
-		).toBeUndefined();
-	} );
-
-	it( 'enters another block: keeps the selected block-level note among several, else the primary', () => {
-		const several = [
-			{ id: 3, status: 'hold', blockClientId: 'b' },
-			{ id: 9, status: 'hold', blockClientId: 'b' },
-		];
-		expect(
-			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 9 } )
-		).toBe( 9 );
-		expect(
-			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 7 } )
-		).toBe( 3 );
-	} );
-
-	it( "leaves the selected note's marker: selects the block's note", () => {
-		const inBlock = { isBlockChange: false };
-		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 7 } ) ).toBe(
-			3
-		);
-		expect(
-			pick( caret( 8 ), { ...inBlock, selectedNoteId: 'new' } )
-		).toBe( 3 );
-	} );
-
-	it( 'anything else: keeps the selection', () => {
-		const inBlock = { isBlockChange: false };
-		expect( pick( caret( 8 ), inBlock ) ).toBeUndefined();
-		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 3 } ) ).toBe(
-			3
-		);
-		expect( pick( noCaret, { ...inBlock, selectedNoteId: 7 } ) ).toBe( 7 );
-	} );
-
-	it( 'reads markers from a string attribute', () => {
-		expect(
-			pick( caret( 2 ), {
-				attributes: {
-					content:
-						'<mark class="wp-note" data-id="7">Alpha</mark> bravo',
+	describe( 'Enters a marker: selects that note', () => {
+		it.each( [
+			[ 'a note marker', caret( 2 ), {}, 7 ],
+			[ 'the draft marker', caret( 14 ), {}, 'new' ],
+			[
+				'a note marker in the same block',
+				caret( 2 ),
+				{ isBlockChange: false },
+				7,
+			],
+			[
+				'a note marker in a block with a draft',
+				caret( 2 ),
+				{ hasDraft: true },
+				7,
+			],
+			[
+				'a note marker in a string attribute',
+				caret( 2 ),
+				{
+					attributes: {
+						content:
+							'<mark class="wp-note" data-id="7">Alpha</mark> bravo',
+					},
 				},
-			} )
-		).toBe( 7 );
+				7,
+			],
+		] )( '%s', ( _, selection, overrides, expected ) => {
+			expect( pick( selection, overrides ) ).toBe( expected );
+		} );
+	} );
+
+	describe( "Enters another block, or moves an end of a selection across blocks: selects the block's note", () => {
+		it.each( [
+			[
+				'enters another block',
+				snapshot( [ 'a' ], at( 'a', 1 ) ),
+				snapshot( [ 'b' ], at( 'b', 1 ) ),
+			],
+			[
+				'enters another block as its content changes, as on a split',
+				snapshot( [ 'a' ], at( 'a', 1 ), at( 'a', 1 ), {} ),
+				snapshot( [ 'b' ], at( 'b', 0 ), at( 'b', 0 ), {} ),
+			],
+			[
+				'extends the selection to another block',
+				snapshot( [ 'a' ], at( 'a', 1 ), at( 'a', 3 ) ),
+				snapshot( [ 'a', 'b' ], at( 'a', 1 ), at( 'b', 3 ) ),
+			],
+			[
+				'moves an end of a selection across blocks',
+				snapshot( [ 'a', 'b' ], at( 'a', 1 ), at( 'b', 3 ) ),
+				snapshot( [ 'a', 'b' ], at( 'a', 1 ), at( 'b', 4 ) ),
+			],
+		] )( 'is a block change: %s', ( _, previous, next ) => {
+			expect( getCaretChange( previous, next ) ).toEqual( {
+				isBlockChange: true,
+			} );
+		} );
+
+		it.each( [
+			[ 'the block-level note', caret( 8 ), {}, 3 ],
+			[
+				'the block-level note for a caret not reported yet',
+				noCaret,
+				{},
+				3,
+			],
+			[ 'the unsent draft', caret( 8 ), { hasDraft: true }, 'new' ],
+			[
+				'none without a block-level note',
+				caret( 8 ),
+				{ blockThreads: [ notes[ 1 ] ] },
+				undefined,
+			],
+			[
+				'the selected block-level note',
+				caret( 8 ),
+				{ blockThreads: several, selectedNoteId: 9 },
+				9,
+			],
+			[
+				'the primary block-level note',
+				caret( 8 ),
+				{ blockThreads: several, selectedNoteId: 7 },
+				3,
+			],
+		] )( 'selects %s', ( _, selection, overrides, expected ) => {
+			expect( pick( selection, overrides ) ).toBe( expected );
+		} );
+	} );
+
+	describe( "Leaves the selected note's marker: selects the block's note", () => {
+		it.each( [
+			[ "a note's marker", 7 ],
+			[ 'the draft marker', 'new' ],
+		] )( '%s', ( _, selectedNoteId ) => {
+			expect(
+				pick( caret( 8 ), { isBlockChange: false, selectedNoteId } )
+			).toBe( 3 );
+		} );
+	} );
+
+	describe( 'Anything else: keeps the selection', () => {
+		const point = at( 'a', 1 );
+		it.each( [
+			[
+				'typing',
+				snapshot( [ 'a' ], at( 'a', 1 ), at( 'a', 1 ), {} ),
+				snapshot( [ 'a' ], at( 'a', 2 ), at( 'a', 2 ), {} ),
+			],
+			[
+				'a store change that keeps the selection',
+				snapshot( [ 'a' ], point ),
+				snapshot( [ 'a' ], point ),
+			],
+		] )( 'is no caret move: %s', ( _, previous, next ) => {
+			expect( getCaretChange( previous, next ) ).toBeNull();
+		} );
+
+		it.each( [
+			[
+				'moving in plain text',
+				snapshot( [ 'a' ], at( 'a', 1 ) ),
+				snapshot( [ 'a' ], at( 'a', 2 ) ),
+			],
+			[
+				'the store replacing the ends of a selection across blocks without moving them',
+				snapshot( [ 'a', 'b' ], at( 'a', 1 ), at( 'b', 3 ) ),
+				snapshot( [ 'a', 'b' ], at( 'a', 1 ), at( 'b', 3 ) ),
+			],
+		] )( 'is no block change: %s', ( _, previous, next ) => {
+			expect( getCaretChange( previous, next ) ).toEqual( {
+				isBlockChange: false,
+			} );
+		} );
+
+		it.each( [
+			[ 'moving in plain text, none selected', caret( 8 ), undefined ],
+			[
+				'moving in plain text, a block-level note selected',
+				caret( 8 ),
+				3,
+			],
+			[ 'a caret not reported yet', noCaret, 7 ],
+		] )( '%s', ( _, selection, selectedNoteId ) => {
+			expect(
+				pick( selection, { isBlockChange: false, selectedNoteId } )
+			).toBe( selectedNoteId );
+		} );
 	} );
 } );
 
