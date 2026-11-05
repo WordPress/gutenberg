@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Clipboard: Include resolved bound content when copying blocks, preserving bindings and inline formatting ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
