@@ -9,7 +9,8 @@ export interface PostWithAuthor {
 		author?: {
 			id: number;
 			name: string;
-			avatar_urls: Record< string, string >;
+			// Absent when the site does not show avatars.
+			avatar_urls?: Record< string, string >;
 		}[];
 	};
 	_links?: Record< string, unknown >;
