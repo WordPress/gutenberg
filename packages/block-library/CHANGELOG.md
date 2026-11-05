@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Template Part: Allow a template part to be inserted inside a Post Template, keeping the restriction for Post Content ([#86377](https://github.com/WordPress/gutenberg/pull/86377)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 
 ## 12.1.0 (2026-11-04)
