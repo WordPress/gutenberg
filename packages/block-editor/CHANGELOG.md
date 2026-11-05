@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InnerBlocks`, `BlockPreview`: fix a crash in the CommonJS build caused by a circular import of `BlockList` ([#86323](https://github.com/WordPress/gutenberg/pull/86323)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

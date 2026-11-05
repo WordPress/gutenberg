@@ -1,8 +1,10 @@
+import type { ComponentProps } from 'react';
 import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
-import BlockList from '../block-list';
+// Keep this import named: the circular import leaves a default import undefined in the CommonJS build.
+import { BlockList } from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
@@ -10,7 +12,12 @@ import type { EditorStylesStyle } from '../editor-styles/types';
 import type { AutoBlockPreviewProps, ScaledBlockPreviewProps } from './types';
 
 // This is used to avoid rendering the block list if the sizes change.
-const MemoizedBlockList = memo( BlockList );
+// Wrapped because the circular import leaves `BlockList` undefined when the CommonJS build runs this line.
+const MemoizedBlockList = memo( function MemoizedBlockListWrapper(
+	props: ComponentProps< typeof BlockList >
+) {
+	return <BlockList { ...props } />;
+} );
 
 const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES: EditorStylesStyle[] = [];

@@ -1,4 +1,5 @@
 import type {
+	ComponentProps,
 	ForwardRefExoticComponent,
 	ReactNode,
 	RefAttributes,
@@ -54,7 +55,12 @@ function BlockContext( {
 	);
 }
 
-const BlockListItemsMemo = memo( BlockListItems );
+// Wrapped because the circular import leaves `BlockListItems` undefined when the CommonJS build runs this line.
+const BlockListItemsMemo = memo( function BlockListItemsMemoWrapper(
+	props: ComponentProps< typeof BlockListItems >
+) {
+	return <BlockListItems { ...props } />;
+} );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
