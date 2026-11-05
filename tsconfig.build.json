@@ -48,6 +48,7 @@
 		{ "path": "packages/i18n/tsconfig.build.json" },
 		{ "path": "packages/icons/tsconfig.build.json" },
 		{ "path": "packages/image-cropper/tsconfig.build.json" },
+		{ "path": "packages/image-editor/tsconfig.build.json" },
 		{ "path": "packages/interactivity/tsconfig.build.json" },
 		{ "path": "packages/interactivity-router/tsconfig.main.json" },
 		{ "path": "packages/interactivity-router/tsconfig.full-page.json" },
