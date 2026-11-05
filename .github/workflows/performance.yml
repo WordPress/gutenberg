@@ -35,6 +35,7 @@ jobs:
         name: Detect changes relevant to performance testing
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         permissions:
             pull-requests: read
         outputs:

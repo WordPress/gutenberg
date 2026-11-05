@@ -15,8 +15,6 @@ coverage
 **/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
 .reassure
-.dev-ready
-
 
 # Directories/files that may appear in your environment
 *.log
