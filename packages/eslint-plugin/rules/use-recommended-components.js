@@ -141,6 +141,7 @@ const DENYLIST = {
 			'Use `Switch` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+		Menu: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ProgressBar:
 			'Use `Progress` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide',
