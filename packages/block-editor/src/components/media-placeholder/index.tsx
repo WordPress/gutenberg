@@ -152,15 +152,19 @@ export function MediaPlaceholder( {
 		} );
 	}
 
-	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			mediaUpload: settings.mediaUpload as
-				MediaUploadFunction | undefined,
-			allowedMimeTypes: settings.allowedMimeTypes,
-		};
-	}, [] );
+	const { mediaUpload, allowedMimeTypes, isPreviewMode } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				mediaUpload: settings.mediaUpload as
+					MediaUploadFunction | undefined,
+				allowedMimeTypes: settings.allowedMimeTypes,
+				isPreviewMode: settings.isPreviewMode,
+			};
+		},
+		[]
+	);
 	const [ src, setSrc ] = useState< string | undefined >( '' );
 
 	useEffect( () => {
@@ -393,7 +397,7 @@ export function MediaPlaceholder( {
 	const renderPlaceholder = placeholder ?? defaultRenderPlaceholder;
 
 	const renderDropZone = () => {
-		if ( disableDropZone ) {
+		if ( disableDropZone || isPreviewMode ) {
 			return null;
 		}
 
@@ -576,6 +580,10 @@ export function MediaPlaceholder( {
 
 	if ( disableMediaButtons ) {
 		return <MediaUploadCheck>{ renderDropZone() }</MediaUploadCheck>;
+	}
+
+	if ( isPreviewMode ) {
+		return mediaPreview || null;
 	}
 
 	return (

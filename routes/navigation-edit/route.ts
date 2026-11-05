@@ -3,6 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
+import { getNavigationMenuCanvas } from '../navigation/route-canvas';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -74,12 +75,7 @@ export const route = {
 			id: string;
 		};
 	} ) => {
-		const postId = parseInt( params.id );
-		return {
-			postType: NAVIGATION_POST_TYPE,
-			postId,
-			isPreview: true,
-		};
+		return getNavigationMenuCanvas( Number( params.id ) );
 	},
 	loader: async ( {
 		params,
@@ -89,10 +85,22 @@ export const route = {
 		};
 	} ) => {
 		const navigationId = parseInt( params.id );
-		await resolveSelect( coreStore ).getEntityRecord(
-			'postType',
-			NAVIGATION_POST_TYPE,
-			navigationId
-		);
+		const resolver = resolveSelect( coreStore );
+
+		await Promise.all( [
+			resolver.getEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				navigationId
+			),
+			// The menu tree edits the wp_navigation entity's blocks directly
+			// through `useEntityBlockEditor`, which reads the edited record.
+			// Preloading it avoids an empty first render on direct route loads.
+			resolver.getEditedEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				navigationId
+			),
+		] );
 	},
 };

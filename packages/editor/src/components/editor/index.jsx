@@ -115,7 +115,7 @@ function Editor( {
 					renderingMode={ renderingMode }
 					useSubRegistry={ false }
 				>
-					<EditorInterface { ...props }>
+					<EditorInterface { ...props } editorSettings={ settings }>
 						{ extraContent }
 					</EditorInterface>
 					{ children }

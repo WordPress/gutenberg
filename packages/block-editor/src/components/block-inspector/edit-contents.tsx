@@ -55,12 +55,21 @@ export default function EditContents( { clientId }: { clientId: string } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { block, canEdit } = useSelect(
+	const { block, canEdit, isUniversalCanvasTemplateSection } = useSelect(
 		( select ) => {
-			const { getBlock, canEditBlock } = select( blockEditorStore );
+			const {
+				getBlock,
+				getBlockListSettings,
+				getSettings,
+				canEditBlock,
+			} = select( blockEditorStore );
 			return {
 				block: getBlock( clientId ),
 				canEdit: canEditBlock( clientId ),
+				isUniversalCanvasTemplateSection:
+					getSettings().__experimentalUniversalCanvas &&
+					getBlockListSettings( clientId )?.templateLock ===
+						'contentOnly',
 			};
 		},
 		[ clientId ]
@@ -72,8 +81,13 @@ export default function EditContents( { clientId }: { clientId: string } ) {
 
 	// Synced patterns and template parts are never edited inline. They're
 	// edited through the entity they render, whose "Edit original" button the
-	// blocks fill into PrivateBlockInspectorEditOriginal.
-	if ( isReusableBlock( block ) || isTemplatePart( block ) ) {
+	// blocks fill into PrivateBlockInspectorEditOriginal. Universal canvas
+	// template sections are entered from the canvas, not the inspector.
+	if (
+		isReusableBlock( block ) ||
+		isTemplatePart( block ) ||
+		isUniversalCanvasTemplateSection
+	) {
 		return null;
 	}
 

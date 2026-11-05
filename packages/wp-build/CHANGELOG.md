@@ -8,6 +8,7 @@
 
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+-   Treat a route's `canvas` file as route content, so a route that ships only a canvas still gets a `content.js` bundle ([#83088](https://github.com/WordPress/gutenberg/pull/83088)).
 
 ### Bug Fixes
 

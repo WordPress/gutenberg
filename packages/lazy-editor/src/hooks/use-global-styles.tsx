@@ -3,10 +3,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
-export function useUserGlobalStyles( id: string | number | undefined ) {
+export function useUserGlobalStyles( id?: string | number ) {
 	const { userGlobalStyles } = useSelect(
 		( select ) => {
-			if ( id === undefined ) {
+			if ( ! id ) {
 				return { userGlobalStyles: undefined };
 			}
 

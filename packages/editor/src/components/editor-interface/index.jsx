@@ -17,6 +17,7 @@ import { ThemeProvider } from '@wordpress/theme';
 import { Stack } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { GLOBAL_POST_TYPES } from '../../store/constants';
 import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -77,6 +78,7 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	iframeProps,
+	editorSettings: currentEditorSettings,
 } ) {
 	const {
 		mode,
@@ -93,6 +95,7 @@ export default function EditorInterface( {
 		showStylebook,
 		isRevisionsMode,
 		showDiff,
+		isGlobalEditorColorScheme,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -108,6 +111,8 @@ export default function EditorInterface( {
 			isShowingRevisionDiff,
 			getCanvasWidth,
 		} = unlock( select( editorStore ) );
+		const blockEditor = select( blockEditorStore );
+		const { getEditedContentOnlySection } = unlock( blockEditor );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
@@ -117,11 +122,38 @@ export default function EditorInterface( {
 		if ( ! editorSettings.codeEditingEnabled && _mode === 'text' ) {
 			_mode = 'visual';
 		}
+		const currentPostType = getCurrentPostType();
+		const editedSectionId = getEditedContentOnlySection();
+		const editedSectionName = editedSectionId
+			? blockEditor.getBlockName( editedSectionId )
+			: null;
+		const editedSectionAttributes = editedSectionId
+			? blockEditor.getBlockAttributes( editedSectionId )
+			: null;
+		const isNavigationOverlayTemplatePart =
+			editedSectionAttributes?.area === 'navigation-overlay' ||
+			editedSectionAttributes?.slug === 'overlay' ||
+			editedSectionAttributes?.slug?.includes( 'overlay' );
+		const isUniversalCanvas = editorSettings.__experimentalUniversalCanvas;
+		const isUniversalCanvasTemplatePart =
+			isUniversalCanvas &&
+			editedSectionName === 'core/template-part' &&
+			! isNavigationOverlayTemplatePart;
+		const isUniversalCanvasTemplateSection =
+			isUniversalCanvas &&
+			blockEditor.getBlockListSettings( editedSectionId )
+				?.templateLock === 'contentOnly';
+		const isInlineGlobalSection =
+			!! editedSectionId &&
+			editedSectionName !== 'core/post-content' &&
+			( editedSectionName === 'core/block' ||
+				isUniversalCanvasTemplatePart ||
+				isUniversalCanvasTemplateSection );
 
 		return {
 			mode: _mode,
 			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
+			postType: currentPostType,
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
@@ -133,6 +165,9 @@ export default function EditorInterface( {
 			showStylebook: getShowStylebook(),
 			isRevisionsMode: _isRevisionsMode(),
 			showDiff: isShowingRevisionDiff(),
+			isGlobalEditorColorScheme:
+				GLOBAL_POST_TYPES.includes( currentPostType ) ||
+				isInlineGlobalSection,
 		};
 	}, [] );
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
@@ -214,6 +249,7 @@ export default function EditorInterface( {
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 				'is-distraction-free': isDistractionFree && ! isPreviewMode,
+				'is-global-editor-color-scheme': isGlobalEditorColorScheme,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -268,10 +304,14 @@ export default function EditorInterface( {
 							{ ( isPreviewMode || mode === 'visual' ) && (
 								<VisualEditor
 									contentRef={ contentRef }
+									isGlobalEditorColorScheme={
+										isGlobalEditorColorScheme
+									}
 									// We should auto-focus the canvas (title) on load.
 									// eslint-disable-next-line jsx-a11y/no-autofocus
 									autoFocus={ autoFocus }
 									iframeProps={ iframeProps }
+									editorSettings={ currentEditorSettings }
 								/>
 							) }
 							{ children }

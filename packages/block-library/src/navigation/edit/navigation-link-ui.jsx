@@ -15,6 +15,9 @@ export function NavigationLinkUI( {
 	insertedBlockClientId,
 	setInsertedBlockClientId,
 	allowedBlockNames,
+	showBlockInserter,
+	onComplete,
+	onCancel,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -65,6 +68,7 @@ export function NavigationLinkUI( {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
 			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
+			onCancel?.( insertedBlockClientId );
 		}
 		setInsertedBlockClientId( null );
 	};
@@ -98,6 +102,7 @@ export function NavigationLinkUI( {
 			clientId={ insertedBlockClientId }
 			link={ insertedBlockAttributes }
 			allowedBlockNames={ allowedBlockNames }
+			showBlockInserter={ showBlockInserter }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function
@@ -122,6 +127,7 @@ export function NavigationLinkUI( {
 				}
 
 				setInsertedBlockClientId( null );
+				onComplete?.( insertedBlockClientId, updatedAttributes );
 			} }
 		/>
 	);

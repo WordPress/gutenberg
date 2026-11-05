@@ -1,45 +1,60 @@
 import { useMemo } from '@wordpress/element';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 import { Spinner as WCSpinner } from '@wordpress/components';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
-import { useEditorAssets } from '@wordpress/lazy-editor';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
+import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
 import './style.scss';
 import NavigationMenuContent from './content';
 
-const noop = () => {};
-
-export default function NavigationMenuEditor( { id }: { id: number } ) {
+export default function NavigationMenuEditor( {
+	id,
+	isAddingItems,
+	navigationMenu,
+	onCloseAddMenuItems,
+	onAutoMenuChange,
+}: {
+	id: number;
+	isAddingItems: boolean;
+	navigationMenu: {
+		id: number;
+		title?: {
+			raw?: string;
+			rendered?: string;
+		};
+		content?: {
+			raw?: string;
+			rendered?: string;
+		};
+	};
+	onCloseAddMenuItems: () => void;
+	onAutoMenuChange: ( isAutoMenu: boolean ) => void;
+} ) {
 	const { isReady: assetsReady } = useEditorAssets();
+	const { isReady: settingsReady, editorSettings } = useEditorSettings();
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{ id }
+	);
 
-	const blocks = useMemo( () => {
-		if ( ! assetsReady || ! id ) {
-			return [];
+	const settings = useMemo( () => {
+		if ( ! editorSettings ) {
+			return editorSettings;
 		}
 
-		// Locking the menu to its content gives its items the same editing
-		// experience as content-only List View editing.
-		return [
-			createBlock( 'core/navigation', {
-				ref: id,
-				templateLock: 'contentOnly',
-			} ),
-		];
-	}, [ assetsReady, id ] );
-
-	// The link UI's search needs a suggestions fetcher, which the block
-	// editor takes from its settings.
-	const settings = useMemo(
-		() => ( {
+		return {
+			...editorSettings,
 			__experimentalFetchLinkSuggestions: (
 				search: string,
 				searchOptions: Record< string, unknown >
-			) => fetchLinkSuggestions( search, searchOptions, {} ),
-		} ),
-		[]
-	);
+			) => fetchLinkSuggestions( search, searchOptions, editorSettings ),
+		};
+	}, [ editorSettings ] );
 
-	if ( ! assetsReady || ! blocks.length ) {
+	if ( ! assetsReady || ! settingsReady || ! blocks ) {
 		return (
 			<div
 				style={ {
@@ -56,12 +71,18 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
+			key={ id }
 			settings={ settings }
 			value={ blocks }
-			onChange={ noop }
-			onInput={ noop }
+			onChange={ onChange }
+			onInput={ onInput }
 		>
-			<NavigationMenuContent rootClientId={ blocks[ 0 ].clientId } />
+			<NavigationMenuContent
+				isAddingItems={ isAddingItems }
+				navigationMenu={ navigationMenu }
+				onCloseAddMenuItems={ onCloseAddMenuItems }
+				onAutoMenuChange={ onAutoMenuChange }
+			/>
 		</BlockEditorProvider>
 	);
 }

@@ -75,6 +75,8 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		renderAppender,
+		appenderParentClientId,
 	} = props;
 
 	const { canParentExpand, isParentSynced } = useSelect(
@@ -109,8 +111,18 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
+	const shouldShowNestedAppender =
+		!! parentId && parentId === appenderParentClientId;
+	const shouldHideCurrentAppender = level === 1 && !! appenderParentClientId;
+	// List View normally shows the appender only at the first level. The
+	// optional explicit parent id lets specialized private List View consumers
+	// expose an appender for one nested branch, such as the selected Navigation
+	// submenu. An id is more reliable than deriving this from selection inside
+	// every recursive branch, because empty branches still need to be mounted.
+	const showAppender =
+		showAppenderProp &&
+		! shouldHideCurrentAppender &&
+		( level === 1 || shouldShowNestedAppender );
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
@@ -178,6 +190,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		const isSync = isSelected || clientId === insertedBlockClientId;
 		const isSelectedBranch =
 			isBranchSelected || ( isSelected && hasNestedBlocks );
+		const shouldShowChildAppender = clientId === appenderParentClientId;
 
 		// To avoid performance issues, we only render blocks that are in view,
 		// or blocks that are selected or dragged. If a block is selected,
@@ -194,7 +207,10 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			index === 0 ||
 			index === blockCount - 1;
 
-		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
+		const showNestedBlocks =
+			( ( hasNestedBlocks && shouldExpand ) ||
+				shouldShowChildAppender ) &&
+			! isDragged;
 
 		if ( ! showBlock ) {
 			placeholderRows += 1;
@@ -247,7 +263,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				{ showNestedBlocks && (
 					<ListViewBranch
 						parentId={ clientId }
-						blocks={ innerBlocks }
+						blocks={ innerBlocks || [] }
 						selectBlock={ selectBlock }
 						showBlockMovers={ showBlockMovers }
 						level={ level + 1 }
@@ -258,6 +274,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						showAppender={ showAppenderProp }
+						renderAppender={ renderAppender }
+						appenderParentClientId={ appenderParentClientId }
 					/>
 				) }
 			</AsyncModeProvider>
@@ -274,14 +293,22 @@ function ListViewBranch( props: ListViewBranchProps ) {
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
+					className={
+						shouldShowNestedAppender
+							? 'block-editor-list-view-submenu-appender'
+							: undefined
+					}
 					isExpanded
 				>
-					<TreeGridCell>
+					<TreeGridCell
+						colSpan={ shouldShowNestedAppender ? 2 : undefined }
+					>
 						{ ( treeGridCellProps ) => (
 							<Appender
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
+								renderAppender={ renderAppender }
 								{ ...treeGridCellProps }
 							/>
 						) }

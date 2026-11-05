@@ -147,6 +147,7 @@ export function useBlockProps<
 		isMultiSelected,
 		isPartiallySelected,
 		isReusable,
+		isUniversalCanvasGlobalSection,
 		isDragging,
 		hasChildSelected,
 		isEditingDisabled,
@@ -262,6 +263,8 @@ export function useBlockProps<
 				'is-movable-multi-selected': isMultiSelected && canMove,
 				'is-partially-selected': isPartiallySelected,
 				'is-reusable': isReusable,
+				'is-universal-canvas-global-section':
+					isUniversalCanvasGlobalSection,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
 				'is-editing-disabled': isEditingDisabled,

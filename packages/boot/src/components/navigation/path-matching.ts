@@ -1,5 +1,34 @@
 import type { MenuItem } from '../../store/types';
 
+const normalizePath = ( path: string ) => {
+	const normalized = path.startsWith( '/' ) ? path : '/' + path;
+	return normalized.endsWith( '/' ) && normalized.length > 1
+		? normalized.slice( 0, -1 )
+		: normalized;
+};
+
+const getMenuItemDepth = ( item: MenuItem, menuItems: MenuItem[] ): number => {
+	let depth = 0;
+	let currentItem = item;
+	const visitedIds = new Set( [ item.id ] );
+
+	while ( currentItem.parent ) {
+		const parentItem = menuItems.find(
+			( candidate ) => candidate.id === currentItem.parent
+		);
+
+		if ( ! parentItem || visitedIds.has( parentItem.id ) ) {
+			break;
+		}
+
+		visitedIds.add( parentItem.id );
+		currentItem = parentItem;
+		depth++;
+	}
+
+	return depth;
+};
+
 /**
  * Checks if a menu path is a valid parent path of the current path.
  * A valid parent path must be a complete path prefix, not just share segments.
@@ -15,14 +44,6 @@ const isValidParentPath = (
 	if ( ! menuPath || menuPath === currentPath ) {
 		return false;
 	}
-
-	// Normalize paths by removing trailing slashes and ensuring leading slash
-	const normalizePath = ( path: string ) => {
-		const normalized = path.startsWith( '/' ) ? path : '/' + path;
-		return normalized.endsWith( '/' ) && normalized.length > 1
-			? normalized.slice( 0, -1 )
-			: normalized;
-	};
 
 	const normalizedCurrent = normalizePath( currentPath );
 	const normalizedMenu = normalizePath( menuPath );
@@ -47,9 +68,17 @@ export const findClosestMenuItem = (
 	currentPath: string,
 	menuItems: MenuItem[]
 ): MenuItem | null => {
-	const exactMatch = menuItems.find( ( item ) => item.to === currentPath );
-	if ( exactMatch ) {
-		return exactMatch;
+	const normalizedCurrentPath = normalizePath( currentPath );
+	const exactMatches = menuItems.filter(
+		( item ) => normalizePath( item.to ) === normalizedCurrentPath
+	);
+	if ( exactMatches.length > 0 ) {
+		return exactMatches.reduce( ( bestMatch, item ) =>
+			getMenuItemDepth( item, menuItems ) >
+			getMenuItemDepth( bestMatch, menuItems )
+				? item
+				: bestMatch
+		);
 	}
 
 	let bestMatch: MenuItem | null = null;

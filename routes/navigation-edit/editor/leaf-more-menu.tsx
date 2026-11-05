@@ -1,21 +1,44 @@
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
-import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
+import {
+	addSubmenu,
+	chevronDown,
+	chevronUp,
+	moreVertical,
+} from '@wordpress/icons';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import {
+	createBlock,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 } as const;
 
+function getBlockListRootClientId( clientId?: string | null ) {
+	return clientId || '';
+}
+
 export default function LeafMoreMenu( {
 	clientId,
+	clientIds,
 	...props
 }: {
 	clientId: string;
+	clientIds?: string[];
 } ) {
+	const selectedClientIds = useMemo(
+		() => ( clientIds?.length ? clientIds : [ clientId ] ),
+		[ clientId, clientIds ]
+	);
+	const firstClientId = selectedClientIds[ 0 ];
+	const lastClientId = selectedClientIds[ selectedClientIds.length - 1 ];
+	const isBulkSelection = selectedClientIds.length > 1;
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -23,58 +46,137 @@ export default function LeafMoreMenu( {
 		duplicateBlocks,
 		insertBeforeBlock,
 		insertAfterBlock,
+		replaceInnerBlocks,
+		selectBlock,
 	} = useDispatch( blockEditorStore );
 
-	const removeLabel = sprintf(
-		/* translators: %s: block name */
-		__( 'Remove %s' ),
-		// The menu is for an existing block, which has a title.
-		BlockTitle( { clientId, maximumLength: 25 } ) as string
-	);
+	// The menu is for an existing block, which has a title.
+	const firstBlockTitle = BlockTitle( {
+		clientId: firstClientId,
+		maximumLength: 25,
+	} ) as string;
+	const removeLabel = isBulkSelection
+		? sprintf(
+				/* translators: %d: number of selected menu items */
+				__( 'Remove %d items' ),
+				selectedClientIds.length
+			)
+		: sprintf(
+				/* translators: %s: block name */
+				__( 'Remove %s' ),
+				firstBlockTitle
+			);
 
-	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockName,
-					canInsertBlockType,
-					getDirectInsertBlock,
-					getBlockIndex,
-					getBlockCount,
-				} = select( blockEditorStore );
-				const { getDefaultBlockName } = select( blocksStore );
+	const {
+		rootClientId,
+		canDuplicate,
+		canInsertBlock,
+		canConvertToSubmenu,
+		canMove,
+		canRemove,
+		convertedSiblingBlocks,
+		firstConvertedSubmenuClientId,
+		isFirst,
+		isLast,
+	} = useSelect(
+		( select ) => {
+			const {
+				canInsertBlockType,
+				canMoveBlocks,
+				canRemoveBlocks,
+				getBlock,
+				getBlockCount,
+				getBlockIndex,
+				getBlockRootClientId,
+				getBlocks,
+				getBlocksByClientId,
+				getDirectInsertBlock,
+			} = select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-				const _rootClientId = getBlockRootClientId( clientId );
-				const _blockName = getBlockName( clientId );
-				const canInsertDefaultBlock = canInsertBlockType(
-					getDefaultBlockName(),
-					_rootClientId
+			const _rootClientId = getBlockRootClientId( firstClientId );
+			const blocks = getBlocksByClientId( selectedClientIds );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
+			const selectionIsSameParent = selectedClientIds.every(
+				( selectedClientId ) =>
+					getBlockRootClientId( selectedClientId ) === _rootClientId
+			);
+			const selectedClientIdsSet = new Set( selectedClientIds );
+			const canConvertSelectedBlocksToSubmenu =
+				selectionIsSameParent &&
+				blocks.every(
+					( selectedBlock ) =>
+						selectedBlock?.name === 'core/navigation-link'
 				);
-				const directInsertBlock = _rootClientId
-					? getDirectInsertBlock( _rootClientId )
-					: null;
+			let firstConvertedClientId: string | undefined;
+			const _convertedSiblingBlocks = canConvertSelectedBlocksToSubmenu
+				? getBlocks( getBlockListRootClientId( _rootClientId ) ).map(
+						( siblingBlock ) => {
+							if (
+								! selectedClientIdsSet.has(
+									siblingBlock.clientId
+								)
+							) {
+								return siblingBlock;
+							}
 
-				return {
-					rootClientId: _rootClientId,
-					canDuplicate:
-						// The menu is for an existing block, which has a name.
-						hasBlockSupport(
-							_blockName as string,
-							'multiple',
-							true
-						) && canInsertBlockType( _blockName, _rootClientId ),
-					canInsertBlock:
-						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
-					isFirst: getBlockIndex( clientId ) === 0,
-					isLast:
-						getBlockIndex( clientId ) ===
-						getBlockCount( _rootClientId ) - 1,
-				};
-			},
-			[ clientId ]
-		);
+							const convertedBlock = createBlock(
+								'core/navigation-submenu',
+								siblingBlock.attributes,
+								siblingBlock.innerBlocks
+							);
+							firstConvertedClientId ??= convertedBlock.clientId;
+
+							return convertedBlock;
+						}
+					)
+				: [];
+
+			return {
+				rootClientId: _rootClientId,
+				canDuplicate:
+					selectionIsSameParent &&
+					blocks.every(
+						( selectedBlock ) =>
+							!! selectedBlock &&
+							hasBlockSupport(
+								selectedBlock.name,
+								'multiple',
+								true
+							) &&
+							canInsertBlockType(
+								selectedBlock.name,
+								_rootClientId
+							)
+					),
+				canInsertBlock:
+					selectedClientIds.length === 1 &&
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					!! getBlock( firstClientId ) &&
+					canInsertBlockType(
+						getBlock( firstClientId )?.name,
+						_rootClientId
+					),
+				canConvertToSubmenu: canConvertSelectedBlocksToSubmenu,
+				canMove:
+					selectionIsSameParent && canMoveBlocks( selectedClientIds ),
+				canRemove: canRemoveBlocks( selectedClientIds ),
+				convertedSiblingBlocks: _convertedSiblingBlocks,
+				firstConvertedSubmenuClientId: firstConvertedClientId,
+				isFirst: getBlockIndex( firstClientId ) === 0,
+				isLast:
+					getBlockIndex( lastClientId ) ===
+					getBlockCount( _rootClientId ) - 1,
+			};
+		},
+		[ firstClientId, lastClientId, selectedClientIds ]
+	);
 
 	return (
 		<DropdownMenu
@@ -90,9 +192,10 @@ export default function LeafMoreMenu( {
 					<MenuGroup>
 						<MenuItem
 							icon={ chevronUp }
-							disabled={ isFirst }
+							disabled={ ! canMove || isFirst }
+							accessibleWhenDisabled
 							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
+								moveBlocksUp( selectedClientIds, rootClientId );
 								onClose();
 							} }
 						>
@@ -100,9 +203,13 @@ export default function LeafMoreMenu( {
 						</MenuItem>
 						<MenuItem
 							icon={ chevronDown }
-							disabled={ isLast }
+							disabled={ ! canMove || isLast }
+							accessibleWhenDisabled
 							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
+								moveBlocksDown(
+									selectedClientIds,
+									rootClientId
+								);
 								onClose();
 							} }
 						>
@@ -111,7 +218,7 @@ export default function LeafMoreMenu( {
 						{ canDuplicate && (
 							<MenuItem
 								onClick={ () => {
-									duplicateBlocks( [ clientId ] );
+									duplicateBlocks( selectedClientIds );
 									onClose();
 								} }
 							>
@@ -122,7 +229,7 @@ export default function LeafMoreMenu( {
 							<>
 								<MenuItem
 									onClick={ () => {
-										insertBeforeBlock( clientId );
+										insertBeforeBlock( firstClientId );
 										onClose();
 									} }
 								>
@@ -130,7 +237,7 @@ export default function LeafMoreMenu( {
 								</MenuItem>
 								<MenuItem
 									onClick={ () => {
-										insertAfterBlock( clientId );
+										insertAfterBlock( firstClientId );
 										onClose();
 									} }
 								>
@@ -138,11 +245,43 @@ export default function LeafMoreMenu( {
 								</MenuItem>
 							</>
 						) }
+						{ canConvertToSubmenu && (
+							<MenuItem
+								icon={ addSubmenu }
+								onClick={ () => {
+									/*
+									 * This route edits the wp_navigation block list
+									 * directly. Use replaceInnerBlocks here instead
+									 * of replaceBlock so Navigation Submenu is not
+									 * rejected for lacking a synthetic core/navigation
+									 * parent in this editor.
+									 */
+									replaceInnerBlocks(
+										getBlockListRootClientId(
+											rootClientId
+										),
+										convertedSiblingBlocks,
+										false
+									);
+									if ( firstConvertedSubmenuClientId ) {
+										selectBlock(
+											firstConvertedSubmenuClientId,
+											null
+										);
+									}
+									onClose();
+								} }
+							>
+								{ __( 'Convert to Submenu' ) }
+							</MenuItem>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
+							disabled={ ! canRemove }
+							accessibleWhenDisabled
 							onClick={ () => {
-								removeBlocks( [ clientId ], false );
+								removeBlocks( selectedClientIds, false );
 								onClose();
 							} }
 						>
