@@ -151,23 +151,27 @@ const BASE_CHECKS = {
 	// Don't warn about directives like 'use client' in bundled dependencies.
 	moduleLevelDirective: false,
 };
-// Rolldown's `__toESM` gives namespace imports a `default` unless the module has
-// its own, even when flagged `__esModule`. Follow the flag alone, like esbuild.
-const TO_ESM_OWN_DEFAULT_CHECK = ' || !__hasOwnProp.call(mod, "default")';
+// Rolldown's `__toESM` copies a module's exports when it is required. In a
+// circular import the module has not assigned its exports yet, so the copy
+// never gets them. The copy also gets a `default` unless the module has its
+// own, even when flagged `__esModule`. Use `__esModule` modules as they are.
+const TO_ESM_START = 'var __toESM = (mod, isNodeMode, target) => ';
+const TO_ESM_HELPER = `${ TO_ESM_START }(target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", {`;
 const esModuleInteropPlugin = {
 	name: 'es-module-interop',
 	renderChunk( code ) {
-		if ( ! code.includes( 'var __toESM = ' ) ) {
+		if ( ! code.includes( TO_ESM_START ) ) {
 			return null;
 		}
-		if ( ! code.includes( TO_ESM_OWN_DEFAULT_CHECK ) ) {
+		if ( ! code.includes( TO_ESM_HELPER ) ) {
 			throw new Error( 'Unexpected Rolldown `__toESM` helper.' );
 		}
-		// A same-length replacement keeps the source map valid.
+		// The helper's line has no source mappings and keeps its line count, so
+		// the source map stays valid.
 		return {
 			code: code.replace(
-				TO_ESM_OWN_DEFAULT_CHECK,
-				' '.repeat( TO_ESM_OWN_DEFAULT_CHECK.length )
+				TO_ESM_START,
+				`${ TO_ESM_START }!isNodeMode && mod && mod.__esModule ? mod : `
 			),
 			map: null,
 		};

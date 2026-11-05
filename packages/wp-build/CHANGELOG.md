@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix circular imports in the CommonJS (`.cjs`) output, which could read a default export as `undefined`, for example `apiFetch` requests with `per_page=-1` ([#86328](https://github.com/WordPress/gutenberg/issues/86328)).
+
 ## 0.27.0 (2026-11-04)
 
 ### Enhancements
