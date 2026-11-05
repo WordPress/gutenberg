@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `SpacingSizesControl`: Let the custom value slider reach a value past its usual max, such as a 1000px Spacer height, instead of showing the max and setting it when the slider is moved ([#86300](https://github.com/WordPress/gutenberg/pull/86300)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
