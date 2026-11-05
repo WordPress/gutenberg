@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Prioritize the Category Link and Tag Link variations in the block appender's quick inserter, so they're reachable without opening "Browse all" ([#83108](https://github.com/WordPress/gutenberg/pull/83108)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
