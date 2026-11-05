@@ -58,12 +58,15 @@ const isSameServerContent = (
 
 /**
  * What the directive last did with its host element's content: the HTML it
- * applied, or adopted from matching content, or the value the browser
+ * wrote, or adopted from matching content, or the value the browser
  * rejected.
  */
 type WriteRecord =
 	| {
-			/** Serialized HTML the element shows. */
+			/**
+			 * The written or adopted value as a string, which the element may
+			 * serialize differently.
+			 */
 			applied: string;
 	  }
 	| {
@@ -77,9 +80,11 @@ directive(
 	( { directives: { html: htmlEntries }, element, evaluate } ) => {
 		// Default entry; unsupported variants retain their original props.
 		const entry = htmlEntries.find( isDefaultDirectiveSuffix );
-		// The last write to the host, or undefined before the first one.
-		// Non-token values apply empty HTML so returning tokens are applied
-		// again after a removal.
+		// What the directive last did with the host's content. It's undefined
+		// for a new host and after the server representation, so the next
+		// token is compared with the element's content and adopted when it
+		// matches. Non-token values write empty HTML, so returning tokens are
+		// written again after a removal.
 		const writeRecord = useRef< WriteRecord | undefined >( undefined );
 		// The value-rule state belongs to a host element, not its wrapper vnode.
 		const previousHost = useRef< HTMLElement | null >( null );
@@ -261,10 +266,10 @@ directive(
 			}
 			const key = String( resolvedValue );
 			const record = writeRecord.current;
-			// A value matching the last write is skipped: by its markup after
-			// an applied write, and only when identical after a rejected one,
-			// so a new token wrapping the rejected string isn't retried but a
-			// `TrustedHTML` value with the same markup is written.
+			// A value matching the record is skipped: by its markup after a
+			// write or an adoption, and only when identical after a rejected
+			// write, so a new token wrapping the rejected string isn't retried
+			// but a `TrustedHTML` value with the same markup is written.
 			if (
 				record &&
 				( 'rejected' in record
