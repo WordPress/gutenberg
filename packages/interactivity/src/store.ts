@@ -6,6 +6,7 @@ import {
 	navigationSignal,
 	deepClone,
 	jsonReviver,
+	warnIfInvalidNamespace,
 } from './utils';
 
 export const stores = new Map();
@@ -20,8 +21,12 @@ const serverStates = new Map();
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = < T extends object = any >( namespace?: string ): T =>
-	storeConfigs.get( namespace || getNamespace() ) || {};
+export const getConfig = < T extends object = any >(
+	namespace?: string
+): T => {
+	warnIfInvalidNamespace( namespace );
+	return storeConfigs.get( namespace || getNamespace() ) || {};
+};
 
 /**
  * Gets the state defined and updated from the server.
@@ -52,6 +57,7 @@ export const getConfig = < T extends object = any >( namespace?: string ): T =>
 export function getServerState( namespace?: string ): Record< string, unknown >;
 export function getServerState< T extends object >( namespace?: string ): T;
 export function getServerState< T extends object >( namespace?: string ): T {
+	warnIfInvalidNamespace( namespace );
 	const ns = namespace || getNamespace();
 	if ( ! serverStates.has( ns ) ) {
 		serverStates.set( ns, {} );
@@ -213,6 +219,7 @@ export function store(
 	{ state = {}, ...block }: any = {},
 	{ lock = false }: StoreOptions = {}
 ) {
+	warnIfInvalidNamespace( namespace );
 	if ( ! stores.has( namespace ) ) {
 		// Lock the store if the passed lock is different from the universal
 		// unlock. Once the lock is set (either false, true, or a given string),
@@ -295,6 +302,7 @@ export const populateServerData = ( data?: {
 	}
 	if ( isPlainObject( data?.config ) ) {
 		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
+			warnIfInvalidNamespace( namespace );
 			storeConfigs.set( namespace, config );
 		} );
 	}
