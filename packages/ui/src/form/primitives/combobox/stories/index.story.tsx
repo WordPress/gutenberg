@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
@@ -20,6 +18,7 @@ const meta: Meta< typeof Combobox.Root > = {
 	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
+		'Combobox.LoadingIndicator': Combobox.LoadingIndicator,
 		'Combobox.Trigger': Combobox.Trigger,
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
@@ -282,8 +281,10 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Combobox.LoadingIndicator` inside `Combobox.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -319,7 +320,7 @@ export const AsyncItems: Story = {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
@@ -332,10 +333,7 @@ export const AsyncItems: Story = {
 					</div>
 					<Combobox.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Combobox.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
