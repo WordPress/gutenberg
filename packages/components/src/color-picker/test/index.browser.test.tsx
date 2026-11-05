@@ -568,7 +568,7 @@ describe( 'ColorPicker', () => {
 					screen.getByRole( 'spinbutton', {
 						name: 'Alpha (RGB A value)',
 					} )
-				).toHaveValue( 99 )
+				).toHaveValue( 95 )
 			);
 			for ( const name of [ 'Red', 'Green', 'Blue' ] ) {
 				expect(
