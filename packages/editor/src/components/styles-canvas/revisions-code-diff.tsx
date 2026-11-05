@@ -84,26 +84,33 @@ export default function StylesRevisionsCodeDiff( {
 	revision,
 	currentConfig,
 }: StylesRevisionsCodeDiffProps ) {
-	const rows = useMemo( () => {
-		if ( ! revision ) {
-			return [];
-		}
-		// Matching styles leave nothing to compare, so show the empty message
-		// rather than the whole config marked as unchanged. The sidebar's
-		// Apply button decides "matching" the same way.
-		if (
-			areGlobalStylesEqual(
+	// Matching styles leave nothing to compare, so show the empty message
+	// rather than the whole config marked as unchanged. The sidebar's Apply
+	// button decides "matching" the same way.
+	const hasChanges = useMemo(
+		() =>
+			!! revision &&
+			! areGlobalStylesEqual(
 				revision as GlobalStylesConfig,
 				( currentConfig ?? {} ) as GlobalStylesConfig
-			)
-		) {
+			),
+		[ revision, currentConfig ]
+	);
+	// The current styles stay the same while revisions are browsed, so they
+	// are serialized once rather than for every revision.
+	const currentCode = useMemo(
+		() => ( hasChanges ? getStylesRevisionCode( currentConfig ) : null ),
+		[ currentConfig, hasChanges ]
+	);
+	const rows = useMemo( () => {
+		if ( ! revision || currentCode === null ) {
 			return [];
 		}
 		return getSplitCodeDiffRows(
 			getStylesRevisionCode( revision ),
-			getStylesRevisionCode( currentConfig )
+			currentCode
 		);
-	}, [ revision, currentConfig ] );
+	}, [ revision, currentCode ] );
 
 	return (
 		<SplitCodeDiffTable
