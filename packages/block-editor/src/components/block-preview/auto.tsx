@@ -3,7 +3,8 @@ import { useResizeObserver, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
-import BlockList from '../block-list';
+// Keep this import named: the circular import leaves a default import undefined in the CommonJS build.
+import { BlockList } from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';

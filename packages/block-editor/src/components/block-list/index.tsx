@@ -204,6 +204,8 @@ export default function BlockList( settings: BlockListProps ) {
 	);
 }
 
+export { BlockList };
+
 const EMPTY_ARRAY: string[] = [];
 const EMPTY_SET = new Set< string >();
 
