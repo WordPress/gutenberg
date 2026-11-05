@@ -199,6 +199,7 @@ function MediaTab( {
 				mediaType={ category.mediaType }
 				onChangeMediaType={ setMediaType }
 				folder={ folder }
+				folders={ folders }
 				folderControl={
 					hasFolderControl ? (
 						<FolderSelect

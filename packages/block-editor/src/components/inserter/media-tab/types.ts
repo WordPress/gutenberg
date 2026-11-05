@@ -56,6 +56,8 @@ export interface MediaCategoryPanelProps {
 	sourceMenu?: import( 'react' ).ReactNode;
 	/** The folder to filter by, when one is selected. */
 	folder?: number;
+	/** The folders available, for the per-item "Add to folder" action. */
+	folders?: import( './folder-select' ).MediaFolder[];
 	/** Rendered beneath the search input. */
 	folderControl?: import( 'react' ).ReactNode;
 	/** Rendered beneath the pager. */

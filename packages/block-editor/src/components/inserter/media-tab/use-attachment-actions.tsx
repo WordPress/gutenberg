@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { external, linkOff } from '@wordpress/icons';
+// The library has no folder icon; the category one is the closest.
+import { external, linkOff, category as folderIcon } from '@wordpress/icons';
 import DetachConfirmation from './detach-confirmation';
+import AddToFolderPicker from './add-to-folder-picker';
 import type { MediaItem } from './types';
+import type { MediaFolder } from './folder-select';
 
 type InserterMediaCategory =
 	import( '../../../store/types' ).InserterMediaCategory;
@@ -18,6 +22,11 @@ type AttachmentCategory = InserterMediaCategory & {
 	postTypeLabel?: string;
 	attach?: ( media: unknown ) => Promise< number >;
 	detach?: ( media: MediaItem ) => Promise< void >;
+	assignToFolder?: ( media: unknown, folderId: number ) => Promise< number >;
+	removeFromFolder?: (
+		media: MediaItem,
+		folderId: number
+	) => Promise< void >;
 	invalidate?: ( query: object ) => void;
 	subscribe?: ( onChange: () => void, query: object ) => () => void;
 };
@@ -36,13 +45,26 @@ type AttachmentCategory = InserterMediaCategory & {
 export function useAttachmentActions( {
 	category,
 	query,
+	folders,
+	folder,
 }: {
 	category: AttachmentCategory;
 	query: object;
+	/**
+	 * The folders available, when the source supports them and the host editor
+	 * supplies them. Absent otherwise, which is what withholds every folder
+	 * action.
+	 */
+	folders?: MediaFolder[];
+	/**
+	 * The folder being browsed, when one is selected.
+	 */
+	folder?: number;
 } ) {
 	// Private to core's media categories, these capabilities act on WordPress
 	// attachments:
 	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
+	// - `assignToFolder`/`removeFromFolder` file them into media folders.
 	// - `subscribe` watches the attachment cache backing them.
 	// An external resource can never own a post's attachments, and every category
 	// registered by an extender through the public `registerInserterMediaCategory`
@@ -52,13 +74,18 @@ export function useAttachmentActions( {
 	const attach = supportsAttachments ? category.attach : undefined;
 	const detach = supportsAttachments ? category.detach : undefined;
 	const subscribe = supportsAttachments ? category.subscribe : undefined;
+	const assignToFolder =
+		supportsAttachments && folders ? category.assignToFolder : undefined;
+	const removeFromFolder =
+		supportsAttachments && folders ? category.removeFromFolder : undefined;
+	const selectedFolder = folders?.find( ( { id } ) => id === folder );
 
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
 
 	// Invalidate the cached results and force `useMediaResults` to refetch so
-	// the grid reflects images that were just attached or detached.
+	// the grid reflects images that were just attached, detached or filed.
 	const refresh = useCallback( () => {
 		if ( supportsAttachments ) {
 			category.invalidate?.( query );
@@ -165,6 +192,107 @@ export function useAttachmentActions( {
 		[ detach, category, refresh, createErrorNotice, createSuccessNotice ]
 	);
 
+	const getFolderName = useCallback(
+		( folderId: number ) => {
+			const match = folders?.find( ( { id } ) => id === folderId );
+			return match ? decodeEntities( match.name ) : '';
+		},
+		[ folders ]
+	);
+
+	// Files items into a folder: the footer picker's selection into the folder
+	// being browsed, or one card into the folder chosen in the action's modal.
+	const addToFolder = useCallback(
+		async ( media: unknown, folderId: number ) => {
+			if ( ! assignToFolder ) {
+				return;
+			}
+			try {
+				const addedCount = await assignToFolder( media, folderId );
+
+				if ( ! addedCount ) {
+					// The picker's "Upload files" tab accepts any file type, so
+					// a selection can hold nothing of this source's type.
+					createWarningNotice( __( 'No items were added.' ), {
+						type: 'snackbar',
+						id: 'inserter-notice',
+					} );
+					return;
+				}
+
+				refresh();
+				createSuccessNotice(
+					sprintf(
+						/* translators: %1$d: Number of items added. %2$s: Name of the folder. */
+						_n(
+							'%1$d item added to %2$s.',
+							'%1$d items added to %2$s.',
+							addedCount
+						),
+						addedCount,
+						getFolderName( folderId )
+					),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice( __( 'Could not add items to the folder.' ), {
+					type: 'snackbar',
+					id: 'inserter-notice',
+				} );
+			}
+		},
+		[
+			assignToFolder,
+			getFolderName,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+			createWarningNotice,
+		]
+	);
+
+	const handleAddToFolder = useCallback(
+		( selectedMedia: unknown ) => {
+			if ( folder !== undefined ) {
+				addToFolder( selectedMedia, folder );
+			}
+		},
+		[ addToFolder, folder ]
+	);
+
+	const handleRemoveFromFolder = useCallback(
+		async ( media: MediaItem ) => {
+			if ( ! removeFromFolder || folder === undefined ) {
+				return;
+			}
+			try {
+				await removeFromFolder( media, folder );
+				refresh();
+				createSuccessNotice(
+					sprintf(
+						/* translators: %s: Name of the folder. */
+						__( 'Item removed from %s.' ),
+						getFolderName( folder )
+					),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			} catch {
+				createErrorNotice(
+					__( 'Could not remove the item from the folder.' ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
+			}
+		},
+		[
+			removeFromFolder,
+			folder,
+			getFolderName,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+		]
+	);
+
 	// Per-item actions for the grid's card menu. None supports bulk, so the
 	// grid renders no selection checkboxes.
 	const actions = useMemo( () => {
@@ -222,8 +350,61 @@ export function useAttachmentActions( {
 				),
 			} );
 		}
+		if ( assignToFolder && folders?.length ) {
+			list.push( {
+				id: 'add-to-folder',
+				label: __( 'Add to folder…' ),
+				icon: folderIcon,
+				modalHeader: __( 'Add to folder' ),
+				RenderModal: ( {
+					items,
+					closeModal,
+				}: {
+					items: MediaItem[];
+					closeModal?: () => void;
+				} ) => (
+					<AddToFolderPicker
+						folders={ folders }
+						onCancel={ () => closeModal?.() }
+						onConfirm={ ( folderId: number ) => {
+							closeModal?.();
+							addToFolder( items, folderId );
+						} }
+					/>
+				),
+			} );
+		}
+		if ( removeFromFolder && selectedFolder ) {
+			list.push( {
+				id: 'remove-from-folder',
+				label: __( 'Remove from folder' ),
+				icon: folderIcon,
+				// Reversible by adding the item again, so no confirmation.
+				callback: ( [ media ]: MediaItem[] ) =>
+					handleRemoveFromFolder( media ),
+			} );
+		}
 		return list;
-	}, [ category, detach, handleDetach ] );
+	}, [
+		category,
+		detach,
+		handleDetach,
+		assignToFolder,
+		folders,
+		addToFolder,
+		removeFromFolder,
+		selectedFolder,
+		handleRemoveFromFolder,
+	] );
 
-	return { actions, attach, handleAttach, refreshKey };
+	return {
+		actions,
+		attach,
+		handleAttach,
+		// The footer's "Add to folder" picker files into the folder being
+		// browsed, so it's offered only while browsing one.
+		addToFolder:
+			selectedFolder && assignToFolder ? handleAddToFolder : undefined,
+		refreshKey,
+	};
 }
