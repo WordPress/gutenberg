@@ -2658,7 +2658,7 @@ test.describe( 'Block Notes', () => {
 				}
 			} );
 
-			await test.step( 'Goes back to the selected copy', async () => {
+			await test.step( 'Goes back to the first copy', async () => {
 				for ( const index of [ 0, 1 ] ) {
 					await editor.selectBlocks( paragraphs.nth( index ) );
 					await thread.click();
@@ -2670,7 +2670,9 @@ test.describe( 'Block Notes', () => {
 						.getByRole( 'button', { name: 'Back to block' } )
 						.focus();
 					await page.keyboard.press( 'Enter' );
-					await expect( paragraphs.nth( index ) ).toBeFocused();
+					await expect( paragraphs.first() ).toHaveClass(
+						/is-selected/
+					);
 				}
 			} );
 

@@ -218,7 +218,8 @@ describe( 'buildBlockHighlightCss', () => {
 	};
 	const getBlockAttributes = ( clientId ) =>
 		attributesByClientId[ clientId ] ?? { content: 'no markers here' };
-	const isTextBlock = ( clientId ) => ! clientId.startsWith( 'image' );
+	const nonTextClientIds = new Set( [ 'image-1' ] );
+	const isTextBlock = ( clientId ) => ! nonTextClientIds.has( clientId );
 
 	const overlaySelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.is-multi-selected)::after`;

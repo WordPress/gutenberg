@@ -111,9 +111,6 @@ export function useNoteThreads( postId ) {
 			const thread = {
 				...item,
 				reply: [],
-				// The first block is where a shared note is listed, and where
-				// it shows unless another of its blocks is selected (see
-				// `getAnchorClientId`).
 				blockClientIds,
 				blockClientId: blockClientIds[ 0 ] ?? null,
 			};

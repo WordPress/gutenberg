@@ -47,7 +47,7 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
       ├── AddNoteToolbarButton           - slot fill in the block toolbar (once the post has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteFocus + keyboard nav + focusThreadOrAdjacent
-      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new', calls useNoteActions
+      │         ├── AddNote              - new note form for the selected blocks, rendered when selectedNote === 'new', calls useNoteActions
       │         └── NoteThread[]         - per thread, calls useNoteActions
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
@@ -91,6 +91,8 @@ A thread's or the new note form's focus-out deselects only when focus did not la
 ## Floating board
 
 Goal: in the floating sidebar, each unresolved note appears beside its associated block, tracks canvas scroll, and shifts up/down to avoid overlapping with neighbors - all without re-rendering threads as the canvas scrolls.
+
+A note shared by several blocks has one place: beside its first block, whichever of its blocks is selected. Hovering or focusing the thread highlights that block, picking the thread selects it, and Back to block returns to it.
 
 Three layers cooperate:
 

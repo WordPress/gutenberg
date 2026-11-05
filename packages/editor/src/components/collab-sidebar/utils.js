@@ -726,22 +726,6 @@ export function hasFocusWithin( element ) {
 }
 
 /**
- * Block a thread shows at: the first selected block the note belongs to,
- * else the note's first block.
- *
- * @param {Object}   thread            Note thread.
- * @param {string[]} selectedClientIds Selected block client IDs.
- * @return {?string} Block client ID.
- */
-export function getAnchorClientId( thread, selectedClientIds ) {
-	return (
-		selectedClientIds.find( ( clientId ) =>
-			thread.blockClientIds?.includes( clientId )
-		) ?? thread.blockClientId
-	);
-}
-
-/**
  * Whether one block is selected and has unsent note text. Only such a draft
  * keeps its marker when its form is left and comes back with the block; a
  * draft across blocks comes back on its first block, without the others.
