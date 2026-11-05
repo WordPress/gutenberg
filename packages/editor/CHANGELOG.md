@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Media categories: Behind the `gutenberg-media-folders` experiment, supply the inserter with the `wp_media_folder` terms through a private `inserterMediaFolders` setting, and give every core media source a `folder` request filter plus `assignToFolder`/`removeFromFolder` capabilities ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
