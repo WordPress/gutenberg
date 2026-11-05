@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room.
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
 ### Bug Fixes
 
