@@ -14,7 +14,6 @@
 -   `useMergeRefs`: Accept disabled refs and object refs that start `undefined` ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 -   `useDebounce`: Accept partial options ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 -   `useDropZone`: Call `onDragEnd` for drags that reach the document with a `dragover` but no `dragenter`, which browsers can skip in an iframe ([#85412](https://github.com/WordPress/gutenberg/pull/85412)).
--   `useDropZone`: Don't end a drag on a `mousemove` while a mouse button is held ([#85412](https://github.com/WordPress/gutenberg/pull/85412)).
 
 ## 9.0.0 (2026-10-20)
 
