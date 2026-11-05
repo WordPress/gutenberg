@@ -34,9 +34,8 @@ export function calculateNotePositions( {
 
 	// The overlap sweep walks outward from the anchor assuming each thread's
 	// top is greater than the previous one's. Thread order is document order,
-	// which tracks visual order for notes anchored to their markers, but a
-	// pending "new" note anchors to the live selection and can therefore sit
-	// above notes that precede it in the list. Sort by measured top so the
+	// except for the pending "new" note: it comes after its block's threads,
+	// but its marker can sit above theirs. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
 	// below and never receive a position.

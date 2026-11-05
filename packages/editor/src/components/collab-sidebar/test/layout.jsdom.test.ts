@@ -241,8 +241,8 @@ describe( 'calculateNotePositions', () => {
 	it( 'never displaces a thread above its own anchor when the pending note sorts out of order', () => {
 		/*
 		 * The pending "new" note is spliced in after its block's existing
-		 * threads, but it anchors to the live selection, which can sit above
-		 * a marker that precedes it in the list. Ordering by measured top
+		 * threads, but its marker can sit above a marker that precedes it in
+		 * the list. Ordering by measured top
 		 * keeps the sweep's assumption true; without it note 1 is pushed to
 		 * 164 - 136px above the marker it points at.
 		 */
