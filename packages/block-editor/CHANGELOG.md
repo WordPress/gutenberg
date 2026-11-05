@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Edit as HTML: Keep the block HTML visible when the block has a text gradient.
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

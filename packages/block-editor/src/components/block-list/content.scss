@@ -374,6 +374,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
+	// A text gradient on the block makes its text fill transparent, and the
+	// fill colour is inherited, so restore it to keep the HTML visible.
+	-webkit-text-fill-color: currentColor;
 	// HTML input is always LTR regardless of language.
 	/*rtl:ignore*/
 	direction: ltr;
