@@ -216,7 +216,7 @@ describe( 'the public API', () => {
 						--wp-image-editor-handle-background-color: rgb(240, 230, 220);
 						--wp-image-editor-tooltip-background-color: rgb(10, 20, 30);
 						--wp-image-editor-tooltip-text-color: rgb(250, 240, 230);
-						--wp-image-editor-dimming-color: rgba(1, 2, 3, 0.7);
+						--wp-image-editor-dimming-color: rgba(255, 0, 0, 0.6);
 						--wp-image-editor-canvas-inset: 30px;
 					}
 				` }</style>
@@ -240,8 +240,19 @@ describe( 'the public API', () => {
 			'rgb(90, 10, 110)'
 		);
 		expect( getComputedStyle( dimming ).boxShadow ).toContain(
-			'rgba(1, 2, 3, 0.7)'
+			'rgba(255, 0, 0, 0.6)'
 		);
+		dimming.style.transition = 'none';
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		expect( getComputedStyle( dimming ).boxShadow ).toContain(
+			'color(srgb 1 0 0 / 0.4'
+		);
+		fireEvent.pointerUp( canvas, { pointerId: 1 } );
 		fireEvent.pointerDown( handle, {
 			button: 0,
 			clientX: 100,

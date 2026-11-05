@@ -18,7 +18,13 @@ npm install @wordpress/image-editor --save
 
 ## Styles
 
-The canvas needs its stylesheet for layout. Load `build-style/style.css` from your app:
+The canvas needs its stylesheet for layout. Load `build-style/style.css` from your app's Sass:
+
+```scss
+@use "@wordpress/image-editor/build-style/style.css";
+```
+
+Or import it from JavaScript:
 
 ```js
 import '@wordpress/image-editor/build-style/style.css';
@@ -34,8 +40,7 @@ Set these CSS custom properties on a parent element or a class passed to `ImageE
 | `--wp-image-editor-handle-background-color`  | Handle fill and the inner focus ring.                                                                            |
 | `--wp-image-editor-tooltip-background-color` | Dimensions tooltip background.                                                                                   |
 | `--wp-image-editor-tooltip-text-color`       | Dimensions tooltip text.                                                                                         |
-| `--wp-image-editor-dimming-color`            | Colour outside the crop.                                                                                         |
-| `--wp-image-editor-dimming-color-dragging`   | Colour outside the crop during a drag.                                                                           |
+| `--wp-image-editor-dimming-color`            | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
 | `--wp-image-editor-grid-color`               | Rule-of-thirds lines.                                                                                            |
 | `--wp-image-editor-canvas-inset`             | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
 
@@ -45,7 +50,6 @@ For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
 .my-cropper {
 	--wp-image-editor-accent-color: rebeccapurple;
 	--wp-image-editor-dimming-color: rgb( 0 0 0 / 60% );
-	--wp-image-editor-dimming-color-dragging: rgb( 0 0 0 / 40% );
 }
 ```
 

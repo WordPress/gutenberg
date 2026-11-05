@@ -70,7 +70,7 @@ $handle-touch-target-size: 44px;
 	}
 
 	&--dragging &__dimming {
-		box-shadow: 0 0 0 9999px var(--wp-image-editor-dimming-color-dragging, rgba(224, 224, 224, 0.4));
+		box-shadow: 0 0 0 9999px color-mix(in srgb, var(--wp-image-editor-dimming-color, rgba(224, 224, 224, 0.6)) 66.667%, transparent);
 	}
 
 	&__grid {
