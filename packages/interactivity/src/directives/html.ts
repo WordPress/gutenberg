@@ -19,24 +19,41 @@ const isServerHTMLRepresentation = ( value: unknown ): boolean =>
 	isPlainObject( value ) && value.wpServerHtml === true;
 
 /**
- * Replaces an element's child nodes with a copy of a server content snapshot's
- * nodes, without writing an HTML string. Child nodes that already equal the
- * snapshot's, compared with `isEqualNode()`, are kept.
+ * Lists the HTML-namespace `<template>` elements of a fragment, in tree order,
+ * without those inside template contents.
  *
- * @param node    The element whose content is replaced.
- * @param content The detached, script-free snapshot, left unmodified.
+ * @param content The fragment to search.
+ *
+ * @return The template elements.
  */
-const showServerContent = ( node: HTMLElement, content: DocumentFragment ) => {
-	const contentNodes = content.childNodes;
-	if (
-		node.childNodes.length === contentNodes.length &&
-		Array.from( node.childNodes ).every( ( child, index ) =>
-			child.isEqualNode( contentNodes[ index ] )
-		)
-	) {
-		return;
+const getTemplates = ( content: DocumentFragment ) =>
+	Array.from( content.querySelectorAll( 'template' ) ).filter(
+		( template ) => template.namespaceURI === 'http://www.w3.org/1999/xhtml'
+	);
+
+/**
+ * Checks whether two server content snapshots hold the same nodes: the same
+ * names, attributes and data, in the same order, at every depth. Unlike
+ * `isEqualNode()` alone, the contents of `<template>` elements are compared
+ * too.
+ *
+ * @param content A detached snapshot.
+ * @param other   Another detached snapshot.
+ *
+ * @return Whether the snapshots hold the same nodes.
+ */
+const isSameServerContent = (
+	content: DocumentFragment,
+	other: DocumentFragment
+): boolean => {
+	if ( ! content.isEqualNode( other ) ) {
+		return false;
 	}
-	node.replaceChildren( node.ownerDocument.importNode( content, true ) );
+	// Equal trees hold their templates at the same places.
+	const otherTemplates = getTemplates( other );
+	return getTemplates( content ).every( ( template, index ) =>
+		isSameServerContent( template.content, otherTemplates[ index ].content )
+	);
 };
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
@@ -60,6 +77,12 @@ directive(
 		// Server content that the current navigation brought to the kept host,
 		// not yet shown.
 		const owedServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
+		// Server content snapshot that the element shows: what hydration found,
+		// a created host's fallback, or owed content shown since. A value that
+		// applies to the element leaves it showing none.
+		const shownServerContent = useRef< DocumentFragment | undefined >(
 			undefined
 		);
 		// Preact always receives empty HTML; fallback copies and later writes
@@ -138,6 +161,9 @@ directive(
 				previousHost.current = node;
 				lastAppliedKey.current = undefined;
 				owedServerContent.current = undefined;
+				shownServerContent.current = preserveContent
+					? serverContent
+					: undefined;
 				if (
 					active &&
 					preserveContent &&
@@ -173,11 +199,23 @@ directive(
 			if ( ! active ) {
 				return;
 			}
-			if ( preserveContent && owedServerContent.current ) {
-				showServerContent( node, owedServerContent.current );
+			const owed = owedServerContent.current;
+			if ( preserveContent && owed ) {
 				owedServerContent.current = undefined;
-				// The shown content differs from what was last applied, so the
-				// next token is compared with the DOM, as at hydration.
+				// Content the server sends again unchanged keeps its nodes, and
+				// what client code changed in them. Any other content is copied
+				// as nodes, so no HTML string is written.
+				if (
+					! shownServerContent.current ||
+					! isSameServerContent( shownServerContent.current, owed )
+				) {
+					node.replaceChildren(
+						node.ownerDocument.importNode( owed, true )
+					);
+				}
+				shownServerContent.current = owed;
+				// The element shows server content, not what was last applied,
+				// so the next token is compared with the DOM, as at hydration.
 				lastAppliedKey.current = undefined;
 				return;
 			}
@@ -193,6 +231,8 @@ directive(
 				}
 				return;
 			}
+			// Any other value writes, adopts or empties the content.
+			shownServerContent.current = undefined;
 			if ( ! trusted && result !== null && result !== undefined ) {
 				warn(
 					'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'

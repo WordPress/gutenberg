@@ -378,19 +378,25 @@ describe( 'a data-wp-html element kept across navigation', () => {
 	test( 'shows each page’s server content on prefetched, cached, restored and refreshed pages', async () => {
 		store( namespace, {
 			state: {
-				/** Selects the value from the page's server context. */
+				/**
+				 * Selects the value from the page's server state, which holds
+				 * the new page's value from the update that renders it.
+				 */
 				get html() {
-					return getServerContext< { value: string } >().value === 'T'
+					return getServerState< { value: string } >().value === 'T'
 						? asDangerousHTML( '<p>T</p>' )
 						: representation;
 				},
 			},
 		} );
+		const serverData = ( value: string ) => ( {
+			state: { [ namespace ]: { value } },
+		} );
 		const page = ( name: string, value = 'M' ) =>
 			regionHtml(
-				`<p class="content">${ name }</p><div data-wp-html="state.html"><i>${ name }</i></div>`,
-				{ value }
-			);
+				`<p class="content">${ name }</p><div data-wp-html="state.html"><i>${ name }</i></div>`
+			) + serverDataHtml( serverData( value ) );
+		populateServerData( serverData( 'M' ) );
 		const region = hydrateHtml( page( 'zero' ) );
 		const element = region.querySelector( '[data-wp-html]' )!;
 		const show = () => [
@@ -430,17 +436,32 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		expect( show() ).toEqual( [ true, '<i>changed</i>' ] );
 	} );
 
-	test( 'keeps its nodes when they already equal the new page’s server content', async () => {
+	test( 'keeps its nodes and the changes made in them while the new page’s server content is the same', async () => {
 		store( namespace, { state: { html: representation } } );
 		const serverData = pendingServerData();
-		const page = ( name: string ) =>
+		// The content differs between pages only inside its `<template>`.
+		const page = ( name: string, template: string ) =>
 			regionHtml(
-				`<p class="content">${ name }</p><div data-wp-html="state.html"><p>Same <b>content</b></p></div><div data-wp-html="state.late"><p>Same <b>content</b></p></div>`
+				`<p class="content">${ name }</p>${ [
+					'state.html',
+					'state.late',
+				]
+					.map(
+						( reference ) =>
+							`<div data-wp-html="${ reference }"><details><summary>Same</summary><p>content</p></details><template><b>${ template }</b></template><script>window.kept = 1;</script></div>`
+					)
+					.join( '' ) }`
 			) + serverDataHtml( serverData );
 		populateServerData( serverData );
-		const region = hydrateHtml( page( 'one' ) );
+		const region = hydrateHtml( page( 'one', 'one' ) );
 		const elements = [ ...region.querySelectorAll( '[data-wp-html]' ) ];
-		const paragraphs = elements.map( ( element ) => element.firstChild );
+		// The visitor opens the details, and a script marks the paragraph.
+		for ( const element of elements ) {
+			element.querySelector( 'details' )!.open = true;
+			element.querySelector( 'p' )!.classList.add( 'js' );
+		}
+		const changed =
+			'<details open=""><summary>Same</summary><p class="js">content</p></details><template><b>one</b></template><script>window.kept = 1;</script>';
 		const mutations: MutationRecord[] = [];
 		const observer = new MutationObserver( ( records ) =>
 			mutations.push( ...records )
@@ -453,16 +474,25 @@ describe( 'a data-wp-html element kept across navigation', () => {
 			} );
 		}
 
-		await navigate( 'two', page( 'two' ) );
+		await navigate( 'two', page( 'two', 'one' ) );
 		// Refreshing the page shown fetches it again.
-		await navigate( 'two', page( 'two' ) );
+		await navigate( 'two', page( 'two', 'one' ) );
 
 		expect( region.querySelector( '.content' ) ).toHaveTextContent( 'two' );
-		expect( elements.map( ( element ) => element.firstChild ) ).toEqual(
-			paragraphs
-		);
+		expect( elements.map( ( element ) => element.innerHTML ) ).toEqual( [
+			changed,
+			changed,
+		] );
 		expect( mutations ).toHaveLength( 0 );
 		observer.disconnect();
+
+		await navigate( 'three', page( 'three', 'three' ) );
+
+		expect( elements.map( ( element ) => element.innerHTML ) ).toEqual(
+			Array( 2 ).fill(
+				'<details><summary>Same</summary><p>content</p></details><template><b>three</b></template>'
+			)
+		);
 	} );
 
 	test( 'shows only its own server content, inert and without scripts', async () => {
