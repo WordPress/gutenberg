@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `AspectRatioIcon`: Add a private component that draws the shape of an aspect ratio, for the aspect ratio control of the block editor ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes
