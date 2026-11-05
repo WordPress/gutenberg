@@ -235,6 +235,90 @@ describe( 'a data-wp-html element kept across navigation', () => {
 		}
 	);
 
+	/**
+	 * Navigates a kept element whose getter returns the server representation
+	 * on the previous page and a token or `null` on the new one.
+	 *
+	 * @param source The server data the getter reads.
+	 * @param next   The value on the new page: `T`, a token, or `null`.
+	 * @return The element and the nodes added to it during the navigation.
+	 */
+	const navigateFromRepresentation = async (
+		source: 'getServerState()' | 'getServerContext()',
+		next: string
+	) => {
+		store( namespace, {
+			state: {
+				/** Selects the value from the page's server data. */
+				get html(): unknown {
+					const { value } =
+						source === 'getServerContext()'
+							? getServerContext< { value: string } >()
+							: getServerState< { value: string } >();
+					if ( value === 'M' ) {
+						return representation;
+					}
+					return value === 'T' ? asDangerousHTML( '<p>T</p>' ) : null;
+				},
+			},
+		} );
+		const serverData = ( value: string ) => ( {
+			state: { [ namespace ]: { value } },
+		} );
+		const page = ( name: string, value: string, content: string ) =>
+			regionHtml(
+				`<p class="content">${ name }</p><div data-wp-html="state.html">${ content }</div>`,
+				{ value }
+			) + serverDataHtml( serverData( value ) );
+		populateServerData( serverData( 'M' ) );
+		const region = hydrateHtml( page( 'one', 'M', '<i>one</i>' ) );
+		const element = region.querySelector( '[data-wp-html]' )!;
+		expect( element.innerHTML ).toBe( '<i>one</i>' );
+		const added: string[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			records.forEach( ( record ) =>
+				record.addedNodes.forEach( ( node ) =>
+					added.push( ( node as Element ).outerHTML )
+				)
+			)
+		);
+		observer.observe( element, { childList: true } );
+
+		await navigate( 'two', page( 'two', next, '<i>two</i>' ) );
+		observer.disconnect();
+
+		expect( region.querySelector( '[data-wp-html]' ) ).toBe( element );
+		return { element, added };
+	};
+
+	test.each( [ 'T', 'null' ] )(
+		'never shows the new page’s server content when a getServerState() getter turns from the server representation into %s',
+		async ( next ) => {
+			const { element, added } = await navigateFromRepresentation(
+				'getServerState()',
+				next
+			);
+
+			expect( element.innerHTML ).toBe( next === 'T' ? '<p>T</p>' : '' );
+			expect( added ).not.toContain( '<i>two</i>' );
+		}
+	);
+
+	// A getter reading the server context returns the previous page's value in
+	// the update's first render, so the element can receive the new page's
+	// content before the token's HTML replaces it.
+	test.each( [ 'T', 'null' ] )(
+		'ends with the value of a getServerContext() getter that turns from the server representation into %s',
+		async ( next ) => {
+			const { element } = await navigateFromRepresentation(
+				'getServerContext()',
+				next
+			);
+
+			expect( element.innerHTML ).toBe( next === 'T' ? '<p>T</p>' : '' );
+		}
+	);
+
 	// Values on the previous page: `null`; `T`, a token an action set there;
 	// `M`, the server representation. On every page, a `data-wp-watch`
 	// callback copies the page's server value into the element's value one
