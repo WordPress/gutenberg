@@ -533,6 +533,50 @@ describe( 'ColorPicker', () => {
 			).toHaveValue( 4 );
 		} );
 
+		it( 'should not change the RGB values of a gray with a retained hue when only the alpha slider moves', async () => {
+			const user = userEvent.setup();
+
+			await render(
+				<ControlledColorPicker
+					enableAlpha
+					initialColor="#f66e04" // hsl(26, 97%, 49%)
+				/>
+			);
+
+			// Enter a gray, which keeps the hue of the previous color.
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Hex' } ) );
+			const hexInput = screen.getByRole( 'textbox' );
+			await userEvent.fill( hexInput, 'eeeeee' );
+			await waitFor( () => expect( hexInput ).toHaveValue( 'eeeeee' ) );
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'RGB' } ) );
+
+			const alphaSlider = screen
+				.getAllByRole( 'slider', { name: 'Alpha' } )
+				.at( -1 )!;
+			alphaSlider.focus();
+			await user.keyboard( '{ArrowLeft}' );
+
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'spinbutton', {
+						name: 'Alpha (RGB A value)',
+					} )
+				).toHaveValue( 99 )
+			);
+			for ( const name of [ 'Red', 'Green', 'Blue' ] ) {
+				expect(
+					screen.getByRole( 'spinbutton', { name } )
+				).toHaveValue( 238 );
+			}
+		} );
+
 		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
 			const user = userEvent.setup();
 

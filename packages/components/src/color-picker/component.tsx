@@ -115,24 +115,22 @@ const UnconnectedColorPicker = (
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
 			const previousHex = lastProducedHexRef.current;
-			const previousColor = colord( previousHex );
-			const previousHSLA = previousColor.toHsl();
 			// An alpha-only change keeps the previous RGB values. Converting
 			// the rounded HSLA channels back to RGB would shift them.
 			const isAlphaOnlyChange =
-				nextHSLA.h === previousHSLA.h &&
-				nextHSLA.s === previousHSLA.s &&
-				nextHSLA.l === previousHSLA.l;
+				nextHSLA.h === internalHSLA.h &&
+				nextHSLA.s === internalHSLA.s &&
+				nextHSLA.l === internalHSLA.l;
 			setInternalHSLA( nextHSLA );
 			const nextHex = isAlphaOnlyChange
-				? previousColor.alpha( nextHSLA.a ).toHex()
+				? colord( previousHex ).alpha( nextHSLA.a ).toHex()
 				: colord( nextHSLA ).toHex();
 			if ( ! colord( nextHex ).isEqual( previousHex ) ) {
 				lastProducedHexRef.current = nextHex;
 				setColor( nextHex );
 			}
 		},
-		[ setColor ]
+		[ internalHSLA, setColor ]
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
