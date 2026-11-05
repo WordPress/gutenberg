@@ -1,4 +1,6 @@
 .wp-block-math {
 	overflow-x: auto;
 	overflow-y: hidden;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 }
