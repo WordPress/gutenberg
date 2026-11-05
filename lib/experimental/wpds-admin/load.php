@@ -248,11 +248,10 @@ function gutenberg_wpds_admin_style_version() {
 }
 
 /**
- * Enqueues the design tokens and returns them as a dependency array.
+ * Enqueues the design tokens and returns the handle to depend on.
  *
- * Makes `--wpds-*` resolvable wherever the restyle renders. Gutenberg registers
- * the `wp-theme` handle itself (see lib/client-assets.php), so no wordpress-develop
- * change is needed. Falls back to the package's prebuilt copy if that stops being true.
+ * Gutenberg registers `wp-theme` in lib/client-assets.php. The prebuilt copy is
+ * a fallback in case that registration goes away.
  *
  * @since 24.1.0
  *
@@ -278,12 +277,9 @@ function gutenberg_wpds_admin_token_dependencies() {
 /**
  * Enqueues every stylesheet in a directory, in filename order.
  *
- * Stylesheets load in filename order, which is what their numeric prefixes are
- * for. Each area of the restyle owns one file and registers itself by being
- * present, so adding one is a single new file and no edit here.
- *
- * Each sheet depends on the one before it, which keeps the generated HTML in the
- * same order as the cascade.
+ * The numeric filename prefixes set the order, and each sheet depends on the
+ * previous one so the HTML comes out in that order too. A new area of the
+ * restyle is a new file in the directory; nothing needs registering here.
  *
  * @since 24.1.0
  *
@@ -322,16 +318,15 @@ function gutenberg_wpds_admin_enqueue_directory( $directory, $url_path, $prefix,
 /**
  * Enqueues design tokens and the restyle stylesheets on admin screens.
  *
- * `admin_enqueue_scripts` only fires in wp-admin, so this never touches the
- * login screen or the front end — both of which also use the `buttons` handle.
+ * `admin_enqueue_scripts` only fires in wp-admin, so the login screen and the
+ * front end (which also use `buttons`) are not affected.
  *
  * @since 24.1.0
  */
 function gutenberg_wpds_admin_enqueue_styles() {
 	/*
-	 * The first sheet depends on `buttons` so ours prints after the demoted WordPress
-	 * sheet and the generated HTML reads in order; the cascade itself no longer
-	 * relies on that, since layer order decides.
+	 * Depending on `buttons` prints our sheets after the demoted core one. Layer
+	 * order decides the cascade regardless; this keeps the HTML readable.
 	 */
 	gutenberg_wpds_admin_enqueue_directory(
 		__DIR__ . '/css',
@@ -345,16 +340,10 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_styles' );
 /**
  * Enqueues the front-end stylesheets on pages that render the admin bar.
  *
- * The admin bar is the only piece of the admin that renders outside
- * wp-admin, so this loads nothing at all for logged-out visitors.
- *
- * Two things make this a separate directory rather than a flag on the admin
- * one. The stylesheets in `css/front/` are NOT layered, and must not be: on the
- * front end WordPress's `admin-bar.css` is unlayered, and an unlayered declaration
- * beats a layered one whatever the source order or specificity. Measured — a
- * layered `#wpadminbar` rule loaded after `admin-bar.css` loses to it outright.
- * And front-end CSS competes with the active theme, so it stays as small as the
- * job allows rather than carrying rules meant for wp-admin.
+ * The front-end sheets live in `css/front/` because they cannot be wrapped in
+ * `@layer`. Core's admin-bar.css is unlayered on the front end, and unlayered
+ * CSS always wins over layered CSS. Keeping them separate also limits what
+ * loads next to the theme to the admin bar rules alone.
  *
  * @since 24.1.0
  */
@@ -364,8 +353,8 @@ function gutenberg_wpds_admin_enqueue_front_styles() {
 	}
 
 	/*
-	 * Depending on `admin-bar` puts ours after it in document order, which is
-	 * what decides the winner between two unlayered sheets of equal specificity.
+	 * Between two unlayered sheets of equal specificity the later one wins, so
+	 * ours has to come after `admin-bar`.
 	 */
 	gutenberg_wpds_admin_enqueue_directory(
 		__DIR__ . '/css/front',

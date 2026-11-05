@@ -1,58 +1,32 @@
 /**
- * Admin chrome — the admin menu and the admin bar — coloured from
- * WordPress Design System tokens.
+ * Admin menu and admin bar colours from design system tokens.
  *
- * SCOPE: the default colour scheme only, and chrome only. Every rule is
- * scoped to `body.admin-color-modern`, the class wp-admin gives the default
- * scheme, so the other schemes keep their own chrome untouched. Without it the
- * dark default surfaces below would also replace, for example, the light
- * sidebar of the Light scheme. The other schemes each need their own rewrite,
- * and they may not survive a move to a single accent-colour control. Content
- * colour — table borders, secondary text, semantic reds and greens — is a
- * separate concern and is not touched here.
+ * Every rule is scoped to `body.admin-color-modern`, the default colour scheme,
+ * so the other schemes keep their own chrome. Content colours are in
+ * 80-content-colour.css.
  *
- * The accent uses the brand strong pair — the background token together with
- * its own foreground — rather than mixing the scheme's accent with a
- * foreground chosen for another background. Never pair a background with
- * another pair's foreground: the pairs are what guarantee contrast.
+ * The design system has no dark surface token. The closest match is the
+ * `interactive-neutral-strong` pair, so the menu and bar use `-strong-active`
+ * (#1e1e1e), submenus and dropdowns use `-strong` (#2d2d2d), and text uses the
+ * `foreground-interactive-neutral-strong` colour that is contrast-checked
+ * against both. Two things change as a result:
  *
- * WHY THE "STRONG" FAMILY. The system has no dark surface token: every surface
- * token is light. Dark exists only as `…-interactive-neutral-strong` (#2d2d2d)
- * and `…-strong-active` (#1e1e1e), each paired with a light foreground
- * (`--wpds-color-foreground-interactive-neutral-strong`, #f0f0f0) that is
- * contrast-checked against it. Chrome is a dark surface carrying light text, so
- * that pair is the only honest mapping — but it means naming a resting surface
- * with a token whose name says "active". Recorded as a gap rather than worked
- * around.
+ * - Submenus are lighter than the menu rather than darker. Core uses #0c0c0c.
+ * - Submenu text is the same brightness as menu text. There is no dimmer light
+ *   foreground that keeps 4.5:1 on these surfaces, so the surface difference
+ *   carries the hierarchy instead.
  *
- * TWO DELIBERATE CHANGES, both consequences of using only tokens that exist:
+ * Core's `#7b90ff` hover and focus text stays as it is, since there is no
+ * light-on-dark brand foreground token.
  *
- * 1. Submenus get LIGHTER, not darker. WordPress recesses them to #0c0c0c; the
- *    nearest thing the system has is #2d2d2d, which is lighter than the menu.
- *    Treating a submenu as raised rather than sunk is the usual convention for
- *    dark interfaces, so this follows it deliberately instead of picking an
- *    untokenised value.
- *
- * 2. Submenu text stops being dimmer. WordPress carries the menu/submenu hierarchy
- *    in text colour (#bbb against #fff); there is no dimmer light foreground in
- *    the system that keeps 4.5:1 on these surfaces. So hierarchy moves from the
- *    text to the surface, which is what the surface change above is for. This
- *    raises contrast rather than lowering it: 10.4:1 to 11.3:1.
- *
- * NOT TOUCHED, for want of a token: the `#7b90ff` hover and focus text. It
- * exists because the accent is unreadable on a dark ground, and the system has
- * no light-on-dark brand foreground. Mirrored rather than invented.
- *
- * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ * No `!important` here; see 99-overrides.css.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
 
 @layer wpds {
 
-	/* -----------------------------------------------------------------------
-	   Admin menu — surface
-	   ----------------------------------------------------------------------- */
+	/* Admin menu surface */
 
 	body.admin-color-modern #adminmenuback,
 	body.admin-color-modern #adminmenuwrap,
@@ -60,10 +34,7 @@
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
 	}
 
-	/*
-	 * Raised rather than sunk; see note 1 in the file header. The same token
-	 * covers the admin bar's dropdowns, so the two read as one system.
-	 */
+	/* Same token as the admin bar dropdowns. */
 	body.admin-color-modern #adminmenu .wp-submenu,
 	body.admin-color-modern #adminmenu .wp-has-current-submenu .wp-submenu,
 	body.admin-color-modern #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
@@ -71,19 +42,17 @@
 		background: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
-	/* The arrow joining an open flyout to the menu tracks the flyout. */
+	/* Arrow joining an open flyout to the menu. */
 	body.admin-color-modern #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
 	body.admin-color-modern #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after {
 		border-right-color: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin menu — text and icons
-
-	   WordPress gives icons `hsl(<hue of the scheme base>, 7%, 95%)`, which lands on
-	   a faintly warm off-white that no one chose — it falls out of the formula.
-	   Icons and labels take the same neutral foreground here.
-	   ----------------------------------------------------------------------- */
+	/*
+	 * Admin menu text and icons. Core colours icons with
+	 * `hsl(<scheme hue>, 7%, 95%)`, a slightly warm off-white. Here icons and
+	 * labels share the same foreground.
+	 */
 
 	body.admin-color-modern #adminmenu a,
 	body.admin-color-modern #adminmenu div.wp-menu-image::before,
@@ -96,11 +65,7 @@
 		color: var(--wpds-color-foreground-interactive-neutral-strong);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin menu — hover and current
-
-	   Both are the accent, so both follow the user's colour scheme.
-	   ----------------------------------------------------------------------- */
+	/* Hover and current item use the brand background with its matching foreground. */
 
 	body.admin-color-modern #adminmenu a:hover,
 	body.admin-color-modern #adminmenu li.menu-top:hover,
@@ -124,15 +89,13 @@
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
-	/* The pointer joining the current item to the page it opened. */
+	/* Pointer joining the current item to the page. */
 	body.admin-color-modern ul#adminmenu a.wp-has-current-submenu::after,
 	body.admin-color-modern ul#adminmenu > li.current > a.current::after {
 		border-right-color: var(--wpds-color-background-track-neutral-weak);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin menu — update and moderation bubbles
-	   ----------------------------------------------------------------------- */
+	/* Update and moderation bubbles */
 
 	body.admin-color-modern #adminmenu .menu-counter,
 	body.admin-color-modern #adminmenu .awaiting-mod,
@@ -141,14 +104,11 @@
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin bar — surface
-
-	   The bar's own stylesheet bakes a pre-7.0 `#1d2327`, and the colour scheme
-	   only corrects it inside wp-admin, by loading afterwards. Sourcing the
-	   value from a token removes the stale default from the equation here; the
-	   front end needs the scheme delivered to it as well, which is PHP.
-	   ----------------------------------------------------------------------- */
+	/*
+	 * Admin bar surface. admin-bar.css still sets the pre-7.0 `#1d2327`, and the
+	 * colour scheme stylesheet only overrides it inside wp-admin. The front end
+	 * is covered by front/70-admin-bar-colour.css.
+	 */
 
 	body.admin-color-modern #wpadminbar {
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
@@ -159,19 +119,13 @@
 		background: var(--wpds-color-background-interactive-neutral-strong);
 	}
 
-	/*
-	 * The secondary block of a dropdown drops back to the bar's own colour, so
-	 * the two sections stay distinguishable now that both submenu levels would
-	 * otherwise share one token.
-	 */
+	/* The secondary block of a dropdown uses the bar colour so it reads as a separate section. */
 	body.admin-color-modern #wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
 	body.admin-color-modern #wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
 		background: var(--wpds-color-background-interactive-neutral-strong-active);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin bar — text and icons
-	   ----------------------------------------------------------------------- */
+	/* Admin bar text and icons */
 
 	body.admin-color-modern #wpadminbar .ab-item,
 	body.admin-color-modern #wpadminbar a.ab-item,
@@ -193,12 +147,7 @@
 		color: var(--wpds-color-foreground-interactive-neutral-strong);
 	}
 
-	/* -----------------------------------------------------------------------
-	   Admin bar — hover
-
-	   Only the surface moves. The hover text colour is WordPress's `#7b90ff`, left
-	   alone for the reason given in the file header.
-	   ----------------------------------------------------------------------- */
+	/* Only the background changes on hover. Core's `#7b90ff` text stays, see the header. */
 
 	body.admin-color-modern #wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
 	body.admin-color-modern #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
