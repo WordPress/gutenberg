@@ -1,4 +1,5 @@
 import { _x } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 import { create, getActiveFormat, RichTextData } from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from './constants';
 
@@ -201,6 +202,34 @@ export function findNoteInBlock( attributes, noteId ) {
 }
 
 /**
+ * Blocks that hold a note at block level: those without its marker while
+ * none of the blocks has one, else only those without a text field for one.
+ * A split can leave a text block with the note's id but none of its text,
+ * which shouldn't turn an inline note into a block-level one, but an image
+ * between the text a note spans is part of it.
+ *
+ * @param {number|string}                 noteId             Note id.
+ * @param {string[]}                      clientIds          The note's blocks.
+ * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
+ * @param {(clientId: string) => boolean} isTextBlock        Whether the block's only content is one rich text field, see `getSoleRichTextAttributeKey`.
+ * @return {string[]} Client IDs of the blocks that hold the note at block level.
+ */
+export function getBlockLevelClientIds(
+	noteId,
+	clientIds,
+	getBlockAttributes,
+	isTextBlock
+) {
+	const withoutMarker = clientIds.filter(
+		( clientId ) =>
+			! findNoteInBlock( getBlockAttributes( clientId ), noteId )
+	);
+	return withoutMarker.length === clientIds.length
+		? withoutMarker
+		: withoutMarker.filter( ( clientId ) => ! isTextBlock( clientId ) );
+}
+
+/**
  * Build the CSS selector matching a note's in-content `core/note` marker in
  * the editor canvas. The format serializes as `<mark class="wp-note">` with
  * the note id in `data-id`.
@@ -365,38 +394,71 @@ export function applyNoteFormat( record, format, start, end ) {
  */
 
 /**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
+ * Key of the block's rich text attribute when that is all the content the
+ * block has: exactly one attribute sourced from the markup, and it is rich
+ * text. Formats applied across blocks reach only such blocks.
  *
- * @param {() => WPSelectionPoint} getSelectionStart Block-editor selector.
- * @param {() => WPSelectionPoint} getSelectionEnd   Block-editor selector.
- * @return {?{clientId: string, attributeKey: string, start: number, end: number}} Normalized selection or null.
+ * A copy of `getSoleRichTextAttributeKey` in the block editor's
+ * `multi-block-format-edit.tsx`, which isn't exported.
+ *
+ * @param {?string} blockName Block name.
+ * @return {string|undefined} Attribute key.
  */
-export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
+export function getSoleRichTextAttributeKey( blockName ) {
+	const sourced = Object.entries(
+		getBlockType( blockName ?? '' )?.attributes ?? {}
+	).filter( ( [ , { source } ] ) => source );
+	return sourced.length === 1 && sourced[ 0 ][ 1 ].source === 'rich-text'
+		? sourced[ 0 ][ 0 ]
+		: undefined;
+}
+
+/**
+ * Text a new note wraps in each selected block, as a format applied across
+ * blocks does: the first block from the caret, the blocks between in full,
+ * the last block up to the caret. Only for a selection with text in it.
+ *
+ * @param {Object}                                                                props
+ * @param {Array<{clientId: string, attributes: ?Object, attributeKey: ?string}>} props.blocks         Selected blocks in order, each with its attributes and sole rich text attribute, see `getSoleRichTextAttributeKey`.
+ * @param {WPSelectionPoint}                                                      props.selectionStart Block-editor selection start.
+ * @param {WPSelectionPoint}                                                      props.selectionEnd   Block-editor selection end.
+ * @return {Map<string, {attributeKey: string, start: number, end: number}>} Range by client ID for the blocks that have one; empty for a block the selection gives no text.
+ */
+export function getNoteRanges( { blocks, selectionStart, selectionEnd } ) {
+	const clientIds = blocks.map( ( block ) => block.clientId );
+	// Reassign selection start and end based on order, as the block editor does.
+	const isBackward =
+		selectionStart.clientId === selectionEnd.clientId
+			? selectionStart.offset > selectionEnd.offset
+			: clientIds.indexOf( selectionStart.clientId ) >
+				clientIds.indexOf( selectionEnd.clientId );
+	const [ first, last ] = isBackward
+		? [ selectionEnd, selectionStart ]
+		: [ selectionStart, selectionEnd ];
+
+	const ranges = new Map();
+	for ( const block of blocks ) {
+		const isFirst = block.clientId === first.clientId;
+		const isLast = block.clientId === last.clientId;
+		// The selection's ends say which field they are in; the blocks between
+		// take their only one.
+		let attributeKey = block.attributeKey;
+		if ( isFirst ) {
+			attributeKey = first.attributeKey;
+		} else if ( isLast ) {
+			attributeKey = last.attributeKey;
+		}
+		if ( attributeKey ) {
+			ranges.set( block.clientId, {
+				attributeKey,
+				start: isFirst ? first.offset : 0,
+				end: isLast
+					? last.offset
+					: ( block.attributes?.[ attributeKey ]?.text.length ?? 0 ),
+			} );
+		}
 	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
+	return ranges;
 }
 
 /**
@@ -535,6 +597,7 @@ export function getNoteAtCaret( attributes, selectionStart, selectionEnd ) {
 		! attributeKey ||
 		start === undefined ||
 		end === undefined ||
+		selectionEnd?.clientId !== selectionStart?.clientId ||
 		selectionEnd?.attributeKey !== attributeKey
 	) {
 		return null;
@@ -551,6 +614,53 @@ export function getNoteAtCaret( attributes, selectionStart, selectionEnd ) {
 		'data-id'
 	];
 	return id ? toNoteId( id ) : undefined;
+}
+
+const isSamePoint = ( a, b ) =>
+	a.clientId === b.clientId &&
+	a.attributeKey === b.attributeKey &&
+	a.offset === b.offset;
+
+/**
+ * @typedef {Object} WPCaretSnapshot
+ * @property {string[]}         clientIds      Selected blocks.
+ * @property {?Object}          attributes     Block attributes while one block is selected, else undefined.
+ * @property {WPSelectionPoint} selectionStart Block-editor selection start.
+ * @property {WPSelectionPoint} selectionEnd   Block-editor selection end.
+ */
+
+/**
+ * Whether a store change is a caret move. Skips typing: a selection change
+ * batched with a content change moves the caret with the text, never across
+ * a marker.
+ *
+ * @param {WPCaretSnapshot} previous Snapshot before the store change.
+ * @param {WPCaretSnapshot} next     Snapshot after it.
+ * @return {?{isBlockChange: boolean}} The caret move, or null when there is none.
+ */
+export function getCaretChange( previous, next ) {
+	if (
+		next.selectionStart === previous.selectionStart &&
+		next.selectionEnd === previous.selectionEnd
+	) {
+		return null;
+	}
+	// A selection across blocks is one anchor, so moving either of its ends
+	// moves to another, as entering another block does. The store can replace
+	// the ends without moving them.
+	const isSameSelection =
+		isSamePoint( next.selectionStart, previous.selectionStart ) &&
+		isSamePoint( next.selectionEnd, previous.selectionEnd );
+	const isBlockChange =
+		( next.clientIds.length > 1 && ! isSameSelection ) ||
+		next.clientIds.length !== previous.clientIds.length ||
+		next.clientIds.some(
+			( clientId, index ) => clientId !== previous.clientIds[ index ]
+		);
+	if ( ! isBlockChange && next.attributes !== previous.attributes ) {
+		return null;
+	}
+	return { isBlockChange };
 }
 
 /**
@@ -663,17 +773,16 @@ export function hasFocusWithin( element ) {
 }
 
 /**
- * Block a thread shows at: the selected block when the note belongs to it,
- * else the note's first block.
+ * Whether one block is selected and has unsent note text. Only such a draft
+ * keeps its marker when its form is left and comes back with the block; a
+ * draft across blocks comes back on its first block, without the others.
  *
- * @param {Object}  thread           Note thread.
- * @param {?string} selectedClientId Selected block client ID.
- * @return {?string} Block client ID.
+ * @param {Map}      drafts    Unsent note drafts, keyed by block client ID.
+ * @param {string[]} clientIds Selected blocks.
+ * @return {boolean} Whether the blocks have a draft.
  */
-export function getAnchorClientId( thread, selectedClientId ) {
-	return thread.blockClientIds?.includes( selectedClientId )
-		? selectedClientId
-		: thread.blockClientId;
+export function hasBlockDraft( drafts, clientIds ) {
+	return clientIds.length === 1 && drafts.has( clientIds[ 0 ] );
 }
 
 /**

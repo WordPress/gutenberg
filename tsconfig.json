@@ -46,6 +46,7 @@
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/image-cropper" },
+		{ "path": "packages/image-editor" },
 		{ "path": "packages/interactivity" },
 		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/interface" },

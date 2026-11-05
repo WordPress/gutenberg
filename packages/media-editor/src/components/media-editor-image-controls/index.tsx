@@ -14,11 +14,7 @@ import {
 	plus,
 } from '@wordpress/icons';
 import { useMediaEditor } from '../../state';
-import {
-	MAX_ZOOM,
-	type AspectRatioPreset,
-} from '../../image-editor/core/constants';
-import { getMinZoom } from '../../image-editor/core/containment';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { useCropOptions } from '../media-editor/use-crop-options';
 
 /**
@@ -79,14 +75,14 @@ export default function MediaEditorImageControls( {
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
 	disabled = false,
 }: MediaEditorImageControlsProps ) {
-	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor().cropper;
+	const { state, setFlip, snapRotate90, setZoom, minZoom, maxZoom } =
+		useMediaEditor().imageEditor;
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
 	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
-	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
 		setZoom(
-			Math.min( MAX_ZOOM, Math.max( minZoom, state.zoom * factor ) )
+			Math.min( maxZoom, Math.max( minZoom, state.zoom * factor ) )
 		);
 	};
 
@@ -155,7 +151,7 @@ export default function MediaEditorImageControls( {
 				icon={ plus }
 				label={ __( 'Zoom in' ) }
 				showTooltip
-				disabled={ disabled || state.zoom >= MAX_ZOOM }
+				disabled={ disabled || state.zoom >= maxZoom }
 				accessibleWhenDisabled
 				onClick={ () => zoomByFactor( zoomFactor ) }
 			/>
