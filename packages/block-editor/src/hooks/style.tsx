@@ -50,6 +50,7 @@ import {
 	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
 } from './block-style-state';
+import { getVariationMatches } from './block-style-variation';
 import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -642,9 +643,7 @@ export function getGlobalBlockBaseStyle(
 
 	// Only the first block style variation with data applies, as in the
 	// variation support.
-	const variationStyles = ( className?.match( /\bis-style-\S+/g ) ?? [] )
-		.map( ( match ) => match.slice( 'is-style-'.length ) )
-		.filter( ( variation ) => variation !== 'default' )
+	const variationStyles = getVariationMatches( className )
 		.map( ( variation ) => variations?.[ variation ] )
 		.find( ( styles ) => styles && Object.keys( styles ).length );
 
