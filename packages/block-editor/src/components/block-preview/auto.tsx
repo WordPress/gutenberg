@@ -10,9 +10,8 @@ import { store } from '../../store';
 import type { EditorStylesStyle } from '../editor-styles/types';
 import type { AutoBlockPreviewProps, ScaledBlockPreviewProps } from './types';
 
-// Avoids rendering the block list when the sizes change. Wrapped rather than
-// `memo( BlockList )`: block-list imports this module back, so the CommonJS
-// build runs this line before that binding is set.
+// This is used to avoid rendering the block list if the sizes change.
+// Wrapped because the circular import leaves `BlockList` undefined when the CommonJS build runs this line.
 const MemoizedBlockList = memo( function MemoizedBlockListWrapper(
 	props: ComponentProps< typeof BlockList >
 ) {
