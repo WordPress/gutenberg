@@ -1,4 +1,23 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+
+/**
+ * Creates a template rendered inside the template it names.
+ *
+ * The `template` field belongs to the templates inside templates experiment,
+ * so the payload the request utils take does not know it.
+ *
+ * @param requestUtils The request utils of the test.
+ * @param payload      The template, with the slug of the template it is rendered inside.
+ */
+function createTemplateInside(
+	requestUtils: RequestUtils,
+	payload: Parameters< RequestUtils[ 'createTemplate' ] >[ 1 ] & {
+		template: string;
+	}
+) {
+	return requestUtils.createTemplate( 'wp_template', payload );
+}
 
 const LAYOUT_CONTENT = `<!-- wp:paragraph --><p>Shared header</p><!-- /wp:paragraph -->
 <!-- wp:post-content /-->
@@ -24,7 +43,7 @@ test.describe( 'Template rendered inside another template', () => {
 			title: 'Layout',
 			content: LAYOUT_CONTENT,
 		} );
-		await requestUtils.createTemplate( 'wp_template', {
+		await createTemplateInside( requestUtils, {
 			slug: '404',
 			title: '404',
 			content: NOT_FOUND_CONTENT,
@@ -194,7 +213,7 @@ test.describe( 'Template rendered inside another template', () => {
 			title: 'Shell',
 			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
 		} );
-		await requestUtils.createTemplate( 'wp_template', {
+		await createTemplateInside( requestUtils, {
 			slug: 'search',
 			title: 'Search',
 			content:
@@ -266,7 +285,7 @@ test.describe( 'Template rendered inside another template', () => {
 			content:
 				'<!-- wp:template-part {"slug":"frame-header","theme":"emptytheme"} /--><!-- wp:post-content /-->',
 		} );
-		await requestUtils.createTemplate( 'wp_template', {
+		await createTemplateInside( requestUtils, {
 			slug: 'archive',
 			title: 'Archive',
 			content:
@@ -292,7 +311,7 @@ test.describe( 'Template rendered inside another template', () => {
 				} = window.wp.data.select( 'core/block-editor' );
 				return Object.fromEntries(
 					getBlocksByName( 'core/template-part' ).map(
-						( clientId ) => [
+						( clientId: string ) => [
 							getBlockAttributes( clientId ).slug,
 							{
 								part: getBlockEditingMode( clientId ),
@@ -369,7 +388,7 @@ test.describe( 'Template rendered inside another template', () => {
 			title: 'Wrapper',
 			content: '<!-- wp:post-content /-->',
 		} );
-		await requestUtils.createTemplate( 'wp_template', {
+		await createTemplateInside( requestUtils, {
 			slug: 'single',
 			title: 'Single',
 			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
