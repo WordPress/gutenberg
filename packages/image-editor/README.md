@@ -35,7 +35,7 @@ Set these CSS custom properties on a parent element or a class passed to `ImageE
 | Property                             | Changes                                                                                                          |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | `--wp-image-editor-accent-color`     | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
-| `--wp-image-editor-foreground-color` | Crop outline and dimensions tooltip text.                                                                        |
+| `--wp-image-editor-foreground-color` | Crop outline at rest and dimensions tooltip text. The focused outline uses the accent colour.                    |
 | `--wp-image-editor-surface-color`    | Handle fill, dimensions tooltip background and the inner focus ring.                                             |
 | `--wp-image-editor-dimming-color`    | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
 | `--wp-image-editor-grid-color`       | Rule-of-thirds lines.                                                                                            |
