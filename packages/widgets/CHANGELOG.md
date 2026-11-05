@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Legacy widget: Show "Select widget" in the widget type select instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

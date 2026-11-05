@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).

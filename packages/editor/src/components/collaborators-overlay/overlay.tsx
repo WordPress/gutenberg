@@ -1,13 +1,22 @@
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import Avatar from '../collaborators-presence/avatar';
 import AvatarGroup from '../collaborators-presence/avatar-group';
 import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
-import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
+import {
+	MAX_BLOCK_LABEL_AVATARS,
+	OVERLAY_IFRAME_STYLES,
+} from './overlay-iframe-styles';
 import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRecentlyTyped } from './use-recently-typed';
@@ -154,6 +163,35 @@ export function Overlay( {
 		resizeObserverRef,
 	] );
 
+	// The sessions whose avatar is drawn above a block. A block label holds
+	// one avatar per user and a limited number of avatars, so a session can
+	// be left out: a second tab of the same user, or anyone past the limit.
+	const clientIdsWithBlockAvatar = useMemo(
+		() =>
+			new Set(
+				highlights.flatMap( ( highlight ) =>
+					highlight.collaborators
+						.slice( 0, MAX_BLOCK_LABEL_AVATARS )
+						.map( ( collaborator ) => collaborator.clientId )
+				)
+			),
+		[ highlights ]
+	);
+
+	// The sessions with a caret on screen. The caret is where "jump to
+	// collaborator" should land, so it owns the registry entry. A block
+	// label only registers for a session that has no caret, such as a
+	// selected image.
+	const clientIdsWithCaret = useMemo(
+		() =>
+			new Set(
+				cursors
+					.filter( ( cursor ) => cursor.x !== undefined )
+					.map( ( cursor ) => cursor.clientId )
+			),
+		[ cursors ]
+	);
+
 	// Track cursor and highlight avatar element refs for registry registration.
 	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
 
@@ -198,6 +236,16 @@ export function Overlay( {
 		[]
 	);
 
+	// A block label avatar only registers its element when the session has
+	// no caret to register instead.
+	const getBlockAvatarRef = ( clientId: number ) => {
+		if ( clientIdsWithCaret.has( clientId ) ) {
+			return undefined;
+		}
+
+		return setCursorRef( clientId );
+	};
+
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
 	return (
@@ -240,11 +288,18 @@ export function Overlay( {
 							{ /*
 							 * With block highlighting on, a collaborator's
 							 * avatar sits above their block instead, and the
-							 * caret stays bare. The local user's own avatar
-							 * (an opt-in) stays on their caret: their block
-							 * is never outlined.
+							 * caret stays bare. A caret only gives up its
+							 * avatar when that session's avatar is drawn
+							 * above a block, so nobody is left without a
+							 * name. The local user's own avatar (an opt-in)
+							 * stays on their caret: their block is never
+							 * outlined.
 							 */ }
-							{ ( cursor.isMe || ! highlightBlocks ) &&
+							{ ( cursor.isMe ||
+								! highlightBlocks ||
+								! clientIdsWithBlockAvatar.has(
+									cursor.clientId
+								) ) &&
 								cursor.blockClientId !==
 									blockClientIdBeingWritten && (
 									<Avatar
@@ -274,11 +329,16 @@ export function Overlay( {
 						top: `${ highlight.y }px`,
 					} }
 				>
-					<AvatarGroup className="collaborators-overlay-block-label-group">
+					<AvatarGroup
+						className="collaborators-overlay-block-label-group"
+						max={ MAX_BLOCK_LABEL_AVATARS }
+					>
 						{ highlight.collaborators.map( ( collaborator ) => (
 							<div
 								key={ collaborator.clientId }
-								ref={ setCursorRef( collaborator.clientId ) }
+								ref={ getBlockAvatarRef(
+									collaborator.clientId
+								) }
 								className="collaborators-overlay-block-label-item"
 							>
 								<Avatar

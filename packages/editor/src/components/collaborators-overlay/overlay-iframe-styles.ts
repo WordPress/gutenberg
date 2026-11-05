@@ -15,6 +15,10 @@ import {
 	WHITE,
 } from './collaborator-styles';
 
+// The most avatars stacked above one highlighted block. Anyone past this is
+// counted in the "+N" after the stack, and keeps their avatar on their caret.
+export const MAX_BLOCK_LABEL_AVATARS = 3;
+
 export const OVERLAY_IFRAME_STYLES = `
 .block-canvas-cover {
 	position: absolute;
@@ -101,11 +105,11 @@ export const OVERLAY_IFRAME_STYLES = `
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
 ${ Array.from(
-	{ length: 10 },
+	{ length: MAX_BLOCK_LABEL_AVATARS },
 	( _, index ) =>
 		`.collaborators-overlay-block-label-item:nth-child(${
 			index + 1
-		}) { z-index: ${ 10 - index }; }`
+		}) { z-index: ${ MAX_BLOCK_LABEL_AVATARS - index }; }`
 ).join( '\n' ) }
 .collaborators-overlay-block-label-group:hover .collaborators-overlay-block-label.editor-avatar.is-badge {
 	grid-template-columns: min-content 1fr;

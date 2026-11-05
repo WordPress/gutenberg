@@ -3,7 +3,6 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import path from 'path';
-import fs from 'fs';
 import spawn from 'cross-spawn';
 import { spawnWatchProcess, stopWatchProcess } from './process.mjs';
 
@@ -75,39 +74,24 @@ function exec( command, args = [], options = {} ) {
 }
 
 /**
- * Create and clean up a marker file to signal that the build is ready.
- * The marker file can be watched by other processes that depend on the build.
- */
-const readyMarkerFile = {
-	markerPath: path.join( ROOT_DIR, '.dev-ready' ),
-	create() {
-		fs.writeFileSync( this.markerPath, Date.now().toString() );
-	},
-	cleanup() {
-		if ( fs.existsSync( this.markerPath ) ) {
-			fs.unlinkSync( this.markerPath );
-		}
-	},
-};
-
-/**
  * Main dev orchestration function.
  */
 async function dev() {
 	const { values } = parseArgs( {
 		options: {
 			'skip-types': { type: 'boolean', default: false },
+			// Command to start once the initial build is ready, for tools
+			// like Storybook which read the build output.
+			'on-ready': { type: 'string' },
 		},
 		strict: false,
 	} );
 	const skipTypes = values[ 'skip-types' ];
+	const onReadyCommand = values[ 'on-ready' ];
 
 	console.log( '🔨 Starting development build...\n' );
 
 	const startTime = Date.now();
-
-	// Clean up marker file from previous runs
-	readyMarkerFile.cleanup();
 
 	try {
 		/*
@@ -213,19 +197,23 @@ async function dev() {
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
+		let onReadyProcess = null;
+
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
 			stopWatchProcess( tscWatch );
+			stopWatchProcess( onReadyProcess );
 			buildWatch.kill();
-			readyMarkerFile.cleanup();
 			process.exit( 0 );
 		};
 
 		process.on( 'SIGINT', cleanup );
 		process.on( 'SIGTERM', cleanup );
+		process.on( 'SIGHUP', cleanup );
 
-		// Wait for wp-build to complete its initial build, then signal ready.
+		// Wait for wp-build to complete its initial build, then start the
+		// on-ready command.
 		// Using .then() ensures cleanup handlers are registered before awaiting,
 		// so early termination still triggers cleanup.
 		let isReady = false;
@@ -262,7 +250,22 @@ async function dev() {
 					);
 				}
 
-				readyMarkerFile.create();
+				if ( onReadyCommand ) {
+					onReadyProcess = spawnWatchProcess( onReadyCommand, [], {
+						cwd: ROOT_DIR,
+						// The command runs in its own process group, which
+						// cannot read from the terminal.
+						stdio: [ 'ignore', 'inherit', 'inherit' ],
+						shell: true,
+					} );
+					onReadyProcess.on( 'exit', ( code ) => {
+						if ( code ) {
+							console.error(
+								`\n❌ On-ready command exited with code ${ code }`
+							);
+						}
+					} );
+				}
 			}
 		} );
 

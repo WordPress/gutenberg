@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '../primitives/combobox/loading-indicator';
 import { Trigger } from './trigger';
 import { SearchableSelectControl as _SearchableSelectControl } from './searchable-select-control';
 import { Group } from '../primitives/combobox/group';
@@ -28,6 +29,7 @@ export const SearchableSelectControl = Object.assign(
 		Item,
 		ItemLabel,
 		ItemDescription,
+		LoadingIndicator,
 		Collection,
 		useFilteredItems,
 	}
