@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Warn about invalid Interactivity API namespaces when `SCRIPT_DEBUG` is enabled ([#86357](https://github.com/WordPress/gutenberg/pull/86357)).
 -   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 -   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 
