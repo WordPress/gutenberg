@@ -14,6 +14,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
+const SharedOutputCleanPlugin = require( '../plugins/shared-output-clean-plugin' );
 const {
 	hasBabelConfig,
 	hasArgInCLI,
@@ -89,6 +90,15 @@ const cssLoaders = [
 	},
 ];
 
+// Keep fonts and images directories when cleaning the output directory.
+const keptOutputPaths = /^(fonts|images)\//;
+
+// Shared by the script and module compilations, which write to the same output directory, so
+// that each of them cleans it without deleting the files of the other.
+const sharedOutputCleanPlugin =
+	hasExperimentalModulesFlag &&
+	new SharedOutputCleanPlugin( { keep: keptOutputPaths } );
+
 /** @type {webpack.Configuration} */
 const baseConfig = {
 	mode,
@@ -98,12 +108,10 @@ const baseConfig = {
 		chunkFilename: '[name].js?ver=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
 		// Clean output directory before emit, except when modules flag is enabled
-		// to prevent the 2 compilations from cleaning each other's output
+		// to prevent the 2 compilations from cleaning each other's output.
+		// `sharedOutputCleanPlugin` cleans it for them instead.
 		...( ! hasExperimentalModulesFlag && {
-			clean: {
-				// Keep fonts and images directories
-				keep: /^(fonts|images)\//,
-			},
+			clean: { keep: keptOutputPaths },
 		} ),
 	},
 	resolve: {
@@ -318,6 +326,7 @@ const scriptConfig = {
 			},
 
 	plugins: [
+		sharedOutputCleanPlugin,
 		new webpack.DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
@@ -489,6 +498,7 @@ if ( hasExperimentalModulesFlag ) {
 		},
 
 		plugins: [
+			sharedOutputCleanPlugin,
 			new webpack.DefinePlugin( {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 				'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
