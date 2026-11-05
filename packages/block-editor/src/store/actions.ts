@@ -3,7 +3,6 @@ import {
 	cloneBlock,
 	cloneSanitizedBlock,
 	createBlock,
-	doBlocksMatchTemplate,
 	getBlockType,
 	getDefaultBlockName,
 	hasBlockSupport,
@@ -33,6 +32,10 @@ import {
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
 import { unlock } from '../lock-unlock';
+import {
+	doBlocksMatchTemplateWithSettings,
+	getTemplateForSynchronization,
+} from './templates';
 import type {
 	BlockEditingMode,
 	BlockEditorThunkArgs,
@@ -88,13 +91,17 @@ export const validateBlocksToTemplate =
 		const isBlocksValidToTemplate =
 			! template ||
 			templateLock !== 'all' ||
-			doBlocksMatchTemplate( blocks, template );
+			doBlocksMatchTemplateWithSettings( blocks, template, select );
 
 		// Update if validity has changed.
 		const isValidTemplate = select.isValidTemplate();
 
 		if ( isBlocksValidToTemplate !== isValidTemplate ) {
-			dispatch.setTemplateValidity( isBlocksValidToTemplate );
+			dispatch( {
+				type: 'VALIDATE_TEMPLATE',
+				isValid: isBlocksValidToTemplate,
+				force: true,
+			} );
 			return isBlocksValidToTemplate;
 		}
 	};
@@ -844,7 +851,9 @@ export const synchronizeTemplate =
 		const template = select.getTemplate();
 		const updatedBlockList = synchronizeBlocksWithTemplate(
 			blocks,
-			template
+			select.getTemplateLock() === 'all'
+				? getTemplateForSynchronization( blocks, template, select )
+				: template
 		);
 
 		dispatch.resetBlocks( updatedBlockList );

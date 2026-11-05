@@ -3,6 +3,7 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { SelectionContext } from './selection-context';
 import type { BlockSelection } from '../../store/types';
 import type {
@@ -157,9 +158,15 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
-		registry.select( blockEditorStore );
+		validateTemplate,
+	} = unlock( registry.dispatch( blockEditorStore ) );
+	const {
+		getBlockName,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+		areInnerBlocksControlled: hasControlledInnerBlocks,
+	} = registry.select( blockEditorStore );
 
 	const pendingChangesRef = useRef< {
 		incoming: Block[] | null;
@@ -245,6 +252,7 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		if ( clientId ) {
+			const wasControlled = hasControlledInnerBlocks( clientId );
 			// Batch so that the controlled flag and block replacement
 			// are applied atomically — subscribers see a consistent state.
 			registry.batch( () => {
@@ -269,6 +277,9 @@ export default function useBlockSync( {
 					history: 'ignore',
 				} );
 				replaceInnerBlocks( clientId, storeBlocks );
+				if ( ! wasControlled ) {
+					validateTemplate();
+				}
 
 				// Invalidate the applied-selection ref so that
 				// restoreSelection() at the end of the
@@ -291,6 +302,7 @@ export default function useBlockSync( {
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
 		if ( clientId ) {
+			const wasControlled = hasControlledInnerBlocks( clientId );
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
@@ -299,6 +311,9 @@ export default function useBlockSync( {
 				history: 'ignore',
 			} );
 			replaceInnerBlocks( clientId, [] );
+			if ( wasControlled ) {
+				validateTemplate();
+			}
 		} else {
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',

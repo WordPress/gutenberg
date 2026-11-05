@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Template validation: Respect nested InnerBlocks ownership and preserve matching unlocked or locally templated descendants when resetting the root template ([#84805](https://github.com/WordPress/gutenberg/pull/84805)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

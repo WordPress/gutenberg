@@ -5,7 +5,12 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
-import type { BlockListSettings, SettingsByClientId } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+import type {
+	BlockListSettings,
+	BlockTemplate,
+	SettingsByClientId,
+} from '../../store/types';
 import type { Layout } from '../../layouts/types';
 import type { DirectInsert, DirectInsertBlock } from './types';
 
@@ -58,6 +63,8 @@ function useShallowMemo< T >( value: T ) {
  * @param orientation                The direction in which the block
  *                                   should face.
  * @param layout                     The layout object for the block container.
+ * @param template                   The resolved local inner block template.
+ * @param blockName                  The block type publishing these settings.
  */
 export default function useNestedSettingsUpdate(
 	clientId: string,
@@ -71,7 +78,9 @@ export default function useNestedSettingsUpdate(
 	templateLock: string | false | undefined,
 	captureToolbars: boolean | undefined,
 	orientation: 'horizontal' | 'vertical' | undefined,
-	layout: Layout | null | undefined
+	layout: Layout | null | undefined,
+	template: BlockTemplate | undefined,
+	blockName: string | null | undefined
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -98,6 +107,8 @@ export default function useNestedSettingsUpdate(
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
 			templateLock: _templateLock,
+			template,
+			blockName,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -172,10 +183,12 @@ export default function useNestedSettingsUpdate(
 			// The map entry is created above.
 			const settings = pendingSettingsUpdates.get( registry )!;
 			if ( Object.keys( settings ).length ) {
-				const { updateBlockListSettings } =
-					registry.dispatch( blockEditorStore );
+				const { updateBlockListSettings, validateTemplate } = unlock(
+					registry.dispatch( blockEditorStore )
+				);
 				updateBlockListSettings( settings );
 				pendingSettingsUpdates.set( registry, {} );
+				validateTemplate();
 			}
 		} );
 	}, [
@@ -190,6 +203,8 @@ export default function useNestedSettingsUpdate(
 		captureToolbars,
 		orientation,
 		layout,
+		template,
+		blockName,
 		registry,
 	] );
 }
