@@ -1,9 +1,8 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import type { PostWithDate } from '../date/types';
 import { isDateFloating } from '../date/is-date-floating';
-import DateView from '../date/view';
+import { getPublishDateLabel } from './get-publish-date-label';
 
 interface PostWithDateAndId extends PostWithDate {
 	id?: number;
@@ -11,8 +10,8 @@ interface PostWithDateAndId extends PostWithDate {
 }
 
 /*
- * The publish date of a post: "Immediately" while the post has no date of its
- * own, the date worded after its status otherwise.
+ * The publish date of a post in words, as the post summary has it: see
+ * getPublishDateLabel().
  */
 export default function PublishDateView( {
 	item,
@@ -34,13 +33,14 @@ export default function PublishDateView( {
 		[ item.type, item.id ]
 	);
 
-	// A reset date (`null`) takes the date of the save, whatever the status.
-	if (
-		! item.date ||
-		isDateFloating( { ...item, status: savedStatus ?? item.status } )
-	) {
-		return <>{ __( 'Immediately' ) }</>;
-	}
-
-	return <DateView item={ item } />;
+	return (
+		<>
+			{ getPublishDateLabel( item.date, {
+				isFloating: isDateFloating( {
+					...item,
+					status: savedStatus ?? item.status,
+				} ),
+			} ) }
+		</>
+	);
 }

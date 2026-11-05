@@ -61,13 +61,14 @@ describe( 'PublishDateView', () => {
 		expect( screen.queryByText( 'Immediately' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'shows the date of a post that has one', () => {
+	it( 'shows the date of a post that has one, whatever its status', () => {
 		const container = mountView( {
 			status: 'publish',
-			date: '2026-09-30T12:00:00',
-			modified: '2026-10-01T12:00:00',
+			date: '2020-09-30T12:00:00',
+			modified: '2020-10-01T12:00:00',
 		} );
-		expect( screen.queryByText( 'Immediately' ) ).not.toBeInTheDocument();
-		expect( container ).toHaveTextContent( /^Published: / );
+		expect( container ).toHaveTextContent(
+			/^September 30, 2020 12:00\spm$/
+		);
 	} );
 } );
