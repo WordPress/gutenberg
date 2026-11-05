@@ -33,6 +33,13 @@ export default function PublishDateView( {
 		[ item.type, item.id ]
 	);
 
+	// A bulk edit passes only the edits made so far, so a date it hasn't
+	// touched is absent: each post keeps its own, and none reads
+	// "Immediately". A reset date is `null`, not absent.
+	if ( item.date === undefined ) {
+		return null;
+	}
+
 	return (
 		<>
 			{ getPublishDateLabel( item.date, {

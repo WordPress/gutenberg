@@ -39,6 +39,16 @@ describe( 'PublishDateView', () => {
 		expect( screen.getByText( 'Immediately' ) ).toBeInTheDocument();
 	} );
 
+	it( 'shows nothing for a bulk edit that left the date untouched', () => {
+		const container = mountView( {} );
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'says a bulk edit that reset the date publishes immediately', () => {
+		mountView( { date: null } );
+		expect( screen.getByText( 'Immediately' ) ).toBeInTheDocument();
+	} );
+
 	it( 'says a draft whose date follows its modified date publishes immediately', () => {
 		mountView( {
 			status: 'draft',
