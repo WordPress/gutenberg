@@ -10,6 +10,7 @@
 
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+-   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
 
 ## 16.1.0 (2026-11-04)
 
