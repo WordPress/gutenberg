@@ -58,7 +58,7 @@ function hasAppliedGridStart(
  * @param getElement  Gets the element of a block by client ID.
  * @param isAutoFit   Whether empty auto-fit column tracks collapse.
  *
- * @return The grid's column count and items, or undefined if the grid can't
+ * @return The grid's track counts and items, or undefined if the grid can't
  *         be measured.
  */
 function getGridSnapshot(
@@ -116,7 +116,12 @@ function getGridSnapshot(
 				: undefined,
 		} );
 	}
-	return { columnCount: columns.length, items };
+	// The resolved row tracks include implicit rows created by auto-placement.
+	return {
+		columnCount: columns.length,
+		rowCount: rows.length,
+		items,
+	};
 }
 
 /**
@@ -200,9 +205,20 @@ export default function AutoGridItemMovers( {
 				observer.observe( element );
 			}
 		}
+		// Remeasure when the moving animation removes its temporary transform.
+		const movementObserver = new MutationObserver( () => {
+			if ( ! ( blockElement as HTMLElement ).style.transform ) {
+				update();
+			}
+		} );
+		movementObserver.observe( blockElement, {
+			attributes: true,
+			attributeFilter: [ 'style' ],
+		} );
 		return () => {
 			cancelAnimationFrame( frame );
 			observer.disconnect();
+			movementObserver.disconnect();
 		};
 	}, [
 		blockElement,
@@ -235,7 +251,8 @@ export default function AutoGridItemMovers( {
 		if (
 			target.columnStart < 1 ||
 			target.columnEnd > current.columnCount ||
-			target.rowStart < 1
+			target.rowStart < 1 ||
+			target.rowEnd > current.rowCount
 		) {
 			return;
 		}
@@ -299,7 +316,11 @@ export default function AutoGridItemMovers( {
 					icon={ chevronDown }
 					label={ __( 'Move down' ) }
 					description={ __( 'Move down' ) }
-					isDisabled={ ! selected }
+					isDisabled={
+						! selected ||
+						! snapshot ||
+						selected.rect.rowEnd >= snapshot.rowCount
+					}
 					onClick={ () => move( 'down' ) }
 				/>
 			</div>

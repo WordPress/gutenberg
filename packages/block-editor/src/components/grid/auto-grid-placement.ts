@@ -11,6 +11,7 @@ export interface AutoGridItem {
 
 export interface AutoGridSnapshot {
 	columnCount: number;
+	rowCount: number;
 	items: AutoGridItem[];
 }
 

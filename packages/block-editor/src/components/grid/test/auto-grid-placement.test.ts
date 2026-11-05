@@ -33,7 +33,7 @@ describe( 'findAutoGridReorderIndex', () => {
 
 		expect(
 			findAutoGridReorderIndex(
-				{ columnCount: 4, items },
+				{ columnCount: 4, rowCount: 2, items },
 				[ 'a', 'b', 'c', 'd', 'e' ],
 				'c',
 				new GridRect( {
@@ -57,7 +57,7 @@ describe( 'findAutoGridReorderIndex', () => {
 
 		expect(
 			findAutoGridReorderIndex(
-				{ columnCount: 4, items },
+				{ columnCount: 4, rowCount: 2, items },
 				[ 'a', 'b', 'c', 'd', 'e' ],
 				'a',
 				new GridRect( {
