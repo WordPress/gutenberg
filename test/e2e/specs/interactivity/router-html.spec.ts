@@ -179,9 +179,11 @@ test.describe( 'Router HTML content', () => {
 					originalKept
 				)
 			).toBe( true );
+			// The resolved token is written once, which the setter and the
+			// observer each record.
 			expect( await contents.jsonValue() ).toEqual(
 				value === 'pending'
-					? expect.any( Array )
+					? [ '<p>T</p>', '<i>two</i>', '<p>U</p>', '<p>U</p>' ]
 					: expect.not.arrayContaining( [ '<i>two</i>' ] )
 			);
 			await contents.dispose();
