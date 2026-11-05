@@ -4110,12 +4110,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.2.0
 	 * @since 7.3.0 Added the `$feature_selectors` and `$feature_declarations` parameters.
 	 *
-	 * @param array[]                $declarations         Declarations generated for the state.
-	 * @param array<string, mixed>   $state_style          State style object, as in the theme.json data.
-	 * @param array[]                $base_styles          Style objects the state layers over, nearest first.
-	 * @param array<string, mixed>   $feature_selectors    Optional. The block's feature selectors.
-	 * @param array<string, array[]> $feature_declarations Optional. Feature declarations keyed by selector,
-	 *                                                     which receive the escapes for feature selectors.
+	 * @param array[]                                                         $declarations         Declarations generated for the state.
+	 * @param array<string, mixed>                                            $state_style          State style object, as in the theme.json data.
+	 * @param array[]                                                         $base_styles          Style objects the state layers over, nearest first.
+	 * @param array{ root?: string, ...<string, string|array<string, string>> } $feature_selectors    Optional. The block's feature selectors.
+	 * @param array<string, array[]>                                          $feature_declarations Optional. Feature declarations keyed by selector,
+	 *                                                                        which receive the escapes for feature selectors.
 	 * @return array[] Declarations with the escapes applied where needed.
 	 */
 	private static function get_state_declarations_with_text_clip_escapes( array $declarations, array $state_style, array $base_styles, array $feature_selectors = array(), array &$feature_declarations = array() ): array {
@@ -5979,22 +5979,24 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param WP_Block_Type $block_type    The block type.
 	 * @param string        $root_selector The block's root selector.
 	 *
-	 * @return array The custom selectors set by the block.
+	 * @return array<string, string|array<string, string>> The custom selectors set by the block.
+	 *
+	 * @phpstan-return array{ root?: string, ...<string, string|array<string, string>> }
 	 */
 	protected static function get_block_selectors( $block_type, $root_selector ) {
 		if ( ! empty( $block_type->selectors ) ) {
 			return $block_type->selectors;
 		}
 
-		$selectors = array( 'root' => $root_selector );
+		$feature_selectors = array();
 		foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) {
 			$feature_selector = wp_get_block_css_selector( $block_type, $key );
 			if ( null !== $feature_selector ) {
-				$selectors[ $feature ] = array( 'root' => $feature_selector );
+				$feature_selectors[ $feature ] = array( 'root' => $feature_selector );
 			}
 		}
 
-		return $selectors;
+		return array( 'root' => $root_selector ) + $feature_selectors;
 	}
 
 	/**
@@ -6036,7 +6038,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array<string, array[]> The style declarations for the node's features with custom
 	 *                                selectors, keyed by selector.
 	 *
-	 * @phpstan-param array{ selectors?: array<string, string|array<string, string>> } $metadata
+	 * @phpstan-param array{ selectors?: array{ root?: string, ...<string, string|array<string, string>> } } $metadata
 	 * @phpstan-return array<string, list<array{ name: non-falsy-string, value: scalar }>>
 	 */
 	protected function get_feature_declarations_for_node( $metadata, &$node ) {

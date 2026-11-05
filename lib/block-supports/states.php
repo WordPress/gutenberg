@@ -288,9 +288,11 @@ function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
 /**
  * Splits a state style object into groups based on block feature selectors.
  *
- * @param array $state_style     State style object.
- * @param array $block_selectors Block selectors metadata.
+ * @param array                                       $state_style     State style object.
+ * @param array<string, string|array<string, string>> $block_selectors Block selectors metadata.
  * @return array[] Selector/style groups.
+ *
+ * @phpstan-param array{ root?: string, ...<string, string|array<string, string>> } $block_selectors
  */
 function gutenberg_get_state_style_groups( $state_style, $block_selectors ) {
 	$groups = array();
