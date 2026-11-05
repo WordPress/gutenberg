@@ -167,10 +167,14 @@ test.describe( 'Router server-rendered HTML content', () => {
 		}
 
 		// The server renders other content for the page shown.
-		const [ post ] = await requestUtils.rest< Array< { id: number } > >( {
+		const shown = withServerProcessing( utils.getLink( 'history two' ) );
+		const posts = await requestUtils.rest<
+			Array< { id: number; link: string } >
+		>( {
 			path: '/wp/v2/posts',
-			params: { slug: 'history-two' },
+			params: { per_page: 100, _fields: 'id,link' },
 		} );
+		const post = posts.find( ( { link } ) => link === shown )!;
 		await requestUtils.rest( {
 			method: 'POST',
 			path: `/wp/v2/posts/${ post.id }`,
