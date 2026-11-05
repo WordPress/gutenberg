@@ -5976,8 +5976,8 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Returns the selectors metadata for a block.
 	 *
-	 * @param object $block_type    The block type.
-	 * @param string $root_selector The block's root selector.
+	 * @param WP_Block_Type $block_type    The block type.
+	 * @param string        $root_selector The block's root selector.
 	 *
 	 * @return array The custom selectors set by the block.
 	 */
