@@ -246,6 +246,217 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				'true'
 			);
 		} );
+
+		test.describe( 'Focus trap', () => {
+			// The submenu sits between two links, so focus can move past it in
+			// both directions.
+			const menuContent = `
+				<!-- wp:navigation-link {"label":"First Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+				<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+					<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+				<!-- /wp:navigation-submenu -->
+				<!-- wp:navigation-link {"label":"Last Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+				`;
+
+			/**
+			 * Waits until the Interactivity API has run the `data-wp-watch`
+			 * callbacks for the last change, such as `callbacks.initMenu` when a
+			 * submenu opens. It runs them after the next frame, with the same
+			 * scheduling as below (`afterNextFrame` in `@wordpress/interactivity`).
+			 * A person cannot press the next key sooner than that, but Playwright
+			 * can.
+			 *
+			 * @param {import('@playwright/test').Page} page The page.
+			 */
+			const waitForWatchCallbacks = ( page ) =>
+				page.evaluate(
+					() =>
+						new Promise( ( resolve ) => {
+							const done = () => {
+								window.clearTimeout( timeout );
+								window.cancelAnimationFrame( frame );
+								window.setTimeout( resolve );
+							};
+							const timeout = window.setTimeout( done, 100 );
+							const frame = window.requestAnimationFrame( done );
+						} )
+				);
+
+			test.describe( 'Custom overlay', () => {
+				test.beforeEach( async ( { requestUtils } ) => {
+					const overlayMenu = await requestUtils.createNavigationMenu(
+						{
+							title: 'Overlay menu',
+							content: menuContent,
+						}
+					);
+					const headerMenu = await requestUtils.createNavigationMenu(
+						{
+							title: 'Header menu',
+							content: `
+							<!-- wp:navigation-link {"label":"Header Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+							`,
+						}
+					);
+
+					await requestUtils.createTemplate( 'wp_template_part', {
+						slug: 'navigation-overlay',
+						title: 'Navigation Overlay',
+						area: 'navigation-overlay',
+						content: `
+							<!-- wp:navigation-overlay-close /-->
+							<!-- wp:navigation {"ref":${ overlayMenu.id },"submenuVisibility":"click","showSubmenuIcon":false,"layout":{"type":"flex","orientation":"vertical"}} /-->
+							`,
+					} );
+					await requestUtils.createTemplate( 'wp_template_part', {
+						slug: 'header',
+						title: 'Header',
+						content: `<!-- wp:navigation {"ref":${ headerMenu.id },"overlayMenu":"always","overlay":"navigation-overlay"} /-->`,
+					} );
+				} );
+
+				test( 'keeps focus inside a custom overlay after a submenu opens and closes', async ( {
+					page,
+					pageUtils,
+				} ) => {
+					await page.goto( '/' );
+
+					const closeButton = page.getByRole( 'button', {
+						name: 'Close',
+						exact: true,
+					} );
+					const firstItem = page.getByRole( 'link', {
+						name: 'First Item',
+					} );
+					const submenuButton = page.getByRole( 'button', {
+						name: 'Submenu submenu',
+					} );
+					const lastItem = page.getByRole( 'link', {
+						name: 'Last Item',
+					} );
+
+					await page
+						.getByRole( 'button', { name: 'Open menu' } )
+						.click();
+					await expect( closeButton ).toBeFocused();
+
+					// Open and close the submenu with the keyboard.
+					await submenuButton.focus();
+					await pageUtils.pressKeys( 'Enter' );
+					await expect( submenuButton ).toHaveAttribute(
+						'aria-expanded',
+						'true'
+					);
+					await waitForWatchCallbacks( page );
+					await pageUtils.pressKeys( 'Enter' );
+					await expect( submenuButton ).toHaveAttribute(
+						'aria-expanded',
+						'false'
+					);
+
+					// Shift+Tab moves back to the previous item.
+					await pageUtils.pressKeys( 'Shift+Tab' );
+					await expect( firstItem ).toBeFocused();
+
+					// Tab past the last item wraps to the start of the overlay.
+					await pageUtils.pressKeys( 'Tab' );
+					await expect( submenuButton ).toBeFocused();
+					await pageUtils.pressKeys( 'Tab' );
+					await expect( lastItem ).toBeFocused();
+					await pageUtils.pressKeys( 'Tab' );
+					await expect( closeButton ).toBeFocused();
+				} );
+
+				test( 'lets focus leave an open submenu, as outside an overlay', async ( {
+					page,
+					pageUtils,
+				} ) => {
+					await page.goto( '/' );
+
+					const submenuButton = page.getByRole( 'button', {
+						name: 'Submenu submenu',
+					} );
+
+					await page
+						.getByRole( 'button', { name: 'Open menu' } )
+						.click();
+					await expect(
+						page.getByRole( 'button', {
+							name: 'Close',
+							exact: true,
+						} )
+					).toBeFocused();
+
+					await submenuButton.focus();
+					await pageUtils.pressKeys( 'Enter' );
+					await expect( submenuButton ).toHaveAttribute(
+						'aria-expanded',
+						'true'
+					);
+					await waitForWatchCallbacks( page );
+
+					// As outside an overlay, an open submenu does not trap focus:
+					// Tab moves on to the next item and closes the submenu.
+					await pageUtils.pressKeys( 'Tab' );
+					await expect(
+						page.getByRole( 'link', { name: 'Submenu Link' } )
+					).toBeFocused();
+					await pageUtils.pressKeys( 'Tab' );
+					await expect(
+						page.getByRole( 'link', { name: 'Last Item' } )
+					).toBeFocused();
+					await expect( submenuButton ).toHaveAttribute(
+						'aria-expanded',
+						'false'
+					);
+				} );
+			} );
+
+			test( 'keeps focus inside the default overlay after hovering over a submenu', async ( {
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Overlay menu',
+					content: menuContent,
+				} );
+				await requestUtils.createTemplate( 'wp_template_part', {
+					slug: 'header',
+					title: 'Header',
+					content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always"} /-->`,
+				} );
+
+				await page.goto( '/' );
+
+				const closeButton = page.getByRole( 'button', {
+					name: 'Close menu',
+				} );
+				const firstItem = page.getByRole( 'link', {
+					name: 'First Item',
+				} );
+				const lastItem = page.getByRole( 'link', {
+					name: 'Last Item',
+				} );
+
+				await page.getByRole( 'button', { name: 'Open menu' } ).click();
+				await expect( firstItem ).toBeFocused();
+
+				// Open a submenu by hovering over it, then move away. The default
+				// overlay already displays its submenus, so nothing visible
+				// changes: wait for the submenu's watch callbacks instead.
+				await page
+					.getByRole( 'link', { name: 'Submenu', exact: true } )
+					.hover();
+				await waitForWatchCallbacks( page );
+				await firstItem.hover();
+
+				// Tab past the last item wraps to the start of the overlay.
+				await lastItem.focus();
+				await pageUtils.pressKeys( 'Tab' );
+				await expect( closeButton ).toBeFocused();
+			} );
+		} );
 	} );
 
 	test.describe( 'Submenu mouse and keyboard interactions', () => {
