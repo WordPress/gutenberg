@@ -2,21 +2,33 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import type { Action } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useCallback, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as mediaEditorPrivateApis,
 	type Media,
 } from '@wordpress/media-editor';
-import { useNavigate, useParams } from '@wordpress/route';
+import {
+	privateApis as routePrivateApis,
+	useNavigate,
+	useParams,
+} from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { Text } from '@wordpress/ui';
 import { useViewConfig } from '@wordpress/views';
+import {
+	MEDIA_LIBRARY_ADMIN_PATH,
+	getMediaLibraryUrlAfterDelete,
+	isAdminReferrer,
+} from './navigation';
 import './style.scss';
 
-const { usePostFields } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { MediaEditor } = unlock( mediaEditorPrivateApis );
+const { useCanGoBack } = unlock( routePrivateApis );
 
 /**
  * The stage only renders a form, so it requests the `form` of the entity view
@@ -26,8 +38,21 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
-const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
+
+// Actions that remove the attachment, after which the editor has nothing to
+// show.
+const DELETE_ACTION_IDS = [ 'move-to-trash', 'permanently-delete' ];
+
+// Actions left out of this screen:
+// - `duplicate-post`: duplicating an attachment needs a new file upload,
+//   which the action doesn't do.
+// - `rename-post`: it saves all of the attachment's pending edits, not just
+//   the title, so it would also save the Details panel's unsaved changes.
+//   The title can be edited in the Details panel instead. It could come back
+//   if the action saved only `title` (e.g. with
+//   `__experimentalSaveSpecifiedEntityEdits`).
+const EXCLUDED_ACTION_IDS = [ 'duplicate-post', 'rename-post' ];
 
 /*
  * The `MediaEditor` callback arguments this route reads. The private API
@@ -144,6 +169,20 @@ function MediaEditorRoute() {
 			) as Media | false,
 		[ attachmentId ]
 	);
+	// The actions check `permissions`, which isn't part of the record.
+	const permissions = useSelect(
+		( select ) =>
+			unlock( select( coreStore ) ).getEntityRecordPermissions(
+				'postType',
+				'attachment',
+				attachmentId
+			),
+		[ attachmentId ]
+	);
+	const actionItem = useMemo(
+		() => ( media ? { ...media, permissions } : undefined ),
+		[ media, permissions ]
+	);
 
 	const title = getMediaTitle( media || null );
 	// Read through the attachment fields, so the values match the Details
@@ -152,27 +191,75 @@ function MediaEditorRoute() {
 		getFieldValue( fields, 'filename', media )
 	);
 	const fileSize = getFieldValue( fields, 'filesize', media );
-	const navigateBack = () => {
-		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
-			window.history.back();
-			return;
-		}
-		if ( isStandaloneAdminPage ) {
-			window.location.assign( MEDIA_LIBRARY_ADMIN_PATH );
-			return;
-		}
-		navigate( { to: MEDIA_LIST_PATH } );
-	};
+	// True only when the router added the previous history entry, so going
+	// back stays in the app.
+	const canGoBack = useCanGoBack();
+	// Goes back to where the user came from, as long as that is in this
+	// wp-admin, or else to the media list. `replace` keeps the editor's URL
+	// out of the history when there's no going back to it.
+	const navigateBack = useCallback(
+		( { replace = false }: { replace?: boolean } = {} ) => {
+			if ( canGoBack ) {
+				window.history.back();
+				return;
+			}
+			if ( isStandaloneAdminPage ) {
+				// The standalone page is opened with a full page load, so the
+				// previous page is outside the router.
+				if (
+					window.history.length > 1 &&
+					isAdminReferrer( document.referrer, window.location.href )
+				) {
+					window.history.back();
+					return;
+				}
+				window.location.assign( MEDIA_LIBRARY_ADMIN_PATH );
+				return;
+			}
+			navigate( { to: MEDIA_LIST_PATH, replace } );
+		},
+		[ canGoBack, isStandaloneAdminPage, navigate ]
+	);
 	// Replace the history entry so Cancel leaves the editor.
 	const openAttachment = ( newId: number ) =>
 		navigate( { to: `/media-editor/${ newId }`, replace: true } );
+
+	const onActionPerformed = useCallback(
+		( actionId: string ) => {
+			if ( ! DELETE_ACTION_IDS.includes( actionId ) ) {
+				return;
+			}
+			// A full page load loses the action's snackbar, so go to the
+			// Media Library with the args for its own notice. Going back
+			// could also show a cached page that still lists the attachment.
+			if ( isStandaloneAdminPage ) {
+				window.location.assign(
+					getMediaLibraryUrlAfterDelete( actionId, attachmentId )
+				);
+				return;
+			}
+			navigateBack( { replace: true } );
+		},
+		[ attachmentId, isStandaloneAdminPage, navigateBack ]
+	);
+	const postActions: Action< Media >[] = usePostActions( {
+		postType: 'attachment',
+		onActionPerformed,
+	} );
+	const actions = useMemo(
+		() =>
+			postActions.filter(
+				( action ) => ! EXCLUDED_ACTION_IDS.includes( action.id )
+			),
+		[ postActions ]
+	);
 
 	return (
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
 			form={ form }
-			onClose={ navigateBack }
+			onClose={ () => navigateBack() }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					openAttachment( savedId );
@@ -238,7 +325,10 @@ function MediaEditorRoute() {
 									{ /* Compact to match the header's other
 									     controls, as elsewhere in wp-admin. */ }
 									<MediaEditor.SaveActions size="compact" />
-									<MediaEditor.MoreMenu />
+									<MediaEditor.MoreMenu
+										actions={ actions }
+										item={ actionItem }
+									/>
 								</>
 							}
 						>
