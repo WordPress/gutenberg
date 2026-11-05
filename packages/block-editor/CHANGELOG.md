@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Edit as HTML: Keep the block HTML visible when the block has a text gradient ([#86370](https://github.com/WordPress/gutenberg/pull/86370)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
