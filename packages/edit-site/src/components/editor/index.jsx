@@ -112,6 +112,21 @@ export default function EditSiteEditor( {
 			if ( postWithTemplate || postType !== TEMPLATE_POST_TYPE ) {
 				return undefined;
 			}
+			/*
+			 * The `template` field is only in the REST response while the
+			 * templates inside templates experiment is on. Without it a
+			 * template names no template at all, as it did before the
+			 * experiment, so the editor and what it reports as the current
+			 * template are left as they were.
+			 */
+			const record = select( coreDataStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( record && ! Object.hasOwn( record, 'template' ) ) {
+				return undefined;
+			}
 			const templateId = unlock( select( coreDataStore ) ).getTemplateId(
 				postType,
 				postId
