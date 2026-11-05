@@ -953,6 +953,19 @@ describe( 'marker attributes', () => {
 		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
 	} );
 
+	it( 'keeps a run link with a query string', () => {
+		const runUrl = 'https://ci.example/runs/123?attempt=2';
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Size.', sha: HEAD, runUrl },
+				HEAD
+			)
+		);
+
+		expect( parseSections( merged )[ 0 ].runUrl ).toBe( runUrl );
+	} );
+
 	it.each( [
 		[ 'a space', 'https://example.com/a b' ],
 		[ 'a closing bracket', 'https://example.com/a>b' ],

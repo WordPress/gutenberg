@@ -37,6 +37,12 @@
 		"anchor": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"__experimentalSkipSerialization": true,
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"link": true
 		},
@@ -90,6 +96,7 @@
 		}
 	},
 	"selectors": {
+		"background": ".wp-block-post-navigation-link:not(:empty)",
 		"border": ".wp-block-post-navigation-link:not(:empty)",
 		"dimensions": ".wp-block-post-navigation-link:not(:empty)",
 		"shadow": ".wp-block-post-navigation-link:not(:empty)",

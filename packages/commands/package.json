@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.57.0",
+	"version": "2.1.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -57,7 +57,7 @@
 		"cmdk": "^1.0.0"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3",
+		"vitest": "^5.0.5",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {

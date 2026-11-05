@@ -65,19 +65,21 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	it( 'should render nothing', () => {
-		const { container } = render( <AutosaveMonitor /> );
+		const { container } = render(
+			<AutosaveMonitor autosave={ vi.fn() } />
+		);
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should start the autosave timer after being mounted', () => {
-		render( <AutosaveMonitor /> );
+		render( <AutosaveMonitor autosave={ vi.fn() } /> );
 
 		expect( setInterval ).toHaveBeenCalled();
 	} );
 
 	it( 'should clear the autosave timer after being unmounted', () => {
-		const { rerender } = render( <AutosaveMonitor /> );
+		const { rerender } = render( <AutosaveMonitor autosave={ vi.fn() } /> );
 
 		rerender( <div /> );
 
@@ -85,18 +87,21 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	it( 'should restart the autosave timer when the interval changes', () => {
-		const { rerender } = render( <AutosaveMonitor interval={ 10 } /> );
+		const autosave = vi.fn();
+		const { rerender } = render(
+			<AutosaveMonitor autosave={ autosave } interval={ 10 } />
+		);
 
 		setInterval.mockClear();
 		clearInterval.mockClear();
-		rerender( <AutosaveMonitor interval={ 999 } /> );
+		rerender( <AutosaveMonitor autosave={ autosave } interval={ 999 } /> );
 
 		expect( clearInterval ).toHaveBeenCalled();
 		expect( setInterval ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should schedule the timer using the interval in seconds', () => {
-		render( <AutosaveMonitor interval={ 5 } /> );
+		render( <AutosaveMonitor autosave={ vi.fn() } interval={ 5 } /> );
 
 		expect( setInterval ).toHaveBeenLastCalledWith(
 			expect.any( Function ),
@@ -106,7 +111,7 @@ describe( 'AutosaveMonitor', () => {
 
 	it( 'should fall back to the editor autosaveInterval setting', () => {
 		setState( { autosaveInterval: 7 } );
-		render( <AutosaveMonitor /> );
+		render( <AutosaveMonitor autosave={ vi.fn() } /> );
 
 		expect( setInterval ).toHaveBeenLastCalledWith(
 			expect.any( Function ),
@@ -196,17 +201,6 @@ describe( 'AutosaveMonitor', () => {
 
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
 		runAutosaveTimer();
-		expect( autosave ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'should fall back to the editor store autosave action', () => {
-		const autosave = vi.fn();
-		useDispatch.mockReturnValue( { autosave } );
-		setState( { isDirty: true, isAutosaveable: true } );
-		render( <AutosaveMonitor interval={ 5 } /> );
-
-		vi.advanceTimersByTime( 5000 );
-
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

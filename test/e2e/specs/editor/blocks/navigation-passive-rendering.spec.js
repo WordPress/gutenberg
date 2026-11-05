@@ -9,15 +9,10 @@ async function getDirtyEntityRecords( page ) {
 	);
 }
 
-async function enableShowTemplate( page, editor ) {
-	await page.evaluate( () => {
-		window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-	} );
-	await editor.openDocumentSettingsSidebar();
-
+async function enableShowTemplate( page ) {
 	await page
-		.getByRole( 'region', { name: 'Editor settings' } )
-		.getByRole( 'button', { name: 'Template options' } )
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'View', exact: true } )
 		.click();
 
 	const showTemplateButton = page.getByRole( 'menuitemcheckbox', {
@@ -99,7 +94,7 @@ test.describe( 'Navigation passive rendering', () => {
 		} );
 
 		await admin.editPost( post.id );
-		await enableShowTemplate( page, editor );
+		await enableShowTemplate( page );
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
