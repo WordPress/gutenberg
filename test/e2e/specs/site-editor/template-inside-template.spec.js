@@ -342,10 +342,15 @@ test.describe( 'Template rendered inside another template', () => {
 			content: 'disabled',
 		} );
 
-		const sidebarText = editor.canvas.getByRole( 'document', {
-			name: 'Block: Paragraph',
-		} );
-		await sidebarText.filter( { hasText: 'Archive sidebar text' } ).click();
+		// A template part covers its blocks until it is selected, as it does
+		// wherever it is edited, so it is selected before its text is.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Archive sidebar' } )
+			.click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Archive sidebar text' } )
+			.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( '!' );
 		await expect(
