@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
+-   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#ISSUE](https://github.com/WordPress/gutenberg/pull/ISSUE)).
 
 ## 12.1.0 (2026-11-04)
 

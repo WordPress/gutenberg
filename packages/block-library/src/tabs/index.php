@@ -90,6 +90,13 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		return '';
 	}
 
+	// A default tab index can be left past the last tab, for example after
+	// the default tab was removed. Fall back to the first tab so that a panel
+	// is still shown.
+	if ( ! isset( $tabs_list[ $active_tab_index ] ) ) {
+		$active_tab_index = 0;
+	}
+
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
