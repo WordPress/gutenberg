@@ -1,8 +1,16 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Path, SVG } from '@wordpress/components';
-import { Autocomplete, Icon, Input, InputLayout, Text } from '@wordpress/ui';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import {
+	Autocomplete,
+	Icon,
+	Input,
+	InputLayout,
+	Text,
+	VisuallyHidden,
+} from '@wordpress/ui';
+import { useDebounce } from '@wordpress/compose';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { search } from '@wordpress/icons';
@@ -86,6 +94,23 @@ function getCodePoint( char: string ): string {
 	);
 }
 
+/**
+ * A character's name with its code point, e.g. "Em dash (U+2014)". It is the
+ * cell's accessible name and the preview strip's text, so both carry the
+ * same information.
+ *
+ * @param option The character's grid cell.
+ * @return The description.
+ */
+function describeCharacter( option: CharacterOption ): string {
+	return sprintf(
+		/* translators: 1: Character name, e.g. "Em dash". 2: Unicode code point, e.g. "U+2014". */
+		__( '%1$s (%2$s)' ),
+		option.label,
+		getCodePoint( option.value )
+	);
+}
+
 interface InlineUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
@@ -132,29 +157,65 @@ function InlineUI( {
 		} ) );
 	}, [ categories, isSearching, query ] );
 
+	/*
+	 * Announce the result count once typing pauses, so a screen reader
+	 * doesn't speak after every keystroke. `Autocomplete.Status` stays
+	 * mounted, so changing its text is announced reliably.
+	 */
+	const resultCount = isSearching ? items.length : 0;
+	let statusMessage = '';
+	if ( isSearching ) {
+		statusMessage = resultCount
+			? sprintf(
+					/* translators: %d: Number of characters found. */
+					_n(
+						'%d character found.',
+						'%d characters found.',
+						resultCount
+					),
+					resultCount
+				)
+			: __( 'No characters found.' );
+	}
+	const [ announcedStatus, setAnnouncedStatus ] = useState( '' );
+	const announceStatus = useDebounce( setAnnouncedStatus, 500 );
+	useEffect( () => {
+		announceStatus( statusMessage );
+	}, [ announceStatus, statusMessage ] );
+
 	function onSelect( option: CharacterOption ) {
 		onChange( insert( value, option.value ) );
 		onClose();
 		onFocus();
 	}
 
-	const renderRows = ( options: CharacterOption[] ) =>
+	/*
+	 * Rows are named after their section, so moving through the grid reads
+	 * "Em dash (U+2014)" and the section rather than every name in the row,
+	 * and moving into the next section announces it.
+	 */
+	const renderRows = ( options: CharacterOption[], rowLabel: string ) =>
 		chunkRows( options ).map( ( row, rowIndex ) => (
 			<Autocomplete.Row
 				key={ rowIndex }
+				aria-label={ rowLabel }
 				className="format-library-special-characters__row"
 			>
 				{ row.map( ( option ) => (
 					<Autocomplete.Item
 						key={ option.key }
 						value={ option }
-						aria-label={ option.label }
 						className="format-library-special-characters__character"
 						// Enter on the highlighted cell clicks it too.
 						onClick={ () => onSelect( option ) }
 					>
 						<Autocomplete.ItemLabel className="format-library-special-characters__character-label">
 							<span aria-hidden="true">{ option.value }</span>
+							{ /* The cell's name, as text, so screen readers don't
+							report the hidden glyph as blank. */ }
+							<VisuallyHidden>
+								{ describeCharacter( option ) }
+							</VisuallyHidden>
 						</Autocomplete.ItemLabel>
 					</Autocomplete.Item>
 				) ) }
@@ -198,6 +259,8 @@ function InlineUI( {
 		>
 			<Autocomplete.Popup
 				className="format-library-special-characters__popup"
+				// The search field inside makes this a dialog, which needs a name.
+				aria-label={ title }
 				width="content"
 				// There is no trigger to return to: the format puts the caret
 				// back itself, and only after Escape or a pick.
@@ -246,11 +309,13 @@ function InlineUI( {
 					className="format-library-special-characters__viewport"
 					tabIndex={ -1 }
 				>
-					<Autocomplete.Empty>
+					{ /* Shown, but announced through `Autocomplete.Status`, so it
+					isn't spoken twice. */ }
+					<Autocomplete.Empty aria-hidden="true">
 						{ __( 'No characters found.' ) }
 					</Autocomplete.Empty>
 					<Autocomplete.List
-						aria-label={ title }
+						aria-label={ __( 'Characters' ) }
 						className={
 							isSearching
 								? 'format-library-special-characters__list is-searching'
@@ -258,7 +323,10 @@ function InlineUI( {
 						}
 					>
 						{ isSearching
-							? renderRows( items as CharacterOption[] )
+							? renderRows(
+									items as CharacterOption[],
+									__( 'Search results' )
+								)
 							: ( group: CharacterOptionGroup ) => (
 									<Autocomplete.Group
 										key={ group.key }
@@ -268,13 +336,19 @@ function InlineUI( {
 										<Autocomplete.GroupLabel className="format-library-special-characters__group-label">
 											{ group.label }
 										</Autocomplete.GroupLabel>
-										{ renderRows( group.items ) }
+										{ renderRows(
+											group.items,
+											group.label
+										) }
 									</Autocomplete.Group>
 								) }
 					</Autocomplete.List>
 				</div>
-				{ /* A sighted-user aid only: each cell already carries its name
-				for assistive technology. */ }
+				<Autocomplete.Status>
+					<VisuallyHidden>{ announcedStatus }</VisuallyHidden>
+				</Autocomplete.Status>
+				{ /* A sighted-user aid only: each cell's accessible name already
+				carries the same name and code point. */ }
 				<div
 					className="format-library-special-characters__preview"
 					aria-hidden="true"
@@ -288,12 +362,7 @@ function InlineUI( {
 								variant="body-sm"
 								className="format-library-special-characters__preview-name"
 							>
-								{ sprintf(
-									/* translators: 1: Character name, e.g. "Em dash". 2: Unicode code point, e.g. "U+2014". */
-									__( '%1$s (%2$s)' ),
-									highlighted.label,
-									getCodePoint( highlighted.value )
-								) }
+								{ describeCharacter( highlighted ) }
 							</Text>
 						</>
 					) }
