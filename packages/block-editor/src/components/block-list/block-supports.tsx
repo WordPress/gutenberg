@@ -191,18 +191,19 @@ const BlockSupportStyles = memo(
 		isSameContext( prevContext, nextContext )
 );
 
-/**
- * The last props, context and wrapper props of each block support of a block,
- * by support index.
- */
-export type BlockSupportCache = Map<
-	number,
-	{
-		props: BlockListBlockFeatureProps;
-		context: BlockSupportContext;
-		wrapperProps: BlockListWrapperProps;
-	}
->;
+// Each block's supports' last props, context and wrapper props, by support
+// index. The key is the block's record, which attribute updates keep.
+const cache = new WeakMap<
+	object,
+	Map<
+		number,
+		{
+			props: BlockListBlockFeatureProps;
+			context: BlockSupportContext;
+			wrapperProps: BlockListWrapperProps;
+		}
+	>
+>();
 
 /**
  * Returns the block supports' wrapper props, and renders their side effects.
@@ -220,8 +221,13 @@ export function getBlockSupportProps(
 	attributes: Record< string, unknown >,
 	context: BlockSupportContext,
 	data: Record< number, Record< string, unknown > >,
-	cache: BlockSupportCache
+	block: object
 ) {
+	let blockCache = cache.get( block );
+	if ( ! blockCache ) {
+		blockCache = new Map();
+		cache.set( block, blockCache );
+	}
 	let wrapperProps: BlockListWrapperProps = {};
 	const effects = [];
 	for ( const [ index, props ] of getActiveBlockSupports(
@@ -235,7 +241,7 @@ export function getBlockSupportProps(
 			: props;
 		// Reuse the support's last props when what it reads is unchanged, as
 		// when typing in the block.
-		let cached = cache.get( index );
+		let cached = blockCache.get( index );
 		if (
 			! cached ||
 			! isShallowEqual( cached.props, supportProps ) ||
@@ -250,7 +256,7 @@ export function getBlockSupportProps(
 					context
 				) as BlockListWrapperProps,
 			};
-			cache.set( index, cached );
+			blockCache.set( index, cached );
 		}
 		wrapperProps = mergeWrapperProps( wrapperProps, cached.wrapperProps );
 		if ( useStyles ) {

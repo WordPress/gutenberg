@@ -1,11 +1,5 @@
 import clsx from 'clsx';
-import {
-	memo,
-	RawHTML,
-	useContext,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -36,7 +30,6 @@ import {
 	mergeWrapperProps,
 	selectBlockSupports,
 } from './block-supports';
-import type { BlockSupportCache } from './block-supports';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
@@ -899,9 +892,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	);
 
 	const currentViewport = useContext( CurrentViewport );
-	const [ blockSupportCache ] = useState< BlockSupportCache >(
-		() => new Map()
-	);
 
 	const parentLayout = useLayout();
 
@@ -983,7 +973,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				parentLayout,
 			},
 			getBlockSupportData( selectedProps ),
-			blockSupportCache
+			selectedProps.blockWithoutAttributes
 		);
 
 	const privateContext = {
