@@ -18,6 +18,7 @@ import type {
 } from '../hooks/use-image-editor';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds } from '../../core/containment';
+import { getOutputSize } from '../../get-output-size';
 import {
 	MAX_VIEW_SCALE,
 	PIXEL_SNAP_DISPLAY_SCALE,
@@ -33,7 +34,6 @@ import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { DimensionsOverlay } from './overlays/dimensions-overlay';
 import {
-	getSourceRegion,
 	snapCropRectToSourcePixelGrid,
 	snapCropRectToSourcePixels,
 } from '../../core/source-region';
@@ -718,11 +718,9 @@ function ImageEditorCanvasInner(
 		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
-		const region = getSourceRegion( state, {
-			width: state.image.naturalWidth,
-			height: state.image.naturalHeight,
-		} );
-		return { width: region.width, height: region.height };
+		// Use the mapper's near-full-crop rule. The size is measured in
+		// state.image pixels, which may differ from the saved file.
+		return getOutputSize( state );
 	}, [ showDimensions, activeHandle, state ] );
 
 	/**
