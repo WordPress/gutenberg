@@ -52,7 +52,6 @@ function MyImageEditor( { src }: { src: string } ) {
 			<ImageEditorCanvas
 				src={ src }
 				controller={ controller }
-				freeformCrop
 				showGrid="interactive"
 			/>
 		</div>
@@ -71,7 +70,7 @@ The canvas the person edits the image on. It fills its parent, so render it insi
 -   `showGrid`: show the rule-of-thirds grid: `true`, `false` or `'interactive'` (only while the crop is being changed). Defaults to `false`.
 -   `showDimming`: dim the image outside the crop area. Defaults to `true`.
 -   `showDimensions`: show the crop size in pixels while resizing. Defaults to `true`.
--   `freeformCrop`: show resize handles so the crop area can be resized and moved. When `false` (the default), the crop area is fixed and centred, and the image pans and zooms under it.
+-   `freeformCrop`: show resize handles so the crop area can be resized and moved. Defaults to `true`. When `false`, the crop area is fixed and centred, and the image pans and zooms under it.
 -   `focusOnMount`: focus the crop area when it mounts. Defaults to `false`.
 -   `disabled`: ignore all crop interaction, for example while saving, so the edit cannot change after saving starts. A gesture already in progress is cancelled. Defaults to `false`.
 -   `onImageLoaded( size )`: called with the image's natural size when the image loads.

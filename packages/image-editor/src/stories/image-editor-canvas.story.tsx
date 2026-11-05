@@ -183,7 +183,7 @@ const WithControlsComponent = () => {
 	} = controller;
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
-	const [ freeformCrop, setFreeformCrop ] = useState( false );
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
 	const [ gridMode, setGridMode ] = useState< GridMode >( 'interactive' );
 	const { src, isCustom, handleFileChange, resetToSample } =
 		useUploadableImage();
@@ -513,7 +513,7 @@ const DebugComponent = () => {
 		isDirty,
 	} = controller;
 
-	const [ freeformCrop, setFreeformCrop ] = useState( false );
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
 	const [ exportFormat, setExportFormat ] =
 		useState< string >( 'image/jpeg' );
 	const { src, isCustom, handleFileChange, resetToSample } =

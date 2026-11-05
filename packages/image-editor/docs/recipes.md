@@ -23,7 +23,6 @@ function MyImageEditor( { src }: { src: string } ) {
 			<ImageEditorCanvas
 				src={ src }
 				controller={ controller }
-				freeformCrop
 				showGrid="interactive"
 			/>
 		</div>
@@ -57,7 +56,7 @@ return (
 		<button onClick={ () => reset() } disabled={ ! controller.isDirty }>
 			Reset
 		</button>
-		<ImageEditorCanvas src={ src } controller={ controller } freeformCrop />
+		<ImageEditorCanvas src={ src } controller={ controller } />
 	</>
 );
 ```
@@ -107,7 +106,7 @@ function PresetPicker( { controller }: { controller: ImageEditorController } ) {
 
 ## Lock the Crop to a Ratio
 
-For a fixed shape, such as a square site icon, start from a state with a locked ratio and leave out `freeformCrop`. The crop stays the largest square that fits, centred, while the person pans and zooms the image under it.
+For a fixed shape, such as a square site icon, start from a state with a locked ratio and pass `freeformCrop={ false }`. The crop stays the largest square that fits, centred, while the person pans and zooms the image under it.
 
 Pass the image too if you have it, so the crop starts the right shape rather than waiting for the canvas to fit it.
 
@@ -117,7 +116,13 @@ const [ state, setState ] = useState( () =>
 );
 const controller = useImageEditor( { state, onChange: setState } );
 
-return <ImageEditorCanvas src={ src } controller={ controller } />;
+return (
+	<ImageEditorCanvas
+		src={ src }
+		controller={ controller }
+		freeformCrop={ false }
+	/>
+);
 ```
 
 ## Start From a Saved Edit
@@ -171,7 +176,6 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 			<ImageEditorCanvas
 				src={ src }
 				controller={ controller }
-				freeformCrop
 				onGestureStart={ () => {
 					gestureStart.current = state;
 				} }
@@ -239,4 +243,4 @@ if ( modifiers.length ) {
 -   `+` or `=` zooms in, and `-` or `_` zooms out.
 -   `R` rotates 90 degrees clockwise, and Shift+`R` rotates counter-clockwise.
 -   `H` flips horizontally, and `V` flips vertically.
--   With `freeformCrop`, the resize handles are buttons. Arrow keys resize from the focused handle; hold Shift for bigger steps.
+-   With resize handles (the default), each handle is a button. Arrow keys resize from the focused handle; hold Shift for bigger steps.

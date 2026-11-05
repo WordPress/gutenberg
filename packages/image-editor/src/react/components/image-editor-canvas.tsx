@@ -76,9 +76,9 @@ export interface ImageEditorCanvasProps {
 	/** Show the crop size in pixels while resizing. Defaults to `true`. */
 	showDimensions?: boolean;
 	/**
-	 * Show resize handles so the crop area can be resized and moved. When
-	 * `false` (the default), the crop area is fixed and centred, and the
-	 * image pans and zooms under it.
+	 * Show resize handles so the crop area can be resized and moved.
+	 * Defaults to `true`. When `false`, the crop area is fixed and
+	 * centred, and the image pans and zooms under it.
 	 */
 	freeformCrop?: boolean;
 	/** Focus the crop area when it mounts. Defaults to `false`. */
@@ -137,7 +137,7 @@ function ImageEditorCanvasInner(
 		showGrid = false,
 		showDimming = true,
 		showDimensions = true,
-		freeformCrop = false,
+		freeformCrop = true,
 		focusOnMount = false,
 		disabled = false,
 		onImageLoaded,
