@@ -88,6 +88,50 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		$this->assertLessThan( strpos( $style, 'rotate' ), strpos( $style, 'fill' ) );
 	}
 
+	public function test_shadow_keeps_the_style_engine_order() {
+		$output = gutenberg_render_block_core_icon(
+			array(
+				'icon'  => 'core/info',
+				'style' => array(
+					'color'      => array( 'text' => '#000' ),
+					'border'     => array( 'width' => '2px' ),
+					'shadow'     => 'var:preset|shadow|natural',
+					'spacing'    => array( 'padding' => '4px' ),
+					'dimensions' => array( 'width' => '48px' ),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+		$this->assertSame( 'has-text-color', $processor->get_attribute( 'class' ) );
+		$this->assertSame( 'fill: none; color:#000;border-width:2px;box-shadow:var(--wp--preset--shadow--natural);width:48px;padding:4px;', $processor->get_attribute( 'style' ) );
+	}
+
+	public function test_applies_width_and_padding_styles() {
+		$output = gutenberg_render_block_core_icon(
+			array(
+				'icon'  => 'core/caution',
+				'style' => array(
+					'dimensions' => array( 'width' => '48px' ),
+					'spacing'    => array(
+						'padding' => array(
+							'top'  => 'var:preset|spacing|20',
+							'left' => '8px',
+						),
+					),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+		$this->assertSame(
+			'fill: none; width:48px;padding-top:var(--wp--preset--spacing--20);padding-left:8px;',
+			$processor->get_attribute( 'style' )
+		);
+	}
+
 	public function test_renders_only_icons_in_public_collections() {
 		// Renders public core icon.
 		$processor = new WP_HTML_Tag_Processor( gutenberg_render_block_core_icon( array( 'icon' => 'core/caution' ) ) );
