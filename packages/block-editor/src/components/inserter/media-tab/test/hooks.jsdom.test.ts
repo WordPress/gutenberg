@@ -88,6 +88,43 @@ describe( 'useMediaResults', () => {
 		);
 	} );
 
+	it( 'omits an arg left unset, so a strict source never sees an empty one', async () => {
+		// The panel keeps every key on its query object (no folder selected
+		// here) so its dependency list stays a fixed length.
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useStubMediaResults(
+				category,
+				{ per_page: 20, page: 1, search: '', folder: undefined },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				search: '',
+			} )
+		);
+	} );
+
+	it( 'passes an arg once it is set', async () => {
+		const category = createCategory( 'images', [ { id: 1 } ] );
+		renderHook( () =>
+			useStubMediaResults(
+				category,
+				{ per_page: 20, page: 1, search: '', folder: 7 },
+				0
+			)
+		);
+		await waitFor( () =>
+			expect( category.fetch ).toHaveBeenCalledWith( {
+				per_page: 20,
+				search: '',
+				folder: 7,
+			} )
+		);
+	} );
+
 	it( 'leaves paging totals undefined for an array-returning source', async () => {
 		const category = createCategory( 'images', [ { id: 1 } ] );
 		const { result } = renderHook( () =>

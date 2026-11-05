@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Inserter: Behind the `gutenberg-media-folders` experiment, add a folder filter beneath the Media tab's search, with a "New folder" button, an "Add to folder" picker in the footer, and per-item "Add to folder…" and "Remove from folder" actions ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
