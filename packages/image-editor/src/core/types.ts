@@ -122,7 +122,7 @@ export interface InternalImageEditorState {
 	/** Rotation in degrees, normalized to 0-360. */
 	rotation: number;
 	/**
-	 * Base pan/zoom/rotation — the pose used to derive a rotation.
+	 * Base pan/zoom/rotation — the pose the user last explicitly set.
 	 *
 	 * During continuous fine rotation (SET_ROTATION), every tick
 	 * re-derives the transient `pan`/`zoom` from these base values
