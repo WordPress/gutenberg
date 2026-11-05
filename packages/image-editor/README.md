@@ -24,7 +24,7 @@ The canvas needs its stylesheet for layout. Load `build-style/style.css` from yo
 import '@wordpress/image-editor/build-style/style.css';
 ```
 
-Set these CSS custom properties on an ancestor or on the canvas's `className` to change its appearance without targeting its internal elements:
+Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
 
 | Property                                   | Changes                                                                                                          |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
