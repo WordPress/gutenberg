@@ -32,7 +32,8 @@
 			opacity: 1;
 		}
 
-		.dataforms-layouts-panel__field-label {
+		.dataforms-layouts-panel__field-label,
+		.dataforms-layouts-panel__field-placeholder {
 			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
@@ -135,11 +136,14 @@
 	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
 	display: flex;
 	align-items: center;
-	overflow: clip;
+	// Clip only horizontally, so that the focus rings of inner controls are not
+	// cut off at the top and bottom, where the row has little room left.
+	overflow-x: clip;
 	// padding-inline + negative margin-inline creates room within the
-	// clip boundary for focus rings of inner controls.
-	padding-inline: var(--wpds-border-width-focus);
-	margin-inline: calc(-1 * var(--wpds-border-width-focus));
+	// clip boundary for focus rings of inner controls, which are drawn
+	// outside the control by their width plus their offset.
+	padding-inline: calc(2 * var(--wpds-border-width-focus));
+	margin-inline: calc(-2 * var(--wpds-border-width-focus));
 	word-break: normal;
 	overflow-wrap: anywhere;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -152,6 +156,27 @@
 
 	> * {
 		min-width: 0;
+	}
+}
+
+// A placeholder stands in for an empty value, so it is muted by color. It keeps
+// the emphasized weight of values, the cue that the row is editable, which is
+// all that tells it apart from the label when forced colors replace the color.
+.dataforms-layouts-panel__field-placeholder {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Wraps the render output of a value followed by its placeholder, without
+// adding a box of its own.
+.dataforms-layouts-panel__field-value {
+	display: contents;
+
+	> * {
+		min-width: 0;
+	}
+
+	&:not(:empty) + .dataforms-layouts-panel__field-placeholder {
+		display: none;
 	}
 }
 

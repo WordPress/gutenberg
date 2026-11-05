@@ -1,6 +1,9 @@
-import { h, type ComponentChild, type JSX } from 'preact';
+import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
+
+/** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
+const htmlFallbacks = new WeakMap< object, DocumentFragment >();
 
 const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
@@ -118,6 +121,68 @@ function splitDirectiveName( directiveName: string ): {
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 /**
+ * Copies a node tree into the target's owner document, omitting script
+ * elements recursively. HTML-namespace template contents are traversed
+ * separately because they are not ordinary child nodes of their template
+ * element; elements named `template` in other namespaces use their child nodes.
+ *
+ * @param source The node whose child nodes are copied.
+ * @param target The fragment or cloned node that receives those children.
+ */
+function copyFallbackChildren( source: Node, target: Node ): void {
+	for ( const child of Array.from( source.childNodes ) ) {
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).localName === 'script'
+		) {
+			continue;
+		}
+
+		// Import directly into the snapshot owner, without creating a node in
+		// the source document or retaining that document through the snapshot.
+		const clone = target.ownerDocument!.importNode( child, false );
+		target.appendChild( clone );
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).namespaceURI ===
+				'http://www.w3.org/1999/xhtml' &&
+			( child as Element ).localName === 'template'
+		) {
+			copyFallbackChildren(
+				( child as HTMLTemplateElement ).content,
+				( clone as HTMLTemplateElement ).content
+			);
+		} else {
+			copyFallbackChildren( child, clone );
+		}
+	}
+}
+
+/**
+ * Gets the inert template-contents document associated with the live document.
+ *
+ * @return The live document's shared template-contents owner document.
+ */
+function getTemplateContentsOwnerDocument(): Document {
+	return document.createElement( 'template' ).content.ownerDocument;
+}
+
+/**
+ * Reads the script-free fallback snapshot recorded for an element vnode. The
+ * snapshot is owned by the live document's shared template-contents document.
+ * Callers must leave it detached and unmodified; insert a clone.
+ *
+ * @param element The element vnode passed to a directive callback.
+ * @return The detached fallback snapshot, or `undefined` when absent.
+ */
+export function getHtmlFallback(
+	element: VNode< any >
+): DocumentFragment | undefined {
+	const htmlProps = element.props.dangerouslySetInnerHTML;
+	return htmlProps && htmlFallbacks.get( htmlProps );
+}
+
+/**
  * Parses the namespace and value from a directive attribute value.
  *
  * JSON is retained only when it produces a plain object. All other values use
@@ -169,13 +234,70 @@ export const isDirectiveMap = ( value: unknown ): boolean =>
 	typeof value === 'object' && value !== null && directiveMaps.has( value );
 
 /**
+ * Gets the namespace named by the parsed value of a `data-wp-interactive`
+ * attribute: the value itself when it is a string, or the `namespace` string of
+ * an object. It is the single place that interprets these values, so
+ * {@link toVdom} and its callers resolve a `data-wp-interactive` attribute to
+ * the same namespace.
+ *
+ * @param value The `value` returned by {@link parseDirectiveValue} for the
+ *              attribute.
+ * @return The namespace, or null when the value names none or a reserved key.
+ */
+export const getInteractiveNamespace = (
+	value: string | Record< string, unknown >
+): string | null => {
+	const namespace =
+		// eslint-disable-next-line no-nested-ternary
+		typeof value === 'string'
+			? value
+			: typeof value?.namespace === 'string'
+				? value.namespace
+				: null;
+	return isReservedKey( namespace ) ? null : namespace;
+};
+
+/**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
- * @param root The root element or node to start traversing on.
+ * Unprefixed directives get the namespace of the nearest `data-wp-interactive`
+ * at or above their element within `root`. Where there is none, the namespace
+ * passed as `namespace` applies, as if `root` sat inside a
+ * `data-wp-interactive` that names it; `null` stands for no namespace. When
+ * `namespace` is omitted, the namespace in effect where the conversion is
+ * requested applies: the enclosing conversion's for `<template>` content, and
+ * `null` for a top-level call. The ancestors of `root` are never read. A
+ * namespace prefix in a directive value always takes precedence.
+ *
+ * @example
+ * ```js
+ * // The directives of the region resolve against `my-plugin`, the namespace
+ * // of the interactive element that contains it.
+ * toVdom( region, 'my-plugin' );
+ * ```
+ *
+ * @param root      The root element or node to start traversing on.
+ * @param namespace Optional namespace for the unprefixed directives that no
+ *                  `data-wp-interactive` within `root` governs.
  * @return The resulting vDOM tree.
  */
-export function toVdom( root: Node ): ComponentChild {
+export function toVdom(
+	root: Node,
+	namespace?: string | null
+): ComponentChild {
+	if ( namespace === undefined ) {
+		return convertToVdom( root );
+	}
+	namespaces.push( namespace );
+	try {
+		return convertToVdom( root );
+	} finally {
+		namespaces.pop();
+	}
+}
+
+function convertToVdom( root: Node ): ComponentChild {
 	const nodesToRemove = new Set< Node >();
 	const nodesToReplace = new Set< Node >();
 
@@ -240,18 +362,7 @@ export function toVdom( root: Node ): ComponentChild {
 					parseDirectiveValue( attributeValue );
 				if ( attributeName === 'data-wp-interactive' ) {
 					island = true;
-					const islandNamespace =
-						// eslint-disable-next-line no-nested-ternary
-						typeof value === 'string'
-							? value
-							: typeof value?.namespace === 'string'
-								? value.namespace
-								: null;
-					namespaces.push(
-						isReservedKey( islandNamespace )
-							? null
-							: islandNamespace
-					);
+					namespaces.push( getInteractiveNamespace( value ) );
 				} else if ( isReservedKey( namespace ) ) {
 					if ( globalThis.SCRIPT_DEBUG ) {
 						warn(
@@ -352,9 +463,19 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			props.dangerouslySetInnerHTML = {
+			const htmlProps = {
 				__html: elementNode.innerHTML,
 			};
+			props.dangerouslySetInnerHTML = htmlProps;
+			if ( hasDefaultHtmlDirective ) {
+				// Preserve a script-free snapshot in the live document's shared
+				// template-contents document. Importing directly there neither
+				// requests fallback resources nor keeps a parsed page alive.
+				const snapshot =
+					getTemplateContentsOwnerDocument().createDocumentFragment();
+				copyFallbackChildren( elementNode, snapshot );
+				htmlFallbacks.set( htmlProps, snapshot );
+			}
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,
