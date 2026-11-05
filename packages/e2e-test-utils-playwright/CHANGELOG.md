@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `RequestUtils`: Open a new connection for each request, so requests no longer fail intermittently with "socket hang up".
+-   `RequestUtils`: Open a new connection for each request, so requests no longer fail intermittently with "socket hang up" ([#86350](https://github.com/WordPress/gutenberg/pull/86350)).
 
 ## 3.2.0 (2026-11-04)
 
