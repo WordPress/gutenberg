@@ -4,6 +4,12 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
+
+## 28.1.0 (2026-11-04)
+
+### Enhancements
+
 -   `use-recommended-components`: Flag `CustomGradientPicker` from `@wordpress/components` in favor of `GradientPicker` with `clearable={ false }` ([#85953](https://github.com/WordPress/gutenberg/pull/85953)).
 -   `use-recommended-components`: Recommend `getWpCompatOverlaySlot` from `@wordpress/ui` ([#85835](https://github.com/WordPress/gutenberg/pull/85835)).
 -   `use-recommended-components`: Link directly to Storybook migration guides in lint messages ([#85752](https://github.com/WordPress/gutenberg/pull/85752)).
