@@ -98,20 +98,17 @@ function runSequenceWithMergeCrdtBlocks( yblocks: YBlocks ) {
 	mergeCrdtBlocks(
 		yblocks,
 		[ makeBlock( 'x', HIDDEN_SECOND ) ],
-		// @ts-expect-error Bug: a bare offset is not a cursor, so the merge runs without one.
-		1
+		getSelection( 1 ).selectionStart
 	);
 	mergeCrdtBlocks(
 		yblocks,
 		[ makeBlock( 'xy', STEP_TWO_SECOND ) ],
-		// @ts-expect-error Bug: a bare offset is not a cursor, so the merge runs without one.
-		2
+		getSelection( 2 ).selectionStart
 	);
 	mergeCrdtBlocks(
 		yblocks,
 		[ makeBlock( 'xyq', FINAL_SECOND ) ],
-		// @ts-expect-error Bug: a bare offset is not a cursor, so the merge runs without one.
-		3
+		getSelection( 3 ).selectionStart
 	);
 }
 
