@@ -2,14 +2,13 @@ import { Button } from '@wordpress/components';
 import { copySmall } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithSlug } from './types';
-import { getSlug } from './utils';
 import styles from './style.module.css';
 
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
@@ -33,8 +32,11 @@ const SlugEdit = ( {
 } ) => {
 	const { id } = field;
 
-	const value = field.getValue( { item: data } );
-	const slug = value ? safeDecodeURIComponent( value ) : getSlug( data );
+	// While the user types, show what they typed. The field's value is decoded
+	// and falls back to the slug derived from the title, so showing it would
+	// turn a typed `%20` into a space and refill a cleared field.
+	const [ draft, setDraft ] = useState< string >();
+	const slug = draft ?? field.getValue( { item: data } ) ?? '';
 	const permalinkTemplate = data.permalink_template || '';
 	const [ permalinkPrefix, permalinkSuffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX
@@ -51,10 +53,12 @@ const SlugEdit = ( {
 			: safeDecodeURIComponent( data.link || '' );
 
 	const onChangeControl = useCallback(
-		( newValue?: string ) =>
+		( newValue?: string ) => {
+			setDraft( newValue ?? '' );
 			onChange( {
 				[ id ]: newValue,
-			} ),
+			} );
+		},
 		[ id, onChange ]
 	);
 
@@ -108,6 +112,7 @@ const SlugEdit = ( {
 						onValueChange={ ( newValue ) => {
 							onChangeControl( newValue );
 						} }
+						onBlur={ () => setDraft( undefined ) }
 						aria-describedby={ postUrlSlugDescriptionId }
 					/>
 					<div className={ styles.help }>
