@@ -55,6 +55,13 @@ export default function useTabActions( tabsClientId ) {
 			return;
 		}
 
+		// Leave the active and default tabs alone when a tab panel can't be
+		// inserted, as `insertBlock()` would then do nothing.
+		const { canInsertBlockType } = registry.select( blockEditorStore );
+		if ( ! canInsertBlockType( 'core/tab-panel', tabPanelsClientId ) ) {
+			return;
+		}
+
 		const newIndex = atIndex ?? tabPanelBlocks.length;
 
 		// Keep the default tab on the same tab panel when the new tab is
@@ -99,6 +106,14 @@ export default function useTabActions( tabsClientId ) {
 			return;
 		}
 
+		// Leave the active and default tabs alone when the tab panel can't be
+		// removed, for example when it's locked, as `removeBlock()` would then
+		// do nothing.
+		const { canRemoveBlock } = registry.select( blockEditorStore );
+		if ( ! canRemoveBlock( target.clientId ) ) {
+			return;
+		}
+
 		// Calculate new active index after removal.
 		const newActiveIndex =
 			removeIndex >= tabCount - 1 ? tabCount - 2 : removeIndex;
@@ -140,6 +155,14 @@ export default function useTabActions( tabsClientId ) {
 		const toIndex = activeIndex + direction;
 		const target = tabPanelBlocks[ activeIndex ];
 		if ( ! target || toIndex < 0 || toIndex >= tabPanelBlocks.length ) {
+			return;
+		}
+
+		// Leave the active and default tabs alone when the tab panel can't be
+		// moved, for example when it's locked, as `moveBlocksToPosition()`
+		// would then do nothing.
+		const { canMoveBlock } = registry.select( blockEditorStore );
+		if ( ! canMoveBlock( target.clientId ) ) {
 			return;
 		}
 
