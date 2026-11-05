@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Block supports: Fix the editor crashing with "Maximum update depth exceeded" when a Global Styles value changes quickly, for example while dragging it ([#86341](https://github.com/WordPress/gutenberg/pull/86341)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
