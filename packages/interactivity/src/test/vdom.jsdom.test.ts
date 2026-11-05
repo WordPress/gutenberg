@@ -283,7 +283,11 @@ describe( 'toVdom', () => {
 				'<input type="checkbox" checked />'
 			);
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { type: 'checkbox', defaultChecked: true }, [] )
+				h(
+					'input',
+					{ type: 'checkbox', defaultChecked: true, checked: true },
+					[]
+				)
 			);
 		} );
 
@@ -299,7 +303,7 @@ describe( 'toVdom', () => {
 		it( 'should map an empty "value" attribute to defaultValue, not true', () => {
 			const element = createElementFromHTML( '<input value="" />' );
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { defaultValue: '' }, [] )
+				h( 'input', { defaultValue: '', value: '' }, [] )
 			);
 		} );
 
@@ -308,7 +312,11 @@ describe( 'toVdom', () => {
 				'<input type="text" value="hello" />'
 			);
 			expect( toVdom( element ) ).toMatchVNode(
-				h( 'input', { type: 'text', defaultValue: 'hello' }, [] )
+				h(
+					'input',
+					{ type: 'text', defaultValue: 'hello', value: 'hello' },
+					[]
+				)
 			);
 		} );
 
@@ -320,8 +328,26 @@ describe( 'toVdom', () => {
 
 			expect( vnode.props.defaultValue ).toBe( '1' );
 			expect( vnode.props.defaultChecked ).toBe( true );
-			expect( vnode.props.value ).toBeUndefined();
-			expect( vnode.props.checked ).toBeUndefined();
+			expect( vnode.props.value ).toBe( '1' );
+			expect( vnode.props.checked ).toBe( true );
+		} );
+
+		it( 'should use the live value and checked state next to the defaults', () => {
+			const text = createElementFromHTML(
+				'<input type="text" value="from server" />'
+			) as HTMLInputElement;
+			text.value = 'typed';
+			const textVnode = toVdom( text ) as any;
+			expect( textVnode.props.defaultValue ).toBe( 'from server' );
+			expect( textVnode.props.value ).toBe( 'typed' );
+
+			const checkbox = createElementFromHTML(
+				'<input type="checkbox" checked />'
+			) as HTMLInputElement;
+			checkbox.checked = false;
+			const checkboxVnode = toVdom( checkbox ) as any;
+			expect( checkboxVnode.props.defaultChecked ).toBe( true );
+			expect( checkboxVnode.props.checked ).toBe( false );
 		} );
 
 		it( 'should not treat "value" as a default outside inputs', () => {
@@ -348,6 +374,17 @@ describe( 'toVdom', () => {
 
 			expect( vnode.props.defaultValue ).toBe( 'from server' );
 			expect( vnode.props.value ).toBeUndefined();
+			expect( vnode.props.__directives.bind ).toHaveLength( 1 );
+		} );
+
+		it( 'should not set a "checked" prop alongside a data-wp-bind--checked directive', () => {
+			const element = createElementFromHTML(
+				'<input type="checkbox" checked data-wp-bind--checked="state.checked" />'
+			);
+			const vnode = toVdom( element ) as any;
+
+			expect( vnode.props.defaultChecked ).toBe( true );
+			expect( vnode.props.checked ).toBeUndefined();
 			expect( vnode.props.__directives.bind ).toHaveLength( 1 );
 		} );
 

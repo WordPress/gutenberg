@@ -375,6 +375,9 @@ const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 		.map( ( [ , arr ] ) => arr );
 };
 
+// `originalProps` seen by each `Directives` scope on its last render.
+const previousPropsByScope = new WeakMap< Scope, any >();
+
 // Component that wraps each priority level of directives of an element.
 const Directives = ( {
 	directives,
@@ -395,9 +398,41 @@ const Directives = ( {
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */
 
+	// `originalProps` is a new object for a newly parsed vnode (e.g. a
+	// client-side navigation) and the same object when a directive triggers a
+	// re-render of this element. Tracking it per scope (one scope per priority
+	// level) keeps nested `Directives` instances from masking a navigation.
+	const isNewVnode = previousPropsByScope.get( scope ) !== originalProps;
+	previousPropsByScope.set( scope, originalProps );
+
 	// Create a fresh copy of the vnode element and add the props to the scope,
 	// named as attributes (HTML Attributes).
 	element = cloneElement( element, { ref: scope.ref } );
+
+	/*
+	 * `toVdom()` keeps both the HTML default and the live value of a static
+	 * input `value`/`checked`. Preact compares the latter against the live DOM
+	 * property on every render, so refresh it from the control when this is a
+	 * re-render of the same vnode; otherwise the value captured at hydration
+	 * would be written back over the visitor's edit. A new vnode keeps
+	 * `toVdom()`'s value so Preact applies a navigation's server-rendered
+	 * value to the reused input.
+	 *
+	 * `toVdom()` omits these props when a data-wp-bind-- directive owns the
+	 * live property, so their presence is the marker. It also always sets the
+	 * default prop, which keeps vnodes created outside `toVdom()` out of this
+	 * refresh.
+	 */
+	if ( ! isNewVnode && element.type === 'input' && scope.ref.current ) {
+		const input = scope.ref.current as HTMLInputElement;
+		if ( 'defaultValue' in element.props && 'value' in element.props ) {
+			element.props.value = input.value;
+		}
+		if ( 'defaultChecked' in element.props && 'checked' in element.props ) {
+			element.props.checked = input.checked;
+		}
+	}
+
 	scope.attributes = element.props;
 
 	// Recursively render the wrapper for the next priority level.
