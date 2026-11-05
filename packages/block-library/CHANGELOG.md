@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Post Content: Align direct More links with the content column in constrained layouts ([#86356](https://github.com/WordPress/gutenberg/pull/86356)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 
 ## 12.1.0 (2026-11-04)
