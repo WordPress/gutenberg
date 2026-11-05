@@ -56,7 +56,7 @@ parameters:
 			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
 			identifier: function.notFound
 
-		# wp_get_block_supports_classes_and_styles() is new in WordPress Core.
+		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
