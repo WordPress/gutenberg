@@ -335,8 +335,12 @@ test.describe( 'Template rendered inside another template', () => {
 		);
 
 		// The part of the template around it belongs to that template, which
-		// is edited on its own screen.
-		expect( insideFrame[ 'frame-header' ].content ).toBe( 'disabled' );
+		// is edited on its own screen, so neither it nor its blocks can be
+		// selected, and it offers no section to edit.
+		expect( insideFrame[ 'frame-header' ] ).toEqual( {
+			part: 'disabled',
+			content: 'disabled',
+		} );
 
 		const sidebarText = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',

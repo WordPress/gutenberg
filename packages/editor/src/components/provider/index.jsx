@@ -527,6 +527,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													? TEMPLATE_SLOT_BLOCK_TYPES
 													: undefined
 											}
+											templatePartEditingMode={
+												isTemplateInsideTemplate
+													? 'disabled'
+													: undefined
+											}
 										/>
 									) }
 									{ type === 'wp_navigation' && (

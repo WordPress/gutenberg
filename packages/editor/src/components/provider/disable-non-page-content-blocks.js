@@ -9,10 +9,14 @@ import usePostContentBlockTypes from './use-post-content-block-types';
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  *
- * @param {Object}   props                     Component props.
- * @param {string[]} [props.contentBlockTypes] The blocks that hold the content being edited. Defaults to the post content blocks, which is what a page is edited through. Pass a list to edit something else through other blocks, such as a template rendered inside another, whose only slot is the post content block of the template around it. Must be a stable value.
+ * @param {Object}   props                           Component props.
+ * @param {string[]} [props.contentBlockTypes]       The blocks that hold the content being edited. Defaults to the post content blocks, which is what a page is edited through. Pass a list to edit something else through other blocks, such as a template rendered inside another, whose only slot is the post content block of the template around it. Must be a stable value.
+ * @param {string}   [props.templatePartEditingMode] The editing mode of the template parts outside the content being edited. Defaults to `contentOnly`, which is how a page shows the template parts of its template. A template rendered inside another passes `disabled`: the template parts of the template around it belong to that template, which is edited on its own screen, and with the template parts of the template being edited treated as sections, a `contentOnly` one would offer to edit a section that has nothing editable in it.
  */
-export default function DisableNonPageContentBlocks( { contentBlockTypes } ) {
+export default function DisableNonPageContentBlocks( {
+	contentBlockTypes,
+	templatePartEditingMode = 'contentOnly',
+} ) {
 	const defaultBlockTypes = usePostContentBlockTypes();
 	const postContentBlockTypes = contentBlockTypes ?? defaultBlockTypes;
 	const { contentOnlyIds, templateParts } = useSelect(
@@ -80,7 +84,7 @@ export default function DisableNonPageContentBlocks( { contentBlockTypes } ) {
 		registry.batch( () => {
 			for ( const clientId of templateParts ) {
 				__unstableMarkNextChangeAsNotPersistent();
-				setBlockEditingMode( clientId, 'contentOnly' );
+				setBlockEditingMode( clientId, templatePartEditingMode );
 			}
 		} );
 
@@ -92,7 +96,7 @@ export default function DisableNonPageContentBlocks( { contentBlockTypes } ) {
 				}
 			} );
 		};
-	}, [ templateParts, registry ] );
+	}, [ templateParts, templatePartEditingMode, registry ] );
 
 	// The modes currently applied by this component, so that a change to the
 	// block tree only dispatches for the blocks that actually changed. The
