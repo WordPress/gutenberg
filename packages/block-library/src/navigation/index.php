@@ -129,7 +129,7 @@ class WP_Navigation_Block_Renderer {
 		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
 
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] );
 		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
 	}
 
@@ -1910,7 +1910,7 @@ function block_core_navigation_get_classic_menu_fallback() {
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
  *
  * @param object $classic_nav_menu WP_Term The classic navigation object to convert.
- * @return array the normalized parsed blocks.
+ * @return string The serialized blocks of the classic menu, or an empty string if it has no items.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
 
