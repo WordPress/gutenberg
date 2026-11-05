@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation Link: Show a help text in the Inspector when a custom (URL-only) link points at a page on this site, since it has no entity ID and will never receive `current-menu-item` highlighting ([#83109](https://github.com/WordPress/gutenberg/pull/83109)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
