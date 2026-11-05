@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Color controls: Save a custom color that matches a palette color as that preset even when it is written differently, such as `#503aa8` for a theme's `#503AA8`, so the block follows the theme and the palette shows it as selected. `getColorObjectByColorValue` matches colors the same way.
+-   Color controls: Save a custom color that matches a palette color as that preset even when it is written differently, such as `#503aa8` for a theme's `#503AA8`, so the block follows the theme and the palette shows it as selected. `getColorObjectByColorValue` matches colors the same way ([#86382](https://github.com/WordPress/gutenberg/pull/86382)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
 ## 20.0.0 (2026-11-04)
