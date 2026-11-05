@@ -74,6 +74,50 @@ test.describe( 'adding inline tokens', () => {
 		] );
 	} );
 
+	test( 'should keep other image attributes when editing the width', async ( {
+		page,
+		editor,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const { source_url: src } = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		const image = ( width ) =>
+			`<img loading="lazy" data-id="1" class="wp-image-1" style="width: ${ width }px;" src="${ src }" alt="">`;
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: `a ${ image( 10 ) }` },
+		} );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { content: `a ${ image( 10 ) }` } },
+			] );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await page.keyboard.press( 'Tab' );
+		const width = page.getByRole( 'spinbutton', {
+			name: 'Width',
+			exact: true,
+		} );
+		await expect( width ).toBeFocused();
+		await expect( width ).toHaveValue( '10' );
+		await width.fill( '20' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: `a ${ image( 20 ) }` },
+			},
+		] );
+	} );
+
 	test( 'should select an inline image by clicking it @webkit @firefox', async ( {
 		page,
 		editor,

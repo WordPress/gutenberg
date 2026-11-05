@@ -18,7 +18,7 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export function AddNote( { clientId, floating } ) {
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { onCreate, onDiscard } = useNoteActions();
