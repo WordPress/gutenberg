@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Default block appender: Keep long placeholders from overlapping the inserter button ([#85496](https://github.com/WordPress/gutenberg/pull/85496)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
