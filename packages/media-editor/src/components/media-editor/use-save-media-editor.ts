@@ -242,7 +242,7 @@ export function useSaveMediaEditor( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					session.imageEditor.reset();
+					session.reset();
 				}
 				onSaved?.( {
 					id: next.id,
