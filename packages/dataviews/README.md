@@ -250,20 +250,22 @@ Properties:
 
 ##### Properties of `layout`
 
-| Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
-| -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
-| `enableMoving` | ✓       | ✓             |        |              |        |            |
-| `styles`       | ✓       | ✓             |        |              |        |            |
-| `badgeFields`  |         |               | ✓      | ✓            |        |            |
-| `previewSize`  |         |               | ✓      | ✓            |        |            |
-| `aspectRatio`  | ✓       |               | ✓      |              |        |            |
-| `mediaFit`     |         |               | ✓      | ✓            |        |            |
+| Props / Layout       | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
+| -------------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
+| `density`            | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
+| `enableMoving`       | ✓       | ✓             |        |              |        |            |
+| `styles`             | ✓       | ✓             |        |              |        |            |
+| `stickyFirstColumn`  | ✓       |               |        |              |        |            |
+| `badgeFields`        |         |               | ✓      | ✓            |        |            |
+| `previewSize`        |         |               | ✓      | ✓            |        |            |
+| `aspectRatio`        | ✓       |               | ✓      |              |        |            |
+| `mediaFit`           |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
+-   `stickyFirstColumn` (`table` only): whether the first (primary) column stays pinned to the leading edge while the table scrolls horizontally, mirroring the sticky actions column at the trailing edge. Off by default. When bulk actions are enabled the checkbox column is pinned alongside the first column so the pair stays together, and the first column is offset by the checkbox column's measured width. Below 480px of available table width the first column scrolls with the rest of the table regardless of this option, because a reserved title column would leave too little room to read it against; the actions column keeps its edge at every width since it reserves a control rather than data. A divider appears on the trailing edge of the pinned cell only once the table has scrolled away from the start.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for the columns listed in `fields`, keyed by field id. The `align` property accepts `'start'`, `'center'`, or `'end'`. Neither layout applies these styles to the primary column (the one that renders `titleField`, `mediaField`, and `descriptionField`). In the `table` layout, that column is the flexible one: the table sizes every other column to fit its content and gives the primary column whatever width is left, so a `width` or `maxWidth` set on it would not be honored by the browser's table layout, and long titles are truncated instead. When the `table` view has no primary column, the last column in `fields` takes the leftover width in the same way. The `pickerTable` layout lets the browser share the width among all columns, but it does not apply the styles to the primary column either.
 -   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 

@@ -14,6 +14,10 @@
 -   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
 
+### New Features
+
+-   Table layout: add a `stickyFirstColumn` option to pin the first column to the leading edge while the table scrolls horizontally, mirroring the sticky actions column. It is off by default; when enabled with bulk actions, the checkbox column is pinned alongside it, and below 480px of table width the column scrolls with the rest of the table ([#84527](https://github.com/WordPress/gutenberg/pull/84527)).
+
 ### Enhancements
 
 -   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
