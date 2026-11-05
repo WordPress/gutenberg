@@ -6,6 +6,7 @@
 
 ### Enhancements
 
+-   Upgrade `core-js` to v3.51.0.
 -   Always polyfill `Array.prototype.toSorted`, even when all supported browsers implement it natively ([#86159](https://github.com/WordPress/gutenberg/pull/86159)).
 
 ### Internal

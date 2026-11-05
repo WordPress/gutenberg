@@ -47,12 +47,12 @@
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/warning": "file:../warning",
 		"browserslist": "^4.28.7",
-		"core-js": "^3.31.0",
+		"core-js": "^3.51.0",
 		"react": "^19.3.0"
 	},
 	"devDependencies": {
-		"core-js-builder": "^3.39.0",
-		"core-js-compat": "^3.39.0",
+		"core-js-builder": "^3.51.0",
+		"core-js-compat": "^3.51.0",
 		"terser": "^5.37.0",
 		"vitest": "^5.0.5"
 	},
