@@ -18,13 +18,36 @@ import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/ui';
+import { InputControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
+const DELIMITER_OPTIONS = [
+	{ label: __( 'Comma' ), value: 'comma' },
+	{ label: __( 'Dot' ), value: 'dot' },
+	{ label: __( 'Pipe' ), value: 'pipe' },
+	{ label: __( 'Slash' ), value: 'slash' },
+	{ label: __( 'Custom' ), value: 'custom' },
+];
+
+const DISPLAY_LAYOUT_OPTIONS = [
+	{ label: __( 'List' ), value: 'list' },
+	{ label: __( 'Dropdown' ), value: 'dropdown' },
+	{ label: __( 'Horizontal' ), value: 'inline' },
+];
+
+const DELIMITER_CHARS = {
+	comma: ', ',
+	dot: ' · ',
+	pipe: ' | ',
+	slash: ' / ',
+};
+
 export default function CategoriesEdit( {
 	attributes: {
-		displayAsDropdown,
+		displayLayout,
+		delimiter,
+		customDelimiter,
 		showHierarchy,
 		showPostCounts,
 		showOnlyTopLevel,
@@ -118,6 +141,42 @@ export default function CategoriesEdit( {
 		);
 	};
 
+	const renderCategoryInline = () => {
+		const delimiterChar =
+			delimiter === 'custom'
+				? customDelimiter || ','
+				: DELIMITER_CHARS[ delimiter ] || DELIMITER_CHARS.comma;
+		// Hierarchy does not apply to the horizontal layout: list every term
+		// flat, whatever the (hidden) hierarchy setting still holds.
+		const categoriesList = getCategoriesList( null );
+
+		const items = [];
+		categoriesList.forEach( ( category, index ) => {
+			const { id, link, count, name } = category;
+			items.push(
+				<span key={ id } className="wp-block-categories__inline-item">
+					<a href={ link } onClick={ showRedirectionPreventedNotice }>
+						{ renderCategoryName( name ) }
+					</a>
+					{ showPostCounts && ` (${ count })` }
+				</span>
+			);
+			if ( index < categoriesList.length - 1 ) {
+				items.push(
+					<span
+						key={ `delimiter-${ id }` }
+						className="wp-block-categories__inline-delimiter"
+						aria-hidden="true"
+					>
+						{ delimiterChar.trim() }
+					</span>
+				);
+			}
+		} );
+
+		return items;
+	};
+
 	const renderCategoryDropdown = () => {
 		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
@@ -174,19 +233,28 @@ export default function CategoriesEdit( {
 		];
 	};
 
-	const TagName =
-		!! categories?.length && ! displayAsDropdown && ! isResolving
-			? 'ul'
-			: 'div';
+	const isDropdown = displayLayout === 'dropdown';
+	const isInline = displayLayout === 'inline';
+	const hasContent = !! categories?.length && ! isResolving;
+
+	let TagName = 'div';
+	if ( hasContent && ! isDropdown ) {
+		TagName = isInline ? 'div' : 'ul';
+	}
 
 	const classes = clsx(
 		className,
 		`wp-block-categories-taxonomy-${ taxonomySlug }`,
 		{
 			'wp-block-categories-list':
-				!! categories?.length && ! displayAsDropdown && ! isResolving,
+				!! categories?.length &&
+				! isDropdown &&
+				! isInline &&
+				! isResolving,
 			'wp-block-categories-dropdown':
-				!! categories?.length && displayAsDropdown && ! isResolving,
+				!! categories?.length && isDropdown && ! isResolving,
+			'wp-block-categories-inline':
+				!! categories?.length && isInline && ! isResolving,
 		}
 	);
 
@@ -203,7 +271,9 @@ export default function CategoriesEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							taxonomy: 'category',
-							displayAsDropdown: false,
+							displayLayout: 'list',
+							delimiter: 'comma',
+							customDelimiter: '',
 							showHierarchy: false,
 							showPostCounts: false,
 							showOnlyTopLevel: false,
@@ -240,20 +310,24 @@ export default function CategoriesEdit( {
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem
-						hasValue={ () => !! displayAsDropdown }
-						label={ __( 'Display as dropdown' ) }
+						hasValue={ () => displayLayout !== 'list' }
+						label={ __( 'Layout' ) }
 						onDeselect={ () =>
-							setAttributes( { displayAsDropdown: false } )
+							setAttributes( { displayLayout: 'list' } )
 						}
 						isShownByDefault
 					>
-						<ToggleControl
-							label={ __( 'Display as dropdown' ) }
-							checked={ displayAsDropdown }
-							onChange={ toggleAttribute( 'displayAsDropdown' ) }
+						<WCSelectControl
+							__next40pxDefaultSize
+							label={ __( 'Layout' ) }
+							options={ DISPLAY_LAYOUT_OPTIONS }
+							value={ displayLayout }
+							onChange={ ( value ) =>
+								setAttributes( { displayLayout: value } )
+							}
 						/>
 					</ToolsPanelItem>
-					{ displayAsDropdown && (
+					{ isDropdown && (
 						<ToolsPanelItem
 							hasValue={ () => ! showLabel }
 							label={ __( 'Show label' ) }
@@ -268,6 +342,46 @@ export default function CategoriesEdit( {
 								checked={ showLabel }
 								onChange={ toggleAttribute( 'showLabel' ) }
 							/>
+						</ToolsPanelItem>
+					) }
+					{ isInline && (
+						<ToolsPanelItem
+							hasValue={ () =>
+								delimiter !== 'comma' || customDelimiter
+							}
+							label={ __( 'Delimiter' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									delimiter: 'comma',
+									customDelimiter: '',
+								} )
+							}
+							isShownByDefault
+						>
+							<Stack gap="sm">
+								<WCSelectControl
+									__next40pxDefaultSize
+									label={ __( 'Delimiter' ) }
+									options={ DELIMITER_OPTIONS }
+									value={ delimiter }
+									onChange={ ( value ) =>
+										setAttributes( { delimiter: value } )
+									}
+								/>
+								{ delimiter === 'custom' && (
+									<InputControl
+										label={ __( 'Custom delimiter' ) }
+										value={ customDelimiter }
+										onChange={ ( event ) =>
+											setAttributes( {
+												customDelimiter:
+													event.target.value,
+											} )
+										}
+										placeholder={ __( 'e.g., •' ) }
+									/>
+								) }
+							</Stack>
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem
@@ -316,22 +430,26 @@ export default function CategoriesEdit( {
 							onChange={ toggleAttribute( 'showEmpty' ) }
 						/>
 					</ToolsPanelItem>
-					{ isHierarchicalTaxonomy && ! showOnlyTopLevel && (
-						<ToolsPanelItem
-							hasValue={ () => !! showHierarchy }
-							label={ __( 'Show hierarchy' ) }
-							onDeselect={ () =>
-								setAttributes( { showHierarchy: false } )
-							}
-							isShownByDefault
-						>
-							<ToggleControl
+					{ isHierarchicalTaxonomy &&
+						! showOnlyTopLevel &&
+						! isInline && (
+							<ToolsPanelItem
+								hasValue={ () => !! showHierarchy }
 								label={ __( 'Show hierarchy' ) }
-								checked={ showHierarchy }
-								onChange={ toggleAttribute( 'showHierarchy' ) }
-							/>
-						</ToolsPanelItem>
-					) }
+								onDeselect={ () =>
+									setAttributes( { showHierarchy: false } )
+								}
+								isShownByDefault
+							>
+								<ToggleControl
+									label={ __( 'Show hierarchy' ) }
+									checked={ showHierarchy }
+									onChange={ toggleAttribute(
+										'showHierarchy'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 				</ToolsPanel>
 			</InspectorControls>
 			{ isResolving && (
@@ -342,11 +460,13 @@ export default function CategoriesEdit( {
 			{ ! isResolving && categories?.length === 0 && (
 				<p>{ taxonomy.labels.no_terms }</p>
 			) }
-			{ ! isResolving &&
-				categories?.length > 0 &&
-				( displayAsDropdown
-					? renderCategoryDropdown()
-					: renderCategoryList() ) }
+			{ ! isResolving && categories?.length > 0 && (
+				<>
+					{ isDropdown && renderCategoryDropdown() }
+					{ isInline && renderCategoryInline() }
+					{ ! isDropdown && ! isInline && renderCategoryList() }
+				</>
+			) }
 		</TagName>
 	);
 }

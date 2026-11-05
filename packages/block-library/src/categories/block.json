@@ -12,9 +12,18 @@
 			"type": "string",
 			"default": "category"
 		},
-		"displayAsDropdown": {
-			"type": "boolean",
-			"default": false
+		"displayLayout": {
+			"type": "string",
+			"default": "list",
+			"enum": [ "list", "dropdown", "inline" ]
+		},
+		"delimiter": {
+			"type": "string",
+			"default": "comma"
+		},
+		"customDelimiter": {
+			"type": "string",
+			"default": ""
 		},
 		"showHierarchy": {
 			"type": "boolean",
