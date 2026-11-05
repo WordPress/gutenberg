@@ -18,13 +18,36 @@ npm install @wordpress/image-editor --save
 
 ## Styles
 
-The canvas needs the editor's styles to lay out at all, so load them. They ship in `build-style/style.css`:
+The canvas needs its stylesheet for layout. Load `build-style/style.css` from your app:
 
-```scss
-@use "@wordpress/image-editor/build-style/style.css";
+```js
+import '@wordpress/image-editor/build-style/style.css';
 ```
 
-The focus ring and the focused resize handle use the admin theme colour. Set `--wp-image-editor-focus-color` on an ancestor to change it.
+Set these CSS custom properties on an ancestor or on the canvas's `className` to change its appearance without targeting its internal elements:
+
+| Property                                   | Changes                                                                                                          |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `--wp-image-editor-accent-color`           | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
+| `--wp-image-editor-focus-color`            | Keyboard focus colour when it should differ from the accent colour.                                              |
+| `--wp-image-editor-foreground-color`       | Crop outline and tooltip text.                                                                                   |
+| `--wp-image-editor-surface-color`          | Handle fill, tooltip background and the inner focus ring.                                                        |
+| `--wp-image-editor-dimming-color`          | Colour outside the crop.                                                                                         |
+| `--wp-image-editor-dimming-color-dragging` | Colour outside the crop during a drag.                                                                           |
+| `--wp-image-editor-grid-color`             | Rule-of-thirds lines.                                                                                            |
+| `--wp-image-editor-canvas-inset`           | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
+
+For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
+
+```css
+.my-cropper {
+	--wp-image-editor-accent-color: rebeccapurple;
+	--wp-image-editor-dimming-color: rgb( 0 0 0 / 60% );
+	--wp-image-editor-dimming-color-dragging: rgb( 0 0 0 / 40% );
+}
+```
+
+The stylesheet supplies defaults for every property. The media editor supplies its grey, white and inset values from WordPress Sass variables.
 
 ## Outside WordPress
 

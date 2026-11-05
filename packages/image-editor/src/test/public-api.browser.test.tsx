@@ -25,10 +25,12 @@ function ConsumerEditor( {
 	onController,
 	initialState = createImageEditorState(),
 	freeformCrop = true,
+	className,
 }: {
 	onController: ( controller: ImageEditorController ) => void;
 	initialState?: ImageEditorState;
 	freeformCrop?: boolean;
+	className?: string;
 } ) {
 	const [ state, setState ] = useState( initialState );
 	const controller = useImageEditor( { state, onChange: setState } );
@@ -41,6 +43,7 @@ function ConsumerEditor( {
 				src={ IMAGE.src }
 				controller={ controller }
 				freeformCrop={ freeformCrop }
+				className={ className }
 			/>
 		</div>
 	);
@@ -202,5 +205,57 @@ describe( 'the public API', () => {
 			} )
 		);
 		expect( controller.isDirty ).toBe( false );
+	} );
+
+	it( 'lets a consumer theme the canvas with CSS custom properties', async () => {
+		await render(
+			<>
+				<style>{ `
+					.my-cropper {
+						--wp-image-editor-accent-color: rgb(90, 10, 110);
+						--wp-image-editor-surface-color: rgb(240, 230, 220);
+						--wp-image-editor-dimming-color: rgba(1, 2, 3, 0.7);
+						--wp-image-editor-canvas-inset: 30px;
+					}
+				` }</style>
+				<ConsumerEditor
+					onController={ () => {} }
+					className="my-cropper"
+				/>
+			</>
+		);
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const dimming = screen.getByTestId( 'image-editor-dimming' );
+
+		expect( getComputedStyle( canvas ).top ).toBe( '30px' );
+		expect( getComputedStyle( handle ).backgroundColor ).toBe(
+			'rgb(240, 230, 220)'
+		);
+		expect( getComputedStyle( handle ).borderTopColor ).toBe(
+			'rgb(90, 10, 110)'
+		);
+		expect( getComputedStyle( dimming ).boxShadow ).toContain(
+			'rgba(1, 2, 3, 0.7)'
+		);
+	} );
+
+	it( 'shows the canvas with standalone style defaults', async () => {
+		await render( <ConsumerEditor onController={ () => {} } /> );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const dimming = screen.getByTestId( 'image-editor-dimming' );
+
+		expect( getComputedStyle( canvas ).top ).toBe( '24px' );
+		expect( getComputedStyle( handle ).backgroundColor ).toBe(
+			'rgb(255, 255, 255)'
+		);
+		expect( getComputedStyle( dimming ).boxShadow ).toContain(
+			'rgba(224, 224, 224, 0.6)'
+		);
 	} );
 } );
