@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).
+-   `useBaseControlProps`: fix instance ID generation crash in CommonJS build by avoiding a circular import of BaseControl ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
+
+## 44.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).

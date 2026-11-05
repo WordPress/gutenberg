@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   Element screens: add an "Overridden by" list of the block types whose own styles override the element, linking to each block's screen ([#84671](https://github.com/WordPress/gutenberg/pull/84671)).
