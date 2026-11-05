@@ -12,6 +12,7 @@ import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
+import { parseAst } from 'rolldown/parseAst';
 import createDsTokenFallbacksPlugin from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 import {
 	groupByDepth,
@@ -173,6 +174,69 @@ const esModuleInteropPlugin = {
 				TO_ESM_START,
 				`${ TO_ESM_START }!isNodeMode && mod && mod.__esModule ? mod : `
 			),
+			map: null,
+		};
+	},
+};
+// Rolldown assigns a module's exports at the end of its CommonJS output, after
+// its `require()` calls. In a circular import, a module that reads an export
+// while the other module is still loading gets `undefined`, even for a
+// function declaration. Define the exports as getters before the `require()`
+// calls, like esbuild did.
+const EXPORTS_HEADER_START = 'Object.defineProperties(exports, {';
+const exportsFirstPlugin = {
+	name: 'exports-first',
+	renderChunk( code ) {
+		const { body } = parseAst( code );
+		const assignments = body.filter(
+			( { type, expression } ) =>
+				type === 'ExpressionStatement' &&
+				expression.type === 'AssignmentExpression' &&
+				expression.left.type === 'MemberExpression' &&
+				expression.left.object.name === 'exports' &&
+				! expression.left.computed &&
+				expression.right.type === 'Identifier'
+		);
+		if ( ! assignments.length ) {
+			return null;
+		}
+		const header = body.find( ( { start } ) =>
+			code.startsWith( EXPORTS_HEADER_START, start )
+		);
+		const names = assignments.map(
+			( { expression } ) => expression.left.property.name
+		);
+		if (
+			! header ||
+			new Set( names ).size !== names.length ||
+			assignments.some(
+				( { start } ) => ! code.startsWith( 'exports.', start )
+			)
+		) {
+			throw new Error( 'Unexpected Rolldown CommonJS exports.' );
+		}
+		const getters = assignments
+			.map(
+				( { expression: { left, right } } ) =>
+					`${ JSON.stringify(
+						left.property.name
+					) }: { enumerable: true, get: () => ${ right.name } }`
+			)
+			.join( ', ' );
+		// Blank the assignments and add the getters on the header's line, so no
+		// other code moves and the source map stays valid.
+		let result = code;
+		for ( const { start, end } of assignments.toReversed() ) {
+			result =
+				result.slice( 0, start ) +
+				' '.repeat( end - start ) +
+				result.slice( end );
+		}
+		return {
+			code:
+				result.slice( 0, header.end ) +
+				` Object.defineProperties(exports, { ${ getters } });` +
+				result.slice( header.end ),
 			map: null,
 		};
 	},
@@ -1532,7 +1596,11 @@ async function transpilePackage( packageName ) {
 					transform: { target, jsx: JSX_OPTIONS },
 					// Every import is kept, as the imported files are transpiled on their own.
 					treeshake: { moduleSideEffects: true },
-					plugins: [ ...plugins, esModuleInteropPlugin ],
+					plugins: [
+						...plugins,
+						esModuleInteropPlugin,
+						exportsFirstPlugin,
+					],
 					output: {
 						dir: buildDir,
 						entryFileNames: '[name].cjs',

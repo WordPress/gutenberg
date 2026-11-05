@@ -25,6 +25,8 @@ const FILES = {
 			return 'main:' + value;
 		}
 		export { helper, namedOnly, plain };
+		export { readDuringLoad } from './read-during-load';
+		export { default as readReexport } from './default-reexport';
 	`,
 	'packages/circular/src/helper.js': `
 		import main from './index';
@@ -33,6 +35,18 @@ const FILES = {
 		}
 	`,
 	'packages/circular/src/named-only.js': 'export const named = 1;',
+	'packages/circular/src/default-reexport.js':
+		"export { default } from './read-reexport';",
+	'packages/circular/src/read-reexport.js': `
+		import reexported from './default-reexport';
+		export default function readReexport() {
+			return reexported;
+		}
+	`,
+	'packages/circular/src/read-during-load.js': `
+		import main from './index';
+		export const readDuringLoad = main;
+	`,
 };
 
 describe( 'CommonJS output', () => {
@@ -65,6 +79,14 @@ describe( 'CommonJS output', () => {
 
 	test( 'keeps a default import live across a circular import', () => {
 		expect( circular.helper( 'value' ) ).toBe( 'main:value:helper' );
+	} );
+
+	test( 'keeps a re-exported default live across a circular import', () => {
+		expect( circular.readReexport() ).toBe( circular.readReexport );
+	} );
+
+	test( 'exposes exports to a module that reads them while loading', () => {
+		expect( circular.readDuringLoad ).toBe( circular.default );
 	} );
 
 	test( 'does not add a default to a namespace import of an ES module', () => {

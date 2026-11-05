@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Fix circular imports in the CommonJS (`.cjs`) output, which could read a default export as `undefined`, for example `apiFetch` requests with `per_page=-1` ([#86346](https://github.com/WordPress/gutenberg/pull/86346)).
+-   Fix circular imports in the CommonJS (`.cjs`) output, which could read an export as `undefined` while the other module was loading or after it had loaded, for example `apiFetch` requests with `per_page=-1`. Exports are now defined as getters before the `require()` calls, like the esbuild output before 0.27.0 ([#86346](https://github.com/WordPress/gutenberg/pull/86346)).
 
 ## 0.27.0 (2026-11-04)
 
