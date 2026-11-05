@@ -108,6 +108,8 @@ function PresetPicker( { controller }: { controller: ImageEditorController } ) {
 
 For a fixed shape, such as a square site icon, start from a state with a locked ratio and pass `freeformCrop={ false }`. The crop stays the largest square that fits, centred, while the person pans and zooms the image under it.
 
+Leave `freeformCrop` at its default to let them move and resize the crop instead. The locked ratio holds either way.
+
 Pass the image too if you have it, so the crop starts the right shape rather than waiting for the canvas to fit it.
 
 ```tsx
