@@ -11,9 +11,20 @@ import {
 	findNoteInBlock,
 	getInlineMarkerStart,
 	getNoteRanges,
+	removeInlineNote,
+	wrapInlineNote,
 } from '../utils/note-anchor';
+import { noteFormat } from '../format';
+import { NOTE_FORMAT_NAME } from '../constants';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+// Rich-text attributes parsed from post content keep their source HTML.
+function parseRichTextAttribute( html: string ) {
+	const element = document.createElement( 'p' );
+	element.innerHTML = html;
+	return RichTextData.fromHTMLElement( element );
+}
 
 describe( 'findNoteInBlock', () => {
 	const FORMAT_NAME = 'core/note';
@@ -57,6 +68,18 @@ describe( 'findNoteInBlock', () => {
 			content: RichTextData.fromHTMLString(
 				'hello <span class="wp-note" data-id="7">marked</span> world'
 			),
+		};
+		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
+			attributeKey: 'content',
+			start: 6,
+			end: 12,
+		} );
+	} );
+
+	it( 'finds the marker in a string attribute', () => {
+		const attributes = {
+			content:
+				'hello <span class="wp-note" data-id="7">marked</span> world',
 		};
 		expect( findNoteInBlock( attributes, 7 ) ).toEqual( {
 			attributeKey: 'content',
@@ -259,5 +282,36 @@ describe( 'getNoteRanges', () => {
 				selectionEnd: at( 'c', 3 ),
 			} ).has( 'image' )
 		).toBe( false );
+	} );
+} );
+
+describe( 'inline note writers', () => {
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( NOTE_FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( NOTE_FORMAT_NAME, noteFormat );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( NOTE_FORMAT_NAME );
+		}
+	} );
+
+	it( 'wraps the selected text in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute( 'one\n  two three' );
+		expect( String( wrapInlineNote( value, 7, 8, 13 ) ) ).toBe(
+			'one two <mark data-id="7" class="wp-note">three</mark>'
+		);
+	} );
+
+	it( 'leaves a marker in a string attribute in place', () => {
+		const attributes = {
+			content: 'a <mark class="wp-note" data-id="7">b</mark> c',
+		};
+		expect( removeInlineNote( attributes, 7 ) ).toBeNull();
 	} );
 } );

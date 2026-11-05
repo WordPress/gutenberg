@@ -1,7 +1,7 @@
 import { getActiveFormat } from '@wordpress/rich-text';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from '../constants';
-import { getFormats, toNoteId } from './note-format';
+import { toNoteId } from './note-format';
+import { toNoteRecord } from './rich-text';
 import type {
 	BlockAttributes,
 	NoteId,
@@ -36,16 +36,17 @@ export function getNoteAtCaret(
 	) {
 		return null;
 	}
-	const formats = getFormats( attributes?.[ attributeKey ] );
-	if ( ! formats ) {
+	const record = toNoteRecord( attributes?.[ attributeKey ] );
+	if ( ! record ) {
 		return undefined;
 	}
 	const value =
 		start <= end
-			? { formats, start, end }
-			: { formats, start: end, end: start };
-	const id = getActiveFormat( value as RichTextValue, NOTE_FORMAT_NAME )
-		?.attributes?.[ 'data-id' ];
+			? { ...record, start, end }
+			: { ...record, start: end, end: start };
+	const id = getActiveFormat( value, NOTE_FORMAT_NAME )?.attributes?.[
+		'data-id'
+	];
 	return id ? toNoteId( id ) : undefined;
 }
 
@@ -116,7 +117,7 @@ function getInlineNoteIds(
 ): Set< NoteId > {
 	const ids = new Set< NoteId >();
 	for ( const value of Object.values( attributes ?? {} ) ) {
-		getFormats( value )?.forEach( ( stack ) => {
+		toNoteRecord( value )?.formats.forEach( ( stack ) => {
 			for ( const format of stack ?? [] ) {
 				if ( format.type === NOTE_FORMAT_NAME ) {
 					ids.add( toNoteId( format.attributes?.[ 'data-id' ] ) );

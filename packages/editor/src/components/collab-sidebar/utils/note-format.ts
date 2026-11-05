@@ -1,4 +1,3 @@
-import { create, RichTextData } from '@wordpress/rich-text';
 import type { RichTextFormat, RichTextValue } from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from '../constants';
 import type { NoteId, NoteRange } from './types';
@@ -8,25 +7,18 @@ import type { NoteId, NoteRange } from './types';
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
  *
- * @param value  Block attribute value (RichTextData, string, or other).
+ * @param value  Rich text value.
  * @param noteId Note id to search for.
  * @return Range or null when no marker is found.
  */
 export function findNoteRange(
-	value: unknown,
+	value: RichTextValue,
 	noteId: NoteId | null | undefined
 ): NoteRange | null {
 	if ( noteId === undefined || noteId === null ) {
 		return null;
 	}
-	let formats;
-	if ( value instanceof RichTextData ) {
-		formats = value.formats;
-	} else if ( typeof value === 'string' && value.includes( 'wp-note' ) ) {
-		formats = create( { html: value } ).formats;
-	} else {
-		return null;
-	}
+	const { formats } = value;
 	const target = String( noteId );
 	let start = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
@@ -142,22 +134,18 @@ export function applyNoteFormat(
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param value  Block attribute value (RichTextData or other).
+ * @param value  Rich text value.
  * @param noteId Note id whose marker should be removed.
- * @return A new value with the marker removed, or null when the attribute
- *         isn't rich text or carries no such marker.
+ * @return A new value with the marker removed, or the same value when it
+ *         carries no such marker.
  */
 export function removeNoteFormat(
-	value: unknown,
+	value: RichTextValue,
 	noteId: NoteId
-): RichTextData | null {
-	if ( ! ( value instanceof RichTextData ) ) {
-		return null;
-	}
+): RichTextValue {
 	const target = String( noteId );
-	const record = create( { html: value } );
 	let changed = false;
-	const formats = record.formats.slice();
+	const formats = value.formats.slice();
 	formats.forEach( ( stack, index ) => {
 		const filtered = stack.filter(
 			( format ) =>
@@ -177,37 +165,7 @@ export function removeNoteFormat(
 			delete formats[ index ];
 		}
 	} );
-	return changed ? new RichTextData( { ...record, formats } ) : null;
-}
-
-let lastParsed: {
-	html: string | null;
-	formats: RichTextValue[ 'formats' ] | null;
-} = { html: null, formats: null };
-
-/**
- * Formats of a rich-text attribute. A string is parsed only when it holds a
- * marker, and the last parse is cached: caret moves re-read the same string.
- *
- * @param value Block attribute value.
- * @return Formats array, or null when the value isn't rich text.
- */
-export function getFormats(
-	value: unknown
-): RichTextValue[ 'formats' ] | null {
-	if ( value instanceof RichTextData ) {
-		return value.formats;
-	}
-	if ( typeof value !== 'string' || ! value.includes( 'wp-note' ) ) {
-		return null;
-	}
-	if ( lastParsed.html !== value ) {
-		lastParsed = {
-			html: value,
-			formats: create( { html: value } ).formats,
-		};
-	}
-	return lastParsed.formats;
+	return changed ? { ...value, formats } : value;
 }
 
 /**

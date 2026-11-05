@@ -1,10 +1,11 @@
-import { create, RichTextData } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from '../constants';
 import {
 	applyNoteFormat,
 	findNoteRange,
 	removeNoteFormat,
 } from './note-format';
+import { toAttribute, toNoteRecord, toRecord } from './rich-text';
 import type {
 	BlockAttributes,
 	NoteAnchor,
@@ -37,7 +38,8 @@ export function findNoteInBlock(
 		return null;
 	}
 	for ( const attributeKey of Object.keys( attributes ) ) {
-		const range = findNoteRange( attributes[ attributeKey ], noteId );
+		const record = toNoteRecord( attributes[ attributeKey ] );
+		const range = record && findNoteRange( record, noteId );
 		if ( range ) {
 			return { attributeKey, start: range.start, end: range.end };
 		}
@@ -152,9 +154,9 @@ export function getNoteRanges( {
 }
 
 /**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
+ * Wrap a rich-text range with a core/note marker. Returns a new value ready to
+ * write back into block attributes, or null when the incoming value isn't a
+ * rich-text instance (legacy/string attributes).
  *
  * @param value Existing block attribute value.
  * @param id    New note id to embed as `data-id`.
@@ -167,17 +169,17 @@ export function wrapInlineNote(
 	id: NoteId,
 	start: number,
 	end: number
-): RichTextData | null {
+): string | RichTextData | null {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return null;
 	}
 	const record = applyNoteFormat(
-		create( { html: value } ),
+		toRecord( value ),
 		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
 		start,
 		end
 	);
-	return new RichTextData( record );
+	return toAttribute( record, value );
 }
 
 /**
@@ -190,9 +192,12 @@ export function wrapInlineNote(
 export function removeInlineNote(
 	attributes: BlockAttributes | null | undefined,
 	noteId: NoteId
-): ( NoteAnchor & { value: RichTextData } ) | null {
+): ( NoteAnchor & { value: string | RichTextData } ) | null {
 	const found = findNoteInBlock( attributes, noteId );
-	const value =
-		found && removeNoteFormat( attributes?.[ found.attributeKey ], noteId );
-	return found && value ? { ...found, value } : null;
+	const current = found && attributes?.[ found.attributeKey ];
+	if ( ! found || ! ( current instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = removeNoteFormat( toRecord( current ), noteId );
+	return { ...found, value: toAttribute( record, current ) };
 }
