@@ -33,7 +33,8 @@ const SlugEdit = ( {
 } ) => {
 	const { id } = field;
 
-	const slug = field.getValue( { item: data } ) || getSlug( data );
+	const value = field.getValue( { item: data } );
+	const slug = value ? safeDecodeURIComponent( value ) : getSlug( data );
 	const permalinkTemplate = data.permalink_template || '';
 	const [ permalinkPrefix, permalinkSuffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX

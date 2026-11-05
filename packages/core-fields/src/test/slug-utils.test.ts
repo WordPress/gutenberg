@@ -12,6 +12,16 @@ describe( 'getSlug', () => {
 		).toBe( 'custom-slug' );
 	} );
 
+	it( 'decodes a percent-encoded slug', () => {
+		expect(
+			getSlug( {
+				id: 123,
+				slug: '%e3%83%86%e3%82%b9%e3%83%88',
+				title: 'Edited Title',
+			} )
+		).toBe( 'テスト' );
+	} );
+
 	it( 'derives the slug from the current title, not the server-generated slug', () => {
 		expect(
 			getSlug( {
