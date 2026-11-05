@@ -5,6 +5,17 @@ import '@wordpress/theme/design-tokens.css';
 import StyleProvider from '../../style-provider';
 import InputControl from '..';
 
+function NarrowControl() {
+	return (
+		<div style={ { width: 'fit-content' } }>
+			<InputControl
+				label="Long input label"
+				__unstableInputWidth="40px"
+			/>
+		</div>
+	);
+}
+
 function ControlFrame() {
 	const [ frame, setFrame ] = useState< HTMLIFrameElement | null >( null );
 	const doc = frame?.contentDocument;
@@ -13,7 +24,7 @@ function ControlFrame() {
 			{ doc &&
 				createPortal(
 					<StyleProvider document={ doc }>
-						<InputControl label="Long input label" />
+						<NarrowControl />
 					</StyleProvider>,
 					doc.body
 				) }
@@ -21,10 +32,17 @@ function ControlFrame() {
 	);
 }
 
-it( 'keeps space beside the label in root and iframe documents', async () => {
+function getLineCount( element: Element ) {
+	const range = element.ownerDocument.createRange();
+	range.selectNodeContents( element );
+	return new Set( Array.from( range.getClientRects(), ( rect ) => rect.top ) )
+		.size;
+}
+
+it( 'keeps a label wider than the input on one line in root and iframe documents', async () => {
 	await render(
 		<>
-			<InputControl label="Long input label" />
+			<NarrowControl />
 			<ControlFrame />
 		</>
 	);
@@ -42,9 +60,13 @@ it( 'keeps space beside the label in root and iframe documents', async () => {
 	frame.contentDocument!.head.appendChild( flexStyle.cloneNode( true ) );
 	for ( const doc of [ document, frame.contentDocument! ] ) {
 		const label = doc.querySelector( 'label' )!;
-		expect(
-			doc.defaultView!.getComputedStyle( label.parentElement! ).maxWidth
-		).toBe( 'calc(100% - 10px)' );
+		const container = doc.querySelector(
+			'.components-input-control__container'
+		)!;
+		expect( label.getBoundingClientRect().width ).toBeGreaterThan(
+			container.getBoundingClientRect().width
+		);
+		expect( getLineCount( label ) ).toBe( 1 );
 	}
 } );
 

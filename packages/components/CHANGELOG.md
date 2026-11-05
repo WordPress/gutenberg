@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InputControl`: Remove the leftover maximum width on the label wrapper so labels wider than the input no longer wrap early ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes
