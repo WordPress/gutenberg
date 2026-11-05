@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix copying fully selected bound text so resolved content and inline formatting are copied ([#84389](https://github.com/WordPress/gutenberg/pull/84389)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
