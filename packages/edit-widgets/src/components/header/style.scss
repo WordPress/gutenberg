@@ -128,6 +128,11 @@
 
 			@media (forced-colors: active) {
 				background: SelectedItem !important;
+
+				&:disabled,
+				&[aria-disabled="true"] {
+					background: GrayText !important;
+				}
 			}
 		}
 
