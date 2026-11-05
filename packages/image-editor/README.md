@@ -88,7 +88,7 @@ React hook that returns the editor's controller. Pass the current state and a fu
 The controller has:
 
 -   `state`: the current state.
--   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. The crop area is in fractions of the view, from 0 to 1. The pan is an offset from the centre, so it is signed, and how far it can go depends on the zoom and the crop, because the image has to cover the crop. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. The lock shapes the crop at the moment you set it, and `<ImageEditorCanvas>` holds the resize handles to it. Nothing re-checks it afterwards, so a rotation or a `setCropRect` can leave the crop a different shape.
+-   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. The crop area is in fractions of the view, from 0 to 1. The pan is an offset from the centre, so it is signed, and how far it can go depends on the zoom and the crop, because the image has to cover the crop. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. While a ratio is locked, the crop always has that ratio: a crop that does not match, from `setCropRect` or a state you pass in, keeps its centre and width and takes the height the ratio needs.
 -   `setImage( image )` to load an image. The canvas calls it when `src` loads. The first image keeps the state you started from, such as an edit you saved earlier. Replacing or clearing a loaded image starts fresh: no pan, zoom, rotation, flip or crop from the old image, but a locked ratio stays.
 -   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the pan, zoom, rotation, flip or crop differs from that state. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. So `reset()` keeps a locked ratio only when the state you started from had one; a ratio locked later is an edit, and reset undoes it along with the rest. Locking a ratio usually makes the edit dirty, because it reshapes the crop. Unlocking does not, and nor does locking a ratio the crop already has.
 -   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit.
@@ -99,7 +99,7 @@ The editor's state, and the state an editor starts from. Pass `image` when you a
 
 ### `areImageEditorStatesEqual( a, b )`
 
-Whether two states describe the same edit, ignoring tiny floating-point differences. Use it to skip entries that change nothing in your own undo history.
+Whether two states have the same public edit fields, ignoring tiny floating-point differences. The values the editor keeps for later rotations do not count. Use it to skip entries that change nothing in your own undo history.
 
 ### `getOutputSize( state )`
 
