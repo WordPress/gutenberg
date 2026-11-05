@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import { memo } from '@wordpress/element';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type { DataRegistry } from '@wordpress/data';
 import type {
 	BlockListBlockFeature,
@@ -159,17 +161,48 @@ export function mergeWrapperProps(
 	return newProps;
 }
 
-function BlockSupportStyles( {
-	useStyles,
-	context,
-	...props
-}: BlockListBlockFeatureProps & {
+// Supports only read their props and context, so equal ones give equal results.
+function isSameContext( a: BlockSupportContext, b: BlockSupportContext ) {
+	return (
+		a.parentLayout === b.parentLayout &&
+		isShallowEqual( a.settings, b.settings )
+	);
+}
+
+type BlockSupportStylesProps = BlockListBlockFeatureProps & {
 	useStyles: NonNullable< BlockListBlockFeature[ 'useStyles' ] >;
 	context: BlockSupportContext;
-} ) {
-	useStyles( props, context );
-	return null;
-}
+};
+
+const BlockSupportStyles = memo(
+	function BlockSupportStylesPure( {
+		useStyles,
+		context,
+		...props
+	}: BlockSupportStylesProps ) {
+		useStyles( props, context );
+		return null;
+	},
+	(
+		{ context: prevContext, ...prevProps }: BlockSupportStylesProps,
+		{ context: nextContext, ...nextProps }: BlockSupportStylesProps
+	) =>
+		isShallowEqual( prevProps, nextProps ) &&
+		isSameContext( prevContext, nextContext )
+);
+
+/**
+ * The last props, context and wrapper props of each block support of a block,
+ * by support index.
+ */
+export type BlockSupportCache = Map<
+	number,
+	{
+		props: BlockListBlockFeatureProps;
+		context: BlockSupportContext;
+		wrapperProps: BlockListWrapperProps;
+	}
+>;
 
 /**
  * Returns the block supports' wrapper props, and renders their side effects.
@@ -186,7 +219,8 @@ export function getBlockSupportProps(
 	clientId: string,
 	attributes: Record< string, unknown >,
 	context: BlockSupportContext,
-	data: Record< number, Record< string, unknown > >
+	data: Record< number, Record< string, unknown > >,
+	cache: BlockSupportCache
 ) {
 	let wrapperProps: BlockListWrapperProps = {};
 	const effects = [];
@@ -199,11 +233,26 @@ export function getBlockSupportProps(
 		const supportProps = data[ index ]
 			? { ...props, ...data[ index ] }
 			: props;
-		wrapperProps = mergeWrapperProps(
-			wrapperProps,
-			// Block supports set valid style values.
-			getBlockProps( supportProps, context ) as BlockListWrapperProps
-		);
+		// Reuse the support's last props when what it reads is unchanged, as
+		// when typing in the block.
+		let cached = cache.get( index );
+		if (
+			! cached ||
+			! isShallowEqual( cached.props, supportProps ) ||
+			! isSameContext( cached.context, context )
+		) {
+			cached = {
+				props: supportProps,
+				context,
+				// Block supports set valid style values.
+				wrapperProps: getBlockProps(
+					supportProps,
+					context
+				) as BlockListWrapperProps,
+			};
+			cache.set( index, cached );
+		}
+		wrapperProps = mergeWrapperProps( wrapperProps, cached.wrapperProps );
 		if ( useStyles ) {
 			effects.push(
 				<BlockSupportStyles
