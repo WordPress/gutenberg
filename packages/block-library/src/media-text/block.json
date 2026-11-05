@@ -20,6 +20,13 @@
 			"default": "",
 			"role": "content"
 		},
+		"mediaTitle": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "figure img",
+			"attribute": "title",
+			"role": "content"
+		},
 		"mediaPosition": {
 			"type": "string",
 			"default": "left"
