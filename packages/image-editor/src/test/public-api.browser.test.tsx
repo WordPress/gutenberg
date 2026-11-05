@@ -213,9 +213,8 @@ describe( 'the public API', () => {
 				<style>{ `
 					.my-cropper {
 						--wp-image-editor-accent-color: rgb(90, 10, 110);
-						--wp-image-editor-handle-background-color: rgb(240, 230, 220);
-						--wp-image-editor-tooltip-background-color: rgb(10, 20, 30);
-						--wp-image-editor-tooltip-text-color: rgb(250, 240, 230);
+						--wp-image-editor-surface-color: rgb(240, 230, 220);
+						--wp-image-editor-foreground-color: rgb(10, 20, 30);
 						--wp-image-editor-dimming-color: rgba(255, 0, 0, 0.6);
 						--wp-image-editor-canvas-inset: 30px;
 					}
@@ -263,11 +262,9 @@ describe( 'the public API', () => {
 			'image-editor-dimensions-tooltip'
 		);
 		expect( getComputedStyle( tooltip ).backgroundColor ).toBe(
-			'rgb(10, 20, 30)'
+			'rgb(240, 230, 220)'
 		);
-		expect( getComputedStyle( tooltip ).color ).toBe(
-			'rgb(250, 240, 230)'
-		);
+		expect( getComputedStyle( tooltip ).color ).toBe( 'rgb(10, 20, 30)' );
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 	} );
 

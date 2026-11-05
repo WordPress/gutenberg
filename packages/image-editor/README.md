@@ -32,23 +32,25 @@ import '@wordpress/image-editor/build-style/style.css';
 
 Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
 
-| Property                                     | Changes                                                                                                          |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `--wp-image-editor-accent-color`             | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
-| `--wp-image-editor-focus-color`              | Keyboard focus colour when it should differ from the accent colour.                                              |
-| `--wp-image-editor-crop-border-color`        | Crop outline.                                                                                                    |
-| `--wp-image-editor-handle-background-color`  | Handle fill and the inner focus ring.                                                                            |
-| `--wp-image-editor-tooltip-background-color` | Dimensions tooltip background.                                                                                   |
-| `--wp-image-editor-tooltip-text-color`       | Dimensions tooltip text.                                                                                         |
-| `--wp-image-editor-dimming-color`            | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
-| `--wp-image-editor-grid-color`               | Rule-of-thirds lines.                                                                                            |
-| `--wp-image-editor-canvas-inset`             | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
+| Property                             | Changes                                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `--wp-image-editor-accent-color`     | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
+| `--wp-image-editor-foreground-color` | Crop outline and dimensions tooltip text.                                                                        |
+| `--wp-image-editor-surface-color`    | Handle fill, dimensions tooltip background and the inner focus ring.                                             |
+| `--wp-image-editor-dimming-color`    | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
+| `--wp-image-editor-grid-color`       | Rule-of-thirds lines.                                                                                            |
+| `--wp-image-editor-canvas-inset`     | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
 
 For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
 
 ```css
 .my-cropper {
 	--wp-image-editor-accent-color: rebeccapurple;
+}
+
+.my-cropper.is-dark {
+	--wp-image-editor-foreground-color: #f0f0f0;
+	--wp-image-editor-surface-color: #1e1e1e;
 	--wp-image-editor-dimming-color: rgb( 0 0 0 / 60% );
 }
 ```
