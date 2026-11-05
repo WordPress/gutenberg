@@ -926,7 +926,6 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 
 	const currentViewport = useContext( CurrentViewport );
 
-	const registry = useRegistry();
 	const parentLayout = useLayout();
 
 	// Users of the editor.BlockListBlock filter used to be able to
