@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui`.
+-   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui` ([#86352](https://github.com/WordPress/gutenberg/pull/86352)).
 
 ## 28.1.0 (2026-11-04)
 
