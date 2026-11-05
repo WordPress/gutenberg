@@ -2923,6 +2923,106 @@ describe( 'state', () => {
 					}
 				} );
 
+				it.each( [
+					[ 'no inner blocks', [] ],
+					[
+						'its controlled inner blocks',
+						[
+							partial< Block >( {
+								clientId: 'content',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					],
+				] )(
+					'should preserve a nested controlled block registered before its parent in RESET_BLOCKS giving the parent %s',
+					( _, innerBlocks ) => {
+						let state = blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'chicken',
+									name: 'core/test-block',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} );
+						state = blocks( state, {
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'chicken',
+							hasControlledInnerBlocks: true,
+						} );
+						state = blocks( state, {
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'chicken',
+							blocks: [
+								partial< Block >( {
+									clientId: 'content',
+									name: 'core/test-block',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} );
+						state = blocks( state, {
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'content',
+							hasControlledInnerBlocks: true,
+						} );
+						state = blocks( state, {
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'content',
+							blocks: [
+								partial< Block >( {
+									clientId: 'content-inner',
+									name: 'core/test-block',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} );
+						// The nested controller comes first, as it does when
+						// it registers before its parent.
+						state = {
+							...state,
+							controlledInnerBlocks: new Set( [
+								'content',
+								'chicken',
+							] ),
+						};
+
+						state = blocks( state, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'chicken',
+									name: 'core/test-block',
+									attributes: {},
+									innerBlocks,
+								} ),
+							],
+						} );
+
+						const fullState = partial< State >( { blocks: state } );
+						expect(
+							state.controlledInnerBlocks.has( 'content' )
+						).toBe( true );
+						expect(
+							getBlocks( fullState, 'chicken' ).map(
+								( b ) => ( b as Block ).clientId
+							)
+						).toEqual( [ 'content' ] );
+						expect(
+							getBlocks( fullState, 'content' ).map(
+								( b ) => ( b as Block ).clientId
+							)
+						).toEqual( [ 'content-inner' ] );
+					}
+				);
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = partial< Block >( {
 						clientId: 'template',

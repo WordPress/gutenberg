@@ -701,6 +701,11 @@ const withBlockReset =
 							state!.attributes.get( blockId )!
 						);
 						newState.parents.set( blockId, parentId );
+						// A nested controller may come before its parent in
+						// the loop, which then skips it as not yet restored.
+						if ( preservedControlledInnerBlocks.has( blockId ) ) {
+							newState.controlledInnerBlocks.add( blockId );
+						}
 						const childOrder = state!.order.get( blockId ) || [];
 						newState.order.set( blockId, childOrder );
 						childOrder.forEach( ( childId ) =>
