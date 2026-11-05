@@ -187,16 +187,26 @@ export function hydrateTrigger( regionAttribute: string | null ) {
 }
 
 /**
+ * Moves to `path` with a history entry tagged with the current session, like
+ * the entries the Interactivity API creates, and returns the `popstate` event
+ * a back or forward traversal to that entry produces.
+ *
+ * @param path The destination path.
+ * @return The `popstate` event for the new entry.
+ */
+export function pushSessionEntry( path: string ) {
+	window.history.pushState( { wpInteractivityId: sessionId }, '', path );
+	return new PopStateEvent( 'popstate', { state: window.history.state } );
+}
+
+/**
  * Moves to `path` and dispatches the `popstate` event a back or forward
  * traversal within the current session produces.
  *
  * @param path The destination path.
  */
 export function traverseTo( path: string ) {
-	window.history.pushState( { wpInteractivityId: sessionId }, '', path );
-	window.dispatchEvent(
-		new PopStateEvent( 'popstate', { state: window.history.state } )
-	);
+	window.dispatchEvent( pushSessionEntry( path ) );
 }
 
 /**

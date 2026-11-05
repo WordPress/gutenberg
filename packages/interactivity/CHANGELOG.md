@@ -6,6 +6,7 @@
 
 -   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 -   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+-   Stop reloading the page on `popstate` events for history entries created by third-party code with the History API, e.g., embedded apps saving their state to the URL ([#81815](https://github.com/WordPress/gutenberg/pull/81815)).
 
 ### Internal
 

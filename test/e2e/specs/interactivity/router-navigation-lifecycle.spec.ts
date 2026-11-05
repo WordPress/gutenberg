@@ -571,9 +571,9 @@ test.describe( 'Router navigation lifecycle', () => {
 			 * The shared setup both parts build on: a real router
 			 * navigation (the positive control that the module
 			 * executed, so its `popstate` listener exists), followed
-			 * by a same-document, non-router history entry the
-			 * router has never cached, built from `pushState` pairs
-			 * rather than page loads -- the only way to reach a
+			 * by a same-document history entry the router has never
+			 * cached, built from `pushState` pairs rather than page
+			 * loads -- the only way to reach a
 			 * same-document entry outside `pages` (investigation
 			 * fact 9).
 			 *
@@ -612,8 +612,11 @@ test.describe( 'Router navigation lifecycle', () => {
 
 				await page.evaluate(
 					( [ p3, p2 ] ) => {
-						history.pushState( {}, '', p3 );
-						history.pushState( {}, '', p2 );
+						// Copy the session tag of the router's entry:
+						// the router ignores uncached entries without
+						// it, as third-party code created them.
+						history.pushState( history.state, '', p3 );
+						history.pushState( history.state, '', p2 );
 					},
 					[ page3Url, page2Url ]
 				);
