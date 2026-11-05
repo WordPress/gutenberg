@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Show field validation feedback in the media editor and prevent saving invalid details ([#86219](https://github.com/WordPress/gutenberg/pull/86219)).
 -   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
 
 ## 0.21.0 (2026-10-20)
