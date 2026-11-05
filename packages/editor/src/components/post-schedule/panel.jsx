@@ -6,6 +6,7 @@ import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
 import { usePostScheduleLabel } from './label';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { store as editorStore } from '../../store';
 import { DESIGN_POST_TYPES } from '../../store/constants';
 
@@ -36,6 +37,7 @@ export default function PostSchedulePanel() {
 
 	const label = usePostScheduleLabel();
 	const fullLabel = usePostScheduleLabel( { full: true } );
+	const lockedProps = useLockedPostSettingProps();
 	if ( DESIGN_POST_TYPES.includes( postType ) ) {
 		return null;
 	}
@@ -63,6 +65,7 @@ export default function PostSchedulePanel() {
 							label={ fullLabel }
 							showTooltip={ label !== fullLabel }
 							aria-expanded={ isOpen }
+							{ ...lockedProps }
 						>
 							{ label }
 						</Button>
