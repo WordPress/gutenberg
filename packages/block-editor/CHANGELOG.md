@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve allowed blocks when pasting content that also contains blocks prohibited at the document root ([#85538](https://github.com/WordPress/gutenberg/pull/85538)).
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
