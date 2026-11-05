@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `useBaseControlProps`: Fix a crash in the CommonJS build when no `id` is passed, which also affected controls built on the hook such as `ToggleGroupControl` ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
+-   `useBaseControlProps`: fix instance ID generation crash in CommonJS build by avoiding a circular import of BaseControl ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
 
 ## 44.0.0 (2026-11-04)
 
