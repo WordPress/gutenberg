@@ -144,7 +144,7 @@ function render_block_core_search( $attributes ) {
 				// Adding these attributes manually is needed until the Interactivity
 				// API SSR logic is added to core.
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
-				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
+				$button->set_attribute( 'aria-controls', $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
 				$button->set_attribute( 'type', 'button' );
 			} else {
@@ -189,6 +189,29 @@ function render_block_core_search( $attributes ) {
 		 data-wp-on--keydown="actions.handleSearchKeydown"
 		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
+
+		// Mirror the derived state from view.js so server-side directive processing keeps the attributes.
+		wp_interactivity_state(
+			'core/search',
+			array(
+				'ariaLabel'    => function () {
+					$context = wp_interactivity_get_context();
+					return $context['isSearchInputVisible'] ? $context['ariaLabelExpanded'] : $context['ariaLabelCollapsed'];
+				},
+				'ariaControls' => function () {
+					$context = wp_interactivity_get_context();
+					return $context['isSearchInputVisible'] ? null : $context['inputId'];
+				},
+				'type'         => function () {
+					$context = wp_interactivity_get_context();
+					return $context['isSearchInputVisible'] ? 'submit' : 'button';
+				},
+				'tabindex'     => function () {
+					$context = wp_interactivity_get_context();
+					return $context['isSearchInputVisible'] ? '0' : '-1';
+				},
+			)
+		);
 	}
 
 	/*
