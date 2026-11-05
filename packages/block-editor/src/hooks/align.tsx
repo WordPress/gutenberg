@@ -8,6 +8,7 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
 import { BlockControls, BlockAlignmentControl } from '../components';
 import {
 	getAvailableAlignments,
@@ -253,6 +254,15 @@ export default {
 	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
 	getBlockProps,
+	select: ( select: DataRegistry[ 'select' ] ) => {
+		const { alignWide, supportsLayout, __unstableIsBlockBasedTheme } =
+			select( blockEditorStore ).getSettings();
+		return {
+			wideControlsEnabled: !! alignWide,
+			themeSupportsLayout: !! supportsLayout,
+			isBlockBasedTheme: !! __unstableIsBlockBasedTheme,
+		};
+	},
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
 	hasSupport( name: string | BlockType ) {
@@ -261,11 +271,14 @@ export default {
 };
 
 function getBlockProps(
-	{ name, align }: BlockListBlockFeatureProps,
 	{
-		blockEditorSettings,
-		parentLayout,
-	}: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+		name,
+		align,
+		wideControlsEnabled,
+		themeSupportsLayout,
+		isBlockBasedTheme,
+	}: BlockListBlockFeatureProps,
+	{ parentLayout }: Pick< BlockSupportContext, 'parentLayout' >
 ) {
 	const blockAllowedAlignments = getValidAlignments(
 		// The `align` support is a boolean or a list of alignments.
@@ -277,10 +290,9 @@ function getBlockProps(
 		[ 'none', ...blockAllowedAlignments ],
 		( parentLayout ?? {} ) as Layout,
 		{
-			wideControlsEnabled: !! blockEditorSettings.alignWide,
-			themeSupportsLayout: !! blockEditorSettings.supportsLayout,
-			isBlockBasedTheme:
-				!! blockEditorSettings.__unstableIsBlockBasedTheme,
+			wideControlsEnabled: wideControlsEnabled as boolean,
+			themeSupportsLayout: themeSupportsLayout as boolean,
+			isBlockBasedTheme: isBlockBasedTheme as boolean,
 		}
 	);
 

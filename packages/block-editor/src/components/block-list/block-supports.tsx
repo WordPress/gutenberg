@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { DataRegistry } from '@wordpress/data';
 import type {
 	BlockListBlockFeature,
 	BlockListBlockFeatureProps,
@@ -40,41 +41,70 @@ function getActiveBlockSupports(
 }
 
 const SETTING_PREFIX = 'blockSupportSetting:';
+const DATA_PREFIX = 'blockSupportData:';
 
 /**
- * Selects the settings the block's supports read, one key per setting, so the
- * block's subscription compares them one by one.
+ * Selects the settings and store values the block's supports read, one key per
+ * value, so the block's subscription compares them one by one.
  *
  * @param name             The block name.
  * @param clientId         The block client ID.
  * @param attributes       The block attributes.
+ * @param select           The registry's `select`.
  * @param getBlockSettings Returns the values of the settings at the paths.
  *
- * @return The settings by prefixed path.
+ * @return The values by prefixed key.
  */
-export function selectBlockSupportSettings(
+export function selectBlockSupports(
 	name: string,
 	clientId: string,
 	attributes: Record< string, unknown >,
+	select: DataRegistry[ 'select' ],
 	getBlockSettings: ( ...paths: string[] ) => unknown[]
 ) {
+	const selected: Record< string, unknown > = {};
 	const paths = new Set< string >();
-	for ( const [ index ] of getActiveBlockSupports(
+	for ( const [ index, props ] of getActiveBlockSupports(
 		name,
 		clientId,
 		attributes
 	) ) {
-		blockSupports[ index ].settings?.forEach( ( path ) =>
-			paths.add( path )
-		);
+		const support = blockSupports[ index ];
+		support.settings?.forEach( ( path ) => paths.add( path ) );
+		const values = support.select?.( select, props );
+		for ( const key in values ) {
+			selected[ `${ DATA_PREFIX }${ index }:${ key }` ] = values[ key ];
+		}
 	}
-	const values = getBlockSettings( ...paths );
-	return Object.fromEntries(
-		[ ...paths ].map( ( path, i ) => [
-			SETTING_PREFIX + path,
-			values[ i ],
-		] )
-	);
+	// Most blocks read no settings, so skip walking up their parents.
+	if ( paths.size ) {
+		const values = getBlockSettings( ...paths );
+		[ ...paths ].forEach( ( path, i ) => {
+			selected[ SETTING_PREFIX + path ] = values[ i ];
+		} );
+	}
+	return selected;
+}
+
+/**
+ * Returns the values selected by `selectBlockSupportData` by support index.
+ *
+ * @param selected The selected props.
+ *
+ * @return The values by support index.
+ */
+export function getBlockSupportData( selected: Record< string, unknown > ) {
+	const data: Record< number, Record< string, unknown > > = {};
+	for ( const key in selected ) {
+		if ( key.startsWith( DATA_PREFIX ) ) {
+			const [ index, name ] = key
+				.slice( DATA_PREFIX.length )
+				.split( ':' );
+			data[ Number( index ) ] ??= {};
+			data[ Number( index ) ][ name ] = selected[ key ];
+		}
+	}
+	return data;
 }
 
 /**
@@ -155,7 +185,8 @@ export function getBlockSupportProps(
 	name: string,
 	clientId: string,
 	attributes: Record< string, unknown >,
-	context: BlockSupportContext
+	context: BlockSupportContext,
+	data: Record< number, Record< string, unknown > >
 ) {
 	let wrapperProps: BlockListWrapperProps = {};
 	const effects = [];
@@ -165,10 +196,13 @@ export function getBlockSupportProps(
 		attributes
 	) ) {
 		const { getBlockProps, useStyles } = blockSupports[ index ];
+		const supportProps = data[ index ]
+			? { ...props, ...data[ index ] }
+			: props;
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
 			// Block supports set valid style values.
-			getBlockProps( props, context ) as BlockListWrapperProps
+			getBlockProps( supportProps, context ) as BlockListWrapperProps
 		);
 		if ( useStyles ) {
 			effects.push(
@@ -177,7 +211,7 @@ export function getBlockSupportProps(
 					key={ index }
 					useStyles={ useStyles }
 					context={ context }
-					{ ...props }
+					{ ...supportProps }
 				/>
 			);
 		}

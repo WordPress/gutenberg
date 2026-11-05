@@ -1,5 +1,6 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	getBlockSelectors,
@@ -11,7 +12,6 @@ import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockListBlockFeatureProps,
-	BlockSupportContext,
 	BlockStyleVariationOverridesWithConfigProps,
 	OverrideStylesProps,
 	StyleOverrideOptions,
@@ -237,20 +237,10 @@ function useBlockStyleVariation(
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
-function getBlockProps(
-	{
-		name,
-		className,
-		clientId,
-	}: BlockListBlockFeatureProps & {
-		className?: string;
-	},
-	{ select }: Pick< BlockSupportContext, 'select' >
-) {
-	const variation = getVariationNameFromClass(
-		className,
-		select( blocksStore ).getBlockStyles( name )
-	);
+function getBlockProps( {
+	variation,
+	clientId,
+}: BlockListBlockFeatureProps & { variation?: string | null } ) {
 	return variation
 		? { className: `${ VARIATION_PREFIX }${ variation }-${ clientId }` }
 		: {};
@@ -258,17 +248,12 @@ function getBlockProps(
 
 function useStyles( {
 	name,
-	className,
+	variation,
 	clientId,
-}: BlockListBlockFeatureProps & { className?: string } ) {
-	const { getBlockStyles } = useSelect( blocksStore );
-
-	const registeredStyles = getBlockStyles( name );
-	const variation = getVariationNameFromClass( className, registeredStyles );
-
+}: BlockListBlockFeatureProps & { variation?: string | null } ) {
 	const { settings, styles, textClipBaseBlocks } = useBlockStyleVariation(
 		name,
-		variation,
+		variation ?? null,
 		clientId
 	);
 
@@ -321,6 +306,17 @@ export default {
 	attributeKeys: [ 'className' ],
 	isMatch: ( { className }: { className?: string } ) =>
 		getVariationMatches( className ).length > 0,
+	// The registered variation the class names, so blocks update when one is
+	// registered or removed.
+	select: (
+		select: DataRegistry[ 'select' ],
+		{ name, className }: BlockListBlockFeatureProps & { className?: string }
+	) => ( {
+		variation: getVariationNameFromClass(
+			className,
+			select( blocksStore ).getBlockStyles( name )
+		),
+	} ),
 	getBlockProps,
 	useStyles,
 };

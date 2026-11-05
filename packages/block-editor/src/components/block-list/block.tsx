@@ -24,10 +24,11 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import {
+	getBlockSupportData,
 	getBlockSupportProps,
 	getBlockSupportSettings,
 	mergeWrapperProps,
-	selectBlockSupportSettings,
+	selectBlockSupports,
 } from './block-supports';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
@@ -777,13 +778,13 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
-				blockEditorSettings: settings,
 				// Settings resolve for the parent, as `useSettings` did in the
 				// block supports, above the block's own edit context.
-				...selectBlockSupportSettings(
+				...selectBlockSupports(
 					blockName,
 					clientId,
 					attributes ?? {},
+					select,
 					( ...paths ) =>
 						getBlockSettings( rootClientId || null, ...paths )
 				),
@@ -963,12 +964,16 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	);
 
 	const { wrapperProps: blockSupportProps, effects: blockSupportEffects } =
-		getBlockSupportProps( name, clientId, attributes ?? {}, {
-			settings: getBlockSupportSettings( selectedProps ),
-			blockEditorSettings: selectedProps.blockEditorSettings,
-			parentLayout,
-			select: registry.select,
-		} );
+		getBlockSupportProps(
+			name,
+			clientId,
+			attributes ?? {},
+			{
+				settings: getBlockSupportSettings( selectedProps ),
+				parentLayout,
+			},
+			getBlockSupportData( selectedProps )
+		);
 
 	const privateContext = {
 		blockSupportProps,

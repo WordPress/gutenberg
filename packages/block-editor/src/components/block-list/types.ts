@@ -225,7 +225,8 @@ export type BlockListBlockSelectedProps = Omit<
 	isSelectionEnabled?: boolean;
 	isLocked?: boolean;
 	canRemove?: boolean;
-	blockEditorSettings: Record< string, unknown >;
 	// The settings the block supports read, by prefixed path.
 	[ blockSupportSetting: `blockSupportSetting:${ string }` ]: unknown;
+	// The store values the block supports select, by prefixed support and key.
+	[ blockSupportData: `blockSupportData:${ string }` ]: unknown;
 };

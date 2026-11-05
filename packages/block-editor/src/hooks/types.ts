@@ -126,9 +126,7 @@ export interface BlockListBlockFeatureProps {
  */
 export interface BlockSupportContext {
 	settings: Record< string, unknown >;
-	blockEditorSettings: Record< string, unknown >;
 	parentLayout: Record< string, unknown > | undefined;
-	select: DataRegistry[ 'select' ];
 }
 
 /**
@@ -147,6 +145,12 @@ export interface BlockListBlockFeature extends BlockSupportFeatureBase {
 		context: BlockSupportContext
 	) => void;
 	settings?: string[];
+	// Store values the support reads, added to its props. The block's own
+	// subscription selects them and compares them one by one.
+	select?: (
+		select: DataRegistry[ 'select' ],
+		props: BlockListBlockFeatureProps
+	) => Record< string, unknown >;
 	isMatch?: ( attributes: Record< string, unknown > ) => boolean;
 }
 

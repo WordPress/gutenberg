@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { Block } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import {
@@ -43,6 +44,8 @@ import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
 type ChildLayoutProps = BlockListBlockFeatureProps & {
 	style?: ChildLayoutBlockStyle;
+	shouldRenderChildLayoutStyles?: boolean;
+	viewportSettings?: Record< string, unknown >;
 };
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -345,23 +348,21 @@ export function getUpdatedChildLayoutStyle(
 
 // The child layout styles, for the block's place in its parent's layout.
 function getChildLayoutCSS(
-	{ clientId, style }: ChildLayoutProps,
 	{
-		blockEditorSettings,
-		parentLayout: context,
-	}: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+		clientId,
+		style,
+		shouldRenderChildLayoutStyles,
+		viewportSettings,
+	}: ChildLayoutProps,
+	{ parentLayout: context }: Pick< BlockSupportContext, 'parentLayout' >
 ) {
-	const shouldRenderChildLayoutStyles =
-		! blockEditorSettings.disableLayoutStyles;
-	const viewportSettings = (
-		blockEditorSettings.__experimentalFeatures as
-			Record< string, unknown > | undefined
-	 )?.viewport as Record< string, unknown > | undefined;
 	const layout = style?.layout ?? {};
 	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
 	const parentLayout = ( context as Layout | undefined ) || {};
 	const selector = `.wp-container-content-${ clientId }`;
 
+	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+	// write code that stores a string attribute instead of a number.
 	if ( process.env.NODE_ENV === 'development' ) {
 		if ( columnStart && typeof columnStart !== 'number' ) {
 			throw new Error( 'columnStart must be a number' );
@@ -399,7 +400,7 @@ function getChildLayoutCSS(
 
 function getBlockProps(
 	props: ChildLayoutProps,
-	context: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+	context: Pick< BlockSupportContext, 'parentLayout' >
 ) {
 	if ( ! getChildLayoutCSS( props, context ) ) {
 		return;
@@ -410,7 +411,7 @@ function getBlockProps(
 
 function useStyles(
 	props: ChildLayoutProps,
-	context: Pick< BlockSupportContext, 'blockEditorSettings' | 'parentLayout' >
+	context: Pick< BlockSupportContext, 'parentLayout' >
 ) {
 	useStyleOverride( { css: getChildLayoutCSS( props, context ) } );
 }
@@ -705,6 +706,16 @@ addFilter(
 export default {
 	getBlockProps,
 	useStyles,
+	select: ( select: DataRegistry[ 'select' ] ) => {
+		const { disableLayoutStyles, __experimentalFeatures } =
+			select( blockEditorStore ).getSettings();
+		return {
+			shouldRenderChildLayoutStyles: ! disableLayoutStyles,
+			viewportSettings: (
+				__experimentalFeatures as Record< string, unknown > | undefined
+			 )?.viewport,
+		};
+	},
 	edit: ChildLayoutControlsPure,
 	attributeKeys: [ 'style' ],
 	hasSupport() {

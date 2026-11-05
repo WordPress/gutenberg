@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
@@ -34,7 +35,10 @@ import type {
 	CustomCSSStateEntry,
 } from './types';
 
-type CustomCSSProps = BlockListBlockFeatureProps & { style?: PanelStyle };
+type CustomCSSProps = BlockListBlockFeatureProps & {
+	style?: PanelStyle;
+	canEditCSS?: boolean;
+};
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -291,18 +295,14 @@ function getBlockProps(
 }
 
 function useStyles(
-	{ style, clientId, name }: CustomCSSProps,
-	{
-		settings,
-		blockEditorSettings,
-	}: Pick< BlockSupportContext, 'settings' | 'blockEditorSettings' >
+	{ style, clientId, name, canEditCSS }: CustomCSSProps,
+	{ settings }: Pick< BlockSupportContext, 'settings' >
 ) {
 	const viewportSettings = settings.viewport;
 
 	// Keep valid CSS states even when another state contains HTML markup,
 	// matching the server-side rendering in
 	// gutenberg_render_custom_css_support_styles().
-	const { canEditCSS } = blockEditorSettings;
 
 	const { createWarningNotice } = useDispatch( noticesStore );
 
@@ -389,6 +389,9 @@ export default {
 	getBlockProps,
 	useStyles,
 	settings: [ 'viewport' ],
+	select: ( select: DataRegistry[ 'select' ] ) => ( {
+		canEditCSS: select( blockEditorStore ).getSettings().canEditCSS,
+	} ),
 	addSaveProps,
 	attributeKeys: [ 'style' ],
 	hasSupport( name: string | BlockType ) {
