@@ -24,23 +24,27 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
-	calculateNotePositions,
-	findNoteInBlock,
-	getBlockLevelClientIds,
-	focusNoteThread,
-	getCaretChange,
-	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	getNoteAtCaret,
+	removeNoteIdFromMetadata,
+} from './utils/metadata';
+import { getTextAttributeKey, toRecord } from './utils/rich-text';
+import {
+	findNoteInBlock,
+	getBlockLevelClientIds,
+	getInlineMarkerStart,
 	getNoteRanges,
-	getSoleRichTextAttributeKey,
+	removeInlineNote,
+	wrapInlineNote,
+} from './utils/note-anchor';
+import {
+	getCaretChange,
+	getNoteAtCaret,
 	hasBlockDraft,
 	pickNoteForCaret,
-	removeInlineNote,
-	removeNoteIdFromMetadata,
-	wrapInlineNote,
-} from './utils';
+} from './utils/note-selection';
+import { focusNoteThread } from './utils/dom';
+import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -284,11 +288,11 @@ export function useNoteActions() {
 					blocks: clientIds.map( ( clientId ) => ( {
 						clientId,
 						attributes: getNoteAttributes( clientId ),
-						attributeKey: getBlockCount( clientId )
-							? undefined
-							: getSoleRichTextAttributeKey(
-									getBlockName( clientId )
-								),
+						attributeKey: getTextAttributeKey(
+							clientId,
+							getBlockName,
+							getBlockCount
+						),
 					} ) ),
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),
@@ -528,7 +532,7 @@ export function useNoteActions() {
 				if (
 					inline &&
 					! findNoteInBlock( attributes, noteId ) &&
-					value?.text?.slice( inline.start, inline.end ) ===
+					toRecord( value ).text.slice( inline.start, inline.end ) ===
 						inline.text
 				) {
 					const wrapped = wrapInlineNote(
@@ -591,14 +595,9 @@ export function useNoteActions() {
 					let inline = null;
 					const removed = removeInlineNote( attributes, note.id );
 					if ( removed ) {
-						const { attributeKey, start, end, value } = removed;
-						newAttributes[ attributeKey ] = value;
-						inline = {
-							attributeKey,
-							start,
-							end,
-							text: value.text.slice( start, end ),
-						};
+						const { value, ...anchor } = removed;
+						newAttributes[ anchor.attributeKey ] = value;
+						inline = anchor;
 					}
 					anchors.set( clientId, inline );
 					return newAttributes;
@@ -725,8 +724,7 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 			caret.attributes?.metadata
 		);
 		const isTextBlock = ( id ) =>
-			! getBlockCount( id ) &&
-			!! getSoleRichTextAttributeKey( getBlockName( id ) );
+			!! getTextAttributeKey( id, getBlockName, getBlockCount );
 		const noteId = pickNoteForCaret( {
 			...caret,
 			blockThreads: notes.filter(
@@ -1029,7 +1027,7 @@ export function useFloatingBoard( {
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(
 		() =>
-			calculateNotePositions( {
+			getThreadLayout( {
 				threads,
 				selectedNoteId,
 				blockRects: anchorRects,
