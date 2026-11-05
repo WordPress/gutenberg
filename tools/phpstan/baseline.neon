@@ -36,6 +36,8 @@ parameters:
 			count: 1
 			path: ../../lib/client-assets.php
 
+		-
+			message: '#^Method WP_Sync_Save_Server\:\:handle_request\(\) should return WP_Error\|WP_REST_Response but returns array\.$#'
 			identifier: return.type
 			count: 1
 			path: ../../lib/experimental/collaboration/class-wp-sync-save-server.php
