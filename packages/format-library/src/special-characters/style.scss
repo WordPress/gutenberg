@@ -1,15 +1,18 @@
-.format-library-special-characters__popover .components-popover__content {
+.format-library-special-characters__popup {
 	// Grid geometry: eight square cells with an extra small gap, padded on
-	// both sides. The popover sizes to it, so it never resizes as results
+	// both sides. The popup sizes to it, so it never resizes as results
 	// change.
 	--special-characters-cell-size: var(--wpds-dimension-size-md);
 	--special-characters-gap: var(--wpds-dimension-gap-xs);
 	--special-characters-padding: var(--wpds-dimension-padding-lg);
 	--special-characters-grid-width: calc(var(--special-characters-cell-size) * 8 + var(--special-characters-gap) * 7);
 
+	// Stack the search, grid and preview, instead of the Design System
+	// popup's header and status rows.
 	display: flex;
 	flex-direction: column;
-	width: max-content;
+	// The grid scrolls inside its own viewport.
+	overflow: hidden;
 }
 
 .format-library-special-characters__search {
@@ -19,7 +22,7 @@
 }
 
 .format-library-special-characters__viewport {
-	// A fixed height, so the popover keeps one size as search results change
+	// A fixed height, so the popup keeps one size as search results change
 	// and does not jump when it opens above the text.
 	height: 260px;
 	overflow: auto;
@@ -32,7 +35,7 @@
 }
 
 // Hold the grid's width even while it is empty (no search results), so the
-// popover doesn't resize and reposition.
+// popup doesn't resize and reposition.
 .format-library-special-characters__list {
 	min-inline-size: var(--special-characters-grid-width);
 	padding-block-end: var(--wpds-dimension-padding-sm);
@@ -52,7 +55,7 @@
 	position: sticky;
 	top: 0;
 	z-index: 1;
-	// Rows scroll behind it, so match the popover surface.
+	// Rows scroll behind it, so match the popup surface.
 	background-color: var(--wpds-color-background-surface-neutral-strong);
 	// Align the heading with the grid's first column.
 	padding-inline: 0;
@@ -82,13 +85,21 @@
 	display: flex;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-md);
-	// Reserve the space so the popover does not resize as the highlight moves.
-	min-height: var(--wpds-dimension-size-lg);
+	// Long names wrap at the grid's width rather than widening the popup.
+	contain: inline-size;
+	// Reserve two lines, so the popup does not resize as the highlight moves
+	// between short and long names.
+	min-height: calc(2lh + var(--wpds-dimension-padding-sm) * 2);
 	padding: var(--wpds-dimension-padding-sm) var(--special-characters-padding);
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
+.format-library-special-characters__preview-name {
+	min-width: 0;
+}
+
 .format-library-special-characters__preview-character {
+	flex-shrink: 0;
 	min-width: 1.5em;
 	font-size: var(--wpds-typography-font-size-2xl);
 	text-align: center;

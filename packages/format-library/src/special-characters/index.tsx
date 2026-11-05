@@ -1,25 +1,30 @@
 import { __, sprintf } from '@wordpress/i18n';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { Popover as WCPopover } from '@wordpress/components';
+import { Path, SVG } from '@wordpress/components';
 import { Autocomplete, Icon, Input, InputLayout, Text } from '@wordpress/ui';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { search, typography as icon } from '@wordpress/icons';
+import { search } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
 import {
 	getSpecialCharacterCategories,
 	searchSpecialCharacters,
 } from './characters';
 import type { SpecialCharacter } from './characters';
-import {
-	getFrequentCharacters,
-	useFrequentCharacters,
-} from './frequent-characters';
 
 const name = 'core/special-characters';
 const title = __( 'Special characters' );
+
+/**
+ * The Classic editor's "Special character" icon: the `editor-customchar`
+ * Dashicon (an omega), kept at its 20px size within the 24px icon grid.
+ */
+const icon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
+		<Path d="M10 5.4c1.27 0 2.24.36 2.91 1.08.66.71 1 1.76 1 3.13 0 1.28-.23 2.37-.69 3.27-.47.89-1.27 1.52-2.22 2.12v2h6v-2h-3.69c.92-.64 1.62-1.34 2.12-2.34.49-1.01.74-2.13.74-3.35 0-1.78-.55-3.19-1.65-4.22S11.92 3.54 10 3.54s-3.43.53-4.52 1.57c-1.1 1.04-1.65 2.44-1.65 4.2 0 1.21.24 2.31.73 3.33.48 1.01 1.19 1.71 2.1 2.36H3v2h6v-2c-.98-.64-1.8-1.28-2.24-2.17-.45-.89-.67-1.96-.67-3.22 0-1.37.33-2.41 1-3.13C7.75 5.76 8.72 5.4 10 5.4z" />
+	</SVG>
+);
 
 /**
  * How many characters each grid row holds. Arrow keys move between rows, so
@@ -31,7 +36,7 @@ const COLUMNS = 8;
  * One grid cell, as handed to `Autocomplete.Root` through `items`.
  */
 interface CharacterOption {
-	// Unique per section, since a character can also be in "Frequently used".
+	// Unique per section; search results get their own prefix.
 	key: string;
 	value: string;
 	label: string;
@@ -101,17 +106,8 @@ function InlineUI( {
 		editableContentElement: contentRef.current,
 		settings: specialCharacters,
 	} );
+	const inputRef = useRef< HTMLInputElement >( null );
 	const categories = useMemo( getSpecialCharacterCategories, [] );
-	const characterByChar = useMemo( () => {
-		const map = new Map< string, SpecialCharacter >();
-		for ( const category of categories ) {
-			for ( const character of category.characters ) {
-				map.set( character.char, character );
-			}
-		}
-		return map;
-	}, [ categories ] );
-	const { entries, recordUse } = useFrequentCharacters();
 	const [ query, setQuery ] = useState( '' );
 	const [ highlighted, setHighlighted ] = useState< CharacterOption >();
 	const isSearching = query.trim() !== '';
@@ -127,30 +123,16 @@ function InlineUI( {
 				( character ) => toOption( character, 'search' )
 			);
 		}
-		// Hidden while searching, where it would repeat category results.
-		const frequent = getFrequentCharacters( entries, ( char ) =>
-			characterByChar.has( char )
-		).map( ( char ) => characterByChar.get( char )! );
-		return [
-			{
-				key: 'frequent',
-				label: __( 'Frequently used' ),
-				items: frequent.map( ( character ) =>
-					toOption( character, 'frequent' )
-				),
-			},
-			...categories.map( ( category ) => ( {
-				key: category.slug,
-				label: category.label,
-				items: category.characters.map( ( character ) =>
-					toOption( character, category.slug )
-				),
-			} ) ),
-		].filter( ( group ) => group.items.length > 0 );
-	}, [ categories, characterByChar, entries, isSearching, query ] );
+		return categories.map( ( category ) => ( {
+			key: category.slug,
+			label: category.label,
+			items: category.characters.map( ( character ) =>
+				toOption( character, category.slug )
+			),
+		} ) );
+	}, [ categories, isSearching, query ] );
 
 	function onSelect( option: CharacterOption ) {
-		recordUse( option.value );
 		onChange( insert( value, option.value ) );
 		onClose();
 		onFocus();
@@ -180,43 +162,56 @@ function InlineUI( {
 		) );
 
 	return (
-		<WCPopover
-			anchor={ popoverAnchor }
-			className="format-library-special-characters__popover"
-			placement="bottom-start"
-			onClose={ () => {
-				// Escape: put the caret back where the character would have gone.
+		<Autocomplete.Root
+			// Mounted only while visible, so it is always open.
+			open
+			onOpenChange={ ( nextOpen: boolean, { reason } ) => {
+				// Picking a cell closes through `onSelect`.
+				if ( nextOpen || reason === 'item-press' ) {
+					return;
+				}
 				onClose();
-				onFocus();
+				// Escape: put the caret back where the character would have
+				// gone. Clicking elsewhere leaves focus where it landed.
+				if ( reason === 'escape-key' ) {
+					onFocus();
+				}
 			} }
-			// Clicking elsewhere closes the popover without stealing focus back.
-			onFocusOutside={ onClose }
+			grid
+			// Sections while browsing, a flat list while searching. Base UI
+			// takes either at runtime, but its overloads can't take the union.
+			items={ items as readonly CharacterOption[] }
+			filter={ null }
+			// Enter picks the top result once the user has typed.
+			autoHighlight
+			value={ query }
+			onValueChange={ ( nextQuery: string, { reason } ) => {
+				// Picking a cell would otherwise write it into the field.
+				if ( reason === 'item-press' ) {
+					return;
+				}
+				setQuery( nextQuery );
+			} }
+			onItemHighlighted={ ( option?: CharacterOption ) =>
+				setHighlighted( option )
+			}
 		>
-			<Autocomplete.Root
-				inline
-				open
-				grid
-				// Sections while browsing, a flat list while searching. Base UI
-				// takes either at runtime, but its overloads can't take the union.
-				items={ items as readonly CharacterOption[] }
-				filter={ null }
-				// Enter picks the top result once the user has typed.
-				autoHighlight
-				value={ query }
-				onValueChange={ ( nextQuery: string, { reason } ) => {
-					// Picking a cell would otherwise write it into the field.
-					if ( reason === 'item-press' ) {
-						return;
-					}
-					setQuery( nextQuery );
-				} }
-				onItemHighlighted={ ( option?: CharacterOption ) =>
-					setHighlighted( option )
+			<Autocomplete.Popup
+				className="format-library-special-characters__popup"
+				width="content"
+				// There is no trigger to return to: the format puts the caret
+				// back itself, and only after Escape or a pick.
+				initialFocus={ inputRef }
+				finalFocus={ false }
+				positioner={
+					// Below the caret, rather than below a trigger button.
+					<Autocomplete.Positioner anchor={ popoverAnchor } />
 				}
 			>
 				<div className="format-library-special-characters__search">
 					<Autocomplete.InputGroup>
 						<Autocomplete.Input
+							ref={ inputRef }
 							aria-label={ __( 'Search special characters' ) }
 							placeholder={ __( 'Search' ) }
 							render={
@@ -289,7 +284,10 @@ function InlineUI( {
 							<span className="format-library-special-characters__preview-character">
 								{ highlighted.value }
 							</span>
-							<Text variant="body-sm">
+							<Text
+								variant="body-sm"
+								className="format-library-special-characters__preview-name"
+							>
 								{ sprintf(
 									/* translators: 1: Character name, e.g. "Em dash". 2: Unicode code point, e.g. "U+2014". */
 									__( '%1$s (%2$s)' ),
@@ -300,8 +298,8 @@ function InlineUI( {
 						</>
 					) }
 				</div>
-			</Autocomplete.Root>
-		</WCPopover>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
 	);
 }
 

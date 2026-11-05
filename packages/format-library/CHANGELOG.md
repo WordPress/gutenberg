@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Special characters: Add a "Special characters" item to the rich text "More" menu, which opens a searchable grid of characters to insert at the cursor ([#86338](https://github.com/WordPress/gutenberg/pull/86338)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Bug Fixes
