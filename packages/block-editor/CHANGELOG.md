@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Block Styles: Show the active style variation in forced colors mode.
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes
