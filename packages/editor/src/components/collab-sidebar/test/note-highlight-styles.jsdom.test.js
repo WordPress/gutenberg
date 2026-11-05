@@ -287,6 +287,22 @@ describe( 'buildBlockHighlightCss', () => {
 		expect( css ).toContain( overlaySelectorFor( 'abc-2' ) );
 	} );
 
+	it( 'skips suggestion threads, which carry their own markers', () => {
+		expect(
+			buildBlockHighlightCss(
+				[
+					{
+						id: 8,
+						author: 1,
+						blockClientIds: [ 'abc-1' ],
+						meta: { _wp_suggestion: '{"operations":[]}' },
+					},
+				],
+				getBlockAttributes
+			)
+		).toBe( '' );
+	} );
+
 	it( 'colors a block with several block-level notes by the first one', () => {
 		const css = buildBlockHighlightCss(
 			[
