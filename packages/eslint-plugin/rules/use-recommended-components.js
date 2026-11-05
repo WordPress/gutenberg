@@ -148,6 +148,7 @@ const DENYLIST = {
 		RadioControl:
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
+		Spinner: 'Use `Spinner` from `@wordpress/ui` instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer:
 			'For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',
