@@ -18,7 +18,8 @@ import {
 import { sharedIcon } from './shared-icon';
 import { isGalleryFlexLayout } from './shared';
 import { Caption } from '../utils/caption';
-import { MAX_IMAGES } from './dynamic-source';
+import FolderControl from './folder-control';
+import { MAX_IMAGES, MEDIA_FOLDER, getDynamicSource } from './dynamic-source';
 
 /**
  * Confirmation for leaving dynamic mode, shown from both the block toolbar and
@@ -67,7 +68,10 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 	const {
 		dynamicContent,
 		canUseDynamicSource,
+		availableSources,
 		sourceDescriptor,
+		sourceFolderId,
+		setSourceFolderId,
 		convertToStatic,
 		enableDynamicMode,
 		isResolvingDynamic,
@@ -76,16 +80,17 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 	} = dynamic;
 	const isDynamic = !! dynamicContent;
 
-	const [ isConfirming, setIsConfirming ] = useState( false );
+	// The source awaiting confirmation, set only while the dialog is open.
+	const [ sourcePendingConfirm, setSourcePendingConfirm ] = useState();
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
 	// Entering dynamic mode discards any hand-added images, so confirm first
 	// when there are images to lose; otherwise switch straight away.
-	function requestEnableDynamicMode() {
+	function requestEnableDynamicMode( source ) {
 		if ( hasImages ) {
-			setIsConfirming( true );
+			setSourcePendingConfirm( source );
 		} else {
-			enableDynamicMode();
+			enableDynamicMode( source );
 		}
 	}
 
@@ -110,6 +115,13 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 						>
 							{ __( 'Detach Gallery' ) }
 						</Button>
+						{ dynamicContent.source === MEDIA_FOLDER && (
+							<FolderControl
+								folderId={ sourceFolderId }
+								onChange={ setSourceFolderId }
+								label={ sourceDescriptor.selectFolderLabel }
+							/>
+						) }
 					</div>
 					{ hasMoreImagesThanCap && (
 						<WCNotice
@@ -149,40 +161,48 @@ export function GallerySourcePanel( { dynamic, hasImages } ) {
 		return null;
 	}
 
+	const pendingDescriptor = sourcePendingConfirm
+		? getDynamicSource( sourcePendingConfirm )
+		: undefined;
+
 	return (
 		<>
 			<PanelBody title={ __( 'Source' ) }>
 				<div className="wp-block-gallery__source-settings">
-					{ /*
-					 * Hardcoded on purpose: this single-source entry button (and
-					 * its confirm dialog below) is temporary. Once more sources
-					 * exist it becomes a "Choose source" select whose options read
-					 * from each source descriptor's `title`, with help text
-					 * carrying the per-source explanation these strings do today.
-					 */ }
 					<p className="wp-block-gallery__source-description">
 						{ __( 'Images added to the gallery.' ) }
 					</p>
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={ requestEnableDynamicMode }
-					>
-						{ __( 'Use attached images' ) }
-					</Button>
+					{ /*
+					 * One entry button per available source, each labelled with
+					 * that source's own `title`. A list rather than a select:
+					 * choosing a source is a one-way change that replaces the
+					 * gallery's contents, so it reads better as an action than as
+					 * a setting, and it keeps the confirmation attached to the
+					 * thing being confirmed.
+					 */ }
+					{ availableSources.map( ( [ source, descriptor ] ) => (
+						<Button
+							key={ source }
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => requestEnableDynamicMode( source ) }
+						>
+							{ descriptor.title }
+						</Button>
+					) ) }
 				</div>
 			</PanelBody>
-			{ isConfirming && (
+			{ pendingDescriptor && (
 				<ConfirmDialog
 					isOpen
-					title={ __( 'Use images attached to the post?' ) }
+					title={ pendingDescriptor.title }
 					__experimentalHideHeader={ false }
-					confirmButtonText={ __( 'Use attached images' ) }
+					confirmButtonText={ __( 'Replace images' ) }
 					onConfirm={ () => {
-						enableDynamicMode();
-						setIsConfirming( false );
+						enableDynamicMode( sourcePendingConfirm );
+						setSourcePendingConfirm( undefined );
 					} }
-					onCancel={ () => setIsConfirming( false ) }
+					onCancel={ () => setSourcePendingConfirm( undefined ) }
 					size="medium"
 				>
 					{ __(
@@ -270,12 +290,19 @@ export function GalleryDynamicView( {
 	multiGallerySelection,
 } ) {
 	const {
+		dynamicContent,
 		sourceDescriptor,
+		sourceFolderId,
 		dynamicImageBlocks,
 		galleryContext,
 		isResolvingDynamic,
 		convertToStatic,
 	} = dynamic;
+
+	// A folder gallery with no folder chosen yet isn't so much empty as
+	// unconfigured, so it says what to do rather than what will appear.
+	const needsFolder =
+		dynamicContent?.source === MEDIA_FOLDER && ! sourceFolderId;
 
 	// Detaching the gallery materializes editable inner blocks, which is a
 	// structural change. Only offer it when the block is fully editable:
@@ -304,10 +331,16 @@ export function GalleryDynamicView( {
 	// post with no matching images and a template with no post in context yet —
 	// in either case the source simply resolves to nothing right now. The per-
 	// source wording comes from the source descriptor.
-	const emptyInstructions = isResolvingDynamic
-		? __( 'Loading images…' )
-		: ( sourceDescriptor?.emptyMessage ??
-			__( 'Dynamic images will appear here.' ) );
+	let emptyInstructions;
+	if ( needsFolder ) {
+		emptyInstructions = sourceDescriptor.noFolderMessage;
+	} else if ( isResolvingDynamic ) {
+		emptyInstructions = __( 'Loading images…' );
+	} else {
+		emptyInstructions =
+			sourceDescriptor?.emptyMessage ??
+			__( 'Dynamic images will appear here.' );
+	}
 
 	return (
 		<>
