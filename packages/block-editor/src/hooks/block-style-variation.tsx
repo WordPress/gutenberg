@@ -2,7 +2,6 @@ import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
-	toStyles,
 	getBlockSelectors,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
@@ -18,7 +17,9 @@ import type {
 	StyleOverrideOptions,
 } from './types';
 
-const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
+const { getVariationStyle, transformToStylesWithTextClipBase } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -139,7 +140,7 @@ export function BlockStyleVariationOverridesWithConfig( {
 					const hasFallbackGapSupport = true;
 					const disableLayoutStyles = true;
 					const disableRootPadding = true;
-					const variationStyles = toStyles(
+					const variationStyles = transformToStylesWithTextClipBase(
 						variationConfig,
 						blockSelectors,
 						hasBlockGapSupport,
@@ -154,7 +155,9 @@ export function BlockStyleVariationOverridesWithConfig( {
 							presets: false,
 							rootPadding: false,
 							variationStyles: true,
-						}
+						},
+						// The block type styles the variation layers over.
+						config?.styles?.blocks
 					);
 					newOverrides.push( {
 						id: `${ override.variation }-${ override.clientId }`,
@@ -211,6 +214,10 @@ function useBlockStyleVariation(
 
 		return {
 			settings: globalSettings,
+			// Mirror of the server's `text_clip_base_blocks` option.
+			textClipBaseBlocks: (
+				globalStyles as { blocks?: Record< string, unknown > }
+			 )?.blocks,
 			// The variation style data is all that is needed to generate
 			// the styles for the current application to a block. The variation
 			// name is updated to match the instance specific class name.
@@ -259,7 +266,7 @@ function useStyles( {
 	const registeredStyles = getBlockStyles( name );
 	const variation = getVariationNameFromClass( className, registeredStyles );
 
-	const { settings, styles } = useBlockStyleVariation(
+	const { settings, styles, textClipBaseBlocks } = useBlockStyleVariation(
 		name,
 		variation,
 		clientId
@@ -277,7 +284,7 @@ function useStyles( {
 		const disableLayoutStyles = true;
 		const disableRootPadding = true;
 
-		return toStyles(
+		return transformToStylesWithTextClipBase(
 			variationConfig,
 			blockSelectors,
 			hasBlockGapSupport,
@@ -292,9 +299,10 @@ function useStyles( {
 				presets: false,
 				rootPadding: false,
 				variationStyles: true,
-			}
+			},
+			textClipBaseBlocks
 		);
-	}, [ variation, settings, styles, clientId ] );
+	}, [ variation, settings, styles, textClipBaseBlocks, clientId ] );
 
 	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,
