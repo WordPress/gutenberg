@@ -2167,6 +2167,12 @@ class WP_Theme_JSON_Gutenberg {
 			return $processed_css;
 		}
 
+		/*
+		 * Treat a nested rule without `&` as `& selector`, matching native CSS
+		 * nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+		 */
+		$css = preg_replace( '/(^|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/', '$1$2& ', $css );
+
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
