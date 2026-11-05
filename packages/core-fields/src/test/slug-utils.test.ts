@@ -32,6 +32,16 @@ describe( 'getSlug', () => {
 		).toBe( 'hello-slug' );
 	} );
 
+	it( 'decodes the slug derived from the title', () => {
+		expect(
+			getSlug( {
+				id: 123,
+				title: '50%20',
+				generated_slug: 'auto-draft',
+			} )
+		).toBe( '50 ' );
+	} );
+
 	it( 'returns an empty string for a post without a slug or a title', () => {
 		expect(
 			getSlug( {

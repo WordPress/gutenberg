@@ -19,9 +19,9 @@ export const getSlug = ( item: PostWithSlug ): string => {
 		return '';
 	}
 
-	if ( item.slug ) {
-		return safeDecodeURIComponent( item.slug );
-	}
-
-	return cleanForSlug( getItemTitle( item, '' ) );
+	// Decoded, as `cleanForSlug` keeps percent-encoded octets, like the slug
+	// WordPress saves.
+	return safeDecodeURIComponent(
+		item.slug || cleanForSlug( getItemTitle( item, '' ) )
+	);
 };
