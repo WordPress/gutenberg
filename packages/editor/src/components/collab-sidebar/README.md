@@ -47,7 +47,7 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
       ├── AddNoteToolbarButton           - slot fill in the block toolbar (once the post has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteFocus + keyboard nav + focusThreadOrAdjacent
-      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new', calls useNoteActions
+      │         ├── AddNote              - new note form for the selected blocks, rendered when selectedNote === 'new', calls useNoteActions
       │         └── NoteThread[]         - per thread, calls useNoteActions
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
@@ -63,6 +63,8 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
 
 Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill. The text a new note is started from is wrapped with a `core/note` marker whose id is `new`, the same sentinel `selectNote` uses for the form, until the note is sent, so the anchor follows edits like a saved note's does; `onCreate` swaps in the saved id, and each exit from an empty form strips it with `onDiscard` at the point of exit: Cancel, the form's focus-out, and `useNoteSelection` when the caret moves the selection away from `new`.
 
+A new note is added to the selected blocks, so selecting several blocks, or text across them, adds one note to each, as if added to each block on its own; from then on it is a note shared by several blocks. `getNoteRanges` picks the text each block's `new` marker wraps, as a format applied across blocks would: the first block from the caret, the blocks between in full, the last block up to the caret. A text block the selection gives no text, like the one it starts at the end of, is left out, unless no block has any. A block without a sole rich text field, like an Image, takes the note without a marker and holds it at block level, unlike a text block a split left without the note's marker; `getBlockLevelClientIds` decides this for both the tint and the caret. The selection stays while the form is open, and the form's blocks are the selected blocks; moving either end of a selection across blocks leaves the form, as entering another block does. Starting a note across blocks strips any `new` marker from them, since one left by a single block's unsent draft isn't this note's. Its text is kept under the first; only a draft on one block keeps its marker when the form is left, so a draft across blocks comes back on its first block.
+
 ## Note selection
 
 The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. Three caret events change the selected note, and everything else leaves it alone:
@@ -70,11 +72,11 @@ The selected note is a small state machine driven by the caret. `useCaretChange`
 | Caret event | Selected note becomes |
 | --- | --- |
 | Enters a marker | That note, or the new note form for the `new` marker |
-| Enters another block | The block's note: its unsent draft, else a block-level note (the selected one, else the primary), else none |
+| Enters another block, or moves an end of a selection across blocks | The block's note: its unsent draft, else a block-level note (the selected one, else the primary), else none |
 | Leaves the selected note's marker | The block's note, as above |
 | Anything else: typing, moving in plain text, a caret not reported yet | Unchanged |
 
-Typing is skipped before the rule runs: a selection change that comes with a change to the block's content moves the caret along with the text, never across a marker. "Anything else" is what keeps explicit actions in place: a block-level note collapsed with Escape stays collapsed while editing, since a block-level note has no caret position. A caret not reported yet is unknown, not outside: RichText reports no offsets on focus until mouseup, and `selectBlock` stores none.
+A block-level note is one the block holds at block level, see `getBlockLevelClientIds`, so a text block a split left with the note's id but none of its text doesn't select it. Typing is skipped before the rule runs: a selection change that comes with a change to the block's content moves the caret along with the text, never across a marker. "Anything else" is what keeps explicit actions in place: a block-level note collapsed with Escape stays collapsed while editing, since a block-level note has no caret position. A caret not reported yet is unknown, not outside: RichText reports no offsets on focus until mouseup, and `selectBlock` stores none.
 
 Explicit actions set the selected note directly:
 
@@ -89,6 +91,8 @@ A thread's or the new note form's focus-out deselects only when focus did not la
 ## Floating board
 
 Goal: in the floating sidebar, each unresolved note appears beside its associated block, tracks canvas scroll, and shifts up/down to avoid overlapping with neighbors - all without re-rendering threads as the canvas scrolls.
+
+A note shared by several blocks has one place: beside its first block, whichever of its blocks is selected. Hovering or focusing the thread highlights that block, picking the thread selects it, and Back to block returns to it.
 
 Three layers cooperate:
 
