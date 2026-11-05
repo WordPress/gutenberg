@@ -1,7 +1,7 @@
 import { Icon as WCIcon } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { audio, file } from '@wordpress/icons';
-import { getFilename } from '@wordpress/url';
+import { getFilename, safeDecodeURIComponent } from '@wordpress/url';
 
 const PREVIEW_ICONS: Record< string, React.JSX.Element > = {
 	audio,
@@ -18,7 +18,7 @@ export default function FilePreview( {
 	mediaType: string;
 } ) {
 	// A URL doesn't always include a filename, in which case the icon renders on its own.
-	const filename = getFilename( url );
+	const filename = safeDecodeURIComponent( getFilename( url ) || '' );
 	return (
 		<Stack
 			direction="column"
