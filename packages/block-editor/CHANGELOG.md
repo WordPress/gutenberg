@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
+-   `resetBlocks`: Drop any inner blocks given to a block whose inner blocks are controlled ([#86387](https://github.com/WordPress/gutenberg/pull/86387)).
 
 ## 20.0.0 (2026-11-04)
 
