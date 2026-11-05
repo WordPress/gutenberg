@@ -45,13 +45,27 @@ describe( 'SlugEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'keeps what the user types as typed', () => {
+	it( 'cleans the slug the user changed when the field loses focus', () => {
 		render( <EditedSlug initial={ post } /> );
 		const input = screen.getByRole( 'textbox' );
 		fireEvent.focus( input );
-		fireEvent.change( input, { target: { value: '50%20' } } );
-		expect( input ).toHaveValue( '50%20' );
-		expect( screen.getByTestId( 'stored' ) ).toHaveTextContent( '50%20' );
+		fireEvent.change( input, { target: { value: 'My New Slug' } } );
+		expect( input ).toHaveValue( 'My New Slug' );
+		fireEvent.blur( input );
+		expect( input ).toHaveValue( 'my-new-slug' );
+		expect( screen.getByTestId( 'stored' ) ).toHaveTextContent(
+			'my-new-slug'
+		);
+	} );
+
+	it( 'leaves an untouched slug as it is when the field loses focus', () => {
+		render( <EditedSlug initial={ post } /> );
+		const input = screen.getByRole( 'textbox' );
+		fireEvent.focus( input );
+		fireEvent.blur( input );
+		expect( screen.getByTestId( 'stored' ) ).toHaveTextContent(
+			'%e3%83%86%e3%82%b9%e3%83%88'
+		);
 	} );
 
 	it( 'lets the user clear the field while typing', () => {

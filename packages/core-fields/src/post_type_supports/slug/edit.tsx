@@ -2,10 +2,10 @@ import { Button } from '@wordpress/components';
 import { copySmall } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithSlug } from './types';
@@ -32,11 +32,14 @@ const SlugEdit = ( {
 } ) => {
 	const { id } = field;
 
-	// While the user types, show what they typed. The field's value is decoded
-	// and falls back to the slug derived from the title, so showing it would
-	// turn a typed `%20` into a space and refill a cleared field.
-	const [ draft, setDraft ] = useState< string >();
-	const slug = draft ?? field.getValue( { item: data } ) ?? '';
+	// Decoded, and falls back to the slug derived from the title, as the
+	// classic PostURL panel does.
+	const value = field.getValue( { item: data } ) ?? '';
+	// An empty slug falls back to the one derived from the title, which would
+	// refill the field. Keep it empty while the user types.
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+	const slugOnFocusRef = useRef< string | undefined >( undefined );
+	const slug = forceEmptyField ? '' : value;
 	const permalinkTemplate = data.permalink_template || '';
 	const [ permalinkPrefix, permalinkSuffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX
@@ -54,10 +57,10 @@ const SlugEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) => {
-			setDraft( newValue ?? '' );
 			onChange( {
 				[ id ]: newValue,
 			} );
+			setForceEmptyField( ! newValue );
 		},
 		[ id, onChange ]
 	);
@@ -112,7 +115,25 @@ const SlugEdit = ( {
 						onValueChange={ ( newValue ) => {
 							onChangeControl( newValue );
 						} }
-						onBlur={ () => setDraft( undefined ) }
+						onFocus={ ( event ) => {
+							slugOnFocusRef.current = event.target.value;
+						} }
+						onBlur={ ( event ) => {
+							// Only clean a slug the user changed. An untouched
+							// slug came from the server, and cleaning it would
+							// strip characters `sanitize_title` kept, such as
+							// emoji. Without a slug the field shows the one
+							// derived from the title, and saving it would stop
+							// the slug from following the title.
+							if (
+								event.target.value !== slugOnFocusRef.current
+							) {
+								onChange( {
+									[ id ]: cleanForSlug( event.target.value ),
+								} );
+							}
+							setForceEmptyField( false );
+						} }
 						aria-describedby={ postUrlSlugDescriptionId }
 					/>
 					<div className={ styles.help }>
