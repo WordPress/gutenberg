@@ -16,6 +16,7 @@ import {
 	mockFetchNotFound,
 	nextFrames,
 	pageHtml,
+	pushSessionEntry,
 	quiet,
 	recordLifecycle,
 	traverseTo,
@@ -31,7 +32,7 @@ let actions: ( typeof import( '../index' ) )[ 'actions' ];
 
 // The router's `popstate` listener, called directly by the tests that need
 // to observe its returned promise rejecting.
-let popstateListener: () => Promise< void >;
+let popstateListener: ( event: PopStateEvent ) => Promise< void >;
 
 beforeAll( async () => {
 	const addEventListener = window.addEventListener;
@@ -54,9 +55,9 @@ beforeAll( async () => {
  * @return Whether the listener resolved or rejected, and with what error.
  */
 async function callPopstateListener( path: string ) {
-	window.history.pushState( {}, '', path );
+	const event = pushSessionEntry( path );
 	try {
-		await popstateListener();
+		await popstateListener( event );
 		return { error: undefined };
 	} catch ( error ) {
 		return { error };
