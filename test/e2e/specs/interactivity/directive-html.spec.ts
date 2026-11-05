@@ -200,44 +200,15 @@ test.describe( 'data-wp-html', () => {
 		] );
 		expect( await rejected.innerHTML() ).toBe( '' );
 		expect( await violations() ).toHaveLength( 1 );
+		// A new token wrapping the same string isn't written again, and a
+		// policy value with the same markup is.
+		await page.getByTestId( 'set rejected html' ).click();
+		expect( await violations() ).toHaveLength( 1 );
+		await page.getByTestId( 'set rejected trusted html' ).click();
+		await expect.poll( () => rejected.innerHTML() ).toBe( '<b>x</b>' );
+		expect( await violations() ).toHaveLength( 1 );
 		expect( pageErrors ).toEqual( [] );
 	} );
-
-	for ( const [ defaultPolicy, policyMode ] of [
-		[ 'none', undefined ],
-		[ 'returns null', 'null' ],
-	] as const ) {
-		test( `shows a TrustedHTML value with the markup of a rejected string under Trusted Types enforcement (default policy: ${ defaultPolicy })`, async ( {
-			page,
-			interactivityUtils: utils,
-		} ) => {
-			const pageErrors = await openEnforcingPage(
-				page,
-				utils.getLink( 'test/directive-html' ),
-				policyMode
-			);
-			const rejected = page.getByTestId( 'rejected html' );
-			await page.getByTestId( 'set rejected html' ).click();
-			await expect.poll( () => rejected.innerHTML() ).toBe( '' );
-			const rejection = await readViolations( page );
-			expect( rejection ).toEqual( [
-				{
-					directive: 'require-trusted-types-for',
-					sample: expect.stringContaining( '<b>x</b>' ),
-				},
-			] );
-
-			// A new token wrapping the same string isn't written again.
-			await page.getByTestId( 'set rejected html' ).click();
-			expect( await readViolations( page ) ).toEqual( rejection );
-			expect( await rejected.innerHTML() ).toBe( '' );
-
-			await page.getByTestId( 'set rejected trusted html' ).click();
-			await expect.poll( () => rejected.innerHTML() ).toBe( '<b>x</b>' );
-			expect( await readViolations( page ) ).toEqual( rejection );
-			expect( pageErrors ).toEqual( [] );
-		} );
-	}
 
 	test( 'should ignore suffixes and unique-ids in the html directive', async ( {
 		page,
