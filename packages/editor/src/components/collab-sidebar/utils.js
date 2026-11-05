@@ -616,6 +616,53 @@ export function getNoteAtCaret( attributes, selectionStart, selectionEnd ) {
 	return id ? toNoteId( id ) : undefined;
 }
 
+const isSamePoint = ( a, b ) =>
+	a.clientId === b.clientId &&
+	a.attributeKey === b.attributeKey &&
+	a.offset === b.offset;
+
+/**
+ * @typedef {Object} WPCaretSnapshot
+ * @property {string[]}         clientIds      Selected blocks.
+ * @property {?Object}          attributes     Block attributes while one block is selected, else undefined.
+ * @property {WPSelectionPoint} selectionStart Block-editor selection start.
+ * @property {WPSelectionPoint} selectionEnd   Block-editor selection end.
+ */
+
+/**
+ * Whether a store change is a caret move. Skips typing: a selection change
+ * batched with a content change moves the caret with the text, never across
+ * a marker.
+ *
+ * @param {WPCaretSnapshot} previous Snapshot before the store change.
+ * @param {WPCaretSnapshot} next     Snapshot after it.
+ * @return {?{isBlockChange: boolean}} The caret move, or null when there is none.
+ */
+export function getCaretChange( previous, next ) {
+	if (
+		next.selectionStart === previous.selectionStart &&
+		next.selectionEnd === previous.selectionEnd
+	) {
+		return null;
+	}
+	// A selection across blocks is one anchor, so moving either of its ends
+	// moves to another, as entering another block does. The store can replace
+	// the ends without moving them.
+	const isSameSelection =
+		isSamePoint( next.selectionStart, previous.selectionStart ) &&
+		isSamePoint( next.selectionEnd, previous.selectionEnd );
+	const isBlockChange =
+		( next.clientIds.length > 1 && ! isSameSelection ) ||
+		next.clientIds.length !== previous.clientIds.length ||
+		next.clientIds.some(
+			( clientId, index ) => clientId !== previous.clientIds[ index ]
+		);
+	if ( ! isBlockChange && next.attributes !== previous.attributes ) {
+		return null;
+	}
+	return { isBlockChange };
+}
+
 /**
  * Ids of the notes with a marker in the block, the draft marker's `'new'`
  * included.
