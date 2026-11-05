@@ -784,6 +784,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					blockName,
 					clientId,
 					attributes ?? {},
+					blockWithoutAttributes,
 					select,
 					( ...paths ) =>
 						getBlockSettings( rootClientId || null, ...paths )

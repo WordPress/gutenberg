@@ -16,14 +16,37 @@ export function registerBlockSupport( support: BlockListBlockFeature ) {
 	blockSupports.push( support );
 }
 
+type BlockSupportCache = {
+	attributes: Record< string, unknown >;
+	active: Array< [ number, BlockListBlockFeatureProps ] >;
+	supports: Map<
+		number,
+		{
+			props: BlockListBlockFeatureProps;
+			context: BlockSupportContext;
+			wrapperProps: BlockListWrapperProps;
+		}
+	>;
+};
+
+// Each block's active supports for its attributes, and each support's last
+// props, context and wrapper props. The key is the block's record, which
+// attribute updates keep.
+const cache = new WeakMap< object, BlockSupportCache >();
+
 // The props of each block support the block uses: one with any of its
 // attributes set, that the block supports and that matches them.
 function getActiveBlockSupports(
 	name: string,
 	clientId: string,
-	attributes: Record< string, unknown >
+	attributes: Record< string, unknown >,
+	block: object
 ) {
-	const active: Array< [ number, BlockListBlockFeatureProps ] > = [];
+	const blockCache = cache.get( block );
+	if ( blockCache?.attributes === attributes ) {
+		return blockCache;
+	}
+	const active: BlockSupportCache[ 'active' ] = [];
 	blockSupports.forEach( ( feature, index ) => {
 		const neededProps: Record< string, unknown > = {};
 		for ( const key of feature.attributeKeys ?? [] ) {
@@ -39,7 +62,17 @@ function getActiveBlockSupports(
 			active.push( [ index, { name, clientId, ...neededProps } ] );
 		}
 	} );
-	return active;
+	// Keep the last props of the supports still in use only.
+	const supports: BlockSupportCache[ 'supports' ] = new Map();
+	for ( const [ index ] of active ) {
+		const cached = blockCache?.supports.get( index );
+		if ( cached ) {
+			supports.set( index, cached );
+		}
+	}
+	const newBlockCache = { attributes, active, supports };
+	cache.set( block, newBlockCache );
+	return newBlockCache;
 }
 
 const SETTING_PREFIX = 'blockSupportSetting:';
@@ -52,6 +85,7 @@ const DATA_PREFIX = 'blockSupportData:';
  * @param name             The block name.
  * @param clientId         The block client ID.
  * @param attributes       The block attributes.
+ * @param block            The block's record in the store.
  * @param select           The registry's `select`.
  * @param getBlockSettings Returns the values of the settings at the paths.
  *
@@ -61,6 +95,7 @@ export function selectBlockSupports(
 	name: string,
 	clientId: string,
 	attributes: Record< string, unknown >,
+	block: object,
 	select: DataRegistry[ 'select' ],
 	getBlockSettings: ( ...paths: string[] ) => unknown[]
 ) {
@@ -69,8 +104,9 @@ export function selectBlockSupports(
 	for ( const [ index, props ] of getActiveBlockSupports(
 		name,
 		clientId,
-		attributes
-	) ) {
+		attributes,
+		block
+	).active ) {
 		const support = blockSupports[ index ];
 		support.settings?.forEach( ( path ) => paths.add( path ) );
 		const values = support.select?.( select, props );
@@ -191,20 +227,6 @@ const BlockSupportStyles = memo(
 		isSameContext( prevContext, nextContext )
 );
 
-// Each block's supports' last props, context and wrapper props, by support
-// index. The key is the block's record, which attribute updates keep.
-const cache = new WeakMap<
-	object,
-	Map<
-		number,
-		{
-			props: BlockListBlockFeatureProps;
-			context: BlockSupportContext;
-			wrapperProps: BlockListWrapperProps;
-		}
-	>
->();
-
 /**
  * Returns the block supports' wrapper props, and renders their side effects.
  *
@@ -212,6 +234,9 @@ const cache = new WeakMap<
  * @param clientId   The block client ID.
  * @param attributes The block attributes.
  * @param context    What the block supports read besides attributes.
+ * @param data       The store values selected by `selectBlockSupports`, by
+ *                   support index.
+ * @param block      The block's record in the store.
  *
  * @return The wrapper props and the side effects to render.
  */
@@ -223,25 +248,22 @@ export function getBlockSupportProps(
 	data: Record< number, Record< string, unknown > >,
 	block: object
 ) {
-	let blockCache = cache.get( block );
-	if ( ! blockCache ) {
-		blockCache = new Map();
-		cache.set( block, blockCache );
-	}
-	let wrapperProps: BlockListWrapperProps = {};
-	const effects = [];
-	for ( const [ index, props ] of getActiveBlockSupports(
+	const { active, supports } = getActiveBlockSupports(
 		name,
 		clientId,
-		attributes
-	) ) {
+		attributes,
+		block
+	);
+	let wrapperProps: BlockListWrapperProps = {};
+	const effects = [];
+	for ( const [ index, props ] of active ) {
 		const { getBlockProps, useStyles } = blockSupports[ index ];
 		const supportProps = data[ index ]
 			? { ...props, ...data[ index ] }
 			: props;
 		// Reuse the support's last props when what it reads is unchanged, as
 		// when typing in the block.
-		let cached = blockCache.get( index );
+		let cached = supports.get( index );
 		if (
 			! cached ||
 			! isShallowEqual( cached.props, supportProps ) ||
@@ -256,7 +278,7 @@ export function getBlockSupportProps(
 					context
 				) as BlockListWrapperProps,
 			};
-			blockCache.set( index, cached );
+			supports.set( index, cached );
 		}
 		wrapperProps = mergeWrapperProps( wrapperProps, cached.wrapperProps );
 		if ( useStyles ) {
