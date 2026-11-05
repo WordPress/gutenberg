@@ -3,7 +3,6 @@ import type {
 	BlockListBlockFeature,
 	BlockListBlockFeatureProps,
 	BlockSupportContext,
-	BlockWrapperProps,
 } from '../../hooks/types';
 import type { BlockListWrapperProps } from './types';
 
@@ -95,19 +94,39 @@ export function getBlockSupportSettings( selected: Record< string, unknown > ) {
 	return settings;
 }
 
-function mergeBlockSupportProps(
-	acc: BlockWrapperProps,
-	wrapperProps: BlockWrapperProps | null | undefined
-): BlockWrapperProps {
-	if ( ! wrapperProps ) {
-		return acc;
-	}
-	return {
-		...acc,
-		...wrapperProps,
-		className: clsx( acc.className, wrapperProps.className ),
-		style: { ...acc.style, ...wrapperProps.style },
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param propsA
+ * @param propsB
+ *
+ * @return Merged props.
+ */
+export function mergeWrapperProps(
+	propsA: BlockListWrapperProps | undefined,
+	propsB: BlockListWrapperProps | undefined
+): BlockListWrapperProps {
+	const newProps: BlockListWrapperProps = {
+		...propsA,
+		...propsB,
 	};
+
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
+		newProps.className = clsx( propsA.className, propsB.className );
+	}
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
 }
 
 function BlockSupportStyles( {
@@ -138,7 +157,7 @@ export function getBlockSupportProps(
 	attributes: Record< string, unknown >,
 	context: BlockSupportContext
 ) {
-	let wrapperProps: BlockWrapperProps = {};
+	let wrapperProps: BlockListWrapperProps = {};
 	const effects = [];
 	for ( const [ index, props ] of getActiveBlockSupports(
 		name,
@@ -146,9 +165,10 @@ export function getBlockSupportProps(
 		attributes
 	) ) {
 		const { getBlockProps, useStyles } = blockSupports[ index ];
-		wrapperProps = mergeBlockSupportProps(
+		wrapperProps = mergeWrapperProps(
 			wrapperProps,
-			getBlockProps( props, context )
+			// Block supports set valid style values.
+			getBlockProps( props, context ) as BlockListWrapperProps
 		);
 		if ( useStyles ) {
 			effects.push(
@@ -162,6 +182,5 @@ export function getBlockSupportProps(
 			);
 		}
 	}
-	// Block supports set valid style values.
-	return { wrapperProps: wrapperProps as BlockListWrapperProps, effects };
+	return { wrapperProps, effects };
 }

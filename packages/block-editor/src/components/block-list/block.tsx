@@ -26,6 +26,7 @@ import BlockCrashWarning from './block-crash-warning';
 import {
 	getBlockSupportProps,
 	getBlockSupportSettings,
+	mergeWrapperProps,
 	selectBlockSupportSettings,
 } from './block-supports';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -49,41 +50,6 @@ import type {
 	BlockListWrapperProps,
 	UseBlockPropsProps,
 } from './types';
-
-/**
- * Merges wrapper props with special handling for classNames and styles.
- *
- * @param propsA
- * @param propsB
- *
- * @return Merged props.
- */
-function mergeWrapperProps(
-	propsA: BlockListWrapperProps | undefined,
-	propsB: BlockListWrapperProps | undefined
-): BlockListWrapperProps {
-	const newProps: BlockListWrapperProps = {
-		...propsA,
-		...propsB,
-	};
-
-	// May be set to undefined, so check if the property is set!
-	if (
-		propsA?.hasOwnProperty( 'className' ) &&
-		propsB?.hasOwnProperty( 'className' )
-	) {
-		newProps.className = clsx( propsA.className, propsB.className );
-	}
-
-	if (
-		propsA?.hasOwnProperty( 'style' ) &&
-		propsB?.hasOwnProperty( 'style' )
-	) {
-		newProps.style = { ...propsA.style, ...propsB.style };
-	}
-
-	return newProps;
-}
 
 function Block( {
 	children,
