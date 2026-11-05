@@ -60,7 +60,7 @@ function getChosenLock( lock: BlockLockSelection ): BlockLock {
  * @param attributes        The block's saved attributes.
  * @param chosenLock        The lock options that aren't mixed.
  * @param applyTemplateLock Whether to apply the lock to the inner blocks, or
- *                          `null` when the blocks differ.
+ *                          `null` to keep each block's saved template lock.
  *
  * @return The block's new lock attributes.
  */
@@ -208,6 +208,11 @@ export default function BlockLockModal( {
 					const { getBlockName, getBlockAttributes } =
 						registry.select( blockEditorStore );
 					const chosenLock = getChosenLock( lock );
+					// A disabled "Apply to all blocks inside" keeps each
+					// block's saved template lock, like a mixed one does.
+					const templateLockChoice = isTemplateLockDisabled
+						? null
+						: applyTemplateLock;
 					updateBlockAttributes(
 						clientIds,
 						Object.fromEntries(
@@ -217,7 +222,7 @@ export default function BlockLockModal( {
 									getBlockName( clientId ) as string,
 									getBlockAttributes( clientId ),
 									chosenLock,
-									applyTemplateLock
+									templateLockChoice
 								),
 							] )
 						),

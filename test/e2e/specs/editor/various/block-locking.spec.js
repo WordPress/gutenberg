@@ -415,6 +415,50 @@ test.describe( 'Block Locking', () => {
 		] );
 	} );
 
+	test( 'keeps the template lock when "Apply to all blocks inside" is disabled', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { templateLock: 'insert' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inside' },
+				},
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock Group' } );
+		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
+			name: 'Apply to all blocks inside',
+			exact: true,
+		} );
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock movement', exact: true } )
+			.click();
+		await expect( applyToInnerBlocks ).toBeDisabled();
+		await expect( applyToInnerBlocks ).toBeChecked();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				attributes: {
+					lock: { move: true, remove: false },
+					templateLock: 'insert',
+				},
+			},
+		] );
+	} );
+
 	test( 'keeps a contentOnly template lock', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/group',
