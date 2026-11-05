@@ -61,6 +61,7 @@ export function MediaCategoryPanel( {
 	onChangeMediaType,
 	sourceMenu,
 	folder,
+	folders,
 	folderControl,
 	footer,
 }: MediaCategoryPanelProps ) {
@@ -103,9 +104,13 @@ export function MediaCategoryPanel( {
 		} ),
 		[ perPage, page, search, folderFilter ]
 	);
-	const { actions, attach, handleAttach, refreshKey } = useAttachmentActions(
-		{ category, query }
-	);
+	const { actions, attach, handleAttach, addToFolder, refreshKey } =
+		useAttachmentActions( {
+			category,
+			query,
+			folders,
+			folder: folderFilter,
+		} );
 	const { mediaList, isLoading, isSwitchingSource, totalItems, totalPages } =
 		useMediaResults( category, query, refreshKey );
 	const numPages = totalPages || 1;
@@ -156,6 +161,29 @@ export function MediaCategoryPanel( {
 		emptyMessage = category.emptyMessage;
 	}
 
+	let footerAction;
+	if ( addToFolder ) {
+		footerAction = (
+			<MediaLibraryButton
+				label={ __( 'Add to folder' ) }
+				title={ __( 'Add to folder' ) }
+				onSelect={ addToFolder }
+				multiple="add"
+				allowedTypes={ [ category.mediaType ] }
+			/>
+		);
+	} else if ( attach ) {
+		footerAction = (
+			<MediaLibraryButton
+				label={ __( 'Attach images' ) }
+				title={ __( 'Attach images' ) }
+				onSelect={ handleAttach }
+				multiple="add"
+				allowedTypes={ ATTACH_ALLOWED_TYPES }
+			/>
+		);
+	}
+
 	return (
 		<div ref={ panelRef } className="block-editor-inserter__media-panel">
 			<MediaGrid
@@ -199,24 +227,12 @@ export function MediaCategoryPanel( {
 				mediaTypes={ mediaTypes }
 				mediaType={ mediaType }
 				onChangeMediaType={ onChangeMediaType }
-				// A source that owns the post's attachments offers its own
-				// footer action, in place of the shared one.
-				footer={
-					attach ? (
-						<MediaLibraryButton
-							label={ __( 'Attach images' ) }
-							title={ __( 'Attach images' ) }
-							onSelect={ handleAttach }
-							// Purely additive: the picker opens with nothing
-							// preselected, so it never implies that deselecting
-							// would detach. Detaching is a per-item action.
-							multiple="add"
-							allowedTypes={ ATTACH_ALLOWED_TYPES }
-						/>
-					) : (
-						footer
-					)
-				}
+				// Browsing a folder, or a source that owns the post's
+				// attachments, offers its own footer action in place of the
+				// shared one. Both pickers are purely additive: they open with
+				// nothing preselected, so neither implies that deselecting
+				// would remove anything. Removing is a per-item action.
+				footer={ footerAction ?? footer }
 			/>
 			{ pendingExternalBlock && (
 				<InsertExternalImageModal
