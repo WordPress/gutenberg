@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui`.
+
 ## 28.1.0 (2026-11-04)
 
 ### Enhancements
