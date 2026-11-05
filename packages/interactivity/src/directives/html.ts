@@ -199,6 +199,11 @@ directive(
 			if ( ! active ) {
 				return;
 			}
+			// A getter reading the server context still returns the previous
+			// page's value in the navigation's first render. When that value is
+			// the server representation or pending and the new one isn't, the
+			// content shown here is replaced later in the same update, after
+			// its media started loading.
 			const owed = owedServerContent.current;
 			if ( preserveContent && owed ) {
 				owedServerContent.current = undefined;
