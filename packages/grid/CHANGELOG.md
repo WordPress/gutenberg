@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-04)
+
 ### Enhancements
 
 -   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
