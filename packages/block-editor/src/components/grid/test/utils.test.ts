@@ -1,10 +1,85 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getInserterDragBlockNames,
+	GridRect,
+	getBoundingGridRect,
 	getGridRectFromPixelRect,
 	getGridTracks,
 	getRowEndForResize,
 } from '../utils';
-import type { GridRect } from '../utils';
+
+describe( 'getBoundingGridRect()', () => {
+	it( 'spans from one cell to another', () => {
+		const rect = getBoundingGridRect(
+			new GridRect( { columnStart: 2, rowStart: 1 } ),
+			new GridRect( { columnStart: 4, rowStart: 3 } )
+		);
+		expect( rect ).toMatchObject( {
+			columnStart: 2,
+			rowStart: 1,
+			columnEnd: 4,
+			rowEnd: 3,
+			columnSpan: 3,
+			rowSpan: 3,
+		} );
+	} );
+
+	it( 'gives the same cells whichever way round the cells are', () => {
+		// Dragged up and to the left, then down and to the left.
+		const start = new GridRect( { columnStart: 4, rowStart: 3 } );
+		const expected = {
+			columnStart: 2,
+			rowStart: 1,
+			columnEnd: 4,
+			rowEnd: 3,
+		};
+		expect(
+			getBoundingGridRect(
+				start,
+				new GridRect( { columnStart: 2, rowStart: 1 } )
+			)
+		).toMatchObject( expected );
+		expect(
+			getBoundingGridRect(
+				new GridRect( { columnStart: 4, rowStart: 1 } ),
+				new GridRect( { columnStart: 2, rowStart: 3 } )
+			)
+		).toMatchObject( expected );
+	} );
+
+	it( 'is one cell when both cells are the same', () => {
+		const cell = new GridRect( { columnStart: 3, rowStart: 2 } );
+		expect( getBoundingGridRect( cell, cell ) ).toMatchObject( {
+			columnStart: 3,
+			rowStart: 2,
+			columnSpan: 1,
+			rowSpan: 1,
+		} );
+	} );
+
+	it( 'contains ranges that span several cells', () => {
+		const rect = getBoundingGridRect(
+			new GridRect( {
+				columnStart: 1,
+				rowStart: 2,
+				columnSpan: 2,
+				rowSpan: 1,
+			} ),
+			new GridRect( {
+				columnStart: 2,
+				rowStart: 1,
+				columnSpan: 1,
+				rowSpan: 3,
+			} )
+		);
+		expect( rect ).toMatchObject( {
+			columnStart: 1,
+			rowStart: 1,
+			columnEnd: 2,
+			rowEnd: 3,
+		} );
+	} );
+} );
 
 // Three 100px columns and three 50px rows, with 10px gaps. Rows are 0-50,
 // 60-110 and 120-170.
@@ -71,5 +146,25 @@ describe( 'getRowEndForResize()', () => {
 	it( 'adds a row for every row height dragged past the end', () => {
 		expect( getRowEndForResize( rowTracks, 230, 10 ) ).toBe( 4 );
 		expect( getRowEndForResize( rowTracks, 290, 10 ) ).toBe( 5 );
+	} );
+} );
+
+describe( 'getInserterDragBlockNames()', () => {
+	it( 'returns the block names of an inserter drag', () => {
+		expect(
+			getInserterDragBlockNames( {
+				types: [ 'wp-block:core/image', 'wp-blocks' ],
+			} )
+		).toEqual( [ 'core/image' ] );
+	} );
+
+	it( 'returns nothing for a file drag', () => {
+		expect( getInserterDragBlockNames( { types: [ 'Files' ] } ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'returns nothing without a dataTransfer', () => {
+		expect( getInserterDragBlockNames( null ) ).toEqual( [] );
 	} );
 } );
