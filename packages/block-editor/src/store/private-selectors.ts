@@ -607,10 +607,8 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 				const grammar = getGrammar( pattern );
 				return (
 					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
-					grammar.every(
-						// @ts-expect-error Grammar blocks have `blockName`, so this is always undefined.
-						( { name: blockName } ) =>
-							canInsertBlockType( state, blockName, rootClientId )
+					grammar.every( ( { blockName } ) =>
+						canInsertBlockType( state, blockName, rootClientId )
 					)
 				);
 			} );
