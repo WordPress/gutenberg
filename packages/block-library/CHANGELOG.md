@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Post Featured Image: Ensure the block wrapper fills available width in the editor so placeholders with an aspect ratio do not overflow stretched containers ([#86014](https://github.com/WordPress/gutenberg/pull/86014)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 
@@ -26,7 +27,6 @@
 
 ### Bug Fixes
 
--   Post Featured Image: Ensure the block wrapper fills available width in the editor so placeholders with an aspect ratio do not overflow stretched containers ([#86014](https://github.com/WordPress/gutenberg/pull/86014)).
 -   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
 -   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
