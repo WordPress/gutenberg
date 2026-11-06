@@ -12,13 +12,13 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 //   0–14:  label row (translates with strip; active label sits centered)
 //   14–32: tick lines (anchored to strip bottom)
 //   14–32: pointer line (overlays the tick area at center)
+// SVG ticks and labels use currentColor and inherit the host's foreground.
 .rotation-ruler {
 	position: relative;
 	min-width: 180px;
 	height: 32px;
 	padding: 0 $grid-unit-10;
 	box-sizing: border-box;
-	color: $gray-900;
 	font-family: $font-family-body;
 	user-select: none;
 	touch-action: none;
@@ -145,7 +145,6 @@ $rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 	font-size: 12px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 14px;
-	color: $gray-900;
 	pointer-events: none;
 
 	&::before {
