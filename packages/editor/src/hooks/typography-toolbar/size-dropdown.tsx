@@ -104,6 +104,37 @@ export default function TypographySizeDropdown( {
 					>
 						{ ( { onClose } ) => (
 							<>
+								<MenuGroup>
+									<MenuItem
+										role="menuitemradio"
+										isSelected={
+											! active && customPx === undefined
+										}
+										onClick={ () => {
+											onSelectPreset( undefined );
+											onClose();
+										} }
+									>
+										{ defaultLabel }
+									</MenuItem>
+									{ fontSizes.map( ( preset ) => (
+										<MenuItem
+											key={ preset.slug }
+											role="menuitemradio"
+											isSelected={ preset.slug === value }
+											style={ {
+												fontSize:
+													preset.size ?? undefined,
+											} }
+											onClick={ () => {
+												onSelectPreset( preset.slug );
+												onClose();
+											} }
+										>
+											{ getSizeLabel( preset ) }
+										</MenuItem>
+									) ) }
+								</MenuGroup>
 								<div className="editor-typography-toolbar__custom-size">
 									<NumberControl
 										label={ __( 'Custom size' ) }
@@ -136,37 +167,6 @@ export default function TypographySizeDropdown( {
 										} }
 									/>
 								</div>
-								<MenuGroup>
-									<MenuItem
-										role="menuitemradio"
-										isSelected={
-											! active && customPx === undefined
-										}
-										onClick={ () => {
-											onSelectPreset( undefined );
-											onClose();
-										} }
-									>
-										{ defaultLabel }
-									</MenuItem>
-									{ fontSizes.map( ( preset ) => (
-										<MenuItem
-											key={ preset.slug }
-											role="menuitemradio"
-											isSelected={ preset.slug === value }
-											style={ {
-												fontSize:
-													preset.size ?? undefined,
-											} }
-											onClick={ () => {
-												onSelectPreset( preset.slug );
-												onClose();
-											} }
-										>
-											{ getSizeLabel( preset ) }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
 							</>
 						) }
 					</DropdownMenu>

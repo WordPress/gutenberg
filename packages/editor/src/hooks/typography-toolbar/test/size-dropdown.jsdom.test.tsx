@@ -198,6 +198,28 @@ describe( 'TypographySizeDropdown', () => {
 		);
 	} );
 
+	it( 'puts the box for a size of your own below the theme’s sizes', async () => {
+		const user = userEvent.setup();
+		render(
+			<TypographySizeDropdown
+				fontSizes={ FONT_SIZES }
+				onSelectPreset={ noop }
+				onSetCustom={ noop }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Size' } ) );
+
+		const options = screen.getAllByRole( 'menuitemradio' );
+		const box = screen.getByRole( 'spinbutton', { name: 'Custom size' } );
+
+		// The last size is neither an ancestor nor a descendant of the box,
+		// so preceding it is the whole of the answer.
+		expect(
+			box.compareDocumentPosition( options[ options.length - 1 ] )
+		).toBe( Node.DOCUMENT_POSITION_PRECEDING );
+	} );
+
 	it( 'offers a slider for a size of your own, as the inspector does', async () => {
 		const user = userEvent.setup();
 		render(

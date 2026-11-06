@@ -233,14 +233,44 @@ test.describe( 'Typography toolbar', () => {
 			.toEqual( expect.any( String ) );
 	} );
 
+	test( 'a background colour is saved as a preset on the block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+
+		await getToolbar( page )
+			.getByRole( 'button', { name: 'Background color' } )
+			.click();
+		await page
+			.locator( '.editor-typography-toolbar__color-popover' )
+			.getByRole( 'option' )
+			.first()
+			.click();
+
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].attributes.backgroundColor
+			)
+			.toEqual( expect.any( String ) );
+	} );
+
 	test( 'leaves a block that cannot be coloured without the control', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/spacer' } );
 
+		const toolbar = getToolbar( page );
 		await expect(
-			getToolbar( page ).getByRole( 'button', { name: 'Text color' } )
+			toolbar.getByRole( 'button', { name: 'Text color' } )
+		).toBeHidden();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Background color' } )
 		).toBeHidden();
 	} );
 

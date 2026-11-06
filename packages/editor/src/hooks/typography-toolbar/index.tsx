@@ -1,7 +1,12 @@
 import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	background as backgroundIcon,
+	textColor as textColorIcon,
+} from '@wordpress/icons';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -39,32 +44,37 @@ const FONT_SIZE_SUPPORT = 'typography.fontSize';
 type ColorOption = { slug?: string; name?: string; color: string };
 
 /**
- * Whether a block lets its text be coloured. The colour support flags each
- * feature, and text is the one that is on unless it is turned off.
+ * Whether a block lets one of its colours be set. The colour support flags
+ * each feature, and these two are on unless they are turned off.
  *
- * @param name The block's name.
+ * @param name    The block's name.
+ * @param feature Which colour to ask about.
  *
- * @return Whether the block offers a text colour.
+ * @return Whether the block offers that colour.
  */
-function hasTextColorSupport( name: string ): boolean {
+function hasColorSupport(
+	name: string,
+	feature: 'text' | 'background'
+): boolean {
 	const support = getBlockSupport( name, 'color' ) as
-		{ text?: boolean } | boolean | undefined;
+		Record< string, boolean | undefined > | boolean | undefined;
 
 	if ( ! support ) {
 		return false;
 	}
 
-	return support === true || support.text !== false;
+	return support === true || support[ feature ] !== false;
 }
 
 type TypographyAttributes = {
 	fontFamily?: string;
 	fontSize?: string;
 	textColor?: string;
+	backgroundColor?: string;
 	// A heading's level decides which element it takes its typography from.
 	level?: unknown;
 	style?: {
-		color?: { text?: string };
+		color?: { text?: string; background?: string };
 		typography?: { fontSize?: string };
 	};
 	[ key: string ]: unknown;
@@ -123,7 +133,8 @@ function TypographyToolbarControls( {
 
 	const hasFont = hasBlockSupport( name, FONT_FAMILY_SUPPORT, false );
 	const hasSize = hasBlockSupport( name, FONT_SIZE_SUPPORT, false );
-	const hasColor = hasTextColorSupport( name );
+	const hasTextColor = hasColorSupport( name, 'text' );
+	const hasBackground = hasColorSupport( name, 'background' );
 	const customFontSize = attributes.style?.typography?.fontSize;
 
 	// A preset lives in its own attribute and a size of your own in `style`,
@@ -147,23 +158,27 @@ function TypographyToolbarControls( {
 		} );
 	};
 
-	// A preset lives in `textColor` and a colour of your own in `style`.
-	const onChangeColor = ( color?: string, slug?: string ) => {
+	// A preset lives in its own attribute and a colour of your own in `style`.
+	const setColor = (
+		attribute: 'textColor' | 'backgroundColor',
+		styleKey: 'text' | 'background',
+		color?: string,
+		slug?: string
+	) => {
 		setAttributes( {
-			textColor: slug,
+			[ attribute ]: slug,
 			style: cleanEmptyObject( {
 				...attributes.style,
 				color: {
 					...attributes.style?.color,
-					text: slug ? undefined : color,
+					[ styleKey ]: slug ? undefined : color,
 				},
 			} ),
 		} );
 	};
 
-	const activeColor = attributes.textColor
-		? colors.find( ( color ) => color.slug === attributes.textColor )?.color
-		: attributes.style?.color?.text;
+	const colorInUse = ( slug?: string, custom?: string ) =>
+		slug ? colors.find( ( color ) => color.slug === slug )?.color : custom;
 
 	return (
 		<BlockControls group="typography">
@@ -194,12 +209,33 @@ function TypographyToolbarControls( {
 					}
 				/>
 			) }
-			{ hasColor && (
+			{ hasTextColor && (
 				<TypographyColorDropdown
+					label={ __( 'Text color' ) }
+					icon={ textColorIcon }
 					colors={ colors }
-					value={ activeColor }
+					value={ colorInUse(
+						attributes.textColor,
+						attributes.style?.color?.text
+					) }
 					defaultColor={ inherited.textColor }
-					onChange={ onChangeColor }
+					onChange={ ( color, slug ) =>
+						setColor( 'textColor', 'text', color, slug )
+					}
+				/>
+			) }
+			{ hasBackground && (
+				<TypographyColorDropdown
+					label={ __( 'Background color' ) }
+					icon={ backgroundIcon }
+					colors={ colors }
+					value={ colorInUse(
+						attributes.backgroundColor,
+						attributes.style?.color?.background
+					) }
+					onChange={ ( color, slug ) =>
+						setColor( 'backgroundColor', 'background', color, slug )
+					}
 				/>
 			) }
 		</BlockControls>
@@ -212,7 +248,8 @@ const withTypographyToolbar = createHigherOrderComponent(
 			const offersTypography =
 				hasBlockSupport( props.name, FONT_FAMILY_SUPPORT, false ) ||
 				hasBlockSupport( props.name, FONT_SIZE_SUPPORT, false ) ||
-				hasTextColorSupport( props.name );
+				hasColorSupport( props.name, 'text' ) ||
+				hasColorSupport( props.name, 'background' );
 
 			return (
 				<>

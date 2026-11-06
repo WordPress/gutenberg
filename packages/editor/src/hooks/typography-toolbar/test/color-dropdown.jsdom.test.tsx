@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { textColor } from '@wordpress/icons';
 import TypographyColorDropdown from '../color-dropdown';
 
 const COLORS = [
@@ -14,7 +15,12 @@ describe( 'TypographyColorDropdown', () => {
 	it( 'offers the theme’s colours', async () => {
 		const user = userEvent.setup();
 		render(
-			<TypographyColorDropdown colors={ COLORS } onChange={ noop } />
+			<TypographyColorDropdown
+				label="Text color"
+				icon={ textColor }
+				colors={ COLORS }
+				onChange={ noop }
+			/>
 		);
 
 		await user.click(
@@ -25,9 +31,29 @@ describe( 'TypographyColorDropdown', () => {
 		expect( screen.getByRole( 'option', { name: 'Clay' } ) ).toBeVisible();
 	} );
 
+	it( 'takes the name it is given', async () => {
+		const user = userEvent.setup();
+		render(
+			<TypographyColorDropdown
+				label="Background color"
+				icon={ textColor }
+				colors={ COLORS }
+				onChange={ noop }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Background color' } )
+		);
+
+		expect( screen.getByRole( 'option', { name: 'Ink' } ) ).toBeVisible();
+	} );
+
 	it( 'draws the colour as a line under the letter, not on it', () => {
 		render(
 			<TypographyColorDropdown
+				label="Text color"
+				icon={ textColor }
 				colors={ COLORS }
 				value="#b4522d"
 				onChange={ noop }
@@ -48,6 +74,8 @@ describe( 'TypographyColorDropdown', () => {
 	it( 'shows the colour the block renders in when it sets none', () => {
 		render(
 			<TypographyColorDropdown
+				label="Text color"
+				icon={ textColor }
 				colors={ COLORS }
 				defaultColor="#1a1a1a"
 				onChange={ noop }
@@ -59,11 +87,31 @@ describe( 'TypographyColorDropdown', () => {
 		} );
 	} );
 
+	it( 'shows no bar at all when there is no colour to show', () => {
+		render(
+			<TypographyColorDropdown
+				label="Background color"
+				icon={ textColor }
+				colors={ COLORS }
+				onChange={ noop }
+			/>
+		);
+
+		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
+			background: 'transparent',
+		} );
+	} );
+
 	it( 'hands back the colour and the preset it came from', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
-			<TypographyColorDropdown colors={ COLORS } onChange={ onChange } />
+			<TypographyColorDropdown
+				label="Text color"
+				icon={ textColor }
+				colors={ COLORS }
+				onChange={ onChange }
+			/>
 		);
 
 		await user.click(
@@ -79,6 +127,8 @@ describe( 'TypographyColorDropdown', () => {
 		const onChange = vi.fn();
 		render(
 			<TypographyColorDropdown
+				label="Text color"
+				icon={ textColor }
 				colors={ COLORS }
 				value="#b4522d"
 				onChange={ onChange }
