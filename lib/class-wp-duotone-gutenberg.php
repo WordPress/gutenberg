@@ -48,7 +48,7 @@ class WP_Duotone_Gutenberg {
 	 *       …
 	 *  ]
 	 *
-	 * @var array<string, string>
+	 * @var ?array<string, string>
 	 */
 	private static $global_styles_block_names;
 
