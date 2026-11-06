@@ -74,14 +74,31 @@
 			border-bottom: 0;
 		}
 
-		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+		.dataviews-item-actions {
+			position: relative;
+		}
+
+		.dataviews-primary-actions {
+			display: flex;
+			align-items: center;
+			position: absolute;
+			right: 100%;
+			top: calc(-1 * var(--wpds-dimension-padding-md));
+			bottom: calc(-1 * var(--wpds-dimension-padding-md));
+			gap: var(--wpds-dimension-gap-xs);
 			opacity: 0;
+			pointer-events: none;
+			white-space: nowrap;
+			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+			padding-inline: var(--wpds-dimension-padding-sm);
+			border-left: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		}
 
 		@media (hover: none) {
 			// Show quick-actions on devices that do not support hover.
-			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			.dataviews-primary-actions {
 				opacity: 1;
+				pointer-events: auto;
 			}
 		}
 
@@ -97,14 +114,29 @@
 			.dataviews-view-table__actions-column--sticky {
 				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			}
+
+			.dataviews-primary-actions {
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+			}
 		}
 
 		// Show action buttons on hover/focus for all rows
 		&:focus-within,
 		&.is-hovered,
 		&:hover {
-			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			.dataviews-primary-actions {
 				opacity: 1;
+				pointer-events: auto;
+			}
+
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
+			}
+		}
+
+		&.is-selected {
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
 			}
 		}
 	}
@@ -254,12 +286,22 @@
 		th {
 			padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 		}
+
+		tr .dataviews-primary-actions {
+			top: calc(-1 * var(--wpds-dimension-padding-xs));
+			bottom: calc(-1 * var(--wpds-dimension-padding-xs));
+		}
 	}
 
 	&.has-comfortable-density {
 		td,
 		th {
 			padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-md);
+		}
+
+		tr .dataviews-primary-actions {
+			top: calc(-1 * var(--wpds-dimension-padding-lg));
+			bottom: calc(-1 * var(--wpds-dimension-padding-lg));
 		}
 	}
 
