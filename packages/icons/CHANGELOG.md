@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `cover`: Redraw the icon on the frame the other container icons share, such as `image` and `caption`, correcting a footprint that read a size larger than its neighbors, and align the bookmark with the top edge of that frame ([#86420](https://github.com/WordPress/gutenberg/pull/86420)).
+
+## 20.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
@@ -24,6 +30,11 @@
 ### Bug Fixes
 
 -   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ## 19.0.0 (2026-10-20)
 

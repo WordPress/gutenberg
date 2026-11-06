@@ -67,7 +67,7 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
-		"phpstan": "@php tools/phpstan/generate-wordpress-stubs.php && phpstan analyse --memory-limit=2G",
+		"phpstan": "@php tools/phpstan/generate-wordpress-stubs.php --quiet && phpstan analyse --memory-limit=2G",
 		"phpstan:baselines": "@phpstan --configuration=phpstan.neon.dist --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
 		"phpstan:generate-wordpress-stubs": "@php tools/phpstan/generate-wordpress-stubs.php",
 		"test": "phpunit",

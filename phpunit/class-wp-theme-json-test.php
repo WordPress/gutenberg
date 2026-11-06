@@ -1600,6 +1600,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_variation_rule_from_a_pseudo_node_ignores_the_pseudo_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient' => 'linear-gradient(135deg,#ff0000,#0000ff)',
+							),
+							':hover'     => array(
+								'background' => array( 'backgroundClip' => 'text' ),
+							),
+							'variations' => array(
+								'flashy' => array(
+									'background' => array( 'backgroundClip' => 'padding-box' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button', ':hover' ),
+				'selector'   => '.wp-block-button:hover',
+				'css'        => '.wp-block-button:hover',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringNotContainsString( 'background-image: unset', $actual_styles );
+	}
+
 	public function test_variation_breakpoint_pseudo_state_reads_the_block_clip() {
 		register_block_style(
 			'core/button',
@@ -1715,6 +1767,119 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		// The breakpoint already escaped the clip, so no fill is needed.
 		$this->assertStringContainsString(
 			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_text_color_gets_its_fill_back_on_the_color_feature_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/search' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'@mobile'    => array( 'color' => array( 'text' => '#00ff00' ) ),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_text_color_gets_its_fill_back_on_the_color_feature_selector() {
+		register_block_style(
+			'core/search',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/search' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		unregister_block_style( 'core/search', 'flashy' );
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-search.is-style-flashy .wp-block-search__button, .wp-block-search.wp-block-search__no-button.is-style-flashy .wp-block-search__input){color: #00ff00;-webkit-text-fill-color: currentColor;}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_text_clip_check_keeps_the_variation_gradient() {
+		register_block_style(
+			'core/post-navigation-link',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/post-navigation-link' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array(
+									'background' => array( 'gradient' => 'linear-gradient(135deg,#00ff00,#ffff00)' ),
+									'color'      => array( 'text' => '#00ff00' ),
+									'@mobile'    => array( 'color' => array( 'text' => '#0000ff' ) ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		unregister_block_style( 'core/post-navigation-link', 'flashy' );
+
+		// The variation paints its own gradient, so only its mobile text color needs the fill.
+		$this->assertStringContainsString(
+			':root :where(.wp-block-post-navigation-link.is-style-flashy){color: #00ff00;}',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-post-navigation-link.is-style-flashy){color: #0000ff;-webkit-text-fill-color: currentColor;}}',
 			$stylesheet
 		);
 	}
@@ -8210,18 +8375,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param string $expected Expected results.
 	 */
 	public function test_process_blocks_custom_css( $input, $expected ) {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(),
-			)
-		);
-		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$reflection->setAccessible( true );
-		}
-
-		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
+		$this->assertSame( $expected, WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $input['css'], $input['selector'] ) );
 	}
 
 	/**
