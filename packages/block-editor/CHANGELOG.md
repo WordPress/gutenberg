@@ -8,7 +8,7 @@
 
 ### Internal
 
--   The deprecated `__experimentalImageEditor` rotates through the rebuilt `@wordpress/image-cropper` instead of redrawing the image, and loads the cropper's stylesheet, which no longer injects its own.
+-   The deprecated `__experimentalImageEditor` rotates through the rebuilt `@wordpress/image-cropper` instead of redrawing the image, and loads the cropper's stylesheet, which no longer injects its own ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 
 ## 20.0.0 (2026-11-04)
 

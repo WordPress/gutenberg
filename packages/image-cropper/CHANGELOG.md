@@ -4,20 +4,20 @@
 
 ### Breaking Changes
 
--   Rebuild the package on `@wordpress/image-editor` and remove the `react-easy-crop` and `dequal` dependencies. `ImageCropper`, `ImageCropperProvider`, `useImageCropper` and `normalizeRotation` keep their names and shapes.
--   Consumers load the package's stylesheet, `build-style/style.css`, from Sass or JavaScript. The old library injected its own styles.
--   `cropperState.crop` is the image editor's pan, in fractions of the image, instead of a pixel offset of the image.
--   `croppedArea` and `croppedAreaPixels` are measured after the flip, then after a clockwise rotation of `rotation` degrees, or of `360 - rotation` degrees when exactly one axis is flipped. The old values were in the unflipped frame.
--   `mediaSize.width` and `mediaSize.height` equal the natural size.
--   `getCroppedImage` ignores its argument and exports the loaded image.
--   A `crop` region in `setResetState` is ignored; zoom, rotation, aspect ratio and flip apply.
--   `minZoom` is accepted and ignored. Zoom is clamped by the editor, with the component's `maxZoom` default of 5.
--   A rotated image refits the view on its own. Small crops are magnified on screen, up to 8x, and keep a 44px minimum size.
--   The `reactEasyCrop_*`, `image-cropper__crop-area` and `image-cropper__image` class names are gone, and extra props are no longer forwarded to the underlying component.
+-   Rebuild the package on `@wordpress/image-editor` and remove the `react-easy-crop` and `dequal` dependencies. `ImageCropper`, `ImageCropperProvider`, `useImageCropper` and `normalizeRotation` keep their names and shapes ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   Consumers load the package's stylesheet, `build-style/style.css`, from Sass or JavaScript. The old library injected its own styles ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   `cropperState.crop` is the image editor's pan, in fractions of the image, instead of a pixel offset of the image ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   `croppedArea` and `croppedAreaPixels` are measured after the flip, then after a clockwise rotation of `rotation` degrees, or of `360 - rotation` degrees when exactly one axis is flipped. The old values were in the unflipped frame ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   `mediaSize.width` and `mediaSize.height` equal the natural size ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   `getCroppedImage` ignores its argument and exports the loaded image ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   A `crop` region in `setResetState` is ignored; zoom, rotation, aspect ratio and flip apply ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   `minZoom` is accepted and ignored. Zoom is clamped by the editor, with the component's `maxZoom` default of 5 ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   A rotated image refits the view on its own. Small crops are magnified on screen, up to 8x, and keep a 44px minimum size ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
+-   The `reactEasyCrop_*`, `image-cropper__crop-area` and `image-cropper__image` class names are gone, and extra props are no longer forwarded to the underlying component ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 
 ### Deprecations
 
--   Deprecate the package in favour of `@wordpress/image-editor`. Mounting `ImageCropperProvider` logs a notice.
+-   Deprecate the package in favour of `@wordpress/image-editor`. Mounting `ImageCropperProvider` logs a notice ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 
 ## 2.1.0 (2026-11-04)
 
