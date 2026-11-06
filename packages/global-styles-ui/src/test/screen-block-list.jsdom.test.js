@@ -386,7 +386,11 @@ describe( 'normalizeBorderStyle', () => {
 					top: { style: 'solid' },
 					right: undefined,
 					bottom: undefined,
-					left: { color: 'currentColor', style: 'solid', width: '4px' },
+					left: {
+						color: 'currentColor',
+						style: 'solid',
+						width: '4px',
+					},
 				},
 			} )
 		).toEqual( {
