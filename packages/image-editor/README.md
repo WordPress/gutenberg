@@ -18,13 +18,46 @@ npm install @wordpress/image-editor --save
 
 ## Styles
 
-The canvas needs the editor's styles to lay out at all, so load them. They ship in `build-style/style.css`:
+The canvas needs its stylesheet for layout. Load `build-style/style.css` from your app's Sass:
 
 ```scss
 @use "@wordpress/image-editor/build-style/style.css";
 ```
 
-The focus ring and the focused resize handle use the admin theme colour. Set `--wp-image-editor-focus-color` on an ancestor to change it.
+Or import it from JavaScript:
+
+```js
+import '@wordpress/image-editor/build-style/style.css';
+```
+
+The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. Gutenberg's media editor reads the user's admin colour scheme for its accent and currently uses a light surface. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
+
+Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
+
+| Property                             | Changes                                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `--wp-image-editor-accent-color`     | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
+| `--wp-image-editor-foreground-color` | Crop outline at rest and dimensions tooltip text. The focused outline uses the accent colour.                    |
+| `--wp-image-editor-surface-color`    | Handle fill, dimensions tooltip background and the inner focus ring.                                             |
+| `--wp-image-editor-dimming-color`    | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
+| `--wp-image-editor-grid-color`       | Rule-of-thirds lines.                                                                                            |
+| `--wp-image-editor-canvas-inset`     | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
+
+For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
+
+```css
+.my-cropper {
+	--wp-image-editor-accent-color: rebeccapurple;
+}
+
+.my-cropper.is-dark {
+	--wp-image-editor-foreground-color: #f0f0f0;
+	--wp-image-editor-surface-color: #1e1e1e;
+	--wp-image-editor-dimming-color: rgb( 0 0 0 / 60% );
+}
+```
+
+To use the design tokens outside WordPress, install `@wordpress/theme` and load its `design-tokens.css` in your app. The image editor runs without it, and your custom properties take precedence over the design tokens.
 
 ## Outside WordPress
 
