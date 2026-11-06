@@ -48,7 +48,11 @@
 				}
 
 				&[data-disabled] {
-					background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
+					/*
+					 * A light track reads as "off" next to unchecked switches, so
+					 * keep the enabled shape (dark track, light thumb) in gray.
+					 */
+					background-color: var(--wpds-color-stroke-interactive-neutral);
 
 					@media (forced-colors: active) {
 						background-color: GrayText;
@@ -105,8 +109,6 @@
 				}
 
 				&[data-disabled] {
-					background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
-
 					@media (forced-colors: active) {
 						/*
 						 * GrayText on both track and thumb hides the thumb.
