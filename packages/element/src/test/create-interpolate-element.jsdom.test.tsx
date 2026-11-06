@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 import type {
@@ -80,7 +81,7 @@ describe( 'createInterpolateElement', () => {
 	);
 	it( 'returns same string when the tag is a non-enumerable key of the conversion map', () => {
 		const testString = 'This is a <hidden>happy</hidden> string';
-		const conversionMap = { item: <em /> };
+		const conversionMap: Record< string, ReactElement > = { item: <em /> };
 		Object.defineProperty( conversionMap, 'hidden', { value: 'text' } );
 		expect( createInterpolateElement( testString, conversionMap ) ).toEqual(
 			<>{ testString }</>
