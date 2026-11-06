@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Keep keyboard focus inside an open overlay menu after a submenu in it opens or closes, instead of trapping focus in the submenu or letting it leave the overlay ([#86392](https://github.com/WordPress/gutenberg/pull/86392)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 -   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
