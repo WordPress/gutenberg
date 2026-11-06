@@ -279,12 +279,101 @@ test.describe( 'Tabs', () => {
 		} );
 	} );
 
-	// TODO: Extend this with the remaining front-end interactions
-	// (e.g. switching tabs by click and by keyboard on the published post).
 	test.describe( 'Frontend functionality', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
 		} );
+
+		for ( const autoActivate of [ false, true ] ) {
+			test( `keyboard navigation with automatic activation ${ autoActivate ? 'enabled' : 'disabled' }`, async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/tabs',
+					innerBlocks: [
+						{ name: 'core/tab-list' },
+						{
+							name: 'core/tab-panels',
+							innerBlocks: [ 1, 2, 3 ].map( ( number ) => ( {
+								name: 'core/tab-panel',
+								attributes: { label: `Tab ${ number }` },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
+											content: `Panel ${ number }`,
+										},
+									},
+								],
+							} ) ),
+						},
+					],
+				} );
+				await editor.selectBlocks(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Tabs',
+						exact: true,
+					} )
+				);
+				await editor.openDocumentSettingsSidebar();
+				const toggle = page.getByRole( 'switch', {
+					name: 'Auto-activate tabs on keyboard navigation',
+				} );
+				await expect( toggle ).not.toBeChecked();
+				if ( autoActivate ) {
+					await toggle.check();
+				}
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+				const tabs = page.getByRole( 'tab' );
+				const panels = page.locator( '.wp-block-tab-panel' );
+				await expect( tabs.first() ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+				await tabs.first().focus();
+
+				for ( const [ key, index ] of [
+					[ 'ArrowRight', 1 ],
+					[ 'End', 2 ],
+					[ 'ArrowRight', 0 ],
+					[ 'ArrowLeft', 2 ],
+					[ 'Home', 0 ],
+					[ 'End', 2 ],
+				] ) {
+					await page.keyboard.press( key );
+					await expect( tabs.nth( index ) ).toBeFocused();
+					const activeIndex = autoActivate ? index : 0;
+					for ( let i = 0; i < 3; i++ ) {
+						await expect( tabs.nth( i ) ).toHaveAttribute(
+							'aria-selected',
+							String( i === activeIndex )
+						);
+						await expect( tabs.nth( i ) ).toHaveAttribute(
+							'tabindex',
+							i === activeIndex ? '0' : '-1'
+						);
+						await expect( panels.nth( i ) ).toHaveJSProperty(
+							'hidden',
+							i === activeIndex ? false : 'until-found'
+						);
+					}
+				}
+				await page.keyboard.press( 'Enter' );
+				await expect( tabs.nth( 2 ) ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+				await page.keyboard.press( 'Home' );
+				await page.keyboard.press( 'Space' );
+				await expect( tabs.first() ).toHaveAttribute(
+					'aria-selected',
+					'true'
+				);
+			} );
+		}
 
 		test( 'keeps the content of inactive panels available to find-in-page', async ( {
 			editor,
