@@ -21,18 +21,10 @@
  *
  * Behind the `gutenberg-template-inheritance` experiment, which is what loads
  * this file, while the product questions this opens are settled: named slots,
- * what a theme may declare, and how a chain meets the template hierarchy.
+ * what a theme may declare, and whether templates may nest more than one level.
  *
  * @package gutenberg
  */
-
-/**
- * The most templates a chain may be deep.
- *
- * A chain that is longer than this is treated as a mistake and resolved as far
- * as the limit allows.
- */
-const GUTENBERG_TEMPLATE_PARENT_MAX_DEPTH = 10;
 
 /**
  * The block whose `core/post-content` blocks are not the slot.
@@ -63,7 +55,38 @@ const GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE = 'templateSlot';
  * @return bool Whether it has a slot.
  */
 function gutenberg_block_template_has_content_slot( $content ) {
-	return null !== gutenberg_substitute_template_content_slot( $content, '' );
+	return gutenberg_blocks_have_content_slot( parse_blocks( (string) $content ) );
+}
+
+/**
+ * Returns whether a list of parsed blocks holds the `core/post-content` block
+ * that is the slot.
+ *
+ * Follows the same walk as `gutenberg_substitute_content_slot_in_block()`,
+ * without building or serializing anything, since it answers the REST field of
+ * every template of a collection.
+ *
+ * @access private
+ *
+ * @param array $blocks Parsed blocks to search.
+ * @return bool Whether one of them, at any depth, is the slot.
+ */
+function gutenberg_blocks_have_content_slot( $blocks ) {
+	foreach ( $blocks as $block ) {
+		if ( GUTENBERG_TEMPLATE_CONTENT_SLOT_EXCLUDED_BLOCK === $block['blockName'] ) {
+			continue;
+		}
+
+		if ( 'core/post-content' === $block['blockName'] ) {
+			return true;
+		}
+
+		if ( ! empty( $block['innerBlocks'] ) && gutenberg_blocks_have_content_slot( $block['innerBlocks'] ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -369,54 +392,44 @@ function gutenberg_render_template_content_slot( $args, $name ) {
 add_filter( 'register_block_type_args', 'gutenberg_render_template_content_slot', 10, 2 );
 
 /**
- * Renders a template inside the templates it is assigned to, up the whole chain.
+ * Renders a template inside the template assigned to it.
  *
- * Stops at the first template that has no template assigned, at one that is
- * already in the chain, and at one whose template has no `core/post-content`
- * block to render it in.
+ * Only one level: a template is rendered inside the template it names, and the
+ * template it names is not rendered inside another in turn, even when it names
+ * one for its own requests. That is all the editor shows around a template, so
+ * the front end matches the canvas, and it leaves no loop to guard against
+ * beyond a template naming itself.
+ *
+ * Renders the template on its own when it names no template, names itself,
+ * names one that is not there or is empty, or names one with no
+ * `core/post-content` block to render it in.
  *
  * @param string $template_id ID of the template being rendered, as `theme//slug`.
  * @param string $content     Serialized blocks of the template being rendered.
- * @return string|null The template rendered inside its chain, or `null` when it is rendered on its own.
+ * @return string|null The template rendered inside the one it names, or `null` when it is rendered on its own.
  */
 function gutenberg_resolve_block_template_parents( $template_id, $content ) {
-	$resolved   = null;
-	$seen       = array( $template_id => true );
-	$current_id = $template_id;
-
-	for ( $depth = 0; $depth < GUTENBERG_TEMPLATE_PARENT_MAX_DEPTH; $depth++ ) {
-		$current = gutenberg_get_block_template_read( $current_id );
-		if ( ! $current ) {
-			break;
-		}
-
-		$parent_slug = gutenberg_get_block_template_parent_slug( $current );
-		if ( '' === $parent_slug ) {
-			break;
-		}
-
-		$parent_id = $current->theme . '//' . $parent_slug;
-		if ( isset( $seen[ $parent_id ] ) ) {
-			break;
-		}
-		$seen[ $parent_id ] = true;
-
-		$parent = gutenberg_get_block_template_read( $parent_id );
-		if ( ! $parent || '' === trim( (string) $parent->content ) ) {
-			break;
-		}
-
-		$combined = gutenberg_substitute_template_content_slot( $parent->content, $content );
-		if ( null === $combined ) {
-			break;
-		}
-
-		$content    = $combined;
-		$resolved   = $combined;
-		$current_id = $parent_id;
+	$template = gutenberg_get_block_template_read( $template_id );
+	if ( ! $template ) {
+		return null;
 	}
 
-	return $resolved;
+	$parent_slug = gutenberg_get_block_template_parent_slug( $template );
+	if ( '' === $parent_slug ) {
+		return null;
+	}
+
+	$parent_id = $template->theme . '//' . $parent_slug;
+	if ( $parent_id === $template_id ) {
+		return null;
+	}
+
+	$parent = gutenberg_get_block_template_read( $parent_id );
+	if ( ! $parent || '' === trim( (string) $parent->content ) ) {
+		return null;
+	}
+
+	return gutenberg_substitute_template_content_slot( $parent->content, $content );
 }
 
 /**

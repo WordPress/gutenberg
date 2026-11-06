@@ -296,11 +296,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			template.id !== post.id;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			if ( isTemplateInsideTemplate ) {
-				postContext.postId = post.id;
-				postContext.postType = post.type;
-				// If it is a template, try to inherit the post type from the name.
-			} else if ( post.type === 'wp_template' ) {
+			// If it is a template, try to inherit the post type from the name.
+			// A template rendered inside another is given the same context, so
+			// that the blocks of the template around it, such as a title block
+			// in its header, stand for the post that template renders rather
+			// than for the template; its post content block is told which
+			// template to render through `templateSlotId` instead.
+			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
@@ -342,6 +344,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return {
 				...postContext,
 				templateSlug,
+				templateSlotId: isTemplateInsideTemplate ? post.id : undefined,
 			};
 		}, [
 			isTemplateInsideTemplate,
@@ -525,6 +528,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 											contentBlockTypes={
 												isTemplateInsideTemplate
 													? TEMPLATE_SLOT_BLOCK_TYPES
+													: undefined
+											}
+											templatePartEditingMode={
+												isTemplateInsideTemplate
+													? 'disabled'
 													: undefined
 											}
 										/>

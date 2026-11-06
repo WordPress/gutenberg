@@ -388,7 +388,7 @@ Additional metadata for templates defined in the templates folder.
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | name | Filename, without extension, of the template in the templates folder. | `string` |
-| template | Filename, without extension, of the template this one is rendered inside of. Its post content block is where this template renders. A site can override it, or render the template on its own, from the editor. | `string` |
+| template | Filename, without extension, of the template this one is rendered inside of. Its post content block is where this template renders. Templates nest one level deep: the template named is not rendered inside another in turn, even if it names one. A site can override it, or render the template on its own, from the editor. | `string` |
 
 ## templateParts
 

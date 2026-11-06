@@ -223,6 +223,49 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 );
 
 /**
+ * Returns the template parts outside the post blocks of the given names.
+ *
+ * The post blocks are what is being edited when the template around them is
+ * locked, see getPostBlocksByName(), so the template parts outside them belong
+ * to that template. A template part inside one belongs to what is being
+ * edited, such as a template rendered inside the template around it, and is
+ * edited the way it is in that template on its own.
+ *
+ * @param {Object}          state      Global application state.
+ * @param {string|string[]} blockNames Names of the post blocks.
+ * @return {string[]} Client IDs of the template parts outside them.
+ */
+export const getTemplatePartsOutsidePostBlocks = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, blockNames ) => {
+				const { getBlocksByName, getBlockParents } =
+					select( blockEditorStore );
+				const postBlockIds = new Set(
+					getPostBlocksByName( state, blockNames )
+				);
+				return getBlocksByName( 'core/template-part' ).filter(
+					( clientId ) =>
+						! getBlockParents( clientId ).some(
+							( parentClientId ) =>
+								postBlockIds.has( parentClientId )
+						)
+				);
+			},
+			( state, blockNames ) => {
+				const { getBlocksByName, getBlockParents } =
+					select( blockEditorStore );
+				const clientIds = getBlocksByName( 'core/template-part' );
+				return [
+					getPostBlocksByName( state, blockNames ),
+					clientIds,
+					...clientIds.map( ( id ) => getBlockParents( id ) ),
+				];
+			}
+		)
+);
+
+/**
  * Returns the default rendering mode for a post type by user preference or post type configuration.
  *
  * @param {Object} state    Global application state.

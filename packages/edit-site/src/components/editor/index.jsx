@@ -58,7 +58,7 @@ function getListPathForPostType( postType ) {
 	throw 'Unknown post type';
 }
 
-function getNavigationPath( location, postType ) {
+function getNavigationPath( location, postType, showStylebook ) {
 	const { path, name } = location;
 	if (
 		[
@@ -72,7 +72,12 @@ function getNavigationPath( location, postType ) {
 	) {
 		return getListPathForPostType( postType );
 	}
-	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
+	// Keep the style book open when leaving the editor on the styles route.
+	return addQueryArgs( path, {
+		canvas: undefined,
+		revision: undefined,
+		preview: name === 'styles' && showStylebook ? 'stylebook' : undefined,
+	} );
 }
 
 export default function EditSiteEditor( {
@@ -112,6 +117,21 @@ export default function EditSiteEditor( {
 			if ( postWithTemplate || postType !== TEMPLATE_POST_TYPE ) {
 				return undefined;
 			}
+			/*
+			 * The `template` field is only in the REST response while the
+			 * templates inside templates experiment is on. Without it a
+			 * template names no template at all, as it did before the
+			 * experiment, so the editor and what it reports as the current
+			 * template are left as they were.
+			 */
+			const record = select( coreDataStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( record && ! Object.hasOwn( record, 'template' ) ) {
+				return undefined;
+			}
 			const templateId = unlock( select( coreDataStore ) ).getTemplateId(
 				postType,
 				postId
@@ -142,6 +162,7 @@ export default function EditSiteEditor( {
 	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )
 	);
+	const { getShowStylebook } = unlock( useSelect( editorStore ) );
 
 	// Revisions and the style book render in place of the block editor, and
 	// belong to the styles route in edit mode. Anywhere else they would show
@@ -268,7 +289,8 @@ export default function EditSiteEditor( {
 													location,
 													postWithTemplate
 														? context.postType
-														: postType
+														: postType,
+													getShowStylebook()
 												),
 												{
 													transition:
