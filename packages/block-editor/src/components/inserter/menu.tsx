@@ -77,7 +77,7 @@ function InserterMenu(
 				!! settings[ reusableBlocksSelectKey ] ||
 				!! settings.__experimentalBlockPatterns?.length ||
 				!! settings.__experimentalReusableBlocks?.length,
-			hasMediaCategories: !! getInserterMediaCategories(),
+			hasMediaCategories: !! getInserterMediaCategories()?.length,
 		};
 	}, [] );
 
