@@ -66,6 +66,11 @@ function useHasFocusWithin(
 		const frameElement = canvasDocument.defaultView?.frameElement;
 		const editorDocument = frameElement?.ownerDocument;
 
+		// The element can arrive after focus did, so check where focus is now.
+		setHasFocus(
+			editableContentElement.contains( canvasDocument.activeElement )
+		);
+
 		function onCanvasFocusIn( event: FocusEvent ) {
 			setHasFocus(
 				!! editableContentElement?.contains( event.target as Node )
@@ -77,8 +82,16 @@ function useHasFocusWithin(
 			if ( event.target === frameElement ) {
 				return;
 			}
+			const target = event.target as Element;
 			setHasFocus(
-				!! toolbarRef.current?.contains( event.target as Node )
+				!! toolbarRef.current?.contains( target ) ||
+					// Popovers the toolbar opens, such as the More dropdown,
+					// render outside it. The block toolbar does not count, as
+					// its options menu renders some of the same format slots.
+					( !! target.closest?.( '.components-popover' ) &&
+						! target.closest(
+							'.block-editor-block-list__block-popover'
+						) )
 			);
 		}
 

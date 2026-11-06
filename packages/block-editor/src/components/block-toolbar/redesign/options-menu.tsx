@@ -32,7 +32,10 @@ import BlockActions from '../../block-actions';
 import { BlockLockModal, useBlockLock } from '../../block-lock';
 import { BlockRenameModal, useBlockRename } from '../../block-rename';
 import { useConvertToGroupButtonProps } from '../../convert-to-group-buttons';
-import { RichTextToolbarControlsFills } from '../../rich-text/format-toolbar';
+import {
+	INSERT_FORMAT_NAMES,
+	RichTextToolbarControlsFills,
+} from '../../rich-text/format-toolbar';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -64,11 +67,9 @@ const FORMAT_FILL_NAMES = [
 	'RichText.ToolbarControls.italic',
 ];
 
-const INSERT_FILL_NAMES = [
-	'RichText.ToolbarControls.image',
-	'RichText.ToolbarControls.footnote',
-	'RichText.ToolbarControls.math',
-];
+// The inserting formats fill the slot shared by the formats without a
+// button of their own, and are picked out by name.
+const INSERT_FILL_NAMES = [ 'RichText.ToolbarControls' ];
 
 /**
  * A menu item that runs an action.
@@ -946,7 +947,7 @@ export default function BlockOptionsMenu( {
 									<RichTextToolbarControlsFills
 										names={ INSERT_FILL_NAMES }
 									>
-										{ ( insertFills ) => (
+										{ ( sharedFills ) => (
 											<OptionsMenuContent
 												clientIds={ clientIds }
 												items={ items }
@@ -958,7 +959,14 @@ export default function BlockOptionsMenu( {
 													shouldKeepFocusRef.current = true;
 												} }
 												formatFills={ formatFills }
-												insertFills={ insertFills }
+												insertFills={ INSERT_FORMAT_NAMES.flatMap(
+													( name ) =>
+														sharedFills.filter(
+															( [ { props } ] ) =>
+																props.name ===
+																name
+														)
+												) }
 												blockActions={ blockActions }
 											/>
 										) }

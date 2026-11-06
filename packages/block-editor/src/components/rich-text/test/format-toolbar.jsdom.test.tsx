@@ -57,10 +57,10 @@ describe( 'FormatToolbar', () => {
 				.getAllByRole( 'menuitem' )
 				.map( ( item ) => item.textContent )
 		).toEqual( [
-			'Footnote',
 			'Highlight',
 			'Inline image',
 			'Math',
+			'Footnote',
 			'Strikethrough',
 		] );
 	} );
