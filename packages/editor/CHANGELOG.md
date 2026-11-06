@@ -24,6 +24,7 @@
 -   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
+-   RTC: Add option optional outline to the text block a collaborator's selection sits in. The option to enable this behavior is in Editor Preferences (...) -> General tab -> Interface -> "Outline collaborators' blocks". ([#86272](https://github.com/WordPress/gutenberg/pull/86272)).
 
 ### Bug Fixes
 
