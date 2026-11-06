@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Meta Boxes: Show the meta box area below the editor by default, with an option to pin it to a resizable pane ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
+
 ## 9.1.0 (2026-11-04)
 
 ### Enhancements

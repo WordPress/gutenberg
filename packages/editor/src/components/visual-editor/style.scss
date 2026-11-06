@@ -36,6 +36,14 @@
 		padding-right: $grid-unit-30;
 	}
 
+	// The canvas grows with the spacer inside it. `overflow: hidden` would
+	// become the sticky scrollport, so the iframe would scroll away with the
+	// canvas instead of staying in view.
+	&.is-fit-content {
+		max-height: none;
+		overflow: visible;
+	}
+
 	// Keeps extra scrollbars from appearing when block toolbars overflow.
 	overflow: hidden;
 

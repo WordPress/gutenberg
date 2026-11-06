@@ -5,10 +5,14 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 // Ruleset to add space for the typewriter effect. When typing in the last
 // block, there needs to be room to scroll up.
-const CSS =
-	':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}';
+const getCSS = ( space ) =>
+	`:root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: ${ space };}`;
 
-export function usePaddingAppender( enabled ) {
+/**
+ * @param {boolean} enabled Whether clicking below the last block appends a block.
+ * @param {string}  space   CSS height of the space below the last block.
+ */
+export function usePaddingAppender( enabled, space = '40vh' ) {
 	const registry = useRegistry();
 	const effect = useRefEffect(
 		( node ) => {
@@ -63,5 +67,5 @@ export function usePaddingAppender( enabled ) {
 		},
 		[ registry ]
 	);
-	return enabled ? [ effect, CSS ] : [];
+	return enabled ? [ effect, getCSS( space ) ] : [];
 }

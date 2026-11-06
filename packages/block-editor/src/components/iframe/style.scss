@@ -10,6 +10,18 @@
 	height: 100%;
 }
 
+// The container is a spacer as tall as the document (set by the `fitContent`
+// effect). The iframe is one window tall, so `vh` inside it means the same
+// as on the front end, and it sticks in place while the spacer scrolls by.
+.block-editor-iframe__container.is-fit-content iframe {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	// Device previews animate the iframe height. Here the height must follow
+	// the window at once.
+	transition: none;
+}
+
 .block-editor-iframe__scale-container {
 	height: 100%;
 }

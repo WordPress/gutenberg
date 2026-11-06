@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Iframe`: Add a `fitContent` prop that sizes the iframe to its document so the closest scrollable ancestor scrolls the canvas instead ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
+
 ### Bug Fixes
 
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
