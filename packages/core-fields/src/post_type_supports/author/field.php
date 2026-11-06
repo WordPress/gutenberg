@@ -10,7 +10,7 @@
 return array(
 	'type'        => 'integer',
 	'label'       => __( 'Author' ),
-	'placeholder' => __( '(No author)' ),
+	'placeholder' => __( '(no author)' ),
 	'filterBy'    => array(
 		'operators' => array( 'isAny', 'isNone' ),
 	),
