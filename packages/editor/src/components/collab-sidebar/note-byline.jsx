@@ -9,7 +9,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getAvatarBorderColor } from './utils';
+import { getAvatarBorderColor } from './utils/display';
 
 export function NoteByline( { avatar, name, date, userId } ) {
 	const hasAvatar = !! avatar;

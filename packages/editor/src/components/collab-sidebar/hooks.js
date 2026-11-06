@@ -24,22 +24,27 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
-	calculateNotePositions,
-	findNoteInBlock,
-	getBlockLevelClientIds,
-	focusNoteThread,
-	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	getNoteAtCaret,
+	removeNoteIdFromMetadata,
+} from './utils/metadata';
+import { getTextAttributeKey, toRecord } from './utils/rich-text';
+import {
+	findNoteInBlock,
+	getBlockLevelClientIds,
+	getInlineMarkerStart,
 	getNoteRanges,
-	getSoleRichTextAttributeKey,
+	removeInlineNote,
+	wrapInlineNote,
+} from './utils/note-anchor';
+import {
+	getCaretChange,
+	getNoteAtCaret,
 	hasBlockDraft,
 	pickNoteForCaret,
-	removeInlineNote,
-	removeNoteIdFromMetadata,
-	wrapInlineNote,
-} from './utils';
+} from './utils/note-selection';
+import { focusNoteThread } from './utils/dom';
+import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -283,11 +288,11 @@ export function useNoteActions() {
 					blocks: clientIds.map( ( clientId ) => ( {
 						clientId,
 						attributes: getNoteAttributes( clientId ),
-						attributeKey: getBlockCount( clientId )
-							? undefined
-							: getSoleRichTextAttributeKey(
-									getBlockName( clientId )
-								),
+						attributeKey: getTextAttributeKey(
+							clientId,
+							getBlockName,
+							getBlockCount
+						),
 					} ) ),
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),
@@ -527,7 +532,7 @@ export function useNoteActions() {
 				if (
 					inline &&
 					! findNoteInBlock( attributes, noteId ) &&
-					value?.text?.slice( inline.start, inline.end ) ===
+					toRecord( value ).text.slice( inline.start, inline.end ) ===
 						inline.text
 				) {
 					const wrapped = wrapInlineNote(
@@ -590,14 +595,9 @@ export function useNoteActions() {
 					let inline = null;
 					const removed = removeInlineNote( attributes, note.id );
 					if ( removed ) {
-						const { attributeKey, start, end, value } = removed;
-						newAttributes[ attributeKey ] = value;
-						inline = {
-							attributeKey,
-							start,
-							end,
-							text: value.text.slice( start, end ),
-						};
+						const { value, ...anchor } = removed;
+						newAttributes[ anchor.attributeKey ] = value;
+						inline = anchor;
 					}
 					anchors.set( clientId, inline );
 					return newAttributes;
@@ -646,15 +646,9 @@ export function useNoteDraft( key ) {
 	return { initialValue, setDraft, hasDraft };
 }
 
-const isSamePoint = ( a, b ) =>
-	a.clientId === b.clientId &&
-	a.attributeKey === b.attributeKey &&
-	a.offset === b.offset;
-
 /**
- * Calls back when the caret moves. Skips typing: a selection change batched
- * with a content change moves the caret with the text, never across a marker.
- * A store subscription, not `useSelect`: nothing renders from it.
+ * Calls back when the caret moves, see `getCaretChange`. A store
+ * subscription, not `useSelect`: nothing renders from it.
  *
  * @param {(caret: Object) => void} onChange Receives `{ clientIds, previousClientIds, isBlockChange, attributes, noteAtCaret }`; `attributes` only while one block is selected.
  */
@@ -668,46 +662,33 @@ function useCaretChange( onChange ) {
 			getSelectionStart,
 			getSelectionEnd,
 		} = registry.select( blockEditorStore );
-		// The caret rules read one block's markers.
-		const getCaretAttributes = ( ids ) =>
-			ids.length === 1 ? getBlockAttributes( ids[ 0 ] ) : undefined;
-		let clientIds = getSelectedBlockClientIds();
-		let attributes = getCaretAttributes( clientIds );
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
+		const getSnapshot = () => {
+			const clientIds = getSelectedBlockClientIds();
+			return {
+				clientIds,
+				// The caret rules read one block's markers.
+				attributes:
+					clientIds.length === 1
+						? getBlockAttributes( clientIds[ 0 ] )
+						: undefined,
+				selectionStart: getSelectionStart(),
+				selectionEnd: getSelectionEnd(),
+			};
+		};
+		let snapshot = getSnapshot();
 		return registry.subscribe( () => {
-			const previousClientIds = clientIds;
-			const previousAttributes = attributes;
-			clientIds = getSelectedBlockClientIds();
-			attributes = getCaretAttributes( clientIds );
-			if (
-				getSelectionStart() === selectionStart &&
-				getSelectionEnd() === selectionEnd
-			) {
+			const previous = snapshot;
+			snapshot = getSnapshot();
+			const change = getCaretChange( previous, snapshot );
+			if ( ! change ) {
 				return;
 			}
-			const isSameSelection =
-				isSamePoint( getSelectionStart(), selectionStart ) &&
-				isSamePoint( getSelectionEnd(), selectionEnd );
-			selectionStart = getSelectionStart();
-			selectionEnd = getSelectionEnd();
-			// A selection across blocks is one anchor, so moving either of its
-			// ends moves to another, as entering another block does. The store
-			// can replace the ends without moving them.
-			const isBlockChange =
-				( clientIds.length > 1 && ! isSameSelection ) ||
-				clientIds.length !== previousClientIds.length ||
-				clientIds.some(
-					( clientId, index ) =>
-						clientId !== previousClientIds[ index ]
-				);
-			if ( ! isBlockChange && attributes !== previousAttributes ) {
-				return;
-			}
+			const { clientIds, attributes, selectionStart, selectionEnd } =
+				snapshot;
 			handleChange( {
 				clientIds,
-				previousClientIds,
-				isBlockChange,
+				previousClientIds: previous.clientIds,
+				isBlockChange: change.isBlockChange,
 				attributes,
 				noteAtCaret: getNoteAtCaret(
 					attributes,
@@ -743,8 +724,7 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 			caret.attributes?.metadata
 		);
 		const isTextBlock = ( id ) =>
-			! getBlockCount( id ) &&
-			!! getSoleRichTextAttributeKey( getBlockName( id ) );
+			!! getTextAttributeKey( id, getBlockName, getBlockCount );
 		const noteId = pickNoteForCaret( {
 			...caret,
 			blockThreads: notes.filter(
@@ -1047,7 +1027,7 @@ export function useFloatingBoard( {
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(
 		() =>
-			calculateNotePositions( {
+			getThreadLayout( {
 				threads,
 				selectedNoteId,
 				blockRects: anchorRects,
