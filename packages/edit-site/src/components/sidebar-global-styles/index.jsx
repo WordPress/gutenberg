@@ -1,14 +1,18 @@
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { seen } from '@wordpress/icons';
+import { backup, seen } from '@wordpress/icons';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -27,9 +31,20 @@ const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
 	setIsStyleBookOpened,
 	path,
+	section,
 	onChangeSection,
 } ) => {
 	const history = useHistory();
+	const hasRevisions = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
+	}, [] );
+	const areRevisionsOpened = section.startsWith( '/revisions' );
 
 	return (
 		<HStack className="edit-site-styles__header-actions">
@@ -45,6 +60,19 @@ const GlobalStylesPageActions = ( {
 					// Navigate to the updated path.
 					history.navigate( updatedPath );
 				} }
+				size="compact"
+			/>
+			<Button
+				isPressed={ areRevisionsOpened }
+				icon={ backup }
+				label={ __( 'Revisions' ) }
+				// The revisions screen has no empty state; it expects to be
+				// opened only when revisions exist.
+				accessibleWhenDisabled
+				disabled={ ! hasRevisions }
+				onClick={ () =>
+					onChangeSection( areRevisionsOpened ? '/' : '/revisions' )
+				}
 				size="compact"
 			/>
 			<GlobalStylesActionMenu
@@ -85,6 +113,20 @@ export default function SidebarGlobalStyles() {
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
+
+	// The preview is the editor, whose revisions preview follows the editor
+	// store's styles path rather than this route's `section` query arg. Keep
+	// the store in sync while the revisions screen is open, so selecting a
+	// revision previews it.
+	const { setStylesPath } = unlock( useDispatch( editorStore ) );
+	const areRevisionsOpened = section.startsWith( '/revisions' );
+	useEffect( () => {
+		if ( ! areRevisionsOpened ) {
+			return;
+		}
+		setStylesPath( section );
+		return () => setStylesPath( '/' );
+	}, [ areRevisionsOpened, section, setStylesPath ] );
 	const settings = useSelect(
 		( select ) => select( editSiteStore ).getSettings(),
 		[]
@@ -98,6 +140,7 @@ export default function SidebarGlobalStyles() {
 						isStyleBookOpened={ isStyleBookOpened }
 						setIsStyleBookOpened={ setIsStyleBookOpened }
 						path={ path }
+						section={ section }
 						onChangeSection={ onChangeSection }
 					/>
 				) : null
