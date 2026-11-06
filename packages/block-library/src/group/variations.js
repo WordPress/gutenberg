@@ -89,7 +89,14 @@ if ( window.__experimentalEnableGridInteractivity ) {
 		name: 'group-canvas',
 		title: __( 'Canvas' ),
 		description: __( 'Place blocks freely on a grid.' ),
-		attributes: { layout: { type: 'grid', isManualPlacement: true } },
+		attributes: {
+			layout: {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 3,
+				rowCount: 3,
+			},
+		},
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: [ 'layout.type', 'layout.isManualPlacement' ],
 		icon: layout,

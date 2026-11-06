@@ -10,7 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { computeSelectionVisual } from './compute-selection';
 import {
 	useDebouncedRecompute,
