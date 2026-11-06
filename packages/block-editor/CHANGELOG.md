@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
+-   Export the props types of the public components, such as `InnerBlocksProps`, `RichTextProps` and `LinkControlProps`, and the types of `useBlockProps` and `useInnerBlocksProps`, from the package entry. They replace the `.Props` types of `@types/wordpress__block-editor`, which TypeScript no longer reads since the package publishes its own declarations ([#86427](https://github.com/WordPress/gutenberg/pull/86427)).
 
 ## 20.0.0 (2026-11-04)
 
