@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`.
+
 ## 9.1.0 (2026-11-04)
 
 ### Enhancements
