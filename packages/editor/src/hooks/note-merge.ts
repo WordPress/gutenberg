@@ -1,11 +1,29 @@
 import { addFilter } from '@wordpress/hooks';
 import type { Block, BlockType } from '@wordpress/blocks';
-import {
-	addNoteIdToMetadata,
-	getNoteIdsFromMetadata,
-} from '../components/collab-sidebar/utils/metadata';
+import { getNoteIdsFromMetadata } from '../components/collab-sidebar/utils/metadata';
+import type { NoteMetadata } from '../components/collab-sidebar/utils/metadata';
 
-type Metadata = Record< string, unknown >;
+/**
+ * Adds the note IDs of one metadata object to another.
+ *
+ * @param metadata        Metadata to add the note IDs to.
+ * @param metadataToMerge Metadata whose note IDs are added.
+ * @return Merged metadata, or `undefined` when no note IDs are added.
+ */
+function mergeNoteIds(
+	metadata: NoteMetadata | undefined,
+	metadataToMerge: NoteMetadata | undefined
+): NoteMetadata | undefined {
+	const noteIds = getNoteIdsFromMetadata( metadata );
+	const mergedIds = new Set( [
+		...noteIds,
+		...getNoteIdsFromMetadata( metadataToMerge ),
+	] );
+	if ( mergedIds.size === noteIds.length ) {
+		return;
+	}
+	return { ...metadata, noteId: [ ...mergedIds ] };
+}
 
 /**
  * Wraps a block type's `merge` callback so that the notes of the merged block
@@ -25,24 +43,11 @@ export function addMergeCallback( settings: BlockType ): BlockType {
 		...settings,
 		merge( attributes, attributesToMerge ) {
 			const result = merge( attributes, attributesToMerge );
-			const noteIds: number[] = getNoteIdsFromMetadata(
-				attributesToMerge.metadata ?? {}
+			const metadata = mergeNoteIds(
+				result.metadata ?? attributes.metadata,
+				attributesToMerge.metadata
 			);
-			if ( noteIds.length === 0 ) {
-				return result;
-			}
-
-			const metadata = ( result.metadata ??
-				attributes.metadata ??
-				{} ) as Metadata;
-			const mergedMetadata = noteIds.reduce(
-				( current, noteId ) =>
-					addNoteIdToMetadata( current, noteId ) as Metadata,
-				metadata
-			);
-			return mergedMetadata === metadata
-				? result
-				: { ...result, metadata: mergedMetadata };
+			return metadata ? { ...result, metadata } : result;
 		},
 	};
 }
@@ -62,25 +67,13 @@ export function addTransforms( result: Block, source: Block | Block[] ): Block {
 		return result;
 	}
 
-	const noteIds: number[] = getNoteIdsFromMetadata(
-		source.attributes?.metadata ?? {}
+	const metadata = mergeNoteIds(
+		result.attributes.metadata,
+		source.attributes.metadata
 	);
-	if ( noteIds.length === 0 ) {
-		return result;
-	}
-
-	const metadata = ( result.attributes?.metadata ?? {} ) as Metadata;
-	const mergedMetadata = noteIds.reduce(
-		( current, noteId ) =>
-			addNoteIdToMetadata( current, noteId ) as Metadata,
-		metadata
-	);
-	return mergedMetadata === metadata
-		? result
-		: {
-				...result,
-				attributes: { ...result.attributes, metadata: mergedMetadata },
-			};
+	return metadata
+		? { ...result, attributes: { ...result.attributes, metadata } }
+		: result;
 }
 
 addFilter(
