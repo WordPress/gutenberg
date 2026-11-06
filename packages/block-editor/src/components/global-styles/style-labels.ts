@@ -7,10 +7,8 @@ import { __ } from '@wordpress/i18n';
  * The block style config (`__EXPERIMENTAL_STYLE_PROPERTY`) has no labels of its
  * own, so they live here. A path with no entry falls back to a readable version
  * of its last part (see `getStyleLabel`).
- *
- * @type {Record<string, string>}
  */
-export const STYLE_LABELS = {
+export const STYLE_LABELS: Record< string, string > = {
 	// Typography.
 	'typography.fontFamily': __( 'Font family' ),
 	'typography.fontSize': __( 'Font size' ),
@@ -56,11 +54,11 @@ export const STYLE_LABELS = {
  * When the path has no label of its own, it falls back to a readable version of
  * the path's last part so nothing shows up blank.
  *
- * @param {string[]} path Style path, e.g. `[ 'color', 'background' ]`.
+ * @param path Style path, e.g. `[ 'color', 'background' ]`.
  *
- * @return {string} A readable label.
+ * @return A readable label.
  */
-export function getStyleLabel( path ) {
+export function getStyleLabel( path: string[] ): string {
 	const key = path.join( '.' );
 	if ( STYLE_LABELS[ key ] ) {
 		return STYLE_LABELS[ key ];

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { unlock } from '../../../lock-unlock';
 import { useReviewRows } from '../use-review-rows';
-import { EMPTY_VALUE_LABEL } from '../format-style-value';
+
+const { EMPTY_VALUE_LABEL } = unlock( blockEditorPrivateApis );
 
 const fontSizeRow = {
 	id: 'typography.fontSize',
