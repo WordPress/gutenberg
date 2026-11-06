@@ -189,6 +189,8 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 			'include_block_style_variations' => true,
 			'skip_root_layout_styles'        => true,
 			'scope'                          => ".$class_name",
+			// The merged block type styles, so a text clip set there can be escaped.
+			'text_clip_base_blocks'          => $theme_json['styles']['blocks'] ?? array(),
 		)
 	);
 

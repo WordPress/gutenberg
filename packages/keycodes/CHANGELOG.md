@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2026-11-04)
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes
