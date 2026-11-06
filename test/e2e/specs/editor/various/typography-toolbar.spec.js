@@ -366,6 +366,50 @@ test.describe( 'Typography toolbar', () => {
 		).toBeHidden();
 	} );
 
+	test( 'folds the controls into one button when the screen is narrow', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+
+		const toolbar = getToolbar( page );
+		const font = toolbar.getByRole( 'button', {
+			name: 'Font',
+			exact: true,
+		} );
+		const collapsed = toolbar.getByRole( 'button', {
+			name: 'Typography',
+		} );
+
+		// Wide enough for all four, so they sit in the toolbar itself.
+		await page.setViewportSize( { width: 1400, height: 900 } );
+		await expect( font ).toBeVisible();
+		await expect( collapsed ).toBeHidden();
+
+		// Too narrow, so they fold away behind one button.
+		await page.setViewportSize( { width: 900, height: 900 } );
+		await expect( collapsed ).toBeVisible();
+		await expect( font ).toBeHidden();
+
+		// And they are all still there, inside it.
+		await collapsed.click();
+		const panel = page.getByRole( 'toolbar', { name: 'Typography' } );
+		await expect(
+			panel.getByRole( 'button', { name: 'Font', exact: true } )
+		).toBeVisible();
+		await expect(
+			panel.getByRole( 'button', { name: 'Size', exact: true } )
+		).toBeVisible();
+		await expect(
+			panel.getByRole( 'button', { name: 'Text color' } )
+		).toBeVisible();
+
+		await page.setViewportSize( { width: 1400, height: 900 } );
+	} );
+
 	test( 'deletes the block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',

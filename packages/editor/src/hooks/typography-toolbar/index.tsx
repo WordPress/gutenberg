@@ -1,13 +1,20 @@
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	useViewportMatch,
+} from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import {
 	ColorIndicator,
+	Dropdown,
+	Toolbar,
 	ToolbarButton,
 	ToolbarGroup,
+	ToolbarItem,
 } from '@wordpress/components';
+import { typography as typographyIcon } from '@wordpress/icons';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -45,6 +52,11 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const PRESET_ORIGINS = [ 'default', 'theme', 'custom' ] as const;
 const EMPTY_ARRAY: never[] = [];
+
+const COLLAPSED_POPOVER_PROPS = {
+	className: 'editor-typography-toolbar__collapsed-popover',
+	placement: 'bottom-start' as const,
+};
 
 const FONT_FAMILY_SUPPORT = 'typography.__experimentalFontFamily';
 const FONT_SIZE_SUPPORT = 'typography.fontSize';
@@ -100,6 +112,14 @@ function TypographyToolbarControls( {
 	attributes,
 	setAttributes,
 }: TypographyToolbarProps ) {
+	/*
+	 * The four controls take about 250px, which the toolbar has to spare
+	 * only on a wide screen. Narrower than that they fold into one button,
+	 * the way the alignment controls fold, rather than crowding out the
+	 * tools that were there first.
+	 */
+	const isCollapsed = useViewportMatch( 'xlarge', '<' );
+
 	// The hook is still JavaScript, so its shape is asserted here.
 	const { merged: globalStyles } = useGlobalStyles() as {
 		merged: GlobalStylesConfig;
@@ -197,8 +217,8 @@ function TypographyToolbarControls( {
 		attributes.style?.color?.background
 	);
 
-	return (
-		<BlockControls group="typography">
+	const controls = (
+		<>
 			{ hasFont && (
 				<TypographyFontDropdown
 					fontFamilies={ fontFamilies }
@@ -262,6 +282,41 @@ function TypographyToolbarControls( {
 						}
 					/>
 				</ToolbarGroup>
+			) }
+		</>
+	);
+
+	return (
+		<BlockControls group="typography">
+			{ isCollapsed ? (
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<Dropdown
+								popoverProps={ COLLAPSED_POPOVER_PROPS }
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<ToolbarButton
+										{ ...toggleProps }
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+										aria-haspopup="true"
+										icon={ typographyIcon }
+										label={ __( 'Typography' ) }
+									/>
+								) }
+								renderContent={ () => (
+									// Its own toolbar, so the controls keep
+									// the context they are built for.
+									<Toolbar label={ __( 'Typography' ) }>
+										{ controls }
+									</Toolbar>
+								) }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
+			) : (
+				controls
 			) }
 		</BlockControls>
 	);
