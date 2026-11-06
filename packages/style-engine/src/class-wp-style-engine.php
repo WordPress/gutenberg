@@ -88,9 +88,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'gradient' => '--wp--preset--gradient--$slug',
 					),
 					'path'          => array( 'background', 'gradient' ),
-					'classnames'    => array(
-						'has-background' => true,
-					),
 				),
 				'backgroundClip'       => array(
 					'value_func' => array( self::class, 'get_background_clip_css_declarations' ),
@@ -514,9 +511,34 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], $css_declarations );
 					}
 				}
+
+				if ( 'background' === $definition_group_key && static::has_box_background( $block_styles['background'] ) ) {
+					$parsed_styles['classnames'][] = 'has-background';
+				}
 			}
 
 			return $parsed_styles;
+		}
+
+		/**
+		 * Checks whether a background object paints the block's box, which is
+		 * what the `has-background` class announces. Mirror of
+		 * `wp_get_background_classes_and_styles()`: an image or a gradient
+		 * does, unless it is clipped to the text, which paints the glyphs
+		 * instead.
+		 *
+		 * @param mixed $background_styles The `background` object from the block styles.
+		 *
+		 * @return bool
+		 */
+		protected static function has_box_background( $background_styles ) {
+			if ( ! is_array( $background_styles ) ) {
+				return false;
+			}
+
+			$has_background = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
+
+			return $has_background && 'text' !== ( $background_styles['backgroundClip'] ?? null );
 		}
 
 		/**
