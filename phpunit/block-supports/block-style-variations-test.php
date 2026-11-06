@@ -921,4 +921,113 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 
 		$this->assertMatchesRegularExpression( '/:root :where\(p\.is-style-no-clip--\d+\)\{color: #00aa00;\}/', $actual );
 	}
+
+	/**
+	 * Tests that block style variations applied to blocks inside a navigation
+	 * menu post are generated on the frontend.
+	 *
+	 * @ticket 85833
+	 */
+	public function test_block_style_variation_is_rendered_for_blocks_inside_a_navigation_menu() {
+		switch_theme( 'block-theme' );
+		$original_styles = clone wp_styles();
+		register_block_style(
+			'core/navigation-link',
+			array(
+				'name'       => 'pill',
+				'style_data' => array(
+					'color' => array(
+						'text' => '#123456',
+					),
+				),
+			)
+		);
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_deregister_style( 'block-style-variation-styles' );
+			$navigation_id = self::factory()->post->create(
+				array(
+					'post_type'    => 'wp_navigation',
+					'post_status'  => 'publish',
+					'post_content' => '<!-- wp:navigation-link {"label":"Home","url":"https://example.org","className":"is-style-pill"} /-->',
+				)
+			);
+
+			$html       = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","ref":' . $navigation_id . '} /-->' );
+			$styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$stylesheet = is_array( $styles ) ? implode( '', $styles ) : '';
+
+			$this->assertStringContainsString( 'is-style-pill--', $html );
+			$this->assertStringContainsString( 'color: #123456', $stylesheet );
+		} finally {
+			unregister_block_style( 'core/navigation-link', 'pill' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$GLOBALS['wp_styles'] = $original_styles;
+		}
+	}
+
+	/**
+	 * Tests that referenced submenu variations precede their children's styles.
+	 *
+	 * @ticket 85833
+	 */
+	public function test_referenced_navigation_variation_styles_preserve_nested_order() {
+		switch_theme( 'block-theme' );
+		$original_styles = clone wp_styles();
+		register_block_style(
+			'core/navigation-submenu',
+			array(
+				'name'       => 'navigation-parent-test',
+				'style_data' => array(
+					'blocks' => array(
+						'core/navigation-link' => array(
+							'color' => array(
+								'text' => '#ff0000',
+							),
+						),
+					),
+				),
+			)
+		);
+		register_block_style(
+			'core/navigation-link',
+			array(
+				'name'       => 'navigation-child-test',
+				'style_data' => array(
+					'color' => array(
+						'text' => '#0000ff',
+					),
+				),
+			)
+		);
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_deregister_style( 'block-style-variation-styles' );
+			$navigation_id = self::factory()->post->create(
+				array(
+					'post_type'    => 'wp_navigation',
+					'post_status'  => 'publish',
+					'post_content' => '<!-- wp:navigation-submenu {"label":"Parent","className":"is-style-navigation-parent-test"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.org/child","kind":"custom","className":"is-style-navigation-child-test"} /--><!-- /wp:navigation-submenu -->',
+				)
+			);
+			$html          = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","ref":' . $navigation_id . '} /-->' );
+			$styles        = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$stylesheet    = is_array( $styles ) ? implode( '', $styles ) : '';
+			$parent_rule   = strpos( $stylesheet, 'color: #ff0000' );
+			$child_rule    = strpos( $stylesheet, 'color: #0000ff' );
+
+			$this->assertStringContainsString( 'is-style-navigation-parent-test--', $html );
+			$this->assertStringContainsString( 'is-style-navigation-child-test--', $html );
+			$this->assertNotFalse( $parent_rule );
+			$this->assertNotFalse( $child_rule );
+			$this->assertLessThan( $child_rule, $parent_rule, 'The child variation must be able to override its parent.' );
+		} finally {
+			unregister_block_style( 'core/navigation-submenu', 'navigation-parent-test' );
+			unregister_block_style( 'core/navigation-link', 'navigation-child-test' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$GLOBALS['wp_styles'] = $original_styles;
+		}
+	}
 }
