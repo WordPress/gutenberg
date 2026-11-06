@@ -71,7 +71,11 @@ function Edit( {
 	} = useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
-	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+	// Fall back to the first tab when the index points past the last tab,
+	// matching the front end.
+	const activeIndex = editorActiveTabIndex ?? activeTabIndex;
+	const effectiveActiveIndex =
+		activeIndex < tabPanels.length ? activeIndex : 0;
 	const tabsList = useMemo(
 		() =>
 			tabPanels.map( ( tab ) => ( {

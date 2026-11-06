@@ -90,6 +90,9 @@ test.describe( 'Test Custom Post Types', () => {
 		} );
 
 		await expect(
+			summary.getByText( 'Status', { exact: true } )
+		).toBeVisible();
+		await expect(
 			summary.getByText( 'Parent', { exact: true } )
 		).toHaveCount( 0 );
 		await expect(

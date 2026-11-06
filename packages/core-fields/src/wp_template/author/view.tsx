@@ -61,7 +61,7 @@ export default function TemplateAuthorView( { item }: { item: Template } ) {
 	);
 
 	return (
-		<Stack direction="row" align="center">
+		<Stack direction="row" gap="xs" align="flex-start">
 			{ imageUrl && (
 				<div
 					className={ clsx( styles.avatar, {

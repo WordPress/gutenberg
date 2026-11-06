@@ -28,7 +28,7 @@ export default function Label( {
 	}
 
 	return (
-		<FlexItem className={ styles[ 'label-wrapper' ] }>
+		<FlexItem>
 			<Text
 				{ ...props }
 				as="label"
