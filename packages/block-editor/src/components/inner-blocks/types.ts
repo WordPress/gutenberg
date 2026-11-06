@@ -25,8 +25,7 @@ export interface DirectInsertBlock {
 export type DirectInsert = boolean | ( ( ...args: never[] ) => unknown );
 
 /**
- * The inner blocks options of `useInnerBlocksProps` and the props of
- * `InnerBlocks`.
+ * The inner blocks options of `useInnerBlocksProps`.
  */
 export interface InnerBlocksOptions extends Pick<
 	UseBlockSyncProps,
@@ -69,10 +68,20 @@ export interface InnerBlocksOptions extends Pick<
 }
 
 /**
+ * The props of the `InnerBlocks` component: its inner blocks options. Like the
+ * other public props types, it leaves out `ref`, which the component takes as
+ * well.
+ */
+export type InnerBlocksProps = InnerBlocksOptions;
+
+/**
  * The props of the inner blocks of a block: the options, plus what the hook
  * selects for the block.
  */
-export interface InnerBlocksProps extends Omit< InnerBlocksOptions, 'layout' > {
+export interface InnerBlocksInternalProps extends Omit<
+	InnerBlocksOptions,
+	'layout'
+> {
 	clientId: string;
 	/** The layout of the inner blocks, or `null` for none. */
 	layout?: Layout | null;

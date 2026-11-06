@@ -27,8 +27,8 @@ import { normalizeLegacyLayout } from '../../layouts/utils';
 import { unlock } from '../../lock-unlock';
 import type { Layout } from '../../layouts/types';
 import type {
+	InnerBlocksInternalProps,
 	InnerBlocksOptions,
-	InnerBlocksProps,
 	UseInnerBlocksPropsProps,
 	UseInnerBlocksPropsResult,
 } from './types';
@@ -64,7 +64,7 @@ const BlockListItemsMemo = memo( BlockListItems );
  *
  * @param props The component props.
  */
-function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
+function UncontrolledInnerBlocks( props: InnerBlocksInternalProps ) {
 	const {
 		clientId,
 		allowedBlocks,
@@ -179,7 +179,7 @@ function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
  *
  * @param props The component props.
  */
-function ControlledInnerBlocks( props: InnerBlocksProps ) {
+function ControlledInnerBlocks( props: InnerBlocksInternalProps ) {
 	useBlockSync( props );
 	return <UncontrolledInnerBlocks { ...props } />;
 }

@@ -725,6 +725,7 @@ export default dedupePlugins( [
 			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
 			[ 'expectPlaceholderState' ],
 		],
+		[ 'packages/block-editor/src/test/types.test.tsx', [ 'expectTypeOf' ] ],
 		[
 			'test/unit/scripts/test/vitest-policy-rules.test.js',
 			[ 'expectValid', 'expectViolation' ],

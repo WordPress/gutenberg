@@ -76,6 +76,10 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
+### AlignmentControlProps
+
+The props of the `AlignmentControl` component.
+
 ### AlignmentToolbar
 
 _Related_
@@ -93,6 +97,10 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
+
+### BlockAlignmentControlProps
+
+The props of the `BlockAlignmentControl` component.
 
 ### BlockAlignmentToolbar
 
@@ -115,9 +123,17 @@ _Returns_
 
 - `Element`: The block attribute binding control.
 
+### BlockBindingsAttributeControlProps
+
+The props of the `BlockBindingsAttributeControl` component.
+
 ### BlockBindingsSourceFieldsList
 
 Undocumented declaration.
+
+### BlockBindingsSourceFieldsListProps
+
+The props of the `BlockBindingsSourceFieldsList` component.
 
 ### BlockBreadcrumb
 
@@ -132,6 +148,10 @@ _Parameters_
 _Returns_
 
 - `React.JSX.Element`: Block Breadcrumb.
+
+### BlockBreadcrumbProps
+
+The props of the `BlockBreadcrumb` component.
 
 ### BlockCanvas
 
@@ -165,6 +185,10 @@ _Returns_
 
 - `Element`: Block Breadcrumb.
 
+### BlockCanvasProps
+
+The props of the `BlockCanvas` component.
+
 ### BlockColorsStyleSelector
 
 Undocumented declaration.
@@ -181,9 +205,17 @@ _Parameters_
 
 - _props_ `BlockContextProviderProps`:
 
+### BlockContextProviderProps
+
+The props of the `BlockContextProvider` component.
+
 ### BlockControls
 
 Undocumented declaration.
+
+### BlockControlsProps
+
+The props of the `BlockControls` component.
 
 ### BlockEdit
 
@@ -197,6 +229,14 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### BlockEditorProviderProps
+
+The props of the `BlockEditorProvider` component.
+
+### BlockEditProps
+
+The props of the `BlockEdit` component.
+
 ### BlockFormatControls
 
 Undocumented declaration.
@@ -206,6 +246,10 @@ Undocumented declaration.
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
+
+### BlockIconProps
+
+The props of the `BlockIcon` component.
 
 ### BlockInspector
 
@@ -217,11 +261,19 @@ _Related_
 
 Undocumented declaration.
 
+### BlockListProps
+
+The props of the `BlockList` component.
+
 ### BlockMover
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
+
+### BlockMoverProps
+
+The props of the `BlockMover` component.
 
 ### BlockNavigationDropdown
 
@@ -232,6 +284,10 @@ Undocumented declaration.
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
+
+### BlockPopoverProps
+
+The props of the `BlockPopover` component.
 
 ### BlockPreview
 
@@ -250,6 +306,10 @@ _Parameters_
 _Returns_
 
 - `Component`: The component to be rendered.
+
+### BlockPreviewProps
+
+The props of the `BlockPreview` component.
 
 ### BlockSelectionClearer
 
@@ -273,9 +333,21 @@ _Returns_
 
 - `Element`: Element.
 
+### BlockSettingsMenuControlsProps
+
+The props of the `BlockSettingsMenuControls` component.
+
+### BlockSettingsMenuProps
+
+The props of the `BlockSettingsMenu` component.
+
 ### BlockStyles
 
 Undocumented declaration.
+
+### BlockStylesProps
+
+The props of the `BlockStyles` component.
 
 ### BlockTitle
 
@@ -301,6 +373,10 @@ _Returns_
 
 - `React.JSX.Element`: Block title.
 
+### BlockTitleProps
+
+The props of the `BlockTitle` component.
+
 ### BlockToolbar
 
 Renders the block toolbar.
@@ -315,6 +391,10 @@ _Parameters_
 - _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
 - _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
 
+### BlockToolbarProps
+
+The props of the `BlockToolbar` component.
+
 ### BlockTools
 
 Renders block tools (the block toolbar, select/navigation mode toolbar, the insertion point and a slot for the inline rich text toolbar). Must be wrapped around the block content and editor styles wrapper or iframe.
@@ -325,11 +405,19 @@ _Parameters_
 - _$0.children_ `Object`: The block content and style container.
 - _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
 
+### BlockToolsProps
+
+The props of the `BlockTools` component.
+
 ### BlockVerticalAlignmentControl
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
+
+### BlockVerticalAlignmentControlProps
+
+The props of the `BlockVerticalAlignmentControl` component.
 
 ### BlockVerticalAlignmentToolbar
 
@@ -342,6 +430,10 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
+
+### ButtonBlockAppenderProps
+
+The props of the `ButtonBlockAppender` component.
 
 ### ButtonBlockerAppender
 
@@ -357,11 +449,19 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### ColorPaletteControlProps
+
+The props of the `ColorPaletteControl` component.
+
 ### ContrastChecker
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
+
+### ContrastCheckerProps
+
+The props of the `ContrastChecker` component.
 
 ### CopyHandler
 
@@ -404,6 +504,10 @@ _Returns_
 
 Undocumented declaration.
 
+### DefaultBlockAppenderProps
+
+The props of the `DefaultBlockAppender` component.
+
 ### DimensionControl
 
 DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.
@@ -426,11 +530,19 @@ _Returns_
 
 - `Component`: The component to be rendered.
 
+### DimensionControlProps
+
+The props of the `DimensionControl` component.
+
 ### FontSizePicker
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
+
+### FontSizePickerProps
+
+The props of the `FontSizePicker` component.
 
 ### getBackgroundClassesAndStyles
 
@@ -676,6 +788,10 @@ _Returns_
 
 - `ReactElement`: The toolbar.
 
+### HeadingLevelDropdownProps
+
+The props of the `HeadingLevelDropdown` component.
+
 ### HeightControl
 
 > **Deprecated** Use DimensionControl instead.
@@ -703,9 +819,21 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
 
+### InnerBlocksOptions
+
+The inner blocks options of `useInnerBlocksProps`.
+
+### InnerBlocksProps
+
+The props of the `InnerBlocks` component.
+
 ### Inserter
 
 Undocumented declaration.
+
+### InserterProps
+
+The props of the `Inserter` component.
 
 ### InspectorAdvancedControls
 
@@ -716,6 +844,10 @@ Undocumented declaration.
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+### InspectorControlsProps
+
+The props of the `InspectorControls` component.
 
 ### isValueSpacingPreset
 
@@ -735,6 +867,10 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
+### JustifyContentControlProps
+
+The props of the `JustifyContentControl` component.
+
 ### JustifyToolbar
 
 _Related_
@@ -746,6 +882,10 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
+
+### LineHeightControlProps
+
+The props of the `LineHeightControl` component.
 
 ### LinkControl
 
@@ -792,17 +932,29 @@ _Parameters_
 
 - _props_ `LinkControlProps`: Component props.
 
+### LinkControlProps
+
+The props of the `LinkControl` component.
+
 ### MediaPlaceholder
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md>
 
+### MediaPlaceholderProps
+
+The props of the `MediaPlaceholder` component.
+
 ### MediaReplaceFlow
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
+
+### MediaReplaceFlowProps
+
+The props of the `MediaReplaceFlow` component.
 
 ### MediaUpload
 
@@ -816,6 +968,14 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
+### MediaUploadCheckProps
+
+The props of the `MediaUploadCheck` component.
+
+### MediaUploadProps
+
+The props of the `MediaUpload` component.
+
 ### MultiSelectScrollIntoView
 
 > **Deprecated**
@@ -826,15 +986,27 @@ Scrolls the multi block selection end into view if not in view already. This is 
 
 Undocumented declaration.
 
+### NavigableToolbarProps
+
+The props of the `NavigableToolbar` component.
+
 ### ObserveTyping
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
 
+### ObserveTypingProps
+
+The props of the `ObserveTyping` component.
+
 ### PanelColorSettings
 
 Undocumented declaration.
+
+### PanelColorSettingsProps
+
+The props of the `PanelColorSettings` component.
 
 ### PlainText
 
@@ -882,6 +1054,10 @@ _Returns_
 
 - `Element`: Plain text component
 
+### PlainTextProps
+
+The props of the `PlainText` component.
+
 ### privateApis
 
 Private `@wordpress/block-editor` APIs.
@@ -903,19 +1079,35 @@ _Returns_
 
 - `React.JSX.Element`: A React element.
 
+### RecursionProviderProps
+
+The props of the `RecursionProvider` component.
+
 ### RichText
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md>
 
+### RichTextProps
+
+The props of the `RichText` component.
+
 ### RichTextShortcut
 
 Undocumented declaration.
 
+### RichTextShortcutProps
+
+The props of the `RichTextShortcut` component.
+
 ### RichTextToolbarButton
 
 Undocumented declaration.
+
+### RichTextToolbarButtonProps
+
+The props of the `RichTextToolbarButton` component.
 
 ### setStyleForState
 
@@ -1022,6 +1214,10 @@ _Returns_
 
 Ensures that the text selection keeps the same vertical distance from the viewport during keyboard events within this component. The vertical distance can vary. It is the last clicked or scrolled to position.
 
+### TypewriterProps
+
+The props of the `Typewriter` component.
+
 ### URLInput
 
 Text field for entering a URL, with an autocomplete list of matching posts, pages and other link suggestions.
@@ -1040,11 +1236,23 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md>
 
+### URLInputButtonProps
+
+The props of the `URLInputButton` component.
+
+### URLInputProps
+
+The props of the `URLInput` component.
+
 ### URLPopover
 
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+### URLPopoverProps
+
+The props of the `URLPopover` component.
 
 ### useBackgroundProps
 
@@ -1204,6 +1412,14 @@ _Returns_
 
 - `Object`: Props to pass to the element to mark as a block.
 
+### UseBlockPropsProps
+
+Props passed to `useBlockProps`, merged into the props it returns.
+
+### UseBlockPropsResult
+
+Props returned by `useBlockProps`, to pass to the element to mark as a block.
+
 ### useCachedTruthy
 
 Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
@@ -1243,6 +1459,14 @@ _Parameters_
 
 - _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 - _options_ `Object`: Optional. Inner blocks options.
+
+### UseInnerBlocksPropsProps
+
+Props passed to `useInnerBlocksProps`, merged into the props it returns.
+
+### UseInnerBlocksPropsResult
+
+Props returned by `useInnerBlocksProps`, to pass to the inner blocks wrapper element.
 
 ### useSetting
 
@@ -1302,6 +1526,10 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md>
 
+### WarningProps
+
+The props of the `Warning` component.
+
 ### withColorContext
 
 Undocumented declaration.
@@ -1349,6 +1577,10 @@ _Parameters_
 
 - _props_ `Object`: Component properties.
 - _props.children_ `Element`: Children to be rendered.
+
+### WritingFlowProps
+
+The props of the `WritingFlow` component.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
