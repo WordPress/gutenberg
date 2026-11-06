@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
-import { closeSmall, chevronDown } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button, pending WordPress/gutenberg#76135.
@@ -297,12 +297,12 @@ function renderBulkActionsContent< Item >(
 											tone="neutral"
 											size="compact"
 											loading={ !! actionInProgress }
-										>
-											{ __( 'Actions' ) }
-											<Button.Icon icon={ chevronDown } />
-										</Button>
+										/>
 									}
-								/>
+								>
+									{ __( 'Actions' ) }
+									<Button.Caret />
+								</Menu.Trigger>
 								<Menu.Popup>
 									<Menu.Group>
 										{ renderActions( true ) }

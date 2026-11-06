@@ -12,13 +12,9 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			gap: var(--wpds-dimension-gap-xs);
 			width: 100%;
 			padding-block: 4px;
-
-			/* Optically adjust the caret to a more balanced position. */
-			padding-inline-start: var(--wp-ui-input-layout-padding-inline);
-			padding-inline-end: calc(var(--wp-ui-input-layout-padding-inline) - 4px);
+			padding-inline: var(--wp-ui-input-layout-padding-inline);
 
 			background-color: transparent;
 			border: none;
@@ -60,10 +56,6 @@
 			.trigger[data-placeholder]:not([data-disabled]) & {
 				color: var(--wpds-color-foreground-interactive-neutral-weak);
 			}
-		}
-
-		.trigger-caret {
-			flex: 0 0 auto;
 		}
 	}
 }
