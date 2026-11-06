@@ -2,13 +2,25 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Visual editor: Size the canvas to its content when meta boxes are inline ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
+-   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
+
+### Bug Fixes
+
+-   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
+-   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+-   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
+
+## 16.1.0 (2026-11-04)
+
 ### New Features
 
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements
 
--   Visual editor: Size the canvas to its content when meta boxes are inline ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
 -   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).

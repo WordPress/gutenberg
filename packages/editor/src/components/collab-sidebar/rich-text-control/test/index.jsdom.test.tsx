@@ -10,7 +10,12 @@ import {
 	type Mock,
 } from 'vitest';
 import { useContext, useEffect } from '@wordpress/element';
-import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
+import {
+	Fill,
+	Popover as WCPopover,
+	Slot,
+	SlotFillProvider,
+} from '@wordpress/components';
 import {
 	unregisterFormatType,
 	registerFormatType,
@@ -409,9 +414,9 @@ describe( 'RichTextControl', () => {
 				tagName: 'kbd',
 				className: null,
 				edit: () => (
-					<Popover>
+					<WCPopover>
 						<button type="button">Inside popover</button>
-					</Popover>
+					</WCPopover>
 				),
 			} );
 		} );

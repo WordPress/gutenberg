@@ -10,7 +10,7 @@ import {
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover as WCPopover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
@@ -426,7 +426,7 @@ function InserterMenu(
 				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<Popover
+				<WCPopover
 					className="block-editor-inserter__preview-container__popover"
 					placement="right-start"
 					offset={ { mainAxis: 16, crossAxis: 16 } }
@@ -434,7 +434,7 @@ function InserterMenu(
 					animate={ false }
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
-				</Popover>
+				</WCPopover>
 			) }
 		</div>
 	);
