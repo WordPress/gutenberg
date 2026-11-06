@@ -1,4 +1,4 @@
-import { GridRect } from './utils';
+import { GridRect, hasExplicitGridPlacement } from './utils';
 
 export type AutoGridMoveDirection = 'left' | 'right' | 'up' | 'down';
 
@@ -328,11 +328,7 @@ export function findAutoGridReorderIndex(
 	const item = snapshot.items.find(
 		( candidate ) => candidate.clientId === blockClientId
 	);
-	if (
-		! item ||
-		item.columnStart !== undefined ||
-		item.rowStart !== undefined
-	) {
+	if ( ! item || hasExplicitGridPlacement( item ) ) {
 		return undefined;
 	}
 

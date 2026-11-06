@@ -19,6 +19,7 @@ import type {
 	BlockDropOperation,
 	InsertOrReplaceBlocks,
 	MoveBlocks,
+	OnBlocksDrop,
 	UseOnBlockDropOptions,
 } from './types';
 
@@ -68,6 +69,7 @@ export function parseDropEvent(
  * @param clearSelectedBlock        A function that clears block selection.
  * @param operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
  * @param getBlock                  A function that returns a block given its client id.
+ * @param onSameOrderDrop           Runs custom behavior for insertion drops that keep the block order.
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -79,7 +81,8 @@ export function onBlockDrop(
 	insertOrReplaceBlocks: InsertOrReplaceBlocks,
 	clearSelectedBlock: () => void,
 	operation: BlockDropOperation,
-	getBlock: ( clientId: string ) => Block | null
+	getBlock: ( clientId: string ) => Block | null,
+	onSameOrderDrop?: OnBlocksDrop
 ) {
 	return ( event: DragEvent | globalThis.DragEvent ) => {
 		const {
@@ -104,17 +107,21 @@ export function onBlockDrop(
 			// A block drop carries the dragged client IDs.
 			const sourceBlockIndex = getBlockIndex( sourceClientIds![ 0 ] );
 
-			// If the user is dropping to the same position, including between
-			// the dragged blocks, return early.
-			const lastSamePositionIndex =
+			// Skip moving blocks when the drop keeps their order, including
+			// drops between the dragged blocks. Custom insertion behavior may
+			// still change their visual placement.
+			const lastSameOrderIndex =
 				operation === 'insert'
 					? sourceBlockIndex + sourceClientIds!.length
 					: sourceBlockIndex;
 			if (
 				sourceRootClientId === targetRootClientId &&
 				targetBlockIndex >= sourceBlockIndex &&
-				targetBlockIndex <= lastSamePositionIndex
+				targetBlockIndex <= lastSameOrderIndex
 			) {
+				if ( operation !== 'replace' && operation !== 'group' ) {
+					onSameOrderDrop?.( sourceClientIds!, sourceRootClientId );
+				}
 				return;
 			}
 
@@ -233,11 +240,12 @@ export function onHTMLDrop( insertOrReplaceBlocks: InsertOrReplaceBlocks ) {
 /**
  * A React hook for handling block drop events.
  *
- * @param targetRootClientId  The root client id where the block(s) will be inserted.
- * @param targetBlockIndex    The index where the block(s) will be inserted.
- * @param options             The optional options.
- * @param options.operation   The type of operation to perform on drop. Could be `insert`, `replace` or `group`.
- * @param options.nearestSide The side of the target block a grouped block is placed on.
+ * @param targetRootClientId   The root client id where the block(s) will be inserted.
+ * @param targetBlockIndex     The index where the block(s) will be inserted.
+ * @param options              The optional options.
+ * @param options.operation    The type of operation to perform on drop. Could be `insert`, `replace` or `group`.
+ * @param options.nearestSide  The side of the target block a grouped block is placed on.
+ * @param options.onBlocksDrop Runs custom behavior when blocks are dropped.
  *
  * @return A function to be passed to the onDrop handler.
  */
@@ -246,7 +254,11 @@ export default function useOnBlockDrop(
 	targetBlockIndex: number,
 	options: UseOnBlockDropOptions = {}
 ) {
-	const { operation = 'insert', nearestSide = 'right' } = options;
+	const {
+		operation = 'insert',
+		nearestSide = 'right',
+		onBlocksDrop,
+	} = options;
 	const {
 		canInsertBlockType,
 		getBlockIndex,
@@ -356,16 +368,18 @@ export default function useOnBlockDrop(
 			insertIndex: number
 		) => {
 			if ( operation === 'replace' ) {
-				// The dragged blocks exist.
-				const sourceBlocks = getBlocksByClientId(
-					sourceClientIds
-				) as Block[];
 				const targetBlockClientIds =
 					getBlockOrder( targetRootClientId );
 				const targetBlockClientId =
 					targetBlockClientIds[ targetBlockIndex ];
 
 				registry.batch( () => {
+					onBlocksDrop?.( sourceClientIds, sourceRootClientId );
+					// Re-read the dragged blocks in case custom drop behavior
+					// updated them.
+					const sourceBlocks = getBlocksByClientId(
+						sourceClientIds
+					) as Block[];
 					// Remove the source blocks.
 					removeBlocks( sourceClientIds, false );
 					// Replace the target block with the source blocks.
@@ -377,12 +391,15 @@ export default function useOnBlockDrop(
 					);
 				} );
 			} else {
-				moveBlocksToPosition(
-					sourceClientIds,
-					sourceRootClientId,
-					targetRootClientId,
-					insertIndex
-				);
+				registry.batch( () => {
+					onBlocksDrop?.( sourceClientIds, sourceRootClientId );
+					moveBlocksToPosition(
+						sourceClientIds,
+						sourceRootClientId,
+						targetRootClientId,
+						insertIndex
+					);
+				} );
 			}
 		},
 		[
@@ -390,6 +407,7 @@ export default function useOnBlockDrop(
 			getBlockOrder,
 			getBlocksByClientId,
 			moveBlocksToPosition,
+			onBlocksDrop,
 			registry,
 			removeBlocks,
 			replaceBlocks,
@@ -407,7 +425,8 @@ export default function useOnBlockDrop(
 		insertOrReplaceBlocks,
 		clearSelectedBlock,
 		operation,
-		getBlock
+		getBlock,
+		onBlocksDrop
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,

@@ -1,4 +1,7 @@
-import type { BlockDropOperation } from '../use-on-block-drop/types';
+import type {
+	BlockDropOperation,
+	OnBlocksDrop,
+} from '../use-on-block-drop/types';
 
 /**
  * The orientation of a block list.
@@ -72,6 +75,8 @@ export interface BlockDropZoneConfig {
 	 * into.
 	 */
 	parentClientId?: string | null;
+	/** Runs custom behavior when blocks are dropped. */
+	onBlocksDrop?: OnBlocksDrop;
 	isDisabled?: boolean;
 }
 

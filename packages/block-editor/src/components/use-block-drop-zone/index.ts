@@ -296,6 +296,7 @@ function isInsertionPoint(
  * @param dropZoneConfig.dropZoneElement Optional element to be used as the drop zone.
  * @param dropZoneConfig.rootClientId    The root client id for the block list.
  * @param dropZoneConfig.parentClientId  The client id of the parent block.
+ * @param dropZoneConfig.onBlocksDrop    Runs custom behavior when blocks are dropped.
  * @param dropZoneConfig.isDisabled      Whether the drop zone is disabled.
  * @return Ref callback for the drop zone element.
  */
@@ -307,6 +308,7 @@ export default function useBlockDropZone( {
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 	parentClientId: parentBlockClientId = '',
+	onBlocksDrop,
 	isDisabled = false,
 }: BlockDropZoneConfig = {} ): RefCallback< HTMLElement > {
 	const registry = useRegistry();
@@ -348,6 +350,7 @@ export default function useBlockDropZone( {
 		{
 			operation: dropTarget.operation,
 			nearestSide: dropTarget.nearestSide,
+			onBlocksDrop,
 		}
 	);
 	const throttled = useThrottle(

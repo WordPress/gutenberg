@@ -16,7 +16,7 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import { isPlainObject } from '../../utils/object';
 import { GridItemMover } from './grid-item-movers';
 import {
