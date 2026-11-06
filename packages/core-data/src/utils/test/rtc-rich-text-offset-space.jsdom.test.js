@@ -285,7 +285,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		}
 
 		expect( checkedCases ).toBe( FUZZ_CASE_COUNT );
-	}, 30000 );
+	} );
 
 	it( 'fuzzes cursor-guided deltas against updated HTML cursor indices', () => {
 		const random = createRandom( FUZZ_SEED + 1 );
@@ -388,7 +388,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		expect( attempts ).toBeLessThanOrEqual( PLACEMENT_FUZZ_CASE_COUNT * 2 );
 		expect( differentCursorIndexCases ).toBeGreaterThan( 100 );
 		expect( oldHtmlWouldPlaceDifferentDeltaCases ).toBeGreaterThan( 25 );
-	}, 30000 );
+	} );
 
 	it( 'preserves formatted paragraph content in applyPostChangesToCRDTDoc', () => {
 		const doc = new Y.Doc();

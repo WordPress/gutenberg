@@ -30,6 +30,22 @@ export interface DiffOptions {
 }
 
 /**
+ * Tokenize an HTML string so that HTML tags, HTML comments, and character
+ * entities are treated as indivisible atomic tokens during diffing. All other
+ * characters are matched as individual Unicode code points.
+ *
+ * @param html - The HTML string to tokenize.
+ * @return An array of token strings.
+ */
+export function tokenizeHtml( html: string ): string[] {
+	return (
+		html.match(
+			/<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:"[^"]*"|'[^']*'|[^'">])*>|&[a-zA-Z0-9#]+;|[\s\S]/gu
+		) ?? []
+	);
+}
+
+/**
  * Normalize diff changes so that `count` reflects UTF-16 code-unit length
  * rather than grapheme-cluster count (which diffChars may return when
  * Intl.Segmenter is available, e.g. diff v8+).

@@ -2936,6 +2936,46 @@ describe( 'crdt-blocks', () => {
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
 		} );
+
+		it( 'keeps peers in sync when replacing a happy face with a neutral face', () => {
+			const docA = new Y.Doc();
+			const docB = new Y.Doc();
+			const textA = docA.getText( 'content' );
+			textA.insert( 0, 'a 😀 b' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+			mergeRichTextUpdate( textA, 'a 😐 b' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+			expect( textA.toString() ).toBe( 'a 😐 b' );
+			expect( docB.getText( 'content' ).toString() ).toBe( 'a 😐 b' );
+		} );
+
+		it( 'keeps peers in sync when concurrently formatting text containing emoji', () => {
+			const docA = new Y.Doc();
+			const docB = new Y.Doc();
+			const textA = docA.getText( 'content' );
+			const textB = docB.getText( 'content' );
+
+			textA.insert( 0, 'the 😀 quick brown fox' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+
+			// Peer A wraps "quick" in strong
+			mergeRichTextUpdate(
+				textA,
+				'the 😀 <strong>quick</strong> brown fox'
+			);
+
+			// Peer B wraps "😀 quick" in em
+			mergeRichTextUpdate( textB, 'the <em>😀 quick</em> brown fox' );
+
+			// Synchronize peers
+			Y.applyUpdate( docA, Y.encodeStateAsUpdate( docB ) );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+
+			expect( textA.toString() ).toBe( textB.toString() );
+			// Emojis and tags must not be corrupted
+			expect( textA.toString() ).toContain( '😀' );
+			expect( textA.toString() ).not.toContain( '\uFFFD' );
+		} );
 	} );
 
 	describe( 'mergeRichTextUpdate - concurrent formatting on overlapping text', () => {

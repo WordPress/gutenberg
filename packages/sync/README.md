@@ -60,6 +60,10 @@ Origin string for CRDT document changes that should be synced but not recorded i
 
 Retries the HTTP polling connection now instead of waiting for the next automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
 
+### tokenizeHtml
+
+Quill Delta implementation used to describe rich text changes.
+
 ### Y
 
 Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future.
