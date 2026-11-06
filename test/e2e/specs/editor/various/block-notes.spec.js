@@ -1341,7 +1341,7 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
-		test( 'closes the new note form on focus-out only when empty', async ( {
+		test( 'keeps the new note form open while its block is edited', async ( {
 			editor,
 			page,
 		} ) => {
@@ -1354,11 +1354,35 @@ test.describe( 'Block Notes', () => {
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await expect( newNoteForm ).toBeFocused();
 			await editor.canvas.getByText( 'First block' ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+			await expect(
+				editor.canvas.getByText( 'First block edited' )
+			).toBeVisible();
+			await expect( newNoteForm ).toBeVisible();
+		} );
+
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toBeHidden();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await newNoteForm.pressSequentially( 'Unsent draft' );
-			await editor.canvas.getByText( 'First block' ).click();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
