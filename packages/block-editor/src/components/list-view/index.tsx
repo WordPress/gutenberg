@@ -96,6 +96,7 @@ const expansion = (
  * @param props.description            Optional accessible description for the tree grid component.
  * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param props.additionalBlockContent Component that renders additional block content UI.
+ * @param props.appender               Component that replaces the default block inserter in the appender row.
  * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
  * @param ref                          Forwarded ref
  */
@@ -113,6 +114,7 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
+		appender: CustomAppender,
 		showContentPopover = false,
 	}: PrivateListViewProps,
 	ref: ForwardedRef< HTMLElement >
@@ -330,6 +332,7 @@ function ListViewComponent(
 		() => ( {
 			AdditionalBlockContent,
 			BlockSettingsMenu,
+			CustomAppender,
 			listViewInstanceId: instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
@@ -339,6 +342,7 @@ function ListViewComponent(
 		[
 			AdditionalBlockContent,
 			BlockSettingsMenu,
+			CustomAppender,
 			instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
