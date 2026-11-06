@@ -846,6 +846,7 @@ parameters:
 		closureUsesThis: false
 		matchingInheritedMethodNames: false
 		switchConditionsMatchingType: false
+		strictFunctionCalls: false
 		illegalConstructorMethodCall: false
 ```
 

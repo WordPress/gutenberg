@@ -38,6 +38,9 @@ rules:
 	- PHPStan\Rules\Methods\WrongCaseOfInheritedMethodRule
 	# strictRules.switchConditionsMatchingType
 	- PHPStan\Rules\SwitchConditions\MatchingTypeInSwitchCaseConditionRule
+	# strictRules.strictFunctionCalls, which for in_array(), array_search(), and array_keys() is also enforced by the
+	# WordPress.PHP.StrictInArray sniff.
+	- PHPStan\Rules\StrictCalls\StrictFunctionCallsRule
 	# strictRules.illegalConstructorMethodCall
 	- PHPStan\Rules\Methods\IllegalConstructorMethodCallRule
 	- PHPStan\Rules\Methods\IllegalConstructorStaticCallRule
