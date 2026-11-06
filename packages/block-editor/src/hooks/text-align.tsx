@@ -150,7 +150,7 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 
 export default {
 	edit: BlockEditTextAlignmentToolbarControlsPure,
-	useBlockProps,
+	getBlockProps,
 	addSaveProps: addAssignedTextAlign,
 	attributeKeys: [ 'style' ],
 	hasSupport( name: string | BlockType ) {
@@ -158,7 +158,7 @@ export default {
 	},
 };
 
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	style,
 }: {

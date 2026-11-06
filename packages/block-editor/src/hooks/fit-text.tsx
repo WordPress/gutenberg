@@ -357,7 +357,7 @@ function addSaveProps(
  * @param props.fitText Whether fit text is enabled.
  * @return Filtered props applied to the block element.
  */
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	fitText,
 }: Pick< UseFitTextProps, 'name' | 'fitText' > ) {
@@ -457,7 +457,7 @@ addFilter(
 );
 
 export default {
-	useBlockProps,
+	getBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fitText', 'fontSize', 'style' ],
 	hasSupport: hasFitTextSupport,

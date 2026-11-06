@@ -1,5 +1,6 @@
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	getBlockSelectors,
@@ -236,20 +237,23 @@ function useBlockStyleVariation(
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
-function useBlockProps( {
-	name,
-	className,
+function getBlockProps( {
+	variation,
 	clientId,
-}: BlockListBlockFeatureProps & { className?: string } ) {
-	const { getBlockStyles } = useSelect( blocksStore );
+}: BlockListBlockFeatureProps & { variation?: string | null } ) {
+	return variation
+		? { className: `${ VARIATION_PREFIX }${ variation }-${ clientId }` }
+		: {};
+}
 
-	const registeredStyles = getBlockStyles( name );
-	const variation = getVariationNameFromClass( className, registeredStyles );
-	const variationClass = `${ VARIATION_PREFIX }${ variation }-${ clientId }`;
-
+function useStyles( {
+	name,
+	variation,
+	clientId,
+}: BlockListBlockFeatureProps & { variation?: string | null } ) {
 	const { settings, styles, textClipBaseBlocks } = useBlockStyleVariation(
 		name,
-		variation,
+		variation ?? null,
 		clientId
 	);
 
@@ -295,8 +299,6 @@ function useBlockProps( {
 		// correct CSS cascade is maintained.
 		clientId,
 	} );
-
-	return variation ? { className: variationClass } : {};
 }
 
 export default {
@@ -304,5 +306,17 @@ export default {
 	attributeKeys: [ 'className' ],
 	isMatch: ( { className }: { className?: string } ) =>
 		getVariationMatches( className ).length > 0,
-	useBlockProps,
+	// The registered variation the class names, so blocks update when one is
+	// registered or removed.
+	select: (
+		select: DataRegistry[ 'select' ],
+		{ name, className }: BlockListBlockFeatureProps & { className?: string }
+	) => ( {
+		variation: getVariationNameFromClass(
+			className,
+			select( blocksStore ).getBlockStyles( name )
+		),
+	} ),
+	getBlockProps,
+	useStyles,
 };

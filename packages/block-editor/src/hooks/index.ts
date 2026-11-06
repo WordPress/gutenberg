@@ -1,8 +1,5 @@
-import {
-	createBlockEditFilter,
-	createBlockListBlockFilter,
-	createBlockSaveFilter,
-} from './utils';
+import { createBlockEditFilter, createBlockSaveFilter } from './utils';
+import { registerBlockSupport } from '../components/block-list/block-supports';
 import './compat';
 import align from './align';
 import background from './background';
@@ -56,24 +53,22 @@ createBlockEditFilter(
 		AutoRegisterControls,
 	].filter( Boolean )
 );
-createBlockListBlockFilter( [
-	align,
-	textAlign,
-	background,
-	style,
-	color,
-	dimensions,
-	duotone,
-	fontFamily,
-	fontSize,
-	textShadow,
-	fitText,
-	border,
-	customCSS,
-	position,
-	blockStyleVariation,
-	childLayout,
-] );
+registerBlockSupport( align );
+registerBlockSupport( textAlign );
+registerBlockSupport( background );
+registerBlockSupport( style );
+registerBlockSupport( color );
+registerBlockSupport( dimensions );
+registerBlockSupport( duotone );
+registerBlockSupport( fontFamily );
+registerBlockSupport( fontSize );
+registerBlockSupport( textShadow );
+registerBlockSupport( fitText );
+registerBlockSupport( border );
+registerBlockSupport( customCSS );
+registerBlockSupport( position );
+registerBlockSupport( blockStyleVariation );
+registerBlockSupport( childLayout );
 createBlockSaveFilter( [
 	align,
 	textAlign,

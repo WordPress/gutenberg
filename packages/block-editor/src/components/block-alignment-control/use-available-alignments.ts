@@ -115,7 +115,7 @@ export default function useAvailableAlignments(
  *
  * @return The alignments the layout offers.
  */
-function getAvailableAlignments(
+export function getAvailableAlignments(
 	controls: string[],
 	layout: Layout,
 	{

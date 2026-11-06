@@ -5,6 +5,7 @@ import type {
 	BlockType,
 	ColorProps,
 } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import type {
 	PanelResetAllFilter,
@@ -110,8 +111,8 @@ export interface BlockEditFeature extends BlockSupportFeatureBase {
 }
 
 /**
- * The props `createBlockListBlockFilter` passes to `useBlockProps`: the block
- * name and client ID, plus the set attributes listed in `attributeKeys`.
+ * The props a block support gets for the block wrapper: the block name and
+ * client ID, plus the set attributes listed in `attributeKeys`.
  */
 export interface BlockListBlockFeatureProps {
 	name: string;
@@ -120,12 +121,36 @@ export interface BlockListBlockFeatureProps {
 }
 
 /**
+ * What a block support reads besides the block's attributes. The settings are
+ * those listed in `settings`, resolved for the block's parent.
+ */
+export interface BlockSupportContext {
+	settings: Record< string, unknown >;
+	parentLayout: Record< string, unknown > | undefined;
+}
+
+/**
  * A block support that adds props to the block wrapper in the editor.
  */
 export interface BlockListBlockFeature extends BlockSupportFeatureBase {
-	useBlockProps: (
-		props: BlockListBlockFeatureProps
+	// The wrapper props, from the attributes and the context alone, so the
+	// block has them in its first render.
+	getBlockProps: (
+		props: BlockListBlockFeatureProps,
+		context: BlockSupportContext
 	) => BlockWrapperProps | null | undefined;
+	// Side effects for the wrapper props, such as their style overrides.
+	useStyles?: (
+		props: BlockListBlockFeatureProps,
+		context: BlockSupportContext
+	) => void;
+	settings?: string[];
+	// Store values the support reads, added to its props. The block's own
+	// subscription selects them and compares them one by one.
+	select?: (
+		select: DataRegistry[ 'select' ],
+		props: BlockListBlockFeatureProps
+	) => Record< string, unknown >;
 	isMatch?: ( attributes: Record< string, unknown > ) => boolean;
 }
 

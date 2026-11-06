@@ -6,7 +6,6 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -240,7 +239,8 @@ function DuotonePanelPure( {
 export default {
 	shareWithChildBlocks: true,
 	edit: DuotonePanelPure,
-	useBlockProps,
+	getBlockProps,
+	useStyles,
 	attributeKeys: [ 'style' ],
 	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'filter.duotone' );
@@ -378,73 +378,75 @@ function useDuotoneStyles( {
 	}, [ isValidFilter, blockElement, colors ] );
 }
 
-// Used for generating the instance ID
-const DUOTONE_BLOCK_PROPS_REFERENCE = {};
+// The selector the duotone filter applies to, for blocks that support it.
+function getDuotoneSelector( name: string ) {
+	const blockType = getBlockType( name );
 
-function useBlockProps( {
+	if ( blockType ) {
+		// Backwards compatibility for `supports.color.__experimentalDuotone`
+		// is provided via the `block_type_metadata_settings` filter. If
+		// `supports.filter.duotone` has not been set and the
+		// experimental property has been, the experimental property
+		// value is copied into `supports.filter.duotone`.
+		const duotoneSupport = getBlockSupport(
+			blockType,
+			'filter.duotone',
+			false
+		);
+		if ( ! duotoneSupport ) {
+			return null;
+		}
+
+		// If the experimental duotone support was set, that value is
+		// to be treated as a selector and requires scoping.
+		const experimentalDuotone = getBlockSupport(
+			blockType,
+			'color.__experimentalDuotone',
+			false
+		);
+		if ( experimentalDuotone ) {
+			const rootSelector = getBlockSelector( blockType );
+			return typeof experimentalDuotone === 'string'
+				? scopeSelector( rootSelector, experimentalDuotone )
+				: rootSelector;
+		}
+
+		// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
+		return getBlockSelector( blockType, 'filter.duotone', {
+			fallback: true,
+		} );
+	}
+	return undefined;
+}
+
+function getBlockProps( {
 	clientId,
 	name,
 	style,
 }: BlockListBlockFeatureProps & { style?: PanelStyle } ) {
-	const id = useInstanceId( DUOTONE_BLOCK_PROPS_REFERENCE );
-	const selector = useMemo( () => {
-		const blockType = getBlockType( name );
-
-		if ( blockType ) {
-			// Backwards compatibility for `supports.color.__experimentalDuotone`
-			// is provided via the `block_type_metadata_settings` filter. If
-			// `supports.filter.duotone` has not been set and the
-			// experimental property has been, the experimental property
-			// value is copied into `supports.filter.duotone`.
-			const duotoneSupport = getBlockSupport(
-				blockType,
-				'filter.duotone',
-				false
-			);
-			if ( ! duotoneSupport ) {
-				return null;
-			}
-
-			// If the experimental duotone support was set, that value is
-			// to be treated as a selector and requires scoping.
-			const experimentalDuotone = getBlockSupport(
-				blockType,
-				'color.__experimentalDuotone',
-				false
-			);
-			if ( experimentalDuotone ) {
-				const rootSelector = getBlockSelector( blockType );
-				return typeof experimentalDuotone === 'string'
-					? scopeSelector( rootSelector, experimentalDuotone )
-					: rootSelector;
-			}
-
-			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
-			return getBlockSelector( blockType, 'filter.duotone', {
-				fallback: true,
-			} );
-		}
-		return undefined;
-	}, [ name ] );
-
 	// The duotone style holds a preset reference, colors or a CSS value.
 	const attribute = style?.color?.duotone as DuotoneValue | undefined;
+	return {
+		className:
+			getDuotoneSelector( name ) && attribute
+				? `wp-duotone-${ clientId }`
+				: '',
+	};
+}
 
-	const filterClass = `wp-duotone-${ id }`;
-
-	const shouldRender = selector && attribute;
-
+function useStyles( {
+	clientId,
+	name,
+	style,
+}: BlockListBlockFeatureProps & { style?: PanelStyle } ) {
 	useDuotoneStyles( {
 		clientId,
-		id: filterClass,
+		id: `wp-duotone-${ clientId }`,
 		// Blocks with duotone support have a selector.
-		selector: selector as string,
-		attribute,
+		selector: getDuotoneSelector( name ) as string,
+		// The duotone style holds a preset reference, colors or a CSS value.
+		attribute: style?.color?.duotone as DuotoneValue | undefined,
 	} );
-
-	return {
-		className: shouldRender ? filterClass : '',
-	};
 }
 
 addFilter(

@@ -7,7 +7,6 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
-import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
@@ -26,6 +25,7 @@ import type { PanelStyle } from '../components/global-styles/types';
 import type {
 	BorderAttributes,
 	BorderHookPanelProps,
+	BlockSupportContext,
 	BlockWrapperProps,
 	MultiOriginColor,
 	ResetAllFilter,
@@ -399,16 +399,28 @@ export function getBorderClasses( attributes: BorderAttributes ) {
 	} );
 }
 
-function useBlockProps( {
-	name,
-	borderColor,
-	style,
-}: {
-	name: string;
-	borderColor?: string;
-	style?: PanelStyle;
-} ) {
-	const { colors } = useMultipleOriginColorsAndGradients();
+function getBlockProps(
+	{
+		name,
+		borderColor,
+		style,
+	}: {
+		name: string;
+		borderColor?: string;
+		style?: PanelStyle;
+	},
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	// The palettes `useMultipleOriginColorsAndGradients` lists, in its order.
+	const colors = [
+		settings[ 'color.palette.theme' ],
+		settings[ 'color.defaultPalette' ]
+			? settings[ 'color.palette.default' ]
+			: undefined,
+		settings[ 'color.palette.custom' ],
+	]
+		.filter( ( palette ) => ( palette as unknown[] | undefined )?.length )
+		.map( ( palette ) => ( { colors: palette } ) ) as ColorOrigin[];
 
 	if (
 		! hasBorderSupport( name, 'color' ) ||
@@ -454,7 +466,13 @@ function useBlockProps( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
+	settings: [
+		'color.palette.theme',
+		'color.defaultPalette',
+		'color.palette.default',
+		'color.palette.custom',
+	],
 	addSaveProps,
 	attributeKeys: [ 'borderColor', 'style' ],
 	hasSupport( name: string | BlockType ) {
