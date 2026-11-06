@@ -220,6 +220,34 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	} );
 
+	test( 'shows a note shared by several blocks beside the first', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		for ( const content of [
+			'First shared',
+			SPACER_TEXT,
+			'Last shared',
+		] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+		const first = getParagraph( editor, 'First shared' );
+		const last = getParagraph( editor, 'Last shared' );
+		await editor.selectBlocks( first, last );
+		await blockNoteUtils.addNote( 'Shared note' );
+		const thread = getThread( page, 'Shared note' );
+		await expectBelow( last, first );
+
+		await blockNoteUtils.deselect();
+		await last.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expectAligned( thread, first );
+	} );
+
 	test( 'follows its block when blocks are reordered', async ( {
 		editor,
 		page,

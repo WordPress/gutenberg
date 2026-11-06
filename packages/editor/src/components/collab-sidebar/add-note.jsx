@@ -9,14 +9,15 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { hasFocusWithin } from './utils';
+import { hasFocusWithin } from './utils/dom';
 import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { clientId, floating } ) {
+export function AddNote( { clientIds, floating } ) {
+	const [ clientId ] = clientIds;
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -55,7 +56,7 @@ export function AddNote( { clientId, floating } ) {
 		 * newly selected note.
 		 */
 		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
-			onDiscard( clientId );
+			onDiscard( clientIds );
 			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
@@ -63,7 +64,7 @@ export function AddNote( { clientId, floating } ) {
 
 	const unselectNote = () => {
 		setDraft( '' );
-		onDiscard( clientId );
+		onDiscard( clientIds );
 		selectNote( undefined );
 		blockElement?.focus();
 		toggleBlockHighlight( clientId, false );
