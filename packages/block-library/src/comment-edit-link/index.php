@@ -51,16 +51,20 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 		// Each action maps to the nonce action and label expected by wp-admin/comment.php.
 		$moderation_links = array(
 			$is_approved ? 'unapprovecomment' : 'approvecomment' => array( 'approve-comment_', $is_approved ? __( 'Unapprove' ) : __( 'Approve' ) ),
-			'spamcomment'  => array( 'delete-comment_', _x( 'Spam', 'verb' ) ),
-			'trashcomment' => array( 'delete-comment_', _x( 'Trash', 'verb' ) ),
+			'spamcomment' => array( 'delete-comment_', _x( 'Spam', 'verb' ) ),
 		);
 
+		// Without a trash, trashing deletes permanently, which is too risky for a one-click link.
+		if ( EMPTY_TRASH_DAYS ) {
+			$moderation_links['trashcomment'] = array( 'delete-comment_', _x( 'Trash', 'verb' ) );
+		}
+
+		// Moderation actions redirect back to the current page, so they always open in the same tab.
 		foreach ( $moderation_links as $action => list( $nonce_action, $label ) ) {
 			$url    = wp_nonce_url( admin_url( "comment.php?action=$action&c=$comment_id" ), $nonce_action . $comment_id );
 			$links .= sprintf(
-				' <a href="%1$s" %2$s>%3$s</a>',
+				' <a href="%1$s">%2$s</a>',
 				esc_url( $url ),
-				$link_atts,
 				esc_html( $label )
 			);
 		}
