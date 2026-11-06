@@ -6,6 +6,102 @@ import { GridRect } from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
+interface AutoSpanItemState {
+	appliedRect: GridRect;
+	attributes: GridItemAttributes;
+	userColumnStart: number;
+	userRowStart: number;
+	extraColumnSpan: number;
+	extraRowSpan: number;
+	autoColumnSpan: number;
+	autoRowSpan: number;
+	cellWidth: number;
+	cellHeight: number;
+	columnSpanWasImplicit: boolean;
+	rowSpanWasImplicit: boolean;
+}
+
+interface AutoSpanState {
+	items: Map< string, AutoSpanItemState >;
+	rows?: {
+		base: number;
+		applied: number;
+	};
+}
+
+interface GridItemDimensions {
+	offsetWidth: number;
+	offsetHeight: number;
+	scrollWidth: number;
+	scrollHeight: number;
+}
+
+// Keep automatic span baselines across editor canvas remounts, such as when
+// switching previews. Client IDs are unique within an editor session.
+const autoSpanStates = new Map< string, AutoSpanState >();
+
+const STYLE_ATTRIBUTE_KEY = new Set( [ 'style' ] );
+const LAYOUT_STYLE_KEY = new Set( [ 'layout' ] );
+const GRID_PLACEMENT_KEYS = new Set( [
+	'columnStart',
+	'rowStart',
+	'columnSpan',
+	'rowSpan',
+] );
+
+/**
+ * Checks whether two objects are shallowly equal, ignoring selected keys.
+ *
+ * @param first       First object.
+ * @param second      Second object.
+ * @param ignoredKeys Keys to ignore.
+ *
+ * @return Whether the remaining values are equal.
+ */
+function areObjectsEqualExcept(
+	first: Record< string, unknown > | undefined,
+	second: Record< string, unknown > | undefined,
+	ignoredKeys: ReadonlySet< string >
+): boolean {
+	const firstKeys = Object.keys( first ?? {} ).filter(
+		( key ) => ! ignoredKeys.has( key )
+	);
+	const secondKeys = Object.keys( second ?? {} ).filter(
+		( key ) => ! ignoredKeys.has( key )
+	);
+	return (
+		firstKeys.length === secondKeys.length &&
+		firstKeys.every(
+			( key ) =>
+				Object.hasOwn( second ?? {}, key ) &&
+				Object.is( first?.[ key ], second?.[ key ] )
+		)
+	);
+}
+
+/**
+ * Checks whether block attributes other than grid placement are unchanged.
+ *
+ * @param first  First set of block attributes.
+ * @param second Second set of block attributes.
+ *
+ * @return Whether the content-affecting attributes are equal.
+ */
+function areContentAttributesEqual(
+	first: GridItemAttributes,
+	second: GridItemAttributes
+): boolean {
+	return (
+		areObjectsEqualExcept( first, second, STYLE_ATTRIBUTE_KEY ) &&
+		areObjectsEqualExcept( first.style, second.style, LAYOUT_STYLE_KEY ) &&
+		areObjectsEqualExcept(
+			first.style?.layout,
+			second.style?.layout,
+			GRID_PLACEMENT_KEYS
+		)
+	);
+}
+
 /**
  * Checks whether a value is a positive integer.
  *
@@ -27,6 +123,69 @@ function isPositiveInteger( value: unknown ): value is number {
 function getCSSPixelValue( value: string ): number {
 	const number = parseFloat( value );
 	return Number.isFinite( number ) ? number : 0;
+}
+
+/**
+ * Checks whether two grid rectangles have the same position and size.
+ *
+ * @param first  First grid rectangle.
+ * @param second Second grid rectangle.
+ *
+ * @return Whether the rectangles are equal.
+ */
+function areGridRectsEqual( first: GridRect, second: GridRect ): boolean {
+	return (
+		first.columnStart === second.columnStart &&
+		first.rowStart === second.rowStart &&
+		first.columnSpan === second.columnSpan &&
+		first.rowSpan === second.rowSpan
+	);
+}
+
+/**
+ * Measures a grid item while it occupies a particular grid rectangle. The
+ * temporary inline styles are restored before the browser paints.
+ *
+ * @param element Grid item element.
+ * @param rect    Grid rectangle to measure.
+ *
+ * @return Grid item dimensions at the requested size.
+ */
+function measureElementAtRect(
+	element: HTMLElement,
+	rect: GridRect
+): GridItemDimensions {
+	const previousGridColumn = element.style.getPropertyValue( 'grid-column' );
+	const previousGridRow = element.style.getPropertyValue( 'grid-row' );
+
+	element.style.setProperty(
+		'grid-column',
+		`${ rect.columnStart } / span ${ rect.columnSpan }`
+	);
+	element.style.setProperty(
+		'grid-row',
+		`${ rect.rowStart } / span ${ rect.rowSpan }`
+	);
+
+	const dimensions = {
+		offsetWidth: element.offsetWidth,
+		offsetHeight: element.offsetHeight,
+		scrollWidth: element.scrollWidth,
+		scrollHeight: element.scrollHeight,
+	};
+
+	if ( previousGridColumn ) {
+		element.style.setProperty( 'grid-column', previousGridColumn );
+	} else {
+		element.style.removeProperty( 'grid-column' );
+	}
+	if ( previousGridRow ) {
+		element.style.setProperty( 'grid-row', previousGridRow );
+	} else {
+		element.style.removeProperty( 'grid-row' );
+	}
+
+	return dimensions;
 }
 
 /**
@@ -97,11 +256,11 @@ function getExpandedColumnRect(
 }
 
 /**
- * In a manual grid, grows the column and row spans of items whose content
- * overflows their grid area, so that rows can stay square. Spans only ever
- * grow, and may overlap other items. Column spans are capped at the column
- * count and may shift left to stay within the grid, while growing past the
- * last row adds rows.
+ * In a manual grid, adjusts column and row spans to fit each item's content,
+ * while retaining any extra spans added by the user. Automatically added
+ * spans may overlap other items. Column spans are capped at the column count
+ * and may shift left to stay within the grid, while growing past the last row
+ * adds rows.
  *
  * @param options
  * @param options.clientId The grid block's client ID.
@@ -117,12 +276,24 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		[ clientId ]
 	);
 	const gridElement = useBlockElement( clientId );
+	const childBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
+		[ clientId ]
+	);
 	const { getBlockAttributes, getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
+		let autoSpanState = autoSpanStates.get( clientId );
+		if ( ! autoSpanState ) {
+			autoSpanState = { items: new Map() };
+			autoSpanStates.set( clientId, autoSpanState );
+		}
 		if ( ! isManualPlacement || ! gridElement ) {
+			if ( ! isManualPlacement ) {
+				autoSpanStates.delete( clientId );
+			}
 			return;
 		}
 		const view = gridElement.ownerDocument.defaultView;
@@ -141,22 +312,19 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					child instanceof view.HTMLElement &&
 					child.hasAttribute( 'data-block' )
 			);
+		// Capture item dimensions in the resize callback. Responsive child UI can
+		// adapt before the scheduled check and otherwise hide the overflow that
+		// caused the resize.
+		const resizeDimensions = new Map< string, GridItemDimensions >();
 
 		/**
-		 * Grows the spans of grid items whose content overflows their grid area.
+		 * Adjusts automatic spans to the current content and grid size.
 		 *
-		 * @return Whether another check is needed after a width change.
+		 * @param allowShrink Whether content changed since the previous check.
+		 *
+		 * @return Whether another check is needed after a span change.
 		 */
-		const growOverflowingItems = () => {
-			const overflowingItemElements = getItemElements().filter(
-				( element ) =>
-					element.scrollWidth > element.clientWidth + 1 ||
-					element.scrollHeight > element.clientHeight + 1
-			);
-			if ( ! overflowingItemElements.length ) {
-				return false;
-			}
-
+		const adjustItemSpans = ( allowShrink: boolean ) => {
 			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
 					?.layout ?? {};
@@ -195,113 +363,273 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			const columnPitch = columnWidth + columnGap;
 
 			const rects = new Map< string, GridRect >();
+			const itemLayouts = new Map< string, GridItemAttributes >();
 			for ( const childId of getBlockOrder( clientId ) ) {
+				const attributes = getBlockAttributes(
+					childId
+				) as GridItemAttributes;
 				const { columnStart, rowStart, columnSpan, rowSpan } =
-					( getBlockAttributes( childId ) as GridItemAttributes )
-						?.style?.layout ?? {};
+					attributes?.style?.layout ?? {};
 				if (
 					isPositiveInteger( columnStart ) &&
 					isPositiveInteger( rowStart )
 				) {
-					rects.set(
-						childId,
-						new GridRect( {
-							columnStart,
-							rowStart,
-							columnSpan: isPositiveInteger( columnSpan )
-								? columnSpan
-								: 1,
-							rowSpan: isPositiveInteger( rowSpan ) ? rowSpan : 1,
-						} )
-					);
+					const rect = new GridRect( {
+						columnStart,
+						rowStart,
+						columnSpan: isPositiveInteger( columnSpan )
+							? columnSpan
+							: 1,
+						rowSpan: isPositiveInteger( rowSpan ) ? rowSpan : 1,
+					} );
+					rects.set( childId, rect );
+					itemLayouts.set( childId, attributes );
 				}
+			}
+			for ( const childId of autoSpanState.items.keys() ) {
+				if ( ! rects.has( childId ) ) {
+					autoSpanState.items.delete( childId );
+				}
+			}
+
+			let autoSpanRows = autoSpanState.rows;
+			if ( ! autoSpanRows || autoSpanRows.applied !== rowCount ) {
+				autoSpanRows = {
+					base: rowCount,
+					applied: rowCount,
+				};
+				autoSpanState.rows = autoSpanRows;
 			}
 
 			const updates: Record< string, Record< string, unknown > > = {};
 			let needsFollowUpCheck = false;
-			for ( const element of overflowingItemElements ) {
-				const childId = element.getAttribute( 'data-block' )!;
+			for ( const element of getItemElements() ) {
+				const childId = element.getAttribute( 'data-block' );
+				if ( ! childId ) {
+					continue;
+				}
 				const rect = rects.get( childId );
-				if ( ! rect ) {
+				const attributes = itemLayouts.get( childId );
+				if ( ! rect || ! attributes ) {
 					continue;
 				}
-				// Allow for sub-pixel rounding.
-				const overflowsWidth =
-					element.scrollWidth > element.clientWidth + 1;
-				const overflowsHeight =
-					element.scrollHeight > element.clientHeight + 1;
-				let { columnStart, columnSpan, rowSpan } = rect;
-				let widthChanged = false;
-				if ( overflowsWidth ) {
-					const neededSpan = Math.ceil(
-						( element.scrollWidth + columnGap ) / columnPitch
+				const itemLayout = attributes.style?.layout ?? {};
+				let itemState = autoSpanState.items.get( childId );
+				const contentAttributesChanged =
+					itemState &&
+					! areContentAttributesEqual(
+						itemState.attributes,
+						attributes
 					);
-					const expandedRect = getExpandedColumnRect(
-						childId,
-						rect,
-						neededSpan,
-						columnCount,
-						rects
-					);
-					columnStart = expandedRect.columnStart;
-					columnSpan = expandedRect.columnSpan;
-					widthChanged =
-						columnStart !== rect.columnStart ||
-						columnSpan !== rect.columnSpan;
-					needsFollowUpCheck ||= widthChanged;
-				}
-				// Widening can reduce wrapped content's height, so only use the
-				// current height measurement when the width is staying the same.
-				if ( overflowsHeight && ! widthChanged ) {
-					const neededSpan = Math.ceil(
-						( element.scrollHeight + rowGap ) / rowPitch
-					);
-					rowSpan = Math.max( rowSpan, neededSpan );
-				}
+				const canShrink = allowShrink || contentAttributesChanged;
+				let columnSpanChanged = false;
+				let rowSpanChanged = false;
 				if (
-					columnStart === rect.columnStart &&
-					columnSpan === rect.columnSpan &&
-					rowSpan === rect.rowSpan
+					itemState &&
+					! areGridRectsEqual( rect, itemState.appliedRect )
 				) {
+					columnSpanChanged =
+						rect.columnSpan !== itemState.appliedRect.columnSpan;
+					rowSpanChanged =
+						rect.rowSpan !== itemState.appliedRect.rowSpan;
+					itemState.userColumnStart = rect.columnStart;
+					itemState.userRowStart = rect.rowStart;
+					if ( columnSpanChanged ) {
+						itemState.columnSpanWasImplicit = ! isPositiveInteger(
+							itemLayout.columnSpan
+						);
+					}
+					if ( rowSpanChanged ) {
+						itemState.rowSpanWasImplicit = ! isPositiveInteger(
+							itemLayout.rowSpan
+						);
+					}
+				}
+
+				const userColumnStart =
+					itemState?.userColumnStart ?? rect.columnStart;
+				const userRowStart = itemState?.userRowStart ?? rect.rowStart;
+				const oneCellRect = new GridRect( {
+					columnStart: userColumnStart,
+					rowStart: userRowStart,
+					columnSpan: 1,
+					rowSpan: 1,
+				} );
+				const oneCellDimensions = measureElementAtRect(
+					element,
+					oneCellRect
+				);
+				const dimensionsBeforeResponsiveReflow =
+					resizeDimensions.get( childId );
+				resizeDimensions.delete( childId );
+				// Allow for sub-pixel rounding.
+				const contentWidth = Math.max(
+					oneCellDimensions.offsetWidth,
+					oneCellDimensions.scrollWidth,
+					rect.columnSpan === 1
+						? ( dimensionsBeforeResponsiveReflow?.scrollWidth ?? 0 )
+						: 0
+				);
+				const measuredAutoColumnSpan = Math.min(
+					columnCount,
+					contentWidth > columnWidth + 1
+						? Math.ceil(
+								( contentWidth + columnGap ) / columnPitch
+							)
+						: 1
+				);
+				const cellWidthChanged =
+					itemState &&
+					Math.abs(
+						itemState.cellWidth - oneCellDimensions.offsetWidth
+					) > 1;
+				// Responsive content can adapt after an item grows, making a
+				// resize-only follow-up appear to fit in one cell. Keep the span
+				// from that content until the content or cell width changes.
+				const autoColumnSpan =
+					itemState && ! canShrink && ! cellWidthChanged
+						? Math.max(
+								itemState.autoColumnSpan,
+								measuredAutoColumnSpan
+							)
+						: measuredAutoColumnSpan;
+				const extraColumnSpan = columnSpanChanged
+					? Math.max( 0, rect.columnSpan - autoColumnSpan )
+					: ( itemState?.extraColumnSpan ??
+						Math.max( 0, rect.columnSpan - autoColumnSpan ) );
+				const desiredColumnSpan = Math.min(
+					columnCount,
+					autoColumnSpan + extraColumnSpan
+				);
+				const desiredWidthRect = getExpandedColumnRect(
+					childId,
+					oneCellRect,
+					desiredColumnSpan,
+					columnCount,
+					rects
+				);
+
+				// Measure height at the content-driven width because widening can reduce
+				// the height of wrapped content.
+				const desiredWidthDimensions = measureElementAtRect(
+					element,
+					desiredWidthRect
+				);
+				const contentHeight = Math.max(
+					desiredWidthDimensions.offsetHeight,
+					desiredWidthDimensions.scrollHeight,
+					rect.columnSpan === desiredWidthRect.columnSpan &&
+						rect.rowSpan === 1
+						? ( dimensionsBeforeResponsiveReflow?.scrollHeight ??
+								0 )
+						: 0
+				);
+				const measuredAutoRowSpan =
+					contentHeight > rowHeight + 1
+						? Math.ceil( ( contentHeight + rowGap ) / rowPitch )
+						: 1;
+				const cellHeightChanged =
+					itemState &&
+					Math.abs(
+						itemState.cellHeight - oneCellDimensions.offsetHeight
+					) > 1;
+				const autoRowSpan =
+					itemState &&
+					! canShrink &&
+					! cellWidthChanged &&
+					! cellHeightChanged &&
+					desiredWidthRect.columnSpan ===
+						itemState.appliedRect.columnSpan
+						? Math.max( itemState.autoRowSpan, measuredAutoRowSpan )
+						: measuredAutoRowSpan;
+				const extraRowSpan = rowSpanChanged
+					? Math.max( 0, rect.rowSpan - autoRowSpan )
+					: ( itemState?.extraRowSpan ??
+						Math.max( 0, rect.rowSpan - autoRowSpan ) );
+				const desiredRect = new GridRect( {
+					columnStart: desiredWidthRect.columnStart,
+					rowStart: userRowStart,
+					columnSpan: desiredWidthRect.columnSpan,
+					rowSpan: autoRowSpan + extraRowSpan,
+				} );
+
+				if ( ! itemState ) {
+					itemState = {
+						appliedRect: rect,
+						attributes,
+						userColumnStart,
+						userRowStart,
+						extraColumnSpan,
+						extraRowSpan,
+						autoColumnSpan,
+						autoRowSpan,
+						cellWidth: oneCellDimensions.offsetWidth,
+						cellHeight: oneCellDimensions.offsetHeight,
+						columnSpanWasImplicit: ! isPositiveInteger(
+							itemLayout.columnSpan
+						),
+						rowSpanWasImplicit: ! isPositiveInteger(
+							itemLayout.rowSpan
+						),
+					};
+					autoSpanState.items.set( childId, itemState );
+				} else {
+					itemState.attributes = attributes;
+					itemState.extraColumnSpan = extraColumnSpan;
+					itemState.extraRowSpan = extraRowSpan;
+					itemState.autoColumnSpan = autoColumnSpan;
+					itemState.autoRowSpan = autoRowSpan;
+					itemState.cellWidth = oneCellDimensions.offsetWidth;
+					itemState.cellHeight = oneCellDimensions.offsetHeight;
+				}
+				if ( areGridRectsEqual( desiredRect, rect ) ) {
+					itemState.appliedRect = rect;
 					continue;
 				}
-				rects.set(
-					childId,
-					new GridRect( {
-						columnStart,
-						rowStart: rect.rowStart,
-						columnSpan,
-						rowSpan,
-					} )
-				);
-				const attributes = getBlockAttributes(
-					childId
-				) as GridItemAttributes;
+				rects.set( childId, desiredRect );
+				itemState.appliedRect = desiredRect;
+				needsFollowUpCheck = true;
 				updates[ childId ] = {
 					style: {
 						...attributes.style,
 						layout: {
 							...attributes.style?.layout,
-							columnStart,
-							columnSpan,
-							rowSpan,
+							columnStart: desiredRect.columnStart,
+							columnSpan:
+								desiredRect.columnSpan === 1 &&
+								itemState.columnSpanWasImplicit
+									? undefined
+									: desiredRect.columnSpan,
+							rowSpan:
+								desiredRect.rowSpan === 1 &&
+								itemState.rowSpanWasImplicit
+									? undefined
+									: desiredRect.rowSpan,
 						},
 					},
 				};
 			}
 
-			// Growing past the last row adds rows. Row height stays the same
+			// Growing past the last row adds rows. Shrinking back removes only
+			// rows that were added automatically. Row height stays the same
 			// because the grid's aspect ratio scales with the row count.
 			const bottomMostRow = Math.max(
-				...[ ...rects.values() ].map( ( r ) => r.rowEnd )
+				0,
+				...[ ...rects.values() ].map( ( rect ) => rect.rowEnd )
 			);
-			if ( Object.keys( updates ).length && bottomMostRow > rowCount ) {
+			const desiredRowCount = Math.max(
+				autoSpanRows.base,
+				bottomMostRow
+			);
+			if ( desiredRowCount !== rowCount ) {
 				const gridLayout = (
 					getBlockAttributes( clientId ) as { layout?: Layout }
 				 ).layout;
 				updates[ clientId ] = {
-					layout: { ...gridLayout, rowCount: bottomMostRow },
+					layout: { ...gridLayout, rowCount: desiredRowCount },
 				};
+				autoSpanRows.applied = desiredRowCount;
+				needsFollowUpCheck = true;
 			}
 
 			if ( Object.keys( updates ).length ) {
@@ -319,11 +647,15 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		/**
 		 * Schedules one overflow check for the next animation frame.
 		 */
-		const scheduleCheck = () => {
+		let shouldAllowShrink = false;
+		const scheduleCheck = ( allowShrink = false ) => {
+			shouldAllowShrink ||= allowShrink;
 			if ( frame === undefined ) {
 				frame = view.requestAnimationFrame( () => {
 					frame = undefined;
-					if ( growOverflowingItems() ) {
+					const allowScheduledShrink = shouldAllowShrink;
+					shouldAllowShrink = false;
+					if ( adjustItemSpans( allowScheduledShrink ) ) {
 						scheduleCheck();
 					}
 				} );
@@ -331,13 +663,34 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		};
 
 		// Text edits don't resize a stretched item, so watch the content too.
-		const mutationObserver = new view.MutationObserver( scheduleCheck );
+		const mutationObserver = new view.MutationObserver( () =>
+			scheduleCheck( true )
+		);
 		mutationObserver.observe( gridElement, {
 			childList: true,
 			characterData: true,
 			subtree: true,
 		} );
-		const resizeObserver = new view.ResizeObserver( scheduleCheck );
+		const resizeObserver = new view.ResizeObserver( ( entries ) => {
+			for ( const { target } of entries ) {
+				if (
+					! ( target instanceof view.HTMLElement ) ||
+					target.parentElement !== gridElement
+				) {
+					continue;
+				}
+				const childId = target.getAttribute( 'data-block' );
+				if ( childId ) {
+					resizeDimensions.set( childId, {
+						offsetWidth: target.offsetWidth,
+						offsetHeight: target.offsetHeight,
+						scrollWidth: target.scrollWidth,
+						scrollHeight: target.scrollHeight,
+					} );
+				}
+			}
+			scheduleCheck();
+		} );
 		resizeObserver.observe( gridElement );
 		getItemElements().forEach( ( element ) =>
 			resizeObserver.observe( element )
@@ -353,6 +706,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		};
 	}, [
 		clientId,
+		childBlocks,
 		gridElement,
 		isManualPlacement,
 		getBlockAttributes,
