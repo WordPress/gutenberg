@@ -1,4 +1,4 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'Editing an unsaved Navigation menu (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin, editor, page } ) => {
@@ -77,8 +77,8 @@ test.describe( 'Editing an unsaved Navigation menu (@firefox, @webkit)', () => {
 			name: 'Description',
 			exact: true,
 		} );
-		let releaseCreation;
-		const creationGate = new Promise( ( resolve ) => {
+		let releaseCreation!: () => void;
+		const creationGate = new Promise< void >( ( resolve ) => {
 			releaseCreation = resolve;
 		} );
 		let creations = 0;
@@ -115,7 +115,7 @@ test.describe( 'Editing an unsaved Navigation menu (@firefox, @webkit)', () => {
 		await expect( description ).toHaveValue( 'A useful description' );
 		const menuId = ( await editor.getBlocks() )[ 0 ].attributes.ref;
 		await editor.publishPost();
-		const menu = await requestUtils.rest( {
+		const menu = await requestUtils.rest< { content: { raw: string } } >( {
 			path: `/wp/v2/navigation/${ menuId }`,
 			data: { context: 'edit' },
 		} );
@@ -138,8 +138,8 @@ test.describe( 'Editing an unsaved Navigation menu (@firefox, @webkit)', () => {
 		page,
 		requestUtils,
 	} ) => {
-		let releaseResolution;
-		const resolutionGate = new Promise( ( resolve ) => {
+		let releaseResolution!: () => void;
+		const resolutionGate = new Promise< void >( ( resolve ) => {
 			releaseResolution = resolve;
 		} );
 		let resolutions = 0;
@@ -169,7 +169,7 @@ test.describe( 'Editing an unsaved Navigation menu (@firefox, @webkit)', () => {
 		}
 		await editor.publishPost();
 		const menuId = ( await editor.getBlocks() )[ 0 ].attributes.ref;
-		const menu = await requestUtils.rest( {
+		const menu = await requestUtils.rest< { content: { raw: string } } >( {
 			path: `/wp/v2/navigation/${ menuId }`,
 			data: { context: 'edit' },
 		} );
