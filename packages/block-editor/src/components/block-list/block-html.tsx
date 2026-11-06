@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import {
 	getBlockAttributes,
 	getBlockContent,
 	getBlockType,
 	getSaveContent,
 	privateApis as blocksPrivateApis,
+	serialize,
 	validateBlock,
 } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNativeUndo } from '../../utils/native-undo';
 import type { TreeBlock } from '../../store/types';
 
-const { applyBuiltInValidationFixes } = unlock( blocksPrivateApis );
+const { applyBuiltInValidationFixes, getCommentAttributes, parseRawBlock } =
+	unlock( blocksPrivateApis );
 
 function BlockHTML( { clientId }: { clientId: string } ) {
 	const [ html, setHtml ] = useState( '' );
@@ -24,7 +28,8 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 			select( blockEditorStore ).getBlock( clientId ) as TreeBlock,
 		[ clientId ]
 	);
-	const { updateBlock } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const { updateBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	// Derive block content as a primitive string so the effect only fires
 	// when the serialized content genuinely changes, not when the block
@@ -34,6 +39,113 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 		() => ( block ? getBlockContent( block ) : '' ),
 		[ block ]
 	);
+
+	// The HTML of a block with inner blocks holds their delimited markup,
+	// which the block's own validation doesn't expect. Parse it the way it is
+	// parsed on load instead, so the inner blocks are split out. Returns false
+	// when the HTML can't be applied this way.
+	const updateWithInnerBlocks = ( blockType: BlockType ) => {
+		// The parser closes blocks without matching their names, and closes
+		// unclosed ones at the end of the input. The trailing newline only
+		// comes back on its own if the block was closed by its own closer.
+		const rawBlocks = grammarParse(
+			`<!-- wp:${ block.name } -->${ html }<!-- /wp:${ block.name } -->\n`
+		);
+		const [ rawBlock, trailing ] = rawBlocks;
+		if (
+			rawBlocks.length !== 2 ||
+			rawBlock.blockName !== block.name ||
+			trailing.blockName !== null ||
+			trailing.innerHTML !== '\n'
+		) {
+			return false;
+		}
+
+		const parsedBlock = parseRawBlock( {
+			...rawBlock,
+			attrs: getCommentAttributes( blockType, block.attributes ),
+		} );
+
+		if ( ! parsedBlock || parsedBlock.name !== block.name ) {
+			return false;
+		}
+
+		// Keep the inner blocks, and their client IDs, unless they changed.
+		const hasInnerBlocksChange =
+			serialize( parsedBlock.innerBlocks ) !==
+			serialize( block.innerBlocks );
+
+		if ( hasInnerBlocksChange ) {
+			const {
+				areInnerBlocksControlled,
+				canEditBlock,
+				canInsertBlockType,
+				canMoveBlock,
+				canRemoveBlock,
+				getBlockEditingMode,
+				getTemplateLock,
+			} = registry.select( blockEditorStore );
+			const getClientIds = ( blocks: TreeBlock[] ): string[] =>
+				blocks.flatMap( ( innerBlock ) => [
+					innerBlock.clientId,
+					...getClientIds( innerBlock.innerBlocks ),
+				] );
+
+			// The inner blocks are replaced as a whole, so they can't belong to
+			// an entity, and nothing in them can be locked in any way.
+			const canReplaceInnerBlocks =
+				! areInnerBlocksControlled( clientId ) &&
+				! getTemplateLock( clientId ) &&
+				getClientIds( block.innerBlocks ).every(
+					( id ) =>
+						! getTemplateLock( id ) &&
+						canRemoveBlock( id ) &&
+						canMoveBlock( id ) &&
+						canEditBlock( id ) &&
+						getBlockEditingMode( id ) === 'default'
+				) &&
+				parsedBlock.innerBlocks.every( ( { name }: Block ) =>
+					canInsertBlockType( name, clientId )
+				);
+
+			if ( ! canReplaceInnerBlocks ) {
+				return false;
+			}
+		}
+
+		// Local attributes aren't part of the comment, so carry them over.
+		const nextAttributes = { ...parsedBlock.attributes };
+		for ( const [ key, schema ] of Object.entries(
+			blockType.attributes ?? {}
+		) ) {
+			if (
+				schema.role === 'local' ||
+				schema.__experimentalRole === 'local'
+			) {
+				nextAttributes[ key ] = block.attributes[ key ];
+			} else if ( ! ( key in nextAttributes ) ) {
+				nextAttributes[ key ] = undefined;
+			}
+		}
+
+		registry.batch( () => {
+			updateBlock( clientId, {
+				attributes: nextAttributes,
+				originalContent: parsedBlock.originalContent,
+				isValid: parsedBlock.isValid,
+				validationIssues: parsedBlock.validationIssues,
+				// Set while invalid, so the block is saved as typed, the same
+				// as a block that is invalid on load.
+				__unstableBlockSource: parsedBlock.__unstableBlockSource,
+			} );
+
+			if ( hasInnerBlocksChange ) {
+				replaceInnerBlocks( clientId, parsedBlock.innerBlocks );
+			}
+		} );
+
+		return true;
+	};
 
 	const onChange = () => {
 		// Blur fires whether or not anything was typed, so an untouched visit
@@ -45,6 +157,14 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 		const blockType = getBlockType( block.name );
 
 		if ( ! blockType ) {
+			return;
+		}
+
+		if (
+			html.trim() &&
+			block.innerBlocks.length &&
+			updateWithInnerBlocks( blockType )
+		) {
 			return;
 		}
 
@@ -86,9 +206,16 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 			isValid: isValid || validateBlock( fixedBlock )[ 0 ],
 		} );
 
-		// Ensure the state is updated if we reset so it displays the default content.
+		// Ensure the state is updated if we reset so it displays the default
+		// content. Inner blocks are kept, so it has to show them too, or the
+		// next blur would remove them.
 		if ( ! html ) {
-			setHtml( content );
+			const resetBlock = { ...block, attributes: nextAttributes };
+			setHtml(
+				block.innerBlocks.length
+					? getBlockContent( resetBlock )
+					: content
+			);
 		}
 	};
 
