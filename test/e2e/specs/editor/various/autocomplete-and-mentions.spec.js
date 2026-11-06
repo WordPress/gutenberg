@@ -53,7 +53,9 @@ const userList = [
 
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all(
+		// Failures are ignored: a user left over from a previous attempt is
+		// valid test data, and a missing one fails the tests that need it.
+		await Promise.allSettled(
 			userList.map( ( user ) =>
 				requestUtils.createUser( {
 					email: `${ user.username }@example.com`,

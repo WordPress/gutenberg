@@ -19,7 +19,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `label` | `string` | — | — |
+| `label` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

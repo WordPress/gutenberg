@@ -606,6 +606,26 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background-size'       => 'cover',
 						'background-attachment' => 'fixed',
 					),
+					'classnames'   => 'has-background',
+				),
+			),
+
+			'inline_background_gradient_clipped_to_text'   => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-image'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
 				),
 			),
 
