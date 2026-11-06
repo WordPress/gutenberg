@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getPath, getQueryString } from '.';
 
 /**

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
 import { unlock } from '../lock-unlock';
 
@@ -126,7 +119,7 @@ const transforms = {
 									...style?.color,
 									background: undefined,
 									gradient: undefined,
-							  }
+								}
 							: undefined,
 					} ),
 				};
@@ -241,7 +234,7 @@ const transforms = {
 											attributes?.customOverlayColor,
 										gradient: attributes?.customGradient,
 										...attributes?.style?.color,
-								  }
+									}
 								: undefined,
 					} ),
 				};
@@ -287,7 +280,7 @@ const transforms = {
 													?.style?.color,
 												...groupAttributes?.style
 													?.color,
-										  }
+											}
 										: undefined,
 							} ),
 						},

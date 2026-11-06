@@ -4,17 +4,119 @@
  *
  * Builds the default view configuration for an entity and exposes it through
  * the dynamic `get_entity_view_config_{$kind}_{$name}` filter so core and third
- * parties can provide the configuration for a specific entity.
+ * parties can provide the configuration for a specific entity. The dynamic
+ * portions of the hook name are lowercased, e.g.
+ * `get_entity_view_config_posttype_page` for the `page` post type.
  *
  * @package gutenberg
  */
 
 /**
+ * Builds the name of the dynamic filter that provides the view configuration
+ * for an entity.
+ *
+ * The entity kind and name are embedded in the hook name lowercased, so the
+ * hook follows the WordPress convention of lowercase hook names regardless of
+ * how the entity identifiers are spelled: the `postType`/`page` entity maps to
+ * the `get_entity_view_config_posttype_page` hook.
+ *
+ * @param string $kind The entity kind (e.g. `postType`).
+ * @param string $name The entity name (e.g. `page`).
+ * @return string The filter name.
+ */
+function gutenberg_get_entity_view_config_hook_name( $kind, $name ) {
+	return strtolower( "get_entity_view_config_{$kind}_{$name}" );
+}
+
+/**
+ * Builds the default `form` configuration for post types that don't provide their own.
+ *
+ * It is a sensible default for `post`, `page`, and custom post types alike rather
+ * than being tailored per type. Post types that need a different shape can replace
+ * it entirely with a dedicated `form` through their own filter callback.
+ *
+ * It is intentionally NOT gated by `supports`. The registered fields are the
+ * single source of truth for what applies: each field is registered for a post
+ * type based on its `supports` (and related flags such as `theme_supports`), and
+ * the editor drops any form field whose definition is absent or whose `isVisible`
+ * returns `false`.
+ *
+ * @return array The default form configuration.
+ */
+function _gutenberg_get_default_posttype_form() {
+	return array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'featured_media',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'post-content-info',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'excerpt',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'       => 'status',
+				'label'    => __( 'Status', 'gutenberg' ),
+				'children' => array(
+					array(
+						'id'     => 'status',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					'scheduled_date',
+					'password',
+					'sticky',
+				),
+			),
+			'date',
+			'slug',
+			'author',
+			'template',
+			array(
+				'id'       => 'discussion',
+				'label'    => __( 'Discussion', 'gutenberg' ),
+				'children' => array(
+					array(
+						'id'     => 'comment_status',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					'ping_status',
+				),
+			),
+			'parent',
+			'format',
+			'revisions',
+		),
+	);
+}
+
+/**
  * Returns the view configuration for the given entity.
  *
  * Builds the default configuration shared by all entities and then exposes it
- * through the dynamic `get_entity_view_config_{$kind}_{$name}` filter so that core
- * and third parties can provide the configuration for a specific entity.
+ * through the dynamic `get_entity_view_config_{$kind}_{$name}` filter — with the
+ * dynamic portions lowercased, see gutenberg_get_entity_view_config_hook_name()
+ * — so that core and third parties can provide the configuration for a
+ * specific entity.
  *
  * @param string $kind The entity kind (e.g. `postType`).
  * @param string $name The entity name (e.g. `page`).
@@ -31,13 +133,13 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	$default_view    = array(
 		'type'       => 'table',
 		'filters'    => array(),
-		'perPage'    => 20,
 		'sort'       => array(
 			'field'     => 'title',
 			'direction' => 'asc',
 		),
-		'titleField' => 'title',
+		'perPage'    => 20,
 		'fields'     => array( 'author', 'status' ),
+		'titleField' => 'title',
 	);
 	$default_layouts = array(
 		'table' => array(),
@@ -62,59 +164,22 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		'default_view'    => $default_view,
 		'default_layouts' => $default_layouts,
 		'view_list'       => $view_list,
-		'form'            => array(),
+		'form'            => 'postType' === $kind ? _gutenberg_get_default_posttype_form() : array(),
 	);
 
-	/**
-	 * Filters the view configuration for a given entity.
-	 *
-	 * The dynamic portions of the hook name, `$kind` and `$name`, refer to the
-	 * entity kind (e.g. `postType`) and the entity name (e.g. `page`).
-	 *
-	 * @param array $config {
-	 *     The view configuration for the entity.
-	 *
-	 *     @type array $default_view    Default view configuration.
-	 *     @type array $default_layouts Default layouts configuration.
-	 *     @type array $view_list       List of available views.
-	 *     @type array $form            Form configuration.
-	 * }
-	 * @param array $entity {
-	 *     The entity the configuration is built for.
-	 *
-	 *     @type string $kind The entity kind.
-	 *     @type string $name The entity name.
-	 * }
-	 */
-	$filtered_config = apply_filters(
-		"get_entity_view_config_{$kind}_{$name}",
-		$config,
-		array(
-			'kind' => $kind,
-			'name' => $name,
-		)
-	);
+	$data = new Gutenberg_View_Config_Data( $config );
 
-	if ( ! is_array( $filtered_config ) ) {
-		return $config;
-	}
-
-	// Backfill any dropped keys with their defaults, then discard any keys the
-	// filter introduced that are not part of the documented configuration shape.
-	$filtered_config = array_merge( $config, $filtered_config );
-	return array_intersect_key( $filtered_config, $config );
+	return $data->apply_filters( $kind, $name );
 }
 
 /**
  * Provides the view configuration for the `page` post type.
  *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_page( $config ) {
-	$config['default_layouts'] = array(
+function _gutenberg_get_entity_view_config_posttype_page( $data ) {
+	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
 				'styles' => array(
@@ -128,7 +193,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 		'list'  => array(),
 	);
 
-	$config['default_view'] = array(
+	$default_view = array(
 		'type'       => 'list',
 		'filters'    => array(),
 		'perPage'    => 20,
@@ -142,10 +207,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 		'fields'     => array( 'author', 'status' ),
 	);
 
-	$config['view_list'] = array(
-		// Reuse the base "all items" view, whose title is derived from the post
-		// type's `all_items` label in gutenberg_get_entity_view_config().
-		$config['view_list'][0],
+	$view_list = array(
 		array(
 			'title' => __( 'Published', 'gutenberg' ),
 			'slug'  => 'published',
@@ -221,7 +283,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 			'slug'  => 'trash',
 			'view'  => array(
 				'type'    => 'table',
-				'layout'  => $config['default_layouts']['table']['layout'],
+				'layout'  => $default_layouts['table']['layout'],
 				'filters' => array(
 					array(
 						'field'    => 'status',
@@ -234,165 +296,28 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 		),
 	);
 
-	$config['form'] = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			array(
-				'id'     => 'featured_media',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'post-content-info',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'excerpt',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'top',
-				),
-			),
-			array(
-				'id'       => 'status',
-				'label'    => __( 'Status', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'scheduled_date',
-					'password',
-					'sticky',
-				),
-			),
-			'date',
-			'slug',
-			'author',
-			'template',
-			array(
-				'id'       => 'discussion',
-				'label'    => __( 'Discussion', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'comment_status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'ping_status',
-				),
-			),
-			'parent',
-			'format',
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
 		),
+		1
 	);
+	// Append the status views, thereby preserving the base "all items" view,
+	// so its post-type-specific title is kept.
+	$data->merge( array( 'view_list' => $view_list ), 1 );
 
-	return $config;
+	return $data;
 }
-if ( has_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' ) ) {
-	remove_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' );
-}
-add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 1 );
-
-/**
- * Provides the view configuration for the `post` post type.
- *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
- */
-function _gutenberg_get_entity_view_config_post_type_post( $config ) {
-	$config['form'] = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			array(
-				'id'     => 'featured_media',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'post-content-info',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'excerpt',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'top',
-				),
-			),
-			array(
-				'id'       => 'status',
-				'label'    => __( 'Status', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'scheduled_date',
-					'password',
-					'sticky',
-				),
-			),
-			'date',
-			'slug',
-			'author',
-			'template',
-			array(
-				'id'       => 'discussion',
-				'label'    => __( 'Discussion', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'comment_status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'ping_status',
-				),
-			),
-			'parent',
-			'format',
-		),
-	);
-
-	return $config;
-}
-if ( has_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' ) ) {
-	remove_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' );
-}
-add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_block` post type.
  *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
-	$config['default_layouts'] = array(
+function _gutenberg_get_entity_view_config_posttype_wp_block( $data ) {
+	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
 				'styles' => array(
@@ -409,14 +334,14 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 		),
 	);
 
-	$config['default_view'] = array(
+	$default_view = array(
 		'type'       => 'grid',
 		'perPage'    => 20,
 		'titleField' => 'title',
 		'mediaField' => 'preview',
 		'fields'     => array( 'sync-status' ),
 		'filters'    => array(),
-		'layout'     => $config['default_layouts']['grid']['layout'],
+		'layout'     => $default_layouts['grid']['layout'],
 	);
 
 	$view_list = array(
@@ -466,25 +391,49 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 		);
 	}
 
-	$config['view_list'] = $view_list;
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'excerpt',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'     => 'post-content-info',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			'sync-status',
+			'revisions',
+		),
+	);
 
-	return $config;
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => $view_list,
+			'form'            => $form,
+		),
+		1
+	);
+
+	return $data;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' );
-}
-add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template_part` post type.
  *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config ) {
-	$config['default_layouts'] = array(
+function _gutenberg_get_entity_view_config_posttype_wp_template_part( $data ) {
+	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
 				'styles' => array(
@@ -499,14 +448,14 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config )
 		),
 	);
 
-	$config['default_view'] = array(
+	$default_view = array(
 		'type'       => 'grid',
 		'perPage'    => 20,
 		'titleField' => 'title',
 		'mediaField' => 'preview',
 		'fields'     => array( 'author' ),
 		'filters'    => array(),
-		'layout'     => $config['default_layouts']['grid']['layout'],
+		'layout'     => $default_layouts['grid']['layout'],
 	);
 
 	$view_list = array(
@@ -550,25 +499,41 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config )
 		);
 	}
 
-	$config['view_list'] = $view_list;
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+		),
+	);
 
-	return $config;
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => $view_list,
+			'form'            => $form,
+		),
+		1
+	);
+
+	return $data;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' );
-}
-add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template` post type.
  *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
-	$config['default_view'] = array(
+function _gutenberg_get_entity_view_config_posttype_wp_template( $data ) {
+	$default_view = array(
 		'type'             => 'grid',
 		'perPage'          => 20,
 		'sort'             => array(
@@ -583,7 +548,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 		'showMedia'        => true,
 	);
 
-	$config['default_layouts'] = array(
+	$default_layouts = array(
 		'table' => array( 'showMedia' => false ),
 		'grid'  => array( 'showMedia' => true ),
 		'list'  => array( 'showMedia' => false ),
@@ -727,11 +692,90 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 		}
 	}
 
-	$config['view_list'] = array_merge( $view_list, $registered_authors, $user_authors );
+	$form = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'description',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'     => 'description_readonly',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'last_edited_date',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'none',
+				),
+			),
+			'revisions',
+			// The following fields are only meaningful in the `home`/`index`
+			// template summary. They edit other entities (`root/site` and the
+			// posts page); the editor merges those records into the form data
+			// under a namespace and controls when the fields are shown.
+			'posts_page_title',
+			'posts_per_page',
+			'default_comment_status',
+		),
+	);
 
-	return $config;
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+			'view_list'       => array_merge( $view_list, $registered_authors, $user_authors ),
+			'form'            => $form,
+		),
+		1
+	);
+
+	return $data;
 }
-if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' ) ) {
-	remove_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' );
+
+/**
+ * Registers the Gutenberg entity view configuration filters, overriding any
+ * defaults that WordPress core may have already registered.
+ *
+ * Core registers its own `_wp_get_entity_view_config_posttype_*` callbacks on
+ * the shared `get_entity_view_config_{$kind}_{$name}` hooks. The Gutenberg
+ * plugin always ships the newest configuration, so it removes the core defaults
+ * and installs its own `_gutenberg_*` callbacks instead.
+ *
+ * Post types without a dedicated `_gutenberg_*` callback (e.g. `post`) still have
+ * the core callback removed so they fall back to the default configuration
+ * built in gutenberg_get_entity_view_config().
+ *
+ * This runs on `init` rather than at file include time so that the core
+ * defaults are guaranteed to be registered first, regardless of whether core
+ * registers them at include time or lazily on a hook.
+ */
+function gutenberg_register_entity_view_config_filters() {
+	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template' );
+
+	foreach ( $post_types as $post_type ) {
+		$hook        = gutenberg_get_entity_view_config_hook_name( 'postType', $post_type );
+		$wp_callback = "_wp_get_entity_view_config_posttype_{$post_type}";
+		$gb_callback = "_gutenberg_get_entity_view_config_posttype_{$post_type}";
+
+		// has_filter() returns the priority the callback was registered at.
+		$wp_priority = has_filter( $hook, $wp_callback );
+		if ( false !== $wp_priority ) {
+			remove_filter( $hook, $wp_callback, $wp_priority );
+		}
+		if ( function_exists( $gb_callback ) ) {
+			// Base definitions run before the default priority, so third-party
+			// callbacks registered at the default compose on top of them
+			// regardless of registration order.
+			add_filter( $hook, $gb_callback, 5, 1 );
+		}
+	}
 }
-add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
+add_action( 'init', 'gutenberg_register_entity_view_config_filters' );

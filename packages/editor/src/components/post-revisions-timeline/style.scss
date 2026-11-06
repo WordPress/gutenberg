@@ -1,17 +1,22 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Give the revisions inspector a bounded height so the timeline scrolls
 // internally and the picker's pagination stays pinned to the bottom.
 //
 // The timeline only renders in revisions mode, so its ancestors are scoped
 // with `:has()` — keeping this layout out of the generic editor sidebar.
+//
+// Keep each `:has()` the subject of its rule: a subject below it recalculates
+// the anchor's whole subtree on every DOM change in the editor.
 .interface-complementary-area:has(.editor-post-revisions-timeline) {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+}
 
-	// The tabs header keeps its natural height.
-	.editor-sidebar__panel-tabs {
-		flex-shrink: 0;
-	}
+// The tabs header keeps its natural height. Inert unless the rule above applies.
+.interface-complementary-area > .editor-sidebar__panel-tabs {
+	flex-shrink: 0;
 }
 
 .editor-sidebar__panel:has(.editor-post-revisions-timeline) {
@@ -19,25 +24,70 @@
 	flex-direction: column;
 	flex: 1;
 	min-height: 0;
+}
 
-	// The document tab panel hands its bounded height down to the timeline.
-	[role="tabpanel"]:has(.editor-post-revisions-timeline) {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
+// The document tab panel hands its bounded height down to the timeline.
+.editor-sidebar__panel [role="tabpanel"]:has(.editor-post-revisions-timeline) {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+// Cap only the post-meta diff content so a large
+// diff (e.g. footnotes) can't dominate the column.
+.editor-sidebar__panel .editor-revision-meta-diff__content {
+	max-height: 80px;
+	overflow-y: auto;
+}
+
+// timeline grows to fill the leftover space and scrolls internally.
+.editor-sidebar__panel .editor-post-revisions-timeline {
+	flex: 1;
+	min-height: 0;
+}
+
+.editor-post-revisions-timeline__author-avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: left;
+	display: flex;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		object-fit: cover;
+		opacity: 0;
+		border-radius: 100%;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
 	}
 
-	// Cap only the post-meta diff content so a large
-	// diff (e.g. footnotes) can't dominate the column.
-	.editor-revision-meta-diff__content {
-		max-height: 80px;
-		overflow-y: auto;
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
 	}
+}
 
-	// timeline grows to fill the leftover space and scrolls internally.
-	.editor-post-revisions-timeline {
-		flex: 1;
-		min-height: 0;
+.editor-post-revisions-timeline__author-icon {
+	display: flex;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+
+	svg {
+		margin-left: -$grid-unit-05;
+		fill: currentColor;
 	}
+}
+
+.editor-post-revisions-timeline__author-name {
+	text-overflow: ellipsis;
+	overflow: hidden;
 }

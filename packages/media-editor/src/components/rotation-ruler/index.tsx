@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { CSSProperties, KeyboardEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useId, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useRulerDrag, clampValue } from './use-ruler-drag';
 
 export interface RotationRulerProps {
@@ -205,6 +194,7 @@ export default function RotationRuler( props: RotationRulerProps ) {
 		<div
 			className={ clsx( 'rotation-ruler', className ) }
 			role="presentation"
+			data-testid="rotation-ruler"
 			data-disabled={ disabled || undefined }
 			{ ...dragHandlers }
 		>

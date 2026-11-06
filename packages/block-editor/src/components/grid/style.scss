@@ -138,17 +138,7 @@
 			}
 		}
 
-		// Don't show the focus inherited by the Button component.
-		&:focus,
-		&:focus:enabled,
-		&:focus::before {
-			box-shadow: none;
-			outline: none;
-		}
 
-		&:focus-visible::before {
-			@include block-toolbar-button-style__focus();
-		}
 	}
 }
 

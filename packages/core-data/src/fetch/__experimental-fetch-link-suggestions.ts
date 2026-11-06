@@ -1,10 +1,9 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+
+type SearchType = 'attachment' | 'post' | 'term' | 'post-format';
 
 export type SearchOptions = {
 	/**
@@ -21,17 +20,24 @@ export type SearchOptions = {
 	/**
 	 * Filters by search type.
 	 */
-	type?: 'attachment' | 'post' | 'term' | 'post-format';
+	type?: SearchType;
 	/**
 	 * Slug of the post-type or taxonomy.
 	 */
 	subtype?: string;
 	/**
+	 * Result types to rank above the usual order, most wanted first. Everything
+	 * left out keeps its usual place behind them.
+	 *
+	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
+	 */
+	preferTypes?: TypeOrderEntry[];
+	/**
 	 * Which page of results to return.
 	 */
 	page?: number;
 	/**
-	 * Search results per page.
+	 * Number of results to search per SearchType.
 	 */
 	perPage?: number;
 };
@@ -116,12 +122,13 @@ export default async function fetchLinkSuggestions(
 			? {
 					...searchOptions,
 					...searchOptions.initialSuggestionsSearchOptions,
-			  }
+				}
 			: searchOptions;
 
 	const {
 		type,
 		subtype,
+		preferTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -244,61 +251,258 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	results = sortResults( results, search );
-	results = results.slice( 0, perPage );
-	return results;
+	return sortResults( { results, search, preferTypes } );
 }
+
+/**
+ * How well a title answers what was typed.
+ *
+ * The search is compared as the string it was typed as, not word by word: a title contains it when
+ * the whole string appears somewhere in the title, and beginning with it is the clearest sign the
+ * title is the thing being looked for.
+ *
+ * @param title
+ * @param search
+ *
+ * @return Whether the title contains the search, and whether it begins with it.
+ */
+function getTitleMatch(
+	title: string,
+	search: string
+): { contains: boolean; begins: boolean } {
+	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
+	// written with straight ones. Compare them as the same character.
+	const plain = ( text: string ) =>
+		( text ?? '' )
+			.toLowerCase()
+			.trim()
+			.replace( /[\u2018\u2019]/g, "'" )
+			.replace( /[\u201c\u201d]/g, '"' );
+
+	const haystack = plain( title );
+	const needle = plain( search );
+
+	if ( ! haystack || ! needle ) {
+		return { contains: false, begins: false };
+	}
+
+	return {
+		contains: haystack.includes( needle ),
+		begins: haystack.startsWith( needle ),
+	};
+}
+
+/**
+ * A position in a type order: a search type, covering everything of that type, or a search type
+ * with one subtype, covering only that subtype.
+ */
+export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
+
+/**
+ * The order result types are ranked in, most wanted first.
+ *
+ * A link is usually to content, then to a taxonomy. A post format is a way of styling a post
+ * rather than somewhere to go, and an attachment is a file rather than a destination, so those
+ * come last in the order they already had: on a site with a large media library they otherwise
+ * crowd out what was being looked for. See https://github.com/WordPress/gutenberg/issues/63683.
+ *
+ * Deliberately no finer than the search types themselves. Nothing general can be said about
+ * whether a page is a better answer than a post, and ranking by search type means every custom
+ * post type counts as content and every custom taxonomy counts as a taxonomy without being named.
+ */
+const TYPE_ORDER: SearchType[] = [
+	'post',
+	'term',
+	'post-format',
+	'attachment',
+];
+
+/**
+ * Which search type a result belongs to.
+ *
+ * Results name themselves by post type or taxonomy slug, so the search type they came back from
+ * has to be recovered from the kind.
+ *
+ * @param result
+ *
+ * @return The search type.
+ */
+function getSearchType( result: SearchResult ): SearchType {
+	if ( result.kind === 'media' ) {
+		return 'attachment';
+	}
+
+	if ( result.type === 'post-format' ) {
+		return 'post-format';
+	}
+
+	return result.kind === 'taxonomy' ? 'term' : 'post';
+}
+
+/**
+ * Where a result's type ranks.
+ *
+ * Earlier entries in `TYPE_ORDER` rank higher, and anything a caller prefers outranks the usual
+ * order entirely. The comparisons before this one come first, so a title that plainly answers the
+ * search still outranks a better-placed type that barely does.
+ *
+ * @param result
+ * @param preferTypes
+ *
+ * @return The rank of the result's type, the highest ranking first.
+ */
+function getTypeRank(
+	result: SearchResult,
+	preferTypes: TypeOrderEntry[] = []
+): number {
+	const searchType = getSearchType( result );
+
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		typeof entry === 'string'
+			? entry === searchType
+			: entry.type === searchType && entry.subtype === result.type
+	);
+
+	if ( preferred !== -1 ) {
+		return TYPE_ORDER.length + ( preferTypes.length - preferred );
+	}
+
+	return TYPE_ORDER.length - TYPE_ORDER.indexOf( searchType );
+}
+
+/**
+ * How many of the words typed a title holds.
+ *
+ * A word counts whether it stands alone or sits inside a longer one, so "coffeehouse" holds
+ * "coffee".
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return How many of the words typed appear in the title.
+ */
+function countWordsFound( title: string, searchTokens: string[] ): number {
+	const titleTokens = tokenize( title || '' );
+
+	return searchTokens.filter( ( searchToken ) =>
+		titleTokens.some( ( titleToken ) => titleToken.includes( searchToken ) )
+	).length;
+}
+
+/**
+ * How much of the search a title covers.
+ *
+ * Counts how much of the search the title covers, not how much of the title the search covers: a
+ * title is not a worse answer for having more words in it, and saying the same word twice does not
+ * make it a better one.
+ *
+ * Example scoring for title "Caterpillars are great"
+ *   cat                = 2.5    3 characters of the 12 in "caterpillars"
+ *   cater              = 4.17   5 of the 12
+ *   caterpillars       = 10     the whole word
+ *   great caterpillars = 10     whole word match
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return 10 when every word typed is in the title whole, less relative to the number of
+ *         characters of a matched word.
+ */
+function getCoverage( title: string, searchTokens: string[] ): number {
+	if ( ! title || ! searchTokens.length ) {
+		return 0;
+	}
+
+	const titleTokens = tokenize( title );
+
+	// How much of the word it was found in a word typed accounts for: all of it when the two are
+	// the same word, and less the more of that word it leaves out. So "cat" is worth little of
+	// "caterpillar", "cater" is worth more of it, and "caterpillar" is worth all of it.
+	const covered = searchTokens.reduce( ( total, searchToken ) => {
+		const best = titleTokens.reduce(
+			( most, titleToken ) =>
+				titleToken.includes( searchToken )
+					? Math.max( most, searchToken.length / titleToken.length )
+					: most,
+			0
+		);
+
+		return total + best;
+	}, 0 );
+
+	return ( covered / searchTokens.length ) * 10;
+}
+
+/**
+ * What to sort, and how.
+ */
+type SortOptions = {
+	results: SearchResult[];
+	search: string;
+	/**
+	 * Result types to rank above the usual order, most wanted first.
+	 */
+	preferTypes?: TypeOrderEntry[];
+};
 
 /**
  * Sort search results by relevance to the given query.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
- * be ordered after all the (potentially irrelevant) post results.
+ * be ordered after less relevant body content matches.
  *
- * We sort by scoring each result, where the score is the number of tokens in the title that are
- * also in the search query, divided by the total number of tokens in the title. This gives us a
- * score between 0 and 1, where 1 is a perfect match.
+ * Ordering is done by a series of comparisons. Let's assume a search of "coffee beans":
  *
- * @param results
- * @param search
+ * 1. Number of word matches in the title: "coffee beans" matches above "coffee" in the title with
+ *    "beans" in the body text of the post
+ * 2. Ordering of the title matches. "The best coffee beans today" will match above "For the best
+ *    coffee, you need the best beans" because of the separation between words
+ * 3. Content Type: content > taxonomies > post formats > media
+ * 4. Starting with search: "Coffee beans, lightly roasted" will rank above "The freshest coffee
+ *    beans"
+ * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
+ *    cat is 75% of "Cats" and only 27% of "Caterpillar"
+ *
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-export function sortResults( results: SearchResult[], search: string ) {
+export function sortResults( {
+	results,
+	search,
+	preferTypes,
+}: SortOptions ): SearchResult[] {
 	const searchTokens = tokenize( search );
 
-	const scores = {};
-	for ( const result of results ) {
-		if ( result.title ) {
-			const titleTokens = tokenize( result.title );
-			const exactMatchingTokens = titleTokens.filter( ( titleToken ) =>
-				searchTokens.some(
-					( searchToken ) => titleToken === searchToken
-				)
-			);
-			const subMatchingTokens = titleTokens.filter( ( titleToken ) =>
-				searchTokens.some(
-					( searchToken ) =>
-						titleToken !== searchToken &&
-						titleToken.includes( searchToken )
-				)
-			);
+	const scored = results.map( ( result ) => ( {
+		result,
+		found: countWordsFound( result.title, searchTokens ),
+		...getTitleMatch( result.title, search ),
+		type: getTypeRank( result, preferTypes ),
+		score: getCoverage( result.title, searchTokens ),
+	} ) );
 
-			// The score is a combination of exact matches and sub-matches.
-			// More weight is given to exact matches, as they are more relevant (e.g. "cat" vs "caterpillar").
-			// Diving by the total number of tokens in the title normalizes the score and skews
-			// the results towards shorter titles.
-			const exactMatchScore =
-				( exactMatchingTokens.length / titleTokens.length ) * 10;
+	scored.sort(
+		( a, b ) =>
+			// Does the title contain all words searched or just one?
+			// If the search is "black cat" then "Black is my favorite color" should rank lower than "Cats that are black"
+			b.found - a.found ||
+			// Then whether it holds them together, as one string: i.e. "Black cats are great" vs "Cats that are black"
+			Number( b.contains ) - Number( a.contains ) ||
+			// Matches are equal so far, so enforce banding by type
+			b.type - a.type ||
+			// Within a band, rank matches that start with the search string higher than mid-string matches:
+			// i.e the search "cat" ranks the title "caterpillar" higher than "concatenate"
+			Number( b.begins ) - Number( a.begins ) ||
+			// Rank by how much of the matched word the search contains: the search
+			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
+			// and only 27% of "Caterpillar"
+			b.score - a.score
+	);
 
-			const subMatchScore = subMatchingTokens.length / titleTokens.length;
-
-			scores[ result.id ] = exactMatchScore + subMatchScore;
-		} else {
-			scores[ result.id ] = 0;
-		}
-	}
-
-	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+	return scored.map( ( { result } ) => result );
 }
 
 /**

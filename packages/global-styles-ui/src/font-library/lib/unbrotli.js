@@ -993,7 +993,7 @@ export default ( function () {
 							br
 						);
 
-						for ( i = 0; i < context_map_size;  ) {
+						for ( i = 0; i < context_map_size; ) {
 							var code;
 
 							br.readMoreInput();

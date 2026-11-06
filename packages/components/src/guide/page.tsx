@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 
 export default function GuidePage(

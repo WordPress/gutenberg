@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent } from 'react';
 
 export type FormToggleProps = {

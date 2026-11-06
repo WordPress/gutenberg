@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { select, subscribe } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../state';
 
 /**
@@ -50,7 +43,9 @@ export function useCropGestureHandlers(
 ) {
 	const { commitOnKeyUp = true } = options;
 	const { beginGesture, endGesture } = useMediaEditor();
-	const keyboardTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const keyboardTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const clearKeyboardTimer = useCallback( () => {
 		clearTimeout( keyboardTimerRef.current );

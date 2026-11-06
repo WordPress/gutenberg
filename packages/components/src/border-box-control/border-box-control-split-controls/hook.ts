@@ -1,16 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import clsx from 'clsx';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/';
-
 import type { SplitControlsProps } from '../types';
 
 export function useBorderBoxControlSplitControls(
@@ -21,34 +12,24 @@ export function useBorderBoxControlSplitControls(
 		colors = [],
 		enableAlpha = false,
 		enableStyle = true,
-		size = 'default',
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderBoxControlSplitControls( size ), className );
-	}, [ cx, className, size ] );
-
-	const centeredClassName = useMemo( () => {
-		return cx( styles.centeredBorderControl, className );
-	}, [ cx, className ] );
-
-	const rightAlignedClassName = useMemo( () => {
-		return cx( styles.rightBorderControl(), className );
-	}, [ cx, className ] );
-
 	return {
 		...otherProps,
-		centeredClassName,
-		className: classes,
+		centeredClassName: clsx(
+			styles[ 'centered-border-control' ],
+			className
+		),
+		className: clsx( styles[ 'split-controls' ], className ),
 		colors,
 		enableAlpha,
 		enableStyle,
-		rightAlignedClassName,
-		size,
+		rightAlignedClassName: clsx(
+			styles[ 'right-border-control' ],
+			className
+		),
 		__experimentalIsRenderedInSidebar,
 	};
 }

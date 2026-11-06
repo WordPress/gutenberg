@@ -1,0 +1,15 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/paragraph": {
+				":hover": {
+					"color": {
+						"text": "red"
+					}
+				}
+			}
+		}
+	}
+}

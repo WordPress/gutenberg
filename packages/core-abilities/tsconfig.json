@@ -1,13 +1,10 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"declarationDir": "build-types",
-		"rootDir": "src"
-	},
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"references": [
-		{ "path": "../abilities" },
-		{ "path": "../api-fetch" },
-		{ "path": "../url" }
-	],
-	"include": [ "src/**/*" ]
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../abilities/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
+		{ "path": "../url/tsconfig.build.json" }
+	]
 }

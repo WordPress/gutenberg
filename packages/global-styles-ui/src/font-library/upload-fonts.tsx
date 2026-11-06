@@ -1,23 +1,16 @@
-/**
- * WordPress dependencies
- */
+import { Progress } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
-	Notice,
+	Notice as WCNotice,
 	FormFileUpload,
 	FlexItem,
-	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
@@ -213,7 +206,7 @@ function UploadFonts() {
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library__local-fonts" justify="start">
 				{ notice && (
-					<Notice
+					<WCNotice
 						status={ notice.type }
 						__unstableHTML
 						onRemove={ () => setNotice( null ) }
@@ -226,12 +219,19 @@ function UploadFonts() {
 								) ) }
 							</ul>
 						) }
-					</Notice>
+					</WCNotice>
 				) }
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library__upload-area">
-							<ProgressBar />
+							<Progress.Root
+								value={ null }
+								aria-label={ __( 'Uploading fonts' ) }
+							>
+								<Progress.Track>
+									<Progress.Indicator />
+								</Progress.Track>
+							</Progress.Root>
 						</div>
 					</FlexItem>
 				) }

@@ -1,0 +1,51 @@
+/*
+ * The avatar, icon and name of the author views of posts and templates.
+ */
+.avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	inline-size: var(--wpds-dimension-size-2xs);
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
+	align-items: center;
+	justify-content: start;
+	display: flex;
+}
+
+.avatar img {
+	inline-size: var(--wpds-dimension-size-2xs);
+	block-size: var(--wpds-dimension-size-2xs);
+	object-fit: cover;
+	opacity: 0;
+	border-radius: 100%;
+}
+
+@media not (prefers-reduced-motion) {
+	.avatar img {
+		transition: opacity 0.1s linear;
+	}
+}
+
+.avatar.is-loaded img {
+	opacity: 1;
+}
+
+.icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	inline-size: var(--wpds-dimension-size-2xs);
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
+}
+
+.icon svg {
+	/* Crop the empty edges of the 24px icon, so the gap sits next to the glyph. */
+	margin-inline: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+	fill: currentColor;
+}
+
+.name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

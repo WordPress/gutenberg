@@ -1,83 +1,71 @@
-/**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import type { WidgetGridSettings } from '../../widget-dashboard/types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../widget-dashboard/types';
-import { normalizeGridSettings } from '../../widget-dashboard/utils/normalize-grid-settings';
-import { DEFAULT_ROW_HEIGHT } from '../../widget-dashboard/utils/row-height-presets';
+import {
+	DEFAULT_GRID,
+	DEFAULT_ROW_HEIGHT,
+	normalizeGridSettings,
+	ROW_HEIGHT_PRESETS,
+} from '@wordpress/widget-dashboard';
+import type { WidgetGridSettings } from '@wordpress/widget-dashboard';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardGridSettings';
 
 /**
- * Default grid settings applied when the preferences store has no
- * entry yet, and the value `resetGridSettings` writes back when the
- * user requests a reset. Kept aligned with the in-component default
- * in `WidgetDashboardProvider` so consumers see consistent values
- * whether or not they wire up this hook.
+ * The column policy of the wp-admin dashboard: one column from 0px, two
+ * from 600px, four from 960px of container width. The page decides this,
+ * not the package. The removed Columns and Minimum tile width controls
+ * persisted other values into the preference; stating the policy on read
+ * keeps those stale values inert.
  */
-const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
-	model: 'grid',
-	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
-	rowHeight: DEFAULT_ROW_HEIGHT,
-};
+const COLUMN_POLICY: Pick< WidgetGridSettings, 'columns' | 'minColumnWidth' > =
+	{
+		columns: { 0: 1, 600: 2, 960: 4 },
+		minColumnWidth: undefined,
+	};
 
 /**
- * Hook for managing dashboard grid-settings preferences.
+ * The removed Row height control wrote presets into the preference. The
+ * package now honors any positive row height, so the page keeps snapping
+ * the stored value to the nearest preset, the way it always rendered it.
  *
- * Returns the persisted settings, a setter that writes through to the
- * preferences store, and a reset action that applies the bundled
- * defaults. The preference is shared across dashboards today; if a
- * per-dashboard split is needed later, the signature can grow a
- * dashboard-identifying parameter without touching call sites that
- * pass the dashboard's name through.
- *
- * @return Tuple `[ settings, setSettings, resetSettings ]`.
+ * @param rowHeight Stored row height in pixels.
+ * @return The nearest preset.
  */
-export function useDashboardGridSettings(): [
-	WidgetGridSettings,
-	( settings: WidgetGridSettings ) => void,
-	() => void,
-] {
-	const settings = useSelect( ( select ) => {
+function snapRowHeight( rowHeight: number ): number {
+	return Object.values( ROW_HEIGHT_PRESETS ).reduce( ( closest, preset ) =>
+		Math.abs( preset - rowHeight ) < Math.abs( closest - rowHeight )
+			? preset
+			: closest
+	);
+}
+
+/**
+ * Reads the persisted dashboard grid-settings preference, normalized, with
+ * the bundled defaults as fallback. The dashboard renders these settings but
+ * does not edit them, so the preference is read-only and shared across
+ * dashboards.
+ *
+ * @return The grid settings to render with.
+ */
+export function useDashboardGridSettings(): WidgetGridSettings {
+	return useSelect( ( select ) => {
 		const stored = select( preferencesStore ).get( SCOPE, KEY ) as
-			| WidgetGridSettings
-			| undefined;
-		return normalizeGridSettings(
-			stored ?? DEFAULT_GRID_SETTINGS,
-			DEFAULT_ROW_HEIGHT
-		);
+			WidgetGridSettings | undefined;
+		const settings = {
+			...normalizeGridSettings(
+				stored ?? DEFAULT_GRID,
+				DEFAULT_ROW_HEIGHT
+			),
+			...COLUMN_POLICY,
+		};
+		return settings.model === 'masonry'
+			? settings
+			: {
+					...settings,
+					rowHeight: snapRowHeight(
+						settings.rowHeight ?? DEFAULT_ROW_HEIGHT
+					),
+				};
 	}, [] );
-
-	const { set } = useDispatch( preferencesStore );
-
-	function setSettings( next: WidgetGridSettings ) {
-		// Persist "back to default" as a cleared preference rather than a stored
-		// copy of the defaults: the dashboard then tracks the current code
-		// default and the value can never drift. Reset routes through here (the
-		// drawer commit fires the setter with the default), so this is what makes
-		// Reset + Save truly clear the stored preference.
-		if ( fastDeepEqual( next, DEFAULT_GRID_SETTINGS ) ) {
-			void set( SCOPE, KEY, null );
-			return;
-		}
-		void set( SCOPE, KEY, next );
-	}
-
-	function resetSettings() {
-		void set( SCOPE, KEY, null );
-	}
-
-	return [ settings, setSettings, resetSettings ];
 }

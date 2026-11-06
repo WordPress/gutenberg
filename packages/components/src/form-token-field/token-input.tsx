@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef, FocusEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 

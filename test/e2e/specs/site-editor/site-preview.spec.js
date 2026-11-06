@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site preview', () => {
@@ -25,10 +22,10 @@ test.describe( 'Site preview', () => {
 			'input:not([type="hidden"]):not([disabled])',
 			'select:not([disabled])',
 			'textarea:not([disabled])',
-		]
-			.map( ( selector ) => `${ selector }:visible` )
-			.join( ',' );
-		const interactiveElements = previewFrame.locator( interactiveSelector );
+		].join( ',' );
+		const interactiveElements = previewFrame
+			.locator( interactiveSelector )
+			.visible();
 
 		await expect( interactiveElements.first() ).toBeVisible();
 

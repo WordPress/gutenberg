@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { dequal } from 'dequal';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { Point, ImageCropperState, CropperState } from '../types';
 import { MIN_ZOOM } from '../constants';
 import {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Copy/cut/paste', () => {
@@ -14,7 +11,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Copy - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
@@ -34,12 +31,23 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
+		// The editor learns of the caret move from an asynchronous selection
+		// change, so only cut once it selects the first block.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getBlockIndex, getSelectedBlockClientId } =
+						window.wp.data.select( 'core/block-editor' );
+					return getBlockIndex( getSelectedBlockClientId() );
+				} )
+			)
+			.toBe( 0 );
 		await pageUtils.pressKeys( 'primary+x' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
@@ -92,7 +100,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'First block' );
@@ -246,7 +254,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -279,7 +287,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
@@ -313,7 +321,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -346,7 +354,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
@@ -863,5 +871,143 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'should copy the block when its entire text is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'A heading', level: 3 },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await editor.canvas.getByText( 'A heading' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// Pasting into an empty paragraph inserts the heading, proving
+		// the clipboard holds the block, not bare text.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
+
+		// Pasting into existing text inserts the text inline instead of
+		// splitting the paragraph.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'existing ' },
+		} );
+		await editor.canvas.getByText( 'existing' ).click();
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'existing A heading' },
+			},
+		] );
+
+		// Pasting over an entirely selected block replaces it, like
+		// pasting into an empty block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
+	} );
+
+	test.describe( 'Bound text', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.beforeEach( async ( { editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+						},
+					},
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'existing ' },
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'should copy the text when the entire bound text is selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const boundParagraph = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+			await editor.selectBlocks( boundParagraph );
+			await boundParagraph.click();
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			await editor.canvas.getByText( 'existing' ).click();
+			await page.keyboard.press( 'ArrowDown' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: { source: 'core/post-meta' },
+							},
+						},
+					},
+				},
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'existing Value of the text custom field',
+					},
+				},
+			] );
+		} );
 	} );
 } );

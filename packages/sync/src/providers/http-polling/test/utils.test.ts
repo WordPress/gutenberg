@@ -1,22 +1,5 @@
-/**
- * External dependencies
- */
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
-// Mock @wordpress/api-fetch
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
-} ) );
-
-/**
- * WordPress dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { SyncUpdateType } from '../types';
 import { MAX_UPDATE_SIZE_IN_BYTES } from '../config';
 import {
@@ -28,8 +11,17 @@ import {
 	rotateWindow,
 	uint8ArrayToBase64,
 } from '../utils';
+// Mock @wordpress/api-fetch
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-const mockApiFetch = jest.mocked( apiFetch );
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+const mockApiFetch = vi.mocked( apiFetch );
 const SERVER_MAX_UPDATE_DATA_SIZE_IN_BYTES = 1024 * 1024;
 
 describe( 'http-polling utils', () => {
@@ -581,7 +573,7 @@ describe( 'http-polling utils', () => {
 
 	describe( 'postSyncUpdate', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'sends a POST request to the sync endpoint', async () => {

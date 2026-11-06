@@ -4,7 +4,7 @@
 
 The block editor’s general layout uses a bar at the top, with content below.
 
-![Editor Interface](https://cldup.com/VWA_jMcIRw-3000x3000.png)
+![Editor Interface](https://developer.wordpress.org/files/2026/09/gutenberg-docs-editor-interface.png)
 
 The **Toolbar** contains document-level actions: Editor/Select modes, save status, global actions for undo/redo/insert, the settings toggle, and publish options.
 
@@ -20,7 +20,7 @@ By surfacing each section of the document as a manipulatable block, we surface b
 
 A selected block shows a number of contextual actions:
 
-![Block Interface](https://cldup.com/3tQqIncKPB-3000x3000.png)
+![Block Interface](https://developer.wordpress.org/files/2026/09/gutenberg-docs-block-interface.png)
 
 The block interface has basic actions. The block editor aims for good, common defaults, so users should be able to create a complete document without actually needing the advanced actions in the Settings Sidebar.
 
@@ -32,13 +32,13 @@ Blocks can be moved up and down via the **Block Mover** icons. Additional block 
 
 An unselected block does not show the block toolbar or any other contextual controls. In effect, an unselected block is a preview of the content itself:
 
-![Unselected Block](https://cldup.com/DH9HZnEgwH-3000x3000.png)
+![Unselected Block](https://developer.wordpress.org/files/2026/09/gutenberg-docs-unselected-block.png)
 
 Please note that selection and focus can be different. An image block can be selected while the focus is on the caption field.
 
 ## Settings Sidebar
 
-![Settings Sidebar](https://cldup.com/iAqrn6Gc8o-3000x3000.png)
+![Settings Sidebar](https://developer.wordpress.org/files/2026/09/gutenberg-docs-settings-sidebar.png)
 
 The sidebar has two tabs, Document and Block:
 
@@ -58,6 +58,6 @@ Actions that could go in the block tab of the sidebar could be:
 
 ## Block Library
 
-![Block Library](https://cldup.com/7QoQIoLk-A-3000x3000.png)
+![Block Library](https://developer.wordpress.org/files/2026/09/gutenberg-docs-block-library.png)
 
 The **Block Library** appears when someone inserts a block, whether via the toolbar, or contextually within the content area. Inside, blocks are organized into expandable sections. The block library’s search bar auto-filters the list of blocks as the user types. Users can choose a block by selecting the **Block Button** or the **Block Name**.

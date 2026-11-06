@@ -1,0 +1,21 @@
+[
+	{
+		"blockName": "core/html",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p>Editable paragraph</p>\n",
+				"innerContent": [ "\n<p>Editable paragraph</p>\n" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"banner\"><h1>Static heading</h1><footer>Static footer</footer></div>\n",
+		"innerContent": [
+			"\n<div class=\"banner\"><h1>Static heading</h1>",
+			null,
+			"<footer>Static footer</footer></div>\n"
+		]
+	}
+]

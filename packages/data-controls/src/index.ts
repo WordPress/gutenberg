@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { controls as dataControls } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -132,11 +129,8 @@ export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
  *
  * @example
  * ```js
- * // WordPress dependencies
  * import { controls } from '@wordpress/data-controls';
  * import { registerStore } from '@wordpress/data';
- *
- * // Internal dependencies
  * import reducer from './reducer';
  * import * as selectors from './selectors';
  * import * as actions from './actions';

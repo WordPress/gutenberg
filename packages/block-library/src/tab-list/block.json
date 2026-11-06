@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab-list",
 	"title": "Tab List",
@@ -16,8 +15,9 @@
 			"selector": "button",
 			"query": {
 				"label": {
-					"type": "string",
-					"source": "html"
+					"type": "rich-text",
+					"source": "rich-text",
+					"role": "content"
 				}
 			},
 			"default": []
@@ -25,8 +25,15 @@
 	},
 	"supports": {
 		"html": false,
+		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalSkipSerialization": true
+		},
 		"color": {
 			"background": true,
 			"text": true,
@@ -38,7 +45,11 @@
 		},
 		"typography": {
 			"fontSize": true,
-			"__experimentalFontFamily": true
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -49,7 +60,8 @@
 		},
 		"layout": {
 			"default": {
-				"type": "flex"
+				"type": "flex",
+				"flexWrap": "wrap"
 			},
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,
@@ -63,10 +75,15 @@
 				"padding": true,
 				"blockGap": true
 			}
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		}
 	},
 	"selectors": {
+		"background": ".wp-block-tab-list button",
 		"border": ".wp-block-tab-list button",
+		"shadow": ".wp-block-tab-list button",
 		"color": {
 			"background": ".wp-block-tab-list button",
 			"text": ".wp-block-tab-list button"
@@ -75,6 +92,6 @@
 			"padding": ".wp-block-tab-list button"
 		}
 	},
-	"editorStyle": "wp-block-tab-list-editor",
-	"style": "wp-block-tab-list"
+	"style": "wp-block-tab-list",
+	"editorStyle": "wp-block-tab-list-editor"
 }

@@ -100,9 +100,9 @@ function gutenberg_is_explicit_aspect_ratio_value( $aspect_ratio ) {
  * This block support uses the `render_block` hook to ensure that
  * it is also applied to non-server-rendered blocks.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_dimensions_support( $block_content, $block ) {
 	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );

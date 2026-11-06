@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const getExportEntries = require( './get-export-entries' );
 const getJSDocFromToken = require( './get-jsdoc-from-token' );
 const getDependencyPath = require( './get-dependency-path' );

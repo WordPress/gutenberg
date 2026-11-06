@@ -1,7 +1,8 @@
+/* stylelint-disable no-duplicate-selectors -- Intentional duplicate selectors test rule order preservation during client-side navigation. */
 .wp-block-test-router-styles-wrapper .order-checker {
-    color: rgb(255, 0, 0);
+	color: rgb(255, 0, 0);
 }
 
 .wp-block-test-router-styles-wrapper .order-checker {
-    color: rgb(0, 255, 0);
+	color: rgb(0, 255, 0);
 }

@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blocksStore } from '../store';
 import type { BlockCategory } from '../types';
 
 /**
  * Returns all the block categories.
- * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ * Ignored from documentation as the recommended usage is via useSelect from `@wordpress/data`.
  *
  * @ignore
  *

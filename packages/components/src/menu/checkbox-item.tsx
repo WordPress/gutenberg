@@ -1,66 +1,72 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { CheckboxItemProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 export const CheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CheckboxItemProps, 'div', false >
->( function CheckboxItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+>( function UnforwardedCheckboxItem(
+	{
+		className,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = false,
+		...props
+	},
 	ref
 ) {
 	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.CheckboxItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
-		<Styled.CheckboxItem
+		<Ariakit.MenuItemCheckbox
 			ref={ ref }
 			{ ...props }
+			className={ clsx(
+				styles.item,
+				styles[ 'checkbox-item' ],
+				className
+			) }
 			accessibleWhenDisabled
 			disabled={ disabled }
-			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
+			store={ store }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
-				render={ <Styled.ItemPrefixWrapper /> }
+				store={ store }
+				render={
+					<span className={ styles[ 'item-prefix-wrapper' ] } />
+				}
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.ItemContentWrapper>
-				<Styled.ItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.ItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.ItemContentWrapper>
-		</Styled.CheckboxItem>
+			</div>
+		</Ariakit.MenuItemCheckbox>
 	);
 } );

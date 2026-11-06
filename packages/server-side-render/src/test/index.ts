@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import { rendererPath, removeBlockSupportAttributes } from '../hook';
 
 describe( 'rendererPath', () => {

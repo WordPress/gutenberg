@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const minimist = require( 'minimist' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
 const { exit, getArgsFromCLI } = require( './process' );
 
@@ -21,7 +14,19 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+// Flags that never take a value, so `--fix file.js` isn't read as `--fix=file.js`.
+// stylelint's `--fix` does take an optional mode though, so drop that first.
+const getFileArgsFromCLI = () => {
+	const args = getArgsFromCLI().filter(
+		( arg, index, all ) =>
+			! (
+				all[ index - 1 ] === '--fix' &&
+				[ 'strict', 'lax' ].includes( arg )
+			)
+	);
+
+	return minimist( args, { boolean: [ 'fix', 'require-pragma' ] } )._;
+};
 
 const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();

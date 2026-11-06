@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import postcss from 'postcss';
-
-/**
- * Internal dependencies
- */
 import plugin from '../';
 
 /**

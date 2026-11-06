@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { OPERATOR_IS_NOT_ALL } from '../constants';
 import normalizeFields from '../field-types';
 import type { Field, Operator, View } from '../types';
@@ -98,7 +87,7 @@ export default function filterSortAndPaginate< Item >(
 					field.enableSorting !== false &&
 					field.id === view.sort?.field
 				);
-		  } )
+			} )
 		: null;
 	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
@@ -106,7 +95,7 @@ export default function filterSortAndPaginate< Item >(
 					field.enableSorting !== false &&
 					field.id === view.groupBy?.field
 				);
-		  } )
+			} )
 		: null;
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {

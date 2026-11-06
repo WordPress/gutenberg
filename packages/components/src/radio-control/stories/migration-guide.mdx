@@ -1,0 +1,112 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as RadioControlStories from './index.story';
+
+<Meta of={ RadioControlStories } name="Migration Guide" />
+
+# RadioControl migration guide
+
+Migrate from [`RadioControl`](?path=/docs/components-radiocontrol--docs) in `@wordpress/components` to [`RadioGroupControl`](?path=/docs/design-system-components-form-radiogroupcontrol--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Rename the options and controlled value props, and use the new callback name:
+
+Before:
+
+```jsx
+import { RadioControl } from '@wordpress/components';
+
+<RadioControl
+	label="Post visibility"
+	options={ visibilityOptions }
+	selected={ visibility }
+	onChange={ setVisibility }
+	help="Choose who can see this post."
+/>;
+```
+
+After:
+
+```jsx
+import { RadioGroupControl } from '@wordpress/ui';
+
+<RadioGroupControl
+	label="Post visibility"
+	items={ visibilityOptions }
+	value={ visibility }
+	onValueChange={ setVisibility }
+	description="Choose who can see this post."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`options\` | \`items\` | Pass an array of items with \`label\` and \`value\`. The item \`description\` and \`disabled\` props also carry over. |
+| \`selected\` | \`value\` | Continue passing the selected string for a controlled group. |
+| \`onChange\` | \`onValueChange\` | Receives the next selected value. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`label\` | \`label\` | The new control requires a plain string. See [Labels](#labels). |
+` }</Markdown>
+
+The new control requires `items`. The legacy control accepts an omitted or empty `options` array and renders nothing. Pass an empty `items` array only when an empty labeled group is intentional.
+
+## Labels
+
+`RadioGroupControl` requires a `label` prop with a plain `string` value. The legacy `RadioControl` accepts an optional `label` that can be a `ReactNode`.
+
+When the visible label text already exists elsewhere, pass a descriptive string and hide it visually:
+
+```jsx
+<RadioGroupControl
+	label="Post visibility"
+	hideLabelFromVision
+	items={ visibilityOptions }
+	value={ visibility }
+	onValueChange={ setVisibility }
+/>
+```
+
+When the label contains markup, or you need a custom layout, compose the [`RadioGroup`](?path=/docs/design-system-components-form-primitives-radiogroup--docs), [`Radio`](?path=/docs/design-system-components-form-primitives-radio--docs), [`Field`](?path=/docs/design-system-components-form-primitives-field--docs), and [`Fieldset`](?path=/docs/design-system-components-form-primitives-fieldset--docs) primitives instead of `RadioGroupControl`. Pass `RadioGroup` to `Fieldset.Root`'s `render` prop so `Fieldset.Legend` gives the group its accessible name:
+
+```jsx
+import { Field, Fieldset, Radio, RadioGroup, Stack } from '@wordpress/ui';
+
+<Field.Root>
+	<Fieldset.Root
+		render={
+			<RadioGroup value={ visibility } onValueChange={ setVisibility } />
+		}
+	>
+		<Fieldset.Legend>
+			Post <strong>visibility</strong>
+		</Fieldset.Legend>
+		{ visibilityOptions.map( ( option ) => (
+			<Field.Item
+				key={ option.value }
+				render={ <Stack gap="sm" align="start" /> }
+			>
+				<Radio value={ option.value } disabled={ option.disabled } />
+				<Field.Label variant="plain">{ option.label }</Field.Label>
+			</Field.Item>
+		) ) }
+	</Fieldset.Root>
+</Field.Root>;
+```
+
+## Form submission
+
+The legacy control generates a name for its radio inputs. When the selected value must be submitted with a form, pass an explicit `name` to the new control so the form data has a stable key:
+
+```jsx
+<RadioGroupControl
+	name="visibility"
+	label="Post visibility"
+	items={ visibilityOptions }
+	value={ visibility }
+	onValueChange={ setVisibility }
+/>
+```

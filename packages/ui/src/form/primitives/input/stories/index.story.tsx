@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input } from '../';
+import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
-import { WithSuffixControl } from '../../input-layout/stories/index.story';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
-	title: 'Design System/Components/Form/Primitives/Input',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Input',
+	id: 'design-system-components-form-primitives-input',
 	component: Input,
 	argTypes: {
 		defaultValue: { control: false },
@@ -14,9 +16,8 @@ const meta: Meta< typeof Input > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -27,6 +28,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -37,15 +39,17 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
 
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	children: undefined,
+export const WithSuffixControl: Story = {
+	args: {
+		'aria-label': 'Value',
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
+	},
 };
-export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

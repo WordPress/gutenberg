@@ -168,7 +168,7 @@ This mechanism was [introduced in WordPress 5.8](https://make.wordpress.org/core
 
 This is the general data flow:
 
-![Data flow of Global Styles](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/global-styles-input-output.png)
+![Data flow of Global Styles](https://developer.wordpress.org/files/2026/06/global-styles-input-output.png)
 
 The process of generating the stylesheet has, in essence, three steps:
 

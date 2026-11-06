@@ -27,8 +27,7 @@
 	text-transform: inherit;
 	text-align: inherit;
 
-	&[aria-selected="true"]::before,
-	&.is-active::before {
+	&[aria-selected="true"]::before {
 		content: "";
 		position: absolute;
 		border-bottom: 2px solid currentColor;

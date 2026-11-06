@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	TypographyPreset,
 	GlobalStylesSettings,
@@ -66,10 +63,10 @@ export function getFluidTypographyOptionsFromSettings(
 						? typographySettings.fluid
 						: {} ),
 				},
-		  }
+			}
 		: {
 				fluid: typographySettings?.fluid,
-		  };
+			};
 }
 
 /**

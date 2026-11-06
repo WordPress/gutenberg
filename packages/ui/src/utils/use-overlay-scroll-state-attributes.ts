@@ -1,5 +1,6 @@
 import type { UIEvent, UIEventHandler } from 'react';
-import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { useCallback, useState } from '@wordpress/element';
 
 export const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
 const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-overlay-scrolled-from-top';
@@ -198,7 +199,7 @@ export function useOverlayScrollStateAttributes<
 		setNode( el );
 	}, [] );
 
-	useLayoutEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		if ( ! node ) {
 			return;
 		}

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';

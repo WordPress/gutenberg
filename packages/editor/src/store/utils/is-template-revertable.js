@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { TEMPLATE_ORIGINS } from '../constants';
 
 // Copy of the function from packages/edit-site/src/utils/is-template-revertable.js

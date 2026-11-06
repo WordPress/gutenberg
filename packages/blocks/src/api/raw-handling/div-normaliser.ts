@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normaliseBlocks from './normalise-blocks';
 
 export default function divNormaliser( div: Node ): void {

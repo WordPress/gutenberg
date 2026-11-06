@@ -15,6 +15,37 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 	}
 
+	/**
+	 * Tests that unsupported duotone attribute types leave the block unchanged.
+	 *
+	 * @dataProvider data_render_duotone_support_invalid_attribute
+	 * @covers WP_Duotone_Gutenberg::render_duotone_support
+	 *
+	 * @param mixed $duotone Invalid duotone attribute value.
+	 */
+	public function test_gutenberg_render_duotone_support_invalid_attribute( $duotone ): void {
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => $duotone ) ) ),
+		);
+		$wp_block      = new WP_Block( $block );
+		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
+
+		$this->assertSame( $block_content, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
+	}
+
+	/**
+	 * @return array<string, array{ 0: bool|int|float }>
+	 */
+	public function data_render_duotone_support_invalid_attribute(): array {
+		return array(
+			'false'   => array( false ),
+			'true'    => array( true ),
+			'integer' => array( 1 ),
+			'float'   => array( 1.5 ),
+		);
+	}
+
 	public function test_gutenberg_render_duotone_support_preset() {
 		$block         = array(
 			'blockName' => 'core/image',
@@ -48,6 +79,14 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
 	}
 
+	public function test_gutenberg_restore_image_outer_container_moves_duotone_class_to_wrapper_in_classic_theme() {
+		switch_theme( 'default' );
+
+		$block_content = '<div class="wp-block-image"><figure class="alignright wp-duotone-blue-orange size-full"><img src="/my-image.jpg"></figure></div>';
+		$expected      = '<div class="wp-block-image wp-duotone-blue-orange"><figure class="alignright size-full"><img src="/my-image.jpg"></figure></div>';
+
+		$this->assertEqualHTML( $expected, WP_Duotone_Gutenberg::restore_image_outer_container( $block_content ) );
+	}
 
 	/**
 	 * Tests whether the CSS declarations are generated even if the block content is
@@ -112,7 +151,9 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_get_slug_from_attribute( $data_attr, $expected ) {
 
 		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'get_slug_from_attribute' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}
@@ -134,7 +175,9 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_is_preset( $data_attr, $expected ) {
 		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'is_preset' );
-		$reflection->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}

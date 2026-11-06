@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { convertLegacyBlockNameAndAttributes } from './parser/convert-legacy-block';
 import { createBlock } from './factory';
 import { getBlockType } from './registration';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import memize from 'memize';
-
-/**
- * Internal dependencies
- */
 import type {
 	ShortcodeAttrs,
 	ShortcodeMatch,

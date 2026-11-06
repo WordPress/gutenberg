@@ -60,9 +60,41 @@ function render_block_core_button( $attributes, $content ) {
 		return '';
 	}
 
+	// Background skips serialization, so apply it to the link element, like the color support does.
+	$background = $attributes['style']['background'] ?? null;
+
+	if ( is_array( $background ) ) {
+		// Button has no clip support, so ignore a stale value.
+		unset( $background['backgroundClip'] );
+		$styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
+
+		if ( ! empty( $styles['style'] ) ) {
+			$processor = new WP_HTML_Tag_Processor( $content );
+			while ( $processor->next_tag() ) {
+				if ( $tag !== $processor->get_tag() ) {
+					continue;
+				}
+
+				$existing_style = $processor->get_attribute( 'style' );
+				if ( is_string( $existing_style ) && '' !== $existing_style ) {
+					$separator = str_ends_with( $existing_style, ';' ) ? '' : ';';
+					$processor->set_attribute( 'style', $existing_style . $separator . $styles['style'] );
+				} else {
+					$processor->set_attribute( 'style', $styles['style'] );
+				}
+
+				if ( ! empty( $styles['class'] ) ) {
+					$processor->add_class( $styles['class'] );
+				}
+				break;
+			}
+			$content = $processor->get_updated_html();
+		}
+	}
+
 	$width = $attributes['style']['dimensions']['width'] ?? null;
 
-	if ( $width ) {
+	if ( is_string( $width ) && '' !== $width ) {
 		// Resolve preset references to their actual values.
 		$resolved_width = $width;
 		$is_preset      = str_starts_with( $width, 'var:preset|dimension|' );

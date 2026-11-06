@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { batch, signal, type Signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import {
 	createProxy,
 	getProxyFromObject,
@@ -15,7 +8,7 @@ import {
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
-import { isPlainObject } from '../utils';
+import { isPlainObject, isReservedKey } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -113,7 +106,8 @@ const stateHandlers: ProxyHandler< object > = {
 		 */
 		if (
 			peeking ||
-			( ! target.hasOwnProperty( key ) && key in target ) ||
+			( ! Object.prototype.hasOwnProperty.call( target, key ) &&
+				key in target ) ||
 			( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
 		) {
 			return Reflect.get( target, key, receiver );
@@ -292,6 +286,11 @@ const deepMergeRecursive = (
 	let hasNewKeys = false;
 
 	for ( const key in source ) {
+		// Assigning `__proto__` would replace the prototype of `target`.
+		if ( isReservedKey( key ) ) {
+			continue;
+		}
+
 		const isNew = ! ( key in target );
 		hasNewKeys = hasNewKeys || isNew;
 
@@ -323,8 +322,10 @@ const deepMergeRecursive = (
 
 			// Handle nested objects
 		} else if ( isPlainObject( source[ key ] ) ) {
-			const targetValue = Object.getOwnPropertyDescriptor( target, key )
-				?.value;
+			const targetValue = Object.getOwnPropertyDescriptor(
+				target,
+				key
+			)?.value;
 			if ( isNew || ( override && ! isPlainObject( targetValue ) ) ) {
 				// Create a new object if the property is new or needs to be overridden
 				target[ key ] = {};

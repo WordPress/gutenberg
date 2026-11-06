@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
@@ -53,8 +46,10 @@ export type WithPermissions< RecordType > = RecordType & {
 	permissions: { delete: boolean; update: boolean };
 };
 
-interface EntityRecordsWithPermissionsResolution< RecordType >
-	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+interface EntityRecordsWithPermissionsResolution< RecordType > extends Omit<
+	EntityRecordsResolution< RecordType >,
+	'records'
+> {
 	/** The requested entity records with permissions */
 	records: WithPermissions< RecordType >[] | null;
 }
@@ -200,7 +195,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 								'_links',
 							] ),
 						].join(),
-				  }
+					}
 				: {} ),
 		},
 		options
@@ -208,7 +203,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const ids = useMemo(
 		() =>
 			data?.map(
-				// @ts-ignore
+				// @ts-expect-error `data` is `unknown[]`, so the callback signature does not line up.
 				( record: RecordType ) => record[ entityConfig?.key ?? 'id' ]
 			) ?? [],
 		[ data, entityConfig?.key ]
@@ -227,7 +222,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const dataWithPermissions = useMemo(
 		() =>
 			data?.map( ( record, index ) => ( {
-				// @ts-ignore
+				// @ts-expect-error `record` is `unknown`, which cannot be spread.
 				...record,
 				permissions: permissions[ index ],
 			} ) ) ?? [],

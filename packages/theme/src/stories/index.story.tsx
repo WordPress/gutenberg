@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useId } from '@wordpress/element';
 import { ThemeProvider } from '../theme-provider';
-import wpdsTokens from '../prebuilt/js/design-tokens.mjs';
+import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
 
-const wpdsColorTokens = wpdsTokens.filter( ( name ) =>
+const wpdsColorTokens = Object.keys( wpdsTokens ).filter( ( name ) =>
 	name.startsWith( '--wpds-color' )
 );
 
@@ -22,7 +22,6 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-private' ],
 };
 export default meta;
 
@@ -47,6 +46,7 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 					} }
 				>
 					<span
+						aria-hidden="true"
 						style={ {
 							backgroundColor: `var(${ name })`,
 							border: '1px solid var(--wpds-color-stroke-surface-neutral)',
@@ -54,7 +54,6 @@ const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
 							aspectRatio: '2/1',
 							display: 'block',
 						} }
-						aria-label={ name }
 					></span>
 					<code>{ name }</code>
 				</li>
@@ -108,7 +107,13 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							boxShadow: '0 0 0.5rem 0 rgba(0, 0, 0, 0.1)',
 						} }
 					>
-						<div>
+						<div
+							style={ {
+								display: 'flex',
+								alignItems: 'center',
+								gap: '0.5rem',
+							} }
+						>
 							<input
 								type="color"
 								id={ id }

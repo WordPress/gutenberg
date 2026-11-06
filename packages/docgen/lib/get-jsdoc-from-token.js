@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const commentParser = require( 'comment-parser' );
-
-/**
- * Internal dependencies
- */
 const getLeadingComments = require( './get-leading-comments' );
 const getTypeAnnotation = require( './get-type-annotation' );
 

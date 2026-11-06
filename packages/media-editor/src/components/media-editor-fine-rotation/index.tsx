@@ -1,19 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
-import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 import RotationRuler from '../rotation-ruler';
 
 export interface MediaEditorFineRotationProps {
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
+	/**
+	 * Disable the ruler. Set while the edit is saving; `RotationRuler`
+	 * cancels an in-flight drag when this flips.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -24,11 +21,14 @@ export interface MediaEditorFineRotationProps {
  *
  * @param props
  * @param props.onPlacementControlInteraction
+ * @param props.disabled
  */
 export default function MediaEditorFineRotation( {
 	onPlacementControlInteraction,
+	disabled = false,
 }: MediaEditorFineRotationProps ) {
-	const { state, setRotation } = useMediaEditor();
+	const { state, setRotation, maxRotationOffset } =
+		useMediaEditor().imageEditor;
 	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
 	// into one undo entry via the gesture idle window. Pointer-up still
 	// closes pointer drags immediately.
@@ -50,8 +50,8 @@ export default function MediaEditorFineRotation( {
 		// causing subsequent events to spiral.
 		const EPS = 0.01;
 		const clamped = Math.max(
-			-MAX_ROTATION_OFFSET + EPS,
-			Math.min( MAX_ROTATION_OFFSET - EPS, value )
+			-maxRotationOffset + EPS,
+			Math.min( maxRotationOffset - EPS, value )
 		);
 		onPlacementControlInteraction?.();
 		setRotation( baseAngle + clamped * visualDir );
@@ -65,10 +65,11 @@ export default function MediaEditorFineRotation( {
 		>
 			<RotationRuler
 				label={ __( 'Fine rotation' ) }
-				min={ -MAX_ROTATION_OFFSET }
-				max={ MAX_ROTATION_OFFSET }
+				min={ -maxRotationOffset }
+				max={ maxRotationOffset }
 				value={ fineOffset }
 				onChange={ handleRotationSlider }
+				disabled={ disabled }
 			/>
 		</div>
 	);

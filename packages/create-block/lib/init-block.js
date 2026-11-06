@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { join } = require( 'path' );
-const makeDir = require( 'make-dir' );
 const { writeFile } = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
+const makeDir = require( 'make-dir' );
 const { info } = require( './log' );
 const { writeOutputTemplate } = require( './output' );
 

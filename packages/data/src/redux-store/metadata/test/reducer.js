@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import reducer from '../reducer';
 
 describe( 'reducer', () => {

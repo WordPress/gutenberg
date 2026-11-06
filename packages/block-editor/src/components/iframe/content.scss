@@ -18,8 +18,8 @@
 	}
 
 	&.zoom-out-animation {
-		$scroll-top: var(--wp-block-editor-iframe-zoom-out-scroll-top, 0);
-		$scroll-top-next: var(--wp-block-editor-iframe-zoom-out-scroll-top-next, 0);
+		$scroll-top: var(--wp-block-editor-iframe-zoom-out-scroll-top, 0px);
+		$scroll-top-next: var(--wp-block-editor-iframe-zoom-out-scroll-top-next, 0px);
 		$overflow-behavior: var(--wp-block-editor-iframe-zoom-out-overflow-behavior, scroll);
 
 		position: fixed;
@@ -34,7 +34,7 @@
 
 	&.is-zoomed-out {
 		$scale: var(--wp-block-editor-iframe-zoom-out-scale, 1);
-		$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size, 0);
+		$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size, 0px);
 		$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 		$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 		$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width);

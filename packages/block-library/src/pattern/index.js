@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import PatternEdit from './edit';

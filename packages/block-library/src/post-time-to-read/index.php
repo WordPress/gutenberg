@@ -23,7 +23,10 @@
  * @param string $text Text to count elements in.
  * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  *
- * @return string The rendered word count.
+ * @return int The number of words or characters in the text.
+ *
+ * @phpstan-param 'words'|'characters_excluding_spaces'|'characters_including_spaces' $type
+ * @phpstan-return int<0, max>
  */
 function block_core_post_time_to_read_word_count( $text, $type ) {
 	$settings = array(
@@ -58,11 +61,6 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
 	// Remove all HTML comments.
 	$text = preg_replace( $settings['html_comment_regexp'], '', $text );
 
-	// If a shortcode regular expression has been provided use it to remove shortcodes.
-	if ( ! empty( $settings['shortcodes_regexp'] ) ) {
-		$text = preg_replace( $settings['shortcodes_regexp'], "\n", $text );
-	}
-
 	// Normalize non-breaking space to a normal space.
 	$text = preg_replace( $settings['space_regexp'], ' ', $text );
 
@@ -92,9 +90,9 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
  *
  * @since 6.9.0
  *
- * @param  array    $attributes Block attributes.
- * @param  string   $content    Block default content.
- * @param  WP_Block $block      Block instance.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {

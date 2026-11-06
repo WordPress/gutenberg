@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	CSSProperties,
 	ReactEventHandler,
 	Ref,
 	VideoHTMLAttributes,
 } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type FocalPoint = Record< FocalPointAxis, number >;

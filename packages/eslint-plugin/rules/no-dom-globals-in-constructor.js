@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const { createDOMGlobalRule } = require( '../utils/dom-globals' );
 
 module.exports = createDOMGlobalRule( {

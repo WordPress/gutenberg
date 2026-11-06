@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, parse, serialize } from '@wordpress/blocks';
 import { addWidgetIdToBlock } from '@wordpress/widgets';
 

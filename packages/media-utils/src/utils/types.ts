@@ -206,7 +206,7 @@ export type CreateRestAttachment = Partial< RestAttachment >;
 export type AdditionalData = BetterOmit< CreateRestAttachment, 'meta' >;
 
 export interface CreateSideloadFile {
-	image_size?: string;
+	image_size?: string | string[];
 	upload_request?: string;
 	generate_sub_sizes?: boolean;
 	convert_format?: boolean;
@@ -214,7 +214,7 @@ export interface CreateSideloadFile {
 
 export interface SideloadAdditionalData {
 	post: RestAttachment[ 'id' ];
-	image_size?: string;
+	image_size?: string | string[];
 }
 
 /**
@@ -224,7 +224,7 @@ export interface SideloadAdditionalData {
  * The client accumulates these and sends them all to the finalize endpoint.
  */
 export interface SubSizeData {
-	image_size: string;
+	image_size: string | string[];
 	width?: number;
 	height?: number;
 	file: string;

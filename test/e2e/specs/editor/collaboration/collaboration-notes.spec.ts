@@ -1,11 +1,22 @@
-/**
- * Internal dependencies
- */
+import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+
+// "All notes" has no toggle before the first note.
+async function showAllNotes( page: Page ) {
+	await page.evaluate( () =>
+		window.wp.data
+			.dispatch( 'core/interface' )
+			.enableComplementaryArea(
+				'core',
+				'edit-post/collab-history-sidebar'
+			)
+	);
+}
 
 test.describe( 'Collaboration - Notes Sync', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'User A adds a note, User B sees it', async ( {
@@ -24,6 +35,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block and adds a note.
 		await editor.insertBlock( {
@@ -34,7 +47,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Hello from User A' );
+			.pressSequentially( 'Hello from User A' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
@@ -86,6 +99,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block so both users have content.
 		await editor.insertBlock( {
@@ -108,7 +123,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await page2Editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page2
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Note from User B' );
+			.pressSequentially( 'Note from User B' );
 		await page2
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
@@ -157,6 +172,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block and adds a note with a reply.
 		await editor.insertBlock( {
@@ -167,7 +184,7 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Main note' );
+			.pressSequentially( 'Main note' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
@@ -180,10 +197,21 @@ test.describe( 'Collaboration - Notes Sync', () => {
 				.getByRole( 'treeitem', { name: 'Note: Main note' } )
 		).toBeVisible();
 
-		// Add a reply.
-		await page
-			.getByRole( 'textbox', { name: 'Reply to' } )
-			.fill( 'A reply to the note' );
+		/*
+		 * The reply form deliberately does not focus on mount so that
+		 * selecting a thread keeps focus on the thread for keyboard
+		 * navigation. Confirm the field does not steal focus, then click into
+		 * the contenteditable to place the caret before typing the reply.
+		 * (The skip-link focus path is covered deterministically in the
+		 * single-user block-notes spec.)
+		 */
+		const replyTextbox = page.getByRole( 'textbox', {
+			name: 'Reply to',
+		} );
+		await expect( replyTextbox ).toBeVisible();
+		await expect( replyTextbox ).not.toBeFocused();
+		await replyTextbox.click();
+		await replyTextbox.pressSequentially( 'A reply to the note' );
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Reply', exact: true } )

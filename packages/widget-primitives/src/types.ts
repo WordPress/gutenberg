@@ -4,16 +4,13 @@
  * Canonical home for widget identity types consumed by the registry and
  * hosts that render widgets.
  *
- * Each type is generic over the widget's attribute object (`Item`) so a
- * widget binds its own attribute shape once and gets typed `attributes`,
- * `example`, and `setAttributes` throughout the framework.
- */
-
-/**
- * External dependencies
+ * Each type is generic over the widget's attribute object (`Item`), so a
+ * widget binds its attribute shape once and gets typed `attributes`,
+ * `example`, and `setAttributes`.
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
 import type { Field } from '@wordpress/dataviews';
+import type { ResolvableField } from './field-types';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -23,20 +20,190 @@ export type WidgetName = `${ string }/${ string }`;
 
 /**
  * Icon for a widget type: a rendered SVG element, typically one from
- * `@wordpress/icons`. Hosts pass it to their icon primitive as is.
+ * `@wordpress/icons`.
  */
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
+
+/**
+ * Registered icon name (`collection/icon-name`), resolved into a
+ * `WidgetIcon` by the application's resolver (see `registerIconResolver`).
+ */
+export type WidgetIconReference = string;
+
+/**
+ * A link in a widget's help note.
+ */
+export interface WidgetHelpLink {
+	/**
+	 * Link label. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Link destination.
+	 */
+	href: string;
+}
+
+/**
+ * Declarative contextual help for a widget type, meant for compact
+ * surfaces such as tooltips.
+ */
+export interface WidgetHelp {
+	/**
+	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
+	 * in `links`.
+	 */
+	content: string;
+
+	/**
+	 * Links contextual to the note.
+	 */
+	links?: WidgetHelpLink[];
+}
+
+/**
+ * How relevant a declaration is. The widget declares importance, not a
+ * surface; hosts map the scale to surfaces of decreasing prominence.
+ * `'low'` is the default.
+ */
+export type WidgetRelevance = 'high' | 'medium' | 'low';
+
+/**
+ * The identity every action shares, whatever fulfills it.
+ */
+export interface WidgetActionEnvelope {
+	/**
+	 * Stable identifier, local to the widget type.
+	 */
+	id: string;
+
+	/**
+	 * Human-readable label naming the action. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Icon for the action, a rendered element. On the wire an action
+	 * declares a registered icon name instead (`WidgetActionRecord`);
+	 * `useWidgetTypes` resolves it, so hosts only receive renderable
+	 * elements.
+	 */
+	icon?: WidgetIcon;
+
+	/**
+	 * How relevant the action is among the widget's actions.
+	 */
+	relevance?: WidgetRelevance;
+}
+
+/**
+ * A verb a widget type declares: serializable data with an envelope and one
+ * fulfillment, named by the key carrying it. Today the only key is `href`,
+ * a link.
+ *
+ * The host picks the primitive and the placement. A link mounts a real
+ * anchor wherever the surface allows one.
+ */
+export interface WidgetAction extends WidgetActionEnvelope {
+	/**
+	 * Link fulfillment: the destination. A URL, an admin path, or a
+	 * widget-local file.
+	 */
+	href: string;
+
+	/**
+	 * Link only. When present and not `false`, downloads instead of
+	 * navigating. A string sets the filename; `true` or `''` keeps the
+	 * original.
+	 */
+	download?: string | boolean;
+
+	/**
+	 * Link only. Whether the destination opens in a new browser tab.
+	 */
+	openInNewTab?: boolean;
+}
+
+/**
+ * An action fulfilled by a function. It does not serialize, so only a
+ * mounted widget declares it, through `useWidgetActions`. A returned
+ * promise keeps the affordance pending until it settles.
+ */
+export interface WidgetCallbackAction extends WidgetActionEnvelope {
+	callback: () => void | Promise< void >;
+}
+
+/**
+ * An action as hosts materialize it: a link or a callback.
+ */
+export type WidgetRuntimeAction = WidgetAction | WidgetCallbackAction;
+
+/**
+ * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:
+ * the same envelope and fulfillment, with `icon` as a registered icon
+ * name rather than a rendered element.
+ */
+export interface WidgetActionRecord extends Omit< WidgetAction, 'icon' > {
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 */
+	icon?: WidgetIconReference;
+}
+
+/**
+ * A DataViews `Field` plus the widget-layer `relevance` hint; what hosts
+ * read. Its `type` may also reference a registered field type by name
+ * (see `registerFieldType`); `useWidgetTypes` resolves such references
+ * into plain `Field` props.
+ */
+type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
+	relevance?: WidgetRelevance;
+};
+
+/**
+ * Authoring helper: a `WidgetAttribute` with `id` narrowed to the widget's
+ * attribute keys (`Item`).
+ */
+export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
+	// `& string` drops number/symbol keys; `Field.id` is a string.
+	id: keyof Item & string;
+};
+
+/**
+ * Wire form of a widget attribute, as carried by a `WidgetModuleRecord`:
+ * the JSON-expressible subset of a DataViews `Field`. `Edit` is a control
+ * name or config, never a component; `isValid` carries no `custom` rule;
+ * `isDisabled` is a boolean, never a callback.
+ */
+export type WidgetAttributeRecord< Item = unknown > = Omit<
+	WidgetAttribute< Item >,
+	| 'Edit'
+	| 'isValid'
+	| 'header'
+	| 'description'
+	| 'render'
+	| 'sort'
+	| 'isVisible'
+	| 'isDisabled'
+	| 'getValue'
+	| 'setValue'
+	| 'getElements'
+	| 'getValueFormatted'
+> & {
+	header?: string;
+	description?: string;
+	isDisabled?: boolean;
+	Edit?: Exclude< NonNullable< Field< Item >[ 'Edit' ] >, Function >;
+	isValid?: Omit< NonNullable< Field< Item >[ 'isValid' ] >, 'custom' >;
+};
 
 /**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
- * assets are discovered by convention from the widget directory
- * (`render.*`, `widget.*`, `render.scss`), not declared here.
- *
- * Hosts that render widgets consume the richer `WidgetType` below,
- * which extends this shape with runtime-only fields produced by the
- * build manifest.
+ * assets are discovered by convention from the widget directory, not
+ * declared here.
  */
 export interface WidgetTypeMetadata< Item = unknown > {
 	/**
@@ -45,19 +212,25 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	apiVersion: number;
 
 	/**
-	 * Stable type identifier. See `WidgetName` for the shape.
+	 * Stable type identifier.
 	 */
 	name: WidgetName;
 
 	/**
-	 * Display title; hosts surface it in pickers and chrome.
+	 * Human-readable title that names the widget type. Translatable.
 	 */
 	title: string;
 
 	/**
-	 * Short description; hosts surface it in pickers and help panels.
+	 * Human-readable description of what the widget type does.
+	 * Translatable.
 	 */
 	description?: string;
+
+	/**
+	 * Contextual help note for compact surfaces.
+	 */
+	help?: WidgetHelp;
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
@@ -72,11 +245,11 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	category?: string;
 
 	/**
-	 * Authoring intent about how the widget wants to render. Static
-	 * and declarative; not a user-editable attribute.
+	 * Authoring intent about how the widget renders. Not a user-editable
+	 * attribute.
 	 *
-	 * - `'framed'` (default when absent): the widget renders its
-	 *   content only.
+	 * - `'framed'` (default when absent): the host paints a header from
+	 *   identity and pads the content area.
 	 * - `'content-bleed'`: the host's chrome stays visible while the
 	 *   content fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
@@ -85,7 +258,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases hosts use to match the widget in their pickers.
+	 * Alternative terms used to match the widget type when searching,
+	 * e.g. `calendar` for an events widget. Translatable.
 	 */
 	keywords?: string[];
 
@@ -107,9 +281,16 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	/**
 	 * Declarative attribute schema, bound to the widget's attribute
 	 * object via `Item`. Hosts render forms straight from this list
-	 * via `DataForm`, with no per-widget form wiring.
+	 * via `DataForm`, with no per-widget form wiring. Entries may carry
+	 * a `relevance` hint.
 	 */
-	attributes?: Field< Item >[];
+	attributes?: WidgetAttribute< Item >[];
+
+	/**
+	 * Declarative actions the widget type exposes. Hosts materialize each
+	 * one as an affordance and decide where to place it.
+	 */
+	actions?: WidgetAction[];
 
 	/**
 	 * Structured example data hosts use for previews, and the default
@@ -124,31 +305,25 @@ export interface WidgetTypeMetadata< Item = unknown > {
 /**
  * Runtime widget type consumed by hosts.
  *
- * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
- * runtime-only fields produced by the build pipeline. Notably
- * `renderModule`, which maps each widget to its discovered script-module
- * entry point.
- *
- * The PHP layer (`widget-types.php`) emits this data in snake_case
- * (`render_module`). The `useWidgetTypes` hook is the single boundary
- * that maps it to the camelCase shape consumed throughout JS/TS.
+ * Extends `WidgetTypeMetadata` with runtime-only fields, notably
+ * `renderModule`. Hosts supply the raw records in snake_case
+ * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
+ * resolves them into this camelCase shape.
  */
-export interface WidgetType< Item = unknown >
-	extends WidgetTypeMetadata< Item > {
+export interface WidgetType<
+	Item = unknown,
+> extends WidgetTypeMetadata< Item > {
 	/**
 	 * Script-module identifier resolved to a React component at render
-	 * time. Produced by the build pipeline from the conventional
-	 * `render.*` entry point; not declared in `widget.json`.
+	 * time, produced from the conventional `render.*` entry point.
 	 */
 	renderModule: string;
 }
 
 /**
- * Props passed to a widget's render component by the consuming host.
- *
- * Bound over `Item` so the destructured `attributes` and any
- * `setAttributes` payload are typed against the widget's attribute
- * object.
+ * Props passed to a widget's render component by the host, bound over
+ * `Item` so `attributes` and `setAttributes` are typed against the
+ * widget's attribute object.
  */
 export interface WidgetRenderProps< Item = unknown > {
 	/**
@@ -178,3 +353,70 @@ export interface WidgetModule {
 export type ResolveWidgetModule = (
 	moduleId: string
 ) => Promise< WidgetModule >;
+
+/**
+ * The `WidgetTypeMetadata` subset a record may carry, resolved server-side
+ * (already translated) and overriding the metadata module's values. Every
+ * field is optional and nullable; `null`/absent means the module's value
+ * stands.
+ */
+type WidgetModuleRecordOverrides = {
+	[
+		K in keyof Pick<
+			WidgetTypeMetadata,
+			| 'title'
+			| 'description'
+			| 'help'
+			| 'category'
+			| 'presentation'
+			| 'keywords'
+		>
+	]?: WidgetTypeMetadata[ K ] | null;
+};
+
+/**
+ * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
+ * format. The host fetches these however it likes; only the field shape is
+ * part of the contract.
+ */
+export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
+	/**
+	 * Stable widget type identifier.
+	 */
+	name: string;
+
+	/**
+	 * Script-module id resolved to the render component at render time.
+	 */
+	render_module?: string | null;
+
+	/**
+	 * Script-module id dynamically imported for the widget's live metadata.
+	 */
+	widget_module?: string | null;
+
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 * `null`/absent means the module's icon stands.
+	 */
+	icon?: WidgetIconReference | null;
+
+	/**
+	 * Declarative actions in wire form, icons as registered icon names.
+	 * `null`/absent means the module's actions stand.
+	 */
+	actions?: WidgetActionRecord[] | null;
+
+	/**
+	 * Attribute schema in wire form. `null`/absent means the module's
+	 * attributes stand; otherwise entries merge with the module's by `id`.
+	 */
+	attributes?: WidgetAttributeRecord[] | null;
+
+	/**
+	 * Structured example in wire form: the shape of the runtime field, with
+	 * JSON values. `null`/absent means the module's example stands; a module
+	 * that declares its own wins, so values that need code stay there.
+	 */
+	example?: WidgetTypeMetadata[ 'example' ] | null;
+}

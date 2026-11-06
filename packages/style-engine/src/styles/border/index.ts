@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
 import { generateRule, generateBoxRules, camelCaseJoin } from '../utils';
 

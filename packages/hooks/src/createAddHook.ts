@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import validateNamespace from './validateNamespace';
 import validateHookName from './validateHookName';
 import type { Callback, Hooks, StoreKey } from '.';

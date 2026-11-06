@@ -26,9 +26,16 @@ The client ID of the block representing the bottom position of the popover.
 
 This determines whether the block popover always shifts into the viewport or remains at its original position. See FloatingUI for more details on shift.
 
--	Type: `Boolean`
--	Required: No
--	Default: `true`
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
+#### children
+
+The content rendered inside the popover.
+
+-   Type: `ReactNode`
+-   Required: No
 
 ## BlockPopoverInbetween - Private Component
 
@@ -38,12 +45,12 @@ This determines whether the block popover always shifts into the viewport or rem
 
 The client ID of the block before the popover.
 
--   Type: `String`
+-   Type: `String|null|undefined`
 -   Required: Yes
 
 #### nextClientId
 
 The client ID of the block after the popover.
 
--   Type: `String`
+-   Type: `String|null|undefined`
 -   Required: Yes

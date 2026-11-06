@@ -1,25 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Icon, Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
-	title: 'DataViews/FieldTypes',
+	parameters: {
+		// FIXME: Helper text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
+	id: 'dataviews-fieldtypes',
+	title: 'Design System/DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {
 		type: {
@@ -50,6 +45,7 @@ const meta = {
 				'telephone',
 				'url',
 				'text',
+				'time',
 				'toggle',
 				'toggleGroup',
 			],
@@ -81,26 +77,7 @@ const meta = {
 };
 export default meta;
 
-const DollarPrefix = () => (
-	<InputControlPrefixWrapper>
-		<span>$</span>
-	</InputControlPrefixWrapper>
-);
-const StarIconPrefix = () => (
-	<InputControlPrefixWrapper variant="icon">
-		<WCIcon icon={ starFilled } />
-	</InputControlPrefixWrapper>
-);
-const PercentSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>%</span>
-	</InputControlSuffixWrapper>
-);
-const USDSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>USD</span>
-	</InputControlSuffixWrapper>
-);
+const StarIconPrefix = () => <Icon icon={ starFilled } />;
 type DataType = {
 	id: number;
 	text: string;
@@ -119,6 +96,9 @@ type DataType = {
 	datetimeWithElements: string;
 	date: string;
 	dateWithElements: string;
+	time: string;
+	timeWithSeconds: string;
+	timeWithElements: string;
 	email: string;
 	emailWithElements: string;
 	telephone: string;
@@ -160,6 +140,9 @@ const data: DataType[] = [
 		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
+		time: '14:30',
+		timeWithSeconds: '14:30:45',
+		timeWithElements: '13:00',
 		email: 'hi@example.com',
 		emailWithElements: 'bob@example.com',
 		telephone: '+1-555-123-4567',
@@ -358,6 +341,31 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'time',
+		type: 'time',
+		label: 'Time',
+		description: 'Help for time.',
+	},
+	{
+		id: 'timeWithSeconds',
+		type: 'time',
+		label: 'Time (with seconds)',
+		description:
+			'A format that renders seconds also gives the control a seconds field.',
+		format: { time: 'H:i:s' },
+	},
+	{
+		id: 'timeWithElements',
+		type: 'time',
+		label: 'Time (with elements)',
+		description: 'Help for time with elements.',
+		elements: [
+			{ value: '09:00', label: 'Morning' },
+			{ value: '13:00', label: 'Afternoon' },
+			{ value: '19:00', label: 'Evening' },
+		],
+	},
+	{
 		id: 'email',
 		type: 'email',
 		label: 'Email',
@@ -531,7 +539,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with dollar sign prefix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
+			prefix: '$',
 		},
 	},
 	{
@@ -542,6 +550,7 @@ const fields: Field< DataType >[] = [
 		Edit: {
 			control: 'text',
 			prefix: StarIconPrefix,
+			prefixPadding: 'minimal',
 		},
 	},
 	{
@@ -551,7 +560,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with percent sign suffix.',
 		Edit: {
 			control: 'text',
-			suffix: PercentSuffix,
+			suffix: '%',
 		},
 	},
 	{
@@ -561,8 +570,8 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with both dollar prefix and USD suffix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
+			prefix: '$',
+			suffix: 'USD',
 		},
 	},
 ];
@@ -586,6 +595,7 @@ type ControlTypes =
 	| 'telephone'
 	| 'url'
 	| 'text'
+	| 'time'
 	| 'toggle'
 	| 'toggleGroup';
 
@@ -1160,6 +1170,56 @@ DateComponent.argTypes = {
 		},
 		description:
 			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
+
+export const TimeComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+	manyElements,
+	formatTime,
+	disabled,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatTime?: string;
+	disabled: boolean;
+} ) => {
+	const timeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'time' )
+				.map( ( field ) =>
+					formatTime
+						? { ...field, format: { time: formatTime } }
+						: field
+				),
+		[ formatTime ]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ timeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+TimeComponent.storyName = 'time';
+TimeComponent.args = {
+	formatTime: '',
+};
+TimeComponent.argTypes = {
+	formatTime: {
+		control: 'text',
+		description:
+			'Custom PHP time format string (e.g., "g:i a" for "2:30 pm"). Leave empty to use the format each field declares.',
 	},
 };
 

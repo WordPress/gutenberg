@@ -17,14 +17,7 @@ export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
  * Size scale for element sizing tokens.
  */
 export type ElementSize =
-	| '5xs'
-	| '4xs'
-	| '3xs'
-	| '2xs'
-	| 'xs'
-	| 'sm'
-	| 'md'
-	| 'lg';
+	'5xs' | '4xs' | '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg';
 
 /**
  * Size scale for surface width tokens.
@@ -79,6 +72,7 @@ export type SurfaceBackgroundColor =
  * Background color variants for interactive elements.
  */
 export type InteractiveBackgroundColor =
+	| 'neutral'
 	| 'neutral-strong'
 	| 'neutral-weak'
 	| 'brand-strong'
@@ -140,11 +134,7 @@ export type SurfaceStrokeColor =
  * Stroke color variants for interactive element borders.
  */
 export type InteractiveStrokeColor =
-	| 'neutral'
-	| 'neutral-strong'
-	| 'brand'
-	| 'error'
-	| 'error-strong';
+	'neutral' | 'neutral-strong' | 'brand' | 'error' | 'error-strong';
 
 /**
  * Foreground color variants for text elements.
@@ -167,6 +157,7 @@ export type ForegroundColor =
 	| 'neutral-strong'
 	| 'neutral-strong-active'
 	| 'neutral-strong-disabled'
+	| 'neutral-weak-active'
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
@@ -193,7 +184,7 @@ export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 /**
  * Font weight variants.
  */
-export type FontWeight = 'regular' | 'medium';
+export type FontWeight = 'default' | 'emphasis';
 
 /**
  * Line height scale.

@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const os = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( './validate-config' );
 
 /**

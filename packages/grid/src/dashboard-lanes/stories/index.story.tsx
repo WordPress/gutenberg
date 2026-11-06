@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
-import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useId, useState, useMemo } from '@wordpress/element';
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
 import type { GridOverlayRenderProps } from '../../shared/types';
 
 const meta: Meta< typeof DashboardLanes > = {
-	title: 'Grid/DashboardLanes',
+	id: 'grid-dashboardlanes',
+	title: 'Widgets/Grid/DashboardLanes',
 	component: DashboardLanes,
 	tags: [ 'status-experimental' ],
 	args: {
@@ -29,12 +19,12 @@ const meta: Meta< typeof DashboardLanes > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 12, step: 1 },
-			description: 'Total lanes in fixed mode.',
+			description: 'Lane count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-lane lower bound in pixels.',
+				'Per-lane floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -192,41 +182,69 @@ export const Default: Story = {
 	},
 };
 
+function TileControls( { title }: { title: string } ) {
+	const metricId = useId();
+	return (
+		<span
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'flex-start',
+				gap: 8,
+			} }
+		>
+			<strong>{ title }</strong>
+			<a href="#details">Details</a>
+			<button type="button">Refresh</button>
+			<label htmlFor={ metricId }>
+				Metric{ ' ' }
+				<select id={ metricId }>
+					<option>Views</option>
+					<option>Clicks</option>
+				</select>
+			</label>
+		</span>
+	);
+}
+
 /**
- * Responsive lane count: derived from container width using
- * `minColumnWidth` as the per-lane lower bound. Resize the preview
- * frame to see the lane count adapt.
+ * Tiles with their own links, buttons and form controls. The a11y addon checks that the lanes do not wrap them in drag semantics. In edit mode, the first tile is pinned (`draggable: false`) and its controls keep their semantics.
  */
-export const Responsive: Story = {
+export const InteractiveContent: Story = {
 	args: {
-		minColumnWidth: 200,
+		columns: 3,
 		layout: [
+			{ key: 'pinned', draggable: false },
 			{ key: 'a' },
 			{ key: 'b' },
-			{ key: 'c' },
-			{ key: 'd' },
-			{ key: 'e' },
-			{ key: 'f' },
 		],
 		children: [
-			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
-			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
-			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
-			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
-			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
-			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+			<Tile key="pinned" tone="neutral" height={ 180 }>
+				<TileControls title="Pinned" />
+			</Tile>,
+			<Tile key="a" tone="info" height={ 180 }>
+				<TileControls title="Tile" />
+			</Tile>,
+			<Tile key="b" tone="success" height={ 180 }>
+				<TileControls title="Tile" />
+			</Tile>,
 		],
 	},
 };
 
 /**
- * Layered configuration: `columns` caps the lane count and
- * `minColumnWidth` enforces a per-tile width floor. The surface
- * renders up to `columns` lanes on wide containers and reduces the
- * count on narrow ones whenever fitting all of them would push
- * tiles below `minColumnWidth`.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the lane
+ * count. `minColumnWidth` alone fits as many lanes of at least that width
+ * as the container allows. Together, `columns` caps what the floor fits:
+ * up to four lanes here, none narrower than 200px, down to one. Open the
+ * story full screen and resize the browser to walk the counts.
  */
-export const Layered: Story = {
+export const Columns: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		minColumnWidth: 200,
@@ -250,11 +268,88 @@ export const Layered: Story = {
 };
 
 /**
+ * `columns` as a map: one lane from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each lane ends up; add `minColumnWidth` to lower it further.
+ */
+export const ColumnSteps: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		columns: { 0: 1, 600: 2, 960: 4 },
+		layout: [
+			{ key: 'fixed-1', width: 1 },
+			{ key: 'fixed-2', width: 2 },
+			{ key: 'fill-1', width: 2 },
+			{ key: 'fixed-3', width: 1 },
+			{ key: 'fixed-4', width: 1 },
+			{ key: 'fixed-5', width: 2 },
+			{ key: 'fill-2', width: 3 },
+			{ key: 'full-1', width: 1 },
+		],
+		children: [
+			<Tile key="fixed-1" tone="brand" height={ 120 } index={ 1 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-2" tone="info" height={ 200 } index={ 2 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-1" tone="success" height={ 80 } index={ 3 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fixed-3" tone="warning" height={ 160 } index={ 4 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-4" tone="error" height={ 100 } index={ 5 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-5" tone="neutral" height={ 240 } index={ 6 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="neutral" height={ 240 } index={ 7 }>
+				width: <strong>3</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral" height={ 240 } index={ 8 }>
+				width: <strong>1</strong>
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two lanes
+ * below 960px, and 200px lanes fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	parameters: ColumnSteps.parameters,
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 200,
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.
  */
 export const Spanning: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		layout: [
@@ -298,6 +393,11 @@ export const Spanning: Story = {
  * story below for a full override example.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		editMode: true,
@@ -308,7 +408,13 @@ export const EditMode: Story = {
 			height: number;
 			label: string;
 		} )[] = [
-			{ key: 'a', tone: 'brand', height: 120, label: '120px' },
+			{
+				key: 'a',
+				draggable: false,
+				tone: 'brand',
+				height: 120,
+				label: 'pinned',
+			},
 			{ key: 'b', tone: 'info', height: 200, label: '200px' },
 			{
 				key: 'wide',
@@ -351,6 +457,125 @@ export const EditMode: Story = {
 						tone={ tile.tone }
 						height={ tile.height }
 						index={ i + 1 }
+					>
+						{ tile.label }
+					</Tile>
+				) ),
+			[ tiles ]
+		);
+
+		return (
+			<DashboardLanes
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ onChangeLayout }
+			>
+				{ tileElements }
+			</DashboardLanes>
+		);
+	},
+};
+
+/**
+ * Per-item width limits via `itemLimits`, in pixels. The wide tile
+ * stops shrinking at its minimum, the capped tile stops growing at its
+ * maximum, the ranged tile stays between both, and the free tiles keep
+ * the full range. Lanes take no height limits; lane heights are
+ * content-driven.
+ */
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	args: {
+		columns: 12,
+		editMode: true,
+		itemLimits: {
+			min: { minWidth: 360 },
+			max: { maxWidth: 500 },
+			ranged: { minWidth: 300, maxWidth: 500 },
+		},
+	},
+	render: function SizeLimitsStory( args ) {
+		const initial: ( DashboardLanesLayoutItem & {
+			tone: Tone;
+			height: number;
+			label: string;
+		} )[] = [
+			{
+				key: 'min',
+				width: 2,
+				tone: 'info',
+				height: 140,
+				label: 'min 360px wide',
+			},
+			{
+				key: 'max',
+				width: 3,
+				tone: 'warning',
+				height: 120,
+				label: 'max 500px wide',
+			},
+			{
+				key: 'ranged',
+				width: 2,
+				tone: 'brand',
+				height: 150,
+				label: 'min 300, max 500px wide',
+			},
+			{
+				key: 'free-a',
+				width: 3,
+				tone: 'neutral',
+				height: 180,
+				label: 'no limits',
+			},
+			{
+				key: 'free-b',
+				width: 2,
+				tone: 'neutral',
+				height: 100,
+				label: 'no limits',
+			},
+			{
+				key: 'free-c',
+				width: 3,
+				tone: 'neutral',
+				height: 160,
+				label: 'no limits',
+			},
+		];
+
+		const [ tiles, setTiles ] = useState( initial );
+
+		const layout: DashboardLanesLayoutItem[] = tiles.map(
+			( { tone: _tone, height: _height, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						height: existing?.height ?? 100,
+						label: existing?.label ?? item.key,
+					};
+				} )
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						height={ tile.height }
 					>
 						{ tile.label }
 					</Tile>
@@ -444,6 +669,11 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * entirely while keeping `editMode` interactions on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 4,

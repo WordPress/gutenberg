@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
@@ -96,7 +89,7 @@ export default function usePatternCategories() {
 
 		sortedCategories.unshift( {
 			name: PATTERN_USER_CATEGORY,
-			label: __( 'My patterns' ),
+			label: __( 'Site patterns' ),
 			count: userPatterns.length,
 		} );
 

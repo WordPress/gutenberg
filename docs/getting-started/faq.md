@@ -125,7 +125,7 @@ This is currently a work in progress and we recommend reviewing the [block based
 
 No, [block variations](/docs/reference-guides/block-api/block-variations.md) are different versions of a single base block, sharing a similar functionality but with slight differences in their implementation or settings (attributes, InnerBlocks, etc.). Block variations are transparent for users, and once there is a registered block variation, it will appear as a new block. For example, the `embed` block registers different block variations to embed content from specific providers.
 
-Meanwhile, [block styles](/docs/reference-guides/filters/block-filters.md#block-style-variations) allow you to provide alternative styles to existing blocks, and they work by adding a `className` to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
+Meanwhile, [block styles](/docs/reference-guides/block-api/block-styles.md) allow you to provide alternative styles to existing blocks, and they work by adding a `className` to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
 
 ### How do editor styles work?
 

@@ -8,7 +8,7 @@ import type { FieldDescriptionProps } from './types';
 export const Description = forwardRef<
 	HTMLParagraphElement,
 	FieldDescriptionProps
->( function Description( { className, ...restProps }, ref ) {
+>( function UnforwardedDescription( { className, ...restProps }, ref ) {
 	return (
 		<_Field.Description
 			ref={ ref }

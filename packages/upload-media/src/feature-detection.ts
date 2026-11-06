@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ImageDimensions } from './get-image-dimensions';
 
 interface NavigatorNetworkInformation {
@@ -35,14 +32,18 @@ let cachedResult: FeatureDetectionResult | null = null;
 /**
  * Detects whether the browser supports client-side media processing.
  *
- * This checks for:
- * 1. WebAssembly support (required for wasm-vips)
- * 2. SharedArrayBuffer support (required for WASM threading)
- * 3. CSP compatibility for blob URL workers (required for inline worker creation)
- * 4. Device memory (disables on devices with ≤2 GB RAM)
- * 5. Hardware concurrency (disables on devices with fewer than 2 CPU cores)
- * 6. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
- * 7. Web Worker support (baseline requirement)
+ * Checks (in order of evaluation):
+ * 1. WebAssembly support (required for wasm-vips).
+ * 2. SharedArrayBuffer support (required for WASM threading; relies on
+ *    cross-origin isolation headers being set).
+ * 3. Web Worker support (baseline requirement for the processing worker).
+ * 4. Device memory: disables on devices reporting ≤ 2 GB of RAM.
+ * 5. Hardware concurrency: disables on devices reporting fewer than 2 CPU cores.
+ * 6. Network conditions: disables when the data saver flag is on, or when the
+ *    connection's effective type is `slow-2g` or `2g`.
+ * 7. CSP compatibility for blob URL workers: a probe Worker is created from a
+ *    blob: URL to confirm the site's Content Security Policy permits inline
+ *    worker creation (`worker-src` must allow `blob:`).
  *
  * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
  *
@@ -208,27 +209,28 @@ const BYTES_PER_PIXEL = 4;
 /**
  * Memory budget (in bytes) for processing interlaced images client-side.
  *
- * wasm-vips is hard-capped at 1 GiB of WASM memory. Progressive JPEGs and
- * Adam7-interlaced PNGs cannot be decoded with shrink-on-load, so the entire
- * image must be buffered at once. A tighter ~0.5 GiB budget leaves headroom
- * for the encode step and avoids the out-of-memory failures these images hit.
+ * wasm-vips can grow its WASM memory up to 2 GiB, but growth can fail on
+ * memory-constrained devices. Progressive JPEGs and Adam7-interlaced PNGs
+ * cannot be decoded with shrink-on-load, so the entire image must be buffered
+ * at once. A tighter ~0.75 GiB budget leaves headroom for the encode step and
+ * avoids the out-of-memory failures these images hit.
  */
-const INTERLACED_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+const INTERLACED_MEMORY_BUDGET = 0.75 * 1024 * 1024 * 1024;
 
 /**
  * Memory budget (in bytes) for processing non-interlaced images client-side.
  *
  * Baseline images can be shrunk during decode, so vips needs far less peak
- * memory. A generous ~0.9 GiB budget acts as a backstop against extreme sizes
+ * memory. A generous ~1.5 GiB budget acts as a backstop against extreme sizes
  * while leaving the vast majority of real-world uploads on the client.
  */
-const BASELINE_MEMORY_BUDGET = 0.9 * 1024 * 1024 * 1024;
+const BASELINE_MEMORY_BUDGET = 1.5 * 1024 * 1024 * 1024;
 
 /**
  * Determines whether an image is too large to process client-side.
  *
  * Very large images, especially interlaced/progressive ones, can exceed the
- * 1 GiB wasm-vips memory cap and fail to process. Such images are better
+ * 2 GiB wasm-vips memory ceiling and fail to process. Such images are better
  * handled by the server, which has no comparable per-image memory ceiling.
  *
  * @param dimensions The image's parsed dimensions and interlacing.

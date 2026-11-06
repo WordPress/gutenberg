@@ -7,6 +7,7 @@
 	color: $gray-900;
 	height: 100%;
 	overflow: auto;
+	width: 100vw;
 
 	@include break-medium() {
 		width: $sidebar-width;
@@ -36,7 +37,7 @@
 
 	h2 {
 		font-size: $default-font-size;
-		font-weight: $font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -45,7 +46,7 @@
 	h3 {
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: $font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}

@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import type { AbsoluteBlockIndexPath } from '../types';
 import { unlock } from '../lock-unlock';
 

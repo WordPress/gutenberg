@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 /**
- * Mirrors `TransformedText` from @wordpress/i18n.
+ * Mirrors `TransformedText` from `@wordpress/i18n`.
  * We don't import directly to avoid a circular dependency.
  */
 type TransformedText< T extends string > = string & {
@@ -16,11 +16,8 @@ export type InterpolationInput = string | TransformedText< string >;
 /**
  * The literal string extracted from the input.
  */
-export type InterpolationString< Input > = Input extends TransformedText<
-	infer Text
->
-	? Text
-	: Input;
+export type InterpolationString< Input > =
+	Input extends TransformedText< infer Text > ? Text : Input;
 
 /**
  * Recursively trims trailing spaces from a string type.
@@ -39,14 +36,14 @@ type ExtractTagName< T extends string > =
 	T extends `/${ string }`
 		? never
 		: TrimTrailingSpaces< T > extends infer Name extends string
-		? Name extends ''
-			? never // Empty tag name
-			: Name extends `${ string } ${ string }`
-			? never // Skip tags with inner spaces like "spaced token"
-			: Name extends `${ infer Base }/`
-			? Base // Self-closing tags like "br/"
-			: Name // Regular opening tags like "div"
-		: never;
+			? Name extends ''
+				? never // Empty tag name
+				: Name extends `${ string } ${ string }`
+					? never // Skip tags with inner spaces like "spaced token"
+					: Name extends `${ infer Base }/`
+						? Base // Self-closing tags like "br/"
+						: Name // Regular opening tags like "div"
+			: never;
 
 /**
  * Utility type to extract all tag names from a template literal string.
