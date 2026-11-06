@@ -288,7 +288,7 @@ function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
 /**
  * Splits a state style object into groups based on block feature selectors.
  *
- * @param array                                       $state_style     State style object.
+ * @param array<string, mixed>                        $state_style     State style object.
  * @param array<string, string|array<string, string>> $block_selectors Block selectors metadata.
  * @return array[] Selector/style groups.
  *
