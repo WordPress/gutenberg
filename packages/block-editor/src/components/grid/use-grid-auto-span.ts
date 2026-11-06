@@ -146,45 +146,62 @@ function areGridRectsEqual( first: GridRect, second: GridRect ): boolean {
  * Measures a grid item while it occupies a particular grid rectangle. The
  * temporary inline styles are restored before the browser paints.
  *
- * @param element Grid item element.
- * @param rect    Grid rectangle to measure.
+ * @param element   Grid item element.
+ * @param rect      Grid rectangle to measure.
+ * @param rowHeight Height of a grid row in pixels.
  *
  * @return Grid item dimensions at the requested size.
  */
 function measureElementAtRect(
 	element: HTMLElement,
-	rect: GridRect
+	rect: GridRect,
+	rowHeight: number
 ): GridItemDimensions {
-	const previousGridColumn = element.style.getPropertyValue( 'grid-column' );
-	const previousGridRow = element.style.getPropertyValue( 'grid-row' );
+	const gridStyle = element.parentElement!.style;
+	const overrides: [ CSSStyleDeclaration, string, string ][] = [
+		[
+			element.style,
+			'grid-column',
+			`${ rect.columnStart } / span ${ rect.columnSpan }`,
+		],
+		[
+			element.style,
+			'grid-row',
+			`${ rect.rowStart } / span ${ rect.rowSpan }`,
+		],
+		// Keep tracks fixed while measuring, including any implicit rows that
+		// would become explicit when the grid's row count is updated.
+		[
+			gridStyle,
+			'grid-template-rows',
+			`repeat(${ rect.rowEnd }, ${ rowHeight }px)`,
+		],
+		[ gridStyle, 'grid-auto-rows', `${ rowHeight }px` ],
+	];
+	const restoreStyles = overrides.map( ( [ style, property, value ] ) => {
+		const previousValue = style.getPropertyValue( property );
+		const previousPriority = style.getPropertyPriority( property );
+		style.setProperty( property, value );
+		return () => {
+			if ( previousValue ) {
+				style.setProperty( property, previousValue, previousPriority );
+			} else {
+				style.removeProperty( property );
+			}
+		};
+	} );
 
-	element.style.setProperty(
-		'grid-column',
-		`${ rect.columnStart } / span ${ rect.columnSpan }`
-	);
-	element.style.setProperty(
-		'grid-row',
-		`${ rect.rowStart } / span ${ rect.rowSpan }`
-	);
-
-	const dimensions = {
-		offsetWidth: element.offsetWidth,
-		offsetHeight: element.offsetHeight,
-		scrollWidth: element.scrollWidth,
-		scrollHeight: element.scrollHeight,
-	};
-
-	if ( previousGridColumn ) {
-		element.style.setProperty( 'grid-column', previousGridColumn );
-	} else {
-		element.style.removeProperty( 'grid-column' );
+	let dimensions: GridItemDimensions;
+	try {
+		dimensions = {
+			offsetWidth: element.offsetWidth,
+			offsetHeight: element.offsetHeight,
+			scrollWidth: element.scrollWidth,
+			scrollHeight: element.scrollHeight,
+		};
+	} finally {
+		restoreStyles.forEach( ( restore ) => restore() );
 	}
-	if ( previousGridRow ) {
-		element.style.setProperty( 'grid-row', previousGridRow );
-	} else {
-		element.style.removeProperty( 'grid-row' );
-	}
-
 	return dimensions;
 }
 
@@ -457,7 +474,8 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				} );
 				const oneCellDimensions = measureElementAtRect(
 					element,
-					oneCellRect
+					oneCellRect,
+					rowHeight
 				);
 				const dimensionsBeforeResponsiveReflow =
 					resizeDimensions.get( childId );
@@ -513,7 +531,8 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				// the height of wrapped content.
 				const desiredWidthDimensions = measureElementAtRect(
 					element,
-					desiredWidthRect
+					desiredWidthRect,
+					rowHeight
 				);
 				const contentHeight = Math.max(
 					desiredWidthDimensions.offsetHeight,
@@ -524,10 +543,38 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 								0 )
 						: 0
 				);
-				const measuredAutoRowSpan =
+				let measuredAutoRowSpan =
 					contentHeight > rowHeight + 1
 						? Math.ceil( ( contentHeight + rowGap ) / rowPitch )
 						: 1;
+				if ( measuredAutoRowSpan > 1 ) {
+					const expandedDimensions = measureElementAtRect(
+						element,
+						new GridRect( {
+							columnStart: desiredWidthRect.columnStart,
+							rowStart: userRowStart,
+							columnSpan: desiredWidthRect.columnSpan,
+							rowSpan: measuredAutoRowSpan,
+						} ),
+						rowHeight
+					);
+					const expandedHeight = Math.max(
+						expandedDimensions.offsetHeight,
+						expandedDimensions.scrollHeight
+					);
+					const expandedOverflow =
+						expandedHeight -
+						( measuredAutoRowSpan * rowPitch - rowGap );
+					// Percentage heights plus margins can overflow by the same
+					// amount at every span. Grow only if extra space reduces the
+					// overflow; otherwise each resize would request more rows.
+					if (
+						expandedOverflow > 1 &&
+						expandedOverflow >= contentHeight - rowHeight - 1
+					) {
+						measuredAutoRowSpan = 1;
+					}
+				}
 				const cellHeightChanged =
 					itemState &&
 					Math.abs(
