@@ -259,6 +259,60 @@ test.describe( 'Typography toolbar', () => {
 			.toEqual( expect.any( String ) );
 	} );
 
+	test( 'clears what the toolbar set, and nothing else', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Writing',
+				fontSize: 'large',
+				textColor: 'vivid-red',
+				style: { typography: { textAlign: 'center' } },
+			},
+		} );
+
+		const toolbar = getToolbar( page );
+		await toolbar
+			.getByRole( 'button', { name: 'Clear formatting' } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Writing',
+					fontSize: undefined,
+					textColor: undefined,
+					// The alignment shares `style.typography`, and stays.
+					style: { typography: { textAlign: 'center' } },
+				},
+			},
+		] );
+
+		// Nothing left to clear, so the button goes.
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Clear formatting' } )
+		).toBeHidden();
+	} );
+
+	test( 'offers nothing to clear on a block that sets nothing', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+
+		await expect(
+			getToolbar( page ).getByRole( 'button', {
+				name: 'Clear formatting',
+			} )
+		).toBeHidden();
+	} );
+
 	test( 'leaves a block that cannot be coloured without the control', async ( {
 		editor,
 		page,

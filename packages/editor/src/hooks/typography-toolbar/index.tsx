@@ -3,7 +3,12 @@ import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { ColorIndicator } from '@wordpress/components';
+import {
+	ColorIndicator,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
+import { reset as resetIcon } from '@wordpress/icons';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -20,7 +25,12 @@ import TypographyFontDropdown from './font-dropdown';
 import TypographySizeDropdown from './size-dropdown';
 import TypographyColorDropdown from './color-dropdown';
 import TextColorIcon from './text-color-icon';
-import { getFontDisplayName, resolveBlockTypography } from './utils';
+import {
+	clearedTypography,
+	getFontDisplayName,
+	hasOwnTypography,
+	resolveBlockTypography,
+} from './utils';
 
 declare global {
 	interface Window {
@@ -241,6 +251,17 @@ function TypographyToolbarControls( {
 						setColor( 'backgroundColor', 'background', color, slug )
 					}
 				/>
+			) }
+			{ hasOwnTypography( attributes ) && (
+				<ToolbarGroup>
+					<ToolbarButton
+						icon={ resetIcon }
+						label={ __( 'Clear formatting' ) }
+						onClick={ () =>
+							setAttributes( clearedTypography( attributes ) )
+						}
+					/>
+				</ToolbarGroup>
 			) }
 		</BlockControls>
 	);

@@ -173,3 +173,82 @@ export function resolveBlockTypography(
 		] )
 	);
 }
+
+// Exactly what the toolbar's own controls write, so clearing takes back what
+// it put there and nothing else: not the alignment that shares
+// `style.typography`, nor the gradient that shares `style.color`.
+const OWN_ATTRIBUTES = [
+	'fontFamily',
+	'fontSize',
+	'textColor',
+	'backgroundColor',
+] as const;
+const OWN_STYLES = {
+	typography: [ 'fontFamily', 'fontSize' ],
+	color: [ 'text', 'background' ],
+} as const;
+
+type BlockStyle = Record< string, Record< string, unknown > | undefined >;
+type BlockAttributes = Record< string, unknown > & { style?: BlockStyle };
+
+/**
+ * Whether a block carries any of the typography the toolbar sets, and so has
+ * something to clear.
+ *
+ * @param attributes The block's attributes.
+ *
+ * @return Whether anything would be cleared.
+ */
+export function hasOwnTypography( attributes: BlockAttributes ): boolean {
+	if ( OWN_ATTRIBUTES.some( ( name ) => attributes[ name ] !== undefined ) ) {
+		return true;
+	}
+
+	return Object.entries( OWN_STYLES ).some( ( [ group, keys ] ) =>
+		keys.some(
+			( key ) => attributes.style?.[ group ]?.[ key ] !== undefined
+		)
+	);
+}
+
+/**
+ * The attributes that put a block back to the type the theme gives it,
+ * leaving everything the toolbar did not set as it was.
+ *
+ * @param attributes The block's attributes.
+ *
+ * @return The attributes to set.
+ */
+export function clearedTypography(
+	attributes: BlockAttributes
+): Record< string, unknown > {
+	const style: BlockStyle = { ...attributes.style };
+
+	for ( const [ group, keys ] of Object.entries( OWN_STYLES ) ) {
+		if ( ! style[ group ] ) {
+			continue;
+		}
+
+		const kept = Object.fromEntries(
+			Object.entries( style[ group ] ).filter(
+				( [ key ] ) => ! ( keys as readonly string[] ).includes( key )
+			)
+		);
+		style[ group ] = Object.keys( kept ).length ? kept : undefined;
+	}
+
+	// A group emptied of its last value, and a style emptied of its last
+	// group, are dropped rather than left behind as husks.
+	const kept = Object.fromEntries(
+		Object.entries( style ).filter(
+			( [ , group ] ) => group && Object.keys( group ).length
+		)
+	);
+
+	return {
+		...Object.fromEntries(
+			OWN_ATTRIBUTES.map( ( name ) => [ name, undefined ] )
+		),
+		style: Object.keys( kept ).length ? kept : undefined,
+	};
+}

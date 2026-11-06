@@ -5,6 +5,8 @@ import {
 	clampCustomFontSize,
 	getFontDisplayName,
 	parseFontSizeToPx,
+	clearedTypography,
+	hasOwnTypography,
 	resolveBlockTypography,
 } from '../utils';
 
@@ -166,5 +168,80 @@ describe( 'getFontDisplayName', () => {
 			getFontDisplayName( undefined, FONT_FAMILIES )
 		).toBeUndefined();
 		expect( getFontDisplayName( '', FONT_FAMILIES ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'hasOwnTypography', () => {
+	it( 'sees what the toolbar itself can set', () => {
+		expect( hasOwnTypography( { fontSize: 'large' } ) ).toBe( true );
+		expect( hasOwnTypography( { fontFamily: 'body' } ) ).toBe( true );
+		expect( hasOwnTypography( { textColor: 'ink' } ) ).toBe( true );
+		expect( hasOwnTypography( { backgroundColor: 'clay' } ) ).toBe( true );
+		expect(
+			hasOwnTypography( { style: { typography: { fontSize: '33px' } } } )
+		).toBe( true );
+		expect(
+			hasOwnTypography( { style: { color: { text: '#1a1a1a' } } } )
+		).toBe( true );
+	} );
+
+	it( 'ignores what it cannot', () => {
+		expect( hasOwnTypography( {} ) ).toBe( false );
+		expect(
+			hasOwnTypography( {
+				style: { typography: { textAlign: 'center' } },
+			} )
+		).toBe( false );
+		expect(
+			hasOwnTypography( { style: { color: { gradient: 'a-gradient' } } } )
+		).toBe( false );
+		expect( hasOwnTypography( { content: 'Writing' } ) ).toBe( false );
+	} );
+} );
+
+describe( 'clearedTypography', () => {
+	it( 'drops the font, the size and the colours', () => {
+		expect(
+			clearedTypography( {
+				fontFamily: 'body',
+				fontSize: 'large',
+				textColor: 'ink',
+				backgroundColor: 'clay',
+			} )
+		).toEqual( {
+			fontFamily: undefined,
+			fontSize: undefined,
+			textColor: undefined,
+			backgroundColor: undefined,
+			style: undefined,
+		} );
+	} );
+
+	it( 'drops the values set as styles of their own', () => {
+		expect(
+			clearedTypography( {
+				style: {
+					typography: { fontSize: '33px', fontFamily: 'Georgia' },
+					color: { text: '#1a1a1a', background: '#fff' },
+				},
+			} ).style
+		).toBeUndefined();
+	} );
+
+	it( 'leaves alone what the toolbar did not set', () => {
+		expect(
+			clearedTypography( {
+				fontSize: 'large',
+				style: {
+					typography: { fontSize: '33px', textAlign: 'center' },
+					color: { text: '#1a1a1a', gradient: 'a-gradient' },
+					spacing: { padding: '2rem' },
+				},
+			} ).style
+		).toEqual( {
+			typography: { textAlign: 'center' },
+			color: { gradient: 'a-gradient' },
+			spacing: { padding: '2rem' },
+		} );
 	} );
 } );
