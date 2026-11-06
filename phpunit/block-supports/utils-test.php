@@ -12,18 +12,18 @@ class WP_Block_Supports_Utils_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_block_supports_classes_and_styles
 	 *
-	 * @param mixed      $block_attributes Block attributes.
-	 * @param array|null $supports         Supports to include.
-	 * @param array      $expected         Expected classes and styles.
+	 * @param array<string, mixed>|null $block_attributes Block attributes, or null to check the guard.
+	 * @param string[]|null             $supports         Supports to include.
+	 * @param array<string, string>     $expected         Expected classes and styles.
 	 */
 	public function test_get_block_supports_classes_and_styles( $block_attributes, $supports, $expected ) {
 		$this->assertSame( $expected, gutenberg_get_block_supports_classes_and_styles( $block_attributes, $supports ) );
 	}
 
 	/**
-	 * Data provider.
+	 * Data provider for {@see self::test_get_block_supports_classes_and_styles()}.
 	 *
-	 * @return array
+	 * @return array<string, array{ block_attributes: array<string, mixed>|null, supports: string[]|null, expected: array{ class?: non-empty-string, style?: non-empty-string } }>
 	 */
 	public function data_get_block_supports_classes_and_styles() {
 		$block_attributes = array(
