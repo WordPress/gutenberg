@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: store the content a conflicting document replaced as a permanent revision of the post, so it can be restored from the revisions screen ([#85876](https://github.com/WordPress/gutenberg/pull/85876)).
+
 ### Bug Fixes
 
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).

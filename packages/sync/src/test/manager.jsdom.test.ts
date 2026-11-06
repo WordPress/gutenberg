@@ -1473,4 +1473,191 @@ describe( 'SyncManager', () => {
 			expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'remote replacement', () => {
+		let capturedDoc: Y.Doc | null;
+		let onRemoteReplacement: Mock<
+			NonNullable< SyncConfig[ 'onRemoteReplacement' ] >
+		>;
+
+		function setRecordKeys( ydoc: Y.Doc, changes: Partial< ObjectData > ) {
+			const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+			Object.entries( changes ).forEach( ( [ key, value ] ) => {
+				recordMap.set( key, value );
+			} );
+		}
+
+		function getCapturedDoc(): Y.Doc {
+			if ( ! capturedDoc ) {
+				throw new Error( 'The provider did not receive a document.' );
+			}
+
+			return capturedDoc;
+		}
+
+		async function tick() {
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		}
+
+		// Build a document that shares no history with the loaded one, set
+		// the given keys in it, and sync it in. Its client ID is chosen so
+		// that Yjs keeps its values over the ones the loaded document holds.
+		async function replaceFromIndependentDoc(
+			changes: Partial< ObjectData >
+		) {
+			const ydoc = getCapturedDoc();
+			const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+			const holders = Object.keys( changes ).map(
+				( key ) => recordMap._map.get( key )?.id.client ?? 0
+			);
+
+			const remoteDoc = new Y.Doc();
+			remoteDoc.clientID = Math.max( ...holders ) + 1;
+			setRecordKeys( remoteDoc, changes );
+			Y.applyUpdateV2( ydoc, Y.encodeStateAsUpdateV2( remoteDoc ) );
+			remoteDoc.destroy();
+
+			await tick();
+		}
+
+		async function load( syncConfig: SyncConfig = mockSyncConfig ) {
+			const manager = createSyncManager();
+
+			await manager.load(
+				syncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			return manager;
+		}
+
+		function withPersistedDoc(): SyncConfig {
+			return {
+				...mockSyncConfig,
+				getPersistedCRDTDoc: vi.fn( () => {
+					const persistedDoc = new Y.Doc();
+					setRecordKeys( persistedDoc, mockRecord );
+					return serializeCrdtDoc( persistedDoc );
+				} ),
+			};
+		}
+
+		beforeEach( () => {
+			capturedDoc = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				setRecordKeys
+			);
+			onRemoteReplacement = vi.fn();
+			mockSyncConfig.onRemoteReplacement = onRemoteReplacement;
+		} );
+
+		it( 'reports the keys an independent document replaced, with the record as it was', async () => {
+			await load( withPersistedDoc() );
+
+			await replaceFromIndependentDoc( {
+				title: 'Title from an independent document',
+			} );
+
+			expect( onRemoteReplacement ).toHaveBeenCalledTimes( 1 );
+			expect( onRemoteReplacement ).toHaveBeenCalledWith( mockRecord, [
+				'title',
+			] );
+
+			// The replacement still reaches the record, after the report.
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Title from an independent document',
+			} );
+			expect(
+				onRemoteReplacement.mock.invocationCallOrder[ 0 ]
+			).toBeLessThan(
+				mockHandlers.editRecord.mock.invocationCallOrder[ 0 ]
+			);
+		} );
+
+		it( 'does not report when the document was built from the record and has no local changes', async () => {
+			await load();
+
+			await replaceFromIndependentDoc( {
+				title: 'Title from an independent document',
+			} );
+
+			expect( onRemoteReplacement ).not.toHaveBeenCalled();
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Title from an independent document',
+			} );
+		} );
+
+		it( 'reports when the document was built from the record and has local changes', async () => {
+			const manager = await load();
+
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Local title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.undoManager.stopCapturing();
+			await tick();
+
+			await replaceFromIndependentDoc( {
+				title: 'Title from an independent document',
+			} );
+
+			expect( onRemoteReplacement ).toHaveBeenCalledWith( mockRecord, [
+				'title',
+			] );
+		} );
+
+		it( 'does not report a remote edit of a key the remote document already held', async () => {
+			await load( withPersistedDoc() );
+			const ydoc = getCapturedDoc();
+
+			// A peer that shares the history sets the key on top of the
+			// value it holds.
+			const remoteDoc = new Y.Doc();
+			Y.applyUpdateV2( remoteDoc, Y.encodeStateAsUpdateV2( ydoc ) );
+			setRecordKeys( remoteDoc, { title: 'Title from a peer' } );
+			Y.applyUpdateV2( ydoc, Y.encodeStateAsUpdateV2( remoteDoc ) );
+			remoteDoc.destroy();
+			await tick();
+
+			expect( onRemoteReplacement ).not.toHaveBeenCalled();
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Title from a peer',
+			} );
+		} );
+
+		it( 'does not report a replacement that changes nothing, now or later', async () => {
+			await load( withPersistedDoc() );
+
+			await replaceFromIndependentDoc( { title: mockRecord.title } );
+
+			expect( onRemoteReplacement ).not.toHaveBeenCalled();
+
+			// The histories are shared now, so a later edit of the same key
+			// is an ordinary edit.
+			const ydoc = getCapturedDoc();
+			const remoteDoc = new Y.Doc();
+			Y.applyUpdateV2( remoteDoc, Y.encodeStateAsUpdateV2( ydoc ) );
+			setRecordKeys( remoteDoc, { title: 'Title from a peer' } );
+			Y.applyUpdateV2( ydoc, Y.encodeStateAsUpdateV2( remoteDoc ) );
+			remoteDoc.destroy();
+			await tick();
+
+			expect( onRemoteReplacement ).not.toHaveBeenCalled();
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Title from a peer',
+			} );
+		} );
+	} );
 } );
