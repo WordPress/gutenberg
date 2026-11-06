@@ -65,7 +65,7 @@ export default function AuthorView( { item }: { item: PostWithAuthor } ) {
 		return null;
 	}
 	return (
-		<Stack direction="row" align="flex-start">
+		<Stack direction="row" gap="xs" align="flex-start">
 			{ !! imageUrl && (
 				<div
 					className={ clsx( styles.avatar, {
