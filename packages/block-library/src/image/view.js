@@ -110,7 +110,7 @@ function getSlidePitch() {
  * @return {string} A CSS transform value.
  */
 function slideTransform( offset ) {
-	return `translate(calc(-50% + ${ offset }px), -50%)`;
+	return `translate(calc(var(--wp--lightbox-container-offset-x, -50%) + ${ offset }px), var(--wp--lightbox-container-offset-y, -50%))`;
 }
 
 /**
