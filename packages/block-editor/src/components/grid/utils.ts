@@ -1,5 +1,20 @@
 import type { GridInfo, GridRectOptions, GridTrack } from './types';
 
+/**
+ * Checks whether a grid item has an explicit column or row start.
+ *
+ * @param layout             Grid item placement.
+ * @param layout.columnStart The item's column start.
+ * @param layout.rowStart    The item's row start.
+ * @return Whether a column or row start is set.
+ */
+export function hasExplicitGridPlacement( layout: {
+	columnStart?: unknown;
+	rowStart?: unknown;
+} ) {
+	return layout.columnStart !== undefined || layout.rowStart !== undefined;
+}
+
 export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );
 }
