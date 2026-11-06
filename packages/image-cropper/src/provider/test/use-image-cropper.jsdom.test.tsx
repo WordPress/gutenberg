@@ -272,6 +272,24 @@ describe( 'useImageCropper', () => {
 		expect( isDirty ).toBe( false );
 	} );
 
+	it( 'keeps the same setter functions across state changes', () => {
+		// A consumer's mount effect that depends on `setResetState`, as the
+		// README shows, must run once rather than after every change.
+		const view = renderCropper();
+		const before = view.result.current.cropper;
+
+		loadImage( view );
+		act( () => before.setResetState( { rotation: 90 } ) );
+		act( () => before.setCropperState( { zoom: 2 } ) );
+
+		const after = view.result.current.cropper;
+		expect( after.cropperState.zoom ).toBe( 2 );
+		expect( after.setCropperState ).toBe( before.setCropperState );
+		expect( after.setResetState ).toBe( before.setResetState );
+		expect( after.reset ).toBe( before.reset );
+		expect( after.getCroppedImage ).toBe( before.getCroppedImage );
+	} );
+
 	it( 'returns null from getCroppedImage before an image loads', async () => {
 		const view = renderCropper();
 

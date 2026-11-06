@@ -33,6 +33,8 @@ export default function ImageCropper( {
 			controller={ controller }
 			className="image-cropper__container"
 			freeformCrop={ false }
+			// The old library showed its rule-of-thirds grid by default.
+			showGrid
 			showDimensions={ false }
 			onImageLoaded={ handleImageLoaded }
 		/>
