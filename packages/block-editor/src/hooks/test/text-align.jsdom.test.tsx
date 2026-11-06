@@ -83,32 +83,12 @@ describe( 'textAlign', () => {
 			).toBe( 'block' );
 		} );
 
-		it( 'uses the text align slot while the writing toolbar is on, so the writing tools can show it', () => {
-			expect(
-				getTextAlignControlGroup(
-					false,
-					{ viewport: 'default', pseudo: 'default' },
-					true
-				)
-			).toBe( 'text-align' );
-		} );
-
 		it( 'uses the style-state slot when responsive editing has a viewport state', () => {
 			expect(
 				getTextAlignControlGroup( true, {
 					viewport: '@mobile',
 					pseudo: 'default',
 				} )
-			).toBe( 'style-state' );
-		} );
-
-		it( 'keeps a viewport state in the style-state slot while the writing toolbar is on', () => {
-			expect(
-				getTextAlignControlGroup(
-					true,
-					{ viewport: '@mobile', pseudo: 'default' },
-					true
-				)
 			).toBe( 'style-state' );
 		} );
 	} );

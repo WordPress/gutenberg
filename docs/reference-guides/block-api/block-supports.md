@@ -1305,18 +1305,3 @@ supports: {
 	visibility: false,
 }
 ```
-
-## writing
-
--   Type: `boolean`
--   Default value: `false`
-
-This property marks the block as one you write prose in. The editor then offers it the writing toolbar: a switch at the right of the block toolbar that swaps the design tools for a text style, font and size, alongside the usual inline formatting and text alignment. Set it on a block whose point is the words in it.
-
-The inline formatting tools and text alignment belong to the writing tools, so they are no longer shown among the design tools; block alignment stays behind with them. A block without this support is still offered the switch while one of its rich text fields holds the selection, which is where its formatting tools are then found.
-
-```js
-supports: {
-	writing: true,
-}
-```

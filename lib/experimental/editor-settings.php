@@ -26,8 +26,8 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-writing-toolbar' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalWritingToolbar = true', 'before' );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-typography-toolbar' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTypographyToolbar = true', 'before' );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
 		$collaboration_enabled = ! (

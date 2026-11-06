@@ -16,7 +16,6 @@
 		}
 	},
 	"supports": {
-		"writing": true,
 		"align": [ "wide" ],
 		"anchor": true,
 		"background": {

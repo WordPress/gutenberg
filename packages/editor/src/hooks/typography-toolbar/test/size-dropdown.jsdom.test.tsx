@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import WritingSizeDropdown from '../size-dropdown';
+import TypographySizeDropdown from '../size-dropdown';
 
 const FONT_SIZES = [
 	{ slug: 'small', name: 'Small', size: '13px' },
@@ -20,11 +20,11 @@ const FLUID_FONT_SIZES = [
 
 const noop = () => {};
 
-describe( 'WritingSizeDropdown', () => {
+describe( 'TypographySizeDropdown', () => {
 	it( 'names each theme size by its number, as a word processor does', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				onSelectPreset={ noop }
 				onSetCustom={ noop }
@@ -43,7 +43,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'rounds a size the theme gives in rem to whole pixels', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ [
 					{ slug: 'medium', name: 'Medium', size: '1.38rem' },
 				] }
@@ -65,7 +65,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'falls back to the name for a size that has no number', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FLUID_FONT_SIZES }
 				onSelectPreset={ noop }
 				onSetCustom={ noop }
@@ -83,7 +83,7 @@ describe( 'WritingSizeDropdown', () => {
 
 	it( 'shows the size the block renders at when it sets none of its own', () => {
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				defaultSize="17px"
 				onSelectPreset={ noop }
@@ -98,7 +98,7 @@ describe( 'WritingSizeDropdown', () => {
 
 	it( 'prefers the size the block sets over the one it would render at', () => {
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				value="large"
 				defaultSize="17px"
@@ -114,7 +114,7 @@ describe( 'WritingSizeDropdown', () => {
 
 	it( 'shows the number of the size in use on the toolbar', () => {
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				value="medium"
 				onSelectPreset={ noop }
@@ -129,7 +129,7 @@ describe( 'WritingSizeDropdown', () => {
 
 	it( 'marks a size of your own with an asterisk', () => {
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				customSize="33px"
 				onSelectPreset={ noop }
@@ -145,7 +145,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'names the default by the size it stands for', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				defaultSize="17px"
 				onSelectPreset={ noop }
@@ -165,7 +165,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'rounds the default to whole pixels too', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				defaultSize="1.38rem"
 				onSelectPreset={ noop }
@@ -183,7 +183,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'just says default when the size it stands for has no number', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				defaultSize="clamp(2rem, 2vw, 4rem)"
 				onSelectPreset={ noop }
@@ -201,7 +201,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'offers a slider for a size of your own, as the inspector does', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				onSelectPreset={ noop }
 				onSetCustom={ noop }
@@ -219,7 +219,7 @@ describe( 'WritingSizeDropdown', () => {
 		const user = userEvent.setup();
 		const onSetCustom = vi.fn();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				onSelectPreset={ noop }
 				onSetCustom={ onSetCustom }
@@ -238,7 +238,7 @@ describe( 'WritingSizeDropdown', () => {
 	it( 'starts the slider at the size the block renders at', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				defaultSize="17px"
 				onSelectPreset={ noop }
@@ -257,7 +257,7 @@ describe( 'WritingSizeDropdown', () => {
 		const user = userEvent.setup();
 		const onSelectPreset = vi.fn();
 		render(
-			<WritingSizeDropdown
+			<TypographySizeDropdown
 				fontSizes={ FONT_SIZES }
 				onSelectPreset={ onSelectPreset }
 				onSetCustom={ noop }

@@ -17,7 +17,7 @@ import {
 } from './utils';
 
 const POPOVER_PROPS = {
-	className: 'editor-writing-toolbar__size-popover',
+	className: 'editor-typography-toolbar__size-popover',
 	placement: 'bottom-start' as const,
 };
 
@@ -50,7 +50,7 @@ function getSizeLabel( preset: FontSizePreset ): string {
  *                             undefined to follow the theme.
  * @param props.onSetCustom    Called with a size in pixels.
  */
-export default function WritingSizeDropdown( {
+export default function TypographySizeDropdown( {
 	fontSizes,
 	value,
 	customSize,
@@ -95,7 +95,7 @@ export default function WritingSizeDropdown( {
 			<ToolbarItem>
 				{ ( toggleProps ) => (
 					<DropdownMenu
-						className="editor-writing-toolbar__size"
+						className="editor-typography-toolbar__size"
 						icon={ null }
 						label={ __( 'Size' ) }
 						text={ text }
@@ -104,7 +104,7 @@ export default function WritingSizeDropdown( {
 					>
 						{ ( { onClose } ) => (
 							<>
-								<div className="editor-writing-toolbar__custom-size">
+								<div className="editor-typography-toolbar__custom-size">
 									<NumberControl
 										label={ __( 'Custom size' ) }
 										value={ customPx }

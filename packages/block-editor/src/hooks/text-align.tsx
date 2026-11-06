@@ -67,29 +67,13 @@ export function getValidTextAlignments(
 	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
 }
 
-/**
- * The block controls group the text alignment control belongs in.
- *
- * @param isResponsiveEditing Whether a viewport is being edited.
- * @param selectedState       The block style state being edited.
- * @param hasWritingToolbar   Whether the writing toolbar is enabled.
- *
- * @return The group's name.
- */
 export function getTextAlignControlGroup(
 	isResponsiveEditing: boolean,
-	selectedState: BlockStyleState | undefined,
-	hasWritingToolbar = false
+	selectedState: BlockStyleState | undefined
 ) {
-	if ( isResponsiveEditing && hasViewportBlockStyleState( selectedState ) ) {
-		return 'style-state';
-	}
-	/*
-	 * The writing tools show text alignment and the design tools do not, so it
-	 * needs a group of its own to be placed apart from the block alignment it
-	 * otherwise shares one with.
-	 */
-	return hasWritingToolbar ? 'text-align' : 'block';
+	return isResponsiveEditing && hasViewportBlockStyleState( selectedState )
+		? 'style-state'
+		: 'block';
 }
 
 function BlockEditTextAlignmentToolbarControlsPure( {
@@ -136,8 +120,7 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 		TextAlignStyle | undefined;
 	const controlsGroup = getTextAlignControlGroup(
 		isResponsiveEditing,
-		selectedState,
-		!! window.__experimentalWritingToolbar
+		selectedState
 	);
 
 	const onChange = ( newTextAlignValue?: string ) => {

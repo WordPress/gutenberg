@@ -30,9 +30,9 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-writing-toolbar',
-					'label'       => __( 'Writing toolbar', 'gutenberg' ),
-					'description' => __( 'Splits the block toolbar in two for blocks you write prose in. A switch at its right swaps the design tools for a text style, font and size, alongside the formatting tools and text alignment.', 'gutenberg' ),
+					'id'          => 'gutenberg-typography-toolbar',
+					'label'       => __( 'Typography toolbar', 'gutenberg' ),
+					'description' => __( 'Adds the font and the size to the block toolbar, for every block that offers them, so typography is a click away rather than a trip to the sidebar.', 'gutenberg' ),
 				),
 			),
 		),

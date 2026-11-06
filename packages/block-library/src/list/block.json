@@ -36,7 +36,6 @@
 		}
 	},
 	"supports": {
-		"writing": true,
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,

@@ -26,7 +26,6 @@
 		}
 	},
 	"supports": {
-		"writing": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"className": true,

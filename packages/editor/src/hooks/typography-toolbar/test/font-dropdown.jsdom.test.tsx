@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import WritingFontDropdown from '../font-dropdown';
+import TypographyFontDropdown from '../font-dropdown';
 
 const FONT_FAMILIES = [
 	{
@@ -18,10 +18,10 @@ const FONT_FAMILIES = [
 
 const noop = () => {};
 
-describe( 'WritingFontDropdown', () => {
+describe( 'TypographyFontDropdown', () => {
 	it( 'shows the font the block renders in when it sets none of its own', () => {
 		render(
-			<WritingFontDropdown
+			<TypographyFontDropdown
 				fontFamilies={ FONT_FAMILIES }
 				defaultName="Inter"
 				onChange={ noop }
@@ -35,7 +35,7 @@ describe( 'WritingFontDropdown', () => {
 
 	it( 'prefers the font the block sets over the one it would render in', () => {
 		render(
-			<WritingFontDropdown
+			<TypographyFontDropdown
 				fontFamilies={ FONT_FAMILIES }
 				value="display"
 				defaultName="Inter"
@@ -51,7 +51,7 @@ describe( 'WritingFontDropdown', () => {
 	it( 'calls the font that follows the theme the default', async () => {
 		const user = userEvent.setup();
 		render(
-			<WritingFontDropdown
+			<TypographyFontDropdown
 				fontFamilies={ FONT_FAMILIES }
 				onChange={ noop }
 			/>
@@ -70,7 +70,7 @@ describe( 'WritingFontDropdown', () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
-			<WritingFontDropdown
+			<TypographyFontDropdown
 				fontFamilies={ FONT_FAMILIES }
 				value="display"
 				onChange={ onChange }

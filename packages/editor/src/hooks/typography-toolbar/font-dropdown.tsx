@@ -9,7 +9,7 @@ import {
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 
 const POPOVER_PROPS = {
-	className: 'editor-writing-toolbar__font-popover',
+	className: 'editor-typography-toolbar__font-popover',
 	placement: 'bottom-start' as const,
 };
 
@@ -23,7 +23,7 @@ const POPOVER_PROPS = {
  * @param props.onChange     Called with the slug of the chosen font, or
  *                           undefined to follow the theme.
  */
-export default function WritingFontDropdown( {
+export default function TypographyFontDropdown( {
 	fontFamilies,
 	value,
 	defaultName,
@@ -41,7 +41,7 @@ export default function WritingFontDropdown( {
 			<ToolbarItem>
 				{ ( toggleProps ) => (
 					<DropdownMenu
-						className="editor-writing-toolbar__font"
+						className="editor-typography-toolbar__font"
 						icon={ null }
 						label={ __( 'Font' ) }
 						text={ active?.name ?? defaultName ?? __( 'Font' ) }
