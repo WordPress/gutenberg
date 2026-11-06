@@ -29,3 +29,7 @@ export { getOutputSize } from './get-output-size';
 // Map the edit onto the original image, for saving it.
 export { mapEditToOriginal } from './map-edit-to-original';
 export type { OriginalImageEdit } from './map-edit-to-original';
+
+// Export the edited image as a file, in the browser.
+export { exportImage } from './export-image';
+export type { ExportImageOptions } from './export-image';
