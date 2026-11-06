@@ -1,0 +1,452 @@
+import clsx from 'clsx';
+import type { ComponentProps, ReactNode } from 'react';
+import { Page } from '@wordpress/admin-ui';
+import { SnackbarList } from '@wordpress/components';
+import type { Field } from '@wordpress/dataviews';
+import { DataForm } from '@wordpress/dataviews';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { Button, Card, Stack, Text } from '@wordpress/ui';
+import type { SubpageStatus } from './router';
+import styles from './style.module.css';
+import { UnsavedChangesGuard } from './unsaved-changes';
+
+const SAVE_DELAY = 800;
+
+export function simulateRequest() {
+	return new Promise( ( resolve ) => setTimeout( resolve, SAVE_DELAY ) );
+}
+
+const NotifyContext = createContext< ( message: string ) => void >( () => {} );
+
+/**
+ * Confirms a save that has no other visible effect.
+ */
+export function useNotify() {
+	return useContext( NotifyContext );
+}
+
+const OverlayContainerContext = createContext< HTMLElement | null >( null );
+
+/**
+ * The element dialogs and drawers portal into, so they stay inside their
+ * example instead of covering the whole docs page.
+ */
+export function useOverlayContainer() {
+	return useContext( OverlayContainerContext );
+}
+
+/**
+ * The frame every example renders in. It hosts the snackbar list, which the
+ * Save & Submit guidance uses to confirm a successful save, and the
+ * container that overlays render into.
+ */
+export function SettingsExample( { children }: { children: ReactNode } ) {
+	const [ notices, setNotices ] = useState<
+		Array< { id: string; content: string } >
+	>( [] );
+	const [ overlayContainer, setOverlayContainer ] =
+		useState< HTMLDivElement | null >( null );
+	const noticeIdRef = useRef( 0 );
+
+	const notify = useCallback( ( message: string ) => {
+		noticeIdRef.current += 1;
+		setNotices( [
+			{ id: String( noticeIdRef.current ), content: message },
+		] );
+	}, [] );
+
+	return (
+		<NotifyContext.Provider value={ notify }>
+			<OverlayContainerContext.Provider value={ overlayContainer }>
+				<div className={ styles.example }>
+					{ children }
+					<SnackbarList
+						className={ styles.snackbars }
+						notices={ notices }
+						onRemove={ ( id ) =>
+							setNotices( ( current ) =>
+								current.filter( ( notice ) => notice.id !== id )
+							)
+						}
+					/>
+					<div
+						ref={ setOverlayContainer }
+						className={ styles.overlays }
+					/>
+				</div>
+			</OverlayContainerContext.Provider>
+		</NotifyContext.Provider>
+	);
+}
+
+/**
+ * Manual save model: edits are held in a local draft and applied together
+ * when the user saves. The saved value lives above the page, so it survives
+ * navigating between pages.
+ */
+export function useManualSave< T extends object >(
+	saved: T,
+	onSave: ( data: T ) => void,
+	message = 'Settings saved.'
+) {
+	const [ data, setData ] = useState( saved );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const notify = useNotify();
+
+	const isDirty = JSON.stringify( data ) !== JSON.stringify( saved );
+
+	const onChange = useCallback( ( edits: Partial< T > ) => {
+		setData( ( previous ) => ( { ...previous, ...edits } ) );
+	}, [] );
+
+	const save = async () => {
+		setIsSaving( true );
+		await simulateRequest();
+		onSave( data );
+		setIsSaving( false );
+		notify( message );
+	};
+
+	return { data, onChange, isDirty, isSaving, save };
+}
+
+/**
+ * The page-level Save, placed in the `Page` header actions. It is disabled
+ * while there is nothing to save and shows a busy state while saving.
+ */
+export function SaveButton( {
+	isDirty,
+	isSaving,
+	onClick,
+}: {
+	isDirty: boolean;
+	isSaving: boolean;
+	onClick: () => void;
+} ) {
+	return (
+		<Button
+			size="compact"
+			variant="solid"
+			disabled={ ! isDirty || isSaving }
+			loading={ isSaving }
+			loadingAnnouncement="Saving"
+			onClick={ onClick }
+		>
+			Save
+		</Button>
+	);
+}
+
+type PageHeaderProps = Omit<
+	ComponentProps< typeof Page >,
+	'children' | 'actions'
+>;
+
+/**
+ * A settings page (or subpage) that owns one manual-save draft, with its
+ * Save in the `Page` header actions. Render it with a `key` per location,
+ * so each page starts from its saved values, and inside a router, which the
+ * unsaved changes guard uses to hold navigation.
+ */
+export function SettingsFormPage< T extends object >( {
+	saved,
+	onSave,
+	children,
+	...pageProps
+}: PageHeaderProps & {
+	saved: T;
+	onSave: ( data: T ) => void;
+	children: ( form: {
+		data: T;
+		onChange: ( edits: Partial< T > ) => void;
+	} ) => ReactNode;
+} ) {
+	const { data, onChange, isDirty, isSaving, save } = useManualSave(
+		saved,
+		onSave
+	);
+
+	return (
+		<Page
+			showSidebarToggle={ false }
+			hasPadding
+			{ ...pageProps }
+			actions={
+				<SaveButton
+					isDirty={ isDirty }
+					isSaving={ isSaving }
+					onClick={ save }
+				/>
+			}
+		>
+			<SettingsContent>
+				{ children( { data, onChange } ) }
+			</SettingsContent>
+			<UnsavedChangesGuard isDirty={ isDirty } />
+		</Page>
+	);
+}
+
+/**
+ * Constrains settings content to a readable width. Forms stay narrow so
+ * fields don't stretch; tables need room for their columns, so they can
+ * be wide.
+ */
+export function SettingsContent( {
+	wide = false,
+	children,
+}: {
+	wide?: boolean;
+	children: ReactNode;
+} ) {
+	return (
+		<Stack
+			direction="column"
+			gap="xl"
+			className={ clsx( styles.content, wide && styles[ 'is-wide' ] ) }
+		>
+			{ children }
+		</Stack>
+	);
+}
+
+/**
+ * A group of related settings in a card.
+ */
+export function SettingsSection( {
+	title,
+	titleId,
+	description,
+	children,
+}: {
+	title: string;
+	titleId?: string;
+	description?: string;
+	children: ReactNode;
+} ) {
+	return (
+		<Card.Root>
+			<Card.Header>
+				<Stack direction="column" gap="xs">
+					<Card.Title id={ titleId } render={ <h2 /> }>
+						{ title }
+					</Card.Title>
+					{ description && (
+						<Text
+							variant="body-md"
+							className={ styles.description }
+						>
+							{ description }
+						</Text>
+					) }
+				</Stack>
+			</Card.Header>
+			<Card.Content>{ children }</Card.Content>
+		</Card.Root>
+	);
+}
+
+/**
+ * A `DataForm` with the regular layout, bound to a manual-save draft.
+ */
+export function SettingsForm< T extends object >( {
+	data,
+	fields,
+	onChange,
+}: {
+	data: T;
+	fields: Field< T >[];
+	onChange: ( edits: Partial< T > ) => void;
+} ) {
+	return (
+		<DataForm< T >
+			data={ data }
+			fields={ fields }
+			form={ {
+				layout: { type: 'regular' },
+				fields: fields.map( ( field ) => field.id ),
+			} }
+			onChange={ ( edits ) => onChange( edits as Partial< T > ) }
+		/>
+	);
+}
+
+export type GeneralSettings = {
+	storeName: string;
+	tagline: string;
+	contactEmail: string;
+	country: string;
+	guestCheckout: boolean;
+	orderNotes: boolean;
+	orderPrefix: string;
+};
+
+export const generalSettings: GeneralSettings = {
+	storeName: 'Pizza Planet',
+	tagline: 'Out of this world pizza.',
+	contactEmail: 'hello@example.com',
+	country: 'us',
+	guestCheckout: true,
+	orderNotes: false,
+	orderPrefix: 'PP-',
+};
+
+export const generalFields: Field< GeneralSettings >[] = [
+	{ id: 'storeName', label: 'Store name', type: 'text' },
+	{
+		id: 'tagline',
+		label: 'Tagline',
+		type: 'text',
+		description: 'A short description shown in search results.',
+	},
+	{ id: 'contactEmail', label: 'Contact email', type: 'email' },
+	{
+		id: 'country',
+		label: 'Country',
+		type: 'text',
+		elements: [
+			{ value: 'us', label: 'United States' },
+			{ value: 'gb', label: 'United Kingdom' },
+			{ value: 'de', label: 'Germany' },
+			{ value: 'jp', label: 'Japan' },
+		],
+	},
+];
+
+export const checkoutFields: Field< GeneralSettings >[] = [
+	{
+		id: 'guestCheckout',
+		label: 'Allow guest checkout',
+		type: 'boolean',
+		Edit: 'checkbox',
+	},
+	{
+		id: 'orderNotes',
+		label: 'Show order notes field',
+		type: 'boolean',
+		Edit: 'checkbox',
+	},
+	{
+		id: 'orderPrefix',
+		label: 'Order number prefix',
+		type: 'text',
+	},
+];
+
+export type PaymentSettings = {
+	currency: string;
+	testMode: boolean;
+	statementDescriptor: string;
+};
+
+export const paymentSettings: PaymentSettings = {
+	currency: 'usd',
+	testMode: true,
+	statementDescriptor: 'PIZZA PLANET',
+};
+
+export const paymentFields: Field< PaymentSettings >[] = [
+	{
+		id: 'currency',
+		label: 'Currency',
+		type: 'text',
+		elements: [
+			{ value: 'usd', label: 'US dollar' },
+			{ value: 'gbp', label: 'Pound sterling' },
+			{ value: 'eur', label: 'Euro' },
+			{ value: 'jpy', label: 'Japanese yen' },
+		],
+	},
+	{
+		id: 'testMode',
+		label: 'Use test mode',
+		type: 'boolean',
+		Edit: 'checkbox',
+		description: 'Process payments without charging customers.',
+	},
+	{
+		id: 'statementDescriptor',
+		label: 'Statement descriptor',
+		type: 'text',
+		description: 'Shown on customers’ bank statements.',
+	},
+];
+
+export type GatewaySettings = {
+	apiKey: string;
+	webhookSecret: string;
+	captureMode: string;
+};
+
+export const GATEWAYS = [
+	{ id: 'cards', name: 'Card payments' },
+	{ id: 'wallets', name: 'Digital wallets' },
+	{ id: 'pay-later', name: 'Buy now, pay later' },
+];
+
+export const gatewaySettings: Record< string, GatewaySettings > = {
+	cards: {
+		apiKey: 'pk_test_4eC39HqLyjWDarjtT1zdp7dc',
+		webhookSecret: '',
+		captureMode: 'automatic',
+	},
+	wallets: {
+		apiKey: 'pk_live_9fB27KdMwqZrLpX4',
+		webhookSecret: 'whsec_51Hq',
+		captureMode: 'automatic',
+	},
+	'pay-later': { apiKey: '', webhookSecret: '', captureMode: 'manual' },
+};
+
+export function gatewayStatus( { apiKey }: GatewaySettings ): SubpageStatus {
+	if ( ! apiKey ) {
+		return { label: 'Not connected', intent: 'none' };
+	}
+	return apiKey.startsWith( 'pk_test_' )
+		? { label: 'Test API key', intent: 'informational' }
+		: { label: 'Connected', intent: 'stable' };
+}
+
+export const gatewayFields: Field< GatewaySettings >[] = [
+	{ id: 'apiKey', label: 'API key', type: 'text' },
+	{ id: 'webhookSecret', label: 'Webhook secret', type: 'password' },
+	{
+		id: 'captureMode',
+		label: 'Capture payments',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'automatic', label: 'Automatically' },
+			{ value: 'manual', label: 'Manually, after review' },
+		],
+	},
+];
+
+export type EmailSettings = {
+	senderName: string;
+	senderEmail: string;
+	footerText: string;
+};
+
+export const emailSettings: EmailSettings = {
+	senderName: 'Pizza Planet',
+	senderEmail: 'orders@example.com',
+	footerText: 'Thanks for ordering from Pizza Planet.',
+};
+
+export const emailFields: Field< EmailSettings >[] = [
+	{ id: 'senderName', label: 'Sender name', type: 'text' },
+	{ id: 'senderEmail', label: 'Sender email', type: 'email' },
+	{
+		id: 'footerText',
+		label: 'Footer text',
+		type: 'text',
+		Edit: 'textarea',
+	},
+];
