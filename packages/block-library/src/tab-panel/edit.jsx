@@ -14,6 +14,7 @@ export default function Edit( { clientId, isSelected } ) {
 		blockIndex,
 		hasInnerBlocksSelected,
 		tabsClientId,
+		tabCount,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -21,6 +22,7 @@ export default function Edit( { clientId, isSelected } ) {
 				getBlockIndex,
 				hasSelectedInnerBlock,
 				getBlockAttributes,
+				getBlockCount,
 			} = select( blockEditorStore );
 
 			// Get the tab-panel parent first
@@ -44,12 +46,16 @@ export default function Edit( { clientId, isSelected } ) {
 				blockIndex: _blockIndex,
 				hasInnerBlocksSelected: _hasInnerBlocksSelected,
 				tabsClientId: _tabsClientId,
+				tabCount: getBlockCount( tabPanelsClientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+	// Fall back to the first tab when the index points past the last tab,
+	// matching the front end.
+	const activeIndex = editorActiveTabIndex ?? activeTabIndex;
+	const effectiveActiveIndex = activeIndex < tabCount ? activeIndex : 0;
 
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
