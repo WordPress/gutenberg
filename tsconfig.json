@@ -127,6 +127,7 @@
 		{ "path": "routes/template-part" },
 		{ "path": "routes/template-part-list" },
 		{ "path": "storybook" },
+		{ "path": "tools/build-scripts" },
 		{ "path": "tools/monorepo" },
 		{ "path": "tools/phpstan" },
 		{ "path": "tools/pr-meta" },
