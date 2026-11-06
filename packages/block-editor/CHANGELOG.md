@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
+
 ### Bug Fixes
 
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
