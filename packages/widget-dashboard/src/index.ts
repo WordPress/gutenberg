@@ -5,6 +5,8 @@ export type {
 	DashboardInstanceOperationRequest,
 	DashboardOperationRequest,
 	DashboardWidget,
+	DashboardWidthOption,
+	DashboardWidthValue,
 	WidgetGridSettings,
 } from './types';
 export { WIDGET_DASHBOARD_COLUMN_COUNT } from './types';

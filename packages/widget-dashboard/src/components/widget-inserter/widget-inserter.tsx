@@ -14,23 +14,38 @@ import { WidgetPicker } from '../widget-picker';
  * Modal widget inserter, mounted by the engine and shown while `inserterOpen`
  * is set in the shared UI context. Selecting widgets appends them to the
  * layout and closes the dialog.
+ *
+ * New instances start at the host's insertion default — the first listed
+ * `widthOptions` choice — so they carry an allowed width; with width
+ * choices active, the staging boundary rejects an insertion whose width
+ * is not one of them.
  */
 export function WidgetInserter() {
-	const { layout, onLayoutChange } = useDashboardInternalContext();
+	const { layout, onLayoutChange, widthOptions } =
+		useDashboardInternalContext();
 	const { inserterOpen, setInserterOpen } = useDashboardUIContext();
+
+	const insertionDefaultWidth =
+		widthOptions.kind === 'custom'
+			? widthOptions.options[ 0 ].value
+			: undefined;
 
 	const insertWidgets = useCallback(
 		( widgetTypes: WidgetType[] ) => {
 			if ( widgetTypes.length > 0 ) {
 				const newWidgets = widgetTypes.map( ( widgetType ) =>
-					createDashboardWidget( widgetType )
+					createDashboardWidget(
+						widgetType,
+						undefined,
+						insertionDefaultWidth
+					)
 				);
 				onLayoutChange( [ ...layout, ...newWidgets ] );
 			}
 
 			setInserterOpen( false );
 		},
-		[ layout, onLayoutChange, setInserterOpen ]
+		[ layout, onLayoutChange, setInserterOpen, insertionDefaultWidth ]
 	);
 
 	if ( ! inserterOpen ) {

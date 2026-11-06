@@ -50,4 +50,21 @@ describe( 'createDashboardWidget', () => {
 		const instance = createDashboardWidget( baseType );
 		expect( instance.attributes ).toBeUndefined();
 	} );
+
+	it( 'starts at the provided insertion default width', () => {
+		expect(
+			createDashboardWidget( baseType, undefined, 'full' ).placement
+		).toEqual( {
+			width: 'full',
+			height: 2,
+			order: 0,
+		} );
+		expect(
+			createDashboardWidget( baseType, undefined, 2 ).placement
+		).toEqual( {
+			width: 2,
+			height: 2,
+			order: 0,
+		} );
+	} );
 } );

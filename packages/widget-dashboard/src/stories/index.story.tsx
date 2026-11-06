@@ -37,6 +37,7 @@ import { WidgetDashboard } from '../widget-dashboard';
 import type {
 	CanPerformDashboardOperation,
 	DashboardWidget,
+	DashboardWidthOption,
 	WidgetGridModel,
 	WidgetGridSettings,
 } from '../types';
@@ -712,6 +713,95 @@ The widget only declares relevance; the fit is measured by the chrome, so the sa
 Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link (declared icon as prefix) in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the help icon in the header, that describes its attributes and what they do.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * Width choices: a two-column host that stores fixed half/full widths. The
+ * tile menu offers only the declared labels, insertions start at the first
+ * choice, and resize gestures snap to the half/full tokens.
+ */
+const WIDTH_CHOICES_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'width-half-traffic',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 1, height: 1, order: 1 },
+	},
+	{
+		uuid: 'width-full-goal',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 'full', height: 1, order: 2 },
+	},
+	{
+		uuid: 'width-half-audience',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 1, order: 3 },
+	},
+];
+
+const DEFAULT_WIDTH_OPTIONS: DashboardWidthOption[] = [
+	{ value: 1, label: 'Half width' },
+	{ value: 'full', label: 'Full width' },
+];
+
+function WidthChoicesStory( {
+	widthOptions,
+}: {
+	widthOptions: DashboardWidthOption[];
+} ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( WIDTH_CHOICES_LAYOUT );
+	const [ editMode, setEditMode ] = useState( true );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ { model: 'grid', columns: 2, rowHeight: 200 } }
+			widthOptions={ widthOptions }
+			editMode={ editMode }
+		>
+			<WidgetDashboard.Widgets />
+		</WidgetDashboard>
+	);
+}
+
+export const WidthChoices: StoryObj< {
+	widthOptions: DashboardWidthOption[];
+} > = {
+	render: ( args ) => <WidthChoicesStory { ...args } />,
+	args: {
+		widthOptions: DEFAULT_WIDTH_OPTIONS,
+	},
+	argTypes: {
+		widthOptions: {
+			control: 'object',
+			description:
+				'Widths the grid model supports, in display order. The first choice is the insertion default. Edit the array to try a `full`-only, `fill`-only, or invalid list.',
+		},
+	},
+	parameters: {
+		controls: {
+			include: [ 'widthOptions' ],
+		},
+		docs: {
+			description: {
+				story: `
+A host that supports fixed half/full widths in a two-column dashboard declares them through \`widthOptions\`. The widget options menu offers "Half width" and "Full width" instead of the native "Use available width" / "Make full width" choices, and inserted widgets start at the first choice.
+
+The width menu can switch between the two tokens even when they resolve to the same span in a narrow container, and a resize gesture snaps the tile to a declared token. The dashboard never rewrites widths that were stored before the choices existed.
 `,
 			},
 		},

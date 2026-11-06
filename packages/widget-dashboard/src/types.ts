@@ -22,6 +22,30 @@ export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
 
 /**
+ * A width token a width choice may store in a grid placement: a column
+ * span, or the named `'fill'` (the remaining columns in the row) or
+ * `'full'` (all of them).
+ */
+export type DashboardWidthValue = number | 'fill' | 'full';
+
+/**
+ * One width choice a host may list in `widthOptions`. The values are the
+ * only widths the grid model stores from the dashboard's width affordances;
+ * the first listed choice is the insertion default.
+ */
+export interface DashboardWidthOption {
+	/**
+	 * Width token to store in the placement.
+	 */
+	value: DashboardWidthValue;
+
+	/**
+	 * Label shown in the width menu. Host-translated.
+	 */
+	label: string;
+}
+
+/**
  * Storage shape for a widget's placement.
  *
  * Structurally a union of every supported per-model shape, but the
@@ -302,6 +326,35 @@ export interface WidgetDashboardProps {
 	 * their persistence.
 	 */
 	gridSettings?: WidgetGridSettings;
+
+	/**
+	 * Width choices for the `'grid'` model, as `{ value, label }` pairs
+	 * in display order. The width menu offers exactly these choices, the
+	 * first one is the width every inserted widget starts at, resize
+	 * gestures resolve and commit to choices only (a stored token is
+	 * retained — a narrow container where two choices look identical
+	 * keeps the stored token until an actual change), and the staging
+	 * layer revalidates staged widths against the list when the choices
+	 * change and at commit: a staged width outside the list is restored
+	 * to the committed width, and a staged insertion with no committed
+	 * width to restore is rejected.
+	 *
+	 * Omitting the prop keeps the current behavior everywhere: the
+	 * native "Use available width"/"Make full width" menu and whole-
+	 * column resize snapping.
+	 *
+	 * Choices apply to the `'grid'` model only — `DashboardLanes` stores
+	 * numeric widths — so a masonry dashboard ignores the prop. An
+	 * invalid list (empty, duplicate or malformed values, missing
+	 * labels) fails closed: the width menu is not offered, width changes
+	 * are denied, and insertions are rejected, rather than restoring the
+	 * unrestricted choices.
+	 *
+	 * The dashboard never rewrites the committed `layout` itself:
+	 * widths stored before this feature stay visible, and the host
+	 * validates its own stored documents and reset results.
+	 */
+	widthOptions?: readonly DashboardWidthOption[];
 
 	children?: ReactNode;
 }
