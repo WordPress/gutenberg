@@ -8,6 +8,18 @@
 	border-bottom: none;
 }
 
+// An empty <hr> has no intrinsic width, so it collapses to zero inside flex
+// layouts. See https://github.com/WordPress/gutenberg/issues/47993.
+// Stretch inside a Stack, like in a regular Group.
+:where(.is-layout-flex.is-vertical) > .wp-block-separator {
+	align-self: stretch;
+}
+
+// Fill the free space inside a Row.
+:where(.is-layout-flex:not(.is-vertical)) > .wp-block-separator {
+	flex-grow: 1;
+}
+
 // Dots block style variation
 :root :where(.wp-block-separator.is-style-dots) {
 	text-align: center;
