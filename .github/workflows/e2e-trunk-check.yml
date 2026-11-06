@@ -68,6 +68,8 @@ jobs:
 
             - name: Npm build
               run: npm run build
+              env:
+                  WP_BUILD_CONCURRENCY: 4
 
             - name: Install Playwright dependencies
               uses: ./.github/setup-playwright

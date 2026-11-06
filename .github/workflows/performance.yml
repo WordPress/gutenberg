@@ -201,6 +201,8 @@ jobs:
             - name: Build
               if: steps.reused.outputs.ok != 'true'
               run: npm run build -- --skip-types || npm run build
+              env:
+                  WP_BUILD_CONCURRENCY: 4
 
             # The list comes from tools/release/plugin-files.mts on the tested commit, so older refs
             # are packaged the same way. They may lack some of the files.
