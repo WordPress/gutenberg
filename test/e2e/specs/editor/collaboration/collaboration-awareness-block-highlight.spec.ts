@@ -5,9 +5,28 @@ import type {
 } from '@wordpress/e2e-test-utils-playwright';
 import { test, expect } from './fixtures';
 import type CollaborationUtils from './fixtures/collaboration-utils';
+import {
+	SECOND_USER,
+	type UserCredentials,
+} from './fixtures/collaboration-utils';
 
 const PARAGRAPH_A = 'Paragraph where User A is working';
 const PARAGRAPH_B = 'Paragraph where User B is working';
+
+// A paragraph much taller than the editor canvas, so its last line and its
+// top-left corner can never be on screen together.
+const TALL_PARAGRAPH = 'A long line of text that fills the paragraph. '.repeat(
+	200
+);
+
+const THIRD_USER: UserCredentials = {
+	username: 'collaborator-three',
+	email: 'collaborator-three@example.com',
+	firstName: 'Third',
+	lastName: 'Collaborator',
+	password: 'password',
+	roles: [ 'editor' ],
+};
 
 /**
  * Opens a session with two paragraphs and leaves User A's caret in the first
@@ -71,19 +90,83 @@ async function openSessionWithUserAInFirstParagraph(
 }
 
 /**
+ * Opens a session with two paragraphs that the admin watches with the block
+ * outline preference on, while two more sessions join as collaborators. The
+ * collaborators' carets are left for each test to place.
+ *
+ * @param collaborationUtils - The collaboration fixture.
+ * @param requestUtils       - The request fixture, used to seed the post.
+ * @param editor             - The watching admin's editor.
+ * @param page               - The watching admin's page.
+ * @param title              - Draft title, so a failure names the case.
+ * @param laterUser          - Who joins last, after the second user. Pass
+ *                           the second user again to open the post in a
+ *                           second tab of the same person.
+ */
+async function openSessionWithTwoCollaborators(
+	collaborationUtils: CollaborationUtils,
+	requestUtils: RequestUtils,
+	editor: Editor,
+	page: Page,
+	title: string,
+	laterUser: UserCredentials
+) {
+	const post = await requestUtils.createPost( {
+		title,
+		status: 'draft',
+		date_gmt: new Date().toISOString(),
+	} );
+	await collaborationUtils.openPost( post.id );
+	const earlier = await collaborationUtils.joinUser( post.id, SECOND_USER );
+	const later = await collaborationUtils.joinUser( post.id, laterUser );
+
+	await setBlockHighlight( page, true );
+
+	// Dock the block toolbars at the top so the floating popover doesn't
+	// sit over a paragraph and swallow the clicks below.
+	await editor.setIsFixedToolbar( true );
+	await earlier.editor.setIsFixedToolbar( true );
+	await later.editor.setIsFixedToolbar( true );
+
+	await editor.insertBlock( {
+		name: 'core/paragraph',
+		attributes: { content: PARAGRAPH_A },
+	} );
+	await editor.insertBlock( {
+		name: 'core/paragraph',
+		attributes: { content: PARAGRAPH_B },
+	} );
+
+	for ( const collaborator of [ earlier, later ] ) {
+		await expect
+			.poll( () => collaborator.editor.getBlocks(), { timeout: 8000 } )
+			.toMatchObject( [
+				{ attributes: { content: PARAGRAPH_A } },
+				{ attributes: { content: PARAGRAPH_B } },
+			] );
+	}
+
+	return { earlier, later, ...overlayLocators( page ) };
+}
+
+/**
  * The overlay pieces a user sees for their collaborators.
  *
  * @param page - The page of the user looking at the overlay.
  */
 function overlayLocators( page: Page ) {
 	const frame = page.frameLocator( 'iframe[name="editor-canvas"]' );
+	// The canvas holds more than one copy of the overlay, each drawing the
+	// same avatars and carets. Look inside one, so a count is a count of
+	// collaborators.
+	const overlay = frame.locator( '.collaborators-overlay-full' ).first();
 	return {
 		outlinedBlocks: frame.locator(
 			'.block-editor-block-list__block.is-collaborator-selected'
 		),
-		blockAvatars: frame.locator( '.collaborators-overlay-block-label' ),
-		caretAvatars: frame.locator( '.collaborators-overlay-user-label' ),
-		carets: frame.locator( '.collaborators-overlay-user-cursor' ),
+		blockAvatars: overlay.locator( '.collaborators-overlay-block-label' ),
+		caretAvatars: overlay.locator( '.collaborators-overlay-user-label' ),
+		carets: overlay.locator( '.collaborators-overlay-user-cursor' ),
 	};
 }
 
@@ -224,5 +307,140 @@ test.describe( 'Collaboration - Awareness Block Highlight', () => {
 		await expect( outlinedBlocks ).toHaveCount( 0 );
 		await expect( blockAvatars ).toHaveCount( 0 );
 		await expect( caretAvatars.first() ).toBeVisible();
+	} );
+
+	test( 'stacks the avatars of collaborators working in the same block, first to join first', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		await requestUtils.createUser( THIRD_USER );
+		const { earlier, later, outlinedBlocks, blockAvatars, caretAvatars } =
+			await openSessionWithTwoCollaborators(
+				collaborationUtils,
+				requestUtils,
+				editor,
+				page,
+				'Block highlight with a shared block',
+				THIRD_USER
+			);
+
+		// The collaborator who joined last gets to the paragraph first.
+		for ( const collaborator of [ later, earlier ] ) {
+			await collaborator.editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+				.click();
+		}
+
+		// One outline, and above it both avatars in the order they joined
+		// the session. Neither caret carries an avatar.
+		await expect( blockAvatars ).toHaveText(
+			[ 'Test Collaborator', 'Third Collaborator' ],
+			{ timeout: 15000 }
+		);
+		await expect( outlinedBlocks ).toHaveCount( 1 );
+		await expect( outlinedBlocks.first() ).toContainText( PARAGRAPH_A );
+		await expect( caretAvatars ).toHaveCount( 0 );
+	} );
+
+	test( 'keeps a name on both blocks when the same collaborator has the post open in two tabs', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		const {
+			earlier,
+			later,
+			outlinedBlocks,
+			blockAvatars,
+			caretAvatars,
+			carets,
+		} = await openSessionWithTwoCollaborators(
+			collaborationUtils,
+			requestUtils,
+			editor,
+			page,
+			'Block highlight with two tabs of one user',
+			SECOND_USER
+		);
+
+		// Each tab parks a caret in its own paragraph.
+		await earlier.editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await later.editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.nth( 1 )
+			.click();
+
+		await expect( outlinedBlocks ).toHaveCount( 2, { timeout: 15000 } );
+		await expect( carets ).toHaveCount( 2 );
+
+		// A person gets one avatar above a block, so the second tab keeps
+		// its avatar on the caret instead of going without a name.
+		await expect( blockAvatars ).toHaveText( [ 'Test Collaborator' ] );
+		await expect( caretAvatars ).toHaveText( [ 'Test Collaborator' ] );
+	} );
+
+	test( "scrolls to the collaborator's caret from the collaborators list", async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Block highlight jump to caret',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { page2, editor2 } = collaborationUtils;
+
+		await setBlockHighlight( page, true );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: TALL_PARAGRAPH },
+		} );
+		await expect
+			.poll( () => editor2.getBlocks(), { timeout: 8000 } )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The collaborator parks a caret at the very end of the paragraph,
+		// far below the avatar that sits above the paragraph's first line.
+		// The caret is placed in one step, not with a click followed by a
+		// move: the watcher would briefly draw the caret where the click
+		// landed, and the jump below could go there instead.
+		await page2.evaluate( ( offset ) => {
+			const { getBlockOrder } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.selectionChange(
+					getBlockOrder()[ 0 ],
+					'content',
+					offset,
+					offset
+				);
+		}, TALL_PARAGRAPH.length );
+
+		const { blockAvatars, carets } = overlayLocators( page );
+		await expect( blockAvatars ).toHaveCount( 1, { timeout: 15000 } );
+		await expect( carets ).toHaveCount( 1 );
+		await expect( carets ).not.toBeInViewport();
+
+		await page
+			.getByRole( 'button', { name: /Collaborators list/ } )
+			.click();
+		await page.getByRole( 'button', { name: /Test Collaborator/ } ).click();
+
+		// The canvas scrolls to where the collaborator is typing, not to
+		// their avatar at the top of the block.
+		await expect( carets ).toBeInViewport();
+		await expect( blockAvatars ).not.toBeInViewport();
 	} );
 } );
