@@ -50,6 +50,31 @@ function gutenberg_get_allowed_svg_icon_tags() {
 		'y1'                  => true,
 		'x2'                  => true,
 		'y2'                  => true,
+		'clip-path'           => true,
+		'mask'                => true,
+		'filter'              => true,
+		'stroke-dasharray'    => true,
+		'stroke-dashoffset'   => true,
+		'stroke-miterlimit'   => true,
+		'stroke-opacity'      => true,
+		'clippathunits'       => true,
+		'maskunits'           => true,
+		'maskcontentunits'    => true,
+		'filterunits'         => true,
+		'spreadmethod'        => true,
+		'fx'                  => true,
+		'fy'                  => true,
+		'stddeviation'        => true,
+		'in'                  => true,
+		'in2'                 => true,
+		'result'              => true,
+		'mode'                => true,
+		'values'              => true,
+		'operator'            => true,
+		'flood-color'         => true,
+		'flood-opacity'       => true,
+		'dx'                  => true,
+		'dy'                  => true,
 	);
 
 	$allowed_tags = array(
@@ -99,23 +124,32 @@ function gutenberg_get_allowed_svg_icon_tags() {
  * @return string Sanitized SVG content.
  */
 function gutenberg_sanitize_svg_icon( $svg_content ) {
+	// Remove markup that wp_kses() would keep, or would turn into stray text.
+	$svg_element = preg_replace(
+		array(
+			'/<\?xml.*?\?>/is',
+			'/<!--.*?(?:-->|$)/s',
+			'/<!DOCTYPE[^>\[]*(?:\[.*?\]\s*)?>/is',
+			'#<(script|style)\b.*?(?:</\1\s*>|$)#is',
+		),
+		'',
+		$svg_content
+	);
+
 	$svg_element = wp_kses(
-		$svg_content,
+		$svg_element,
 		gutenberg_get_allowed_svg_icon_tags()
 	);
 
 	// wp_kses() lowercases names, but SVG names are case-sensitive.
 	$svg_elements   = array( 'linearGradient', 'radialGradient', 'clipPath', 'feGaussianBlur', 'feColorMatrix', 'feBlend', 'feComposite', 'feFlood', 'feMerge', 'feMergeNode', 'feOffset', 'feImage' );
-	$svg_attributes = array( 'viewBox', 'preserveAspectRatio', 'gradientUnits', 'gradientTransform' );
+	$svg_attributes = array( 'viewBox', 'preserveAspectRatio', 'gradientUnits', 'gradientTransform', 'clipPathUnits', 'maskUnits', 'maskContentUnits', 'filterUnits', 'spreadMethod', 'stdDeviation' );
 	foreach ( $svg_elements as $name ) {
 		$svg_element = preg_replace( '#(</?)' . strtolower( $name ) . '(?=[\s/>])#', '$1' . $name, $svg_element );
 	}
 	foreach ( $svg_attributes as $name ) {
 		$svg_element = preg_replace( '/(\s)' . strtolower( $name ) . '(?==")/', '$1' . $name, $svg_element );
 	}
-
-	// Remove XML declaration if present.
-	$svg_element = preg_replace( '/^<\?xml[^>]*\?>\s*/', '', $svg_element );
 
 	return trim( $svg_element );
 }
@@ -137,6 +171,9 @@ function gutenberg_resolve_block_icon_path( $metadata ) {
 	}
 
 	$resolve_svg_path = function ( $path ) use ( $metadata ) {
+		if ( ! is_string( $path ) ) {
+			return $path;
+		}
 		$resolved_path = remove_block_asset_path_prefix( $path );
 		if ( $resolved_path === $path ) {
 			return $path;
@@ -144,7 +181,7 @@ function gutenberg_resolve_block_icon_path( $metadata ) {
 		$full_path = wp_normalize_path(
 			realpath( dirname( $metadata['file'] ) . '/' . $resolved_path )
 		);
-		if ( ! $full_path || ! file_exists( $full_path ) ) {
+		if ( ! $full_path || ! is_file( $full_path ) ) {
 			_doing_it_wrong(
 				'gutenberg_resolve_block_icon_path',
 				sprintf(
@@ -156,8 +193,20 @@ function gutenberg_resolve_block_icon_path( $metadata ) {
 			);
 			return $path;
 		}
-		$svg_content = file_get_contents( $full_path );
-		return gutenberg_sanitize_svg_icon( $svg_content );
+		$svg_element = gutenberg_sanitize_svg_icon( (string) file_get_contents( $full_path ) );
+		if ( ! str_starts_with( $svg_element, '<svg' ) ) {
+			_doing_it_wrong(
+				'gutenberg_resolve_block_icon_path',
+				sprintf(
+					/* translators: %s: path to the icon file */
+					__( 'Icon file is not a valid SVG: %s', 'gutenberg' ),
+					$resolved_path
+				),
+				'7.3.0'
+			);
+			return $path;
+		}
+		return $svg_element;
 	};
 
 	if ( is_string( $metadata['icon'] ) ) {

@@ -18,7 +18,7 @@ class Block_Json_Icon_Filename_Test extends WP_UnitTestCase {
 	public function tear_down() {
 		$registry = WP_Block_Type_Registry::get_instance();
 
-		foreach ( array( 'my-plugin/icon-file', 'my-plugin/icon-object', 'my-plugin/icon-missing', 'my-plugin/notice' ) as $block_name ) {
+		foreach ( array( 'my-plugin/icon-file', 'my-plugin/icon-object', 'my-plugin/icon-missing', 'my-plugin/icon-invalid', 'my-plugin/notice' ) as $block_name ) {
 			if ( $registry->is_registered( $block_name ) ) {
 				$registry->unregister( $block_name );
 			}
@@ -94,5 +94,59 @@ class Block_Json_Icon_Filename_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'gradientUnits="userSpaceOnUse"', $icon, 'The gradientUnits attribute lost its case.' );
 		$this->assertStringNotContainsString( 'onload', $icon, 'The event handler was not removed.' );
 		$this->assertStringNotContainsString( '<script', $icon, 'The script element was not removed.' );
+	}
+	/**
+	 * Tests that comments, doctypes and the contents of script and style elements are removed.
+	 *
+	 * @covers ::gutenberg_sanitize_svg_icon
+	 */
+	public function test_sanitized_icon_removes_non_svg_markup() {
+		$icon = gutenberg_sanitize_svg_icon( '<?xml version="1.0"?><!-- Generator --><!DOCTYPE svg [<!ENTITY a "b">]><svg viewBox="0 0 8 8"><style>.a{fill:red}</style><script>x()</script><path d="M0 0" /></svg>' );
+
+		$this->assertStringStartsWith( '<svg', $icon, 'The icon does not start with the svg element.' );
+		$this->assertStringNotContainsString( 'Generator', $icon, 'The comment was not removed.' );
+		$this->assertStringNotContainsString( 'fill:red', $icon, 'The style contents were not removed.' );
+		$this->assertStringNotContainsString( 'x()', $icon, 'The script contents were not removed.' );
+	}
+
+	/**
+	 * Tests that common presentation attributes survive sanitizing.
+	 *
+	 * @covers ::gutenberg_sanitize_svg_icon
+	 */
+	public function test_sanitized_icon_keeps_presentation_attributes() {
+		$icon = gutenberg_sanitize_svg_icon( '<svg><g clip-path="url(#a)"><path d="M0 0" stroke-dasharray="2" stroke-miterlimit="10" /></g><filter id="f"><feGaussianBlur stdDeviation="1" /></filter></svg>' );
+
+		$this->assertStringContainsString( 'clip-path="url(#a)"', $icon, 'The clip-path attribute was removed.' );
+		$this->assertStringContainsString( 'stroke-dasharray="2"', $icon, 'The stroke-dasharray attribute was removed.' );
+		$this->assertStringContainsString( 'stroke-miterlimit="10"', $icon, 'The stroke-miterlimit attribute was removed.' );
+		$this->assertStringContainsString( 'stdDeviation="1"', $icon, 'The stdDeviation attribute was removed or lost its case.' );
+	}
+
+	/**
+	 * Tests that a `file:` icon pointing at a file that is not an SVG is left alone.
+	 *
+	 * @covers ::gutenberg_resolve_block_icon_path
+	 * @expectedIncorrectUsage gutenberg_resolve_block_icon_path
+	 */
+	public function test_invalid_icon_file_is_left_untouched() {
+		$result = register_block_type_from_metadata( GUTENBERG_DIR_TESTFIXTURES . 'icon-invalid' );
+
+		$this->assertInstanceOf( 'WP_Block_Type', $result, 'The block was not registered' );
+		$this->assertSame( 'file:./icon.svg', $result->icon, 'The invalid icon was modified.' );
+	}
+
+	/**
+	 * Tests that an object icon whose src is not a string is left alone.
+	 *
+	 * @covers ::gutenberg_resolve_block_icon_path
+	 */
+	public function test_non_string_icon_src_is_left_untouched() {
+		$metadata = array(
+			'file' => __FILE__,
+			'icon' => array( 'src' => array( 'invalid' ) ),
+		);
+
+		$this->assertSame( $metadata, gutenberg_resolve_block_icon_path( $metadata ) );
 	}
 }

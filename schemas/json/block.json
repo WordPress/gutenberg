@@ -106,9 +106,7 @@
 							"type": "string"
 						}
 					},
-					"required": [
-						"src"
-					],
+					"required": [ "src" ],
 					"additionalProperties": false
 				}
 			]
@@ -1078,8 +1076,37 @@
 								]
 							},
 							"icon": {
-								"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
-								"$ref": "#/properties/icon"
+								"description": "An icon helping to visualize the variation. It can be a Dashicon slug, or an object with src, background, foreground and shadowColor properties. The file: prefix is not supported here.",
+								"oneOf": [
+									{
+										"type": "string",
+										"pattern": "^(?!file:)"
+									},
+									{
+										"type": "object",
+										"properties": {
+											"src": {
+												"description": "The icon source, as a Dashicon slug.",
+												"type": "string",
+												"pattern": "^(?!file:)"
+											},
+											"background": {
+												"description": "The background color for the icon.",
+												"type": "string"
+											},
+											"foreground": {
+												"description": "The foreground color for the icon.",
+												"type": "string"
+											},
+											"shadowColor": {
+												"description": "The shadow color for the icon.",
+												"type": "string"
+											}
+										},
+										"required": [ "src" ],
+										"additionalProperties": false
+									}
+								]
 							},
 							"isDefault": {
 								"description": "Indicates whether the current variation is the default one.",

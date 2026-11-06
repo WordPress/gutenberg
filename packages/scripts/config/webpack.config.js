@@ -375,9 +375,14 @@ const scriptConfig = {
 										iconPath.replace( 'file:', '' )
 									);
 									if ( existsSync( resolved ) ) {
-										return sanitizeSvgContent(
+										const svg = sanitizeSvgContent(
 											readFileSync( resolved, 'utf8' )
 										);
+										// Leave a file that isn't an SVG for the
+										// server to report at registration.
+										if ( svg.startsWith( '<svg' ) ) {
+											return svg;
+										}
 									}
 								}
 								return iconPath;
@@ -385,20 +390,26 @@ const scriptConfig = {
 
 							/**
 							 * Sanitize SVG content to remove dangerous elements.
-							 * Strips scripts, event handlers, and javascript: URLs.
+							 * Strips the XML prolog, comments, doctypes, scripts,
+							 * styles, event handlers, and javascript: URLs.
 							 *
 							 * @param {string} svg Raw SVG content.
 							 * @return {string} Sanitized SVG content.
 							 */
 							const sanitizeSvgContent = ( svg ) => {
 								return svg
-									.replace( /<\?xml[^>]*\?>\s*/gi, '' )
+									.replace( /<\?xml[\s\S]*?\?>/gi, '' )
+									.replace( /<!--[\s\S]*?-->/g, '' )
 									.replace(
-										/<script[\s\S]*?<\/script>/gi,
+										/<!DOCTYPE[^>[]*(?:\[[\s\S]*?\]\s*)?>/gi,
 										''
 									)
 									.replace(
-										/\s+on\w+\s*=\s*["'][^"']*["']/gi,
+										/<(script|style)\b[\s\S]*?<\/\1\s*>/gi,
+										''
+									)
+									.replace(
+										/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi,
 										''
 									)
 									.replace(
