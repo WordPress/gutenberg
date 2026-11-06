@@ -13,6 +13,7 @@ export { ItemLabel } from './item-label';
 export { List } from './list';
 export { ListBody } from './list-body';
 export { ListFooter } from './list-footer';
+export { LoadingIndicator } from './loading-indicator';
 export { Portal } from './portal';
 export { Positioner } from './positioner';
 export { Popup } from './popup';
