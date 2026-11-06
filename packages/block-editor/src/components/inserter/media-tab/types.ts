@@ -14,7 +14,16 @@ export type MediaType = InserterMediaCategory[ 'mediaType' ];
  * `subscribe` — which are private and typed where they are consumed, in
  * `use-attachment-actions`.
  */
-export type MediaCategory = InserterMediaCategory & { label: string };
+export type MediaCategory = InserterMediaCategory & {
+	label: string;
+	/**
+	 * Whether the source's items can be filed into media folders. Private to
+	 * core's attachment-backed categories, and only set while the media
+	 * folders experiment is on. Read by both the tab and the panel, hence here
+	 * rather than at one point of use.
+	 */
+	supportsFolders?: boolean;
+};
 
 /**
  * An `InserterMediaItem` (see the `registerInserterMediaCategory` typedef in
@@ -45,6 +54,12 @@ export interface MediaCategoryPanelProps {
 	onChangeMediaType?: ( mediaType: MediaType ) => void;
 	/** Rendered beside the search input. */
 	sourceMenu?: import( 'react' ).ReactNode;
+	/** The folder to filter by, when one is selected. */
+	folder?: number;
+	/** The folders available, for the per-item "Add to folder" action. */
+	folders?: import( './folder-select' ).MediaFolder[];
+	/** Rendered beneath the search input. */
+	folderControl?: import( 'react' ).ReactNode;
 	/** Rendered beneath the pager. */
 	footer?: import( 'react' ).ReactNode;
 }

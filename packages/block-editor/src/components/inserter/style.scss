@@ -486,6 +486,24 @@ $media-grid-loading-min-height: 500px;
 		}
 	}
 
+	// The folder filter beneath the search: the dropdown takes the width, with
+	// the "New folder" button beside it.
+	.block-editor-inserter__media-grid__filters {
+		flex-shrink: 0;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+
+		// As with the search above, a tab bar below supplies its own
+		// separation.
+		&:has(+ .block-editor-inserter__media-grid__tabs) {
+			padding-bottom: 0;
+		}
+
+		.block-editor-inserter__media-folder-select {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
 	.block-editor-inserter__media-grid__tabs {
 		display: flex;
 		flex-direction: column;

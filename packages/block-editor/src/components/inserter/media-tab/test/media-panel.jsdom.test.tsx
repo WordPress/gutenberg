@@ -31,7 +31,9 @@ vi.mock( import( '../hooks' ), () => ( {
 } ) );
 
 // Replace the grid with a marker that reports the actions it was given and
-// lets tests drive its search and paging callbacks.
+// lets tests drive its search and paging callbacks. The folder control and the
+// footer render through so their own controls can be exercised; the empty state
+// only when there is nothing to show, as `DataViews` does.
 vi.mock( import( '../media-grid' ), () => ( {
 	__esModule: true,
 	default: ( {
@@ -39,6 +41,9 @@ vi.mock( import( '../media-grid' ), () => ( {
 		onChangeSearch,
 		onChangePage,
 		page,
+		mediaList,
+		folderControl,
+		empty,
 		footer,
 		isLoading,
 	} ) => (
@@ -50,6 +55,8 @@ vi.mock( import( '../media-grid' ), () => ( {
 		>
 			<button onClick={ () => onChangeSearch( 'sunset' ) }>search</button>
 			<button onClick={ () => onChangePage( 2 ) }>next page</button>
+			{ folderControl }
+			{ ! mediaList.length && empty }
 			{ footer }
 		</div>
 	),
@@ -79,10 +86,18 @@ const baseCategory = {
 // A stub category, with what each test adds to the base one.
 type StubCategory = typeof baseCategory & Record< string, unknown >;
 
-// The search term lives above the panel (in `MediaTab`), so the harness
-// owns it here the same way.
-function PanelHarness( { category }: { category: StubCategory } ) {
+// The search term and the folder both live above the panel (in `MediaTab`), so
+// the harness owns them here the same way. The folder control is whatever the
+// tab passes down, so the harness stands in for it with a button.
+function PanelHarness( {
+	category,
+	folders,
+}: {
+	category: StubCategory;
+	folders?: { id: number; name: string }[];
+} ) {
 	const [ search, setSearch ] = useState( '' );
+	const [ folder, setFolder ] = useState< number | undefined >();
 	return (
 		<MediaCategoryPanel
 			onInsert={ vi.fn() }
@@ -92,12 +107,24 @@ function PanelHarness( { category }: { category: StubCategory } ) {
 			mediaType={ category.mediaType as MediaCategory[ 'mediaType' ] }
 			search={ search }
 			onChangeSearch={ setSearch }
+			folder={ folder }
+			folders={ folders }
+			folderControl={
+				folders && (
+					<button onClick={ () => setFolder( 7 ) }>
+						choose Holiday
+					</button>
+				)
+			}
 		/>
 	);
 }
 
-function renderPanel( category: StubCategory ) {
-	return render( <PanelHarness category={ category } /> );
+function renderPanel(
+	category: StubCategory,
+	folders?: { id: number; name: string }[]
+) {
+	return render( <PanelHarness category={ category } folders={ folders } /> );
 }
 
 const getGridActions = () =>
@@ -326,5 +353,111 @@ describe( 'MediaCategoryPanel page sizing', () => {
 		expect( lastQuery() ).toEqual(
 			expect.objectContaining( { per_page: 14 } )
 		);
+	} );
+} );
+
+describe( 'MediaCategoryPanel media folders', () => {
+	// The panel has rendered, so the hook was called.
+	const lastQuery = () => useMediaResults.mock.lastCall![ 1 ];
+
+	const folders = [
+		{ id: 7, name: 'Holiday' },
+		{ id: 8, name: 'Product shots' },
+	];
+	const folderCategory = {
+		...baseCategory,
+		supportsFolders: true,
+		assignToFolder: vi.fn(),
+		removeFromFolder: vi.fn(),
+	};
+
+	it( 'ignores the folder when the source does not support them', () => {
+		// The tab withholds the folders from such a source, but the selection
+		// itself is shared, so a stale one must not narrow the query.
+		renderPanel( baseCategory, folders );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { folder: undefined } )
+		);
+		expect( getGridActions() ).toBe( 'detach' );
+	} );
+
+	it( 'filters by the chosen folder from the first page', async () => {
+		const user = userEvent.setup();
+		renderPanel( folderCategory, folders );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { folder: undefined } )
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'next page' } ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { page: 1, folder: 7 } )
+		);
+	} );
+
+	it( 'swaps the footer action for the folder being browsed', async () => {
+		const user = userEvent.setup();
+		renderPanel( folderCategory, folders );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Attach images' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Add to folder' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Attach images' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'offers "Add to folder" everywhere and "Remove from folder" inside a folder', async () => {
+		const user = userEvent.setup();
+		renderPanel( folderCategory, folders );
+
+		expect( getGridActions() ).toBe( 'detach,add-to-folder' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+
+		expect( getGridActions() ).toBe(
+			'detach,add-to-folder,remove-from-folder'
+		);
+	} );
+
+	it( 'offers no folder actions when there are no folders yet', () => {
+		// The control still renders, since it carries the means to create one.
+		renderPanel( folderCategory, [] );
+
+		expect( getGridActions() ).toBe( 'detach' );
+		expect(
+			screen.queryByRole( 'button', { name: 'Add to folder' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'says the folder is empty rather than that nothing was found', async () => {
+		const user = userEvent.setup();
+		useMediaResults.mockReturnValue( { mediaList: [], isLoading: false } );
+		renderPanel( folderCategory, folders );
+
+		expect( screen.getByText( 'No results found.' ) ).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'choose Holiday' } )
+		);
+
+		expect(
+			screen.getByText( 'This folder is empty.' )
+		).toBeInTheDocument();
 	} );
 } );

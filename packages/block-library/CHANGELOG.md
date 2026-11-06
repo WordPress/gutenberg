@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Gallery: Behind the `gutenberg-media-folders` experiment, add `core/media-folder` as a dynamic source, so a gallery can display the images in a media folder ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
