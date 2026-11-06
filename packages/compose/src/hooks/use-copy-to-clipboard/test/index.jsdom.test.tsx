@@ -7,6 +7,7 @@ interface TestComponentProps {
 	text: string | ( () => string );
 	onSuccess?: () => void;
 	onError?: () => void;
+	isDisabled?: boolean;
 }
 
 describe( 'useCopyToClipboard', () => {
@@ -14,9 +15,14 @@ describe( 'useCopyToClipboard', () => {
 		text,
 		onSuccess,
 		onError,
+		isDisabled,
 	}: TestComponentProps ) => {
 		const ref = useCopyToClipboard( text, onSuccess, onError );
-		return <button ref={ ref }>Copy</button>;
+		return (
+			<button ref={ ref } aria-disabled={ isDisabled }>
+				Copy
+			</button>
+		);
 	};
 
 	it( 'should copy text on click', async () => {
@@ -31,6 +37,31 @@ describe( 'useCopyToClipboard', () => {
 
 		expect( writeTextMock ).toHaveBeenCalledTimes( 1 );
 		expect( writeTextMock ).toHaveBeenCalledWith( 'test text' );
+	} );
+
+	it( 'should not copy when the element has aria-disabled', async () => {
+		const user = userEvent.setup();
+		const onSuccess = vi.fn();
+		const onError = vi.fn();
+		render(
+			<TestComponent
+				text="test text"
+				onSuccess={ onSuccess }
+				onError={ onError }
+				isDisabled
+			/>
+		);
+
+		const writeTextMock = vi
+			.spyOn( navigator.clipboard, 'writeText' )
+			.mockClear()
+			.mockResolvedValue();
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( writeTextMock ).not.toHaveBeenCalled();
+		expect( onSuccess ).not.toHaveBeenCalled();
+		expect( onError ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call onSuccess when copy succeeds', async () => {
