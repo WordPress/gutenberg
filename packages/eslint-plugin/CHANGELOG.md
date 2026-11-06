@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui` ([#86352](https://github.com/WordPress/gutenberg/pull/86352)).
+-   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
+
 ## 28.1.0 (2026-11-04)
 
 ### Enhancements
