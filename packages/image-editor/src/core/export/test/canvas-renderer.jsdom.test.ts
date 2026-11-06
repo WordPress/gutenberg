@@ -648,7 +648,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		expect( Math.sign( b ) ).not.toBe( Math.sign( c ) );
 	} );
 
-	it( 'zoom 2x should double the scale components', () => {
+	it( 'zoom 2x halves the output size and keeps a 1:1 pixel scale', () => {
 		setupMockCanvas();
 
 		// Render at zoom=1.
@@ -663,8 +663,13 @@ describe( 'renderToCanvas — export matrix verification', () => {
 			naturalWidth: 800,
 			naturalHeight: 600,
 		} as HTMLImageElement;
-		renderToCanvas( mockImage, stateZ1 );
+		const { width: widthZ1, height: heightZ1 } = renderToCanvas(
+			mockImage,
+			stateZ1
+		);
 		const [ a1, , , d1 ] = mockCtx.setTransform.mock.calls[ 0 ];
+		expect( widthZ1 ).toBe( 800 );
+		expect( heightZ1 ).toBe( 600 );
 
 		// Reset for zoom=2.
 		vi.restoreAllMocks();
@@ -676,12 +681,47 @@ describe( 'renderToCanvas — export matrix verification', () => {
 			pan: { x: 0, y: 0 },
 			cropRect: { x: 0, y: 0, width: 1, height: 1 },
 		} );
-		renderToCanvas( mockImage, stateZ2 );
+		const { width: widthZ2, height: heightZ2 } = renderToCanvas(
+			mockImage,
+			stateZ2
+		);
 		const [ a2, , , d2 ] = mockCtx.setTransform.mock.calls[ 0 ];
 
-		// The scale components should double.
-		expect( a2 ).toBeCloseTo( a1 * 2, 5 );
-		expect( d2 ).toBeCloseTo( d1 * 2, 5 );
+		// At 2x the full-frame crop frames the middle quarter of the image:
+		// 400x300 source pixels, the size `getOutputSize` reports. They are
+		// drawn 1:1, so the scale components do not change with the zoom.
+		expect( widthZ2 ).toBe( 400 );
+		expect( heightZ2 ).toBe( 300 );
+		expect( a2 ).toBeCloseTo( a1, 5 );
+		expect( d2 ).toBeCloseTo( d1, 5 );
+	} );
+
+	it( 'exports the full frame when the crop is too near full to be saved', () => {
+		setupMockCanvas();
+
+		// A zoom of 1.0005 frames all but a hair of the image. `getOutputSize`
+		// reports the full size because the mapper saves no crop that close
+		// to the frame, and the export has to match what a consumer read.
+		const state = createTestState( {
+			rotation: 0,
+			zoom: 1.0005,
+			flip: { horizontal: false, vertical: false },
+			pan: { x: 0, y: 0 },
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			image: {
+				src: 'big.jpg',
+				naturalWidth: 20000,
+				naturalHeight: 10000,
+			},
+		} );
+		const mockImage = {
+			naturalWidth: 20000,
+			naturalHeight: 10000,
+		} as HTMLImageElement;
+
+		const { width, height } = renderToCanvas( mockImage, state );
+
+		expect( { width, height } ).toEqual( { width: 20000, height: 10000 } );
 	} );
 
 	it( 'horizontal flip should negate the x-scale component', () => {
