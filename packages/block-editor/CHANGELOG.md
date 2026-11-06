@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Enhancements
+### Bug Fixes
 
--   DimensionsTool: Draw the aspect ratio icons on the same pixel grid as the Original icon, so that their outlines are crisp ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+-   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
 ## 20.0.0 (2026-11-04)
 

@@ -131,12 +131,10 @@ export interface InternalImageEditorState {
 	 * rotating 0°→30°→0° returns to the exact starting pan, not a
 	 * slightly-nudged version of it.
 	 *
-	 * These are updated by every action except SET_ROTATION itself —
-	 * explicit zoom, pan, crop-rect, flip, and 90° snap all commit
-	 * the post-containment state into base. SET_ROTATION reads from
-	 * `basePan` and `baseRotation` to compute the new pan, and reads
-	 * `baseZoom` as the zoom floor (enforceContainment may bump it up
-	 * to cover the rotated crop, but never leaves it above baseZoom).
+	 * Explicit zoom, pan, crop, and flip changes commit the contained
+	 * pose. A 90° turn keeps the unclamped pan in `basePan`, allowing
+	 * later turns to restore a position that could not fit in between.
+	 * SET_ROTATION derives from the base without committing it.
 	 */
 	basePan: NormalizedPoint;
 	baseZoom: number;

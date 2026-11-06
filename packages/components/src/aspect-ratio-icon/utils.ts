@@ -1,23 +1,17 @@
 import type { AspectRatioShape } from './types';
 
-// The icon is drawn inside a 24px box. The generic aspect ratio icon spans
-// 15.5px on its longest side, so the shapes drawn here match its size.
+// The icon is drawn inside a 24px box, leaving a 4px margin on every side.
 export const BOX_SIZE = 24;
-const MAX_SIDE = 15.5;
+const MAX_SIDE = 16;
 // Keeps very wide or very tall ratios from collapsing into a line.
 const MIN_RATIO = 1 / 3;
 const MAX_RATIO = 3;
 
-/**
- * Snaps the length of a side to a half pixel past a whole number, e.g. 8.5.
- * Centered in the box, the outline then sits a quarter pixel from the pixel
- * grid, like the strokes of the generic icon, so every shape has the same
- * crisp edges and none looks blurry.
- *
- * @param side Length of the side, in pixels.
- */
-function snapSide( side: number ) {
-	return Math.round( side - 0.5 ) + 0.5;
+// The 1.5px line is centred on the rectangle's edges. A size ending in .5 puts
+// those edges on .25 or .75, as in the generic icon, so the line covers whole
+// pixels on a 2x display instead of being blurred across them.
+function snapToPixels( size: number ) {
+	return Math.ceil( size ) - 0.5;
 }
 
 /**
@@ -34,12 +28,8 @@ export function getAspectRatioShape(
 	}
 
 	const clampedRatio = Math.min( MAX_RATIO, Math.max( MIN_RATIO, ratio ) );
-	const width = snapSide(
-		clampedRatio >= 1 ? MAX_SIDE : MAX_SIDE * clampedRatio
-	);
-	const height = snapSide(
-		clampedRatio >= 1 ? MAX_SIDE / clampedRatio : MAX_SIDE
-	);
+	const width = snapToPixels( MAX_SIDE * Math.min( 1, clampedRatio ) );
+	const height = snapToPixels( MAX_SIDE / Math.max( 1, clampedRatio ) );
 
 	return {
 		x: ( BOX_SIZE - width ) / 2,

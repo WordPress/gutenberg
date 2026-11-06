@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the fine-rotation ruler's ticks and labels visible when the browser forces dark colors ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
+
 ### Internal
 
 -   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).

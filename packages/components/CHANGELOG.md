@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).
+-   `useBaseControlProps`: fix instance ID generation crash in CommonJS build by avoiding a circular import of BaseControl ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
+
 ### Internal
 
 -   `AspectRatioIcon`: Add a private component that draws the shape of an aspect ratio, for the aspect ratio control of the block editor ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
