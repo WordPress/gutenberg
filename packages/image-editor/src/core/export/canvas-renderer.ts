@@ -35,16 +35,21 @@ export function renderToCanvas(
 	state: InternalImageEditorState
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
-	const { rotation, cropRect } = state;
+	const { rotation, cropRect, zoom } = state;
 	const imageSize = { width: naturalWidth, height: naturalHeight };
 
 	// Output size is the crop region in the snap-rotation bbox — matches
 	// the preview's reference frame so the exported pixels track exactly
-	// what the stencil framed, even at fine rotation angles.
+	// what the stencil framed, even at fine rotation angles. The crop is a
+	// fraction of the view, and the view shows the image at `zoom`, so the
+	// region framed in source pixels is the crop divided by the zoom. This
+	// is the size `getOutputSize` reports; without the division a zoomed
+	// export came out upscaled by the zoom factor.
 	const snapRotation = Math.round( rotation / 90 ) * 90;
 	const rotBBox = getRotatedBBox( naturalWidth, naturalHeight, snapRotation );
-	const outW = Math.round( cropRect.width * rotBBox.width );
-	const outH = Math.round( cropRect.height * rotBBox.height );
+	const safeZoom = zoom > 0 ? zoom : 1;
+	const outW = Math.round( ( cropRect.width / safeZoom ) * rotBBox.width );
+	const outH = Math.round( ( cropRect.height / safeZoom ) * rotBBox.height );
 
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = outW;

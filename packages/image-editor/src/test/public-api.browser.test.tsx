@@ -325,6 +325,30 @@ describe( 'the public API', () => {
 		} );
 	} );
 
+	it( 'exports the framed region at source size when zoomed, not upscaled', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		const image = paintedImage( 1200, 600 );
+		await render(
+			<ConsumerEditor onController={ onController } image={ image } />
+		);
+		await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+
+		act( () => controller.setZoom( 2 ) );
+
+		// At 2x the full-frame crop frames the middle quarter of the image.
+		const outputSize = getOutputSize( controller.state )!;
+		expect( outputSize.width ).toBeCloseTo( 600 );
+		expect( outputSize.height ).toBeCloseTo( 300 );
+		expect(
+			await decodedSize( await exportImage( controller.state ) )
+		).toEqual( { width: 600, height: 300 } );
+	} );
+
 	it( 'swaps the exported width and height after a quarter turn', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {
