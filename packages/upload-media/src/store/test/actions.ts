@@ -683,6 +683,132 @@ describe( 'actions', () => {
 			( cancelGifToVideoOperations as Mock ).mockClear();
 		} );
 
+		it.each( [ false, true ] )(
+			'deletes a cancelled uploaded attachment only once (silent: %s)',
+			async ( silent ) => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const onError = vi.fn();
+				const actions = unlock( registry.dispatch( uploadStore ) );
+				actions.updateSettings( { mediaDelete } );
+				actions.addItem( { file: jpegFile, onError } );
+				const [ item ] = unlock(
+					registry.select( uploadStore )
+				).getAllItems();
+				actions.finishOperation( item.id, { attachment: { id: 42 } } );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						item.id,
+						new Error( 'User cancelled' ),
+						silent
+					);
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						item.id,
+						new Error( 'User cancelled' ),
+						silent
+					);
+
+				expect( mediaDelete ).toHaveBeenCalledExactlyOnceWith( 42 );
+				expect( onError ).toHaveBeenCalledTimes( silent ? 0 : 1 );
+				expect(
+					registry.select( uploadStore ).getItems()
+				).toHaveLength( 0 );
+			}
+		);
+
+		it( 'deletes the attachment when finalizing an upload fails', async () => {
+			const failure = new Error( 'Finalization failed' );
+			const mediaFinalize = vi.fn().mockRejectedValue( failure );
+			const mediaDelete = vi.fn().mockResolvedValue( undefined );
+			const onError = vi.fn();
+			const onSuccess = vi.fn();
+			const actions = unlock( registry.dispatch( uploadStore ) );
+			actions.updateSettings( { mediaFinalize, mediaDelete } );
+			actions.addItem( { file: jpegFile, onError, onSuccess } );
+			const [ item ] = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			actions.finishOperation( item.id, { attachment: { id: 42 } } );
+
+			await actions.finalizeItem( item.id );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
+			expect( mediaDelete ).toHaveBeenCalledExactlyOnceWith( 42 );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.MEDIA_FINALIZE_ERROR,
+				} )
+			);
+			expect( onSuccess ).not.toHaveBeenCalled();
+			expect( registry.select( uploadStore ).getItems() ).toHaveLength(
+				0
+			);
+			expect( console ).toHaveWarnedWith(
+				'Media finalization failed:',
+				failure
+			);
+		} );
+
+		it( 'completes cancellation when attachment deletion fails', async () => {
+			const mediaDelete = vi
+				.fn()
+				.mockRejectedValue( new Error( 'Deletion failed' ) );
+			const onError = vi.fn();
+			const error = new Error( 'User cancelled' );
+			const actions = unlock( registry.dispatch( uploadStore ) );
+			actions.updateSettings( { mediaDelete } );
+			actions.addItem( { file: jpegFile, onError } );
+			const [ item ] = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			actions.finishOperation( item.id, { attachment: { id: 42 } } );
+
+			await registry.dispatch( uploadStore ).cancelItem( item.id, error );
+
+			expect( mediaDelete ).toHaveBeenCalledExactlyOnceWith( 42 );
+			expect( onError ).toHaveBeenCalledExactlyOnceWith( error );
+			expect( registry.select( uploadStore ).getItems() ).toHaveLength(
+				0
+			);
+		} );
+
+		it.each( [ false, true ] )(
+			'does not delete attachments for child cancellations or uploads without an attachment (child: %s)',
+			async ( isChild ) => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const actions = unlock( registry.dispatch( uploadStore ) );
+				actions.updateSettings( { mediaDelete } );
+				if ( isChild ) {
+					actions.addSideloadItem( {
+						file: jpegFile,
+						parentId: 'parent',
+					} );
+				} else {
+					actions.addItem( { file: jpegFile, onError: vi.fn() } );
+				}
+				const [ item ] = unlock(
+					registry.select( uploadStore )
+				).getAllItems();
+				if ( isChild ) {
+					actions.finishOperation( item.id, {
+						attachment: { id: 42 },
+					} );
+				}
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect(
+					registry.select( uploadStore ).getItems()
+				).toHaveLength( 0 );
+			}
+		);
+
 		it( 'calls vipsCancelOperations when cancelling', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
@@ -954,7 +1080,7 @@ describe( 'actions', () => {
 					.dispatch( uploadStore )
 					.cancelItem( child!.id, vipsError );
 
-				expect( mediaDelete ).toHaveBeenCalledWith( 42 );
+				expect( mediaDelete ).toHaveBeenCalledExactlyOnceWith( 42 );
 				expect( parentOnError ).toHaveBeenCalledWith(
 					expect.objectContaining( {
 						code: 'IMAGE_TRANSCODING_ERROR',
@@ -991,7 +1117,7 @@ describe( 'actions', () => {
 					.dispatch( uploadStore )
 					.cancelItem( child!.id, networkError );
 
-				expect( mediaDelete ).toHaveBeenCalledWith( 42 );
+				expect( mediaDelete ).toHaveBeenCalledExactlyOnceWith( 42 );
 				expect( parentOnError ).toHaveBeenCalledWith(
 					expect.objectContaining( {
 						code: 'GENERAL',
