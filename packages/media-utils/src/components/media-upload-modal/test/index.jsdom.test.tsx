@@ -656,19 +656,23 @@ describe( 'MediaUploadModal', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'shows a filter on a registered field', async () => {
-			renderModal(
-				{ fields: [ genreField ] },
-				{
-					filters: [
-						{ field: 'genre', operator: 'isAny', value: [ 3 ] },
-					],
-				}
+		it( 'offers a registered field as a filter', async () => {
+			const user = userEvent.setup();
+			renderModal( { fields: [ genreField ] } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Genre' } )
 			);
 
 			expect(
-				await screen.findByRole( 'button', { name: /Genre/ } )
-			).toBeInTheDocument();
+				await screen.findByRole( 'option', { name: 'Portrait' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', { name: 'Landscape' } )
+			).toBeVisible();
 		} );
 
 		it( "keeps the modal's own field when one is registered with its ID", async () => {
