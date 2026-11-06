@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Typography toolbar: Add the font and the size to the block toolbar, for every block that supports them, naming the ones the block renders at until it sets its own. Behind the `gutenberg-typography-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
+-   Typography toolbar: Add the font, the size and the text colour to the block toolbar, for every block that supports them, naming the font and size the block renders at until it sets its own. Behind the `gutenberg-typography-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements

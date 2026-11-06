@@ -1,7 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -16,6 +16,7 @@ import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import TypographyFontDropdown from './font-dropdown';
 import TypographySizeDropdown from './size-dropdown';
+import TypographyColorDropdown from './color-dropdown';
 import { getFontDisplayName, resolveBlockTypography } from './utils';
 
 declare global {
@@ -35,12 +36,37 @@ const EMPTY_ARRAY: never[] = [];
 const FONT_FAMILY_SUPPORT = 'typography.__experimentalFontFamily';
 const FONT_SIZE_SUPPORT = 'typography.fontSize';
 
+type ColorOption = { slug?: string; name?: string; color: string };
+
+/**
+ * Whether a block lets its text be coloured. The colour support flags each
+ * feature, and text is the one that is on unless it is turned off.
+ *
+ * @param name The block's name.
+ *
+ * @return Whether the block offers a text colour.
+ */
+function hasTextColorSupport( name: string ): boolean {
+	const support = getBlockSupport( name, 'color' ) as
+		{ text?: boolean } | boolean | undefined;
+
+	if ( ! support ) {
+		return false;
+	}
+
+	return support === true || support.text !== false;
+}
+
 type TypographyAttributes = {
 	fontFamily?: string;
 	fontSize?: string;
+	textColor?: string;
 	// A heading's level decides which element it takes its typography from.
 	level?: unknown;
-	style?: { typography?: { fontSize?: string } };
+	style?: {
+		color?: { text?: string };
+		typography?: { fontSize?: string };
+	};
 	[ key: string ]: unknown;
 };
 
@@ -67,13 +93,16 @@ function TypographyToolbarControls( {
 	 * not treated that way, so they are gathered across the origins, as the
 	 * typography inspector gathers them.
 	 */
-	const [ fontFamilyOrigins, fontSizePresets ] = useSettings(
+	const [ fontFamilyOrigins, fontSizePresets, colorPalette ] = useSettings(
 		'typography.fontFamilies',
-		'typography.fontSizes'
+		'typography.fontSizes',
+		'color.palette'
 	) as [
 		Record< string, FontFamilyPreset[] > | undefined,
 		FontSizePreset[] | undefined,
+		ColorOption[] | undefined,
 	];
+	const colors: ColorOption[] = colorPalette ?? EMPTY_ARRAY;
 	const fontSizes: FontSizePreset[] = fontSizePresets ?? EMPTY_ARRAY;
 
 	const fontFamilies = useMemo(
@@ -94,6 +123,7 @@ function TypographyToolbarControls( {
 
 	const hasFont = hasBlockSupport( name, FONT_FAMILY_SUPPORT, false );
 	const hasSize = hasBlockSupport( name, FONT_SIZE_SUPPORT, false );
+	const hasColor = hasTextColorSupport( name );
 	const customFontSize = attributes.style?.typography?.fontSize;
 
 	// A preset lives in its own attribute and a size of your own in `style`,
@@ -116,6 +146,24 @@ function TypographyToolbarControls( {
 			} ),
 		} );
 	};
+
+	// A preset lives in `textColor` and a colour of your own in `style`.
+	const onChangeColor = ( color?: string, slug?: string ) => {
+		setAttributes( {
+			textColor: slug,
+			style: cleanEmptyObject( {
+				...attributes.style,
+				color: {
+					...attributes.style?.color,
+					text: slug ? undefined : color,
+				},
+			} ),
+		} );
+	};
+
+	const activeColor = attributes.textColor
+		? colors.find( ( color ) => color.slug === attributes.textColor )?.color
+		: attributes.style?.color?.text;
 
 	return (
 		<BlockControls group="typography">
@@ -146,6 +194,13 @@ function TypographyToolbarControls( {
 					}
 				/>
 			) }
+			{ hasColor && (
+				<TypographyColorDropdown
+					colors={ colors }
+					value={ activeColor }
+					onChange={ onChangeColor }
+				/>
+			) }
 		</BlockControls>
 	);
 }
@@ -155,7 +210,8 @@ const withTypographyToolbar = createHigherOrderComponent(
 		( props: TypographyToolbarProps ) => {
 			const offersTypography =
 				hasBlockSupport( props.name, FONT_FAMILY_SUPPORT, false ) ||
-				hasBlockSupport( props.name, FONT_SIZE_SUPPORT, false );
+				hasBlockSupport( props.name, FONT_SIZE_SUPPORT, false ) ||
+				hasTextColorSupport( props.name );
 
 			return (
 				<>

@@ -206,6 +206,44 @@ test.describe( 'Typography toolbar', () => {
 		);
 	} );
 
+	test( 'a text colour is saved as a preset on the block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+
+		await getToolbar( page )
+			.getByRole( 'button', { name: 'Text color' } )
+			.click();
+		// Whichever colour the theme puts first; the slug is its own.
+		await page
+			.locator( '.editor-typography-toolbar__color-popover' )
+			.getByRole( 'option' )
+			.first()
+			.click();
+
+		await expect
+			.poll(
+				async () =>
+					( await editor.getBlocks() )[ 0 ].attributes.textColor
+			)
+			.toEqual( expect.any( String ) );
+	} );
+
+	test( 'leaves a block that cannot be coloured without the control', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/spacer' } );
+
+		await expect(
+			getToolbar( page ).getByRole( 'button', { name: 'Text color' } )
+		).toBeHidden();
+	} );
+
 	test( 'offers the tools to a block that is not prose but has typography', async ( {
 		editor,
 		page,
