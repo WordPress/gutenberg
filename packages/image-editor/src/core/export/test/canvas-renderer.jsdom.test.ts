@@ -696,6 +696,34 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		expect( d2 ).toBeCloseTo( d1, 5 );
 	} );
 
+	it( 'exports the full frame when the crop is too near full to be saved', () => {
+		setupMockCanvas();
+
+		// A zoom of 1.0005 frames all but a hair of the image. `getOutputSize`
+		// reports the full size because the mapper saves no crop that close
+		// to the frame, and the export has to match what a consumer read.
+		const state = createTestState( {
+			rotation: 0,
+			zoom: 1.0005,
+			flip: { horizontal: false, vertical: false },
+			pan: { x: 0, y: 0 },
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			image: {
+				src: 'big.jpg',
+				naturalWidth: 20000,
+				naturalHeight: 10000,
+			},
+		} );
+		const mockImage = {
+			naturalWidth: 20000,
+			naturalHeight: 10000,
+		} as HTMLImageElement;
+
+		const { width, height } = renderToCanvas( mockImage, state );
+
+		expect( { width, height } ).toEqual( { width: 20000, height: 10000 } );
+	} );
+
 	it( 'horizontal flip should negate the x-scale component', () => {
 		setupMockCanvas();
 
