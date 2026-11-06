@@ -51,7 +51,10 @@ export function replaceActiveStyle(
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	list.add( 'is-style-' + newStyle.name );
+	// The default style is the absence of a style, so it needs no class.
+	if ( ! newStyle.isDefault ) {
+		list.add( 'is-style-' + newStyle.name );
+	}
 
 	return list.value;
 }
