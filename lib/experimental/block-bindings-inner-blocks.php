@@ -57,14 +57,29 @@ add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_remove_inner_
  * blocks.
  *
  * Serialized block markup supplies them, and an empty string supplies none.
- * Any other value, like the plain text of a field, leaves the block with its
- * own inner blocks.
+ * Markup supplies them when the first block delimiter the block parser finds,
+ * after any whitespace, opens a block. Any other value, like the plain text of
+ * a field, leaves the block with its own inner blocks.
  *
  * @param mixed $value The value of the source.
  * @return bool Whether the value supplies inner blocks.
  */
 function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
-	return '' === $value || ( is_string( $value ) && str_starts_with( ltrim( $value, " \t\n\f\r" ), '<!-- wp:' ) );
+	if ( '' === $value ) {
+		return true;
+	}
+	if ( ! is_string( $value ) ) {
+		return false;
+	}
+
+	$processor = new WP_Block_Processor( $value );
+	while ( $processor->next_token() ) {
+		if ( $processor->is_html() && ! $processor->is_non_whitespace_html() ) {
+			continue;
+		}
+		return ! $processor->is_html() && $processor->opens_block();
+	}
+	return false;
 }
 
 /**
