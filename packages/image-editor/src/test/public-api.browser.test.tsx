@@ -280,8 +280,8 @@ describe( 'the public API', () => {
 		expect( getComputedStyle( handle ).backgroundColor ).toBe(
 			'rgb(255, 255, 255)'
 		);
-		expect( getComputedStyle( dimming ).boxShadow ).toContain(
-			'rgba(224, 224, 224, 0.6)'
+		expect( getComputedStyle( dimming ).boxShadow ).toMatch(
+			/color\(srgb 0\.878\d* 0\.878\d* 0\.878\d* \/ 0\.6\)|rgba\(224, 224, 224, 0\.6\)/
 		);
 	} );
 } );
