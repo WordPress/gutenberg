@@ -79,8 +79,11 @@ parameters:
 			identifier: offsetAssign.valueType
 			reportUnmatched: false
 
-		# The block library also runs in WordPress Core, where WP_Theme_JSON_Gutenberg is not defined.
+		# Level 4:
+		# The Navigation block checks for WP_Theme_JSON_Gutenberg::get_viewport_media_queries() before falling back to
+		# WP_Theme_JSON. PHPStan sees the Gutenberg class as always defined, but the block library also runs in
+		# WordPress Core, where it is not, so the check is needed there.
 		-
-			identifier: function.alreadyNarrowedType
 			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			path: packages/block-library/src/navigation/index.php
