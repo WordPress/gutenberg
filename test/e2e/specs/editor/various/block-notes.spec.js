@@ -1362,6 +1362,30 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toBeVisible();
 		} );
 
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await optionsButton.focus();
+			await expect( newNoteForm ).toBeHidden();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+			await optionsButton.focus();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+		} );
+
 		test( 'discards a draft when the form is cancelled', async ( {
 			editor,
 			page,

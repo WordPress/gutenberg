@@ -2,7 +2,9 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
 import type { NoteId } from './types';
 
-const { ownsSelection } = unlock( richTextPrivateApis );
+const { ownsSelection } = unlock< {
+	ownsSelection: ( element: HTMLElement ) => boolean;
+} >( richTextPrivateApis );
 
 /**
  * Build the CSS selector matching a note's in-content `core/note` marker in
@@ -95,10 +97,9 @@ export function isFocusInBlocks(
 		editable && ownsSelection( editable )
 			? editable
 			: ownerDocument.activeElement;
-	return clientIds.includes(
-		focusOwner?.closest< HTMLElement >( '[data-block]' )?.dataset
-			.block ?? ''
-	);
+	const block =
+		focusOwner?.closest< HTMLElement >( '[data-block]' )?.dataset.block;
+	return !! block && clientIds.includes( block );
 }
 
 /**
