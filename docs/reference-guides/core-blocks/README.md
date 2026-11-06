@@ -517,7 +517,7 @@ Add a page, link, or another item to your navigation.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/navigation
 -	**Allowed Blocks:** core/navigation-link, core/navigation-submenu, core/page-list
--	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** anchor, color (background, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
 ## Navigation Overlay Close
