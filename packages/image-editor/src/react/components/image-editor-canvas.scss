@@ -1,6 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
-
 // Handle touch target size — used for the handle ::before hit area. The
 // inner canvas inset must stay at least half this (22px) so the handles'
 // reach isn't clipped by the root.
@@ -25,11 +22,10 @@ $handle-touch-target-size: 44px;
 	// (required for the dimming overlay's box-shadow trick), so a flush
 	// handle would be clipped. The inner `__canvas` wrapper is inset to
 	// reserve reach room on all sides while keeping the root as the clipping
-	// boundary. `$grid-unit-30` (24px) ≥ half the 44px touch target, so the
-	// handles still clear the edge.
+	// boundary. The inset must stay at least half the 44px touch target.
 	&__canvas {
 		position: absolute;
-		inset: $grid-unit-30;
+		inset: max(22px, var(--wp-image-editor-canvas-inset, 24px));
 		min-height: 100px;
 		min-width: 100px;
 
@@ -67,16 +63,14 @@ $handle-touch-target-size: 44px;
 	&__dimming {
 		position: absolute;
 		pointer-events: none;
-		/* Large shadow spread washes everything outside the crop area
-		   toward the canvas grey ($gray-200). Slightly stronger at rest
-		   for clear crop framing, lighter during drag so the user can see
-		   where they're panning. */
-		box-shadow: 0 0 0 9999px rgba($gray-200, 0.6);
+		/* Large shadow spread washes everything outside the crop area.
+		   It is lighter during drag so the image stays visible. */
+		box-shadow: 0 0 0 9999px var(--wp-image-editor-dimming-color, rgba(224, 224, 224, 0.6));
 		transition: box-shadow 0.15s ease;
 	}
 
 	&--dragging &__dimming {
-		box-shadow: 0 0 0 9999px rgba($gray-200, 0.4);
+		box-shadow: 0 0 0 9999px color-mix(in srgb, var(--wp-image-editor-dimming-color, rgba(224, 224, 224, 0.6)) 66.667%, transparent);
 	}
 
 	&__grid {
@@ -103,7 +97,7 @@ $handle-touch-target-size: 44px;
 
 	&__grid-line {
 		position: absolute;
-		background: rgba(255, 255, 255, 0.4);
+		background: var(--wp-image-editor-grid-color, rgba(255, 255, 255, 0.4));
 
 		&--horizontal {
 			left: 0;
@@ -121,8 +115,8 @@ $handle-touch-target-size: 44px;
 	&__dimensions-tooltip {
 		position: absolute;
 		padding: 2px 6px;
-		background: #fff;
-		color: #1e1e1e;
+		background: var(--wp-image-editor-surface-color, #fff);
+		color: var(--wp-image-editor-foreground-color, #1e1e1e);
 		font-size: 11px;
 		line-height: 1.4;
 		font-variant-numeric: tabular-nums;
@@ -136,7 +130,7 @@ $handle-touch-target-size: 44px;
 		position: absolute;
 		// Dark crop outline, matching the sidebar control/heading text so
 		// the crop boundary stays legible against the light grey wash.
-		border: 1px solid $gray-900;
+		border: 1px solid var(--wp-image-editor-foreground-color, #1e1e1e);
 		box-sizing: border-box;
 		pointer-events: none;
 		transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -149,8 +143,8 @@ $handle-touch-target-size: 44px;
 	// on the canvas ensures the outline appears only when the canvas
 	// itself is focused, not when focus is on a child handle.
 	&__canvas--focus-visible:focus &__stencil-rect {
-		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
-		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+		border-color: var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
+		box-shadow: 0 0 0 1px var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
 	}
 
 	&__handle {
@@ -168,8 +162,8 @@ $handle-touch-target-size: 44px;
 		height: 12px;
 		// Solid white fill with an accent-blue border so the handles read
 		// clearly against the light grey wash.
-		background: $white;
-		border: 1px solid var(--wp-admin-theme-color, #3858e9);
+		background: var(--wp-image-editor-surface-color, #fff);
+		border: 1px solid var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
 		border-radius: 50%;
 		box-sizing: border-box;
 		pointer-events: auto;
@@ -185,9 +179,9 @@ $handle-touch-target-size: 44px;
 		// keyboard session — e.g., clicking a handle to start a drag —
 		// don't leave the active ring stuck on the handle.
 		.wp-image-editor__canvas--focus-visible &:focus {
-			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+			background: var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
 			border-color: transparent;
-			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+			box-shadow: 0 0 0 2px var(--wp-image-editor-surface-color, #fff), 0 0 0 4px var(--wp-image-editor-accent-color, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		// Extend touch target to the minimum accessible hit area.

@@ -1,21 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { select, dispatch } from '@wordpress/data';
 import MediaUpload from '../index';
+import type { MediaFrame, MediaUploadProps } from '../types';
 import { invalidateAttachmentResolutions } from '../../../utils/invalidate-attachment-resolutions';
 
 vi.mock( import( '../../../utils/invalidate-attachment-resolutions' ) );
 
 describe( 'MediaUpload', () => {
+	const props: MediaUploadProps = {
+		onSelect: vi.fn(),
+		render: vi.fn(),
+	};
+
 	beforeEach( () => {
 		vi.clearAllMocks();
 	} );
 
 	describe( 'onClose', () => {
 		it( 'invalidates the cached attachment resolutions against the default registry', () => {
-			const instance = new MediaUpload( { onClose: vi.fn() } );
+			const instance = new MediaUpload( { ...props, onClose: vi.fn() } );
 			// `onClose` detaches the underlying wp.media frame; stub it so the
 			// method can run without the global media library being present.
-			instance.frame = { detach: vi.fn() };
+			instance.frame = { detach: vi.fn() } as unknown as MediaFrame;
 
 			instance.onClose();
 
@@ -31,8 +37,8 @@ describe( 'MediaUpload', () => {
 		} );
 
 		it( 'invalidates even when no onClose prop is provided', () => {
-			const instance = new MediaUpload( {} );
-			instance.frame = { detach: vi.fn() };
+			const instance = new MediaUpload( props );
+			instance.frame = { detach: vi.fn() } as unknown as MediaFrame;
 
 			instance.onClose();
 
@@ -47,8 +53,8 @@ describe( 'MediaUpload', () => {
 
 		it( 'calls the onClose prop before detaching the frame', () => {
 			const onClose = vi.fn();
-			const instance = new MediaUpload( { onClose } );
-			instance.frame = { detach: vi.fn() };
+			const instance = new MediaUpload( { ...props, onClose } );
+			instance.frame = { detach: vi.fn() } as unknown as MediaFrame;
 
 			instance.onClose();
 

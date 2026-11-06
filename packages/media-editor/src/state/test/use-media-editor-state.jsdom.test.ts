@@ -275,6 +275,85 @@ describe( 'useMediaEditorState', () => {
 				result.current.imageEditor.state.cropRect.height
 			).toBeCloseTo( 1, 5 );
 		} );
+
+		it( 'keeps a locked preset and crop together through two turns and undo/redo', () => {
+			const { result } = setupHook();
+			const preset = ( 16 / 9 ).toString();
+			act( () => result.current.setAspectRatioValue( preset ) );
+			const originalCrop = result.current.imageEditor.state.cropRect;
+			const originalZoom = result.current.imageEditor.state.zoom;
+
+			act( () => result.current.imageEditor.snapRotate90( 1 ) );
+			const firstTurnCrop = result.current.imageEditor.state.cropRect;
+			act( () => result.current.imageEditor.snapRotate90( 1 ) );
+			const secondTurnCrop = result.current.imageEditor.state.cropRect;
+			expect( result.current.cropOptions.aspectRatioValue ).toBe(
+				preset
+			);
+			expect( secondTurnCrop.x ).toBeCloseTo( originalCrop.x, 10 );
+			expect( secondTurnCrop.y ).toBeCloseTo( originalCrop.y, 10 );
+			expect( secondTurnCrop.width ).toBeCloseTo(
+				originalCrop.width,
+				10
+			);
+			expect( secondTurnCrop.height ).toBeCloseTo(
+				originalCrop.height,
+				10
+			);
+			expect( result.current.imageEditor.state.zoom ).toBeCloseTo(
+				originalZoom,
+				6
+			);
+
+			act( () => result.current.undo() );
+			expect( result.current.imageEditor.state.rotation ).toBe( 90 );
+			expect( result.current.imageEditor.state.cropRect ).toEqual(
+				firstTurnCrop
+			);
+			expect( result.current.cropOptions.aspectRatioValue ).toBe(
+				preset
+			);
+
+			act( () => result.current.redo() );
+			expect( result.current.imageEditor.state.rotation ).toBe( 180 );
+			expect( result.current.imageEditor.state.cropRect ).toEqual(
+				secondTurnCrop
+			);
+			expect( result.current.imageEditor.state.zoom ).toBeCloseTo(
+				originalZoom,
+				6
+			);
+		} );
+
+		it( 'restores a panned image after four turns', () => {
+			const { result } = setupHook();
+			act( () =>
+				result.current.setSourceImage( {
+					src: 'four-by-three.jpg',
+					naturalWidth: 1600,
+					naturalHeight: 1200,
+				} )
+			);
+			act( () =>
+				result.current.setAspectRatioValue( ( 16 / 9 ).toString() )
+			);
+			act( () => result.current.imageEditor.setPan( { x: 0, y: 0.1 } ) );
+			const originalPan = result.current.imageEditor.state.pan;
+
+			for ( let i = 0; i < 4; i++ ) {
+				act( () => result.current.imageEditor.snapRotate90( 1 ) );
+			}
+
+			expect( originalPan.y ).toBeCloseTo( 0.1, 6 );
+			expect( result.current.imageEditor.state.pan.x ).toBeCloseTo(
+				originalPan.x,
+				6
+			);
+			expect( result.current.imageEditor.state.pan.y ).toBeCloseTo(
+				originalPan.y,
+				6
+			);
+		} );
 	} );
 
 	describe( 'reset', () => {
