@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaUploadModal`: Add a `fields` prop for fields registered for attachments, shown alongside the modal's own as columns and filters.
+
 ## 6.1.0 (2026-11-04)
 
 ### Enhancements
