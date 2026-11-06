@@ -1,7 +1,17 @@
 .wp-block-details {
 	box-sizing: border-box;
+	position: relative;
 }
 
 .wp-block-details summary {
 	cursor: pointer;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+	}
 }
