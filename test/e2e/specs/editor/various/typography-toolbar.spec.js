@@ -79,6 +79,32 @@ test.describe( 'Typography toolbar', () => {
 		).toBeVisible();
 	} );
 
+	test( 'puts the font and the size before the alignment controls', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Writing' },
+		} );
+
+		const labels = await getToolbar( page )
+			.getByRole( 'button' )
+			.evaluateAll( ( buttons ) =>
+				buttons.map( ( button ) => button.getAttribute( 'aria-label' ) )
+			);
+
+		expect( labels.indexOf( 'Font' ) ).toBeLessThan(
+			labels.indexOf( 'Align text' )
+		);
+		expect( labels.indexOf( 'Size' ) ).toBeLessThan(
+			labels.indexOf( 'Align text' )
+		);
+		expect( labels.indexOf( 'Font' ) ).toBeLessThan(
+			labels.indexOf( 'Size' )
+		);
+	} );
+
 	test( 'reads a heading from the element its level renders as', async ( {
 		editor,
 		page,

@@ -289,6 +289,10 @@ export function PrivateBlockToolbar( {
 												className="block-editor-block-toolbar__slot"
 											/>
 											<BlockControls.Slot
+												group="typography"
+												className="block-editor-block-toolbar__slot"
+											/>
+											<BlockControls.Slot
 												group="block"
 												className="block-editor-block-toolbar__slot"
 											/>

@@ -118,7 +118,7 @@ function TypographyToolbarControls( {
 	};
 
 	return (
-		<BlockControls group="block">
+		<BlockControls group="typography">
 			{ hasFont && (
 				<TypographyFontDropdown
 					fontFamilies={ fontFamilies }
