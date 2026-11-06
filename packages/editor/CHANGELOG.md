@@ -16,6 +16,7 @@
 
 ### New Features
 
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists every file in the library, images, video and audio included, and inserts it as a File block ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements

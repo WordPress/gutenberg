@@ -174,9 +174,10 @@ export interface InserterMediaCategory {
 		search_items?: string;
 	};
 	/**
-	 * The media type of the media category.
+	 * The media type of the media category. `application` covers documents
+	 * such as PDFs, which are inserted as File blocks.
 	 */
-	mediaType: 'image' | 'audio' | 'video';
+	mediaType: 'image' | 'audio' | 'video' | 'application';
 	/**
 	 * The function to fetch media items for the category. Returning an
 	 * `InserterMediaResponse` instead of a plain array opts the category into
