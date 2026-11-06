@@ -16,6 +16,7 @@
 -   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
 -   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
 -   DataForm: The `showPlaceholderIfEmpty` option of the `panel` layout also shows the placeholder when the field's `render` output is empty, like for an id matching no record ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
 ### Bug Fixes
 
