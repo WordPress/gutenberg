@@ -24,6 +24,7 @@ import { fieldExtensions as parent } from './parent/field';
 import { fieldExtensions as password } from './password/field';
 import { fieldExtensions as pingStatus } from './ping_status/field';
 import { fieldExtensions as postContentInfo } from './post_content_info/field';
+import { fieldExtensions as publishDate } from './publish_date/field';
 import { fieldExtensions as scheduledDate } from './scheduled_date/field';
 import { fieldExtensions as slug } from './slug/field';
 import { fieldExtensions as status } from './status/field';
@@ -42,6 +43,7 @@ const fields: FieldsScriptParts = {
 	password,
 	ping_status: pingStatus,
 	'post-content-info': postContentInfo,
+	publish_date: publishDate,
 	scheduled_date: scheduledDate,
 	slug,
 	status,

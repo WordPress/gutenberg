@@ -10,7 +10,7 @@ import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { createCursorRegistry } from '../collaborators-overlay/cursor-registry';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';

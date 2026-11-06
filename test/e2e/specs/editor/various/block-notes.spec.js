@@ -1341,7 +1341,7 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
-		test( 'closes the new note form on focus-out only when empty', async ( {
+		test( 'keeps the new note form open while its block is edited', async ( {
 			editor,
 			page,
 		} ) => {
@@ -1354,11 +1354,35 @@ test.describe( 'Block Notes', () => {
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await expect( newNoteForm ).toBeFocused();
 			await editor.canvas.getByText( 'First block' ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+			await expect(
+				editor.canvas.getByText( 'First block edited' )
+			).toBeVisible();
+			await expect( newNoteForm ).toBeVisible();
+		} );
+
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toBeHidden();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await newNoteForm.pressSequentially( 'Unsent draft' );
-			await editor.canvas.getByText( 'First block' ).click();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
@@ -1591,6 +1615,80 @@ test.describe( 'Block Notes', () => {
 
 			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
+
+		for ( const { first, second } of [
+			{
+				first: { name: 'core/paragraph', label: 'Block: Paragraph' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+			{
+				first: { name: 'core/heading', label: 'Block: Heading' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+		] ) {
+			test( `keeps the notes of both blocks when a ${ second.name } block is merged into a ${ first.name } block`, async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				const firstBlock = editor.canvas
+					.getByRole( 'document', { name: first.label } )
+					.first();
+				const secondBlock = editor.canvas
+					.getByRole( 'document', { name: second.label } )
+					.last();
+
+				await blockNoteUtils.insertBlockWithNote( {
+					name: first.name,
+					content: 'One',
+					note: 'First block note',
+				} );
+				await firstBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First block inline note' );
+				await blockNoteUtils.insertBlockWithNote( {
+					name: second.name,
+					content: 'two',
+					note: 'Second block note',
+				} );
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second block inline note' );
+				const blocks = await editor.getBlocks();
+				const noteId = blocks.flatMap(
+					( { attributes } ) => attributes.metadata.noteId
+				);
+				expect( noteId ).toHaveLength( 4 );
+
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+
+				await expect(
+					editor.canvas.getByRole( 'document', { name: first.label } )
+				).toHaveText( 'Onetwo' );
+				await expect(
+					editor.canvas.locator( 'mark.wp-note' )
+				).toHaveText( [ 'One', 'two' ] );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: first.name,
+						attributes: { metadata: { noteId } },
+					},
+				] );
+				for ( const note of [
+					'First block note',
+					'First block inline note',
+					'Second block note',
+					'Second block inline note',
+				] ) {
+					await expect(
+						blockNoteUtils.getThread( note )
+					).toBeVisible();
+				}
+			} );
+		}
 
 		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
 			editor,
@@ -2658,7 +2756,7 @@ test.describe( 'Block Notes', () => {
 				}
 			} );
 
-			await test.step( 'Goes back to the selected copy', async () => {
+			await test.step( 'Goes back to the first copy', async () => {
 				for ( const index of [ 0, 1 ] ) {
 					await editor.selectBlocks( paragraphs.nth( index ) );
 					await thread.click();
@@ -2670,7 +2768,9 @@ test.describe( 'Block Notes', () => {
 						.getByRole( 'button', { name: 'Back to block' } )
 						.focus();
 					await page.keyboard.press( 'Enter' );
-					await expect( paragraphs.nth( index ) ).toBeFocused();
+					await expect( paragraphs.first() ).toHaveClass(
+						/is-selected/
+					);
 				}
 			} );
 
@@ -2759,6 +2859,312 @@ test.describe( 'Block Notes', () => {
 				await page.getByRole( 'button', { name: 'Resolve' } ).click();
 				await expect( marks ).toHaveCount( 0 );
 			} );
+		} );
+
+		test( 'selects a note only from blocks that hold it', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'one' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+			// A split can leave a copy with the note's id but none of its text.
+			const [ { attributes } ] = await editor.getBlocks();
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { metadata: attributes.metadata },
+			} );
+
+			await test.step( 'Not from a text block without its marker', async () => {
+				const thread = blockNoteUtils.getThread( 'Inline note' );
+				await blockNoteUtils.deselect();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				const copy = editor.canvas.getByRole( 'document', {
+					name: /^Empty block/,
+				} );
+				await copy.click();
+				await expect( copy ).toHaveClass( /is-selected/ );
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+			} );
+
+			await test.step( 'From an empty block with a block-level note', async () => {
+				await blockNoteUtils.insertBlockWithNote( {
+					name: 'core/heading',
+					content: '',
+					note: 'Heading note',
+				} );
+				const thread = blockNoteUtils.getThread( 'Heading note' );
+				await blockNoteUtils.deselect();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await editor.canvas
+					.getByRole( 'document', { name: 'Block: Heading' } )
+					.click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+		} );
+	} );
+
+	test.describe( 'Notes spanning blocks', () => {
+		async function insertParagraphs( editor ) {
+			for ( let i = 0; i < 3; i++ ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'abcdef' },
+				} );
+			}
+		}
+
+		// The same text on each line, so the caret lands between the same
+		// letters two lines up.
+		async function selectAcrossBlocks( {
+			editor,
+			pageUtils,
+			blockNoteUtils,
+		} ) {
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+				.click();
+			await blockNoteUtils.selectBlockText( { start: 3, length: 0 } );
+			await pageUtils.pressKeys( 'shift+ArrowUp', { times: 2 } );
+		}
+
+		async function getNoteIds( editor ) {
+			return ( await editor.getBlocks() ).map(
+				( block ) => block.attributes.metadata?.noteId
+			);
+		}
+
+		test( 'adds one note to every selected block', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await insertParagraphs( editor );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			await test.step( 'Cancel removes the draft from every block', async () => {
+				await selectAcrossBlocks( {
+					editor,
+					pageUtils,
+					blockNoteUtils,
+				} );
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await expect( marks ).toHaveText( [ 'def', 'abcdef', 'abc' ] );
+				await sidebar.getByRole( 'button', { name: 'Cancel' } ).click();
+				await expect( marks ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'Adds one note to every block', async () => {
+				await selectAcrossBlocks( {
+					editor,
+					pageUtils,
+					blockNoteUtils,
+				} );
+				await blockNoteUtils.addNote( 'Spanning note' );
+				await expect(
+					blockNoteUtils.getThread( 'Spanning note' )
+				).toHaveCount( 1 );
+				await expect( marks ).toHaveText( [ 'def', 'abcdef', 'abc' ] );
+				const noteIds = await getNoteIds( editor );
+				expect( noteIds[ 0 ] ).toHaveLength( 1 );
+				expect( noteIds ).toEqual( [
+					noteIds[ 0 ],
+					noteIds[ 0 ],
+					noteIds[ 0 ],
+				] );
+			} );
+
+			await test.step( 'Deletes the note from every block', async () => {
+				await blockNoteUtils.getThread( 'Spanning note' ).click();
+				await blockNoteUtils.deleteNote();
+				await expect( marks ).toHaveCount( 0 );
+				await expect( paragraphs ).toHaveText( [
+					'abcdef',
+					'abcdef',
+					'abcdef',
+				] );
+			} );
+
+			await test.step( 'Leaves out a block the selection gives no text', async () => {
+				await paragraphs.first().click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 0 } );
+				await pageUtils.pressKeys( 'shift+ArrowDown' );
+				await blockNoteUtils.addNote( 'Second block note' );
+				await expect( marks ).toHaveText( [ 'abcdef' ] );
+				const noteIds = await getNoteIds( editor );
+				expect( noteIds[ 1 ] ).toHaveLength( 1 );
+				expect( noteIds ).toEqual( [
+					undefined,
+					noteIds[ 1 ],
+					undefined,
+				] );
+				await blockNoteUtils.getThread( 'Second block note' ).click();
+				await blockNoteUtils.deleteNote();
+			} );
+
+			await test.step( 'Adds a block-level note to blocks selected as a whole', async () => {
+				await editor.selectBlocks(
+					paragraphs.first(),
+					paragraphs.nth( 1 )
+				);
+				await blockNoteUtils.addNote( 'Block note' );
+				await expect(
+					blockNoteUtils.getThread( 'Block note' )
+				).toHaveCount( 1 );
+				await expect( marks ).toHaveCount( 0 );
+				const noteIds = await getNoteIds( editor );
+				expect( noteIds[ 0 ] ).toHaveLength( 1 );
+				expect( noteIds ).toEqual( [
+					noteIds[ 0 ],
+					noteIds[ 0 ],
+					undefined,
+				] );
+			} );
+		} );
+
+		test( 'keeps unsent drafts across blocks', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await insertParagraphs( editor );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			const form = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await test.step( 'Leaves the form when an end of the selection moves', async () => {
+				await selectAcrossBlocks( {
+					editor,
+					pageUtils,
+					blockNoteUtils,
+				} );
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await form.fill( 'Draft' );
+				await expect( marks ).toHaveText( [ 'def', 'abcdef', 'abc' ] );
+
+				const box = await paragraphs.first().boundingBox();
+				await paragraphs.first().click( {
+					modifiers: [ 'Shift' ],
+					position: { x: box.width - 2, y: box.height / 2 },
+				} );
+				await expect( form ).toBeHidden();
+				await expect( marks ).toHaveCount( 0 );
+
+				// The text is kept under the first block.
+				await title.click();
+				await paragraphs.first().click();
+				await expect( form ).toHaveText( 'Draft' );
+			} );
+
+			await test.step( "Keeps another block's draft out of a note on whole blocks", async () => {
+				// Moves the block toolbar off the middle paragraph.
+				await title.click();
+				await paragraphs.nth( 1 ).click();
+				await blockNoteUtils.selectBlockText( { start: 1, length: 3 } );
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await form.fill( 'Unsent' );
+				await title.click();
+
+				await editor.selectBlocks(
+					paragraphs.first(),
+					paragraphs.last()
+				);
+				await blockNoteUtils.addNote( 'Whole blocks note' );
+				await expect( marks ).toHaveCount( 0 );
+				const noteIds = await getNoteIds( editor );
+				expect( noteIds[ 0 ] ).toHaveLength( 1 );
+				expect( noteIds ).toEqual( [
+					noteIds[ 0 ],
+					noteIds[ 0 ],
+					noteIds[ 0 ],
+				] );
+			} );
+		} );
+
+		test( 'tints and selects a block without text between the noted text', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const image = editor.canvas.getByRole( 'document', {
+				name: 'Block: Image',
+			} );
+			await paragraphs.last().click();
+			await blockNoteUtils.selectBlockText( { start: 3, length: 0 } );
+			await paragraphs
+				.first()
+				.click( { modifiers: [ 'Shift' ], position: { x: 1, y: 5 } } );
+			await blockNoteUtils.addNote( 'Note around an image' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
+				[ 'abcdef', 'abc' ]
+			);
+
+			await blockNoteUtils.deselect();
+			await expect( image ).toHaveCSS( 'background-color', tint, {
+				pseudo: 'after',
+			} );
+			await expect( paragraphs.first() ).not.toHaveCSS(
+				'background-color',
+				tint,
+				{ pseudo: 'after' }
+			);
+
+			const thread = blockNoteUtils.getThread( 'Note around an image' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await image.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 	} );
 } );

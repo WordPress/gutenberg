@@ -18,18 +18,17 @@
 function render_block_core_avatar( $attributes, $content, $block ) {
 	$size               = $attributes['size'] ?? 96;
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$border_attributes  = get_block_core_avatar_border_attributes( $attributes );
-	$shadow_attributes  = wp_get_shadow_classes_and_styles( $attributes );
+	$image_attributes   = wp_get_block_supports_classes_and_styles( $attributes, array( 'border', 'shadow' ) );
 
 	// Class gets passed through `esc_attr` via `get_avatar`.
-	$image_classes = ! empty( $border_attributes['class'] )
-		? "wp-block-avatar__image {$border_attributes['class']}"
+	$image_classes = ! empty( $image_attributes['class'] )
+		? "wp-block-avatar__image {$image_attributes['class']}"
 		: 'wp-block-avatar__image';
 
 	// Unlike class, `get_avatar` doesn't filter the styles via `esc_attr`.
 	// The style engine does pass the border and shadow styles through
 	// `safecss_filter_attr` however.
-	$image_css    = ( $border_attributes['style'] ?? '' ) . ( $shadow_attributes['style'] ?? '' );
+	$image_css    = $image_attributes['style'] ?? '';
 	$image_styles = ! empty( $image_css )
 		? sprintf( ' style="%s"', esc_attr( $image_css ) )
 		: '';
@@ -87,7 +86,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			'class'      => $image_classes,
 		)
 	);
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && '' !== $comment->comment_author_url ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			// translators: %s: Comment author name.
