@@ -10,7 +10,13 @@ import {
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	createPortal,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { search } from '@wordpress/icons';
@@ -222,7 +228,15 @@ function InlineUI( {
 			</Autocomplete.Row>
 		) );
 
-	return (
+	/*
+	 * Rendered into the page's body, not where the format renders. Format
+	 * controls render next to the editable text, inside the editor canvas,
+	 * and the popup places hidden focus guards beside its React position.
+	 * There they would sit among the blocks: the paragraph would no longer
+	 * be the first child, pick up block spacing, and shift down while the
+	 * picker is open.
+	 */
+	return createPortal(
 		<Autocomplete.Root
 			// Mounted only while visible, so it is always open.
 			open
@@ -368,7 +382,8 @@ function InlineUI( {
 					) }
 				</div>
 			</Autocomplete.Popup>
-		</Autocomplete.Root>
+		</Autocomplete.Root>,
+		document.body
 	);
 }
 
