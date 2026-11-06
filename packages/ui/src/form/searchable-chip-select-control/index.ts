@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '../primitives/combobox/loading-indicator';
 import { SearchableChipSelectControl as _SearchableChipSelectControl } from './searchable-chip-select-control';
 import { Group } from '../primitives/combobox/group';
 import { GroupLabel } from '../primitives/combobox/group-label';
@@ -22,6 +23,7 @@ export const SearchableChipSelectControl = Object.assign(
 		Item,
 		ItemLabel,
 		ItemDescription,
+		LoadingIndicator,
 		ChipWithRemove,
 		Collection,
 		useFilteredItems,

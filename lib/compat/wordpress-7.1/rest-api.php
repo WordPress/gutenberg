@@ -35,7 +35,7 @@ function gutenberg_add_date_wp_template_schema() {
 				'get_callback' => function ( $item ) {
 					if ( ! empty( $item['wp_id'] ) ) {
 						$post = get_post( $item['wp_id'] );
-						if ( $post && isset( $post->post_date ) ) {
+						if ( $post ) {
 							return mysql_to_rfc3339( $post->post_date );
 						}
 					}
