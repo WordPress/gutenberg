@@ -56,23 +56,31 @@ export function addMergeCallback( settings: BlockType ): BlockType {
 }
 
 /**
- * Keeps the notes of a single block when it's switched to another block type.
- * Blocks of different types are merged by switching the second block first,
- * and a block switched on its own reaches the filter as a block instead of an
- * array, so its metadata isn't kept.
+ * Keeps the notes of the source blocks when blocks are switched to another
+ * block type.
  *
- * @param result Transformed block.
- * @param source Source block or blocks.
+ * @param result  Transformed block.
+ * @param source  Source block or blocks.
+ * @param index   Index of the transformed block.
+ * @param results All blocks that resulted from the transformation.
  * @return Transformed block with the source block's notes.
  */
-export function addTransforms( result: Block, source: Block | Block[] ): Block {
-	if ( Array.isArray( source ) ) {
+export function addTransforms(
+	result: Block,
+	source: Block | Block[],
+	index: number,
+	results: Block[]
+): Block {
+	const sources = Array.isArray( source ) ? source : [ source ];
+	const isWrapping =
+		results.length === 1 && result.innerBlocks.length === sources.length;
+	if ( isWrapping || results.length !== sources.length ) {
 		return result;
 	}
 
 	const metadata = mergeNoteIds(
 		result.attributes.metadata,
-		source.attributes.metadata
+		sources[ index ].attributes.metadata
 	);
 	return metadata
 		? { ...result, attributes: { ...result.attributes, metadata } }
