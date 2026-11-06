@@ -73,6 +73,35 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+// Fit the block outline to the image rather than the figure, whose box extends
+// under floats from earlier blocks. The outline stays on the block's
+// pseudo-element, so filters on the image, such as duotone, don't recolor it.
+// Gallery captions overlay the image, so galleries keep the default.
+// See https://github.com/WordPress/gutenberg/issues/28570.
+@supports (anchor-name: --a) {
+	.wp-block-image.block-editor-block-list__block:not(.wp-block-gallery > *):has(> img, > a > img) {
+		anchor-scope: --wp-image-outline;
+
+		> img,
+		> a > img {
+			anchor-name: --wp-image-outline;
+		}
+
+		.block-editor-block-list__layout &.is-highlighted,
+		.block-editor-block-list__layout &.is-hovered-draggable:is([draggable="true"], [data-draggable="true"]):not(.is-multi-selected),
+		.block-editor-block-list__layout &:not([contenteditable="true"]):focus,
+		.is-outline-mode &:not(.remove-outline).is-hovered,
+		.is-outline-mode &:not(.remove-outline).is-selected {
+			&::after {
+				top: anchor(--wp-image-outline top);
+				right: anchor(--wp-image-outline right);
+				bottom: anchor(--wp-image-outline bottom);
+				left: anchor(--wp-image-outline left);
+			}
+		}
+	}
+}
+
 // Disable any duotone filter applied in the selected state.
 .wp-block-image.is-selected .block-editor-media-placeholder {
 	filter: none !important;
