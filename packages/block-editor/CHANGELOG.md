@@ -12,6 +12,11 @@
 
 - `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 
+### New Features
+
+-   Flex layout: Add Space around and Space evenly justification options, using a select control with icons and labels in the Layout panel ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+-   `JustifyContentControl`: Include Space around and Space evenly in the default controls ([#71129](https://github.com/WordPress/gutenberg/pull/71129)).
+
 ### Enhancements
 
 -   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).

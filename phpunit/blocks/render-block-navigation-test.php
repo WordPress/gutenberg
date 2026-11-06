@@ -277,6 +277,49 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that horizontal justification values are mapped to Navigation custom properties.
+	 *
+	 * @dataProvider data_horizontal_justification_values
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_layout_custom_property_declarations
+	 *
+	 * @param string $justify_content Justification value.
+	 * @param string $justify         Expected CSS value.
+	 */
+	public function test_get_horizontal_layout_custom_property_declarations( $justify_content, $justify ) {
+		$actual = gutenberg_block_core_navigation_get_layout_custom_property_declarations(
+			array( 'justifyContent' => $justify_content )
+		);
+
+		$this->assertSame(
+			array(
+				'--navigation-layout-justification-setting' => $justify,
+				'--navigation-layout-direction' => 'row',
+				'--navigation-layout-wrap'      => 'wrap',
+				'--navigation-layout-justify'   => $justify,
+				'--navigation-layout-align'     => 'center',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Data provider for horizontal Navigation justification values.
+	 *
+	 * @return array
+	 */
+	public function data_horizontal_justification_values() {
+		return array(
+			'left'          => array( 'left', 'flex-start' ),
+			'center'        => array( 'center', 'center' ),
+			'right'         => array( 'right', 'flex-end' ),
+			'space between' => array( 'space-between', 'space-between' ),
+			'space around'  => array( 'space-around', 'space-around' ),
+			'space evenly'  => array( 'space-evenly', 'space-evenly' ),
+		);
+	}
+
+	/**
 	 * Test responsive layout styles and classes on local Navigation containers.
 	 *
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
