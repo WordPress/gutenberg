@@ -27,46 +27,41 @@ type TokenType =
 type Token = [ TokenType, string, Attributes, number, number ];
 
 /**
- * Matches block comment delimiters
+ * Matches block comment delimiter candidates
  *
- * While most of this pattern is straightforward the attribute parsing
- * incorporates a tricks to make sure we don't choke on specific input
+ * Sub-matches:
+ *  1. Leading “closer” solidus before `wp`
+ *  2. Namespace
+ *  3. Block name
  *
- *  - since JavaScript has no possessive quantifier or atomic grouping
- *    we are emulating it with a trick
- *
- *    we want a possessive quantifier or atomic group to prevent backtracking
- *    on the `}`s should we fail to match the remainder of the pattern
- *
- *    we can emulate this with a positive lookahead and back reference
- *    (a++)*c === ((?=(a+))\1)*c
- *
- *    let's examine an example:
- *      - /(a+)*c/.test('aaaaaaaaaaaaad') fails after over 49,000 steps
- *      - /(a++)*c/.test('aaaaaaaaaaaaad') fails after 85 steps
- *      - /(?>a+)*c/.test('aaaaaaaaaaaaad') fails after 126 steps
- *
- *    this is because the possessive `++` and the atomic group `(?>)`
- *    tell the engine that all those `a`s belong together as a single group
- *    and so it won't split it up when stepping backwards to try and match
- *
- *    if we use /((?=(a+))\1)*c/ then we get the same behavior as the atomic group
- *    or possessive and prevent the backtracking because the `a+` is matched but
- *    not captured. thus, we find the long string of `a`s and remember it, then
- *    reference it as a whole unit inside our pattern
- *
- *    @see http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
- *    @see http://blog.stevenlevithan.com/archives/mimic-atomic-groups
- *    @see https://javascript.info/regexp-infinite-backtracking-problem
- *
- *    once browsers reliably support atomic grouping or possessive
- *    quantifiers natively we should remove this trick and simplify
- *
- * @since 3.8.0
- * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
+ * @since 24.3.0
  */
-const tokenizer =
-	/<!--[ \t\f\r\n]+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)[ \t\f\r\n]+({(?:(?=([^}]+|}+(?=})|(?!}[ \t\f\r\n]+\/?-->)[^])*)\5|[^]*?)}[ \t\f\r\n]+)?(\/)?-->/g;
+const delimiterPrefixPattern =
+	/[ \t\f\r\n]+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)[ \t\f\r\n]+/g;
+
+/**
+ * Matches the end of a block delimiter’s JSON attribute area.
+ *
+ * Sub-matches:
+ *  1. Void flag
+ *
+ * @since 24.3.0
+ */
+const attributeAreaClosingPattern = /}[ \t\f\r\n]+(\/)?$/g;
+
+/**
+ * Matches the start of an HTML comment;
+ *
+ * @since 24.3.0
+ */
+const commentStartPattern = /<!--/g;
+
+/**
+ * Matches the end of an open HTML comment.
+ *
+ * @since 24.3.0
+ */
+const commentEndPattern = /^-*>|--!?>/g;
 
 /**
  * Constructs a block object.
@@ -213,7 +208,7 @@ export const parse = ( doc: string ): ParsedBlock[] => {
 	offset = 0;
 	output = [];
 	stack = [];
-	tokenizer.lastIndex = 0;
+	delimiterPrefixPattern.lastIndex = 0;
 
 	do {
 		// twiddle our thumbs
@@ -380,54 +375,108 @@ function parseJSON( input: string ): Object | null {
  * @return The next matched token.
  */
 function nextToken(): Token {
-	// Aye the magic
-	// we're using a single RegExp to tokenize the block comment delimiters
-	// we're also using a trick here because the only difference between a
-	// block opener and a block closer is the leading `/` before `wp:` (and
-	// a closer has no attributes). we can trap them both and process the
-	// match back in JavaScript to see which one it was.
-	const matches = tokenizer.exec( document );
+	while ( offset < document.length ) {
+		commentStartPattern.lastIndex = offset;
+		const nextComment = commentStartPattern.exec( document );
 
-	// We have no more tokens.
-	if ( null === matches ) {
-		return [ 'no-more-tokens', '', null, 0, 0 ];
+		// If there are no more comment openers then there are no more blocks.
+		if ( null === nextComment ) {
+			offset = document.length;
+			break;
+		}
+
+		// Find the end of the potential delimiter. Start after the opening `<!--`.
+		commentEndPattern.lastIndex = commentStartPattern.lastIndex;
+		const commentEnd = commentEndPattern.exec( document );
+
+		// If the comment doesn’t close then there are no more blocks.
+		if ( null === commentEnd ) {
+			offset = document.length;
+			break;
+		}
+
+		// The comment closed before a block delimiter could possibly exist.
+		//
+		//     <!-- ̲w̲p̲:̲a̲ -->                                      ␠   wp  :   a   ␠
+		//            ╰ the shortest possible inside contents are 1 + 2 + 1 + 1 + 1 = 6
+		if ( commentEnd.index < commentStartPattern.lastIndex + 6 ) {
+			offset = commentEndPattern.lastIndex;
+			continue;
+		}
+
+		// Could this comment be a block delimiter? Start after the opening `<!--`
+		delimiterPrefixPattern.lastIndex = commentStartPattern.lastIndex;
+		const delimiterPrefix = delimiterPrefixPattern.exec( document );
+
+		// Just another HTML comment.
+		if ( null === delimiterPrefix ) {
+			offset = commentEndPattern.lastIndex;
+			continue;
+		}
+
+		// It’s only a block delimiter if there are no JSON attributes or if the potential
+		// JSON attributes are a map. It need not be valid JSON, but it must be bounded by
+		// curly brackets.
+
+		const attributeAreaLength =
+			commentEnd.index - delimiterPrefixPattern.lastIndex;
+		const hasAttrs = attributeAreaLength > 0;
+		if (
+			hasAttrs &&
+			'{' !== document[ delimiterPrefixPattern.lastIndex ]
+		) {
+			offset = commentEndPattern.lastIndex;
+			continue;
+		}
+
+		const attributeArea = document.slice(
+			delimiterPrefixPattern.lastIndex + 1,
+			commentEnd.index
+		);
+		// Skip the opening `{` to find the end of the JSON area.
+		attributeAreaClosingPattern.lastIndex = 1;
+		const attributeClosing = hasAttrs
+			? attributeAreaClosingPattern.exec( attributeArea )
+			: null;
+
+		if ( hasAttrs && null === attributeClosing ) {
+			offset = commentEndPattern.lastIndex;
+			continue;
+		}
+
+		const isVoid = '/' === attributeClosing[ 1 ];
+		const jsonAttributes = attributeClosing
+			? attributeArea.slice( 0, attributeClosing.index + 1 )
+			: null;
+
+		const startedAt = nextComment.index;
+
+		const length = commentEndPattern.lastIndex;
+		const isCloser = delimiterPrefix[ 1 ];
+		const namespace = delimiterPrefix[ 2 ] || 'core/';
+		const name = namespace + delimiterPrefix[ 3 ];
+		const attrs = jsonAttributes ? parseJSON( jsonAttributes ) : {};
+
+		// This state isn't allowed
+		// This is an error.
+		if ( isCloser && ( isVoid || hasAttrs ) ) {
+			// We can ignore them since they don't hurt anything
+			// we may warn against this at some point or reject it.
+		}
+
+		if ( isVoid ) {
+			return [ 'void-block', name, attrs, startedAt, length ];
+		}
+
+		if ( isCloser ) {
+			return [ 'block-closer', name, null, startedAt, length ];
+		}
+
+		return [ 'block-opener', name, attrs, startedAt, length ];
 	}
 
-	const startedAt = matches.index;
-	const [
-		match,
-		closerMatch,
-		namespaceMatch,
-		nameMatch,
-		attrsMatch /* Internal/unused. */,
-		,
-		voidMatch,
-	] = matches;
-
-	const length = match.length;
-	const isCloser = !! closerMatch;
-	const isVoid = !! voidMatch;
-	const namespace = namespaceMatch || 'core/';
-	const name = namespace + nameMatch;
-	const hasAttrs = !! attrsMatch;
-	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
-
-	// This state isn't allowed
-	// This is an error.
-	if ( isCloser && ( isVoid || hasAttrs ) ) {
-		// We can ignore them since they don't hurt anything
-		// we may warn against this at some point or reject it.
-	}
-
-	if ( isVoid ) {
-		return [ 'void-block', name, attrs, startedAt, length ];
-	}
-
-	if ( isCloser ) {
-		return [ 'block-closer', name, null, startedAt, length ];
-	}
-
-	return [ 'block-opener', name, attrs, startedAt, length ];
+	// There can be no more tokens.
+	return [ 'no-more-tokens', '', null, 0, 0 ];
 }
 
 /**
