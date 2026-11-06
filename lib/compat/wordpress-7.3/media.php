@@ -25,7 +25,13 @@ function gutenberg_encode_attachment_source_urls( $response ) {
 		$data['source_url'] = str_replace( ' ', '%20', $data['source_url'] );
 	}
 
-	if ( ! empty( $data['media_details']['sizes'] ) && is_array( $data['media_details']['sizes'] ) ) {
+	// Core sets media_details, and media_details.sizes, to an empty object when there are none.
+	if (
+		isset( $data['media_details'] ) &&
+		is_array( $data['media_details'] ) &&
+		! empty( $data['media_details']['sizes'] ) &&
+		is_array( $data['media_details']['sizes'] )
+	) {
 		foreach ( $data['media_details']['sizes'] as $size => $size_data ) {
 			if ( ! empty( $size_data['source_url'] ) && is_string( $size_data['source_url'] ) ) {
 				$data['media_details']['sizes'][ $size ]['source_url'] = str_replace( ' ', '%20', $size_data['source_url'] );
