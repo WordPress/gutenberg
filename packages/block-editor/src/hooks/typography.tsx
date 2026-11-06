@@ -26,6 +26,7 @@ import {
 import useBlockColorContrastWarning from './contrast-checker';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
+	ResetAllContext,
 	ResetAllFilter,
 	StyleInspectorControlProps,
 	TypographyAttributes,
@@ -161,8 +162,14 @@ function TypographyInspectorControl( {
 	resetAllFilter,
 }: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes: TypographyAttributes ) => {
-			const existingStyle = attributesToStyle( attributes );
+		( attributes: TypographyAttributes, context?: ResetAllContext ) => {
+			// "Reset all" passes `style` as the first argument and the block's other
+			// attributes in `context`. A palette text color is saved in `textColor`,
+			// so add it, or the reset can't tell that the link color matches it.
+			const existingStyle = attributesToStyle( {
+				textColor: context?.attributes?.textColor as string | undefined,
+				...attributes,
+			} );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
 				...attributes,
@@ -325,13 +332,17 @@ export function TypographyPanel( {
 				setAttributes( newAttributes );
 			};
 
-	// Link color failures are reported by the Elements panel, which owns the
-	// link color selection.
+	// The Elements panel reports link color failures and the Background panel
+	// a solid color clipped to the text, since those panels own the colors.
+	const hasTextGradient =
+		'text' === value?.background?.backgroundClip &&
+		!! value?.background?.gradient;
+	// The Gradient control shows without the text color setting.
 	const enableContrastChecking =
 		! value?.color?.gradient &&
-		'text' !== value?.background?.backgroundClip &&
-		!! value?.color?.text &&
-		settings?.color?.text &&
+		( 'text' === value?.background?.backgroundClip
+			? hasTextGradient
+			: !! value?.color?.text && settings?.color?.text ) &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
 
 	const contrastWarning = useBlockColorContrastWarning( {
@@ -339,9 +350,13 @@ export function TypographyPanel( {
 		name,
 		enabled: !! enableContrastChecking,
 		checkLinkColor: false,
-		messageOverride: __(
-			'This color has poor contrast against the background. Consider increasing contrast.'
-		),
+		messageOverride: hasTextGradient
+			? __(
+					'Part of this gradient has poor contrast against the background. Consider increasing contrast.'
+				)
+			: __(
+					'This color has poor contrast against the background. Consider increasing contrast.'
+				),
 	} );
 
 	if ( ! isEnabled ) {

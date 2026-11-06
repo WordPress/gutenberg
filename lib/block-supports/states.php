@@ -487,7 +487,7 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 	}
 
 	$css_rules       = array();
-	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
+	$block_selectors = is_array( $block_type->selectors )
 		? $block_type->selectors
 		: array();
 

@@ -29,6 +29,7 @@ export default function BlockStylesMenuItems( {
 					>
 						<WCText
 							as="span"
+							color="inherit"
 							limit={ 18 }
 							ellipsizeMode="tail"
 							truncate

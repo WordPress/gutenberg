@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
 import { unlock } from '../../lock-unlock';
 import type { TabbedSidebarProps } from './types';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 /**
  * A component that creates a tabbed sidebar with a close button.
@@ -61,7 +61,7 @@ function TabbedSidebar(
 ) {
 	return (
 		<div className="block-editor-tabbed-sidebar">
-			<Tabs
+			<WCTabs
 				selectOnMove={ false }
 				defaultTabId={ defaultTabId }
 				onSelect={ onSelect }
@@ -76,23 +76,23 @@ function TabbedSidebar(
 						size="compact"
 					/>
 
-					<Tabs.TabList
+					<WCTabs.TabList
 						className="block-editor-tabbed-sidebar__tablist"
 						ref={ ref }
 					>
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab
+							<WCTabs.Tab
 								key={ tab.name }
 								tabId={ tab.name }
 								className="block-editor-tabbed-sidebar__tab"
 							>
 								{ tab.title }
-							</Tabs.Tab>
+							</WCTabs.Tab>
 						) ) }
-					</Tabs.TabList>
+					</WCTabs.TabList>
 				</div>
 				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel
+					<WCTabs.TabPanel
 						key={ tab.name }
 						tabId={ tab.name }
 						focusable={ false }
@@ -100,9 +100,9 @@ function TabbedSidebar(
 						ref={ tab.panelRef }
 					>
 						{ tab.panel }
-					</Tabs.TabPanel>
+					</WCTabs.TabPanel>
 				) ) }
-			</Tabs>
+			</WCTabs>
 		</div>
 	);
 }

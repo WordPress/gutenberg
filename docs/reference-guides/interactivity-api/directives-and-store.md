@@ -198,6 +198,8 @@ The `wp-bind` will do different things when the DOM element is applied, dependin
 -   If the value is a string, the attribute is added with its value assigned: `<div attribute="value">`
 -   If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
+Event handler attributes cannot be bound: a directive whose suffix starts with `on`, like `data-wp-bind--onclick`, is ignored. Use the [`wp-on`](#wp-on) directive to attach an event handler.
+
 ### `wp-class`
 
 This directive adds or removes a class to an HTML element, depending on a boolean value. It follows the syntax `data-wp-class--classname`.
@@ -387,7 +389,7 @@ To keep showing the fallback, return a pending value, not `null`. After [client-
 
 #### Inert content
 
-Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup. Client-side navigation ignores router regions in this content too; see [Where to place router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#where-to-place-router-regions).
 
 #### Conflicts with other directives
 
@@ -400,7 +402,7 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
+    -   The fallback of an element the client creates, such as a [`data-wp-each`](#wp-each) item or an element added by client-side navigation, is copied into the element as nodes, not as a string, so it never goes through a Trusted Types policy, default policy included. A default policy that transforms, filters or rejects HTML doesn't apply to it, and the markup appears as the server rendered it. Don't rely on a policy to prepare fallback markup: it isn't sanitized, apart from leaving out `<script>` elements, so write it as you want it shown, from content you trust. This doesn't change values from `asDangerousHTML()`, which the browser still checks when they are rendered.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
@@ -564,6 +566,8 @@ The `wp-watch` directive is executed:
 
 The `wp-watch` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
+The callback runs in the element's directive scope, but the cleanup does not. Return the cleanup wrapped with [`withScope()`](#withscope) to keep the element's scope.
+
 As a reference, some use cases for this directive may be:
 
 -   Logging
@@ -617,7 +621,7 @@ store( 'myPlugin', {
 
 </details>
 
-The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
+The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM. As with `wp-watch`, the returned function runs without a directive scope: return it wrapped with [`withScope()`](#withscope) to keep the element's scope.
 
 ### `wp-run`
 
@@ -1299,7 +1303,7 @@ If you subscribe to any value returned by `getServerContext()` or `getServerStat
 
 Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
 
-When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+When the Interactivity API runtime executes the actions and directive callbacks of an element, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
 
 An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
 
@@ -1313,6 +1317,23 @@ store( 'mySliderPlugin', {
 				} ),
 				3_000
 			);
+		},
+	},
+} );
+```
+
+The same applies to cleanups. A cleanup returned by a `data-wp-watch` or `data-wp-init` callback, or by a [`watch()`](#watch) callback, runs without a directive scope, so `getContext()`, `getElement()` and `getServerContext()` throw inside it. To keep a scope, return the cleanup wrapped with `withScope()` from code that has the scope, such as the `data-wp-watch` or `data-wp-init` callback itself:
+
+```js
+store( 'myPlugin', {
+	callbacks: {
+		logRemoval: () => {
+			// The element's scope is available here, so the wrapped
+			// cleanup keeps it.
+			return withScope( () => {
+				const { name } = getContext();
+				console.log( `Cleaning up ${ name }` );
+			} );
 		},
 	},
 } );
@@ -1430,6 +1451,27 @@ const unwatch = watch( () => {
 	return () => {
 		document.removeEventListener( 'click', handler );
 	};
+} );
+```
+
+Like the callback, the cleanup runs without a directive scope, even when an action of an element triggers the re-run or the `unwatch()` call. To keep a scope, wrap it with [`withScope()`](#withscope) in code that has one, such as an action, and return the wrapped function:
+
+```js
+store( 'myPlugin', {
+	actions: {
+		startWatching: () => {
+			// Wrapped here, where the action's scope is available.
+			const cleanup = withScope( () => {
+				const { name } = getContext();
+				console.log( `Stopped watching for ${ name }` );
+			} );
+
+			watch( () => {
+				console.log( 'Counter is ' + state.counter );
+				return cleanup;
+			} );
+		},
+	},
 } );
 ```
 

@@ -41,7 +41,7 @@ export default function StatusView( {
 	const label = status?.label || currentStatus;
 	const icon = ICONS[ currentStatus ];
 	return (
-		<Stack direction="row" align="center" justify="flex-start">
+		<Stack direction="row" align="flex-start" justify="flex-start">
 			{ icon && (
 				<div className={ styles.icon }>
 					<Icon icon={ icon } />
