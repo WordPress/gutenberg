@@ -8,7 +8,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { reset as resetIcon } from '@wordpress/icons';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -19,6 +18,7 @@ import {
 	useSettings,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import clearFormattingIcon from './clear-formatting-icon';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import TypographyFontDropdown from './font-dropdown';
@@ -255,7 +255,7 @@ function TypographyToolbarControls( {
 			{ hasOwnTypography( attributes ) && (
 				<ToolbarGroup>
 					<ToolbarButton
-						icon={ resetIcon }
+						icon={ clearFormattingIcon }
 						label={ __( 'Clear formatting' ) }
 						onClick={ () =>
 							setAttributes( clearedTypography( attributes ) )

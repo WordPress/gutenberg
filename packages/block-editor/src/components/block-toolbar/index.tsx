@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -9,7 +9,8 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { trash } from '@wordpress/icons';
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
@@ -73,8 +74,9 @@ export function PrivateBlockToolbar( {
 		areSelectedBlocksHiddenOnViewport,
 		showStyleStateSlot,
 		canEdit,
+		canRemove,
 	} = useSelect( ( select ) => {
-		const { canEditBlock } = select( blockEditorStore );
+		const { canEditBlock, canRemoveBlocks } = select( blockEditorStore );
 		const {
 			getBlockName,
 			getBlockMode,
@@ -175,8 +177,11 @@ export function PrivateBlockToolbar( {
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
 			canEdit: _canEditBlock,
+			canRemove: canRemoveBlocks( selectedBlockClientIds ),
 		};
 	}, [] );
+
+	const { removeBlocks } = useDispatch( blockEditorStore );
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -323,6 +328,17 @@ export function PrivateBlockToolbar( {
 						</>
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				{ !! window.__experimentalTypographyToolbar &&
+					! isPlaceholder &&
+					canRemove && (
+						<ToolbarGroup>
+							<ToolbarButton
+								icon={ trash }
+								label={ __( 'Delete' ) }
+								onClick={ () => removeBlocks( blockClientIds ) }
+							/>
+						</ToolbarGroup>
+					) }
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>

@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Block toolbar: Add a Delete button, so removing a block no longer means opening the options menu first. Behind the `gutenberg-typography-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
 -   Block toolbar: Name the block beside its icon, as a synced block has always been named, so the toolbar reads as the block and the type it is set in. Behind the `gutenberg-typography-toolbar` experiment ([#86248](https://github.com/WordPress/gutenberg/pull/86248)).
 -   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).

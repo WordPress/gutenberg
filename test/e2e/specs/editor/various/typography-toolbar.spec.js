@@ -366,6 +366,27 @@ test.describe( 'Typography toolbar', () => {
 		).toBeHidden();
 	} );
 
+	test( 'deletes the block', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		await getToolbar( page )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'First' } },
+			] );
+	} );
+
 	test( 'leaves the toolbar alone while the experiment is off', async ( {
 		editor,
 		page,
@@ -378,11 +399,12 @@ test.describe( 'Typography toolbar', () => {
 			attributes: { content: 'Writing' },
 		} );
 
+		const toolbar = getToolbar( page );
 		await expect(
-			getToolbar( page ).getByRole( 'button', {
-				name: 'Font',
-				exact: true,
-			} )
+			toolbar.getByRole( 'button', { name: 'Font', exact: true } )
+		).toBeHidden();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Delete' } )
 		).toBeHidden();
 
 		await requestUtils.setGutenbergExperiments( [
