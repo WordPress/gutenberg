@@ -18,76 +18,9 @@ import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
 import type { ResolvedAssets } from '../../store/types';
-import type { EventConstructor, IframeProps } from './types';
+import type { IframeProps } from './types';
 import { CanvasWindowContext } from './canvas-window-context';
-
-// Members of each `*EventInit` dictionary. Copying anything beyond them
-// produces an event that breaks text editing and selection in WebKit.
-const EVENT_FIELDS = [ 'bubbles', 'cancelable', 'composed' ];
-
-const UI_EVENT_FIELDS = [ ...EVENT_FIELDS, 'detail', 'view' ];
-
-const MOUSE_EVENT_FIELDS = [
-	...UI_EVENT_FIELDS,
-	'screenX',
-	'screenY',
-	'clientX',
-	'clientY',
-	'ctrlKey',
-	'shiftKey',
-	'altKey',
-	'metaKey',
-	'button',
-	'buttons',
-	'relatedTarget',
-	'movementX',
-	'movementY',
-];
-
-const DRAG_EVENT_FIELDS = [ ...MOUSE_EVENT_FIELDS, 'dataTransfer' ];
-
-const POINTER_EVENT_FIELDS = [
-	...MOUSE_EVENT_FIELDS,
-	'pointerId',
-	'width',
-	'height',
-	'pressure',
-	'tangentialPressure',
-	'tiltX',
-	'tiltY',
-	'twist',
-	'altitudeAngle',
-	'azimuthAngle',
-	'pointerType',
-	'isPrimary',
-];
-
-const KEYBOARD_EVENT_FIELDS = [
-	...UI_EVENT_FIELDS,
-	'key',
-	'code',
-	'location',
-	'repeat',
-	'isComposing',
-	'ctrlKey',
-	'shiftKey',
-	'altKey',
-	'metaKey',
-	// Deprecated, but still widely read, and they default to 0 if omitted.
-	'charCode',
-	'keyCode',
-	'which',
-];
-
-// Only reachable via getModifierState(), so a field copy misses them.
-const MODIFIER_MEMBERS = {
-	modifierAltGraph: 'AltGraph',
-	modifierCapsLock: 'CapsLock',
-	modifierNumLock: 'NumLock',
-	modifierScrollLock: 'ScrollLock',
-	modifierFn: 'Fn',
-	modifierSymbol: 'Symbol',
-};
+import { cloneEvent } from './clone-event';
 
 /**
  * Events redispatched onto the outer `<iframe>` element.
@@ -97,106 +30,23 @@ const MODIFIER_MEMBERS = {
  * portal delivery.
  */
 const BRIDGED_EVENTS = [
-	{
-		native: 'dragover',
-		react: 'onDragOver',
-		fields: DRAG_EVENT_FIELDS,
-	},
-	{
-		native: 'mousemove',
-		react: 'onMouseMove',
-		fields: MOUSE_EVENT_FIELDS,
-	},
-	{
-		native: 'pointerdown',
-		react: 'onPointerDown',
-		fields: POINTER_EVENT_FIELDS,
-	},
-	{
-		native: 'mousedown',
-		react: 'onMouseDown',
-		fields: POINTER_EVENT_FIELDS,
-	},
-	{
-		native: 'click',
-		react: 'onClick',
-		fields: POINTER_EVENT_FIELDS,
-	},
-	{
-		native: 'keydown',
-		react: 'onKeyDown',
-		fields: KEYBOARD_EVENT_FIELDS,
-	},
+	{ native: 'dragover', react: 'onDragOver' },
+	{ native: 'mousemove', react: 'onMouseMove' },
+	{ native: 'pointerdown', react: 'onPointerDown' },
+	{ native: 'mousedown', react: 'onMouseDown' },
+	{ native: 'click', react: 'onClick' },
+	{ native: 'keydown', react: 'onKeyDown' },
 ] as const satisfies ReadonlyArray< {
 	native: string;
 	react: keyof IframeHTMLAttributes< HTMLIFrameElement >;
-	fields: readonly string[];
 } >;
 
 type BridgedReactEvent = ( typeof BRIDGED_EVENTS )[ number ][ 'react' ];
 type BridgedEventHandler =
 	EventHandler< SyntheticEvent< HTMLIFrameElement > > | undefined;
 
-/**
- * Resolves the parent-window event constructor that matches `event`.
- * Looks up by the event prototype's constructor name so the redispatched
- * event is created in this realm (not the iframe's).
- *
- * @param event Native or React synthetic event from the iframe document.
- */
-function getEventConstructor( event: Event | SyntheticEvent ) {
-	const constructorName = Object.getPrototypeOf( event ).constructor.name;
-	return ( window as unknown as Record< string, EventConstructor > )[
-		constructorName
-	];
-}
-
-function bubbleEvent(
-	event: Event | SyntheticEvent,
-	frame: HTMLIFrameElement,
-	fields: readonly string[]
-) {
-	const init: {
-		clientX?: number;
-		clientY?: number;
-		[ key: string ]: unknown;
-	} = {};
-
-	for ( const field of fields ) {
-		init[ field ] = ( event as unknown as Record< string, unknown > )[
-			field
-		];
-	}
-
-	for ( const member in MODIFIER_MEMBERS ) {
-		init[ member ] = ( event as KeyboardEvent ).getModifierState(
-			MODIFIER_MEMBERS[ member as keyof typeof MODIFIER_MEMBERS ]
-		);
-	}
-
-	// Check if the event is a MouseEvent generated within the iframe.
-	// If so, adjust the coordinates to be relative to the position of
-	// the iframe. This ensures that components such as Draggable
-	// receive coordinates relative to the window, instead of relative
-	// to the iframe. Without this, the Draggable event handler would
-	// result in components "jumping" position as soon as the user
-	// drags over the iframe.
-	if (
-		// A frame that dispatches events has a document and window.
-		event instanceof
-		( frame.contentDocument!.defaultView! as typeof window ).MouseEvent
-	) {
-		const rect = frame.getBoundingClientRect();
-		// Mouse events have coordinates.
-		init.clientX! += rect.left;
-		init.clientY! += rect.top;
-	}
-
-	const newEvent = new ( getEventConstructor( event ) )( event.type, init );
-	if ( event.defaultPrevented ) {
-		newEvent.preventDefault();
-	}
-	const cancelled = ! frame.dispatchEvent( newEvent );
+function bubbleEvent( event: Event, frame: HTMLIFrameElement ) {
+	const cancelled = ! frame.dispatchEvent( cloneEvent( event, frame ) );
 
 	if ( cancelled ) {
 		event.preventDefault();
@@ -296,9 +146,9 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 		}
 		const { frameElement } = defaultView;
 		const handlers: Record< string, ( event: Event ) => void > = {};
-		for ( const { native, fields } of BRIDGED_EVENTS ) {
+		for ( const { native } of BRIDGED_EVENTS ) {
 			handlers[ native ] = ( event ) => {
-				bubbleEvent( event, frameElement as HTMLIFrameElement, fields );
+				bubbleEvent( event, frameElement as HTMLIFrameElement );
 			};
 			iframeDocument!.addEventListener( native, handlers[ native ] );
 		}
