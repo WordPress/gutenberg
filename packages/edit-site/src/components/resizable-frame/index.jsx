@@ -127,9 +127,6 @@ function ResizableFrame( {
 
 		setIsOversized( updatedWidth > defaultSize.width );
 
-		// The library controls the width while resizing (via `resizeRatio`).
-		// Pass it back anyway, because the library resets a dimension missing
-		// from `size` to `auto` when the resize ends.
 		setFrameSize( {
 			width: ref.style.width,
 			height: isOversized
