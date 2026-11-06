@@ -323,7 +323,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param array $attributes The block attributes.
-	 * @return WP_Block_List Returns the inner blocks for the navigation block.
+	 * @return WP_Block_List|null Returns the inner blocks for the navigation block, or null if the navigation post is not published.
 	 */
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
 		$navigation_post = get_post( $attributes['ref'] );
@@ -352,7 +352,7 @@ class WP_Navigation_Block_Renderer {
 			return new WP_Block_List( $blocks, $attributes );
 		}
 
-		return new WP_Block_List( array(), $attributes );
+		return null;
 	}
 
 	/**
