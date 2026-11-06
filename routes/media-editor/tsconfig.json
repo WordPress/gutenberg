@@ -18,6 +18,7 @@
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/media-editor/tsconfig.build.json" },
 		{ "path": "../../packages/route/tsconfig.build.json" },
+		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

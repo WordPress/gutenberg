@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
