@@ -482,7 +482,7 @@ _Parameters_
 
 _Returns_
 
-- `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+- `?Object`: Color object included in the colors array whose color property is the same color as colorValue. Returns undefined if no color object matches this requirement.
 
 ### getComputedFluidTypographyValue
 

@@ -17,6 +17,7 @@ import {
 	useToolsPanelItemPopoverProps,
 } from './utils';
 import { setImmutably } from '../../utils/object';
+import { getColorObjectByColorValue } from '../colors/utils';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import type {
 	BorderPanelProps,
@@ -125,9 +126,10 @@ export default function BorderPanel( {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
 		);
-		const colorObject = allColors.find(
-			( { color } ) => color === colorValue
-		);
+		const colorObject =
+			typeof colorValue === 'string'
+				? getColorObjectByColorValue( allColors, colorValue )
+				: undefined;
 		return colorObject
 			? 'var:preset|color|' + colorObject.slug
 			: colorValue;

@@ -1,3 +1,5 @@
+import { getColorObjectByColorValue } from '../components/colors/utils';
+
 /**
  * Extracts the palette slug from a style value for any preset type, supporting
  * both the user preset format and the theme CSS-variable format:
@@ -58,6 +60,6 @@ export function encodeColorValueWithPalette(
 	if ( slug ) {
 		return 'var:preset|color|' + slug;
 	}
-	const colorObject = allColors.find( ( { color } ) => color === colorValue );
+	const colorObject = getColorObjectByColorValue( allColors, colorValue );
 	return colorObject ? 'var:preset|color|' + colorObject.slug : colorValue;
 }
