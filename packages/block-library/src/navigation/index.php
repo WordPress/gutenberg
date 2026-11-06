@@ -323,7 +323,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param array $attributes The block attributes.
-	 * @return WP_Block_List Returns the inner blocks for the navigation block.
+	 * @return WP_Block_List|null Returns the inner blocks for the navigation block, or null if the navigation post is not published.
 	 */
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
 		$navigation_post = get_post( $attributes['ref'] );
@@ -351,6 +351,8 @@ class WP_Navigation_Block_Renderer {
 			// context which could be refined.
 			return new WP_Block_List( $blocks, $attributes );
 		}
+
+		return null;
 	}
 
 	/**
@@ -802,10 +804,11 @@ class WP_Navigation_Block_Renderer {
 		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 		// Add Interactivity API directives to the markup if needed.
-		$open_button_directives          = '';
-		$responsive_container_directives = '';
-		$responsive_dialog_directives    = '';
-		$close_button_directives         = '';
+		$open_button_directives                  = '';
+		$responsive_container_directives         = '';
+		$responsive_dialog_directives            = '';
+		$responsive_container_content_directives = '';
+		$close_button_directives                 = '';
 		if ( $is_interactive ) {
 			$open_button_directives                  = '
 				data-wp-on--click="actions.openMenuOnClick"
@@ -1465,7 +1468,7 @@ function block_core_navigation_block_tree_has_block_type( $blocks, $block_type, 
 		}
 
 		// Recursively check inner blocks, skipping specified block types.
-		if ( ! in_array( $block->name, $skip_block_types, true ) && ! empty( $block->inner_blocks ) ) {
+		if ( ! in_array( $block->name, $skip_block_types, true ) && count( $block->inner_blocks ) > 0 ) {
 			if ( block_core_navigation_block_tree_has_block_type( $block->inner_blocks, $block_type, $skip_block_types ) ) {
 				return true;
 			}

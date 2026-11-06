@@ -72,6 +72,7 @@ function render_block_core_search( $attributes ) {
 	if ( ! $show_button && ! empty( $color_classes ) ) {
 		$input_classes[] = $color_classes;
 	}
+	$is_expandable_searchfield = false;
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );

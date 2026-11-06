@@ -87,7 +87,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			'class'      => $image_classes,
 		)
 	);
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && '' !== $comment->comment_author_url ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			// translators: %s: Comment author name.
