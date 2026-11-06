@@ -77,7 +77,7 @@ export function PrivatePostSchedule( {
 	};
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		postDate ? startOfMonth( new Date( postDate ) ) : getSiteMonth()
+		postDate ? new Date( postDate ) : getSiteMonth()
 	);
 
 	// The calendar moves to the month of a new date, from the Month and Year
@@ -86,9 +86,7 @@ export function PrivatePostSchedule( {
 	const [ prevPostDate, setPrevPostDate ] = useState( postDate );
 	if ( postDate !== prevPostDate ) {
 		setPrevPostDate( postDate );
-		setPreviewedMonth(
-			postDate ? startOfMonth( new Date( postDate ) ) : getSiteMonth()
-		);
+		setPreviewedMonth( postDate ? new Date( postDate ) : getSiteMonth() );
 	}
 
 	// Pick up published and scheduled site posts.
