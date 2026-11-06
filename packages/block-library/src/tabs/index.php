@@ -116,6 +116,9 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 
 	$output = $tag_processor->get_updated_html();
 
+	// Text direction for the arrow keys, as the view script can't use `isRTL()`.
+	wp_interactivity_config( 'core/tabs', array( 'isRTL' => is_rtl() ) );
+
 	/**
 	 * Builds a client side state for just this tabs instance, so each
 	 * core/tabs block manages its own state, like context.
