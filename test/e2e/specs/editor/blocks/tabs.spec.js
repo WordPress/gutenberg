@@ -2,6 +2,30 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Tabs', () => {
 	test.describe( 'Editor functionality', () => {
+		// Makes a tab the default tab with its Tab Panel's "Default tab" setting.
+		async function makeDefaultTab( { editor, page }, label ) {
+			await editor.canvas.getByRole( 'tab', { name: label } ).click();
+
+			// Only the active Tab Panel is visible, so this selects the one for
+			// the clicked tab.
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Tab Panel',
+					exact: true,
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'checkbox', { name: 'Default tab' } )
+				.check();
+		}
+
+		// The default tab is saved as the Tabs block's `activeTabIndex`.
+		async function getDefaultTabIndex( editor ) {
+			return ( await editor.getBlocks() )[ 0 ].attributes.activeTabIndex;
+		}
+
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.createNewPost();
 			await editor.insertBlock( {
@@ -135,25 +159,9 @@ test.describe( 'Tabs', () => {
 			page,
 			pageUtils,
 		} ) => {
-			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
-
-			// Make the second tab the default tab.
-			await editor.selectBlocks(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Tab Panel',
-					exact: true,
-				} )
-			);
-			await editor.openDocumentSettingsSidebar();
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'checkbox', { name: 'Default tab' } )
-				.check();
-
-			await tab1.click();
-			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
 
 			await page.keyboard.press( 'End' );
 			await page.keyboard.press( 'Enter' );
@@ -165,12 +173,12 @@ test.describe( 'Tabs', () => {
 				'aria-selected',
 				'false'
 			);
-			await expect( tabs.nth( 2 ) ).toHaveAttribute(
+			await expect( tabs.nth( 1 ) ).toHaveAttribute(
 				'aria-selected',
 				'false'
 			);
 
-			const newTab = tabs.nth( 1 );
+			const newTab = tabs.nth( 2 );
 			await expect( newTab ).toHaveAttribute( 'aria-selected', 'true' );
 			await expect(
 				newTab.locator( '[contenteditable="true"]' )
@@ -189,29 +197,11 @@ test.describe( 'Tabs', () => {
 				includeHidden: true,
 			} );
 			await expect( panels ).toHaveCount( 3 );
-			await expect( panels.nth( 1 ) ).toBeVisible();
-
-			// The new tab is inserted before the default tab, which stays on
-			// the second tab.
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 2 );
+			await expect( panels.nth( 2 ) ).toBeVisible();
 
 			// The tab insertion is persistent, so undo removes the new tab
-			// and restores the default tab.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 1 );
 		} );
 
 		test( 'removes the tab and activates the previous one when pressing Delete on an empty tab label', async ( {
@@ -222,20 +212,6 @@ test.describe( 'Tabs', () => {
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
 			await tab2.click();
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-
-			// Make the second tab the default tab.
-			await editor.selectBlocks(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Tab Panel',
-					exact: true,
-				} )
-			);
-			await editor.openDocumentSettingsSidebar();
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'checkbox', { name: 'Default tab' } )
-				.check();
-			await tab2.click();
 
 			// Empty the tab label, then delete again to remove the tab.
 			await pageUtils.pressKeys( 'primary+a' );
@@ -252,48 +228,16 @@ test.describe( 'Tabs', () => {
 			).toBeFocused();
 			await expect( editor.canvas.getByText( 'Panel 1' ) ).toBeVisible();
 
-			// The default tab was removed, so the first tab becomes the default.
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 0 );
-
-			// The tab removal is persistent, so undo brings the tab back,
-			// along with the default tab.
+			// The tab removal is persistent, so undo brings the tab back.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 1 );
 		} );
 
 		test( 'moves the active tab to the previous position with the toolbar mover', async ( {
 			editor,
-			page,
 			pageUtils,
 		} ) => {
 			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
-			await tab2.click();
-
-			// Make the second tab the default tab.
-			await editor.selectBlocks(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Tab Panel',
-					exact: true,
-				} )
-			);
-			await editor.openDocumentSettingsSidebar();
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'checkbox', { name: 'Default tab' } )
-				.check();
 			await tab2.click();
 
 			await editor.clickBlockToolbarButton( 'Move tab before' );
@@ -313,29 +257,15 @@ test.describe( 'Tabs', () => {
 				'Tab 1',
 			] );
 
-			// The moved tab stays active and remains the default tab.
+			// The moved tab stays active.
 			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 0 );
 
-			// Undo restores the original order and default tab.
+			// Undo restores the original order.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
 				'Tab 1',
 				'Tab 2',
 			] );
-			await expect
-				.poll(
-					async () =>
-						( await editor.getBlocks() )[ 0 ].attributes
-							.activeTabIndex
-				)
-				.toBe( 1 );
 		} );
 
 		test( 'moves the active tab to the next position with the toolbar mover', async ( {
@@ -370,6 +300,68 @@ test.describe( 'Tabs', () => {
 				'Tab 1',
 				'Tab 2',
 			] );
+		} );
+
+		test( 'keeps the default tab when a tab is added before it', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			// Add a tab between the first tab and the default tab.
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 1' } ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveCount( 3 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 2 );
+
+			// Undo removes the new tab and restores the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
+
+		test( 'falls back to the first tab when the default tab is removed', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
+			await editor.clickBlockToolbarButton( 'Remove tab' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveCount( 1 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 0 );
+
+			// Undo brings the tab back as the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
+
+		test( 'keeps the default tab on the moved tab', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
+			await editor.clickBlockToolbarButton( 'Move tab before' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveText( [ 'Tab 2', 'Tab 1' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 0 );
+
+			// Undo restores the order and the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveText( [ 'Tab 1', 'Tab 2' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
 		} );
 	} );
 
