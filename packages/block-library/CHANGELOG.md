@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Image: Snap the lightbox image to whole device pixels, so the enlarged image is no longer blurry ([#85271](https://github.com/WordPress/gutenberg/pull/85271)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 
@@ -43,7 +44,6 @@
 -   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
 -   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
 -   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
--   Image: Snap the lightbox image to whole device pixels, so the enlarged image is no longer blurry ([#85271](https://github.com/WordPress/gutenberg/pull/85271)).
 -   Media & Text: Restore the content area's default padding in classic themes whose CSS reset sets `padding: 0` on `div`, which overrode it on the front end since the padding's specificity was lowered. Theme overrides keep working ([#85200](https://github.com/WordPress/gutenberg/pull/85200)).
 -   Image: Only use own properties when looking up view script state by an ID from the context. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Post Navigation Link, Comments Pagination: Escape the link labels before rendering. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
