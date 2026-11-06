@@ -3,14 +3,23 @@ import {
 	createBlock,
 	getBlockFromExample,
 } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Text } from '@wordpress/ui';
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
 import type { InserterItem } from '../../store/types';
 
 function InserterPreviewPanel( { item }: { item: InserterItem } ) {
-	const { name, title, icon, description, initialAttributes, example } = item;
+	const {
+		name,
+		title,
+		icon,
+		description,
+		initialAttributes,
+		example,
+		isDisabled,
+	} = item;
 	const isReusable = isReusableBlock( item );
 	const blocks = useMemo( () => {
 		if ( ! example ) {
@@ -49,7 +58,7 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 								[
 									{
 										css: `
-										body { 
+										body {
 											padding: 24px;
 											min-height:${ Math.round( minHeight ) }px;
 											display:flex;
@@ -74,6 +83,19 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 					icon={ icon }
 					description={ description }
 				/>
+			) }
+			{ isDisabled && (
+				<Text
+					render={ <p /> }
+					className="block-editor-inserter__preview-disabled-note"
+				>
+					{ createInterpolateElement(
+						__(
+							'<strong>Note:</strong> This block can only be used once, and is already in use.'
+						),
+						{ strong: <strong /> }
+					) }
+				</Text>
 			) }
 		</div>
 	);
