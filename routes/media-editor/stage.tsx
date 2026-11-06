@@ -1,7 +1,7 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import type { Action } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -11,6 +11,7 @@ import {
 	privateApis as mediaEditorPrivateApis,
 	type Media,
 } from '@wordpress/media-editor';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	privateApis as routePrivateApis,
 	useNavigate,
@@ -224,6 +225,7 @@ function MediaEditorRoute() {
 	const openAttachment = ( newId: number ) =>
 		navigate( { to: `/media-editor/${ newId }`, replace: true } );
 
+	const { removeAllNotices } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
 		( actionId: string ) => {
 			if ( ! DELETE_ACTION_IDS.includes( actionId ) ) {
@@ -233,6 +235,9 @@ function MediaEditorRoute() {
 			// Media Library with the args for its own notice. Going back
 			// could also show a cached page that still lists the attachment.
 			if ( isStandaloneAdminPage ) {
+				// The action has just shown its snackbar. Remove it so it
+				// doesn't show while the page unloads.
+				removeAllNotices( 'snackbar' );
 				window.location.assign(
 					getMediaLibraryUrlAfterDelete( actionId, attachmentId )
 				);
@@ -240,7 +245,7 @@ function MediaEditorRoute() {
 			}
 			navigateBack( { replace: true } );
 		},
-		[ attachmentId, isStandaloneAdminPage, navigateBack ]
+		[ attachmentId, isStandaloneAdminPage, navigateBack, removeAllNotices ]
 	);
 	const postActions: Action< Media >[] = usePostActions( {
 		postType: 'attachment',
