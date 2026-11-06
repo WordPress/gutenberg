@@ -12,8 +12,8 @@ import {
 	getChildLayoutStyleRules,
 	getChildLayoutStyles,
 	getResponsiveChildLayoutStyles,
-	getUpdatedChildLayoutStyle,
 } from '../layout-child';
+import { getUpdatedChildLayoutStyle } from '../layout-child-utils';
 
 describe( 'layout child', () => {
 	describe( 'getChildLayoutStyleRules()', () => {
