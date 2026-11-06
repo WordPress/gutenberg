@@ -40,6 +40,26 @@ describe( 'getActiveStyle', () => {
 } );
 
 describe( 'replaceActiveStyle', () => {
+	it( 'Should not add a class for the default style, which is the absence of a style', () => {
+		const activeStyle = { name: 'plain' };
+		const newStyle = { name: 'default', isDefault: true };
+		const className = 'is-style-plain';
+
+		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
+			''
+		);
+	} );
+
+	it( 'Should keep other classes when switching to the default style', () => {
+		const activeStyle = { name: 'plain' };
+		const newStyle = { name: 'default', isDefault: true };
+		const className = 'custom-class is-style-plain';
+
+		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
+			'custom-class'
+		);
+	} );
+
 	it( 'Should add the new style if no active style', () => {
 		const activeStyle = undefined;
 		const newStyle = { name: 'small' };

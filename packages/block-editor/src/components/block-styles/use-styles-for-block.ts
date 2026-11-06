@@ -91,7 +91,8 @@ export default function useStylesForBlocks( {
 			style
 		);
 		updateBlockAttributes( clientId, {
-			className: styleClassName,
+			// An empty className means no style, so drop the attribute.
+			className: styleClassName || undefined,
 		} );
 		// Callers selecting styles pass the switch callback.
 		onSwitch!();

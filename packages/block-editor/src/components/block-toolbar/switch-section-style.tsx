@@ -85,7 +85,8 @@ function SwitchSectionStyle( { clientId }: ClientIdProps ) {
 		);
 
 		updateBlockAttributes( clientId, {
-			className: styleClassName,
+			// An empty className means no style, so drop the attribute.
+			className: styleClassName || undefined,
 		} );
 	};
 
