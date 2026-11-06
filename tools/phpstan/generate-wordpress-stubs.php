@@ -32,9 +32,7 @@
  *                        as in CI, so generate them with `--pr` or `--commit` before pushing.
  *
  * A commit is read from the wordpress-develop checkout that Gutenberg is in when it has the commit,
- * and is fetched from GitHub otherwise. A branch or the head of a pull request is first resolved to
- * its commit with the GitHub API, which is much faster than fetching, so the checkout serves as a cache
- * for these too, such as for a pull request whose branch is checked out. The options record the new source in composer.json, which is
+ * and is fetched from GitHub otherwise. The options record the new source in composer.json, which is
  * what gets committed. After using one, run `composer update` and `composer phpstan:baselines`.
  *
  * This needs PHP, Composer, and Git, and runs commands without a shell, so that it works on Windows
@@ -459,75 +457,6 @@ function fetch_commit( string $dir, string $repo, string $commit, array $pattern
 }
 
 /**
- * Returns the commit that a ref of a GitHub repository points to, without fetching it.
- *
- * The commit is looked up with the GitHub REST API, which takes a second, so that a commit the local
- * checkout already has can be read from it rather than fetched. `git ls-remote` would avoid the API,
- * but for a repository with as many refs as wordpress-develop, it can take most of a minute. A token
- * in `GITHUB_TOKEN` or `GH_TOKEN` is sent when set, for the higher rate limit of authenticated
- * requests, such as in CI.
- *
- * @param non-empty-string $repo The repository, such as WordPress/wordpress-develop.
- * @param non-empty-string $ref  The branch, tag, or full ref, such as `trunk` or `refs/pull/123/head`.
- * @return non-empty-string|null The commit hash, or null when it cannot be looked up.
- */
-function resolve_remote_ref( string $repo, string $ref ): ?string {
-	$headers = array(
-		'Accept: application/vnd.github.sha',
-		'User-Agent: gutenberg-generate-wordpress-stubs',
-		'X-GitHub-Api-Version: 2022-11-28',
-	);
-	foreach ( array( 'GITHUB_TOKEN', 'GH_TOKEN' ) as $name ) {
-		$token = getenv( $name );
-		if ( false !== $token && '' !== $token ) {
-			$headers[] = "Authorization: Bearer $token";
-			break;
-		}
-	}
-	$options = array(
-		'header'        => $headers,
-		'timeout'       => 10,
-		'ignore_errors' => true,
-	);
-
-	// Unlike Git and curl, PHP does not read the proxy from the environment, so use it as they would.
-	// Without it, the request fails wherever the network is only reachable through the proxy, and
-	// the ref is then fetched, which is the slow path this avoids.
-	$proxy = '';
-	foreach ( array( 'https_proxy', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY' ) as $name ) {
-		$value = getenv( $name );
-		if ( false !== $value && '' !== $value ) {
-			$proxy = $value;
-			break;
-		}
-	}
-	$no_proxy = (string) ( false !== getenv( 'no_proxy' ) ? getenv( 'no_proxy' ) : getenv( 'NO_PROXY' ) );
-	$bypassed = false;
-	foreach ( explode( ',', $no_proxy ) as $pattern ) {
-		$pattern = ltrim( trim( $pattern ), '.' );
-		if ( '*' === $pattern || 'api.github.com' === $pattern || 'github.com' === $pattern ) {
-			$bypassed = true;
-		}
-	}
-	$proxy_url = '' !== $proxy && ! $bypassed ? parse_url( false !== strpos( $proxy, '://' ) ? $proxy : "http://$proxy" ) : false;
-	if ( is_array( $proxy_url ) && isset( $proxy_url['host'] ) ) {
-		$options['proxy'] = 'tcp://' . $proxy_url['host'] . ':' . ( $proxy_url['port'] ?? 80 );
-		if ( isset( $proxy_url['user'] ) ) {
-			$options['header'][] = 'Proxy-Authorization: Basic ' . base64_encode( rawurldecode( $proxy_url['user'] ) . ':' . rawurldecode( $proxy_url['pass'] ?? '' ) );
-		}
-	}
-	$context = stream_context_create( array( 'http' => $options ) );
-	// The ref goes in the path, where each of its segments is encoded, keeping the slashes.
-	// A failure is silenced, since the ref is then fetched instead.
-	$path = implode( '/', array_map( 'rawurlencode', explode( '/', $ref ) ) );
-	$body = @file_get_contents( "https://api.github.com/repos/$repo/commits/$path", false, $context );
-	if ( false === $body || ! preg_match( '/^[0-9a-f]{40}$/', trim( $body ), $matches ) ) {
-		return null;
-	}
-	return $matches[0];
-}
-
-/**
  * Returns the full hash of a commit.
  *
  * @param non-empty-string $dir The repository.
@@ -757,16 +686,9 @@ function main( array $args ): void {
 		$source_label = "$develop_repo@" . short_commit( $commit );
 	}
 
-	// A ref, such as the head of a pull request, is resolved to its commit on GitHub, so that the commit
-	// is read from the local checkout when it has it. Otherwise, the ref is resolved once fetched.
-	$resolved_ref = ! is_commit_hash( $commit );
-	if ( null !== $local_checkout && $resolved_ref ) {
-		$remote_commit = resolve_remote_ref( $develop_repo, $commit );
-		if ( null !== $remote_commit && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$remote_commit^{commit}" ) ) ) {
-			$commit = $remote_commit;
-		}
-	}
-	if ( null !== $local_checkout && is_commit_hash( $commit ) && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
+	// A ref, such as the head of a pull request, is only resolved to a commit once fetched.
+	$fetched_ref = ! is_commit_hash( $commit );
+	if ( null !== $local_checkout && ! $fetched_ref && succeeds( array( 'git', '-C', $local_checkout, 'cat-file', '-e', "$commit^{commit}" ) ) ) {
 		report_row( 'Source', $source_label . style( ' (local checkout)', '2' ) );
 		// Check out the commit's src directory with an index of its own, leaving the checkout as it is.
 		$env = array( 'GIT_INDEX_FILE' => $work_dir . '/index' );
@@ -937,11 +859,11 @@ function main( array $args ): void {
 		HEADER;
 	file_put_contents( $stub_file, $header . substr( $stubs, $header_end + strlen( "\n */\n" ) ) );
 
-	// The done row names the WordPress version, then, dimmed, the commit that a ref resolved
+	// The done row names the WordPress version, then, dimmed, the commit that a fetched ref resolved
 	// to, the revision, and how long the whole run took, including fetching the source and setting up
 	// the generator. The check mark only goes with colors, as the row's label already says the same.
 	$details = array();
-	if ( $resolved_ref ) {
+	if ( $fetched_ref ) {
 		$details[] = short_commit( $commit );
 	}
 	$details[] = ( $is_trunk ? '' : 'based on ' ) . "r$revision";
