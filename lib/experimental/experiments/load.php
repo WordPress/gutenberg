@@ -29,6 +29,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-typography-toolbar',
+					'label'       => __( 'Typography toolbar', 'gutenberg' ),
+					'description' => __( 'Adds the font and the size to the block toolbar, for every block that offers them, so typography is a click away rather than a trip to the sidebar.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

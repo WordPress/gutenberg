@@ -1,0 +1,24 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// Each font and size previews itself, so a long name has to give way rather
+// than widen the menu.
+.editor-typography-toolbar__font-popover,
+.editor-typography-toolbar__size-popover {
+	.components-menu-item__button {
+		line-height: $default-line-height;
+	}
+
+	.components-menu-item__item {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.editor-typography-toolbar__size-popover .components-popover__content {
+	max-width: 280px;
+}
+
+.editor-typography-toolbar__custom-size {
+	padding: $grid-unit-10 $grid-unit-10 0;
+}

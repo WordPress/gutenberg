@@ -3,6 +3,15 @@ import type { createSlotFill, DropdownMenu } from '@wordpress/components';
 
 type SlotFill = ReturnType< typeof createSlotFill >;
 
+declare global {
+	interface Window {
+		/**
+		 * Whether the typography toolbar experiment is enabled.
+		 */
+		__experimentalTypographyToolbar?: boolean;
+	}
+}
+
 /**
  * The last item fill of the block toolbar, which carries its slot as a
  * static.
