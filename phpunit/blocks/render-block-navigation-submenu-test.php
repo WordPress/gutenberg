@@ -51,6 +51,48 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 *
+	 * @dataProvider data_empty_labels
+	 *
+	 * @param string $label Label that has no visible text.
+	 */
+	public function test_should_not_render_when_label_has_no_visible_text( $label ) {
+		$markup = '<!-- wp:navigation-submenu ' . wp_json_encode(
+			array(
+				'label' => $label,
+				'kind'  => 'custom',
+				'url'   => 'http://' . WP_TESTS_DOMAIN . '/sample',
+			)
+		) . ' /-->';
+
+		$parsed_blocks = parse_blocks( $markup );
+		$submenu_block = new WP_Block( $parsed_blocks[0], array() );
+		$this->assertSame(
+			'',
+			gutenberg_render_block_core_navigation_submenu(
+				$submenu_block->attributes,
+				'',
+				$submenu_block
+			)
+		);
+	}
+
+	/**
+	 * Data provider for labels that contain no visible text.
+	 *
+	 * @return array
+	 */
+	public function data_empty_labels() {
+		return array(
+			'spaces'                => array( '   ' ),
+			'non-breaking space'    => array( '&nbsp;' ),
+			'literal non-breaking'  => array( "\u{00A0}" ),
+			'empty formatting tags' => array( '<strong> </strong>' ),
+		);
+	}
+
+	/**
 	 * @group submenu-color-inheritance
 	 * @covers ::gutenberg_render_block_core_navigation_submenu
 	 */
