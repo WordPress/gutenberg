@@ -3,7 +3,7 @@ import { addFilter } from '@wordpress/hooks';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
-import enhanceVariations from './hooks';
+import enhanceVariations, { hideBlockGapOutsideFlexAndGrid } from './hooks';
 import deprecated from './deprecated';
 
 const { name } = metadata;
@@ -20,6 +20,12 @@ export const init = () => {
 		'blocks.registerBlockType',
 		'core/template-part',
 		enhanceVariations
+	);
+
+	addFilter(
+		'blockEditor.useSetting.before',
+		'core/post-terms/hide-block-gap-outside-flex-and-grid',
+		hideBlockGapOutsideFlexAndGrid
 	);
 
 	return initBlock( { name, metadata, settings } );
