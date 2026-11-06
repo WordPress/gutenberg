@@ -822,21 +822,17 @@ PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using
 
 #### Running the analysis
 
-First run `composer install` and `npm run build`, which generates PHP files that the analysis needs. Then run the analysis with Composer, or in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment):
+First run `composer install` and `npm run build`, which generates PHP files that the analysis needs. Then run the analysis in either of these ways:
 
-```bash
-composer phpstan
-npm run typecheck:php
-```
+-   `composer phpstan`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php`, in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment).
 
 #### The baseline
 
-Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched. Regenerate the baseline and commit the result:
+Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched. Regenerate the baseline in either of these ways, and commit the result:
 
-```bash
-composer phpstan:baselines
-npm run typecheck:php:baselines
-```
+-   `composer phpstan:baselines`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:baselines`, in the local environment.
 
 #### WordPress stubs
 
