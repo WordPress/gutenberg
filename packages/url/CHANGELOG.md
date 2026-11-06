@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getFilename`: Decode percent-encoded characters, so filenames with non-ASCII characters or spaces, such as `生成波の音1.mp3`, are returned as written instead of as `%E7%94%9F…`.
+
 ## 5.1.0 (2026-11-04)
 
 ## 5.0.0 (2026-10-20)
