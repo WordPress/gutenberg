@@ -8,6 +8,7 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 -   Follow WordPress Design System colours and spacing by default when its tokens are present, while keeping standalone defaults and consumer overrides ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
 -   Allow consumers to theme the canvas through CSS custom properties ([#86340](https://github.com/WordPress/gutenberg/pull/86340)).
+-   Add `exportImage( state, options? )`, which exports the edited image as a `Blob` in the browser.
 
 ### Bug Fixes
 

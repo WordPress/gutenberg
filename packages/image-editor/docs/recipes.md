@@ -238,6 +238,17 @@ if ( modifiers.length ) {
 }
 ```
 
+An editor that uploads the result as a new file, rather than asking the server to edit the original, exports it in the browser instead. `exportImage( state, options? )` resolves with a `Blob` of the framed region at the size `getOutputSize( state )` reports:
+
+```ts
+import { exportImage } from '@wordpress/image-editor';
+
+const file = await exportImage( controller.state, {
+	type: 'image/jpeg',
+	quality: 0.9,
+} );
+```
+
 ## Accessibility Notes
 
 -   The crop area is focusable and keyboard-operable, and changes are announced through an ARIA live region.
