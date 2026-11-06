@@ -554,19 +554,22 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 
 	/**
 	 * The defaults every post type gets, whatever it supports, each with
-	 * whether the design post types exclude it.
+	 * whether the design post types exclude it, and the design post types
+	 * that register a field of their own with that id instead.
 	 *
-	 * @return array[] The id of each field and whether the design post
-	 *                 types exclude it.
+	 * @return array[] The id of each field, whether the design post types
+	 *                 exclude it, and the ones replacing it.
 	 */
 	public function data_default_fields_of_every_post_type() {
 		return array(
-			'date'             => array( 'date', true ),
-			'last_edited_date' => array( 'last_edited_date', false ),
-			'password'         => array( 'password', true ),
-			'scheduled_date'   => array( 'scheduled_date', true ),
-			'status'           => array( 'status', true ),
-			'template'         => array( 'template', true ),
+			'date'             => array( 'date', true, array() ),
+			'last_edited_date' => array( 'last_edited_date', false, array() ),
+			'password'         => array( 'password', true, array() ),
+			'scheduled_date'   => array( 'scheduled_date', true, array() ),
+			'status'           => array( 'status', true, array() ),
+			// Templates get the `template` field of their own collection,
+			// the template they are rendered inside.
+			'template'         => array( 'template', true, array( 'wp_template' ) ),
 		);
 	}
 
@@ -577,10 +580,11 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_default_fields_of_every_post_type
 	 *
-	 * @param string $field_id              The id of the field.
-	 * @param bool   $excluded_for_design The design post types exclude it.
+	 * @param string   $field_id            The id of the field.
+	 * @param bool     $excluded_for_design The design post types exclude it.
+	 * @param string[] $replaced_by         The design post types registering a field of their own with that id.
 	 */
-	public function test_a_default_field_of_every_post_type( $field_id, $excluded_for_design ) {
+	public function test_a_default_field_of_every_post_type( $field_id, $excluded_for_design, $replaced_by ) {
 		$this->assertContains( $field_id, self::EVERY_POST_TYPE_FIELDS, 'The tests know the field applies to every post type.' );
 		$this->register_post_types( array( 'gutenberg_plain' => array( 'title' ) ) );
 		self::reset_registry();
@@ -588,7 +592,9 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertContains( $field_id, array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_plain' ), 'id' ) );
 		foreach ( array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ) as $post_type ) {
 			$ids = array_column( wp_get_registered_entity_fields( 'postType', $post_type ), 'id' );
-			if ( $excluded_for_design ) {
+			if ( in_array( $post_type, $replaced_by, true ) ) {
+				$this->assertContains( $field_id, $ids, "$post_type registers a field of its own with that id." );
+			} elseif ( $excluded_for_design ) {
 				$this->assertNotContains( $field_id, $ids, "$post_type excludes the field." );
 			} else {
 				$this->assertContains( $field_id, $ids, "$post_type gets the field." );
@@ -965,12 +971,15 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( wp_get_registered_entity_fields( 'postType', 'wp_template' ), null, 'id' );
+		// `get_support_field_ids()` leaves out the ids of the defaults every
+		// post type gets, which `template` is one of, so the `template` field
+		// of the collection is asserted through its module below.
 		$this->assertSame( array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The fields are the ones of the collection, not the default author and title fields.' );
 		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ),
+			array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'template', 'title' ),
 			array_column( wp_get_registered_entity_field_modules( 'postType', 'wp_template' ), 'fields', 'id' )['@wordpress/core-fields/wp_template'],
 			'The fields of templates ship their JavaScript parts in the module of the collection.'
 		);

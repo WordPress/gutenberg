@@ -20,6 +20,7 @@ import { fieldExtensions as descriptionReadonly } from './description_readonly/f
 import { fieldExtensions as defaultCommentStatus } from './default_comment_status/field';
 import { fieldExtensions as postsPageTitle } from './posts_page_title/field';
 import { fieldExtensions as postsPerPage } from './posts_per_page/field';
+import { fieldExtensions as template } from './template/field';
 import { fieldExtensions as title } from './title/field';
 
 const fields: FieldsScriptParts = {
@@ -29,6 +30,7 @@ const fields: FieldsScriptParts = {
 	posts_page_title: postsPageTitle,
 	posts_per_page: postsPerPage,
 	default_comment_status: defaultCommentStatus,
+	template,
 	title,
 };
 

@@ -61,6 +61,17 @@ const NON_CONTEXTUAL_POST_TYPES = [
 ];
 
 /**
+ * The blocks that hold what is being edited when a template is rendered inside
+ * another one.
+ *
+ * The slot is the post content block of the template around it, and the server
+ * substitutes that block alone. A post title or a featured image in the
+ * template around it belongs to that template, which is edited on its own
+ * screen, so neither is content to edit here.
+ */
+const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/post-content' ];
+
+/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -175,8 +186,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		renderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
-		__unstableTemplate: template,
+		__unstableTemplate: _template,
 	} ) => {
+		/*
+		 * A host editing a template names that template as the template too,
+		 * so that the canvas stands for it. There is nothing to render around
+		 * it then, unlike a template that names another one to render inside.
+		 */
+		const standsForOwnTemplate = _template?.id === post.id;
+		const template = standsForOwnTemplate ? undefined : _template;
 		const hasTemplate = !! template;
 		const {
 			editorSettings,
@@ -206,8 +224,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
+				//
+				// A canvas that stands for the template it is editing has
+				// nothing to render around it, so the mode that renders a
+				// post inside its template has nothing to show: the template
+				// is edited on its own however the preference for the post
+				// type reads, and the mode is settled rather than pending.
 				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+					renderingMode ??
+					( standsForOwnTemplate
+						? 'post-only'
+						: getDefaultRenderingMode( post.type ) );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -247,14 +274,34 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[
+				post.type,
+				post.id,
+				hasTemplate,
+				standsForOwnTemplate,
+				renderingMode,
+			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
+		/*
+		 * A template can name the template it is rendered inside, in which case
+		 * the canvas shows that one around it and the template being edited is
+		 * what its post content block renders, the way a page is.
+		 */
+		const isTemplateInsideTemplate =
+			shouldRenderTemplate &&
+			post.type === 'wp_template' &&
+			template.id !== post.id;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
+			// A template rendered inside another is given the same context, so
+			// that the blocks of the template around it, such as a title block
+			// in its header, stand for the post that template renders rather
+			// than for the template; its post content block is told which
+			// template to render through `templateSlotId` instead.
 			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
@@ -280,14 +327,27 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				postContext.postType = post.type;
 			}
 
+			/*
+			 * The template the blocks being edited belong to. For a template
+			 * rendered inside another that is the template itself: the blocks
+			 * in the slot are its own, and what they stand for — an archive, a
+			 * category, an author — follows from its slug rather than from the
+			 * slug of the template around them.
+			 */
+			let templateSlug;
+			if ( isTemplateInsideTemplate ) {
+				templateSlug = post.slug;
+			} else if ( rootLevelPost.type === 'wp_template' ) {
+				templateSlug = rootLevelPost.slug;
+			}
+
 			return {
 				...postContext,
-				templateSlug:
-					rootLevelPost.type === 'wp_template'
-						? rootLevelPost.slug
-						: undefined,
+				templateSlug,
+				templateSlotId: isTemplateInsideTemplate ? post.id : undefined,
 			};
 		}, [
+			isTemplateInsideTemplate,
 			shouldRenderTemplate,
 			post.id,
 			post.type,
@@ -402,10 +462,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => updateEditorSettings( { renderingMode: undefined } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
 
-		// Synchronizes the active template with the state.
+		// Synchronizes the active template with the state. Named from the prop
+		// rather than the template to render around the post, so a canvas that
+		// stands for a template still reports which one it is editing.
 		useEffect( () => {
-			setCurrentTemplateId( template?.id );
-		}, [ template?.id, setCurrentTemplateId ] );
+			setCurrentTemplateId( _template?.id );
+		}, [ _template?.id, setCurrentTemplateId ] );
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
@@ -462,7 +524,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
 									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
+										<DisableNonPageContentBlocks
+											contentBlockTypes={
+												isTemplateInsideTemplate
+													? TEMPLATE_SLOT_BLOCK_TYPES
+													: undefined
+											}
+											templatePartEditingMode={
+												isTemplateInsideTemplate
+													? 'disabled'
+													: undefined
+											}
+										/>
 									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />

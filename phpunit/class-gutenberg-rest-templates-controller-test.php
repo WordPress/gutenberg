@@ -94,26 +94,28 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		unset( $data['_links'] );
 
 		$expected = array(
-			'id'              => 'default//my_template',
-			'theme'           => 'default',
-			'slug'            => 'my_template',
-			'source'          => 'custom',
-			'origin'          => null,
-			'type'            => 'wp_template',
-			'description'     => 'Description of my template.',
-			'title'           => array(
+			'id'               => 'default//my_template',
+			'theme'            => 'default',
+			'slug'             => 'my_template',
+			'source'           => 'custom',
+			'origin'           => null,
+			'type'             => 'wp_template',
+			'description'      => 'Description of my template.',
+			'title'            => array(
 				'raw'      => 'My Template',
 				'rendered' => 'My Template',
 			),
-			'status'          => 'publish',
-			'wp_id'           => self::$template_post->ID,
-			'has_theme_file'  => false,
-			'is_custom'       => true,
-			'author'          => 0,
-			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-			'author_text'     => 'Test Blog',
-			'original_source' => 'site',
-			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+			'status'           => 'publish',
+			'wp_id'            => self::$template_post->ID,
+			'has_theme_file'   => false,
+			'is_custom'        => true,
+			'author'           => 0,
+			'modified'         => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'      => 'Test Blog',
+			'original_source'  => 'site',
+			'date'             => mysql_to_rfc3339( self::$template_post->post_date ),
+			'template'         => '',
+			'has_content_slot' => false,
 		);
 		$actual   = $data;
 
@@ -133,26 +135,28 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$data     = $response->get_data();
 
 		$expected = array(
-			'id'              => 'default//my_template',
-			'theme'           => 'default',
-			'slug'            => 'my_template',
-			'source'          => 'custom',
-			'origin'          => null,
-			'type'            => 'wp_template',
-			'description'     => 'Description of my template.',
-			'title'           => array(
+			'id'               => 'default//my_template',
+			'theme'            => 'default',
+			'slug'             => 'my_template',
+			'source'           => 'custom',
+			'origin'           => null,
+			'type'             => 'wp_template',
+			'description'      => 'Description of my template.',
+			'title'            => array(
 				'raw'      => 'My Template',
 				'rendered' => 'My Template',
 			),
-			'status'          => 'publish',
-			'wp_id'           => self::$template_post->ID,
-			'has_theme_file'  => false,
-			'is_custom'       => true,
-			'author'          => 0,
-			'modified'        => mysql_to_rfc3339( self::$template_post->post_modified ),
-			'author_text'     => 'Test Blog',
-			'original_source' => 'site',
-			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+			'status'           => 'publish',
+			'wp_id'            => self::$template_post->ID,
+			'has_theme_file'   => false,
+			'is_custom'        => true,
+			'author'           => 0,
+			'modified'         => mysql_to_rfc3339( self::$template_post->post_modified ),
+			'author_text'      => 'Test Blog',
+			'original_source'  => 'site',
+			'date'             => mysql_to_rfc3339( self::$template_post->post_date ),
+			'template'         => '',
+			'has_content_slot' => false,
 		);
 		$actual   = $this->find_and_normalize_template_by_id( $data, 'default//my_template' );
 
@@ -234,8 +238,10 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 19, $properties );
+		$this->assertCount( 21, $properties );
 		$this->assertArrayHasKey( 'id', $properties );
+		$this->assertArrayHasKey( 'template', $properties );
+		$this->assertArrayHasKey( 'has_content_slot', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
 		$this->assertArrayHasKey( 'theme', $properties );
