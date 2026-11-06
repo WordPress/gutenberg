@@ -3,7 +3,7 @@ import type { Block, BlockType } from '@wordpress/blocks';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
-} from '../components/collab-sidebar/utils';
+} from '../components/collab-sidebar/utils/metadata';
 
 type Metadata = Record< string, unknown >;
 
