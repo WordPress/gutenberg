@@ -540,6 +540,18 @@ const reloadAndDischarge = ( token: number ) => {
 	}
 };
 
+// The navigation type the browser reported, through its Navigation API, for
+// the latest change of the current history entry. The browser reports it
+// right before the `popstate` that change fires, so the listener below can
+// tell a fragment navigation (`push` or `replace`), such as an in-page link
+// click, from a back/forward traversal (`traverse`). It stays `null` where the
+// browser has no Navigation API, and every `popstate` is then handled as a
+// traversal.
+let entryChangeType: NavigationType | null = null;
+window.navigation?.addEventListener( 'currententrychange', ( event ) => {
+	entryChangeType = event.navigationType;
+} );
+
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 //
@@ -551,6 +563,20 @@ const reloadAndDischarge = ( token: number ) => {
 // callback contributes no scope, while a `withScope()`-wrapped callback
 // contributes the scope it installed.
 window.addEventListener( 'popstate', async () => {
+	// A fragment navigation, such as an in-page link click, is not a
+	// navigation start. While an `actions.navigate()` call is in flight, it
+	// only brings `state.url` to the new URL: the call keeps the token,
+	// renders its page and ends the lifecycle. Otherwise, it is handled like a
+	// traversal below.
+	if (
+		( entryChangeType === 'push' || entryChangeType === 'replace' ) &&
+		currentNavigationId === navigateCallId &&
+		state.navigating
+	) {
+		state.url = window.location.href;
+		return;
+	}
+
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 
 	// Claim the lifecycle token (see the `navigationId` comment above
@@ -586,6 +612,14 @@ window.addEventListener( 'popstate', async () => {
 
 		const page = await pages.get( pagePath );
 
+		// A newer navigation started while the page was loading. It owns the
+		// page, the URL and the lifecycle, so this traversal neither renders
+		// nor reloads. Nothing may suspend or write to a store between this
+		// check and the reload below.
+		if ( currentNavigationId !== token ) {
+			return;
+		}
+
 		// A cached entry that resolved to nothing also reloads. The claim-frame
 		// clear above already ran; on this exit, reload comes before the
 		// discharge, which writes only what changes.
@@ -596,17 +630,33 @@ window.addEventListener( 'popstate', async () => {
 
 		// Start of the lifecycle. If a `navigate()` call is still in flight,
 		// `navigating` is already `true` and the signal dedups the write.
-		if ( currentNavigationId === token ) {
-			batch( () => {
-				state.navigating = true;
-				state.initiator = null;
-			} );
+		batch( () => {
+			state.navigating = true;
+			state.initiator = null;
+		} );
+
+		// A `watch()` reacting to that start can start a newer navigation,
+		// which then owns the page. Nothing may suspend or write to a store
+		// between this check and the render below.
+		if ( currentNavigationId !== token ) {
+			return;
 		}
 
+		// A traversal shows no loading feedback of its own, but it closes the
+		// feedback that a navigation which ended without rendering, such as one
+		// this traversal superseded, left open.
+		const { navigation } = privateState;
 		batch( () => {
 			state.url = window.location.href;
+			if ( navigation.hasStarted ) {
+				navigation.hasStarted = false;
+				navigation.hasFinished = true;
+			}
 			renderPage( page );
 		} );
+		if ( isLoadingAnnounced ) {
+			a11ySpeak( 'loaded' );
+		}
 
 		// Schedule the end write on the next frame, like `navigate()` does, so
 		// directives observe the transition (see the comment on that write).
@@ -663,17 +713,27 @@ window.document
 	);
 } )();
 
-// Variable to store the current navigation.
-let navigatingTo = '';
-
 // Token that identifies the navigation currently in flight. A navigation
 // claims it with `currentNavigationId = ++navigationId` and then guards all
 // its lifecycle writes (`state.navigating` and `state.initiator`) with
 // `currentNavigationId === token`, so a superseded navigation never writes
-// over a newer one. Whoever claims the token must end the lifecycle on every
-// exit path.
+// over a newer one. The same check, run after each wait, keeps a superseded
+// navigation from rendering its page or falling back to a full page load, and
+// run by the 400 ms timer, from showing the loading feedback.
+// Whoever claims the token must end the lifecycle on every exit path.
 let navigationId = 0;
 let currentNavigationId = 0;
+
+// Token of the most recent `actions.navigate()` call. While it is also the
+// current token and `state.navigating` is `true`, that call is in flight.
+let navigateCallId = 0;
+
+// Whether the router's latest announcement is the loading message. While it
+// is, the next navigation that renders its page announces the loaded message,
+// whatever its options, so the loading message of a navigation that ended
+// without rendering, such as a superseded one, is followed by a single loaded
+// message when the visitor's page renders. `a11ySpeak()` keeps it up to date.
+let isLoadingAnnounced = false;
 
 let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
@@ -791,6 +851,11 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
+		 * If another navigation (another call or a back/forward traversal)
+		 * starts before this one renders its page, this one is abandoned: it
+		 * doesn't render its page, change the session history or fall back to
+		 * a full page load.
+		 *
 		 * @param href                               The page href.
 		 * @param [options]                          Options object.
 		 * @param [options.force]                    If true, it forces re-fetching the URL.
@@ -801,7 +866,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 * @param [options.initiator]                Who started the navigation. A nonempty string is used as is; `null` suppresses attribution silently; omitting it derives the value from the directive scope. An empty string or any other invalid value warns when `SCRIPT_DEBUG` is enabled, resolves to `null`, and never derives an initiator.
 		 *
-		 * @return  Promise that resolves once the navigation is completed or aborted.
+		 * @return  Promise that resolves once the navigation is completed or abandoned.
 		 */
 		*navigate( href: string, options: NavigateOptions = {} ) {
 			// Only read the options passed as own properties.
@@ -826,7 +891,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 				timeout = 10000,
 			} = options;
 
-			navigatingTo = href;
 			actions.prefetch( pagePath, options );
 
 			// Creates a promise that resolves when the specified timeout ends.
@@ -835,9 +899,16 @@ export const { state, actions } = store< Store >( 'core/router', {
 				setTimeout( resolve, timeout )
 			);
 
+			// Claim the lifecycle token. This navigation must end the lifecycle
+			// on every exit path; see the `finally` below.
+			const token = ++navigationId;
+			currentNavigationId = token;
+			navigateCallId = token;
+
 			// Doesn't update the navigation status immediately, wait 400 ms.
+			// A navigation superseded by then shows no loading feedback.
 			const loadingTimeout = setTimeout( () => {
-				if ( navigatingTo !== href ) {
+				if ( currentNavigationId !== token ) {
 					return;
 				}
 
@@ -849,11 +920,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 					a11ySpeak( 'loading' );
 				}
 			}, 400 );
-
-			// Claim the lifecycle token. This navigation must end the lifecycle
-			// on every exit path; see the `finally` below.
-			const token = ++navigationId;
-			currentNavigationId = token;
 
 			try {
 				// Write both keys in one batch so no watcher sees `navigating`
@@ -874,20 +940,31 @@ export const { state, actions } = store< Store >( 'core/router', {
 				// Dismisses loading message if it hasn't been added yet.
 				clearTimeout( loadingTimeout );
 
-				// Once the page is fetched, the destination URL could have changed
-				// (e.g., by clicking another link in the meantime). If so, bail
-				// out, and let the newer execution to update the HTML.
-				if ( navigatingTo !== href ) {
+				const canRenderPage =
+					page &&
+					! page.initialData?.config?.[ 'core/router' ]
+						?.clientNavigationDisabled;
+
+				// A navigation that has been superseded does not import the
+				// page's script modules.
+				if ( canRenderPage && currentNavigationId === token ) {
+					yield importScriptModules( page.scriptModules );
+				}
+
+				// Another navigation (a `navigate()` call, including one to the
+				// same URL, or a back/forward traversal) started while this one
+				// was waiting. The newest navigation owns the page, `state.url`,
+				// the session history, the document and the loading feedback, so
+				// this one neither renders, falls back to a full page load nor
+				// touches the feedback, and its promise resolves. Nothing may
+				// suspend or write to a store, whose watchers can start a
+				// navigation, between this check and the commit or the fallback
+				// below.
+				if ( currentNavigationId !== token ) {
 					return;
 				}
 
-				if (
-					page &&
-					! page.initialData?.config?.[ 'core/router' ]
-						?.clientNavigationDisabled
-				) {
-					yield importScriptModules( page.scriptModules );
-
+				if ( canRenderPage ) {
 					// The batch keeps `state.url` and `renderPage()` together so
 					// consumers see the URL and the DOM change at once. Derivation
 					// reads whatever scope is ambient at the `navigate()` entry.
@@ -896,8 +973,11 @@ export const { state, actions } = store< Store >( 'core/router', {
 						state.url = href;
 
 						// Updates the navigation status once the new page rendering
-						// has been completed.
-						if ( loadingAnimation ) {
+						// has been completed. The animation that a navigation which
+						// ended without rendering left running, such as one this
+						// navigation superseded, finishes here too, whatever the
+						// options.
+						if ( loadingAnimation || navigation.hasStarted ) {
 							navigation.hasStarted = false;
 							navigation.hasFinished = true;
 						}
@@ -910,7 +990,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 						options.replace ? 'replaceState' : 'pushState'
 					]( { wpInteractivityId: sessionId }, '', href );
 
-					if ( screenReaderAnnouncement ) {
+					if ( screenReaderAnnouncement || isLoadingAnnounced ) {
 						a11ySpeak( 'loaded' );
 					}
 
@@ -998,10 +1078,13 @@ state.url = state.url || window.location.href;
  *
  * This is a wrapper around the `@wordpress/a11y` package's `speak` function. It handles importing
  * the package on demand and should be used instead of calling `a11y.speak` directly.
+ * It also records whether the latest announcement is the loading message.
  *
  * @param messageKey The message to be announced by assistive technologies.
  */
 function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
+	isLoadingAnnounced = messageKey === 'loading';
+
 	if ( ! hasLoadedNavigationTextsData ) {
 		hasLoadedNavigationTextsData = true;
 		const script = document.querySelector(
