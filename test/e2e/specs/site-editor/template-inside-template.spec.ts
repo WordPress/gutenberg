@@ -377,6 +377,44 @@ test.describe( 'Template rendered inside another template', () => {
 		).toBeVisible();
 	} );
 
+	test( 'labels the archive by the template being edited rather than the one around it', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'archive-frame',
+			title: 'Archive frame',
+			content: '<!-- wp:post-content /-->',
+		} );
+		await createTemplateInside( requestUtils, {
+			slug: 'category',
+			title: 'Category',
+			content: '<!-- wp:query-title {"type":"archive"} /-->',
+			template: 'archive-frame',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//category',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		const archiveTitle = editor.canvas.locator( '.wp-block-query-title' );
+		await expect( archiveTitle ).toHaveText( 'Category: Name' );
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		// The title is still the category's, rather than the generic label of a
+		// template, `archive-frame`, whose slug names no archive.
+		await expect( archiveTitle ).toHaveText( 'Category: Name' );
+	} );
+
 	test( 'previews the blocks in the slot as the template they belong to', async ( {
 		admin,
 		editor,
@@ -386,7 +424,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'wrapper',
 			title: 'Wrapper',
-			content: '<!-- wp:post-content /-->',
+			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'single',
@@ -411,11 +449,14 @@ test.describe( 'Template rendered inside another template', () => {
 		 * The blocks in the slot are the ones of the template being edited, and
 		 * they stand for the post it renders the way they do when it is edited on
 		 * its own: the title is the one a post has yet to be given rather than the
-		 * title of the template.
+		 * title of the template. So does the title in the template around it,
+		 * which shows the title of the same post on the front end, rather than
+		 * the title of the template being edited.
 		 */
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Title' } )
-		).toHaveText( 'Title' );
+		const titles = editor.canvas.locator( '.wp-block-post-title' );
+		await expect( titles ).toHaveCount( 2 );
+		await expect( titles.nth( 0 ) ).toHaveText( 'Title' );
+		await expect( titles.nth( 1 ) ).toHaveText( 'Title' );
 
 		// The content block of the template being edited is where the content of
 		// that post goes, rather than the template rendering itself.
