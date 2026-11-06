@@ -3,7 +3,12 @@ import { Button, DateTimePicker } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import {
+	date as formatDate,
+	dateI18n,
+	getDate,
+	getSettings,
+} from '@wordpress/date';
 import { useId, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fieldset, Stack } from '@wordpress/ui';
@@ -15,18 +20,42 @@ import styles from './style.module.css';
 
 type Item = PostWithDate & { id?: number; type?: string };
 
+function toTimezonelessDate( date: Date, time: string ) {
+	const pad = ( number: number ) => String( number ).padStart( 2, '0' );
+	return `${ date.getFullYear() }-${ pad( date.getMonth() + 1 ) }-${ pad(
+		date.getDate()
+	) }T${ time }`;
+}
+
+/*
+ * The bounds of the posts query for the month of a date. The server reads a
+ * date without a timezone in the site's timezone, as `post_date` is, so the
+ * bounds carry none. Both are exclusive: they are the last second of the
+ * previous month and the first second of the next one.
+ */
 function getMonthBounds( date: Date ) {
+	const year = date.getFullYear();
+	const month = date.getMonth();
 	return {
-		after: new Date( date.getFullYear(), date.getMonth(), 1 ).toISOString(),
-		before: new Date(
-			date.getFullYear(),
-			date.getMonth() + 1,
-			0,
-			23,
-			59,
-			59
-		).toISOString(),
+		after: toTimezonelessDate( new Date( year, month, 0 ), '23:59:59' ),
+		before: toTimezonelessDate(
+			new Date( year, month + 1, 1 ),
+			'00:00:00'
+		),
 	};
+}
+
+/*
+ * Today's month in the site's timezone: the month the date picker shows when
+ * there is no date. The browser's month can differ near a month boundary.
+ */
+function getSiteMonth() {
+	const now = new Date();
+	return new Date(
+		Number( formatDate( 'Y', now ) ),
+		Number( formatDate( 'n', now ) ) - 1,
+		1
+	);
 }
 
 /*
@@ -45,8 +74,17 @@ export default function DateEdit( {
 	const value = field.getValue( { item: data } ) ?? undefined;
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		value ? new Date( value ) : new Date()
+		value ? new Date( value ) : getSiteMonth()
 	);
+
+	// The calendar moves to the month of a new date, from the Month and Year
+	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
+	// markers come from the month on screen.
+	const [ prevValue, setPrevValue ] = useState( value );
+	if ( value !== prevValue ) {
+		setPrevValue( value );
+		setPreviewedMonth( value ? new Date( value ) : getSiteMonth() );
+	}
 
 	// Mark the days with published and scheduled posts of the same type.
 	const otherPosts = useSelect(
