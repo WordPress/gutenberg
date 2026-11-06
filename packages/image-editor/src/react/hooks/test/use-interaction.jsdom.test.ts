@@ -182,6 +182,29 @@ describe( 'useInteraction grid placement signal', () => {
 		expect( result.current.isPlacementActive ).toBe( false );
 	} );
 
+	it( 'stops wheel zoom at the maxZoom option the canvas passes from the controller', () => {
+		vi.useFakeTimers();
+		const actions = createActions();
+		const { result } = renderHook( () =>
+			useInteraction( makeState(), actions, CONTAINER_SIZE, IMAGE_SIZE, {
+				maxZoom: 2.5,
+			} )
+		);
+
+		act( () => {
+			result.current.onWheelNative(
+				createWheelEvent( { deltaY: -4000, currentTarget: null } )
+			);
+		} );
+
+		// Without an element to measure, wheel zoom has no focal point and
+		// uses the plain setter.
+		expect( actions.setZoom ).toHaveBeenCalledTimes( 1 );
+		const [ zoom ] = actions.setZoom.mock.calls[ 0 ];
+		expect( zoom ).toBeGreaterThan( 2 );
+		expect( zoom ).toBeLessThanOrEqual( 2.5 );
+	} );
+
 	it( 'sets isPlacementActive during pinch zoom, then clears it on touch end', () => {
 		const doc = createTouchDocument();
 		const target = createTouchTarget( doc );

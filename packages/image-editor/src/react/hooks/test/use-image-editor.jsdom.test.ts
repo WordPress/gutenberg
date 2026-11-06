@@ -142,6 +142,65 @@ describe( 'useInternalImageEditor', () => {
 		expect( result.current.state.zoom ).toBe( 1 );
 	} );
 
+	it( 'caps zoom at the maxZoom option, for the setters that take a zoom', () => {
+		const { result } = renderHook( () =>
+			useInternalImageEditor( { maxZoom: 5 } )
+		);
+
+		expect( result.current.maxZoom ).toBe( 5 );
+
+		act( () => {
+			result.current.setZoom( 8 );
+		} );
+		expect( result.current.state.zoom ).toBe( 5 );
+
+		act( () => {
+			result.current.setZoomAtPoint( 8, { x: 0, y: 0 } );
+		} );
+		expect( result.current.state.zoom ).toBe( 5 );
+	} );
+
+	it( 'treats a maxZoom below 1, non-finite or above the ceiling as absent', () => {
+		for ( const maxZoom of [ 0, -2, NaN, Infinity, 50 ] ) {
+			const { result } = renderHook( () =>
+				useInternalImageEditor( { maxZoom } )
+			);
+
+			expect( result.current.maxZoom ).toBe( 10 );
+
+			act( () => {
+				result.current.setZoom( 8 );
+			} );
+			expect( result.current.state.zoom ).toBe( 8 );
+		}
+	} );
+
+	it( 'lets the coverage floor win over a lower maxZoom', () => {
+		// A fine rotation of a full-frame crop needs more than 1x zoom
+		// to keep the image covering the crop, so the floor sits above
+		// a cap of 1. The cap must not pull the zoom below the floor.
+		const { result } = renderHook( () =>
+			useInternalImageEditor( {
+				maxZoom: 1,
+				initialState: {
+					image: {
+						src: 'landscape.jpg',
+						naturalWidth: 1000,
+						naturalHeight: 600,
+					},
+					rotation: 45,
+				},
+			} )
+		);
+		const floor = result.current.state.zoom;
+		expect( floor ).toBeGreaterThan( 1 );
+
+		act( () => {
+			result.current.setZoom( 5 );
+		} );
+		expect( result.current.state.zoom ).toBe( floor );
+	} );
+
 	it( 'allows setZoom below 1 when the coverage minimum permits', () => {
 		// Thin, fine-rotated crop on a portrait image: the coverage
 		// minimum drops below 1, so `setZoom` (slider / keyboard path)

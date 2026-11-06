@@ -140,6 +140,12 @@ export function createImageEditorState(
 export interface InternalImageEditorOptions {
 	/** Starting state when the controller keeps its own state. */
 	initialState?: Partial< InternalImageEditorState >;
+	/**
+	 * The largest zoom allowed, from 1 up to the editor's own ceiling.
+	 * Reported as `maxZoom` on the controller, so the canvas's wheel and
+	 * pinch zoom stop there too. A value outside that range is ignored.
+	 */
+	maxZoom?: number;
 	/** The state, when you keep it yourself. */
 	state?: ImageEditorState;
 	/**
@@ -168,6 +174,17 @@ export function useInternalImageEditor(
 ): InternalImageEditorController {
 	const { initialState, state: controlledState, onChange } = options;
 	const isControlled = controlledState !== undefined;
+	// A cap below 1 or above the ceiling is not a cap; the ceiling stays.
+	const maxZoom =
+		typeof options.maxZoom === 'number' &&
+		Number.isFinite( options.maxZoom ) &&
+		options.maxZoom >= 1
+			? Math.min( options.maxZoom, MAX_ZOOM )
+			: MAX_ZOOM;
+	const maxZoomRef = useRef( maxZoom );
+	useLayoutEffect( () => {
+		maxZoomRef.current = maxZoom;
+	}, [ maxZoom ] );
 
 	const [ ownState, setOwnState ] = useState< InternalImageEditorState >(
 		() => enforceContainment( { ...DEFAULT_STATE, ...initialState } )
@@ -302,7 +319,8 @@ export function useInternalImageEditor(
 				( action ) => {
 					apply( action );
 				},
-				() => latestRef.current
+				() => latestRef.current,
+				() => maxZoomRef.current
 			),
 		[ apply ]
 	);
@@ -347,7 +365,7 @@ export function useInternalImageEditor(
 				reset,
 				isDirty,
 				minZoom,
-				maxZoom: MAX_ZOOM,
+				maxZoom,
 				maxRotationOffset: MAX_ROTATION_OFFSET,
 				getCroppedImage,
 				adjustCropRectForViewport,
@@ -359,6 +377,7 @@ export function useInternalImageEditor(
 			reset,
 			isDirty,
 			minZoom,
+			maxZoom,
 			getCroppedImage,
 			adjustCropRectForViewport,
 		]
@@ -424,6 +443,12 @@ export interface ImageEditorController {
 export interface ImageEditorOptions {
 	/** The current state. Start from `createImageEditorState()`. */
 	state: ImageEditorState;
+	/**
+	 * The largest zoom allowed, from 1 up to the editor's own ceiling.
+	 * Reported as `maxZoom` on the controller, so the canvas's wheel and
+	 * pinch zoom stop there too. A value outside that range is ignored.
+	 */
+	maxZoom?: number;
 	/**
 	 * Called with the next state. `isEdit` is `false` for changes the
 	 * person did not make, such as an image loading or the crop being

@@ -20,15 +20,18 @@ import { getMinZoom, restrictPanZoom } from './containment';
  *
  * @param state         The current editor state.
  * @param requestedZoom The zoom value the caller asked for.
+ * @param maxZoom       The largest zoom allowed. Defaults to `MAX_ZOOM`.
+ *                      The coverage floor wins over a cap below it.
  * @return A `SET_ZOOM_AT_POINT` action, or `null` if no change is required.
  */
 export function buildFocalPointZoomAction(
 	state: InternalImageEditorState,
-	requestedZoom: number
+	requestedZoom: number,
+	maxZoom: number = MAX_ZOOM
 ): ImageEditorAction | null {
-	const clampedZoom = Math.min(
-		MAX_ZOOM,
-		Math.max( getMinZoom( state ), requestedZoom )
+	const clampedZoom = Math.max(
+		getMinZoom( state ),
+		Math.min( maxZoom, requestedZoom )
 	);
 	if ( clampedZoom === state.zoom ) {
 		return null;

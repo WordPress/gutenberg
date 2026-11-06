@@ -112,9 +112,9 @@ The canvas the person edits the image on. It fills its parent, so render it insi
 -   `onGestureEnd()`: called when a drag, resize or pinch ends.
 -   `className`: an extra class for the container.
 
-### `useImageEditor( { state, onChange } )`
+### `useImageEditor( { state, onChange, maxZoom } )`
 
-React hook that returns the editor's controller. Pass the current state and a function that stores the next one. `onChange( nextState, { isEdit } )` gets `isEdit: false` for changes the person did not make, such as an image loading or the crop being refitted after a window resize, which usually should not get an undo entry.
+React hook that returns the editor's controller. Pass the current state and a function that stores the next one. `onChange( nextState, { isEdit } )` gets `isEdit: false` for changes the person did not make, such as an image loading or the crop being refitted after a window resize, which usually should not get an undo entry. `maxZoom` is optional: it caps how far the editor zooms, from 1 up to the editor's own ceiling of 10, and the canvas's wheel and pinch zoom stop there too. A value outside that range leaves the ceiling in place.
 
 The controller has:
 
@@ -122,7 +122,7 @@ The controller has:
 -   `setPan( { x, y } )`, `setZoom( zoom )`, `setRotation( degrees )`, `snapRotate90( 1 | -1 )`, `setFlip( { horizontal, vertical } )`, `toggleFlip( 'horizontal' | 'vertical' )`, `setCropRect( { x, y, width, height } )` and `setAspectRatio( ratio )` to change the edit. The crop area is in fractions of the view, from 0 to 1. The pan is an offset from the centre, so it is signed, and how far it can go depends on the zoom and the crop, because the image has to cover the crop. `setAspectRatio( ratio )` reshapes the crop to the largest box of that ratio, and `setAspectRatio( undefined )` unlocks it. While a ratio is locked, the crop always has that ratio: a crop that does not match, from `setCropRect` or a state you pass in, keeps its centre and width and takes the height the ratio needs.
 -   `setImage( image )` to load an image. The canvas calls it when `src` loads. The first image keeps the state you started from, such as an edit you saved earlier. Replacing or clearing a loaded image starts fresh: no pan, zoom, rotation, flip or crop from the old image, but a locked ratio stays.
 -   `reset()` to go back to the clean state, and `isDirty`, which is `true` when the pan, zoom, rotation, flip or crop differs from that state. The clean state is the state you started from, as the editor settled it before the person made an edit: loading the image and fitting the crop to a locked ratio are not edits. So `reset()` keeps a locked ratio only when the state you started from had one; a ratio locked later is an edit, and reset undoes it along with the rest. Locking a ratio usually makes the edit dirty, because it reshapes the crop. Unlocking does not, and nor does locking a ratio the crop already has.
--   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit.
+-   `minZoom`, `maxZoom` and `maxRotationOffset`: the limits for building zoom and rotation controls. `minZoom` is the smallest zoom that still covers the crop area, so it changes with the edit. `maxZoom` is the cap you passed, or the editor's ceiling. When a crop needs more zoom than the cap to stay covered, the floor wins.
 
 ### `ImageEditorState`, `createImageEditorState( options? )`
 

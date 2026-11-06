@@ -6,6 +6,7 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import { buildFocalPointZoomAction } from '../../core/setter-helpers';
+import { MAX_ZOOM } from '../../core/constants';
 
 /**
  * The named editor setters `useInternalImageEditor` exposes.
@@ -42,16 +43,23 @@ export interface ImageEditorSetters {
  *                       Used by setters that need to read
  *                       the latest state to compute their
  *                       payload (focal-point zoom, flip toggle).
+ * @param getMaxZoom     Return the largest zoom the consumer allows.
+ *                       Defaults to `MAX_ZOOM`.
  * @return The named editor setters.
  */
 export function buildImageEditorSetters(
 	dispatchAction: ( action: ImageEditorAction ) => void,
-	getState: () => InternalImageEditorState
+	getState: () => InternalImageEditorState,
+	getMaxZoom: () => number = () => MAX_ZOOM
 ): ImageEditorSetters {
 	return {
 		setPan: ( pan ) => dispatchAction( { type: 'SET_PAN', payload: pan } ),
 		setZoom: ( zoom ) => {
-			const action = buildFocalPointZoomAction( getState(), zoom );
+			const action = buildFocalPointZoomAction(
+				getState(),
+				zoom,
+				getMaxZoom()
+			);
 			if ( action ) {
 				dispatchAction( action );
 			}
@@ -59,7 +67,8 @@ export function buildImageEditorSetters(
 		setZoomAtPoint: ( zoom, pan ) =>
 			dispatchAction( {
 				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom, pan },
+				// The reducer raises the zoom to the coverage floor.
+				payload: { zoom: Math.min( getMaxZoom(), zoom ), pan },
 			} ),
 		setRotation: ( rotation ) =>
 			dispatchAction( {
