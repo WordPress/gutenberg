@@ -1867,7 +1867,7 @@
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 3
+			"count": 2
 		},
 		"react-hooks/immutability": {
 			"count": 1
@@ -3964,9 +3964,6 @@
 			"count": 1
 		},
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {

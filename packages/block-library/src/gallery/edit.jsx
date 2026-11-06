@@ -798,18 +798,6 @@ export default function GalleryEdit( props ) {
 		} );
 	}
 
-	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
-		if ( ! linkTo ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				linkTo:
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE,
-			} );
-		}
-	}, [ linkTo ] );
-
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0

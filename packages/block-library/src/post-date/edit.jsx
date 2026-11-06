@@ -1,5 +1,5 @@
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	dateI18n,
 	humanTimeDiff,
@@ -8,7 +8,6 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
-	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalDateFormatPicker as DateFormatPicker,
@@ -25,7 +24,7 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
@@ -50,19 +49,6 @@ export default function PostDateEdit( props ) {
 		() => ( { anchor: popoverAnchor } ),
 		[ popoverAnchor ]
 	);
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	// We need to set the datetime to a default value upon first loading
-	// to discern the block from its legacy version (which would default
-	// to the containing post's publish date).
-	useEffect( () => {
-		if ( datetime === undefined ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { datetime: new Date() } );
-		}
-	}, [ datetime ] );
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dateSettings = getDateSettings();

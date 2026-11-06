@@ -51,7 +51,7 @@ import type {
 type RichTextHtml = string | RichTextData | undefined;
 type BlockTypeWithEditableRoot = BlockType & Record< symbol, unknown >;
 
-const { editableRootKey } = unlock( blocksPrivateApis );
+const { editableRootKey, insertAttributesKey } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -421,7 +421,7 @@ export const replaceBlocks =
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				clientIds,
-				blocks: blocksWithTemplates,
+				blocks: applyBlockTypeInsertAttributes( blocksWithTemplates ),
 				time: Date.now(),
 				indexToSelect,
 				initialPosition,
@@ -635,6 +635,36 @@ function applyBlockTypeTemplates(
 }
 
 /**
+ * Adds the attributes that block types set on insertion, through the private
+ * `insertAttributesKey` setting, to the blocks and their inner blocks.
+ *
+ * @param blocks Block objects.
+ *
+ * @return Block objects with the insertion attributes added.
+ */
+function applyBlockTypeInsertAttributes( blocks: Block[] ): Block[] {
+	return blocks.map( ( block ) => {
+		const getInsertAttributes = (
+			getBlockType( block.name ) as BlockTypeWithEditableRoot | undefined
+		 )?.[ insertAttributesKey ] as
+			| ( ( attributes: Block[ 'attributes' ] ) => Block[ 'attributes' ] )
+			| undefined;
+		return {
+			...block,
+			attributes: getInsertAttributes
+				? {
+						...block.attributes,
+						...getInsertAttributes( block.attributes ),
+					}
+				: block.attributes,
+			innerBlocks:
+				block.innerBlocks &&
+				applyBlockTypeInsertAttributes( block.innerBlocks ),
+		};
+	} );
+}
+
+/**
  * Moves the selection into the first inner leaf block of a freshly
  * scaffolded block, when the block ended up selected and its block type
  * opts in with `templateInsertUpdatesSelection`. Expects the state to
@@ -731,7 +761,9 @@ export const insertBlocks =
 			registry.batch( () => {
 				dispatch( {
 					type: 'INSERT_BLOCKS',
-					blocks: blocksWithTemplates,
+					blocks: applyBlockTypeInsertAttributes(
+						blocksWithTemplates
+					),
 					index,
 					rootClientId,
 					time: Date.now(),

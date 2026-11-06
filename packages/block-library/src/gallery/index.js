@@ -1,4 +1,5 @@
 import { gallery as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -6,6 +7,10 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
+import { LINK_DESTINATION_NONE } from './constants';
+import { unlock } from '../lock-unlock';
+
+const { insertAttributesKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -37,6 +42,16 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	// Save the site's default link, so changing image_default_link_type later
+	// doesn't change existing galleries.
+	[ insertAttributesKey ]: ( attributes ) =>
+		attributes.linkTo
+			? {}
+			: {
+					linkTo:
+						window?.wp?.media?.view?.settings?.defaultProps?.link ||
+						LINK_DESTINATION_NONE,
+				},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
