@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
+
 ### Bug Fixes
 
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
