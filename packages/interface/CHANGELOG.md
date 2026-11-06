@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the entities saved states panel visible while it is open, also when the window loses focus ([#86413](https://github.com/WordPress/gutenberg/pull/86413)).
+
 ## 11.1.0 (2026-11-04)
 
 ### Internal
