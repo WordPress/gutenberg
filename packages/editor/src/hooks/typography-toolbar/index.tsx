@@ -198,6 +198,7 @@ function TypographyToolbarControls( {
 				<TypographyColorDropdown
 					colors={ colors }
 					value={ activeColor }
+					defaultColor={ inherited.textColor }
 					onChange={ onChangeColor }
 				/>
 			) }

@@ -22,3 +22,21 @@
 .editor-typography-toolbar__custom-size {
 	padding: $grid-unit-10 $grid-unit-10 0;
 }
+
+// The colour sits as a line under the letter, as a word processor draws it,
+// so the letter stays legible whatever colour is chosen.
+.editor-typography-toolbar__color-icon {
+	display: flex;
+	position: relative;
+}
+
+.editor-typography-toolbar__color-bar {
+	background: currentColor;
+	border-radius: $radius-small;
+	bottom: 2px;
+	height: 3px;
+	left: 50%;
+	position: absolute;
+	transform: translateX(-50%);
+	width: 14px;
+}

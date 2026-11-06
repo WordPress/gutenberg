@@ -19,19 +19,22 @@ type ColorOption = { slug?: string; name?: string; color: string };
  * Offers the theme's colours for the block's text, the way the inline text
  * colour does, with the icon's bar carrying the colour in use.
  *
- * @param props          Component props.
- * @param props.colors   The theme's colour presets.
- * @param props.value    The colour in use, as a CSS colour.
- * @param props.onChange Called with the chosen colour and the preset it came
- *                       from, or nothing at all to clear it.
+ * @param props              Component props.
+ * @param props.colors       The theme's colour presets.
+ * @param props.value        The colour the block sets, as a CSS colour.
+ * @param props.defaultColor The colour it renders in when it sets none.
+ * @param props.onChange     Called with the chosen colour and the preset it
+ *                           came from, or nothing at all to clear it.
  */
 export default function TypographyColorDropdown( {
 	colors,
 	value,
+	defaultColor,
 	onChange,
 }: {
 	colors: ColorOption[];
 	value?: string;
+	defaultColor?: string;
 	onChange: ( color?: string, slug?: string ) => void;
 } ) {
 	return (
@@ -48,10 +51,17 @@ export default function TypographyColorDropdown( {
 								aria-haspopup="true"
 								label={ __( 'Text color' ) }
 								icon={
-									<Icon
-										icon={ textColorIcon }
-										style={ { color: value } }
-									/>
+									<span className="editor-typography-toolbar__color-icon">
+										<Icon icon={ textColorIcon } />
+										<span
+											className="editor-typography-toolbar__color-bar"
+											data-testid="typography-color-bar"
+											style={ {
+												background:
+													value ?? defaultColor,
+											} }
+										/>
+									</span>
 								}
 							/>
 						) }

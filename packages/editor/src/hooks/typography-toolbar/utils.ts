@@ -12,11 +12,17 @@ const ROOT_FONT_SIZE = 16;
 const RELATIVE_UNITS = [ 'em', 'rem' ];
 const SIZE_PATTERN = /^(-?[\d.]+)(px|rem|em)?$/;
 
-const TYPOGRAPHY_PROPERTIES = [ 'fontFamily', 'fontSize' ] as const;
+// The style path behind each value the toolbar shows.
+const RESOLVED_STYLES = {
+	fontFamily: 'typography.fontFamily',
+	fontSize: 'typography.fontSize',
+	textColor: 'color.text',
+} as const;
 
 type Typography = {
 	fontFamily?: string;
 	fontSize?: string;
+	textColor?: string;
 };
 
 /**
@@ -136,8 +142,8 @@ function getStyleElement(
 }
 
 /**
- * Reads the typography a block renders with when it sets none of its own,
- * taking the most specific value there is for each property: the element's,
+ * Reads the typography and colour a block renders with when it sets none of
+ * its own, taking the most specific value there is for each: the element's,
  * then the block's, then the root's.
  *
  * @param globalStyles     The merged global styles.
@@ -155,19 +161,15 @@ export function resolveBlockTypography(
 	const element = getStyleElement( blockName, attributes );
 
 	return Object.fromEntries(
-		TYPOGRAPHY_PROPERTIES.map( ( property ) => [
+		Object.entries( RESOLVED_STYLES ).map( ( [ property, path ] ) => [
 			property,
 			( element &&
 				getStyle< string >(
 					globalStyles,
-					`elements.${ element }.typography.${ property }`
+					`elements.${ element }.${ path }`
 				) ) ||
-				getStyle< string >(
-					globalStyles,
-					`typography.${ property }`,
-					blockName
-				) ||
-				getStyle< string >( globalStyles, `typography.${ property }` ),
+				getStyle< string >( globalStyles, path, blockName ) ||
+				getStyle< string >( globalStyles, path ),
 		] )
 	);
 }

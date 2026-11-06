@@ -75,9 +75,11 @@ const GLOBAL_STYLES = {
 				},
 			},
 		},
+		color: { text: '#1a1a1a' },
 		blocks: {
 			'core/quote': {
 				typography: { fontFamily: '"Newsreader", serif' },
+				color: { text: '#b4522d' },
 			},
 		},
 	},
@@ -92,6 +94,7 @@ describe( 'resolveBlockTypography', () => {
 		).toEqual( {
 			fontFamily: '"Bricolage Grotesque", sans-serif',
 			fontSize: '40px',
+			textColor: '#1a1a1a',
 		} );
 	} );
 
@@ -103,6 +106,7 @@ describe( 'resolveBlockTypography', () => {
 		).toEqual( {
 			fontFamily: '"Instrument Sans", sans-serif',
 			fontSize: '17px',
+			textColor: '#1a1a1a',
 		} );
 	} );
 
@@ -112,8 +116,18 @@ describe( 'resolveBlockTypography', () => {
 			{
 				fontFamily: '"Newsreader", serif',
 				fontSize: '17px',
+				textColor: '#b4522d',
 			}
 		);
+	} );
+
+	it( 'reads the colour the block renders in as well', () => {
+		expect(
+			resolveBlockTypography( GLOBAL_STYLES, 'core/quote' ).textColor
+		).toBe( '#b4522d' );
+		expect(
+			resolveBlockTypography( GLOBAL_STYLES, 'core/paragraph' ).textColor
+		).toBe( '#1a1a1a' );
 	} );
 
 	it( 'reads a block the theme says nothing about from the root', () => {
@@ -122,6 +136,7 @@ describe( 'resolveBlockTypography', () => {
 		).toEqual( {
 			fontFamily: '"Instrument Sans", sans-serif',
 			fontSize: '17px',
+			textColor: '#1a1a1a',
 		} );
 	} );
 } );

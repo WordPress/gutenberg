@@ -25,6 +25,40 @@ describe( 'TypographyColorDropdown', () => {
 		expect( screen.getByRole( 'option', { name: 'Clay' } ) ).toBeVisible();
 	} );
 
+	it( 'draws the colour as a line under the letter, not on it', () => {
+		render(
+			<TypographyColorDropdown
+				colors={ COLORS }
+				value="#b4522d"
+				onChange={ noop }
+			/>
+		);
+
+		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
+			background: '#b4522d',
+		} );
+
+		// The letter keeps the toolbar's own colour, so a pale choice still
+		// leaves a legible icon.
+		expect(
+			screen.getByRole( 'button', { name: 'Text color' } )
+		).not.toHaveStyle( { color: '#b4522d' } );
+	} );
+
+	it( 'shows the colour the block renders in when it sets none', () => {
+		render(
+			<TypographyColorDropdown
+				colors={ COLORS }
+				defaultColor="#1a1a1a"
+				onChange={ noop }
+			/>
+		);
+
+		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
+			background: '#1a1a1a',
+		} );
+	} );
+
 	it( 'hands back the colour and the preset it came from', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
