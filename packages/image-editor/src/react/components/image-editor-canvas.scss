@@ -3,8 +3,11 @@
 // reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
-// The source stylesheet must also work without a design token stylesheet;
-// build-time fallback injection only applies to published CSS.
+// The --wpds-* tokens come from @wordpress/theme: their definitions are in
+// packages/theme/tokens/{color,dimension}.json, and their generated values
+// are in packages/theme/prebuilt/css/design-tokens.css. This source stylesheet
+// must also work without that CSS; build-time fallback injection only applies
+// to published CSS.
 /* stylelint-disable plugin-wpds/no-token-fallback-values -- Standalone source styles need the same fallbacks as the published CSS. */
 $accent-color: var(--wp-image-editor-accent-color, var(--wpds-color-stroke-focus, var(--wp-admin-theme-color, #3858e9)));
 $foreground-color: var(--wp-image-editor-foreground-color, var(--wpds-color-foreground-content-neutral, #1e1e1e));
