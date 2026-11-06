@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { speak } from '@wordpress/a11y';
 import { Component, useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -66,7 +66,7 @@ function CopyErrorButton( { error }: { error: Error } ) {
 			ref={ ref }
 			icon={ RESULT_ICON[ feedback.result ] }
 		>
-			{ __( 'Copy error' ) }
+			{ _x( 'Copy error', 'button label: copy the error message' ) }
 		</Button>
 	);
 }
