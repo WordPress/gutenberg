@@ -290,12 +290,15 @@ function classnames_for_block_core_search( $attributes ) {
  *
  * @since 6.1.0
  *
- * @param array  $attributes     The block attributes.
- * @param string $property       Border property to generate rule for e.g. width or color.
- * @param string $side           Optional side border. The dictates the value retrieved and final CSS property.
- * @param array  $wrapper_styles Current collection of wrapper styles.
- * @param array  $button_styles  Current collection of button styles.
- * @param array  $input_styles   Current collection of input styles.
+ * @param array       $attributes     The block attributes.
+ * @param string      $property       Border property to generate rule for e.g. width or color.
+ * @param string|null $side           Side of the border to style, or null for all sides. This dictates the value
+ *                                    retrieved and the final CSS property.
+ * @param array       $wrapper_styles Current collection of wrapper styles.
+ * @param array       $button_styles  Current collection of button styles.
+ * @param array       $input_styles   Current collection of input styles.
+ *
+ * @phpstan-param 'top'|'right'|'bottom'|'left'|null $side
  */
 function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
 	$is_button_inside = isset( $attributes['buttonPosition'] ) && 'button-inside' === $attributes['buttonPosition'];
