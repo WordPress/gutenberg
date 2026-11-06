@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).

@@ -17,7 +17,7 @@ function AttributesPanel() {
 		};
 	}, [] );
 
-	if ( ! isEnabled || ! postType ) {
+	if ( ! isEnabled || ! postType?.hierarchical ) {
 		return null;
 	}
 
