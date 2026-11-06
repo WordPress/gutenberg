@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaUploadModal`: Query filters on attachment taxonomy fields by the taxonomy.
+
 ## 6.1.0 (2026-11-04)
 
 ### Enhancements

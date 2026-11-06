@@ -166,9 +166,20 @@ function PostListView( {
 		}
 	};
 
+	const hasTaxonomies = !! postTypeObject?.taxonomies?.length;
+	const taxonomies = useSelect(
+		( select ) =>
+			hasTaxonomies
+				? select( coreStore ).getTaxonomies( {
+						type: postType,
+						per_page: -1,
+					} )
+				: undefined,
+		[ hasTaxonomies, postType ]
+	);
 	const postTypeQuery = useMemo(
-		() => viewToQuery( view, postType ),
-		[ view, postType ]
+		() => viewToQuery( view, postType, taxonomies ?? [] ),
+		[ view, postType, taxonomies ]
 	);
 	const {
 		records: posts,
