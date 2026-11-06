@@ -35,6 +35,7 @@
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
 -   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
 -   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
+-   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 
 ## 16.0.0 (2026-10-20)
 
