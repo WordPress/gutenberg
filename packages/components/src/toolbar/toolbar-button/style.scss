@@ -5,7 +5,7 @@
 	position: relative;
 
 	// Subscript for numbered icon buttons, like headings
-	&[data-subscript] svg {
+	&[data-subscript] svg:where(:not(.components-button__busy-spinner)) {
 		padding: 5px 10px 5px 0;
 	}
 

@@ -104,7 +104,7 @@ the default value of its `size` prop.
  - Type: `boolean`
  - Required: No
 
-Indicates activity while a action is being performed.
+Displays a centered spinner while an action is in progress. The label stays available to assistive technology. This does not disable the button or announce a loading state.
 
 ### `isDestructive`
 
