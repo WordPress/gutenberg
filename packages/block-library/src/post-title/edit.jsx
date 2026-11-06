@@ -1,4 +1,5 @@
 import {
+	BlockContextProvider,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -19,6 +20,12 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
+/**
+ * The title belongs to the post, not the pattern, so the pattern's overrides
+ * must not lock its text field.
+ */
+const NO_PATTERN_OVERRIDES = { 'pattern/overrides': undefined };
+
 export default function PostTitleEdit( {
 	attributes: {
 		level,
@@ -30,7 +37,12 @@ export default function PostTitleEdit( {
 		fitText,
 	},
 	setAttributes,
-	context: { postType, postId, queryId },
+	context: {
+		postType,
+		postId,
+		queryId,
+		'pattern/overrides': patternOverrides,
+	},
 } ) {
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -63,7 +75,10 @@ export default function PostTitleEdit( {
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
 	const blockProps = useBlockProps();
-	const blockEditingMode = useBlockEditingMode();
+	const isInSyncedPattern = !! patternOverrides;
+	const blockEditingMode = useBlockEditingMode(
+		isInSyncedPattern && userCanEdit ? 'contentOnly' : undefined
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	let titleElement = (
@@ -229,7 +244,9 @@ export default function PostTitleEdit( {
 					</InspectorControls>
 				</>
 			) }
-			{ titleElement }
+			<BlockContextProvider value={ NO_PATTERN_OVERRIDES }>
+				{ titleElement }
+			</BlockContextProvider>
 		</>
 	);
 }

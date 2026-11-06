@@ -6,7 +6,6 @@
 
 ### Enhancements
 
--   Add the `editableInSyncedPatterns` block support, which keeps a block editable inside a synced pattern ([#71981](https://github.com/WordPress/gutenberg/issues/71981)).
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
 
 ### Bug Fixes

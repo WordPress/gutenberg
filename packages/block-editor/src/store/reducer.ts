@@ -6,7 +6,6 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
-	hasBlockSupport,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
@@ -2931,19 +2930,7 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 					return;
 				}
 
-				/**
-				 * Blocks with bindings are overridden per instance. Blocks that
-				 * opt in edit data owned by the post, not the pattern, so the
-				 * instance can edit them too.
-				 */
-				if (
-					hasBindings( block ) ||
-					( blockName &&
-						hasBlockSupport(
-							blockName,
-							'editableInSyncedPatterns'
-						) )
-				) {
+				if ( hasBindings( block ) ) {
 					derivedBlockEditingModes.set( clientId, 'contentOnly' );
 					return;
 				}

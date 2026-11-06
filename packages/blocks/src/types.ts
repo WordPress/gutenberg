@@ -1264,14 +1264,6 @@ export interface BlockSupports {
 	contentRole?: boolean;
 
 	/**
-	 * Keeps the block editable inside a synced pattern instance. It is meant
-	 * for blocks that edit data owned by the post, not by the pattern.
-	 *
-	 * (default) false
-	 */
-	editableInSyncedPatterns?: boolean;
-
-	/**
 	 * This property adds a field to define a custom className for the
 	 * block's wrapper.
 	 *

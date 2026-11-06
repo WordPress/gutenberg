@@ -4694,66 +4694,6 @@ describe( 'state', () => {
 				);
 			} );
 
-			describe( 'blocks that are editable in synced patterns', () => {
-				beforeAll( () => {
-					registerBlockType( 'core/test-editable-block', {
-						apiVersion: 3,
-						title: 'Editable block',
-						category: 'text',
-						attributes: {},
-						supports: { editableInSyncedPatterns: true },
-					} );
-				} );
-
-				afterAll( () => {
-					unregisterBlockType( 'core/test-editable-block' );
-				} );
-
-				it( 'stay in contentOnly mode, except in nested synced patterns', () => {
-					const { derivedBlockEditingModes } = dispatchActions(
-						[
-							{
-								type: 'INSERT_BLOCKS',
-								rootClientId: 'root-pattern',
-								blocks: [
-									partial< Block >( {
-										name: 'core/test-editable-block',
-										clientId: 'editable-block',
-										attributes: {},
-										innerBlocks: [],
-									} ),
-								],
-							},
-							{
-								type: 'INSERT_BLOCKS',
-								rootClientId: 'nested-pattern',
-								blocks: [
-									partial< Block >( {
-										name: 'core/test-editable-block',
-										clientId: 'nested-editable-block',
-										attributes: {},
-										innerBlocks: [],
-									} ),
-								],
-							},
-						],
-						testReducer,
-						initialState
-					);
-
-					expect(
-						derivedBlockEditingModes.get( 'editable-block' )
-					).toBe( 'contentOnly' );
-					expect(
-						derivedBlockEditingModes.get( 'nested-editable-block' )
-					).toBe( 'disabled' );
-					// Blocks without the support stay disabled.
-					expect(
-						derivedBlockEditingModes.get( 'pattern-paragraph' )
-					).toBe( 'disabled' );
-				} );
-			} );
-
 			it( 'removes block editing modes when synced patterns are removed', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
