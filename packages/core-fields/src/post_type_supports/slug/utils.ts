@@ -1,4 +1,4 @@
-import { cleanForSlug } from '@wordpress/url';
+import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { getItemTitle } from '../../shared/title/get-item-title';
 import type { PostWithSlug } from './types';
 
@@ -19,5 +19,9 @@ export const getSlug = ( item: PostWithSlug ): string => {
 		return '';
 	}
 
-	return item.slug || cleanForSlug( getItemTitle( item, '' ) );
+	// Decoded, as `cleanForSlug` keeps percent-encoded octets, like the slug
+	// WordPress saves.
+	return safeDecodeURIComponent(
+		item.slug || cleanForSlug( getItemTitle( item, '' ) )
+	);
 };
