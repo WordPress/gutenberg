@@ -3,10 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	background as backgroundIcon,
-	textColor as textColorIcon,
-} from '@wordpress/icons';
+import { ColorIndicator } from '@wordpress/components';
 import type {
 	FontFamilyPreset,
 	FontSizePreset,
@@ -22,6 +19,7 @@ import { useGlobalStyles } from '../../components/global-styles/hooks';
 import TypographyFontDropdown from './font-dropdown';
 import TypographySizeDropdown from './size-dropdown';
 import TypographyColorDropdown from './color-dropdown';
+import TextColorIcon from './text-color-icon';
 import { getFontDisplayName, resolveBlockTypography } from './utils';
 
 declare global {
@@ -180,6 +178,15 @@ function TypographyToolbarControls( {
 	const colorInUse = ( slug?: string, custom?: string ) =>
 		slug ? colors.find( ( color ) => color.slug === slug )?.color : custom;
 
+	const textColor = colorInUse(
+		attributes.textColor,
+		attributes.style?.color?.text
+	);
+	const backgroundColor = colorInUse(
+		attributes.backgroundColor,
+		attributes.style?.color?.background
+	);
+
 	return (
 		<BlockControls group="typography">
 			{ hasFont && (
@@ -212,13 +219,13 @@ function TypographyToolbarControls( {
 			{ hasTextColor && (
 				<TypographyColorDropdown
 					label={ __( 'Text color' ) }
-					icon={ textColorIcon }
+					icon={
+						<TextColorIcon
+							color={ textColor ?? inherited.textColor }
+						/>
+					}
 					colors={ colors }
-					value={ colorInUse(
-						attributes.textColor,
-						attributes.style?.color?.text
-					) }
-					defaultColor={ inherited.textColor }
+					value={ textColor }
 					onChange={ ( color, slug ) =>
 						setColor( 'textColor', 'text', color, slug )
 					}
@@ -227,12 +234,9 @@ function TypographyToolbarControls( {
 			{ hasBackground && (
 				<TypographyColorDropdown
 					label={ __( 'Background color' ) }
-					icon={ backgroundIcon }
+					icon={ <ColorIndicator colorValue={ backgroundColor } /> }
 					colors={ colors }
-					value={ colorInUse(
-						attributes.backgroundColor,
-						attributes.style?.color?.background
-					) }
+					value={ backgroundColor }
 					onChange={ ( color, slug ) =>
 						setColor( 'backgroundColor', 'background', color, slug )
 					}

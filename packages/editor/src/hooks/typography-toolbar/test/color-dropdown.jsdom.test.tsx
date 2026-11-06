@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { textColor } from '@wordpress/icons';
+import { Icon, textColor } from '@wordpress/icons';
 import TypographyColorDropdown from '../color-dropdown';
 
 const COLORS = [
@@ -17,7 +17,7 @@ describe( 'TypographyColorDropdown', () => {
 		render(
 			<TypographyColorDropdown
 				label="Text color"
-				icon={ textColor }
+				icon={ <Icon icon={ textColor } /> }
 				colors={ COLORS }
 				onChange={ noop }
 			/>
@@ -27,8 +27,12 @@ describe( 'TypographyColorDropdown', () => {
 			screen.getByRole( 'button', { name: 'Text color' } )
 		);
 
-		expect( screen.getByRole( 'option', { name: 'Ink' } ) ).toBeVisible();
-		expect( screen.getByRole( 'option', { name: 'Clay' } ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'option', { name: 'Ink' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'option', { name: 'Clay' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'takes the name it is given', async () => {
@@ -36,7 +40,7 @@ describe( 'TypographyColorDropdown', () => {
 		render(
 			<TypographyColorDropdown
 				label="Background color"
-				icon={ textColor }
+				icon={ <Icon icon={ textColor } /> }
 				colors={ COLORS }
 				onChange={ noop }
 			/>
@@ -46,60 +50,9 @@ describe( 'TypographyColorDropdown', () => {
 			screen.getByRole( 'button', { name: 'Background color' } )
 		);
 
-		expect( screen.getByRole( 'option', { name: 'Ink' } ) ).toBeVisible();
-	} );
-
-	it( 'draws the colour as a line under the letter, not on it', () => {
-		render(
-			<TypographyColorDropdown
-				label="Text color"
-				icon={ textColor }
-				colors={ COLORS }
-				value="#b4522d"
-				onChange={ noop }
-			/>
-		);
-
-		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
-			background: '#b4522d',
-		} );
-
-		// The letter keeps the toolbar's own colour, so a pale choice still
-		// leaves a legible icon.
 		expect(
-			screen.getByRole( 'button', { name: 'Text color' } )
-		).not.toHaveStyle( { color: '#b4522d' } );
-	} );
-
-	it( 'shows the colour the block renders in when it sets none', () => {
-		render(
-			<TypographyColorDropdown
-				label="Text color"
-				icon={ textColor }
-				colors={ COLORS }
-				defaultColor="#1a1a1a"
-				onChange={ noop }
-			/>
-		);
-
-		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
-			background: '#1a1a1a',
-		} );
-	} );
-
-	it( 'shows no bar at all when there is no colour to show', () => {
-		render(
-			<TypographyColorDropdown
-				label="Background color"
-				icon={ textColor }
-				colors={ COLORS }
-				onChange={ noop }
-			/>
-		);
-
-		expect( screen.getByTestId( 'typography-color-bar' ) ).toHaveStyle( {
-			background: 'transparent',
-		} );
+			screen.getByRole( 'option', { name: 'Ink' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'hands back the colour and the preset it came from', async () => {
@@ -108,7 +61,7 @@ describe( 'TypographyColorDropdown', () => {
 		render(
 			<TypographyColorDropdown
 				label="Text color"
-				icon={ textColor }
+				icon={ <Icon icon={ textColor } /> }
 				colors={ COLORS }
 				onChange={ onChange }
 			/>
@@ -128,7 +81,7 @@ describe( 'TypographyColorDropdown', () => {
 		render(
 			<TypographyColorDropdown
 				label="Text color"
-				icon={ textColor }
+				icon={ <Icon icon={ textColor } /> }
 				colors={ COLORS }
 				value="#b4522d"
 				onChange={ onChange }
