@@ -6,7 +6,7 @@ This package is still experimental. “Experimental” means this is an early im
 
 An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that describes the edits to apply when saving it. Cropping is the first thing it does. The media editor is built on it.
 
-This package is set to replace `@wordpress/image-cropper`. That package stays as it is for now. It will be rebuilt on the maths in this package's core, and deprecated once it is.
+This package replaces `@wordpress/image-cropper`, which is deprecated and will be removed in a later release.
 
 ## Installation
 
