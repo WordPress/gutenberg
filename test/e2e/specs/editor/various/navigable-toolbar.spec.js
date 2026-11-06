@@ -406,4 +406,60 @@ test.describe( 'Block Toolbar', () => {
 		// We should be on the Move Up button again
 		await expect( blockToolbarMoveUpButton ).toBeFocused();
 	} );
+
+	test( 'should not render last item fills in the toolbar while no block is selected on a small screen', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.evaluate( () => {
+			const { createElement } = window.wp.element;
+			const { ToolbarButton, ToolbarGroup } = window.wp.components;
+			const { __unstableBlockToolbarLastItem: BlockToolbarLastItem } =
+				window.wp.blockEditor;
+			window.wp.plugins.registerPlugin( 'test-block-toolbar-last-item', {
+				render: () =>
+					createElement(
+						BlockToolbarLastItem,
+						null,
+						createElement(
+							ToolbarGroup,
+							null,
+							createElement( ToolbarButton, {
+								label: 'Last item',
+							} )
+						)
+					),
+			} );
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph' },
+		} );
+		await pageUtils.setBrowserViewport( 'small' );
+
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		const lastItem = blockToolbar.getByRole( 'button', {
+			name: 'Last item',
+		} );
+		await expect( lastItem ).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		// On small screens the toolbar keeps its row as a disabled placeholder
+		// while no block is selected.
+		await expect(
+			blockToolbar.getByRole( 'button', {
+				name: 'Paragraph',
+				exact: true,
+			} )
+		).toBeDisabled();
+		await expect( lastItem ).toBeHidden();
+
+		await pageUtils.setBrowserViewport( 'large' );
+	} );
 } );

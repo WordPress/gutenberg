@@ -1,0 +1,21 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-dimensions-tool__aspect-ratio-option {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	// Allow the label to shrink so that it can be truncated.
+	min-width: 0;
+
+	svg {
+		flex-shrink: 0;
+	}
+}
+
+// The trigger truncates its value with an ellipsis, which doesn't apply
+// through the flex wrapper, so truncate the label itself.
+.block-editor-dimensions-tool__aspect-ratio-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

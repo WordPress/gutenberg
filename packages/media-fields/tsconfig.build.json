@@ -8,12 +8,12 @@
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

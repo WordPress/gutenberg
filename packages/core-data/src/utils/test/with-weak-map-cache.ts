@@ -1,0 +1,26 @@
+import { describe, expect, it, vi } from 'vitest';
+import withWeakMapCache from '../with-weak-map-cache';
+
+describe( 'withWeakMapCache', () => {
+	it( 'calls and returns from the original function', () => {
+		const cachedFn = withWeakMapCache( () => 'Called' );
+		// @ts-expect-error Tests a call without a key, which is not cached.
+		const result = cachedFn();
+
+		expect( result ).toBe( 'Called' );
+	} );
+
+	it( 'caches by weak reference', () => {
+		const a = {};
+		const b = {};
+		const fn = vi.fn().mockReturnValue( 'Called' );
+		const cachedFn = withWeakMapCache( fn );
+
+		cachedFn( a );
+		cachedFn( a );
+		expect( fn ).toHaveBeenCalledTimes( 1 );
+
+		cachedFn( b );
+		expect( fn ).toHaveBeenCalledTimes( 2 );
+	} );
+} );

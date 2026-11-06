@@ -71,6 +71,7 @@ export interface CollectionFontVariantProps {
 	font: FontFamily;
 	handleToggleVariant: ( font: FontFamily, face?: FontFace ) => void;
 	selected: boolean;
+	installed: boolean;
 }
 
 export interface FontUploadResult {

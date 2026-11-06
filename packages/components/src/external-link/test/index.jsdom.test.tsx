@@ -15,7 +15,8 @@ describe( 'ExternalLink', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: 'WordPress.org (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'WordPress.org(opens in a new tab)',
 		} );
 
 		await user.click( link );
@@ -31,7 +32,8 @@ describe( 'ExternalLink', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: "I'm an anchor link! (opens in a new tab)",
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: "I'm an anchor link!(opens in a new tab)",
 		} );
 
 		// We are using this approach so we can test the defaultPrevented
@@ -57,7 +59,8 @@ describe( 'ExternalLink', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: "I'm an anchor link! (opens in a new tab)",
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: "I'm an anchor link!(opens in a new tab)",
 		} );
 
 		await user.click( link );
@@ -77,7 +80,8 @@ describe( 'ExternalLink', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: "I'm not an anchor link! (opens in a new tab)",
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: "I'm not an anchor link!(opens in a new tab)",
 		} );
 
 		// We are using this approach so we can test the defaultPrevented

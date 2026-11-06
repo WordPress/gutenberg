@@ -1,5 +1,5 @@
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
-import { toVdom, hydratedIslands } from './vdom';
+import { toVdom } from './vdom';
 import { createRootFragment, splitTask } from './utils';
 
 // Keep the same root fragment for each interactive region node.
@@ -31,19 +31,28 @@ export const initialVdomPromise = new Promise<
 	resolveInitialVdom = resolve;
 } );
 
-// Initialize the router with the initial DOM.
+/**
+ * Hydrates the document's top-level interactive islands and initializes the
+ * router's initial vDOM. Islands without an interactive ancestor are selected
+ * before any hydration can change the document. Nested islands run only as part
+ * of their outer island's tree.
+ *
+ * @return A promise that resolves once all eligible islands are hydrated.
+ */
 export const hydrateRegions = async () => {
-	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
+	const nodes = [
+		...document.querySelectorAll( `[data-wp-interactive]` ),
+	].filter(
+		( node ) => ! node.parentElement?.closest( '[data-wp-interactive]' )
+	);
 
 	for ( const node of nodes ) {
-		if ( ! hydratedIslands.has( node ) ) {
-			await splitTask();
-			const fragment = getRegionRootFragment( node );
-			const vdom = toVdom( node );
-			initialVdom.set( node, vdom );
-			await splitTask();
-			hydrate( vdom, fragment );
-		}
+		await splitTask();
+		const fragment = getRegionRootFragment( node );
+		const vdom = toVdom( node );
+		initialVdom.set( node, vdom );
+		await splitTask();
+		hydrate( vdom, fragment );
 	}
 
 	// Resolve the promise with the fully populated initialVdom after all regions are hydrated.

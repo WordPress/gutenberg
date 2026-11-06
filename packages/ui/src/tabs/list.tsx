@@ -130,6 +130,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				data-select-on-move={ activateOnFocus ? 'true' : 'false' }
 				className={ clsx(
 					styles.tablist,
+					overflow.isScrolling && styles[ 'is-scrolling' ],
 					overflow.first && styles[ 'is-overflowing-first' ],
 					overflow.last && styles[ 'is-overflowing-last' ],
 					styles[ `is-${ variant }-variant` ],

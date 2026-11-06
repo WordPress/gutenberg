@@ -17,7 +17,7 @@ type Story = StoryObj;
 /**
  * Button ancestors select a position within one hierarchy. The consumer owns
  * selection and intentional focus moves. Set aria-current="true" on CurrentItem
- * to preserve group semantics after the final ancestor is removed.
+ * to preserve selection-list semantics after the final ancestor is removed.
  */
 export const HierarchySelection: Story = {
 	render: function SelectionExample() {

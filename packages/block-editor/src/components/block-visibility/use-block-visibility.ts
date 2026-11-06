@@ -7,7 +7,9 @@ import { unlock } from '../../lock-unlock';
  * Viewport breakpoints keyed by viewport. Desktop has no breakpoint: it
  * applies above the largest configured one.
  */
-type ViewportBreakpoints = Partial< Record< 'mobile' | 'tablet', string > >;
+export type ViewportBreakpoints = Partial<
+	Record< 'mobile' | 'tablet', string >
+>;
 
 /**
  * Block visibility metadata: `false` hides the block on all viewports,
@@ -33,24 +35,22 @@ type UseBlockVisibilityOptions = {
 };
 
 /**
- * Returns information about the current block visibility state.
+ * Returns the viewport the block visibility rules apply to.
  *
  * @param options                  Parameters to avoid extra store subscriptions.
- * @param options.blockVisibility  Block visibility metadata.
  * @param options.deviceType       Current device type.
  * @param options.viewportSettings Viewport breakpoint settings.
  * @param options.view             Window instance in which to perform viewport matching.
- * @return Object with `isBlockCurrentlyHidden` and `currentViewport` properties.
+ * @return The current viewport.
  */
-export default function useBlockVisibility( {
-	blockVisibility,
+export function useCurrentViewport( {
 	deviceType = 'desktop',
 	viewportSettings,
 	view = window,
-}: UseBlockVisibilityOptions = {} ): {
-	isBlockCurrentlyHidden: boolean;
-	currentViewport: BlockVisibilityViewport;
-} {
+}: Omit<
+	UseBlockVisibilityOptions,
+	'blockVisibility'
+> = {} ): BlockVisibilityViewport {
 	const viewportBreakpoints = getViewportBreakpoints( viewportSettings );
 	const mobileMediaQuery = viewportBreakpoints.mobile
 		? `(width <= ${ viewportBreakpoints.mobile })`
@@ -69,24 +69,59 @@ export default function useBlockVisibility( {
 	 * 1. Device type override (Mobile/Tablet) - uses device type to determine viewport
 	 * 2. Actual window size (Desktop mode) - uses viewport detection
 	 */
-	let currentViewport: BlockVisibilityViewport;
 	if ( deviceType === 'mobile' && viewportBreakpoints.mobile ) {
-		currentViewport = 'mobile';
+		return 'mobile';
 	} else if ( deviceType === 'tablet' && viewportBreakpoints.tablet ) {
-		currentViewport = 'tablet';
+		return 'tablet';
 	} else if ( isMobileViewport ) {
-		currentViewport = 'mobile';
+		return 'mobile';
 	} else if ( isTabletViewport && viewportBreakpoints.tablet ) {
-		currentViewport = 'tablet';
-	} else {
-		currentViewport = 'desktop';
+		return 'tablet';
 	}
+	return 'desktop';
+}
 
-	// Determine if block is currently hidden.
-	const isBlockCurrentlyHidden =
+/**
+ * Returns whether a block is hidden in the given viewport.
+ *
+ * @param blockVisibility Block visibility metadata.
+ * @param currentViewport The current viewport.
+ * @return Whether the block is hidden.
+ */
+export function isBlockHidden(
+	blockVisibility: BlockVisibility | undefined,
+	currentViewport: BlockVisibilityViewport
+): boolean {
+	return (
 		blockVisibility === false ||
 		( typeof blockVisibility === 'object' &&
-			blockVisibility?.viewport?.[ currentViewport ] === false );
+			blockVisibility?.viewport?.[ currentViewport ] === false )
+	);
+}
 
-	return { isBlockCurrentlyHidden, currentViewport };
+/**
+ * Returns information about the current block visibility state.
+ *
+ * @param options                  Parameters to avoid extra store subscriptions.
+ * @param options.blockVisibility  Block visibility metadata.
+ * @param options.deviceType       Current device type.
+ * @param options.viewportSettings Viewport breakpoint settings.
+ * @param options.view             Window instance in which to perform viewport matching.
+ * @return Object with `isBlockCurrentlyHidden` and `currentViewport` properties.
+ */
+export default function useBlockVisibility( {
+	blockVisibility,
+	...options
+}: UseBlockVisibilityOptions = {} ): {
+	isBlockCurrentlyHidden: boolean;
+	currentViewport: BlockVisibilityViewport;
+} {
+	const currentViewport = useCurrentViewport( options );
+	return {
+		isBlockCurrentlyHidden: isBlockHidden(
+			blockVisibility,
+			currentViewport
+		),
+		currentViewport,
+	};
 }

@@ -11,8 +11,8 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
-	Spinner,
-	Notice,
+	Spinner as WCSpinner,
+	Notice as WCNotice,
 	ComboboxControl,
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
@@ -64,7 +64,7 @@ function BlockContent( {
 		return (
 			<div { ...blockProps }>
 				<div className="wp-block-page-list__loading-indicator-container">
-					<Spinner className="wp-block-page-list__loading-indicator" />
+					<WCSpinner className="wp-block-page-list__loading-indicator" />
 				</div>
 			</div>
 		);
@@ -73,9 +73,9 @@ function BlockContent( {
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}
@@ -83,9 +83,9 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status="info" isDismissible={ false }>
+				<WCNotice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}
@@ -111,9 +111,9 @@ function BlockContent( {
 
 		return (
 			<div { ...blockProps }>
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}

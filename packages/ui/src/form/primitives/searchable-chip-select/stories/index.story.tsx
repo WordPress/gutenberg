@@ -8,6 +8,10 @@ import {
 	type FixtureItem,
 } from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
@@ -15,6 +19,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.LoadingIndicator':
+			SearchableChipSelect.LoadingIndicator,
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
@@ -175,5 +181,17 @@ export const WithoutClearButton: Story = {
 	args: {
 		...Default.args,
 		showClearButton: false,
+	},
+};
+
+/**
+ * Use `popupWidth` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		'aria-label': 'Tags',
+		items: longLabelPopupItems,
+		popupWidth: 'sm',
 	},
 };

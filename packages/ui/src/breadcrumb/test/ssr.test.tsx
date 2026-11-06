@@ -25,10 +25,9 @@ describe( 'Breadcrumb server rendering', () => {
 	} );
 	it.each( [
 		[ undefined, 'navigation', 'page' ],
-		[ true, 'group', 'true' ],
-		[ 'true', 'group', 'true' ],
+		[ true, 'list', 'true' ],
+		[ 'true', 'list', 'true' ],
 		[ 'page', 'navigation', 'page' ],
-		[ false, 'navigation', 'false' ],
 	] as const )(
 		'renders a current-only trail with aria-current=%j and role=%s on the server',
 		( ariaCurrent, role, renderedAriaCurrent ) => {
@@ -43,6 +42,13 @@ describe( 'Breadcrumb server rendering', () => {
 				</Breadcrumb.Root>
 			);
 			expect( view ).toContain( `role="${ role }"` );
+			expect( view ).toMatch(
+				role === 'list'
+					? /<ol[^>]*aria-label="Hierarchy"/
+					: /<nav[^>]*aria-label="Hierarchy"/
+			);
+			expect( view.match( /aria-label="Hierarchy"/g ) ).toHaveLength( 1 );
+			expect( view ).toContain( 'role="list"' );
 			expect( view ).toContain(
 				`aria-current="${ renderedAriaCurrent }"`
 			);
@@ -57,7 +63,8 @@ describe( 'Breadcrumb server rendering', () => {
 				<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
 			</Breadcrumb.Root>
 		);
-		expect( view ).toContain( 'role="group"' );
+		expect( view ).toContain( 'role="list"' );
+		expect( view ).toMatch( /<ol[^>]*aria-label="Hierarchy"/ );
 		expect( view ).toContain( 'type="button"' );
 		expect( view ).toContain( 'aria-current="true"' );
 		expect( view ).not.toContain( '<nav' );

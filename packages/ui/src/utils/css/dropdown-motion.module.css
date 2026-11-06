@@ -1,7 +1,8 @@
 @layer wp-ui {
 	/*
 	 * Motion configuration for dropdown-like popovers.
-	 * Keep constants in sync with: packages/components/src/utils/dropdown-motion.ts
+	 * Keep the slide distance in sync with packages/components/src/popover/utils.ts
+	 * and packages/components/src/menu/style.module.scss.
 	 */
 
 	@layer utilities, components, compositions, overrides;

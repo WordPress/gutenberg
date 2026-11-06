@@ -11,6 +11,9 @@ paths:
             # yet, and its last release predates the feature. Tracked upstream in
             # https://github.com/rhysd/actionlint/issues/654.
             - 'unexpected key "queue" for "concurrency" section.+'
+            # `stacked` is a real `pull_request_target` activity type for stacked
+            # PRs, which actionlint's last release also predates.
+            - 'invalid activity type "stacked" for "pull_request_target" Webhook event.+'
     .github/workflows/end2end-test.yml:
         ignore:
             # This file gets created in the step prior.

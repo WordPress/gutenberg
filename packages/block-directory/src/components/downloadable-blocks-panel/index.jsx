@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
@@ -88,7 +88,7 @@ export default function DownloadableBlocksPanel( {
 					</>
 				) }
 				<div className="block-directory-downloadable-blocks-panel has-blocks-loading">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			</>
 		);

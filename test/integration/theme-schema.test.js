@@ -37,6 +37,87 @@ describe( 'theme.json schema', () => {
 		expect( jsonFiles.length ).toBeGreaterThan( 0 );
 	} );
 
+	test( 'accepts supported text input pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					textInput: {
+						':focus': {
+							color: { text: 'blue' },
+						},
+						':user-invalid': {
+							spacing: { padding: { top: '1rem' } },
+						},
+						'::placeholder': {
+							typography: { fontStyle: 'italic' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects unsupported text input pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					textInput: {
+						':hover': {
+							color: { text: 'green' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
+	test( 'accepts separate row and column block gaps in block styles', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/group': {
+						spacing: { blockGap: { top: '1.3em', left: '0.75em' } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects separate row and column block gaps in root styles', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				spacing: { blockGap: { top: '1.3em', left: '0.75em' } },
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
+	test( 'rejects separate row and column block gaps in element styles', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					button: {
+						spacing: { blockGap: { top: '1.3em', left: '0.75em' } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(
@@ -49,6 +130,43 @@ describe( 'theme.json schema', () => {
 		const result = ajv.validate( themeSchema, metadata ) || ajv.errors;
 
 		expect( result ).toBe( true );
+	} );
+
+	test( 'accepts supported select pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					select: {
+						':hover': {
+							color: { background: 'blue' },
+						},
+						':focus-visible': {
+							outline: { style: 'solid' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects unsupported select pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					select: {
+						':visited': {
+							color: { text: 'green' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
 	} );
 
 	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
