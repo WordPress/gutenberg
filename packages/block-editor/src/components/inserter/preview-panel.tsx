@@ -3,7 +3,7 @@ import {
 	createBlock,
 	getBlockFromExample,
 } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Text } from '@wordpress/ui';
 import BlockCard from '../block-card';
@@ -58,7 +58,7 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 								[
 									{
 										css: `
-										body { 
+										body {
 											padding: 24px;
 											min-height:${ Math.round( minHeight ) }px;
 											display:flex;
@@ -89,9 +89,11 @@ function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 					render={ <p /> }
 					className="block-editor-inserter__preview-disabled-note"
 				>
-					<strong>{ __( 'Note:' ) }</strong>{ ' ' }
-					{ __(
-						'This block can only be used once, and is already in use.'
+					{ createInterpolateElement(
+						__(
+							'<strong>Note:</strong> This block can only be used once, and is already in use.'
+						),
+						{ strong: <strong /> }
 					) }
 				</Text>
 			) }
