@@ -32,7 +32,8 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 							? $tabs_id . '-tab-' . $tab_number
 							: 'tab-' . $tab_number );
 
-					$tabs_list[] = esc_attr( $tab_id );
+					// Escaped where it's output, so escaping here would double-escape it.
+					$tabs_list[] = (string) $tab_id;
 					++$tab_number;
 				}
 			}
@@ -81,9 +82,15 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
-	$tabs_list        = $block->context['core/tabs-list'] ?? array();
-	$tabs_id          = $block->context['core/tabs-id'] ?? null;
+	$tabs_list = $block->context['core/tabs-list'] ?? array();
+	$tabs_id   = $block->context['core/tabs-id'] ?? null;
+
+	// A default tab index can be left past the last tab, for example after
+	// the default tab was removed. Fall back to the first tab so that a panel
+	// is still shown.
+	$active_tab_index = isset( $attributes['activeTabIndex'], $tabs_list[ $attributes['activeTabIndex'] ] )
+		? $attributes['activeTabIndex']
+		: 0;
 
 	if ( empty( $tabs_id ) ) {
 		// If malformed tabs, return early to avoid errors.
@@ -108,6 +115,9 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor->set_attribute( 'data-wp-on-window--hashchange', 'callbacks.activateTabByHash' );
 
 	$output = $tag_processor->get_updated_html();
+
+	// Text direction for the arrow keys, as the view script can't use `isRTL()`.
+	wp_interactivity_config( 'core/tabs', array( 'isRTL' => is_rtl() ) );
 
 	/**
 	 * Builds a client side state for just this tabs instance, so each
