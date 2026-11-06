@@ -10,7 +10,7 @@
 		clear: both;
 	}
 
-	ol {
+	ol:not(.wp-block-comment-content ol) {
 		margin-bottom: 0;
 		max-width: 100%;
 		list-style: none;
