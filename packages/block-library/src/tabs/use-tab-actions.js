@@ -19,7 +19,6 @@ export default function useTabActions( tabsClientId ) {
 		removeBlock,
 		moveBlocksToPosition,
 		updateBlockAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
 	// Derive the current tabs state at call time without subscribing.
@@ -74,16 +73,11 @@ export default function useTabActions( tabsClientId ) {
 		}
 
 		// Batch the changes into a single undo step, so undo restores the
-		// default tab along with removing the new tab. The insertion comes
-		// last, as the last change in the batch decides whether it creates
-		// an undo step.
+		// default tab along with removing the new tab.
 		registry.batch( () => {
-			// Switch editor active tab to the new tab.
-			__unstableMarkNextChangeAsNotPersistent();
+			// Switch editor to the new tab and keep the default tab.
 			updateBlockAttributes( tabsClientId, {
 				editorActiveTabIndex: newIndex,
-			} );
-			updateBlockAttributes( tabsClientId, {
 				activeTabIndex: newDefaultIndex,
 			} );
 			insertBlock(
@@ -180,11 +174,9 @@ export default function useTabActions( tabsClientId ) {
 		// Batch the changes into a single undo step, so undo restores the
 		// default tab along with the tab order.
 		registry.batch( () => {
-			__unstableMarkNextChangeAsNotPersistent();
+			// Switch editor to the moved tab and keep the default tab.
 			updateBlockAttributes( tabsClientId, {
 				editorActiveTabIndex: toIndex,
-			} );
-			updateBlockAttributes( tabsClientId, {
 				activeTabIndex: newDefaultIndex,
 			} );
 			moveBlocksToPosition(
