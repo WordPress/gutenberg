@@ -680,7 +680,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 *     @type bool $include_desktop Whether to include the desktop media query. Default false.
 	 * }
-	 * @return array Responsive media queries.
+	 * @return array<string, string> Responsive media queries, keyed by style-state name.
+	 *
+	 * @phpstan-return array{
+	 *     '@mobile'?: non-falsy-string,
+	 *     '@tablet'?: non-falsy-string,
+	 *     '@desktop'?: non-falsy-string,
+	 * }
 	 */
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
 		$breakpoints = self::sanitize_viewport_settings( $viewport_settings );

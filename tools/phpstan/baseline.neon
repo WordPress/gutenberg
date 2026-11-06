@@ -7,12 +7,6 @@ parameters:
 			path: ../../lib/class-wp-rest-global-styles-controller-gutenberg.php
 
 		-
-			message: '#^Call to function method_exists\(\) with ''WP_Interactivity_API'' and ''add_client…'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../lib/client-assets.php
-
-		-
 			message: '#^Access to an undefined property WP_Post\:\:\$content\.$#'
 			identifier: property.notFound
 			count: 2
@@ -47,18 +41,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: ../../lib/experimental/navigation-theme-opt-in.php
-
-		-
-			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 2
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
 
 		-
 			message: '#^Function block_core_navigation_get_classic_menu_fallback\(\) should return object but return statement is missing\.$#'
