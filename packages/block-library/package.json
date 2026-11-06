@@ -78,6 +78,7 @@
 					"wp_get_spacing_classes_and_styles",
 					"wp_get_global_styles",
 					"wp_get_background_classes_and_styles",
+					"wp_get_block_supports_classes_and_styles",
 					"wp_get_global_settings"
 				],
 				"suffixClasses": [
