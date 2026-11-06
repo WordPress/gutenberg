@@ -1,5 +1,5 @@
 import { useRef, useInsertionEffect } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import type { RefObject } from 'react';
 import * as copyHandler from './copy-handler';
 import * as selectObject from './select-object';
 import * as formatBoundaries from './format-boundaries';
@@ -128,22 +128,27 @@ function addListeners(
 	}
 }
 
-export function useEventListeners( props: EventListenerProps ) {
+// The latest props, for the listeners to read when an event arrives.
+export function useEventListenerProps( props: EventListenerProps ) {
 	const propsRef = useRef( props );
 	useInsertionEffect( () => {
 		propsRef.current = props;
 	} );
+	return propsRef;
+}
 
-	return useRefEffect( ( element: HTMLElement ) => {
-		const { ownerDocument } = element;
-		fields.set( element, { element, props: propsRef } );
-		if ( ! documents.has( ownerDocument ) ) {
-			documents.add( ownerDocument );
-			addListeners( ownerDocument, first, true );
-			addListeners( ownerDocument, defaults, false );
-		}
-		return () => {
-			fields.delete( element );
-		};
-	}, [] );
+export function addField(
+	element: HTMLElement,
+	props: RefObject< EventListenerProps >
+) {
+	const { ownerDocument } = element;
+	fields.set( element, { element, props } );
+	if ( ! documents.has( ownerDocument ) ) {
+		documents.add( ownerDocument );
+		addListeners( ownerDocument, first, true );
+		addListeners( ownerDocument, defaults, false );
+	}
+	return () => {
+		fields.delete( element );
+	};
 }
