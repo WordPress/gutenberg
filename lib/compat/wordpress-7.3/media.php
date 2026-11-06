@@ -13,6 +13,7 @@
  * a URL from the media modal be compared with the REST API's size URLs.
  *
  * @see https://github.com/WordPress/gutenberg/issues/86388
+ * @see https://core.trac.wordpress.org/ticket/66531
  *
  * @param WP_REST_Response $response The response object.
  * @return WP_REST_Response The filtered response object.
