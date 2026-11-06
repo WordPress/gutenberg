@@ -20,17 +20,28 @@ import styles from './style.module.css';
 
 type Item = PostWithDate & { id?: number; type?: string };
 
+function toTimezonelessDate( date: Date, time: string ) {
+	const pad = ( number: number ) => String( number ).padStart( 2, '0' );
+	return `${ date.getFullYear() }-${ pad( date.getMonth() + 1 ) }-${ pad(
+		date.getDate()
+	) }T${ time }`;
+}
+
+/*
+ * The bounds of the posts query for the month of a date. The server reads a
+ * date without a timezone in the site's timezone, as `post_date` is, so the
+ * bounds carry none. Both are exclusive: they are the last second of the
+ * previous month and the first second of the next one.
+ */
 function getMonthBounds( date: Date ) {
+	const year = date.getFullYear();
+	const month = date.getMonth();
 	return {
-		after: new Date( date.getFullYear(), date.getMonth(), 1 ).toISOString(),
-		before: new Date(
-			date.getFullYear(),
-			date.getMonth() + 1,
-			0,
-			23,
-			59,
-			59
-		).toISOString(),
+		after: toTimezonelessDate( new Date( year, month, 0 ), '23:59:59' ),
+		before: toTimezonelessDate(
+			new Date( year, month + 1, 1 ),
+			'00:00:00'
+		),
 	};
 }
 

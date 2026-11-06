@@ -1,4 +1,4 @@
-import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { speak } from '@wordpress/a11y';
 import { date as formatDate, getSettings } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -26,6 +26,43 @@ function getSiteMonth() {
 		Number( formatDate( 'n', now ) ) - 1,
 		1
 	);
+}
+
+/**
+ * Formats the day of a date with a time, without a timezone.
+ *
+ * @param {Date}   date The date.
+ * @param {string} time The time, as `H:i:s`.
+ *
+ * @return {string} The date, e.g. `2026-10-31T23:59:59`.
+ */
+function toTimezonelessDate( date, time ) {
+	const pad = ( number ) => String( number ).padStart( 2, '0' );
+	return `${ date.getFullYear() }-${ pad( date.getMonth() + 1 ) }-${ pad(
+		date.getDate()
+	) }T${ time }`;
+}
+
+/**
+ * The bounds of the posts query for the month of a date. The server reads a
+ * date without a timezone in the site's timezone, as `post_date` is, so the
+ * bounds carry none. Both are exclusive: they are the last second of the
+ * previous month and the first second of the next one.
+ *
+ * @param {Date} date A date in the month.
+ *
+ * @return {{after: string, before: string}} The bounds.
+ */
+function getMonthBounds( date ) {
+	const year = date.getFullYear();
+	const month = date.getMonth();
+	return {
+		after: toTimezonelessDate( new Date( year, month, 0 ), '23:59:59' ),
+		before: toTimezonelessDate(
+			new Date( year, month + 1, 1 ),
+			'00:00:00'
+		),
+	};
 }
 
 /**
@@ -94,8 +131,7 @@ export function PrivatePostSchedule( {
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {
 				status: 'publish,future',
-				after: startOfMonth( previewedMonth ).toISOString(),
-				before: endOfMonth( previewedMonth ).toISOString(),
+				...getMonthBounds( previewedMonth ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
 				per_page: 100,
 				_fields: 'id,date',

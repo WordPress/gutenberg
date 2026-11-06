@@ -14,6 +14,8 @@ vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 // The date picker measures its layout.
 globalThis.wpVitest.mockResizeObserver();
 
+type MonthBounds = { after: string; before: string };
+
 const field = {
 	id: 'date',
 	label: 'Date',
@@ -243,7 +245,7 @@ describe( 'DateEdit', () => {
 		expect( speak ).not.toHaveBeenCalled();
 	} );
 	it( 'marks the posts of the month the date moves to', async () => {
-		const queriedMonths: number[] = [];
+		const queriedMonths: MonthBounds[] = [];
 		const store = createReduxStore( 'core', {
 			reducer: ( state = {} ) => state,
 			selectors: {
@@ -252,9 +254,12 @@ describe( 'DateEdit', () => {
 					state: unknown,
 					kind: string,
 					name: string,
-					query: { after: string }
+					query: MonthBounds
 				) => {
-					queriedMonths.push( new Date( query.after ).getMonth() );
+					queriedMonths.push( {
+						after: query.after,
+						before: query.before,
+					} );
 					return [];
 				},
 			},
@@ -276,7 +281,10 @@ describe( 'DateEdit', () => {
 				/>
 			</RegistryProvider>
 		);
-		expect( queriedMonths.at( -1 ) ).toBe( 10 );
+		expect( queriedMonths.at( -1 ) ).toEqual( {
+			after: '2026-10-31T23:59:59',
+			before: '2026-12-01T00:00:00',
+		} );
 
 		// A date from outside the calendar, like the Month input.
 		rerender(
@@ -291,7 +299,10 @@ describe( 'DateEdit', () => {
 		expect(
 			await screen.findByRole( 'button', { name: /August 4, 2026/ } )
 		).toBeInTheDocument();
-		expect( queriedMonths.at( -1 ) ).toBe( 7 );
+		expect( queriedMonths.at( -1 ) ).toEqual( {
+			after: '2026-07-31T23:59:59',
+			before: '2026-09-01T00:00:00',
+		} );
 	} );
 	describe( 'without a date', () => {
 		const originalSettings = getSettings();
@@ -317,7 +328,7 @@ describe( 'DateEdit', () => {
 			} );
 		}
 
-		function createRecordingRegistry( queriedMonths: number[] ) {
+		function createRecordingRegistry( queriedMonths: MonthBounds[] ) {
 			const store = createReduxStore( 'core', {
 				reducer: ( state = {} ) => state,
 				selectors: {
@@ -326,11 +337,12 @@ describe( 'DateEdit', () => {
 						state: unknown,
 						kind: string,
 						name: string,
-						query: { after: string }
+						query: MonthBounds
 					) => {
-						queriedMonths.push(
-							new Date( query.after ).getMonth()
-						);
+						queriedMonths.push( {
+							after: query.after,
+							before: query.before,
+						} );
 						return [];
 					},
 				},
@@ -349,7 +361,7 @@ describe( 'DateEdit', () => {
 
 		it( "marks the posts of today's month in the site's timezone", async () => {
 			atMonthBoundary();
-			const queriedMonths: number[] = [];
+			const queriedMonths: MonthBounds[] = [];
 			render(
 				<RegistryProvider
 					value={ createRecordingRegistry( queriedMonths ) }
@@ -362,12 +374,15 @@ describe( 'DateEdit', () => {
 				</RegistryProvider>
 			);
 			await screen.findByRole( 'button', { name: 'Reset' } );
-			expect( queriedMonths.at( -1 ) ).toBe( 9 );
+			expect( queriedMonths.at( -1 ) ).toEqual( {
+				after: '2026-09-30T23:59:59',
+				before: '2026-11-01T00:00:00',
+			} );
 		} );
 
 		it( "marks the posts of today's month in the site's timezone after a reset", async () => {
 			atMonthBoundary();
-			const queriedMonths: number[] = [];
+			const queriedMonths: MonthBounds[] = [];
 			const registry = createRecordingRegistry( queriedMonths );
 			const { rerender } = render(
 				<RegistryProvider value={ registry }>
@@ -379,7 +394,10 @@ describe( 'DateEdit', () => {
 				</RegistryProvider>
 			);
 			await screen.findByRole( 'button', { name: 'Reset' } );
-			expect( queriedMonths.at( -1 ) ).toBe( 7 );
+			expect( queriedMonths.at( -1 ) ).toEqual( {
+				after: '2026-07-31T23:59:59',
+				before: '2026-09-01T00:00:00',
+			} );
 			rerender(
 				<RegistryProvider value={ registry }>
 					<DateEdit
@@ -390,7 +408,10 @@ describe( 'DateEdit', () => {
 				</RegistryProvider>
 			);
 			await screen.findByRole( 'button', { name: 'Reset' } );
-			expect( queriedMonths.at( -1 ) ).toBe( 9 );
+			expect( queriedMonths.at( -1 ) ).toEqual( {
+				after: '2026-09-30T23:59:59',
+				before: '2026-11-01T00:00:00',
+			} );
 		} );
 	} );
 } );
