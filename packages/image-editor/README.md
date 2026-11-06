@@ -30,6 +30,8 @@ Or import it from JavaScript:
 import '@wordpress/image-editor/build-style/style.css';
 ```
 
+The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. Gutenberg's media editor reads the user's admin colour scheme for its accent and currently uses a light surface. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
+
 Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
 
 | Property                             | Changes                                                                                                          |
@@ -55,7 +57,7 @@ For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
 }
 ```
 
-The stylesheet supplies defaults for every property. The media editor supplies its grey, white and inset values from WordPress Sass variables.
+To use the design tokens outside WordPress, install `@wordpress/theme` and load its `design-tokens.css` in your app. The image editor runs without it, and your custom properties take precedence over the design tokens.
 
 ## Outside WordPress
 
