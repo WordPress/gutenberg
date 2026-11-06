@@ -274,6 +274,11 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__categories-panel-spinner {
+	left: 8px;
+	top: 8px;
+}
+
 .block-editor-inserter__patterns-category-panel-header {
 	padding: $grid-unit-10 0;
 	@include break-medium {
