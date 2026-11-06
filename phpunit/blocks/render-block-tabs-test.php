@@ -228,8 +228,13 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 	 * is still shown.
 	 *
 	 * @covers ::block_core_tabs_render_block_callback
+	 *
+	 * @dataProvider data_default_tab_index
+	 *
+	 * @param int $saved_index    Default tab index saved in the block.
+	 * @param int $expected_index Default tab index passed to the front end.
 	 */
-	public function test_should_fall_back_to_first_tab_when_default_tab_index_is_out_of_range(): void {
+	public function test_should_fall_back_to_first_tab_when_default_tab_index_is_out_of_range( int $saved_index, int $expected_index ): void {
 		$tabs_block = <<<'BLOCK_CONTENT'
 			<!-- wp:tabs {"activeTabIndex":%d} -->
 			<div class="wp-block-tabs"><!-- wp:tab-list -->
@@ -248,17 +253,28 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			<!-- /wp:tabs -->
 		BLOCK_CONTENT;
 
-		$cases = array(
-			1 => array( 1, 'A default tab that exists should be kept.' ),
-			2 => array( 0, 'A default tab past the last tab should fall back to the first tab.' ),
+		$processor = new WP_HTML_Tag_Processor( do_blocks( sprintf( $tabs_block, $saved_index ) ) );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( $expected_index, $context['activeTabIndex'] ?? null );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_default_tab_index(): array {
+		return array(
+			'existing default tab'          => array(
+				'saved_index'    => 1,
+				'expected_index' => 1,
+			),
+			'default tab past the last tab' => array(
+				'saved_index'    => 2,
+				'expected_index' => 0,
+			),
 		);
-
-		foreach ( $cases as $saved_index => list( $expected_index, $message ) ) {
-			$processor = new WP_HTML_Tag_Processor( do_blocks( sprintf( $tabs_block, $saved_index ) ) );
-			$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-
-			$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
-			$this->assertSame( $expected_index, $context['activeTabIndex'] ?? null, $message );
-		}
 	}
 }
