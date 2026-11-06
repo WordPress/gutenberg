@@ -60,9 +60,9 @@ jobs:
             - name: Score the rules
               continue-on-error: true
               env:
-                  DECISION_API_URL: ${{ vars.DECISION_API_URL }}
-                  DECISION_API_KEY: ${{ secrets.DECISION_API_KEY }}
-                  DECISION_MODEL: ${{ vars.DECISION_MODEL }}
+                  DECISION_API_URL: ${{ vars.REVIEW_ROUTING_DECISION_API_URL }}
+                  DECISION_API_KEY: ${{ secrets.REVIEW_ROUTING_DECISION_API_KEY }}
+                  DECISION_MODEL: ${{ vars.REVIEW_ROUTING_DECISION_MODEL }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   PR_NUMBER: ${{ github.event.number }}
                   REPO: ${{ github.repository }}
