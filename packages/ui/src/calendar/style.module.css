@@ -7,7 +7,9 @@
 			--wp-ui-calendar-cell-size: var(--wpds-dimension-size-md);
 
 			position: relative; /* Required to position the navigation toolbar. */
-			display: inline flow-root;
+			display: flow-root;
+			width: 100%;
+			min-width: calc(var(--wp-ui-calendar-cell-size) * 7);
 			color: var(--wpds-color-foreground-content-neutral);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			font-family: var(--wpds-typography-font-family-body);
@@ -47,7 +49,7 @@
 			display: flex;
 			position: relative;
 
-			width: var(--wp-ui-calendar-cell-size);
+			width: 100%;
 			height: var(--wp-ui-calendar-cell-size);
 
 			border: none;
@@ -71,15 +73,6 @@
 				border: none; /* No default border to avoid polluting high-contrast mode. */
 				border-radius: var(--wpds-border-radius-sm);
 				background-color: var(--wpds-color-background-interactive-neutral-weak);
-			}
-
-			/* Use the button's ::after to show the selection preview. */
-			&::after {
-				content: "";
-				position: absolute;
-				z-index: 1;
-				inset: 0;
-				pointer-events: none;
 			}
 
 			&:disabled {
@@ -137,10 +130,20 @@
 			justify-content: center;
 			flex-wrap: wrap;
 			gap: var(--wpds-dimension-gap-lg);
-			max-width: fit-content;
+		}
+
+		.month {
+			/* Also size the absolute month snapshot used during navigation. */
+			width: 100%;
+			/* Each row shares its remaining width, including an incomplete last row. */
+			flex: 1 0 calc(var(--wp-ui-calendar-cell-size) * 7);
 		}
 
 		.month-grid {
+			/* Keep intrinsic sizing compact while filling months with a definite width. */
+			width: calc(var(--wp-ui-calendar-cell-size) * 7);
+			min-width: 100%;
+			table-layout: fixed;
 			border-collapse: separate;
 			border-spacing: 0 var(--wpds-dimension-gap-xs);
 		}
@@ -159,7 +162,6 @@
 		}
 
 		.weekday {
-			width: var(--wp-ui-calendar-cell-size);
 			height: var(--wp-ui-calendar-cell-size);
 			padding: 0;
 
@@ -271,24 +273,43 @@
 		/*
 		 * RANGE PREVIEW (range calendar only)
 		 *
-		 * The preview is rendered in the button's ::after pseudo-element, so that it
-		 * can be rendered over the button's contents.
-		 * The selection preview is shown with a dashed border. In order to have
-		 * control over the dash pattern (especially the seams between days), the
-		 * dashed borders are rendered as SVGs via the url() CSS function.
-		 * Since SVGs rendered in the url() function don't seem to be able to access
-		 * CSS variables, we're using the SVGs as masks, and using `background-color`
-		 * to consume the accent color variable.
+		 * Use an SVG rectangle without a viewBox so its stroke, dashes, and corners
+		 * keep their size as the cell widens. Extend open ends outside the clipped
+		 * SVG viewport to join adjacent days without drawing vertical borders.
 		 */
 		.preview svg {
 			position: absolute;
 			inset: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
 			pointer-events: none;
 			color: var(--wpds-color-stroke-interactive-neutral);
 
 			@media (forced-colors: active) {
 				color: inherit;
 			}
+		}
+
+		.preview rect {
+			x: -2px;
+			y: 0.5px;
+			width: calc(100% + 4px);
+			height: calc(100% - 1px);
+			rx: 2px;
+		}
+
+		.preview [data-preview-start] rect {
+			x: 0.5px;
+			width: calc(100% + 2px);
+		}
+
+		.preview [data-preview-end] rect {
+			width: calc(100% + 1.5px);
+		}
+
+		.preview [data-preview-start][data-preview-end] rect {
+			width: calc(100% - 1px);
 		}
 
 		/* Do not render the preview outline over selected range endpoints. */
