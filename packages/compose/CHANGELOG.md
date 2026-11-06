@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`.
+-   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`. ([#86445](https://github.com/WordPress/gutenberg/pull/86445))
 
 ## 9.1.0 (2026-11-04)
 
