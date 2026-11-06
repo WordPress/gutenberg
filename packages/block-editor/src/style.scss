@@ -40,6 +40,8 @@
 @use "./components/grid/style.scss" as *;
 @use "./components/height-control/style.scss" as *;
 @use "./components/iframe/style.scss" as *;
+// The cropper no longer injects its own styles, so load its stylesheet here.
+@use "@wordpress/image-cropper/build-style/style.css" as *;
 @use "./components/image-editor/style.scss" as *;
 @use "./components/inserter-list-item/style.scss" as *;
 @use "./components/inspector-controls/styles.scss" as *;

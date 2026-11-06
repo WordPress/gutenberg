@@ -1,73 +1,40 @@
-import Cropper from 'react-easy-crop';
-import { useCallback } from '@wordpress/element';
-import { useImageCropper } from '../../provider';
-import type { Area, ImageCropperProps, MediaSize, Point } from '../../types';
-import { MIN_ZOOM, MAX_ZOOM } from '../../constants';
+import { useCallback, useEffect } from '@wordpress/element';
+import { ImageEditorCanvas, type Size } from '@wordpress/image-editor';
+import { useImageCropperInternals } from '../../provider';
+import type { ImageCropperProps } from '../../types';
+import { MAX_ZOOM } from '../../constants';
 
 export default function ImageCropper( {
 	src,
 	onLoad,
-	minZoom = MIN_ZOOM,
 	maxZoom = MAX_ZOOM,
-	...props
 }: ImageCropperProps ) {
-	const { cropperState, setCropperState } = useImageCropper();
-	const { crop, zoom, rotation, aspectRatio, flip } = cropperState;
+	const { controller, setMaxZoom } = useImageCropperInternals();
 
-	const setCrop = ( newCrop: Point ) => setCropperState( { crop: newCrop } );
-	const setZoom = ( newZoom: number ) => setCropperState( { zoom: newZoom } );
-	const setRotation = ( newRotation: number ) =>
-		setCropperState( { rotation: newRotation } );
-	const setMediaSize = ( newMediaSize: MediaSize ) =>
-		setCropperState( { mediaSize: newMediaSize } );
+	useEffect( () => {
+		setMaxZoom( maxZoom );
+	}, [ maxZoom, setMaxZoom ] );
 
-	/**
-	 * Handles the crop complete event, when a user stops interacting with the cropper.
-	 * Updates the cropped area in percentages and pixels.
-	 *
-	 * @param {Area} areaPercentage - The area percentage.
-	 * @param {Area} areaPixels     - The area pixels.
-	 */
-	const onCropComplete = useCallback(
-		( areaPercentage: Area, areaPixels: Area ) => {
-			setCropperState( {
-				croppedArea: areaPercentage,
-				croppedAreaPixels: areaPixels,
+	const handleImageLoaded = useCallback(
+		( size: Size ) => {
+			onLoad?.( {
+				width: size.width,
+				height: size.height,
+				naturalWidth: size.width,
+				naturalHeight: size.height,
 			} );
 		},
-		[ setCropperState ]
+		[ onLoad ]
 	);
 
 	return (
-		<Cropper
-			classes={ {
-				containerClassName: 'image-cropper__container',
-				cropAreaClassName: 'image-cropper__crop-area',
-				mediaClassName: 'image-cropper__image',
-			} }
-			minZoom={ minZoom }
-			maxZoom={ maxZoom }
-			rotation={ rotation }
-			image={ src }
-			setMediaSize={ setMediaSize }
-			crop={ crop }
-			zoom={ zoom }
-			aspect={ aspectRatio }
-			onCropChange={ setCrop }
-			onZoomChange={ setZoom }
-			onCropComplete={ onCropComplete }
-			onMediaLoaded={ ( loadedMediaSize: MediaSize ) => {
-				onLoad?.( loadedMediaSize );
-			} }
-			onRotationChange={ setRotation }
-			transform={ [
-				`translate(${ crop.x }px, ${ crop.y }px)`,
-				`rotateZ(${ rotation }deg)`,
-				`rotateY(${ flip.horizontal ? 180 : 0 }deg)`,
-				`rotateX(${ flip.vertical ? 180 : 0 }deg)`,
-				`scale(${ zoom })`,
-			].join( ' ' ) }
-			{ ...props }
+		<ImageEditorCanvas
+			src={ src }
+			controller={ controller }
+			className="image-cropper__container"
+			freeformCrop={ false }
+			showDimensions={ false }
+			onImageLoaded={ handleImageLoaded }
 		/>
 	);
 }

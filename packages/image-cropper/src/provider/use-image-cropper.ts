@@ -1,11 +1,25 @@
-import { dequal } from 'dequal';
-import { useMemo, useState, useCallback } from '@wordpress/element';
-import type { Point, ImageCropperState, CropperState } from '../types';
-import { MIN_ZOOM } from '../constants';
 import {
-	getCroppedImage as getCroppedImageUtil,
-	normalizeRotation,
-} from '../utils';
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import {
+	areImageEditorStatesEqual,
+	createImageEditorState,
+	exportImage,
+	useImageEditor,
+	type ImageEditorState,
+} from '@wordpress/image-editor';
+import type {
+	CropperState,
+	ImageCropperContextValue,
+	ImageCropperState,
+} from '../types';
+import { MAX_ZOOM, MIN_ZOOM } from '../constants';
+import { normalizeRotation } from '../utils';
+import { toCropperState } from './cropper-state';
 
 export const DEFAULT_INITIAL_STATE: Required< ImageCropperState > = {
 	crop: {
@@ -23,170 +37,179 @@ export const DEFAULT_INITIAL_STATE: Required< ImageCropperState > = {
 	},
 };
 
-const DEFAULT_CROP_MEDIA_POSITION: Point = {
-	x: 0,
-	y: 0,
-};
-
-const DEFAULT_CROPPER_STATE: CropperState = {
-	crop: DEFAULT_CROP_MEDIA_POSITION,
-	croppedArea: DEFAULT_INITIAL_STATE.crop,
-	croppedAreaPixels: null,
-	zoom: DEFAULT_INITIAL_STATE.zoom,
-	rotation: DEFAULT_INITIAL_STATE.rotation,
-	flip: DEFAULT_INITIAL_STATE.flip,
-	aspectRatio: DEFAULT_INITIAL_STATE.aspectRatio,
-	mediaSize: null,
-};
-
+/**
+ * The cropper's state and the functions that change it, built on the
+ * image editor. The provider keeps the editor's state here and hands the
+ * editor each change, so the reset state and dirtiness can be the
+ * cropper's own.
+ *
+ * @return The context value for consumers, the editor's controller for
+ *         the component, and a setter for the zoom cap.
+ */
 export default function useCropper() {
-	const [ cropperState, setInternalCropperState ] = useState< CropperState >(
-		DEFAULT_CROPPER_STATE
+	const [ editorState, setEditorState ] = useState( () =>
+		createImageEditorState( {
+			aspectRatio: DEFAULT_INITIAL_STATE.aspectRatio,
+		} )
 	);
+	const [ maxZoom, setMaxZoom ] = useState( MAX_ZOOM );
 	const [ resetState, setInternalResetState ] =
 		useState< ImageCropperState | null >( null );
+	// The editor state `reset` returns to and `isDirty` compares against,
+	// once a reset state is set. Without one, the editor's own clean state
+	// serves.
+	const [ snapshot, setSnapshot ] = useState< ImageEditorState | null >(
+		null
+	);
 
-	// Unified setter that supports both partial updates and function updates
-	const setCropperState = useCallback(
-		(
-			newState:
-				| Partial< CropperState >
-				| ( ( prev: CropperState ) => Partial< CropperState > )
-		) => {
-			setInternalCropperState( ( prev ) => {
-				const updates =
-					typeof newState === 'function'
-						? newState( prev )
-						: newState;
+	// The latest editor state, so several setters in one event see each
+	// other's result and the snapshot is taken from the composed state.
+	const latestRef = useRef( editorState );
+	useLayoutEffect( () => {
+		latestRef.current = editorState;
+	}, [ editorState ] );
+	// Until the person edits, the snapshot follows the changes they did
+	// not make, such as the image loading and the crop fitting to its
+	// ratio, as the editor's own clean state does.
+	const editedSinceSnapshotRef = useRef( false );
 
-				// Apply normalization to rotation if it's being updated
-				const normalizedUpdates = { ...updates };
-				if (
-					'rotation' in normalizedUpdates &&
-					normalizedUpdates.rotation !== undefined
-				) {
-					normalizedUpdates.rotation = normalizeRotation(
-						normalizedUpdates.rotation
-					);
-				}
-
-				return { ...prev, ...normalizedUpdates };
-			} );
+	const onChange = useCallback(
+		( next: ImageEditorState, { isEdit }: { isEdit: boolean } ) => {
+			latestRef.current = next;
+			setEditorState( next );
+			if ( isEdit ) {
+				editedSinceSnapshotRef.current = true;
+			} else if ( ! editedSinceSnapshotRef.current ) {
+				setSnapshot( ( current ) => ( current ? next : current ) );
+			}
 		},
 		[]
 	);
 
-	const setResetState = useCallback(
-		( newResetState: Partial< ImageCropperState > | null = null ) => {
-			// If null, wipe the reset state and reset the cropper state to the default state.
-			if ( ! newResetState ) {
-				setInternalResetState( null );
-				setCropperState( DEFAULT_CROPPER_STATE );
-				return;
+	const controller = useImageEditor( {
+		state: editorState,
+		onChange,
+		maxZoom,
+	} );
+
+	const applyFields = useCallback(
+		( fields: Partial< CropperState > ) => {
+			if ( fields.rotation !== undefined ) {
+				const target = normalizeRotation( fields.rotation );
+				const turn = normalizeRotation(
+					target - latestRef.current.rotation
+				);
+				if ( turn % 90 === 0 ) {
+					// A whole number of quarter turns goes through the
+					// editor's snap, which refits the crop to the largest
+					// box of its ratio and turns the pan with the image, as
+					// the old cropper did. `setRotation` is for fine angles:
+					// it keeps the crop's centre and width instead.
+					if ( turn === 270 ) {
+						controller.snapRotate90( -1 );
+					}
+					for ( let i = 0; i < turn / 90 && turn !== 270; i++ ) {
+						controller.snapRotate90( 1 );
+					}
+				} else {
+					controller.setRotation( target );
+				}
 			}
-			if ( typeof newResetState === 'object' ) {
-				const initialState = {
-					...DEFAULT_INITIAL_STATE,
-					...newResetState,
-				};
-				setInternalResetState( initialState );
-				setCropperState( initialState );
+			if ( fields.aspectRatio !== undefined ) {
+				controller.setAspectRatio( fields.aspectRatio );
 			}
+			if ( fields.zoom !== undefined ) {
+				controller.setZoom( fields.zoom );
+			}
+			if ( fields.flip !== undefined ) {
+				controller.setFlip( { ...fields.flip } );
+			}
+			if ( fields.crop !== undefined ) {
+				controller.setPan( { x: fields.crop.x, y: fields.crop.y } );
+			}
+			// `croppedArea`, `croppedAreaPixels` and `mediaSize` are read
+			// from the editor's state, so writing them changes nothing.
 		},
-		[ setCropperState, setInternalResetState ]
+		[ controller ]
 	);
 
-	/*
-	 * Resets the cropper state.
-	 */
-	const reset = useCallback( () => {
-		if ( resetState ) {
-			// Convert ImageCropperState to CropperState updates
-			const resetUpdates: Partial< CropperState > = {
-				// Reset media position to center
-				crop: { x: 0, y: 0 },
-				// Reset cropped area pixels (will be recalculated)
-				croppedAreaPixels: null,
-			};
-
-			// Set the cropped area from resetState (this is the target crop area)
-			if ( resetState.crop ) {
-				resetUpdates.croppedArea = resetState.crop;
-			}
-			if ( resetState.zoom !== undefined ) {
-				resetUpdates.zoom = resetState.zoom;
-			}
-			if ( resetState.rotation !== undefined ) {
-				resetUpdates.rotation = resetState.rotation;
-			}
-			if ( resetState.aspectRatio !== undefined ) {
-				resetUpdates.aspectRatio = resetState.aspectRatio;
-			}
-			if ( resetState.flip !== undefined ) {
-				resetUpdates.flip = resetState.flip;
-			}
-
-			setCropperState( resetUpdates );
-		} else {
-			setCropperState( { ...DEFAULT_CROPPER_STATE } );
-		}
-	}, [ resetState, setCropperState ] );
-
-	/*
-	 * Returns true if the cropper state is dirty.
-	 * Compare against reset state if available, otherwise against default state.
-	 */
-	const isDirty = useMemo( () => {
-		if ( resetState ) {
-			// Compare the relevant cropper properties against reset state
-			const currentState = {
-				crop:
-					cropperState.croppedAreaPixels || cropperState.croppedArea,
-				zoom: cropperState.zoom,
-				rotation: normalizeRotation( cropperState.rotation ),
-				aspectRatio: cropperState.aspectRatio,
-				flip: cropperState.flip,
-			};
-			return false === dequal( currentState, resetState );
-		}
-
-		// Compare against default state using percentage values
-		const currentState = {
-			crop: cropperState.croppedArea,
-			zoom: cropperState.zoom,
-			rotation: normalizeRotation( cropperState.rotation ),
-			aspectRatio: cropperState.aspectRatio,
-			flip: cropperState.flip,
-		};
-		return false === dequal( currentState, DEFAULT_INITIAL_STATE );
-	}, [ cropperState, resetState ] );
-
-	/**
-	 * Returns the cropped image.
-	 *
-	 * @param {string} src - The source of the image to crop.
-	 * @return {Promise<string | null>} A promise that resolves to the cropped image.
-	 */
-	const getCroppedImage = useCallback(
-		async ( src: string ) => {
-			if ( ! cropperState.croppedAreaPixels ) {
-				return null;
-			}
-			return getCroppedImageUtil(
-				src,
-				cropperState.croppedAreaPixels,
-				cropperState.rotation,
-				cropperState.flip
+	const setCropperState = useCallback<
+		ImageCropperContextValue[ 'setCropperState' ]
+	>(
+		( newState ) => {
+			applyFields(
+				typeof newState === 'function'
+					? newState( toCropperState( latestRef.current ) )
+					: newState
 			);
 		},
-		[
-			cropperState.croppedAreaPixels,
-			cropperState.rotation,
-			cropperState.flip,
-		]
+		[ applyFields ]
 	);
 
-	return useMemo(
+	const setResetState = useCallback(
+		( newResetState: Partial< ImageCropperState > | null = null ) => {
+			if ( ! newResetState ) {
+				setInternalResetState( null );
+				setSnapshot( null );
+				controller.reset();
+				return;
+			}
+			const initialState = {
+				...DEFAULT_INITIAL_STATE,
+				...newResetState,
+			};
+			setInternalResetState( initialState );
+			// Start from the clean state, so the fields a reset state
+			// leaves out return to their defaults. Its `crop` is a region
+			// of the image, which the editor cannot place yet.
+			controller.reset();
+			applyFields( {
+				rotation: initialState.rotation,
+				aspectRatio: initialState.aspectRatio,
+				zoom: initialState.zoom,
+				flip: initialState.flip,
+			} );
+			setSnapshot( latestRef.current );
+			editedSinceSnapshotRef.current = false;
+		},
+		[ controller, applyFields ]
+	);
+
+	const reset = useCallback( () => {
+		if ( ! snapshot ) {
+			controller.reset();
+			return;
+		}
+		const next = { ...snapshot, image: latestRef.current.image };
+		latestRef.current = next;
+		setEditorState( next );
+		editedSinceSnapshotRef.current = false;
+	}, [ snapshot, controller ] );
+
+	const isDirty = snapshot
+		? ! areImageEditorStatesEqual( editorState, snapshot )
+		: controller.isDirty;
+
+	const getCroppedImage = useCallback( async () => {
+		if ( ! latestRef.current.image ) {
+			return null;
+		}
+		try {
+			const blob = await exportImage( latestRef.current, {
+				type: 'image/jpeg',
+			} );
+			return URL.createObjectURL( blob );
+		} catch {
+			return null;
+		}
+	}, [] );
+
+	const cropperState = useMemo(
+		() => toCropperState( editorState ),
+		[ editorState ]
+	);
+
+	const contextValue = useMemo< ImageCropperContextValue >(
 		() => ( {
 			cropperState,
 			setCropperState,
@@ -206,4 +229,6 @@ export default function useCropper() {
 			getCroppedImage,
 		]
 	);
+
+	return { contextValue, controller, setMaxZoom };
 }

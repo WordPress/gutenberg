@@ -16,6 +16,8 @@ import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
 import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
+import imageCropperLtr from '../package-styles/image-cropper-ltr.lazy.scss?inline';
+import imageCropperRtl from '../package-styles/image-cropper-rtl.lazy.scss?inline';
 import imageEditorLtr from '../package-styles/image-editor-ltr.lazy.scss?inline';
 import imageEditorRtl from '../package-styles/image-editor-rtl.lazy.scss?inline';
 import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline';
@@ -103,6 +105,12 @@ const CONFIG = [
 		componentIdMatcher: /^image-editor-/,
 		ltr: [ componentsLtr, imageEditorLtr ],
 		rtl: [ componentsRtl, imageEditorRtl ],
+	},
+	{
+		// The cropper's stylesheet includes the image editor's.
+		componentIdMatcher: /^imagecropper-/,
+		ltr: [ componentsLtr, imageCropperLtr ],
+		rtl: [ componentsRtl, imageCropperRtl ],
 	},
 	{
 		componentIdMatcher: /^mediaeditor-/,

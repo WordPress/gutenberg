@@ -13,7 +13,7 @@ export default function ImageCropper( {
 	naturalWidth,
 	borderProps,
 }: ImageEditorCropperProps ) {
-	const { isInProgress, editedUrl, rotation } = useImageEditingContext();
+	const { isInProgress, rotation } = useImageEditingContext();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
@@ -42,7 +42,7 @@ export default function ImageCropper( {
 				height: editedHeight,
 			} }
 		>
-			<ImageCropperComponent src={ editedUrl || url } />
+			<ImageCropperComponent src={ url } />
 			{ isInProgress && <WCSpinner /> }
 		</div>
 	);

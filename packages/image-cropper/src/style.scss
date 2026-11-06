@@ -1,0 +1,9 @@
+@use "@wordpress/image-editor/build-style/style.css" as *;
+
+// The old cropper filled its container edge to edge, and this one shows no
+// resize handles, so it needs none of the room the image editor keeps
+// around its editing surface for them. The editor's own custom property
+// cannot take that inset below 22px, so override the rule here.
+.image-cropper__container .wp-image-editor__canvas {
+	inset: 0;
+}

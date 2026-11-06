@@ -101,8 +101,6 @@ export type ImageEditorCropperProps = Pick<
  * The image transform state and its setters.
  */
 export interface TransformImage {
-	editedUrl: string | undefined;
-	setEditedUrl: ( url: string | undefined ) => void;
 	crop: CropArea | undefined;
 	zoom: number;
 	setZoom: ( zoom: number ) => void;

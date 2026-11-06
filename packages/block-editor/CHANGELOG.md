@@ -6,6 +6,10 @@
 
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
+### Internal
+
+-   The deprecated `__experimentalImageEditor` rotates through the rebuilt `@wordpress/image-cropper` instead of redrawing the image, and loads the cropper's stylesheet, which no longer injects its own.
+
 ## 20.0.0 (2026-11-04)
 
 ### Breaking Changes

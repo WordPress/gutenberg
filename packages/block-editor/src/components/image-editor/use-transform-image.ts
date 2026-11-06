@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { useImageCropper } from '@wordpress/image-cropper';
 import type { ImageEditorProps, TransformImage } from './types';
 
 export default function useTransformImage( {
-	url,
 	naturalWidth,
 	naturalHeight,
 }: Pick<
 	ImageEditorProps,
 	'url' | 'naturalWidth' | 'naturalHeight'
 > ): TransformImage {
-	const [ editedUrl, setEditedUrl ] = useState< string >();
 	const { cropperState, setCropperState } = useImageCropper();
-	const { zoom, aspectRatio, crop, croppedArea } = cropperState;
+	const { zoom, aspectRatio, croppedArea, rotation } = cropperState;
 
 	const setZoom = useCallback(
 		( newZoom: number ) => {
@@ -38,130 +35,50 @@ export default function useTransformImage( {
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
-	 * rotateClockwise rotates the image by 90° clockwise by drawing the original image onto a canvas with rotation applied,
-	 * then saves it as a new blob URL (editedUrl).
-	 * This creates a new rotated image file, bypassing the image-cropper’s CSS transform rotation.
-	 * It's a bespoke solution to ensure that the rotated image fills the content width.
+	 * Rotates the image a quarter turn clockwise. The cropper refits the
+	 * view to the turned image, so nothing is redrawn. A crop with a chosen
+	 * ratio or zoom keeps them; otherwise the crop follows the image's
+	 * orientation.
 	 */
-	const [ internalRotation, setInternalRotation ] = useState( 0 );
 	const rotateClockwise = useCallback( () => {
-		const angle = ( internalRotation + 90 ) % 360;
-
-		let naturalAspectRatio = defaultAspect;
 		const isDefaultAspect =
 			defaultAspect === aspectRatio || rotatedAspect === aspectRatio;
-		const shouldResetAspect = zoom !== 1 || ! isDefaultAspect;
-
-		if ( internalRotation % 180 === 90 ) {
-			naturalAspectRatio = 1 / defaultAspect;
+		const keepsAspect = zoom !== 1 || ! isDefaultAspect;
+		const nextRotation = ( rotation + 90 ) % 360;
+		let nextAspect = aspectRatio;
+		if ( ! keepsAspect ) {
+			nextAspect =
+				nextRotation % 180 === 90 ? rotatedAspect : defaultAspect;
 		}
-
-		if ( angle === 0 ) {
-			setEditedUrl( undefined );
-			setInternalRotation( angle );
-			const newAspectRatio = shouldResetAspect
-				? aspectRatio
-				: defaultAspect;
-			setCropperState( {
-				aspectRatio: newAspectRatio,
-				crop: {
-					x: -( crop.y * naturalAspectRatio ),
-					y: crop.x * naturalAspectRatio,
-				},
-			} );
-			return;
-		}
-
-		function editImage( event: Event & { target: HTMLImageElement } ) {
-			const canvas = document.createElement( 'canvas' );
-
-			let translateX = 0;
-			let translateY = 0;
-
-			if ( angle % 180 ) {
-				canvas.width = event.target.height;
-				canvas.height = event.target.width;
-			} else {
-				canvas.width = event.target.width;
-				canvas.height = event.target.height;
-			}
-
-			if ( angle === 90 || angle === 180 ) {
-				translateX = canvas.width;
-			}
-
-			if ( angle === 270 || angle === 180 ) {
-				translateY = canvas.height;
-			}
-
-			// A new canvas has a 2D context.
-			const context = canvas.getContext( '2d' )!;
-
-			context.translate( translateX, translateY );
-			context.rotate( ( angle * Math.PI ) / 180 );
-			context.drawImage( event.target, 0, 0 );
-
-			canvas.toBlob( ( blob ) => {
-				// A canvas with a drawn image converts to a blob.
-				setEditedUrl( URL.createObjectURL( blob! ) );
-				setInternalRotation( angle );
-				const newAspectRatio = shouldResetAspect
-					? aspectRatio
-					: canvas.width / canvas.height;
-				setCropperState( {
-					aspectRatio: newAspectRatio,
-					crop: {
-						x: -( crop.y * naturalAspectRatio ),
-						y: crop.x * naturalAspectRatio,
-					},
-				} );
-			} );
-		}
-
-		const el = new window.Image();
-		el.src = url;
-		// Load events target the image.
-		el.onload = editImage as ( event: Event ) => void;
-
-		const imgCrossOrigin = applyFilters(
-			'media.crossOrigin',
-			undefined,
-			url
-		);
-		if ( typeof imgCrossOrigin === 'string' ) {
-			el.crossOrigin = imgCrossOrigin;
-		}
+		setCropperState( {
+			rotation: nextRotation,
+			aspectRatio: nextAspect,
+		} );
 	}, [
-		internalRotation,
-		defaultAspect,
-		url,
-		setCropperState,
-		crop,
-		zoom,
 		aspectRatio,
+		defaultAspect,
 		rotatedAspect,
-		setInternalRotation,
+		rotation,
+		setCropperState,
+		zoom,
 	] );
 
 	return useMemo(
 		() => ( {
-			editedUrl,
-			setEditedUrl,
 			crop: croppedArea,
 			zoom,
 			setZoom,
-			rotation: internalRotation,
+			rotation,
 			rotateClockwise,
 			aspect: aspectRatio,
 			setAspect: setAspectRatio,
 			defaultAspect,
 		} ),
 		[
-			editedUrl,
 			croppedArea,
 			zoom,
 			setZoom,
-			internalRotation,
+			rotation,
 			rotateClockwise,
 			aspectRatio,
 			setAspectRatio,
