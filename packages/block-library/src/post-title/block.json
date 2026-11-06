@@ -39,6 +39,7 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"editableInSyncedPatterns": true,
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,

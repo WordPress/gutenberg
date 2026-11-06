@@ -718,6 +718,11 @@
 					"type": "boolean",
 					"default": false
 				},
+				"editableInSyncedPatterns": {
+					"description": "This property keeps the block editable inside a synced pattern. It is intended for blocks that edit data owned by the post rather than by the pattern, such as the Post Title. The block must still check that the user can edit that data.",
+					"type": "boolean",
+					"default": false
+				},
 				"listView": {
 					"description": "This property enables a dedicated List View panel in the block inspector for the block. When enabled, the inspector shows a List View tree for the block's inner blocks, allowing users to inspect, reorder, and manage the block's items from the sidebar instead of only using the global document List View.",
 					"type": "boolean",

@@ -690,6 +690,19 @@ attributes: {
 }
 ```
 
+## editableInSyncedPatterns
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Keeps the block editable inside a synced pattern. By default, the blocks of a synced pattern can only be edited from the pattern itself, unless they use block bindings. This property is intended for blocks that edit data owned by the post rather than by the pattern, such as the Post Title. The block must still check that the user can edit that data.
+
+```js
+supports: {
+	editableInSyncedPatterns: true
+}
+```
+
 ## editableRoot
 
 -   Type: `boolean`

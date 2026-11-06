@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Title: Keep the title editable inside synced patterns ([#71981](https://github.com/WordPress/gutenberg/issues/71981)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
