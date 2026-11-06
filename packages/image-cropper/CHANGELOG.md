@@ -9,7 +9,6 @@
 -   `cropperState.crop` is the image editor's pan, in fractions of the image, instead of a pixel offset of the image ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 -   `croppedArea` and `croppedAreaPixels` are measured after the flip, then after a clockwise rotation of `rotation` degrees, or of `360 - rotation` degrees when exactly one axis is flipped. The old values were in the unflipped frame ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 -   `mediaSize.width` and `mediaSize.height` equal the natural size ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
--   `getCroppedImage` ignores its argument and exports the loaded image ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 -   A `crop` region in `setResetState` is ignored; zoom, rotation, aspect ratio and flip apply ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 -   `minZoom` is accepted and ignored. Zoom is clamped by the editor, with the component's `maxZoom` default of 5 ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).
 -   A rotated image refits the view on its own. Small crops are magnified on screen, up to 8x, and keep a 44px minimum size ([#86407](https://github.com/WordPress/gutenberg/pull/86407)).

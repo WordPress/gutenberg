@@ -122,11 +122,18 @@ export default function useCropper() {
 				// box of its ratio and turns the pan with the image, as
 				// the old cropper did. `setRotation` is for fine angles:
 				// it keeps the crop's centre and width instead.
+				//
+				// The snap's direction is the turn on screen. With exactly
+				// one axis flipped, the screen turns the opposite way to
+				// the stored rotation, so the direction is reversed to
+				// land the stored value on the number asked for.
+				const { horizontal, vertical } = latestRef.current.flip;
+				const forward = horizontal !== vertical ? -1 : 1;
 				if ( turn === 270 ) {
-					editor.snapRotate90( -1 );
+					editor.snapRotate90( forward === 1 ? -1 : 1 );
 				}
 				for ( let i = 0; i < turn / 90 && turn !== 270; i++ ) {
-					editor.snapRotate90( 1 );
+					editor.snapRotate90( forward );
 				}
 			} else {
 				editor.setRotation( target );
@@ -207,18 +214,52 @@ export default function useCropper() {
 		editedSinceSnapshotRef.current = false;
 	}, [] );
 
+	// When the loaded image is replaced, the editor starts fresh for it and
+	// the snapshot still describes the old image. The reset state is about
+	// the edit, not the image, so apply it to the new image and take the
+	// snapshot again from the result.
+	const image = editorState.image;
+	useLayoutEffect( () => {
+		const current = snapshotRef.current;
+		if ( ! resetState || ! current || ! image ) {
+			return;
+		}
+		const previous = current.image;
+		if (
+			previous &&
+			previous.src === image.src &&
+			previous.naturalWidth === image.naturalWidth &&
+			previous.naturalHeight === image.naturalHeight
+		) {
+			return;
+		}
+		applyFields( {
+			rotation: resetState.rotation,
+			aspectRatio: resetState.aspectRatio,
+			zoom: resetState.zoom,
+			flip: resetState.flip,
+		} );
+		snapshotRef.current = latestRef.current;
+		setSnapshot( latestRef.current );
+		editedSinceSnapshotRef.current = false;
+	}, [ image, resetState, applyFields ] );
+
 	const isDirty = snapshot
 		? ! areImageEditorStatesEqual( editorState, snapshot )
 		: controller.isDirty;
 
-	const getCroppedImage = useCallback( async () => {
-		if ( ! latestRef.current.image ) {
+	const getCroppedImage = useCallback( async ( src?: string ) => {
+		const state = latestRef.current;
+		if ( ! state.image ) {
 			return null;
 		}
 		try {
-			const blob = await exportImage( latestRef.current, {
-				type: 'image/jpeg',
-			} );
+			// A consumer may pass a processed copy of the displayed image.
+			// It is assumed to have the same dimensions, as it always was.
+			const source = src
+				? { ...state, image: { ...state.image, src } }
+				: state;
+			const blob = await exportImage( source, { type: 'image/jpeg' } );
 			return URL.createObjectURL( blob );
 		} catch {
 			return null;

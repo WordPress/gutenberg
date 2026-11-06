@@ -155,6 +155,66 @@ describe( 'useImageCropper', () => {
 		expect( viaHook.current.cropper.cropperState.rotation ).toBe( 90 );
 	} );
 
+	it( 'stores the rotation asked for when one axis is flipped', () => {
+		// The editor's snap reverses the stored direction under a single
+		// flip so the picture turns the same way on screen. The hook must
+		// still land the stored value on the number asked for.
+		const { result: viaHook } = renderCropper();
+		const { result: viaSnap } = renderCropper();
+		for ( const result of [ viaHook, viaSnap ] ) {
+			act( () => result.current.internals.controller.setImage( WIDE ) );
+			act( () =>
+				result.current.cropper.setCropperState( {
+					flip: { horizontal: true, vertical: false },
+				} )
+			);
+		}
+
+		act( () =>
+			viaHook.current.cropper.setCropperState( { rotation: 90 } )
+		);
+		act( () => viaSnap.current.internals.controller.snapRotate90( -1 ) );
+
+		expect( viaHook.current.cropper.cropperState.rotation ).toBe( 90 );
+		expect(
+			areImageEditorStatesEqual(
+				viaHook.current.internals.controller.state,
+				viaSnap.current.internals.controller.state
+			)
+		).toBe( true );
+
+		act( () => viaHook.current.cropper.setCropperState( { rotation: 0 } ) );
+		expect( viaHook.current.cropper.cropperState.rotation ).toBe( 0 );
+	} );
+
+	it( 'applies the reset state to a replacement image and takes the snapshot from it', () => {
+		const view = renderCropper();
+		loadImage( view );
+		act( () =>
+			view.result.current.cropper.setResetState( { rotation: 90 } )
+		);
+		act( () => view.result.current.cropper.setCropperState( { zoom: 2 } ) );
+		expect( view.result.current.cropper.isDirty ).toBe( true );
+
+		loadImage( view, WIDE );
+
+		const { cropperState, isDirty } = view.result.current.cropper;
+		expect( cropperState.mediaSize?.naturalWidth ).toBe( 400 );
+		expect( cropperState.rotation ).toBe( 90 );
+		expect( cropperState.zoom ).toBeCloseTo( 1 );
+		expect( isDirty ).toBe( false );
+
+		act( () => view.result.current.cropper.setCropperState( { zoom: 3 } ) );
+		act( () => view.result.current.cropper.reset() );
+		expect( view.result.current.cropper.cropperState.zoom ).toBeCloseTo(
+			1
+		);
+		expect( view.result.current.cropper.cropperState.rotation ).toBe( 90 );
+		expect(
+			view.result.current.cropper.cropperState.mediaSize?.naturalWidth
+		).toBe( 400 );
+	} );
+
 	it( 'keeps the crop and pan when flipping', () => {
 		const view = renderCropper();
 		loadImage( view );

@@ -72,7 +72,7 @@ const {
 	// Actions
 	reset, // Reset all changes (uses resetState if set)
 	setResetState, // Set custom reset state
-	getCroppedImage, // Get cropped image as an object URL
+	getCroppedImage, // Get the crop as a JPEG object URL; pass a processed copy of the image to cut from it instead
 
 	// Reset state
 	resetState, // Current reset state configuration
@@ -227,7 +227,6 @@ The exports and the hook's shape are unchanged. These are the differences a cons
 - `crop` is the image editor's pan in fractions of the image, not a pixel offset of the image.
 - `croppedArea` and `croppedAreaPixels` are measured after the flip, then after the rotation described above. The old values were in the unflipped frame.
 - `mediaSize.width` and `mediaSize.height` equal the natural size.
-- `getCroppedImage` ignores its argument and exports the loaded image, as a JPEG object URL.
 - A `crop` region in `setResetState` is ignored. Zoom, rotation, aspect ratio and flip apply.
 - `minZoom` is accepted and ignored.
 - A rotated image refits the view on its own.

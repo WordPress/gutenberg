@@ -10,15 +10,40 @@ import type { ImageCropperContextValue } from '../../../types';
 // Browser Mode needs the package's real styles for layout.
 import '../../../style.scss';
 
-function paintedImage( width: number, height: number ) {
+function paintedImage(
+	width: number,
+	height: number,
+	color = 'rgb(51, 153, 255)'
+) {
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = width;
 	canvas.height = height;
 	// A fresh canvas has a 2D context.
 	const context = canvas.getContext( '2d' )!;
-	context.fillStyle = 'rgb(51, 153, 255)';
+	context.fillStyle = color;
 	context.fillRect( 0, 0, width, height );
 	return canvas.toDataURL( 'image/png' );
+}
+
+// The colour at the centre of an exported image.
+async function centrePixel( url: string ) {
+	const bitmap = await createImageBitmap(
+		await ( await fetch( url ) ).blob()
+	);
+	const canvas = document.createElement( 'canvas' );
+	canvas.width = bitmap.width;
+	canvas.height = bitmap.height;
+	// A fresh canvas has a 2D context.
+	const context = canvas.getContext( '2d' )!;
+	context.drawImage( bitmap, 0, 0 );
+	const [ r, g, b ] = context.getImageData(
+		bitmap.width / 2,
+		bitmap.height / 2,
+		1,
+		1
+	).data;
+	bitmap.close();
+	return { r, g, b };
 }
 
 function Probe( {
@@ -103,7 +128,18 @@ describe( 'ImageCropper', () => {
 			expect( pixels?.height ).toBeCloseTo( 600, 2 );
 		} );
 
-		const url = await cropper.getCroppedImage( 'ignored.png' );
+		const url = await cropper.getCroppedImage();
 		expect( url ).toMatch( /^blob:/ );
+		const blue = await centrePixel( url! );
+		expect( blue.b ).toBeGreaterThan( 200 );
+		expect( blue.r ).toBeLessThan( 100 );
+
+		// A processed copy of the image, passed in, is what gets cut.
+		const fromCopy = await cropper.getCroppedImage(
+			paintedImage( 1200, 600, 'rgb(220, 20, 20)' )
+		);
+		const red = await centrePixel( fromCopy! );
+		expect( red.r ).toBeGreaterThan( 200 );
+		expect( red.b ).toBeLessThan( 100 );
 	} );
 } );

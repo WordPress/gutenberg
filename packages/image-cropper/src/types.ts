@@ -82,8 +82,9 @@ export interface ImageCropperContextValue {
 	reset: () => void;
 	/**
 	 * Export the crop as a JPEG object URL, or `null` before the image
-	 * loads or when the export fails. The argument is ignored; the
-	 * loaded image is exported.
+	 * loads or when the export fails. `src` is the image to cut from,
+	 * assumed to have the loaded image's dimensions; it defaults to the
+	 * loaded image.
 	 */
-	getCroppedImage: ( src: string ) => Promise< string | null >;
+	getCroppedImage: ( src?: string ) => Promise< string | null >;
 }
