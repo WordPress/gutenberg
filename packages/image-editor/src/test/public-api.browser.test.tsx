@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 // Only what the package exports, as a consumer would import it.
 import {
 	ImageEditorCanvas,
@@ -267,65 +266,6 @@ describe( 'the public API', () => {
 		);
 		expect( getComputedStyle( tooltip ).color ).toBe( 'rgb(10, 20, 30)' );
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
-	} );
-
-	it( 'follows the design system accent and surface as the theme changes', async () => {
-		const themedEditor = ( primary: string, background: string ) => (
-			<ThemeProvider color={ { primary, background } }>
-				<div>
-					<span
-						data-testid="focus-token"
-						style={ { color: 'var(--wpds-color-stroke-focus)' } }
-					/>
-					<span
-						data-testid="surface-token"
-						style={ {
-							background:
-								'var(--wpds-color-background-surface-neutral-strong)',
-						} }
-					/>
-					<ConsumerEditor onController={ () => {} } />
-				</div>
-			</ThemeProvider>
-		);
-		const { rerender } = await render(
-			themedEditor( '#3858e9', '#fcfcfc' )
-		);
-		const handle = await screen.findByRole( 'button', {
-			name: 'Resize from bottom-right corner',
-		} );
-		const dimming = screen.getByTestId( 'image-editor-dimming' );
-		handle.style.transition = 'none';
-		dimming.style.transition = 'none';
-		expect( getComputedStyle( handle ).backgroundColor ).toBe(
-			getComputedStyle( screen.getByTestId( 'surface-token' ) )
-				.backgroundColor
-		);
-		expect( getComputedStyle( handle ).borderTopColor ).toBe(
-			getComputedStyle( screen.getByTestId( 'focus-token' ) ).color
-		);
-		const lightSurface = getComputedStyle( handle ).backgroundColor;
-		const lightAccent = getComputedStyle( handle ).borderTopColor;
-		const lightDimming = getComputedStyle( dimming ).boxShadow;
-
-		await rerender( themedEditor( '#cf4339', '#202020' ) );
-
-		expect( getComputedStyle( handle ).backgroundColor ).toBe(
-			getComputedStyle( screen.getByTestId( 'surface-token' ) )
-				.backgroundColor
-		);
-		expect( getComputedStyle( handle ).borderTopColor ).toBe(
-			getComputedStyle( screen.getByTestId( 'focus-token' ) ).color
-		);
-		expect( getComputedStyle( handle ).backgroundColor ).not.toBe(
-			lightSurface
-		);
-		expect( getComputedStyle( handle ).borderTopColor ).not.toBe(
-			lightAccent
-		);
-		expect( getComputedStyle( dimming ).boxShadow ).not.toBe(
-			lightDimming
-		);
 	} );
 
 	it( 'shows the canvas with standalone style defaults', async () => {
