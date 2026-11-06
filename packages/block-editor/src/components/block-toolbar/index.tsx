@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	getBlockType,
@@ -30,6 +30,8 @@ import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import { isBlockToolbarRedesignEnabled } from '../../utils/block-toolbar-redesign';
+import RedesignedBlockToolbar from './redesign';
 import type { BlockToolbarProps, PrivateBlockToolbarProps } from './types';
 
 /**
@@ -189,26 +191,96 @@ export function PrivateBlockToolbar( {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
+	// The redesigned toolbar keeps its place whatever the block hierarchy,
+	// unless the parent selector would be cut off at the edge of the canvas.
+	const [ parentSelectorRoom, setParentSelectorRoom ] = useState( 0 );
+	const onMakeRoomForParent = useCallback(
+		( width: number ) => setParentSelectorRoom( width ),
+		[]
+	);
+
 	const hasBlockToolbar = useHasBlockToolbar();
 	const isPlaceholder = showPlaceholder && ! blockClientIds.length;
 	if ( ! hasBlockToolbar && ! isPlaceholder ) {
 		return null;
 	}
 
+	const isRedesign = isBlockToolbarRedesignEnabled();
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
-		'has-parent': showParentSelector,
+		'has-parent': showParentSelector && ! isRedesign,
 		'is-placeholder': isPlaceholder,
+		'is-redesign': isRedesign,
+		'has-parent-selector':
+			isRedesign && showParentSelector && ! isMultiToolbar,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 		'is-connected': isUsingBindings,
 	} );
+
+	if ( isRedesign ) {
+		return (
+			<NavigableToolbar
+				focusEditorOnEscape
+				shouldUseKeyboardFocusShortcut={ ! isPlaceholder }
+				className={ classes }
+				/* translators: accessibility text for the block toolbar */
+				aria-label={ __( 'Block tools' ) }
+				// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
+				variant={ variant === 'toolbar' ? undefined : variant }
+				focusOnMount={ focusOnMount }
+				__experimentalInitialIndex={ __experimentalInitialIndex }
+				__experimentalOnIndexChange={ __experimentalOnIndexChange }
+				// Resets the index whenever the active block changes so
+				// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+				key={ toolbarKey }
+				style={
+					parentSelectorRoom
+						? { marginInlineStart: parentSelectorRoom }
+						: undefined
+				}
+			>
+				<div ref={ toolbarWrapperRef } className={ innerClasses }>
+					<RedesignedBlockToolbar
+						blockClientId={ blockClientId }
+						blockClientIds={ blockClientIds }
+						isPlaceholder={ isPlaceholder }
+						isMultiToolbar={ isMultiToolbar }
+						isSynced={ isSynced }
+						showParentSelector={
+							!! showParentSelector && isLargeViewport
+						}
+						// In the top toolbar, the parent selector stays in line.
+						isParentSelectorOutside={ variant === 'toolbar' }
+						shouldShowVisualToolbar={ shouldShowVisualToolbar }
+						isDefaultEditingMode={ isDefaultEditingMode }
+						showBlockVisibilityButton={ showBlockVisibilityButton }
+						hideDragHandle={ hideDragHandle }
+						areSelectedBlocksHiddenOnViewport={
+							areSelectedBlocksHiddenOnViewport
+						}
+						canEdit={ canEdit }
+						showShuffleButton={ showShuffleButton }
+						showSwitchSectionStyleButton={
+							showSwitchSectionStyleButton
+						}
+						isSectionContainer={ isSectionContainer }
+						showSlots={ showSlots }
+						showStyleStateSlot={ showStyleStateSlot }
+						blockNameRef={ nodeRef }
+						blockNameGestures={ showHoveredOrFocusedGestures }
+						onMakeRoomForParent={ onMakeRoomForParent }
+					/>
+				</div>
+			</NavigableToolbar>
+		);
+	}
 
 	return (
 		<NavigableToolbar

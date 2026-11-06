@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
@@ -15,6 +15,12 @@ import { shouldSkipSerialization, useBlockSettings } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { isBlockToolbarRedesignEnabled } from '../utils/block-toolbar-redesign';
+import {
+	BlockOptionsMenuControls,
+	BlockOptionsMenuItem,
+} from '../components/block-toolbar/redesign/options-menu-item';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import type {
 	BlockStyleState,
 	BlockWrapperProps,
@@ -42,6 +48,43 @@ const TEXT_ALIGNMENT_OPTIONS = [
 		align: 'right',
 	},
 ];
+
+const TEXT_ALIGNMENT_MENU_LABELS: Record< string, string > = {
+	left: _x( 'Left', 'Text alignment option' ),
+	center: _x( 'Center', 'Text alignment option' ),
+	right: _x( 'Right', 'Text alignment option' ),
+};
+
+/**
+ * Returns the text alignment a block renders with when it sets none, so the
+ * options menu can show it as the current value. It usually comes from Global
+ * Styles.
+ *
+ * @param element The block element.
+ * @return The rendered text alignment, if it is one of the alignment options.
+ */
+function getRenderedTextAlign(
+	element: HTMLElement | null
+): string | undefined {
+	if ( ! element ) {
+		return undefined;
+	}
+	const { textAlign, direction } =
+		element.ownerDocument.defaultView?.getComputedStyle( element ) ?? {};
+	const isRTL = direction === 'rtl';
+	switch ( textAlign ) {
+		case 'start':
+			return isRTL ? 'right' : 'left';
+		case 'end':
+			return isRTL ? 'left' : 'right';
+		case 'left':
+		case 'center':
+		case 'right':
+			return textAlign;
+		default:
+			return undefined;
+	}
+}
 
 const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
 const NO_TEXT_ALIGNMENTS: string[] = [];
@@ -85,6 +128,7 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	const settings = useBlockSettings( blockName );
 	const hasTextAlignControl = settings?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
+	const blockElement = useBlockElement( clientId );
 	const { selectedState, isResponsiveEditing } = useSelect(
 		( select ) => {
 			const {
@@ -136,6 +180,34 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 			style: setStyleForState( style, selectedState, newStateStyle ),
 		} );
 	};
+
+	// The redesigned toolbar offers text alignment in the options menu.
+	if ( isBlockToolbarRedesignEnabled() && controlsGroup === 'block' ) {
+		const currentValue =
+			stateStyle?.typography?.textAlign ??
+			getRenderedTextAlign( blockElement as HTMLElement | null );
+		return (
+			<BlockOptionsMenuControls>
+				<BlockOptionsMenuItem
+					group="align"
+					name="text-align"
+					label={ __( 'Text' ) }
+					icon={
+						textAlignmentControls.find(
+							( control ) => control.align === currentValue
+						)?.icon ?? alignLeft
+					}
+					choices={ textAlignmentControls.map( ( control ) => ( {
+						value: control.align,
+						label: TEXT_ALIGNMENT_MENU_LABELS[ control.align ],
+						icon: control.icon,
+					} ) ) }
+					value={ currentValue }
+					onChange={ onChange }
+				/>
+			</BlockOptionsMenuControls>
+		);
+	}
 
 	return (
 		<BlockControls group={ controlsGroup }>

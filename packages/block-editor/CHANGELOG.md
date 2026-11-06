@@ -25,6 +25,10 @@
 -   DimensionsTool: Show an icon in the shape of each ratio next to the aspect ratio options and the selected value ([#85812](https://github.com/WordPress/gutenberg/pull/85812)).
 -   Block Inspector: Slide the inspector in for a Social Icon inside a Navigation block, as it does for its Social Icons parent ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
+### Experimental
+
+-   Block toolbar: Add a redesign of the block toolbar behind the "Block toolbar redesign" experiment. It shows the block name as the entry point for transforms and style presets, groups block tools in one searchable options menu, moves text formatting to a toolbar that appears with a text selection, adds full-size movers, a Delete button, a Layout menu and inserter for container blocks, and moves the parent selector outside the block with a menu of every ancestor ([#85567](https://github.com/WordPress/gutenberg/pull/85567)).
+
 ### Bug Fixes
 
 -   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).

@@ -25,6 +25,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-block-toolbar-redesign',
+					'label'       => __( 'Block toolbar redesign', 'gutenberg' ),
+					'description' => __( 'Shows the block name in the block toolbar, groups block tools in one options menu, moves text formatting to a toolbar that appears when text is selected, and moves the parent selector outside the block.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),

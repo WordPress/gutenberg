@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   The block toolbar redesign experiment shows the Highlight, Inline image and Math toolbar buttons in its own places, picking them out by name. The format toolbar still lists them in its More menu ([#85567](https://github.com/WordPress/gutenberg/pull/85567)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Bug Fixes

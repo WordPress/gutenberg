@@ -64,6 +64,11 @@ import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacin
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
 import NoteIconSlotFill from './components/collab/note-icon-slot';
+import {
+	BlockOptionsMenuControls,
+	BlockOptionsMenuItem,
+	BlockOptionsMenuItemFill,
+} from './components/block-toolbar/redesign/options-menu-item';
 import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
@@ -137,6 +142,9 @@ lock( privateApis, {
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	NoteIconSlotFill,
+	BlockOptionsMenuControls,
+	BlockOptionsMenuItem,
+	BlockOptionsMenuItemFill,
 	NoteIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
