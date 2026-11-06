@@ -95,6 +95,36 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>One</p>', $this->render_group() );
 	}
 
+	/**
+	 * @dataProvider data_whitespace_after_the_delimiter_opener
+	 *
+	 * @param string $whitespace The whitespace between `<!--` and `wp:`.
+	 */
+	public function test_value_may_have_any_whitespace_after_the_delimiter_opener( $whitespace ) {
+		$this->value = "<!--{$whitespace}wp:paragraph --><p>One</p><!-- /wp:paragraph -->";
+		$output      = $this->render_group();
+		$this->assertStringContainsString( '>One</p>', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
+	public function data_whitespace_after_the_delimiter_opener() {
+		return array(
+			'space'   => array( ' ' ),
+			'tab'     => array( "\t" ),
+			'newline' => array( "\n" ),
+		);
+	}
+
+	public function test_whitespace_value_keeps_own_inner_blocks() {
+		$this->value = " \n\t";
+		$this->assertStringContainsString( '>Default</p>', $this->render_group() );
+	}
+
+	public function test_value_starting_with_a_closer_keeps_own_inner_blocks() {
+		$this->value = '<!-- /wp:paragraph --><!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$this->assertStringContainsString( '>Default</p>', $this->render_group() );
+	}
+
 	public function test_empty_value_removes_inner_blocks() {
 		$this->value = '';
 		$output      = $this->render_group();
