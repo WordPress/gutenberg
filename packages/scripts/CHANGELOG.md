@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Document how to silence the `npm warn allow-scripts` install warnings from npm 11.16 and later by listing the dependencies that npm reports in the project's `allowScripts` field ([#79276](https://github.com/WordPress/gutenberg/pull/79276)).
+
 ## 37.1.0 (2026-11-04)
 
 ### Internal
