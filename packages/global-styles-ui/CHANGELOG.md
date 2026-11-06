@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Avoid saving `null` top-level `border` properties when editing split borders in Global Styles ([#86428](https://github.com/WordPress/gutenberg/pull/86428)).
+
 ## 2.1.0 (2026-11-04)
 
 ### Enhancements
