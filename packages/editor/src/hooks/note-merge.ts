@@ -11,18 +11,21 @@ import type { NoteMetadata } from '../components/collab-sidebar/utils/metadata';
  * @return Merged metadata, or `undefined` when no note IDs are added.
  */
 function mergeNoteIds(
-	metadata: NoteMetadata | undefined,
-	metadataToMerge: NoteMetadata | undefined
+	metadata: unknown,
+	metadataToMerge: unknown
 ): NoteMetadata | undefined {
-	const noteIds = getNoteIdsFromMetadata( metadata );
+	const current = metadata as NoteMetadata | undefined;
+	const noteIds = getNoteIdsFromMetadata( current );
 	const mergedIds = new Set( [
 		...noteIds,
-		...getNoteIdsFromMetadata( metadataToMerge ),
+		...getNoteIdsFromMetadata(
+			metadataToMerge as NoteMetadata | undefined
+		),
 	] );
 	if ( mergedIds.size === noteIds.length ) {
 		return;
 	}
-	return { ...metadata, noteId: [ ...mergedIds ] };
+	return { ...current, noteId: [ ...mergedIds ] };
 }
 
 /**
