@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Filter } from '@wordpress/dataviews';
 
 /**
