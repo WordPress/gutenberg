@@ -19,7 +19,7 @@ Does this change add or change a public API of the design system packages? ...
 
 `threshold` is optional and defaults to 0.7. Write the body in plain language, and say when to answer no if the boundary is not clear.
 
-Ask about one kind of change in each file. A question that combines several conditions gives a less useful probability, and the model can let one condition hide another. To route several kinds of change to a team, add a file for each kind with the same `team`. The team gets one request if any of its rules passes, and the report shows which rules did. To add a team, add a file.
+Ask about one kind of change in each file. A question that combines several conditions gives a less useful probability, and the model can let one condition hide another. To route several kinds of change to a team, add a file for each kind with the same `team`. Many files can name the same team. The tool decides each rule on its own and does not combine the rules of a team, so the report shows the probability of each rule. To add a team, add a file.
 
 ## What the model reads
 
