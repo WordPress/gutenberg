@@ -56,10 +56,11 @@ export interface BlockHighlightData {
  * @param postId              - The ID of the post.
  * @param postType            - The type of the post.
  * @param delayMs             - Milliseconds to wait before recomputing highlight positions.
- * @param highlightTextBlocks - Whether a caret or text selection outlines the block it
- *                            sits in, and puts the collaborator's avatar above that
- *                            block. When false, text blocks are only outlined when
- *                            the caret has nowhere visible to draw.
+ * @param highlightTextBlocks - Whether a caret or text selection outlines every block
+ *                            it touches, and puts the collaborator's avatar above
+ *                            the first of those blocks. When false, text blocks are
+ *                            only outlined when the caret has nowhere visible to
+ *                            draw.
  * @return Highlight data for rendering and a delayed recompute function.
  */
 export function useBlockHighlighting(
@@ -114,9 +115,9 @@ export function useBlockHighlighting(
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
-			// true: always outline. false: outline only on non-text blocks
-			// (a text block in a multi-block range shows selection rects
-			// instead, so its content stays readable).
+			// true: always outline. false: outline only on non-text blocks.
+			// Only a multi-block range with text block highlighting off
+			// uses false: its text blocks show selection rects alone.
 			alwaysOutline: boolean;
 		};
 
@@ -297,10 +298,13 @@ export function useBlockHighlighting(
 					.map( ( el ) => el.getAttribute( 'data-block' ) )
 					.filter( ( id ): id is string => Boolean( id ) );
 
+				// Describe the collaborator once for the whole range.
+				const collaborator = describeCollaborator( userState );
+
 				return [ firstId, ...intermediateIds, lastId ].map(
 					( blockId ) => ( {
 						blockId,
-						...describeCollaborator( userState ),
+						...collaborator,
 						alwaysOutline: highlightTextBlocks,
 					} )
 				);
@@ -395,12 +399,13 @@ export function useBlockHighlighting(
 				blockElement = element;
 			}
 
-			// WholeBlock (single block entirely selected) and, with text
-			// block highlighting on, a caret or text selection: always
-			// outline. SelectionInMultipleBlocks: outline only on non-text
-			// blocks (image, spacer, etc.) — text blocks are highlighted via
-			// text rects from compute-selection so their content stays
-			// visible.
+			// WholeBlock (single block entirely selected): always outline.
+			// With text block highlighting on, every block a caret or text
+			// selection touches is outlined too, including each block of a
+			// SelectionInMultipleBlocks range. With it off, such a range
+			// only outlines its non-text blocks (image, spacer, etc.): the
+			// text blocks are highlighted via text rects from
+			// compute-selection alone.
 			const isNonTextBlock = ! blockElement.innerText?.trim();
 			if (
 				! currentHighlightedIds.has( blockId ) &&
