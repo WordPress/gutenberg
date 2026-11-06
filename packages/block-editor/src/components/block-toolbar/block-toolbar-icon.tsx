@@ -177,7 +177,15 @@ export default function BlockToolbarIcon( {
 	} ) as string;
 
 	const isSingleBlock = clientIds.length === 1;
-	const showBlockTitle = isSingleBlock && isSynced && ! showIconLabels;
+	/*
+	 * A synced block has always been named beside its icon, because its name
+	 * is the only thing distinguishing it. The typography toolbar names every
+	 * block, so the toolbar reads as the block and the type it is set in.
+	 */
+	const showBlockTitle =
+		isSingleBlock &&
+		( isSynced || !! window.__experimentalTypographyToolbar ) &&
+		! showIconLabels;
 	let label = isSingleBlock ? blockTitle : __( 'Multiple blocks selected' );
 	if ( ! clientIds.length ) {
 		label =

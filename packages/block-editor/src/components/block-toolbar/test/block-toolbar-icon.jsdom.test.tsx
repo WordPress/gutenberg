@@ -51,8 +51,17 @@ vi.mock( import( '../../block-icon' ), () => ( {
 } ) );
 vi.mock( import( '../../block-switcher' ), () => ( {
 	// Takes the props the switcher uses as a plain component.
-	default: ( ( { children }: { children: ReactNode } ) => (
-		<div data-testid="block-switcher">{ children }</div>
+	default: ( ( {
+		children,
+		text,
+	}: {
+		children: ReactNode;
+		text?: string;
+	} ) => (
+		<div data-testid="block-switcher">
+			{ children }
+			{ text }
+		</div>
 	) ) as typeof BlockSwitcher,
 } ) );
 vi.mock( import( '../pattern-overrides-dropdown' ), () => ( {
@@ -128,6 +137,48 @@ describe( 'BlockToolbarIcon', () => {
 			expect(
 				screen.queryByTestId( 'pattern-overrides-dropdown' )
 			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'naming the block beside its icon', () => {
+		const renderSwitcher = ( props = {} ) => {
+			mockedUseSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: false,
+				variant: 'switcher',
+			} ) );
+			render( <BlockToolbarIcon { ...defaultProps } { ...props } /> );
+			return screen.getByTestId( 'block-switcher' );
+		};
+
+		it( 'names the block while the experiment is on', () => {
+			window.__experimentalTypographyToolbar = true;
+			expect( renderSwitcher() ).toHaveTextContent( 'Block Name' );
+		} );
+
+		it( 'leaves it unnamed while the experiment is off', () => {
+			window.__experimentalTypographyToolbar = undefined;
+			expect( renderSwitcher() ).not.toHaveTextContent( 'Block Name' );
+		} );
+
+		it( 'still names a synced block while the experiment is off', () => {
+			window.__experimentalTypographyToolbar = undefined;
+			expect( renderSwitcher( { isSynced: true } ) ).toHaveTextContent(
+				'Block Name'
+			);
+		} );
+
+		it( 'leaves it unnamed when the buttons carry their own labels', () => {
+			window.__experimentalTypographyToolbar = true;
+			mockedUseSelect.mockImplementation( () => ( {
+				icon: paragraph,
+				showIconLabels: true,
+				variant: 'switcher',
+			} ) );
+			render( <BlockToolbarIcon { ...defaultProps } /> );
+			expect(
+				screen.getByTestId( 'block-switcher' )
+			).not.toHaveTextContent( 'Block Name' );
 		} );
 	} );
 
