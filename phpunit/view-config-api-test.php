@@ -13,7 +13,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const CONFIG_KEYS = array( 'default_view', 'default_layouts', 'view_list', 'form' );
+	const CONFIG_KEYS = array( 'default_view', 'default_layouts', 'view_list', 'form', 'quick_edit_form' );
 
 	/**
 	 * The default view configuration shared by all entities.

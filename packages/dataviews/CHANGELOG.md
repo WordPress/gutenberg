@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DataForm`: a form field can pass settings to its field's `Edit` control through a new `config` property, so one form can ask a control for a variant without changing the field ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
+
 ### Bug Fixes
 
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
