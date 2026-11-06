@@ -18,6 +18,8 @@
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
+-   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
+-   PostSchedule: Mark the posts of the month in the site's timezone, including posts at the first and last second of the month ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
 
 ## 16.0.0 (2026-10-20)
