@@ -14,12 +14,15 @@
  * Adds `innerBlocks` to the attributes that block bindings support on the Group
  * and Column blocks, so that Core resolves its binding.
  *
+ * Not while the inner blocks a source supplied render: Core then skips the
+ * binding without calling its source, and the block keeps its own inner blocks.
+ *
  * @param string[]|mixed $supported_attributes The attributes supported by block bindings.
  * @param string         $block_type           The block type name.
  * @return string[]|mixed The supported attributes.
  */
 function gutenberg_block_bindings_add_inner_blocks_support( $supported_attributes, $block_type ) {
-	if ( is_array( $supported_attributes ) && in_array( $block_type, array( 'core/group', 'core/column' ), true ) ) {
+	if ( is_array( $supported_attributes ) && in_array( $block_type, array( 'core/group', 'core/column' ), true ) && ! gutenberg_block_bindings_is_rendering_supplied_inner_blocks() ) {
 		$supported_attributes[] = 'innerBlocks';
 	}
 	return $supported_attributes;
@@ -65,6 +68,45 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 }
 
 /**
+ * Returns whether the inner blocks a block bindings source supplied are
+ * rendering.
+ *
+ * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ *
+ * @return bool Whether supplied inner blocks are rendering.
+ */
+function gutenberg_block_bindings_is_rendering_supplied_inner_blocks() {
+	global $gutenberg_block_bindings_supplied_inner_blocks_host;
+	return null !== $gutenberg_block_bindings_supplied_inner_blocks_host;
+}
+
+/**
+ * Stops tracking the block whose supplied inner blocks were rendering, once
+ * the block itself has rendered.
+ *
+ * While a block renders the inner blocks a source supplied, no descendant gets
+ * its inner blocks from a source, not even one inside content that loads as
+ * it renders, like the menu of a Navigation block. This way sources whose
+ * values bind each other's, directly or through such content, can't render
+ * forever. Bindings on sibling blocks still resolve, one after the other.
+ *
+ * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ *
+ * @param string   $block_content The rendered block.
+ * @param array    $parsed_block  The parsed block.
+ * @param WP_Block $instance      The block instance.
+ * @return string The rendered block.
+ */
+function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block_content, $parsed_block, $instance ) {
+	global $gutenberg_block_bindings_supplied_inner_blocks_host;
+	if ( $instance === $gutenberg_block_bindings_supplied_inner_blocks_host ) {
+		$gutenberg_block_bindings_supplied_inner_blocks_host = null;
+	}
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_inner_blocks', 10, 3 );
+
+/**
  * Parses the inner blocks a block bindings source supplies.
  *
  * The markup never went through the filters that sanitize post content on
@@ -92,12 +134,7 @@ function gutenberg_block_bindings_parse_inner_blocks( $markup ) {
 /**
  * Prepares the blocks a source supplies, and their inner blocks, to render.
  *
- * Removes their `innerBlocks` bindings: none of them gets its inner blocks from
- * a source, so that two sources whose values bind each other's can't render
- * forever. Removes the bindings and metadata this leaves empty, as the editor
- * does.
- *
- * Also removes their custom CSS, which only users who can edit CSS may add:
+ * Removes their custom CSS, which only users who can edit CSS may add:
  * whoever supplied the value is unknown.
  *
  * @param array[] $blocks The parsed blocks.
@@ -112,15 +149,6 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 			}
 		}
 
-		if ( isset( $block['attrs']['metadata']['bindings']['innerBlocks'] ) ) {
-			unset( $block['attrs']['metadata']['bindings']['innerBlocks'] );
-			if ( empty( $block['attrs']['metadata']['bindings'] ) ) {
-				unset( $block['attrs']['metadata']['bindings'] );
-			}
-			if ( empty( $block['attrs']['metadata'] ) ) {
-				unset( $block['attrs']['metadata'] );
-			}
-		}
 		$block['innerBlocks'] = gutenberg_block_bindings_prepare_inner_blocks( $block['innerBlocks'] );
 	}
 	return $blocks;
@@ -206,6 +234,8 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * a binding in the block's own metadata replaces them, not the one the
  * `__default` binding expands to.
  *
+ * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ *
  * @param mixed    $value          The value of the source.
  * @param string   $source_name    The name of the source.
  * @param array    $source_args    The arguments of the binding.
@@ -214,6 +244,8 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * @return mixed The value, or null for `innerBlocks`.
  */
 function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
+	global $gutenberg_block_bindings_supplied_inner_blocks_host;
+
 	if ( 'innerBlocks' !== $attribute_name ) {
 		return $value;
 	}
@@ -234,6 +266,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->parsed_block['innerHTML']    = implode( '', array_filter( $inner_content, 'is_string' ) );
 	$block_instance->inner_blocks                 = new WP_Block_List( array() );
 	$block_instance->refresh_parsed_block_dependents();
+
+	$gutenberg_block_bindings_supplied_inner_blocks_host = $block_instance;
 
 	return null;
 }
