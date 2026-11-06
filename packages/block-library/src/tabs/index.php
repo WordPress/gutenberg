@@ -32,7 +32,10 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 							? $tabs_id . '-tab-' . $tab_number
 							: 'tab-' . $tab_number );
 
-					$tabs_list[] = esc_attr( $tab_id );
+					// Not escaped here: the HTML API escapes the IDs where they
+					// become attributes, and the interactivity state is printed
+					// as JSON. Escaping here too would leave entities in the IDs.
+					$tabs_list[] = (string) $tab_id;
 					++$tab_number;
 				}
 			}
