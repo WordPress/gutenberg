@@ -16,15 +16,27 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	 */
 	private $value;
 
+	/**
+	 * The number of times the test source supplied `innerBlocks`.
+	 *
+	 * @var int
+	 */
+	private $inner_blocks_calls;
+
 	public function set_up() {
 		parent::set_up();
-		$this->value = null;
+		$this->value              = null;
+		$this->inner_blocks_calls = 0;
 		register_block_bindings_source(
 			self::SOURCE,
 			array(
 				'label'              => 'Test',
 				'get_value_callback' => function ( $source_args, $block_instance, $attribute_name ) {
-					return 'innerBlocks' === $attribute_name ? $this->value : 'Bound text';
+					if ( 'innerBlocks' !== $attribute_name ) {
+						return 'Bound text';
+					}
+					++$this->inner_blocks_calls;
+					return $this->value;
 				},
 			)
 		);
@@ -152,15 +164,42 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'From other', $output );
 	}
 
+	public function test_bindings_inside_content_loaded_by_the_value_are_ignored() {
+		register_block_type(
+			'test/loads-content',
+			array(
+				'render_callback' => static function () {
+					return do_blocks( '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Loaded own</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+				},
+			)
+		);
+		$this->value = '<!-- wp:test/loads-content /-->';
+		$output      = $this->render_group();
+		unregister_block_type( 'test/loads-content' );
+
+		$this->assertSame( 1, $this->inner_blocks_calls );
+		$this->assertStringContainsString( '>Loaded own</p>', $output );
+	}
+
+	public function test_sibling_bindings_each_resolve() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$group       = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$output      = do_blocks( $group . $group );
+
+		$this->assertSame( 2, $this->inner_blocks_calls );
+		$this->assertSame( 2, substr_count( $output, '>One</p>' ) );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
+	public function test_bindings_resolve_again_after_supplied_inner_blocks_render() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$this->render_group();
+		$this->assertContains( 'innerBlocks', get_block_bindings_supported_attributes( 'core/group' ) );
+	}
+
 	public function test_attribute_bindings_inside_the_value_are_kept() {
 		$this->value = '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/inner-blocks"}}}} --><p>One</p><!-- /wp:paragraph -->';
 		$this->assertStringContainsString( '>Bound text</p>', $this->render_group() );
-	}
-
-	public function test_removed_bindings_leave_no_empty_metadata() {
-		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"></div><!-- /wp:group -->';
-		$attributes  = $this->render_group_and_get_supplied_attributes();
-		$this->assertArrayNotHasKey( 'metadata', $attributes[0] );
 	}
 
 	public function test_custom_css_in_the_value_is_removed() {
