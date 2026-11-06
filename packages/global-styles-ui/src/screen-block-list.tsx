@@ -14,7 +14,6 @@ import {
 } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
-	useState,
 	useContext,
 	useEffect,
 	useMemo,
@@ -157,7 +156,7 @@ export function hasUserStylesForBlock(
 	);
 }
 
-type StyleFilter = 'all' | 'customized';
+export type StyleFilter = 'all' | 'customized';
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -460,9 +459,19 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 
 const MemoizedBlockAndElementList = memo( BlockAndElementList );
 
-function ScreenBlockList() {
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ styleFilter, setStyleFilter ] = useState< StyleFilter >( 'all' );
+interface ScreenBlockListProps {
+	filterValue: string;
+	setFilterValue: ( value: string ) => void;
+	styleFilter: StyleFilter;
+	setStyleFilter: ( value: StyleFilter ) => void;
+}
+
+export function ScreenBlockList( {
+	filterValue,
+	setFilterValue,
+	styleFilter,
+	setStyleFilter,
+}: ScreenBlockListProps ) {
 	const deferredFilterValue = useDeferredValue( filterValue );
 
 	return (

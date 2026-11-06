@@ -2,7 +2,7 @@ import { Navigator, useNavigator } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { useMemo, useEffect, Fragment } from '@wordpress/element';
+import { useMemo, useEffect, useState, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import {
 	generateGlobalStyles,
@@ -11,7 +11,7 @@ import {
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { GlobalStylesProvider } from './provider';
 import ScreenRoot from './screen-root';
-import ScreenBlockList from './screen-block-list';
+import ScreenBlockList, { type StyleFilter } from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenElement from './screen-element';
@@ -153,6 +153,12 @@ export function GlobalStylesUI( {
 }: GlobalStylesUIProps ) {
 	const blocks = getBlockTypes();
 
+	// The Blocks screen unmounts while a block is open, so its filter state
+	// lives here, in the component that stays mounted for the whole
+	// round-trip, and is passed down.
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ styleFilter, setStyleFilter ] = useState< StyleFilter >( 'all' );
+
 	// Compute merged value for CSS generation
 	const mergedValue = useMemo( () => {
 		return mergeGlobalStyles( baseValue, value );
@@ -245,7 +251,12 @@ export function GlobalStylesUI( {
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
-						<ScreenBlockList />
+						<ScreenBlockList
+							filterValue={ filterValue }
+							setFilterValue={ setFilterValue }
+							styleFilter={ styleFilter }
+							setStyleFilter={ setStyleFilter }
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks/elements/:element">
 						<ScreenElement
