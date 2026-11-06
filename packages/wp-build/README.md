@@ -151,6 +151,8 @@ Files to copy with optional PHP transformations:
 }
 ```
 
+In watch mode, a change to one of these PHP files copies only that file to the build, without rebuilding the package. Adding or removing a file rebuilds the package, but the build's copy of a removed file is not deleted.
+
 ### `wpWorkers`
 
 Worker bundle definitions for packages that need self-contained Web Worker files.
