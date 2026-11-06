@@ -246,6 +246,7 @@ Properties:
 
 -   `infiniteScrollEnabled`: whether infinite scroll is enabled. `false` by default.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
+-   `fieldOrder`: optional. The order of every field the user can show or hide, hidden ones included. `fields` only lists the visible fields, so this is what lets a hidden field keep its place and come back to it when shown again. The view config's Properties panel lists fields in this order and lets users reorder them by dragging. Visible fields always render in the order `fields` gives them.
 -   `layout`: config that is specific to a particular layout type.
 
 ##### Properties of `layout`

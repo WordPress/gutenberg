@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 .dataviews-view-config {
 	width: 320px;
 	container-type: inline-size;
@@ -61,6 +63,81 @@
 
 .dataviews-view-config__label {
 	text-wrap: nowrap;
+}
+
+// A Properties row the user can move: the toggle and the drag handle side by
+// side, laid out to match a plain `Item` button.
+.dataviews-view-config__sortable-field.dataviews-view-config__sortable-field {
+	display: flex;
+	align-items: stretch;
+	padding: 0;
+	position: relative;
+
+	// Opaque only while it's lifted off the list.
+	&.is-dragging {
+		z-index: 1;
+		background: var(--wpds-color-background-surface-neutral-strong);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+	}
+}
+
+.dataviews-view-config__field-toggle,
+.dataviews-view-config__field-handle {
+	box-sizing: border-box;
+	margin: 0;
+	border: 1px solid transparent;
+	// The row draws the separator below, so it ends up as tall as a plain
+	// `Item` button.
+	border-block-end-width: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	font-size: 13px;
+}
+
+.dataviews-view-config__field-toggle {
+	flex: 1;
+	min-width: 0;
+	// Matches the padding `Item` gives a medium row, so it's 36px tall.
+	padding: calc((36px - 13px * 1.4 - 2px) / 2) 12px;
+	text-align: start;
+}
+
+button.dataviews-view-config__field-toggle,
+.dataviews-view-config__field-handle {
+	cursor: var(--wpds-cursor-control);
+
+	&:hover {
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	&:focus {
+		box-shadow: none;
+	}
+
+	&:focus-visible {
+		@include outset-ring__focus();
+	}
+}
+
+.dataviews-view-config__field-handle {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	padding: 0;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	cursor: grab;
+	touch-action: none;
+
+	svg {
+		fill: currentColor;
+	}
+
+	.is-dragging & {
+		cursor: grabbing;
+	}
 }
 
 .dataviews-view-config__toggle-wrapper {
