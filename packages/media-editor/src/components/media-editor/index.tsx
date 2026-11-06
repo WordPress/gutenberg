@@ -328,6 +328,8 @@ interface MediaActionModalProps {
 	closeModal: () => void;
 }
 
+// A copy of the `ActionModal` in `@wordpress/dataviews`, which isn't
+// exported. It could be replaced if dataviews exports it.
 function MediaActionModal( {
 	action,
 	items,
