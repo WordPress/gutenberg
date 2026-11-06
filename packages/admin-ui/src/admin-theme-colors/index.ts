@@ -14,13 +14,13 @@ const DEFAULT_THEME_COLORS: AdminThemeColors = {
  */
 export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'modern', DEFAULT_THEME_COLORS ],
-	[ 'fresh', { primary: '#007cba', background: '#25292b' } ],
-	[ 'midnight', { primary: '#cf4339', background: '#3d4042' } ],
-	[ 'coffee', { primary: '#916745', background: '#5b534d' } ],
-	[ 'ocean', { primary: '#567958', background: '#5f787f' } ],
-	[ 'blue', { primary: '#437aa8', background: '#3876a8' } ],
+	[ 'fresh', { primary: '#0073ad', background: '#25292b' } ],
+	[ 'midnight', { primary: '#c33f36', background: '#3d4042' } ],
+	[ 'coffee', { primary: '#8e6544', background: '#5b534d' } ],
+	[ 'ocean', { primary: '#537555', background: '#5f787f' } ],
+	[ 'blue', { primary: '#3e719c', background: '#3876a8' } ],
 	[ 'ectoplasm', { primary: '#646c3e', background: '#4f386e' } ],
-	[ 'sunrise', { primary: '#ad631e', background: '#cc4541' } ],
+	[ 'sunrise', { primary: '#a35d1c', background: '#cc4541' } ],
 	[ 'light', { primary: '#007cba', background: '#eaeeed' } ],
 ] );
 
