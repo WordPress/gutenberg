@@ -300,12 +300,20 @@ class WP_Block_Parser {
 			? json_decode( $matches['attrs'][0], /* as-associative */ true )
 			: array();
 
-		/*
-		 * This state isn't allowed
-		 * This is an error
-		 */
 		if ( $is_closer && ( $is_void || $has_attrs ) ) {
-			// we can ignore them since they don't hurt anything.
+			/*
+			 * Although the closing flag and void flag are mutually exclusive,
+			 * and closing tags should not contain JSON attributes, it's unlikely
+			 * that almost-valid block delimiter syntax was accidentally produced.
+			 * It's more likely that some code accidentally added the closing flag.
+			 *
+			 * In these cases, instead of treating the delimiter as non-block HTML
+			 * content, the parser shall prefer treating the block delimiter as a
+			 * void block if the void flag is present. Otherwise it shall ignore
+			 * any attributes that exist on a closing delimiter.
+			 *
+			 * This particular error-resolution behavior may change in the future.
+			 */
 		}
 
 		if ( $is_void ) {
