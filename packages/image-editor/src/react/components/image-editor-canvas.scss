@@ -3,12 +3,11 @@
 // reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
-// The --wpds-* tokens come from @wordpress/theme: their definitions are in
-// packages/theme/tokens/{color,dimension}.json, and their generated values
-// are in packages/theme/prebuilt/css/design-tokens.css. This source stylesheet
-// must also work without that CSS; build-time fallback injection only applies
-// to published CSS.
-/* stylelint-disable plugin-wpds/no-token-fallback-values -- Standalone source styles need the same fallbacks as the published CSS. */
+// The --wpds-* tokens are defined in @wordpress/theme
+// (packages/theme/tokens/color.json and dimension.json). The canvas uses a
+// consumer's value first, then a design token if available, then the defaults
+// written here. These defaults also let an app use this SCSS on its own.
+/* stylelint-disable plugin-wpds/no-token-fallback-values -- This SCSS also works when the design tokens are not loaded. */
 $accent-color: var(--wp-image-editor-accent-color, var(--wpds-color-stroke-focus, var(--wp-admin-theme-color, #3858e9)));
 $foreground-color: var(--wp-image-editor-foreground-color, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 $surface-color: var(--wp-image-editor-surface-color, var(--wpds-color-background-surface-neutral-strong, #fff));
