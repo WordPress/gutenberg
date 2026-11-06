@@ -1,10 +1,10 @@
 import { useRef } from 'preact/hooks';
 import type { RefObject } from 'preact';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { isPlainObject, useLayoutEffect, warn } from '../utils';
+import { afterNextFrame, isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
-import { getHtmlFallback } from '../vdom';
+import { getHtmlFallback, getHtmlServerContent } from '../vdom';
 import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
 
 /**
@@ -17,6 +17,44 @@ import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
  */
 const isServerHTMLRepresentation = ( value: unknown ): boolean =>
 	isPlainObject( value ) && value.wpServerHtml === true;
+
+/**
+ * Lists the HTML-namespace `<template>` elements of a fragment, in tree order,
+ * without those inside template contents.
+ *
+ * @param content The fragment to search.
+ *
+ * @return The template elements.
+ */
+const getTemplates = ( content: DocumentFragment ) =>
+	Array.from( content.querySelectorAll( 'template' ) ).filter(
+		( template ) => template.namespaceURI === 'http://www.w3.org/1999/xhtml'
+	);
+
+/**
+ * Checks whether two server content snapshots hold the same nodes: the same
+ * names, attributes and data, in the same order, at every depth. Unlike
+ * `isEqualNode()` alone, the contents of `<template>` elements are compared
+ * too.
+ *
+ * @param content A detached snapshot.
+ * @param other   Another detached snapshot.
+ *
+ * @return Whether the snapshots hold the same nodes.
+ */
+const isSameServerContent = (
+	content: DocumentFragment,
+	other: DocumentFragment
+): boolean => {
+	if ( ! content.isEqualNode( other ) ) {
+		return false;
+	}
+	// Equal trees hold their templates at the same places.
+	const otherTemplates = getTemplates( other );
+	return getTemplates( content ).every( ( template, index ) =>
+		isSameServerContent( template.content, otherTemplates[ index ].content )
+	);
+};
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
 directive(
@@ -32,6 +70,21 @@ directive(
 		// Inputs are compared inside the effect so host replacements can be
 		// detected on every commit without repeating unchanged value-rule work.
 		const previousInputs = useRef< unknown[] | null >( null );
+		// Server content snapshot of the vnode at the host's previous commit.
+		const previousServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
+		// Server content that the current navigation brought to the kept host,
+		// not yet shown.
+		const owedServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
+		// Server content snapshot that the element shows: what hydration found,
+		// a created host's fallback, or owed content shown since. A value that
+		// applies to the element leaves it showing none.
+		const shownServerContent = useRef< DocumentFragment | undefined >(
+			undefined
+		);
 		// Preact always receives empty HTML; fallback copies and later writes
 		// belong to this directive's layout effect.
 		const preactHtml = useRef< {
@@ -65,7 +118,9 @@ directive(
 
 		// Only supported default entries own the element's content.
 		const active = !! entry && ! entry.uniqueId;
-		// Pending values and the server token representation keep content as-is.
+		// Pending values and the server token representation keep the content,
+		// apart from showing server content that navigation brought to a kept
+		// host.
 		const serverHTMLRepresentation = isServerHTMLRepresentation( result );
 		const preserveContent =
 			result === PENDING_GETTER || serverHTMLRepresentation;
@@ -75,10 +130,13 @@ directive(
 		const resolvedValue = trusted ? getDangerousHTML( result ) : emptyHTML;
 		// The detached fallback captured when this vnode was built.
 		const fallback = getHtmlFallback( element );
+		// The page's server-rendered content, absent for template content.
+		const serverContent = getHtmlServerContent( element );
 
 		// Apply after commit; matching server nodes or content kept for the
 		// representation can be adopted without another innerHTML write. The
-		// vnode dependency makes this run for possible host replacements too.
+		// vnode dependency makes this run for possible host replacements and
+		// for vnodes that navigation brings from another page's markup.
 		useLayoutEffect( () => {
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
 			const hostChanged = previousHost.current !== node;
@@ -102,6 +160,10 @@ directive(
 			if ( hostChanged ) {
 				previousHost.current = node;
 				lastAppliedKey.current = undefined;
+				owedServerContent.current = undefined;
+				shownServerContent.current = preserveContent
+					? serverContent
+					: undefined;
 				if (
 					active &&
 					preserveContent &&
@@ -112,9 +174,54 @@ directive(
 						node.ownerDocument.importNode( fallback, true )
 					);
 				}
+			} else if ( serverContent !== previousServerContent.current ) {
+				// Navigation rendered the kept host from another page's markup.
+				// The content stays owed for the rest of that navigation: its
+				// update, which includes the render where a getter reading the
+				// new page's server context returns its new value, and the
+				// `data-wp-watch` callbacks it notifies, which run a frame later
+				// and can copy the new page's server value. Those that read the
+				// server context are notified once the region commits, after
+				// this effect, so the end is queued once the commit is over.
+				// Later changes on the same page keep the content, as the value
+				// rule says.
+				owedServerContent.current = serverContent;
+				queueMicrotask( () => {
+					afterNextFrame( () => {
+						if ( owedServerContent.current === serverContent ) {
+							owedServerContent.current = undefined;
+						}
+					} );
+				} );
 			}
+			previousServerContent.current = serverContent;
 
 			if ( ! active ) {
+				return;
+			}
+			// A getter reading the server context still returns the previous
+			// page's value in the navigation's first render. When that value is
+			// the server representation or pending and the new one isn't, the
+			// content shown here is replaced later in the same update, after
+			// its media started loading.
+			const owed = owedServerContent.current;
+			if ( preserveContent && owed ) {
+				owedServerContent.current = undefined;
+				// Content the server sends again unchanged keeps its nodes, and
+				// what client code changed in them. Any other content is copied
+				// as nodes, so no HTML string is written.
+				if (
+					! shownServerContent.current ||
+					! isSameServerContent( shownServerContent.current, owed )
+				) {
+					node.replaceChildren(
+						node.ownerDocument.importNode( owed, true )
+					);
+				}
+				shownServerContent.current = owed;
+				// The element shows server content, not what was last applied,
+				// so the next token is compared with the DOM, as at hydration.
+				lastAppliedKey.current = undefined;
 				return;
 			}
 			if ( ! hostChanged && ! inputsChanged ) {
@@ -129,6 +236,8 @@ directive(
 				}
 				return;
 			}
+			// Any other value writes, adopts or empties the content.
+			shownServerContent.current = undefined;
 			if ( ! trusted && result !== null && result !== undefined ) {
 				warn(
 					'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'
@@ -167,6 +276,7 @@ directive(
 			trusted,
 			resolvedValue,
 			fallback,
+			serverContent,
 			element.ref,
 			element,
 		] );

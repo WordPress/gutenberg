@@ -77,11 +77,6 @@ export function addTransforms(
 
 	const preservedMetadata: BlockMetadata = {};
 
-	// Notes
-	if ( sourceMetadata.noteId && ! result.attributes?.metadata?.noteId ) {
-		preservedMetadata.noteId = sourceMetadata.noteId;
-	}
-
 	// Custom name
 	if (
 		sourceMetadata.name &&
