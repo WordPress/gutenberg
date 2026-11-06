@@ -1,4 +1,7 @@
 .wp-block-accordion-item {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
 		transform: rotate(45deg);
 	}

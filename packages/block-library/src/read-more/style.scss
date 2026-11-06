@@ -1,6 +1,8 @@
 .wp-block-read-more {
 	display: block;
 	width: fit-content;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	&:where(:not([style*="text-decoration"])) {
 		text-decoration: none;
 

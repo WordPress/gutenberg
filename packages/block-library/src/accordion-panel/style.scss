@@ -1,4 +1,7 @@
 .wp-block-accordion-panel {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	// Prevent blockGap, borders, box-shadows, and padding from adding extra spacing or rendering when the panel is closed.
 	&[hidden] {
 		border: none !important;
