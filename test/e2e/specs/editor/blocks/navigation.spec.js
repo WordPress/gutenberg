@@ -2623,6 +2623,36 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 
+		test( 'saves and closes the link popover when Apply is pressed', async ( {
+			editor,
+			page,
+			navigation,
+		} ) => {
+			await navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Custom Link' } )
+				.first()
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const linkButton = navigation
+				.getContentControls()
+				.getByRole( 'button', { name: /Link to:/ } );
+			await linkButton.click();
+
+			const searchInput = navigation.getLinkControlSearch();
+			await expect( searchInput ).toBeFocused();
+			await page.keyboard.type( 'https://example.com' );
+			await navigation
+				.getLinkPopover()
+				.getByRole( 'button', { name: 'Apply' } )
+				.click();
+
+			await expect( searchInput ).toBeHidden();
+			await expect( linkButton ).toContainText( 'example.com' );
+			await expect( linkButton ).toBeFocused();
+		} );
+
 		test( 'can add a page link to an empty link field', async ( {
 			editor,
 			page,
