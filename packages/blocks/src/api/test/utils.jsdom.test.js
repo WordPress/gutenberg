@@ -595,6 +595,14 @@ describe( 'convertSvgStringToIconElement', () => {
 		expect( result.props.viewBox ).toBe( '0 0 24 24' );
 	} );
 
+	it( 'should preserve the case of child element names', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg><linearGradient id="a"></linearGradient></svg>'
+		);
+
+		expect( result.props.children.type ).toBe( 'linearGradient' );
+	} );
+
 	it( 'should convert child elements of the SVG element', () => {
 		const result = convertSvgStringToIconElement(
 			'<svg><path d="M5 5h10v10H5z"></path></svg>'

@@ -47,7 +47,8 @@ function domNodeToReactElement(
 	}
 
 	const element = node as globalThis.Element;
-	const tagName = element.tagName.toLowerCase();
+	// SVG names are case-sensitive, so `linearGradient` must keep its case.
+	const tagName = element.tagName;
 	const props: Record< string, string > = {};
 
 	for ( let i = 0; i < element.attributes.length; i++ ) {

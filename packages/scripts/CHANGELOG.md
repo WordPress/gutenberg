@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `build`: Inline the SVG from a `file:` path in a `block.json` `icon`, including the object form's `src`, into the copied `block.json` ([#79658](https://github.com/WordPress/gutenberg/pull/79658)).
+
 ## 37.1.0 (2026-11-04)
 
 ### Internal
@@ -63,10 +67,6 @@
 ### Breaking Changes
 
 -   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
-
-### New Features
-
--   `build`: A `block.json` `icon` may point at an SVG file with the `file:` prefix, as `style`, `editorScript`, `render` and `variations` already do. The SVG is inlined into the copied `block.json` at build time, so the built file stays self-contained. Both the string form and the object form's `src` are resolved ([#79658](https://github.com/WordPress/gutenberg/pull/79658)).
 
 ### Bug Fixes
 
