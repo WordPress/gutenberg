@@ -216,11 +216,6 @@
 	z-index: 1;
 }
 
-.label-wrapper.label-wrapper {
-	// Keep the label's space over FlexItem's max-width in either style order.
-	max-width: calc(100% - 10px);
-}
-
 @mixin prefix-suffix-padding($property) {
 	#{$property}: $grid-unit-15;
 
