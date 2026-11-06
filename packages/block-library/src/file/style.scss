@@ -12,10 +12,17 @@
 		/*rtl:ignore*/
 		text-align: right;
 	}
+}
 
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
-	}
+// Map the block alignment to a justification: `text-align` no longer positions
+// a flex container's contents. Zero specificity, so an editor choice wins.
+:where(.wp-block-file.is-layout-flex.aligncenter) {
+	justify-content: center;
+}
+
+:where(.wp-block-file.is-layout-flex.alignright) {
+	/*rtl:ignore*/
+	justify-content: right;
 }
 
 // Matches Global Styles specificity so a font size set there can win, since
@@ -29,15 +36,16 @@
 	margin-bottom: 1.5em;
 }
 
-.wp-block-file__embed {
-	margin-bottom: 1em;
+// Keeps trunk's spacing in themes without block gap support, which only get a
+// zero specificity fallback gap. Any Global Styles gap is more specific and wins.
+div:where(.wp-block-file) {
+	gap: 1.3em 0.75em;
 }
 
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;
 	padding: 0.5em 1em;
-	display: inline-block;
 
 	&:where(a) {
 		&:hover,

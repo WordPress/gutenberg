@@ -51,7 +51,13 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
+function FileEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const {
 		id,
 		fileName,
@@ -176,6 +182,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const blockProps = useBlockProps( {
 		className: clsx(
+			layoutClassNames,
 			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': !! temporaryURL,
@@ -274,7 +281,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						) }
 					</ResizableBox>
 				) }
-				<div className="wp-block-file__content-wrapper">
+				{ /* Like captions, an empty file name only shows while the block is
+				selected, so the layout matches the front end, which omits it. */ }
+				{ ( isSelected || ! RichText.isEmpty( fileName ) ) && (
 					<RichText
 						identifier="fileName"
 						tagName="a"
@@ -288,32 +297,29 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						}
 						href={ textLinkHref }
 					/>
-					{ showDownloadButton && (
-						<div className="wp-block-file__button-richtext-wrapper">
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
-							<RichText
-								identifier="downloadButtonText"
-								tagName="div" // Must be block-level or else cursor disappears.
-								aria-label={ __( 'Download button text' ) }
-								className={ clsx(
-									'wp-block-file__button',
-									__experimentalGetElementClassName(
-										'button'
-									)
-								) }
-								value={ downloadButtonText }
-								withoutInteractiveFormatting
-								placeholder={ __( 'Add text…' ) }
-								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText:
-											removeAnchorTag( text ),
-									} )
-								}
-							/>
-						</div>
-					) }
-				</div>
+				) }
+				{ showDownloadButton && (
+					<div className="wp-block-file__button-richtext-wrapper">
+						{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
+						<RichText
+							identifier="downloadButtonText"
+							tagName="div" // Must be block-level or else cursor disappears.
+							aria-label={ __( 'Download button text' ) }
+							className={ clsx(
+								'wp-block-file__button',
+								__experimentalGetElementClassName( 'button' )
+							) }
+							value={ downloadButtonText }
+							withoutInteractiveFormatting
+							placeholder={ __( 'Add text…' ) }
+							onChange={ ( text ) =>
+								setAttributes( {
+									downloadButtonText: removeAnchorTag( text ),
+								} )
+							}
+						/>
+					</div>
+				) }
 			</div>
 		</>
 	);
