@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Audio: Pause the Audio block that is playing when another one starts, so two never play at once ([#86453](https://github.com/WordPress/gutenberg/issues/86453)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
