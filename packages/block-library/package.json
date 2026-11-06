@@ -42,6 +42,7 @@
 	"wpScript": true,
 	"wpScriptModuleExports": {
 		"./accordion/view": "./build-module/accordion/view.mjs",
+		"./audio/view": "./build-module/audio/view.mjs",
 		"./cover/view": "./build-module/cover/view.mjs",
 		"./file/view": "./build-module/file/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
