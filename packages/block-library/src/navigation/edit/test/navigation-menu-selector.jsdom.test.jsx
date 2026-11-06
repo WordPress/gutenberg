@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { dispatch } from '@wordpress/data';
 import NavigationMenuSelector from '../navigation-menu-selector';
 import useNavigationMenu from '../../use-navigation-menu';
 
@@ -59,9 +60,29 @@ const classicMenusFixture = [
 	},
 ];
 
+/**
+ * Mocks `useNavigationMenu` and seeds the create permission the selector reads
+ * with `canUser`, so the resolver doesn't send a request.
+ *
+ * @param {Object}  value                              Value returned by `useNavigationMenu`.
+ * @param {boolean} value.canUserCreateNavigationMenus Whether the user can create menus.
+ */
+function mockNavigationMenu( { canUserCreateNavigationMenus, ...value } ) {
+	const { receiveUserPermission, finishResolution } = dispatch( coreStore );
+	receiveUserPermission(
+		'create/postType/wp_navigation',
+		!! canUserCreateNavigationMenus
+	);
+	finishResolution( 'canUser', [
+		'create',
+		{ kind: 'postType', name: 'wp_navigation' },
+	] );
+	useNavigationMenu.mockReturnValue( value );
+}
+
 describe( 'NavigationMenuSelector', () => {
 	beforeEach( () => {
-		useNavigationMenu.mockReturnValue( {
+		mockNavigationMenu( {
 			navigationMenus: [],
 			hasResolvedNavigationMenus: true,
 			canUserCreateNavigationMenus: true,
@@ -74,7 +95,7 @@ describe( 'NavigationMenuSelector', () => {
 
 	describe( 'Toggle', () => {
 		it( 'should show dropdown toggle with loading message when menus have not resolved', async () => {
-			useNavigationMenu.mockReturnValue( {
+			mockNavigationMenu( {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
@@ -91,7 +112,7 @@ describe( 'NavigationMenuSelector', () => {
 		} );
 
 		it( 'should show correct dropdown toggle prompt to choose a menu when Navigation Menus have resolved', async () => {
-			useNavigationMenu.mockReturnValue( {
+			mockNavigationMenu( {
 				navigationMenus: [],
 				hasResolvedNavigationMenus: true,
 				canUserCreateNavigationMenus: true,
@@ -112,7 +133,7 @@ describe( 'NavigationMenuSelector', () => {
 		it( 'should show in loading state with no options when menus have not resolved and user cannot create menus', async () => {
 			const user = userEvent.setup();
 
-			useNavigationMenu.mockReturnValue( {
+			mockNavigationMenu( {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
@@ -150,7 +171,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should show option to create a menu when no menus exist but user can create menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -201,7 +222,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should not show option to create a menu when user does not have permission to create menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: false,
@@ -224,7 +245,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 				const handler = vi.fn();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -252,7 +273,7 @@ describe( 'NavigationMenuSelector', () => {
 				const handler = vi.fn();
 
 				// at the start we have the menus and we're not waiting on network
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -275,7 +296,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// creating a menu is a network activity
 				// so we have to wait on it
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: false,
 					isResolvingNavigationMenus: true,
@@ -300,7 +321,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// once the menu is created
 				// no more network activity to wait on
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					isResolvingNavigationMenus: false,
@@ -324,7 +345,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -345,7 +366,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should show a list of menus when menus exist', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: false,
@@ -384,7 +405,7 @@ describe( 'NavigationMenuSelector', () => {
 					},
 				];
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: menusWithNoTitle,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -418,7 +439,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should pre-select the correct menu in the menu list if a menu ID is passed', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -446,7 +467,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				const handler = vi.fn();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenus: true,
@@ -499,7 +520,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should not show classic menus if there are classic menus but the user does not have permission to create menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					canUserCreateNavigationMenus: false,
 				} );
 
@@ -521,7 +542,7 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should show classic menus if there are classic menus and the user has permission to create menus', async () => {
 				const user = userEvent.setup();
 
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					canUserCreateNavigationMenus: true,
 				} );
 
@@ -554,7 +575,7 @@ describe( 'NavigationMenuSelector', () => {
 				const handler = vi.fn( async () => {} );
 
 				// initially we have the menus, and we're not waiting on network
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
@@ -587,7 +608,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// since we're importing we are doing network activity
 				// so we have to wait on it
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: true,
 					hasResolvedNavigationMenus: false,
@@ -620,7 +641,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				// once the menu is imported
 				// no more network activity to wait on
-				useNavigationMenu.mockReturnValue( {
+				mockNavigationMenu( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
