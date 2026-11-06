@@ -2314,9 +2314,12 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 
 	// Treat a nested rule without `&` as `& selector`, matching native CSS
 	// nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+	// A rule at the very start is only rewritten when it starts with a type
+	// selector, as other selectors there, e.g. `:hover {}`, are already
+	// appended to the block selector.
 	// This must stay in sync with `process_blocks_custom_css()` in PHP.
 	const normalizedCSS = css.replace(
-		/(^|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/g,
+		/(^(?=[a-zA-Z*\s])|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/g,
 		'$1$2& '
 	);
 
