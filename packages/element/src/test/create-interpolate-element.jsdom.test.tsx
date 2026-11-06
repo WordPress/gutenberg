@@ -78,6 +78,14 @@ describe( 'createInterpolateElement', () => {
 			).toEqual( <>{ testString }</> );
 		}
 	);
+	it( 'returns same string when the tag is a non-enumerable key of the conversion map', () => {
+		const testString = 'This is a <hidden>happy</hidden> string';
+		const conversionMap = { item: <em /> };
+		Object.defineProperty( conversionMap, 'hidden', { value: 'text' } );
+		expect( createInterpolateElement( testString, conversionMap ) ).toEqual(
+			<>{ testString }</>
+		);
+	} );
 	it( 'warns and stops interpolating when there is an unmatched closing tag', () => {
 		const testString = 'This is a </item> string';
 		const expectedElement = <>{ testString }</>;
