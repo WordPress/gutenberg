@@ -4,14 +4,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .media-editor {
-	// Supply the image editor's visual defaults from the same Sass tokens as
-	// the rest of this screen. The package also has standalone fallbacks.
-	--wp-image-editor-canvas-inset: #{$grid-unit-30};
-	--wp-image-editor-dimming-color: #{rgba($gray-200, 0.6)};
-	--wp-image-editor-foreground-color: #{$gray-900};
-	--wp-image-editor-surface-color: #{$white};
-	--wp-image-editor-grid-color: #{rgba($white, 0.4)};
-
 	display: flex;
 	flex: 1;
 	flex-direction: column;
