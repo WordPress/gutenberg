@@ -183,6 +183,8 @@ function gutenberg_state_paints_own_background( array $state_style ): bool {
  * @param array<string, mixed> $state_style State style object.
  * @param string               $base_clip   Background clip of the styles the state layers over.
  * @return array<string, string> CSS declarations, empty when no escape is needed.
+ *
+ * @phpstan-return array<non-falsy-string, non-falsy-string>
  */
 function gutenberg_get_state_text_clip_escape( array $state_style, string $base_clip ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
@@ -205,6 +207,8 @@ function gutenberg_get_state_text_clip_escape( array $state_style, string $base_
  *
  * @param array<string, mixed> $state_style State style object.
  * @return array<string, string> CSS declarations, empty when no reset is needed.
+ *
+ * @phpstan-return array<non-falsy-string, non-falsy-string>
  */
 function gutenberg_get_state_text_fill_reset( array $state_style ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';

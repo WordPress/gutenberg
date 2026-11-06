@@ -4110,13 +4110,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.2.0
 	 * @since 7.3.0 Added the `$feature_selectors` and `$feature_declarations` parameters.
 	 *
-	 * @param array[]                                                         $declarations         Declarations generated for the state.
-	 * @param array<string, mixed>                                            $state_style          State style object, as in the theme.json data.
-	 * @param array[]                                                         $base_styles          Style objects the state layers over, nearest first.
-	 * @param array{ root?: string, ...<string, string|array<string, string>> } $feature_selectors    Optional. The block's feature selectors.
-	 * @param array<string, array[]>                                          $feature_declarations Optional. Feature declarations keyed by selector,
-	 *                                                                        which receive the escapes for feature selectors.
+	 * @param array[]                                     $declarations         Declarations generated for the state.
+	 * @param array<string, mixed>                        $state_style          State style object, as in the theme.json data.
+	 * @param array[]                                     $base_styles          Style objects the state layers over, nearest first.
+	 * @param array<string, string|array<string, string>> $feature_selectors    Optional. The block's feature selectors.
+	 * @param array<string, array[]>                      $feature_declarations Optional. Feature declarations keyed by selector,
+	 *                                                                          which receive the escapes for feature selectors.
 	 * @return array[] Declarations with the escapes applied where needed.
+	 *
+	 * @phpstan-param list<array{ name: non-falsy-string, value: scalar }> $declarations
+	 * @phpstan-param array{ root?: string, ...<string, string|array<string, string>> } $feature_selectors
+	 * @phpstan-return list<array{ name: non-falsy-string, value: scalar }>
 	 */
 	private static function get_state_declarations_with_text_clip_escapes( array $declarations, array $state_style, array $base_styles, array $feature_selectors = array(), array &$feature_declarations = array() ): array {
 		$base_clip = '';
