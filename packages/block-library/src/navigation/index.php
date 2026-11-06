@@ -45,8 +45,8 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  *
  * @since 7.1.0
  *
- * @param mixed $layout Layout configuration. It comes from block attributes, so it is not guaranteed to be an array.
- * @return array Navigation layout custom property declarations.
+ * @param array<string, mixed> $layout Layout configuration.
+ * @return array<string, string> Navigation layout custom property declarations.
  */
 function block_core_navigation_get_layout_custom_property_declarations( $layout ) {
 	$justification_values = array(
@@ -55,13 +55,13 @@ function block_core_navigation_get_layout_custom_property_declarations( $layout 
 		'right'         => 'flex-end',
 		'space-between' => 'space-between',
 	);
-	$justify_content      = is_array( $layout ) ? ( $layout['justifyContent'] ?? 'left' ) : 'left';
+	$justify_content      = $layout['justifyContent'] ?? 'left';
 	if ( ! is_string( $justify_content ) || ! isset( $justification_values[ $justify_content ] ) ) {
 		$justify_content = 'left';
 	}
 
 	$justification = $justification_values[ $justify_content ];
-	$is_vertical   = is_array( $layout ) && 'vertical' === ( $layout['orientation'] ?? null );
+	$is_vertical   = 'vertical' === ( $layout['orientation'] ?? null );
 	$align         = 'center';
 	$justify       = $justification;
 
@@ -73,7 +73,7 @@ function block_core_navigation_get_layout_custom_property_declarations( $layout 
 	return array(
 		'--navigation-layout-justification-setting' => $justification,
 		'--navigation-layout-direction'             => $is_vertical ? 'column' : 'row',
-		'--navigation-layout-wrap'                  => is_array( $layout ) && 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
+		'--navigation-layout-wrap'                  => 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
 		'--navigation-layout-justify'               => $justify,
 		'--navigation-layout-align'                 => $align,
 	);
@@ -1679,10 +1679,15 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 			continue;
 		}
 
+		/*
+		 * The layout attribute is a JSON object, so its keys are strings. Any
+		 * unexpected key is harmless, since the values are read with `??`.
+		 */
+		/** @var array<string, mixed> $layout */
+		$layout = array_replace( $base_layout, $viewport_layout );
+
 		$styles[] = array(
-			'declarations' => block_core_navigation_get_layout_custom_property_declarations(
-				array_replace( $base_layout, $viewport_layout )
-			),
+			'declarations' => block_core_navigation_get_layout_custom_property_declarations( $layout ),
 			'rules_group'  => $media_query,
 		);
 	}
