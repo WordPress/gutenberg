@@ -425,6 +425,7 @@ function gutenberg_define_interactivity_modules_support() {
 		return;
 	}
 
+	/** @var list<array{ id: string, path: string, asset: string, min_only?: true }> $modules */
 	$modules = require $modules_registry_file;
 
 	// Add client navigation support to block library modules.
