@@ -1686,6 +1686,10 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 	$styles      = array();
 	$base_layout = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		if ( ! is_string( $media_query ) ) {
+			continue;
+		}
+
 		$viewport_style  = is_array( $style[ $breakpoint ] ?? null ) ? $style[ $breakpoint ] : array();
 		$viewport_layout = is_array( $viewport_style['layout'] ?? null ) ? $viewport_style['layout'] : array();
 		if ( empty( $viewport_layout ) ) {
