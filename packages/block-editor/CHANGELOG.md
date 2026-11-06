@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Block Styles: Don't add an `is-style-default` class when the default style is selected, so a block on the default style is saved the same way however it got there ([#86447](https://github.com/WordPress/gutenberg/pull/86447)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
 ## 20.0.0 (2026-11-04)
