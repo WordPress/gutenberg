@@ -1,0 +1,17 @@
+{
+	"name": "@wordpress/admin-shell-demo-counter-history-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/history",
+		"page": "shell-demo-counter"
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../../../packages/admin-ui",
+		"@wordpress/i18n": "file:../../../../packages/i18n",
+		"@wordpress/route": "file:../../../../packages/route"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0"
+	}
+}

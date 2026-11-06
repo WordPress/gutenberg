@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
-import { SlotFillProvider } from '@wordpress/components';
+import { Popover as WCPopover, SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -86,6 +86,12 @@ export default function RootSinglePage() {
 					</div>
 				</ThemeProvider>
 			</ThemeProvider>
+			{ /*
+			 * Popovers render here, inside the page's app, rather than in a
+			 * container on <body> shared by every page, so they hide with
+			 * the page when the admin shell shows another one.
+			 */ }
+			<WCPopover.Slot />
 		</SlotFillProvider>
 	);
 }

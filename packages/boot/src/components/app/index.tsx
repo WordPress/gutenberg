@@ -5,6 +5,22 @@ import RootSinglePage from '../root/single-page';
 import { store } from '../../store';
 import type { MenuItem, Route } from '../../store/types';
 
+/*
+ * The React roots of single-page apps, by mount element, so the admin shell
+ * can unmount pages it no longer keeps alive.
+ */
+const roots = new Map< Element, ReturnType< typeof createRoot > >();
+
+/**
+ * Unmounts the single-page app mounted into `element`, if any.
+ *
+ * @param element Mount element.
+ */
+export function unmountPage( element: Element ) {
+	roots.get( element )?.unmount();
+	roots.delete( element );
+}
+
 interface AppProps {
 	rootComponent?: ComponentType;
 }
@@ -15,12 +31,32 @@ function App( { rootComponent }: AppProps ) {
 	return <Router routes={ routes } rootComponent={ rootComponent } />;
 }
 
+interface GuestAppProps {
+	routes: Route[];
+	pageKey: string;
+}
+
+/*
+ * An app for another wp-admin page, booted into the current document by the
+ * admin shell. Its routes are passed directly instead of through the boot
+ * store, so they don't collide with the routes of the page that loaded.
+ */
+function GuestApp( { routes, pageKey }: GuestAppProps ) {
+	return (
+		<Router
+			routes={ routes }
+			rootComponent={ RootSinglePage }
+			pageKey={ pageKey }
+		/>
+	);
+}
+
 /*
  * Import and run page init modules.
  * Each module must export an async `init` function,
  * awaited before the app renders so startup tasks finish first.
  */
-async function runInitModules( initModules?: string[] ) {
+export async function runInitModules( initModules?: string[] ) {
 	for ( const moduleId of initModules ?? [] ) {
 		const module = await import( moduleId );
 		await module.init();
@@ -89,10 +125,41 @@ export async function initSinglePage( {
 	const rootElement = document.getElementById( mountId );
 	if ( rootElement ) {
 		const root = createRoot( rootElement );
+		roots.set( rootElement, root );
 		root.render(
 			<StrictMode>
 				<App rootComponent={ RootSinglePage } />
 			</StrictMode>
 		);
 	}
+}
+
+interface MountGuestPageProps {
+	element: HTMLElement;
+	pageKey: string;
+	routes: Route[];
+}
+
+/**
+ * Boots the single-page app of another wp-admin page into `element`.
+ * Used by the admin shell. The page's init modules are expected to have run.
+ *
+ * @param props         Mount options.
+ * @param props.element Element to mount the app into.
+ * @param props.pageKey wp-admin page the app belongs to.
+ * @param props.routes  The page's routes.
+ */
+export function mountGuestPage( {
+	element,
+	pageKey,
+	routes,
+}: MountGuestPageProps ) {
+	const root = createRoot( element );
+	roots.set( element, root );
+	root.render(
+		<StrictMode>
+			<GuestApp routes={ routes } pageKey={ pageKey } />
+		</StrictMode>
+	);
+	return root;
 }

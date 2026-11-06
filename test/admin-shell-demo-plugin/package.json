@@ -1,0 +1,59 @@
+{
+	"name": "@wordpress/admin-shell-demo-plugin",
+	"version": "1.0.0",
+	"description": "Demo plugin whose admin pages, built with @wordpress/build, opt into the admin shell.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"admin-shell"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/test/admin-shell-demo-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "test/admin-shell-demo-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"wpPlugin": {
+		"name": "admin_shell_demo",
+		"scriptGlobal": false,
+		"packageNamespace": "admin-shell-demo",
+		"pages": [
+			"shell-demo-notes",
+			"shell-demo-counter",
+			"shell-demo-settings",
+			"shell-demo-heavy-1",
+			"shell-demo-heavy-2",
+			"shell-demo-heavy-3"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/boot": "file:../../packages/boot",
+		"@wordpress/commands": "file:../../packages/commands",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/keyboard-shortcuts": "file:../../packages/keyboard-shortcuts",
+		"@wordpress/route": "file:../../packages/route",
+		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0",
+		"@wordpress/build": "file:../../packages/wp-build"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build:plugin": "wp-build"
+	}
+}

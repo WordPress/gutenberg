@@ -34,6 +34,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/editor',
 	'@wordpress/font-list-route',
 	'@wordpress/format-library',
+	'@wordpress/keyboard-shortcuts',
 	'@wordpress/notices',
 	'@wordpress/patterns',
 	'@wordpress/preferences',

@@ -42,7 +42,8 @@
 	"dependencies": {
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes"
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

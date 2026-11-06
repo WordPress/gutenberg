@@ -99,6 +99,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-admin-shell',
+					'label'       => __( 'Instant admin page switching', 'gutenberg' ),
+					'description' => __( 'Switches between admin pages built with @wordpress/build, such as Fonts and Connectors, without reloading the page. Plugins can add their pages with the admin_shell_pages filter. Each page you open stays in memory as you left it. (Proof of concept.)', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Uses React 19 for the registered React scripts, instead of the legacy React 18 version. Can be disabled when the new React 19 script cause compatibility issues with plugins and themes.', 'gutenberg' ),

@@ -1,0 +1,19 @@
+{
+	"name": "@wordpress/admin-shell-demo-notes-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": "shell-demo-notes"
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../../../packages/admin-ui",
+		"@wordpress/components": "file:../../../../packages/components",
+		"@wordpress/element": "file:../../../../packages/element",
+		"@wordpress/i18n": "file:../../../../packages/i18n",
+		"@wordpress/ui": "file:../../../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0"
+	}
+}
