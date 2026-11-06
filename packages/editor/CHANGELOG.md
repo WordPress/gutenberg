@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
 -   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
