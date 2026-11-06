@@ -6,13 +6,6 @@ const {
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Document-Isolation-Policy places the editor in its own agent cluster.
-		// Pattern editing involves page reloads and entity navigation to pages
-		// without the DIP header, creating an agent cluster mismatch that breaks
-		// cross-window communication.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -24,12 +17,6 @@ test.describe( 'Unsynced pattern', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test( 'create a new unsynced pattern via the block options menu', async ( {
@@ -759,13 +746,6 @@ test.describe( 'Unsynced pattern', () => {
 
 test.describe( 'Synced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		// Document-Isolation-Policy places the editor in its own agent cluster.
-		// Pattern editing involves page reloads and entity navigation to pages
-		// without the DIP header, creating an agent cluster mismatch that breaks
-		// cross-window communication.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -778,12 +758,6 @@ test.describe( 'Synced pattern', () => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test( 'create a new synced pattern via the block options menu', async ( {
