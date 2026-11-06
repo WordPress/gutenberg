@@ -1,5 +1,6 @@
 import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
+import { getOutputSize } from '../../get-output-size';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
 const DEFAULT_QUALITY = 0.92;
@@ -35,21 +36,20 @@ export function renderToCanvas(
 	state: InternalImageEditorState
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
-	const { rotation, cropRect, zoom } = state;
 	const imageSize = { width: naturalWidth, height: naturalHeight };
 
-	// Output size is the crop region in the snap-rotation bbox — matches
-	// the preview's reference frame so the exported pixels track exactly
-	// what the stencil framed, even at fine rotation angles. The crop is a
-	// fraction of the view, and the view shows the image at `zoom`, so the
-	// region framed in source pixels is the crop divided by the zoom. This
-	// is the size `getOutputSize` reports; without the division a zoomed
-	// export came out upscaled by the zoom factor.
-	const snapRotation = Math.round( rotation / 90 ) * 90;
-	const rotBBox = getRotatedBBox( naturalWidth, naturalHeight, snapRotation );
-	const safeZoom = zoom > 0 ? zoom : 1;
-	const outW = Math.round( ( cropRect.width / safeZoom ) * rotBBox.width );
-	const outH = Math.round( ( cropRect.height / safeZoom ) * rotBBox.height );
+	// The output has the size `getOutputSize` reports, so a consumer that
+	// read the size before saving gets a file of that size. That helper
+	// divides the crop by the zoom, since the view shows the image zoomed,
+	// and treats a crop within a hair of the full frame as no crop, as the
+	// server path does. The element is what gets drawn, so its natural size
+	// is the one that counts, whatever `state.image` says.
+	const outputSize = getOutputSize( {
+		...state,
+		image: { src: state.image?.src ?? '', naturalWidth, naturalHeight },
+	} ) ?? { width: 0, height: 0 };
+	const outW = Math.round( outputSize.width );
+	const outH = Math.round( outputSize.height );
 
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = outW;
