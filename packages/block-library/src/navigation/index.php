@@ -45,7 +45,7 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  *
  * @since 7.1.0
  *
- * @param array<string, mixed> $layout Layout configuration.
+ * @param array<mixed> $layout Layout configuration.
  * @return array<string, string> Navigation layout custom property declarations.
  *
  * @phpstan-return array{
@@ -1692,16 +1692,10 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 			continue;
 		}
 
-		/**
-		 * The layout attribute is a JSON object, so its keys are strings. Any
-		 * unexpected key is harmless, since the values are read with `??`.
-		 *
-		 * @var array<string, mixed> $layout
-		 */
-		$layout = array_replace( $base_layout, $viewport_layout );
-
 		$styles[] = array(
-			'declarations' => block_core_navigation_get_layout_custom_property_declarations( $layout ),
+			'declarations' => block_core_navigation_get_layout_custom_property_declarations(
+				array_replace( $base_layout, $viewport_layout )
+			),
 			'rules_group'  => $media_query,
 		);
 	}
