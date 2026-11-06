@@ -47,6 +47,14 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  *
  * @param array<string, mixed> $layout Layout configuration.
  * @return array<string, string> Navigation layout custom property declarations.
+ *
+ * @phpstan-return array{
+ *     '--navigation-layout-justification-setting': 'flex-start'|'center'|'flex-end'|'space-between',
+ *     '--navigation-layout-direction': 'column'|'row',
+ *     '--navigation-layout-wrap': 'nowrap'|'wrap',
+ *     '--navigation-layout-justify': 'initial'|'flex-start'|'center'|'flex-end'|'space-between',
+ *     '--navigation-layout-align': 'flex-start'|'center'|'flex-end',
+ * }
  */
 function block_core_navigation_get_layout_custom_property_declarations( $layout ) {
 	$justification_values = array(
@@ -66,7 +74,12 @@ function block_core_navigation_get_layout_custom_property_declarations( $layout 
 	$justify       = $justification;
 
 	if ( $is_vertical ) {
-		$align   = in_array( $justify_content, array( 'center', 'right' ), true ) ? $justification : 'flex-start';
+		$vertical_align_values = array(
+			'center' => 'center',
+			'right'  => 'flex-end',
+		);
+
+		$align   = $vertical_align_values[ $justify_content ] ?? 'flex-start';
 		$justify = 'left' === $justify_content ? 'initial' : $justification;
 	}
 
