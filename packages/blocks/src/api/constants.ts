@@ -302,6 +302,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		rootOnly: true,
 	},
+	'--wp--style--root--color--background': {
+		value: [ 'color', 'background' ],
+		rootOnly: true,
+	},
+	'--wp--style--root--color--text': {
+		value: [ 'color', 'text' ],
+		rootOnly: true,
+	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS: Record< string, string > = {

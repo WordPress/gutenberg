@@ -650,7 +650,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variables = ':root{--wp--preset--color--grey: grey;--wp--preset--gradient--custom-gradient: linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--big: 41px;--wp--preset--font-family--arial: Arial, serif;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
-		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(p){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
+		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);--wp--style--root--color--text: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(p){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
 		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-custom-gradient-gradient-background{background: var(--wp--preset--gradient--custom-gradient) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-big-font-size{font-size: var(--wp--preset--font-size--big) !important;}.has-arial-font-family{font-family: var(--wp--preset--font-family--arial) !important;}';
 		$all       = $variables . $styles . $presets;
 
@@ -5697,7 +5697,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body{background-color: #ffffff;color: #000000;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #000000;color: #ffffff;}';
+		$expected = 'body{background-color: #ffffff;color: #000000;--wp--style--root--color--background: #ffffff;--wp--style--root--color--text: #000000;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #000000;color: #ffffff;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -5776,7 +5776,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body{background-color: #ffffff;}:root :where(.wp-element-button, .wp-block-button__link){color: #ffffff;}';
+		$expected = 'body{background-color: #ffffff;--wp--style--root--color--background: #ffffff;}:root :where(.wp-element-button, .wp-block-button__link){color: #ffffff;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -5808,7 +5808,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body{background-color: #ffffff;color: #ffffff;}:root :where(.wp-element-button, .wp-block-button__link){color: #ffffff;}';
+		$expected = 'body{background-color: #ffffff;color: #ffffff;--wp--style--root--color--background: #ffffff;--wp--style--root--color--text: #ffffff;}:root :where(.wp-element-button, .wp-block-button__link){color: #ffffff;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -5831,7 +5831,31 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body{background-color: #ffffff;}';
+		$expected = 'body{background-color: #ffffff;--wp--style--root--color--background: #ffffff;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_get_stylesheet_generates_root_color_custom_properties() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'color'  => array(
+						'background' => 'var:preset|color|base',
+						'text'       => '#000000',
+					),
+					'blocks' => array(
+						'core/group' => array(
+							'color' => array(
+								'background' => '#ff0000',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body{background-color: var(--wp--preset--color--base);color: #000000;--wp--style--root--color--background: var(--wp--preset--color--base);--wp--style--root--color--text: #000000;}:root :where(.wp-block-group){background-color: #ff0000;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
