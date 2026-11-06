@@ -303,6 +303,7 @@ jobs:
                   name: build-assets
                   path: |
                       ./build/
+                      ./packages/ui/build-php/
                   # Only consumed by the jobs of this run, including re-runs.
                   retention-days: 3
 
@@ -393,7 +394,12 @@ jobs:
               uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: build-assets
-                  path: build
+                  path: .
+
+            # The UI component tests skip themselves when these are missing, as they are in a
+            # checkout that hasn't been built, so check here that CI still runs them.
+            - name: Check the UI component fixtures were built
+              run: test -f packages/ui/build-php/manifest.json && test -f packages/ui/build-php/test/fixtures.json
 
             - name: Docker debug information
               run: |
@@ -554,7 +560,7 @@ jobs:
               uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: build-assets
-                  path: build
+                  path: .
 
             # The WordPress stubs are not committed, and generating them from the core commit that
             # tools/phpstan/wordpress-stubs/composer.json records takes a while, so they are cached by

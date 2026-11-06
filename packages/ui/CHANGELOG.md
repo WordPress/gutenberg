@@ -43,6 +43,7 @@
 
 -   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 -   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Add an experimental build step that writes a stylesheet and React fixtures for rendering components in PHP ([#85756](https://github.com/WordPress/gutenberg/pull/85756)).
 
 ### Documentation
 

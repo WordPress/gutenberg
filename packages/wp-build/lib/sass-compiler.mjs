@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises';
-import { initAsyncCompiler } from 'sass-embedded';
+import path from 'path';
+import { initAsyncCompiler, NodePackageImporter } from 'sass-embedded';
 
 /** @type {Promise<import('sass-embedded').AsyncCompiler> | undefined} */
 let compilerPromise;
@@ -38,4 +39,29 @@ export async function compileStylesheet( filePath, sassOptions ) {
 		sourceMap: false,
 	} );
 	return css;
+}
+
+/**
+ * Get SASS options for the given working directory.
+ *
+ * Uses NodePackageImporter from sass-embedded for resolving package imports
+ * (like `@wordpress/base-styles`) which works with any package manager (npm, pnpm, yarn).
+ *
+ * @param {string} workingDir              - The directory where we're working (for NodePackageImporter).
+ * @param {string} [rootDir=process.cwd()] - The repository root.
+ * @return {Object} SASS options object with importers and loadPaths.
+ */
+export function getSassOptions( workingDir, rootDir = process.cwd() ) {
+	return {
+		importers: [ new NodePackageImporter( workingDir ) ],
+		// loadPaths for resolving @wordpress/base-styles imports and local base-styles imports
+		loadPaths: [
+			// Package's own node_modules (for pnpm isolated deps)
+			path.join( workingDir, 'node_modules' ),
+			// Root node_modules (for npm hoisted deps)
+			path.join( rootDir, 'node_modules' ),
+			// For local imports like @use "mixins"
+			path.join( rootDir, 'packages', 'base-styles' ),
+		],
+	};
 }
