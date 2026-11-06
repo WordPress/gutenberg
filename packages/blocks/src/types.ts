@@ -353,6 +353,11 @@ export interface RawHandlerOptions {
 	 * The tag into which the content will be inserted.
 	 */
 	tagName?: string;
+	/**
+	 * Whether to convert Markdown in plain text when using `pasteHandler`.
+	 * Defaults to true.
+	 */
+	convertMarkdown?: boolean;
 }
 
 /**

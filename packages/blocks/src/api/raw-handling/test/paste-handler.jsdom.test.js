@@ -1,8 +1,11 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { decodeEntities } from '@wordpress/html-entities';
 import { pasteHandler, serialize } from '@wordpress/blocks';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterParagraphBlock } from '../../../../../block-library/src/paragraph';
+import { init as initAndRegisterHeadingBlock } from '../../../../../block-library/src/heading';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -311,6 +314,158 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+} );
+
+describe( 'pasteHandler — optional Markdown conversion', () => {
+	beforeAll( () => {
+		initAndRegisterParagraphBlock();
+		initAndRegisterHeadingBlock();
+	} );
+
+	it.each( [
+		'# 3 reason why',
+		'## 見出しタイトル',
+		'**bold title** and _italic_',
+		'- list item',
+		'[link text](https://example.com)',
+		'> quoted title',
+		'~~strikethrough~~',
+		'\\*literal asterisks\\*',
+	] )( 'preserves literal Markdown when disabled: %s', ( plainText ) => {
+		const result = pasteHandler( { plainText, convertMarkdown: false } );
+
+		expect( console ).toHaveLogged();
+		expect( decodeEntities( result ) ).toBe( plainText );
+	} );
+
+	it.each( [ {}, { convertMarkdown: true } ] )(
+		'continues converting Markdown by default or when enabled: %j',
+		( options ) => {
+			const result = pasteHandler( {
+				plainText: '**bold**',
+				...options,
+			} );
+
+			expect( console ).toHaveLogged();
+			expect( result ).toBe( '<strong>bold</strong>' );
+		}
+	);
+
+	it( 'preserves literal Markdown in inline mode', () => {
+		const result = pasteHandler( {
+			plainText: '**bold**',
+			mode: 'INLINE',
+			convertMarkdown: false,
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe( '**bold**' );
+	} );
+
+	it( 'preserves literal Markdown in blocks mode', () => {
+		const result = pasteHandler( {
+			plainText: '# Heading',
+			mode: 'BLOCKS',
+			convertMarkdown: false,
+		} );
+
+		expect( console ).toHaveLogged();
+		expect(
+			result.map( ( { name, attributes } ) => ( {
+				name,
+				attributes: { content: attributes.content.toString() },
+			} ) )
+		).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '# Heading' } },
+		] );
+		expect( result ).toHaveLength( 1 );
+	} );
+
+	it.each( [ '\n\n', '\r\n\r\n' ] )(
+		'preserves paragraph boundaries without Markdown conversion: %j',
+		( separator ) => {
+			const result = pasteHandler( {
+				plainText: `# First title${ separator }**Second paragraph**`,
+				convertMarkdown: false,
+			} );
+
+			expect( console ).toHaveLogged();
+			expect(
+				result.map( ( { name, attributes } ) => ( {
+					name,
+					attributes: { content: attributes.content.toString() },
+				} ) )
+			).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '# First title' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: '**Second paragraph**' },
+				},
+			] );
+			expect( result ).toHaveLength( 2 );
+		}
+	);
+
+	it( 'preserves single line breaks without Markdown conversion', () => {
+		const result = pasteHandler( {
+			plainText: '# First line\nSecond line',
+			convertMarkdown: false,
+		} );
+
+		expect( console ).toHaveLogged();
+		expect(
+			result.map( ( { name, attributes } ) => ( {
+				name,
+				attributes: { content: attributes.content.toString() },
+			} ) )
+		).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '# First line<br>Second line' },
+			},
+		] );
+		expect( result ).toHaveLength( 1 );
+	} );
+
+	it( 'recognizes a decorative clipboard span as plain text', () => {
+		const result = pasteHandler( {
+			HTML: '<span style="font-family: monospace"># Title</span>',
+			plainText: '# Title',
+			convertMarkdown: false,
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe( '# Title' );
+	} );
+
+	it( 'continues parsing rich HTML when Markdown conversion is disabled', () => {
+		const result = pasteHandler( {
+			HTML: '<h2><strong>Heading</strong></h2><p><em>Body</em></p>',
+			plainText: 'Heading\n\nBody',
+			convertMarkdown: false,
+		} );
+
+		expect( console ).toHaveLogged();
+		expect(
+			result.map( ( { name, attributes } ) => ( {
+				name,
+				attributes: { content: attributes.content.toString() },
+			} ) )
+		).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: '<strong>Heading</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<em>Body</em>' },
+			},
+		] );
+		expect( result ).toHaveLength( 2 );
 	} );
 } );
 
