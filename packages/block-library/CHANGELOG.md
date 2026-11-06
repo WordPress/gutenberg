@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
--   Content: Give the blocks of a template rendered inside another template the context of the post that template renders, so a title among them is that post's rather than the template's, and a content block among them is where the post's content goes rather than the template rendering itself ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
+-   Content: Render the template named by the new `templateSlotId` context in place of a post, which the editor provides when a template is shown inside the template it is rendered inside ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 
 ## 12.1.0 (2026-11-04)
