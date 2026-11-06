@@ -37,7 +37,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 		<Checkbox
 			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
-			aria-disabled={ disabled }
+			disabled={ disabled }
 			checked={ checked }
 			onCheckedChange={ () => {
 				if ( disabled ) {

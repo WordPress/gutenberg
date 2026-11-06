@@ -1041,6 +1041,34 @@ describe( 'DataViews component', () => {
 			expect( onClickItem ).not.toHaveBeenCalled();
 		} );
 
+		it( 'disables the checkbox of items with no eligible bulk action', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					actions={ [
+						{
+							id: 'delete',
+							label: 'Delete',
+							supportsBulk: true,
+							// The second item is not selectable.
+							isEligible: ( item: Data ) => item.id !== 2,
+							callback: vi.fn(),
+						},
+					] }
+				/>
+			);
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).not.toHaveAttribute( 'data-disabled' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			).toHaveAttribute( 'data-disabled' );
+		} );
+
 		it( 'passes only eligible items to a bulk action callback', async () => {
 			const restore = vi.fn();
 			render(
