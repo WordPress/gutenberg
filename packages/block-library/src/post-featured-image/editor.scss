@@ -145,3 +145,9 @@ div[data-type="core/post-featured-image"] {
 		display: block;
 	}
 }
+
+// Ensure the block wrapper fills available width in vertical flex (Stack) containers
+// so aspect-ratio placeholders do not overflow their bounds.
+.is-vertical > .wp-block-post-featured-image {
+	width: 100%;
+}
