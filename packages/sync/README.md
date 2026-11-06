@@ -44,6 +44,10 @@ Creates the sync manager, which orchestrates the lifecycle of syncing entity rec
 
 Quill Delta implementation used to describe rich text changes.
 
+### DiffOptions
+
+Quill Delta implementation used to describe rich text changes.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.
@@ -55,6 +59,10 @@ Origin string for CRDT document changes that should be synced but not recorded i
 ### retrySyncConnection
 
 Retries the HTTP polling connection now instead of waiting for the next automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
+
+### tokenizeHtml
+
+Quill Delta implementation used to describe rich text changes.
 
 ### Y
 

@@ -2936,6 +2936,158 @@ describe( 'crdt-blocks', () => {
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
 		} );
+
+		it( 'keeps peers in sync when replacing a happy face with a neutral face', () => {
+			const docA = new Y.Doc();
+			const docB = new Y.Doc();
+			const textA = docA.getText( 'content' );
+			textA.insert( 0, 'a 😀 b' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+			mergeRichTextUpdate( textA, 'a 😐 b' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+			expect( textA.toString() ).toBe( 'a 😐 b' );
+			expect( docB.getText( 'content' ).toString() ).toBe( 'a 😐 b' );
+		} );
+
+		it( 'keeps peers in sync when concurrently formatting text containing emoji', () => {
+			const docA = new Y.Doc();
+			const docB = new Y.Doc();
+			const textA = docA.getText( 'content' );
+			const textB = docB.getText( 'content' );
+
+			textA.insert( 0, 'the 😀 quick brown fox' );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+
+			// Peer A wraps "quick" in strong
+			mergeRichTextUpdate(
+				textA,
+				'the 😀 <strong>quick</strong> brown fox'
+			);
+
+			// Peer B wraps "😀 quick" in em
+			mergeRichTextUpdate( textB, 'the <em>😀 quick</em> brown fox' );
+
+			// Synchronize peers
+			Y.applyUpdate( docA, Y.encodeStateAsUpdate( docB ) );
+			Y.applyUpdate( docB, Y.encodeStateAsUpdate( docA ) );
+
+			expect( textA.toString() ).toBe( textB.toString() );
+			// Emojis and tags must not be corrupted
+			expect( textA.toString() ).toContain( '😀' );
+			expect( textA.toString() ).not.toContain( '\uFFFD' );
+		} );
+	} );
+
+	describe( 'mergeRichTextUpdate - concurrent formatting on overlapping text', () => {
+		it( 'does not interleave or garble tags when peers format overlapping text', () => {
+			const peerADoc = new Y.Doc();
+			const peerBDoc = new Y.Doc();
+
+			const textA = peerADoc.getText( 'content' );
+			const textB = peerBDoc.getText( 'content' );
+
+			const base = 'the quick brown fox';
+			textA.insert( 0, base );
+			Y.applyUpdate( peerBDoc, Y.encodeStateAsUpdate( peerADoc ) );
+
+			// Peer A wraps "quick" in strong
+			mergeRichTextUpdate(
+				textA,
+				'the <strong data-test="strong">quick</strong> brown fox'
+			);
+
+			// Peer B wraps "ick brown" in a link
+			mergeRichTextUpdate(
+				textB,
+				'the qu<a href="https://example.com">ick brown</a> fox'
+			);
+
+			// Synchronize the two peers
+			const updateA = Y.encodeStateAsUpdate( peerADoc );
+			const updateB = Y.encodeStateAsUpdate( peerBDoc );
+			Y.applyUpdate( peerADoc, updateB );
+			Y.applyUpdate( peerBDoc, updateA );
+
+			expect( textA.toString() ).toBe( textB.toString() );
+			const merged = textA.toString();
+			// Tags should not interleave (e.g. `<str<a` or `<a<strong` or broken attributes)
+			expect( merged ).not.toMatch( /<[^>]*<|>[^<]*>/ );
+		} );
+
+		it( 'prevents tag shredding when attributes share substrings with formatted text (href collision)', () => {
+			const peerADoc = new Y.Doc();
+			const peerBDoc = new Y.Doc();
+
+			const textA = peerADoc.getText( 'content' );
+			const textB = peerBDoc.getText( 'content' );
+
+			const base = 'the href brown fox';
+			textA.insert( 0, base );
+			Y.applyUpdate( peerBDoc, Y.encodeStateAsUpdate( peerADoc ) );
+
+			// Peer A bolds "href"
+			mergeRichTextUpdate( textA, 'the <strong>href</strong> brown fox' );
+
+			// Peer B links "href brown"
+			mergeRichTextUpdate(
+				textB,
+				'the <a href="https://example.com/">href brown</a> fox'
+			);
+
+			// Synchronize the two peers
+			const updateA = Y.encodeStateAsUpdate( peerADoc );
+			const updateB = Y.encodeStateAsUpdate( peerBDoc );
+			Y.applyUpdate( peerADoc, updateB );
+			Y.applyUpdate( peerBDoc, updateA );
+
+			expect( textA.toString() ).toBe( textB.toString() );
+			const merged = textA.toString();
+
+			// Tags should be atomic and never shredded (e.g. `<a href</strong>="..."`)
+			expect( merged ).not.toContain( '<a href</strong>' );
+			expect( merged ).toContain( '<a href="https://example.com/">' );
+			expect( merged ).toContain( '<strong>' );
+			expect( merged ).toContain( '</strong>' );
+			expect( merged ).toContain( '</a>' );
+			expect( merged ).not.toMatch( /<[^>]*<|>[^<]*>/ );
+		} );
+
+		it( 'handles attributes containing angle brackets inside quotes atomically', () => {
+			const peerADoc = new Y.Doc();
+			const peerBDoc = new Y.Doc();
+
+			const textA = peerADoc.getText( 'content' );
+			const textB = peerBDoc.getText( 'content' );
+
+			const base = 'the quick brown fox';
+			textA.insert( 0, base );
+			Y.applyUpdate( peerBDoc, Y.encodeStateAsUpdate( peerADoc ) );
+
+			// Peer A inserts tag with angle bracket inside quote
+			mergeRichTextUpdate(
+				textA,
+				'the <span title="a > b">quick</span> brown fox'
+			);
+
+			// Peer B adds emphasis to "quick brown"
+			mergeRichTextUpdate( textB, 'the <em>quick brown</em> fox' );
+
+			const updateA = Y.encodeStateAsUpdate( peerADoc );
+			const updateB = Y.encodeStateAsUpdate( peerBDoc );
+			Y.applyUpdate( peerADoc, updateB );
+			Y.applyUpdate( peerBDoc, updateA );
+
+			expect( textA.toString() ).toBe( textB.toString() );
+			const merged = textA.toString();
+
+			expect( merged ).toContain( '<span title="a > b">' );
+			expect( merged ).toContain( '</span>' );
+			expect( merged ).toContain( '<em>' );
+			expect( [
+				'the <span title="a > b"><em>quick</span> brown</em> fox',
+				'the <em><span title="a > b">quick</span> brown</em> fox',
+			] ).toContain( merged );
+		} );
 	} );
 
 	describe( 'mergeRichTextUpdate - rapid typing', () => {

@@ -1,4 +1,4 @@
-import { Y } from '@wordpress/sync';
+import { Y, tokenizeHtml } from '@wordpress/sync';
 import { create, insert, toHTMLString } from '@wordpress/rich-text';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import type { YPostRecord } from './crdt';
@@ -305,3 +305,5 @@ function findBlockByClientIdInBlocks(
 
 	return null;
 }
+
+export { tokenizeHtml };

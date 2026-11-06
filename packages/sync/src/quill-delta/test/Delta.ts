@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import Delta from '../Delta';
+import Delta, { tokenizeHtml } from '../Delta';
 
 describe( 'Delta.diffWithCursor', () => {
 	describe( 'insertions', () => {
@@ -264,6 +264,268 @@ describe( 'Delta.diffWithCursor', () => {
 			expect( diff.ops ).toEqual( [
 				{ retain: 3 },
 				{ insert: 'l', attributes: { bold: true } },
+			] );
+		} );
+	} );
+
+	describe( 'tokenizeHtml', () => {
+		it( 'tokenizes plain text into individual code points', () => {
+			expect( tokenizeHtml( 'abc' ) ).toEqual( [ 'a', 'b', 'c' ] );
+		} );
+
+		it( 'does not split surrogate pairs when tokenizing emojis', () => {
+			expect( tokenizeHtml( 'a 😀 b' ) ).toEqual( [
+				'a',
+				' ',
+				'😀',
+				' ',
+				'b',
+			] );
+			expect( tokenizeHtml( '🇺🇸' ) ).toEqual( [ '🇺', '🇸' ] );
+			expect( tokenizeHtml( '👋🏽' ) ).toEqual( [ '👋', '🏽' ] );
+		} );
+
+		it( 'handles supplementary plane characters', () => {
+			// CJK Unified Ideographs Extension B (U+20BB7)
+			expect( tokenizeHtml( '𠮷' ) ).toEqual( [ '𠮷' ] );
+			// Mathematical alphanumeric symbols (U+1D400)
+			expect( tokenizeHtml( '𝐀' ) ).toEqual( [ '𝐀' ] );
+		} );
+
+		it( 'treats HTML tags as single tokens', () => {
+			expect( tokenizeHtml( '<strong>bold</strong>' ) ).toEqual( [
+				'<strong>',
+				'b',
+				'o',
+				'l',
+				'd',
+				'</strong>',
+			] );
+		} );
+
+		it( 'treats tags with attributes (including quotes and spaces) as single tokens', () => {
+			expect(
+				tokenizeHtml(
+					'<a href="https://example.com?foo=1&bar=2">link</a>'
+				)
+			).toEqual( [
+				'<a href="https://example.com?foo=1&bar=2">',
+				'l',
+				'i',
+				'n',
+				'k',
+				'</a>',
+			] );
+		} );
+
+		it( 'treats self-closing tags as single tokens', () => {
+			expect(
+				tokenizeHtml( '<img src="image.jpg" alt="test > arrow" />' )
+			).toEqual( [ '<img src="image.jpg" alt="test > arrow" />' ] );
+			expect( tokenizeHtml( '<br />' ) ).toEqual( [ '<br />' ] );
+			expect( tokenizeHtml( '<hr/>' ) ).toEqual( [ '<hr/>' ] );
+		} );
+
+		it( 'treats custom element tags and namespaced tags as single tokens', () => {
+			expect(
+				tokenizeHtml( '<my-custom-tag value="123"></my-custom-tag>' )
+			).toEqual( [ '<my-custom-tag value="123">', '</my-custom-tag>' ] );
+			expect( tokenizeHtml( '<svg:path d="M0 0h24v24H0z" />' ) ).toEqual(
+				[ '<svg:path d="M0 0h24v24H0z" />' ]
+			);
+		} );
+
+		it( 'treats HTML comments as single tokens', () => {
+			expect(
+				tokenizeHtml( '<!-- wp:paragraph {"fontSize":"small"} -->' )
+			).toEqual( [ '<!-- wp:paragraph {"fontSize":"small"} -->' ] );
+			expect(
+				tokenizeHtml( '<!-- comment with <div> and > inside -->' )
+			).toEqual( [ '<!-- comment with <div> and > inside -->' ] );
+		} );
+
+		it( 'treats HTML character entities as single tokens', () => {
+			expect(
+				tokenizeHtml( '&amp;&lt;&gt;&quot;&nbsp;&#123;&#x1F600;' )
+			).toEqual( [
+				'&amp;',
+				'&lt;',
+				'&gt;',
+				'&quot;',
+				'&nbsp;',
+				'&#123;',
+				'&#x1F600;',
+			] );
+		} );
+
+		it( 'does not treat raw angle brackets in math comparisons as tags', () => {
+			expect( tokenizeHtml( '3 < 5 and 7 > 2' ) ).toEqual( [
+				'3',
+				' ',
+				'<',
+				' ',
+				'5',
+				' ',
+				'a',
+				'n',
+				'd',
+				' ',
+				'7',
+				' ',
+				'>',
+				' ',
+				'2',
+			] );
+		} );
+
+		it( 'handles empty string and malformed/unclosed tags gracefully', () => {
+			expect( tokenizeHtml( '' ) ).toEqual( [] );
+			expect( tokenizeHtml( '<strong unclosed' ) ).toEqual( [
+				'<',
+				's',
+				't',
+				'r',
+				'o',
+				'n',
+				'g',
+				' ',
+				'u',
+				'n',
+				'c',
+				'l',
+				'o',
+				's',
+				'e',
+				'd',
+			] );
+		} );
+	} );
+
+	describe( 'tokenized diffing via DiffOptions', () => {
+		it( 'should keep HTML tags as indivisible units during diff', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const newDelta = new Delta().insert(
+				'the <strong data-attr="test">quick</strong> brown fox'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<strong data-attr="test">' },
+				{ retain: 5 },
+				{ insert: '</strong>' },
+			] );
+		} );
+
+		it( 'should not interleave characters inside HTML tags when formatting overlapping text', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const linkDelta = new Delta().insert(
+				'the qu<a href="https://example.com">ick brown</a> fox'
+			);
+
+			const diff = oldDelta.diff( linkDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 6 },
+				{ insert: '<a href="https://example.com">' },
+				{ retain: 9 },
+				{ insert: '</a>' },
+			] );
+		} );
+
+		it( 'should not align characters inside custom tags like Suggestion mode marks with text', () => {
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const markDelta = new Delta().insert(
+				'the <mark data-suggestion="del-1">quick</mark> brown fox'
+			);
+
+			const diff = oldDelta.diff( markDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<mark data-suggestion="del-1">' },
+				{ retain: 5 },
+				{ insert: '</mark>' },
+			] );
+		} );
+
+		it( 'should keep tags with attributes containing quotes and > whole', () => {
+			const oldDelta = new Delta().insert( 'the fox' );
+			const imgDelta = new Delta().insert(
+				'the <img src="test.jpg" alt="a > b" /> fox'
+			);
+
+			const diff = oldDelta.diff( imgDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '<img src="test.jpg" alt="a > b" /> ' },
+			] );
+		} );
+
+		it( 'should replace emoji atomically without splitting surrogate pairs', () => {
+			const oldDelta = new Delta().insert( 'a 😀 b' );
+			const newDelta = new Delta().insert( 'a 😐 b' );
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 2 },
+				{ insert: '😐' },
+				{ delete: 2 },
+			] );
+		} );
+
+		it( 'should format text containing emoji atomically', () => {
+			const oldDelta = new Delta().insert( 'hello 😀 world' );
+			const newDelta = new Delta().insert( 'hello <em>😀</em> world' );
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 6 },
+				{ insert: '<em>' },
+				{ retain: 2 },
+				{ insert: '</em>' },
+			] );
+		} );
+
+		it( 'should handle modifications around HTML entities', () => {
+			const oldDelta = new Delta().insert( 'foo &amp; bar' );
+			const newDelta = new Delta().insert( 'foo &amp; baz' );
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 12 },
+				{ insert: 'z' },
+				{ delete: 1 },
+			] );
+		} );
+
+		it( 'should preserve HTML comments intact when modifying surrounding text', () => {
+			const oldDelta = new Delta().insert(
+				'<!-- wp:paragraph -->abc<!-- /wp:paragraph -->'
+			);
+			const newDelta = new Delta().insert(
+				'<!-- wp:paragraph -->xyz<!-- /wp:paragraph -->'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer: tokenizeHtml,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 21 },
+				{ insert: 'xyz' },
+				{ delete: 3 },
 			] );
 		} );
 	} );

@@ -5,7 +5,11 @@ import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
 import { applyPostChangesToCRDTDoc } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
-import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
+import {
+	getRootMap,
+	richTextOffsetToHtmlIndex,
+	tokenizeHtml,
+} from '../crdt-utils';
 /**
  * Mock block schemas and sync providers.
  */
@@ -156,7 +160,8 @@ function makeCursor( offset ) {
 function deltaForUpdate( oldHtml, newHtml, cursorPosition ) {
 	return new Delta( [ { insert: oldHtml } ] ).diffWithCursor(
 		new Delta( [ { insert: newHtml } ] ),
-		cursorPosition
+		cursorPosition,
+		{ tokenizer: tokenizeHtml }
 	);
 }
 
