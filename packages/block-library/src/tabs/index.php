@@ -81,20 +81,19 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
-	$tabs_list        = $block->context['core/tabs-list'] ?? array();
-	$tabs_id          = $block->context['core/tabs-id'] ?? null;
-
-	if ( empty( $tabs_id ) ) {
-		// If malformed tabs, return early to avoid errors.
-		return '';
-	}
+	$tabs_list = $block->context['core/tabs-list'] ?? array();
+	$tabs_id   = $block->context['core/tabs-id'] ?? null;
 
 	// A default tab index can be left past the last tab, for example after
 	// the default tab was removed. Fall back to the first tab so that a panel
 	// is still shown.
-	if ( ! isset( $tabs_list[ $active_tab_index ] ) ) {
-		$active_tab_index = 0;
+	$active_tab_index = isset( $attributes['activeTabIndex'], $tabs_list[ $attributes['activeTabIndex'] ] )
+		? $attributes['activeTabIndex']
+		: 0;
+
+	if ( empty( $tabs_id ) ) {
+		// If malformed tabs, return early to avoid errors.
+		return '';
 	}
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
