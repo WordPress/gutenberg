@@ -8492,6 +8492,49 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo, .bar){color: red;}:root :where(.foo img, .bar img){color: blue;}',
 			),
+			// Rules without `&` at the very start keep their existing output.
+			'leading pseudo-class'         => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => ':hover{color: red;}',
+				),
+				'expected' => ':root :where(.foo:hover){color: red;}',
+			),
+			'leading pseudo-element'       => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '::before{color: red;}',
+				),
+				'expected' => ':root :where(.foo)::before{color: red;}',
+			),
+			'leading class'                => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '.is-style-x{color: red;}',
+				),
+				'expected' => ':root :where(.foo.is-style-x){color: red;}',
+			),
+			'leading id'                   => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '#hero{color: red;}',
+				),
+				'expected' => ':root :where(.foo#hero){color: red;}',
+			),
+			'leading :is()'                => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => ':is(.a, .b){color: red;}',
+				),
+				'expected' => ':root :where(.foo:is(.a, .b)){color: red;}',
+			),
+			'twenty twenty-four calendar'  => array(
+				'input'    => array(
+					'selector' => '.wp-block-calendar',
+					'css'      => '.wp-block-calendar table:where(:not(.has-text-color)) th{background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)} & table:where(:not(.has-text-color)) td{border-color:var(--wp--preset--color--contrast-2)}',
+				),
+				'expected' => ':root :where(.wp-block-calendar.wp-block-calendar table:where(:not(.has-text-color)) th){background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)}:root :where(.wp-block-calendar table:where(:not(.has-text-color)) td){border-color:var(--wp--preset--color--contrast-2)}',
+			),
 		);
 	}
 
