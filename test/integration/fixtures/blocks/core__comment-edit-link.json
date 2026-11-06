@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"linkTarget": "_blank",
+			"showModerationLinks": false,
 			"backgroundColor": "recommended-color-03",
 			"fontFamily": "system-monospace",
 			"fontSize": "extra-large",
