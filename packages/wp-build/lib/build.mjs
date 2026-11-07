@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, rm, unlink } from 'fs/promises';
 import path from 'path';
 import { createRequire as createNodeRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
+import { build } from 'rolldown';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
@@ -1759,6 +1760,136 @@ function getPackageName( filename ) {
 }
 
 /**
+ * Packages that route modules import from a shared module, instead of each
+ * route module bundling its own copy.
+ */
+const ROUTE_SHARED_PACKAGES = [ '@wordpress/ui' ];
+
+/**
+ * Directory, relative to the routes build directory, of the shared modules.
+ */
+const ROUTE_SHARED_MODULES_DIR = 'chunks';
+
+const ROUTE_SHARED_MODULE_PREFIX = '\0route-shared-module:';
+
+/**
+ * Build the shared module of a package, re-exporting all of the package.
+ *
+ * @param {string}             specifier     Package name.
+ * @param {string | undefined} importer      Module importing the package, to resolve it from.
+ * @param {boolean}            isDevelopment Whether to build the non-minified module.
+ * @return {Promise<import('./wordpress-externals-plugin.mjs').SharedModule>} The shared module.
+ */
+async function buildRouteSharedModule( specifier, importer, isDevelopment ) {
+	const entryId = ROUTE_SHARED_MODULE_PREFIX + specifier;
+	const externalsPlugin = wordpressExternalsPlugin(
+		'',
+		'esm',
+		[],
+		false // Importing route modules list the dependencies.
+	);
+	const suffix = isDevelopment ? '' : '.min';
+
+	// Not queued with `buildWithConcurrency()`: the route builds waiting for
+	// it may hold all the slots.
+	const output = await build( {
+		moduleTypes: LOADER_CONFIG,
+		checks: BASE_CHECKS,
+		input: {
+			[ specifier.replace( /^@/, '' ).replace( /\//g, '-' ) ]: entryId,
+		},
+		transform: {
+			target: getEsbuildTarget(),
+			define: getDefine( isDevelopment ),
+			jsx: JSX_OPTIONS,
+		},
+		resolve: {
+			conditionNames: isDevelopment
+				? developmentConditions
+				: defaultConditions,
+		},
+		plugins: [
+			{
+				name: 'route-shared-module-entry',
+				resolveId( source, sourceImporter ) {
+					if ( source === entryId ) {
+						return entryId;
+					}
+					if ( sourceImporter === entryId ) {
+						return this.resolve( source, importer, {
+							skipSelf: true,
+						} );
+					}
+					return null;
+				},
+				load( id ) {
+					if ( id !== entryId ) {
+						return null;
+					}
+					return `export * from ${ JSON.stringify( specifier ) };`;
+				},
+			},
+			...createStyleBundlingPlugins( ROOT_DIR ),
+			externalsPlugin,
+		],
+		output: {
+			dir: path.join( BUILD_DIR, 'routes', ROUTE_SHARED_MODULES_DIR ),
+			entryFileNames: `[name]-[hash]${ suffix }.js`,
+			codeSplitting: false,
+			format: 'esm',
+			minify: ! isDevelopment,
+		},
+	} );
+
+	return {
+		importPath: `../${ ROUTE_SHARED_MODULES_DIR }/${ output.output[ 0 ].fileName }`,
+		...externalsPlugin.api.getDependencies(),
+	};
+}
+
+/**
+ * Create the shared modules of route modules, each built when a route module
+ * first imports its package.
+ *
+ * @param {boolean} isDevelopment Whether to build the non-minified modules.
+ * @return {import('./wordpress-externals-plugin.mjs').SharedModules} Shared modules.
+ */
+function createRouteSharedModules( isDevelopment ) {
+	/** @type {Map<string, Promise<import('./wordpress-externals-plugin.mjs').SharedModule>>} */
+	const sharedModules = new Map();
+	return {
+		packages: ROUTE_SHARED_PACKAGES,
+		get( specifier, importer ) {
+			if ( ! sharedModules.has( specifier ) ) {
+				sharedModules.set(
+					specifier,
+					buildRouteSharedModule( specifier, importer, isDevelopment )
+				);
+			}
+			return sharedModules.get( specifier );
+		},
+	};
+}
+
+/**
+ * Shared modules of the minified and the non-minified route modules.
+ */
+let routeSharedModules;
+
+/**
+ * Forget the built shared modules of route modules, so that the next route
+ * builds build them again.
+ */
+function resetRouteSharedModules() {
+	routeSharedModules = {
+		minified: createRouteSharedModules( false ),
+		development: createRouteSharedModules( true ),
+	};
+}
+
+resetRouteSharedModules();
+
+/**
  * Build a single route's files.
  *
  * @param {string} routeName Route name.
@@ -1800,7 +1931,8 @@ async function buildRoute( routeName ) {
 							'route.min',
 							'esm',
 							[],
-							true // Generate asset file for minified build
+							true, // Generate asset file for minified build
+							routeSharedModules.minified
 						),
 					],
 					output: {
@@ -1826,7 +1958,8 @@ async function buildRoute( routeName ) {
 							'route.min',
 							'esm',
 							[],
-							false // Skip asset file for non-minified build
+							false, // Skip asset file for non-minified build
+							routeSharedModules.development
 						),
 					],
 					output: {
@@ -1867,7 +2000,8 @@ async function buildRoute( routeName ) {
 						'content.min',
 						'esm',
 						[],
-						true // Generate asset file for minified build
+						true, // Generate asset file for minified build
+						routeSharedModules.minified
 					),
 				],
 				output: {
@@ -1893,7 +2027,8 @@ async function buildRoute( routeName ) {
 						'content.min',
 						'esm',
 						[],
-						false // Skip asset file for non-minified build
+						false, // Skip asset file for non-minified build
+						routeSharedModules.development
 					),
 				],
 				output: {
@@ -1942,6 +2077,13 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 		console.log( '   No routes found, skipping.\n' );
 		return;
 	}
+
+	// Shared module file names contain a content hash, so remove previous ones.
+	await rm( path.join( BUILD_DIR, 'routes', ROUTE_SHARED_MODULES_DIR ), {
+		recursive: true,
+		force: true,
+	} );
+	resetRouteSharedModules();
 
 	await Promise.all(
 		routes.map( async ( routeName ) => {
@@ -2762,6 +2904,11 @@ async function watchMode() {
 				ROOT_DIR,
 				allRoutes
 			);
+
+			// The package may be in a shared module: build them again.
+			if ( affectedRoutes.length > 0 ) {
+				resetRouteSharedModules();
+			}
 
 			for ( const route of affectedRoutes ) {
 				try {
