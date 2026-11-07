@@ -173,6 +173,7 @@ export function BorderPanel( {
 	name,
 	setAttributes,
 	settings,
+	asWrapper,
 }: BorderHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
@@ -243,7 +244,7 @@ export function BorderPanel( {
 
 	return (
 		<StylesBorderPanel
-			as={ BordersInspectorControl }
+			as={ asWrapper || BordersInspectorControl }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
@@ -337,15 +338,26 @@ function addAttributes( settings: BlockType ): BlockType {
 		return settings;
 	}
 
-	// Add new borderColor attribute to block settings.
+	const borderColorAttribute = {
+		type: 'string' as const,
+	};
+	const attributes: BlockType[ 'attributes' ] = {};
+	for ( const [ name, definition ] of Object.entries(
+		settings.attributes
+	) ) {
+		if ( name === 'style' ) {
+			attributes.borderColor = borderColorAttribute;
+		}
+		attributes[ name ] = definition;
+	}
+	if ( ! attributes.borderColor ) {
+		attributes.borderColor = borderColorAttribute;
+	}
+
+	// Add new borderColor attribute to block settings before the style object.
 	return {
 		...settings,
-		attributes: {
-			...settings.attributes,
-			borderColor: {
-				type: 'string',
-			},
-		},
+		attributes,
 	};
 }
 
@@ -465,5 +477,8 @@ export default {
 addFilter(
 	'blocks.registerBlockType',
 	'core/border/addAttributes',
-	addAttributes
+	addAttributes,
+	// This module can load early through the shared style panels. Register after
+	// default-priority attribute filters to preserve serialized attribute order.
+	11
 );

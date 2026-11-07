@@ -17,6 +17,7 @@ export interface InspectorControlsTabsProps {
 	tabs: InspectorTab[];
 	isSectionBlock?: boolean;
 	contentClientIds?: string[];
+	textStyleClientIds?: string[];
 }
 
 export interface ContentTabProps {
@@ -37,11 +38,13 @@ export interface SectionStyleControlsProps {
 	blockName: string;
 	clientId: string;
 	contentClientIds: string[];
+	showTypography?: boolean;
 }
 
 export interface StylesTabProps extends Partial< SectionStyleControlsProps > {
 	hasBlockStyles?: boolean;
 	isSectionBlock?: boolean;
+	textStyleClientIds?: string[];
 }
 
 /**
