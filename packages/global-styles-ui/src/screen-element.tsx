@@ -1,5 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { PanelBody, useNavigator } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -34,6 +35,7 @@ const {
 	TypographyPanel: StylesTypographyPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 	getBlockTypesForElement,
+	getContrastWarning,
 } = unlock( blockEditorPrivateApis );
 
 /*
@@ -101,6 +103,51 @@ export const ELEMENTS = {
 
 export type ElementName = keyof typeof ELEMENTS;
 
+/**
+ * Returns a warning when the site's text color has poor contrast against its
+ * background color, or `undefined` when contrast is sufficient.
+ *
+ * Unlike the block editor, there is no rendered element to measure here, so
+ * the colors are read from the merged styles. A gradient or image background
+ * can't be checked from those values, so no warning is given for one.
+ *
+ * @param enabled Whether to check contrast.
+ *
+ * @return The warning message, if any.
+ */
+export function useTextContrastWarning( enabled: boolean ) {
+	const [ textColor ] = useStyle< string >( 'color.text' );
+	const [ backgroundColor ] = useStyle< string >( 'color.background' );
+	const [ gradient ] = useStyle< string >( 'color.gradient' );
+	const [ backgroundImage ] = useStyle< unknown >(
+		'background.backgroundImage'
+	);
+
+	const warning =
+		enabled && ! gradient && ! backgroundImage
+			? getContrastWarning( {
+					backgroundColor,
+					textColor,
+					// Same copy as the block editor's text color warning.
+					messageOverride: __(
+						'This color has poor contrast against the background. Consider increasing contrast.'
+					),
+					enableAlphaChecker: true,
+				} )
+			: null;
+
+	// The notice that displays the warning is muted, so announce it here, and
+	// only when the message appears or changes.
+	const speakMessage = warning?.speakMessage;
+	useEffect( () => {
+		if ( speakMessage ) {
+			speak( speakMessage );
+		}
+	}, [ speakMessage ] );
+
+	return warning?.message;
+}
+
 interface ScreenElementProps {
 	/**
 	 * The element to style. Read from the `:element` path parameter when not
@@ -149,6 +196,8 @@ function ElementStylePanels( {
 		element
 	);
 
+	const contrastWarning = useTextContrastWarning( isRoot );
+
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings ) && ! isRoot;
 	const hasDimensionsPanel = useHasDimensionsPanel( settings ) && ! isRoot;
@@ -166,6 +215,7 @@ function ElementStylePanels( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					contrastWarning={ contrastWarning }
 				/>
 			) }
 			{ hasBackgroundPanel && (
