@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'preact/test-utils';
 import '../directives';
 import { hydrateRegions, initialVdom } from '../hydration';
 import { populateServerData, store } from '../store';
-import { getElement } from '../scopes';
+import { getContext, getElement, getServerContext } from '../scopes';
 import { asDangerousHTML } from '../html';
 
 /** Counter for store namespaces, whose registry persists between tests. */
@@ -21,6 +21,10 @@ function uniqueNamespace(): string {
 describe( 'hydrateRegions', () => {
 	beforeEach( () => {
 		document.body.innerHTML = '';
+	} );
+
+	afterEach( () => {
+		vi.unstubAllGlobals();
 	} );
 
 	it.each( [ false, true ] )(
@@ -291,5 +295,42 @@ describe( 'hydrateRegions', () => {
 			'<i>Fallback</i>',
 		] );
 		expect( items[ 1 ].firstElementChild ).toBe( serverNodes[ 1 ] );
+	} );
+
+	it( 'leaves no scope behind when a directive throws during hydration', async () => {
+		const namespace = uniqueNamespace();
+		const failure = new Error( 'directive failure' );
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		store( namespace, {
+			actions: {
+				/** Throws while the element it is attached to renders. */
+				fail: () => {
+					throw failure;
+				},
+			},
+		} );
+		document.body.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-context='{ "value": "own" }' data-wp-run="actions.fail"></div>`;
+
+		await expect( act( () => hydrateRegions() ) ).rejects.toBe( failure );
+
+		// A callback scheduled after hydration runs without a scope.
+		const results = await new Promise< Array< { value?: unknown } > >(
+			( resolve ) => {
+				setTimeout( () => {
+					resolve(
+						[ getContext, getElement, getServerContext ].map(
+							( reader ) => {
+								try {
+									return { value: reader( namespace ) };
+								} catch {
+									return {};
+								}
+							}
+						)
+					);
+				}, 0 );
+			}
+		);
+		expect( results ).toEqual( [ {}, {}, {} ] );
 	} );
 } );
