@@ -154,13 +154,17 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_remove_block_nav_menu_items( $menu_items ) {
-	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @link https://github.com/WordPress/gutenberg/issues/34265.
-	/*if ( current_theme_supports( 'block-nav-menus' ) ) {*/
-	if ( false ) {
-		return $menu_items;
-	}
-
+	/*
+	 * Block menu items are always removed since the theme opt-in for the
+	 * block-nav-menus feature is disabled. When the feature becomes stable, the
+	 * menu items should be returned unchanged when the theme supports it:
+	 *
+	 *     if ( current_theme_supports( 'block-nav-menus' ) ) {
+	 *         return $menu_items;
+	 *     }
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/34265
+	 */
 	return array_filter(
 		$menu_items,
 		static function ( $menu_item ) {
@@ -249,10 +253,7 @@ function gutenberg_convert_menu_items_to_blocks(
  * @return string|null Nav menu output to short-circuit with.
  */
 function gutenberg_output_block_nav_menu( $output, $args ) {
-	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @link https://github.com/WordPress/gutenberg/issues/34265.
-	/*if ( ! current_theme_supports( 'block-nav-menus' ) ) {*/
-	if ( true ) {
+	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
 		return null;
 	}
 
@@ -318,7 +319,9 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 
 	return render_block( $navigation_block );
 }
-add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
+// We should uncomment the line below when the block-nav-menus feature becomes stable.
+// @link https://github.com/WordPress/gutenberg/issues/34265.
+// add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
 
 /**
  * Shim that makes nav-menus.php nicely display a menu item with its `type` set to
