@@ -8,7 +8,8 @@ includes:
 	# The base configuration file for using PHPStan with the Gutenberg codebase.
 	- tools/phpstan/base.neon
 
-	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`.
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`, or remove the entries
+	# for fixed errors with `composer phpstan -- --fix`.
 	# https://phpstan.org/user-guide/baseline
 	- tools/phpstan/baseline.neon
 

@@ -54,6 +54,8 @@ interface PhpstanError {
 	identifier: string | null;
 	/** Tip shown with the error, if any. */
 	tip: string | null;
+	/** Whether running PHPStan with `--fix` fixes the error. */
+	fixable: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ interface PhpstanReportMessage {
 	line?: number | null;
 	identifier?: string;
 	tip?: string;
+	fixable?: boolean;
 }
 
 /**
@@ -80,8 +83,8 @@ interface PhpstanReport {
 
 /**
  * Whether an error means a baseline entry records more occurrences of an error
- * than there are now, because some were fixed. Regenerating the baseline fixes
- * it.
+ * than there are now, because some were fixed. Running PHPStan with `--fix`
+ * fixes it.
  *
  * @param error The error.
  * @return Whether the baseline entry is stale.
@@ -117,6 +120,10 @@ const ANNOTATION_LIMIT = 10;
  * upgrade, could otherwise exceed.
  */
 const SUMMARY_LIMIT = 500;
+
+// Added to the annotation of an error that PHPStan can fix itself, such as an out-of-date baseline entry.
+const FIX_HINT =
+	'This can be fixed automatically by running `composer phpstan -- --fix` (or `npm run typecheck:php -- --fix`).';
 
 /**
  * Escapes the message of a workflow command.
@@ -182,6 +189,7 @@ function readErrors( reportPath: string ): PhpstanError[] | null {
 		message,
 		identifier: null,
 		tip: null,
+		fixable: false,
 	} ) );
 
 	for ( const [ key, file ] of Object.entries( report.files ) ) {
@@ -197,6 +205,7 @@ function readErrors( reportPath: string ): PhpstanError[] | null {
 				message: message.message,
 				identifier: message.identifier ?? null,
 				tip: message.tip ?? null,
+				fixable: message.fixable ?? false,
 			} );
 		}
 	}
@@ -222,9 +231,13 @@ function annotate( errors: PhpstanError[] ): void {
 		if ( error.line ) {
 			properties.push( `line=${ error.line }` );
 		}
-		const message = error.tip
-			? `${ error.message }\n${ error.tip }`
-			: error.message;
+		const message = [
+			error.message,
+			error.tip,
+			error.fixable ? FIX_HINT : null,
+		]
+			.filter( Boolean )
+			.join( '\n' );
 		process.stdout.write(
 			`::error ${ properties.join( ',' ) }::${ escapeData( message ) }\n`
 		);
@@ -277,6 +290,12 @@ function buildSummary( errors: PhpstanError[] ): string {
 			'### The baseline is out of date',
 			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all.'
 		);
+		sections.push(
+			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
+			'```bash\ncomposer phpstan -- --fix\n```',
+			'or, in the local environment:',
+			'```bash\nnpm run typecheck:php -- --fix\n```'
+		);
 		if (
 			errors.some(
 				( error ) =>
@@ -284,20 +303,14 @@ function buildSummary( errors: PhpstanError[] ): string {
 					! isExceededBaselineEntry( error )
 			)
 		) {
-			// Regenerating now would record those errors in the baseline.
+			/*
+			 * `--fix` only lowers or removes baseline entries, whereas regenerating
+			 * the baseline now would record those errors in it.
+			 */
 			sections.push(
-				'This run also reports other errors, which are listed below. **Fix those first**, since regenerating the baseline would record them as accepted errors. When a pull request changes a line with a baselined error, the error can also come back as a new one with a different message, so that its baseline entry no longer matches: fix it rather than regenerating the baseline. Once only out-of-date entries are left, regenerate the baseline and commit the result.'
-			);
-		} else {
-			sections.push(
-				'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: regenerate the baseline and commit the result.'
+				'This run also reports other errors, which are listed below, and which still need to be fixed. `--fix` leaves them reported, but **do not regenerate the baseline** with `composer phpstan:baselines` until they are fixed, since that would record them as accepted errors. When a pull request changes a line with a baselined error, the error can also come back as a new one with a different message, so that its baseline entry no longer matches: fix the new error rather than baselining it.'
 			);
 		}
-		sections.push(
-			'```bash\ncomposer phpstan:baselines\n```',
-			'or, in the local environment:',
-			'```bash\nnpm run typecheck:php:baselines\n```'
-		);
 	}
 
 	if ( errors.some( isExceededBaselineEntry ) ) {
@@ -316,6 +329,8 @@ function buildSummary( errors: PhpstanError[] ): string {
 						? `<code>${ escapeHtml( error.identifier ) }</code>`
 						: ''
 				}</td><td>${ escapeHtml( error.message ) }${
+					error.fixable ? ' 🔧' : ''
+				}${
 					error.tip ? `<br><em>${ escapeHtml( error.tip ) }</em>` : ''
 				}</td></tr>`
 		);
@@ -330,6 +345,12 @@ function buildSummary( errors: PhpstanError[] ): string {
 			`…and ${
 				errors.length - SUMMARY_LIMIT
 			} more, which are listed in the output of this step.`
+		);
+	}
+
+	if ( errors.some( ( error ) => error.fixable ) ) {
+		sections.push(
+			'Errors marked with 🔧 can be fixed automatically by running PHPStan with `--fix`.'
 		);
 	}
 
