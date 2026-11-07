@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useRef } from '@wordpress/element';
+import { createInterpolateElement, useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
@@ -23,6 +23,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { InputControl, Link } from '@wordpress/ui';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
@@ -62,6 +63,7 @@ function attributesFromMedia( {
 		if ( ! media || ! media.url ) {
 			setAttributes( {
 				mediaAlt: undefined,
+				mediaTitle: undefined,
 				mediaId: undefined,
 				mediaType: undefined,
 				mediaUrl: undefined,
@@ -196,6 +198,7 @@ function MediaTextEdit( {
 		mediaAlt,
 		mediaId,
 		mediaPosition,
+		mediaTitle,
 		mediaType,
 		mediaUrl,
 		mediaWidth,
@@ -265,6 +268,7 @@ function MediaTextEdit( {
 			mediaId: undefined,
 			mediaUrl: undefined,
 			mediaAlt: undefined,
+			mediaTitle: undefined,
 			mediaLink: undefined,
 			linkDestination: undefined,
 			linkTarget: undefined,
@@ -526,6 +530,30 @@ function MediaTextEdit( {
 		<>
 			{ mediaInspectorPanel }
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
+			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
+				<InspectorControls group="advanced">
+					<InputControl
+						label={ __( 'Title attribute' ) }
+						value={ mediaTitle || '' }
+						onValueChange={ ( value ) =>
+							setAttributes( { mediaTitle: value || undefined } )
+						}
+						details={ createInterpolateElement(
+							__(
+								'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+							),
+							{
+								a: (
+									<Link
+										href="https://www.w3.org/TR/html52/dom.html#the-title-attribute"
+										openInNewTab
+									/>
+								),
+							}
+						) }
+					/>
+				</InspectorControls>
+			) }
 			<BlockControls group="block">
 				{ blockEditingMode === 'default' && (
 					<>
