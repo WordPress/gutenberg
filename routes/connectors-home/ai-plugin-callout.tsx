@@ -12,6 +12,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
+import {
+	installPluginViaWpUpdates,
+	isFilesystemUnavailableError,
+} from './use-connector-plugin';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
@@ -121,12 +125,36 @@ export function AiPluginCallout() {
 	const installPlugin = async () => {
 		setIsBusy( true );
 		try {
-			await saveEntityRecord(
-				'root',
-				'plugin',
-				{ slug: AI_PLUGIN_SLUG, status: 'active' },
-				{ throwOnError: true }
-			);
+			try {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: AI_PLUGIN_SLUG, status: 'active' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				// The REST plugin endpoint rejects installs up front with
+				// `fs_unavailable` when FS_METHOD is not 'direct' and
+				// credentials have not been stored. Fall back to
+				// wp.updates.installPlugin() so the standard "Connection
+				// Information" modal handles credential entry, then activate
+				// via REST.
+				if ( ! isFilesystemUnavailableError( error ) ) {
+					throw error;
+				}
+				const outcome =
+					await installPluginViaWpUpdates( AI_PLUGIN_SLUG );
+				if ( outcome === 'canceled' ) {
+					// User closed the credentials modal; abort silently.
+					return;
+				}
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ plugin: AI_PLUGIN_ID, status: 'active' },
+					{ throwOnError: true }
+				);
+			}
 			setJustActivated( true );
 			createSuccessNotice(
 				__( 'AI plugin installed and activated successfully.' ),
