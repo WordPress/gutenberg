@@ -79,7 +79,7 @@ Explicit actions set the selected note directly:
 | Escape | None, until one of the caret events above |
 | Cancel, the new note form's focus-out | Strips the draft marker, none |
 
-A thread's or the new note form's focus-out deselects only when focus did not land in its block; in the block, the caret events decide.
+A thread's or the new note form's focus-out deselects only when focus did not land in one of its blocks, see `isFocusInBlocks`; in those blocks, the caret events decide. While the canvas is the editing host (the selected block supports `editableRoot`), the host holds focus, so the block holding the caret counts.
 
 ## Floating board
 
