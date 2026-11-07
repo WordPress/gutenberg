@@ -203,6 +203,8 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	/**
 	 * Tests that template part variations preserve descriptions when set,
 	 * and fall back to a non-breaking space when empty.
+	 *
+	 * @covers ::gutenberg_build_template_part_block_instance_variations
 	 */
 	public function test_build_template_part_block_instance_variations_description() {
 		add_theme_support( 'block-template-parts' );
