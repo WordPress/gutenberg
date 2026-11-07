@@ -175,6 +175,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		// Select an item, then add a new one from the appender. The edit is
 		// what carries the sidebar's selection over to the entity.
 		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
+		// The click opens the item's settings a moment later. Wait for them,
+		// so they can't open after the appender and take its focus.
+		await expect(
+			page.getByRole( 'heading', { name: 'Settings', exact: true } )
+		).toBeVisible();
 		await listView.getByRole( 'button', { name: 'Add page' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
