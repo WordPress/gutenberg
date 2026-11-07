@@ -32,6 +32,7 @@ import useUploadSaveLock from './use-upload-save-lock';
 import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
+import BlockEditControls from '../block-edit-controls';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
@@ -460,6 +461,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ ! settings.isPreviewMode && (
 								<>
 									<PatternsMenuItems />
+									<BlockEditControls />
 									<TemplatePartMenuItems />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />

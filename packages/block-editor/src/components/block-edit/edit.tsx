@@ -17,7 +17,9 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { PrivateBlockContext } from '../block-list/private-block-context';
-import type { BlockEditPublicProps } from './types';
+import { renderBlockEditFeatures } from './features';
+import { SelectedBlockEditControlsSlot } from './selected-controls';
+import type { BlockEditContextValue, BlockEditPublicProps } from './types';
 
 const Edit = ( props: BlockEditPublicProps ) => {
 	const { name } = props;
@@ -44,7 +46,11 @@ const EditWithFilters = withFilters( 'editor.BlockEdit' )(
 // Outside a block list there is no block context, nor bindable attributes.
 const NO_SOURCES: Record< string, Omit< BlockBindingsSource, 'name' > > = {};
 
-const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
+// Renders the block's edit with its generated props, from `BlockEdit`.
+export default function useGeneratedEdit(
+	props: BlockEditPublicProps,
+	blockEditContext: BlockEditContextValue
+) {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
@@ -264,15 +270,30 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		return null;
 	}
 
+	const editProps = {
+		...props,
+		attributes: computedAttributes,
+		context,
+		setAttributes: setBoundAttributes,
+	};
+	const features = renderBlockEditFeatures( editProps, blockEditContext );
+	const selectedControls = props.isSelected && (
+		<SelectedBlockEditControlsSlot fillProps={ editProps } />
+	);
+
 	// An absent version compares as `false`.
 	if ( ( blockType.apiVersion as number ) > 1 ) {
 		return (
-			<EditWithFilters
-				{ ...props }
-				attributes={ computedAttributes }
-				context={ context }
-				setAttributes={ setBoundAttributes }
-			/>
+			<>
+				{ features }
+				<EditWithFilters
+					{ ...props }
+					attributes={ computedAttributes }
+					context={ context }
+					setAttributes={ setBoundAttributes }
+				/>
+				{ selectedControls }
+			</>
 		);
 	}
 
@@ -288,14 +309,16 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	);
 
 	return (
-		<EditWithFilters
-			{ ...props }
-			attributes={ computedAttributes }
-			className={ className }
-			context={ context }
-			setAttributes={ setBoundAttributes }
-		/>
+		<>
+			{ features }
+			<EditWithFilters
+				{ ...props }
+				attributes={ computedAttributes }
+				className={ className }
+				context={ context }
+				setAttributes={ setBoundAttributes }
+			/>
+			{ selectedControls }
+		</>
 	);
-};
-
-export default EditWithGeneratedProps;
+}

@@ -1,5 +1,3 @@
-import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -13,7 +11,7 @@ import { unlock } from '../lock-unlock';
 
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
-const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
+export const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
 
 // Complementary area identifier for the block inspector
 const BLOCK_INSPECTOR_AREA = 'edit-post/block';
@@ -26,7 +24,7 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  * @param {string} props.clientId The template part block client ID.
  * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
-function TemplatePartNavigationEditButton( { clientId } ) {
+export default function TemplatePartNavigationEditButton( { clientId } ) {
 	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
@@ -109,31 +107,3 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		</BlockToolbarLastItem>
 	);
 }
-
-/**
- * Higher-order component that adds the Edit navigation button to template part blocks.
- */
-const withTemplatePartNavigationEditButton = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const isTemplatePart = props.name === TEMPLATE_PART_BLOCK_NAME;
-
-		return (
-			<>
-				<BlockEdit key="edit" { ...props } />
-				{ props.isSelected && isTemplatePart && (
-					<TemplatePartNavigationEditButton
-						clientId={ props.clientId }
-					/>
-				) }
-			</>
-		);
-	},
-	'withTemplatePartNavigationEditButton'
-);
-
-// Register the filter.
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/with-template-part-navigation-edit-button',
-	withTemplatePartNavigationEditButton
-);

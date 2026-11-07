@@ -1,17 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { applyFilters, removeFilter } from '@wordpress/hooks';
-import type { ComponentType } from 'react';
-import { createBlockEditFilter } from '../utils';
 import {
-	BlockEditContextProvider,
+	renderBlockEditFeatures,
+	setBlockEditFeatures,
+} from '../../components/block-edit/features';
+import {
+	DEFAULT_BLOCK_EDIT_CONTEXT,
 	mayDisplayControlsKey,
 	mayDisplayPatternEditingControlsKey,
 } from '../../components/block-edit/context';
 
-describe( 'createBlockEditFilter', () => {
+describe( 'renderBlockEditFeatures', () => {
 	afterEach( () => {
-		removeFilter( 'editor.BlockEdit', 'core/editor/hooks' );
+		setBlockEditFeatures( [] );
 	} );
 
 	it.each( [
@@ -28,18 +29,15 @@ describe( 'createBlockEditFilter', () => {
 	] )(
 		'with supportsPatternEditing=$supportsPatternEditing and selection=$isSelected, renders=$renders during pattern editing',
 		( { supportsPatternEditing, isSelected, renders } ) => {
-			createBlockEditFilter( [
+			setBlockEditFeatures( [
 				{
 					edit: () => <span>Feature control</span>,
 					hasSupport: () => true,
 					supportsPatternEditing,
 				},
 			] );
-			const FilteredEdit = applyFilters(
-				'editor.BlockEdit',
-				() => null
-			) as ComponentType< { name: string; attributes: object } >;
 			const context = {
+				...DEFAULT_BLOCK_EDIT_CONTEXT,
 				name: 'test/container',
 				isSelected,
 				[ mayDisplayControlsKey ]: isSelected,
@@ -47,9 +45,49 @@ describe( 'createBlockEditFilter', () => {
 			};
 
 			render(
-				<BlockEditContextProvider value={ context }>
-					<FilteredEdit name="test/container" attributes={ {} } />
-				</BlockEditContextProvider>
+				<>
+					{ renderBlockEditFeatures(
+						{ name: 'test/container', attributes: {} },
+						context
+					) }
+				</>
+			);
+
+			expect( screen.queryByText( 'Feature control' ) !== null ).toBe(
+				renders
+			);
+		}
+	);
+
+	it.each( [
+		{ isSelected: false, fitText: true, renders: true },
+		{ isSelected: false, fitText: undefined, renders: false },
+		{ isSelected: true, fitText: undefined, renders: true },
+	] )(
+		'with isActive, selection=$isSelected and fitText=$fitText, renders=$renders',
+		( { isSelected, fitText, renders } ) => {
+			setBlockEditFeatures( [
+				{
+					edit: () => <span>Feature control</span>,
+					hasSupport: () => true,
+					attributeKeys: [ 'fitText' ],
+					isActive: ( attributes ) => !! attributes.fitText,
+				},
+			] );
+			const context = {
+				...DEFAULT_BLOCK_EDIT_CONTEXT,
+				name: 'test/heading',
+				isSelected,
+				[ mayDisplayControlsKey ]: isSelected,
+			};
+
+			render(
+				<>
+					{ renderBlockEditFeatures(
+						{ name: 'test/heading', attributes: { fitText } },
+						context
+					) }
+				</>
 			);
 
 			expect( screen.queryByText( 'Feature control' ) !== null ).toBe(

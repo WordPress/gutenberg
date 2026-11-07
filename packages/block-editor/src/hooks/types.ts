@@ -107,6 +107,9 @@ export interface BlockEditFeature extends BlockSupportFeatureBase {
 	edit: ComponentType< BlockSupportEditProps >;
 	shareWithChildBlocks?: boolean;
 	supportsPatternEditing?: boolean;
+	// Renders the feature for a block whose controls are not displayed, when
+	// its attributes need it, e.g. to size its text to fit.
+	isActive?: ( attributes: Record< string, unknown > ) => boolean;
 }
 
 /**

@@ -13,6 +13,7 @@ import {
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { SelectedBlockEditControls } from './components/block-edit/selected-controls';
 import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
@@ -102,6 +103,7 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
+	SelectedBlockEditControls,
 	useHasBlockToolbar,
 	blockToolbarShowPlaceholderKey,
 	cleanEmptyObject,
