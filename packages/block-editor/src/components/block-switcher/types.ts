@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import type { DropdownMenu, Popover } from '@wordpress/components';
+import type { DropdownMenu, Popover as WCPopover } from '@wordpress/components';
 import type { Block, BlockVariation } from '@wordpress/blocks';
 import type { BlockPattern, InserterItem } from '../../store/types';
 
@@ -14,11 +14,11 @@ export interface PreviewBlockPopoverProps {
 	/** Blocks to preview. */
 	blocks: Block | Block[];
 	/** Placement of the popover. */
-	placement?: ComponentProps< typeof Popover >[ 'placement' ];
+	placement?: ComponentProps< typeof WCPopover >[ 'placement' ];
 	/** Distance of the popover from its anchor. */
 	offset?: number;
 	/** Element the popover is anchored to. */
-	anchor?: ComponentProps< typeof Popover >[ 'anchor' ];
+	anchor?: ComponentProps< typeof WCPopover >[ 'anchor' ];
 }
 
 export interface BlockStylesMenuProps {
