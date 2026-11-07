@@ -547,7 +547,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string $style_value      A single raw style value or CSS preset property from the $block_styles array.
 		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
-		 * @return array|string[] An array of CSS classnames, or empty array.
+		 * @return string[] An array of CSS classnames, or empty array.
+		 *
+		 * @phpstan-param array{ classnames?: array<string, string|true>, ... } $style_definition
+		 * @phpstan-return list<string>
 		 */
 		protected static function get_classnames( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
