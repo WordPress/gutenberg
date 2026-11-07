@@ -593,9 +593,9 @@ describe( 'sortResults', () => {
 			( result ) => result.title
 		);
 		expect( order ).toEqual( [
-			'News', // begins with 'News', and has the word whole
-			'News Flash News', // same as above, repeating the word does not increase the ranking
+			'News', // the whole title is the search
 			'News', // Same as the above, ordered by original order since it ranks the same
+			'News Flash News', // begins with 'News' and has the word whole; repeating it does not increase the ranking
 			'Newspaper', // has the word inside a longer one, not the full word
 		] );
 	} );
@@ -625,6 +625,34 @@ describe( 'sortResults', () => {
 		).toEqual( [
 			'A day trip from Stockholm to Swedish countryside towns', // begins with it
 			'Tips for travel with a young baby', // only contains it
+		] );
+	} );
+
+	it( 'ranks a title that is exactly the search above a longer one', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Home Improvement Tips',
+				url: 'http://wordpress.local/home-improvement-tips/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Home',
+				url: 'http://wordpress.local/home/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( { results, search: 'Home' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Home', // the whole title is the search
+			'Home Improvement Tips', // begins with it, and has the word whole
 		] );
 	} );
 

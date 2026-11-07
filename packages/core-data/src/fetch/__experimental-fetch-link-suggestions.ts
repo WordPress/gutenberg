@@ -264,12 +264,12 @@ export default async function fetchLinkSuggestions(
  * @param title
  * @param search
  *
- * @return Whether the title contains the search, and whether it begins with it.
+ * @return Whether the title contains the search, begins with it, and matches it exactly.
  */
 function getTitleMatch(
 	title: string,
 	search: string
-): { contains: boolean; begins: boolean } {
+): { contains: boolean; begins: boolean; exact: boolean } {
 	// `get_the_title()` runs `wptexturize`, so a title comes back with curly quotes where it was
 	// written with straight ones. Compare them as the same character.
 	const plain = ( text: string ) =>
@@ -283,12 +283,13 @@ function getTitleMatch(
 	const needle = plain( search );
 
 	if ( ! haystack || ! needle ) {
-		return { contains: false, begins: false };
+		return { contains: false, begins: false, exact: false };
 	}
 
 	return {
 		contains: haystack.includes( needle ),
 		begins: haystack.startsWith( needle ),
+		exact: haystack === needle,
 	};
 }
 
@@ -461,7 +462,8 @@ type SortOptions = {
  * 3. Content Type: content > taxonomies > post formats > media
  * 4. Starting with search: "Coffee beans, lightly roasted" will rank above "The freshest coffee
  *    beans"
- * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
+ * 5. Exact title: "Coffee beans" will rank above "Coffee beans, lightly roasted"
+ * 6. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
  *
  * @param options
@@ -496,6 +498,8 @@ export function sortResults( {
 			// Within a band, rank matches that start with the search string higher than mid-string matches:
 			// i.e the search "cat" ranks the title "caterpillar" higher than "concatenate"
 			Number( b.begins ) - Number( a.begins ) ||
+			// Then a title that is exactly the search: i.e. the search "home" ranks "Home" above "Home Improvement Tips"
+			Number( b.exact ) - Number( a.exact ) ||
 			// Rank by how much of the matched word the search contains: the search
 			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
 			// and only 27% of "Caterpillar"

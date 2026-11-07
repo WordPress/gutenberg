@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86316](https://github.com/WordPress/gutenberg/pull/86316)).
 
 ## 9.1.0 (2026-11-04)
 
