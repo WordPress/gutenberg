@@ -156,6 +156,7 @@ function CommandItem( { command, search, onRun }: CommandItemProps ) {
 	return (
 		<Autocomplete.Item
 			value={ command }
+			className="commands-command-menu__option"
 			onClick={ () => onRun( command, close ) }
 		>
 			<Autocomplete.ItemLabel>

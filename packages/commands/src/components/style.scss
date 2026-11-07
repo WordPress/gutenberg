@@ -41,6 +41,16 @@
 	padding: 0 $grid-unit-10 $grid-unit-10;
 }
 
+.commands-command-menu__option > * {
+	// Let the item content span the row, so the category sits at the end.
+	flex: 1;
+}
+
+.commands-command-menu__item:not(.has-icon) {
+	// Align the label with those of commands that have an icon.
+	padding-inline-start: calc(#{$icon-size} + var(--wpds-dimension-gap-sm));
+}
+
 .commands-command-menu__item svg {
 	// Follow the item's foreground color across all states.
 	fill: currentColor;
@@ -58,12 +68,18 @@
 
 .commands-command-menu__item-category {
 	flex: 0 0 auto;
-	margin-left: auto;
-	padding-left: $grid-unit-30;
+	margin-inline-start: auto;
+	padding-inline-start: $grid-unit-30;
 	color: $gray-700;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
-	text-align: right;
+	text-align: end;
+
+	// Follow the item's foreground color while highlighted, which also covers
+	// forced colors mode.
+	[data-highlighted] & {
+		color: inherit;
+	}
 }
 
 .commands-command-menu__item mark {
