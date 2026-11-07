@@ -6,6 +6,10 @@
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
 
+### Internal
+
+-   Remove '@wordpress/private-apis' dependency and export internal utilities directly as regular package exports ([#86115](https://github.com/WordPress/gutenberg/pull/86115)).
+
 ## 2.1.0 (2026-11-04)
 
 ### New Features

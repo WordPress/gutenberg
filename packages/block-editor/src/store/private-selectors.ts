@@ -4,7 +4,7 @@ import {
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import {
 	getBlockOrder,
 	getBlockParents,
@@ -48,7 +48,6 @@ import type {
 } from './types';
 
 const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 

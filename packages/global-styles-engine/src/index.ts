@@ -14,6 +14,7 @@ export { default as getGlobalStylesChanges } from './utils/get-global-styles-cha
 export { generateGlobalStyles } from './core/render';
 export {
 	transformToStyles as toStyles,
+	transformToStylesWithTextClipBase,
 	getBlockSelectors,
 	getLayoutStyles,
 	processCSSNesting,
@@ -30,9 +31,25 @@ export {
 	getResolvedValue,
 	splitSelectorList,
 } from './utils/common';
-export { privateApis } from './private-apis';
+export {
+	getResponsiveMediaQueries,
+	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
+} from './utils/viewport';
+export {
+	getDuotoneFilter,
+	getDuotoneStylesheet,
+	getDuotoneUnsetStylesheet,
+} from './utils/duotone';
+export { resolveStyle } from './resolve-style';
+export { getVariationStyle } from './variation';
 
 // Types
 export type * from './types';
+export type {
+	ResolvedStyle,
+	SourceDescriptor,
+	ResolveStyleContext,
+} from './resolve-style';
 
 export { generatePreviewStateStyles as __unstableGeneratePreviewStateStyles } from './preview-state-styles';

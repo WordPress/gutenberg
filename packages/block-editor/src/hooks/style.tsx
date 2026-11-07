@@ -3,7 +3,7 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import {
 	mergeGlobalStyles,
-	privateApis as globalStylesEnginePrivateApis,
+	getResponsiveMediaQueries,
 } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
@@ -75,8 +75,6 @@ interface StyleGroup {
 	selector?: string;
 	style: BlockStyle;
 }
-
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 

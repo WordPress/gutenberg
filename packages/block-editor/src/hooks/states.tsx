@@ -1,15 +1,12 @@
 import { useMemo } from '@wordpress/element';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
-import { unlock } from '../lock-unlock';
 import type { StyleStateOption } from '../components/global-styles/types';
 import type { BlockStatesControlProps, BlockStateBadgesProps } from './types';
-
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS: Record< string, string > = {
 	':hover': _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
