@@ -121,7 +121,11 @@ function TextColorEdit( {
 					title: controlTitle,
 					icon,
 				} ) => {
-					const isPropertyActive = !! activeColors[ property ];
+					const isPropertyActive =
+						!! activeColors[ property ] ||
+						// A text color class from a previous theme's palette
+						// is still applied, even if it isn't in the current palette.
+						( property === 'color' && !! activeAttributes.class );
 					if ( ! hasColorsToChoose && ! isPropertyActive ) {
 						return null;
 					}
