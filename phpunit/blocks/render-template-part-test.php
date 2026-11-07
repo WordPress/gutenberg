@@ -207,10 +207,6 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	public function test_build_template_part_block_instance_variations_description() {
 		add_theme_support( 'block-template-parts' );
 
-		$build_variations = function_exists( 'gutenberg_build_template_part_block_instance_variations' )
-			? 'gutenberg_build_template_part_block_instance_variations'
-			: 'build_template_part_block_instance_variations';
-
 		$with_desc_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_template_part',
@@ -241,7 +237,7 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		wp_set_post_terms( $empty_desc_id, array( get_stylesheet() ), 'wp_theme' );
 		wp_set_post_terms( $empty_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
 
-		$variations = call_user_func( $build_variations );
+		$variations = gutenberg_build_template_part_block_instance_variations();
 
 		$with_desc_variation  = null;
 		$empty_desc_variation = null;
