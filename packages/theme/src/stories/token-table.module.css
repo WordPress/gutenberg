@@ -1,0 +1,62 @@
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+	text-align: start;
+}
+
+.table th,
+.table td {
+	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+	text-align: start;
+	vertical-align: middle;
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.table th {
+	font-size: var(--wpds-typography-font-size-md);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	border-block-end-color: var(--wpds-color-stroke-surface-neutral);
+}
+
+.value {
+	display: none;
+}
+
+/* Narrow screens: stack each row as a card instead of squeezing columns. */
+@media (max-width: 600px) {
+	.table,
+	.table tbody,
+	.table tr,
+	.table td {
+		display: block;
+		width: auto;
+	}
+
+	/* Visually hidden, still available to assistive technology. */
+	.table thead {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+	}
+
+	.table tr {
+		padding-block: var(--wpds-dimension-padding-md);
+		border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	}
+
+	.table.table td {
+		padding-block: var(--wpds-dimension-padding-xs);
+		border: 0;
+	}
+
+	.value {
+		display: block;
+		margin-block-end: var(--wpds-dimension-gap-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+}
