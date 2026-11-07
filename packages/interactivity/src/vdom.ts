@@ -364,6 +364,13 @@ function convertToVdom( root: Node ): ComponentChild {
 		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
 		// and property read crosses the JS/DOM boundary and may allocate an
 		// `Attr` wrapper object.
+		const isInput = elementNode.localName === 'input';
+		// A bind directive owns the live property, so the static attribute is
+		// only the HTML default.
+		const hasBoundValue =
+			isInput && elementNode.hasAttribute( 'data-wp-bind--value' );
+		const hasBoundChecked =
+			isInput && elementNode.hasAttribute( 'data-wp-bind--checked' );
 		const attributeNames = elementNode.getAttributeNames();
 		for ( let i = 0; i < attributeNames.length; i++ ) {
 			const attributeName = attributeNames[ i ];
@@ -407,13 +414,52 @@ function convertToVdom( root: Node ): ComponentChild {
 			// mismatches (readonly→readOnly) are `undefined`, not `true`,
 			// falling through to Preact's setAttribute path, which handles them
 			// correctly: https://github.com/preactjs/preact/blob/bf7a195ac4b1706468e876e41b27428e3d8a08f3/src/diff/props.js#L114
-			if (
-				attributeValue === '' &&
-				elementNode[ attributeName ] === true
-			) {
-				props[ attributeName ] = true;
+			const attributePropValue =
+				attributeValue === '' && elementNode[ attributeName ] === true
+					? true
+					: attributeValue;
+
+			/*
+			 * A server-rendered `value` or `checked` on an input is the HTML
+			 * default, not the live value: the browser shows it until the
+			 * visitor edits the control, and a later re-render must not write it
+			 * back over the edit.
+			 *
+			 * Preact writes `value`/`checked` to the DOM whenever they differ
+			 * from the live property, so map them to `defaultValue` and
+			 * `defaultChecked`. Preact assigns those as DOM properties, which
+			 * reflect to the content attribute without overwriting an edit.
+			 *
+			 * The live property is passed as well. On a client-side navigation
+			 * the router reuses the existing DOM node, and the browser ignores
+			 * changes to `defaultValue`/`defaultChecked` once the control is
+			 * dirty. A `value`/`checked` prop built from the freshly parsed
+			 * element differs from the reused node's live property, so Preact
+			 * resets it to the destination's server-rendered value. On a
+			 * same-vnode re-render, `hooks.tsx` refreshes these props from the
+			 * live element, so the visitor's edit is kept.
+			 *
+			 * A `data-wp-bind--value` or `data-wp-bind--checked` directive
+			 * owns the live property, so it is not set here.
+			 */
+			if ( isInput && attributeName === 'value' ) {
+				props.defaultValue = attributePropValue;
+				if ( ! hasBoundValue ) {
+					props.value = ( elementNode as HTMLInputElement ).value;
+				}
+			} else if ( isInput && attributeName === 'checked' ) {
+				/*
+				 * The attribute is present, so the HTML default is always
+				 * checked. Don't use `attributePropValue`: it reads the live
+				 * `checked` property, which is `false` once the visitor has
+				 * unchecked the control.
+				 */
+				props.defaultChecked = true;
+				if ( ! hasBoundChecked ) {
+					props.checked = ( elementNode as HTMLInputElement ).checked;
+				}
 			} else {
-				props[ attributeName ] = attributeValue;
+				props[ attributeName ] = attributePropValue;
 			}
 		}
 
