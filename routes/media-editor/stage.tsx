@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { MediaEditor, type Media } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { Text } from '@wordpress/ui';
 import { useViewConfig } from '@wordpress/views';
 import './style.scss';
 
@@ -56,6 +57,65 @@ function getMediaTitle( media: Media | null ) {
 	return title ? decodeEntities( title ) : __( 'Edit media' );
 }
 
+/**
+ * Returns the value of one of the attachment fields for the media, or an
+ * empty string if the field isn't available.
+ *
+ * @param fields  The attachment fields.
+ * @param fieldId The id of the field to read.
+ * @param media   The media record.
+ */
+function getFieldValue(
+	fields: Array< {
+		id: string;
+		getValue?: ( args: { item: Media } ) => string;
+	} >,
+	fieldId: string,
+	media: Media | false
+): string {
+	if ( ! media ) {
+		return '';
+	}
+	const field = fields.find( ( { id } ) => id === fieldId );
+	return field?.getValue?.( { item: media } ) || '';
+}
+
+/**
+ * Returns the extension of a filename, or an empty string if it has none.
+ *
+ * @param filename The filename.
+ */
+function getFileExtension( filename: string ) {
+	const index = filename.lastIndexOf( '.' );
+	return index > 0 ? filename.slice( index + 1 ) : '';
+}
+
+/**
+ * The file type and size shown beside the title.
+ *
+ * @param props
+ * @param props.fileType The file extension.
+ * @param props.fileSize The formatted file size.
+ */
+function MediaEditorFileDetails( {
+	fileType,
+	fileSize,
+}: {
+	fileType: string;
+	fileSize: string;
+} ) {
+	if ( ! fileType && ! fileSize ) {
+		return null;
+	}
+	return (
+		<Text variant="body-md" className="media-editor-route__file-details">
+			{ fileType && <span>{ fileType }</span> }
+			{ fileType && fileSize && <span aria-hidden="true">·</span> }
+			{ fileSize && <span>{ fileSize }</span> }
+		</Text>
+	);
+}
+
 function MediaEditorRoute() {
 	const { id } = useParams( { from: '/media-editor/$id' } );
 	const attachmentId = parseInt( id, 10 );
@@ -82,6 +142,12 @@ function MediaEditorRoute() {
 	);
 
 	const title = getMediaTitle( media || null );
+	// Read through the attachment fields, so the values match the Details
+	// panel.
+	const fileType = getFileExtension(
+		getFieldValue( fields, 'filename', media )
+	);
+	const fileSize = getFieldValue( fields, 'filesize', media );
 	const navigateBack = () => {
 		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
 			window.history.back();
@@ -93,6 +159,9 @@ function MediaEditorRoute() {
 		}
 		navigate( { to: MEDIA_LIST_PATH } );
 	};
+	// Replace the history entry so Cancel leaves the editor.
+	const openAttachment = ( newId: number ) =>
+		navigate( { to: `/media-editor/${ newId }`, replace: true } );
 
 	return (
 		<MediaEditor
@@ -102,9 +171,10 @@ function MediaEditorRoute() {
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
-					navigate( { to: `/media-editor/${ savedId }` } );
+					openAttachment( savedId );
 				}
 			} }
+			onEditOriginal={ openAttachment }
 			renderFrame={ ( {
 				children,
 				isImage,
@@ -146,15 +216,25 @@ function MediaEditorRoute() {
 									}
 								/>
 							}
+							badges={
+								<MediaEditorFileDetails
+									fileType={ fileType }
+									fileSize={ fileSize }
+								/>
+							}
 							actions={
 								<>
 									{ ! isNarrow && (
 										<MediaEditor.HistoryActions />
 									) }
-									<MediaEditor.HeaderActions />
+									{ /* Same order as the block editor's
+									     header: sidebar toggle, save, then the
+									     more menu. */ }
+									<MediaEditor.PanelToggle />
 									{ /* Compact to match the header's other
 									     controls, as elsewhere in wp-admin. */ }
 									<MediaEditor.SaveActions size="compact" />
+									<MediaEditor.MoreMenu />
 								</>
 							}
 						>
