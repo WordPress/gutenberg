@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `build`: Inline the SVG from a `file:` path in a `block.json` `icon`, including the object form's `src`, into the copied `block.json` ([#79658](https://github.com/WordPress/gutenberg/pull/79658)).
+
 ## 37.1.0 (2026-11-04)
 
 ### Internal

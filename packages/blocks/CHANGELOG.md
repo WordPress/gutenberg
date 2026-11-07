@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Render a block type icon given as a string of SVG markup, such as one inlined from a `file:` path in `block.json` ([#79658](https://github.com/WordPress/gutenberg/pull/79658)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements
