@@ -14,6 +14,7 @@ export { default as getGlobalStylesChanges } from './utils/get-global-styles-cha
 export { generateGlobalStyles } from './core/render';
 export {
 	transformToStyles as toStyles,
+	transformToStylesWithTextClipBase,
 	getBlockSelectors,
 	getLayoutStyles,
 	processCSSNesting,

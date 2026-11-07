@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { useMergeRefs } from '@wordpress/compose';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import {
 	forwardRef,
 	useMemo,
@@ -110,7 +110,7 @@ function BlockPopover(
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			ref={ mergedRefs }
 			animate={ false }
 			focusOnMount={ false }
@@ -128,7 +128,7 @@ function BlockPopover(
 			variant="unstyled"
 		>
 			{ children }
-		</Popover>
+		</WCPopover>
 	);
 }
 
