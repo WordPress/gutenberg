@@ -1,0 +1,179 @@
+/**
+ * Admin notices, styled from WordPress Design System tokens.
+ *
+ * Parity target is the React `Notice` (packages/components/src/notice/style.scss),
+ * which is already expressed entirely in tokens. The admin's tone classes map
+ * one to one onto its variants: `.notice-success` to `is-success`, and so on.
+ *
+ * The visible change is how tone is carried. WordPress signals it with a 4px bar on
+ * the leading edge over a white or near-white background. The design system uses
+ * a full hairline border, a tinted surface and tinted text, with a rounded
+ * corner. That is a genuine change of idiom rather than a value swap, and the
+ * bar is the most recognisable thing about a WordPress notice.
+ *
+ * `.updated` and `.error` are styled alongside `.notice` because WordPress does the
+ * same, and a great many plugins still emit them. `div.error` is qualified by
+ * element exactly as WordPress qualifies it, so bare `.error` used for field
+ * validation is not caught.
+ *
+ * Margin and position are left to common.css, which sets them contextually. Padding is
+ * set here because it is part of the notice's appearance, and the few contextual
+ * overrides that exist are repeated at the end so they survive.
+ *
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base — neutral tone
+	   ----------------------------------------------------------------------- */
+
+	.notice,
+	div.updated,
+	div.error {
+		box-sizing: border-box;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		border-radius: var(--wpds-border-radius-lg);
+		background-color: var(--wpds-color-background-surface-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral);
+		padding: var(--wpds-dimension-padding-md);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+		box-shadow: none;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Tones
+
+	   `.notice-alt` is not listed separately. In common.css it exists to drop the box
+	   shadow and keep the tint; both are now unconditional, so it needs no rule
+	   of its own.
+	   ----------------------------------------------------------------------- */
+
+	.notice-success,
+	div.updated {
+		border-color: var(--wpds-color-stroke-surface-success);
+		background-color: var(--wpds-color-background-surface-success-weak);
+		color: var(--wpds-color-foreground-content-success);
+	}
+
+	.notice-warning {
+		border-color: var(--wpds-color-stroke-surface-warning);
+		background-color: var(--wpds-color-background-surface-warning-weak);
+		color: var(--wpds-color-foreground-content-warning);
+	}
+
+	.notice-error,
+	div.error {
+		border-color: var(--wpds-color-stroke-surface-error);
+		background-color: var(--wpds-color-background-surface-error-weak);
+		color: var(--wpds-color-foreground-content-error);
+	}
+
+	.notice-info {
+		border-color: var(--wpds-color-stroke-surface-info);
+		background-color: var(--wpds-color-background-surface-info-weak);
+		color: var(--wpds-color-foreground-content-info);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Content spacing
+
+	   WordPress gives notice paragraphs `margin: 0.5em 0`, which stacks on top of the
+	   notice's own padding — a single-line notice ends up 13px taller than the
+	   padding asks for, and taller than the same notice in the design system.
+
+	   The outer margins are removed so the notice's padding alone defines the
+	   box. Margins between paragraphs are left alone, since a notice with two
+	   paragraphs still needs them.
+	   ----------------------------------------------------------------------- */
+
+	.notice > p:first-child,
+	div.updated > p:first-child,
+	div.error > p:first-child {
+		margin-block-start: 0;
+	}
+
+	/*
+	 * In a dismissible notice the dismiss button is appended after the last
+	 * paragraph, so that paragraph is no longer `:last-child` and would keep
+	 * its bottom margin, leaving the notice taller than its padding asks for
+	 * and the text off-centre.
+	 */
+	.notice > p:last-child,
+	.notice > p:has(+ .notice-dismiss:last-child),
+	div.updated > p:last-child,
+	div.error > p:last-child {
+		margin-block-end: 0;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Dismiss button
+
+	   The glyph is a dashicons font character rather than an image, so it takes
+	   `color` directly and can simply inherit the notice's tone — no masking
+	   needed, unlike the checkbox tick.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * common.css reserves room for the button with `padding-right: 48px` on
+	 * `.notice.is-dismissible`, which the padding above would otherwise
+	 * flatten, letting long text run under the button. The same room, from the
+	 * notice's own padding: a padding either side of common.css's 24px button.
+	 */
+	.notice.is-dismissible {
+		padding-inline-end: calc(var(--wpds-dimension-padding-md) * 2 + 24px);
+	}
+
+	.notice-dismiss {
+		/*
+		 * Centre the button on the first line of text. Centring rather than
+		 * offsetting keeps it aligned whatever size the button is: common.css
+		 * enlarges it below 782px. The inline inset puts the 20px glyph, inside
+		 * the 24px button, the notice's padding away from the edge, matching the
+		 * space left of the text.
+		 */
+		top: calc(var(--wpds-dimension-padding-md) + var(--wpds-typography-line-height-sm) / 2);
+		translate: 0 -50%;
+		inset-inline-end: calc(var(--wpds-dimension-padding-md) - 2px);
+		color: inherit;
+
+		/* Already exactly 2px in common.css; named here so the notice owns every
+		   radius it renders rather than sharing one with the radius sheet. */
+		border-radius: var(--wpds-border-radius-sm);
+	}
+
+	.notice-dismiss::before {
+		color: inherit;
+	}
+
+	.notice-dismiss:focus {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: 0;
+		box-shadow: none;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Contextual padding, repeated from WordPress's stylesheets
+
+	   Setting padding above would otherwise flatten these, because layer order
+	   is compared before specificity. There are only three, all deliberately
+	   tighter than a standalone notice, and all in containers where the roomier
+	   padding would crowd or overflow.
+	   ----------------------------------------------------------------------- */
+
+	.wrap #templateside .notice {
+		padding: 5px 8px;
+	}
+
+	.plugin-card .notice.plugin-dependencies {
+		padding: 15px;
+	}
+
+	.inline-edit-row .notice-error .error {
+		padding: 2px;
+	}
+}
