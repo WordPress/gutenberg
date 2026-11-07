@@ -597,6 +597,403 @@ describe( 'data-wp-html', () => {
 		);
 	} );
 
+	it( 'uses a replaced directive host’s fallback and resolves its own pending value', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const sharedHTML = '<b>Old host HTML</b>';
+		runtime.populateServerData( {
+			state: {
+				[ namespace ]: {
+					html: runtime.asDangerousHTML( sharedHTML ),
+					late: {},
+				},
+			},
+			derivedStateClosures: { [ namespace ]: [ 'state.late' ] },
+		} );
+		const firstRegion = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>First fallback</p></div>'
+		);
+		const mount = document.createElement( 'main' );
+		const firstTree = runtime.toVdom( firstRegion );
+		document.body.appendChild( mount );
+		runtime.render( firstTree, mount );
+		const firstHost = mount.querySelector( '[data-wp-html]' )!;
+		expect( firstHost.innerHTML ).toBe( sharedHTML );
+
+		const secondRegion = createRegion(
+			namespace,
+			'<span data-wp-html="state.late"><p>Second fallback</p></span>'
+		);
+		const secondTree = runtime.toVdom( secondRegion );
+		runtime.render( secondTree, mount );
+
+		const secondHost = mount.querySelector( '[data-wp-html]' )!;
+		expect( secondHost ).not.toBe( firstHost );
+		expect( secondHost.innerHTML ).toBe( '<p>Second fallback</p>' );
+
+		await runtime.act( async () => {
+			runtime.store( namespace, {
+				state: {
+					get late() {
+						return runtime.asDangerousHTML( sharedHTML );
+					},
+				},
+			} );
+		} );
+		expect( secondHost.innerHTML ).toBe( sharedHTML );
+	} );
+
+	it( 'renders a token on a replacement host when it matches the previous host’s HTML', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const sharedHTML = '<b>Shared host HTML</b>';
+		runtime.store( namespace, {
+			state: { html: runtime.asDangerousHTML( sharedHTML ) },
+		} );
+		const firstRegion = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>First fallback</p></div>'
+		);
+		const mount = document.createElement( 'main' );
+		const firstTree = runtime.toVdom( firstRegion );
+		document.body.appendChild( mount );
+		runtime.render( firstTree, mount );
+		const firstHost = mount.querySelector( '[data-wp-html]' )!;
+		expect( firstHost.innerHTML ).toBe( sharedHTML );
+
+		const secondRegion = createRegion(
+			namespace,
+			'<span data-wp-html="state.html"><p>Second fallback</p></span>'
+		);
+		const secondTree = runtime.toVdom( secondRegion );
+		runtime.render( secondTree, mount );
+
+		const secondHost = mount.querySelector( '[data-wp-html]' )!;
+		expect( secondHost ).not.toBe( firstHost );
+		expect( secondHost.innerHTML ).toBe( sharedHTML );
+	} );
+
+	it( 'copies script-free fallbacks to every item without changing the template', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const items: Array< { html: unknown } > = [];
+		const { state } = runtime.store( namespace, {
+			state: { list: items },
+		} );
+		const region = createRegion(
+			namespace,
+			'<ul><template data-wp-each="state.list"><li><div data-wp-html="context.item.html"><p>Loading</p><script>window.fallbackRuns = true</script><template><script>window.nestedFallbackRuns = true</script></template></div></li></template></ul>'
+		);
+		const template = region.querySelector( 'template' )!;
+		const templateHTML = template.innerHTML;
+		const templateParagraph = template.content.querySelector( 'p' );
+		const representation = { wpServerHtml: true };
+
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		await runtime.act( () => {
+			state.list.push( { html: representation } );
+		} );
+		const firstTarget = region.querySelector( 'li div' )!;
+		const firstParagraph = firstTarget.querySelector( 'p' );
+		expect( firstTarget.innerHTML ).toBe(
+			'<p>Loading</p><template></template>'
+		);
+		expect( firstTarget.querySelector( 'script' ) ).toBeNull();
+		expect(
+			firstTarget
+				.querySelector( 'template' )!
+				.content.querySelector( 'script' )
+		).toBeNull();
+		expect( firstParagraph ).not.toBe( templateParagraph );
+
+		await runtime.act( () => {
+			state.list.push(
+				{ html: representation },
+				{ html: representation }
+			);
+		} );
+		const targets = Array.from( region.querySelectorAll( 'li div' ) );
+		const paragraphs = targets.map( ( target ) =>
+			target.querySelector( 'p' )
+		);
+		expect( targets ).toHaveLength( 3 );
+		expect( targets.map( ( target ) => target.innerHTML ) ).toEqual( [
+			'<p>Loading</p><template></template>',
+			'<p>Loading</p><template></template>',
+			'<p>Loading</p><template></template>',
+		] );
+		expect( new Set( paragraphs ).size ).toBe( 3 );
+		expect( paragraphs ).not.toContain( templateParagraph );
+
+		await runtime.act( () => {
+			state.list.splice( 0, 1 );
+		} );
+		await runtime.act( () => {
+			state.list.push( { html: representation } );
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( target ) => target.innerHTML
+			)
+		).toEqual( Array( 3 ).fill( '<p>Loading</p><template></template>' ) );
+		expect( template.innerHTML ).toBe( templateHTML );
+	} );
+
+	it( 'uses the fallback snapshot captured before its live source changes', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		runtime.store( namespace, {
+			state: { html: { wpServerHtml: true } },
+		} );
+		const source = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>At capture</p></div>'
+		);
+		const tree = runtime.toVdom( source );
+		source.querySelector( '[data-wp-html]' )!.innerHTML =
+			'<b>Changed after capture</b>';
+		source.remove();
+
+		const mount = document.createElement( 'main' );
+		document.body.appendChild( mount );
+		runtime.render( tree, mount );
+
+		expect( mount.querySelector( '[data-wp-html]' )!.innerHTML ).toBe(
+			'<p>At capture</p>'
+		);
+	} );
+
+	it( 'keeps a created fallback through unrelated renders and never restores it after removal', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const item: { html: unknown; active: boolean } = {
+			html: { wpServerHtml: true },
+			active: false,
+		};
+		const { state } = runtime.store( namespace, {
+			state: { list: [ item ] },
+		} );
+		const region = createRegion(
+			namespace,
+			'<ul><template data-wp-each="state.list"><li data-wp-class--active="context.item.active"><div data-wp-html="context.item.html"><p>Loading</p></div></li></template></ul>'
+		);
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		const target = region.querySelector< HTMLElement >( 'li div' )!;
+		const paragraph = target.querySelector( 'p' );
+		const writes = recordHtmlWrites( target );
+		const mutations: MutationRecord[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			mutations.push( ...records )
+		);
+		observer.observe( target, { childList: true } );
+
+		await runtime.act( () => {
+			state.list[ 0 ].active = true;
+		} );
+		await runtime.act( () => {
+			state.list[ 0 ].active = false;
+		} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( target.querySelector( 'p' ) ).toBe( paragraph );
+		expect( writes ).toEqual( [] );
+		expect( mutations ).toHaveLength( 0 );
+
+		await runtime.act( () => {
+			state.list[ 0 ].html = null;
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		await runtime.act( () => {
+			state.list[ 0 ].html = { wpServerHtml: true };
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		await runtime.act( () => {
+			state.list[ 0 ].html = runtime.asDangerousHTML( '<b>a</b>' );
+		} );
+		expect( target.innerHTML ).toBe( '<b>a</b>' );
+		await runtime.act( () => {
+			state.list[ 0 ].html = { wpServerHtml: true };
+		} );
+		expect( target.innerHTML ).toBe( '<b>a</b>' );
+		expect( writes ).toEqual( [ '', '<b>a</b>' ] );
+		observer.disconnect();
+	} );
+
+	it( 'changes child nodes once for different token HTML and adopts matching fallback HTML', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const items: Array< { html: unknown } > = [];
+		const { state } = runtime.store( namespace, {
+			state: { list: items },
+		} );
+		const region = createRegion(
+			namespace,
+			'<ul><template data-wp-each="state.list"><li><div data-wp-html="context.item.html"><p>Loading</p></div></li></template></ul>'
+		);
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		await runtime.act( () => {
+			state.list.push(
+				{ html: { wpServerHtml: true } },
+				{ html: { wpServerHtml: true } }
+			);
+		} );
+		const targets = Array.from(
+			region.querySelectorAll< HTMLElement >( 'li div' )
+		);
+		const paragraphs = targets.map( ( target ) =>
+			target.querySelector( 'p' )
+		);
+		const writes = targets.map( recordHtmlWrites );
+		const mutations = targets.map( () => [] as MutationRecord[] );
+		const observers = targets.map( ( target, index ) => {
+			const observer = new MutationObserver( ( records ) =>
+				mutations[ index ].push( ...records )
+			);
+			observer.observe( target, { childList: true } );
+			return observer;
+		} );
+
+		await runtime.act( () => {
+			state.list[ 0 ].html = runtime.asDangerousHTML( '<b>a</b>' );
+		} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( targets[ 0 ].innerHTML ).toBe( '<b>a</b>' );
+		expect( writes[ 0 ] ).toEqual( [ '<b>a</b>' ] );
+		expect( mutations[ 0 ] ).toHaveLength( 1 );
+
+		await runtime.act( () => {
+			state.list[ 1 ].html = runtime.asDangerousHTML( '<p>Loading</p>' );
+		} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( targets[ 1 ].querySelector( 'p' ) ).toBe( paragraphs[ 1 ] );
+		expect( writes[ 1 ] ).toEqual( [] );
+		expect( mutations[ 1 ] ).toHaveLength( 0 );
+		observers.forEach( ( observer ) => observer.disconnect() );
+	} );
+
+	it( 'keeps fallback directives and islands inert before and after the token replaces them', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const otherNamespace = `${ namespace }-other`;
+		const { state } = runtime.store( namespace, {
+			state: { list: [] as Array< { html: unknown } >, text: 'dynamic' },
+		} );
+		let initCalls = 0;
+		runtime.store( otherNamespace, {
+			callbacks: {
+				init() {
+					initCalls++;
+				},
+			},
+		} );
+		const region = createRegion(
+			namespace,
+			`<ul><template data-wp-each="state.list"><li><div data-wp-html="context.item.html"><span data-wp-text="state.text">static</span><div data-wp-interactive="${ otherNamespace }" data-wp-init="callbacks.init"></div></div></li></template></ul>`
+		);
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		await runtime.act( () => {
+			state.list.push( { html: { wpServerHtml: true } } );
+		} );
+		const target = region.querySelector( 'li div' )!;
+		await runtime.act( () => {
+			state.text = 'changed';
+		} );
+		expect( target.querySelector( 'span' ) ).toHaveTextContent( 'static' );
+		expect( initCalls ).toBe( 0 );
+
+		await runtime.act( () => {
+			state.list[ 0 ].html = runtime.asDangerousHTML( '<b>Live</b>' );
+		} );
+		expect( target.innerHTML ).toBe( '<b>Live</b>' );
+		expect( initCalls ).toBe( 0 );
+	} );
+
+	it( 'empties rejected writes after a created fallback and never shows one for a rejected token at creation', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const items: Array< { html: unknown } > = [];
+		const { state } = runtime.store( namespace, {
+			state: { list: items },
+		} );
+		const region = createRegion(
+			namespace,
+			'<ul><template data-wp-each="state.list"><li><div data-wp-html="context.item.html"><p>Loading</p></div></li></template></ul>'
+		);
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		const descriptor = Object.getOwnPropertyDescriptor(
+			Element.prototype,
+			'innerHTML'
+		)!;
+		const rejectedValues = new Set( [ '<b>x</b>', '<b>y</b>' ] );
+		Object.defineProperty( Element.prototype, 'innerHTML', {
+			configurable: true,
+			get() {
+				return descriptor.get!.call( this );
+			},
+			set( this: Element, value: string ) {
+				if ( rejectedValues.has( value ) ) {
+					throw new TypeError( `rejected ${ value }` );
+				}
+				descriptor.set!.call( this, value );
+			},
+		} );
+		const warnings = vi.spyOn( console, 'warn' );
+		const warningStart = warnings.mock.calls.length;
+		try {
+			await runtime.act( () => {
+				state.list.push( { html: { wpServerHtml: true } } );
+			} );
+			const existing = region.querySelector( 'li div' )!;
+			expect( existing.innerHTML ).toBe( '<p>Loading</p>' );
+			await runtime.act( () => {
+				state.list[ 0 ].html = runtime.asDangerousHTML( '<b>x</b>' );
+			} );
+			await runtime.act( () => {
+				state.list.push( {
+					html: runtime.asDangerousHTML( '<b>y</b>' ),
+				} );
+			} );
+			expect(
+				Array.from(
+					region.querySelectorAll( 'li div' ),
+					( target ) => target.innerHTML
+				)
+			).toEqual( [ '', '' ] );
+			expect( warnings.mock.calls.slice( warningStart ) ).toHaveLength(
+				2
+			);
+			expect( warnings.mock.calls.slice( warningStart ) ).toEqual( [
+				[
+					expect.stringContaining(
+						'browser rejected this HTML value'
+					),
+				],
+				[
+					expect.stringContaining(
+						'browser rejected this HTML value'
+					),
+				],
+			] );
+			expect( console ).toHaveWarnedWith(
+				expect.stringContaining( 'browser rejected this HTML value' )
+			);
+		} finally {
+			Object.defineProperty( Element.prototype, 'innerHTML', descriptor );
+		}
+	} );
+
 	it( 'empties content and restores scope when a function value throws', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
@@ -774,10 +1171,11 @@ describe( 'data-wp-html', () => {
 } );
 
 /**
- * Loads an isolated runtime so each test can observe deduplicated warnings.
- * Its renderer hook is restored by the file's afterEach cleanup.
+ * Loads an isolated runtime so each test can observe deduplicated warnings and
+ * render with the matching Preact instance. Its renderer hook is restored by
+ * the file's afterEach cleanup.
  *
- * @return The directive runtime and its matching Preact renderer.
+ * @return The directive runtime and its matching Preact renderers.
  */
 async function loadConflictRuntime() {
 	vi.resetModules();
@@ -786,8 +1184,9 @@ async function loadConflictRuntime() {
 	const { store: register, populateServerData: populate } =
 		await import( '../../store' );
 	const { asDangerousHTML: token } = await import( '../../html' );
+	const { hydrate: hydrateRegion, render: renderTree } =
+		await import( 'preact' );
 	const { getContext: readContext } = await import( '../../scopes' );
-	const { hydrate: hydrateRegion } = await import( 'preact' );
 	const { act: flush } = await import( 'preact/test-utils' );
 	return {
 		// Converts the test markup using this runtime's directive registry.
@@ -802,6 +1201,8 @@ async function loadConflictRuntime() {
 		getContext: readContext,
 		// Hydrates markup with the matching Preact instance.
 		hydrate: hydrateRegion,
+		// Renders replacement markup with the matching Preact instance.
+		render: renderTree,
 		// Flushes reactive updates with the matching Preact instance.
 		act: flush,
 	};

@@ -262,6 +262,19 @@ describe( 'MediaUploadModal', () => {
 		);
 	} );
 
+	it( 'renders while the media total is still unknown', async () => {
+		mockUseEntityRecordsWithPermissions.mockReturnValue( {
+			records: [],
+			isResolving: true,
+			totalItems: null,
+			totalPages: null,
+		} );
+
+		renderModal();
+
+		expect( await screen.findByText( '0 items' ) ).toBeInTheDocument();
+	} );
+
 	it( 'updates the media query when the picker changes page', async () => {
 		const user = userEvent.setup();
 		const { registry } = renderModal();
