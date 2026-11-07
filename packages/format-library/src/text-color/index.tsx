@@ -89,6 +89,7 @@ function TextColorEdit( {
 	value,
 	onChange,
 	isActive,
+	activeAttributes,
 	contentRef,
 }: FormatEditProps ) {
 	// The settings hold the custom color flag and the palette.
