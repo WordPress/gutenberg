@@ -319,15 +319,17 @@ jobs:
             contents: read
         timeout-minutes: 20
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        # PHP 8.6 support is still in progress, so failures are allowed for now.
+        continue-on-error: ${{ matrix.php == '8.6' }}
         strategy:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
+                    # On PRs: Only test PHP 7.4, 8.5, and 8.6, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
@@ -352,6 +354,9 @@ jobs:
                     - php: '8.3'
                       wordpress: 'previous major version'
                     - php: '8.4'
+                      wordpress: 'previous major version'
+                    # PHP 8.6 support was added in WordPress 7.2.
+                    - php: '8.6'
                       wordpress: 'previous major version'
 
         env:
@@ -406,6 +411,63 @@ jobs:
                   curl --version
                   git --version
                   locale -a
+
+            # The official `wordpress` images are only published for stable PHP releases, but
+            # wp-env always builds from `wordpress:php<version>` and `wordpress:cli-php<version>`.
+            # For a PHP pre-release, build those two images locally from the official Dockerfiles,
+            # with the base swapped for the official PHP release candidate image. wp-env does not
+            # pull the images it builds from, so `docker compose up --build` uses the local ones.
+            - name: Build WordPress images for PHP ${{ matrix.php }} pre-release
+              if: ${{ matrix.php == '8.6' }}
+              env:
+                  PHP_VERSION: ${{ matrix.php }}
+                  # The newest PHP version docker-library/wordpress has Dockerfiles for.
+                  TEMPLATE_PHP_VERSION: '8.5'
+                  DOCKER_LIBRARY_WORDPRESS_SHA: f32865bc92a2273d9e473c051e3d02b5f6a6ab32
+              run: |
+                  base_url="https://raw.githubusercontent.com/docker-library/wordpress/${DOCKER_LIBRARY_WORDPRESS_SHA}"
+                  build_dir="${RUNNER_TEMP}/wordpress-images"
+                  mkdir -p "${build_dir}/apache" "${build_dir}/cli"
+
+                  for file in Dockerfile docker-entrypoint.sh wp-config-docker.php; do
+                    curl -sSfL --retry 3 -o "${build_dir}/apache/${file}" "${base_url}/latest/php${TEMPLATE_PHP_VERSION}/apache/${file}"
+                  done
+                  for file in Dockerfile docker-entrypoint.sh; do
+                    curl -sSfL --retry 3 -o "${build_dir}/cli/${file}" "${base_url}/cli/php${TEMPLATE_PHP_VERSION}/alpine/${file}"
+                  done
+                  chmod +x "${build_dir}/apache/docker-entrypoint.sh" "${build_dir}/cli/docker-entrypoint.sh"
+
+                  sed -i "s|^FROM php:${TEMPLATE_PHP_VERSION}-apache\$|FROM php:${PHP_VERSION}-rc-apache|" "${build_dir}/apache/Dockerfile"
+                  sed -i "s|^FROM php:${TEMPLATE_PHP_VERSION}-alpine\$|FROM php:${PHP_VERSION}-rc-alpine|" "${build_dir}/cli/Dockerfile"
+                  grep -qx "FROM php:${PHP_VERSION}-rc-apache" "${build_dir}/apache/Dockerfile"
+                  grep -qx "FROM php:${PHP_VERSION}-rc-alpine" "${build_dir}/cli/Dockerfile"
+
+                  # The official PHP images no longer ship PECL as of PHP 8.6, and no PECL extensions
+                  # support PHP 8.6 yet, so skip installing and enabling them.
+                  for dockerfile in "${build_dir}/apache/Dockerfile" "${build_dir}/cli/Dockerfile"; do
+                    extensions="$(sed -nE 's/^[[:space:]]*pecl install ([a-z0-9_]+)-[^;]*;.*$/\1/p' "${dockerfile}")"
+                    sed -i -E '/^[[:space:]]*pecl install /d; /^[[:space:]]*rm -r \/tmp\/pear;/d' "${dockerfile}"
+                    for extension in ${extensions}; do
+                      sed -i -E "/^[[:space:]]*docker-php-ext-enable ${extension};/d" "${dockerfile}"
+                    done
+                    if grep -nE '^[[:space:]]*(pecl |rm -r /tmp/pear)' "${dockerfile}"; then
+                      echo "Could not remove the PECL commands from ${dockerfile}." && exit 1
+                    fi
+                  done
+
+                  # The official PHP images stopped compiling in mbstring along with PECL, but PHPUnit
+                  # requires it. Install it as a regular extension, with the oniguruma headers it needs.
+                  for variant in apache:libonig-dev cli:oniguruma-dev; do
+                    dockerfile="${build_dir}/${variant%%:*}/Dockerfile"
+                    onig_package="${variant#*:}"
+                    ONIG_PACKAGE="${onig_package}" perl -0pi -e 's/^(\s+)libzip-dev \\\n/$1libzip-dev \\\n$1$ENV{ONIG_PACKAGE} \\\n/m; s/^(\s+)zip \\\n/$1mbstring \\\n$1zip \\\n/m' "${dockerfile}"
+                    if ! grep -qE "^[[:space:]]+${onig_package} \\\\$" "${dockerfile}" || ! grep -qE '^[[:space:]]+mbstring \\$' "${dockerfile}"; then
+                      echo "Could not add mbstring to ${dockerfile}." && exit 1
+                    fi
+                  done
+
+                  docker build --pull -t "wordpress:php${PHP_VERSION}" "${build_dir}/apache"
+                  docker build --pull -t "wordpress:cli-php${PHP_VERSION}" "${build_dir}/cli"
 
             - name: Start Docker environment
               run: npm run wp-env-test start
@@ -644,8 +706,8 @@ jobs:
     #
     # The script reads every job in the run, so `needs` is only about waiting: it must cover
     # every job that would otherwise still be running when the script looks. `--ignore` then
-    # names the jobs whose results do not count. Here that is this job itself, and the
-    # housekeeping that runs alongside it.
+    # names the jobs whose results do not count. Here that is this job itself, the
+    # housekeeping that runs alongside it, and the PHP 8.6 jobs, which are allowed to fail.
     unit-status-check:
         name: Unit Tests - Status Check
         runs-on: 'ubuntu-slim'
@@ -676,4 +738,4 @@ jobs:
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check' --ignore 'PHP 8.6 on Linux' --ignore 'PHP 8.6 multisite on Linux'
