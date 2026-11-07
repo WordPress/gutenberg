@@ -89,6 +89,29 @@ class Gutenberg_Get_JXL_Info_Test extends WP_UnitTestCase {
 		$this->assertFalse( gutenberg_get_jxl_info( $this->write_temp_file( $container ) ) );
 	}
 
+	public function test_reads_a_codestream_split_across_partial_codestream_boxes(): void {
+		// The 64x16 codestream split across two `jxlp` boxes, with an `Exif` box in between.
+		$container = "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A"
+			. "\x00\x00\x00\x14ftypjxl \x00\x00\x00\x00jxl "
+			. "\x00\x00\x00\x0Fjxlp\x00\x00\x00\x00\xFF\x0A\x03"
+			. "\x00\x00\x00\x0CExif\x00\x00\x00\x00"
+			. "\x00\x00\x00\x0Ejxlp\x80\x00\x00\x01\x0E\x00";
+
+		$info = gutenberg_get_jxl_info( $this->write_temp_file( $container ) );
+
+		$this->assertSame(
+			array(
+				'width'  => 64,
+				'height' => 16,
+			),
+			$info
+		);
+	}
+
+	public function test_returns_false_for_a_truncated_codestream(): void {
+		$this->assertFalse( gutenberg_get_jxl_info( $this->write_temp_file( "\xFF\x0A" ) ) );
+	}
+
 	public function test_returns_false_for_a_missing_file(): void {
 		$this->assertFalse( gutenberg_get_jxl_info( '/nonexistent/photo.jxl' ) );
 	}

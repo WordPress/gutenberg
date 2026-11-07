@@ -139,7 +139,7 @@ add_filter( 'wp_check_filetype_and_ext', 'gutenberg_filter_jxl_filetype_and_ext'
  *
  * getimagesize() cannot identify JPEG XL, so this decodes the SizeHeader
  * (ISO/IEC 18181-1, section A.3) itself. Handles both a naked codestream and
- * one wrapped in an ISOBMFF container, in a `jxlc` or the first `jxlp` box.
+ * one wrapped in an ISOBMFF container, in a `jxlc` box or split across `jxlp` boxes.
  * The dimensions are swapped for orientations that transpose the image, since
  * decoders apply the orientation and report the upright size.
  *
@@ -198,6 +198,11 @@ function gutenberg_get_jxl_info( string $filename ) {
 		$orientation = 1 + $read_bits( 3 );
 	}
 
+	// A header shorter than the fields read is truncated, not a real image.
+	if ( $bit_position > 8 * strlen( $header ) ) {
+		return false;
+	}
+
 	if ( $orientation > 4 ) {
 		list( $width, $height ) = array( $height, $width );
 	}
@@ -231,11 +236,14 @@ function gutenberg_read_jxl_codestream_header( $handle ) {
 		return false;
 	}
 
-	$offset = 12;
-	while ( fseek( $handle, $offset ) === 0 ) {
+	// A container may split the codestream across several `jxlp` boxes, with
+	// other boxes in between, so gather it from each box's payload in turn.
+	$codestream = '';
+	$offset     = 12;
+	while ( strlen( $codestream ) < $header_length && fseek( $handle, $offset ) === 0 ) {
 		$box = fread( $handle, 8 );
 		if ( ! is_string( $box ) || strlen( $box ) < 8 ) {
-			return false;
+			break;
 		}
 
 		$size        = unpack( 'N', $box )[1];
@@ -245,30 +253,44 @@ function gutenberg_read_jxl_codestream_header( $handle ) {
 		if ( 1 === $size ) {
 			$large_size = fread( $handle, 8 );
 			if ( ! is_string( $large_size ) || strlen( $large_size ) < 8 ) {
-				return false;
+				break;
 			}
 			$size        = unpack( 'J', $large_size )[1];
 			$header_size = 16;
 		}
 
+		// A size of 0 means the box runs to the end of the file.
+		if ( 0 !== $size && $size < $header_size ) {
+			break;
+		}
+		$payload_size = 0 === $size ? $header_length : $size - $header_size;
+
 		if ( 'jxlc' === $type || 'jxlp' === $type ) {
 			if ( 'jxlp' === $type ) {
 				// Skip the partial codestream box's sequence number.
+				$payload_size -= 4;
 				fread( $handle, 4 );
 			}
-			$codestream = fread( $handle, $header_length );
-			return is_string( $codestream ) && "\xFF\x0A" === substr( $codestream, 0, 2 ) ? $codestream : false;
+
+			$length = min( $payload_size, $header_length - strlen( $codestream ) );
+			if ( $length > 0 ) {
+				$codestream .= (string) fread( $handle, $length );
+			}
+
+			// A `jxlc` box holds the rest of the codestream.
+			if ( 'jxlc' === $type ) {
+				break;
+			}
 		}
 
-		// A size of 0 means the box runs to the end of the file.
-		if ( 0 === $size || $size < $header_size ) {
-			return false;
+		if ( 0 === $size ) {
+			break;
 		}
 
 		$offset += $size;
 	}
 
-	return false;
+	return "\xFF\x0A" === substr( $codestream, 0, 2 ) ? $codestream : false;
 }
 
 /**
