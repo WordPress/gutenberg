@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import '@wordpress/theme/design-tokens.css';
@@ -6,6 +7,7 @@ import { ContextSystemProvider } from '../../context';
 import { ToolsPanel, ToolsPanelItem } from '..';
 // The cascade contract includes Button's global icon-button defaults.
 import '../../button/style.scss';
+import '../../style.scss';
 
 const defaultProps = {
 	label: 'Panel header',
@@ -27,6 +29,35 @@ const hiddenControlProps = {
 };
 
 describe( 'ToolsPanel styles', () => {
+	it( 'aligns reset actions with selection rows', async () => {
+		const user = userEvent.setup();
+		await render(
+			<ToolsPanel { ...defaultProps }>
+				<ToolsPanelItem { ...controlProps } isShownByDefault>
+					Control
+				</ToolsPanelItem>
+				<ToolsPanelItem { ...hiddenControlProps }>
+					Hidden control
+				</ToolsPanelItem>
+			</ToolsPanel>
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Panel header options' } )
+		);
+		await expect
+			.element(
+				screen.getByRole( 'menuitem', {
+					name: 'Example, reset to default',
+				} )
+			)
+			.toBeVisible();
+		expect(
+			screen.getByText( 'Example' ).getBoundingClientRect().left
+		).toBe(
+			screen.getByText( 'Hidden example' ).getBoundingClientRect().left
+		);
+	} );
+
 	it( 'applies the panel padding and border', async () => {
 		await render(
 			<ToolsPanel { ...defaultProps } data-testid="tools-panel">
