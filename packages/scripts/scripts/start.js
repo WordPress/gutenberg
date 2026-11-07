@@ -10,7 +10,9 @@ if ( hasArgInCLI( '--hot' ) ) {
 	webpackArgs.unshift( 'watch' );
 }
 
-const { status } = spawn( resolveBin( 'webpack' ), webpackArgs, {
-	stdio: 'inherit',
-} );
+const { status } = spawn(
+	process.execPath,
+	[ resolveBin( 'webpack' ), ...webpackArgs ],
+	{ stdio: 'inherit' }
+);
 process.exit( status === null ? EXIT_ERROR_CODE : status );
