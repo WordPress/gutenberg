@@ -415,6 +415,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 *
 	 * @param WP_Post|int $post Post object or ID.
 	 * @return array<string, array<string, string|int>> Links for the given post.
+	 *
+	 * @phpstan-return array{
+	 *     self: array{ href: non-falsy-string },
+	 *     about: array{ href: non-falsy-string },
+	 *     version-history?: array{ href: non-falsy-string, count: int<0, max> },
+	 * }
 	 */
 	protected function prepare_links( $post ) {
 		$id   = $post instanceof WP_Post ? $post->ID : $post;
