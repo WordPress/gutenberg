@@ -41,10 +41,3 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: ../../lib/experimental/navigation-theme-opt-in.php
-
-		-
-			message: '#^Right side of \|\| is always true\.$#'
-			identifier: booleanOr.rightAlwaysTrue
-			count: 1
-			path: ../../packages/block-library/src/template-part/index.php
-
