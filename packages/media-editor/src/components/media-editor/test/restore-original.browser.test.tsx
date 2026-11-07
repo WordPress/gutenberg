@@ -6,9 +6,19 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import '@wordpress/components/src/style.scss';
+// The package stylesheet loads the image editor's built CSS, which only
+// exists after a build, so load the same styles from source.
+import '@wordpress/image-editor/src/style.scss';
 import MediaEditor, { type MediaEditorFrameProps } from '../index';
 import type { Media } from '../../media-editor-provider';
-import '../../../style.scss';
+import '../../media-preview/style.scss';
+import '../style.scss';
+import '../../media-form/style.scss';
+import '../../media-editor-modal/style.scss';
+import '../../media-editor-canvas/style.scss';
+import '../../media-editor-image-controls/style.scss';
+import '../../media-editor-keyboard-shortcuts-modal/style.scss';
+import '../../rotation-ruler/style.scss';
 
 const original: Media = {
 	id: 10,
@@ -249,10 +259,18 @@ describe( 'Restore original', () => {
 		const editWrite = withTransform
 			? writes.mock.calls[ 0 ][ 1 ]
 			: undefined;
-		expect( { src: editWrite?.src, post: editWrite?.post } ).toEqual(
+		expect( {
+			src: editWrite?.src,
+			post: editWrite?.post,
+			modifiers: editWrite?.modifiers,
+		} ).toEqual(
 			withTransform
-				? { src: original.source_url, post: original.post }
-				: { src: undefined, post: undefined }
+				? {
+						src: original.source_url,
+						post: original.post,
+						modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
+					}
+				: { src: undefined, post: undefined, modifiers: undefined }
 		);
 	} );
 } );
