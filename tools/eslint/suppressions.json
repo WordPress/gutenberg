@@ -6841,6 +6841,11 @@
 			"count": 3
 		}
 	},
+	"packages/core-actions/src/wp_template/duplicate-template/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
