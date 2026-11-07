@@ -10,10 +10,6 @@
 	background-color: #fff;
 }
 
-.layout:global(.dataviews-view-table) thead {
-	inset-block-start: 67px;
-}
-
 .empty {
 	border: 1px solid #000;
 	border-radius: 8px;

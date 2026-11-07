@@ -16,14 +16,14 @@ $test_store_tag_double  = $test_store_tag_counter * 2;
 	<div>
 		Counter:
 		<span
-			data-wp-bind--children="state.counter.value"
+			data-wp-text="state.counter.value"
 			data-testid="counter value"
 			><?php echo $test_store_tag_counter; ?></span
 		>
 		<br />
 		Double:
 		<span
-			data-wp-bind--children="state.counter.double"
+			data-wp-text="state.counter.double"
 			data-testid="counter double"
 			><?php echo $test_store_tag_double; ?></span
 		>
@@ -35,7 +35,7 @@ $test_store_tag_double  = $test_store_tag_counter * 2;
 			+1
 		</button>
 		<span
-			data-wp-bind--children="state.counter.clicks"
+			data-wp-text="state.counter.clicks"
 			data-testid="counter clicks"
 			>0</span
 		>

@@ -1,6 +1,6 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -86,13 +86,23 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 // The editor packages should not be using the dataviews packages directly,
 // and the dataviews package should not be using the editor packages directly,
 // so duplicating the code here seems like the least bad option.
+// Keep menu label formatting in sync with DataViews' getActionLabel.
 
 function DropdownMenuItemTrigger( { action, onClick, items } ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+	const menuLabel =
+		'RenderModal' in action &&
+		! /(?:\s*(?:[…⋯]|[.。．]{3,}(?![.。．])))+\s*$/u.test( label )
+			? sprintf(
+					/* translators: %s: Action label. Use the ellipsis and spacing appropriate for your language. */
+					_x( '%s…', 'menu item requiring further input' ),
+					label
+				)
+			: label;
 	return (
 		<Menu.Item onClick={ onClick }>
-			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+			<Menu.ItemLabel>{ menuLabel }</Menu.ItemLabel>
 		</Menu.Item>
 	);
 }

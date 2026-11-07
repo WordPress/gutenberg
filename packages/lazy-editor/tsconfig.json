@@ -8,7 +8,7 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../asset-loader/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },
-		{ "path": "../blocks" },
+		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data/tsconfig.build.json" },
