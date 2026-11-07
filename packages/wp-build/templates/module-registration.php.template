@@ -35,10 +35,9 @@ function {{PREFIX}}_register_script_modules() {
 
 	$modules = require $modules_file;
 	$base_url = $build_constants['build_url'] . 'modules/';
-
 	foreach ( $modules as $module ) {
 		// WASM-only modules (e.g., vips worker) only have .min.js; use it even when SCRIPT_DEBUG is `true`.
-		$extension = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && empty( $module['min_only'] ) )
+		$extension = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] && empty( $module['min_only'] ) )
 			? '.js'
 			: '.min.js';
 
