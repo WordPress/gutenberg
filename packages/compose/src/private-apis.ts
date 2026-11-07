@@ -1,10 +1,16 @@
 import { lock } from './lock-unlock';
-import subscribeDelegatedListener from './utils/subscribe-delegated-listener';
+import {
+	addDelegatedListeners,
+	useDelegatedListeners,
+} from './utils/delegated-listeners';
+import { ownsSelection } from './utils/owns-selection';
 
 /**
  * Private `@wordpress/compose` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
-	subscribeDelegatedListener,
+	addDelegatedListeners,
+	useDelegatedListeners,
+	ownsSelection,
 } );
