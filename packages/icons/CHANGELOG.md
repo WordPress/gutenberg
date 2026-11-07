@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `manifest.json`: Map 114 more Dashicons to `core-admin` icons. To do so, add 80 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `formatBold` and `undo`, and add `chevronUpDown` and `file` from the `core` collection to the `core-admin` collection too ([#86466](https://github.com/WordPress/gutenberg/pull/86466)).
+
 ### Bug Fixes
 
 -   `cover`: Redraw the icon on the frame the other container icons share, such as `image` and `caption`, correcting a footprint that read a size larger than its neighbors, and align the bookmark with the top edge of that frame ([#86420](https://github.com/WordPress/gutenberg/pull/86420)).
