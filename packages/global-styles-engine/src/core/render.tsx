@@ -1080,10 +1080,19 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 			return [];
 		}
 
+		// A breakpoint pseudo state is output after the default pseudo state,
+		// so that comes nearest. Mirror of the PHP `get_state_base_styles()`.
+		const defaultPseudoStyles =
+			name && mediaQuery ? baseStyles?.[ 0 ]?.[ pseudoSelector ] : null;
+
 		return [
 			{
 				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
-				baseStyles: [ sourceStyles ?? styles, ...( baseStyles ?? [] ) ],
+				baseStyles: [
+					...( defaultPseudoStyles ? [ defaultPseudoStyles ] : [] ),
+					sourceStyles ?? styles,
+					...( baseStyles ?? [] ),
+				],
 				sourceStyles: sourceStyles?.[ pseudoSelector ],
 				selector,
 				selectorSuffix: pseudoSelector,
