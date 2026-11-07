@@ -7,10 +7,6 @@ export const previewStyle: CSSProperties = {
 	color: 'var(--wpds-color-foreground-content-neutral)',
 };
 
-export const headingStyle: CSSProperties = {
-	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
-};
-
 export const listStyle: CSSProperties = {
 	display: 'flex',
 	flexDirection: 'column',
