@@ -8445,6 +8445,85 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo, .bar)::before{color: yellow;}:root :where(.foo, .bar) ::before{color: purple;}:root :where(.foo.three, .bar.three)::before{color: orange;}:root :where(.foo .four, .bar .four)::before{color: skyblue;}',
 			),
+			// CSS with nested selectors without `&`.
+			'nested without &'             => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			),
+			'only nested without &'        => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo img){color: blue;}',
+			),
+			'mixed nested selectors'       => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; &.one{color: blue;} .two{color: green;} > img{color: yellow;} ::before{color: purple;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}:root :where(.foo > img){color: yellow;}:root :where(.foo) ::before{color: purple;}',
+			),
+			'nested without & inside &'    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '& { color: red; img { color: blue; } }',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			),
+			'nested without & multi root'  => array(
+				'input'    => array(
+					'selector' => '.foo, .bar',
+					'css'      => 'color: red; img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo, .bar){color: red;}:root :where(.foo img, .bar img){color: blue;}',
+			),
+			// Rules without `&` at the very start keep their existing output.
+			'leading pseudo-class'         => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => ':hover{color: red;}',
+				),
+				'expected' => ':root :where(.foo:hover){color: red;}',
+			),
+			'leading pseudo-element'       => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '::before{color: red;}',
+				),
+				'expected' => ':root :where(.foo)::before{color: red;}',
+			),
+			'leading class'                => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '.is-style-x{color: red;}',
+				),
+				'expected' => ':root :where(.foo.is-style-x){color: red;}',
+			),
+			'leading id'                   => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '#hero{color: red;}',
+				),
+				'expected' => ':root :where(.foo#hero){color: red;}',
+			),
+			'leading :is()'                => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => ':is(.a, .b){color: red;}',
+				),
+				'expected' => ':root :where(.foo:is(.a, .b)){color: red;}',
+			),
+			'twenty twenty-four calendar'  => array(
+				'input'    => array(
+					'selector' => '.wp-block-calendar',
+					'css'      => '.wp-block-calendar table:where(:not(.has-text-color)) th{background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)} & table:where(:not(.has-text-color)) td{border-color:var(--wp--preset--color--contrast-2)}',
+				),
+				'expected' => ':root :where(.wp-block-calendar.wp-block-calendar table:where(:not(.has-text-color)) th){background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)}:root :where(.wp-block-calendar table:where(:not(.has-text-color)) td){border-color:var(--wp--preset--color--contrast-2)}',
+			),
 		);
 	}
 

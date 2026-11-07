@@ -9,6 +9,7 @@ import {
 	transformToStylesWithTextClipBase,
 	getBlockSelectors,
 	generateGlobalStyles,
+	processCSSNesting,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -2758,6 +2759,91 @@ describe( 'global styles renderer', () => {
 			);
 			expect( result ).toContain(
 				':root :where(.wp-block-button){width: 200px;}'
+			);
+		} );
+	} );
+
+	describe( 'processCSSNesting', () => {
+		it.each( [
+			[ 'no css', '', '' ],
+			[
+				'no nested selectors',
+				'color: red; margin: auto;',
+				':root :where(.foo){color: red; margin: auto;}',
+			],
+			[
+				'nested selectors with &',
+				'color: red; &.one{color: blue;} & .two{color: green;}',
+				':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}',
+			],
+			[
+				'nested selector without &',
+				'color: red; img{color: blue;}',
+				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			],
+			[
+				'only nested selector without &',
+				'img{color: blue;}',
+				':root :where(.foo img){color: blue;}',
+			],
+			[
+				'mixed nested selectors',
+				'color: red; &.one{color: blue;} .two{color: green;} > img{color: yellow;} ::before{color: purple;}',
+				':root :where(.foo){color: red;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}:root :where(.foo > img){color: yellow;}:root :where(.foo) ::before{color: purple;}',
+			],
+			[
+				'nested selector without & inside &',
+				'& { color: red; img { color: blue; } }',
+				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			],
+			[
+				'leading pseudo-class keeps its existing output',
+				':hover{color: red;}',
+				':root :where(.foo:hover){color: red;}',
+			],
+			[
+				'leading pseudo-element keeps its existing output',
+				'::before{color: red;}',
+				':root :where(.foo)::before{color: red;}',
+			],
+			[
+				'leading class keeps its existing output',
+				'.is-style-x{color: red;}',
+				':root :where(.foo.is-style-x){color: red;}',
+			],
+			[
+				'leading id keeps its existing output',
+				'#hero{color: red;}',
+				':root :where(.foo#hero){color: red;}',
+			],
+			[
+				'leading :is() keeps its existing output',
+				':is(.a, .b){color: red;}',
+				':root :where(.foo:is(.a, .b)){color: red;}',
+			],
+		] )( '%s', ( _description, css, expected ) => {
+			expect( processCSSNesting( css, '.foo' ) ).toBe( expected );
+		} );
+
+		it( 'keeps the existing output for the Twenty Twenty-Four Calendar CSS', () => {
+			expect(
+				processCSSNesting(
+					'.wp-block-calendar table:where(:not(.has-text-color)) th{background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)} & table:where(:not(.has-text-color)) td{border-color:var(--wp--preset--color--contrast-2)}',
+					'.wp-block-calendar'
+				)
+			).toBe(
+				':root :where(.wp-block-calendar.wp-block-calendar table:where(:not(.has-text-color)) th){background-color:var(--wp--preset--color--contrast-2);color:var(--wp--preset--color--base);border-color:var(--wp--preset--color--contrast-2)}:root :where(.wp-block-calendar table:where(:not(.has-text-color)) td){border-color:var(--wp--preset--color--contrast-2)}'
+			);
+		} );
+
+		it( 'scopes a nested selector without & to every root selector', () => {
+			expect(
+				processCSSNesting(
+					'color: red; img{color: blue;}',
+					'.foo, .bar'
+				)
+			).toBe(
+				':root :where(.foo, .bar){color: red;}:root :where(.foo img, .bar img){color: blue;}'
 			);
 		} );
 	} );
