@@ -224,6 +224,9 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 						$this->heading_block( 'Page one heading', 'page-one-heading' ),
 						$this->nextpage_block(),
 						$this->heading_block( 'Page two heading', 'page-two-heading' ),
+						// A locked Page Break saves attributes in its block comment.
+						"<!-- wp:nextpage {\"lock\":{\"move\":false,\"remove\":true}} -->\n<!--nextpage-->\n<!-- /wp:nextpage -->",
+						$this->heading_block( 'Page three heading', 'page-three-heading' ),
 					)
 				),
 			)
@@ -237,6 +240,10 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'href="' . esc_url( $permalink . '#page-one-heading' ) . '"', $nav );
 		$this->assertStringContainsString(
 			'href="' . esc_url( add_query_arg( 'page', 2, $permalink ) . '#page-two-heading' ) . '"',
+			$nav
+		);
+		$this->assertStringContainsString(
+			'href="' . esc_url( add_query_arg( 'page', 3, $permalink ) . '#page-three-heading' ) . '"',
 			$nav
 		);
 	}

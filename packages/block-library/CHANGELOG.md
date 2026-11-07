@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 -   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
