@@ -141,6 +141,70 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A tabs block with an anchor can be rendered more than once on a page,
+	 * for example from a synced pattern inserted twice. Every render should
+	 * get its own tab and panel IDs, matched up with its own buttons.
+	 *
+	 * @covers ::block_core_tabs_provide_context
+	 * @covers ::block_core_tab_list_render_callback
+	 * @covers ::block_core_tab_panel_render
+	 */
+	public function test_should_give_each_render_of_an_anchored_block_its_own_tab_ids(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs {"anchor":"rendered-twice"} -->
+			<div class="wp-block-tabs" id="rendered-twice"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Description</button><button type="button" role="tab">Reviews</button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Description"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel {"label":"Reviews"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$renders = array( do_blocks( $tabs_block ), do_blocks( $tabs_block ) );
+		$ids     = array();
+
+		foreach ( $renders as $index => $rendered_block ) {
+			$processor = new WP_HTML_Tag_Processor( $rendered_block );
+			$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+			$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+
+			$controls = array();
+			while ( $processor->next_tag( array( 'tag_name' => 'button' ) ) ) {
+				$controls[] = $processor->get_attribute( 'aria-controls' );
+				$ids[]      = $processor->get_attribute( 'id' );
+			}
+
+			$processor = new WP_HTML_Tag_Processor( $rendered_block );
+			$panels    = array();
+			while ( $processor->next_tag( array( 'class_name' => 'wp-block-tab-panel' ) ) ) {
+				$panels[] = $processor->get_attribute( 'id' );
+				$ids[]    = $processor->get_attribute( 'id' );
+			}
+
+			$this->assertSame( $panels, $controls, "Render $index's buttons should control its own panels." );
+			$this->assertCount( 2, $panels, "Render $index should have two panels." );
+
+			if ( 0 === $index ) {
+				$this->assertSame( 'rendered-twice', $context['tabsId'] ?? '', 'The first render should keep the anchor.' );
+				$this->assertSame( 'rendered-twice-tab-1', $panels[0], 'The first render should keep the anchor-based panel IDs.' );
+			} else {
+				$this->assertStringStartsWith( 'rendered-twice__', $context['tabsId'] ?? '', 'A later render should be prefixed with the anchor.' );
+				$this->assertNotSame( 'rendered-twice', $context['tabsId'] ?? '', 'A later render should not reuse the anchor.' );
+			}
+		}
+
+		$this->assertSame( $ids, array_unique( $ids ), 'No tab or panel ID should appear in both renders.' );
+	}
+
+	/**
 	 * Reads the instance number out of the `tabsId` a rendered tabs block was given.
 	 *
 	 * @param string $rendered_block Rendered tabs block.
