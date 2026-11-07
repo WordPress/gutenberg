@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add serifs to the `formatItalic` icon so it reads as an italic "I" instead of a slash ([#86459](https://github.com/WordPress/gutenberg/issues/86459)).
+-   Add serifs to the `formatItalic` icon so it reads as an italic "I" instead of a slash ([#86467](https://github.com/WordPress/gutenberg/pull/86467)).
 
 ### Bug Fixes
 
