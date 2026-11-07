@@ -587,7 +587,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param array $style_value      A single raw style value from $block_styles array.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
 		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 * @param array $options          {
 		 *     Optional. An array of options. Default empty array.
