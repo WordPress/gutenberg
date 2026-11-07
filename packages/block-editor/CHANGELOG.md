@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
