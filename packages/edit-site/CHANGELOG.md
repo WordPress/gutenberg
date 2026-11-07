@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the theme preview's save panel visible when the browser loses focus ([#86413](https://github.com/WordPress/gutenberg/pull/86413)).
+
 ## 8.1.0 (2026-11-04)
 
 ## 8.0.0 (2026-10-20)
