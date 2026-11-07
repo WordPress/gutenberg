@@ -385,7 +385,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = $this->prepare_links( $post );
+			$links = $this->prepare_links( $post->ID );
 			// Only return resolved URIs for get requests to user theme JSON.
 			if ( $theme_json ) {
 				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
