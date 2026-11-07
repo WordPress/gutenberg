@@ -1,8 +1,9 @@
+import type { AnyAction } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 
-const getFooSelector = ( state ) => state;
+const getFooSelector: any = ( state: any ) => state;
 
 const DEPRECATION_MESSAGE =
 	'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
@@ -12,7 +13,7 @@ beforeEach( () => {
 } );
 
 const testStore = {
-	reducer: ( state = null, action ) => {
+	reducer: ( state = null, action: AnyAction ) => {
 		if ( action.type === 'RECEIVE' ) {
 			return action.items;
 		}
@@ -24,14 +25,14 @@ const testStore = {
 	},
 };
 
-async function resolve( registry, selector ) {
+async function resolve( registry: any, selector: string ) {
 	try {
 		await registry.resolveSelect( 'store' )[ selector ]();
 	} catch {}
 }
 
 describe( 'getIsResolving', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -78,7 +79,7 @@ describe( 'getIsResolving', () => {
 } );
 
 describe( 'hasStartedResolution', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -102,7 +103,7 @@ describe( 'hasStartedResolution', () => {
 } );
 
 describe( 'hasFinishedResolution', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -126,7 +127,7 @@ describe( 'hasFinishedResolution', () => {
 } );
 
 describe( 'isResolving', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -158,7 +159,7 @@ describe( 'isResolving', () => {
 } );
 
 describe( 'hasResolutionFailed', () => {
-	let registry;
+	let registry: any;
 
 	beforeEach( () => {
 		registry = createRegistry();
@@ -166,7 +167,7 @@ describe( 'hasResolutionFailed', () => {
 
 	it( 'returns false if the resolution has succeeded', async () => {
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -174,7 +175,7 @@ describe( 'hasResolutionFailed', () => {
 				return state;
 			},
 			selectors: {
-				getFoo: ( state ) => state,
+				getFoo: ( state: unknown ) => state,
 			},
 			resolvers: {
 				getFoo: () => {},
@@ -194,7 +195,7 @@ describe( 'hasResolutionFailed', () => {
 
 	it( 'returns true if the resolution has failed', async () => {
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -202,7 +203,7 @@ describe( 'hasResolutionFailed', () => {
 				return state;
 			},
 			selectors: {
-				getFoo: ( state ) => state,
+				getFoo: ( state: unknown ) => state,
 			},
 			resolvers: {
 				getFoo: () => {
@@ -224,7 +225,7 @@ describe( 'hasResolutionFailed', () => {
 
 	it( 'returns true if the resolution has failed even if the error is falsy', async () => {
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -232,7 +233,7 @@ describe( 'hasResolutionFailed', () => {
 				return state;
 			},
 			selectors: {
-				getFoo: ( state ) => state,
+				getFoo: ( state: unknown ) => state,
 			},
 			resolvers: {
 				getFoo: () => {
@@ -254,15 +255,15 @@ describe( 'hasResolutionFailed', () => {
 } );
 
 describe( 'getResolutionError', () => {
-	let registry;
-	let shouldFail;
+	let registry: any;
+	let shouldFail: boolean;
 
 	beforeEach( () => {
 		shouldFail = false;
 		registry = createRegistry();
 
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -270,7 +271,7 @@ describe( 'getResolutionError', () => {
 				return state;
 			},
 			selectors: {
-				getFoo: ( state ) => state,
+				getFoo: ( state: unknown ) => state,
 			},
 			resolvers: {
 				getFoo: () => {
@@ -336,7 +337,7 @@ describe( 'getResolutionError', () => {
 } );
 
 describe( 'hasResolvingSelectors', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -368,12 +369,12 @@ describe( 'hasResolvingSelectors', () => {
 } );
 
 describe( 'countSelectorsByStatus', () => {
-	let registry;
+	let registry: any;
 
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -381,11 +382,11 @@ describe( 'countSelectorsByStatus', () => {
 				return state;
 			},
 			selectors: {
-				getFoo: ( state ) => state,
-				getBar: ( state ) => state,
-				getBaz: ( state ) => state,
-				getFailingFoo: ( state ) => state,
-				getFailingBar: ( state ) => state,
+				getFoo: ( state: unknown ) => state,
+				getBar: ( state: unknown ) => state,
+				getBaz: ( state: unknown ) => state,
+				getFailingFoo: ( state: unknown ) => state,
+				getFailingBar: ( state: unknown ) => state,
 			},
 			resolvers: {
 				getFailingFoo: () => {
@@ -455,7 +456,7 @@ describe( 'countSelectorsByStatus', () => {
 } );
 
 describe( 'Selector arguments normalization', () => {
-	let registry;
+	let registry: any;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
