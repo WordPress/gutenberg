@@ -33,6 +33,18 @@ export default function useClickSelection() {
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
+
+				// A press on a block's own element outside its fields, such as
+				// a list item's bullet, selects the block as a whole. Stop
+				// editing so the browser drags the block, not places a caret.
+				const target = event.target as HTMLElement;
+				if (
+					node.contentEditable === 'true' &&
+					target.contentEditable === 'inherit' &&
+					target.id === `block-${ getBlockClientId( target ) }`
+				) {
+					setContentEditableWrapper( node, false );
+				}
 			}
 
 			function onMouseDown( event: MouseEvent ) {
