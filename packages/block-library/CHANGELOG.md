@@ -30,6 +30,7 @@
 
 ### Bug Fixes
 
+-   Date: Bind a Date block inserted in a Query Loop to each post's publish date, instead of saving the insert time as a fixed date that every post in the loop showed ([#86083](https://github.com/WordPress/gutenberg/pull/86083)).
 -   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
 -   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
