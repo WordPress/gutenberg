@@ -365,7 +365,11 @@ function LinkControl( {
 		}
 
 		// Preserve the URL for taxonomy entities before binding overrides it
-		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
+		if (
+			( updatedValue?.kind === 'taxonomy' ||
+				updatedValue?.kind === 'post-type' ) &&
+			updatedValue?.url
+		) {
 			entityUrlFallbackRef.current = updatedValue.url;
 		}
 
@@ -565,7 +569,7 @@ function LinkControl( {
 	const previewValue = useMemo( () => {
 		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
 		if (
-			value?.kind === 'taxonomy' &&
+			( value?.kind === 'taxonomy' || value?.kind === 'post-type' ) &&
 			! value?.url &&
 			entityUrlFallbackRef.current
 		) {

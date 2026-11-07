@@ -3,6 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 import {
 	isInsideRootBlock,
 	getBlockClientId,
@@ -93,6 +94,9 @@ export default function useSelectAll() {
 					node.ownerDocument
 						.defaultView!.getSelection()!
 						.removeAllRanges();
+					// The parent is selected as a whole, so it must not take
+					// focus inside the editing host the blocks' text needed.
+					setContentEditableWrapper( node, false );
 					selectBlock( rootClientId );
 				}
 				return;

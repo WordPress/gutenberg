@@ -13,31 +13,34 @@ import { unlock } from '../../lock-unlock';
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
 type NoteToolbarButtonProps = {
-	clientId: string;
+	clientIds: string[];
 	count: number;
 	onClick: () => void;
 };
 
 function NoteToolbarButton( {
-	clientId,
+	clientIds,
 	count,
 	onClick,
 }: NoteToolbarButtonProps ) {
 	const { canAddNote, shortcut } = useSelect(
 		( select ) => {
 			const { getBlockName, isBlockValid } = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
 			return {
-				canAddNote:
-					isBlockValid( clientId ) &&
-					blockName !== 'core/freeform' &&
-					blockName !== getUnregisteredTypeHandlerName(),
+				canAddNote: clientIds.every( ( clientId: string ) => {
+					const blockName = getBlockName( clientId );
+					return (
+						isBlockValid( clientId ) &&
+						blockName !== 'core/freeform' &&
+						blockName !== getUnregisteredTypeHandlerName()
+					);
+				} ),
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
 			};
 		},
-		[ clientId ]
+		[ clientIds ]
 	);
 
 	if ( ! canAddNote ) {
@@ -50,7 +53,7 @@ function NoteToolbarButton( {
 			label={
 				count
 					? sprintf(
-							// translators: %d: Number of notes on the block.
+							// translators: %d: Number of notes on the selected blocks.
 							_n(
 								'Add note (%d note)',
 								'Add note (%d notes)',
@@ -68,14 +71,14 @@ function NoteToolbarButton( {
 
 type AddNoteToolbarButtonProps = {
 	/**
-	 * Number of notes on the selected block.
+	 * Number of notes on the selected blocks.
 	 */
 	count: number;
 
 	/**
-	 * Called with the block's client ID to start a new note.
+	 * Called with the selected blocks' client IDs to start a new note.
 	 */
-	onClick: ( clientId: string ) => void;
+	onClick: ( clientIds: string[] ) => void;
 };
 
 export function AddNoteToolbarButton( {
@@ -85,11 +88,11 @@ export function AddNoteToolbarButton( {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			{ ( { clientIds }: { clientIds: string[] } ) =>
-				clientIds.length === 1 && (
+				clientIds.length > 0 && (
 					<NoteToolbarButton
-						clientId={ clientIds[ 0 ] }
+						clientIds={ clientIds }
 						count={ count }
-						onClick={ () => onClick( clientIds[ 0 ] ) }
+						onClick={ () => onClick( clientIds ) }
 					/>
 				)
 			}
