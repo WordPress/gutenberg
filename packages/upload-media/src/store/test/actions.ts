@@ -12,7 +12,11 @@ import { store as uploadStore } from '..';
 import { ItemStatus, OperationType, type QueueItem } from '../types';
 import { unlock } from '../../lock-unlock';
 import { ErrorCode, UploadError } from '../../upload-error';
-import { vipsCancelOperations, vipsResizeImage } from '../utils';
+import {
+	vipsCancelOperations,
+	vipsConvertImageFormat,
+	vipsResizeImage,
+} from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -42,6 +46,7 @@ vi.mock(
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
+			maybeRecycleVipsWorker: vi.fn(),
 		} ) as unknown as typeof import( '../utils' )
 );
 
@@ -60,8 +65,6 @@ vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 	};
 } );
 
-// Import the mocked modules to access the mock functions.
-
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
@@ -77,6 +80,18 @@ const jpegFile = new File( [ 'foo' ], 'example.jpg', {
 const mp4File = new File( [ 'foo' ], 'amazing-video.mp4', {
 	lastModified: 1234567891,
 	type: 'video/mp4',
+} );
+
+const jxlFile = new File( [ 'foo' ], 'example.jxl', {
+	lastModified: 1234567891,
+	type: 'image/jxl',
+} );
+
+// Windows and most Linux distributions have no `.jxl` entry in their MIME
+// registry, so the browser hands back an empty `File.type`.
+const untypedJxlFile = new File( [ 'foo' ], 'example.jxl', {
+	lastModified: 1234567891,
+	type: '',
 } );
 
 describe( 'actions', () => {
@@ -222,6 +237,71 @@ describe( 'actions', () => {
 				] )
 			);
 			// Server should not generate sub-sizes for vips-supported images.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'uploads a JPEG XL as-is and keeps sub-size generation on the client', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
+			expect( updatedItem.file ).toBe( jxlFile );
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'labels a JPEG XL as image/jxl when the OS reports no mime type', async () => {
+			/*
+			 * On systems with no `.jxl` MIME mapping the type is an empty
+			 * string, which vips cannot pick a loader for.
+			 */
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: untypedJxlFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.file.type ).toBe( 'image/jxl' );
+			expect( updatedItem.file.name ).toBe( untypedJxlFile.name );
+			expect( updatedItem.sourceFile ).toBe( updatedItem.file );
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				false
 			);

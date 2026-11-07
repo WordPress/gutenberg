@@ -102,6 +102,28 @@ function loadVipsModule(): Promise<
 }
 
 /**
+ * Runs a call into the vips worker, holding the worker so a recycle cannot
+ * drop it mid-call.
+ *
+ * Loads JPEG XL support first when an input or output is JXL.
+ *
+ * @param types    MIME types the call reads or writes.
+ * @param callback Vips call to run.
+ * @return The callback's result.
+ */
+function runVipsCall< T >(
+	types: string[],
+	callback: () => Promise< T >
+): Promise< T > {
+	return withVipsWorkerHeld( async () => {
+		if ( types.includes( 'image/jxl' ) ) {
+			await vipsEnsureJxlSupport();
+		}
+		return callback();
+	} );
+}
+
+/**
  * Converts an image to a different format using vips in a web worker.
  *
  * @param id      Queue item ID.
@@ -114,17 +136,24 @@ export async function vipsConvertImageFormat(
 	id: QueueItemId,
 	file: File,
 	type:
-		'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' | 'image/gif',
+		| 'image/jpeg'
+		| 'image/png'
+		| 'image/webp'
+		| 'image/avif'
+		| 'image/gif'
+		| 'image/jxl',
 	options: VipsConvertOptions = {}
 ) {
 	const { vipsConvertImageFormat: convertImageFormat } =
 		await loadVipsModule();
-	const buffer = await convertImageFormat(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		type,
-		options
+	const buffer = await runVipsCall( [ file.type, type ], async () =>
+		convertImageFormat(
+			id,
+			await file.arrayBuffer(),
+			file.type,
+			type,
+			options
+		)
 	);
 	const ext = type.split( '/' )[ 1 ];
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
@@ -166,10 +195,13 @@ export async function vipsEncodeCanvasAsJpeg(
 		throw new Error( 'Could not get canvas 2d context' );
 	}
 	const pixels = ctx.getImageData( 0, 0, width, height ).data.buffer;
-	const buffer = await encodePixelsAsJpeg( id, pixels, width, height, {
-		quality,
-		metadataSource: await source.arrayBuffer(),
-	} );
+	const metadataSource = await source.arrayBuffer();
+	const buffer = await runVipsCall( [], () =>
+		encodePixelsAsJpeg( id, pixels, width, height, {
+			quality,
+			metadataSource,
+		} )
+	);
 	return new Blob( [ buffer as ArrayBuffer ], { type: 'image/jpeg' } );
 }
 
@@ -187,11 +219,8 @@ export async function vipsCompressImage(
 	options: VipsConvertOptions = {}
 ) {
 	const { vipsCompressImage: compressImage } = await loadVipsModule();
-	const buffer = await compressImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		options
+	const buffer = await runVipsCall( [ file.type ], async () =>
+		compressImage( id, await file.arrayBuffer(), file.type, options )
 	);
 	return new File(
 		[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
@@ -212,7 +241,8 @@ export async function vipsHasTransparency( url: string ) {
 	if ( ! response.ok ) {
 		throw new Error( `Failed to fetch image: ${ response.status }` );
 	}
-	return hasTransparency( await response.arrayBuffer() );
+	const buffer = await response.arrayBuffer();
+	return runVipsCall( [], () => hasTransparency( buffer ) );
 }
 
 /**
@@ -224,7 +254,7 @@ export async function vipsHasTransparency( url: string ) {
  */
 export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ) {
 	const { vipsGetUltraHdrInfo: getUltraHdrInfo } = await loadVipsModule();
-	return getUltraHdrInfo( buffer );
+	return runVipsCall( [], () => getUltraHdrInfo( buffer ) );
 }
 
 /**
@@ -262,13 +292,15 @@ export async function vipsResizeImage(
 
 	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await resizeImage( id, await file.arrayBuffer(), file.type, resize, {
-			smartCrop,
-			quality,
-			stripMeta,
-			maxBitdepth,
-			preserveAnimation,
-		} );
+		await runVipsCall( [ file.type ], async () =>
+			resizeImage( id, await file.arrayBuffer(), file.type, resize, {
+				smartCrop,
+				quality,
+				stripMeta,
+				maxBitdepth,
+				preserveAnimation,
+			} )
+		);
 
 	let fileName = file.name;
 	const wasResized = originalWidth > width || originalHeight > height;
@@ -334,11 +366,10 @@ export async function vipsRotateImage(
 	}
 
 	const { vipsRotateImage: rotateImage } = await loadVipsModule();
-	const { buffer, width, height } = await rotateImage(
-		id,
-		await file.arrayBuffer(),
-		file.type,
-		orientation
+	const { buffer, width, height } = await runVipsCall(
+		[ file.type ],
+		async () =>
+			rotateImage( id, await file.arrayBuffer(), file.type, orientation )
 	);
 
 	// Add '-rotated' suffix to filename, matching WordPress core behavior.
@@ -377,6 +408,21 @@ export async function vipsCancelOperations( id: QueueItemId ) {
 }
 
 /**
+ * Ensures JXL (JPEG XL) support is available in the vips worker.
+ *
+ * Lazily loads the vips-jxl.wasm module (a separate bundler chunk) and
+ * signals the worker to re-initialize vips with JXL dynamic library
+ * support. The wrappers above call it for any image whose input or output
+ * type is `image/jxl`.
+ *
+ * Safe to call multiple times — the underlying import and RPC are cached.
+ */
+export async function vipsEnsureJxlSupport(): Promise< void > {
+	const { vipsEnsureJxlSupport: ensureJxlSupport } = await loadVipsModule();
+	return ensureJxlSupport();
+}
+
+/**
  * Terminates the vips worker if it has been loaded.
  *
  * If the vips module has not been loaded yet (i.e., no image processing
@@ -390,6 +436,32 @@ export async function vipsCancelOperations( id: QueueItemId ) {
 export function terminateVipsWorker(): void {
 	if ( vipsModule ) {
 		vipsModule.terminateVipsWorker();
+	}
+}
+
+/**
+ * Number of calls into the vips worker in flight.
+ */
+let heldVipsOperations = 0;
+
+/**
+ * Runs vips work that the worker must not be recycled during.
+ *
+ * Every vips wrapper in this file runs through it. Recycling mid-call would
+ * drop the in-flight request, and drop worker-side state such as JXL support
+ * that a later call in the same callback relies on.
+ *
+ * @param callback Vips work to run.
+ * @return The callback's result.
+ */
+export async function withVipsWorkerHeld< T >(
+	callback: () => Promise< T >
+): Promise< T > {
+	heldVipsOperations++;
+	try {
+		return await callback();
+	} finally {
+		heldVipsOperations--;
 	}
 }
 
@@ -428,7 +500,8 @@ export function maybeRecycleVipsWorker(
 
 	if (
 		completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE &&
-		activeImageProcessingCount === 0
+		activeImageProcessingCount === 0 &&
+		heldVipsOperations === 0
 	) {
 		terminateVipsWorker();
 		completedVipsOperations = 0;

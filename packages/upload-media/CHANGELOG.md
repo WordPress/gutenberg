@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add JPEG XL (JXL) support. A JXL upload keeps its format, and its sub-sizes are generated as JXL client-side via vips. The vips-jxl.wasm module is loaded lazily on first use, keeping it out of the default bundle ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

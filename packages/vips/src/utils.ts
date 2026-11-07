@@ -14,8 +14,10 @@
  */
 export function supportsQuality(
 	type: string
-): type is 'image/jpeg' | 'image/webp' | 'image/avif' {
-	return [ 'image/jpeg', 'image/webp', 'image/avif' ].includes( type );
+): type is 'image/jpeg' | 'image/webp' | 'image/avif' | 'image/jxl' {
+	return [ 'image/jpeg', 'image/webp', 'image/avif', 'image/jxl' ].includes(
+		type
+	);
 }
 
 /**

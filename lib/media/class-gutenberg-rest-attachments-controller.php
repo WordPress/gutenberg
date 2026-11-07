@@ -1187,6 +1187,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$size = $skip_dimension_read ? array( 0, 0 ) : wp_getimagesize( $path );
 
+		// getimagesize() cannot read JPEG XL, which the client generates
+		// sub-sizes in when the upload is a JXL.
+		if ( ! $size && 'image/jxl' === $type ) {
+			$jxl_size = gutenberg_get_jxl_info( $path );
+			$size     = $jxl_size ? array( $jxl_size['width'], $jxl_size['height'] ) : false;
+		}
+
 		if ( ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).
 			wp_delete_file( $path );

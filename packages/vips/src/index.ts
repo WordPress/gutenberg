@@ -26,7 +26,160 @@ interface EmscriptenModule {
 
 let cleanup: () => void;
 
-let vipsPromise: Promise< typeof Vips > | undefined;
+/**
+ * A vips instance, and the operations using it.
+ */
+interface VipsInstance {
+	promise: Promise< typeof Vips >;
+	/**
+	 * Whether the instance was started with the JXL dynamic library. Known
+	 * when the init starts, so an operation arriving mid-init can tell whether
+	 * the pending instance will do.
+	 */
+	hasJxl: boolean;
+	/**
+	 * Operations holding the instance. A retired instance is shut down once
+	 * this reaches 0, so it is never shut down under an operation using it.
+	 */
+	users: number;
+	retired: boolean;
+}
+
+/**
+ * The instance new operations use.
+ */
+let currentVips: VipsInstance | undefined;
+
+/**
+ * Inlined bytes of the lazily loaded vips-jxl.wasm module.
+ *
+ * JXL support is loaded on demand the first time a JXL image is processed.
+ * The bytes are produced by dynamically importing `wasm-vips/vips-jxl.wasm`
+ * in the main thread (where the bundler can split it into its own chunk) and
+ * sent here via RPC. Kept out of the worker bundle so the worker stays small
+ * when JXL is unused.
+ */
+let jxlWasmBytes: ArrayBuffer | undefined;
+
+/**
+ * Whether the last instance started with the JXL library failed to come up.
+ *
+ * Operations that do not need JXL then start a plain instance, so a broken
+ * JXL library only fails JXL work. A JXL operation still retries it.
+ */
+let jxlInitFailed = false;
+
+/**
+ * Sets the inlined bytes of the vips-jxl.wasm module.
+ *
+ * Call this from the main thread before processing a JXL image. The bytes
+ * come from the lazily loaded `wasm-vips/vips-jxl.wasm` module; they are
+ * wrapped in a Blob URL on demand (see `getWasmUrl`).
+ *
+ * Takes a bare `ArrayBuffer` rather than a typed array so the RPC layer
+ * recognises it as transferable: comctx only fast-paths `ArrayBuffer` and
+ * `Array`, and walks anything else key by key, which for a multi-megabyte
+ * typed array means millions of allocations on the calling thread.
+ *
+ * @param bytes Inlined bytes of the vips-jxl.wasm module.
+ */
+export function setJxlWasm( bytes: ArrayBuffer ): void {
+	jxlWasmBytes = bytes;
+	jxlInitFailed = false;
+}
+
+/**
+ * Shuts down a retired instance once no operation is using it. Each holds a
+ * large WASM heap that would otherwise be stranded for the worker's lifetime.
+ *
+ * @param instance The instance.
+ */
+function maybeShutDownVips( instance: VipsInstance ): void {
+	if ( ! instance.retired || instance.users > 0 ) {
+		return;
+	}
+	instance.promise.then(
+		( vips ) => vips.shutdown(),
+		// Nothing to reclaim if the instance never came up.
+		() => {}
+	);
+}
+
+/**
+ * Takes a vips instance for one operation.
+ *
+ * Reuses the current instance unless the operation needs JXL and the instance
+ * was started without it, in which case the instance is retired and a
+ * JXL-enabled one started. Call `release()` in a `finally` once done.
+ *
+ * @param needsJxl Whether the operation reads or writes JXL.
+ * @return The instance, and a function to release it.
+ */
+function leaseVips( needsJxl: boolean ): {
+	vips: Promise< typeof Vips >;
+	release: () => void;
+} {
+	if ( currentVips && needsJxl && jxlWasmBytes && ! currentVips.hasJxl ) {
+		currentVips.retired = true;
+		maybeShutDownVips( currentVips );
+		currentVips = undefined;
+	}
+
+	if ( ! currentVips ) {
+		currentVips = startVips(
+			Boolean( jxlWasmBytes ) && ( needsJxl || ! jxlInitFailed )
+		);
+	}
+
+	const instance = currentVips;
+	instance.users++;
+
+	let released = false;
+	return {
+		vips: instance.promise,
+		release: () => {
+			if ( released ) {
+				return;
+			}
+			released = true;
+			instance.users--;
+			maybeShutDownVips( instance );
+		},
+	};
+}
+
+/**
+ * Whether a buffer holds a JPEG XL image, either a naked codestream or an
+ * ISOBMFF container.
+ *
+ * @param buffer Image buffer.
+ * @return Whether the buffer is JXL.
+ */
+function isJxlBuffer( buffer: ArrayBuffer ): boolean {
+	const bytes = new Uint8Array(
+		buffer,
+		0,
+		Math.min( 12, buffer.byteLength )
+	);
+	if ( bytes[ 0 ] === 0xff && bytes[ 1 ] === 0x0a ) {
+		return true;
+	}
+	const container = [
+		0, 0, 0, 0x0c, 0x4a, 0x58, 0x4c, 0x20, 0x0d, 0x0a, 0x87, 0x0a,
+	];
+	return (
+		bytes.length === container.length &&
+		container.every( ( byte, i ) => bytes[ i ] === byte )
+	);
+}
+
+/**
+ * Encoder effort for JXL output.
+ *
+ * The default of 7 is too slow for interactive use; 3 balances speed and
+ * compression.
+ */
+const JXL_SAVE_EFFORT = 3;
 
 /**
  * Bytes of WASM memory a decoded pixel occupies.
@@ -95,7 +248,7 @@ function logAnimationFallback(
  * loads them (including the HEIF dynamic library) by fetching a URL, so the
  * bytes are wrapped in a Blob URL the first time each is requested.
  */
-const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+const wasmUrls = new WeakMap< object, string >();
 
 /**
  * Returns a Blob URL for an inlined WASM binary, creating it on first use.
@@ -103,7 +256,7 @@ const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
  * @param bytes The inlined WASM binary.
  * @return A Blob URL pointing at the binary.
  */
-function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > | ArrayBuffer ): string {
 	let url = wasmUrls.get( bytes );
 	if ( ! url ) {
 		url = URL.createObjectURL(
@@ -115,60 +268,95 @@ function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
 }
 
 /**
- * Instantiates and returns a new vips instance.
+ * Starts a new vips instance.
  *
- * Reuses any existing instance.
+ * @param withJxl Whether to load the JXL dynamic library.
+ * @return The instance.
  */
-async function getVips(): Promise< typeof Vips > {
-	if ( vipsPromise ) {
-		return await vipsPromise;
+function startVips( withJxl: boolean ): VipsInstance {
+	const dynamicLibraries = [ 'vips-heif.wasm' ];
+	if ( withJxl ) {
+		dynamicLibraries.push( 'vips-jxl.wasm' );
 	}
 
-	vipsPromise = Vips( {
-		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
-		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as a Uint8Array at build time and exposed
-			// here as Blob URLs. This eliminates the need for separate file
-			// downloads and avoids issues with hosts not serving WASM files
-			// with correct MIME types, while keeping the inlined bytes
-			// compressible (see the build-time binary encoding).
-			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return getWasmUrl( VipsModule );
-			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return getWasmUrl( VipsHeifModule );
-			}
-			return fileName;
-		},
-		preRun: ( module: EmscriptenModule ) => {
-			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
-			module.setAutoDeleteLater( true );
-			module.setDelayFunction( ( fn: () => void ) => {
-				cleanup = fn;
+	// The promise is assigned below, as its failure handling refers back to
+	// the instance.
+	const instance = {
+		hasJxl: withJxl,
+		users: 0,
+		retired: false,
+	} as VipsInstance;
+
+	instance.promise = ( async () => {
+		let vipsInstance: typeof Vips;
+		try {
+			vipsInstance = await Vips( {
+				// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
+				// JXL is loaded on demand when a JXL image is processed, via
+				// setJxlWasm() which is called from the main thread after the
+				// `wasm-vips/vips-jxl.wasm` module is dynamically imported.
+				dynamicLibraries,
+				locateFile: ( fileName: string ) => {
+					// WASM files are inlined as a Uint8Array at build time and exposed
+					// here as Blob URLs. This eliminates the need for separate file
+					// downloads and avoids issues with hosts not serving WASM files
+					// with correct MIME types, while keeping the inlined bytes
+					// compressible (see the build-time binary encoding).
+					if ( fileName.endsWith( 'vips.wasm' ) ) {
+						return getWasmUrl( VipsModule );
+					} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+						return getWasmUrl( VipsHeifModule );
+					} else if (
+						fileName.endsWith( 'vips-jxl.wasm' ) &&
+						jxlWasmBytes
+					) {
+						return getWasmUrl( jxlWasmBytes );
+					}
+					return fileName;
+				},
+				preRun: ( module: EmscriptenModule ) => {
+					// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
+					module.setAutoDeleteLater( true );
+					module.setDelayFunction( ( fn: () => void ) => {
+						cleanup = fn;
+					} );
+				},
+				// Redirect wasm-vips internal stdout/stderr to prevent console errors
+				// (e.g. AVIF codec warnings that are not actionable for users).
+				// Set globalThis.__vipsDebug to a function to capture this output during development.
+				print: ( text: string ) => {
+					( globalThis as any ).__vipsDebug?.( text );
+				},
+				printErr: ( text: string ) => {
+					( globalThis as any ).__vipsDebug?.( text );
+				},
 			} );
-		},
-		// Redirect wasm-vips internal stdout/stderr to prevent console errors
-		// (e.g. AVIF codec warnings that are not actionable for users).
-		// Set globalThis.__vipsDebug to a function to capture this output during development.
-		print: ( text: string ) => {
-			( globalThis as any ).__vipsDebug?.( text );
-		},
-		printErr: ( text: string ) => {
-			( globalThis as any ).__vipsDebug?.( text );
-		},
-	} );
+		} catch ( error ) {
+			// Drop the failed instance so the next call retries instead of
+			// replaying this failure for the rest of the worker's life.
+			if ( currentVips === instance ) {
+				currentVips = undefined;
+			}
+			if ( withJxl ) {
+				jxlInitFailed = true;
+			}
+			throw error;
+		}
 
-	const vipsInstance = await vipsPromise;
+		if ( withJxl ) {
+			jxlInitFailed = false;
+		}
 
-	// Disable the operation cache to prevent out-of-memory crashes
-	// during repeated image processing. libvips caches results from
-	// previous operations which accumulates WASM memory over time.
-	// See https://github.com/WordPress/gutenberg/issues/76706
-	vipsInstance.Cache.max( 0 );
+		// Disable the operation cache to prevent out-of-memory crashes
+		// during repeated image processing. libvips caches results from
+		// previous operations which accumulates WASM memory over time.
+		// See https://github.com/WordPress/gutenberg/issues/76706
+		vipsInstance.Cache.max( 0 );
 
-	return vipsInstance;
+		return vipsInstance;
+	} )();
+
+	return instance;
 }
 
 /**
@@ -216,6 +404,9 @@ export async function convertImageFormat(
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	const lease = leaseVips(
+		'image/jxl' === inputType || 'image/jxl' === outputType
+	);
 
 	try {
 		let strOptions = '';
@@ -237,7 +428,7 @@ export async function convertImageFormat(
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
 
-		const vips = await getVips();
+		const vips = await lease.vips;
 		const image = vips.Image.newFromBuffer(
 			buffer,
 			strOptions,
@@ -296,6 +487,10 @@ export async function convertImageFormat(
 			}
 		}
 
+		if ( 'image/jxl' === outputType ) {
+			saveOptions.effort = JXL_SAVE_EFFORT;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 		const result = outBuffer.buffer;
 
@@ -304,6 +499,7 @@ export async function convertImageFormat(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		lease.release();
 	}
 }
 
@@ -619,6 +815,10 @@ function buildSaveOptions( {
 		}
 	}
 
+	if ( 'image/jxl' === type ) {
+		saveOptions.effort = JXL_SAVE_EFFORT;
+	}
+
 	return saveOptions;
 }
 
@@ -824,9 +1024,10 @@ export async function resizeImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	const lease = leaseVips( 'image/jxl' === type );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -1002,6 +1203,7 @@ export async function resizeImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		lease.release();
 	}
 }
 
@@ -1030,8 +1232,9 @@ interface UltraHdrInfo {
 export async function getUltraHdrInfo(
 	buffer: ArrayBuffer
 ): Promise< UltraHdrInfo | null > {
+	const lease = leaseVips( false );
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 		const image = vips.Image.uhdrloadBuffer( buffer );
 		if ( ! image.gainmap ) {
 			cleanup?.();
@@ -1062,6 +1265,8 @@ export async function getUltraHdrInfo(
 		// Not an UltraHDR image (or libultrahdr decoder unavailable).
 		cleanup?.();
 		return null;
+	} finally {
+		lease.release();
 	}
 }
 
@@ -1097,9 +1302,10 @@ export async function rotateImage(
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
+	const lease = leaseVips( 'image/jxl' === type );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
@@ -1191,6 +1397,7 @@ export async function rotateImage(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		lease.release();
 	}
 }
 
@@ -1211,25 +1418,30 @@ export async function rotateImage(
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	const vips = await getVips();
-	const image = vips.Image.newFromBuffer( buffer );
+	const lease = leaseVips( isJxlBuffer( buffer ) );
+	try {
+		const vips = await lease.vips;
+		const image = vips.Image.newFromBuffer( buffer );
 
-	if ( ! image.hasAlpha() ) {
+		if ( ! image.hasAlpha() ) {
+			cleanup?.();
+			return false;
+		}
+
+		// `min()` on the alpha band is one read of a single channel of frame 0.
+		// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
+		// inputs here) use 65535. Anything lower means at least one pixel is
+		// transparent.
+		const alpha = image.extractBand( image.bands - 1 );
+		const minAlpha = alpha.min();
+		const opaqueValue = image.format === 'ushort' ? 65535 : 255;
+
 		cleanup?.();
-		return false;
+
+		return minAlpha < opaqueValue;
+	} finally {
+		lease.release();
 	}
-
-	// `min()` on the alpha band is one read of a single channel of frame 0.
-	// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
-	// inputs here) use 65535. Anything lower means at least one pixel is
-	// transparent.
-	const alpha = image.extractBand( image.bands - 1 );
-	const minAlpha = alpha.min();
-	const opaqueValue = image.format === 'ushort' ? 65535 : 255;
-
-	cleanup?.();
-
-	return minAlpha < opaqueValue;
 }
 
 /**
@@ -1258,9 +1470,10 @@ export async function encodePixelsAsJpeg(
 	const { quality = 0.82, metadataSource } = options;
 
 	inProgressOperations.add( id );
+	const lease = leaseVips( false );
 
 	try {
-		const vips = await getVips();
+		const vips = await lease.vips;
 
 		// JPEG has no alpha channel and decoded photo pixels are opaque, so
 		// the alpha band is dropped rather than flattened.
@@ -1296,6 +1509,7 @@ export async function encodePixelsAsJpeg(
 		return result;
 	} finally {
 		inProgressOperations.delete( id );
+		lease.release();
 	}
 }
 
@@ -1339,4 +1553,5 @@ export {
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	encodePixelsAsJpeg as vipsEncodePixelsAsJpeg,
 	cancelOperations as vipsCancelOperations,
+	setJxlWasm as vipsSetJxlWasm,
 };
