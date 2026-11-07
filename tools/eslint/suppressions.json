@@ -7044,17 +7044,7 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/redux-store/test/combine-reducers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/redux-store/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/test/keyed-reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
