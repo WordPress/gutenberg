@@ -988,4 +988,36 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$this->assertInstanceOf( WP_Style_Engine_CSS_Rules_Store_Gutenberg::class, $store );
 		$this->assertSame( array(), $store->get_all_rules(), 'Expected no rule to be stored.' );
 	}
+
+	/**
+	 * Tests that non-string style values are left out of the returned declarations,
+	 * since {@see WP_Style_Engine_CSS_Declarations_Gutenberg::add_declaration()} would drop them from the CSS anyway.
+	 *
+	 * @covers ::gutenberg_style_engine_get_styles
+	 */
+	public function test_should_omit_non_string_values_from_declarations() {
+		$block_styles = array(
+			'typography' => array(
+				'textColumns' => 2,
+				'fontSize'    => '12px',
+			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'  => 5,
+					'left' => '1em',
+				),
+			),
+		);
+
+		$this->assertSame(
+			array(
+				'css'          => 'padding-left:1em;font-size:12px;',
+				'declarations' => array(
+					'padding-left' => '1em',
+					'font-size'    => '12px',
+				),
+			),
+			gutenberg_style_engine_get_styles( $block_styles )
+		);
+	}
 }
