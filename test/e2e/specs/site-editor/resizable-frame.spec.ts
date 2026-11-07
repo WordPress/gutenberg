@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 // Whether the run targets the extensible site editor (v2).
