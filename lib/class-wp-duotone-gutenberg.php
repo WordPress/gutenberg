@@ -814,7 +814,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @return null|array<string, string> An array of global style block slugs, keyed on the block name.
+	 * @return array<string, string> An array of global style block slugs, keyed on the block name.
 	 */
 	private static function get_all_global_style_block_names() {
 		if ( isset( self::$global_styles_block_names ) ) {

@@ -1313,7 +1313,7 @@ _Parameters_
 
 _Returns_
 
-- `ResourcePermissionsResolution< IdType >`: Entity records data.
+- `ResourcePermissionsResolution< IdType >`: Resource permissions and resolution details.
 
 _Changelog_
 
