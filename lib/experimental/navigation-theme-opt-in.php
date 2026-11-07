@@ -123,12 +123,15 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
  * @param stdClass $args        An object of wp_nav_menu() arguments.
  *
  * @return string The menu item's updated HTML output.
+ *
+ * @phpstan-param WP_Post&object{type: string, content?: string} $item
+ * @phpstan-param stdClass&object{before: string, after: string} $args
  */
 function gutenberg_output_block_nav_menu_item( $item_output, $item, $depth, $args ) {
 	if ( 'block' === $item->type ) {
 		$item_output = $args->before;
 		/** This filter is documented in wp-includes/post-template.php */
-		$item_output .= apply_filters( 'the_content', $item->content );
+		$item_output .= apply_filters( 'the_content', $item->content ?? '' );
 		$item_output .= $args->after;
 	}
 
@@ -338,6 +341,8 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
  *
  * @param int     $item_id Menu item ID.
  * @param WP_Post $item    Menu item data object.
+ *
+ * @phpstan-param WP_Post&object{type: string, content?: string} $item
  */
 function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 	if ( 'block' === $item->type ) {
@@ -345,7 +350,7 @@ function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
 				<?php _e( 'Content', 'gutenberg' ); ?><br />
-				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ?? '' ) ); ?></textarea>
 			</label>
 		</p>
 		<?php

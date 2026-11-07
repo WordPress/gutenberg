@@ -5,15 +5,3 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: ../../lib/class-wp-rest-global-styles-controller-gutenberg.php
-
-		-
-			message: '#^Access to an undefined property WP_Post\:\:\$content\.$#'
-			identifier: property.notFound
-			count: 2
-			path: ../../lib/experimental/navigation-theme-opt-in.php
-
-		-
-			message: '#^Access to an undefined property WP_Post\:\:\$type\.$#'
-			identifier: property.notFound
-			count: 2
-			path: ../../lib/experimental/navigation-theme-opt-in.php
