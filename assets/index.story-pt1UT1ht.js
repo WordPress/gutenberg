@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./shortcut-BgkxKz8q.js";var i,a,Template,o,s;function init_index_story(){return(init_index_story=e((()=>{n(),i=t(),a={tags:[`manifest`],component:r,title:`Components/@wordpress-components/Utilities/Shortcut`,id:`components-shortcut`,parameters:{controls:{expanded:!0},docs:{canvas:{sourceState:`shown`}},componentStatus:{status:`recommended`,whereUsed:`global`}}},Template=e=>(0,i.jsx)(r,{shortcut:`Ctrl + S`,...e}),o=Template.bind({}),s=Template.bind({}),s.args={...o.args,shortcut:{display:`Ctrl + L`,ariaLabel:`Load`}},o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`props => {
+  return <Shortcut shortcut="Ctrl + S" {...props} />;
+}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`props => {
+  return <Shortcut shortcut="Ctrl + S" {...props} />;
+}`,...s.parameters?.docs?.source}}}})))()}init_index_story();export{o as Default,s as WithAriaLabel,a as default};

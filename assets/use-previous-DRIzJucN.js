@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{n as t,t as n}from"./react-Cd8OJmTE.js";function usePrevious(e){let t=(0,n.useRef)(void 0);return(0,n.useEffect)(()=>{t.current=e},[e]),t.current}function init_use_previous(){return(init_use_previous=e((()=>{t()})))()}export{usePrevious as n,init_use_previous as t};

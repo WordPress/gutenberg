@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function serializeValue(e){if(e==null)return``;if(typeof e==`string`)return e;try{return JSON.stringify(e)}catch{return String(e)}}function init_serializeValue(){return(init_serializeValue=e((()=>{})))()}export{serializeValue as n,init_serializeValue as t};

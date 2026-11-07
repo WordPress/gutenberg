@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";var t,n,r;function init_visuallyHidden(){return(init_visuallyHidden=e((()=>{t={clipPath:`inset(50%)`,overflow:`hidden`,whiteSpace:`nowrap`,border:0,padding:0,width:1,height:1,margin:-1},n={...t,position:`fixed`,margin:0,top:0,left:0},r={...t,position:`absolute`}})))()}export{n,r,init_visuallyHidden as t};
