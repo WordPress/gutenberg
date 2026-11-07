@@ -434,6 +434,27 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 }
 
 /**
+ * Whether a title is exactly what was typed.
+ *
+ * Compares words, not the strings typed, so punctuation does not count: for the search
+ * "coffee beans", "Coffee Beans" and "Coffee Beans." are both exact, and
+ * "Coffee Beans, Lightly Roasted" is not.
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return Whether the title's words are the words typed, in the same order.
+ */
+function isExactTitle( title: string, searchTokens: string[] ): boolean {
+	const titleTokens = tokenize( title || '' );
+
+	return (
+		titleTokens.length > 0 &&
+		titleTokens.join( ' ' ) === searchTokens.join( ' ' )
+	);
+}
+
+/**
  * What to sort, and how.
  */
 type SortOptions = {
@@ -463,6 +484,7 @@ type SortOptions = {
  *    beans"
  * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
+ * 6. Exact title: "Coffee beans" will rank above "Coffee beans, lightly roasted"
  *
  * @param options
  * @param options.results
@@ -482,6 +504,7 @@ export function sortResults( {
 		...getTitleMatch( result.title, search ),
 		type: getTypeRank( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
+		exact: isExactTitle( result.title, searchTokens ),
 	} ) );
 
 	scored.sort(
@@ -499,7 +522,10 @@ export function sortResults( {
 			// Rank by how much of the matched word the search contains: the search
 			// "cat" ranks the title "Cats" above the title "Caterpillar" since cat is 75% of "Cats"
 			// and only 27% of "Caterpillar"
-			b.score - a.score
+			b.score - a.score ||
+			// Then a title that is exactly the search: the search "coffee beans" ranks the title
+			// "Coffee Beans" above "Coffee Beans, Lightly Roasted"
+			Number( b.exact ) - Number( a.exact )
 	);
 
 	return scored.map( ( { result } ) => result );

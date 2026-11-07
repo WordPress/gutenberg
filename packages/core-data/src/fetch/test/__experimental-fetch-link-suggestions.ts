@@ -561,6 +561,13 @@ describe( 'sortResults', () => {
 	it( 'orders results to prefer direct matches over sub matches', () => {
 		const results = [
 			{
+				id: 3,
+				title: 'News Flash News',
+				url: 'http://wordpress.local/news-flash-news/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
 				id: 1,
 				title: 'News',
 				url: 'http://wordpress.local/news/',
@@ -571,13 +578,6 @@ describe( 'sortResults', () => {
 				id: 2,
 				title: 'Newspaper',
 				url: 'http://wordpress.local/newspaper/',
-				type: 'page',
-				kind: 'post-type',
-			},
-			{
-				id: 3,
-				title: 'News Flash News',
-				url: 'http://wordpress.local/news-flash-news/',
 				type: 'page',
 				kind: 'post-type',
 			},
@@ -593,10 +593,46 @@ describe( 'sortResults', () => {
 			( result ) => result.title
 		);
 		expect( order ).toEqual( [
-			'News', // begins with 'News', and has the word whole
-			'News Flash News', // same as above, repeating the word does not increase the ranking
+			'News', // the whole title is the search
 			'News', // Same as the above, ordered by original order since it ranks the same
+			'News Flash News', // begins with 'News' and has the word whole, but has words the search does not
 			'Newspaper', // has the word inside a longer one, not the full word
+		] );
+	} );
+
+	it( 'ranks a title that is the words searched above a longer one, whatever the punctuation', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Beans, Lightly Roasted',
+				url: 'http://wordpress.local/coffee-beans-lightly-roasted/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/coffee-beans/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee Beans.',
+				url: 'http://wordpress.local/coffee-beans-2/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( { results, search: 'coffee beans' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Coffee Beans', // the words searched
+			'Coffee Beans.', // the words searched, ending with a period
+			'Coffee Beans, Lightly Roasted', // begins with the search, but has words the search does not
 		] );
 	} );
 
