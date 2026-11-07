@@ -1,6 +1,8 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -11,7 +13,6 @@ import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import type { ComponentProps } from 'react';
-import type { ClassValue } from 'clsx';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
@@ -25,11 +26,6 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import type { BlockStyleState } from '../../hooks/types';
 import type { ChildLayout } from '../child-layout-control/types';
 import type {
@@ -48,34 +44,6 @@ type SpacingValues = ComponentProps< typeof SpacingSizesControl >[ 'values' ];
 type SpacingSides = ComponentProps< typeof SpacingSizesControl >[ 'sides' ];
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
-
-/**
- * Determines whether a spacing control (`BoxControl` or `SpacingSizesControl`)
- * renders its linked/unlink toggle button, which the local-override reset dot
- * offsets itself against.
- *
- * @param sides            Configurable sides for the control.
- * @param isPresetsControl Whether the presets-based
- *                         `SpacingSizesControl` is used.
- *
- * @return Whether the toggle button is rendered.
- */
-function hasSpacingToggle(
-	sides: string[] | undefined,
-	isPresetsControl: boolean
-): boolean {
-	if ( sides?.length === 1 ) {
-		return false;
-	}
-	if ( isPresetsControl ) {
-		const hasOnlyAxialSides =
-			sides?.includes( 'horizontal' ) &&
-			sides?.includes( 'vertical' ) &&
-			sides?.length === 2;
-		return ! hasOnlyAxialSides;
-	}
-	return true;
-}
 
 export function useHasDimensionsPanel(
 	settings: StyleSettings | undefined,
@@ -228,18 +196,53 @@ function getNumericPlaceholder(
 	return quantity;
 }
 
+/**
+ * Expands a CSS spacing shorthand without splitting values inside CSS functions.
+ *
+ * @param value The padding or margin shorthand.
+ * @return The values for each side.
+ */
+function unpackBoxShorthand( value: string ): SpacingSidesValue {
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+
+	for ( const char of value.trim() ) {
+		if ( char === '(' ) {
+			depth++;
+			current += char;
+		} else if ( char === ')' ) {
+			depth = Math.max( 0, depth - 1 );
+			current += char;
+		} else if ( /\s/.test( char ) && depth === 0 ) {
+			if ( current ) {
+				parts.push( current );
+				current = '';
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if ( current ) {
+		parts.push( current );
+	}
+
+	if ( parts.length >= 2 && parts.length <= 4 ) {
+		const [ top, right = top, bottom = top, left = right ] = parts;
+		return { top, right, bottom, left };
+	}
+
+	return { top: value, right: value, bottom: value, left: value };
+}
+
 function splitStyleValue(
 	value: StyleValue | SpacingSidesValue
 ): StyleValue | SpacingSidesValue {
 	// Check for shorthand value (a string value).
 	if ( hasValue( value ) && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
-		return {
-			top: value,
-			right: value,
-			bottom: value,
-			left: value,
-		};
+		return unpackBoxShorthand( value );
 	}
 
 	return value;
@@ -281,37 +284,6 @@ function getCommonSidesValue(
 	}
 	const first = values[ 0 ];
 	return values.every( ( v ) => v === first ) ? first : undefined;
-}
-
-/**
- * Returns whether a sides object (top/right/bottom/left) or shorthand string
- * holds any value on at least one side.
- *
- * Unlike `getCommonSidesValue`, this does not require every side to be defined
- * or equal. It is used to drive the inherited-from-Global-Styles label
- * treatment and the local-override dot, which should reflect the mere presence
- * of an inherited value regardless of whether the individual sides match (a
- * constraint that only applies to BoxControl's single-string placeholder).
- *
- * @param sidesValue The sides shape.
- * @return Whether any side holds a value.
- */
-function hasAnySideValue(
-	sidesValue: StyleValue | SpacingSidesValue
-): boolean {
-	if ( ! hasValue( sidesValue ) ) {
-		return false;
-	}
-	if ( typeof sidesValue === 'string' ) {
-		return sidesValue !== '';
-	}
-	if ( typeof sidesValue !== 'object' ) {
-		return false;
-	}
-	return [ 'top', 'right', 'bottom', 'left' ].some( ( side ) =>
-		// An object holds a value per side.
-		hasValue( ( sidesValue as SpacingSidesValue )[ side ] )
-	);
 }
 
 function splitGapValue(
@@ -397,7 +369,6 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: DimensionsPanelProps ) {
 	const { dimensions, spacing } = settings;
 
@@ -426,19 +397,6 @@ export default function DimensionsPanel( {
 			rawValue
 		);
 	};
-	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = (
-		isInherited: unknown,
-		hasLocalOverride: unknown,
-		className?: ClassValue
-	) =>
-		getInheritanceProps(
-			showInheritanceLabelIndicators && isInherited,
-			showInheritanceLabelIndicators && hasLocalOverride,
-			className
-		);
-
 	const showSpacingPresetsControl = hasSpacingPresets( settings );
 	const units = useCustomUnits( {
 		availableUnits: settings?.spacing?.units || [
@@ -555,13 +513,6 @@ export default function DimensionsPanel( {
 	const isPaddingPlaceholder =
 		! hasValue( value?.spacing?.padding ) &&
 		inheritedPaddingPlaceholder !== undefined;
-	// Label/dot inheritance treatment is independent of whether the inherited
-	// sides share a common value — it only reflects the presence of an
-	// inherited value (the all-sides-equal constraint applies solely to the
-	// single-string BoxControl placeholder above).
-	const hasInheritedPadding = hasAnySideValue( inheritedPaddingValues );
-	const isPaddingInherited =
-		! hasValue( value?.spacing?.padding ) && hasInheritedPadding;
 	const paddingSides = Array.isArray( settings?.spacing?.padding )
 		? settings?.spacing?.padding
 		: // The setting is an array or an object with the sides.
@@ -598,9 +549,6 @@ export default function DimensionsPanel( {
 	const isMarginPlaceholder =
 		! hasValue( value?.spacing?.margin ) &&
 		inheritedMarginPlaceholder !== undefined;
-	const hasInheritedMargin = hasAnySideValue( inheritedMarginValues );
-	const isMarginInherited =
-		! hasValue( value?.spacing?.margin ) && hasInheritedMargin;
 	const marginSides = Array.isArray( settings?.spacing?.margin )
 		? settings?.spacing?.margin
 		: // The setting is an array or an object with the sides.
@@ -781,9 +729,6 @@ export default function DimensionsPanel( {
 		inheritedValue?.dimensions?.aspectRatio
 	);
 	const aspectRatioValue = localAspectRatioValue ?? inheritedAspectRatioValue;
-	const isAspectRatioPlaceholder =
-		! hasValue( value?.dimensions?.aspectRatio ) &&
-		hasValue( inheritedAspectRatioValue );
 	const setAspectRatioValue = ( newValue?: string ) => {
 		const tempValue = setImmutably(
 			value,
@@ -834,12 +779,7 @@ export default function DimensionsPanel( {
 				</span>
 			) }
 			{ showContentSizeControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isContentSizePlaceholder,
-						hasUserSetContentSizeValue() &&
-							inheritedContentSizeValue !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Content width' ) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
@@ -878,15 +818,10 @@ export default function DimensionsPanel( {
 							</InputControlPrefixWrapper>
 						}
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showWideSizeControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isWideSizePlaceholder,
-						hasUserSetWideSizeValue() &&
-							inheritedWideSizeValue !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Wide width' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
@@ -922,29 +857,20 @@ export default function DimensionsPanel( {
 							</InputControlPrefixWrapper>
 						}
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
-				<InheritanceToolsPanelItem
+				<ToolsPanelItem
 					// A side count is truthy like `true`.
 					hasValue={ hasPaddingValue as () => boolean }
 					label={ __( 'Padding' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						paddingSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
-					{ ...inheritanceProps(
-						isPaddingInherited,
-						hasPaddingValue() && hasInheritedPadding,
-						{
-							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
-						}
-					) }
+					className={ clsx( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 					panelId={ panelId }
 				>
 					{ ! showSpacingPresetsControl && (
@@ -983,29 +909,20 @@ export default function DimensionsPanel( {
 							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
-				<InheritanceToolsPanelItem
+				<ToolsPanelItem
 					// A side count is truthy like `true`.
 					hasValue={ hasMarginValue as () => boolean }
 					label={ __( 'Margin' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						marginSides,
-						showSpacingPresetsControl
-					) }
 					onDeselect={ resetMarginValue }
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
-					{ ...inheritanceProps(
-						isMarginInherited,
-						hasMarginValue() && hasInheritedMargin,
-						{
-							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
-						}
-					) }
+					className={ clsx( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
 					panelId={ panelId }
 				>
 					{ ! showSpacingPresetsControl && (
@@ -1053,28 +970,22 @@ export default function DimensionsPanel( {
 							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showGapControl && (
-				<InheritanceToolsPanelItem
+				<ToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
-					hasInlineEndToggle={ isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
-					{ ...inheritanceProps(
-						isGapPlaceholder,
-						hasGapValue() && inheritedGapRaw !== undefined,
-						{
-							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
-							'single-column':
-								// If UnitControl is used, should be single-column.
-								! showSpacingPresetsControl && ! isAxialGap,
-						}
-					) }
+					className={ clsx( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+						'single-column':
+							// If UnitControl is used, should be single-column.
+							! showSpacingPresetsControl && ! isAxialGap,
+					} ) }
 					panelId={ panelId }
 				>
 					{ ! showSpacingPresetsControl &&
@@ -1120,7 +1031,7 @@ export default function DimensionsPanel( {
 							allowReset={ false }
 						/>
 					) }
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showChildLayoutControl && (
 				<ChildLayoutControl
@@ -1139,12 +1050,7 @@ export default function DimensionsPanel( {
 				/>
 			) }
 			{ showMinHeightControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isMinHeightPlaceholder,
-						hasMinHeightValue() &&
-							inheritedMinHeightValue !== undefined
-					) }
+				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ resetMinHeightValue }
@@ -1172,15 +1078,10 @@ export default function DimensionsPanel( {
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showMinWidthControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isMinWidthPlaceholder,
-						hasMinWidthValue() &&
-							inheritedMinWidthValue !== undefined
-					) }
+				<ToolsPanelItem
 					hasValue={ hasMinWidthValue }
 					label={ __( 'Minimum width' ) }
 					onDeselect={ resetMinWidthValue }
@@ -1207,14 +1108,10 @@ export default function DimensionsPanel( {
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showHeightControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isHeightPlaceholder,
-						hasHeightValue() && inheritedHeightValue !== undefined
-					) }
+				<ToolsPanelItem
 					hasValue={ hasHeightValue }
 					label={ __( 'Height' ) }
 					onDeselect={ resetHeightValue }
@@ -1234,14 +1131,10 @@ export default function DimensionsPanel( {
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showWidthControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isWidthPlaceholder,
-						hasWidthValue() && inheritedWidthValue !== undefined
-					) }
+				<ToolsPanelItem
 					hasValue={ hasWidthValue }
 					label={ __( 'Width' ) }
 					onDeselect={ resetWidthValue }
@@ -1259,7 +1152,7 @@ export default function DimensionsPanel( {
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showAspectRatioControl && (
 				<AspectRatioTool
@@ -1267,11 +1160,6 @@ export default function DimensionsPanel( {
 					value={ aspectRatioValue }
 					onChange={ setAspectRatioValue }
 					panelId={ panelId }
-					{ ...inheritanceProps(
-						isAspectRatioPlaceholder,
-						hasAspectRatioValue() &&
-							inheritedAspectRatioValue !== undefined
-					) }
 					isShownByDefault={
 						defaultControls.aspectRatio ??
 						DEFAULT_CONTROLS.aspectRatio

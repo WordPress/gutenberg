@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CopyFromMenuExample } from './copy-from-menu';
 
 const meta = {
-	title: 'Design System/Patterns/Copy to Clipboard',
+	title: 'Design System/Patterns/Copy from Menu',
 	component: CopyFromMenuExample,
 	parameters: {
 		controls: { disable: true },

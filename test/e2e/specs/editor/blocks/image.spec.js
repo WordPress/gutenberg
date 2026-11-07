@@ -149,6 +149,75 @@ test.describe( 'Image', () => {
 		] );
 	} );
 
+	test( 'should hide an empty caption when the image is deselected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const caption = imageBlock.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		await expect( caption ).toBeFocused();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		await expect( caption ).toBeHidden();
+
+		await editor.selectBlocks( imageBlock );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add caption' } )
+		).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( caption ).toBeHidden();
+	} );
+
+	test( 'should show the caption again when removing it is undone', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+				caption: 'Caption',
+			},
+		} );
+		const caption = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'textbox', { name: 'Image caption text' } );
+		await expect( caption ).toHaveText( 'Caption' );
+
+		await editor.clickBlockToolbarButton( 'Remove caption' );
+		await expect( caption ).toBeHidden();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: undefined } },
+			] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( caption ).toHaveText( 'Caption' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image', attributes: { caption: 'Caption' } },
+			] );
+	} );
+
 	test( 'should allow soft line breaks in caption', async ( {
 		editor,
 		page,
@@ -1011,6 +1080,106 @@ test.describe( 'Image', () => {
 			button: 'right',
 		} );
 		expect( await target ).toBe( true );
+	} );
+} );
+
+test.describe( 'Image - server-side uploads', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test( 'keeps the image when a replacement upload fails, and Reset still removes it', async ( {
+		editor,
+		page,
+		requestUtils,
+		imageBlockUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: media.id,
+				url: media.source_url,
+				alt: 'Original image',
+				caption: 'Original caption',
+			},
+		} );
+		const image = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'img', { name: 'Original image' } );
+		await expect( image ).toHaveAttribute( 'src', media.source_url );
+
+		// Make the replacement upload fail on the server.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.continue();
+			}
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'simulated_failure',
+					message: 'Simulated upload failure.',
+				} ),
+			} );
+		} );
+
+		await editor.clickBlockToolbarButton( 'Replace' );
+		await imageBlockUtils.upload(
+			page.getByRole( 'menu' ).getByTestId( 'form-file-upload-input' )
+		);
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Simulated upload failure.' } )
+		).toBeVisible();
+
+		// The failed upload leaves the current image and its details.
+		await expect( image ).toHaveAttribute( 'src', media.source_url );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: media.id,
+					url: media.source_url,
+					alt: 'Original image',
+					caption: 'Original caption',
+				},
+			},
+		] );
+
+		// Reset still removes the image.
+		await editor.clickBlockToolbarButton( 'Replace' );
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: undefined,
+					url: undefined,
+					alt: undefined,
+					caption: undefined,
+				},
+			},
+		] );
 	} );
 } );
 

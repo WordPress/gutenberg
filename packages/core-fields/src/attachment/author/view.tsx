@@ -40,8 +40,15 @@ export default function AuthorView( { item }: { item: MediaItem } ) {
 		}
 	};
 
+	// Some media have no author, and the author id of others matches no user
+	// listed as an author, like a deleted user. A panel row shows the field's
+	// placeholder for both.
+	if ( ! text ) {
+		return null;
+	}
+
 	return (
-		<Stack direction="row" align="center" justify="flex-start">
+		<Stack direction="row" gap="xs" align="flex-start" justify="flex-start">
 			{ !! imageUrl && (
 				<div
 					className={ clsx( styles.avatar, {

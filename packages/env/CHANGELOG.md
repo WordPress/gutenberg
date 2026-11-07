@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
+
+## 12.1.0 (2026-11-04)
+
 ### New Features
 
 -   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker ([#85512](https://github.com/WordPress/gutenberg/pull/85512), [#85574](https://github.com/WordPress/gutenberg/pull/85574)).
@@ -9,7 +15,10 @@
 ### Bug Fixes
 
 -   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
--   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 
 ## 12.0.0 (2026-10-20)
 

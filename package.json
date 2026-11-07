@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.3.0-rc.1",
+	"version": "24.4.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -99,8 +99,7 @@
 		"lint-staged": "^16.4.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.14.1",
-		"syncpack": "^15.3.1",
-		"wait-on": "^8.0.1"
+		"syncpack": "^15.3.1"
 	},
 	"overrides": {
 		"@y/websocket-server": {
@@ -177,8 +176,8 @@
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
+		"storybook:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook storybook:dev\"",
+		"storybook:e2e:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
 		"test": "npm run lint && npm run test:unit",
@@ -218,6 +217,8 @@
 		"test:agent-evals": "npm --prefix test/ai-development run eval --",
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
+		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
+		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"

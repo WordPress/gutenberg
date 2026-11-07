@@ -97,6 +97,8 @@ Function called with the control's internal state changes. The `selectedItem` pr
 
 The list of options that can be chosen from.
 
+Options can provide custom styles through `style` and `className`. Hovered and keyboard-active options use the design system's highlight colors so text stays readable. Custom text and background colors apply while the option is inactive; other custom styling remains in effect.
+
 -   Required: Yes
 
 #### `size`: `'default' | 'small'`
