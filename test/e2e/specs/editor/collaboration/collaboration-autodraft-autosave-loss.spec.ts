@@ -1,11 +1,13 @@
 import type { Page, Response } from '@playwright/test';
 import { test, expect } from './fixtures';
+import { SECOND_USER } from './fixtures/collaboration-utils';
 
 type RestPost = {
 	id: number;
 	status: string;
 	title?: { raw?: string; rendered?: string } | string;
 	content?: { raw?: string; rendered?: string } | string;
+	meta?: { _crdt_document?: string };
 };
 
 function rawField( field: RestPost[ 'title' ] ): string {
@@ -118,5 +120,79 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 		expect( rawField( post.title ) ).toContain( title );
 		expect( rawField( post.content ) ).toContain( marker );
 		expect( drafts.map( ( draft ) => draft.id ) ).toContain( postId );
+
+		// The promotion is the only autosave that writes the parent post, so
+		// it must also persist the shared document. Otherwise a peer joining
+		// later rebuilds the document from the parent content and can replace
+		// everything typed since.
+		expect( post.meta?._crdt_document ).toBeTruthy();
+	} );
+
+	test( 'keeps content typed after the first autosave when a collaborator joins', async ( {
+		admin,
+		collaborationUtils,
+		editor,
+		page,
+	} ) => {
+		test.setTimeout( 120_000 );
+
+		const title = 'RTC auto-draft join retention title';
+		const savedMarker = 'rtc-auto-draft-join-saved-content';
+		const liveMarker = 'rtc-auto-draft-join-live-content';
+
+		await admin.createNewPost();
+		await collaborationUtils.waitForEntityReady( page, {
+			requireCollaboration: false,
+			timeout: 30_000,
+		} );
+		await collaborationUtils.waitForCollaborationReady( page, {
+			timeout: 30_000,
+		} );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( title );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( savedMarker );
+
+		// The first autosave promotes the auto-draft to a draft. It is the
+		// last time the parent post is written until a manual save: later
+		// autosaves only create revisions.
+		const postId = await getCurrentPostId( page );
+		const autosaveRequest = page.waitForResponse(
+			( response ) => isAutosaveResponse( response, postId ),
+			{ timeout: 30_000 }
+		);
+		await useFastAutosaveInterval( page );
+
+		await autosaveRequest;
+		await page.waitForFunction(
+			() =>
+				! ( window as any ).wp.data
+					.select( 'core/editor' )
+					.isAutosavingPost(),
+			undefined,
+			{ timeout: 30_000 }
+		);
+
+		// Content typed after the promotion exists only in the shared
+		// document. A collaborator who joins now must receive it rather than
+		// replace it with the parent post's content.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( liveMarker );
+
+		await collaborationUtils.joinUser( postId, SECOND_USER );
+		await collaborationUtils.waitForMutualDiscovery( { timeout: 30_000 } );
+
+		const state = await collaborationUtils.waitForConvergence( {
+			timeout: 30_000,
+		} );
+
+		expect( state.title ).toBe( title );
+		expect(
+			state.blocks.map( ( block ) => block.attributes.content )
+		).toEqual( [ savedMarker, liveMarker ] );
 	} );
 } );

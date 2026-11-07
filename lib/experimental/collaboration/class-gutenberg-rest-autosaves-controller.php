@@ -132,6 +132,10 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 
 		if ( $should_promote_auto_draft ) {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
+
+			if ( ! is_wp_error( $autosave_id ) ) {
+				$this->update_parent_post_meta( $post, $meta, $request );
+			}
 		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
 			 * Nothing changed from the latest shared state, so storing a
@@ -160,6 +164,51 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Persists meta sent with an autosave to the parent post it updated.
+	 *
+	 * When an autosave is stored as a revision, create_post_autosave() writes
+	 * the request's revisioned meta (e.g. `footnotes`) to that revision. When
+	 * an autosave updates the parent post directly, core drops the request's
+	 * meta. This writes the same keys to the parent post so both branches
+	 * behave alike. RTC uses the filter to add the CRDT document, so it is
+	 * stored in the same request as the content it describes.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param WP_Post         $post    The parent post the autosave updated.
+	 * @param array           $meta    Meta values submitted with the autosave.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return void
+	 */
+	private function update_parent_post_meta( $post, $meta, $request ) {
+		/**
+		 * Filters the meta keys persisted to the parent post when an autosave
+		 * updates it directly instead of creating a revision.
+		 *
+		 * Defaults to the keys registered with `revisions_enabled`, which are
+		 * the keys an autosave revision stores.
+		 *
+		 * @since 7.3.0
+		 *
+		 * @param string[]        $meta_keys Meta keys to persist to the parent post.
+		 * @param WP_Post         $post      The parent post the autosave updated.
+		 * @param WP_REST_Request $request   Full details about the request.
+		 */
+		$meta_keys = apply_filters(
+			'rest_autosave_parent_post_meta_keys',
+			wp_post_revision_meta_keys( $post->post_type ),
+			$post,
+			$request
+		);
+
+		foreach ( $meta_keys as $meta_key ) {
+			if ( isset( $meta[ $meta_key ] ) ) {
+				update_metadata( 'post', $post->ID, $meta_key, wp_slash( $meta[ $meta_key ] ) );
+			}
+		}
 	}
 
 	/**
