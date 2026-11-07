@@ -41,21 +41,3 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: ../../lib/experimental/navigation-theme-opt-in.php
-
-		-
-			message: '#^Function block_core_navigation_get_classic_menu_fallback\(\) should return object but return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: ../../packages/block-library/src/navigation/index.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine-css-rules-store.php
-
-		-
-			message: '#^Parameter \#1 \$style_value of static method WP_Style_Engine\:\:get_slug_from_preset_value\(\) expects string, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../packages/style-engine/src/class-wp-style-engine.php
