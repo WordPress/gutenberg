@@ -46,9 +46,6 @@ Private exports:
 
 ## commands
 
-Private exports:
-- `useCommandContext` (added May 2023 in #50543)
-
 ### `core/commands` store
 
 Private actions:

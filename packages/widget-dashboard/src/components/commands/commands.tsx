@@ -1,17 +1,11 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	useCommands,
-	privateApis as commandsPrivateApis,
-} from '@wordpress/commands';
+import { useCommandContext, useCommands } from '@wordpress/commands';
 import type { CommandConfig } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
-import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { usePendingWhenEditMode } from './use-pending-when-edit-mode';
-
-const { useCommandContext } = unlock( commandsPrivateApis );
 
 export const DASHBOARD_COMMAND_CONTEXT = 'dashboard';
 
