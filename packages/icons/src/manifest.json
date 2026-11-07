@@ -242,7 +242,11 @@
 		"label": "Calendar",
 		"filePath": "library/calendar.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-calendar-alt", "dashicons-calendar" ]
+		"dashicons": [
+			"dashicons-calendar-alt",
+			"dashicons-calendar",
+			"dashicons-schedule"
+		]
 	},
 	{
 		"slug": "cancel-circle-filled",
