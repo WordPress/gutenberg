@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import DataForm from '../index';
 import type {
@@ -143,6 +144,17 @@ const fields: Field< SamplePost >[] = [
 		id: 'file_type',
 		label: 'File type',
 		readOnly: true,
+	},
+	{
+		// A read-only field whose value is an interactive control.
+		id: 'attachment',
+		label: 'Attachment',
+		readOnly: true,
+		render: () => (
+			<Button variant="link" href="#">
+				View file
+			</Button>
+		),
 	},
 	{
 		id: 'tags',
@@ -399,6 +411,7 @@ const LayoutPanelComponent = ( {
 				'filesize',
 				'dimensions',
 				'file_type',
+				'attachment',
 				'tags',
 				{
 					id: 'discussion',

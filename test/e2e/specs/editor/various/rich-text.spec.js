@@ -154,6 +154,36 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should not highlight the format of a deselected block', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: '<strong>Heading text</strong> end' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a <em>italic</em> b' },
+		} );
+		const italic = editor.canvas.locator( 'em' );
+		await italic.click();
+		await expect( italic ).not.toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toHaveClass( /is-selected/ );
+		await expect( italic ).toHaveCSS(
+			'background-color',
+			'rgba(0, 0, 0, 0)'
+		);
+	} );
+
 	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
@@ -718,11 +748,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+a' );
 		await editor.clickBlockToolbarButton( 'More' );
-		await page.locator( 'button:text("Highlight")' ).click();
+		await page.locator( 'button:text("Text color")' ).click();
 
-		// Initial focus is on the "Text" tab.
-		// Tab to the "Custom color picker".
-		await page.keyboard.press( 'Tab' );
+		// Initial focus is on the "Custom color picker".
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.

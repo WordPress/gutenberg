@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.51.0 (2026-11-04)
+
 ### Enhancements
 
 - `MediaEdit`: Prevent animation on item removal for multiple select ([#85372](https://github.com/WordPress/gutenberg/pull/85372)).
