@@ -1,0 +1,130 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as SettingsPageStories from './settings-page.story';
+import SimpleSource from './settings-page/simple.tsx?raw';
+import AdjacentPagesSource from './settings-page/adjacent-pages.tsx?raw';
+import SubpagesSource from './settings-page/subpages.tsx?raw';
+import AdjacentPagesAndSubpagesSource from './settings-page/adjacent-pages-and-subpages.tsx?raw';
+import RecordsSubpageSource from './settings-page/records-subpage.tsx?raw';
+import RecordsDialogSource from './settings-page/records-dialog.tsx?raw';
+import RecordsDrawerSource from './settings-page/records-drawer.tsx?raw';
+
+<Meta title="Design System/Patterns/Settings Page" tags={ [ 'manifest' ] } />
+
+# Settings Page
+
+Templates for settings screens, composed from the admin-ui `Page`, `@wordpress/ui` components, `@wordpress/theme` tokens and DataViews. Start from the template closest to your settings, then replace the fields.
+
+These templates are starting points, not requirements. Not every settings page needs to match one exactly: adapt the structure to what your settings need, and combine or depart from the templates where that serves people better.
+
+## Building blocks
+
+Every template uses the same parts:
+
+-   **`Page`** from `@wordpress/admin-ui` provides the header: a title or breadcrumbs, optional section navigation, and the actions area where Save lives.
+-   **`Card`** from `@wordpress/ui` groups related settings. Give each card a short title, and a description when the title alone doesn't say what the settings affect. Cap form cards at `--wpds-dimension-surface-width-xl` so fields stay a readable length, and give tables of records `--wpds-dimension-surface-width-2xl` so their columns fit.
+-   **`DataForm`** from `@wordpress/dataviews` renders the fields, so labels, descriptions, validation and spacing stay consistent.
+-   **`DataViews`** from `@wordpress/dataviews` lists records people can add and edit.
+-   **`Dialog`**, **`Drawer`** and **`AlertDialog`** from `@wordpress/ui` hold record editors and confirmations.
+-   **Snackbars** confirm saves that have no other visible effect. `SnackbarList` comes from `@wordpress/components`, since `@wordpress/ui` doesn't offer an equivalent yet.
+
+Each example's code shows its template. The helpers it imports, such as the manual-save draft, the sample fields and the in-canvas router, live alongside it in `storybook/stories/design-system/patterns/settings-page/`.
+
+## Saving
+
+These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs): edits are held in a draft until the user clicks Save. Autosave remains the preferred default when every field can be saved independently. If you adopt autosave, remove the Save button rather than mixing the two models on one page.
+
+-   **One Save per page**, in the `Page` header actions. It covers every field on that page and nothing else.
+-   **Disabled when there is nothing to save**, and busy while saving.
+-   **Checkboxes, not toggles, for on/off settings.** A toggle implies the change takes effect immediately, which isn't true until Save is clicked. Toggles belong on autosave surfaces.
+-   **A snackbar confirms the save.** Errors belong next to the field, or in a `Notice` when a save fails or only partly succeeds.
+-   **Pages that only list records have no page-level Save.** Each record editor saves on its own, and the header holds the action that adds a record.
+-   **Leaving with unsaved edits asks first.** Switching pages or following a breadcrumb holds the navigation and asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
+
+## Simple settings page
+
+A single page with a few groups of settings. Use it when everything fits on one screen.
+
+<Canvas
+	of={ SettingsPageStories.Simple }
+	source={ { code: SimpleSource, language: 'tsx', type: 'code' } }
+/>
+
+## Adjacent pages
+
+Peer sections of one settings area, such as General, Payments and Emails, switched with the `Page` `navigation`. Use it when the sections are independent and each one is substantial enough to deserve a page.
+
+-   Keep the page title the same across adjacent pages; the navigation shows which section is current.
+-   Each page has its own draft and Save. Saving one page doesn't save another.
+-   Pass a router link through `components.link`, so switching pages doesn't reload the screen.
+
+<Canvas
+	of={ SettingsPageStories.AdjacentPages }
+	source={ { code: AdjacentPagesSource, language: 'tsx', type: 'code' } }
+/>
+
+## Subpages
+
+A subpage holds detail that would crowd the main page, such as the credentials for each payment gateway. Open it from the page body with a full-width row at the bottom of the card: an unstyled `ButtonLink` with a trailing chevron to signal that it navigates. A status badge in the row tells people what they will find there.
+
+When a card leads to several subpages, put the rows in a list:
+
+-   **Use a `ul`, named by the card title.** Render the title as a heading, and point the list's `aria-labelledby` at it, so screen readers announce “Payment gateways, list, 3 items”.
+-   **Keep `role="list"` on the unstyled list.** Safari drops list semantics when the bullets are removed.
+-   **Name each link after its destination.** The row label matches the subpage's heading, so the link's name is just “Card payments”. Show the status in a `Badge` and connect it with `aria-describedby`, so screen readers announce it as a description rather than as part of the name.
+
+On the subpage, breadcrumbs replace the title and lead back to the parent page. Repeat the row's status next to the breadcrumbs with the `Page` `badges` prop, and update it from the saved settings, not the draft, so it changes when people click Save.
+
+<Canvas
+	of={ SettingsPageStories.Subpages }
+	source={ { code: SubpagesSource, language: 'tsx', type: 'code' } }
+/>
+
+## Adjacent pages and subpages
+
+When a subpage belongs to one of several adjacent pages, the breadcrumb ancestor stays the same as the area title, for example "Settings / Card payments", whichever adjacent page the subpage belongs to. Adjacent pages are peers, not levels, so they never appear in the trail. The ancestor links back to the adjacent page the subpage was opened from, and the subpage drops the section navigation.
+
+<Canvas
+	of={ SettingsPageStories.AdjacentPagesAndSubpages }
+	source={ { code: AdjacentPagesAndSubpagesSource, language: 'tsx', type: 'code' } }
+/>
+
+## Records
+
+Some settings are lists of records, such as API keys, webhooks or redirects. These examples use API keys. Show them in a `DataViews` table, and choose how each record opens by the size of its editor.
+
+<Markdown>{ `
+| Editor | Use when |
+| --- | --- |
+| Subpage | The editor is long, has its own sections, or people need to link to a record. |
+| Dialog | The editor is short and people should stay focused on one record. |
+| Drawer | The editor is medium-sized, people benefit from seeing the table, or the record has secondary actions. |
+` }</Markdown>
+
+### Records that open a subpage
+
+The record title links to the subpage, and the Edit action goes to the same place. The subpage uses breadcrumbs, and its Save sits in the `Page` header like any other settings page.
+
+<Canvas
+	of={ SettingsPageStories.RecordsWithSubpages }
+	source={ { code: RecordsSubpageSource, language: 'tsx', type: 'code' } }
+/>
+
+### Records that open a dialog
+
+The dialog saves on its own. Cancel discards the draft, and Save applies it, closes the dialog and confirms with a snackbar. The same dialog adds new records.
+
+The footer actions are the only way out: there is no close icon, and clicking outside does nothing, so people always choose between keeping and discarding their edits. Pressing Escape closes an untouched dialog, but asks first when there are unsaved edits.
+
+<Canvas
+	of={ SettingsPageStories.RecordsWithDialog }
+	source={ { code: RecordsDialogSource, language: 'tsx', type: 'code' } }
+/>
+
+### Records that open a drawer
+
+The drawer works like the dialog, including closing only through its footer actions, with room for secondary actions. Revoking a key can't be undone, so it asks for confirmation in an `AlertDialog` with the `irreversible` intent, following [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs).
+
+<Canvas
+	of={ SettingsPageStories.RecordsWithDrawer }
+	source={ { code: RecordsDrawerSource, language: 'tsx', type: 'code' } }
+/>
