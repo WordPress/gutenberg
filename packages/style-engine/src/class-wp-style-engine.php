@@ -455,7 +455,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 		/**
 		 * Returns classnames and CSS based on the values in a styles object.
-		 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * Return values are parsed based on the instructions in {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @since 6.1.0
 		 *
@@ -545,7 +545,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., '`var:preset|<PRESET_TYPE>|<PRESET_SLUG>`'.
 		 *
 		 * @param mixed  $style_value      A single raw style value or CSS preset property from the $block_styles array.
-		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array  $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return string[] An array of CSS classnames, or empty array.
 		 *
@@ -569,11 +569,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					if ( $slug ) {
 						/*
-						* Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
-						* One day, if there are no stored schemata, we could allow custom patterns or
-						* generate classnames based on other properties
-						* such as a path or a value or a prefix passed in options.
-						*/
+						 * Right now we expect a classname pattern to be stored in self::BLOCK_STYLE_DEFINITIONS_METADATA.
+						 * One day, if there are no stored schemata, we could allow custom patterns or
+						 * generate classnames based on other properties
+						 * such as a path or a value or a prefix passed in options.
+						 */
 						$classnames[] = strtr( $classname, array( '$slug' => $slug ) );
 					}
 				}
@@ -588,7 +588,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @since 6.1.0
 		 *
 		 * @param mixed $style_value      A single raw style value from $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 * @param array $options          {
 		 *     Optional. An array of options. Default empty array.
 		 *
@@ -658,7 +658,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * "border-image-{outset|source|width|repeat|slice}: {value};"
 		 *
 		 * @param array $style_value                    A single raw style value from $block_styles array.
-		 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA representing an individual property of a CSS property, e.g., 'top' in 'border-top'.
+		 * @param array $individual_property_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA} representing an individual property of a CSS property, e.g., 'top' in 'border-top'.
 		 * @param array $options                        {
 		 *     Optional. An array of options. Default empty array.
 		 *
@@ -710,7 +710,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * e.g., array( 'background-image' => "url( '...' )" ).
 		 *
 		 * @param array $style_value      A single raw style value from $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 */
@@ -745,7 +745,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * properties to clip the background to the text.
 		 *
 		 * @param string $style_value      A single raw style value from $block_styles array.
-		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array  $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
 		 */
