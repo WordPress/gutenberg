@@ -380,7 +380,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 		 *
-		 * @param string $style_value  A single CSS preset value.
+		 * @param mixed  $style_value  A single CSS preset value.
 		 * @param string $property_key The CSS property that is the second element of the preset string. Used for matching.
 		 *
 		 * @return string The slug, or empty string if not found.
@@ -418,7 +418,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string $style_value A single CSS preset value.
+		 * @param mixed $style_value A single raw style value.
 		 *
 		 * @return bool
 		 */
@@ -544,7 +544,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., '`var:preset|<PRESET_TYPE>|<PRESET_SLUG>`'.
 		 *
-		 * @param string $style_value      A single raw style value or CSS preset property from the $block_styles array.
+		 * @param mixed  $style_value      A single raw style value or CSS preset property from the $block_styles array.
 		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
 		 * @return string[] An array of CSS classnames, or empty array.
