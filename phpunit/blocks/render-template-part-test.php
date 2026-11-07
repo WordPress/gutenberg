@@ -38,6 +38,8 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 			$this->get_the_terms_filter = null;
 		}
 
+		remove_theme_support( 'block-template-parts' );
+
 		parent::tear_down();
 	}
 
