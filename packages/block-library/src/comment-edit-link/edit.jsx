@@ -4,13 +4,14 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Fragment } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 export default function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { linkTarget } = attributes;
+	const { linkTarget, showModerationLinks } = attributes;
 	useDeprecatedTextAlign( props );
 	const blockProps = useBlockProps();
 
@@ -23,6 +24,7 @@ export default function Edit( props ) {
 				resetAll={ () => {
 					setAttributes( {
 						linkTarget: '_self',
+						showModerationLinks: false,
 					} );
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
@@ -45,6 +47,25 @@ export default function Edit( props ) {
 						checked={ linkTarget === '_blank' }
 					/>
 				</ToolsPanelItem>
+				<ToolsPanelItem
+					label={ __( 'Show moderation links' ) }
+					isShownByDefault
+					hasValue={ () => !! showModerationLinks }
+					onDeselect={ () =>
+						setAttributes( { showModerationLinks: false } )
+					}
+				>
+					<ToggleControl
+						label={ __( 'Show moderation links' ) }
+						help={ __(
+							'Also display links to unapprove, spam, or trash the comment.'
+						) }
+						onChange={ ( value ) =>
+							setAttributes( { showModerationLinks: value } )
+						}
+						checked={ !! showModerationLinks }
+					/>
+				</ToolsPanelItem>
 			</ToolsPanel>
 		</InspectorControls>
 	);
@@ -59,6 +80,22 @@ export default function Edit( props ) {
 				>
 					{ __( 'Edit' ) }
 				</a>
+				{ showModerationLinks &&
+					[
+						__( 'Unapprove' ),
+						_x( 'Spam', 'verb' ),
+						_x( 'Trash', 'verb' ),
+					].map( ( label ) => (
+						<Fragment key={ label }>
+							{ ' ' }
+							<a
+								href="#moderate-comment-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ label }
+							</a>
+						</Fragment>
+					) ) }
 			</div>
 		</>
 	);

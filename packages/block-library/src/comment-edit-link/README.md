@@ -20,6 +20,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `linkTarget` | `string` | `"_self"` | — |
+| `showModerationLinks` | `boolean` | `false` | — |
 
 ## Supports
 
