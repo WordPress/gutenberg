@@ -246,7 +246,8 @@ function gutenberg_read_jxl_codestream_header( $handle ) {
 			break;
 		}
 
-		$size        = unpack( 'N', $box )[1];
+		$fields      = unpack( 'Nsize', $box );
+		$size        = is_array( $fields ) && is_int( $fields['size'] ) ? $fields['size'] : -1;
 		$type        = substr( $box, 4, 4 );
 		$header_size = 8;
 
@@ -255,7 +256,8 @@ function gutenberg_read_jxl_codestream_header( $handle ) {
 			if ( ! is_string( $large_size ) || strlen( $large_size ) < 8 ) {
 				break;
 			}
-			$size        = unpack( 'J', $large_size )[1];
+			$fields      = unpack( 'Jsize', $large_size );
+			$size        = is_array( $fields ) && is_int( $fields['size'] ) ? $fields['size'] : -1;
 			$header_size = 16;
 		}
 
