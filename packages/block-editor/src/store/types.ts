@@ -7,6 +7,7 @@ import type {
 } from '@wordpress/blocks';
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { Color } from '@wordpress/global-styles-engine';
+import type { BlockAlignmentConstraint } from '../components/block-alignment-control/types';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { EditorStylesStyle } from '../components/editor-styles/types';
 import type {
@@ -26,6 +27,7 @@ import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	outerWidthConstraintKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
@@ -457,6 +459,12 @@ export type Settings = Record< string | symbol, unknown > & {
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
 	) => UserPattern[] | null;
+	/**
+	 * What limits block widths from outside the post, such as the template
+	 * wrapped around the content. The block editor detects that a constraint
+	 * exists but cannot know what a template is, so the host supplies this.
+	 */
+	[ outerWidthConstraintKey ]?: BlockAlignmentConstraint;
 	[ sectionRootClientIdKey ]?: string;
 	[ selectBlockPatternsKey ]?: (
 		select: typeof globalSelect
