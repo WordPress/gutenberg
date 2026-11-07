@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate the package in favour of `@wordpress/image-editor`. Mounting `ImageCropperProvider` logs a notice. The package will be removed in a later release.
+
 ## 2.1.0 (2026-11-04)
 
 ## 2.0.0 (2026-10-20)

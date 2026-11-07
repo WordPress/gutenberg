@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" }
 	]
