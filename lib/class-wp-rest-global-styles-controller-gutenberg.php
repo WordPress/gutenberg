@@ -385,7 +385,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = $this->prepare_links( $post->ID );
+			$links = $this->prepare_links( $post );
 			// Only return resolved URIs for get requests to user theme JSON.
 			if ( $theme_json ) {
 				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
@@ -411,11 +411,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 *
 	 * @since 5.9.0
 	 * @since 6.3.0 Adds revisions count and rest URL href to version-history.
+	 * @since 7.3.0 Accepts a post object, matching the parent method.
 	 *
-	 * @param integer $id ID.
-	 * @return array Links for the given post.
+	 * @param WP_Post|int $post Post object or ID.
+	 * @return array<string, array<string, string|int>> Links for the given post.
 	 */
-	protected function prepare_links( $id ) {
+	protected function prepare_links( $post ) {
+		$id   = $post instanceof WP_Post ? $post->ID : $post;
 		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
 
 		$links = array(
