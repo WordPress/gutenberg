@@ -10,6 +10,7 @@ import {
 	patchTransitionalSymbols,
 	patchCoerceRef,
 	patchInertAttribute,
+	patchMemoDefaultProps,
 } from './codemod-react-legacy-element.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -22,12 +23,14 @@ const WORKSPACE_DIR = path.resolve( __dirname, '..' );
 
 // Patchers that adapt React 19 to also accept legacy (React 17/18) elements.
 // The `react` core bundle only needs the element-symbol patch, while the
-// `react-dom` bundle additionally needs the DOM-only ref and `inert` patches.
+// `react-dom` bundle additionally needs the DOM-only ref and `inert` patches,
+// and the reconciler patch that restores `memo()` `defaultProps`.
 const patchReact = createPatcher( patchTransitionalSymbols );
 const patchReactDOM = createPatcher(
 	patchTransitionalSymbols,
 	patchCoerceRef,
-	patchInertAttribute
+	patchInertAttribute,
+	patchMemoDefaultProps
 );
 
 const requireFromWorkspace = createRequire(

@@ -4,13 +4,13 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../constants';
-import './style.css';
+import styles from './style.module.css';
 
 export default {
 	id: 'imagecropper-imagecropper',
@@ -21,8 +21,8 @@ export default {
 const DefaultComponent = ( args: ImageCropperProps ) => {
 	return (
 		<ImageCropperProvider>
-			<div className="image-cropper__container-wrapper-story">
-				<div className="image-cropper__container-story">
+			<div className={ styles[ 'container-wrapper' ] }>
+				<div className={ styles.container }>
 					<ImageCropper { ...args } />
 				</div>
 			</div>
@@ -188,10 +188,22 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 							cropperState.aspectRatio.toFixed( 2 )
 						) }
 					</Heading>
-					<WCSelectControl
-						value={ cropperState.aspectRatio.toString() }
-						options={ aspectRatioOptions }
-						onChange={ handleAspectRatioChange }
+					<SelectControl
+						label={ __( 'Aspect ratio' ) }
+						hideLabelFromVision
+						value={
+							aspectRatioOptions.find(
+								( item ) =>
+									item.value ===
+									cropperState.aspectRatio.toString()
+							) ?? null
+						}
+						items={ aspectRatioOptions }
+						onValueChange={ ( item ) => {
+							if ( item && item.value !== null ) {
+								handleAspectRatioChange( item.value );
+							}
+						} }
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>
@@ -199,9 +211,9 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 				</HStack>
 			</VStack>
 
-			<div className="image-cropper__container-wrapper-story">
+			<div className={ styles[ 'container-wrapper' ] }>
 				<div
-					className="image-cropper__container-story"
+					className={ styles.container }
 					ref={ containerRef }
 					style={ {
 						...containerStyle,

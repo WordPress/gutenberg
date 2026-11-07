@@ -3,12 +3,13 @@ import {
 	Button,
 	DropZone,
 	Icon as WCIcon,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
+	withFilters,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -55,13 +56,15 @@ const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 function AnimatedMediaItem( {
 	children,
 	index,
+	itemsKey,
 	className,
 }: {
 	children: React.ReactNode;
 	index: number;
+	itemsKey: string;
 	className?: string;
 } ) {
-	const ref = useMovingAnimation( index );
+	const ref = useMovingAnimation( index, itemsKey );
 	return (
 		<div ref={ ref } className={ className }>
 			{ children }
@@ -85,11 +88,12 @@ function normalizeValue( value: number | number[] | undefined ): number[] {
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
- * otherwise falls back to media-utils MediaUpload.
+ * otherwise falls back to media-utils MediaUpload. Also what `FilteredMediaUpload`
+ * falls back to when nothing is registered on `editor.MediaUpload`, as in tests.
  *
  * @param root0          Component props.
  * @param root0.render   Render prop function that receives { open } object.
- * @param root0.multiple Whether to allow multiple media selections.
+ * @param root0.multiple Whether to allow multiple media selections; `'add'` keeps the current selection in the legacy media frame.
  * @return The component.
  */
 function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
@@ -101,7 +105,8 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 				{ isModalOpen && (
 					<MediaUploadModal
 						{ ...props }
-						multiple={ multiple }
+						// The modal takes a boolean.
+						multiple={ !! multiple }
 						isOpen={ isModalOpen }
 						onClose={ () => {
 							setIsModalOpen( false );
@@ -117,14 +122,19 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 		);
 	}
 	// Fallback to media-utils MediaUpload when experiment is disabled.
-	return (
-		<MediaUpload
-			{ ...props }
-			render={ render }
-			multiple={ multiple ? 'add' : undefined }
-		/>
-	);
+	return <MediaUpload { ...props } render={ render } multiple={ multiple } />;
 }
+
+/*
+ * `ConditionalMediaUpload` resolved through `editor.MediaUpload`: the hook
+ * through which the editor supplies its media library to blocks and plugins
+ * extend it (extra sources, validation). Those callbacks assume an editor
+ * context, so `MediaEdit` does not use it; `MediaEditControl` does when
+ * `isPickerFiltered` is set, for fields that render inside the editor.
+ */
+const FilteredMediaUpload = withFilters( 'editor.MediaUpload' )(
+	ConditionalMediaUpload
+) as React.ComponentType< Record< string, unknown > >;
 
 function MediaPickerButton( {
 	open,
@@ -171,7 +181,7 @@ function MediaPickerButton( {
 			{ children }
 			{ isBlob && (
 				<span className="fields__media-edit-picker-button-spinner">
-					<Spinner />
+					<WCSpinner />
 				</span>
 			) }
 			{ ! isUploading && (
@@ -296,6 +306,21 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
+
+/**
+ * Identifies the set of items regardless of their order, so a reorder can be
+ * told apart from items being added or removed.
+ *
+ * @param items The items in the list.
+ * @return A key that only changes when items are added or removed.
+ */
+function getItemsKey( items: Array< MediaEditAttachment > | null ) {
+	return ( items ?? [] )
+		.map( ( item ) => String( item.id ) )
+		.sort()
+		.join( ',' );
+}
+
 interface MediaEditAttachmentsProps {
 	allItems: Array< MediaEditAttachment > | null;
 	addButtonLabel: string;
@@ -319,6 +344,7 @@ function ExpandedMediaEditAttachments( {
 	isUploading,
 	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<div
 			className={ clsx( 'fields__media-edit-expanded', {
@@ -336,6 +362,7 @@ function ExpandedMediaEditAttachments( {
 					<AnimatedMediaItem
 						key={ attachment.id }
 						index={ index }
+						itemsKey={ itemsKey }
 						className={ clsx( 'fields__media-edit-expanded-item', {
 							'has-preview-image': hasPreviewImage,
 						} ) }
@@ -443,6 +470,7 @@ function CompactMediaEditAttachments( {
 	isUploading,
 	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<>
 			{ !! allItems?.length && (
@@ -461,6 +489,7 @@ function CompactMediaEditAttachments( {
 								<AnimatedMediaItem
 									key={ attachment.id }
 									index={ index }
+									itemsKey={ itemsKey }
 									className="fields__media-edit-compact"
 								>
 									<MediaPickerButton
@@ -589,7 +618,15 @@ function CompactMediaEditAttachments( {
  * };
  * ```
  */
-export default function MediaEdit< Item >( {
+export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
+	return <MediaEditControl { ...props } />;
+}
+
+/*
+ * Body of `MediaEdit`. Package-internal: the featured image field renders it
+ * for the props the public control doesn't offer.
+ */
+export function MediaEditControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -598,7 +635,28 @@ export default function MediaEdit< Item >( {
 	multiple,
 	isExpanded,
 	validity,
-}: MediaEditProps< Item > ) {
+	isPickerFiltered,
+	featuredImageFlow,
+	pickerTitle,
+}: MediaEditProps< Item > & {
+	/**
+	 * Whether the picker resolves through the `editor.MediaUpload` filter, so
+	 * the plugin extensions registered on it apply.
+	 */
+	isPickerFiltered?: boolean;
+	/**
+	 * Opens the featured-image media frame, as the classic panel does; plugins
+	 * extending `editor.MediaUpload` recognize the featured image by it.
+	 */
+	featuredImageFlow?: boolean;
+	/**
+	 * Title of the picker, in place of the field label.
+	 */
+	pickerTitle?: string;
+} ) {
+	const MediaUploadComponent = isPickerFiltered
+		? FilteredMediaUpload
+		: ConditionalMediaUpload;
 	const value = field.getValue( { item: data } );
 	// While the permission is unresolved, show the picker, as the editor does.
 	const canUpload = useSelect(
@@ -646,9 +704,7 @@ export default function MediaEdit< Item >( {
 	// reorders (same IDs), we fall back to the cached list to avoid a visual
 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
 	// we let attachments be null as normal.
-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
-		null
-	);
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
 	if ( attachments !== null ) {
 		stableAttachmentsRef.current = attachments;
 	}
@@ -883,7 +939,15 @@ export default function MediaEdit< Item >( {
 	return (
 		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
-				<ConditionalMediaUpload
+				<MediaUploadComponent
+					title={ pickerTitle ?? field.label }
+					featuredImageFlow={ featuredImageFlow }
+					// The deprecated name is passed too, because the callbacks on
+					// `editor.MediaUpload` read it from the props and would
+					// otherwise stop recognizing the featured image. It will be
+					// removed in the near future, and passing both raises no
+					// warning.
+					unstableFeaturedImageFlow={ featuredImageFlow }
 					onSelect={ ( selectedMedia: any ) => {
 						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
@@ -930,8 +994,12 @@ export default function MediaEdit< Item >( {
 					// and open in single-select mode so the user picks exactly
 					// one replacement, even if `multiple` is true.
 					value={ targetItemId !== undefined ? targetItemId : value }
-					multiple={ multiple && targetItemId === undefined }
-					title={ field.label }
+					// Pickers on `editor.MediaUpload` take the block-editor
+					// `MediaUpload` value, `'add'` to keep the current selection
+					// or `false`, so the control speaks that API.
+					multiple={
+						multiple && targetItemId === undefined ? 'add' : false
+					}
 					render={ ( { open }: any ) => {
 						// Keep a ref to the latest `open` so the deferred effect can call it.
 						openModalRef.current = open;

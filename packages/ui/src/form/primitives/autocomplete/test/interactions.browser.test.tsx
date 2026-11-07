@@ -17,10 +17,14 @@ describe( 'Autocomplete interactions', () => {
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.Item value="Apple">
-							Apple
+							<Autocomplete.ItemLabel>
+								Apple
+							</Autocomplete.ItemLabel>
 						</Autocomplete.Item>
 						<Autocomplete.Item value="Apple pie">
-							Apple pie
+							<Autocomplete.ItemLabel>
+								Apple pie
+							</Autocomplete.ItemLabel>
 						</Autocomplete.Item>
 					</Autocomplete.List>
 				</Autocomplete.Popup>

@@ -1,4 +1,6 @@
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { __ } from '@wordpress/i18n';
+import { desktop, tablet, mobile } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
@@ -14,6 +16,13 @@ const DESKTOP_DEVICE_TYPE = 'Desktop';
 const TABLET_DEVICE_TYPE = 'Tablet';
 const MOBILE_DEVICE_TYPE = 'Mobile';
 const DEVICE_PREVIEW_WIDTH_OFFSET = 1;
+
+/** Labels and icons shared by device preview controls and viewport status. */
+export const DEVICE_TYPE_METADATA = {
+	Desktop: { label: __( 'Desktop' ), icon: desktop },
+	Tablet: { label: __( 'Tablet' ), icon: tablet },
+	Mobile: { label: __( 'Mobile' ), icon: mobile },
+};
 
 /**
  * Maps a device preview type to its corresponding viewport style state. Used

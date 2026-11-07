@@ -14,9 +14,15 @@ const EMPTY_IMAGE_MEDIA = [];
 export default function useGetMedia( innerBlockImages ) {
 	return useSelect(
 		( select ) => {
+			// Sorted so the query only changes when the set of images changes,
+			// not when they're reordered: a reorder would otherwise be a new
+			// query, and the records would read as empty until it resolved.
+			// Consumers look records up by id, so the returned order doesn't
+			// matter.
 			const imageIds = innerBlockImages
 				.map( ( imageBlock ) => imageBlock.attributes.id )
-				.filter( ( id ) => id !== undefined );
+				.filter( ( id ) => id !== undefined )
+				.sort( ( a, b ) => a - b );
 
 			if ( imageIds.length === 0 ) {
 				return EMPTY_IMAGE_MEDIA;
@@ -29,7 +35,6 @@ export default function useGetMedia( innerBlockImages ) {
 					{
 						include: imageIds.join( ',' ),
 						per_page: -1,
-						orderby: 'include',
 					}
 				) ?? EMPTY_IMAGE_MEDIA
 			);

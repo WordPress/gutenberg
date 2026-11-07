@@ -26,7 +26,7 @@ const BorderLabel = ( props: LabelProps & { id?: string } ) => {
 
 	// The visible label is rendered as `BaseControl.VisualLabel` so it carries
 	// the stable `.components-base-control__label` className consumers style
-	// against; `StyledLabel` is an emotion component with a generated one.
+	// against, preserving the visible label's public styling hook.
 	return hideLabelFromVision ? (
 		<VisuallyHidden as="span" id={ id }>
 			{ label }

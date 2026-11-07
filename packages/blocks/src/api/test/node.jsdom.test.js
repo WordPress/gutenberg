@@ -49,6 +49,7 @@ describe( 'fromDOM', () => {
 		expect( () => {
 			fromDOM( document.createDocumentFragment() );
 		} ).toThrow( TypeError );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should return an equivalent block node, including children', () => {

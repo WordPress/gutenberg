@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 import ColorPalette from '..';
+import '../../popover/style.scss';
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -15,6 +17,13 @@ const DUPLICATE_COLOR_PALETTE = [
 	{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
 ];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
+
+const DEPRECATION_MESSAGE =
+	'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 const ControlledColorPalette = ( {
 	onChange,
@@ -64,6 +73,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		await render(
 			<ColorPalette
 				aria-label="Colors"
@@ -79,9 +89,7 @@ describe( 'ColorPalette', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'red' } )
 		).not.toHaveAttribute( 'aria-pressed' );
-		expect( console ).toHaveWarnedWith(
-			'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( 'should preserve asButtons as a toggle-button alias', async () => {
@@ -236,6 +244,44 @@ describe( 'ColorPalette', () => {
 		);
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'keeps the color format selector above the ColorPalette popup and returns focus after dismissal', async () => {
+		const user = userEvent.setup();
+		delete (
+			window as Window & { __wpUiCompatOverlaySlotEnabled?: boolean }
+		 ).__wpUiCompatOverlaySlotEnabled;
+		await render( <ControlledColorPalette /> );
+		const pickerTrigger = screen.getByRole( 'button', {
+			name: /^Custom color picker/,
+		} );
+		await user.click( pickerTrigger );
+		const formatTrigger = screen.getByRole( 'combobox', {
+			name: 'Color format',
+		} );
+		await user.click( formatTrigger );
+		const hslOption = screen.getByRole( 'option', { name: 'HSL' } );
+		await waitFor( () => {
+			const { x, y, width, height } = hslOption.getBoundingClientRect();
+			expect(
+				hslOption.contains(
+					document.elementFromPoint( x + width / 2, y + height / 2 )
+				)
+			).toBe( true );
+		} );
+		await user.click( hslOption );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Hue (HSL H value)' } )
+		).toBeVisible();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		await user.click( formatTrigger );
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		expect(
+			screen.queryByRole( 'option', { name: 'HSL' } )
+		).not.toBeInTheDocument();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
 	} );
 
 	it( 'should render dropdown and its content', async () => {

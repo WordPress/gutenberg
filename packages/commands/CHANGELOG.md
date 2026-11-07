@@ -2,13 +2,33 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
-
 ### Internal
 
 -   Replace the `cmdk` dependency with the `Autocomplete` primitive from `@wordpress/ui` to resolve accessibility issues ([#83263](https://github.com/WordPress/gutenberg/pull/83263)).
+
+## 2.1.0 (2026-11-04)
+
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   The package now bundles TypeScript types ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
+
+### Bug Fixes
+
+-   Fix the command palette crashing on a dashicon or component icon, and stop reporting an unregistered command loader as loading ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
+
+## 1.57.0 (2026-10-07)
+
+## 1.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
 
 ## 1.55.0 (2026-09-10)
 
