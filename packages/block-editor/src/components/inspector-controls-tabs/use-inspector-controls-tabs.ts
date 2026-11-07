@@ -122,7 +122,10 @@ export default function useInspectorControlsTabs(
 
 	if (
 		! isPreviewMode &&
-		( hasBlockStyles || hasStyleFills || hasSharedStyleControls )
+		( hasBlockStyles ||
+			hasStyleFills ||
+			isSectionBlock ||
+			hasSharedStyleControls )
 	) {
 		tabs.push( TAB_STYLES );
 	}
