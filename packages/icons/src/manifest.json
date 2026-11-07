@@ -760,6 +760,11 @@
 		"dashicons": [ "dashicons-format-gallery" ]
 	},
 	{
+		"slug": "gallery-grid",
+		"label": "Gallery Grid",
+		"filePath": "library/gallery-grid.svg"
+	},
+	{
 		"slug": "gift",
 		"label": "Gift",
 		"filePath": "library/gift.svg"
