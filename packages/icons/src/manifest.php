@@ -150,7 +150,7 @@ return array(
 		'label'       => _x( 'Calendar', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/calendar.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-calendar-alt', 'dashicons-calendar' ),
+		'dashicons'   => array( 'dashicons-calendar-alt', 'dashicons-calendar', 'dashicons-schedule' ),
 	),
 	'capture-photo'            => array(
 		'label'       => _x( 'Capture Photo', 'icon label', 'gutenberg' ),

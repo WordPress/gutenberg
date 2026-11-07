@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `manifest.json`: Map 113 more Dashicons to `core-admin` icons. To do so, add 80 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `formatBold` and `undo`, and add `chevronUpDown` and `file` from the `core` collection to the `core-admin` collection too ([#86466](https://github.com/WordPress/gutenberg/pull/86466)).
+-   `manifest.json`: Map 114 more Dashicons to `core-admin` icons. To do so, add 80 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `formatBold` and `undo`, and add `chevronUpDown` and `file` from the `core` collection to the `core-admin` collection too ([#86466](https://github.com/WordPress/gutenberg/pull/86466)).
 
 ### Bug Fixes
 
