@@ -127,6 +127,8 @@ function ResizableFrame( {
 
 		setIsOversized( updatedWidth > defaultSize.width );
 
+		// `re-resizable` resets a dimension missing from `size` to `auto` when
+		// the resize ends.
 		setFrameSize( {
 			width: ref.style.width,
 			height: isOversized
