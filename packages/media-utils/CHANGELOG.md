@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaUploadModal`: Add a `fields` prop for fields registered for attachments, shown alongside the modal's own as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
+
 ## 6.1.0 (2026-11-04)
 
 ### Enhancements

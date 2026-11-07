@@ -222,6 +222,14 @@ interface MediaUploadModalProps {
 	 * template" — falling back to a generic label when it is absent.
 	 */
 	postType?: string;
+
+	/**
+	 * Fields registered for attachments, such as a plugin's, shown alongside
+	 * the modal's own and available as columns and filters. A field with the
+	 * ID of one of the modal's own is left out: those carry behavior specific
+	 * to the modal, such as the "Attached to" options for the current post.
+	 */
+	fields?: Field< RestAttachment >[];
 }
 
 /**
@@ -245,6 +253,7 @@ interface MediaUploadModalProps {
  * @param props.searchLabel   Label for search input
  * @param props.postId        ID of the post the modal was opened from
  * @param props.postType      Slug of that post's type
+ * @param props.fields        Fields registered for attachments
  * @return JSX element or null
  */
 export function MediaUploadModal( {
@@ -262,6 +271,7 @@ export function MediaUploadModal( {
 	searchLabel = __( 'Search media' ),
 	postId,
 	postType,
+	fields: registeredFields,
 }: MediaUploadModalProps ) {
 	// The "uploaded to this post" option resolves to this ID, and the media query
 	// has no use for anything else — a template's entity ID, for instance, is a
@@ -508,7 +518,7 @@ export function MediaUploadModal( {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
 
-	const fields: Field< RestAttachment >[] = useMemo(
+	const ownFields: Field< RestAttachment >[] = useMemo(
 		() => [
 			// Media field definitions from @wordpress/media-fields
 			// Cast is safe because RestAttachment has the same properties as Attachment
@@ -562,6 +572,17 @@ export function MediaUploadModal( {
 		],
 		[ attachedToPostId, uploadedToLabel ]
 	);
+
+	const fields = useMemo( () => {
+		if ( ! registeredFields?.length ) {
+			return ownFields;
+		}
+		const ownIds = new Set( ownFields.map( ( { id } ) => id ) );
+		return [
+			...ownFields,
+			...registeredFields.filter( ( { id } ) => ! ownIds.has( id ) ),
+		];
+	}, [ ownFields, registeredFields ] );
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
 		() => [
