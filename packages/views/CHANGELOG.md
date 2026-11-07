@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `getTaxonomyQueryArgs`, which returns the REST query arguments for a view's filters on taxonomy fields. ([#86458](https://github.com/WordPress/gutenberg/pull/86458))
+
 ## 3.1.0 (2026-11-04)
 
 ### Internal

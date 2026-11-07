@@ -23,7 +23,7 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
-import { useView } from '@wordpress/views';
+import { getTaxonomyQueryArgs, useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -281,6 +281,15 @@ export function MediaUploadModal( {
 		[ attachedToPostId, postType ]
 	);
 
+	// The attachment taxonomies, so that a filter on a taxonomy field reaches
+	// the query. Only requested when attachments have taxonomies at all.
+	const taxonomies = useSelect( ( select ) => {
+		const { getPostType, getTaxonomies } = select( coreStore );
+		return getPostType( 'attachment' )?.taxonomies?.length
+			? getTaxonomies( { type: 'attachment', per_page: -1 } )
+			: undefined;
+	}, [] );
+
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
 	);
@@ -451,9 +460,10 @@ export function MediaUploadModal( {
 			orderby: view.sort?.field,
 			search: view.search,
 			_embed: 'author,wp:attached-to',
+			...getTaxonomyQueryArgs( view.filters, taxonomies ?? [] ),
 			...filters,
 		};
-	}, [ view, allowedTypes, attachedToPostId ] );
+	}, [ view, allowedTypes, attachedToPostId, taxonomies ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
