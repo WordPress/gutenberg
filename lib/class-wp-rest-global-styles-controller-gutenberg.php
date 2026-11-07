@@ -411,7 +411,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 *
 	 * @since 5.9.0
 	 * @since 6.3.0 Adds revisions count and rest URL href to version-history.
-	 * @since 7.3.0 Accepts a post object, matching the parent method.
+	 * @since 7.2.0 Accepts a post object, matching the parent method.
 	 *
 	 * @param WP_Post|int $post Post object or ID.
 	 * @return array<string, array<string, string|int>> Links for the given post.
