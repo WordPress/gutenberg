@@ -197,4 +197,75 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
 		$this->assertSame( 1, $error_action->get_call_count(), 'One error should be reported.' );
 	}
+
+	/**
+	 * Tests that template part variations preserve descriptions when set,
+	 * and fall back to a non-breaking space when empty.
+	 *
+	 * @ticket 86102
+	 */
+	public function test_build_template_part_block_instance_variations_description() {
+		add_theme_support( 'block-template-parts' );
+
+		$build_variations = function_exists( 'gutenberg_build_template_part_block_instance_variations' )
+			? 'gutenberg_build_template_part_block_instance_variations'
+			: 'build_template_part_block_instance_variations';
+
+		$with_desc_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Header with Description',
+				'post_name'    => 'header-with-desc',
+				'post_excerpt' => 'Site header navigation description',
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $with_desc_id );
+		wp_set_post_terms( $with_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $with_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
+
+		$empty_desc_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Header Empty Description',
+				'post_name'    => 'header-empty-desc',
+				'post_excerpt' => '',
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $empty_desc_id );
+		wp_set_post_terms( $empty_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $empty_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
+
+		$variations = call_user_func( $build_variations );
+
+		$with_desc_variation  = null;
+		$empty_desc_variation = null;
+
+		foreach ( $variations as $variation ) {
+			if ( 'instance_header-with-desc' === $variation['name'] ) {
+				$with_desc_variation = $variation;
+			} elseif ( 'instance_header-empty-desc' === $variation['name'] ) {
+				$empty_desc_variation = $variation;
+			}
+		}
+
+		$this->assertNotNull( $with_desc_variation, 'Variation with description should exist.' );
+		$this->assertSame(
+			'Site header navigation description',
+			$with_desc_variation['description'],
+			'Template part with description should retain its description string.'
+		);
+
+		$this->assertNotNull( $empty_desc_variation, 'Variation with empty description should exist.' );
+		$this->assertSame(
+			"\u{00A0}",
+			$empty_desc_variation['description'],
+			'Template part with empty description should fall back to non-breaking space (U+00A0).'
+		);
+	}
 }
