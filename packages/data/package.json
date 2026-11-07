@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "11.0.0",
+	"version": "11.1.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -62,7 +62,7 @@
 		"@testing-library/user-event": "^14.6.8",
 		"@types/deep-freeze": "^0.1.5",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.3"
+		"vitest": "^5.0.5"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
