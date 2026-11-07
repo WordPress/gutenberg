@@ -226,6 +226,59 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( 'preserves manually added attributes when editing a link', async ( {
+		editor,
+		page,
+		LinkUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="https://wordpress.org" id="manual-link" class="button" title="Tooltip" data-pizza="Pepperoni">Custom link</a>',
+			},
+		} );
+
+		const link = editor.canvas.getByRole( 'link', { name: 'Custom link' } );
+		await link.click();
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await page
+			.getByPlaceholder( 'Search or type URL' )
+			.fill( 'https://wordpress.org/gutenberg' );
+		await linkPopover.getByRole( 'button', { name: 'Advanced' } ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).check();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect( link ).toHaveAttribute(
+			'href',
+			'https://wordpress.org/gutenberg'
+		);
+		await expect( link ).toHaveAttribute( 'target', '_blank' );
+		await expect( link ).toHaveAttribute( 'data-pizza', 'Pepperoni' );
+		await expect( link ).toHaveAttribute( 'id', 'manual-link' );
+		await expect( link ).toHaveAttribute( 'class', 'button' );
+		await expect( link ).toHaveAttribute( 'title', 'Tooltip' );
+
+		// Clearing a managed setting must not restore its previous value.
+		await link.click();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).uncheck();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+		await expect( link ).not.toHaveAttribute( 'target' );
+		await expect( link ).not.toHaveAttribute( 'rel' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: expect.stringContaining(
+						'data-pizza="Pepperoni"'
+					),
+				},
+			},
+		] );
+	} );
+
 	test( `can remove existing links`, async ( { editor, LinkUtils } ) => {
 		await LinkUtils.createLink();
 

@@ -13,6 +13,7 @@
 -   Non-breaking space: Remove a non-breaking space instead of replacing it when HTML would collapse the space ([#85873](https://github.com/WordPress/gutenberg/pull/85873)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Non-breaking space: Label the replace button "Replace non-breaking space" when it replaces only one ([#85777](https://github.com/WordPress/gutenberg/pull/85777)).
+-   Link: Preserve manually added attributes and HTML IDs when editing an existing inline link ([#84841](https://github.com/WordPress/gutenberg/pull/84841)).
 
 ## 6.0.0 (2026-10-20)
 
