@@ -964,4 +964,28 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
+
+	/**
+	 * Tests that storing a rule whose selector is only whitespace is skipped
+	 * instead of calling {@see WP_Style_Engine_CSS_Rule_Gutenberg::add_declarations()} on null.
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
+	 */
+	public function test_should_skip_storing_rule_with_whitespace_selector() {
+		$css_rules = array(
+			array(
+				'selector'     => ' ',
+				'declarations' => array(
+					'color' => 'red',
+				),
+			),
+		);
+
+		gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'context' => 'test-whitespace-selector' ) );
+
+		$store = WP_Style_Engine_Gutenberg::get_store( 'test-whitespace-selector' );
+		$this->assertInstanceOf( WP_Style_Engine_CSS_Rules_Store_Gutenberg::class, $store );
+		$this->assertSame( array(), $store->get_all_rules(), 'Expected no rule to be stored.' );
+	}
 }
