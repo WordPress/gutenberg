@@ -12,6 +12,7 @@ import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { store as editorStore } from '../../store';
 
 const COMMENT_OPTIONS = [
@@ -32,6 +33,9 @@ const COMMENT_OPTIONS = [
 
 export default function SiteDiscussion() {
 	const { editEntityRecord } = useDispatch( coreStore );
+	// Site settings are not part of the post: a suggestion cannot propose
+	// them, so they are read-only while suggesting.
+	const lockedProps = useLockedPostSettingProps();
 	const { allowCommentsOnNewPosts, isTemplate, postSlug } = useSelect(
 		( select ) => {
 			const { getEditedPostAttribute, getCurrentPostType } =
@@ -89,6 +93,7 @@ export default function SiteDiscussion() {
 						aria-expanded={ isOpen }
 						aria-label={ __( 'Change discussion settings' ) }
 						onClick={ onToggle }
+						{ ...lockedProps }
 					>
 						{ allowCommentsOnNewPosts
 							? __( 'Comments open' )
