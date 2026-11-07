@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Remove `@wordpress/private-apis` dependency and export `MediaEditor`, `MediaEditorModal`, and `store` as regular package exports ([#86114](https://github.com/WordPress/gutenberg/pull/86114)).
 -   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ## 0.22.0 (2026-11-04)
