@@ -44,6 +44,7 @@
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 -   Typography panel: "Reset all" also clears the link color that follows the text color ([#85376](https://github.com/WordPress/gutenberg/pull/85376)).
 -   Block Inspector: While a style state is edited, show the regular style panels for a template part instead of empty section style panels ([#86084](https://github.com/WordPress/gutenberg/pull/86084)).
+-   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
 
 ### Internal
 
