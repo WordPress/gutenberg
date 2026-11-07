@@ -436,7 +436,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		);
 
 		if ( post_type_supports( $this->post_type, 'revisions' ) ) {
-			$revisions                = wp_get_latest_revision_id_and_total_count( $id );
+			$revisions                = wp_get_latest_revision_id_and_total_count( $post );
 			$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
 			$revisions_base           = sprintf( '/%s/%d/revisions', $base, $id );
 			$links['version-history'] = array(
