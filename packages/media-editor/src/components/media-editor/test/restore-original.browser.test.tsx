@@ -6,9 +6,19 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import '@wordpress/components/src/style.scss';
+// The package stylesheet loads the image editor's built CSS, which only
+// exists after a build, so load the same styles from source.
+import '@wordpress/image-editor/src/style.scss';
 import MediaEditor, { type MediaEditorFrameProps } from '../index';
 import type { Media } from '../../media-editor-provider';
-import '../../../style.scss';
+import '../../media-preview/style.scss';
+import '../style.scss';
+import '../../media-form/style.scss';
+import '../../media-editor-modal/style.scss';
+import '../../media-editor-canvas/style.scss';
+import '../../media-editor-image-controls/style.scss';
+import '../../media-editor-keyboard-shortcuts-modal/style.scss';
+import '../../rotation-ruler/style.scss';
 
 const original: Media = {
 	id: 10,
@@ -51,7 +61,9 @@ function Frame( { children }: MediaEditorFrameProps ) {
 	);
 }
 
-async function setup() {
+async function setup( {
+	onEditOriginal,
+}: { onEditOriginal?: ( originalId: number ) => void } = {} ) {
 	await page.viewport( 1000, 800 );
 	const writes = vi.fn();
 	vi.spyOn( window, 'fetch' ).mockImplementation(
@@ -96,6 +108,7 @@ async function setup() {
 			<MediaEditor
 				id={ 11 }
 				onSaved={ onSaved }
+				onEditOriginal={ onEditOriginal }
 				renderFrame={ Frame }
 				fields={ [
 					{
@@ -158,6 +171,35 @@ describe( 'Restore original', () => {
 		).toBe( false );
 	} );
 
+	it( 'hands the original to the frame when it opens the original itself', async () => {
+		const onEditOriginal = vi.fn();
+		const { registry } = await setup( { onEditOriginal } );
+		await userEvent.fill(
+			screen.getByRole( 'textbox', { name: 'Alternative text' } ),
+			'Unsaved cropped text'
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'History' } )
+		);
+		expect(
+			screen.queryByRole( 'menuitem', { name: /^Restore original/ } )
+		).not.toBeInTheDocument();
+		await userEvent.click(
+			screen.getByRole( 'menuitem', { name: /^Edit original/ } )
+		);
+
+		expect( onEditOriginal ).toHaveBeenCalledExactlyOnceWith( 10 );
+		expect(
+			registry
+				.select( coreStore )
+				.hasEditsForEntityRecord( 'postType', 'attachment', 11 )
+		).toBe( false );
+		expect( screen.getByRole( 'textbox', { name: 'Title' } ) ).toHaveValue(
+			'Cropped title'
+		);
+	} );
+
 	it( 'saves an untouched restore without writing an attachment', async () => {
 		const { writes, onSaved } = await setup();
 		await restoreOriginal();
@@ -217,10 +259,18 @@ describe( 'Restore original', () => {
 		const editWrite = withTransform
 			? writes.mock.calls[ 0 ][ 1 ]
 			: undefined;
-		expect( { src: editWrite?.src, post: editWrite?.post } ).toEqual(
+		expect( {
+			src: editWrite?.src,
+			post: editWrite?.post,
+			modifiers: editWrite?.modifiers,
+		} ).toEqual(
 			withTransform
-				? { src: original.source_url, post: original.post }
-				: { src: undefined, post: undefined }
+				? {
+						src: original.source_url,
+						post: original.post,
+						modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
+					}
+				: { src: undefined, post: undefined, modifiers: undefined }
 		);
 	} );
 } );
