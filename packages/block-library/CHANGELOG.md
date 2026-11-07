@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Template Part: Fix boolean operator in instance variation description fallback to preserve template part descriptions and use a non-breaking space when empty ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 -   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
@@ -32,7 +33,6 @@
 
 -   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
 -   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
--   Template Part: Fix boolean operator in instance variation description fallback to preserve template part descriptions and use a non-breaking space when empty ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
 -   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
