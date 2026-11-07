@@ -1,9 +1,9 @@
 import type {
 	Command,
-	CommandCategory,
 	CommandConfig,
 	CommandLoader,
 	CommandLoaderHook,
+	RegisterableCommandCategory,
 } from '../store/types';
 
 export type OnResolved = (
@@ -11,36 +11,30 @@ export type OnResolved = (
 	commands: CommandConfig[]
 ) => void;
 
+export type RunCommand = ( command: Command, close: () => void ) => void;
+
+export interface CommandGroup {
+	key: string;
+	label: string;
+	items: Command[];
+}
+
 export interface CommandItemProps {
-	command: CommandConfig;
+	command: Command;
 	search: string;
-	category?: CommandCategory;
-	valuePrefix?: string;
+	onRun: RunCommand;
 }
 
-export interface CommandMenuLoaderProps {
-	name: string;
-	search: string;
-	hook: CommandLoaderHook;
-	category?: CommandCategory;
-	valuePrefix?: string;
-}
-
-export interface CommandListProps {
-	search: string;
-	commands: Command[];
-	loaders: CommandLoader[];
-	valuePrefix?: string;
-}
-
-export interface RecentLoaderRunnerProps {
+export interface LoaderCollectorOptions {
 	hook: CommandLoaderHook;
 	name: string;
-	filterNames: Set< string >;
+	category?: RegisterableCommandCategory;
+	search: string;
 	onResolved: OnResolved;
 }
 
-export interface CommandInputProps {
+export interface LoaderRunnerProps {
+	loader: CommandLoader;
 	search: string;
-	setSearch: ( search: string ) => void;
+	onResolved: OnResolved;
 }
