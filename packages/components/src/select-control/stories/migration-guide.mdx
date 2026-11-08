@@ -202,6 +202,8 @@ The primitive accepts string values directly. With string item values as in this
 
 The legacy `onChange` receives the selected string and an optional `{ event }` envelope containing a select change event. The new `onValueChange` receives the selected item and event details. That event comes from the popup interaction and is not a native select change event. Read the value from the callback's first argument, not `event.target.value`.
 
+The legacy control calls `onChange` only when the selection changes. The new control also calls `onValueChange` when the user selects the item that is already selected. If the callback does more than store the value, such as resetting view state, compare the new item with the current selection before acting on it.
+
 When migrating a component that exposes its own callback to plugins, preserve its documented value and argument shape where possible. If forwarding an event is required, adapt the envelope explicitly and document the change in event semantics.
 
 ## Update refs and DOM access
@@ -223,7 +225,7 @@ For directly bundled applications mixing `@wordpress/components` overlays with `
 ## Verify a migration
 
 - Select each meaningful default, empty, zero, inherited, mixed, and custom value. Confirm the label, stored value, and selection survive saving and reopening. Include missing saved values, empty item arrays, disabled choices, and asynchronously loaded items where supported.
-- Open and select with both pointer and keyboard. Check Escape dismissal, focus return, Tab navigation, typeahead, accessible names and descriptions, and any focus or hover preview callbacks.
+- Open and select with both pointer and keyboard. Reselect the current item and confirm that the stored value and other view state stay unchanged. Check Escape dismissal, focus return, Tab navigation, typeahead, accessible names and descriptions, and any focus or hover preview callbacks.
 - Exercise the actual parent popover, modal, editor, or form. Check stacking, outside-click behavior, scrolling to the last option near viewport edges, and native submission or validation when used.
 - Check long labels and constrained layouts. In Storybook, include WordPress Global CSS and forced colors for migrated styling. Use browser checks for layout, scrolling, and focus behavior.
 

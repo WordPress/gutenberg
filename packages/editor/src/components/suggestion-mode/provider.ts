@@ -15,7 +15,7 @@ import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
 	removeNoteIdFromMetadata,
-} from '../collab-sidebar/utils';
+} from '../collab-sidebar/utils/metadata';
 import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 import { unlock } from '../../lock-unlock';
 

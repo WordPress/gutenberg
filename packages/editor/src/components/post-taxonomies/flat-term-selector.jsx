@@ -9,7 +9,6 @@ import {
 import { withFilters } from '@wordpress/components';
 import {
 	SearchableChipSelectControl,
-	Spinner,
 	Stack,
 	VisuallyHidden,
 } from '@wordpress/ui';
@@ -539,10 +538,9 @@ export function FlatTermSelector( { slug } ) {
 				onInputValueChange={ onInputValueChange }
 				statusContent={
 					isSearching ? (
-						<Stack direction="row" gap="sm" align="center">
-							<Spinner />
+						<SearchableChipSelectControl.LoadingIndicator>
 							{ __( 'Searching…' ) }
-						</Stack>
+						</SearchableChipSelectControl.LoadingIndicator>
 					) : (
 						suggestions.length > 0 && (
 							<VisuallyHidden>
