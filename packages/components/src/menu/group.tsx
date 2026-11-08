@@ -1,20 +1,15 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { GroupProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 
 export const Group = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< GroupProps, 'div', false >
->( function Group( props, ref ) {
+>( function UnforwardedGroup( { className, ...props }, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
@@ -24,6 +19,11 @@ export const Group = forwardRef<
 	}
 
 	return (
-		<Styled.Group ref={ ref } { ...props } store={ menuContext.store } />
+		<Ariakit.MenuGroup
+			ref={ ref }
+			{ ...props }
+			className={ clsx( styles.group, className ) }
+			store={ menuContext.store }
+		/>
 	);
 } );

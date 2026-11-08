@@ -25,8 +25,7 @@
 		content: "";
 		position: absolute;
 		top: 0;
-		left: $grid-unit-30;
-		right: $grid-unit-30;
+		inset-inline: $grid-unit-30;
 		height: 1px;
 		background-color: $gray-100;
 	}

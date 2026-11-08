@@ -1,60 +1,49 @@
-/**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
-import { useRegistry } from '@wordpress/data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function getLatestHeadings( select, clientId ) {
-	const {
-		getBlockAttributes,
-		getBlockName,
-		getBlocksByName,
-		getClientIdsOfDescendants,
-	} = select( blockEditorStore );
+const EMPTY_ARRAY = [];
 
-	// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-	// Blocks can be loaded into a *non-post* block editor, so to avoid
-	// declaring @wordpress/editor as a dependency, we must access its
-	// store by string. When the store is not available, editorSelectors
-	// will be null, and the block's saved markup will lack permalinks.
-	const permalink = select( 'core/editor' ).getPermalink() ?? null;
+/**
+ * Flattens a block tree in document order, the same order the server walks
+ * the post content in.
+ *
+ * @param {Object[]} blocks Blocks to flatten.
+ *
+ * @return {Object[]} Flat list of blocks.
+ */
+function flattenBlocks( blocks ) {
+	return blocks.flatMap( ( block ) => [
+		block,
+		...flattenBlocks( block.innerBlocks ?? [] ),
+	] );
+}
 
-	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
-	const { onlyIncludeCurrentPage, maxLevel } =
-		getBlockAttributes( clientId ) ?? {};
-
-	// Get post-content block client ID.
-	const [ postContentClientId = '' ] = getBlocksByName( 'core/post-content' );
-
-	// Get the client ids of all blocks in the editor.
-	const allBlockClientIds = getClientIdsOfDescendants( postContentClientId );
+function getLatestHeadings(
+	blocks,
+	clientId,
+	permalink,
+	{ onlyIncludeCurrentPage, maxLevel }
+) {
+	const allBlocks = flattenBlocks( blocks );
+	const isPaginated = allBlocks.some(
+		( block ) => block.name === 'core/nextpage'
+	);
 
 	// If onlyIncludeCurrentPage is true, calculate the page (of a paginated post) this block is part of, so we know which headings to include; otherwise, skip the calculation.
+	// A Table of Contents placed outside the post content, in a template,
+	// is not part of the post, so it uses the first page.
 	let tocPage = 1;
 
 	if ( isPaginated && onlyIncludeCurrentPage ) {
-		// We can't use getBlockIndex because it only returns the index
-		// relative to sibling blocks.
-		const tocIndex = allBlockClientIds.indexOf( clientId );
+		const tocIndex = allBlocks.findIndex(
+			( block ) => block.clientId === clientId
+		);
 
-		for ( const [
-			blockIndex,
-			blockClientId,
-		] of allBlockClientIds.entries() ) {
-			// If we've reached blocks after the Table of Contents, we've
-			// finished calculating which page the block is on.
-			if ( blockIndex >= tocIndex ) {
-				break;
-			}
-			if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
+		for ( const block of allBlocks.slice( 0, Math.max( tocIndex, 0 ) ) ) {
+			if ( block.name === 'core/nextpage' ) {
 				tocPage++;
 			}
 		}
@@ -66,17 +55,14 @@ function getLatestHeadings( select, clientId ) {
 	let headingPage = 1;
 	let headingPageLink = null;
 
-	// If the core/editor store is available, we can add permalinks to the
-	// generated table of contents.
 	if ( typeof permalink === 'string' ) {
 		headingPageLink = isPaginated
 			? addQueryArgs( permalink, { page: headingPage } )
 			: permalink;
 	}
 
-	for ( const blockClientId of allBlockClientIds ) {
-		const blockName = getBlockName( blockClientId );
-		if ( blockName === 'core/nextpage' ) {
+	for ( const block of allBlocks ) {
+		if ( block.name === 'core/nextpage' ) {
 			headingPage++;
 
 			// If we're only including headings from the current page (of
@@ -97,8 +83,8 @@ function getLatestHeadings( select, clientId ) {
 		// the same page as the Table of Contents block, add them to the
 		// list.
 		else if ( ! onlyIncludeCurrentPage || headingPage === tocPage ) {
-			if ( blockName === 'core/heading' ) {
-				const headingAttributes = getBlockAttributes( blockClientId );
+			if ( block.name === 'core/heading' ) {
+				const headingAttributes = block.attributes;
 
 				// Skip headings that are deeper than maxLevel
 				if ( maxLevel && headingAttributes.level > maxLevel ) {
@@ -130,38 +116,56 @@ function getLatestHeadings( select, clientId ) {
 	return latestHeadings;
 }
 
-function observeCallback( select, dispatch, clientId ) {
-	const { getBlockAttributes } = select( blockEditorStore );
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		dispatch( blockEditorStore );
+/**
+ * Returns the headings of the post given by the block context, including
+ * unsaved edits.
+ *
+ * @param {Object}  options
+ * @param {string}  options.clientId               Table of Contents block client ID.
+ * @param {number}  options.postId                 Post ID from the block context.
+ * @param {string}  options.postType               Post type from the block context.
+ * @param {boolean} options.onlyIncludeCurrentPage Whether to only include headings from the current page.
+ * @param {number}  options.maxLevel               Maximum heading level to include.
+ *
+ * @return {Object[]} Heading data.
+ */
+export function useHeadings( {
+	clientId,
+	postId,
+	postType,
+	onlyIncludeCurrentPage,
+	maxLevel,
+} ) {
+	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
+		id: postId,
+	} );
+	const permalink = useSelect(
+		( select ) =>
+			postId
+				? select( coreStore ).getEditedEntityRecord(
+						'postType',
+						postType,
+						postId
+					)?.link
+				: undefined,
+		[ postType, postId ]
+	);
 
-	/**
-	 * If the block no longer exists in the store, skip the update.
-	 * The "undo" action recreates the block and provides a new `clientId`.
-	 * The hook still might be observing the changes while the old block unmounts.
-	 */
-	const attributes = getBlockAttributes( clientId );
-	if ( attributes === null ) {
-		return;
-	}
+	return useMemo( () => {
+		if ( ! postId || ! blocks ) {
+			return EMPTY_ARRAY;
+		}
 
-	const headings = getLatestHeadings( select, clientId );
-	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
-		// Executing the update in a microtask ensures that the non-persistent marker doesn't affect an attribute triggering the change.
-		window.queueMicrotask( () => {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( clientId, { headings } );
+		return getLatestHeadings( blocks, clientId, permalink, {
+			onlyIncludeCurrentPage,
+			maxLevel,
 		} );
-	}
-}
-
-export function useObserveHeadings( clientId ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
-		// See: https://github.com/WordPress/gutenberg/pull/45513
-		return registry.subscribe( () =>
-			observeCallback( registry.select, registry.dispatch, clientId )
-		);
-	}, [ registry, clientId ] );
+	}, [
+		blocks,
+		clientId,
+		permalink,
+		postId,
+		onlyIncludeCurrentPage,
+		maxLevel,
+	] );
 }

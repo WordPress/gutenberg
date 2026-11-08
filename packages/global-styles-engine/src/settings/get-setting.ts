@@ -1,12 +1,10 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import type { GlobalStylesConfig } from '../types';
 
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundClip',
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
@@ -38,6 +36,7 @@ const VALID_SETTINGS = [
 	'dimensions.aspectRatio',
 	'dimensions.height',
 	'dimensions.minHeight',
+	'dimensions.minWidth',
 	'dimensions.width',
 	'dimensions.dimensionSizes',
 	'layout.contentSize',
@@ -69,8 +68,13 @@ const VALID_SETTINGS = [
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textIndent',
+	'typography.textShadow',
+	'typography.defaultTextShadowPresets',
+	'typography.textShadowPresets',
 	'typography.textTransform',
 	'typography.writingMode',
+	'viewport.mobile',
+	'viewport.tablet',
 ];
 
 export function getSetting< T = any >(

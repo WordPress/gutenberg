@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Footnotes in Revisions UI', () => {
@@ -14,7 +11,7 @@ test.describe( 'Footnotes in Revisions UI', () => {
 	} ) => {
 		// --- Revision 1: paragraph with footnote "alpha" ---
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph one' );
 
@@ -39,7 +36,9 @@ test.describe( 'Footnotes in Revisions UI', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
 			.click();
 
 		// Wait for the revisions mode to be active.

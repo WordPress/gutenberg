@@ -1,22 +1,13 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MenuItemsChoice from '..';
 import MenuGroup from '../../menu-group';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuItemsChoice > = {
+	tags: [ 'manifest' ],
 	component: MenuItemsChoice,
-	title: 'Components/Actions/MenuItemsChoice',
+	title: 'Components/@wordpress-components/Actions/MenuItemsChoice',
 	id: 'components-menuitemschoice',
 	argTypes: {
 		onHover: { action: 'onHover' },
@@ -29,7 +20,7 @@ const meta: Meta< typeof MenuItemsChoice > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},
@@ -45,17 +36,19 @@ const Template: StoryFn< typeof MenuItemsChoice > = ( {
 	const [ choice, setChoice ] = useState( choices[ 0 ]?.value ?? '' );
 
 	return (
-		<MenuGroup label="Editor">
-			<MenuItemsChoice
-				choices={ choices }
-				value={ choice }
-				onSelect={ ( ...selectArgs ) => {
-					onSelect( ...selectArgs );
-					setChoice( ...selectArgs );
-				} }
-				onHover={ onHover }
-			/>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup label="Editor">
+				<MenuItemsChoice
+					choices={ choices }
+					value={ choice }
+					onSelect={ ( ...selectArgs ) => {
+						onSelect( ...selectArgs );
+						setChoice( ...selectArgs );
+					} }
+					onHover={ onHover }
+				/>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 

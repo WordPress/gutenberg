@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 const { exit, stdout } = require( 'process' );
-
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
 const { sync: dirGlob } = require( 'dir-glob' );
 const { sync: readPkgUp } = require( 'read-pkg-up' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	fromProjectRoot,
@@ -104,7 +93,19 @@ if ( fileArgs.length === 0 ) {
 
 // Converts `foo/bar` directory to `foo/bar/**/*.js`
 const globArgs = dirGlob( fileArgs, {
-	extensions: [ 'js', 'jsx', 'json', 'ts', 'tsx', 'yml', 'yaml' ],
+	extensions: [
+		'cjs',
+		'cts',
+		'js',
+		'json',
+		'jsx',
+		'mjs',
+		'mts',
+		'ts',
+		'tsx',
+		'yml',
+		'yaml',
+	],
 } );
 
 const result = spawn(

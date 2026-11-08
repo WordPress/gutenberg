@@ -3,12 +3,17 @@ import {
 	formatBold,
 	formatItalic,
 	formatUnderline,
-	info,
+	help,
 } from '@wordpress/icons';
-import { Icon, IconButton, Popover, Tooltip, VisuallyHidden } from '../..';
+import * as Tooltip from '../';
+import { Icon } from '../../icon';
+import { IconButton } from '../../icon-button';
+import * as Popover from '../../popover';
+import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta = {
-	title: 'Design System/Components/Tooltip/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Tooltip/Usage Guidelines',
+	id: 'design-system-components-tooltip-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},
@@ -52,7 +57,7 @@ export const RecommendedUsage: Story = {
 };
 
 /**
- * Popups that open when hovering an info icon should use `Popover` with
+ * Popups that open when hovering a help icon should use `Popover` with
  * `openOnHover` instead of a Tooltip. This ensures the content is accessible
  * to touch and screen reader users.
  */
@@ -82,7 +87,7 @@ export const InfotipWithPopover: Story = {
 						borderRadius: 'var(--wpds-border-radius-sm)',
 					} }
 				>
-					<Icon icon={ info } size={ 20 } />
+					<Icon icon={ help } size={ 20 } />
 				</Popover.Trigger>
 				<Popover.Popup>
 					<Popover.Arrow />

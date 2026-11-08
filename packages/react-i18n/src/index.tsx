@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	ComponentType,
 	FunctionComponent,
 	PropsWithChildren,
 } from 'react';
 import type { Subtract } from 'utility-types';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,

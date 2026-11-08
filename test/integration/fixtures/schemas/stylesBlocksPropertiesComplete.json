@@ -1,0 +1,13 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"notablockname": {
+				"color": {
+					"text": "red"
+				}
+			}
+		}
+	}
+}

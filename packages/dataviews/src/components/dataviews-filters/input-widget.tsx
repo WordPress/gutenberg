@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import { Flex } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	NormalizedFilter,
@@ -114,7 +103,7 @@ export default function InputWidget( {
 							//
 							// In practice, this means the filter will not be able to find an empty string as the value.
 							value: nextValue === '' ? undefined : nextValue,
-					  }
+						}
 					: _filter
 			),
 		} );

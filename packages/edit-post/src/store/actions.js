@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -12,10 +9,6 @@ import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
@@ -274,19 +267,6 @@ export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	return {
 		type: 'SET_META_BOXES_PER_LOCATIONS',
 		metaBoxesPerLocation,
-	};
-}
-
-/**
- * Stores the IDs of meta boxes marked as compatible with real-time collaboration
- * via the __rtc_compatible_meta_box flag on the server.
- *
- * @param {string[]} ids Meta box IDs that are RTC-compatible.
- */
-export function setRtcCompatibleMetaBoxIds( ids ) {
-	return {
-		type: 'SET_RTC_COMPATIBLE_META_BOX_IDS',
-		ids,
 	};
 }
 

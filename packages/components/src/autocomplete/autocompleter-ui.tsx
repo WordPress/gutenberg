@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
-
-/**
- * WordPress dependencies
- */
 import {
 	useLayoutEffect,
 	useRef,
@@ -17,10 +10,6 @@ import { useAnchor } from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
@@ -30,6 +19,7 @@ import type { AutocompleterUIProps, KeyedOption } from './types';
 type ListBoxProps = {
 	items: KeyedOption[];
 	onSelect: ( option: KeyedOption ) => void;
+	onHover: ( index: number ) => void;
 	selectedIndex: number;
 	instanceId: number;
 	listBoxId: string | undefined;
@@ -40,6 +30,7 @@ type ListBoxProps = {
 function ListBox( {
 	items,
 	onSelect,
+	onHover,
 	selectedIndex,
 	instanceId,
 	listBoxId,
@@ -65,12 +56,15 @@ function ListBox( {
 						'components-autocomplete__result',
 						className,
 						{
-							// Unused, for backwards compatibility.
 							'is-selected': index === selectedIndex,
 						}
 					) }
-					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
+					onMouseMove={ () => {
+						if ( index !== selectedIndex ) {
+							onHover( index );
+						}
+					} }
 				>
 					{ option.label }
 				</Button>
@@ -88,6 +82,7 @@ export function AutocompleterUI( {
 	selectedIndex,
 	onChangeOptions,
 	onSelect,
+	onHover,
 	reset,
 	contentRef,
 }: AutocompleterUIProps ) {
@@ -96,7 +91,6 @@ export function AutocompleterUI( {
 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
-	// eslint-disable-next-line react-compiler/react-compiler
 	const [ items ] = useItems( filterValue );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -189,6 +183,7 @@ export function AutocompleterUI( {
 				<ListBox
 					items={ items }
 					onSelect={ onSelect }
+					onHover={ onHover }
 					selectedIndex={ selectedIndex }
 					instanceId={ instanceId }
 					listBoxId={ listBoxId }
@@ -201,6 +196,7 @@ export function AutocompleterUI( {
 					<ListBox
 						items={ items }
 						onSelect={ onSelect }
+						onHover={ onHover }
 						selectedIndex={ selectedIndex }
 						instanceId={ instanceId }
 						listBoxId={ listBoxId }

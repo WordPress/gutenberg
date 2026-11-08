@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import type {
 	ViewTable,
@@ -23,13 +16,9 @@ import type {
 export default function DensityPicker() {
 	const context = useContext( DataViewsContext );
 	const view = context.view as
-		| ViewTable
-		| ViewList
-		| ViewGrid
-		| ViewPickerGrid;
+		ViewTable | ViewList | ViewGrid | ViewPickerGrid;
 	return (
 		<ToggleGroupControl
-			size="__unstable-large"
 			label={ __( 'Density' ) }
 			value={ view.layout?.density || 'balanced' }
 			onChange={ ( value ) => {

@@ -3,8 +3,16 @@ import { useId } from '@wordpress/element';
 import { VisuallyHidden } from '../';
 
 const meta: Meta< typeof VisuallyHidden > = {
-	title: 'Design System/Components/VisuallyHidden',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/VisuallyHidden',
+	id: 'design-system-components-visuallyhidden',
 	component: VisuallyHidden,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
