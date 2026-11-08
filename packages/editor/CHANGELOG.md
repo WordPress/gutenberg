@@ -6,6 +6,7 @@
 
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+-   Notes: Enable notes on saved templates and template parts in the site editor, resolving the note's target post from the template record's `wp_id` ([#81548](https://github.com/WordPress/gutenberg/pull/81548)).
 
 ### Bug Fixes
 

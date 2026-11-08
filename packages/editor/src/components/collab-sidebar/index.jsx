@@ -38,15 +38,23 @@ function NotesSidebar( { postId, drafts } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	const { clientIds, isClassicBlock } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockName } =
-			select( blockEditorStore );
+	const { clientIds, canAddNote } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientIds,
+			getBlockName,
+			getBlockParentsByBlockName,
+		} = select( blockEditorStore );
 		const _clientIds = getSelectedBlockClientIds();
 		return {
 			clientIds: _clientIds,
-			isClassicBlock: _clientIds.some(
-				( id ) => getBlockName( id ) === 'core/freeform'
-			),
+			canAddNote:
+				_clientIds.length > 0 &&
+				_clientIds.every(
+					( id ) =>
+						getBlockName( id ) !== 'core/freeform' &&
+						! getBlockParentsByBlockName( id, 'core/template-part' )
+							.length
+				),
 		};
 	}, [] );
 	const { notesDisplayMode, selectedNoteId, isAllNotesSidebarOpen } =
@@ -145,7 +153,7 @@ function NotesSidebar( { postId, drafts } ) {
 			addNewNote( clientIds );
 		},
 		{
-			isDisabled: isClassicBlock || ! clientIds.length,
+			isDisabled: ! canAddNote,
 		}
 	);
 
@@ -230,11 +238,11 @@ export default function NotesSidebarContainer() {
 	const [ drafts ] = useState( () => new Map() );
 	const { postId, editorMode, revisionsMode, isDistractionFree } = useSelect(
 		( select ) => {
-			const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
+			const { getNotesPostId, getEditorMode, isRevisionsMode } = unlock(
 				select( editorStore )
 			);
 			return {
-				postId: getCurrentPostId(),
+				postId: getNotesPostId(),
 				editorMode: getEditorMode(),
 				revisionsMode: isRevisionsMode(),
 				isDistractionFree: select( preferencesStore ).get(
@@ -246,7 +254,9 @@ export default function NotesSidebarContainer() {
 		[]
 	);
 
-	if ( ! postId || typeof postId !== 'number' ) {
+	// Notes need a numeric post to attach to. Templates that only exist as
+	// theme files don't have one until they're saved.
+	if ( postId === undefined ) {
 		return null;
 	}
 
