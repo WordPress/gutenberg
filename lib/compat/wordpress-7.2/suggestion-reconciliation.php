@@ -158,7 +158,6 @@ function gutenberg_register_suggestion_placeholder_block() {
 	}
 	register_block_type(
 		Gutenberg_Suggestion_Content::PLACEHOLDER,
-		// @phpstan-ignore argument.type (WordPress takes an integer API version, as block.json gives it; the stubs say string.)
 		array(
 			'api_version'     => 3,
 			'attributes'      => array(
