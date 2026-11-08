@@ -2596,9 +2596,6 @@ async function watchMode() {
 			await transpilePackage( packageName );
 			await bundlePackage( packageName );
 
-			// A PHP file may have been added or removed.
-			await updateCopiedPhpFiles( packageName );
-
 			const buildTime = Date.now() - startTime;
 			console.log( `✅ ${ packageName } (${ buildTime }ms)` );
 
@@ -2804,6 +2801,19 @@ async function watchMode() {
 			event === 'change' && copiedPhpFiles.get( packageName )?.has( file )
 				? `php:${ packageName }:${ file }`
 				: packageName;
+
+		/*
+		 * Find the package's copied PHP files again when one may have been
+		 * added or removed. Until that finishes, a change to an added file
+		 * rebuilds the package, which copies it too.
+		 */
+		if ( event !== 'change' && file.endsWith( '.php' ) ) {
+			updateCopiedPhpFiles( packageName ).catch( ( error ) => {
+				console.log(
+					`❌ ${ packageName } - Error finding copied PHP files: ${ error.message }`
+				);
+			} );
+		}
 
 		// Queue the item, so that it is not written while a rebuild is running.
 		if ( isRebuilding ) {
