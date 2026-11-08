@@ -58,7 +58,7 @@ import type {
 } from './operations';
 import { readSuggestionMarker, proposedAttributes } from './marker';
 import type { SuggestionMarker } from './marker';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionsProvider } from './provider';
 import { useHydratePostFieldProposals } from './post-field-proposal-hydration';

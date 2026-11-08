@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
 import { withoutProposedAttributes } from './marker';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import {
 	rebaseFormatOriginal,
 	resolveInlineSuggestion,

@@ -5,7 +5,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
-import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
+import { removeNoteIdFromMetadata } from '../collab-sidebar/utils/metadata';
 import { useSuggestionsProvider } from './provider';
 import { useSuggestionSession } from './suggestion-session';
 

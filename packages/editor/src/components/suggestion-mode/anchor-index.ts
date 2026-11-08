@@ -31,7 +31,7 @@ import {
 	SUGGESTION_ID_ATTRIBUTE,
 	isSuggestionFormat,
 } from '../inline-suggestions';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 
 /**
  * The id attribute of a serialized inline marker. Matched on the serialized

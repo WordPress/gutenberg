@@ -3,7 +3,7 @@ import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import type { MovedBlockDescriptor } from './move-ghost-index';
 
 /**
