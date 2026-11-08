@@ -681,12 +681,12 @@ test.describe( 'Client-side media processing', () => {
 				mediaProcessingUtils,
 				media.id,
 				async ( modal ) => {
+					// The docked Crop panel carries the aspect ratio control.
 					await modal
-						.getByRole( 'button', { name: 'Aspect ratio' } )
-						.first()
+						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
 					await page
-						.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+						.getByRole( 'option', { name: 'Square (1:1)' } )
 						.click();
 				}
 			);
@@ -733,12 +733,12 @@ test.describe( 'Client-side media processing', () => {
 				mediaProcessingUtils,
 				media.id,
 				async ( modal ) => {
+					// The docked Crop panel carries the aspect ratio control.
 					await modal
-						.getByRole( 'button', { name: 'Aspect ratio' } )
-						.first()
+						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
 					await page
-						.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+						.getByRole( 'option', { name: 'Square (1:1)' } )
 						.click();
 				}
 			);
