@@ -19,7 +19,7 @@ import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
 	removeNoteIdFromMetadata,
-} from '../collab-sidebar/utils';
+} from '../collab-sidebar/utils/metadata';
 import { unlock } from '../../lock-unlock';
 import { buildSuggestionPayload } from './operations';
 import type { SuggestionOperation } from './operations';

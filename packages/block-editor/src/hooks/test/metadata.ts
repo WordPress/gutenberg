@@ -20,14 +20,14 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					clientId: '1',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
 					clientId: '2',
 					isValid: true,
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Block 2' } },
 					innerBlocks: [],
 				},
 			];
@@ -49,7 +49,7 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					clientId: '4',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 			];
@@ -85,14 +85,14 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					clientId: '7',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
 					clientId: '8',
 					isValid: true,
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Block 2' } },
 					innerBlocks: [],
 				},
 			];
@@ -114,21 +114,21 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					clientId: '10',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
 					clientId: '11',
 					isValid: true,
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Block 2' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
 					clientId: '12',
 					isValid: true,
-					attributes: { metadata: { noteId: 3 } },
+					attributes: { metadata: { name: 'Block 3' } },
 					innerBlocks: [],
 				},
 			];
@@ -163,14 +163,14 @@ describe( 'metadata', () => {
 					name: 'core/foo',
 					clientId: '15',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
 					clientId: '16',
 					isValid: true,
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Block 2' } },
 					innerBlocks: [],
 				},
 			];
@@ -179,14 +179,14 @@ describe( 'metadata', () => {
 					name: 'core/bar',
 					clientId: '17',
 					isValid: true,
-					attributes: { metadata: { noteId: 1 } },
+					attributes: { metadata: { name: 'Block 1' } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/bar',
 					clientId: '18',
 					isValid: true,
-					attributes: { metadata: { noteId: 2 } },
+					attributes: { metadata: { name: 'Block 2' } },
 					innerBlocks: [],
 				},
 			];
@@ -197,10 +197,10 @@ describe( 'metadata', () => {
 			);
 
 			expect( firstTransformed.attributes.metadata ).toEqual( {
-				noteId: 1,
+				name: 'Block 1',
 			} );
 			expect( secondTransformed.attributes.metadata ).toEqual( {
-				noteId: 2,
+				name: 'Block 2',
 			} );
 		} );
 
@@ -347,7 +347,6 @@ describe( 'metadata', () => {
 					isValid: true,
 					attributes: {
 						metadata: {
-							noteId: 1,
 							name: 'Custom Name',
 							blockVisibility: false,
 						},
@@ -361,7 +360,6 @@ describe( 'metadata', () => {
 				isValid: true,
 				attributes: {
 					metadata: {
-						noteId: 2,
 						name: 'Existing Name',
 						blockVisibility: true,
 					},
@@ -371,7 +369,6 @@ describe( 'metadata', () => {
 			const transformed = addTransforms( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.metadata ).toEqual( {
-				noteId: 2,
 				name: 'Existing Name',
 				blockVisibility: true,
 			} );
