@@ -14,7 +14,12 @@ vi.mock( import( '../reaction-emojis' ), async ( importOriginal ) => ( {
 	useReactionEmojis: vi.fn(),
 } ) );
 
-const HEART = { emoji: '❤️', hexKey: '2764', label: 'heart' };
+const HEART = {
+	emoji: '❤️',
+	hexKey: '2764',
+	label: 'Heart',
+	sentenceLabel: 'heart',
+};
 
 describe( 'NoteReactions', () => {
 	it( 'keeps the pill of an emoji the site no longer offers, for removal only', () => {

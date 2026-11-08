@@ -39,7 +39,7 @@ import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
  */
@@ -247,7 +247,8 @@ function PostListView( {
 	const quickEditAction = useMemo(
 		() => ( {
 			id: 'quick-edit',
-			label: __( 'Quick Edit' ),
+			label: ( items: Post[] ) =>
+				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
@@ -273,17 +274,7 @@ function PostListView( {
 	);
 
 	const actions = useMemo( () => {
-		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
-				}
-
-				return [ action ];
-			} ),
-		];
+		const _actions = [ ...postTypeActions ];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}
@@ -351,18 +342,18 @@ function PostListView( {
 		>
 			{ viewList && viewList.length > 1 && (
 				<div className="routes-post-list__tabs-wrapper">
-					<Tabs onSelect={ handleTabChange } selectedTabId={ slug }>
-						<Tabs.TabList>
+					<WCTabs onSelect={ handleTabChange } selectedTabId={ slug }>
+						<WCTabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ entry.slug }
 									key={ entry.slug }
 								>
 									{ entry.title }
-								</Tabs.Tab>
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews

@@ -43,8 +43,19 @@ describe( 'getReactionEmojisFromSetting', () => {
 		];
 
 		expect( getReactionEmojisFromSetting( setting ) ).toEqual( [
-			{ emoji: '🦄️', hexKey: '1f984', label: 'unicorn' },
-			{ emoji: '🚀️', hexKey: '1f680', label: 'rocket' },
+			{
+				emoji: '🦄️',
+				hexKey: '1f984',
+				label: 'unicorn',
+				sentenceLabel: 'unicorn',
+			},
+			// A default emoji keeps the editor's own labels.
+			{
+				emoji: '🚀',
+				hexKey: '1f680',
+				label: 'Rocket',
+				sentenceLabel: 'rocket',
+			},
 		] );
 	} );
 

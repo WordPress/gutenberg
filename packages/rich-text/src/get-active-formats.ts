@@ -12,9 +12,9 @@ import type { RichTextFormatList, RichTextValue } from './types';
 export function getActiveFormats(
 	value: RichTextValue,
 	EMPTY_ACTIVE_FORMATS: RichTextFormatList = []
-) {
+): RichTextFormatList {
 	const { formats, start, end, activeFormats } = value;
-	if ( start === undefined ) {
+	if ( start === undefined || end === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 

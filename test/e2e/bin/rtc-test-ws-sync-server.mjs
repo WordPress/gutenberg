@@ -3,7 +3,7 @@
 /**
  * Local-only WebSocket sync server for Gutenberg RTC e2e tests.
  *
- * Built on @y/websocket-server so the test harness exercises the same
+ * Built on `@y/websocket-server` so the test harness exercises the same
  * y-protocol wire format as the production broker. No auth, no metrics,
  * no persistence. /reset closes every live connection and drops the
  * server's in-memory document map so each test starts clean.

@@ -1,3 +1,4 @@
+import { _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -10,10 +11,69 @@ export interface ReactionEmoji {
 	// The storage key: lowercase code points padded to four digits and
 	// joined by `-`, with U+FE0F stripped (e.g. `2764` for ❤️). ASCII keys
 	// sidestep utf8/utf8mb4 portability issues on the comments table. The
-	// server accepts exactly these keys.
+	// server accepts the keys in the `wp_note_reaction_emojis` list.
 	hexKey: string;
 	label: string;
+	sentenceLabel: string;
 }
+
+/**
+ * The default reaction emoji, which carry the editor's own translations.
+ * `label` names the emoji on its own
+ * (picker items, the reaction count label). `sentenceLabel` is only used in
+ * the "reacted with" sentences, so translators can give it whatever form
+ * that phrase needs.
+ */
+export const REACTION_EMOJIS: ReactionEmoji[] = [
+	{
+		emoji: '👍',
+		hexKey: '1f44d',
+		label: _x( 'Thumbs up', 'emoji reaction' ),
+		sentenceLabel: _x(
+			'thumbs up',
+			'emoji reaction, after "reacted with"'
+		),
+	},
+	{
+		emoji: '➕',
+		hexKey: '2795',
+		label: _x( 'Plus', 'emoji reaction' ),
+		sentenceLabel: _x( 'plus', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '❤️',
+		hexKey: '2764',
+		label: _x( 'Heart', 'emoji reaction' ),
+		sentenceLabel: _x( 'heart', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '🎉',
+		hexKey: '1f389',
+		label: _x( 'Celebration', 'emoji reaction' ),
+		sentenceLabel: _x(
+			'celebration',
+			'emoji reaction, after "reacted with"'
+		),
+	},
+	{
+		emoji: '😄',
+		hexKey: '1f604',
+		label: _x( 'Smile', 'emoji reaction' ),
+		sentenceLabel: _x( 'smile', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '👀',
+		hexKey: '1f440',
+		label: _x( 'Eyes', 'emoji reaction' ),
+		sentenceLabel: _x( 'eyes', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '🚀',
+		hexKey: '1f680',
+		label: _x( 'Rocket', 'emoji reaction' ),
+		sentenceLabel: _x( 'rocket', 'emoji reaction, after "reacted with"' ),
+	},
+];
 
 const HEX_KEY_PATTERN = /^[0-9a-f]{4,6}(?:-[0-9a-f]{4,6})*$/;
 
@@ -45,7 +105,7 @@ export function hexKeyToEmoji( hexKey: string ): string {
 /**
  * The reaction emoji the editor offers, from the private
  * `getNoteReactionEmojis` selector. The server builds the list from the
- * `wp_note_reaction_emojis` filter, so the menu offers the same emoji the
+ * `wp_note_reaction_emojis` filter, so the picker offers the same emoji the
  * REST API accepts. Offers none when the list is missing, since the
  * accepted emoji are then unknown.
  *
@@ -65,7 +125,9 @@ const settingCache = new WeakMap< object, ReactionEmoji[] >();
 
 /**
  * Builds the reaction emoji from the `noteReactionEmojis` editor setting,
- * dropping malformed entries.
+ * dropping malformed entries. A default emoji keeps the editor's labels,
+ * which have a standalone and a mid-sentence form; any other emoji uses the
+ * server's label for both.
  *
  * @param setting The setting's value.
  * @return The reaction emoji, or none when the setting is not a list.
@@ -88,9 +150,20 @@ export function getReactionEmojisFromSetting(
 				return [];
 			}
 			const emoji = hexKeyToEmoji( entry.hexKey );
-			return emoji
-				? [ { emoji, hexKey: entry.hexKey, label: entry.label } ]
-				: [];
+			if ( ! emoji ) {
+				return [];
+			}
+			const known = REACTION_EMOJIS.find(
+				( { hexKey } ) => hexKey === entry.hexKey
+			);
+			return [
+				known ?? {
+					emoji,
+					hexKey: entry.hexKey,
+					label: entry.label,
+					sentenceLabel: entry.label,
+				},
+			];
 		} );
 		settingCache.set( setting, emojis );
 	}

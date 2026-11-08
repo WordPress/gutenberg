@@ -30,8 +30,10 @@
  * Adds the 'reaction' type to core's default 'comment' and 'note' avatar
  * comment types.
  *
- * @param array $comment_type The array of comment types.
- * @return array The updated array of comment types.
+ * @param string[] $comment_type The array of comment types.
+ * @return string[] The updated array of comment types.
+ *
+ * @phpstan-return non-empty-list<string>
  */
 function gutenberg_update_get_avatar_comment_type_7_2( $comment_type ) {
 	return array_values( array_unique( array_merge( $comment_type, array( 'note', 'reaction' ) ) ) );
@@ -51,7 +53,7 @@ add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_typ
  *
  * @return string[] The modified SQL clauses for the comments query.
  */
-function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, $query ) {
+function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, WP_Comment_Query $query ) {
 	$types_in     = array_merge( (array) $query->query_vars['type'], (array) $query->query_vars['type__in'] );
 	$types_not_in = (array) $query->query_vars['type__not_in'];
 
@@ -64,11 +66,11 @@ function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, $query ) {
 	}
 
 	global $wpdb;
-	$clauses['where'] .= $wpdb->prepare( " AND {$wpdb->comments}.comment_type != %s", 'reaction' );
+	$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'reaction'";
 
 	return $clauses;
 }
-add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
+add_filter( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
 
 /**
  * Excludes internal comment types from comment feeds.
@@ -84,10 +86,7 @@ add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2
  */
 function gutenberg_exclude_internal_comment_types_from_feed_7_2( $cwhere ) {
 	global $wpdb;
-	$internal_types    = array( 'note', 'reaction' );
-	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-	return $cwhere . ' AND ' . $wpdb->prepare( "{$wpdb->comments}.comment_type NOT IN ( $type_placeholders )", $internal_types );
+	return $cwhere . " AND {$wpdb->comments}.comment_type NOT IN ( 'note', 'reaction' )";
 }
 add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from_feed_7_2' );
 
@@ -102,11 +101,13 @@ add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from
  */
 function gutenberg_filter_comment_count_query_exclude_block_comments_7_2( $query ) {
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
-		// Add an exclusion clause for each internal type not already present.
-		// Core's query already hardcodes the note-only exclusion, so expanding
-		// per type - rather than bailing when any exclusion exists - ensures
-		// reactions are excluded too and keeps the filter idempotent if it
-		// runs more than once.
+		/*
+		 * Add an exclusion clause for each internal type not already present.
+		 * Core's query already hardcodes the note-only exclusion, so expanding
+		 * per type - rather than bailing when any exclusion exists - ensures
+		 * reactions are excluded too and keeps the filter idempotent if it
+		 * runs more than once.
+		 */
 		$type_clauses = array();
 		foreach ( array( 'note', 'reaction' ) as $internal_type ) {
 			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
@@ -142,12 +143,7 @@ function gutenberg_exclude_internal_comment_types_from_lastcommentmodified_7_2( 
 		return $query;
 	}
 
-	$internal_types    = array( 'note', 'reaction' );
-	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-	$type_not_in = $wpdb->prepare( " AND comment_type NOT IN ( $type_placeholders )", $internal_types );
-
-	return str_replace( "comment_approved = '1' ORDER BY", "comment_approved = '1'{$type_not_in} ORDER BY", $query );
+	return str_replace( "comment_approved = '1' ORDER BY", "comment_approved = '1' AND comment_type NOT IN ( 'note', 'reaction' ) ORDER BY", $query );
 }
 add_filter( 'query', 'gutenberg_exclude_internal_comment_types_from_lastcommentmodified_7_2' );
 
@@ -176,20 +172,17 @@ add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_
  * @param int|null $new_count The new comment count. Default null.
  * @param int      $old_count The old comment count.
  * @param int      $post_id   Post ID.
- * @return int|null The modified comment count.
+ * @return int The modified comment count.
  */
 function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count, $post_id ) {
 	global $wpdb;
 	if ( null !== $new_count ) {
 		return $new_count;
 	}
-	$internal_types    = array( 'note', 'reaction' );
-	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
-	$new_count         = (int) $wpdb->get_var(
+	$new_count = (int) $wpdb->get_var(
 		$wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			"SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type NOT IN ( $type_placeholders )",
-			array_merge( array( $post_id ), $internal_types )
+			"SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type NOT IN ( 'note', 'reaction' )",
+			$post_id
 		)
 	);
 	return $new_count;
@@ -240,6 +233,14 @@ function gutenberg_get_note_reaction_emojis() {
 	// Labels are lowercase since they also appear mid-sentence, eg. in the
 	// reaction pill's tooltip.
 	$default_emojis = array(
+		array(
+			'hexKey' => '1f44d',
+			'label'  => _x( 'thumbs up', 'emoji reaction', 'gutenberg' ),
+		),
+		array(
+			'hexKey' => '2795',
+			'label'  => _x( 'plus', 'emoji reaction', 'gutenberg' ),
+		),
 		array(
 			'hexKey' => '2764',
 			'label'  => _x( 'heart', 'emoji reaction', 'gutenberg' ),
@@ -355,7 +356,7 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_set
  *                           includes trashed reactions.
  * @return int[] Reaction comment IDs, oldest first.
  */
-function gutenberg_get_note_reaction_ids( $note, $status = 'any' ) {
+function gutenberg_get_note_reaction_ids( WP_Comment $note, string $status = 'any' ): array {
 	return get_comments(
 		array(
 			'parent'  => $note->comment_ID,
@@ -381,16 +382,20 @@ function gutenberg_get_note_reaction_ids( $note, $status = 'any' ) {
  *
  * @since 7.2.0
  *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The comment being deleted.
+ * @param string          $comment_id The comment ID as a numeric string.
+ * @param WP_Comment|null $comment    The comment being deleted.
+ *
+ * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_delete_note_reactions( $comment_id, $comment ) {
-	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+function gutenberg_delete_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 
-	// Every status: trashing the note, or a REST delete without `force`,
-	// leaves reactions in the trash.
+	/*
+	 * Every status: trashing the note, or a REST delete without `force`,
+	 * leaves reactions in the trash.
+	 */
 	foreach ( gutenberg_get_note_reaction_ids( $comment ) as $reaction_id ) {
 		wp_delete_comment( $reaction_id, true );
 	}
@@ -410,11 +415,14 @@ add_action( 'delete_comment', 'gutenberg_delete_note_reactions', 10, 2 );
  *
  * @since 7.2.0
  *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The trashed comment.
+ * @param string          $comment_id The comment ID as a numeric string.
+ * @param WP_Comment|null $comment    The trashed comment, or null when a plugin
+ *                                    fires the action for a missing row.
+ *
+ * @phpstan-param numeric-string $comment_id
  */
-function gutenberg_trash_note_reactions( $comment_id, $comment ) {
-	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+function gutenberg_trash_note_reactions( $comment_id, ?WP_Comment $comment ): void {
+	if ( ! $comment || 'note' !== $comment->comment_type ) {
 		return;
 	}
 

@@ -142,17 +142,17 @@ export function WidgetFooter( {
 						) : (
 							<Link
 								key={ action.id }
-								className={
-									action.icon
-										? styles[ 'prefixed-action' ]
-										: undefined
-								}
+								className={ styles[ 'link-action' ] }
 								download={ action.download }
 								openInNewTab={ action.openInNewTab }
 								render={ <HostLink href={ action.href } /> }
 							>
-								{ action.icon && <Icon icon={ action.icon } /> }
-								{ action.label }
+								<span className={ styles[ 'prefixed-action' ] }>
+									{ action.icon && (
+										<Icon icon={ action.icon } />
+									) }
+									{ action.label }
+								</span>
 							</Link>
 						)
 					) }

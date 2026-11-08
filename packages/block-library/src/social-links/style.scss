@@ -24,11 +24,6 @@
 	}
 
 	.wp-social-link {
-		svg {
-			width: 1em;
-			height: 1em;
-		}
-
 		span:not(.screen-reader-text) {
 			margin-left: 0.5em;
 			margin-right: 0.5em;
@@ -122,12 +117,6 @@
 :where(.wp-block-social-links.is-style-logos-only) {
 	.wp-social-link {
 		background: none;
-
-		// Make these bigger.
-		svg {
-			width: 1.25em;
-			height: 1.25em;
-		}
 	}
 
 	@include socials-without-bg;
@@ -141,16 +130,29 @@
 }
 
 // The following rules have their selector specificity set to 0-1-0 to
-// facilitate theme.json styling of the inner social-link block padding.
-:root :where(.wp-block-social-links .wp-social-link a) {
-	padding: 0.25em;
-}
-:root :where(.wp-block-social-links.is-style-logos-only .wp-social-link a) {
-	padding: 0;
-}
-:root :where(.wp-block-social-links.is-style-pill-shape .wp-social-link a) {
-	padding-left: calc((2/3) * 1em);
-	padding-right: calc((2/3) * 1em);
+// facilitate theme.json styling of the inner social-link block icon size
+// and padding.
+:root {
+	:where(.wp-block-social-links .wp-social-link svg) {
+		width: 1em;
+		height: 1em;
+	}
+	// Make the icons bigger for the logos only style.
+	:where(.wp-block-social-links.is-style-logos-only .wp-social-link svg) {
+		width: 1.25em;
+		height: 1.25em;
+	}
+
+	:where(.wp-block-social-links .wp-social-link a) {
+		padding: 0.25em;
+	}
+	:where(.wp-block-social-links.is-style-logos-only .wp-social-link a) {
+		padding: 0;
+	}
+	:where(.wp-block-social-links.is-style-pill-shape .wp-social-link a) {
+		padding-left: calc((2/3) * 1em);
+		padding-right: calc((2/3) * 1em);
+	}
 }
 
 // Ensure the Snapchat label is visible when no custom

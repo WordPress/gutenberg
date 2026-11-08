@@ -2,14 +2,40 @@
 /**
  * REST API comment controller with reaction support for WordPress 7.2 compatibility.
  *
- * Extends the 6.9 comment controller to add support for the 'reaction'
- * comment type, enabling emoji reactions on notes.
+ * Overrides core's WP_REST_Comments_Controller to add the 'reaction' comment
+ * type, enabling emoji reactions on notes on older WordPress versions.
+ *
+ * Methods that only extend core call the parent. Where a change is needed
+ * inside a core method, the whole method is copied from WordPress 7.1.0 and
+ * every line that differs from core is wrapped in START CHANGE / END CHANGE
+ * comments, so the rest of the method can be read as unmodified core code.
+ * Code added around a parent call is wrapped the same way, and members that
+ * core does not have are wrapped as a whole.
  *
  * @package gutenberg
- * @since   7.2.0
  */
 
 class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller {
+
+	// START CHANGE: New method, added in 7.2.
+	/**
+	 * Retrieves the hex keys of the emoji a note reaction accepts.
+	 *
+	 * Each key is the emoji's lowercase code points, padded to four digits,
+	 * matching the client's storage keys. A reaction stores its key in
+	 * `comment_content`. Sites change the list with the
+	 * `wp_note_reaction_emojis` filter.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return string[] Hex keys of the emoji from `gutenberg_get_note_reaction_emojis()`.
+	 *
+	 * @phpstan-return list<lowercase-string&non-falsy-string>
+	 */
+	private static function get_note_reaction_keys(): array {
+		return gutenberg_get_note_reaction_keys();
+	}
+	// END CHANGE.
 
 	/**
 	 * Retrieves the comment schema, adding reaction_summary.
@@ -19,11 +45,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 *
 	 * @since 7.2.0
 	 *
-	 * @return array Item schema data.
+	 * @return array<string, mixed> Item schema data.
 	 */
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
 
+		// START CHANGE: Add `reaction_summary`.
 		$schema['properties']['reaction_summary'] = array(
 			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji hex key.', 'gutenberg' ),
 			'type'                 => 'object',
@@ -35,58 +62,88 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 					'count'                 => array(
 						'description' => __( 'Total number of reactions with this emoji.', 'gutenberg' ),
 						'type'        => 'integer',
+						'minimum'     => 0,
 					),
 					'current_user_reaction' => array(
 						'description' => __( 'The current user\'s reaction comment ID for this emoji, or 0 if they have not reacted.', 'gutenberg' ),
 						'type'        => 'integer',
+						'minimum'     => 0,
 					),
 				),
 			),
 		);
+		// END CHANGE.
 
 		return $schema;
 	}
 
+	// START CHANGE: New Gutenberg-only helper, not in core.
 	/**
 	 * Checks whether the request type is an internal comment type (note or reaction).
 	 *
-	 * @param string $type The comment type from the request.
+	 * @since 7.2.0
+	 *
+	 * @param mixed $type The comment type from the request.
 	 * @return bool True if the type is one of the internal comment types.
 	 */
-	protected function is_note_or_reaction( $type ) {
+	protected function is_note_or_reaction( $type ): bool {
 		return in_array( $type, array( 'note', 'reaction' ), true );
 	}
+	// END CHANGE.
+
+	// START CHANGE: New Gutenberg-only helper, not in core.
+	/**
+	 * Checks whether a note belongs to a resolved thread.
+	 *
+	 * Resolving a thread approves its root note.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $note A root note or a reply.
+	 * @return bool True if the note's thread is resolved.
+	 */
+	protected function is_thread_resolved( $note ): bool {
+		$thread_root = $note;
+		$visited     = array( (int) $thread_root->comment_ID => true );
+		while ( $thread_root->comment_parent ) {
+			$ancestor = get_comment( $thread_root->comment_parent );
+			// Stop at a missing ancestor or a corrupt, cyclic chain.
+			if ( ! $ancestor || isset( $visited[ (int) $ancestor->comment_ID ] ) ) {
+				break;
+			}
+			$visited[ (int) $ancestor->comment_ID ] = true;
+			$thread_root                            = $ancestor;
+		}
+		return '1' === $thread_root->comment_approved;
+	}
+	// END CHANGE.
 
 	/**
-	 * Checks whether a post type supports notes.
+	 * Check if post type supports notes.
 	 *
-	 * The core comment controller (WordPress 6.9) declares this check as a
-	 * private method, so it cannot be reused from this subclass. The logic is
-	 * mirrored here to keep the note permission checks working.
+	 * Copied from core, where it is private and cannot be called from this subclass.
 	 *
 	 * @param string $post_type Post type name.
-	 * @return bool True if the post type supports notes, false otherwise.
+	 * @return bool True if post type supports notes, false otherwise.
 	 */
 	protected function check_post_type_supports_notes( $post_type ) {
 		$supports = get_all_post_type_supports( $post_type );
+
 		if ( ! isset( $supports['editor'] ) ) {
 			return false;
 		}
+
 		if ( ! is_array( $supports['editor'] ) ) {
 			return false;
 		}
-		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
-				return true;
-			}
-		}
-		return false;
+
+		return array_any( $supports['editor'], fn( $item ) => ! empty( $item['notes'] ) );
 	}
 
 	/**
 	 * Checks if a given request has access to read comments.
 	 *
-	 * Mirrors core's check, extended to the 'reaction' type.
+	 * Copied from core, extended to the 'reaction' type.
 	 *
 	 * @since 7.2.0
 	 *
@@ -94,7 +151,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return true|WP_Error True if the request has read access, error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		$is_note          = $this->is_note_or_reaction( $request['type'] );
+		// START CHANGE: Treat `reaction` like `note`.
+		$is_note = $this->is_note_or_reaction( $request['type'] );
+		// END CHANGE.
 		$is_edit_context  = 'edit' === $request['context'];
 		$protected_params = array( 'author', 'author_exclude', 'author_email', 'type', 'status' );
 		$forbidden_params = array();
@@ -196,14 +255,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to read the comment.
+	 *
+	 * Copied from core, extended to the 'reaction' type.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, error object otherwise.
+	 */
 	public function get_item_permissions_check( $request ) {
 		$comment = $this->get_comment( $request['id'] );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
 
+		// START CHANGE: Treat `reaction` like `note`.
 		// Re-map edit context capabilities when requesting `note` or `reaction` type.
 		$edit_cap = $this->is_note_or_reaction( $comment->comment_type ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		// END CHANGE.
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -251,23 +322,30 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return bool True if the user can read the comment, false otherwise.
 	 */
 	protected function check_read_permission( $comment, $request ) {
-		if ( 'reaction' === $comment->comment_type ) {
-			if ( 0 === get_current_user_id() ) {
-				return false;
+		// START CHANGE: Treat `reaction` like `note`.
+		if ( ! $this->is_note_or_reaction( $comment->comment_type ) && ! empty( $comment->comment_post_ID ) ) {
+			// END CHANGE.
+			$post = get_post( $comment->comment_post_ID );
+			if ( $post ) {
+				if ( $this->check_read_post_permission( $post, $request ) && 1 === (int) $comment->comment_approved ) {
+					return true;
+				}
 			}
-
-			if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
-				return false;
-			}
-
-			if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
-				return true;
-			}
-
-			return current_user_can( 'edit_comment', $comment->comment_ID );
 		}
 
-		return parent::check_read_permission( $comment, $request );
+		if ( 0 === get_current_user_id() ) {
+			return false;
+		}
+
+		if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
+			return false;
+		}
+
+		if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
 	}
 
 	/**
@@ -291,6 +369,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
+		// START CHANGE: Reactions cannot be edited.
 		if ( 'reaction' === $comment->comment_type ) {
 			return new WP_Error(
 				'rest_comment_update_not_allowed',
@@ -298,16 +377,49 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				array( 'status' => 403 )
 			);
 		}
+		// END CHANGE.
 
 		return parent::update_item_permissions_check( $request );
 	}
 
 	/**
+	 * Checks if a comment can be edited or deleted.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction requires
+	 * the same edit access to the note's post as the note it belongs to.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return bool Whether the comment can be edited or deleted.
+	 */
+	protected function check_edit_permission( $comment ) {
+		if ( 0 === (int) get_current_user_id() ) {
+			return false;
+		}
+
+		// START CHANGE: Check notes and reactions against the note's post.
+		/*
+		 * Notes and their reactions are editorial content, so require edit access
+		 * to the note's post rather than the moderate_comments capability.
+		 */
+		if ( in_array( strtolower( $comment->comment_type ), array( 'note', 'reaction' ), true ) ) {
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+		// END CHANGE.
+
+		if ( current_user_can( 'moderate_comments' ) ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
+	}
+
+	/**
 	 * Checks if a given request has access to delete a comment.
 	 *
-	 * Anyone who can edit a note's post can edit the note, and core's delete
-	 * check follows that, but a reaction belongs to the user who added it:
-	 * only they can take it back.
+	 * A reaction speaks for its author, so only they can remove it, and
+	 * reactions on a resolved thread are frozen like new ones.
 	 *
 	 * @since 7.2.0
 	 *
@@ -315,12 +427,18 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return true|WP_Error True if the request has access to delete the item, error object otherwise.
 	 */
 	public function delete_item_permissions_check( $request ) {
-		$comment = $this->get_comment( $request['id'] );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
+		$check = parent::delete_item_permissions_check( $request );
+		if ( true !== $check ) {
+			return $check;
 		}
 
-		if ( 'reaction' === $comment->comment_type && get_current_user_id() !== (int) $comment->user_id ) {
+		// START CHANGE: Only the author can remove a reaction, and not on a resolved thread.
+		$comment = $this->get_comment( $request['id'] );
+		if ( 'reaction' !== $comment->comment_type ) {
+			return true;
+		}
+
+		if ( get_current_user_id() !== (int) $comment->user_id ) {
 			return new WP_Error(
 				'rest_cannot_delete',
 				__( 'Sorry, you can only remove your own reactions.', 'gutenberg' ),
@@ -328,11 +446,34 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		return parent::delete_item_permissions_check( $request );
+		$note = get_comment( $comment->comment_parent );
+		if ( $note && $this->is_thread_resolved( $note ) ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'A reaction cannot be removed from a resolved note.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+		// END CHANGE.
+
+		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to create a comment.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction can only
+	 * be added by the current user, never on behalf of someone else.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, error object otherwise.
+	 */
 	public function create_item_permissions_check( $request ) {
-		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
+		// START CHANGE: Treat `reaction` like `note`.
+		$is_note = $this->is_note_or_reaction( $request['type'] );
+		// END CHANGE.
 
 		if ( ! is_user_logged_in() && $is_note ) {
 			return new WP_Error(
@@ -363,6 +504,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 		}
 
+		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
 		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_author',
@@ -372,11 +514,14 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// A reaction is always first-person: the uniqueness check and the
-		// reaction summary key on the current user, so one stored against
-		// somebody else could never be counted or removed.
+		// START CHANGE: Reject a reaction on behalf of another user.
+		/*
+		 * A reaction is always first-person: the uniqueness check and the
+		 * reaction summary key on the current user, so one stored against
+		 * somebody else could never be counted or removed.
+		 */
 		if (
-			! empty( $request['type'] ) && 'reaction' === $request['type'] &&
+			'reaction' === $request['type'] &&
 			isset( $request['author'] ) && get_current_user_id() !== (int) $request['author']
 		) {
 			return new WP_Error(
@@ -385,6 +530,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
+		// END CHANGE.
 
 		if ( isset( $request['author_ip'] ) && ! current_user_can( 'moderate_comments' ) ) {
 			if ( empty( $_SERVER['REMOTE_ADDR'] ) || $request['author_ip'] !== $_SERVER['REMOTE_ADDR'] ) {
@@ -397,9 +543,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Notes and reactions require edit access to the post they belong to,
-		// regardless of whether a status is supplied. Mirrors core's note guard
-		// in WP_REST_Comments_Controller::create_item_permissions_check().
 		if ( $is_note && ! empty( $request['post'] ) && ! current_user_can( 'edit_post', (int) $request['post'] ) ) {
 			return new WP_Error(
 				'rest_cannot_create_note',
@@ -482,7 +625,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	/**
 	 * Creates a comment.
 	 *
-	 * Extends the 6.9 implementation to support 'reaction' comment type
+	 * Copied from core, extended to support the 'reaction' comment type
 	 * with validation for parent note, valid emoji hex keys, and uniqueness.
 	 *
 	 * @since 7.2.0
@@ -499,21 +642,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Allow 'comment' plus internal comment types (note, reaction).
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array_merge( array( 'comment' ), array( 'note', 'reaction' ) ), true ) ) {
+		// START CHANGE: Allow the `reaction` type.
+		// Do not allow comments to be created with a non-core type.
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'reaction' ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
+		// END CHANGE.
 
-		// The canonical reaction key, populated once validated below so the
-		// stored content matches what was validated (not the raw input).
+		// START CHANGE: Validate reactions.
+		/*
+		 * The canonical reaction key, populated once validated below so the
+		 * stored content matches what was validated (not the raw input).
+		 */
 		$reaction_key = null;
 
 		// Validate reaction-specific requirements.
-		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
+		if ( 'reaction' === $request['type'] ) {
 			// Validate parent is a note.
 			if ( empty( $request['parent'] ) ) {
 				return new WP_Error(
@@ -532,9 +680,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// The parent note must belong to the post the reaction targets. Check
-			// this before the note's status, which would otherwise leak to a user
-			// who can only edit some other post.
+			/*
+			 * The parent note must belong to the post the reaction targets. Check
+			 * this before the note's status, which would otherwise leak to a user
+			 * who can only edit some other post.
+			 */
 			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',
@@ -552,20 +702,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Resolving a thread approves its root note, and the editor
-			// disables reactions from then on; hold stale tabs to that too.
-			$thread_root = $parent_comment;
-			$visited     = array( (int) $thread_root->comment_ID => true );
-			while ( $thread_root->comment_parent ) {
-				$ancestor = get_comment( $thread_root->comment_parent );
-				// Stop at a missing ancestor or a corrupt, cyclic chain.
-				if ( ! $ancestor || isset( $visited[ (int) $ancestor->comment_ID ] ) ) {
-					break;
-				}
-				$visited[ (int) $ancestor->comment_ID ] = true;
-				$thread_root                            = $ancestor;
-			}
-			if ( '1' === $thread_root->comment_approved ) {
+			/*
+			 * Resolving a thread approves its root note, and the editor
+			 * disables reactions from then on; hold stale tabs to that too.
+			 */
+			if ( $this->is_thread_resolved( $parent_comment ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction cannot be added to a resolved note.', 'gutenberg' ),
@@ -573,12 +714,14 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Validate the reaction content: the hex key of one of the
-			// curated reaction emoji, lowercase code points padded to four
-			// digits (e.g. "2764" for ❤️). Raw emoji bytes are rejected
-			// because the comments table is not guaranteed to be utf8mb4
-			// across all WordPress installs; clients normalize before
-			// submitting.
+			/*
+			 * Validate the reaction content: the hex key of one of the
+			 * curated reaction emoji, lowercase code points padded to four
+			 * digits (e.g. "2764" for ❤️). Raw emoji bytes are rejected
+			 * because the comments table is not guaranteed to be utf8mb4
+			 * across all WordPress installs; clients normalize before
+			 * submitting.
+			 */
 			$raw_content = '';
 
 			// Accept `content` as a string or `{ raw }`, like prepare_item_for_database().
@@ -590,7 +733,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 			$emoji_key = trim( wp_strip_all_tags( $raw_content ) );
 
-			if ( ! in_array( $emoji_key, gutenberg_get_note_reaction_keys(), true ) ) {
+			if ( ! in_array( $emoji_key, self::get_note_reaction_keys(), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
@@ -598,10 +741,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// A reaction is always approved. The uniqueness check, the race
-			// cleanup below and the reaction summary only see approved rows, so
-			// a reaction created in any other status could never be counted,
-			// deduplicated or, since reactions cannot be updated, fixed.
+			/*
+			 * A reaction is always approved. The uniqueness check, the race
+			 * cleanup below and the reaction summary only see approved rows, so
+			 * a reaction created in any other status could never be counted,
+			 * deduplicated or, since reactions cannot be updated, fixed.
+			 */
 			if ( isset( $request['status'] ) && ! in_array( $request['status'], array( 'approve', 'approved', '1' ), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_status',
@@ -610,9 +755,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Enforce uniqueness: prevent duplicate emoji per user per note.
-			// Limit to active reactions - trashed reactions are invisible and
-			// must not block the user from re-adding the same emoji.
+			/*
+			 * Enforce uniqueness: prevent duplicate emoji per user per note.
+			 * Limit to active reactions - trashed reactions are invisible and
+			 * must not block the user from re-adding the same emoji.
+			 */
 			$existing = get_comments(
 				array(
 					'parent'  => $request['parent'],
@@ -634,6 +781,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 			$reaction_key = $emoji_key;
 		}
+		// END CHANGE.
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
 		if ( is_wp_error( $prepared_comment ) ) {
@@ -642,18 +790,22 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$prepared_comment['comment_type'] = $request['type'];
 
-		// Persist the validated, canonical reaction key rather than the raw
-		// request content, so stored values stay consistent for grouping and
-		// counting (e.g. "<b>2764</b>" is stored as "2764").
+		// START CHANGE: Store the canonical reaction key.
+		/*
+		 * Persist the validated, canonical reaction key rather than the raw
+		 * request content, so stored values stay consistent for grouping and
+		 * counting (e.g. "<b>2764</b>" is stored as "2764").
+		 */
 		if ( null !== $reaction_key ) {
 			$prepared_comment['comment_content'] = $reaction_key;
 		}
+		// END CHANGE.
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
 			$prepared_comment['comment_content'] = '';
 		}
 
-		// Include note metadata into check_is_comment_content_allowed [backport].
+		// Include note metadata into check_is_comment_content_allowed.
 		if ( isset( $request['meta']['_wp_note_status'] ) ) {
 			$prepared_comment['meta']['_wp_note_status'] = $request['meta']['_wp_note_status'];
 		}
@@ -686,9 +838,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$prepared_comment['comment_author_url']   = $user->user_url;
 		}
 
-		// Pin a reaction to the current user, whatever author details the
-		// request carried. Author fields alone leave `user_id` at 0, which
-		// the uniqueness check and the reaction summary both key on.
+		// START CHANGE: Pin a reaction to the current user.
+		/*
+		 * Pin a reaction to the current user, whatever author details the
+		 * request carried. Author fields alone leave `user_id` at 0, which
+		 * the uniqueness check and the reaction summary both key on.
+		 */
 		if ( null !== $reaction_key ) {
 			$user = wp_get_current_user();
 
@@ -697,6 +852,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$prepared_comment['comment_author_email'] = $user->user_email;
 			$prepared_comment['comment_author_url']   = $user->user_url;
 		}
+		// END CHANGE.
 
 		// Honor the discussion setting that requires a name and email address of the comment author.
 		if ( get_option( 'require_name_email' ) ) {
@@ -732,11 +888,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// START CHANGE: Treat `reaction` like `note`.
 		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
 			$this->is_note_or_reaction( $prepared_comment['comment_type'] ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
+		// END CHANGE.
 
 		if ( is_wp_error( $prepared_comment['comment_approved'] ) ) {
 			$error_code    = $prepared_comment['comment_approved']->get_error_code();
@@ -777,13 +935,16 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// The pre-insert uniqueness check is not atomic, so two concurrent
-		// requests for the same user/note/emoji can both insert an approved
-		// row. Converge on a single row deterministically: keep the earliest
-		// matching reaction (lowest comment ID) and delete any later
-		// duplicates. Every concurrent request applies the same rule, so they
-		// all settle on the same surviving row. If this request's own row lost
-		// the race, repoint the response to the survivor.
+		// START CHANGE: Remove duplicate reactions from concurrent requests.
+		/*
+		 * The pre-insert uniqueness check is not atomic, so two concurrent
+		 * requests for the same user/note/emoji can both insert an approved
+		 * row. Converge on a single row deterministically: keep the earliest
+		 * matching reaction (lowest comment ID) and delete any later
+		 * duplicates. Every concurrent request applies the same rule, so they
+		 * all settle on the same surviving row. If this request's own row lost
+		 * the race, repoint the response to the survivor.
+		 */
 		if ( null !== $reaction_key ) {
 			$matching   = get_comments(
 				array(
@@ -802,10 +963,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				}
 			}
 
-			// Repoint whenever any matching row survives, not only when this
-			// request still sees its own duplicate: a competing request may
-			// already have deleted this request's row, leaving a single
-			// survivor that is not `$comment_id`.
+			/*
+			 * Repoint whenever any matching row survives, not only when this
+			 * request still sees its own duplicate: a competing request may
+			 * already have deleted this request's row, leaving a single
+			 * survivor that is not `$comment_id`.
+			 */
 			if ( ! empty( $duplicates ) ) {
 				$survivor_id = array_shift( $duplicates );
 				foreach ( $duplicates as $duplicate_id ) {
@@ -814,13 +977,18 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				$comment_id = $survivor_id;
 			}
 		}
+		// END CHANGE.
 
-		// Reactions are inserted approved and their status was validated above.
-		// Skipping them here also keeps a request from changing the status of a
-		// row that the race cleanup above may have handed it from another request.
+		// START CHANGE: Skip the status param for reactions.
+		/*
+		 * Reactions are inserted approved and their status was validated above.
+		 * Skipping them here also keeps a request from changing the status of a
+		 * row that the race cleanup above may have handed it from another request.
+		 */
 		if ( isset( $request['status'] ) && null === $reaction_key ) {
 			$this->handle_status_param( $request['status'], $comment_id );
 		}
+		// END CHANGE.
 
 		$comment = get_comment( $comment_id );
 
@@ -858,6 +1026,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return $response;
 	}
 
+	// START CHANGE: New property, added in 7.2.
 	/**
 	 * Pre-fetched reaction summaries for batch queries.
 	 *
@@ -865,9 +1034,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * multiple note comments.
 	 *
 	 * @since 7.2.0
-	 * @var array|null
+	 * @var array<int, array<string, array{count: int, current_user_reaction: int}>>|null
 	 */
 	protected $reaction_summaries = null;
+	// END CHANGE.
 
 	/**
 	 * Retrieves a collection of comments.
@@ -881,14 +1051,21 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
 	 */
 	public function get_items( $request ) {
+		// START CHANGE: Pre-fetch reaction summaries.
 		$fields = $this->get_fields_for_response( $request );
 
-		// Pre-fetch reaction summaries for the notes the parent query actually
-		// returns, so pagination, ordering, and `rest_comment_query` filters
-		// all apply. The filter removes itself after the first query.
+		/*
+		 * Pre-fetch reaction summaries for the notes the parent query actually
+		 * returns, so pagination, ordering, and `rest_comment_query` filters
+		 * all apply. The filter removes itself after the first query.
+		 *
+		 * WordPress 7.2 pre-fetches in core's get_items(), so skip it there
+		 * to avoid running the summary queries twice.
+		 */
 		$prefetch = null;
 		if (
-			! empty( $request['type'] ) &&
+			// @phpstan-ignore function.alreadyNarrowedType (The stubs are generated from trunk, but the method does not exist before WordPress 7.2.)
+			! method_exists( 'WP_REST_Comments_Controller', 'prefetch_reaction_summaries' ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )
 		) {
@@ -905,17 +1082,21 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			};
 			add_filter( 'the_comments', $prefetch );
 		}
+		// END CHANGE.
 
 		$response = parent::get_items( $request );
 
+		// START CHANGE: Clear the pre-fetched reaction summaries.
 		if ( $prefetch ) {
 			remove_filter( 'the_comments', $prefetch );
 		}
 		$this->reaction_summaries = null;
+		// END CHANGE.
 
 		return $response;
 	}
 
+	// START CHANGE: New method, added in 7.2.
 	/**
 	 * Pre-fetches reaction summaries for a set of note IDs.
 	 *
@@ -937,35 +1118,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$current_user_id = get_current_user_id();
 
-		// Query 1: Get aggregated counts per emoji per note.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$counts = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT comment_parent, comment_content, COUNT(*) AS reaction_count
-				FROM ' . $wpdb->comments . '
-				WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
-				AND comment_type = %s
-				AND comment_approved = %s
-				GROUP BY comment_parent, comment_content',
-				...array_merge( $note_ids, array( 'reaction', '1' ) )
-			)
+		$parent_in = $wpdb->prepare(
+			'comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')',
+			...$note_ids
 		);
+
+		// Query 1: Get aggregated counts per emoji per note.
+		$query  = "SELECT comment_parent, comment_content, COUNT(*) AS reaction_count FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
+		$query .= $parent_in;
+		$query .= ' GROUP BY comment_parent, comment_content';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$counts = $wpdb->get_results( $query );
 
 		// Query 2: Get the current user's own reaction IDs (if logged in).
 		$my_reactions = array();
 		if ( $current_user_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$user_rows = $wpdb->get_results(
-				$wpdb->prepare(
-					'SELECT comment_ID, comment_parent, comment_content
-					FROM ' . $wpdb->comments . '
-					WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
-					AND comment_type = %s
-					AND comment_approved = %s
-					AND user_id = %d',
-					...array_merge( $note_ids, array( 'reaction', '1', $current_user_id ) )
-				)
-			);
+			$query  = "SELECT comment_ID, comment_parent, comment_content FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
+			$query .= $parent_in;
+			$query .= $wpdb->prepare( ' AND user_id = %d', $current_user_id );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$user_rows = $wpdb->get_results( $query );
 
 			if ( $user_rows ) {
 				foreach ( $user_rows as $row ) {
@@ -995,6 +1167,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 	}
+	// END CHANGE.
 
 	/**
 	 * Prepares a single comment output for response.
@@ -1009,7 +1182,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$response = parent::prepare_item_for_response( $item, $request );
-		$fields   = $this->get_fields_for_response( $request );
+
+		// START CHANGE: Add `reaction_summary` to notes.
+		$fields = $this->get_fields_for_response( $request );
 
 		if ( 'note' === $item->comment_type && rest_is_field_included( 'reaction_summary', $fields ) ) {
 			// Use pre-fetched data if available, otherwise query individually.
@@ -1026,6 +1201,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$data['reaction_summary'] = $summary;
 			$response->set_data( $data );
 		}
+		// END CHANGE.
 
 		return $response;
 	}
@@ -1046,9 +1222,16 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	protected function prepare_links( $comment ) {
 		$links = parent::prepare_links( $comment );
 
+		// START CHANGE: Leave reactions out of the `children` link.
 		if ( isset( $links['children'] ) ) {
-			$comment_children = $comment->get_children(
+			/*
+			 * Query directly: before WordPress 7.1, `get_children()` caches a
+			 * count, so it would return the count core just took.
+			 * See https://core.trac.wordpress.org/changeset/62822.
+			 */
+			$comment_children = get_comments(
 				array(
+					'parent'       => $comment->comment_ID,
 					'count'        => true,
 					'orderby'      => 'none',
 					'type'         => 'all',
@@ -1060,28 +1243,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				unset( $links['children'] );
 			}
 		}
+		// END CHANGE.
 
 		return $links;
-	}
-
-	/**
-	 * Checks if comment content is allowed.
-	 *
-	 * Extends the 6.9 implementation to also allow reaction content
-	 * (emoji hex keys are always valid content).
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array $prepared_comment The prepared comment data.
-	 * @return bool True if the content is allowed, false otherwise.
-	 */
-	protected function check_is_comment_content_allowed( $prepared_comment ) {
-		// Note reactions always have content (the emoji hex key).
-		if ( isset( $prepared_comment['comment_type'] ) && 'reaction' === $prepared_comment['comment_type'] ) {
-			return true;
-		}
-
-		return parent::check_is_comment_content_allowed( $prepared_comment );
 	}
 }
 

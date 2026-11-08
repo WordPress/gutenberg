@@ -21,13 +21,13 @@ Keep product-specific behavior in the consuming package and use [design-system-u
 
 - Follow the package's component, prop/ref, state, and styling conventions. Reuse existing composition and helpers instead of rebuilding behavior already provided by a dependency.
 - For removals, replacements, or behavior changes, compare the affected old and new contracts using the [compatibility guidance](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Include plugin and npm consumers, even when all Gutenberg callers have been migrated.
-- For token changes, choose by semantic purpose and affected modes, then follow the [token source guide](../../../packages/theme/tokens/README.md) and [build procedure](../../../packages/theme/README.md#building). For Emotion migrations, use [emotion-to-scss-modules](../emotion-to-scss-modules/SKILL.md).
+- For token changes, choose by semantic purpose and affected modes, then follow the [token source guide](../../../packages/theme/tokens/README.md) and [build procedure](../../../packages/theme/README.md#building).
 - Use [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) only when changing a contract between independently updated package and WordPress versions.
 
 ## Verify what changed
 
 Start with existing tests and stories. Add coverage only for a concrete regression risk introduced by our code or integration that existing coverage does not address. Rely on dependency tests for behavior the dependency owns; avoid speculative edge cases and exhaustive combinations. Use the guide's [verification choices](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for checks that need a browser.
 
-When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together.
+When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together. When a `@wordpress/ui` component replaces a `@wordpress/components` component, follow the stages in [Replace a legacy component](../../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component).
 
 Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.

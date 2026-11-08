@@ -19,8 +19,6 @@
 	"Autocomplete.Root>Autocomplete.Status:children",
 	"Autocomplete.Root>Autocomplete.Value",
 	"Autocomplete.Root>Autocomplete.Value:children",
-	"BaseControl:className",
-	"BaseControl>BaseControl.VisualLabel",
 	"ComboboxControl:className",
 	"Composite>Composite.Context:children",
 	"Composite>Composite.Context:value",

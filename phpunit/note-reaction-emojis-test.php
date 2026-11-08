@@ -11,9 +11,9 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	public function test_defaults_to_the_five_quick_reactions() {
+	public function test_defaults_to_the_seven_quick_reactions() {
 		$this->assertSame(
-			array( '2764', '1f389', '1f604', '1f440', '1f680' ),
+			array( '1f44d', '2795', '2764', '1f389', '1f604', '1f440', '1f680' ),
 			gutenberg_get_note_reaction_keys()
 		);
 	}
@@ -31,7 +31,7 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			array( '1f389', '1f604', '1f440', '1f680', '1f984' ),
+			array( '2795', '2764', '1f389', '1f604', '1f440', '1f680', '1f984' ),
 			gutenberg_get_note_reaction_keys()
 		);
 	}
@@ -45,7 +45,7 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 	public function test_falls_back_to_the_defaults_when_the_filter_returns_no_list() {
 		add_filter( 'wp_note_reaction_emojis', '__return_null' );
 
-		$this->assertCount( 5, gutenberg_get_note_reaction_emojis() );
+		$this->assertCount( 7, gutenberg_get_note_reaction_emojis() );
 	}
 
 	public function test_drops_malformed_and_duplicate_entries() {
