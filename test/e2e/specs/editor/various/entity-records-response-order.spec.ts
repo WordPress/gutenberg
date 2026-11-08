@@ -2,11 +2,10 @@ import { join } from 'node:path';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 /*
- * The exact query the inserter's Media tab resolves for its "Images" source:
- * `per_page` and `search` come from the media panel, `media_type` and
- * `orderBy` are added by the editor's core media category. The test resolves
- * the same query so it races (and asserts) the same cached resolution the
- * panel reads.
+ * An image list query shaped like the ones the inserter's Media tab resolves
+ * (`media_type` and `orderBy` come from the editor's core media category). The
+ * test races this query's resolution directly, since the tab's page size now
+ * depends on the viewport.
  */
 const IMAGES_QUERY = {
 	per_page: 20,
@@ -138,11 +137,12 @@ test.describe( 'Entity records response order', () => {
 		// The stale list must not replace the fresher one…
 		expect( await listContainsUpload() ).toBe( true );
 
-		// …so the inserter's Media tab still shows the uploaded image.
+		// …and the inserter's Media tab shows the uploaded image.
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
-		await expect( page.getByLabel( media.title.raw ) ).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: media.title.raw } )
+		).toBeVisible();
 
 		await page.unroute( LIST_REQUEST_MATCHER );
 	} );
