@@ -42,7 +42,6 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/components": "file:../components",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"dequal": "^2.0.3",

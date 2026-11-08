@@ -1,10 +1,4 @@
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
+import { createContext, useContext, useMemo } from '@wordpress/element';
 import useCropper from './use-image-cropper';
 import type { ImageCropperContextValue } from '../types';
 import { MIN_ZOOM } from '../constants';
@@ -33,13 +27,6 @@ export default function ImageCropperProvider( {
 }: {
 	children: React.ReactNode;
 } ) {
-	useEffect( () => {
-		deprecated( '@wordpress/image-cropper', {
-			alternative: '@wordpress/image-editor',
-			hint: 'The package will be removed in a later release.',
-		} );
-	}, [] );
-
 	const cropperApi = useCropper();
 	const contextValue = useMemo( () => {
 		return {

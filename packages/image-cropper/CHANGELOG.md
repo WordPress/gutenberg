@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   Deprecate the package in favour of `@wordpress/image-editor`. Mounting `ImageCropperProvider` logs a notice. The package will be removed in a later release. ([#86417](https://github.com/WordPress/gutenberg/pull/86417)).
+-   Deprecate the package in favour of `@wordpress/image-editor` ([#86417](https://github.com/WordPress/gutenberg/pull/86417)).
 
 ## 2.1.0 (2026-11-04)
 
