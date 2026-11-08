@@ -43,6 +43,7 @@ jobs:
         name: Detect changes relevant to unit tests
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         permissions:
             pull-requests: read
         outputs:
@@ -252,7 +253,7 @@ jobs:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-slim'
         needs: [detect-relevant-changes]
-        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -281,7 +282,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
         needs: [detect-relevant-changes]
-        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         permissions:
             contents: read
         steps:
