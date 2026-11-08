@@ -525,16 +525,16 @@ test.describe( 'Client-side media processing', () => {
 			// The cropper is inert until its image has loaded; an edit
 			// applied before that is lost when it initializes.
 			await expect(
-				modal.locator( '.media-editor-canvas__cropper.is-loaded' )
+				modal.locator( '.media-editor-canvas__image-editor.is-loaded' )
 			).toBeVisible();
 			await expect(
-				modal.locator( '.wp-media-editor-image-editor__image' )
+				modal.locator( '.wp-image-editor__image' )
 			).toHaveJSProperty( 'complete', true );
 
 			await applyEdits( modal );
-			// Every edit here makes the editor dirty, which enables Reset.
+			// Every edit here makes the editor dirty, which enables Undo.
 			await expect(
-				modal.locator( 'role=button[name="Reset"i]' )
+				modal.locator( 'role=button[name="Undo"i]' )
 			).toBeEnabled();
 			await modal.locator( 'role=button[name="Save"i]' ).click();
 			await expect( modal ).toBeHidden( { timeout: 60_000 } );
@@ -681,10 +681,13 @@ test.describe( 'Client-side media processing', () => {
 				mediaProcessingUtils,
 				media.id,
 				async ( modal ) => {
-					// Square (1:1) preset, keyed by its ratio.
 					await modal
-						.getByRole( 'combobox', { name: 'Aspect ratio' } )
-						.selectOption( '1' );
+						.getByRole( 'button', { name: 'Aspect ratio' } )
+						.first()
+						.click();
+					await page
+						.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+						.click();
 				}
 			);
 
@@ -731,8 +734,12 @@ test.describe( 'Client-side media processing', () => {
 				media.id,
 				async ( modal ) => {
 					await modal
-						.getByRole( 'combobox', { name: 'Aspect ratio' } )
-						.selectOption( '1' );
+						.getByRole( 'button', { name: 'Aspect ratio' } )
+						.first()
+						.click();
+					await page
+						.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+						.click();
 				}
 			);
 			expect( cropped.media_details.width ).toBe( 768 );

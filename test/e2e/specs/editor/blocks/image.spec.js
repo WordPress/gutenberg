@@ -370,10 +370,10 @@ test.describe( 'Image', () => {
 		// The cropper is inert until its image has loaded; an edit applied
 		// before that is lost when it initializes.
 		await expect(
-			modal.locator( '.media-editor-canvas__cropper.is-loaded' )
+			modal.locator( '.media-editor-canvas__image-editor.is-loaded' )
 		).toBeVisible();
 		await expect(
-			modal.locator( '.wp-media-editor-image-editor__image' )
+			modal.locator( '.wp-image-editor__image' )
 		).toHaveJSProperty( 'complete', true );
 
 		// Rotate and save.
@@ -381,7 +381,7 @@ test.describe( 'Image', () => {
 			.locator( 'role=button[name="Rotate 90° clockwise"i]' )
 			.click();
 		await expect(
-			modal.locator( 'role=button[name="Reset"i]' )
+			modal.locator( 'role=button[name="Undo"i]' )
 		).toBeEnabled();
 		await modal.locator( 'role=button[name="Save"i]' ).click();
 
