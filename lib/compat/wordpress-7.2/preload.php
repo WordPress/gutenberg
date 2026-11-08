@@ -8,17 +8,7 @@
 /**
  * Filters the block editor preload paths.
  *
- * Also scopes the preloaded autosaves path to the current user. Core preloads
- * the whole autosave collection for the post, but the editor only ever reads
- * the current user's autosave, so `getAutosave` requests that one record. The
- * preload cache is keyed on the requested path, so the two have to agree.
- * WordPress ignores query parameters an endpoint has not registered, so on a
- * version without `author` support this preloads the same collection under
- * the path the editor asks for.
- *
  * @since 7.2.0
- *
- * @see https://core.trac.wordpress.org/ticket/62057
  *
  * @param array                   $paths   REST API paths to preload.
  * @param WP_Block_Editor_Context $context Block editor context.
@@ -37,16 +27,6 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 			// Replace with the complete fields list to ensure exact match.
 			$paths[ $key ] = '/?_fields=' . $root_fields;
 			break;
-		}
-	}
-
-	$user_id = get_current_user_id();
-	if ( $user_id ) {
-		foreach ( $paths as $key => $path ) {
-			if ( is_string( $path ) && str_ends_with( $path, '/autosaves?context=edit' ) ) {
-				$paths[ $key ] = add_query_arg( 'author', $user_id, $path );
-				break;
-			}
 		}
 	}
 
