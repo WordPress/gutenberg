@@ -4,12 +4,36 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { mapEditToOriginal } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
-import {
-	buildModifiers,
-	type Modifier,
-} from '../media-editor-modal/build-modifiers';
+
+/**
+ * A single modifier in the Core REST `/edit` payload. Order is
+ * significant — the server applies modifiers sequentially (see
+ * `WP_REST_Attachments_Controller::edit_media_item`).
+ *
+ * Shape/units:
+ *   - `flip`:   booleans per axis.
+ *   - `rotate`: `angle` in degrees, clockwise-positive (matches the
+ *     image editor's own convention; Core negates it internally for
+ *     `WP_Image_Editor::rotate`, which is counterclockwise-positive).
+ *   - `crop`:   percentages (0–100) of the image's dimensions **at the
+ *     moment the crop is applied**. Because modifiers are applied in
+ *     order, after a preceding `rotate` the server's
+ *     `WP_Image_Editor::get_size()` reports the full post-rotate AABB,
+ *     so the percentages are of that AABB. Origin is top-left.
+ */
+type Modifier =
+	| {
+			type: 'flip';
+			args: { flip: { horizontal: boolean; vertical: boolean } };
+	  }
+	| { type: 'rotate'; args: { angle: number } }
+	| {
+			type: 'crop';
+			args: { left: number; top: number; width: number; height: number };
+	  };
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.
@@ -65,7 +89,35 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	if ( ! session.hasOutputEdits ) {
 		return [];
 	}
-	return buildModifiers( session.cropper );
+	// The edits already follow Core's order and frames; only the shape and
+	// the crop's units (fractions to percentages) differ.
+	return mapEditToOriginal( session.imageEditor.state ).map(
+		( edit ): Modifier => {
+			if ( edit.type === 'flip' ) {
+				return {
+					type: 'flip',
+					args: {
+						flip: {
+							horizontal: edit.horizontal,
+							vertical: edit.vertical,
+						},
+					},
+				};
+			}
+			if ( edit.type === 'rotate' ) {
+				return { type: 'rotate', args: { angle: edit.angle } };
+			}
+			return {
+				type: 'crop',
+				args: {
+					left: edit.x * 100,
+					top: edit.y * 100,
+					width: edit.width * 100,
+					height: edit.height * 100,
+				},
+			};
+		}
+	);
 }
 
 function getMetadataEdits(
@@ -190,7 +242,7 @@ export function useSaveMediaEditor( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					session.cropper.reset();
+					session.reset();
 				}
 				onSaved?.( {
 					id: next.id,
