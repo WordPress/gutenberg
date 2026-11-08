@@ -2,8 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
 function renderMenu( children ) {
@@ -162,7 +164,8 @@ describe( 'PostPreviewButton', () => {
 		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'Preview(opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );

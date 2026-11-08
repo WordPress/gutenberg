@@ -66,7 +66,7 @@ type Token = [ TokenType, string, Attributes, number, number ];
  * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
  */
 const tokenizer =
-	/<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+	/<!--[ \t\f\r\n]+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)[ \t\f\r\n]+({(?:(?=([^}]+|}+(?=})|(?!}[ \t\f\r\n]+\/?-->)[^])*)\5|[^]*?)}[ \t\f\r\n]+)?(\/)?-->/g;
 
 /**
  * Constructs a block object.
@@ -237,30 +237,32 @@ function proceed(): boolean {
 
 	switch ( tokenType ) {
 		case 'no-more-tokens':
-			// If not in a block then flush output.
+			/*
+			 * Most documents will end with all blocks properly closed.
+			 * In these cases, all that’s necessary is to flush the output.
+			 * There is probably a terminating newline.
+			 */
 			if ( 0 === stackDepth ) {
 				addFreeform();
 				return false;
 			}
 
-			// Otherwise we have a problem
-			// This is an error
-			// we have options
-			//  - treat it all as freeform text
-			//  - assume an implicit closer (easiest when not nesting)
-
-			// For the easy case we'll assume an implicit closer.
-			if ( 1 === stackDepth ) {
-				addBlockFromStack();
-				return false;
-			}
-
-			// For the nested case where it's more difficult we'll
-			// have to assume that multiple closers are missing
-			// and so we'll collapse the whole stack piecewise.
-			while ( 0 < stack.length ) {
-				addBlockFromStack();
-			}
+			/*
+			 * However, if blocks remain open it means there were missing
+			 * closing block delimiters. The post may have been truncated,
+			 * for example, but some amount of corruption produced a malformed
+			 * document.
+			 *
+			 * The spec parser considers this a parse error and returns a long
+			 * freeform block containing the full span of text from the input
+			 * document from the start of the un-closed block.
+			 *
+			 * This parser, however, is making a different pragmatic choice: it
+			 * will implicitly close any remaining open blocks, as if the closers
+			 * were provided. This ensures recovery of as much of the provided
+			 * block structure as is possible.
+			 */
+			implicitlyCloseAllOpenBlocks();
 			return false;
 		case 'void-block':
 			// easy case is if we stumbled upon a void block
@@ -330,8 +332,12 @@ function proceed(): boolean {
 				stackTop.prevOffset,
 				startOffset - stackTop.prevOffset
 			);
-			stackTop.block.innerHTML += html;
-			stackTop.block.innerContent.push( html );
+
+			if ( html ) {
+				stackTop.block.innerHTML += html;
+				stackTop.block.innerContent.push( html );
+			}
+
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addInnerBlock(
@@ -500,4 +506,50 @@ function addBlockFromStack( endOffset?: number ) {
 	}
 
 	output.push( block );
+}
+
+/**
+ * Closes all open blocks and adds remaining blocks and freeform content to the output list.
+ *
+ * @since 24.3.0
+ */
+function implicitlyCloseAllOpenBlocks() {
+	let lastClosedBlock: ParsedBlock | null = null;
+	let lastOpenerAt: number = document.length;
+	let lastLeadingHtml: number | null = null;
+
+	while ( stack.length > 0 ) {
+		const stackTop = stack.pop() as ParsedFrame;
+		let html: string;
+
+		const htmlLength = lastOpenerAt - stackTop.prevOffset;
+		if ( htmlLength > 0 ) {
+			html = document.substr( stackTop.prevOffset, htmlLength );
+			stackTop.block.innerHTML += html;
+			stackTop.block.innerContent.push( html );
+		}
+
+		if ( lastClosedBlock !== null ) {
+			stackTop.block.innerContent.push( null );
+			stackTop.block.innerBlocks.push( lastClosedBlock );
+		}
+
+		lastClosedBlock = stackTop.block;
+		lastOpenerAt = stackTop.tokenStart;
+		lastLeadingHtml = stackTop.leadingHtmlStart;
+	}
+
+	if ( null !== lastLeadingHtml && lastOpenerAt > lastLeadingHtml ) {
+		const html = document.substr(
+			lastLeadingHtml,
+			lastOpenerAt - lastLeadingHtml
+		);
+		output.push( Freeform( html ) );
+	}
+
+	if ( lastClosedBlock !== null ) {
+		output.push( lastClosedBlock );
+	}
+
+	offset = document.length;
 }

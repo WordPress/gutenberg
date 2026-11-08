@@ -13,7 +13,6 @@ import { isURL, isEmail, isPhoneNumber } from '@wordpress/url';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';

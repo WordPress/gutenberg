@@ -14,8 +14,9 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	 * inside `WP_Widget_Type_Registry` once registered, and consumed by host
 	 * code that needs to enumerate or look up widget types.
 	 *
-	 * The shape is intentionally minimal: identity (`name`) plus the
-	 * script-module handles the build pipeline produced for the widget.
+	 * The shape mirrors `widget.json`: identity (`name`), the script-module
+	 * handles the build pipeline produced for the widget, and the declarative
+	 * metadata the manifest carries, translated and sanitized at registration.
 	 * Placement and host concerns (which page or sidebar uses the widget)
 	 * live with the consumer, not on the type definition.
 	 */
@@ -141,6 +142,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var array|null
 		 */
 		public $attributes = null;
+
+		/**
+		 * Structured example: `attributes` maps attribute names to the JSON
+		 * values hosts preview the widget with, and apply to a new instance
+		 * created without attributes of its own. Not translated.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $example = null;
 
 		/**
 		 * Alternative terms used to match the widget type when searching,
