@@ -1,6 +1,7 @@
 import { readFile, writeFile, copyFile, mkdir } from 'fs/promises';
 import path from 'path';
 import glob from 'fast-glob';
+import { boolConfigVal } from './package-utils.mjs';
 
 /**
  * @typedef {Object} PhpTransforms
@@ -24,20 +25,6 @@ import glob from 'fast-glob';
 /**
  * @typedef {{ wpCopyFiles?: CopyFiles }} CopyFilesPackageJson
  */
-
-/**
- * Interprets a configuration value as a boolean, where `"true"` and `"1"`
- * are considered true while all other values are false.
- *
- * @param {string|undefined} value The configuration value to interpret.
- * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
- */
-export const boolConfigVal = ( value ) => {
-	if ( value === undefined ) {
-		return undefined;
-	}
-	return [ 'true', '1' ].includes( value.toLowerCase() );
-};
 
 /**
  * Apply a package's `wpCopyFiles` PHP transforms to a PHP file's content.

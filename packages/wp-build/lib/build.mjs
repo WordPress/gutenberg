@@ -23,8 +23,12 @@ import {
 	getPhpReplacements,
 	renderTemplateToString,
 } from './php-generator.mjs';
-import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
-import { boolConfigVal, copyPackageFile, getCopyFiles } from './copy-files.mjs';
+import {
+	boolConfigVal,
+	getPackageInfo,
+	getPackageInfoFromFile,
+} from './package-utils.mjs';
+import { copyPackageFile, getCopyFiles } from './copy-files.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
