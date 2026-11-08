@@ -5,6 +5,7 @@
 ### New Features
 
 -   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#83538](https://github.com/WordPress/gutenberg/pull/83538)).
+-   Notes: the emoji picker shows the highlighted emoji with its name in a footer under the grid, following both the pointer and the arrow keys ([#84051](https://github.com/WordPress/gutenberg/pull/84051)).
 
 ### Enhancements
 
