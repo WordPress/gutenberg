@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getCuratedLabel } from './reaction-emojis';
 
@@ -87,7 +86,7 @@ export interface EmojibaseDataResult extends EmojibaseDataState {
 
 /*
  * Locales Emojibase ships translated labels for. Must stay in sync with
- * `LOCALES` in `tools/build-scripts/copy-emojibase-data.mjs`.
+ * `LOCALES` in `tools/build-scripts/copy-emojibase-data.mts`.
  */
 export const EMOJIBASE_LOCALES = new Set( [
 	'bn',

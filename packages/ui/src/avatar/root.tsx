@@ -2,7 +2,9 @@ import { Avatar as _Avatar } from '@base-ui/react/avatar';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { RootProps } from './types';
+import { warnAvatarColor } from './dev-warnings';
 import resetStyles from '../utils/css/resets.module.css';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 
 /**
@@ -23,17 +25,29 @@ import styles from './style.module.css';
  */
 export const Root = forwardRef< HTMLSpanElement, RootProps >(
 	function AvatarRoot(
-		{ size = 'md', shape = 'circle', className, ...props },
+		{ size = 'md', shape = 'circle', color, className, style, ...props },
 		ref
 	) {
+		if ( process.env.NODE_ENV !== 'production' ) {
+			warnAvatarColor( color );
+		}
+
+		const customProperties =
+			color === undefined
+				? style
+				: { ...style, '--_wp-ui-avatar-color': color };
+
 		return (
 			<_Avatar.Root
 				ref={ ref }
+				style={ customProperties }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
+					defenseStyles.span,
 					styles.root,
 					styles[ `is-${ size }` ],
 					shape === 'square' && styles[ 'is-square' ],
+					color !== undefined && styles[ 'has-color' ],
 					className
 				) }
 				{ ...props }

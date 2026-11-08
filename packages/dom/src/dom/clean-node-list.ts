@@ -15,13 +15,13 @@ const noop = () => {};
  * @param nodeList The nodeList to filter.
  * @param doc      The document of the nodeList.
  * @param schema   Schema for the HTML.
- * @param inline   Whether to clean for inline mode.
+ * @param [inline] Whether to clean for inline mode.
  */
 export default function cleanNodeList(
 	nodeList: NodeList,
 	doc: Document,
 	schema: Schema,
-	inline: boolean
+	inline?: boolean
 ) {
 	Array.from( nodeList ).forEach(
 		( node: Node & { nextElementSibling?: unknown } ) => {

@@ -7,14 +7,15 @@ import {
 	useEffect,
 	useRef,
 	isValidElement,
-	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	Icon as WCIcon,
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import type { IconType } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
@@ -26,6 +27,7 @@ import { unlock } from '../lock-unlock';
 import {
 	recordUsage,
 	useLoaderCollector,
+	useLoaderLoadingState,
 	useRecentCommands,
 } from './use-recent-commands';
 import type { CommandCategory } from '../store/types';
@@ -64,22 +66,18 @@ const CATEGORY_LABELS: Record< CommandCategory, string > = {
 };
 
 /**
- * Function that checks if the parameter is a valid icon.
- * Taken from @wordpress/blocks/src/api/utils.js and copied
- * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
+ * Whether `WCIcon` can render the value. Plugins in plain JS may still pass
+ * dashicon names or components, so this accepts more than the `icon` type.
  *
- * @param icon Parameter to be checked.
+ * @param icon Value to check.
  *
- * @return True if the parameter is a valid icon and false otherwise.
+ * @return Whether the value is a renderable icon.
  */
-
-export function isValidIcon( icon: unknown ): boolean {
+function isValidIcon( icon: unknown ): icon is IconType {
 	return (
-		!! icon &&
-		( typeof icon === 'string' ||
-			isValidElement( icon ) ||
-			typeof icon === 'function' ||
-			icon instanceof Component )
+		( typeof icon === 'string' && icon !== '' ) ||
+		typeof icon === 'function' ||
+		isValidElement( icon )
 	);
 }
 
@@ -94,11 +92,10 @@ function CommandItem( {
 	const categoryLabel = commandCategory
 		? CATEGORY_LABELS[ commandCategory ]
 		: undefined;
-	const icon =
-		command.icon ??
-		( commandCategory
-			? CATEGORY_FALLBACK_ICONS[ commandCategory ]
-			: undefined );
+	const fallbackIcon = commandCategory
+		? CATEGORY_FALLBACK_ICONS[ commandCategory ]
+		: undefined;
+	const icon = isValidIcon( command.icon ) ? command.icon : fallbackIcon;
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -122,7 +119,7 @@ function CommandItem( {
 					'has-icon': !! icon,
 				} ) }
 			>
-				{ isValidIcon( icon ) && <Icon icon={ icon! } /> }
+				{ icon && <WCIcon icon={ icon } size={ 24 } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
@@ -146,11 +143,8 @@ function CommandMenuLoader( {
 	category,
 	valuePrefix,
 }: CommandMenuLoaderProps ) {
-	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
-	useEffect( () => {
-		setLoaderLoading( name, loading );
-	}, [ setLoaderLoading, name, loading ] );
+	useLoaderLoadingState( name, loading );
 
 	if ( ! commands.length ) {
 		return null;

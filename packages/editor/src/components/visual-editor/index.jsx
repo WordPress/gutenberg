@@ -8,7 +8,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -403,6 +403,15 @@ function VisualEditor( {
 	const canvasHeight = shouldConstrainCanvasHeight
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
+
+	const { setCanvasHeight } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setCanvasHeight(
+			typeof canvasHeight === 'number' ? canvasHeight : undefined
+		);
+	}, [ canvasHeight, setCanvasHeight ] );
+	// The store must not retain dimensions for a canvas that is no longer mounted.
+	useEffect( () => () => setCanvasHeight( undefined ), [ setCanvasHeight ] );
 
 	// A resizable canvas (device preview) or a scaled one (zoom out) has no
 	// margin.

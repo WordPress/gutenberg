@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { ExternalLink } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { ScreenHeader } from './screen-header';
 import { useStyle } from './hooks';

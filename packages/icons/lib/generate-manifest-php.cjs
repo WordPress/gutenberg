@@ -59,10 +59,18 @@ function generatePHPArray( manifest ) {
 					.join( ', ' ) } ),`
 			: '';
 
+		// Dashicons are optional, and list the Dashicon class names the admin
+		// interface replaces with the icon.
+		const dashicons = item.dashicons?.length
+			? `\n\t\t'dashicons'   => array( ${ item.dashicons
+					.map( ( dashicon ) => `'${ escapePHPString( dashicon ) }'` )
+					.join( ', ' ) } ),`
+			: '';
+
 		return `${ key } => array(
 		'label'       => _x( '${ label }', 'icon label', 'gutenberg' ),
 		'filePath'    => '${ filePath }',
-		'collections' => array( ${ collections } ),${ keywords }
+		'collections' => array( ${ collections } ),${ keywords }${ dashicons }
 	),`;
 	} );
 

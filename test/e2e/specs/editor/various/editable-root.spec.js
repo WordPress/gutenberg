@@ -66,7 +66,7 @@ test.describe( 'editableRoot host mode', () => {
 			.toBe( true );
 	} );
 
-	test( 'a heading (no support) is not hosted', async ( {
+	test( 'wrapper becomes the editing host for a heading with siblings', async ( {
 		editor,
 		page,
 	} ) => {
@@ -91,6 +91,6 @@ test.describe( 'editableRoot host mode', () => {
 							)
 					)
 			)
-			.toBe( false );
+			.toBe( true );
 	} );
 } );

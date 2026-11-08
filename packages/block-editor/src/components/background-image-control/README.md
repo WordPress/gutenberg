@@ -88,13 +88,6 @@ The theme settings object. The background size, position, and repeat controls ar
 
 Default values for the background properties, used as placeholders when nothing is set.
 
-#### `showInheritanceLabelIndicators`
-
--   **Type:** `Boolean`
--   **Default:** whether global styles inheritance is enabled
-
-Whether to show the inherited-value label treatment, including the local-override affordance on the reset control.
-
 ## Utility functions
 
 ### `coordsToBackgroundPosition( value )`

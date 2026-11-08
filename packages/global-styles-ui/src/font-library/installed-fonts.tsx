@@ -10,7 +10,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Notice,
+	Notice as WCNotice,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
@@ -292,12 +292,12 @@ function InstalledFonts() {
 						<Navigator.Screen path="/">
 							<VStack spacing="8">
 								{ notice && (
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 								) }
 								{ ! hasFonts && (
 									<WCText as="p">
@@ -439,12 +439,12 @@ function InstalledFonts() {
 							{ notice && (
 								<>
 									<Spacer margin={ 1 } />
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 									<Spacer margin={ 1 } />
 								</>
 							) }
