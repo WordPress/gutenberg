@@ -6,6 +6,7 @@
 
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+-   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
 ### Bug Fixes
 

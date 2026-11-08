@@ -30,6 +30,7 @@ The components are in the hierarchy below. Besides them:
 | `dom` | Marker selectors, anchor rects, focusing and scrolling threads |
 | `layout` | Floating thread positions, see "Floating board" |
 | `display` | Excerpts and avatar colors |
+| `unseen` | Which note activity the current user has not seen yet |
 
 ## Component hierarchy
 
