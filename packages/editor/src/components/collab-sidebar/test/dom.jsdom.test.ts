@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getNoteMarkerSelector, getNoteAnchorRect } from '../utils/dom';
+import {
+	getHiddenBlockAnchorRect,
+	getNoteMarkerSelector,
+	getNoteAnchorRect,
+} from '../utils/dom';
 import { noteFormat } from '../format';
 
 describe( 'getNoteMarkerSelector', () => {
@@ -105,5 +109,121 @@ describe( 'getNoteAnchorRect', () => {
 
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 120 );
 		expect( getNoteAnchorRect( 34, blockEl ).top ).toBe( 180 );
+	} );
+} );
+
+describe( 'getHiddenBlockAnchorRect', () => {
+	// Only the rendered blocks appear in the lookup; a hidden block (and
+	// anything nested inside it) resolves to null, like the real DOM.
+	function makeLookup( rectsByClientId: Record< string, DOMRect > ) {
+		return ( clientId: string ) => {
+			const rect = rectsByClientId[ clientId ];
+			return rect ? { getBoundingClientRect: () => rect } : null;
+		};
+	}
+
+	const rect = ( top: number, height = 100 ) =>
+		( {
+			top,
+			left: 20,
+			width: 600,
+			height,
+		} ) as DOMRect;
+
+	it( 'centres the rect in the gap between the rendered neighbours', () => {
+		// 'a' ends at 200, 'c' starts at 400, so the hidden block's slot is
+		// at 300 - where the block itself sits when it is selected.
+		const result = getHiddenBlockAnchorRect(
+			'b',
+			[ 'a', 'b', 'c' ],
+			makeLookup( { a: rect( 100 ), c: rect( 400 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 300,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( 'skips consecutive unrendered blocks, such as a hidden subtree', () => {
+		const result = getHiddenBlockAnchorRect(
+			'parent',
+			[ 'a', 'parent', 'child', 'grandchild', 'c' ],
+			makeLookup( { a: rect( 100 ), c: rect( 400 ) } )
+		);
+
+		expect( result?.top ).toBe( 300 );
+	} );
+
+	it( "anchors to the next block's top when nothing precedes", () => {
+		const result = getHiddenBlockAnchorRect(
+			'a',
+			[ 'a', 'b' ],
+			makeLookup( { b: rect( 400 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 400,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( "anchors to the previous block's bottom when nothing follows", () => {
+		const result = getHiddenBlockAnchorRect(
+			'c',
+			[ 'a', 'b', 'c' ],
+			makeLookup( { a: rect( 100 ), b: rect( 250, 80 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 330,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( 'skips blocks inside collapsed content', () => {
+		// 'b' sits in a closed Details, which still reports its expanded box.
+		const lookup = makeLookup( {
+			a: rect( 100 ),
+			b: rect( 200 ),
+			d: rect( 400 ),
+		} );
+		const result = getHiddenBlockAnchorRect(
+			'c',
+			[ 'a', 'b', 'c', 'd' ],
+			( clientId: string ) => {
+				const element = lookup( clientId );
+				return element && clientId === 'b'
+					? { ...element, checkVisibility: () => false }
+					: element;
+			}
+		);
+
+		expect( result?.top ).toBe( 300 );
+	} );
+
+	it( 'returns null when no block in the document is rendered', () => {
+		expect(
+			getHiddenBlockAnchorRect( 'b', [ 'a', 'b', 'c' ], makeLookup( {} ) )
+		).toBeNull();
+	} );
+
+	it( 'returns null for a client ID that is not in the document', () => {
+		expect(
+			getHiddenBlockAnchorRect(
+				'gone',
+				[ 'a', 'b' ],
+				makeLookup( { a: rect( 100 ), b: rect( 400 ) } )
+			)
+		).toBeNull();
+		expect(
+			getHiddenBlockAnchorRect( 'a', undefined, makeLookup( {} ) )
+		).toBeNull();
 	} );
 } );

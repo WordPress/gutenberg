@@ -38,7 +38,10 @@ export function getThreadLayout( {
 	// but its marker can sit above theirs. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
-	// below and never receive a position.
+	// below and never receive a position. Threads sharing a top - two hidden
+	// blocks resolving to the same boundary rect, say (see
+	// `getHiddenBlockAnchorRect`) - keep document order too, because the sort
+	// is stable, and the sweep below spaces them out.
 	const orderedThreads = threads.toSorted(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -

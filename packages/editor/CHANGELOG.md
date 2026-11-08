@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Notes: Keep a floating note thread at its block's place in the document when the block is hidden at the current viewport, and label the thread as hidden, instead of hiding it until the block is selected ([#81549](https://github.com/WordPress/gutenberg/pull/81549)).
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
 -   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).

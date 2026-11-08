@@ -264,4 +264,74 @@ describe( 'getThreadLayout', () => {
 		expect( positions ).toEqual( { 1: 334, new: 234 } );
 		expect( positions[ 1 ] ).toBeGreaterThan( blockRects[ 1 ].top - 50 );
 	} );
+
+	it( 'positions a thread anchored to a hidden block boundary rect', () => {
+		// Thread 2's block is hidden, so it anchors to the zero-height
+		// boundary where the block would be, between its two neighbours.
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		const blockRects = {
+			1: makeRect( 100 ),
+			2: { top: 300, height: 0 },
+			3: makeRect( 500 ),
+		};
+		const heights = { 1: 50, 2: 50, 3: 50 };
+
+		const { positions } = getThreadLayout( {
+			threads,
+			selectedNoteId: 1,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// 1: 100 - 16 = 84
+		// 2: 300 - 16 = 284
+		// 3: 500 - 16 = 484
+		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
+	} );
+
+	it( 'keeps a hidden thread ahead of the thread it shares a boundary with', () => {
+		// A hidden block's boundary rect sits at the top of the next
+		// rendered block, tying with that block's own thread. Document
+		// order decides, and the sweep pushes the later thread down.
+		const threads = [ { id: 1 }, { id: 2 } ];
+		const blockRects = {
+			1: { top: 300, height: 0 },
+			2: makeRect( 300 ),
+		};
+		const heights = { 1: 50, 2: 50 };
+
+		const { positions } = getThreadLayout( {
+			threads,
+			selectedNoteId: 1,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// 1 (anchor):    300 - 16 = 284
+		// 2 (downward):  (284 + 50) - 300 + 20 = 54 → 354
+		expect( positions ).toEqual( { 1: 284, 2: 354 } );
+		expect( positions[ 1 ] ).toBeLessThan( positions[ 2 ] );
+	} );
+
+	it( 'positions every thread when the hidden thread is the anchor', () => {
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		const blockRects = {
+			1: makeRect( 100 ),
+			2: { top: 300, height: 0 },
+			3: makeRect( 500 ),
+		};
+		const heights = { 1: 50, 2: 50, 3: 50 };
+
+		const { positions } = getThreadLayout( {
+			threads,
+			selectedNoteId: 2,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
+	} );
 } );

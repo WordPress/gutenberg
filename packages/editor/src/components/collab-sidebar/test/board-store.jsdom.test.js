@@ -69,4 +69,32 @@ describe( 'createBoardStore', () => {
 		expect( listener ).toHaveBeenCalled();
 		expect( store.getSnapshot().heights ).toEqual( { 1: 80 } );
 	} );
+
+	it( "anchors a thread whose block isn't rendered between its neighbours", () => {
+		const store = createBoardStore();
+		const root = document.createElement( 'div' );
+		root.className = 'is-root-container';
+		document.body.appendChild( root );
+		const before = document.createElement( 'p' );
+		before.id = 'block-a';
+		before.getBoundingClientRect = () => ( { top: 100, height: 100 } );
+		const after = document.createElement( 'p' );
+		after.id = 'block-c';
+		after.getBoundingClientRect = () => ( { top: 400, height: 100 } );
+		root.append( before, after );
+
+		store.subscribe( () => {} );
+		store.setBlockOrder( [ 'a', 'b', 'c' ] );
+		store.registerThread( 1, before, document.createElement( 'div' ), 'a' );
+		// Block 'b' is hidden, so it has no element.
+		store.registerThread( 2, null, document.createElement( 'div' ), 'b' );
+		resize( root, 500 );
+
+		expect( store.getSnapshot().anchorRects ).toEqual( {
+			1: { top: 100 },
+			2: { top: 300 },
+		} );
+
+		root.remove();
+	} );
 } );
