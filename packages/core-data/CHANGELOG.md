@@ -6,6 +6,7 @@
 
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   `getEntityRecord`: Discard a REST response that is delivered after a newer response for the same request. Invalidating a resolution starts a second request while the first may still be in flight, and the store kept whichever one arrived last, so a record read from the database before an update could overwrite the updated one ([#81846](https://github.com/WordPress/gutenberg/pull/81846)).
+-   `getEntityRecords`: Discard a list response that is delivered after a newer response for the same query, so a list read from the database before an update — as happens when a batch upload invalidates the attachment list once per file — can no longer replace a fresher one, overwrite the records it contains, or mark their resolutions finished ([#81886](https://github.com/WordPress/gutenberg/pull/81886)).
 
 ## 9.1.0 (2026-11-04)
 
