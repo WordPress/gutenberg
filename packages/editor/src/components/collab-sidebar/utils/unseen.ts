@@ -75,7 +75,11 @@ export function setNotesLastSeen(
 	timestamp: string,
 	limit: number
 ): Record< string, string > {
-	const entries = Object.entries( { ...lastSeen, [ postId ]: timestamp } );
+	const updated: Record< string, string > = {
+		...lastSeen,
+		[ postId ]: timestamp,
+	};
+	const entries = Object.entries( updated );
 	if ( entries.length <= limit ) {
 		return Object.fromEntries( entries );
 	}
