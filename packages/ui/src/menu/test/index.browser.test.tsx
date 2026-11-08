@@ -21,6 +21,7 @@ import {
 import { isRTL } from '@wordpress/i18n';
 import { copySmall } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
+import { Icon } from '../../icon';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -161,26 +162,29 @@ describe( 'Menu', () => {
 		expect( within( item ).queryByRole( 'img' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'centers the prefix icon of a submenu trigger on its label', async () => {
+	it( 'keeps a submenu trigger as tall as a plain item', async () => {
+		const prefix = (
+			<Menu.PrefixIcon
+				icon={ copySmall }
+				role="img"
+				aria-label="Prefix icon"
+			/>
+		);
+
 		await render(
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
+					<Menu.Item prefix={ prefix }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger
-							prefix={
-								<Menu.PrefixIcon
-									icon={ copySmall }
-									role="img"
-									aria-label="Copy icon"
-								/>
-							}
-						>
+						<Menu.SubmenuTrigger prefix={ prefix }>
 							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
 							<Menu.Item>
-								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+								<Menu.ItemLabel>Folder</Menu.ItemLabel>
 							</Menu.Item>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
@@ -191,21 +195,213 @@ describe( 'Menu', () => {
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Actions' } )
 		);
-		const item = await screen.findByRole( 'menuitem', {
+		const plainItem = await screen.findByRole( 'menuitem', {
+			name: 'Archive',
+		} );
+		const submenuTrigger = screen.getByRole( 'menuitem', {
 			name: 'Move to',
 		} );
-		const icon = within( item ).getByRole( 'img', { hidden: true } );
-		const label = within( item ).getByText( 'Move to' );
 
-		// The submenu chevron is taller than the label line. It must not
-		// move the label away from the icon.
-		const getCenter = ( element: Element ) => {
-			const { top, height } = element.getBoundingClientRect();
-			return top + height / 2;
+		// The chevron is taller than the label line. It must not grow the row.
+		expect( submenuTrigger.getBoundingClientRect().height ).toBe(
+			plainItem.getBoundingClientRect().height
+		);
+	} );
+
+	describe( 'slot alignment', () => {
+		const SHORTCUT = {
+			displayShortcut: '⌘M',
+			ariaKeyShortcut: 'Meta+M',
+			label: 'Command M',
 		};
-		expect(
-			Math.abs( getCenter( icon ) - getCenter( label ) )
-		).toBeLessThan( 0.5 );
+		const WRAPPING_LABEL =
+			'Move this item to another folder in the library, then archive it for later review by the team';
+
+		type AlignmentCase = {
+			content: string;
+			variant?: 'item' | 'submenu' | 'radio';
+			prefixSize?: number;
+			// A string is the suffix text, a number is the size of a suffix icon.
+			suffix?: 'text' | number;
+			shortcut?: boolean;
+			description?: boolean;
+			wrapped?: boolean;
+		};
+
+		// The prefix, suffix, shortcut, chevron and selection indicator all
+		// share the vertical center of the label's first line.
+		it.each< AlignmentCase >( [
+			{
+				content: 'a prefix, a suffix, a shortcut and a chevron',
+				variant: 'submenu',
+				suffix: 'text',
+				shortcut: true,
+			},
+			{
+				content: 'a 32px prefix and a 32px suffix icon',
+				prefixSize: 32,
+				suffix: 32,
+			},
+			{
+				content:
+					'a wrapped label, a 24px suffix icon, a shortcut and a chevron',
+				variant: 'submenu',
+				suffix: 24,
+				shortcut: true,
+				wrapped: true,
+			},
+			{
+				content: 'a radio indicator and a 24px prefix',
+				variant: 'radio',
+				prefixSize: 24,
+				suffix: 'text',
+			},
+			{
+				content: 'a description',
+				variant: 'submenu',
+				description: true,
+			},
+		] )(
+			'centers the slots of an item with $content on the first line of its label',
+			async ( {
+				variant = 'item',
+				prefixSize = 16,
+				suffix,
+				shortcut,
+				description,
+				wrapped,
+			} ) => {
+				const labelText = wrapped ? WRAPPING_LABEL : 'Move to';
+				const slotProps = {
+					prefix: (
+						<Menu.PrefixIcon
+							icon={ copySmall }
+							size={ prefixSize }
+							role="img"
+							aria-label="Prefix icon"
+						/>
+					),
+					suffix:
+						typeof suffix === 'number' ? (
+							<Icon
+								icon={ copySmall }
+								size={ suffix }
+								role="img"
+								aria-label="Suffix icon"
+							/>
+						) : (
+							suffix && 'Draft'
+						),
+					shortcut: shortcut ? SHORTCUT : undefined,
+				};
+				const label = <Menu.ItemLabel>{ labelText }</Menu.ItemLabel>;
+				const details = description ? (
+					<Menu.ItemDescription>
+						Move the item to another folder.
+					</Menu.ItemDescription>
+				) : null;
+
+				let element = (
+					<Menu.Item { ...slotProps }>
+						{ label }
+						{ details }
+					</Menu.Item>
+				);
+				if ( variant === 'submenu' ) {
+					element = (
+						<Menu.SubmenuRoot>
+							<Menu.SubmenuTrigger { ...slotProps }>
+								{ label }
+								{ details }
+							</Menu.SubmenuTrigger>
+							<Menu.Popup>
+								<Menu.Item>
+									<Menu.ItemLabel>Folder</Menu.ItemLabel>
+								</Menu.Item>
+							</Menu.Popup>
+						</Menu.SubmenuRoot>
+					);
+				} else if ( variant === 'radio' ) {
+					element = (
+						<Menu.RadioGroup value="move">
+							<Menu.RadioItem value="move" { ...slotProps }>
+								{ label }
+								{ details }
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					);
+				}
+
+				await render(
+					<Menu.Root>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>{ element }</Menu.Popup>
+					</Menu.Root>
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Actions' } )
+				);
+				const item = await screen.findByRole(
+					variant === 'radio' ? 'menuitemradio' : 'menuitem'
+				);
+				const labelElement = within( item ).getByText( labelText );
+				const firstLineCenter =
+					labelElement.getBoundingClientRect().top +
+					parseFloat( getComputedStyle( labelElement ).lineHeight ) /
+						2;
+
+				// The prefix is hidden from assistive technology, so it has no
+				// accessible name to query by.
+				const slots: Record< string, Element > = {
+					prefix: within( item ).getByLabelText( 'Prefix icon' ),
+				};
+				if ( typeof suffix === 'number' ) {
+					slots.suffix =
+						within( item ).getByLabelText( 'Suffix icon' );
+				} else if ( suffix ) {
+					slots.suffix = within( item ).getByText( 'Draft' );
+				}
+				if ( shortcut ) {
+					slots.shortcut = within( item ).getByText( '⌘M' );
+				}
+				// The chevron and selection indicator are decorative icons with
+				// no role or text to query.
+				// eslint-disable-next-line testing-library/no-node-access
+				const decoration = item.querySelector( 'svg:not([role])' );
+				expect( decoration !== null ).toBe( variant !== 'item' );
+				if ( decoration ) {
+					slots[ variant === 'radio' ? 'indicator' : 'chevron' ] =
+						decoration;
+				}
+
+				const itemBox = item.getBoundingClientRect();
+				const offsets: Record< string, number > = {};
+				const overflowing: string[] = [];
+				for ( const [ name, slot ] of Object.entries( slots ) ) {
+					const box = slot.getBoundingClientRect();
+					offsets[ name ] =
+						box.top + box.height / 2 - firstLineCenter;
+					if (
+						box.top < itemBox.top ||
+						box.bottom > itemBox.bottom
+					) {
+						overflowing.push( name );
+					}
+				}
+
+				expect( offsets ).toEqual(
+					Object.fromEntries(
+						Object.keys( offsets ).map( ( name ) => [
+							name,
+							expect.closeTo( 0, 0 ),
+						] )
+					)
+				);
+				// A slot taller than the label line grows the row instead.
+				expect( overflowing ).toEqual( [] );
+			}
+		);
 	} );
 
 	it( 'opens from the trigger and exposes menu semantics', async () => {
