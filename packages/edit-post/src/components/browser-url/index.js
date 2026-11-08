@@ -1,109 +1,121 @@
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { addQueryArgs, getQueryArg } from '@wordpress/url';
+import { store as editorStore } from '@wordpress/editor';
+import { unlock } from '../../lock-unlock';
+import useClassicRevisionRedirect from './use-classic-revision-redirect';
+
 /**
- * WordPress dependencies
+ * Safari throws when rapid revision changes trigger more than 100 History API
+ * calls in 30 seconds.
  */
-import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
+const URL_WRITE_DEBOUNCE_MS = 300;
 
 /**
  * Returns the Post's Edit URL.
  *
- * @param {number} postId Post ID.
+ * @param {number}  postId     Post ID.
+ * @param {?number} revisionId Revision being previewed, if any.
  *
  * @return {string} Post edit URL.
  */
-export function getPostEditURL( postId ) {
-	return addQueryArgs( 'post.php', { post: postId, action: 'edit' } );
-}
-
-/**
- * Returns the Post's Trashed URL.
- *
- * @param {number} postId    Post ID.
- * @param {string} postType Post Type.
- *
- * @return {string} Post trashed URL.
- */
-export function getPostTrashedURL( postId, postType ) {
-	return addQueryArgs( 'edit.php', {
-		trashed: 1,
-		post_type: postType,
-		ids: postId,
-	} );
-}
-
-export class BrowserURL extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			historyId: null,
-		};
+export function getPostEditURL( postId, revisionId ) {
+	const args = { post: postId, action: 'edit' };
+	if ( revisionId ) {
+		args.revision = revisionId;
 	}
+	return addQueryArgs( 'post.php', args );
+}
 
-	componentDidUpdate( prevProps ) {
-		const { postId, postStatus, postType, isSavingPost } = this.props;
-		const { historyId } = this.state;
+export default function BrowserURL() {
+	useClassicRevisionRedirect();
 
-		// Posts are still dirty while saving so wait for saving to finish
-		// to avoid the unsaved changes warning when trashing posts.
-		if ( postStatus === 'trash' && ! isSavingPost ) {
-			this.setTrashURL( postId, postType );
+	// Read the initial revision once, before URL sync can overwrite it.
+	const [ initialRevisionId ] = useState( () => {
+		const revision = Number(
+			getQueryArg( window.location.href, 'revision' )
+		);
+		return Number.isInteger( revision ) && revision > 0 ? revision : null;
+	} );
+	const hasHandledInitialRevisionRef = useRef( false );
+
+	const { postId, postStatus, currentRevisionId } = useSelect( ( select ) => {
+		const { getCurrentPost } = select( editorStore );
+		const { getCurrentRevisionId } = unlock( select( editorStore ) );
+		const post = getCurrentPost();
+		let { id, status, type } = post;
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			type
+		);
+		if ( isTemplate ) {
+			id = post.wp_id;
+		}
+
+		return {
+			postId: id,
+			postStatus: status,
+			// `post.php` rejects templates because `show_ui` is false. Adding
+			// their revision ID to this URL would create a dead link.
+			currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
+		};
+	}, [] );
+	const { openRevision } = unlock( useDispatch( editorStore ) );
+
+	const lastURLWriteTimeRef = useRef( null );
+	const lastPostIdRef = useRef( null );
+
+	useEffect( () => {
+		if ( ! postId ) {
 			return;
 		}
-
-		if (
-			( postId !== prevProps.postId || postId !== historyId ) &&
-			postStatus !== 'auto-draft'
-		) {
-			this.setBrowserURL( postId );
+		if ( initialRevisionId && ! hasHandledInitialRevisionRef.current ) {
+			hasHandledInitialRevisionRef.current = true;
+			openRevision( initialRevisionId );
+			return;
 		}
-	}
+		if ( postStatus === 'auto-draft' ) {
+			return;
+		}
+		const previousPostId = lastPostIdRef.current;
+		lastPostIdRef.current = postId;
+		const url = getPostEditURL( postId, currentRevisionId );
+		const write = () => {
+			lastURLWriteTimeRef.current = Date.now();
+			try {
+				window.history.replaceState(
+					{ id: postId },
+					'Post ' + postId,
+					url
+				);
+			} catch {
+				// Leave the URL unchanged. The effect can try again on the next
+				// state change.
+			}
+		};
+		if ( previousPostId !== null && previousPostId !== postId ) {
+			write();
+			return;
+		}
+		if ( lastURLWriteTimeRef.current === null ) {
+			write();
+			return;
+		}
+		if (
+			Date.now() - lastURLWriteTimeRef.current >=
+			URL_WRITE_DEBOUNCE_MS
+		) {
+			write();
+			return;
+		}
+		const timeoutId = setTimeout( write, URL_WRITE_DEBOUNCE_MS );
+		return () => clearTimeout( timeoutId );
+	}, [
+		postId,
+		postStatus,
+		currentRevisionId,
+		initialRevisionId,
+		openRevision,
+	] );
 
-	/**
-	 * Navigates the browser to the post trashed URL to show a notice about the trashed post.
-	 *
-	 * @param {number} postId    Post ID.
-	 * @param {string} postType  Post Type.
-	 */
-	setTrashURL( postId, postType ) {
-		window.location.href = getPostTrashedURL( postId, postType );
-	}
-
-	/**
-	 * Replaces the browser URL with a post editor link for the given post ID.
-	 *
-	 * Note it is important that, since this function may be called when the
-	 * editor first loads, the result generated `getPostEditURL` matches that
-	 * produced by the server. Otherwise, the URL will change unexpectedly.
-	 *
-	 * @param {number} postId Post ID for which to generate post editor URL.
-	 */
-	setBrowserURL( postId ) {
-		window.history.replaceState(
-			{ id: postId },
-			'Post ' + postId,
-			getPostEditURL( postId )
-		);
-
-		this.setState( () => ( {
-			historyId: postId,
-		} ) );
-	}
-
-	render() {
-		return null;
-	}
+	return null;
 }
-
-export default withSelect( ( select ) => {
-	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
-	const { id, status, type } = getCurrentPost();
-
-	return {
-		postId: id,
-		postStatus: status,
-		postType: type,
-		isSavingPost: isSavingPost(),
-	};
-} )( BrowserURL );

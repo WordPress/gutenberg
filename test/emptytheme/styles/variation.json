@@ -1,0 +1,28 @@
+{
+	"version": 3,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "foreground",
+					"color": "#3F67C6",
+					"name": "Foreground"
+				}
+			]
+		}
+	},
+	"styles": {
+		"background": {
+			"backgroundImage": {
+				"url": "file:./img/1024x768_emptytheme_test_image.jpg"
+			}
+		},
+		"blocks": {
+			"core/post-title": {
+				"typography": {
+					"fontWeight": "700"
+				}
+			}
+		}
+	}
+}

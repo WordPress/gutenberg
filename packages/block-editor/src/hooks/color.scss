@@ -1,0 +1,18 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.color-block-support-panel {
+	// Blocks with non-standard color attributes (e.g. Social Icons,
+	// Navigation) still render the public ContrastChecker component
+	// directly within the color panel.
+	.block-editor-contrast-checker {
+		grid-column: span 2;
+		margin-top: $grid-unit-20;
+	}
+
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.color-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+}

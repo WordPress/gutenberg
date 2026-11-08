@@ -1,11 +1,11 @@
-( function() {
+( function () {
 	const { wp } = window;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 	const { useSelect } = wp.data;
 
-	var allowedBlocks = [ 'core/quote', 'core/video' ];
+	const allowedBlocks = [ 'core/quote', 'core/video' ];
 
 	function myCustomAppender() {
 		return el(
@@ -55,19 +55,20 @@
 	}
 
 	registerBlockType( 'test/inner-blocks-render-appender', {
+		apiVersion: 3,
 		title: 'InnerBlocks renderAppender',
 		icon: 'carrot',
 		category: 'text',
 
-		edit() {
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				el( InnerBlocks, {
-					allowedBlocks: allowedBlocks,
-					renderAppender: myCustomAppender,
-				} )
-			);
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks,
+				renderAppender: myCustomAppender,
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {
@@ -80,11 +81,15 @@
 	} );
 
 	registerBlockType( 'test/inner-blocks-render-appender-dynamic', {
+		apiVersion: 3,
 		title: 'InnerBlocks renderAppender dynamic',
 		icon: 'carrot',
 		category: 'text',
 
-		edit( props ) {
+		edit: function Edit( props ) {
+			const blockProps = useBlockProps( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
 			const numberOfChildren = useSelect(
 				( select ) => {
 					const { getBlockOrder } = select( 'core/block-editor' );
@@ -92,6 +97,7 @@
 				},
 				[ props.clientId ]
 			);
+			let renderAppender;
 			switch ( numberOfChildren ) {
 				case 0:
 					renderAppender = emptyBlockAppender;
@@ -103,14 +109,11 @@
 					renderAppender = multipleBlockAppender;
 					break;
 			}
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				el( InnerBlocks, {
-					allowedBlocks,
-					renderAppender,
-				} )
-			);
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks,
+				renderAppender,
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {

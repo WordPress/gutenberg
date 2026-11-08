@@ -1,6 +1,6 @@
 // These rules ensure the preview scales smoothly regardless of the container size.
 .block-editor-block-preview__container {
-	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
+	// In the component, a top padding is provided as an inline style to provide an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
 
@@ -10,18 +10,10 @@
 
 	overflow: hidden;
 
-	// Overrides the default padding applied in editor styles otherwise preview centering break.
-	&.editor-styles-wrapper {
-		padding: 0;
-		margin: 0;
-	}
-
 	.block-editor-block-preview__content {
-		// This element receives inline styles for width, height, and transform-scale.
+		// This element receives inline styles for transform-scale and aspect-ratio.
 		// Those inline styles are calculated to fit a perfect thumbnail.
-
-		// Position above the padding.
-		position: absolute;
+		width: 100%;
 
 		// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
 		top: 0;
@@ -38,21 +30,21 @@
 		min-height: auto;
 
 		.block-editor-block-list__insertion-point,
-		.block-editor-block-drop-zone,
-		.reusable-block-indicator,
 		.block-list-appender {
 			display: none;
 		}
-
-		// Reset default editor padding
-		.block-editor-block-list__layout.is-root-container {
-			padding-left: 0;
-			padding-right: 0;
-
-			> .wp-block[data-align="full"] {
-				margin-left: 0;
-				margin-right: 0;
-			}
-		}
 	}
+}
+
+// The goal of this pseudo-element is to cover the iframe
+// otherwise it won't be able to drag elements containing
+// the preview iframe in Safari.
+.block-editor-block-preview__container::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
 }

@@ -1,25 +1,27 @@
-/**
- * External dependencies
- */
-import { find } from 'lodash';
+import { useSelect } from '@wordpress/data';
+import { VISIBILITY_OPTIONS } from './utils';
+import { store as editorStore } from '../../store';
 
 /**
- * WordPress dependencies
+ * Returns the label for the current post visibility setting.
+ *
+ * @return {string} Post visibility label.
  */
-import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { visibilityOptions } from './utils';
-
-function PostVisibilityLabel( { visibility } ) {
-	const getVisibilityLabel = () =>
-		find( visibilityOptions, { value: visibility } ).label;
-
-	return getVisibilityLabel( visibility );
+export default function PostVisibilityLabel() {
+	return usePostVisibilityLabel();
 }
 
-export default withSelect( ( select ) => ( {
-	visibility: select( 'core/editor' ).getEditedPostVisibility(),
-} ) )( PostVisibilityLabel );
+/**
+ * Get the label for the current post visibility setting.
+ *
+ * @return {string} Post visibility label.
+ */
+export function usePostVisibilityLabel() {
+	const visibility = useSelect(
+		( select ) => select( editorStore ).getEditedPostVisibility(),
+		[]
+	);
+
+	return VISIBILITY_OPTIONS.find( ( option ) => option.value === visibility )
+		?.label;
+}

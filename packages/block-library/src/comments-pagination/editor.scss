@@ -1,0 +1,20 @@
+$pagination-margin: 0.5em;
+
+// Center flex items. This has an equivalent in style.scss.
+.wp-block[data-align="center"] > .wp-block-comments-pagination {
+	justify-content: center;
+}
+
+:where(.editor-styles-wrapper) {
+	.wp-block-comments-pagination {
+		max-width: 100%;
+	}
+}
+
+.wp-block-comments-pagination {
+	> .wp-block-comments-pagination-next,
+	> .wp-block-comments-pagination-previous,
+	> .wp-block-comments-pagination-numbers {
+		font-size: inherit;
+	}
+}

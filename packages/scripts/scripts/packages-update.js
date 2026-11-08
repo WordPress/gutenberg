@@ -1,9 +1,6 @@
-/* eslint-disable no-console */
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const spawn = require( 'cross-spawn' );
+const { getArgFromCLI } = require( '../utils' );
 
 /**
  * Constants
@@ -44,8 +41,10 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 }
 
 function updatePackagesToLatestVersion( packages ) {
+	const distTag = getArgFromCLI( '--dist-tag' ) || 'latest';
+
 	const packagesWithLatest = packages.map(
-		( packageName ) => `${ packageName }@latest`
+		( packageName ) => `${ packageName }@${ distTag }`
 	);
 	return spawn.sync( 'npm', [ 'install', ...packagesWithLatest, '--save' ], {
 		stdio: 'inherit',
@@ -75,4 +74,3 @@ function updatePackageJSON() {
 }
 
 updatePackageJSON();
-/* eslint-enable no-console */

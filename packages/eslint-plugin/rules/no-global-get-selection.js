@@ -10,7 +10,8 @@ module.exports = {
 			) {
 				context.report( {
 					node,
-					message: 'Avoid global selection getting',
+					message:
+						'Avoid accessing the selection with a global. Use the ownerDocument.defaultView property on a node ref instead.',
 				} );
 			},
 		};

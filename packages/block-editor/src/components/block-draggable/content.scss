@@ -1,0 +1,36 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// This creates a "slot" where the block you're dragging appeared.
+// We use !important as one of the rules are meant to be overridden.
+// Blocks riding the drag pile are the drag visual itself, not a slot
+// left behind, so they keep their looks.
+.block-editor-block-list__layout .is-dragging:not([data-drag-pile]) {
+	opacity: 0.1;
+
+	iframe {
+		pointer-events: none;
+	}
+
+	// Hide the multi selection indicator when dragging.
+	&::selection {
+		background: transparent !important;
+	}
+
+	&::after {
+		content: none !important;
+	}
+}
+
+// A multi selection drag shows two of the dragged blocks as cards and
+// hides the rest.
+[data-drag-pile] .block-editor-block-list__layout .is-dragging {
+	&:not([data-drag-pile]) {
+		visibility: hidden;
+	}
+
+	&[data-drag-pile] {
+		position: relative;
+		z-index: 999;
+		box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15);
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"$schema": "../../schemas/docs-manifest.json",
+	"displayName": "BaseControl",
+	"filePath": "./index.tsx",
+	"subcomponents": [
+		{
+			"displayName": "VisualLabel",
+			"preferredDisplayName": "BaseControl.VisualLabel",
+			"filePath": "./index.tsx"
+		}
+	]
+}

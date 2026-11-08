@@ -1,0 +1,23 @@
+[
+	{
+		"name": "core/group",
+		"isValid": true,
+		"attributes": {
+			"tagName": "div",
+			"backgroundColor": "lighter-blue",
+			"align": "full",
+			"anchor": "test-id"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "test",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

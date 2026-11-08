@@ -1,0 +1,24 @@
+[
+	{
+		"name": "core/navigation-submenu",
+		"isValid": true,
+		"attributes": {
+			"label": "A fine submenu",
+			"opensInNewTab": false,
+			"isTopLevelItem": true,
+			"isParentSubmenu": true
+		},
+		"innerBlocks": [
+			{
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://wordpress.org/"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

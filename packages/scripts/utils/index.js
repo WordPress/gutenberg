@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -11,32 +9,50 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
+	getPhpFilePaths,
+	getProjectSourcePath,
 	getWebpackArgs,
+	getWebpackEntryPoints,
 	hasBabelConfig,
-	getJestOverrideConfigFile,
-	hasJestConfig,
-	hasPrettierConfig,
+	hasCssnanoConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 } = require( './config' );
-const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { hasPackageProp } = require( './package' );
+const {
+	fromConfigRoot,
+	fromProjectRoot,
+	fromScriptsRoot,
+	hasProjectFile,
+} = require( './file' );
+const { getPackageProp, hasPackageProp } = require( './package' );
+const {
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
+} = require( './block-json' );
 
 module.exports = {
-	fromProjectRoot,
 	fromConfigRoot,
+	fromProjectRoot,
+	fromScriptsRoot,
+	getAsBooleanFromENV,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
 	getNodeArgsFromCLI,
+	getPackageProp,
+	getPhpFilePaths,
+	getProjectSourcePath,
 	getWebpackArgs,
-	hasBabelConfig,
+	getWebpackEntryPoints,
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
 	hasArgInCLI,
+	hasBabelConfig,
+	hasCssnanoConfig,
 	hasFileArgInCLI,
-	getJestOverrideConfigFile,
-	hasJestConfig,
 	hasPackageProp,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 	hasProjectFile,
 	spawnScript,
 };

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-plugins-preset",
-	"version": "1.5.1",
+	"version": "6.1.0",
 	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -12,7 +12,7 @@
 		"plugins",
 		"preset"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-plugins-preset/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/postcss-plugins-preset/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -22,17 +22,23 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"lib"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/postcss-themes": "file:../postcss-themes",
-		"autoprefixer": "^9.8.6",
-		"postcss-custom-properties": "^10.0.0"
+		"@wordpress/browserslist-config": "file:../browserslist-config",
+		"autoprefixer": "^10.4.21",
+		"postcss-import": "^16.1.1"
+	},
+	"peerDependencies": {
+		"postcss": "^8.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

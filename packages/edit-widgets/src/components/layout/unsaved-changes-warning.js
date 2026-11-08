@@ -1,9 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as editWidgetsStore } from '../../store';
 
 /**
  * Warns the user if there are unsaved changes before leaving the editor.
@@ -11,15 +9,14 @@ import { useSelect } from '@wordpress/data';
  * This is a duplicate of the component implemented in the editor package.
  * Duplicated here as edit-widgets doesn't depend on editor.
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function UnsavedChangesWarning() {
-	const getIsDirty = useSelect( ( select ) => {
-		return () => {
-			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			return dirtyEntityRecords.length > 0;
-		};
+	const isDirty = useSelect( ( select ) => {
+		const { getEditedWidgetAreas } = select( editWidgetsStore );
+		const editedWidgetAreas = getEditedWidgetAreas();
+
+		return editedWidgetAreas?.length > 0;
 	}, [] );
 
 	useEffect( () => {
@@ -28,14 +25,10 @@ export default function UnsavedChangesWarning() {
 		 *
 		 * @param {Event} event `beforeunload` event.
 		 *
-		 * @return {?string} Warning prompt message, if unsaved changes exist.
+		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
 		 */
 		const warnIfUnsavedChanges = ( event ) => {
-			// We need to call the selector directly in the listener to avoid race
-			// conditions with `BrowserURL` where `componentDidUpdate` gets the
-			// new value of `isEditedPostDirty` before this component does,
-			// causing this component to incorrectly think a trashed post is still dirty.
-			if ( getIsDirty() ) {
+			if ( isDirty ) {
 				event.returnValue = __(
 					'You have unsaved changes. If you proceed, they will be lost.'
 				);
@@ -48,7 +41,7 @@ export default function UnsavedChangesWarning() {
 		return () => {
 			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
 		};
-	}, [ getIsDirty ] );
+	}, [ isDirty ] );
 
 	return null;
 }

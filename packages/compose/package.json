@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.22.0",
+	"version": "9.1.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +11,7 @@
 		"hoc",
 		"hooks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -20,20 +20,63 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
+		"@types/mousetrap": "^1.6.8",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/priority-queue": "file:../priority-queue",
-		"clipboard": "^2.0.1",
-		"lodash": "^4.17.19",
-		"mousetrap": "^1.6.5",
-		"react-resize-aware": "^3.0.1",
-		"use-memo-one": "^1.1.1"
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/undo-manager": "file:../undo-manager",
+		"change-case": "^4.1.2",
+		"mousetrap": "^1.6.5"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.8",
+		"@types/react-dom": "^19.3.0",
+		"react-dom": "^19.3.0",
+		"vitest": "^5.0.5",
+		"vitest-browser-react": "^2.3.0"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

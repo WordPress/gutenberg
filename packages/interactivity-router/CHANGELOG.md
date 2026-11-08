@@ -1,0 +1,275 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### Bug Fixes
+
+-   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+-   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
+## 3.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Load new script modules during client-side navigation without `eval()` or WebAssembly, so the Content Security Policy doesn't need `'unsafe-eval'` or `'wasm-unsafe-eval'`. ([#84056](https://github.com/WordPress/gutenberg/pull/84056))
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.57.0 (2026-10-07)
+
+### New Features
+
+-   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Bug Fixes
+
+-   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+## 2.56.0 (2026-09-23)
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))
+
+## 2.53.0 (2026-08-12)
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fix race condition where router evaluates before `hydrateRegions()` completes on Safari and Firefox, causing interactive regions to be permanently non-functional (dead DOM). ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
+### Deprecations
+
+-   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
+
+### Bug Fixes
+
+-   Update cached styles for re-fetched pages. ([#75097](https://github.com/WordPress/gutenberg/pull/75097))
+
+## 2.39.0 (2026-01-29)
+
+### Bug Fixes
+
+-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
+-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
+
+## 2.38.0 (2026-01-16)
+
+## 2.36.0 (2025-11-26)
+
+## 2.35.0 (2025-11-12)
+
+## 2.34.0 (2025-10-29)
+
+## 2.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 2.33.0 (2025-10-17)
+
+## 2.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+
+## 2.31.0 (2025-09-17)
+
+## 2.30.0 (2025-09-03)
+
+## 2.29.0 (2025-08-20)
+
+## 2.28.0 (2025-08-07)
+
+## 2.27.0 (2025-07-23)
+
+### Bug Fixes
+
+-   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
+
+-   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
+
+## 2.26.0 (2025-06-25)
+
+### New Features
+
+-   Add support for new router regions with `attachTo` from new pages. ([70421](https://github.com/WordPress/gutenberg/pull/70421))
+
+### Enhancements
+
+-   Export `NavigateOptions` and `PrefetchOptions` types. ([#70315](https://github.com/WordPress/gutenberg/pull/70315))
+-   Support new styles and script modules on client-side navigation, including a new full-page client-side navigation mode. ([#70353](https://github.com/WordPress/gutenberg/pull/70353))
+-   Introduce `AsyncAction` and `TypeYield` type helpers. ([#70422](https://github.com/WordPress/gutenberg/pull/70422))
+
+### Bug Fixes
+
+-   Prevents duplicating nested router regions after a client-side navigation. ([#70302](https://github.com/WordPress/gutenberg/pull/70302))
+-   Fix dynamic imports on new visited pages. ([#70489](https://github.com/WordPress/gutenberg/pull/70489))
+
+## 2.25.0 (2025-06-04)
+
+## 2.24.0 (2025-05-22)
+
+## 2.23.0 (2025-05-07)
+
+## 2.22.0 (2025-04-11)
+
+## 2.21.0 (2025-03-27)
+
+## 2.20.0 (2025-03-13)
+
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 2.19.0 (2025-02-28)
+
+### Bug Fixes
+
+-   Revert "Handle styles assets on region-based navigation". ([#69222](https://github.com/WordPress/gutenberg/pull/69222))
+
+## 2.18.0 (2025-02-12)
+
+### Bug Fixes
+
+-   Fix CSS rule order in some constructed style sheets. ([#68923](https://github.com/WordPress/gutenberg/pull/68923))
+
+## 2.17.0 (2025-01-29)
+
+## 2.16.0 (2025-01-15)
+
+## 2.15.0 (2025-01-02)
+
+## 2.14.0 (2024-12-11)
+
+## 2.13.0 (2024-11-27)
+
+## 2.12.0 (2024-11-16)
+
+## 2.11.0 (2024-10-30)
+
+## 2.10.0 (2024-10-16)
+
+### Enhancements
+
+-   Improvements to the experimental full-page navigation ([#64067](https://github.com/WordPress/gutenberg/pull/64067)):
+    -   Remove the `src` attributes from prefetched script tags.
+    -   Use `.textContent` instead of `.innerText` to set `<script>` contents.
+    -   Use [`populateServerData()`](https://github.com/WordPress/gutenberg/blob/9671329c386d2b743f14ef314823fbf915366ebd/packages/interactivity/src/store.ts#L269) with state from the server.
+    -   Wait for the `load` event of the script element before evaluating it.
+    -   Make `renderRegions()` an async function.
+    -   Only prefetch **module** scripts, never prefetch regular scripts. That's because regular scripts (without `async` or `defer` attributes) found in the head are blocking and must be executed in order. When prefetching there is no guarantee that the scripts will execute in the order they are prefetched. Module scripts can be executed in any order.
+
+## 2.9.0 (2024-10-03)
+
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 2.8.0 (2024-09-19)
+
+## 2.7.0 (2024-09-05)
+
+## 2.6.0 (2024-08-21)
+
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 2.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 1.8.0 (2024-05-16)
+
+## 1.7.0 (2024-05-02)
+
+## 1.6.0 (2024-04-19)
+
+## 1.5.0 (2024-04-03)
+
+## 1.4.0 (2024-03-21)
+
+## 1.3.0 (2024-03-06)
+
+### Bug Fixes
+
+-   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+
+## 1.2.0 (2024-02-21)
+
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
+## 1.1.0 (2024-02-09)
+
+### New Features
+
+-   Add the `clientNavigationDisabled` option to the `core/router` config. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
+
+## 1.0.0 (2024-01-24)
+
+### Breaking Changes
+
+-   Initial version. ([57924](https://github.com/WordPress/gutenberg/pull/57924))

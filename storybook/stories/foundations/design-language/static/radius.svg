@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1091" height="395" fill="none">
+	<g clip-path="url(#a)">
+		<rect width="1091" height="395" fill="#3858E9" rx="8"/>
+		<g filter="url(#b)">
+			<path fill="url(#c)" fill-opacity=".8" d="M73.06 344.57c-31.45-117.36 38.2-238 155.56-269.44L1091.2-156l166.69 622.08L182.8 754.14 73.07 344.57Z"/>
+		</g>
+		<g filter="url(#d)">
+			<path fill="url(#e)" fill-opacity=".8" d="M130.76 328.07c-22.73-84.82 27.6-172 112.43-194.73l863.53-231.38 145.37 542.51L234.97 717.02 130.76 328.07Z"/>
+		</g>
+		<g filter="url(#f)">
+			<path fill="url(#g)" fill-opacity=".8" d="M188.71 312.55c-14.15-52.82 17.2-107.1 70-121.25l863.55-231.4 127.94 477.48-959.16 257-102.32-381.84Z"/>
+		</g>
+		<g filter="url(#h)">
+			<path fill="url(#i)" fill-opacity=".8" d="M246.93 297.98A40 40 0 0 1 275.2 249l862.57-231.12 103.79 387.33-901.2 241.48-93.44-348.7Z"/>
+		</g>
+	</g>
+	<defs>
+		<linearGradient id="c" x1="553.66" x2="720.34" y1="-11.97" y2="610.11" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" stop-opacity=".25"/>
+			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
+		</linearGradient>
+		<linearGradient id="e" x1="598.16" x2="743.53" y1="38.22" y2="580.74" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" stop-opacity=".25"/>
+			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
+		</linearGradient>
+		<linearGradient id="g" x1="642.67" x2="770.61" y1="88.42" y2="565.89" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" stop-opacity=".25"/>
+			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
+		</linearGradient>
+		<linearGradient id="i" x1="687.18" x2="790.97" y1="138.61" y2="525.94" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#fff" stop-opacity=".25"/>
+			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
+		</linearGradient>
+		<filter id="b" width="1208.37" height="926.14" x="57.51" y="-164" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
+			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
+			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
+		</filter>
+		<filter id="d" width="1142.79" height="831.06" x="117.3" y="-106.05" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
+			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
+			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
+		</filter>
+		<filter id="f" width="1080.88" height="750.49" x="177.31" y="-48.09" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
+			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
+			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
+		</filter>
+		<filter id="h" width="1012.02" height="644.81" x="237.55" y="9.87" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
+			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
+			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
+		</filter>
+		<clipPath id="a">
+			<rect width="1091" height="395" fill="#fff" rx="8"/>
+		</clipPath>
+	</defs>
+</svg>

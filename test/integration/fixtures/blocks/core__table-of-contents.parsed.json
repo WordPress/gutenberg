@@ -1,0 +1,12 @@
+[
+	{
+		"blockName": "core/table-of-contents",
+		"attrs": {
+			"maxLevel": 3,
+			"ordered": false
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/social-link",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/",
+			"service": "patreon"
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,90 +1,35 @@
-/**
- * External dependencies
- */
-const { readFile } = require( 'fs' ).promises;
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const fs = require( 'node:fs' );
+let readFile = vi
+	.spyOn( fs.promises, 'readFile' )
+	.mockImplementation( () => undefined );
+const readRawConfigFile = require( '../read-raw-config-file' );
+const { ValidationError } = require( '../validate-config' );
 
-/**
- * Internal dependencies
- */
-const readConfigFile = require( '../read-raw-config-file' );
-
-jest.mock( 'fs', () => ( {
-	promises: {
-		readFile: jest.fn(),
-	},
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'readRawConfigFile', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		readFile = vi.spyOn( fs.promises, 'readFile' );
+		readFile.mockReset().mockImplementation( () => undefined );
 	} );
 
 	it( 'returns null if it cannot find a file', async () => {
-		readFile.mockImplementation( () =>
-			Promise.reject( { code: 'ENOENT' } )
-		);
-		const result = await readConfigFile( 'wp-env', '/.wp-env.json' );
+		readFile.mockRejectedValue( { code: 'ENOENT' } );
+
+		const result = await readRawConfigFile( '/.wp-env.json' );
 		expect( result ).toBe( null );
 	} );
 
-	it( 'converts testPort into tests.port', async () => {
-		readFile.mockImplementation( () =>
-			Promise.resolve( JSON.stringify( { testsPort: 100 } ) )
-		);
-		const result = await readConfigFile( 'wp-env', '/.wp-env.json' );
-		expect( result ).toEqual( {
-			env: {
-				tests: {
-					port: 100,
-				},
-			},
-		} );
-	} );
+	it( 'rejects when read file fails', async () => {
+		readFile.mockRejectedValue( { message: 'Test' } );
 
-	it( 'does not overwrite other test config values', async () => {
-		readFile.mockImplementation( () =>
-			Promise.resolve(
-				JSON.stringify( {
-					testsPort: 100,
-					env: {
-						tests: {
-							something: 'test',
-						},
-					},
-				} )
-			)
+		await expect( readRawConfigFile( '/.wp-env.json' ) ).rejects.toEqual(
+			new ValidationError( 'Could not read .wp-env.json: Test' )
 		);
-		const result = await readConfigFile( 'wp-env', '/.wp-env.json' );
-		expect( result ).toEqual( {
-			env: {
-				tests: {
-					port: 100,
-					something: 'test',
-				},
-			},
-		} );
-	} );
-
-	it( 'uses tests.port if both tests.port and testsPort exist', async () => {
-		readFile.mockImplementation( () =>
-			Promise.resolve(
-				JSON.stringify( {
-					testsPort: 100,
-					env: {
-						tests: {
-							port: 200,
-						},
-					},
-				} )
-			)
-		);
-		const result = await readConfigFile( 'wp-env', '/.wp-env.json' );
-		expect( result ).toEqual( {
-			env: {
-				tests: {
-					port: 200,
-				},
-			},
-		} );
 	} );
 } );

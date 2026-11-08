@@ -12,18 +12,31 @@
  */
 function gutenberg_register_colors_support( $block_type ) {
 	$color_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$color_support = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
+	if ( $block_type instanceof WP_Block_Type ) {
+		$color_support = $block_type->supports['color'] ?? false;
 	}
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
-	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
+	$has_text_colors_support       = true === $color_support ||
+		( isset( $color_support['text'] ) && $color_support['text'] ) ||
+		( is_array( $color_support ) && ! isset( $color_support['text'] ) );
+	$has_background_colors_support = true === $color_support ||
+		( isset( $color_support['background'] ) && $color_support['background'] ) ||
+		( is_array( $color_support ) && ! isset( $color_support['background'] ) );
+	$has_gradients_support         = $color_support['gradients'] ?? false;
+	$has_link_colors_support       = $color_support['link'] ?? false;
+	$has_button_colors_support     = $color_support['button'] ?? false;
+	$has_heading_colors_support    = $color_support['heading'] ?? false;
+	$has_color_support             = $has_text_colors_support ||
+		$has_background_colors_support ||
+		$has_gradients_support ||
+		$has_link_colors_support ||
+		$has_button_colors_support ||
+		$has_heading_colors_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( $has_text_colors_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( $has_color_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
@@ -53,95 +66,118 @@ function gutenberg_register_colors_support( $block_type ) {
  * Add CSS classes and inline styles for colors to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
  *
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
-	$color_support                 = gutenberg_experimental_get( $block_type->supports, array( 'color' ), false );
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'text' ), true ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && gutenberg_experimental_get( $color_support, array( 'background' ), true ) );
-	$has_link_colors_support       = gutenberg_experimental_get( $color_support, array( 'link' ), false );
-	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
-	$classes                       = array();
-	$styles                        = array();
+	$color_support = $block_type->supports['color'] ?? false;
 
-	// Text Colors.
-	// Check support for text colors.
-	if ( $has_text_colors_support ) {
-		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
-		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
+	if (
+		is_array( $color_support ) &&
+		wp_should_skip_block_supports_serialization( $block_type, 'color' )
+	) {
+		return array();
+	}
 
-		// Apply required generic class.
-		if ( $has_custom_text_color || $has_named_text_color ) {
-			$classes[] = 'has-text-color';
-		}
-		// Apply color class or inline style.
-		if ( $has_named_text_color ) {
-			$classes[] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
-		} elseif ( $has_custom_text_color ) {
-			$styles[] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
+	$has_text_colors_support       = true === $color_support ||
+		( isset( $color_support['text'] ) && $color_support['text'] ) ||
+		( is_array( $color_support ) && ! isset( $color_support['text'] ) );
+	$has_background_colors_support = true === $color_support ||
+		( isset( $color_support['background'] ) && $color_support['background'] ) ||
+		( is_array( $color_support ) && ! isset( $color_support['background'] ) );
+	$has_gradients_support         = $color_support['gradients'] ?? false;
+	$skip_text                     = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' );
+	$skip_background               = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' );
+	$skip_gradients                = wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' );
+
+	// background.php owns the CSS when a background gradient is set, so skip color.gradient.
+	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
+	$has_background_gradient_value   = ! empty( $block_attributes['style']['background']['gradient'] );
+	$has_background_gradient         = $has_background_gradient_support && $has_background_gradient_value;
+
+	/*
+	 * Mirror of the background support: a color clipped to the text paints the
+	 * glyphs, not the box, so only a gradient still adds `has-background`.
+	 * Read before the attributes are filtered for the helper.
+	 */
+	$clips_to_text = 'text' === ( $block_attributes['style']['background']['backgroundClip'] ?? null ) &&
+		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) &&
+		! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
+
+	// The helper reads only `style.color`, so a non-array value counts as no color styles.
+	if ( ! isset( $block_attributes['style']['color'] ) || ! is_array( $block_attributes['style']['color'] ) ) {
+		unset( $block_attributes['style'] );
+	}
+
+	if ( ! $has_text_colors_support || $skip_text ) {
+		unset( $block_attributes['textColor'], $block_attributes['style']['color']['text'] );
+	}
+
+	if ( ! $has_background_colors_support || $skip_background ) {
+		unset( $block_attributes['backgroundColor'], $block_attributes['style']['color']['background'] );
+	}
+
+	if ( ! $has_gradients_support || $skip_gradients || $has_background_gradient ) {
+		unset( $block_attributes['gradient'], $block_attributes['style']['color']['gradient'] );
+	}
+
+	$classes_and_styles = gutenberg_get_color_classes_and_styles( $block_attributes );
+	$has_gradient       = ! empty( $block_attributes['gradient'] ) || ! empty( $block_attributes['style']['color']['gradient'] );
+
+	if ( $clips_to_text && ! $has_gradient && ! empty( $classes_and_styles['class'] ) ) {
+		$classes = array_diff( explode( ' ', $classes_and_styles['class'] ), array( 'has-background' ) );
+		if ( empty( $classes ) ) {
+			unset( $classes_and_styles['class'] );
+		} else {
+			$classes_and_styles['class'] = implode( ' ', $classes );
 		}
 	}
 
-	// Link Colors.
-	if ( $has_link_colors_support ) {
-		$has_link_color = isset( $block_attributes['style']['color']['link'] );
-		// Apply required class and style.
-		if ( $has_link_color ) {
-			$classes[] = 'has-link-color';
-			// If link is a named color.
-			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
-				// Get the name from the string and add proper styles.
-				$index_to_splice = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
-				$link_color_name = substr( $block_attributes['style']['color']['link'], $index_to_splice );
-				$styles[]        = sprintf( '--wp--style--color--link: var(--wp--preset--color--%s);', $link_color_name );
-			} else {
-				$styles[] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
-			}
-		}
+	return $classes_and_styles;
+}
+
+/**
+ * Returns color classes and inline styles for block attributes, like the JS
+ * `getColorClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
+ *
+ * @since 7.3.0
+ *
+ * @param array $block_attributes Block attributes.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
+ */
+function gutenberg_get_color_classes_and_styles( $block_attributes ) {
+	if ( ! is_array( $block_attributes ) ) {
+		return array();
 	}
 
-	// Background Colors.
-	if ( $has_background_colors_support ) {
-		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
-		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
+	$color_block_styles = array();
+	$preset_attributes  = array(
+		'text'       => array( 'textColor', 'color' ),
+		'background' => array( 'backgroundColor', 'color' ),
+		'gradient'   => array( 'gradient', 'gradient' ),
+	);
 
-		// Apply required background class.
-		if ( $has_custom_background_color || $has_named_background_color ) {
-			$classes[] = 'has-background';
-		}
-		// Apply background color classes or styles.
-		if ( $has_named_background_color ) {
-			$classes[] = sprintf( 'has-%s-background-color', $block_attributes['backgroundColor'] );
-		} elseif ( $has_custom_background_color ) {
-			$styles[] = sprintf( 'background-color: %s;', $block_attributes['style']['color']['background'] );
-		}
-	}
+	foreach ( $preset_attributes as $feature => list( $preset_attribute, $preset_type ) ) {
+		$preset_slug = $block_attributes[ $preset_attribute ] ?? null;
 
-	// Gradients.
-	if ( $has_gradients_support ) {
-		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
-		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
-
-		if ( $has_named_gradient || $has_custom_gradient ) {
-			$classes[] = 'has-background';
-		}
-		// Apply required background class.
-		if ( $has_named_gradient ) {
-			$classes[] = sprintf( 'has-%s-gradient-background', $block_attributes['gradient'] );
-		} elseif ( $has_custom_gradient ) {
-			$styles[] = sprintf( 'background: %s;', $block_attributes['style']['color']['gradient'] );
-		}
+		// Preset slugs are strings in theme.json and the editor.
+		$preset_value                   = is_string( $preset_slug ) && '' !== $preset_slug ? "var:preset|{$preset_type}|{$preset_slug}" : null;
+		$custom_value                   = $block_attributes['style']['color'][ $feature ] ?? null;
+		$color_block_styles[ $feature ] = $preset_value ?? $custom_value;
 	}
 
 	$attributes = array();
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
+	$styles     = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
 	}
-	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( ' ', $styles );
+
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
 	return $attributes;

@@ -1,0 +1,34 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import ColorIndicator from '..';
+
+const meta: Meta< typeof ColorIndicator > = {
+	tags: [ 'manifest' ],
+	component: ColorIndicator,
+	title: 'Components/@wordpress-components/Selection & Input/Color/ColorIndicator',
+	id: 'components-colorindicator',
+	argTypes: {
+		colorValue: {
+			control: { type: 'color' },
+		},
+	},
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof ColorIndicator > = ( { ...args } ) => (
+	<ColorIndicator { ...args } />
+);
+
+export const Default: StoryFn< typeof ColorIndicator > = Template.bind( {} );
+Default.args = {
+	colorValue: '#0073aa',
+};

@@ -1,23 +1,81 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/post-comments-form",
-	"category": "design",
-	"attributes": {
-		"textAlign": {
-			"type": "string"
+	"title": "Comments Form",
+	"category": "theme",
+	"description": "Display a post's comments form.",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"anchor": true,
+		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"color": {
+			"button": true,
+			"gradients": true,
+			"heading": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"textAlign": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
+	"editorStyle": "wp-block-post-comments-form-editor",
+	"style": [
+		"wp-block-post-comments-form",
+		"wp-block-buttons",
+		"wp-block-button"
 	],
-	"supports": {
-		"html": false,
-		"color": {
-			"gradients": true,
-			"link": true
-		},
-		"fontSize": true,
-		"lineHeight": true
+	"example": {
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		}
 	}
 }

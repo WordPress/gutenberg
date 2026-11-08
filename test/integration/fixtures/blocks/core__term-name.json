@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/term-name",
+		"isValid": true,
+		"attributes": {
+			"level": 0,
+			"isLink": false
+		},
+		"innerBlocks": []
+	}
+]

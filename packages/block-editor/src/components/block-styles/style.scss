@@ -1,63 +1,55 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-styles__preview-panel {
+	display: none;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+
+	// Only show in narrow widths.
+	@include break-medium() {
+		display: block;
+	}
+
+	.block-editor-block-icon {
+		display: none;
+	}
+}
+
 .block-editor-block-styles {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
+	grid-column: 1 / -1;
 }
 
-.block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-unit-05 });
-	margin: $grid-unit-05 0;
-	flex-shrink: 0;
-	cursor: pointer;
-	overflow: hidden;
-	border-radius: $radius-block-ui;
-	padding: $grid-unit-05 * 1.5;
-	display: flex;
-	flex-direction: column;
+.block-editor-block-styles__variants {
+	display: grid;
+	gap: $grid-unit-10;
 
-	&:focus {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
+	.block-editor-block-styles__row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: $grid-unit-10;
 	}
 
-	&:hover .block-editor-block-styles__item-preview {
-		border-color: var(--wp-admin-theme-color);
+	.block-editor-block-styles__item-text {
+		text-align: center;
+		// Without this, the ellipsis of a centered line is partially clipped.
+		padding-inline: $grid-unit-05;
+		margin-inline: -$grid-unit-05;
 	}
 
-	&.is-active {
-		.block-editor-block-styles__item-label {
-			font-weight: bold;
-		}
-
-		.block-editor-block-styles__item-preview {
-			margin: 0;
-			border: 2px solid $gray-900;
+	// Forced colors discard the solid background that marks the active style,
+	// so fill it with the system selection colors instead. Opting out of color
+	// adjustment removes the text backplate, which would otherwise cover the
+	// fill, so the focus ring needs an explicit system color too.
+	.block-editor-block-styles__item[aria-checked="true"] {
+		@media (forced-colors: active) {
+			forced-color-adjust: none;
+			outline-color: CanvasText;
+			background-color: SelectedItem;
+			color: SelectedItemText;
+			border-color: ButtonBorder;
 		}
 	}
 }
 
-// Show a little preview thumbnail for style variations.
-.block-editor-block-styles__item-preview {
-	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	padding: 0;
-	margin: 2px;
-	border-radius: $radius-block-ui;
-	display: flex;
-	overflow: hidden;
-	background: $white;
-	align-items: center;
-	flex-grow: 1;
-	min-height: 80px;
-	max-height: 160px;
-}
-
-.block-editor-block-switcher__styles__menugroup {
-	position: relative;
-}
-
-.block-editor-block-styles__item-label {
-	text-align: center;
-	padding: 4px 0;
-}

@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-global-get-selection';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
@@ -23,7 +19,12 @@ ruleTester.run( 'no-global-get-selection', rule, {
 	invalid: [
 		{
 			code: 'window.getSelection();',
-			errors: [ { message: 'Avoid global selection getting' } ],
+			errors: [
+				{
+					message:
+						'Avoid accessing the selection with a global. Use the ownerDocument.defaultView property on a node ref instead.',
+				},
+			],
 		},
 	],
 } );

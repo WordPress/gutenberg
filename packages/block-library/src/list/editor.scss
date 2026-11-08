@@ -1,7 +1,0 @@
-// Extra specificity required to override default editor styles, which are
-// loaded after core block styles. If the load order changes, this rule can be
-// removed. See https://github.com/WordPress/gutenberg/issues/24011.
-ol.has-background.has-background,
-ul.has-background.has-background {
-	padding: $block-bg-padding--v $block-bg-padding--h;
-}

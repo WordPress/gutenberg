@@ -1,124 +1,679 @@
 name: Unit Tests
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [master]
-    paths-ignore:
-    - '**.md'
+    pull_request:
+    # Running on pushes to the release branches leads Zizmor to treat this as a release workflow, and so
+    # to report every cache that its jobs restore as open to cache poisoning: an attacker who can write
+    # a cache entry on trunk could have it restored here. That only matters for a workflow that publishes
+    # what it builds, and nothing built here is published; the jobs only report test and lint results,
+    # and the build-assets artifact is only used by this workflow's own jobs. If that changes, remove
+    # this ignore and avoid restoring caches in the jobs that publish.
+    push: # zizmor: ignore[cache-poisoning] Nothing built in this workflow is published; see above.
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+        inputs:
+            browser-trace-file:
+                description: 'Optional repository-relative Browser test file to run with a failure trace'
+                type: string
+                default: ''
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events. Keep each focused trace run separate
+    # so it cannot cancel full test runs or other diagnostics for the same commit.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}${{ inputs.browser-trace-file && format('-browser-trace-{0}', github.run_id) || '' }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
 
 jobs:
-  unit-js:
-    name: JavaScript
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact unit tests. A series of ignore patterns are used in place of an include
+    # list to ensure tests run even if the list of filters happens to become stale.
+    detect-relevant-changes:
+        name: Detect changes relevant to unit tests
+        runs-on: 'ubuntu-slim'
+        timeout-minutes: 5
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check for changes that may impact unit test results
+              id: filter
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          # Start from every file, then exclude what cannot change a test result.
+                          - '**'
+                          # Documentation.
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,storybook}/**'
+                          # Development tooling and its configuration.
+                          - '!tools/{docs,eslint,stylelint}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          # Repository metadata.
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
+                          - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
 
-    runs-on: ubuntu-latest
+    svn-release:
+        name: SVN release recovery
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+                  sparse-checkout: tools/release
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+            - name: Test SVN publication and recovery
+              run: node --test tools/release/test-publish-to-svn.mts
 
-    - name: Npm install and build
-      # It's not necessary to run the full build, since Jest can interpret
-      # source files with `babel-jest`. Some packages have their own custom
-      # build tasks, however. These must be run.
-      run: |
-        npm ci
-        npx lerna run build
+    unit-js:
+        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: false
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['24', '26']
+                shard: ['1/4', '2/4', '3/4', '4/4']
 
-    - name: Running the tests
-      run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-  unit-php:
-    name: PHP
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
 
-    runs-on: ubuntu-latest
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Run the Vitest Node and jsdom projects
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Keep a separate Flakiness.io history for each Node.js major.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: |
+                  # New workflow runs vary the seed; reruns keep the original seed.
+                  echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=node --project=jsdom --shard=$SHARD"
+                  npm run test:unit:vitest:shuffled -- \
+                    --sequence.seed="$GITHUB_RUN_NUMBER" \
+                    --project=node \
+                    --project=jsdom \
+                    --shard="$SHARD" \
+                    --passWithNoTests
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+    unit-js-browser:
+        name: JavaScript Browser (Chromium, Node.js 24)
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-    - name: Npm install and build
-      run: |
-        npm ci
-        npm run build
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: 24
 
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
+            - name: Install Chromium for Browser Mode tests
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
 
-    - name: Running the tests
-      run: npm run test-php && npm run test-unit-php-multisite
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
 
-  mobile-unit-js:
-    name: Mobile
+            - name: Run the Vitest Browser project
+              env:
+                  FK_ENV_NODEJS: '24'
+                  BROWSER_TRACE_FILE: ${{ inputs.browser-trace-file }}
+              run: |
+                  if [[ -n "$BROWSER_TRACE_FILE" ]]; then
+                    if [[ ! -f "$BROWSER_TRACE_FILE" ]] || [[ "$BROWSER_TRACE_FILE" != packages/*.browser.test.* && "$BROWSER_TRACE_FILE" != test/*.browser.test.* ]]; then
+                      echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
+                      exit 1
+                    fi
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser \"$BROWSER_TRACE_FILE\""
+                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser "$BROWSER_TRACE_FILE"
+                  else
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser"
+                    npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser
+                  fi
 
-    runs-on: ubuntu-latest
+            - name: Upload Browser Mode failure artifacts
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: vitest-browser-failures
+                  path: |
+                      test-results/vitest-attachments/failure-screenshots/
+                      test-results/vitest-browser-screenshots/
+                      test-results/vitest-browser-traces/**/*.trace.zip
+                  retention-days: 3
+                  if-no-files-found: ignore
 
-    steps:
-    - uses: actions/checkout@v2
+    unit-js-date:
+        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: false
+            matrix:
+                event: ['${{ github.event_name }}']
+                node: ['24', '26']
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
 
-    - name: Npm install and build
-      # It's not necessary to run the full build, since Jest can interpret
-      # source files with `babel-jest`. Some packages have their own custom
-      # build tasks, however. These must be run.
-      run: |
-        npm ci
-        npx lerna run build
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
 
-    - name: Running the tests
-      run: npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+            - name: Run the date tests
+              env:
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: npm run test:unit:date
+
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
+        runs-on: 'ubuntu-slim'
+        needs: [detect-relevant-changes]
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        permissions: {}
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
+
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
+                  # shellcheck disable=SC2034
+                  IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION="$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)"
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> "$GITHUB_OUTPUT"
+                  rm versions.json
+
+    build-assets:
+        name: Build JavaScript assets for PHP unit tests
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Run build scripts
+              run: npm run build
+
+            - name: Upload built JavaScript assets
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  name: build-assets
+                  path: |
+                      ./build/
+                  # Only consumed by the jobs of this run, including re-runs.
+                  retention-days: 3
+
+    test-php:
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
+        needs:
+            [
+                detect-relevant-changes,
+                compute-previous-wordpress-version,
+                build-assets,
+            ]
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        strategy:
+            fail-fast: true
+            matrix:
+                event: ['${{ github.event_name }}']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+                multisite: [false, true]
+                wordpress: ['', 'previous major version']
+                exclude:
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
+                    - event: 'pull_request'
+                      php: '8.0'
+                    - event: 'pull_request'
+                      php: '8.1'
+                    - event: 'pull_request'
+                      php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
+                    - event: 'pull_request'
+                      multisite: true
+                    - event: 'pull_request'
+                      wordpress: 'previous major version'
+                    # On trunk/releases: Only test previous WP version with specific PHP versions
+                    - php: '8.0'
+                      wordpress: 'previous major version'
+                    - php: '8.1'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
+                      wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
+                      wordpress: 'previous major version'
+
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+              with:
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: build-assets
+                  path: build
+
+            - name: Docker debug information
+              run: |
+                  docker -v
+
+            - name: General debug information
+              run: |
+                  npm --version
+                  node --version
+                  curl --version
+                  git --version
+                  locale -a
+
+            - name: Start Docker environment
+              run: npm run wp-env-test start
+
+            - name: Log running Docker containers
+              run: docker ps -a
+
+            - name: Docker container debug information
+              run: |
+                  npm run wp-env-test -- run mysql -- sh -c 'if command -v mariadb > /dev/null; then mariadb --version; else mysql --version; fi'
+                  npm run wp-env-test -- run wordpress php -- --version
+                  npm run wp-env-test -- run wordpress php -m
+                  npm run wp-env-test -- run wordpress php -i
+                  npm run wp-env-test -- run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env-test -- run wordpress locale -a
+                  npm run wp-env-test -- run cli wp core version
+
+            - name: Running single site unit tests
+              if: ${{ ! matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
+
+            - name: Running multisite unit tests
+              if: ${{ matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
+
+            # Verifies that PHPUnit actually runs in the first place. We want visibility
+            # into issues which can cause it to fail silently, so we check the output
+            # to verify that at least 500 tests have passed. This is an arbitrary
+            # number, but makes sure a drastic change doesn't happen without us noticing.
+            - name: Check number of passed tests
+              run: |
+                  # Note: relies on PHPUnit execution to fail on test failure.
+                  # Extract the number of executed tests from the log file.
+                  if ! num_tests="$(grep -Eo 'OK \([0-9]+ tests' phpunit.log)" ; then
+                    if ! num_tests="$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log)" ; then
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
+                    fi
+                  fi
+                  # Extract just the number of tests from the string.
+                  num_tests="$(echo "$num_tests" | grep -Eo '[0-9]+')"
+                  if [ "$num_tests" -lt 500 ] ; then
+                    echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
+                  fi
+                  echo "$num_tests tests passed."
+
+    phpcs:
+        name: PHP coding standards
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+              with:
+                  php-version: '7.4'
+                  coverage: none
+                  tools: cs2pr
+
+            # This date is used to ensure that the PHPCS cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
+
+            - name: Cache PHPCS scan cache
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpcs.json
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            - name: Make Composer packages available globally
+              run: echo "${PWD}/vendor/bin" >> "$GITHUB_PATH"
+
+            - name: Run PHPCS on all Gutenberg files
+              id: phpcs-gutenberg
+              run: phpcs --report-full --report-checkstyle=./.cache/phpcs-report.xml
+
+            - name: Show PHPCS results in PR
+              if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    phpstan:
+        name: PHP static analysis
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes, build-assets]
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # The PHP versions to analyze for are set by `phpVersion` in tools/phpstan/base.neon,
+            # so the version PHPStan runs on does not affect the results.
+            - name: Set up PHP
+              uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+              with:
+                  php-version: '8.4'
+                  coverage: none
+
+            # This date is used to ensure that the Composer cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            # The build generates the PHP files that define the gutenberg_* functions and *_Gutenberg
+            # classes that lib/ calls, which PHPStan scans.
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+              with:
+                  name: build-assets
+                  path: build
+
+            # The WordPress stubs are not committed, and generating them from the core commit that
+            # tools/phpstan/wordpress-stubs/composer.json records takes a while, so they are cached by
+            # that file and the script that generates them. The script generates them again when the
+            # cached ones were generated from another source. As with the result cache, only runs on
+            # trunk save a cache.
+            - name: Restore the WordPress stubs
+              id: restore-wordpress-stubs
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: tools/phpstan/wordpress-stubs/wordpress-stubs.stub
+                  key: ${{ runner.os }}-wordpress-stubs-${{ hashFiles('tools/phpstan/wordpress-stubs/composer.json', 'tools/phpstan/generate-wordpress-stubs.php') }}
+
+            - name: Generate the WordPress stubs
+              run: composer phpstan:generate-wordpress-stubs
+
+            - name: Save the WordPress stubs
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' && steps.restore-wordpress-stubs.outputs.cache-hit != 'true' }}
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: tools/phpstan/wordpress-stubs/wordpress-stubs.stub
+                  key: ${{ steps.restore-wordpress-stubs.outputs.cache-primary-key }}
+
+            # Restores the latest cache saved on trunk for the same configuration and dependencies.
+            # PHPStan invalidates the parts of the cache that the changed files affect. The baseline is
+            # left out of the key, since it only filters the errors and does not change the analysis,
+            # so a change to it can reuse the cache.
+            - name: Restore PHPStan result cache
+              id: restore-phpstan-cache
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon') }}-${{ github.run_id }}
+                  restore-keys: |
+                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon') }}-
+
+            # The report is written to a file for the next step. PHPStan exits with 1 when it reports
+            # errors, which that step handles; anything higher means the analysis did not finish.
+            - name: Run PHPStan
+              run: |
+                  status=0
+                  composer phpstan -- --error-format=json --no-progress > "${RUNNER_TEMP}/phpstan-report.json" || status=$?
+                  if [ "${status}" -gt 1 ]; then
+                      echo "::error title=PHPStan did not complete::The analysis exited with status ${status}, so the code was not fully checked."
+                      exit "${status}"
+                  fi
+
+            # Only runs on trunk save a cache. One saved for a pull request could only be restored by
+            # that pull request, so it would mostly use up the repository's cache storage, and push
+            # out the caches that every run restores.
+            - name: Save PHPStan result cache
+              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: .cache/phpstan
+                  key: ${{ steps.restore-phpstan-cache.outputs.cache-primary-key }}
+
+            # The report script is TypeScript, which Node runs by stripping the types, so it needs the
+            # repository's Node version rather than the runner's default, and the npm version that
+            # package.json requires to run it. It imports nothing outside Node, so the dependencies
+            # are not installed.
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
+
+            # Annotates the errors and lists all of them in the job summary, including those on lines
+            # the pull request did not change and those with no line, such as an out-of-date baseline.
+            - name: Report the PHPStan results
+              run: npm run --workspace @wordpress/phpstan-tools report -- "${RUNNER_TEMP}/phpstan-report.json"
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
+    #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    #
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
+    unit-status-check:
+        name: Unit Tests - Status Check
+        runs-on: 'ubuntu-slim'
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        needs:
+            [
+                detect-relevant-changes,
+                svn-release,
+                unit-js,
+                unit-js-browser,
+                unit-js-date,
+                test-php,
+                phpcs,
+                phpstan,
+            ]
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Check for any failures of required jobs
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'

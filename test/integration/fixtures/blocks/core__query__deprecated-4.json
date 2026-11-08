@@ -1,0 +1,51 @@
+[
+	{
+		"name": "core/query",
+		"isValid": true,
+		"attributes": {
+			"queryId": 0,
+			"query": {
+				"perPage": 10,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			},
+			"tagName": "div",
+			"layout": {
+				"contentSize": null,
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/post-template",
+				"isValid": true,
+				"attributes": {
+					"layout": {
+						"type": "default"
+					}
+				},
+				"innerBlocks": [
+					{
+						"name": "core/post-title",
+						"isValid": true,
+						"attributes": {
+							"level": 2,
+							"isLink": false,
+							"rel": "",
+							"linkTarget": "_self"
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
+	}
+]

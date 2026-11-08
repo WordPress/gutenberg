@@ -1,0 +1,20 @@
+{
+	"version": 3,
+	"title": "Block Style Variation B",
+	"slug": "block-style-variation-b",
+	"blockTypes": [ "core/group" ],
+	"styles": {
+		"border": {
+			"width": "2px",
+			"style": "dashed"
+		},
+		"blocks": {
+			"core/group": {
+				"border": {
+					"width": "22px",
+					"style": "groove"
+				}
+			}
+		}
+	}
+}

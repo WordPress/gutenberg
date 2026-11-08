@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { toggleFormat } from '../toggle-format';
 import { getSparseArrayLength } from './helpers';
 
@@ -14,15 +7,18 @@ describe( 'toggleFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 
-	it( 'should remove format if it exists at start of selection', () => {
+	it( 'should remove format if it is active', () => {
 		const record = {
 			formats: [
 				,
 				,
 				,
-				[ strong ],
+				// In reality, formats at a different index are never the same
+				// value. Only formats that create the same tag are the same
+				// value.
+				[ { type: 'strong' } ],
 				[ em, strong ],
-				[ em ],
+				[ em, strong ],
 				[ em ],
 				,
 				,

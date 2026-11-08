@@ -1,46 +1,15 @@
-.block-editor-media-placeholder__url-input-container {
-	// Reset the margin to ensure the url popover is adjacent to the button.
-	.block-editor-media-placeholder__button {
-		margin-bottom: 0;
-	}
-}
+@use "@wordpress/base-styles/mixins" as *;
 
 .block-editor-media-placeholder__url-input-form {
-	display: flex;
+	min-width: 260px;
 
-	// Selector requires a lot of specificity to override base styles.
-	input[type="url"].block-editor-media-placeholder__url-input-field {
-		width: 100%;
-		@include break-small() {
-			width: 300px;
-		}
-
-		flex-grow: 1;
-		border: none;
-		border-radius: 0;
-		margin: 2px;
-
+	@include break-small() {
+		width: 300px;
 	}
-}
 
-.block-editor-media-placeholder__url-input-submit-button {
-	flex-shrink: 1;
-}
-
-.block-editor-media-placeholder__button {
-	margin-bottom: 0.5rem;
-}
-
-.block-editor-media-placeholder__cancel-button.is-link {
-	margin: 1em;
-	display: block;
-}
-
-.block-editor-media-placeholder.is-appender {
-	min-height: 0;
-
-	&:hover {
-		cursor: pointer;
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	input {
+		// Targeting input as we're using text instead of URLs for relative paths.
+		/* rtl:ignore */
+		direction: ltr;
 	}
 }

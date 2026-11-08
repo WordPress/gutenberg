@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../dependency-group';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -22,8 +18,8 @@ ruleTester.run( 'dependency-group', rule, {
 /**
  * External dependencies
  */
-import { get } from 'lodash';
-import classnames from 'classnames';
+import { camelCase } from 'change-case';
+import clsx from 'clsx';;
 
 /**
  * WordPress dependencies
@@ -40,8 +36,8 @@ import edit from './edit';`,
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
-const classnames = require( 'classnames' );
+const { camelCase } = require( 'change-case' );
+const clsx = require( 'clsx' );
 
 /**
  * WordPress dependencies
@@ -52,13 +48,29 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+import { camelCase } from 'change-case';
+import clsx from 'clsx';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
+			options: [ 'never' ],
+		},
+		{
+			code: `
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';`,
+			options: [ 'never' ],
 		},
 	],
 	invalid: [
 		{
 			code: `
-import { get } from 'lodash';
-import classnames from 'classnames';
+import { camelCase } from 'change-case';
+import clsx from 'clsx';;
 /*
  * wordpress dependencies.
  */
@@ -82,8 +94,8 @@ import edit from './edit';`,
 /**
  * External dependencies
  */
-import { get } from 'lodash';
-import classnames from 'classnames';
+import { camelCase } from 'change-case';
+import clsx from 'clsx';;
 /**
  * WordPress dependencies
  */
@@ -95,8 +107,8 @@ import edit from './edit';`,
 		},
 		{
 			code: `
-const { get } = require( 'lodash' );
-const classnames = require( 'classnames' );
+const { camelCase } = require( 'change-case' );
+const clsx = require( 'clsx' );
 /*
  * wordpress dependencies.
  */
@@ -120,8 +132,8 @@ const edit = require( './edit' );`,
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
-const classnames = require( 'classnames' );
+const { camelCase } = require( 'change-case' );
+const clsx = require( 'clsx' );
 /**
  * WordPress dependencies
  */
@@ -130,6 +142,83 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+/**
+ * External dependencies
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * WordPress dependencies
+ */
+
+import { Component } from '@wordpress/element';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+import { Component } from '@wordpress/element';`,
+		},
+		{
+			code: `
+/*
+ * external Dependencies.
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+
+/**
+ * NODE DEPENDENCIES
+ */
+import 'node:fs';
+
+/**
+ * wordpress dependencies.
+ */
+import { Component } from '@wordpress/element';
+
+/**
+ * internal Dependencies.
+ */
+import edit from './edit';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+import 'node:fs';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
 		},
 	],
 } );

@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/page-list-item",
+		"attrs": {
+			"id": "1",
+			"label": "Page",
+			"link": "https://example.com",
+			"hasChildren": "false"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

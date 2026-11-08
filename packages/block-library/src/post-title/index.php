@@ -8,6 +8,9 @@
 /**
  * Renders the `core/post-title` block on the server.
  *
+ * @since 6.3.0 Omitting the $post argument from the `get_the_title`.
+ * @since 7.3.0 Uses the post supplied by block context when it differs from the global post.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -19,19 +22,35 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID          = $block->context['postId'];
-	$tag_name         = 'h2';
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	/**
+	 * Use the global post for the current post so that unsaved title changes are reflected in previews.
+	 * See: https://github.com/WordPress/gutenberg/pull/37622#issuecomment-1000932816.
+	 */
+	$is_global_post = (int) get_the_ID() === (int) $block->context['postId'];
+	$title          = get_the_title( $is_global_post ? null : $block->context['postId'] );
 
+	if ( ! $title ) {
+		return '';
+	}
+
+	$tag_name = 'h2';
 	if ( isset( $attributes['level'] ) ) {
-		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
+		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
 	}
 
-	$title = get_the_title( $post_ID );
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$title = sprintf( '<a href="%1s" target="%2s" rel="%3s">%4s</a>', get_the_permalink( $post_ID ), $attributes['linkTarget'], $attributes['rel'], $title );
+		$rel   = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
+		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', esc_url( get_the_permalink( $block->context['postId'] ) ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
+	$classes = array();
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
@@ -43,6 +62,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-title` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_title() {
 	register_block_type_from_metadata(

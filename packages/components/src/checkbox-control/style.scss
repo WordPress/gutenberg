@@ -1,12 +1,87 @@
-$checkbox-input-size: 20px;
-$checkbox-input-size-sm: 24px; // Width & height for small viewports.
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-checkbox-control {
+	--checkbox-input-size: 16px;
+
+	--checkbox-input-margin: #{$grid-unit-10};
+}
+
+.components-checkbox-control__label {
+	// Ensure label is aligned with checkbox along X axis
+	line-height: var(--checkbox-input-size);
+	color: var(--wpds-color-foreground-content-neutral);
+
+	.components-checkbox-control:not(:has(:disabled)) & {
+		cursor: var(--wpds-cursor-control);
+	}
+}
 
 .components-checkbox-control__input[type="checkbox"] {
-	@include checkbox-control;
-	background: $white;
-	color: $gray-900;
+	transition: none;
+	@include input-control;
+
+	&:hover:not(:disabled, [aria-disabled="true"]) {
+		background: var(--wpds-color-background-interactive-neutral-active);
+	}
+
+	&:checked::before,
+	&[aria-checked="mixed"]::before {
+		margin: -3px -5px;
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+
+		@include break-medium() {
+			margin: -4px 0 0 -5px;
+		}
+	}
+
+	&[aria-checked="mixed"] {
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
+
+		&::before {
+			// Inherited from `forms.css`.
+			// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+			content: "\f460";
+			float: left;
+			display: inline-block;
+			vertical-align: middle;
+			width: 16px;
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
+			font: 400 30px/1 dashicons;
+			speak: none;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+
+			@include break-medium() {
+				float: none;
+				font-size: 21px;
+			}
+		}
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: var(--wpds-color-background-interactive-neutral-disabled);
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
+
+		@media (forced-colors: active) {
+			border-color: GrayText;
+		}
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+	}
+	background: var(--wpds-color-background-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	clear: none;
-	cursor: pointer;
 	display: inline-block;
 	line-height: 0;
 	margin: 0 $grid-unit-05 0 0;
@@ -14,67 +89,79 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	padding: 0 !important;
 	text-align: center;
 	vertical-align: top;
-	width: $checkbox-input-size-sm;
-	height: $checkbox-input-size-sm;
-
-	@include break-small() {
-		height: $checkbox-input-size;
-		width: $checkbox-input-size;
-	}
+	position: relative;
+	width: var(--checkbox-input-size);
+	height: var(--checkbox-input-size);
 
 	appearance: none;
-	transition: 0.1s border-color ease-in-out;
-	@include reduce-motion("transition");
 
-	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
-
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s border-color ease-in-out;
 	}
 
-	&:checked {
-		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
+	&:not(:disabled):is(:checked, :indeterminate) {
+		background: var(--wpds-color-background-interactive-brand-strong);
+		border-color: var(--wpds-color-background-interactive-brand-strong);
+	}
 
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
+	&:not(:disabled) {
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:checked::before {
 		content: none;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: max(var(--checkbox-input-size), #{$grid-unit-30});
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
 	}
 }
 
 .components-checkbox-control__input-container {
 	position: relative;
 	display: inline-block;
-	margin-right: 12px;
+	margin-right: var(--checkbox-input-margin);
 	vertical-align: middle;
-	width: $checkbox-input-size-sm;
-	height: $checkbox-input-size-sm;
+	width: var(--checkbox-input-size);
+	aspect-ratio: 1;
+	line-height: 1; // maintains proper height even with WP common.css
+	flex-shrink: 0;
+}
 
-	@include break-small() {
-		width: $checkbox-input-size;
-		height: $checkbox-input-size;
+svg.components-checkbox-control__checked,
+svg.components-checkbox-control__indeterminate {
+	color: var(--wpds-color-foreground-interactive-brand-strong);
+	cursor: var(--wpds-cursor-control);
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: var(--checkbox-input-size);
+	height: var(--checkbox-input-size);
+	user-select: none;
+	pointer-events: none;
+	// Override the browser's SVG default so indicators follow forced system colors.
+	forced-color-adjust: auto;
+}
+
+.components-checkbox-control:has(:disabled) {
+	svg.components-checkbox-control__checked,
+	svg.components-checkbox-control__indeterminate {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
 	}
 }
 
-svg.components-checkbox-control__checked {
-	fill: $white;
-	cursor: pointer;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: $button-size-small;
-	height: $button-size-small;
-
-	@include break-small() {
-		left: -2px;
-		top: -2px;
-	}
-	user-select: none;
-	pointer-events: none;
+.components-checkbox-control__help {
+	display: inline-block;
+	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
 }

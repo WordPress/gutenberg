@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { __, _x } from '@wordpress/i18n';
 import { more as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -17,14 +10,18 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'More', 'block name' ),
-	description: __(
-		'Content before this block will be shown in the excerpt on your archives page.'
-	),
-	keywords: [ __( 'read more' ) ],
 	icon,
 	example: {},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return attributes.customText;
 		}
@@ -33,3 +30,5 @@ export const settings = {
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

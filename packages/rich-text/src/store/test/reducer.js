@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { formatTypes } from '../reducer';
 
 describe( 'formatTypes', () => {
@@ -13,7 +7,7 @@ describe( 'formatTypes', () => {
 		expect( formatTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add add a new format type', () => {
+	it( 'should add a new format type', () => {
 		const original = deepFreeze( {
 			'core/bold': { name: 'core/bold' },
 		} );

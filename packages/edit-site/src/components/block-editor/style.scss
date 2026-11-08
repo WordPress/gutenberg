@@ -1,13 +1,6 @@
-// The button element easily inherits styles that are meant for the editor style.
-// These rules enhance the specificity to reduce that inheritance.
-// This is duplicated in visual-editor.
-.edit-site-block-editor__editor-styles-wrapper  .components-button {
-	font-family: $default-font;
-	font-size: $default-font-size;
-	padding: 6px 12px;
-
-	&.is-tertiary,
-	&.has-icon {
-		padding: 6px;
+.edit-site-visual-editor__editor-canvas {
+	&.is-focused {
+		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
 	}
 }

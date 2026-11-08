@@ -1,23 +1,44 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [
+			"gutenberg-env",
+			"gutenberg-vitest-test-env",
+			"react-css-custom-properties",
+			"style-imports"
+		]
 	},
-	"references": [ { "path": "../hooks" }, { "path": "../primitives" } ],
+	"files": [ "global.d.ts" ],
 	"include": [
-		"src/base-control/**/*",
-		"src/dashicon/**/*",
-		"src/tip/**/*",
-		"src/utils/**/*",
-		"src/visually-hidden/**/*"
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
 	],
-	"exclude": [
-		"src/**/*.android.js",
-		"src/**/*.ios.js",
-		"src/**/*.native.js",
-		"src/**/react-native-*",
-		"src/**/stories",
-		"src/**/test"
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../date/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../escape-html/tsconfig.build.json" },
+		{ "path": "../hooks/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../primitives/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
+		{ "path": "../rich-text/tsconfig.build.json" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }

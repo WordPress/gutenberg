@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Editing modes (visual/HTML) saves content when using the shortcut in the Code Editor 1`] = `
-"<!-- wp:paragraph -->
-<p>Hi world!</p>
-<!-- /wp:paragraph -->"
-`;

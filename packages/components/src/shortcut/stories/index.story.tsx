@@ -1,0 +1,32 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import Shortcut from '../';
+
+const meta: Meta< typeof Shortcut > = {
+	tags: [ 'manifest' ],
+	component: Shortcut,
+	title: 'Components/@wordpress-components/Utilities/Shortcut',
+	id: 'components-shortcut',
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof Shortcut > = ( props ) => {
+	return <Shortcut shortcut="Ctrl + S" { ...props } />;
+};
+
+export const Default: StoryFn< typeof Shortcut > = Template.bind( {} );
+
+export const WithAriaLabel = Template.bind( {} );
+WithAriaLabel.args = {
+	...Default.args,
+	shortcut: { display: 'Ctrl + L', ariaLabel: 'Load' },
+};

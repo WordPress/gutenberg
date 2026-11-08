@@ -1,7 +1,14 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-autocompleters__block {
 	white-space: nowrap;
 
 	.block-editor-block-icon {
 		margin-right: $grid-unit-10;
+	}
+
+	&:is([aria-selected="true"], :focus) .block-editor-block-icon {
+		color: inherit !important;
+		background-color: transparent !important;
 	}
 }

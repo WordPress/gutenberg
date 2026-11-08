@@ -1,3 +1,15 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-image.wp-block-image {
+	.block-editor-media-placeholder.is-small {
+		min-height: 60px;
+	}
+}
+
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
@@ -5,8 +17,21 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	// While uploading or processing client-side, hug the preview so the
+	// centered spinner lands on the image. A preview narrower than the content
+	// width (e.g. a small animated GIF being transcoded to a video) otherwise
+	// leaves the spinner off to one side. Wide and full alignments keep their
+	// own width.
+	// The media editor swap state marks the img rather than the figure (its
+	// state lives alongside the img's load handlers), hence the :has() variant.
+	&.is-transient:not(.alignwide):not(.alignfull),
+	&:has(img.is-swapping-media):not(.alignwide):not(.alignfull) {
+		width: fit-content;
+	}
+
 	.is-applying img,
-	&.is-transient img {
+	&.is-transient img,
+	img.is-swapping-media {
 		opacity: 0.3;
 	}
 
@@ -14,24 +39,43 @@ figure.wp-block-image:not(.wp-block) {
 		display: inline;
 	}
 
-	// Shown while image is being uploaded
+	// Shown while image is being uploaded.
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
+		transform: translate(-50%, -50%);
+		margin: 0;
+	}
+
+	.components-resizable-box__container {
+		pointer-events: none;
+	}
+
+	.components-resizable-box__handle {
+		pointer-events: auto;
 	}
 }
 
-// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image .components-resizable-box__container {
-	display: inline-block;
-	img {
-		display: block;
-		width: inherit;
-		height: inherit;
+// Shown while image is being uploaded but cannot be previewed.
+.wp-block-image__placeholder {
+	aspect-ratio: 4 / 3;
+
+	// Make placeholder background white so that you can see the spinner on top of it.
+	&.has-illustration::before {
+		background: $white;
+		opacity: 0.8;
 	}
+
+	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
+}
+
+// Disable any duotone filter applied in the selected state.
+.wp-block-image.is-selected .block-editor-media-placeholder {
+	filter: none !important;
 }
 
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
@@ -48,6 +92,7 @@ figure.wp-block-image:not(.wp-block) {
 [data-align="wide"] > .wp-block-image,
 [data-align="full"] > .wp-block-image {
 	img {
+		height: auto;
 		width: 100%;
 	}
 }
@@ -85,48 +130,16 @@ figure.wp-block-image:not(.wp-block) {
 	text-align: center;
 }
 
-.wp-block-image__crop-area {
+// Relatively position the alignment container to support the content resizer.
+.wp-block[data-align]:has(> .wp-block-image) {
 	position: relative;
-	max-width: 100%;
-	width: 100%;
 }
 
-.wp-block-image__crop-icon {
-	padding: 0 8px;
-	min-width: 48px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
-	svg {
-		fill: currentColor;
-	}
+.wp-block-image__toolbar_content_textarea__container {
+	padding: $grid-unit;
 }
 
-.wp-block-image__zoom {
-	.components-popover__content {
-		overflow: visible;
-	}
-
-	.components-range-control {
-		flex: 1;
-	}
-
-	.components-base-control__field {
-		display: flex;
-		margin-bottom: 0;
-	}
-}
-
-.wp-block-image__aspect-ratio {
-	height: $grid-unit-60 - $border-width - $border-width;
-	margin-bottom: -$grid-unit-10;
-	display: flex;
-	align-items: center;
-
-	.components-button {
-		width: $button-size;
-		padding-left: 0;
-		padding-right: 0;
-	}
+.wp-block-image__toolbar_content_textarea {
+	// Corresponds to the size of the textarea in the block inspector.
+	width: 250px;
 }

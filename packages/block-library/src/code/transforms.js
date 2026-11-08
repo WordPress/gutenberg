@@ -1,21 +1,39 @@
-/**
- * WordPress dependencies
- */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockContent } from '@wordpress/blocks';
+import { create, toHTMLString } from '@wordpress/rich-text';
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
 	from: [
 		{
-			type: 'enter',
+			type: 'input',
 			regExp: /^```$/,
 			transform: () => createBlock( 'core/code' ),
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html' ],
-			transform: ( { content } ) => {
+			blocks: [ 'core/paragraph' ],
+			transform: ( attributes ) => {
+				const { content } = attributes;
 				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
 					content,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/html' ],
+			__experimentalConvert( block ) {
+				const { attributes } = block;
+				return createBlock( 'core/code', {
+					...attributes,
+					...getTransformedAttributes( attributes, 'core/code' ),
+					// The HTML is plain text (with plain line breaks), so
+					// convert it to rich text.
+					content: toHTMLString( {
+						value: create( { text: getBlockContent( block ) } ),
+					} ),
 				} );
 			},
 		},
@@ -35,6 +53,19 @@ const transforms = {
 						},
 					},
 				},
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( attributes ) => {
+				const { content } = attributes;
+				return createBlock( 'core/paragraph', {
+					...getTransformedAttributes( attributes, 'core/paragraph' ),
+					content,
+				} );
 			},
 		},
 	],

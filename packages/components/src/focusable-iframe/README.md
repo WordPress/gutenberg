@@ -1,5 +1,7 @@
 # Focusable Iframe
 
+**Deprecated**
+
 `<FocusableIframe />` is a component rendering an `iframe` element enhanced to support focus events. By default, it is not possible to detect when an iframe is focused or clicked within. This enhanced component uses a technique which checks whether the target of a window `blur` event is the iframe, inferring that this has resulted in the focus of the iframe. It dispatches an emulated [`FocusEvent`](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent) on the iframe element with event bubbling, so a parent component binding its own `onFocus` event will account for focus transitioning within the iframe.
 
 ## Usage
@@ -23,14 +25,14 @@ Any props aside from those listed below will be passed to the `FocusableIframe` 
 
 ### `onFocus`
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 Callback to invoke when iframe receives focus. Passes an emulated `FocusEvent` object as the first argument.
 
 ### `iframeRef`
 
-- Type: `wp.element.Ref`
-- Required: No
+-   Type: `React.Ref`
+-   Required: No
 
-If a reference to the underlying DOM element is needed, pass `iframeRef` as the result of a `wp.element.createRef` called from your component.
+If a reference to the underlying DOM element is needed, pass `iframeRef` as the result of a `React.createRef` called from your component.

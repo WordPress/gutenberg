@@ -1,4 +1,7 @@
 module.exports = [
-	require( 'postcss-custom-properties' )(),
-	require( 'autoprefixer' )( { grid: true } ),
+	require( 'postcss-import' )(),
+	require( 'autoprefixer' )( {
+		grid: true,
+		overrideBrowserslist: require( '@wordpress/browserslist-config' ),
+	} ),
 ];

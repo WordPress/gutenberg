@@ -3,4 +3,4 @@
  *
  * @type {string}
  */
-export const STORE_KEY = 'core/edit-site';
+export const STORE_NAME = 'core/edit-site';

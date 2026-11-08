@@ -1,36 +1,30 @@
-/**
- * External dependencies
- */
-import { camelCase, mapKeys } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { apiFetch } from '@wordpress/data-controls';
-
-/**
- * Internal dependencies
- */
+import { camelCase } from 'change-case';
+import apiFetch from '@wordpress/api-fetch';
 import { fetchDownloadableBlocks, receiveDownloadableBlocks } from './actions';
 
-export default {
-	*getDownloadableBlocks( filterValue ) {
+export const getDownloadableBlocks =
+	( filterValue ) =>
+	async ( { dispatch } ) => {
 		if ( ! filterValue ) {
 			return;
 		}
 
 		try {
-			yield fetchDownloadableBlocks( filterValue );
-			const results = yield apiFetch( {
+			dispatch( fetchDownloadableBlocks( filterValue ) );
+			const results = await apiFetch( {
 				path: `wp/v2/block-directory/search?term=${ filterValue }`,
 			} );
 			const blocks = results.map( ( result ) =>
-				mapKeys( result, ( value, key ) => {
-					return camelCase( key );
-				} )
+				Object.fromEntries(
+					Object.entries( result ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
 			);
 
-			yield receiveDownloadableBlocks( blocks, filterValue );
-		} catch ( error ) {}
-	},
-};
+			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );
+		} catch {
+			dispatch( receiveDownloadableBlocks( [], filterValue ) );
+		}
+	};

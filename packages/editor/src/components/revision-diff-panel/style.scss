@@ -1,0 +1,15 @@
+.editor-revision-fields-diff__value {
+	word-break: normal;
+	overflow-wrap: anywhere;
+}
+
+.editor-revision-fields-diff__added {
+	background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
+	text-decoration: none;
+}
+
+.editor-revision-fields-diff__removed {
+	background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
+	text-decoration: line-through;
+	text-decoration-color: #d63638;
+}

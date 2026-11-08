@@ -1,0 +1,43 @@
+[
+	{
+		"blockName": "core/navigation",
+		"attrs": {
+			"openSubmenusOnClick": true,
+			"overlayMenu": "mobile"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/navigation-link",
+				"attrs": {
+					"label": "WordPress",
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/navigation-submenu",
+				"attrs": {
+					"label": "Submenu"
+				},
+				"innerBlocks": [
+					{
+						"blockName": "core/navigation-link",
+						"attrs": {
+							"label": "Child Link",
+							"url": "https://example.com/"
+						},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					}
+				],
+				"innerHTML": "\n\n",
+				"innerContent": [ "\n", null, "\n" ]
+			}
+		],
+		"innerHTML": "\n\n\n",
+		"innerContent": [ "\n", null, "\n", null, "\n" ]
+	}
+]

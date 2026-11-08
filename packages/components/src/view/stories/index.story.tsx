@@ -1,0 +1,32 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { View } from '..';
+
+const meta: Meta< typeof View > = {
+	component: View,
+	id: 'components-view',
+	title: 'Components/@wordpress-components/View',
+	argTypes: {
+		as: { control: false },
+		children: { control: { type: 'text' } },
+	},
+	tags: [ 'status-experimental' ],
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
+	},
+};
+export default meta;
+
+const Template: StoryFn< typeof View > = ( args ) => {
+	return <View { ...args } />;
+};
+
+export const Default: StoryFn< typeof View > = Template.bind( {} );
+Default.args = {
+	children: 'An example tip',
+};

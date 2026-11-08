@@ -1,0 +1,45 @@
+@media all and (max-width:699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width :699px) {
+
+	/* Your selectors */
+}
+
+@media all and (unknown) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width>=699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width >=699px) {
+
+	/* Your selectors */
+}
+
+@media all and (max-width>= 699px) {
+
+	/* Your selectors */
+}
+
+@mdia all and (max-width>= 699px) {
+
+	/* Your selectors */
+}
+
+@media screen and (color) , print and (color) {
+
+	/* Your selectors */
+}
+
+@media screen and (color) ,
+	print and (color) {
+
+	/* Your selectors */
+}

@@ -1,8 +1,10 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
+	const { useBlockProps } = wp.blockEditor;
 
 	registerBlockType( 'test/test-meta-attribute-block-late', {
+		apiVersion: 3,
 		title: 'Test Meta Attribute Block (Late Registration)',
 		icon: 'star',
 		category: 'text',
@@ -15,17 +17,18 @@
 			},
 		},
 
-		edit: function( props ) {
-			return el( 'input', {
+		edit: function Edit( props ) {
+			const blockProps = useBlockProps( {
 				className: 'my-meta-input',
 				value: props.attributes.content,
-				onChange: function( event ) {
+				onChange( event ) {
 					props.setAttributes( { content: event.target.value } );
 				},
 			} );
+			return el( 'input', blockProps );
 		},
 
-		save: function() {
+		save() {
 			return null;
 		},
 	} );

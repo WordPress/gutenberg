@@ -1,0 +1,10 @@
+{
+	"$schema": "../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"color": {
+			"background": "#000",
+			"text": "#fff"
+		}
+	}
+}

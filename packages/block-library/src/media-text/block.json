@@ -1,31 +1,39 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/media-text",
+	"title": "Media & Text",
 	"category": "media",
+	"description": "Set media and words side-by-side for a richer layout.",
+	"keywords": [ "image", "video" ],
+	"textdomain": "default",
 	"attributes": {
 		"align": {
 			"type": "string",
-			"default": "wide"
+			"default": "none"
 		},
 		"mediaAlt": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure img",
 			"attribute": "alt",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"mediaPosition": {
 			"type": "string",
 			"default": "left"
 		},
 		"mediaId": {
-			"type": "number"
+			"type": "number",
+			"role": "content"
 		},
 		"mediaUrl": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure video,figure img",
-			"attribute": "src"
+			"attribute": "src",
+			"role": "content"
 		},
 		"mediaLink": {
 			"type": "string"
@@ -43,7 +51,8 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "figure a",
-			"attribute": "href"
+			"attribute": "href",
+			"role": "content"
 		},
 		"rel": {
 			"type": "string",
@@ -58,7 +67,8 @@
 			"attribute": "class"
 		},
 		"mediaType": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"mediaWidth": {
 			"type": "number",
@@ -79,15 +89,79 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"heading": true,
+			"link": true,
+			"button": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"shadow": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"filter": {
+			"duotone": true
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"allowedBlocks": true
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-media-text > .wp-block-media-text__media img, .wp-block-media-text > .wp-block-media-text__media video"
 		}
-	}
+	},
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }

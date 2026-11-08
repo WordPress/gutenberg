@@ -1,0 +1,24 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "pullquote",
+			"citation": "citation",
+			"className": "is-style-default",
+			"style": {
+				"color": {
+					"background": "#3486aa",
+					"text": "#ffefef"
+				},
+				"border": {
+					"color": "#045679"
+				},
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

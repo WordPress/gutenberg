@@ -1,6 +1,4 @@
-/**
- * External dependencies
- */
+'use strict';
 const crypto = require( 'crypto' );
 
 /**

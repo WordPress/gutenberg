@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "1.3.0",
+	"version": "4.1.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"warning"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/warning/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/warning/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,11 +18,35 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"babel-plugin.cjs"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json",
+		"./babel-plugin": "./babel-plugin.cjs"
+	},
+	"wpScript": true,
+	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@babel/core": "^7.25.7",
+		"vitest": "^5.0.5"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -1,0 +1,29 @@
+/**
+* #.# Section title
+*
+* Description of section, whether or not it has media queries, etc.
+*/
+
+.selector {
+	float: left;
+}
+
+
+/**
+* #.# Another section title
+*
+* Description of section, whether or not it has media queries, long comments
+* should manually break the line length at 80 characters.
+*/
+
+.another-selector {
+	float: right;
+}
+
+/* This is a comment about this selector */
+.one-more-selector {
+	position: absolute;
+	top: 0 !important; /* I should explain why this is so !important */
+}
+
+/* Long comments should manually break the line length at 80 characters. */

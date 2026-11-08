@@ -16,7 +16,7 @@ class MyURLPopover extends Component {
 		super( ...arguments );
 
 		this.onChangeURL = this.onChangeURL.bind( this );
-		this.openURLPopover = this.closeURLPopover.bind( this );
+		this.openURLPopover = this.openURLPopover.bind( this );
 		this.closeURLPopover = this.closeURLPopover.bind( this );
 		this.submitURL = this.submitURL.bind( this );
 		this.setTarget = this.setTarget.bind( this );
@@ -94,13 +94,13 @@ class MyURLPopover extends Component {
 
 The component accepts the following props. Any other props are passed through to the underlying `Popover` component ([refer to props documentation](/packages/components/src/popover/README.md)).
 
-### position
+### placement
 
-Where the Popover should be positioned relative to its parent. Defaults to "bottom center".
+Where the Popover should be positioned relative to its parent. Defaults to "bottom".
 
 -   Type: `String`
 -   Required: No
--   Default: "bottom center"
+-   Default: "bottom"
 
 ### focusOnMount
 
@@ -120,10 +120,17 @@ drawer.
 -   Type: `Function`
 -   Required: No
 
+### additionalControls
+
+Elements rendered in a row below the URL input. They are hidden while the settings drawer is open.
+
+-   Type: `Element`
+-   Required: No
+
 ## Useful UI pieces
 
 The URLPopover exposes two components that may be used as child components to make the UI creation process easier.
-Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it maybe is possible and perfectly fine to use them standalone if they fit a use-case.
+Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it may be possible and perfectly fine to use them standalone if they fit a use-case.
 
 ### LinkViewer
 
@@ -194,3 +201,12 @@ Reference passed to the auto complete element of the ([URLInput component](/pack
 
 -   Type: `Object`
 -   Required: no
+
+### position
+
+_Note: this prop is deprecated. Please use the `placement` prop instead._
+
+Where the Popover should be positioned relative to its parent.
+
+-   Type: `String`
+-   Required: No

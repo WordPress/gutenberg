@@ -1,0 +1,78 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { Spacer } from '..';
+
+const controls = [
+	'margin',
+	'marginY',
+	'marginX',
+	'marginTop',
+	'marginBottom',
+	'marginLeft',
+	'marginRight',
+
+	'padding',
+	'paddingY',
+	'paddingX',
+	'paddingTop',
+	'paddingBottom',
+	'paddingLeft',
+	'paddingRight',
+].reduce(
+	( acc, prop ) => ( { ...acc, [ prop ]: { control: { type: 'text' } } } ),
+	{}
+);
+
+const meta: Meta< typeof Spacer > = {
+	component: Spacer,
+	id: 'components-spacer',
+	title: 'Components/@wordpress-components/Spacer',
+	argTypes: {
+		as: { control: { type: 'text' } },
+		children: {
+			control: { type: 'text' },
+		},
+		...controls,
+	},
+	tags: [ 'status-experimental' ],
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
+	},
+};
+export default meta;
+
+const BlackBox = () => (
+	<div
+		style={ { backgroundColor: 'black', width: '100px', height: '100px' } }
+	/>
+);
+
+const Template: StoryFn< typeof Spacer > = ( { onChange, ...args } ) => {
+	return (
+		<>
+			<BlackBox />
+			<Spacer { ...args } />
+			<BlackBox />
+		</>
+	);
+};
+
+export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
+Default.args = {
+	children: 'This is the spacer',
+};
+
+export const Nested: StoryFn< typeof Spacer > = () => (
+	<Spacer padding={ 4 } style={ { backgroundColor: '#ddd' } }>
+		<Spacer style={ { backgroundColor: '#fff' } }>
+			<BlackBox />
+		</Spacer>
+	</Spacer>
+);

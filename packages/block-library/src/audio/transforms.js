@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
@@ -18,9 +15,9 @@ const transforms = {
 				const file = files[ 0 ];
 				// We don't need to upload the media directly here
 				// It's already done as part of the `componentDidMount`
-				// in the audio block
+				// in the audio block.
 				const block = createBlock( 'core/audio', {
-					src: createBlobURL( file ),
+					blob: createBlobURL( file ),
 				} );
 
 				return block;

@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "1.0.2",
-	"description": "Reusable blocks utilities.",
+	"version": "7.1.0",
+	"description": "Deprecated no-op reusable blocks compatibility module.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"reusable blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/reusable-blocks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/reusable-blocks/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,24 +18,41 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"react-native": "src/index",
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": true,
 	"sideEffects": [
-		"{src,build,build-module}/{index.js,store/index.js}"
+		"src/index.js",
+		"src/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"lodash": "^4.17.19"
+		"@wordpress/deprecated": "file:../deprecated"
+	},
+	"peerDependencies": {
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"
