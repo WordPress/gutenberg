@@ -1,6 +1,18 @@
 import type { Page, Route } from '@playwright/test';
 import { test, expect } from '../fixtures';
 
+// "All notes" has no toggle before the first note.
+async function showAllNotes( page: Page ) {
+	await page.evaluate( () =>
+		window.wp.data
+			.dispatch( 'core/interface' )
+			.enableComplementaryArea(
+				'core',
+				'edit-post/collab-history-sidebar'
+			)
+	);
+}
+
 /**
  * Regression test for https://github.com/WordPress/gutenberg/issues/74751.
  *
@@ -18,6 +30,7 @@ import { test, expect } from '../fixtures';
 test.describe( 'Collaboration - concurrent notes on the same block', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'notes added by two users at the same moment both survive', async ( {
@@ -36,6 +49,8 @@ test.describe( 'Collaboration - concurrent notes on the same block', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2, editor2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// Both users select the same paragraph block.
 		for ( const [ pg, ed ] of [
