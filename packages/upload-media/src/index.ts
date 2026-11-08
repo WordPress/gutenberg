@@ -11,6 +11,7 @@ export {
 } from './heic-support';
 export {
 	detectClientSideMediaSupport,
+	exceedsClientProcessingMemory,
 	isClientSideMediaSupported,
 	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
@@ -18,5 +19,7 @@ export {
 export { isHeicFile } from './utils';
 
 export type { ImageFormat } from './store/types';
+export type { ImageEditModifier } from '@wordpress/vips/worker';
 export type { FeatureDetectionResult } from './feature-detection';
+export type { ImageDimensions } from './get-image-dimensions';
 export type { ErrorMessageConfig } from './error-messages';

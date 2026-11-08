@@ -7,6 +7,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { mapEditToOriginal } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
+import {
+	editImageClientSide,
+	getEditedAttachmentData,
+} from './edit-image-client-side';
 
 /**
  * A single modifier in the Core REST `/edit` payload. Order is
@@ -188,29 +192,59 @@ export function useSaveMediaEditor( {
 						'attachment',
 						targetId
 					) as PendingMetadataEdits;
-				const metadataEdits = getMetadataEdits(
-					pendingEdits,
-					targetMedia
-				);
 
-				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ targetId }/edit`,
-					method: 'POST',
-					data: {
-						src: targetUrl,
-						modifiers,
-						...metadataEdits,
-					},
-				} ) ) as Media;
+				// Prefer applying the edits in the browser, which keeps what
+				// the server-side image editors drop (an UltraHDR gain map,
+				// for one) and generates sub-sizes client-side. The server
+				// path remains the fallback whenever that is unavailable.
+				const editedId = targetMedia
+					? await editImageClientSide( {
+							registry,
+							media: targetMedia,
+							modifiers,
+							additionalData: getEditedAttachmentData(
+								pendingEdits,
+								targetMedia
+							),
+						} )
+					: null;
 
-				if ( saved ) {
-					receiveEntityRecords(
-						'postType',
-						'attachment',
-						saved,
-						undefined,
-						true
+				if ( editedId ) {
+					// The upload transport has already cleared any stale
+					// record for this ID, so this fetches the finalized
+					// attachment, with its sub-sizes, into the store.
+					saved = ( await registry
+						.resolveSelect( coreStore )
+						.getEntityRecord(
+							'postType',
+							'attachment',
+							editedId
+						) ) as Media | undefined;
+				} else {
+					const metadataEdits = getMetadataEdits(
+						pendingEdits,
+						targetMedia
 					);
+
+					saved = ( await apiFetch( {
+						path: `/wp/v2/media/${ targetId }/edit`,
+						method: 'POST',
+						data: {
+							src: targetUrl,
+							modifiers,
+							...metadataEdits,
+						},
+					} ) ) as Media;
+
+					if ( saved ) {
+						receiveEntityRecords(
+							'postType',
+							'attachment',
+							saved,
+							undefined,
+							true
+						);
+					}
 				}
 			} else if (
 				replacementSource &&

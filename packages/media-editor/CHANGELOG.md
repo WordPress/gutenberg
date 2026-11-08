@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Apply crop, rotate and flip edits in the browser with client-side media processing when it is available, uploading the result through the upload queue so an UltraHDR gain map survives the edit, and fall back to the REST `media/<id>/edit` endpoint otherwise. An original the attachment record shows to be past the client memory budget goes straight to the server without being downloaded ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+
 ### Bug Fixes
 
 -   Keep the fine-rotation ruler's ticks and labels visible when the browser forces dark colors ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
