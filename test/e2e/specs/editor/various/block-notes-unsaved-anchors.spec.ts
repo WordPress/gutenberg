@@ -48,7 +48,7 @@ async function addNote( editor: Editor, page: Page, content: string ) {
 function getThread( page: Page, content: string ) {
 	return page
 		.getByRole( 'region', { name: /^(Notes|Editor settings)$/ } )
-		.getByRole( 'treeitem', { name: `Note: ${ content }` } );
+		.getByRole( 'treeitem', { name: `Note: ${ content }`, exact: true } );
 }
 
 // Orphaned notes only list in "All notes".
@@ -99,6 +99,40 @@ test.describe( 'Block Notes: unsaved note anchors', () => {
 			.toHaveLength( 1 );
 		await openAllNotes( page );
 		await expect( getThread( page, 'Unsaved anchor note' ) ).toBeVisible();
+	} );
+
+	test( 'drops the snapshot once the post is saved', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep me attached' },
+		} );
+		await editor.saveDraft();
+		await addNote( editor, page, 'Saved anchor note' );
+		const [ noteId ] = await getFirstBlockNoteIds( editor );
+		const getSnapshot = () =>
+			requestUtils
+				.rest< { meta: { _wp_note_anchor: unknown[] } } >( {
+					path: `/wp/v2/comments/${ noteId }`,
+					params: { context: 'edit' },
+				} )
+				.then( ( note ) => note.meta._wp_note_anchor );
+
+		expect( await getSnapshot() ).toHaveLength( 1 );
+		// The first save's notice is still up, so wait for the request itself.
+		const saved = page.waitForResponse(
+			( response ) =>
+				response.request().method() === 'POST' &&
+				response.url().includes( '/wp/v2/posts/' )
+		);
+		await editor.saveDraft();
+		await saved;
+		expect( await getSnapshot() ).toHaveLength( 0 );
 	} );
 
 	test( 'keeps a note attached on a published post without updating it', async ( {

@@ -46,3 +46,64 @@ function gutenberg_register_note_anchor_meta(): void {
 	);
 }
 add_action( 'init', 'gutenberg_register_note_anchor_meta' );
+
+/**
+ * Collects the note ids the blocks link to, through `metadata.noteId`.
+ *
+ * @param mixed[] $blocks Parsed blocks.
+ * @return int[] Note ids.
+ */
+function gutenberg_get_note_ids_from_blocks( array $blocks ): array {
+	$note_ids = array();
+	foreach ( $blocks as $block ) {
+		if ( ! is_array( $block ) ) {
+			continue;
+		}
+		$metadata = is_array( $block['attrs'] ?? null ) ? ( $block['attrs']['metadata'] ?? null ) : null;
+		$ids      = is_array( $metadata ) ? ( $metadata['noteId'] ?? null ) : null;
+		foreach ( (array) $ids as $id ) {
+			if ( is_numeric( $id ) ) {
+				$note_ids[] = (int) $id;
+			}
+		}
+		if ( is_array( $block['innerBlocks'] ?? null ) ) {
+			$note_ids = array_merge( $note_ids, gutenberg_get_note_ids_from_blocks( $block['innerBlocks'] ) );
+		}
+	}
+	return $note_ids;
+}
+
+/**
+ * Deletes the snapshots of the notes a saved post links to, which the post
+ * now persists itself. Notes the saved content doesn't link to keep theirs,
+ * since another user may have saved content from before they were added.
+ *
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post    Post object.
+ * @param bool    $update  Whether this is an existing post being updated.
+ */
+function gutenberg_delete_persisted_note_anchors( $post_id, $post, $update ): void {
+	if ( ! $update || 'revision' === $post->post_type ) {
+		return;
+	}
+	$note_ids = get_comments(
+		array(
+			'post_id'  => $post_id,
+			'type'     => 'note',
+			'parent'   => 0,
+			'meta_key' => '_wp_note_anchor',
+			'fields'   => 'ids',
+		)
+	);
+	if ( ! is_array( $note_ids ) || ! $note_ids ) {
+		return;
+	}
+	$linked = gutenberg_get_note_ids_from_blocks( parse_blocks( $post->post_content ) );
+	foreach ( $note_ids as $note_id ) {
+		$note_id = (int) $note_id;
+		if ( $note_id > 0 && in_array( $note_id, $linked, true ) ) {
+			delete_comment_meta( $note_id, '_wp_note_anchor' );
+		}
+	}
+}
+add_action( 'wp_after_insert_post', 'gutenberg_delete_persisted_note_anchors', 10, 3 );
