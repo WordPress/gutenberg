@@ -21,7 +21,7 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 	}, [] );
 	const lockedProps = useLockedPostSettingProps();
 	const authorName =
-		decodeEntities( postAuthor?.name ) || __( '(No author)' );
+		decodeEntities( postAuthor?.name ) || __( '(no author)' );
 	return (
 		<Button
 			size="compact"

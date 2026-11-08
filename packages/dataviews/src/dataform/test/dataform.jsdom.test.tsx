@@ -715,7 +715,7 @@ describe( 'DataForm component', () => {
 			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should show the value of a non-empty field instead of its placeholder', () => {
+		it( 'should show the value of a non-empty field before its placeholder', () => {
 			render(
 				<Dataform
 					onChange={ noop }
@@ -735,10 +735,35 @@ describe( 'DataForm component', () => {
 				/>
 			);
 
+			// The placeholder follows the value, and the styles hide it while
+			// the value renders something.
 			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
-			expect(
-				screen.queryByText( 'Add a title' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should follow an empty render output of a non-empty field with its placeholder', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'author',
+							label: 'Author',
+							type: 'integer',
+							placeholder: 'No author',
+							// Like an id matching no record.
+							render: () => null,
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'author' ],
+					} }
+					data={ { author: 99 } }
+				/>
+			);
+
+			expect( screen.getByText( 'No author' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should fall back to the render output when an empty field has no placeholder', () => {
