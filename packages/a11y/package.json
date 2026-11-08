@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "4.57.0",
+	"version": "5.1.0",
 	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,7 +47,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
-		"vitest": "^5.0.3"
+		"vitest": "^5.0.5"
 	},
 	"publishConfig": {
 		"access": "public"

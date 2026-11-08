@@ -264,16 +264,16 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-breadcrumbs',
 			label: showBlockBreadcrumbs
-				? __( 'Hide block breadcrumbs' )
-				: __( 'Show block breadcrumbs' ),
+				? __( 'Hide editor footer' )
+				: __( 'Show editor footer' ),
 			category: 'command',
 			callback: ( { close } ) => {
 				toggle( 'core', 'showBlockBreadcrumbs' );
 				close();
 				createInfoNotice(
 					showBlockBreadcrumbs
-						? __( 'Breadcrumbs hidden.' )
-						: __( 'Breadcrumbs visible.' ),
+						? __( 'Editor footer hidden.' )
+						: __( 'Editor footer visible.' ),
 					{
 						id: 'core/editor/toggle-breadcrumbs/notice',
 						type: 'snackbar',
