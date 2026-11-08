@@ -22,15 +22,34 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 	const BLOCK_KEYS = array( 'name', 'attributes', 'inner_blocks', 'inner_html', 'inner_content' );
 
 	/**
+	 * Query parameters that request `content.blocks`.
+	 *
+	 * @var array<string, string>
+	 */
+	const BLOCKS_PARAMS = array(
+		'context' => 'edit',
+		'_fields' => 'id,content.blocks',
+	);
+
+	/**
 	 * Editor user ID.
 	 *
 	 * @var int
 	 */
 	protected static int $editor_id;
 
+	/**
+	 * Contributor user ID.
+	 *
+	 * @var int
+	 */
+	protected static int $contributor_id;
+
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
-		$editor_id       = $factory->user->create( array( 'role' => 'editor' ) );
-		self::$editor_id = is_int( $editor_id ) ? $editor_id : 0;
+		$editor_id            = $factory->user->create( array( 'role' => 'editor' ) );
+		$contributor_id       = $factory->user->create( array( 'role' => 'contributor' ) );
+		self::$editor_id      = is_int( $editor_id ) ? $editor_id : 0;
+		self::$contributor_id = is_int( $contributor_id ) ? $contributor_id : 0;
 	}
 
 	public function set_up(): void {
@@ -54,34 +73,47 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Requests a post through the REST API and returns its `content` field.
+	 * Sends a GET request and returns the response data.
 	 *
-	 * @param int                  $post_id Post ID.
-	 * @param array<string, mixed> $params  Query parameters.
-	 * @return array<mixed> The `content` field.
+	 * @param string               $route  REST route.
+	 * @param array<string, mixed> $params Query parameters.
+	 * @return array<mixed> Response data.
 	 */
-	private function get_content( int $post_id, array $params = array() ): array {
-		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+	private function get( string $route, array $params ): array {
+		$request = new WP_REST_Request( 'GET', $route );
 		$request->set_query_params( $params );
 		$response = rest_do_request( $request );
 		$this->assertSame( 200, $response->get_status() );
 
 		$data = rest_get_server()->response_to_data( $response, false );
 		$this->assertIsArray( $data );
+
+		return $data;
+	}
+
+	/**
+	 * Requests a post and returns its `content` field.
+	 *
+	 * @param int                  $post_id Post ID.
+	 * @param array<string, mixed> $params  Query parameters.
+	 * @return array<mixed> The `content` field.
+	 */
+	private function get_content( int $post_id, array $params ): array {
+		$data = $this->get( '/wp/v2/posts/' . $post_id, $params );
 		$this->assertIsArray( $data['content'] );
 
 		return $data['content'];
 	}
 
 	/**
-	 * Returns `content.blocks` for a post.
+	 * Requests a post as an editor and returns `content.blocks`.
 	 *
-	 * @param int                  $post_id Post ID.
-	 * @param array<string, mixed> $params  Query parameters.
+	 * @param int $post_id Post ID.
 	 * @return array<mixed> Block data.
 	 */
-	private function get_blocks( int $post_id, array $params = array() ): array {
-		$content = $this->get_content( $post_id, $params );
+	private function get_blocks( int $post_id ): array {
+		wp_set_current_user( self::$editor_id );
+		$content = $this->get_content( $post_id, self::BLOCKS_PARAMS );
 		$this->assertArrayHasKey( 'blocks', $content );
 		$this->assertIsArray( $content['blocks'] );
 
@@ -114,35 +146,62 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( '"name":"core\/group","attributes":{}', $json );
 	}
 
-	public function test_fields_param_skips_blocks(): void {
-		$content = $this->get_content( $this->create_post(), array( '_fields' => 'content.rendered' ) );
+	public function test_password_protected_post_shows_blocks_to_editor(): void {
+		$this->assertCount( 2, $this->get_blocks( $this->create_post( array( 'post_password' => 'secret' ) ) ) );
+	}
+
+	public function test_blocks_are_not_added_in_view_context(): void {
+		$content = $this->get_content(
+			$this->create_post(),
+			array(
+				'context' => 'view',
+				'_fields' => 'content.blocks',
+			)
+		);
 
 		$this->assertArrayNotHasKey( 'blocks', $content );
 	}
 
-	public function test_fields_param_can_request_only_blocks(): void {
-		$content = $this->get_content( $this->create_post(), array( '_fields' => 'content.blocks' ) );
-
-		$this->assertSame( array( 'blocks' ), array_keys( $content ) );
-	}
-
-	public function test_password_protected_post_hides_blocks(): void {
-		$post_id = $this->create_post( array( 'post_password' => 'secret' ) );
-
-		$this->assertSame( array(), $this->get_blocks( $post_id ) );
-	}
-
-	public function test_password_protected_post_shows_blocks_with_password(): void {
-		$post_id = $this->create_post( array( 'post_password' => 'secret' ) );
-
-		$this->assertCount( 2, $this->get_blocks( $post_id, array( 'password' => 'secret' ) ) );
-	}
-
-	public function test_password_protected_post_shows_blocks_to_editor_in_edit_context(): void {
-		$post_id = $this->create_post( array( 'post_password' => 'secret' ) );
+	public function test_blocks_are_not_added_unless_requested(): void {
 		wp_set_current_user( self::$editor_id );
 
-		$this->assertCount( 2, $this->get_blocks( $post_id, array( 'context' => 'edit' ) ) );
+		$this->assertArrayNotHasKey( 'blocks', $this->get_content( $this->create_post(), array( 'context' => 'edit' ) ) );
+		$this->assertArrayNotHasKey(
+			'blocks',
+			$this->get_content(
+				$this->create_post(),
+				array(
+					'context' => 'edit',
+					'_fields' => 'content',
+				)
+			)
+		);
+	}
+
+	public function test_collection_skips_posts_the_user_cannot_edit(): void {
+		$own_post_id   = $this->create_post(
+			array(
+				'post_author' => self::$contributor_id,
+				'post_status' => 'draft',
+			)
+		);
+		$other_post_id = $this->create_post( array( 'post_author' => self::$editor_id ) );
+		wp_set_current_user( self::$contributor_id );
+
+		$items = $this->get( '/wp/v2/posts', array_merge( self::BLOCKS_PARAMS, array( 'status' => 'draft,publish' ) ) );
+
+		$blocks_by_id = array();
+		foreach ( $items as $item ) {
+			$this->assertIsArray( $item );
+			$this->assertIsInt( $item['id'] );
+			$this->assertIsArray( $item['content'] );
+			$blocks_by_id[ $item['id'] ] = $item['content']['blocks'] ?? null;
+		}
+
+		// Core may leave the post out of an edit context collection entirely.
+		$this->assertNull( $blocks_by_id[ $other_post_id ] ?? null, 'Blocks should not be added for posts the user cannot edit.' );
+		$this->assertArrayHasKey( $own_post_id, $blocks_by_id );
+		$this->assertIsArray( $blocks_by_id[ $own_post_id ] );
 	}
 
 	public function test_schema_includes_blocks(): void {
@@ -153,19 +212,7 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 		$this->assertIsArray( $data['schema']['properties'] );
 		$this->assertIsArray( $data['schema']['properties']['content'] );
 		$this->assertIsArray( $data['schema']['properties']['content']['properties'] );
-		$this->assertArrayHasKey( 'blocks', $data['schema']['properties']['content']['properties'] );
-	}
-
-	public function test_filter_disables_blocks_for_post_type(): void {
-		add_filter(
-			'gutenberg_add_blocks_to_rest_for_post_type',
-			static function ( bool $show_blocks, string $post_type ): bool {
-				return 'post' === $post_type ? false : $show_blocks;
-			},
-			10,
-			2
-		);
-
-		$this->assertArrayNotHasKey( 'blocks', $this->get_content( $this->create_post() ) );
+		$this->assertIsArray( $data['schema']['properties']['content']['properties']['blocks'] );
+		$this->assertSame( array( 'edit' ), $data['schema']['properties']['content']['properties']['blocks']['context'] );
 	}
 }

@@ -44,7 +44,9 @@ function gutenberg_prepare_blocks_for_rest( array $parsed_blocks ): array {
 /**
  * Adds `content.blocks` to a post REST API response.
  *
- * Follows the same password rules as `content.rendered`.
+ * Blocks hold the raw stored markup, so like `content.raw` they need the
+ * `edit` context and permission to edit the post. They are also opt-in:
+ * the request must name `content.blocks` in `_fields`.
  *
  * @param WP_REST_Response|mixed $response The response object.
  * @param WP_Post|mixed          $post     Post object.
@@ -56,23 +58,22 @@ function gutenberg_add_blocks_to_post_rest_response( $response, $post, $request 
 		return $response;
 	}
 
-	$data = $response->get_data();
-	if ( ! is_array( $data ) || ! isset( $data['content'] ) || ! is_array( $data['content'] ) ) {
-		return $response;
-	}
-
 	$fields = $request['_fields'];
-	if ( ( is_string( $fields ) || is_array( $fields ) ) && ! rest_is_field_included( 'content.blocks', wp_parse_list( $fields ) ) ) {
+	if (
+		'edit' !== $request['context'] ||
+		! ( is_string( $fields ) || is_array( $fields ) ) ||
+		! in_array( 'content.blocks', wp_parse_list( $fields ), true ) ||
+		! current_user_can( 'edit_post', $post->ID )
+	) {
 		return $response;
 	}
 
-	$can_view_content = true;
-	if ( '' !== $post->post_password ) {
-		$can_view_content = ( 'edit' === $request['context'] && current_user_can( 'edit_post', $post->ID ) ) ||
-			( is_string( $request['password'] ) && hash_equals( $post->post_password, $request['password'] ) );
+	$data = $response->get_data();
+	if ( ! is_array( $data ) || ! isset( $data['content'] ) || ! is_array( $data['content'] ) || isset( $data['content']['blocks'] ) ) {
+		return $response;
 	}
 
-	$data['content']['blocks'] = $can_view_content ? gutenberg_prepare_blocks_for_rest( parse_blocks( $post->post_content ) ) : array();
+	$data['content']['blocks'] = gutenberg_prepare_blocks_for_rest( parse_blocks( $post->post_content ) );
 	$response->set_data( $data );
 
 	return $response;
@@ -97,9 +98,9 @@ function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
 	}
 
 	$properties['content']['properties']['blocks'] = array(
-		'description' => __( 'Blocks parsed from the content.', 'gutenberg' ),
+		'description' => __( 'Blocks parsed from the content. Only returned when requested with _fields.', 'gutenberg' ),
 		'type'        => 'array',
-		'context'     => array( 'view', 'edit' ),
+		'context'     => array( 'edit' ),
 		'readonly'    => true,
 		'items'       => array(
 			'type'       => 'object',
@@ -115,6 +116,7 @@ function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
 				'inner_blocks'  => array(
 					'description' => __( 'Nested blocks, in the same shape.', 'gutenberg' ),
 					'type'        => 'array',
+					'items'       => array( 'type' => 'object' ),
 				),
 				'inner_html'    => array(
 					'description' => __( 'Block HTML without its inner blocks.', 'gutenberg' ),
@@ -123,6 +125,7 @@ function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
 				'inner_content' => array(
 					'description' => __( 'HTML chunks, with null where each inner block goes.', 'gutenberg' ),
 					'type'        => 'array',
+					'items'       => array( 'type' => array( 'string', 'null' ) ),
 				),
 			),
 		),
@@ -140,16 +143,6 @@ function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
 function gutenberg_register_post_rest_blocks(): void {
 	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
 		if ( ! post_type_supports( $post_type, 'editor' ) ) {
-			continue;
-		}
-
-		/**
-		 * Filters whether REST API responses for a post type include `content.blocks`.
-		 *
-		 * @param bool   $show_blocks Whether to include `content.blocks`. Default true.
-		 * @param string $post_type   Post type slug.
-		 */
-		if ( ! apply_filters( 'gutenberg_add_blocks_to_rest_for_post_type', true, $post_type ) ) {
 			continue;
 		}
 
