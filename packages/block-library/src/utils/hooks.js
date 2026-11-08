@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useSelect, useRegistry } from '@wordpress/data';
-import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -155,15 +155,14 @@ export function useToolsPanelDropdownMenuProps() {
 export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 	const registry = useRegistry();
 
-	// Keep the latest callbacks in a ref so registration happens exactly once
-	// per item while the store still calls the current handlers. Registering
-	// on every callback identity change would loop: dispatching
-	// registerItemCallbacks replaces the queue item, which would re-trigger
-	// an effect depending on it.
-	const latestCallbacksRef = useRef( { onChange, onError } );
-	useLayoutEffect( () => {
-		latestCallbacksRef.current = { onChange, onError };
-	} );
+	// Stable handlers that call the latest callbacks, so registration happens
+	// exactly once per item. Registering on every callback identity change
+	// would loop: dispatching registerItemCallbacks replaces the queue item,
+	// which would re-trigger an effect depending on it.
+	const handleChange = useEvent( ( attachments ) =>
+		onChange?.( attachments?.[ 0 ] )
+	);
+	const handleError = useEvent( ( error ) => onError?.( error ) );
 	const registeredItemIdRef = useRef();
 
 	// Only PendingResume (loaded-from-storage) items need the block to
@@ -192,14 +191,9 @@ export function useResumeUploadFromMarker( { uploadId, onChange, onError } ) {
 		// intentionally omitted.
 		unlock( registry.dispatch( uploadStore ) ).registerItemCallbacks(
 			uploadId,
-			{
-				onChange: ( attachments ) =>
-					latestCallbacksRef.current.onChange?.( attachments?.[ 0 ] ),
-				onError: ( error ) =>
-					latestCallbacksRef.current.onError?.( error ),
-			}
+			{ onChange: handleChange, onError: handleError }
 		);
-	}, [ uploadId, item, registry ] );
+	}, [ uploadId, item, registry, handleChange, handleError ] );
 
 	return item?.attachment?.url;
 }

@@ -381,11 +381,7 @@ export function ImageEdit( {
 	} );
 
 	// Show the recreated preview while a resumed upload is pending.
-	useEffect( () => {
-		if ( resumePreviewURL && ! temporaryURL ) {
-			setTemporaryURL( resumePreviewURL );
-		}
-	}, [ resumePreviewURL, temporaryURL ] );
+	const previewURL = temporaryURL || resumePreviewURL;
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -413,7 +409,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL || isSideloading,
+		'is-transient': !! previewURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -508,7 +504,7 @@ export function ImageEdit( {
 		<>
 			<figure { ...blockProps }>
 				<Image
-					temporaryURL={ temporaryURL }
+					temporaryURL={ previewURL }
 					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -536,7 +532,7 @@ export function ImageEdit( {
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }
 					mediaPreview={ mediaPreview }
-					disableMediaButtons={ temporaryURL || url }
+					disableMediaButtons={ previewURL || url }
 				/>
 			</figure>
 			{

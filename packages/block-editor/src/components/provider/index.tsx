@@ -216,7 +216,7 @@ function mediaUpload(
 		additionalData,
 		allowedTypes,
 		uploadId,
-		postId: additionalData?.post,
+		postId: additionalData?.post as number | undefined,
 	} );
 }
 
@@ -307,7 +307,7 @@ async function heicMediaUpload(
 			additionalData,
 			allowedTypes,
 			uploadId,
-			postId: additionalData?.post,
+			postId: additionalData?.post as number | undefined,
 		} );
 	}
 
