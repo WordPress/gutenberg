@@ -29,6 +29,7 @@ import {
 	useNoteThreads,
 	usePickNote,
 } from './hooks';
+import { useReattachOrphanedNotes } from './use-reattach-orphaned-notes';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -64,7 +65,8 @@ function NotesSidebar( { postId, drafts } ) {
 			};
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const { notes, unresolvedNotes, hasResolved } = useNoteThreads( postId );
+	useReattachOrphanedNotes( notes, hasResolved );
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
