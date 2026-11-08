@@ -2,11 +2,8 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import { randomUUID } from 'node:crypto';
-import { test, expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * @typedef {import('@playwright/test').Page} Page
- */
+import type { Locator, Page } from '@playwright/test';
+import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
 
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 
@@ -19,18 +16,13 @@ const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
  */
 const VIDEO_FIXTURE = '160x120-transcode-test.webm';
 
-test.use( {
-	videoTranscodingUtils: async ( { page }, use ) => {
-		await use( new VideoTranscodingUtils( { page } ) );
-	},
-} );
-
 /**
  * Shared utilities for the video transcoding e2e tests.
  */
 class VideoTranscodingUtils {
-	constructor( { page } ) {
-		/** @type {Page} */
+	page: Page;
+
+	constructor( { page }: { page: Page } ) {
 		this.page = page;
 	}
 
@@ -38,11 +30,11 @@ class VideoTranscodingUtils {
 	 * Upload a fixture to the given input element. Copies the asset to a
 	 * unique temp file to avoid cross-test collisions.
 	 *
-	 * @param {import('@playwright/test').Locator} inputElement File input locator.
-	 * @param {string}                             fileName     File name in the assets directory.
-	 * @return {Promise<string>} Unique file name (without extension).
+	 * @param inputElement File input locator.
+	 * @param fileName     File name in the assets directory.
+	 * @return Unique file name (without extension).
 	 */
-	async upload( inputElement, fileName ) {
+	async upload( inputElement: Locator, fileName: string ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-video-' )
 		);
@@ -57,12 +49,12 @@ class VideoTranscodingUtils {
 	/**
 	 * Wait for the upload-media store queue to drain.
 	 *
-	 * @param {number} timeout Timeout in milliseconds.
+	 * @param timeout Timeout in milliseconds.
 	 */
 	async waitForUploadQueueEmpty( timeout = 120000 ) {
 		await this.page.waitForFunction(
 			() => {
-				const items = window.wp.data
+				const items = ( window as any ).wp.data
 					.select( 'core/upload-media' )
 					.getItems();
 				return items.length === 0;
@@ -75,11 +67,14 @@ class VideoTranscodingUtils {
 	/**
 	 * Skip this test if client-side video transcoding is not active.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object.
+	 * @param testInstance      The test object.
+	 * @param testInstance.skip Skips the test when its condition is true.
 	 */
-	async skipIfTranscodingInactive( testInstance ) {
+	async skipIfTranscodingInactive( testInstance: {
+		skip: ( condition: boolean, description: string ) => void;
+	} ) {
 		const isActive = await this.page.evaluate( () => {
-			if ( ! window.__clientSideMediaProcessing ) {
+			if ( ! ( window as any ).__clientSideMediaProcessing ) {
 				return false;
 			}
 			return (
@@ -93,6 +88,12 @@ class VideoTranscodingUtils {
 		);
 	}
 }
+
+const test = base.extend< { videoTranscodingUtils: VideoTranscodingUtils } >( {
+	videoTranscodingUtils: async ( { page }, use ) => {
+		await use( new VideoTranscodingUtils( { page } ) );
+	},
+} );
 
 test.describe( 'Video transcoding: web-safe conversion', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -134,10 +135,10 @@ test.describe( 'Video transcoding: web-safe conversion', () => {
 		await videoTranscodingUtils.waitForUploadQueueEmpty( 120_000 );
 
 		const block = await page.evaluate( () =>
-			window.wp.data
+			( window as any ).wp.data
 				.select( 'core/block-editor' )
 				.getBlocks()
-				.find( ( b ) => b.name === 'core/video' )
+				.find( ( b: { name: string } ) => b.name === 'core/video' )
 		);
 
 		// The block plays the web-safe MP4 companion, not a blob URL.
@@ -178,10 +179,11 @@ test.describe( 'Video transcoding: web-safe conversion', () => {
 
 		const optimizedSrc = await page.evaluate(
 			() =>
-				window.wp.data
+				( window as any ).wp.data
 					.select( 'core/block-editor' )
 					.getBlocks()
-					.find( ( b ) => b.name === 'core/video' ).attributes.src
+					.find( ( b: { name: string } ) => b.name === 'core/video' )
+					.attributes.src
 		);
 		expect( optimizedSrc ).toMatch( /\.mp4(\?.*)?$/i );
 
@@ -195,10 +197,11 @@ test.describe( 'Video transcoding: web-safe conversion', () => {
 
 		const originalSrc = await page.evaluate(
 			() =>
-				window.wp.data
+				( window as any ).wp.data
 					.select( 'core/block-editor' )
 					.getBlocks()
-					.find( ( b ) => b.name === 'core/video' ).attributes.src
+					.find( ( b: { name: string } ) => b.name === 'core/video' )
+					.attributes.src
 		);
 		expect( originalSrc ).toMatch( /\.webm(\?.*)?$/i );
 	} );
@@ -239,11 +242,13 @@ test.describe( 'Video transcoding: web-safe conversion', () => {
 			.poll( () =>
 				page.evaluate(
 					() =>
-						window.wp.data
+						( window as any ).wp.data
 							.select( 'core/block-editor' )
 							.getBlocks()
-							.filter( ( b ) => b.name === 'core/video' )[ 1 ]
-							?.attributes.src
+							.filter(
+								( b: { name: string } ) =>
+									b.name === 'core/video'
+							)[ 1 ]?.attributes.src
 				)
 			)
 			.toMatch( /\.mp4(\?.*)?$/i );
