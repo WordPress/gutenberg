@@ -6,7 +6,6 @@ import Modal from '../../modal';
 import { ConfirmDialog } from '..';
 // The z-index contract spans ConfirmDialog's CSS Module and Modal's global
 // overlay styles, so load the same global stylesheet WordPress enqueues.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../modal/style.scss';
 
 const noop = () => {};

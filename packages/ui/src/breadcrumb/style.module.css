@@ -19,7 +19,7 @@
 			max-inline-size: 100%;
 			margin: 0;
 			padding-block: var(--wp-ui-breadcrumb-ring-space);
-			padding-inline: var(--wp-ui-breadcrumb-ring-space);
+			padding-inline: calc(var(--wp-ui-breadcrumb-ring-space) + var(--wpds-dimension-padding-xs));
 			overflow-x: auto;
 			overflow-y: hidden;
 			list-style: none;
@@ -66,9 +66,15 @@
 			text-overflow: ellipsis;
 		}
 
+		/* Match the label inset of buttons, including their transparent border. */
+		.link:not(.button-item),
+		.current {
+			padding-inline: calc(var(--wpds-dimension-padding-xs) + 1px);
+		}
+
 		.separator {
 			flex: 0 0 auto;
-			padding-inline: var(--wpds-dimension-gap-sm);
+			padding-inline: var(--wpds-dimension-padding-xs);
 			color: var(--wpds-color-stroke-surface-neutral-strong);
 			user-select: none;
 
@@ -111,13 +117,22 @@
 
 		.root .list {
 			--_gcd-ol-padding-block: var(--wp-ui-breadcrumb-ring-space);
-			--_gcd-ol-padding-inline: var(--wp-ui-breadcrumb-ring-space);
+			--_gcd-ol-padding-inline: calc(var(--wp-ui-breadcrumb-ring-space) + var(--wpds-dimension-padding-xs));
 		}
 	}
 
 	@layer compositions {
+		.button-item,
 		.overflow-trigger {
-			--wp-ui-button-min-width: unset;
+			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-xs);
+		}
+
+		.button-item {
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-default);
+		}
+
+		.overflow-trigger {
+			--wp-ui-button-min-width: var(--wpds-dimension-size-sm);
 		}
 	}
 }

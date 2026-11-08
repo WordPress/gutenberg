@@ -68,9 +68,9 @@ _Returns_
 
 Performs some basic cleanup of a string for use as a post slug.
 
-This replicates some of what `sanitize_title_with_dashes()` does in WordPress core, but is only designed to approximate what the slug will be.
+This replicates what `sanitize_title()` does in WordPress core when saving a post, without the `sanitize_title` filters and the locale-specific transliterations of `remove_accents()`, so it can only approximate what the slug will be. It works on decoded characters, while WordPress returns the slug percent-encoded, and keeps percent-encoded octets as they are. Like WordPress, it keeps what fits in 200 percent-encoded characters.
 
-Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin letters. Removes combining diacritical marks. Converts whitespace, periods, and forward slashes to hyphens. Removes any remaining non-word characters except hyphens. Converts remaining string to lowercase. It does not account for octets, HTML entities, or other encoded characters.
+Converts accented letters to basic Latin letters, and strips HTML tags and entities. Converts spaces, periods, forward slashes, dashes and wide spaces to hyphens. Strips the punctuation and invisible characters WordPress strips, and any other ASCII character that isn't a letter, a number, an underscore or a hyphen. Keeps other characters, such as letters of other scripts and emoji. Converts the string to lowercase.
 
 _Parameters_
 

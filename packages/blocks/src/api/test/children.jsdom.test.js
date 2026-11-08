@@ -78,6 +78,7 @@ describe( 'concat', () => {
 			},
 		} );
 
+		expect( console ).toHaveWarned();
 		expect( result ).toEqual( [
 			'Hello ',
 			{

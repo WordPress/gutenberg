@@ -4,7 +4,8 @@ import { VisuallyHidden } from '../';
 
 const meta: Meta< typeof VisuallyHidden > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/VisuallyHidden',
+	title: 'Components/@wordpress-ui/VisuallyHidden',
+	id: 'design-system-components-visuallyhidden',
 	component: VisuallyHidden,
 	parameters: {
 		componentStatus: {

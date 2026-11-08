@@ -13,6 +13,13 @@ const { AsyncDependenciesBlock } = webpack;
 
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
+/**
+ * Lazily instantiated shared PHP printer.
+ *
+ * @type {undefined | ( ( data: unknown ) => string )}
+ */
+let phpPrinter;
+
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
@@ -129,12 +136,18 @@ class DependencyExtractionWebpackPlugin {
 	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php(
+			if ( ! phpPrinter ) {
+				phpPrinter = json2php.make( {
+					linebreak: '\n',
+					indent: '\t',
+				} );
+			}
+			return `<?php return ${ phpPrinter(
 				JSON.parse( JSON.stringify( asset ) )
 			) };\n`;
 		}
 
-		return JSON.stringify( asset );
+		return JSON.stringify( asset, null, '\t' );
 	}
 
 	/** @type {webpack.WebpackPluginInstance['apply']} */

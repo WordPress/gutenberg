@@ -4,11 +4,11 @@ import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { authorField } from '@wordpress/fields';
 import { Badge, Stack, Text } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { PostContentInformationUI } from '../post-content-information';
+import authorField from './author-field';
 
 const PAGE_SIZE = 10;
 const EMPTY_ARRAY = [];

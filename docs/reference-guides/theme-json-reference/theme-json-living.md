@@ -62,6 +62,7 @@ Settings related to background.
 | backgroundImage | Allow users to set a background image. | `boolean` | `false` |
 | backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
 | gradient | Allow users to set a gradient background. | `boolean` | `false` |
+| backgroundClip | Allow users to set background clip. Pass true for all methods, or an array of CSS values: ["text", "padding-box", "border-box", "content-box"]. | `boolean`, `[ string ]` |  |
 
 ---
 
@@ -254,6 +255,7 @@ Background styles.
 | backgroundRepeat | Sets the `background-repeat` CSS property. | `string`, `{ ref }` |
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
+| backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
 
 ---
 
@@ -341,7 +343,7 @@ Spacing styles.
 
 | Property | Description | Type |
 | -------- | ----------- | ---- |
-| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. | `string`, `{ ref }` |
+| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now. | `string`, `{ ref }`, `{ top, left }` |
 | margin | Margin styles. | `{ top, right, bottom, left }` |
 | padding | Padding styles. | `{ top, right, bottom, left }` |
 

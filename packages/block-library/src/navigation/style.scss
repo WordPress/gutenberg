@@ -268,18 +268,18 @@ $navigation-icon-size: 24px;
 		height: auto;
 	}
 
-	// Show submenus on hover unless they open on click.
+	// Show submenus on hover unless they open on click or are always shown.
 	// Restricted to true-hover devices to prevent sticky touch-hover on mobile.
 	@media (hover: hover) {
-		&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+		&:not(.open-on-click):not(.open-always):hover > .wp-block-navigation__submenu-container {
 			@include show-submenu;
 			min-width: 200px;
 		}
 	}
 	// Keep submenus open when focus is within.
-	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
+	&:not(.open-on-click):not(.open-on-hover-click):not(.open-always):focus-within > .wp-block-navigation__submenu-container,
 	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+	&:not(.open-always) .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
 		@include show-submenu;
 		min-width: 200px;
 	}
@@ -333,6 +333,8 @@ $navigation-icon-size: 24px;
 			border: none;
 			background-color: transparent;
 			color: inherit;
+			// Has to be !important to override the inline instance style.
+			box-shadow: none !important;
 		}
 	}
 }
@@ -699,6 +701,12 @@ button.wp-block-navigation-item__content {
 			.wp-block-page-list {
 				color: inherit !important;
 				background: transparent !important;
+			}
+
+			// Submenus unfold inline here, so drop the dropdown shadow.
+			// Has to be !important to override the inline instance style.
+			.wp-block-navigation-item .wp-block-navigation__submenu-container {
+				box-shadow: none !important;
 			}
 
 			// Override justification dropdown menu positioning rules.

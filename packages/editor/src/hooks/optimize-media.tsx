@@ -4,9 +4,9 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorControls,
 	store as blockEditorStore,
-	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
-import { PanelBody, Button, Spinner } from '@wordpress/components';
+import { PanelBody, Button } from '@wordpress/components';
+import { Spinner } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
@@ -261,7 +261,7 @@ function FeaturedImageOptimizeControl( {
 	);
 	return (
 		<OptimizeControl
-			attachmentId={ featuredMedia }
+			attachmentId={ featuredMedia as number | undefined }
 			onComplete={ ( media ) => setFeaturedMedia( media.id ) }
 		/>
 	);

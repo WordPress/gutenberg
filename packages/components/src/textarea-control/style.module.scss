@@ -6,7 +6,7 @@
 	display: block;
 	background: $components-color-background;
 	color: $components-color-foreground;
-	/* stylelint-disable-next-line logical-css/require-logical-keywords -- Preserve Emotion `resize: vertical`; `block` is not equivalent in vertical writing modes. */
+	/* stylelint-disable-next-line logical-css/require-logical-keywords -- Preserve `resize: vertical`; `block` is not equivalent in vertical writing modes. */
 	resize: vertical;
 
 	@include input-control;
@@ -28,7 +28,7 @@
 	}
 
 	// Use opacity to work in various editor styles.
-	// Keep the legacy vendor placeholders from the Emotion styles for parity
+	// Keep the legacy vendor placeholder selectors.
 	&::-webkit-input-placeholder {
 		color: $components-color-dark-gray-placeholder;
 	}

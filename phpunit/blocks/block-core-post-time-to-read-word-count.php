@@ -19,9 +19,9 @@ class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 	 * @param int    $characters_including_spaces Expected value if the count type is based on single character including spaces.
 	 */
 	public function test_word_count( $input_string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'words' ), $words );
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_excluding_spaces' ), $characters_excluding_spaces );
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_including_spaces' ), $characters_including_spaces );
+		$this->assertSame( $words, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'words' ) );
+		$this->assertSame( $characters_excluding_spaces, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_excluding_spaces' ) );
+		$this->assertSame( $characters_including_spaces, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_including_spaces' ) );
 	}
 
 	/**
