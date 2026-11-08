@@ -447,7 +447,7 @@ function gutenberg_attach_block_response_callback( $post_types ) {
 		 * @param string $post_type           The post type.
 		 */
 		if ( apply_filters( 'gutenberg_add_blocks_to_rest_for_post_type', true, $post_type ) ) {
-			add_filter( 'rest_prepare_' . $post_type, 'gutenberg_extract_blocks_from_post_content', 10, 3 );
+			add_filter( 'rest_prepare_' . $post_type, 'gutenberg_extract_blocks_from_post_content', 10, 2 );
 		}
 	}
 }
