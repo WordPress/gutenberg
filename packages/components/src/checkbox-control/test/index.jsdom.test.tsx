@@ -66,10 +66,12 @@ describe( 'CheckboxControl', () => {
 
 		it( 'should render the indeterminate icon when in the indeterminate state', () => {
 			const id = 'checkbox-control';
-			const { asFragment, rerender } = render(
+			const { rerender } = render(
 				<BaseCheckboxControl id={ id } onChange={ noop } />
 			);
-			const checkboxDefault = asFragment();
+			expect(
+				screen.queryByRole( 'presentation', { hidden: true } )
+			).not.toBeInTheDocument();
 
 			rerender(
 				<BaseCheckboxControl
@@ -78,12 +80,9 @@ describe( 'CheckboxControl', () => {
 					indeterminate
 				/>
 			);
-			const checkboxIndeterminate = asFragment();
-
-			// Expect the diff snapshot to be mostly about the indeterminate icon
-			expect( checkboxDefault ).toMatchDiffSnapshot(
-				checkboxIndeterminate
-			);
+			expect(
+				screen.getByRole( 'presentation', { hidden: true } )
+			).toHaveClass( 'components-checkbox-control__indeterminate' );
 		} );
 
 		it( 'should associate the `help` text accessibly', () => {

@@ -1,4 +1,6 @@
-import { PointerCircle } from './styles/focal-point-style';
+import clsx from 'clsx';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { FocalPointProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -10,9 +12,14 @@ export default function FocalPoint( {
 	const style = { left, top };
 
 	return (
-		<PointerCircle
+		<PolymorphicElement
+			as="div"
 			{ ...props }
-			className="components-focal-point-picker__icon_container"
+			className={ clsx(
+				styles.pointer,
+				'components-focal-point-picker__icon_container',
+				{ [ styles[ 'is-dragging' ] ]: props.isDragging }
+			) }
 			style={ style }
 		/>
 	);

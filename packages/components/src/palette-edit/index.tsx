@@ -32,6 +32,7 @@ import { Heading } from '../heading';
 import { View } from '../view';
 import InputControl from '../input-control';
 import ColorIndicator from '../color-indicator';
+import { VisuallyHidden } from '../visually-hidden';
 import styles from './style.module.scss';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
@@ -240,19 +241,25 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 export function deduplicateElementSlugs< T extends PaletteElement >(
 	elements: T[]
 ) {
-	const slugCounts: { [ slug: string ]: number } = {};
+	// Reserve every existing slug so a duplicate cannot take a later item's ID.
+	const usedSlugs = new Set( elements.map( ( { slug } ) => slug ) );
+	const nextSuffixes = new Map< string, number >();
 
 	return elements.map( ( element ) => {
-		let newSlug: string | undefined;
-
 		const { slug } = element;
-		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+		let newSlug = slug;
+		let suffix = nextSuffixes.get( slug ) ?? 1;
 
-		if ( slugCounts[ slug ] > 1 ) {
-			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		if ( nextSuffixes.has( slug ) ) {
+			do {
+				newSlug = `${ slug }-${ suffix }`;
+				suffix++;
+			} while ( usedSlugs.has( newSlug ) );
+			usedSlugs.add( newSlug );
 		}
+		nextSuffixes.set( slug, suffix );
 
-		return { ...element, slug: newSlug ?? slug };
+		return { ...element, slug: newSlug };
 	} );
 }
 
@@ -315,6 +322,16 @@ function ColorPickerPopover< T extends PaletteElement >( {
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const dismissButton = (
+		<VisuallyHidden
+			as="button"
+			type="button"
+			tabIndex={ -1 }
+			onClick={ onClose }
+		>
+			{ __( 'Close' ) }
+		</VisuallyHidden>
+	);
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
 			() => ( {
@@ -335,7 +352,21 @@ function ColorPickerPopover< T extends PaletteElement >( {
 		);
 
 	return (
-		<Popover { ...popoverProps } onClose={ onClose }>
+		<Popover
+			role="dialog"
+			aria-label={ sprintf(
+				// translators: %s is a color, gradient or duotone name, e.g. "Red".
+				__( 'Edit: %s' ),
+				element.name.trim().length
+					? element.name
+					: getElementValue( element, variant ) || ''
+			) }
+			{ ...popoverProps }
+			onClose={ onClose }
+		>
+			{ /* Screen reader users can dismiss from either end of the popup
+			     without adding a visible control or a keyboard Tab stop. */ }
+			{ dismissButton }
 			{ variant === 'color' && (
 				<ColorPicker
 					color={ element.color }
@@ -403,6 +434,7 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					</VStack>
 				</div>
 			) }
+			{ dismissButton }
 		</Popover>
 	);
 }

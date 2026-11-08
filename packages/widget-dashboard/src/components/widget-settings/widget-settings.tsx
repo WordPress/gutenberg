@@ -3,8 +3,12 @@ import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Drawer } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Drawer,
+} from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
