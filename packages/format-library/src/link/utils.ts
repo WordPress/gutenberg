@@ -192,8 +192,8 @@ export function createLinkFormat( {
 export function getFormatBoundary(
 	value: RichTextValue,
 	format: RichTextFormat,
-	startIndex: number = value.start,
-	endIndex: number = value.end
+	startIndex = value.start,
+	endIndex = value.end
 ): {
 	start: number | undefined;
 	end: number | undefined;
@@ -207,7 +207,11 @@ export function getFormatBoundary(
 	let targetFormat;
 	let initialIndex;
 
-	if ( ! formats?.length ) {
+	if (
+		! formats?.length ||
+		startIndex === undefined ||
+		endIndex === undefined
+	) {
 		return EMPTY_BOUNDARIES;
 	}
 

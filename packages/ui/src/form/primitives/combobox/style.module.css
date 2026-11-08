@@ -2,6 +2,10 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
+		.search-icon:dir(ltr) {
+			transform: scaleX(-1);
+		}
+
 		.positioner {
 			z-index: var(--wp-ui-combobox-z-index, initial);
 		}

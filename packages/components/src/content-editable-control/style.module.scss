@@ -19,7 +19,6 @@
 
 	// Subtract 1px to account for the border, which isn't included on the element
 	// on newer components like InputControl, SelectControl, etc.
-	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
 	padding: $grid-unit-15;
 
 	// Match the disabled treatment of native form controls (see the

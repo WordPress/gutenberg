@@ -59,7 +59,8 @@ export const AddNavigationModal = ( {
 				// Navigate to the newly created navigation menu
 				navigate( {
 					to: `/navigation/edit/${ encodeURIComponent(
-						savedRecord.id
+						// Saved navigation menus have a numeric ID.
+						savedRecord.id as number
 					) }`,
 				} );
 			}

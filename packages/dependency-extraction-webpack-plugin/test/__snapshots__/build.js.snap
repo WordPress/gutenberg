@@ -253,7 +253,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`no-default\` > sh
 	'dependencies' => array(
 		
 	),
-	'version' => 'ef50aa650dbfb7d400af',
+	'version' => 'e92a9548b4a6bd2acd81',
 	'type' => 'module'
 );
 "
@@ -418,7 +418,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 	'dependencies' => array(
 		'@wordpress/blob'
 	),
-	'version' => '5822b2168d9a9ad0ab52',
+	'version' => '0b4be29a9a428b9e8608',
 	'type' => 'module',
 	'handle' => 'runtime-chunk-single-modules-a'
 );
@@ -858,7 +858,7 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`no-default\` > sh
 	'dependencies' => array(
 		
 	),
-	'version' => '93d83bee525cbfa3ca27'
+	'version' => '9c20c9bd8e5f5841767b'
 );
 "
 `;
@@ -1029,7 +1029,7 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`runtime-chunk-sin
 	'dependencies' => array(
 		'wp-blob'
 	),
-	'version' => '10219f2e878437d6563a',
+	'version' => 'c4233136b50b85f54397',
 	'handle' => 'runtime-chunk-single-scripts-a'
 );
 "

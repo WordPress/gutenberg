@@ -6,7 +6,8 @@ import { Stack } from '../../stack';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
-	title: 'Design System/Components/Notice/Announcements',
+	title: 'Components/@wordpress-ui/Notice/Announcements',
+	id: 'design-system-components-notice-announcements',
 	component: Notice.Root,
 	tags: [ '!autodocs' ],
 	parameters: { controls: { disable: true } },
