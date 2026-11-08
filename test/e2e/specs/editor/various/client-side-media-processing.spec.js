@@ -1228,7 +1228,7 @@ test.describe( 'Client-side media processing', () => {
 		 * Simulate that worst-case ordering: hold the response of the first
 		 * attachment GET issued before `finalize` starts (reading its stale
 		 * body immediately), and deliver it only after the upload queue has
-		 * emptied and the finalized record has been fetched.
+		 * emptied and the finalized record has been received.
 		 */
 		let finalizeStarted = false;
 		let holding = false;

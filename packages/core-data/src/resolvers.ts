@@ -46,10 +46,7 @@ const lastReceivedResponse = new WeakMap<
  * `invalidateResolution` starts a second request for a record while the first
  * one may still be in flight, and the store keeps whichever response is
  * *delivered* last - even when its body was read from the database before the
- * newer one. Client-side media uploads hit this: the record fetched while
- * sub-sizes are still being generated carries an empty `media_details.sizes`,
- * and when it lands after the post-upload refetch it hides the sizes again.
- * See https://github.com/WordPress/gutenberg/issues/81844.
+ * newer one.
  *
  * Only responses to an identical request are compared, so a request for a
  * different set of `_fields` never discards another one's data.
@@ -80,6 +77,63 @@ function claimResponseOrder(
 		received.set( orderKey, sequence );
 		return true;
 	};
+}
+
+/**
+ * The stored record each `getEntityRecord` response last wrote, per registry
+ * and per record and context.
+ */
+const lastResolverWrite = new WeakMap<
+	CoreDataThunkArgs[ 'registry' ],
+	Map< string, unknown >
+>();
+
+/**
+ * Returns whether a complete record was received from outside the resolver -
+ * a save, or a response the caller stored itself - after a request began.
+ * Such a record is newer than that request's response, which must not
+ * overwrite it. The editor stores the finalize response of a client-side
+ * upload this way while an earlier read of the attachment may still be in
+ * flight. See https://github.com/WordPress/gutenberg/issues/81844.
+ *
+ * @param registry     A `@wordpress/data` registry.
+ * @param recordKey    Identifies the stored record and its context.
+ * @param storedBefore The stored record when the request began.
+ * @param storedNow    The stored record now.
+ *
+ * @return Whether the stored record changed without the resolver writing it.
+ */
+function wasReceivedElsewhere(
+	registry: CoreDataThunkArgs[ 'registry' ],
+	recordKey: string,
+	storedBefore: unknown,
+	storedNow: unknown
+): boolean {
+	return (
+		storedNow !== undefined &&
+		storedNow !== storedBefore &&
+		storedNow !== lastResolverWrite.get( registry )?.get( recordKey )
+	);
+}
+
+/**
+ * Remembers the stored record a `getEntityRecord` response just wrote.
+ *
+ * @param registry  A `@wordpress/data` registry.
+ * @param recordKey Identifies the stored record and its context.
+ * @param stored    The stored record after the write.
+ */
+function rememberResolverWrite(
+	registry: CoreDataThunkArgs[ 'registry' ],
+	recordKey: string,
+	stored: unknown
+) {
+	let writes = lastResolverWrite.get( registry );
+	if ( ! writes ) {
+		writes = new Map();
+		lastResolverWrite.set( registry, writes );
+	}
+	writes.set( recordKey, stored );
 }
 
 /**
@@ -186,12 +240,27 @@ export const getEntityRecord =
 				registry,
 				JSON.stringify( [ kind, name, key, query ?? null ] )
 			);
+			const context =
+				( query?.context as string | undefined ) ?? 'default';
+			const recordKey = JSON.stringify( [ kind, name, key, context ] );
+			const getStored = () =>
+				select.getStoredEntityRecord( kind, name, key, context );
+			const storedBefore = getStored();
 			const response = await apiFetch( { path, parse: false } );
 			const record: RestRecord = await response.json();
 
-			// A response to the same request has already been received since
-			// this one was made, so this record is known to be out of date.
-			if ( ! isFreshestResponse() ) {
+			// A newer copy of this record has already been received since
+			// this request was made, so this response is out of date.
+			if (
+				! isFreshestResponse() ||
+				( ! query?._fields &&
+					wasReceivedElsewhere(
+						registry,
+						recordKey,
+						storedBefore,
+						getStored()
+					) )
+			) {
 				return;
 			}
 
@@ -327,6 +396,7 @@ export const getEntityRecord =
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
+			rememberResolverWrite( registry, recordKey, getStored() );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}

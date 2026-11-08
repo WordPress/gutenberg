@@ -130,6 +130,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'getEntityRecord', () => {
 		const registry = { batch: ( callback ) => callback() };
+		const select = { getStoredEntityRecord: () => undefined };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
@@ -149,7 +150,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.shouldSync ).toHaveBeenCalledWith(
 				'postType',
@@ -173,20 +174,20 @@ describe( 'the entity sync interface', () => {
 
 		it( 'does not load records with a query, a string id, or when shouldSync declines', async () => {
 			await getEntityRecord( 'postType', 'post', 1, { context: 'view' } )(
-				{ dispatch, registry, resolveSelect }
+				{ select, dispatch, registry, resolveSelect }
 			);
 			await getEntityRecord(
 				'postType',
 				'post',
 				'hello-world'
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			manager.shouldSync.mockReturnValue( false );
 			await getEntityRecord(
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 		} );
@@ -196,7 +197,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 
@@ -228,7 +229,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 			const REFETCHED = { id: 1, title: 'Refetched' };
@@ -255,7 +256,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(

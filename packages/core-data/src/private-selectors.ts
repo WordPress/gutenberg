@@ -408,6 +408,32 @@ export function getEntityActionsConfig(
 }
 
 /**
+ * Returns the stored copy of a complete entity record, without resolving it.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record's key.
+ * @param context  REST context the record was received in.
+ *
+ * @return The stored record, or undefined if no complete record is stored.
+ */
+export function getStoredEntityRecord(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey,
+	context: string = 'default'
+): unknown {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState?.itemIsComplete[ context ]?.[ recordId ] ) {
+		return undefined;
+	}
+	return queriedState.items[ context ]?.[ recordId ];
+}
+
+/**
  * Returns the current sync connection status across all entities. Prioritizes
  * disconnected states, then connecting, then connected.
  *

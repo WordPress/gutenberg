@@ -68,8 +68,10 @@ describe( 'getEntityRecord', () => {
 		| 'finishResolutions'
 	>;
 	let syncManager: Record< string, Mock >;
+	let select: { getStoredEntityRecord: Mock };
 
 	beforeEach( async () => {
+		select = { getStoredEntityRecord: vi.fn() };
 		dispatch = Object.assign( vi.fn(), {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
@@ -97,7 +99,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -133,7 +135,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -180,7 +182,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// ...while the resolution is invalidated and requested again.
@@ -188,7 +190,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
@@ -232,14 +234,14 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'page'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		deliverPostResponse();
 		await postRequest;
@@ -259,6 +261,96 @@ describe( 'getEntityRecord', () => {
 			POST,
 			undefined
 		);
+	} );
+
+	it( 'ignores a response delivered after the record was received elsewhere', async () => {
+		const STALE_POST_TYPE = { slug: 'post', name: 'stale' };
+		const RECEIVED_POST_TYPE = { slug: 'post', name: 'received' };
+
+		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
+		const staleResponseGate = new Promise( ( resolve ) => {
+			deliverStaleResponse = resolve;
+		} );
+
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => staleResponseGate.then( () => STALE_POST_TYPE ),
+		} ) );
+
+		const staleRequest = getEntityRecord( 'root', 'postType', 'post', {
+			context: 'view',
+		} )( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// The record is received outside the resolver while the request is
+		// in flight, as the editor does with an upload's finalize response.
+		select.getStoredEntityRecord.mockReturnValue( RECEIVED_POST_TYPE );
+
+		deliverStaleResponse();
+		await staleRequest;
+
+		expect( select.getStoredEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			'post',
+			'view'
+		);
+		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+	} );
+
+	it( 'keeps a newer response delivered after an older one was received', async () => {
+		const OLDER_POST_TYPE = { slug: 'post', name: 'older' };
+		const NEWER_POST_TYPE = { slug: 'post', name: 'newer' };
+
+		// Stores each received record as a new object, like the reducer.
+		let stored: unknown;
+		select.getStoredEntityRecord.mockImplementation( () => stored );
+		dispatch.receiveEntityRecords.mockImplementation(
+			( _kind, _name, record ) => {
+				stored = { ...record };
+			}
+		);
+
+		let deliverOlderResponse: ( value?: unknown ) => void = () => {};
+		const olderResponseGate = new Promise( ( resolve ) => {
+			deliverOlderResponse = resolve;
+		} );
+		let deliverNewerResponse: ( value?: unknown ) => void = () => {};
+		const newerResponseGate = new Promise( ( resolve ) => {
+			deliverNewerResponse = resolve;
+		} );
+
+		apiFetchMock
+			.mockImplementationOnce( () => ( {
+				json: () => olderResponseGate.then( () => OLDER_POST_TYPE ),
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => newerResponseGate.then( () => NEWER_POST_TYPE ),
+			} ) );
+
+		const olderRequest = getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		const newerRequest = getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// Responses arrive in the order the requests were made.
+		deliverOlderResponse();
+		await olderRequest;
+		deliverNewerResponse();
+		await newerRequest;
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
+		expect( stored ).toEqual( NEWER_POST_TYPE );
 	} );
 
 	it( 'loads entity with sync manager', async () => {
@@ -288,6 +380,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -335,6 +428,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -366,7 +460,8 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
 		};
-		const select = {
+		const selectWithoutCollaboration = {
+			...select,
 			isCollaborationSupported: vi.fn( () => false ),
 		};
 
@@ -378,7 +473,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
-				select,
+				select: selectWithoutCollaboration,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -386,7 +481,9 @@ describe( 'getEntityRecord', () => {
 		);
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
-		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect(
+			selectWithoutCollaboration.isCollaborationSupported
+		).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
@@ -422,6 +519,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -467,6 +565,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -512,6 +611,7 @@ describe( 'getEntityRecord', () => {
 		// Call with a query parameter
 		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
