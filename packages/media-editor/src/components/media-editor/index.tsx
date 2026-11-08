@@ -20,6 +20,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -39,7 +40,7 @@ import {
 	isKeyboardEvent,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
-import type { Field, Form } from '@wordpress/dataviews';
+import { useFormValidity, type Field, type Form } from '@wordpress/dataviews';
 import type {
 	KeyboardEvent as ReactKeyboardEvent,
 	ReactElement,
@@ -53,7 +54,7 @@ import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaEditorImageControls from '../media-editor-image-controls';
-import MediaForm from '../media-form';
+import MediaForm, { DEFAULT_FORM } from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
@@ -228,6 +229,7 @@ function MediaEditorSidebar( {
 interface MediaEditorFrameContextValue {
 	isImage: boolean;
 	isSaving: boolean;
+	isFormValid: boolean;
 	hasMedia: boolean;
 	hasChanges: boolean;
 	isUndoRedoDisabled: boolean;
@@ -514,9 +516,10 @@ export interface SaveActionsProps {
 }
 
 function SaveActions( { size = 'default' }: SaveActionsProps ) {
-	const { isSaving, hasMedia, hasChanges, onCancel, onSave } =
+	const { isSaving, isFormValid, hasMedia, hasChanges, onCancel, onSave } =
 		useMediaEditorFrameContext();
-	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	const saveDisabled =
+		isSaving || ! hasMedia || ! hasChanges || ! isFormValid;
 	return (
 		<Stack
 			className="media-editor__save-actions"
@@ -747,6 +750,15 @@ function MediaEditorContent( {
 
 	// A bare replacement has no image editor change, so OR the flag in explicitly.
 	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
+	const editableFields = useMemo(
+		() => fields.filter( ( field ) => ! field.readOnly ),
+		[ fields ]
+	);
+	const { validity, isValid: isFormValid } = useFormValidity(
+		media ?? {},
+		editableFields,
+		form ?? DEFAULT_FORM
+	);
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -903,7 +915,7 @@ function MediaEditorContent( {
 		{
 			id: DETAILS_PANEL,
 			title: __( 'Details' ),
-			render: () => <MediaForm />,
+			render: () => <MediaForm validity={ validity } />,
 		},
 	];
 
@@ -1035,6 +1047,7 @@ function MediaEditorContent( {
 	const contextValue: MediaEditorFrameContextValue = {
 		isImage,
 		isSaving,
+		isFormValid,
 		hasMedia: !! media,
 		hasChanges,
 		// Saving freezes the whole edit surface: `save()` reads the
@@ -1046,7 +1059,11 @@ function MediaEditorContent( {
 		activePanel,
 		onTogglePanel: togglePanel,
 		onCancel: handleRequestClose,
-		onSave: saveMediaEditor,
+		onSave: () => {
+			if ( isFormValid ) {
+				saveMediaEditor();
+			}
+		},
 		canRestoreOriginal,
 		isSourceReplaced,
 		opensOriginal: !! onEditOriginal,

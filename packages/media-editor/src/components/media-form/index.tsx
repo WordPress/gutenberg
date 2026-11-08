@@ -1,5 +1,5 @@
 import { DataForm } from '@wordpress/dataviews';
-import type { Form } from '@wordpress/dataviews';
+import type { Form, FormValidity } from '@wordpress/dataviews';
 import {
 	Spinner as WCSpinner,
 	__experimentalVStack as VStack,
@@ -17,7 +17,7 @@ import { useMediaEditorContext } from '../media-editor-provider';
  * first, in a regular layout, then the metadata and the file information, in
  * panels. A field it lists that is not passed renders nothing.
  */
-const DEFAULT_FORM: Form = {
+export const DEFAULT_FORM: Form = {
 	layout: {
 		type: 'panel',
 	},
@@ -51,6 +51,8 @@ const DEFAULT_FORM: Form = {
 export interface MediaFormProps {
 	form?: Form;
 	header?: ReactNode;
+	/** The validity state of the form's fields, keyed by field id. */
+	validity?: FormValidity;
 }
 
 /**
@@ -61,15 +63,17 @@ export interface MediaFormProps {
  * the `form` prop, else the form of the provider settings, else a default
  * form of the core attachment fields.
  *
- * @param props        - Component props.
- * @param props.form   - Optional form configuration, which takes precedence
- *                     over the form of the provider settings.
- * @param props.header - Optional header content to display above the form.
+ * @param props          - Component props.
+ * @param props.form     - Optional form configuration, which takes precedence
+ *                       over the form of the provider settings.
+ * @param props.header   - Optional header content to display above the form.
+ * @param props.validity - The validity state of the form's fields.
  * @return The MediaForm component.
  */
 export default function MediaForm( {
 	form: formOverrides,
 	header,
+	validity,
 }: MediaFormProps ) {
 	const {
 		media,
@@ -100,6 +104,7 @@ export default function MediaForm( {
 					fields={ fields }
 					form={ form }
 					onChange={ onChange }
+					validity={ validity }
 				/>
 			</VStack>
 		</div>
