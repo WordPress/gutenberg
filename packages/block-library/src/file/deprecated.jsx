@@ -68,9 +68,22 @@ const v4 = {
 	supports: {
 		anchor: true,
 		align: true,
+		background: {
+			backgroundImage: true,
+			backgroundSize: true,
+			gradient: true,
+			__experimentalDefaultControls: {
+				backgroundImage: true,
+				gradient: true,
+			},
+		},
 		spacing: {
 			margin: true,
 			padding: true,
+		},
+		dimensions: {
+			minHeight: true,
+			minWidth: true,
 		},
 		color: {
 			gradients: true,
@@ -91,6 +104,20 @@ const v4 = {
 				color: true,
 				width: true,
 				style: true,
+			},
+		},
+		shadow: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
 			},
 		},
 		interactivity: true,
