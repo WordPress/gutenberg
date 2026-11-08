@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	useEffect,
 	useState,
 	useRef,
 	useMemo,
@@ -10,7 +9,7 @@ import {
 import {
 	TextControl,
 	ToolbarButton,
-	Popover,
+	Popover as WCPopover,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -402,11 +401,10 @@ function ButtonEdit( props ) {
 		setIsEditingURL( false );
 	}
 
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsEditingURL( false );
-		}
-	}, [ isSelected ] );
+	// Close the link popover when the block is deselected.
+	if ( ! isSelected && isEditingURL ) {
+		setIsEditingURL( false );
+	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
@@ -535,7 +533,7 @@ function ButtonEdit( props ) {
 				</BlockControls>
 			) }
 			{ isLinkTag && isSelected && isEditingURL && ! lockUrlControls && (
-				<Popover
+				<WCPopover
 					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
@@ -559,7 +557,7 @@ function ButtonEdit( props ) {
 						withCreateSuggestion={ userCanCreatePages }
 						createSuggestionButtonText={ createButtonText }
 					/>
-				</Popover>
+				</WCPopover>
 			) }
 			{ hasContentControls && (
 				<InspectorControls group="content">

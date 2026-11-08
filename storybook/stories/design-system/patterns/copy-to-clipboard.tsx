@@ -16,32 +16,35 @@ const RESULT_ICON = {
 };
 
 function useCopyFeedback() {
-	const [ result, setResult ] = useState< CopyResult >( 'idle' );
+	const [ feedback, setFeedback ] = useState< { result: CopyResult } >( {
+		result: 'idle',
+	} );
 
 	useEffect( () => {
-		if ( result === 'idle' ) {
+		if ( feedback.result === 'idle' ) {
 			return;
 		}
 		const timeoutId = setTimeout(
-			() => setResult( 'idle' ),
+			() => setFeedback( { result: 'idle' } ),
 			FEEDBACK_TIMEOUT
 		);
 		return () => clearTimeout( timeoutId );
-	}, [ result ] );
+	}, [ feedback ] );
 
 	const ref = useCopyToClipboard(
 		SAMPLE_VALUE,
 		() => {
-			setResult( 'copied' );
+			// A new feedback object restarts the timeout for repeated copies.
+			setFeedback( { result: 'copied' } );
 			speak( 'Copied to clipboard' );
 		},
 		() => {
-			setResult( 'error' );
+			setFeedback( { result: 'error' } );
 			speak( "Couldn't copy to clipboard." );
 		}
 	);
 
-	return { result, ref };
+	return { result: feedback.result, ref };
 }
 
 /**

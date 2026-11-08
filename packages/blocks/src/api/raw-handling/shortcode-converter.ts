@@ -13,8 +13,8 @@ import type {
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
-const beforeLineRegexp = /(\n|<p>|<br\s*\/?>)\s*$/;
-const afterLineRegexp = /^\s*(\n|<\/p>|<br\s*\/?>)/;
+const beforeLineRegexp = /(^|\n|<p>|<br\s*\/?>)\s*$/;
+const afterLineRegexp = /^\s*($|\n|<\/p>|<br\s*\/?>)/;
 
 function segmentHTMLToShortcodeBlock(
 	HTML: string,
@@ -59,17 +59,10 @@ function segmentHTMLToShortcodeBlock(
 	const beforeHTML = HTML.substr( 0, match.index );
 	const afterHTML = HTML.substr( lastIndex );
 
-	// If the shortcode content does not contain HTML and the shortcode is
-	// not on a new line (or in paragraph from Markdown converter),
-	// consider the shortcode as inline text, and thus skip conversion for
-	// this segment.
-	if (
-		! match.shortcode.content?.includes( '<' ) &&
-		! (
-			beforeLineRegexp.test( beforeHTML ) &&
-			afterLineRegexp.test( afterHTML )
-		)
-	) {
+	// A shortcode in the middle of a line stays inline.
+	const isLineStart = beforeLineRegexp.test( beforeHTML );
+	const isLineEnd = afterLineRegexp.test( afterHTML );
+	if ( ! isLineStart && ! isLineEnd ) {
 		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 	}
 
@@ -156,10 +149,46 @@ function segmentHTMLToShortcodeBlock(
 		blocks = [ block ];
 	}
 
+	// On its own line, a shortcode becomes a block.
+	if ( isLineStart && isLineEnd ) {
+		return [
+			...segmentHTMLToShortcodeBlock(
+				beforeHTML.replace( beforeLineRegexp, '' )
+			),
+			...blocks,
+			...segmentHTMLToShortcodeBlock(
+				afterHTML.replace( afterLineRegexp, '' )
+			),
+		];
+	}
+
+	// Like images, at the start or end of a line it only moves out of the text
+	// if its block is aligned.
+	if (
+		! blocks.every( ( block ) =>
+			[ 'left', 'center', 'right' ].includes(
+				block.attributes.align as string
+			)
+		)
+	) {
+		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+	}
+
+	// At the start, it moves before the line, which keeps its opening tag.
+	if ( isLineStart ) {
+		const lineStart = beforeHTML.search( beforeLineRegexp );
+		return [
+			...segmentHTMLToShortcodeBlock( beforeHTML.slice( 0, lineStart ) ),
+			...blocks,
+			...segmentHTMLToShortcodeBlock(
+				beforeHTML.slice( lineStart ) + afterHTML
+			),
+		];
+	}
+
+	// At the end, it moves after the line.
 	return [
-		...segmentHTMLToShortcodeBlock(
-			beforeHTML.replace( beforeLineRegexp, '' )
-		),
+		...segmentHTMLToShortcodeBlock( beforeHTML ),
 		...blocks,
 		...segmentHTMLToShortcodeBlock(
 			afterHTML.replace( afterLineRegexp, '' )

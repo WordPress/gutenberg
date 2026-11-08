@@ -1,5 +1,32 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
+// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+// palette is changed without updating the e2e expectation.
+const AVATAR_BORDER_COLORS = [
+	'#6F42C1',
+	'#D94145',
+	'#FBBF24',
+	'#FF35EE',
+	'#879F11',
+	'#0F766E',
+	'#00CFFF',
+];
+
+/**
+ * The current user's author color at the note highlight's 0x40 alpha.
+ *
+ * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils
+ */
+async function getAuthorTint( requestUtils ) {
+	const { id } = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+	const hex = AVATAR_BORDER_COLORS[ id % AVATAR_BORDER_COLORS.length ];
+	const [ r, g, b ] = [ 1, 3, 5 ].map( ( i ) =>
+		parseInt( hex.slice( i, i + 2 ), 16 )
+	);
+	return `rgba(${ r }, ${ g }, ${ b }, 0.25)`;
+}
+
 class BlockNoteUtils {
 	/** @type {import('@playwright/test').Page} */
 	#page;
@@ -55,6 +82,14 @@ class BlockNoteUtils {
 		return this.#page.getByRole( 'region', {
 			name: /^(Notes|Editor settings)$/,
 		} );
+	}
+
+	// Focusing the post title clears the block selection, and with it the
+	// selected note.
+	async deselect() {
+		await this.#editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
 	}
 
 	// "All notes" has no toggle before the first note.
@@ -128,11 +163,63 @@ class BlockNoteUtils {
 		);
 	}
 
+	/**
+	 * Inserts a block with a block-level note without going through the
+	 * notes UI. For tests that need notes but don't test adding them. Leaves
+	 * the note selected, as adding it through the UI does.
+	 *
+	 * @param {Object}   options
+	 * @param {string}   [options.name]    Block name, a paragraph by default.
+	 * @param {string}   options.content   Block content.
+	 * @param {string}   options.note      Text of the note.
+	 * @param {string[]} [options.replies] Texts of the note's replies.
+	 */
+	async insertBlockWithNote( {
+		name = 'core/paragraph',
+		content,
+		note,
+		replies = [],
+	} ) {
+		// Saves the way the notes UI does, so the notes list picks it up.
+		const noteId = await this.#page.evaluate(
+			async ( { noteContent, replyContents } ) => {
+				const { dispatch, select } = window.wp.data;
+				const save = ( text, parent = 0 ) =>
+					dispatch( 'core' ).saveEntityRecord(
+						'root',
+						'comment',
+						{
+							post: select( 'core/editor' ).getCurrentPostId(),
+							content: text,
+							status: 'hold',
+							type: 'note',
+							parent,
+						},
+						{ throwOnError: true }
+					);
+				const { id } = await save( noteContent );
+				for ( const reply of replyContents ) {
+					await save( reply, id );
+				}
+				return id;
+			},
+			{ noteContent: note, replyContents: replies }
+		);
+		await this.#editor.insertBlock( {
+			name,
+			attributes: { content, metadata: { noteId: [ noteId ] } },
+		} );
+		// The caret entered the block before the notes list had the note.
+		const thread = this.getThread( note );
+		await thread.click();
+		await expect( thread ).toHaveClass( /is-selected/ );
+	}
+
 	async addNote( content ) {
 		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 		await this.#page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.pressSequentially( content );
+			.fill( content );
 		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
@@ -179,16 +266,14 @@ class BlockNoteUtils {
 	async addReply( content ) {
 		const sidebar = this.#getNotesSurface();
 		const replyForm = sidebar.getByRole( 'textbox', { name: 'Reply to' } );
-		// The reply form doesn't focus on mount.
-		await replyForm.click();
-		await replyForm.pressSequentially( content );
+		await replyForm.fill( content );
 		await sidebar
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect(
 			sidebar.getByText( content, { exact: true } )
 		).toBeVisible();
-		// The form clears after the reply saves; typing earlier appends to it.
+		// The form clears once the reply saves.
 		await expect( replyForm ).toHaveText( '' );
 	}
 
@@ -226,4 +311,4 @@ class BlockNoteUtils {
 	}
 }
 
-module.exports = { BlockNoteUtils };
+module.exports = { BlockNoteUtils, getAuthorTint };
