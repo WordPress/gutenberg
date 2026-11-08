@@ -1,0 +1,89 @@
+# PHPStan configuration for Gutenberg
+#
+# To overload this configuration, copy this file to phpstan.neon and adjust as needed.
+#
+# https://phpstan.org/config-reference
+
+includes:
+	# The base configuration file for using PHPStan with the Gutenberg codebase.
+	- tools/phpstan/base.neon
+
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`.
+	# https://phpstan.org/user-guide/baseline
+	- tools/phpstan/baseline.neon
+
+parameters:
+	# https://phpstan.org/user-guide/rule-levels
+	level: 5
+	reportUnmatchedIgnoredErrors: true
+
+	# Errors that are intentionally ignored, as opposed to the baseline, which records errors still to be fixed.
+	ignoreErrors:
+		# Level 0:
+		# Return values from action callbacks are discarded by do_action(), but returning one is harmless and lets
+		# callers and tests know whether the callback did anything. Core has many such callbacks, like _wp_cron() and
+		# wp_set_up_cross_origin_isolation().
+		-
+			message: '#^Action callback returns .+ but should not return anything\.$#'
+			identifier: return.void
+		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_shadow_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_spacing_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_background_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_border_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# Level 3:
+		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
+		# template (`@template TOffset of key-of<T>`, `@param T[TOffset] $value`). PHPStan does not resolve that
+		# template for an offset write like `$request['context'] = 'edit'`, so every such write is rejected, valid
+		# ones included, while the equivalent `$request->set_param( 'context', 'edit' )` call is accepted.
+		#
+		# This is a false positive which should be fixed in PHPStan: https://github.com/phpstan/phpstan-src/pull/6903
+		# Once a PHPStan release with that fix is required, remove these entries.
+		-
+			message: '#^Cannot assign offset .+ to WP_REST_Request(?:<.+>)?\.$#'
+			identifier: offsetAssign.dimType
+			reportUnmatched: false
+		-
+			message: '#^WP_REST_Request(?:<.+>)? does not accept .+\.$#'
+			identifier: offsetAssign.valueType
+			reportUnmatched: false
+
+		# Level 4:
+		# The Navigation block checks for WP_Theme_JSON_Gutenberg::get_viewport_media_queries() before falling back to
+		# WP_Theme_JSON. PHPStan sees the Gutenberg class as always defined, but the block library also runs in
+		# WordPress Core, where it is not, so the check is needed there.
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			path: packages/block-library/src/navigation/index.php

@@ -5,7 +5,7 @@ import type { WPKeycodeModifier } from '@wordpress/keycodes';
  */
 export interface ShortcutKeyCombination {
 	character: string;
-	modifier: WPKeycodeModifier | undefined;
+	modifier?: WPKeycodeModifier | undefined;
 }
 
 /**

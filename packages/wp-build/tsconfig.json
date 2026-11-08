@@ -19,7 +19,7 @@
 	},
 	"references": [
 		{ "path": "../style-runtime/tsconfig.build.json" },
-		{ "path": "../theme/tsconfig.plugins.json" }
+		{ "path": "../theme-build-tools/tsconfig.build.json" }
 	],
 	"include": [ "." ],
 	"exclude": [

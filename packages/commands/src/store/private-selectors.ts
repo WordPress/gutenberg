@@ -8,5 +8,8 @@ import type { State } from './types';
  * @return {boolean} Whether any loader is loading.
  */
 export function isLoading( state: State ) {
-	return Object.values( state.loaderStates ).some( Boolean );
+	// A loader that unregistered mid-load never reports that it finished.
+	return Object.entries( state.loaderStates ).some(
+		( [ name, loading ] ) => loading && !! state.commandLoaders[ name ]
+	);
 }

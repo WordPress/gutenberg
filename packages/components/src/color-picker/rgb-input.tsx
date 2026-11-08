@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { colord } from 'colord';
 import { InputWithSlider } from './input-with-slider';
 import type { RgbInputProps } from './types';
@@ -10,7 +11,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 			<InputWithSlider
 				min={ 0 }
 				max={ 255 }
-				label="Red"
+				label={ __( 'Red' ) }
 				abbreviation="R"
 				value={ r }
 				onChange={ ( nextR: number ) =>
@@ -20,7 +21,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 			<InputWithSlider
 				min={ 0 }
 				max={ 255 }
-				label="Green"
+				label={ __( 'Green' ) }
 				abbreviation="G"
 				value={ g }
 				onChange={ ( nextG: number ) =>
@@ -30,7 +31,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 			<InputWithSlider
 				min={ 0 }
 				max={ 255 }
-				label="Blue"
+				label={ __( 'Blue' ) }
 				abbreviation="B"
 				value={ b }
 				onChange={ ( nextB: number ) =>
@@ -41,7 +42,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				<InputWithSlider
 					min={ 0 }
 					max={ 100 }
-					label="Alpha"
+					label={ __( 'Alpha (RGB A value)' ) }
 					abbreviation="A"
 					value={ Math.trunc( a * 100 ) }
 					onChange={ ( nextA: number ) =>

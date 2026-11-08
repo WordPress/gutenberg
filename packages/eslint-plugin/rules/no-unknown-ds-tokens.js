@@ -1,5 +1,9 @@
-const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
-const tokenList = tokenListModule.default || tokenListModule;
+const tokenModule = require( '@wordpress/theme/design-tokens.js' );
+// Prefer the named export so a future theme release can remove the default.
+// Keep the fallback for consumers using older theme versions.
+const tokenList = tokenModule.tokens
+	? Object.keys( tokenModule.tokens )
+	: tokenModule.default || tokenModule;
 const {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,

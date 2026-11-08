@@ -3,7 +3,7 @@
  * Exposes a same-origin URL for the bundled Emojibase data, so the Notes
  * emoji picker fetches its dataset without an external CDN.
  *
- * `tools/build-scripts/copy-emojibase-data.mjs` copies the files into
+ * `tools/build-scripts/copy-emojibase-data.mts` copies the files into
  * `build/emojibase-data/{locale}/` at plugin build time.
  *
  * @package gutenberg

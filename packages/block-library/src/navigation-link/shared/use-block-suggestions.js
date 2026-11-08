@@ -107,13 +107,17 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
  * The allowed blocks are read when a search runs, not subscribed to, so an
  * open link UI does no work as the editor changes.
  *
- * @param {Object}    options               Hook options.
- * @param {string}    options.clientId      Client ID of the link or submenu.
- * @param {boolean}   options.isEnabled     Whether to list blocks at all.
- * @param {Function=} options.onBlockInsert Called with the inserted block by a
- *                                          caller that tracks the new link,
- *                                          such as the list view.
- * @param {Function=} options.onClose       Closes the link UI.
+ * @param {Object}    options                   Hook options.
+ * @param {string}    options.clientId          Client ID of the link or submenu.
+ * @param {boolean}   options.isEnabled         Whether to list blocks at all.
+ * @param {string[]=} options.allowedBlockNames Names of the blocks to list.
+ *                                              Every allowed block is listed
+ *                                              when left out, and none when
+ *                                              empty.
+ * @param {Function=} options.onBlockInsert     Called with the inserted block by a
+ *                                              caller that tracks the new link,
+ *                                              such as the list view.
+ * @param {Function=} options.onClose           Closes the link UI.
  * @return {{ transformSuggestions: Function|undefined, insertBlockFromSuggestion: Function }}
  * The `transformSuggestions` to give LinkControl, and the handler for a chosen
  * block suggestion.
@@ -121,6 +125,7 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
 export function useBlockSuggestions( {
 	clientId,
 	isEnabled,
+	allowedBlockNames,
 	onBlockInsert,
 	onClose,
 } ) {
@@ -133,15 +138,22 @@ export function useBlockSuggestions( {
 	const { insertBlock, replaceBlock } = useDispatch( blockEditorStore );
 
 	const transformSuggestions = useCallback(
-		( suggestions, { isInitialSuggestions, searchTerm } ) =>
-			isInitialSuggestions
-				? suggestions
-				: addBlockSuggestions(
-						suggestions,
-						getInserterItems( getBlockRootClientId( clientId ) ),
-						searchTerm
-					),
-		[ clientId, getBlockRootClientId, getInserterItems ]
+		( suggestions, { isInitialSuggestions, searchTerm } ) => {
+			// An empty list asks for no blocks.
+			if ( isInitialSuggestions || allowedBlockNames?.length === 0 ) {
+				return suggestions;
+			}
+
+			const items = getInserterItems( getBlockRootClientId( clientId ) );
+			const blockItems = allowedBlockNames
+				? items.filter( ( { name } ) =>
+						allowedBlockNames.includes( name )
+					)
+				: items;
+
+			return addBlockSuggestions( suggestions, blockItems, searchTerm );
+		},
+		[ clientId, getBlockRootClientId, getInserterItems, allowedBlockNames ]
 	);
 
 	const insertBlockFromSuggestion = ( itemId ) => {

@@ -78,41 +78,6 @@ function TypographyElements() {
 					element="text"
 					label={ __( 'Text' ) }
 				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="link"
-					label={ __( 'Links' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="heading"
-					label={ __( 'Headings' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="caption"
-					label={ __( 'Captions' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="cite"
-					label={ __( 'Citations' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="button"
-					label={ __( 'Buttons' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="textInput"
-					label={ __( 'Inputs' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="select"
-					label={ __( 'Selects' ) }
-				/>
 			</ItemGroup>
 		</VStack>
 	);

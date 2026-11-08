@@ -116,6 +116,12 @@
             - className
             - render
             - style
+      - name: Autocomplete.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Popup
         props:
             - children
@@ -182,24 +188,10 @@
   props:
       - children
       - className
+      - infotip
       - intent
       - render
       - style
-- name: BaseControl
-  props:
-      - __nextHasNoMarginBottom
-      - as
-      - children
-      - className
-      - help
-      - hideLabelFromVision
-      - id
-      - label
-  subcomponents:
-      - name: BaseControl.VisualLabel
-        props:
-            - as
-            - children
 - name: Button
   props:
       - __experimentalIsFocusable
@@ -880,12 +872,15 @@
       - label
 - name: MenuItem
   props:
+      - accessibleWhenDisabled
       - children
       - className
+      - href
       - icon
       - iconPosition
       - info
       - isDestructive
+      - isPressed
       - isSelected
       - label
       - role
@@ -982,7 +977,9 @@
       - className
       - icon
       - intent
+      - politeness
       - render
+      - spokenMessage
       - style
   subcomponents:
       - name: Notice.ActionButton
@@ -1026,6 +1023,12 @@
             - shortcut
             - style
       - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.List
         props:
             - children
             - className
@@ -1210,6 +1213,7 @@
       - separatorType
       - shiftStep
       - showTooltip
+      - size
       - step
       - trackColor
       - type
@@ -1365,6 +1369,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelect.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelect.Separator
         props:
             - className
@@ -1474,6 +1484,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelectControl.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelectControl.Separator
         props:
             - className
@@ -1530,7 +1546,7 @@
       - required
       - searchPlaceholder
       - statusContent
-      - triggerContent
+      - trigger
       - value
       - virtualized
   subcomponents:
@@ -1574,10 +1590,26 @@
             - className
             - render
             - style
+      - name: SearchableSelectControl.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableSelectControl.Separator
         props:
             - className
             - render
+            - style
+      - name: SearchableSelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: SearchControl
   props:
@@ -1738,7 +1770,7 @@
       - ref
       - required
       - size
-      - triggerContent
+      - trigger
       - value
   subcomponents:
       - name: SelectControl.Group
@@ -1779,6 +1811,16 @@
         props:
             - className
             - render
+            - style
+      - name: SelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: Shortcut
   props:

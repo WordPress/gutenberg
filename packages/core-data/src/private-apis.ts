@@ -14,6 +14,7 @@ import {
 	default as EntitiesSavedStates,
 } from './components/entities-saved-states';
 import { useIsDirty as useEntitiesSavedStatesIsDirty } from './components/entities-saved-states/hooks/use-is-dirty';
+import { PrivateEntityProvider } from './entity-provider';
 import { lock } from './lock-unlock';
 import {
 	CRDT_AUTOSAVE_SNAPSHOT_KEY,
@@ -27,6 +28,7 @@ import {
 } from './utils/crdt-user-selections';
 
 const lockedApis = {
+	PrivateEntityProvider,
 	EntitiesSavedStates,
 	EntitiesSavedStatesExtensible,
 	getTemplateInfo,

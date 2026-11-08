@@ -259,6 +259,9 @@ export default defineConfig( {
 		// that overlap explicit and avoid a redundant cleanup pass.
 		clearMocks: false,
 		globals: false,
+		// Match native ES modules, which have no `__dirname`, `require`, or
+		// other CommonJS variables. CommonJS files keep them.
+		injectCjsGlobals: false,
 		includeTaskLocation: true,
 		isolate: true,
 		mockReset: true,
