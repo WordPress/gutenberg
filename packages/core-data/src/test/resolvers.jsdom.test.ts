@@ -162,12 +162,12 @@ describe( 'getEntityRecord', () => {
 		const STALE_POST_TYPE = { slug: 'post', name: 'stale' };
 		const FRESH_POST_TYPE = { slug: 'post', name: 'fresh' };
 
-		let deliverStaleResponse;
+		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
 		const staleResponseGate = new Promise( ( resolve ) => {
 			deliverStaleResponse = resolve;
 		} );
 
-		triggerFetch
+		apiFetchMock
 			.mockImplementationOnce( () => ( {
 				json: () => staleResponseGate.then( () => STALE_POST_TYPE ),
 			} ) )
@@ -180,7 +180,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// ...while the resolution is invalidated and requested again.
@@ -188,7 +188,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
@@ -213,12 +213,12 @@ describe( 'getEntityRecord', () => {
 		const POST = { slug: 'post' };
 		const PAGE = { slug: 'page' };
 
-		let deliverPostResponse;
+		let deliverPostResponse: ( value?: unknown ) => void = () => {};
 		const postResponseGate = new Promise( ( resolve ) => {
 			deliverPostResponse = resolve;
 		} );
 
-		triggerFetch
+		apiFetchMock
 			.mockImplementationOnce( () => ( {
 				json: () => postResponseGate.then( () => POST ),
 			} ) )
@@ -232,14 +232,14 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'page'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		deliverPostResponse();
 		await postRequest;
