@@ -27,6 +27,146 @@ test.describe( 'Playlist block', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.describe( 'selectors', () => {
+		test.beforeEach( async ( { admin, editor } ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/playlist',
+				innerBlocks: [ 'Beta', 'Alpha', 'Gamma' ].map( ( title ) => ( {
+					name: 'core/playlist-track',
+					attributes: {
+						id: uploadedAudio.id,
+						src: uploadedAudio.source_url,
+						title,
+					},
+				} ) ),
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Playlist',
+					exact: true,
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test( 'sorts tracks when users change Order', async ( {
+			editor,
+			page,
+		} ) => {
+			const order = page.getByRole( 'combobox', { name: 'Order' } );
+			const trackTitles = editor.canvas.getByLabel( 'Track title', {
+				exact: true,
+			} );
+
+			await order.click();
+			await page.getByRole( 'option', { name: 'Descending' } ).click();
+
+			await expect( order ).toHaveText( 'Descending' );
+			await expect( trackTitles ).toHaveText( [
+				'Gamma',
+				'Beta',
+				'Alpha',
+			] );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'desc' },
+					innerBlocks: [
+						{ attributes: { title: 'Gamma' } },
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Alpha' } },
+					],
+				},
+			] );
+
+			await order.click();
+			await page.getByRole( 'option', { name: 'Ascending' } ).click();
+
+			await expect( order ).toHaveText( 'Ascending' );
+			await expect( trackTitles ).toHaveText( [
+				'Alpha',
+				'Beta',
+				'Gamma',
+			] );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'asc' },
+					innerBlocks: [
+						{ attributes: { title: 'Alpha' } },
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Gamma' } },
+					],
+				},
+			] );
+		} );
+
+		test( 'preserves manual track order when users reselect the current Order', async ( {
+			editor,
+			page,
+		} ) => {
+			const order = page.getByRole( 'combobox', { name: 'Order' } );
+			const trackTitles = editor.canvas.getByLabel( 'Track title', {
+				exact: true,
+			} );
+			await expect( order ).toHaveText( 'Ascending' );
+			await expect( trackTitles ).toHaveText( [
+				'Beta',
+				'Alpha',
+				'Gamma',
+			] );
+
+			await order.click();
+			await page.getByRole( 'option', { name: 'Ascending' } ).click();
+
+			await expect( trackTitles ).toHaveText( [
+				'Beta',
+				'Alpha',
+				'Gamma',
+			] );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/playlist',
+					attributes: { order: 'asc' },
+					innerBlocks: [
+						{ attributes: { title: 'Beta' } },
+						{ attributes: { title: 'Alpha' } },
+						{ attributes: { title: 'Gamma' } },
+					],
+				},
+			] );
+		} );
+
+		test( 'changes the waveform Shape and clears its stored value when users return to Bars', async ( {
+			editor,
+			page,
+		} ) => {
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
+			const shape = page.getByRole( 'combobox', { name: 'Shape' } );
+
+			await shape.click();
+			await page
+				.getByRole( 'option', { name: 'Line', exact: true } )
+				.click();
+
+			await expect( shape ).toHaveText( 'Line' );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.waveformStyle
+			).toBe( 'line' );
+
+			await shape.click();
+			await page
+				.getByRole( 'option', { name: 'Bars', exact: true } )
+				.click();
+
+			await expect( shape ).toHaveText( 'Bars' );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.waveformStyle
+			).toBeUndefined();
+		} );
+	} );
+
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
 		page,
 		requestUtils,

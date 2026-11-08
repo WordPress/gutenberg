@@ -30,7 +30,7 @@ vi.mock( import( 'wasm-vips' ), async ( importOriginal ) => {
 	};
 } );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+const FIXTURES = join( import.meta.dirname, 'fixtures' );
 
 const loadFixture = ( file: string ): ArrayBuffer => {
 	const contents = readFileSync( join( FIXTURES, file ) );

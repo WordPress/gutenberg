@@ -6,6 +6,8 @@
 
 -   Export `sideloadMedia`, previously only available as a private API ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
 
+## 6.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
