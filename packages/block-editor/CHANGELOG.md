@@ -7,6 +7,7 @@
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 -   Suggest mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
+-   Suggestion mode: show both authors on an addition nested in another author's addition: the inner run takes its author's color as a background and drops its underline below the outer author's ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
 
 ## 20.0.0 (2026-11-04)
 
@@ -38,7 +39,6 @@
 -   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
--   Suggestion mode: show both authors on an addition nested in another author's addition: the inner run takes its author's color as a background and drops its underline below the outer author's ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
 -   Inserter: Keep keyboard-focused search results below the sticky search field ([#85706](https://github.com/WordPress/gutenberg/pull/85706)).
