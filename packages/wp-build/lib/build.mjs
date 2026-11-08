@@ -2588,6 +2588,7 @@ async function watchMode() {
 	 * Rebuild a package and any affected scripts/modules.
 	 *
 	 * @param {string} packageName Package to rebuild (short name).
+	 * @return {Promise<boolean>} Whether the package itself was rebuilt.
 	 */
 	async function rebuildPackage( packageName ) {
 		try {
@@ -2644,8 +2645,10 @@ async function watchMode() {
 					);
 				}
 			}
+			return true;
 		} catch ( error ) {
 			console.log( `❌ ${ packageName } - Error: ${ error.message }` );
+			return false;
 		}
 	}
 
@@ -2670,10 +2673,10 @@ async function watchMode() {
 	/**
 	 * Copy a changed PHP file to the build, without rebuilding its package.
 	 *
-	 * @param {string} packageName Package name (short name).
-	 * @param {string} filename    Absolute path of the PHP file.
+	 * @param {string} filename Absolute path of the PHP file.
 	 */
-	async function recopyPhpFile( packageName, filename ) {
+	async function recopyPhpFile( filename ) {
+		const packageName = getPackageName( filename );
 		const relativePath = path.relative( PACKAGES_DIR, filename );
 		try {
 			const startTime = Date.now();
@@ -2724,6 +2727,9 @@ async function watchMode() {
 		const itemsToRebuild = Array.from( needsRebuild );
 		needsRebuild.clear();
 
+		const phpFilesToCopy = [];
+		const rebuiltPackages = new Set();
+
 		for ( const item of itemsToRebuild ) {
 			// Check if it's a route (prefixed with 'route:')
 			if ( item.startsWith( 'route:' ) ) {
@@ -2733,14 +2739,16 @@ async function watchMode() {
 				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
 				await rebuildWidget( widgetDirName );
 			} else if ( item.startsWith( 'php:' ) ) {
-				// Split 'php:{package}:{file}'; the file may contain colons.
-				const [ , packageName, ...file ] = item.split( ':' );
-				// A rebuild of the package copies the file too.
-				if ( ! itemsToRebuild.includes( packageName ) ) {
-					await recopyPhpFile( packageName, file.join( ':' ) );
-				}
-			} else {
-				await rebuildPackage( item );
+				phpFilesToCopy.push( item.slice( 4 ) ); // Remove 'php:' prefix
+			} else if ( await rebuildPackage( item ) ) {
+				rebuiltPackages.add( item );
+			}
+		}
+
+		// Copy the PHP files last, unless a rebuild of their package did.
+		for ( const file of phpFilesToCopy ) {
+			if ( ! rebuiltPackages.has( getPackageName( file ) ) ) {
+				await recopyPhpFile( file );
 			}
 		}
 
@@ -2799,7 +2807,7 @@ async function watchMode() {
 		const file = normalizePath( path.resolve( filename ) );
 		const item =
 			event === 'change' && copiedPhpFiles.get( packageName )?.has( file )
-				? `php:${ packageName }:${ file }`
+				? `php:${ file }`
 				: packageName;
 
 		/*
