@@ -386,7 +386,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 			if ( '' === $part || ! str_contains( $part, ':' ) ) {
 				continue;
 			}
-			list( $property, $value ) = array_map( 'trim', explode( ':', $part, 2 ) );
+			list( $property, $value )  = array_map( 'trim', explode( ':', $part, 2 ) );
 			$declarations[ $property ] = $value;
 		}
 		ksort( $declarations );

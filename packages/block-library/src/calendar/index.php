@@ -116,7 +116,7 @@ add_action( 'init', 'register_block_core_calendar' );
  * objects. Flatten those so table inheritance paints a full cell grid. Mixed
  * per-side borders are left as-is for the edge SCSS selectors.
  *
- * @since 7.1.0
+ * @since 7.3.0
  *
  * @param array $attributes Block attributes.
  * @return array Attributes with a normalized border value.
@@ -177,7 +177,7 @@ function block_core_calendar_normalize_border_attributes( $attributes ) {
 /**
  * Merges CSS declarations into a tag's existing style attribute.
  *
- * @since 7.1.0
+ * @since 7.3.0
  *
  * @param WP_HTML_Tag_Processor $processor      Tag processor positioned on a tag.
  * @param string                $additional_css CSS declarations to append.

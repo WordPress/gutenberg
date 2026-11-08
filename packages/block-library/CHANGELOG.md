@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Calendar: Add border support ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
+
 ### Bug Fixes
 
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
@@ -15,8 +19,6 @@
 ## 12.1.0 (2026-11-04)
 
 ### Enhancements
-
--   Calendar: Add border support ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
 
 -   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
 -   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
