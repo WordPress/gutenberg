@@ -16,6 +16,32 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
+### Install script warnings with npm 11.16 and later
+
+Starting with npm 11.16, `npm install` warns about dependencies that run an install script and are not listed in the `allowScripts` field of your project's `package.json`. The packages that npm lists depend on your platform and dependency versions, and the output looks like this:
+
+```text
+npm warn allow-scripts 3 packages have install scripts not yet covered by allowScripts:
+npm warn allow-scripts   core-js@3.51.0 (postinstall: node -e "try{require('./postinstall')}catch(e){}")
+npm warn allow-scripts   @parcel/watcher@2.6.0 (install: node scripts/build-from-source.js)
+```
+
+These come from transitive dependencies of `@wordpress/scripts`. npm v12 will skip such scripts by default, so the warnings are a preview of that behavior. `@wordpress/scripts` does not need these scripts to work: `@parcel/watcher`, `unrs-resolver` and `fsevents` ship prebuilt native binaries, and the `core-js` and `core-js-pure` scripts only print a message. To silence the warnings, add every package that npm lists to the root `package.json` of your project with the value `false`:
+
+```json
+{
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"fsevents": false,
+		"unrs-resolver": false
+	}
+}
+```
+
+npm only reads `allowScripts` from the root of the project being installed, so a dependency such as `@wordpress/scripts` cannot set it for you. Run `npm install-scripts ls` to review the packages that are not covered yet (npm 11.17 and earlier name `npm approve-scripts` in the warning instead).
+
 **Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Setup
