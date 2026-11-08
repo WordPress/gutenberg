@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 import type {
@@ -66,6 +67,25 @@ describe( 'createInterpolateElement', () => {
 		expect(
 			createInterpolateElement( testString, { 'spaced token': <em /> } )
 		).toEqual( expectedElement );
+	} );
+	it.each( [
+		'This is a <constructor>fun</constructor> string',
+		'This is a <__proto__/> string',
+	] )(
+		'returns same string when the tag in "%s" is not in the conversion map',
+		( testString ) => {
+			expect(
+				createInterpolateElement( testString, { item: <em /> } )
+			).toEqual( <>{ testString }</> );
+		}
+	);
+	it( 'returns same string when the tag is a non-enumerable key of the conversion map', () => {
+		const testString = 'This is a <hidden>happy</hidden> string';
+		const conversionMap: Record< string, ReactElement > = { item: <em /> };
+		Object.defineProperty( conversionMap, 'hidden', { value: 'text' } );
+		expect( createInterpolateElement( testString, conversionMap ) ).toEqual(
+			<>{ testString }</>
+		);
 	} );
 	it( 'warns and stops interpolating when there is an unmatched closing tag', () => {
 		const testString = 'This is a </item> string';
