@@ -33,3 +33,14 @@ updates:
       labels:
           - 'dependencies'
           - '[Type] Build Tooling'
+
+    # Manage npm security updates only for the AI development tests, which keep
+    # their own lockfile outside the root workspaces.
+    - package-ecosystem: 'npm'
+      directory: '/test/ai-development'
+      schedule:
+          interval: 'daily'
+      open-pull-requests-limit: 0
+      labels:
+          - 'dependencies'
+          - '[Type] Build Tooling'

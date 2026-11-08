@@ -5,11 +5,10 @@ import type { StateValue as MetadataStateValue } from './reducer';
  * Extracts selector key names from a store descriptor.
  * Falls back to `string` when the store type is unknown.
  */
-export type SelectorKeysOf< S > = S extends StoreDescriptor<
-	ReduxStoreConfig< any, any, infer Selectors >
->
-	? string & keyof Selectors
-	: string;
+export type SelectorKeysOf< S > =
+	S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
+		? string & keyof Selectors
+		: string;
 
 /**
  * Metadata selectors injected into every Redux store.
@@ -88,7 +87,7 @@ export type MetadataActions< S = unknown > = {
 	) => Promise< void >;
 	invalidateResolution: (
 		selectorName: SelectorKeysOf< S >,
-		args: unknown[]
+		args?: unknown[] | null
 	) => Promise< void >;
 	invalidateResolutionForStore: () => Promise< void >;
 	invalidateResolutionForStoreSelector: (

@@ -1,15 +1,14 @@
-import { useSelect, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
+import { isValidViewport } from './viewport';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 /**
  * Hook to handle navigation to entity records.
  *
@@ -20,10 +19,6 @@ export default function useNavigateToEntityRecord() {
 	const location = useLocation();
 	const { query, path } = location;
 	const registry = useRegistry();
-	const currentDeviceType = useSelect(
-		( select ) => select( editorStore ).getDeviceType(),
-		[]
-	);
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
@@ -49,37 +44,21 @@ export default function useNavigateToEntityRecord() {
 			// Store the selected block in the URL for restoration when navigating back.
 			if ( externalClientId ) {
 				urlUpdates.selectedBlock = externalClientId;
+				history.navigate( addQueryArgs( path, urlUpdates ), {
+					replace: true,
+				} );
 			}
 
-			// Save the current viewport for when we navigate back (e.g. from overlay editor).
-			// Omit viewport from URL when it's the default to keep URLs clean.
+			// The width an entity is asked to be edited at is where it opens,
+			// not something the entity being left carries away: a width set from
+			// the device preview is view state, and an entity that asks for none
+			// opens at the default.
 			const requestedViewport =
 				typeof params.viewport === 'string'
 					? params.viewport.toLowerCase()
 					: undefined;
 			const isValidRequestedViewport =
-				VALID_VIEWPORTS.includes( requestedViewport );
-
-			if ( isValidRequestedViewport ) {
-				const currentViewportLower = (
-					currentDeviceType || DEFAULT_DEVICE_TYPE
-				).toLowerCase();
-				if (
-					currentViewportLower === DEFAULT_DEVICE_TYPE.toLowerCase()
-				) {
-					delete urlUpdates.viewport;
-				} else {
-					urlUpdates.viewport = currentViewportLower;
-				}
-			}
-
-			const hasUpdatesToSave =
-				externalClientId || isValidRequestedViewport;
-			if ( hasUpdatesToSave ) {
-				history.navigate( addQueryArgs( path, urlUpdates ), {
-					replace: true,
-				} );
-			}
+				isValidViewport( requestedViewport );
 
 			// Navigate to the new entity record
 			const queryArgs = {
@@ -96,7 +75,7 @@ export default function useNavigateToEntityRecord() {
 
 			history.navigate( url );
 		},
-		[ history, path, query, registry, currentDeviceType ]
+		[ history, path, query, registry ]
 	);
 
 	return onNavigateToEntityRecord;

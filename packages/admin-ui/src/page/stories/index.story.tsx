@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useCallback, useState } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
-import { Badge, Button, Text } from '@wordpress/ui';
+import {
+	Badge,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
+	Button,
+	Text,
+} from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
@@ -10,7 +14,8 @@ import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
-	title: 'Admin UI/Page',
+	id: 'admin-ui-page',
+	title: 'Design System/Admin UI/Page',
 	parameters: {
 		layout: 'fullscreen',
 	},

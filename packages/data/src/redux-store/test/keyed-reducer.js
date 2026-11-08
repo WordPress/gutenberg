@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { keyedReducer } from '../keyed-reducer';
 
 describe( 'keyedReducer', () => {

@@ -39,6 +39,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	public function set_up() {
 		parent::set_up();
+		// When the tests run outside of wp-env, the emptytheme fixture is not
+		// mounted in the WordPress theme root, so register the plugin's test
+		// theme directory to make it discoverable.
+		if ( ! wp_get_theme( 'emptytheme' )->exists() ) {
+			register_theme_directory( dirname( __DIR__ ) . '/test' );
+			wp_clean_themes_cache();
+		}
 		switch_theme( 'emptytheme' );
 	}
 
@@ -166,7 +173,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 					),
 					'wp:theme-file' => array(
 						array(
-							'href'   => home_url( '/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg' ),
+							'href'   => get_theme_file_uri( 'img/1024x768_emptytheme_test_image.jpg' ),
 							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
 							'target' => 'styles.background.backgroundImage.url',
 							'type'   => 'image/jpeg',

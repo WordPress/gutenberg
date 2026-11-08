@@ -10,6 +10,7 @@
  * Exits non-zero with a hint to run `npm install` if the trees diverge.
  */
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -24,6 +25,7 @@ const CACHE_FILE = path.join(
 	'node_modules',
 	'.check-installed-deps.cache.json'
 );
+const STORE = path.join( ROOT, 'node_modules', '.store' );
 
 const verbose = process.argv.includes( '--verbose' );
 
@@ -34,6 +36,51 @@ function fail( summary, details = '' ) {
 	}
 	console.error( msg );
 	process.exit( 1 );
+}
+
+/**
+ * Read the configured install strategy. npm resolves it across every .npmrc,
+ * the environment and the command line, so ask npm rather than parse a file.
+ *
+ * @return {string} The configured strategy.
+ */
+function configuredStrategy() {
+	// Set for anything npm runs, which is how this check is invoked.
+	if ( process.env.npm_config_install_strategy ) {
+		return process.env.npm_config_install_strategy;
+	}
+
+	try {
+		return execFileSync( 'npm', [ 'config', 'get', 'install-strategy' ], {
+			cwd: ROOT,
+			encoding: 'utf8',
+		} ).trim();
+	} catch {
+		return 'hoisted';
+	}
+}
+
+/*
+ * The lockfile is the same under either layout, and the comparison below
+ * reduces paths to name@version, so a tree installed with the other strategy
+ * passes everything. Compare the configured strategy against the real tree
+ * first, and before the mtime fast path, which such a tree would satisfy.
+ */
+const strategy = configuredStrategy();
+const installedIsolated = fs.existsSync( STORE );
+
+if ( strategy === 'linked' && ! installedIsolated ) {
+	fail(
+		'npm is configured for the isolated layout but node_modules is hoisted.',
+		`\tno ${ path.relative( ROOT, STORE ) }; run \`npm install\` to reinstall.`
+	);
+}
+
+if ( strategy !== 'linked' && installedIsolated ) {
+	fail(
+		`npm is configured for the ${ strategy } layout but node_modules is isolated.`,
+		`\t${ path.relative( ROOT, STORE ) } exists; run \`npm install\` to reinstall.`
+	);
 }
 
 /*

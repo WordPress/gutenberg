@@ -69,7 +69,15 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
-		"__experimentalExposeControlsToChildren": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -88,7 +96,12 @@
 				"width": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"interactivity": true,
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true

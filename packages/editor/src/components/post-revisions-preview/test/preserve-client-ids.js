@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { preserveClientIds } from '../preserve-client-ids';
 
 describe( 'preserveClientIds', () => {

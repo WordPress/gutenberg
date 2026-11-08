@@ -15,6 +15,7 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
@@ -74,7 +75,7 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 }
 
 const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
-	function GridItem(
+	function UnforwardedGridItem(
 		{
 			view,
 			selection,
@@ -120,7 +121,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			[ forwardedRef ]
 		);
 		useIntersectionObserver( elementRef, posinset );
-		const instanceId = useInstanceId( GridItem );
+		const instanceId = useInstanceId( UnforwardedGridItem );
 
 		const isSelected = selection.includes( id );
 
@@ -152,8 +153,14 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					id: `dataviews-view-grid__title-field-${ instanceId }`,
 				};
 			} else {
+				// With no visible title to point at, label the clickable media
+				// area with the item's title so it isn't announced generically.
 				mediaA11yProps = {
-					'aria-label': __( 'Navigate to item' ),
+					'aria-label':
+						titleField?.getValueFormatted( {
+							item,
+							field: titleField,
+						} ) || __( 'Navigate to item' ),
 				};
 			}
 		}
@@ -315,7 +322,7 @@ interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
-	inert?: string;
+	inert?: boolean;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];
@@ -337,7 +344,7 @@ export default function CompositeGrid< Item >( {
 	data,
 	isInfiniteScroll,
 	className,
-	inert,
+	inert = false,
 	isLoading,
 	view,
 	fields,
@@ -353,12 +360,12 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
-	// Consumer-configured aspect ratio for item previews, validated against
-	// the presets (like `density`) so arbitrary values are ignored, and
-	// surfaced to CSS as a custom property the media field's stylesheet
-	// reads. Always set (with the square default), so an identically-named
-	// variable set by a consumer on an ancestor can't leak into the previews
-	// when the view doesn't configure a ratio.
+	// Consumer-configured shape for item previews, validated against the
+	// presets (like `density`) so arbitrary values are ignored, and surfaced
+	// to CSS as a custom property the media field's stylesheet reads. Always
+	// set (with the square default), so an identically-named variable set by
+	// a consumer on an ancestor can't leak into the previews when the view
+	// doesn't configure a ratio.
 	const gridStyle = {
 		'--wp-dataviews-media-aspect-ratio':
 			view.layout?.aspectRatio &&
@@ -366,6 +373,10 @@ export default function CompositeGrid< Item >( {
 				? view.layout.aspectRatio
 				: '1/1',
 	} as CSSProperties;
+	// `mediaFit` is a class rather than a custom property (unlike the aspect
+	// ratio above) because it switches the preview box's background token as
+	// well as its `object-fit`, which a custom property can't do.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -431,6 +442,7 @@ export default function CompositeGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
@@ -441,8 +453,7 @@ export default function CompositeGrid< Item >( {
 						}
 						role="feed"
 						focusWrap
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
 						{ Array.from( { length: placeholdersNeeded } ).map(
@@ -533,13 +544,13 @@ export default function CompositeGrid< Item >( {
 								[ 'compact', 'comfortable' ].includes(
 									view.layout.density
 								),
+							'has-media-fit-contain': isMediaContain,
 						} ) }
 						focusWrap
 						aria-busy={ isLoading }
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (
 							<Composite.Row

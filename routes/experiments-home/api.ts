@@ -6,6 +6,7 @@ export interface Experiment {
 	description: string;
 	group: string;
 	groupLabel: string;
+	defaultValue: boolean;
 }
 
 interface SettingsSchema {
@@ -19,8 +20,7 @@ interface SettingsSchema {
 						description?: string;
 						group?: string;
 						group_label?: string;
-						separate_option?: boolean;
-						option_name?: string;
+						default?: boolean;
 					}
 				>;
 			};
@@ -44,5 +44,6 @@ export async function fetchExperiments(): Promise< Experiment[] > {
 		description: schema.description ?? '',
 		group: schema.group ?? 'other',
 		groupLabel: schema.group_label ?? '',
+		defaultValue: schema.default ?? false,
 	} ) );
 }

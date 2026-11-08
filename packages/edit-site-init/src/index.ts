@@ -10,6 +10,7 @@ import {
 } from '@wordpress/icons';
 import { dispatch } from '@wordpress/data';
 import { store as bootStore } from '@wordpress/boot';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Initialize edit-site menu items with icons.
@@ -55,5 +56,12 @@ export async function init() {
 			...entityLinks.default,
 			...links,
 		} );
+	} );
+
+	// Read without a fallback where they are used, so they are off unless seeded.
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		enableChoosePatternModal: true,
+		showBlockBreadcrumbs: true,
 	} );
 }
