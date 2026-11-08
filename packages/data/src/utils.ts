@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import defaultRegistry from './default-registry';
 import type { DataRegistry } from './types';
 

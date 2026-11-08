@@ -927,12 +927,12 @@ console.log( 'Post saved!' );
 
 _Parameters_
 
--   _predicate_ `() => boolean`: A function that returns a boolean derived from store state.
--   _registry_ `DataRegistry`: Registry to observe. Defaults to the global registry.
+- _predicate_ `() => boolean`: A function that returns a boolean derived from store state.
+- _registry_ `DataRegistry`: Registry to observe. Defaults to the global registry.
 
 _Returns_
 
--   `Promise< void >`: A Promise that resolves the next time `predicate` returns `false` after returning `true`.
+- `Promise< void >`: A Promise that resolves the next time `predicate` returns `false` after returning `true`.
 
 ### withDispatch
 

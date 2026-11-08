@@ -1,26 +1,33 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '../registry';
 import { waitForTransition } from '../utils';
 
+type SavingState = { saving: boolean };
+type SavingAction = { type: string; saving: boolean };
+
 describe( 'waitForTransition', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'test', {
-			reducer: ( state = { saving: false }, action ) => {
+			reducer: (
+				state: SavingState = { saving: false },
+				action: SavingAction
+			) => {
 				if ( action.type === 'SET_SAVING' ) {
 					return { ...state, saving: action.saving };
 				}
 				return state;
 			},
 			selectors: {
-				isSaving: ( state ) => state.saving,
+				isSaving: ( state: SavingState ) => state.saving,
 			},
 			actions: {
-				setSaving: ( saving ) => ( { type: 'SET_SAVING', saving } ),
+				setSaving: ( saving: boolean ) => ( {
+					type: 'SET_SAVING',
+					saving,
+				} ),
 			},
 		} );
 	} );
@@ -85,7 +92,7 @@ describe( 'waitForTransition', () => {
 	} );
 
 	it( 'should call predicate only once per state change', async () => {
-		const predicate = jest.fn( () => registry.select( 'test' ).isSaving() );
+		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
 
 		const promise = waitForTransition( predicate, registry );
 
@@ -101,7 +108,7 @@ describe( 'waitForTransition', () => {
 	} );
 
 	it( 'should unsubscribe after resolving', async () => {
-		const predicate = jest.fn( () => registry.select( 'test' ).isSaving() );
+		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
 
 		const promise = waitForTransition( predicate, registry );
 
@@ -124,7 +131,7 @@ describe( 'waitForTransition', () => {
 	it( 'should reject and unsubscribe when the predicate throws', async () => {
 		const error = new Error( 'predicate failed' );
 		let throwOnNextCall = false;
-		const predicate = jest.fn( () => {
+		const predicate = vi.fn( () => {
 			if ( throwOnNextCall ) {
 				throw error;
 			}
