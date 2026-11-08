@@ -24,3 +24,6 @@ c56e8a1910ed74f405b74bbb12fe81dea974e5c3
 
 # Remove dependency import separators.
 7f43eafccea3691044eabf94e94b978435d25bd3
+
+# Prettier upgrade to 3.9.6.
+a4d2df95732fbf4514fe1a155fc0aa37d94412e7

@@ -1,12 +1,30 @@
 import clsx from 'clsx';
-import { useRef, useEffect } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { useRef, useLayoutEffect } from '@wordpress/element';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
 const { useNativeUndo } = unlock( blockEditorPrivateApis );
+
+/**
+ * Moves `node` to the end of `parent`.
+ *
+ * `moveBefore` keeps the subtree's state, where `appendChild` reloads any
+ * iframe in it. That reload breaks a classic editor rendered by a meta box.
+ * `moveBefore` only works between connected nodes.
+ *
+ * @param {Element} parent Element to move into.
+ * @param {Element} node   Element to move.
+ */
+function move( parent, node ) {
+	if ( parent.moveBefore && parent.isConnected && node.isConnected ) {
+		parent.moveBefore( node, null );
+	} else {
+		parent.appendChild( node );
+	}
+}
 
 /**
  * Render metabox area.
@@ -19,20 +37,20 @@ function MetaBoxesArea( { location } ) {
 	const container = useRef( null );
 	const formRef = useRef( null );
 
-	useEffect( () => {
+	// A layout effect because the cleanup has to run before React detaches the
+	// meta boxes: `moveBefore` needs them connected.
+	useLayoutEffect( () => {
 		formRef.current = document.querySelector(
 			'.metabox-location-' + location
 		);
 
 		if ( formRef.current ) {
-			container.current.appendChild( formRef.current );
+			move( container.current, formRef.current );
 		}
 
 		return () => {
 			if ( formRef.current ) {
-				document
-					.querySelector( '#metaboxes' )
-					.appendChild( formRef.current );
+				move( document.querySelector( '#metaboxes' ), formRef.current );
 			}
 		};
 	}, [ location ] );
@@ -52,7 +70,7 @@ function MetaBoxesArea( { location } ) {
 	return (
 		<div className={ classes } ref={ nativeUndoRef }>
 			{ isSaving && (
-				<Spinner className="edit-post-meta-boxes-area__spinner" />
+				<WCSpinner className="edit-post-meta-boxes-area__spinner" />
 			) }
 			<div
 				className="edit-post-meta-boxes-area__container"

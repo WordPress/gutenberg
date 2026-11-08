@@ -13,26 +13,51 @@ import type {
 	ResolveWidgetModule,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { canonicalizeLayout } from '../utils/canonicalize-layout';
 import { DEFAULT_GRID } from '../utils/default-grid';
+import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
+import {
+	resolveDashboardColumns,
+	resolveDashboardMinColumnWidth,
+} from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
+import { createPendingActionsMap } from '../utils/pending-actions-map';
+import type { PendingActionsMap } from '../utils/pending-actions-map';
+import { createRuntimeActionsMap } from '../utils/runtime-actions-map';
+import type { RuntimeActionsMap } from '../utils/runtime-actions-map';
 import { useDashboardPolicy } from '../components/dashboard-policy';
+import { WIDGET_DASHBOARD_COLUMN_STEPS } from '../types';
 import type {
 	CanPerformDashboardOperation,
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
 
-type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
-
+/*
+ * Validates the host's column policy and hands it to the surface: the
+ * `@wordpress/grid` surface measures its own width and resolves the count.
+ * The default steps only apply when the host set no count and no floor.
+ */
 function resolveGridSettings(
 	settings: WidgetGridSettings
-): GridSettingsWithColumns {
+): WidgetGridSettings {
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
+	const minColumnWidth = resolveDashboardMinColumnWidth(
+		normalized.minColumnWidth
+	);
+	const columns = resolveDashboardColumns(
+		normalized.columns,
+		minColumnWidth
+	);
+
 	return {
 		...normalized,
-		columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+		columns:
+			columns === undefined && minColumnWidth === undefined
+				? WIDGET_DASHBOARD_COLUMN_STEPS
+				: columns,
+		minColumnWidth,
 	};
 }
 
@@ -44,33 +69,6 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
  * A single global timer, so editing several widgets settles into one save.
  */
 const AUTO_SAVE_DELAY_MS = 5000;
-
-/**
- * Canonical form of `layout`: widgets sorted by `placement.order` (falling
- * back to array index), then `order` stripped since position now implies it.
- * Used both as the comparison form for `hasUncommittedChanges` (so a change
- * and its undo compare equal) and as the publish form, keeping persisted
- * payloads free of redundant `order` fields.
- *
- * @param {DashboardWidget[]} layout Layout to canonicalize.
- * @return {DashboardWidget[]} Canonicalized layout.
- */
-function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
-	const indexed = layout.map( ( widget, index ) => ( {
-		widget,
-		order: widget.placement?.order ?? index,
-	} ) );
-
-	indexed.sort( ( a, b ) => a.order - b.order );
-
-	return indexed.map( ( { widget } ) => {
-		if ( ! widget.placement ) {
-			return widget;
-		}
-		const { order: _stripped, ...placement } = widget.placement;
-		return { ...widget, placement };
-	} );
-}
 
 /**
  * Rich state distributed to every compound component inside `WidgetDashboard`.
@@ -86,7 +84,7 @@ interface InternalDashboardContextValue {
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
-	gridSettings: GridSettingsWithColumns;
+	gridSettings: WidgetGridSettings;
 
 	/**
 	 * Publishes the staged layout when it differs from the committed
@@ -124,6 +122,16 @@ interface InternalDashboardContextValue {
 	 * so further policy sources compose at this single point.
 	 */
 	canPerform: CanPerformDashboardOperation;
+
+	/**
+	 * The actions each mounted instance declares at runtime.
+	 */
+	runtimeActions: RuntimeActionsMap;
+
+	/**
+	 * The callback actions of each instance still settling.
+	 */
+	pendingActions: PendingActionsMap;
 }
 
 const ALLOW_EVERY_OPERATION: CanPerformDashboardOperation = () => true;
@@ -204,6 +212,8 @@ export function WidgetDashboardProvider( {
 }: ProviderProps ): React.ReactNode {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
+	const [ runtimeActions ] = useState( createRuntimeActionsMap );
+	const [ pendingActions ] = useState( createPendingActionsMap );
 
 	const policy = useDashboardPolicy();
 
@@ -218,37 +228,23 @@ export function WidgetDashboardProvider( {
 		[ policy ]
 	);
 
-	// Every mutation stages through here. Instances the policy locks against
-	// removal are re-asserted right after the nearest preceding instance that
-	// survived, so no composed trigger can drop or displace them.
+	// Every mutation stages through here, diffed against the current
+	// staging so every change the policy denies is re-asserted before it
+	// lands: what the interface hides, the staging layer rejects. Without
+	// a policy there is nothing to enforce, and staging stays byte-equal
+	// to what the trigger wrote.
 	const stageLayout = useCallback(
 		( next: DashboardWidget[] ) => {
-			setStagingLayout( ( previous ) => {
-				const staged = [ ...next ];
-				let insertAt = 0;
-				previous.forEach( ( widget ) => {
-					const position = staged.findIndex(
-						( { uuid } ) => uuid === widget.uuid
-					);
-					if ( position !== -1 ) {
-						insertAt = position + 1;
-						return;
-					}
-					const removable = canPerform( {
-						operation: 'remove',
-						widget,
-						widgetType: widgetTypes.find(
-							( type ) => type.name === widget.type
-						),
-					} );
-					if ( removable ) {
-						return;
-					}
-					staged.splice( insertAt, 0, widget );
-					insertAt += 1;
-				} );
-				return staged.length === next.length ? next : staged;
-			} );
+			setStagingLayout( ( previous ) =>
+				canPerform === ALLOW_EVERY_OPERATION
+					? next
+					: enforceLayoutPolicy( {
+							previous,
+							next,
+							canPerform,
+							widgetTypes,
+						} )
+			);
 		},
 		[ canPerform, widgetTypes ]
 	);
@@ -268,8 +264,8 @@ export function WidgetDashboardProvider( {
 	const hasLayoutChanges = useMemo(
 		() =>
 			! fastDeepEqual(
-				canonicalize( committedLayout ),
-				canonicalize( stagingLayout )
+				canonicalizeLayout( committedLayout ),
+				canonicalizeLayout( stagingLayout )
 			),
 		[ committedLayout, stagingLayout ]
 	);
@@ -279,7 +275,7 @@ export function WidgetDashboardProvider( {
 	const commit = useCallback(
 		( options?: CommitOptions ) => {
 			if ( hasLayoutChanges ) {
-				onLayoutChange( canonicalize( stagingLayout ) );
+				onLayoutChange( canonicalizeLayout( stagingLayout ) );
 			}
 
 			if ( options?.exitEditMode !== false ) {
@@ -355,6 +351,8 @@ export function WidgetDashboardProvider( {
 			onEditChange,
 			resolveWidgetModule,
 			canPerform,
+			runtimeActions,
+			pendingActions,
 		} ),
 		[
 			widgetTypes,
@@ -372,6 +370,8 @@ export function WidgetDashboardProvider( {
 			onEditChange,
 			resolveWidgetModule,
 			canPerform,
+			runtimeActions,
+			pendingActions,
 		]
 	);
 

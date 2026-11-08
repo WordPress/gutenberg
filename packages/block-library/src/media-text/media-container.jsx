@@ -1,5 +1,9 @@
 import clsx from 'clsx';
-import { ResizableBox, Spinner, Placeholder } from '@wordpress/components';
+import {
+	ResizableBox,
+	Spinner as WCSpinner,
+	Placeholder,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -15,11 +19,11 @@ import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
 import { imageFillStyles } from './image-fill';
+import { ALLOWED_MEDIA_TYPES } from './constants';
 
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const noop = () => {};
 
 const ResizableBoxContainer = forwardRef(
@@ -53,6 +57,7 @@ function ToolbarEditButton( {
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				name={ mediaUrl ? __( 'Replace' ) : __( 'Add media' ) }
 				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
@@ -122,6 +127,20 @@ function MediaContainer( props, ref ) {
 
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
+	const toolbarEditButton = (
+		<ToolbarEditButton
+			onSelectMedia={ onSelectMedia }
+			mediaUrl={
+				useFeaturedImage && featuredImageURL
+					? featuredImageURL
+					: mediaUrl
+			}
+			mediaId={ mediaId }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			useFeaturedImage={ useFeaturedImage }
+		/>
+	);
+
 	if ( mediaUrl || featuredImageURL || useFeaturedImage ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
@@ -185,19 +204,9 @@ function MediaContainer( props, ref ) {
 				isStackedOnMobile={ isStackedOnMobile }
 				ref={ ref }
 			>
-				<ToolbarEditButton
-					onSelectMedia={ onSelectMedia }
-					mediaUrl={
-						useFeaturedImage && featuredImageURL
-							? featuredImageURL
-							: mediaUrl
-					}
-					mediaId={ mediaId }
-					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-					useFeaturedImage={ useFeaturedImage }
-				/>
+				{ toolbarEditButton }
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				{ isTemporaryMedia && <Spinner /> }
+				{ isTemporaryMedia && <WCSpinner /> }
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
@@ -210,7 +219,12 @@ function MediaContainer( props, ref ) {
 		);
 	}
 
-	return <PlaceholderContainer { ...props } />;
+	return (
+		<>
+			{ toolbarEditButton }
+			<PlaceholderContainer { ...props } />
+		</>
+	);
 }
 
 export default forwardRef( MediaContainer );

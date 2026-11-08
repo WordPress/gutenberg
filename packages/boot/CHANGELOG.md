@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 0.26.0 (2026-11-04)
+
+### Enhancements
+
+-   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+## 0.25.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.24.0 (2026-10-07)
+
+### Enhancements
+
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+## 0.23.0 (2026-09-23)
+
+## 0.22.0 (2026-09-10)
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/commands` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -10,6 +36,7 @@
 
 ### Bug Fixes
 
+-   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
 -   Restore bottom-centered snackbar notices after the CSS Modules migration ([#81995](https://github.com/WordPress/gutenberg/pull/81995)).
 -   Mount the plugins registered with `registerPlugin`, so the sidebars, panels and menu items they fill render ([#81754](https://github.com/WordPress/gutenberg/pull/81754)).
 -   Canvas: Show the site's front end where a route names no entity and the theme has no block templates to resolve one from, instead of an editor with nothing open. Was previously handled by the home route alone, leaving `/identity` broken on a classic theme ([#81749](https://github.com/WordPress/gutenberg/pull/81749)).

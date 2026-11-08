@@ -5,6 +5,7 @@ import type {
 	ReactNode,
 	RefAttributes,
 } from 'react';
+import type { WidgetRuntimeAction } from '../types';
 
 /**
  * Host link capability: recognition of the host's own routes plus the
@@ -13,9 +14,10 @@ import type {
  */
 export interface WidgetHostLinks {
 	/**
-	 * Returns the in-app route path for a href, or `null` when the href
-	 * points outside the host's registered routes. Consumers hand the
-	 * path back to `Link` without interpreting it.
+	 * Returns the in-app route for a href, path and query as the host's
+	 * router takes them, or `null` when the href points outside the host's
+	 * registered routes. Consumers hand the string back to `Link` without
+	 * interpreting it.
 	 */
 	match: ( href: string ) => string | null;
 
@@ -33,6 +35,19 @@ export interface WidgetHostLinks {
 }
 
 /**
+ * Host actions capability: takes the actions a mounted widget declares.
+ * The host binds it to the instance it renders.
+ */
+export interface WidgetHostActions {
+	/**
+	 * Replaces the instance's runtime actions. One carrying a declared
+	 * action's `id` takes its place, keeping the declared `icon` and
+	 * `relevance` it leaves out.
+	 */
+	declare: ( actions: WidgetRuntimeAction[] ) => void;
+}
+
+/**
  * Capabilities a host provides to the widgets it renders. Every field is
  * optional: an absent capability degrades to the host-agnostic behavior.
  */
@@ -41,6 +56,11 @@ export interface WidgetHost {
 	 * In-app link materialization. Absent: links mount plain anchors.
 	 */
 	links?: WidgetHostLinks;
+
+	/**
+	 * Runtime action placement. Absent: widgets keep their own affordances.
+	 */
+	actions?: WidgetHostActions;
 }
 
 const WidgetHostContext = createContext< WidgetHost >( {} );

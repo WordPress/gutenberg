@@ -1,7 +1,11 @@
-import { useCallback } from '@wordpress/element';
-import { WidgetRender as WidgetRenderPrimitive } from '@wordpress/widget-primitives';
-import type { WidgetType } from '@wordpress/widget-primitives';
+import { useCallback, useId, useMemo } from '@wordpress/element';
+import {
+	WidgetHostProvider,
+	WidgetRender as WidgetRenderPrimitive,
+} from '@wordpress/widget-primitives';
+import type { WidgetHost, WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { declareRuntimeActions } from '../../utils/runtime-actions-map';
 import type { DashboardWidget } from '../../types';
 
 interface WidgetRenderProps {
@@ -16,11 +20,19 @@ interface WidgetRenderProps {
  * callback the render contract expects. When the policy denies `edit`,
  * the widget renders read-only: it receives no `setAttributes`.
  *
+ * Lends the widget the `actions` capability, bound to this render of the
+ * instance.
+ *
  * @param {WidgetRenderProps} props Component props.
  */
 export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
-	const { layout, onLayoutChange, resolveWidgetModule, canPerform } =
-		useDashboardInternalContext();
+	const {
+		layout,
+		onLayoutChange,
+		resolveWidgetModule,
+		canPerform,
+		runtimeActions,
+	} = useDashboardInternalContext();
 	const canEdit = canPerform( { operation: 'edit', widget, widgetType } );
 
 	const setAttributes = useCallback(
@@ -34,7 +46,7 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 									...( w.attributes as object ),
 									...( next as object ),
 								},
-						  }
+							}
 						: w
 				)
 			);
@@ -42,12 +54,30 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 		[ widget.uuid, layout, onLayoutChange ]
 	);
 
+	const renderId = useId();
+	const host = useMemo< WidgetHost >(
+		() => ( {
+			actions: {
+				declare: ( actions ) =>
+					declareRuntimeActions(
+						runtimeActions,
+						widget.uuid,
+						renderId,
+						actions
+					),
+			},
+		} ),
+		[ runtimeActions, widget.uuid, renderId ]
+	);
+
 	return (
-		<WidgetRenderPrimitive
-			widgetType={ widgetType }
-			attributes={ widget.attributes }
-			setAttributes={ canEdit ? setAttributes : undefined }
-			resolveWidgetModule={ resolveWidgetModule }
-		/>
+		<WidgetHostProvider value={ host }>
+			<WidgetRenderPrimitive
+				widgetType={ widgetType }
+				attributes={ widget.attributes }
+				setAttributes={ canEdit ? setAttributes : undefined }
+				resolveWidgetModule={ resolveWidgetModule }
+			/>
+		</WidgetHostProvider>
 	);
 }

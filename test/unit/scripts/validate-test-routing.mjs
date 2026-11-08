@@ -1,29 +1,35 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { globSync } from 'glob';
 import {
 	discoverTestFiles,
 	findOverlappingVitestProjectTests,
-	getVitestTests,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
 import { resolvePackageBin } from './resolve-package-bin.mjs';
+import { collectJestInfrastructureEntries } from './test-infrastructure-policy.mjs';
+import { sourceHasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
 );
-const JEST_CONFIG = 'test/unit/jest.config.js';
 const VITEST_CONFIG = 'test/unit/vitest.config.mjs';
-const manifest = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
+
+function readInfrastructureSource( file ) {
+	try {
+		return readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
+	} catch ( error ) {
+		if ( error.code === 'ENOENT' ) {
+			return null;
+		}
+		throw error;
+	}
+}
 
 function normalizeTestPath( testPath ) {
 	return path
@@ -32,7 +38,7 @@ function normalizeTestPath( testPath ) {
 		.join( '/' );
 }
 
-function listTests( packageName, args ) {
+function runTestList( packageName, args ) {
 	const result = spawnSync(
 		process.execPath,
 		[ resolvePackageBin( packageName ), ...args ],
@@ -54,80 +60,66 @@ function listTests( packageName, args ) {
 		process.exit( result.status ?? 1 );
 	}
 
-	return new Set(
-		result.stdout
-			.trim()
-			.split( /\r?\n/ )
-			.filter( Boolean )
-			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
-			.map( normalizeTestPath )
-	);
+	return result.stdout.trim().split( /\r?\n/ ).filter( Boolean );
 }
 
-function assertUniquePaths( label, testPaths ) {
-	assert.equal(
-		new Set( testPaths ).size,
-		testPaths.length,
-		`${ label } contains duplicate paths.`
+function listVitestTestsByProject() {
+	const testsByProject = Object.fromEntries(
+		VITEST_PROJECT_NAMES.map( ( projectName ) => [
+			projectName,
+			new Set(),
+		] )
 	);
+	const lines = runTestList( 'vitest', [
+		'list',
+		'--config',
+		VITEST_CONFIG,
+		'--filesOnly',
+		'--passWithNoTests',
+	] );
 
-	for ( const testPath of testPaths ) {
-		assert.equal(
-			testPath,
-			normalizeTestPath( testPath ),
-			`${ label } contains a non-normalized path: ${ testPath }`
+	for ( const line of lines ) {
+		const match = line.match( /^\[([^\]]+)\]\s+(.+)$/ );
+		assert.ok( match, `Unexpected Vitest list output: ${ line }` );
+		const [ , listedProjectName, testPath ] = match;
+		const projectName = listedProjectName.replace( / \(.+\)$/, '' );
+		assert.ok(
+			testsByProject[ projectName ],
+			`Unexpected Vitest project \`${ projectName }\`. Expected only: ${ VITEST_PROJECT_NAMES.join(
+				', '
+			) }`
 		);
+		assert.ok(
+			existsSync( path.resolve( ROOT_DIR, testPath ) ),
+			`Vitest ${ projectName } listed a missing test: ${ testPath }`
+		);
+		const normalizedPath = normalizeTestPath( testPath );
+		assert.ok(
+			! testsByProject[ projectName ].has( normalizedPath ),
+			`Vitest ${ projectName } listed a test twice: ${ normalizedPath }`
+		);
+		testsByProject[ projectName ].add( normalizedPath );
 	}
+
+	return testsByProject;
 }
 
-function isWithinDirectory( testPath, directoryPath ) {
-	return (
-		testPath === directoryPath ||
-		testPath.startsWith( `${ directoryPath }/` )
-	);
-}
-
-function isValidManifestPath( testPath, expectedType ) {
-	const resolvedPath = path.resolve( ROOT_DIR, testPath );
-	const relativePath = path.relative( ROOT_DIR, resolvedPath );
-	const isWithinRoot =
-		relativePath !== '..' &&
-		! relativePath.startsWith( `..${ path.sep }` ) &&
-		! path.isAbsolute( relativePath );
-
-	return (
-		isWithinRoot &&
-		existsSync( resolvedPath ) &&
-		statSync( resolvedPath )[ expectedType ]()
-	);
-}
-
-const jestTests = listTests( 'jest', [
-	'--config',
-	JEST_CONFIG,
-	'--listTests',
-] );
 const staticInventory = discoverTestFiles( ROOT_DIR );
-const expectedVitestTestsByProject = getVitestTestsByProject(
-	staticInventory,
-	manifest
+const testsWithEnvironmentOverrides = staticInventory.filter( ( testPath ) =>
+	sourceHasTestEnvironmentOverride(
+		readFileSync( path.join( ROOT_DIR, testPath ), 'utf8' ),
+		testPath
+	)
 );
-const vitestTestsByProject = Object.fromEntries(
-	VITEST_PROJECT_NAMES.map( ( projectName ) => [
-		projectName,
-		existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
-			? listTests( 'vitest', [
-					'list',
-					'--config',
-					VITEST_CONFIG,
-					'--project',
-					projectName,
-					'--filesOnly',
-					'--passWithNoTests',
-			  ] )
-			: new Set(),
-	] )
+assert.deepEqual(
+	testsWithEnvironmentOverrides,
+	[],
+	`Per-file test environment overrides are not allowed; use the filename suffix:\n${ testsWithEnvironmentOverrides.join(
+		'\n'
+	) }`
 );
+const expectedVitestTestsByProject = getVitestTestsByProject( staticInventory );
+const vitestTestsByProject = listVitestTestsByProject();
 const overlappingVitestProjectTests =
 	findOverlappingVitestProjectTests( vitestTestsByProject );
 assert.deepEqual(
@@ -152,92 +144,52 @@ const vitestTests = new Set(
 	] )
 );
 
-const migratedTestFiles = manifest.vitest.files;
-const migratedDirectories = manifest.vitest.directories;
-
-assertUniquePaths( 'vitest.files', migratedTestFiles );
-assertUniquePaths( 'vitest.directories', migratedDirectories );
-
-const overlappingManifestEntries = [
-	...migratedTestFiles.filter( ( testPath ) =>
-		migratedDirectories.some( ( directoryPath ) =>
-			isWithinDirectory( testPath, directoryPath )
-		)
-	),
-	...migratedDirectories.filter( ( directoryPath, index ) =>
-		migratedDirectories.some(
-			( otherDirectoryPath, otherIndex ) =>
-				otherIndex !== index &&
-				isWithinDirectory( directoryPath, otherDirectoryPath )
-		)
-	),
+// Retain only the public Jest adapter, legacy E2E/reporting packages, and the
+// runner-neutral jest-dom rules and Jest lint rules for legacy consumers.
+const retainedJestInfrastructure = [
+	'dependency:packages/eslint-plugin/package.json:dependencies.eslint-plugin-jest',
+	'dependency:packages/report-flaky-tests/package.json:dependencies.@jest/test-result',
+	'dependency:packages/report-flaky-tests/package.json:dependencies.jest-message-util',
+	'dependency:packages/scripts/package.json:peerDependencies.jest',
+	'dependency:tools/eslint/package.json:dependencies.eslint-plugin-jest-dom',
 ];
-assert.deepEqual(
-	overlappingManifestEntries,
-	[],
-	`Vitest migration manifest entries must be disjoint:\n${ overlappingManifestEntries.join(
-		'\n'
-	) }`
+const infrastructureFiles = globSync(
+	[
+		'**/package.json',
+		'**/*jest*.config.*',
+		'.github/{actions,workflows}/**/*.{yml,yaml}',
+	],
+	{
+		cwd: ROOT_DIR,
+		dot: true,
+		nodir: true,
+		ignore: [
+			'**/node_modules/**',
+			'**/build/**',
+			'**/build-module/**',
+			'**/build-style/**',
+			'**/build-types/**',
+			'**/build-wp/**',
+			'vendor/**',
+			'**/.git/**',
+		],
+	}
 );
-
-const invalidMigratedEntries = [
-	...migratedTestFiles.filter(
-		( testPath ) => ! isValidManifestPath( testPath, 'isFile' )
-	),
-	...migratedDirectories.filter(
-		( directoryPath ) =>
-			! isValidManifestPath( directoryPath, 'isDirectory' )
-	),
-];
-assert.deepEqual(
-	invalidMigratedEntries,
-	[],
-	`Migrated files or directories must exist inside the repository and match their declared type:\n${ invalidMigratedEntries.join(
-		'\n'
-	) }`
-);
-
-const emptyMigratedDirectories = migratedDirectories.filter(
-	( directoryPath ) =>
-		! staticInventory.some( ( testPath ) =>
-			isWithinDirectory( testPath, directoryPath )
-		)
+const jestInfrastructure = collectJestInfrastructureEntries(
+	infrastructureFiles,
+	readInfrastructureSource
 );
 assert.deepEqual(
-	emptyMigratedDirectories,
-	[],
-	`Migrated directories must contain at least one test:\n${ emptyMigratedDirectories.join(
-		'\n'
-	) }`
+	jestInfrastructure,
+	retainedJestInfrastructure,
+	'Jest infrastructure must exactly match the retained public tooling and active lint rules.'
 );
-
-const overlappingTests = [ ...jestTests ].filter( ( testPath ) =>
-	vitestTests.has( testPath )
-);
-assert.deepEqual(
-	overlappingTests,
-	[],
-	`Tests are owned by both Jest and Vitest:\n${ overlappingTests.join(
-		'\n'
-	) }`
-);
-
-const expectedVitestTests = getVitestTests( staticInventory, manifest );
 assert.deepEqual(
 	[ ...vitestTests ].sort(),
-	expectedVitestTests,
-	`Vitest discovery does not match the migration manifest.`
-);
-
-const runnerInventory = [
-	...new Set( [ ...jestTests, ...vitestTests ] ),
-].sort();
-assert.deepEqual(
-	runnerInventory,
 	staticInventory,
-	'Executable runner inventory does not match static test discovery.'
+	'Executable Vitest inventory does not match static test discovery.'
 );
 
 console.log(
-	`Validated exactly one runner for ${ staticInventory.length } tests: ${ jestTests.size } Jest and ${ vitestTests.size } Vitest.`
+	`Validated exactly one Vitest project for each of ${ staticInventory.length } tests.`
 );

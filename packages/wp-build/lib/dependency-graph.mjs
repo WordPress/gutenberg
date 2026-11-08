@@ -1,7 +1,7 @@
 /**
  * Dependency graph utilities for WordPress packages.
  *
- * This module provides functions to analyze dependencies between @wordpress/* packages
+ * This module provides functions to analyze dependencies between `@wordpress/*` packages
  * and determine the correct build order using topological sorting.
  */
 

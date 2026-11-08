@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import Button from '../../button';
 import { Popover } from '..';
-import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
 import type { PopoverProps } from '../types';
 
 const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
@@ -23,7 +23,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 
 const meta: Meta< typeof Popover > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Overlays/Popover',
+	title: 'Components/@wordpress-components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
 	subcomponents: {

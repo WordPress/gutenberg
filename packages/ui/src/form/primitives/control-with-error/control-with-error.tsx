@@ -9,7 +9,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import type { ControlWithErrorProps, ValidityTarget } from './types';
+import { Stack } from '../../../stack';
 import { ValidityIndicator } from '../validity-indicator';
+
+const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
+	<Stack { ...props } direction="column" gap="sm" />
+);
 
 function appendRequiredIndicator(
 	label: React.ReactNode,
@@ -40,6 +45,25 @@ function appendRequiredIndicator(
 
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
 
+type Validity = NonNullable< ControlWithErrorProps[ 'customValidity' ] >;
+
+function getValidity(
+	customValidity: ControlWithErrorProps[ 'customValidity' ],
+	validityTarget: ValidityTarget | null | undefined
+): Validity | undefined {
+	if ( customValidity?.type === 'validating' ) {
+		return customValidity;
+	}
+	if ( validityTarget?.validationMessage ) {
+		return { type: 'invalid', message: validityTarget.validationMessage };
+	}
+	return customValidity?.type === 'valid' ? customValidity : undefined;
+}
+
+function isSameValidity( a?: Validity, b?: Validity ) {
+	return a?.type === b?.type && a?.message === b?.message;
+}
+
 /**
  * A wrapper that adds inline validation feedback to a form control, based on
  * the native Constraint Validation API.
@@ -53,26 +77,19 @@ const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
 export const ControlWithError = forwardRef<
 	HTMLDivElement,
 	ControlWithErrorProps
->( function ControlWithError(
+>( function UnforwardedControlWithError(
 	{
 		required,
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
 		children,
-		render,
+		render = DEFAULT_RENDER,
 		...restProps
 	},
 	forwardedRef
 ) {
-	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
-	const [ statusMessage, setStatusMessage ] = useState<
-		| {
-				type: 'validating' | 'valid';
-				message?: string;
-		  }
-		| undefined
-	>();
+	const [ validity, setValidity ] = useState< Validity | undefined >();
 	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
 
@@ -88,7 +105,7 @@ export const ControlWithError = forwardRef<
 			// While async validation is pending, keep its indicator instead
 			// of showing a message its result may supersede.
 			if ( customValidity?.type !== 'validating' ) {
-				setErrorMessage( validityTarget?.validationMessage );
+				setValidity( getValidity( customValidity, validityTarget ) );
 			}
 			setShowMessage( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
@@ -96,7 +113,7 @@ export const ControlWithError = forwardRef<
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
-	}, [ customValidity?.type, getValidityTarget ] );
+	}, [ customValidity, getValidityTarget ] );
 
 	// Suppress the native error popover, while keeping the focus behavior intact.
 	useEffect( () => {
@@ -133,7 +150,7 @@ export const ControlWithError = forwardRef<
 						wrapperRef.current?.querySelectorAll< HTMLInputElement >(
 							`input[type="radio"][name="${ validityTarget?.name }"]`
 						) ?? []
-				  ).filter( ( sibling ) => sibling !== validityTarget )
+					).filter( ( sibling ) => sibling !== validityTarget )
 				: [];
 
 		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
@@ -152,49 +169,23 @@ export const ControlWithError = forwardRef<
 		};
 	}, [ getValidityTarget ] );
 
-	// Handle validity messages.
+	// Re-read the native validity after every render, since the target's value
+	// and constraints can change without a prop change here. Only set state
+	// when the result differs, or each render schedules another.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
+		validityTarget?.setCustomValidity(
+			customValidity?.type === 'invalid'
+				? ( customValidity.message ?? '' )
+				: ''
+		);
 
-		if ( ! customValidity?.type ) {
-			validityTarget?.setCustomValidity( '' );
-			setErrorMessage( validityTarget?.validationMessage );
-			setStatusMessage( undefined );
-			return;
+		const nextValidity = getValidity( customValidity, validityTarget );
+		if ( ! isSameValidity( nextValidity, validity ) ) {
+			setValidity( nextValidity );
 		}
-
-		switch ( customValidity.type ) {
-			case 'validating': {
-				validityTarget?.setCustomValidity( '' );
-				setErrorMessage( undefined );
-
-				setStatusMessage( {
-					type: 'validating',
-					message: customValidity.message,
-				} );
-				break;
-			}
-			case 'valid': {
-				validityTarget?.setCustomValidity( '' );
-				setErrorMessage( validityTarget?.validationMessage );
-
-				setStatusMessage( {
-					type: 'valid',
-					message: customValidity.message,
-				} );
-				break;
-			}
-			case 'invalid': {
-				validityTarget?.setCustomValidity(
-					customValidity.message ?? ''
-				);
-				setErrorMessage( validityTarget?.validationMessage );
-
-				setStatusMessage( undefined );
-				break;
-			}
-		}
-	}, [ customValidity, getValidityTarget ] );
+	} );
 
 	// Show messages if field has been touched (i.e. has blurred at least once),
 	// or validation has been triggered by the consumer/user.
@@ -215,46 +206,46 @@ export const ControlWithError = forwardRef<
 		setShowMessage( true );
 	}, [ isTouched, customValidity?.type, showMessage ] );
 
-	// Mark blurred fields as touched.
+	// Mark blurred fields as touched, and re-read the native validity once
+	// the control has settled.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
-		if ( isTouched ) {
-			return;
-		}
-
 		// Only consider "blurred from the component" if focus has fully left the wrapping div.
 		// This prevents unnecessary blurs from components with multiple focusable elements.
 		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
+			event.relatedTarget &&
+			event.currentTarget.contains( event.relatedTarget )
 		) {
+			return;
+		}
+
+		if ( ! isTouched ) {
 			setIsTouched( true );
 			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
+
+		// A control that commits an adjusted value on blur (e.g. a number
+		// control clamping to its `min`) can take a few more commits to settle
+		// while its controlled value catches up with the parent, so a message
+		// sampled in the render triggered by this event may be stale. Re-read
+		// it once React has flushed the blur's work.
+		const validityTarget = getValidityTarget();
+		const isValidating = customValidity?.type === 'validating';
+		window.queueMicrotask( () => {
+			if ( ! isValidating ) {
+				setValidity( getValidity( customValidity, validityTarget ) );
+			}
+		} );
 	};
 
 	const messageId = useId();
 
-	const message = ( () => {
-		if ( errorMessage ) {
-			return (
-				<ValidityIndicator
-					id={ messageId }
-					type="invalid"
-					message={ errorMessage }
-				/>
-			);
-		}
-		if ( statusMessage?.type ) {
-			return (
-				<ValidityIndicator
-					id={ messageId }
-					type={ statusMessage.type }
-					message={ statusMessage.message }
-				/>
-			);
-		}
-		return null;
-	} )();
+	const message = validity ? (
+		<ValidityIndicator
+			id={ messageId }
+			type={ validity.type }
+			message={ validity.message }
+		/>
+	) : null;
 
 	const visibleMessage = showMessage ? message : null;
 
@@ -290,7 +281,6 @@ export const ControlWithError = forwardRef<
 
 	return useRender( {
 		render,
-		defaultTagName: 'div',
 		ref: [ forwardedRef, wrapperRef ],
 		props: mergeProps< 'div' >( restProps, {
 			onBlur,

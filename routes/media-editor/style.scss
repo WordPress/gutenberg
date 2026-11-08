@@ -14,6 +14,7 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	// The page has no footer under the editor, so the body would otherwise
 	// run to the bottom edge. Scoped to the route: the modal has its own
@@ -23,6 +24,15 @@
 
 		@include break-small() {
 			margin-bottom: $grid-unit-30;
+		}
+	}
+
+	// From `small` up the canvas meets the page header's bottom border, so it
+	// drops its top corners to sit flush against it.
+	@include break-small() {
+		.media-editor__canvas-area {
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
 		}
 	}
 }
@@ -39,7 +49,11 @@
 	align-items: center;
 	justify-content: center;
 	gap: $grid-unit-20;
-	padding: $grid-unit-20 $grid-unit-40;
+	// No top padding: the canvas column's bottom margin already spaces it.
+	padding: 0 $grid-unit-40 $grid-unit-20;
+	// Sits outside `.media-editor-route__content`, so it needs the same
+	// background or it shows the page's grey.
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	// `HistoryActions` is the only child, and it renders nothing when the
 	// canvas is off screen — below `large` an open Details panel replaces it.
@@ -49,5 +63,35 @@
 	// `renderFrame` has no `hasCanvas` prop.
 	&:empty {
 		display: none;
+	}
+}
+
+// From `medium` up the boot layout sizes the page as a flex item that can't
+// shrink below its content, so a long title would widen the page past the
+// admin and add a horizontal scrollbar. Containing the inline size makes the
+// page take its width from the layout instead.
+.media-editor-route {
+	contain: inline-size;
+}
+
+// Lets the breadcrumbs shrink below the title's width, so the title truncates
+// rather than pushing the file details out of the header.
+.media-editor-route nav:has(h1) {
+	min-width: 0;
+}
+
+// File type and size beside the title. Hidden below `small`, where the header
+// has no room for them.
+.media-editor-route__file-details {
+	display: none;
+	flex-shrink: 0;
+	gap: $grid-unit-05;
+	margin-inline-start: $grid-unit-05;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	text-transform: uppercase;
+	white-space: nowrap;
+
+	@include break-small() {
+		display: flex;
 	}
 }

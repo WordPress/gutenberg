@@ -4,7 +4,7 @@ import {
 	QueryControls,
 	RadioControl,
 	RangeControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	ToolbarGroup,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -164,7 +164,7 @@ function Controls( { attributes, setAttributes } ) {
 			return;
 		}
 		// Categories that are already will be objects, while new additions will be strings (the name).
-		// allCategories nomalizes the array so that they are all objects.
+		// allCategories normalizes the array so that they are all objects.
 		const allCategories = tokens.map( ( token ) => {
 			return typeof token === 'string'
 				? categorySuggestions[ token ]
@@ -610,7 +610,7 @@ export default function LatestPostsEdit( {
 				{ inspectorControls }
 				<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
 					{ ! Array.isArray( latestPosts ) ? (
-						<Spinner />
+						<WCSpinner />
 					) : (
 						__( 'No posts found.' )
 					) }
@@ -758,7 +758,7 @@ export default function LatestPostsEdit( {
 									!! titleTrimmed
 										? {
 												__html: titleTrimmed,
-										  }
+											}
 										: undefined
 								}
 								onClick={ showRedirectionPreventedNotice }

@@ -263,6 +263,10 @@ test.describe( 'Links', () => {
 
 		const linkPopover = LinkUtils.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
+		// The URL field takes focus in a timeout after the popover mounts.
+		await expect(
+			linkPopover.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toBeFocused();
 
 		// Pressing "left" should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
@@ -293,6 +297,10 @@ test.describe( 'Links', () => {
 		const linkPopover = LinkUtils.getLinkPopover();
 
 		await expect( linkPopover ).toBeVisible();
+		// The URL field takes focus in a timeout after the popover mounts.
+		await expect(
+			linkPopover.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toBeFocused();
 
 		// Pressing arrow key should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
@@ -554,6 +562,10 @@ test.describe( 'Links', () => {
 
 		// Expect link popover to be visible
 		await expect( linkPopover ).toBeVisible();
+		// The URL field takes focus in a timeout after the popover mounts.
+		await expect(
+			linkPopover.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toBeFocused();
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -1159,11 +1171,9 @@ test.describe( 'Links', () => {
 			await optionsButton.click();
 
 			await expect( linkPopover ).toBeHidden();
-			// Expect focus on Top toolbar button within dropdown
+			// Expect focus to have moved into the dropdown
 			await expect(
-				page.getByRole( 'menuitemcheckbox', {
-					name: 'Top toolbar Access all block and document tools in a single place',
-				} )
+				page.getByRole( 'menu', { name: 'Options' } )
 			).toBeFocused();
 			// Press Escape
 			await pageUtils.pressKeys( 'Escape' );

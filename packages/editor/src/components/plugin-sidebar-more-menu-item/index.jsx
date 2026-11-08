@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
 
 /**
@@ -49,5 +50,16 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * @return {React.ReactNode} The rendered component.
  */
 export default function PluginSidebarMoreMenuItem( props ) {
-	return <ComplementaryAreaMoreMenuItem scope="core" { ...props } />;
+	// The menu renders the item itself, so `as` is dropped rather than
+	// forwarded.
+	const { as, ...itemProps } = props;
+
+	if ( as ) {
+		deprecated( 'The `as` prop of wp.editor.PluginSidebarMoreMenuItem', {
+			since: '7.2',
+			hint: 'The menu renders the item itself. The prop is ignored.',
+		} );
+	}
+
+	return <ComplementaryAreaMoreMenuItem scope="core" { ...itemProps } />;
 }

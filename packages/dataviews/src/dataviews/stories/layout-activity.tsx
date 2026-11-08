@@ -607,7 +607,7 @@ const LayoutActivityComponent = ( {
 					field: 'date',
 					direction: 'asc',
 					showLabel: groupByLabel,
-			  }
+				}
 			: undefined,
 	} );
 	useEffect( () => {
@@ -619,7 +619,7 @@ const LayoutActivityComponent = ( {
 							field: 'date',
 							direction: 'asc',
 							showLabel: groupByLabel,
-					  }
+						}
 					: undefined,
 				showMedia,
 			};

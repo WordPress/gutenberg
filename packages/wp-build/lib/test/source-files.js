@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import glob from 'fast-glob';
+import { afterEach, describe, expect, it } from 'vitest';
 import { getSourceFileGlob, isTestSourceFile } from '../source-files.mjs';
 
 describe( 'source file discovery', () => {
@@ -21,7 +22,17 @@ describe( 'source file discovery', () => {
 		const sourceDirectory = path.join( temporaryDirectory, 'src' );
 		mkdirSync( sourceDirectory );
 
-		for ( const extension of [ 'js', 'jsx', 'mjs', 'ts', 'tsx', 'css' ] ) {
+		for ( const extension of [
+			'js',
+			'jsx',
+			'mjs',
+			'cjs',
+			'ts',
+			'tsx',
+			'mts',
+			'cts',
+			'css',
+		] ) {
 			writeFileSync(
 				path.join( sourceDirectory, `index.${ extension }` ),
 				''
@@ -33,9 +44,12 @@ describe( 'source file discovery', () => {
 		} );
 
 		expect( sourceFiles.sort() ).toEqual( [
+			'src/index.cjs',
+			'src/index.cts',
 			'src/index.js',
 			'src/index.jsx',
 			'src/index.mjs',
+			'src/index.mts',
 			'src/index.ts',
 			'src/index.tsx',
 		] );
@@ -45,6 +59,8 @@ describe( 'source file discovery', () => {
 		'packages/example/src/test/component.jsx',
 		'packages/example/src/component.test.jsx',
 		'packages/example/src/component.spec.mjs',
+		'packages/example/src/component.test.mts',
+		'packages/example/src/component.spec.cts',
 	] )( 'identifies development-only source: %s', ( filename ) => {
 		expect( isTestSourceFile( filename ) ).toBe( true );
 	} );

@@ -2,6 +2,69 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-04)
+
+### New Features
+
+-   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}` ([#85729](https://github.com/WordPress/gutenberg/pull/85729)).
+
+### Enhancements
+
+-   `WidgetModuleRecord.example`: a record carries the `example` `widget.json` declares, in the shape of the runtime field; `useWidgetTypes` reads it for a record without a metadata module, and when the module declares no `example` of its own ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+
+## 0.10.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.9.0 (2026-10-07)
+
+### New Features
+
+-   `useWidgetActions( actions )`: a mounted widget declares actions for its host to place, fulfilled by an `href` or a runtime-only `callback`. Adds the `actions` host capability (`WidgetHostActions`) and the types `WidgetActionEnvelope`, `WidgetCallbackAction` and `WidgetRuntimeAction` ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
+
+### Internal
+
+-   Keep Vite from analyzing host-provided widget metadata URLs in `useWidgetTypes`. ([#83602](https://github.com/WordPress/gutenberg/pull/83602))
+
+## 0.8.0 (2026-09-23)
+
+### New Features
+
+-   `HostLink`: an anchor that mounts the host router's link for a target
+    `links.match` recognizes, and a plain anchor otherwise, including for a
+    `download` or a `_blank` target. Composes through the `render` prop of a
+    UI link ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+-   `WidgetModuleRecord.attributes`: a record carries the attribute schema
+    `widget.json` declares, as `WidgetAttributeRecord[]`; `useWidgetTypes`
+    merges it by `id` over the module's entries, the record winning a shared
+    key and `isValid` merging rule by rule
+    ([#82485](https://github.com/WordPress/gutenberg/pull/82485)).
+
+### Documentation
+
+-   Add a `WithHostLink` story: the same action declarations routed through
+    `HostLink` against a demo router, with a toggle that removes the `links`
+    capability ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).
+
+## 0.7.0 (2026-09-10)
+
+### Documentation
+
+-   `WidgetHostLinks.match`: the in-app route it returns carries the
+    route's query when the href has one; docblock, README, Storybook page
+    and seam diagram say so
+    ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+-   `WidgetAction.download`: any value but `false` downloads; `true` or `''`
+    keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features

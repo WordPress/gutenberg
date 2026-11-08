@@ -283,12 +283,21 @@ if ( ! function_exists( 'gutenberg_add_note_unfollow_link_to_email' ) ) {
 	 * the opt-out for the subscription it implies. Hooked on the
 	 * `wp_note_notification_text` filter from notes-mentions.php.
 	 *
+	 * The post author is left out: core emails them about every note whether
+	 * or not they follow the thread, so the link could not deliver what it
+	 * promises.
+	 *
 	 * @param string     $body    Email body.
 	 * @param WP_User    $user    Recipient.
 	 * @param WP_Comment $comment The note.
-	 * @return string Email body with the unfollow footer.
+	 * @return string Email body, with the unfollow footer for non-authors.
 	 */
 	function gutenberg_add_note_unfollow_link_to_email( string $body, WP_User $user, WP_Comment $comment ): string {
+		$post = get_post( (int) $comment->comment_post_ID );
+		if ( $post && (int) $post->post_author === (int) $user->ID ) {
+			return $body;
+		}
+
 		$root_id = gutenberg_get_note_thread_root_id( $comment );
 
 		$body .= "\n\n";

@@ -5,17 +5,19 @@ import LayoutTableComponent from './layout-table';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
+import HierarchicalLevelsComponent from './hierarchical-levels';
 import InfiniteScrollComponent from './infinite-scroll';
 import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-import './style.css';
+import LargePageCountComponent from './large-page-count';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViews',
+	id: 'dataviews-dataviews',
+	title: 'Design System/DataViews/DataViews',
 	component: DataViews,
 	args: {
 		containerHeight: 'auto',
@@ -238,6 +240,20 @@ export const LayoutCustom = {
 	render: LayoutCustomComponent,
 };
 
+export const HierarchicalLevels = {
+	render: HierarchicalLevelsComponent,
+	args: {
+		showLevels: true,
+	},
+	argTypes: {
+		showLevels: {
+			control: 'boolean',
+			description:
+				'Whether the table indents each item by its level (`view.showLevels`). When enabled, each item is placed below its parent; when disabled, items follow the sort order only',
+		},
+	},
+};
+
 export const Empty = {
 	render: EmptyComponent,
 	args: {
@@ -315,6 +331,24 @@ export const AsyncInfiniteScroll = {
 			table: {
 				disable: true,
 			},
+		},
+	},
+};
+
+/**
+ * A server-backed dataset with tens of thousands of pages. Above 100 pages the
+ * footer offers a page number input instead of a select listing every page.
+ */
+export const LargePageCount = {
+	render: LargePageCountComponent,
+	args: {
+		totalItems: 1453038,
+	},
+	argTypes: {
+		totalItems: {
+			control: 'number',
+			description:
+				'Number of items the dataset reports. At 20 per page, the default makes 72,652 pages',
 		},
 	},
 };

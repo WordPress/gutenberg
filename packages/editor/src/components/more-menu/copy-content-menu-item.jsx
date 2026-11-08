@@ -1,8 +1,11 @@
-import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 export default function CopyContentMenuItem() {
@@ -22,5 +25,9 @@ export default function CopyContentMenuItem() {
 
 	const ref = useCopyToClipboard( getText, onSuccess );
 
-	return <MenuItem ref={ ref }>{ __( 'Copy all blocks' ) }</MenuItem>;
+	return (
+		<Menu.Item ref={ ref }>
+			<Menu.ItemLabel>{ __( 'Copy all blocks' ) }</Menu.ItemLabel>
+		</Menu.Item>
+	);
 }

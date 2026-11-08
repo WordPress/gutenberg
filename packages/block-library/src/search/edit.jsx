@@ -5,15 +5,18 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	getTypographyClassesAndStyles as useTypographyProps,
+	getDimensionsClassesAndStyles as useDimensionsProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -25,10 +28,11 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { Icon, search } from '@wordpress/icons';
+import { Icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
+import { Path, SVG } from '@wordpress/primitives';
 import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
@@ -55,6 +59,15 @@ const TAG_NAME_MESSAGES = {
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
 const PERCENTAGE_WIDTHS = [ 25, 50, 75, 100 ];
+
+// Keep this block-specific icon aligned with the PHP renderer. Unlike the
+// Search icon from @wordpress/icons, it remains fill-based so existing theme
+// styles continue to work in both the editor and the front end.
+const searchBlockIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z" />
+	</SVG>
+);
 
 export default function SearchEdit( {
 	className,
@@ -125,6 +138,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
+	const [ isResizing, setIsResizing ] = useState( false );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -210,11 +227,13 @@ export default function SearchEdit( {
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			hasNoButton ? colorProps.className : undefined,
+			hasNoButton ? backgroundProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
 			...( hasNoButton ? colorProps.style : {} ),
+			...( hasNoButton ? backgroundProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -226,8 +245,8 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
-				: borderProps.style ),
+					}
+				: { ...borderProps.style, ...shadowProps.style } ),
 			...typographyProps.style,
 			textDecoration: undefined,
 		};
@@ -258,6 +277,7 @@ export default function SearchEdit( {
 		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
+			backgroundProps.className,
 			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
@@ -265,6 +285,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...backgroundProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
 				? {
@@ -277,8 +298,8 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
-				: borderProps.style ),
+					}
+				: { ...borderProps.style, ...shadowProps.style } ),
 		};
 		return (
 			<>
@@ -294,7 +315,7 @@ export default function SearchEdit( {
 						}
 						ref={ buttonRef }
 					>
-						<Icon icon={ search } />
+						<Icon icon={ searchBlockIcon } />
 					</button>
 				) }
 
@@ -363,7 +384,7 @@ export default function SearchEdit( {
 						} }
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							value={ buttonPosition }
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
@@ -480,7 +501,7 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'HTML element' ) }
 					value={ tagName ?? '' }
 					options={ [
@@ -516,7 +537,7 @@ export default function SearchEdit( {
 
 	const getWrapperStyles = () => {
 		const styles = isButtonPositionInside
-			? borderProps.style
+			? { ...borderProps.style, ...shadowProps.style }
 			: {
 					borderRadius: borderProps.style?.borderRadius,
 					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
@@ -526,7 +547,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomLeftRadius,
 					borderBottomRightRadius:
 						borderProps.style?.borderBottomRightRadius,
-			  };
+				};
 
 		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.
@@ -624,19 +645,30 @@ export default function SearchEdit( {
 							: undefined
 					) }
 					style={ getWrapperStyles() }
-					minWidth={ MIN_WIDTH }
+					// ResizableBox writes these over `style`, and only reads
+					// them as pixel limits while resizing.
+					minWidth={
+						isResizing ? MIN_WIDTH : dimensionsProps.style?.minWidth
+					}
+					minHeight={
+						isResizing
+							? undefined
+							: dimensionsProps.style?.minHeight
+					}
 					enable={ getResizableSides() }
 					onResizeStart={ ( event, direction, elt ) => {
 						setAttributes( {
 							width: parseInt( elt.offsetWidth, 10 ),
 							widthUnit: 'px',
 						} );
+						setIsResizing( true );
 						toggleSelection( false );
 					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
 						setAttributes( {
 							width: parseInt( width + delta.width, 10 ),
 						} );
+						setIsResizing( false );
 						toggleSelection( true );
 					} }
 					showHandle={ isSelected }

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, test } from 'vitest';
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
@@ -52,9 +53,13 @@ describe( 'blocks', () => {
 			unlock( select( blocksStore ) ).getUnprocessedBlockTypes()
 		);
 		dispatch( blocksStore ).removeBlockTypes( registeredNames );
+		Object.keys( select( blocksStore ).getCollections() ).forEach(
+			unregisterBlockCollection
+		);
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
+		setGroupingBlockName( undefined );
 
 		// Reset deprecation logging to ensure we properly track warnings.
 		for ( const key in logged ) {
@@ -178,6 +183,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with an invalid edit function', () => {
 			const blockType = {
+					apiVersion: 3,
 					save: noop,
 					edit: {},
 					category: 'text',
@@ -227,6 +233,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without title', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -243,6 +250,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with empty titles', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -260,6 +268,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject titles which are not strings', () => {
 			const blockType = {
+					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
@@ -328,6 +337,7 @@ describe( 'blocks', () => {
 			'should warn and default to empty object when attributes is %s',
 			( _label, value ) => {
 				registerBlockType( 'core/test-block-null-attributes', {
+					apiVersion: 3,
 					title: 'block title',
 					category: 'text',
 					save: noop,
@@ -854,40 +864,12 @@ describe( 'blocks', () => {
 					],
 				};
 
-				let i = 0;
+				const filteredSettings = [];
 				addFilter(
 					'blocks.registerBlockType',
 					'core/blocks/without-title',
 					( settings ) => {
-						// Verify that for deprecations, the filter is called with a merge of pre-filter
-						// settings with deprecation keys omitted and the deprecation entry.
-						if ( i > 0 ) {
-							// eslint-disable-next-line jest/no-conditional-expect
-							expect( settings ).toEqual( {
-								...omit(
-									{
-										name,
-										icon: BLOCK_ICON_DEFAULT,
-										attributes: {},
-										providesContext: {},
-										usesContext: [],
-										keywords: [],
-										selectors: {},
-										supports: {},
-										styles: [],
-										variations: [],
-										blockHooks: {},
-										save: () => null,
-										...blockSettingsWithDeprecations,
-									},
-									DEPRECATED_ENTRY_KEYS
-								),
-								...blockSettingsWithDeprecations.deprecated[
-									i - 1
-								],
-							} );
-						}
-						i++;
+						filteredSettings.push( settings );
 
 						return {
 							...settings,
@@ -904,6 +886,34 @@ describe( 'blocks', () => {
 				const block = registerBlockType(
 					name,
 					blockSettingsWithDeprecations
+				);
+				expect( filteredSettings ).toHaveLength( 3 );
+				// Deprecation settings merge the pre-filter settings, without
+				// deprecation keys, with each deprecation entry.
+				blockSettingsWithDeprecations.deprecated.forEach(
+					( deprecation, index ) => {
+						expect( filteredSettings[ index + 1 ] ).toEqual( {
+							...omit(
+								{
+									name,
+									icon: BLOCK_ICON_DEFAULT,
+									attributes: {},
+									providesContext: {},
+									usesContext: [],
+									keywords: [],
+									selectors: {},
+									supports: {},
+									styles: [],
+									variations: [],
+									blockHooks: {},
+									save: () => null,
+									...blockSettingsWithDeprecations,
+								},
+								DEPRECATED_ENTRY_KEYS
+							),
+							...deprecation,
+						} );
+					}
 				);
 
 				expect( block.attributes.id ).toEqual( { type: 'string' } );

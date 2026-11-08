@@ -1,11 +1,16 @@
 import clsx from 'clsx';
 import {
 	Button,
-	Spinner,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
+	__unstableAnimatePresence as AnimatePresence,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
-import { useViewportMatch } from '@wordpress/compose';
+import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { NavigableRegion } from '@wordpress/admin-ui';
@@ -19,15 +24,28 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import {
+	backup,
+	close,
+	drawerRight,
+	keyboard,
+	moreVertical,
+	redo,
+	undo,
+} from '@wordpress/icons';
 import {
 	displayShortcut,
 	isAppleOS,
 	isKeyboardEvent,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
-import type { Field } from '@wordpress/dataviews';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type { Field, Form } from '@wordpress/dataviews';
+import type {
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactElement,
+	ReactNode,
+} from 'react';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -38,7 +56,6 @@ import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 import {
@@ -68,10 +85,30 @@ const DETAILS_PANEL = 'details';
 /** Identifier for the crop panel. Images only; other media has nothing to crop. */
 const CROP_PANEL = 'crop';
 
+// Matches the editor's sidebar in `ComplementaryArea`.
+const SIDEBAR_ANIMATION_DURATION = 0.3;
+
+type SidebarTransition = {
+	type: 'tween';
+	duration: number;
+	ease: number[];
+};
+
+const sidebarVariants = {
+	// `auto` leaves the width to the sidebar's stylesheet.
+	open: { width: 'auto' },
+	// Takes the transition from `AnimatePresence`'s `custom` prop, so a
+	// sidebar that is already closing still gets the current one.
+	closed: ( transition: SidebarTransition ) => ( {
+		width: 0,
+		transition,
+	} ),
+};
+
 interface MediaEditorTab {
 	id: string;
 	title: string;
-	render: () => JSX.Element;
+	render: () => ReactElement;
 }
 
 export interface MediaEditorFrameProps {
@@ -101,11 +138,14 @@ export interface MediaEditorFrameProps {
 
 export interface MediaEditorProps {
 	fields?: Field< Media >[];
+	form?: Form;
 	id: number;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
-	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
+	/** Called with the original's id when the user chooses "Edit original". */
+	onEditOriginal?: ( originalId: number ) => void;
+	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
@@ -116,12 +156,15 @@ interface MediaEditorSidebarProps {
 	/** The open panel's id. Always one of `tabs`. */
 	activeTab: string;
 	onSelectTab: ( tab: string ) => void;
+	/** Freeze the open panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 function MediaEditorSidebar( {
 	tabs,
 	activeTab,
 	onSelectTab,
+	disabled = false,
 }: MediaEditorSidebarProps ) {
 	return (
 		<NavigableRegion
@@ -146,7 +189,11 @@ function MediaEditorSidebar( {
 				<div className="media-editor__tablist">
 					<Tabs.List variant="minimal">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } value={ tab.id }>
+							<Tabs.Tab
+								key={ tab.id }
+								value={ tab.id }
+								disabled={ disabled }
+							>
 								{ tab.title }
 							</Tabs.Tab>
 						) ) }
@@ -196,7 +243,24 @@ interface MediaEditorFrameContextValue {
 	onTogglePanel: () => void;
 	onCancel: () => void;
 	onSave: () => void;
-	onReset: () => void;
+	/**
+	 * When `true`, the media has a lineage root to restore to, so the
+	 * history menu shows its "Restore original" item.
+	 */
+	canRestoreOriginal: boolean;
+	/**
+	 * When `true`, another attachment has replaced the edited one in the
+	 * image editor this session (today, only the original), so the menu item is
+	 * disabled.
+	 */
+	isSourceReplaced: boolean;
+	/** Whether the frame opens the original itself. */
+	opensOriginal: boolean;
+	/**
+	 * Load the lineage root into the image editor, or hand it to the
+	 * frame.
+	 */
+	onRestoreOriginal: () => void;
 }
 
 const MediaEditorFrameContext =
@@ -229,11 +293,66 @@ export interface HeaderActionsProps {
 	showCloseButton?: boolean;
 }
 
-function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
-		useMediaEditorFrameContext();
+function PanelToggle() {
+	const { isWide, activePanel, onTogglePanel } = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
+	// The sidebar holds more than one panel, so this opens and closes the
+	// sidebar rather than naming a panel: reopening returns to whichever tab
+	// was last showing, and the tab strip inside switches between them.
+	return (
+		<Button
+			size="compact"
+			icon={ drawerRight }
+			label={ __( 'Media settings' ) }
+			isPressed={ isPanelOpen }
+			// Only a docked column really expands beside the canvas; below
+			// that the panel replaces the view, which the pressed state
+			// already describes.
+			aria-expanded={ isWide ? isPanelOpen : undefined }
+			onClick={ onTogglePanel }
+		/>
+	);
+}
+
+function MoreMenu() {
+	const { isImage } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
+	if ( ! isImage ) {
+		return null;
+	}
+	return (
+		<>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More options' ) }
+				toggleProps={ { size: 'compact' } }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<MenuGroup>
+						<MenuItem
+							icon={ keyboard }
+							iconPosition="left"
+							onClick={ () => {
+								setIsShortcutsModalOpen( true );
+								closeMenu();
+							} }
+						>
+							{ __( 'Keyboard shortcuts' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
+		</>
+	);
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isSaving, onCancel } = useMediaEditorFrameContext();
 	return (
 		<Stack
 			className="media-editor__header-actions"
@@ -241,29 +360,8 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && (
-				<Button
-					size="compact"
-					icon={ keyboard }
-					label={ __( 'Keyboard shortcuts' ) }
-					onClick={ () => setIsShortcutsModalOpen( true ) }
-				/>
-			) }
-			{ /* The sidebar holds more than one panel, so this opens and
-			     closes the sidebar rather than naming a panel: reopening
-			     returns to whichever tab was last showing, and the tab strip
-			     inside switches between them. */ }
-			<Button
-				size="compact"
-				icon={ drawerRight }
-				label={ __( 'Media settings' ) }
-				isPressed={ isPanelOpen }
-				// Only a docked column really expands beside the canvas; below
-				// that the panel replaces the view, which the pressed state
-				// already describes.
-				aria-expanded={ isWide ? isPanelOpen : undefined }
-				onClick={ onTogglePanel }
-			/>
+			<PanelToggle />
+			<MoreMenu />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -274,18 +372,22 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					accessibleWhenDisabled
 				/>
 			) }
-			{ isShortcutsModalOpen && (
-				<MediaEditorKeyboardShortcutsModal
-					onClose={ () => setIsShortcutsModalOpen( false ) }
-				/>
-			) }
 		</Stack>
 	);
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		isUndoRedoDisabled,
+		isWide,
+		activePanel,
+		canRestoreOriginal,
+		isSourceReplaced,
+		opensOriginal,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -293,11 +395,9 @@ function HistoryActions() {
 		hasRedo,
 		undo: undoCrop,
 		redo: redoCrop,
-		beginGesture,
-		endGesture,
 	} = useMediaEditor();
-	// Reset, undo and redo act on the cropper, so they only appear where the
-	// canvas does. Non-image media has no edit history at all; below the dock
+	// Reset, undo and redo act on the image edits, so they only appear where
+	// the canvas does. Non-image media has no edit history at all; below the dock
 	// breakpoint an open panel replaces the canvas, and leaving these behind
 	// would put an enabled, destructive Reset next to metadata fields it does
 	// not touch — clicking it would discard a crop the user cannot see.
@@ -320,10 +420,10 @@ function HistoryActions() {
 		redoCrop();
 	};
 	const handleReset = () => {
-		beginGesture();
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
 		reset();
-		onReset();
-		endGesture();
 	};
 	return (
 		<Stack
@@ -331,15 +431,6 @@ function HistoryActions() {
 			align="center"
 			gap="sm"
 		>
-			<Button
-				size="compact"
-				variant="tertiary"
-				disabled={ ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
 			<Button
 				size="compact"
 				icon={ undo }
@@ -364,6 +455,50 @@ function HistoryActions() {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
+			<DropdownMenu
+				icon={ backup }
+				label={ __( 'History' ) }
+				popoverProps={ { placement: 'top-start' } }
+				toggleProps={ {
+					size: 'compact',
+					disabled:
+						isUndoRedoDisabled ||
+						( ! isDirty && ! canRestoreOriginal ),
+					accessibleWhenDisabled: true,
+				} }
+			>
+				{ ( { onClose: closeMenu } ) => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								disabled={ isUndoRedoDisabled || ! isDirty }
+								onClick={ () => {
+									handleReset();
+									closeMenu();
+								} }
+							>
+								{ __( 'Reset image edits' ) }
+							</MenuItem>
+						</MenuGroup>
+						{ canRestoreOriginal && (
+							<MenuGroup>
+								<MenuItem
+									disabled={ isSourceReplaced || isSaving }
+									info={ __( 'Discards unsaved changes.' ) }
+									onClick={ () => {
+										onRestoreOriginal();
+										closeMenu();
+									} }
+								>
+									{ opensOriginal
+										? __( 'Edit original' )
+										: __( 'Restore original' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
 		</Stack>
 	);
 }
@@ -416,16 +551,18 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 
 function MediaEditorContent( {
 	fields = [],
+	form,
 	id,
 	aspectRatioPresets,
 	onClose,
 	onSaved,
+	onEditOriginal,
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useMediaEditor();
+	const session = useMediaEditor();
 	// Width decides whether the settings panel docks beside the canvas or
 	// takes the whole body. It docks from `small` (600px): the modal is the
 	// viewport less a 16px margin either side, so a 320px panel and the
@@ -439,74 +576,39 @@ function MediaEditorContent( {
 	// The choice is not carried across openings: the modal is transient, and
 	// re-opening with the panel hidden on a wide screen is how #81487 read to
 	// people in the first place. Within one opening it does hold — see
-	// `hasChosenPanelRef` below.
+	// `chosenPanel` below.
 	const isWide = useViewportMatch( 'small' );
-	// `null` when nothing is open, otherwise the open panel's id.
-	const [ activePanel, setActivePanel ] = useState< string | null >(
-		isWide ? DETAILS_PANEL : null
-	);
-	// Width picks the starting panel, but only until the user picks one. After
-	// that their choice holds for the rest of the session: closing the panel
-	// and then resizing — or crossing the breakpoint by rotating a tablet —
-	// should not reopen something they just dismissed.
-	const hasChosenPanelRef = useRef( false );
-	// The panel the toggle reopens, and the one width picks until the user
-	// picks their own. Tracked separately from `hasChosenPanelRef` because
-	// the two answer different questions: whether the panel should be open,
-	// and which tab it should show.
-	const lastPanelRef = useRef( DETAILS_PANEL );
-	const hasChosenTabRef = useRef( false );
-	// Switching tabs says nothing about whether the panel should be open, so
-	// it leaves `hasChosenPanelRef` alone: picking Details on a wide screen
-	// and then dragging the window narrow should still hand the canvas the
-	// full width.
-	const selectPanel = useCallback( ( panel: string ) => {
-		hasChosenTabRef.current = true;
-		lastPanelRef.current = panel;
-		setActivePanel( panel );
-	}, [] );
-	const togglePanel = useCallback( () => {
-		hasChosenPanelRef.current = true;
-		setActivePanel( ( open ) => ( open ? null : lastPanelRef.current ) );
-	}, [] );
+	// Below `small` the open panel replaces the canvas instead of sitting
+	// beside it, so there is nothing to animate.
+	const disableSidebarMotion = useReducedMotion() || ! isWide;
+	const sidebarTransition: SidebarTransition = {
+		type: 'tween',
+		duration: disableSidebarMotion ? 0 : SIDEBAR_ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
+	// Width picks the starting panel, but only until the user opens or closes
+	// it. After that their choice holds for the rest of the session: closing
+	// the panel and then resizing — or crossing the breakpoint by rotating a
+	// tablet — should not reopen something they just dismissed. `undefined`
+	// until then, otherwise `null` for closed or the open panel's id.
+	const [ chosenPanel, setChosenPanel ] = useState< string | null >();
+	// The tab the user picked, `null` until they pick one. Tracked separately
+	// from `chosenPanel` because the two answer different questions: whether
+	// the panel should be open, and which tab it should show.
+	const [ chosenTab, setChosenTab ] = useState< string | null >( null );
 	// Below `small` a frame's header cannot fit the history cluster alongside
 	// its own controls, so it moves that cluster elsewhere. The same width
 	// undocks the panel, so this is `isWide` rather than a second query.
 	const layout: 'wide' | 'narrow' = isWide ? 'wide' : 'narrow';
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			const {
-				getEditedEntityRecord,
-				getEntityRecord,
-				hasEditsForEntityRecord,
-			} = select( coreStore );
-			// Trigger an _embed fetch so `_embedded.author` and
-			// `_embedded['wp:attached-to']` land on the record for the Details
-			// fields to read. `getEditedEntityRecord` doesn't formally accept a
-			// query, so we can't embed via that selector directly.
-			getEntityRecord(
+	const sourceMedia = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
-				id,
-				ATTACHMENT_EMBED_QUERY
-			);
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					id
-				),
-			};
-		},
+				id
+			) as Media,
 		[ id ]
 	);
-
-	const hasChanges = cropper.isCropperDirty || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -516,8 +618,15 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	// Whether another attachment has replaced `id` in the image editor this
+	// session (today, the original via "Restore original image"). Stays a
+	// distinct flag (not derived from the image editor) so a bare replacement
+	// counts as a change even though swapping the source resets the
+	// image editor's own dirty baseline.
+	const [ isSourceReplaced, setIsSourceReplaced ] = useState( false );
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -540,72 +649,162 @@ function MediaEditorContent( {
 		};
 	}, [] );
 
-	useEffect( () => {
-		setIsPlacementActive( false );
-		setIsCanvasGestureActive( false );
-	}, [ id ] );
-
-	// Bust the cached `_embed` resolution each time the editor mounts (or the
-	// id changes) so embedded data such as the attached post's title or the
-	// author's name reflects any edits made elsewhere since the last open.
+	// Restore-original: the edit root the edited attachment descends from,
+	// exposed by the server as the root-level `edit_root` id on the
+	// attachment (edit context, embeddable via the `wp:edit-root` link).
+	// Fetch the original's record for the URL and natural dimensions the
+	// image editor needs to seed itself.
+	const originalId: number | undefined = sourceMedia?.edit_root;
+	const originalRecord = useSelect(
+		( select ) =>
+			originalId
+				? ( select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						originalId
+					) as Media | undefined )
+				: undefined,
+		[ originalId ]
+	);
+	const originalWidth = Number( originalRecord?.media_details?.width );
+	const originalHeight = Number( originalRecord?.media_details?.height );
+	const originalUrl = originalRecord?.source_url;
+	const originalSource =
+		originalId &&
+		originalRecord &&
+		typeof originalUrl === 'string' &&
+		originalUrl.length > 0 &&
+		Number.isFinite( originalWidth ) &&
+		originalWidth > 0 &&
+		Number.isFinite( originalHeight ) &&
+		originalHeight > 0
+			? {
+					id: originalId,
+					url: originalUrl,
+					media: originalRecord,
+				}
+			: undefined;
+	const canRestoreOriginal = !! originalSource;
+	const replacementSource =
+		isSourceReplaced && originalSource
+			? {
+					id: originalSource.id,
+					url: originalSource.url,
+					media: originalSource.media,
+				}
+			: undefined;
+	// Details and pending edits follow the attachment shown on the canvas.
+	// Keep `sourceMedia` separate for the snackbar's previous attachment.
+	const activeId = replacementSource?.id ?? id;
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
+			// Fetch embedded author and attached-post data for Details.
+			getEntityRecord(
+				'postType',
+				'attachment',
+				activeId,
+				ATTACHMENT_EMBED_QUERY
+			);
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					activeId
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					activeId
+				),
+			};
+		},
+		[ activeId ]
+	);
+	// Refresh embedded data on opening or switching to the original.
 	useEffect( () => {
 		invalidateResolution( 'getEntityRecord', [
 			'postType',
 			'attachment',
-			id,
+			activeId,
 			ATTACHMENT_EMBED_QUERY,
 		] );
-	}, [ id, invalidateResolution ] );
+	}, [ activeId, invalidateResolution ] );
+	const handleRestoreOriginal = useCallback( () => {
+		// Restoring discards every pending edit, as the menu item says, so
+		// nothing staged against the attachment being replaced reaches a save.
+		clearEntityRecordEdits( 'postType', 'attachment', id );
+		if ( onEditOriginal && originalId ) {
+			onEditOriginal( originalId );
+			return;
+		}
+		setIsSourceReplaced( true );
+	}, [ clearEntityRecordEdits, id, onEditOriginal, originalId ] );
+
+	// A bare replacement has no image editor change, so OR the flag in explicitly.
+	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
 
-	// Until the user picks a panel, follow the breakpoint: dragging a window
-	// narrow hands the canvas the full width instead of leaving a panel
-	// wedged beside it.
-	//
 	// Docked, the panel opens on Crop: the canvas is still beside it and
 	// cropping is what the editor is for. Below `small` an open panel covers
 	// the canvas, and crop controls with no crop in sight are not worth
 	// opening on, so Details leads there. Non-image media has no Crop tab at
-	// all (see `tabs`), so it always gets Details. `isImage` comes from a
-	// record that resolves after mount, which is why this runs in an effect
-	// rather than seeding `useState`.
-	useEffect( () => {
-		if ( hasChosenPanelRef.current && hasChosenTabRef.current ) {
-			return;
-		}
-		const defaultPanel = isWide && isImage ? CROP_PANEL : DETAILS_PANEL;
-		if ( ! hasChosenTabRef.current ) {
-			lastPanelRef.current = defaultPanel;
-		}
-		if ( ! hasChosenPanelRef.current ) {
-			setActivePanel( isWide ? lastPanelRef.current : null );
-		}
-	}, [ isWide, isImage ] );
-	// Only `resetCropOptions` is needed here, for the Reset button; the
-	// aspect-ratio members are read by `MediaEditorImageControls` itself.
-	const {
-		aspectRatioValue,
-		setAspectRatioValue,
-		aspectRatioOptions,
-		resetCropOptions,
-	} = useCropOptions( { aspectRatioPresets } );
+	// all (see `tabs`), so it always gets Details.
+	const currentTab =
+		chosenTab ?? ( isWide && isImage ? CROP_PANEL : DETAILS_PANEL );
+	// `null` when nothing is open, otherwise the open panel's id. Until the
+	// user opens or closes the panel, follow the breakpoint: dragging a window
+	// narrow hands the canvas the full width instead of leaving a panel
+	// wedged beside it.
+	let activePanel = chosenPanel;
+	if ( activePanel === undefined ) {
+		activePanel = isWide ? currentTab : null;
+	}
+	// Switching tabs says nothing about whether the panel should be open, so
+	// it leaves `chosenPanel` unset: picking Details on a wide screen and then
+	// dragging the window narrow should still hand the canvas the full width.
+	const selectPanel = useCallback( ( panel: string ) => {
+		setChosenTab( panel );
+		setChosenPanel( ( chosen ) =>
+			chosen === undefined ? chosen : panel
+		);
+	}, [] );
+	const togglePanel = useCallback( () => {
+		setChosenPanel( activePanel ? null : currentTab );
+	}, [ activePanel, currentTab ] );
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
-		cropper,
+		session,
 		id,
 		isImage,
-		media,
+		media: sourceMedia,
 		onSaved,
+		replacementSource,
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
-		editEntityRecord( 'postType', 'attachment', id, updates );
+		// A save reads the pending edits once and then waits. An edit
+		// arriving after that read misses the request, and a crop save
+		// then clears the edits for this id, so it would be lost rather
+		// than merely late. It would also land on the attachment being
+		// replaced, not the new one the modal moves to.
+		if ( isSaving ) {
+			return;
+		}
+		editEntityRecord( 'postType', 'attachment', activeId, updates );
 	};
 
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
-		clearEntityRecordEdits( 'postType', 'attachment', id );
+		clearEntityRecordEdits( 'postType', 'attachment', activeId );
+		setIsSourceReplaced( false );
 		onClose?.();
 	};
 
@@ -634,13 +833,13 @@ function MediaEditorContent( {
 				! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 			if ( ! isMetadataField ) {
 				event.preventDefault();
-				if ( isCropInteractionActive ) {
+				if ( isCropInteractionActive || isSaving ) {
 					return;
 				}
 				if ( isRedoShortcut ) {
-					cropper.redo();
+					session.redo();
 				} else {
-					cropper.undo();
+					session.undo();
 				}
 			}
 		}
@@ -677,6 +876,7 @@ function MediaEditorContent( {
 			<MediaEditorImageControls
 				showAspectRatioControl
 				aspectRatioPresets={ aspectRatioPresets }
+				disabled={ isSaving }
 			/>
 		) : null;
 
@@ -694,10 +894,11 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
+								disabled={ isSaving }
 							/>
 						),
 					},
-			  ]
+				]
 			: [] ),
 		{
 			id: DETAILS_PANEL,
@@ -709,6 +910,7 @@ function MediaEditorContent( {
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
 			onPlacementControlInteraction={ signalPlacementControlInteraction }
+			disabled={ isSaving }
 		/>
 	) : null;
 
@@ -716,12 +918,24 @@ function MediaEditorContent( {
 		<MediaEditorProvider
 			value={ media ?? undefined }
 			onChange={ handleChange }
-			settings={ { fields } }
+			settings={ {
+				// Disable the fields while saving, so the guard in
+				// `handleChange` is not silently swallowing typing.
+				// `readOnly` would swap the field's layout mid-save;
+				// disabled keeps it in place and greys it out.
+				fields: isSaving
+					? fields.map( ( field ) => ( {
+							...field,
+							isDisabled: true,
+						} ) )
+					: fields,
+				form,
+			} }
 		>
 			<div className="media-editor">
 				{ ! media ? (
 					<div className="media-editor__loading">
-						<Spinner />
+						<WCSpinner />
 					</div>
 				) : (
 					<div
@@ -745,6 +959,7 @@ function MediaEditorContent( {
 											handleCanvasGestureStart
 										}
 										onGestureEnd={ handleCanvasGestureEnd }
+										disabled={ isSaving }
 									/>
 								) : (
 									<MediaPreview />
@@ -757,24 +972,41 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ !! activePanel && (
-							<MediaEditorSidebar
-								tabs={ tabs }
-								// Swapping the edited media can drop the Crop
-								// tab out from under an open panel — saving a
-								// crop moves the editor to a new id, which may
-								// resolve as non-image. Fall back rather than
-								// hand `Tabs.Root` a value no tab matches.
-								activeTab={
-									tabs.some(
-										( tab ) => tab.id === activePanel
-									)
-										? activePanel
-										: DETAILS_PANEL
-								}
-								onSelectTab={ selectPanel }
-							/>
-						) }
+						<AnimatePresence
+							initial={ false }
+							custom={ sidebarTransition }
+						>
+							{ !! activePanel && (
+								<motion.div
+									className="media-editor__sidebar-container"
+									variants={ sidebarVariants }
+									initial="closed"
+									animate="open"
+									exit="closed"
+									transition={ sidebarTransition }
+								>
+									<MediaEditorSidebar
+										tabs={ tabs }
+										// Swapping the edited media can drop the
+										// Crop tab out from under an open panel —
+										// saving a crop moves the editor to a new
+										// id, which may resolve as non-image.
+										// Fall back rather than hand `Tabs.Root`
+										// a value no tab matches.
+										activeTab={
+											tabs.some(
+												( tab ) =>
+													tab.id === activePanel
+											)
+												? activePanel
+												: DETAILS_PANEL
+										}
+										onSelectTab={ selectPanel }
+										disabled={ isSaving }
+									/>
+								</motion.div>
+							) }
+						</AnimatePresence>
 					</div>
 				) }
 			</div>
@@ -805,14 +1037,20 @@ function MediaEditorContent( {
 		isSaving,
 		hasMedia: !! media,
 		hasChanges,
-		isUndoRedoDisabled: isCropInteractionActive,
+		// Saving freezes the whole edit surface: `save()` reads the
+		// modifiers once and then awaits, so anything changed after that
+		// would be silently dropped when the save resolves.
+		isUndoRedoDisabled: isCropInteractionActive || isSaving,
 		aspectRatioPresets,
 		isWide,
 		activePanel,
 		onTogglePanel: togglePanel,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
-		onReset: resetCropOptions,
+		canRestoreOriginal,
+		isSourceReplaced,
+		opensOriginal: !! onEditOriginal,
+		onRestoreOriginal: handleRestoreOriginal,
 	};
 
 	return (
@@ -844,6 +1082,8 @@ export function MediaEditor( props: MediaEditorProps ) {
 // `DataViewsPicker` exposes its own sub-components. They read what they need
 // from context, so a frame only chooses where they go and how they look.
 MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.PanelToggle = PanelToggle;
+MediaEditor.MoreMenu = MoreMenu;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
 

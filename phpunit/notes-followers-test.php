@@ -426,6 +426,25 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Unfollowing cannot stop core's post-author emails, so the post author's
+	 * mention email does not offer the link.
+	 *
+	 * @covers ::gutenberg_add_note_unfollow_link_to_email
+	 */
+	public function test_mentioned_post_author_is_not_offered_the_unfollow_link(): void {
+		$note = $this->insert_note(
+			'Hey ' . self::mention( self::$post_author->ID, '@Author' ),
+			self::$commenter->ID
+		);
+
+		$this->fire_rest_insert( $note );
+
+		$emails = $this->emails_to( self::$post_author->user_email );
+		$this->assertCount( 1, $emails );
+		$this->assertStringNotContainsString( 'wp_note_unfollow', $emails[0]['message'] );
+	}
+
+	/**
 	 * Without a mention, core's generic post-author email is untouched.
 	 *
 	 * @covers ::gutenberg_route_post_author_mention_notification

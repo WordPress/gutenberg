@@ -65,13 +65,7 @@ function SidebarNavigationItemContent( {
 			{ ...props }
 		>
 			<Stack direction="row" align="center" justify="start" gap="sm">
-				{ icon && (
-					<Icon
-						style={ { fill: 'currentcolor' } }
-						icon={ icon }
-						size={ 24 }
-					/>
-				) }
+				{ icon && <Icon icon={ icon } size={ 24 } /> }
 				<FlexBlock>{ children }</FlexBlock>
 				{ withChevron && (
 					<Icon

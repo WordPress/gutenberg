@@ -1,0 +1,7 @@
+import { expect, test } from 'vitest';
+
+test( 'defaults to Node without Gutenberg setup', () => {
+	expect( typeof document ).toBe( 'undefined' );
+	expect( globalThis.wpVitest ).toBeUndefined();
+	expect( globalThis.expect ).toBeUndefined();
+} );

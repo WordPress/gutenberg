@@ -309,7 +309,7 @@ const SUPPORTS_ANCHORS = fs.existsSync( SUPPORTS_DOC_PATH )
 					.matchAll( /^#{1,6}\s+(.+)$/gm ),
 				( m ) => slugifyHeading( m[ 1 ] )
 			)
-	  )
+		)
 	: new Set();
 
 /**

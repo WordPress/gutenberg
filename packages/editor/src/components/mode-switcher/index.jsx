@@ -1,7 +1,10 @@
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 /**
@@ -24,9 +27,9 @@ function ModeSwitcher() {
 	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
 		useSelect(
 			( select ) => ( {
-				shortcut: select(
-					keyboardShortcutsStore
-				).getShortcutRepresentation( 'core/editor/toggle-mode' ),
+				shortcut: select( keyboardShortcutsStore ).getKeyboardShortcut(
+					'core/editor/toggle-mode'
+				),
 				isRichEditingEnabled:
 					select( editorStore ).getEditorSettings()
 						.richEditingEnabled,
@@ -70,13 +73,27 @@ function ModeSwitcher() {
 	} );
 
 	return (
-		<MenuGroup label={ __( 'Editor' ) }>
-			<MenuItemsChoice
-				choices={ choices }
-				value={ selectedMode }
-				onSelect={ switchEditorMode }
-			/>
-		</MenuGroup>
+		<Menu.RadioGroup
+			value={ selectedMode }
+			onValueChange={ ( value ) => switchEditorMode( value ) }
+		>
+			<Menu.GroupLabel>{ __( 'Editor' ) }</Menu.GroupLabel>
+			{ choices.map( ( choice ) => (
+				<Menu.RadioItem
+					key={ choice.value }
+					value={ choice.value }
+					disabled={ choice.disabled }
+					shortcut={ choice.shortcut }
+				>
+					<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+					{ choice.info && (
+						<Menu.ItemDescription>
+							{ choice.info }
+						</Menu.ItemDescription>
+					) }
+				</Menu.RadioItem>
+			) ) }
+		</Menu.RadioGroup>
 	);
 }
 

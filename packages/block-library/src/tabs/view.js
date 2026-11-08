@@ -1,5 +1,6 @@
 import {
 	store,
+	getConfig,
 	getContext,
 	getElement,
 	withSyncEvent,
@@ -76,7 +77,7 @@ const { actions, state } = store(
 		},
 		actions: {
 			/**
-			 * Handles the keydown events for the tab label and tabs controller.
+			 * Handles the keydown events for the tab buttons.
 			 *
 			 * @param {KeyboardEvent} event The keydown event.
 			 */
@@ -87,12 +88,15 @@ const { actions, state } = store(
 					return;
 				}
 
+				// Swap the Left and Right arrows on RTL sites.
+				const step = getConfig().isRTL ? -1 : 1;
+
 				if ( event.key === 'ArrowRight' ) {
 					event.preventDefault();
-					actions.moveFocus( tabIndex + 1 );
+					actions.moveFocus( tabIndex + step );
 				} else if ( event.key === 'ArrowLeft' ) {
 					event.preventDefault();
-					actions.moveFocus( tabIndex - 1 );
+					actions.moveFocus( tabIndex - step );
 				} else if ( event.key === 'Home' ) {
 					event.preventDefault();
 					actions.moveFocus( 0 );
@@ -186,23 +190,47 @@ const { actions, state } = store(
 			},
 		},
 		callbacks: {
-			/**
-			 * When the tabs are initialized, we need to check if there is a hash in the url and if so if it exists in the current tabsList, set the active tab to that index.
-			 *
-			 */
-			onTabsInit: () => {
+			activateTabByHash: () => {
 				const { tabsList } = state;
-				if ( tabsList.length === 0 ) {
+
+				if ( ! tabsList || tabsList.length === 0 ) {
 					return;
 				}
 
-				const { hash } = window.location;
-				const tabId = hash.replace( '#', '' );
-				const tabIndex = tabsList.findIndex( ( t ) => t === tabId );
-				// Check if tabIndex is a positive number and if so we'll auto activate that tab.
-				if ( tabIndex >= 0 ) {
-					actions.setActiveTab( tabIndex, true );
+				const targetElement = document.querySelector( ':target' );
+				if ( ! targetElement ) {
+					return;
 				}
+
+				const panelIndex = tabsList.findIndex(
+					( t ) => t === targetElement.id
+				);
+				if ( panelIndex >= 0 ) {
+					actions.setActiveTab( panelIndex, true );
+					return;
+				}
+
+				// Walk up the panels containing the target rather than taking
+				// the nearest one, so that nested tabs resolve to the panel
+				// belonging to this block.
+				let panel = targetElement.closest( '.wp-block-tab-panel' );
+				let tabIndex = -1;
+
+				while ( panel && tabIndex < 0 ) {
+					tabIndex = tabsList.findIndex( ( t ) => t === panel.id );
+					panel =
+						panel.parentElement?.closest( '.wp-block-tab-panel' ) ??
+						null;
+				}
+
+				if ( tabIndex < 0 ) {
+					return;
+				}
+
+				actions.setActiveTab( tabIndex );
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
 			},
 		},
 	},

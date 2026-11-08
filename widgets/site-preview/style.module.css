@@ -25,7 +25,7 @@
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	border-radius: var(--wpds-border-radius-lg);
-	background: var(--wpds-color-background-surface-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 }
 
 .url-favicon {

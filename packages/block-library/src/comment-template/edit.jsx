@@ -8,12 +8,12 @@ import {
 	store as blockEditorStore,
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCommentQueryArgs, useCommentTree } from './hooks';
 
 /**
- * Function that returns a comment structure that will be rendered with default placehoders.
+ * Function that returns a comment structure that will be rendered with default placeholders.
  *
  * Each comment has a `commentId` property that is always a negative number in
  * case of the placeholders. This is to ensure that the comment does not
@@ -266,7 +266,7 @@ export default function CommentTemplateEdit( {
 	if ( ! topLevelComments ) {
 		return (
 			<p { ...blockProps }>
-				<Spinner />
+				<WCSpinner />
 			</p>
 		);
 	}

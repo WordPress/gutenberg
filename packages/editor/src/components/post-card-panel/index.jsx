@@ -4,8 +4,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as WCText,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import { close } from '@wordpress/icons';
 import {
 	store as coreStore,
@@ -23,7 +23,6 @@ import {
 import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 /**
@@ -56,14 +55,14 @@ export default function PostCardPanel( {
 				getPostIcon,
 				getCurrentPostType,
 				isRevisionsMode,
-				getCurrentRevision,
+				getShownVersion,
 			} = unlock( select( editorStore ) );
 			let _title = '';
 
 			// In revisions mode, use the current revision.
 			if ( isRevisionsMode() ) {
 				const parentPostType = getCurrentPostType();
-				const _record = getCurrentRevision();
+				const _record = getShownVersion();
 				_title = _record?.title?.rendered || _record?.title?.raw || '';
 				return {
 					postTitle: _title,
@@ -90,7 +89,7 @@ export default function PostCardPanel( {
 					? getTemplateInfo( {
 							template: _record,
 							templateTypes,
-					  } )
+						} )
 					: {};
 				_title = _templateInfo?.title || _record?.title;
 			}
@@ -140,7 +139,7 @@ export default function PostCardPanel( {
 						{ title }
 					</span>
 					{ pageTypeBadge && postIds.length === 1 && (
-						<WCBadge>{ pageTypeBadge }</WCBadge>
+						<Badge>{ pageTypeBadge }</Badge>
 					) }
 				</WCText>
 				{ ! hideActions && postIds.length === 1 && (
