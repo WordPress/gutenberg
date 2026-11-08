@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `getFilename`: Decode percent-encoded characters, so filenames with non-ASCII characters or spaces, such as `生成波の音1.mp3`, are returned as written instead of as `%E7%94%9F…`.
+-   `getFilename`: Decode the filename so non-ASCII names read as written ([#86422](https://github.com/WordPress/gutenberg/pull/86422)).
 
 ## 5.1.0 (2026-11-04)
 
