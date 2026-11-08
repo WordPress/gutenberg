@@ -685,13 +685,9 @@ test.describe( 'Client-side media processing', () => {
 					await modal
 						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
+					// The presets come from the theme, e.g. "Square - 1:1".
 					await page
-						// The popup renders outside the modal, which hides
-						// its siblings from the accessibility tree.
-						.getByRole( 'option', {
-							name: 'Square (1:1)',
-							includeHidden: true,
-						} )
+						.getByRole( 'option', { name: /^Square/ } )
 						.click();
 				}
 			);
@@ -742,13 +738,9 @@ test.describe( 'Client-side media processing', () => {
 					await modal
 						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
+					// The presets come from the theme, e.g. "Square - 1:1".
 					await page
-						// The popup renders outside the modal, which hides
-						// its siblings from the accessibility tree.
-						.getByRole( 'option', {
-							name: 'Square (1:1)',
-							includeHidden: true,
-						} )
+						.getByRole( 'option', { name: /^Square/ } )
 						.click();
 				}
 			);
