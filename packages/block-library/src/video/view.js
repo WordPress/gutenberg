@@ -1,4 +1,5 @@
-import { store, getElement } from '@wordpress/interactivity';
+import { getElement, store } from '@wordpress/interactivity';
+import { prefersReducedMotion } from '../utils/reduced-motion';
 
 /**
  * Playback for a Live photo Video block.
@@ -13,7 +14,7 @@ import { store, getElement } from '@wordpress/interactivity';
  * one tap and returns to the still on the next.
  *
  * The directives are attached at render time, and only to Live photos (see
- * render_block_core_video), so an ordinary video page never loads this module.
+ * render_block_core_video), so an ordinary video never gets them.
  */
 
 /**
@@ -43,6 +44,20 @@ function rest( video ) {
 store(
 	'core/video',
 	{
+		callbacks: {
+			stopAutoplay() {
+				if ( ! prefersReducedMotion() ) {
+					return;
+				}
+
+				// The video is saved with `autoplay`, so it is stopped here
+				// rather than never started. Clearing the attribute as well
+				// keeps it from playing again if the source reloads.
+				const { ref } = getElement();
+				ref.autoplay = false;
+				ref.pause();
+			},
+		},
 		actions: {
 			playLivePhoto( event ) {
 				const { ref } = getElement();

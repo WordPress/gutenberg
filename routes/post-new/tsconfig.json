@@ -11,7 +11,7 @@
 	},
 	"references": [
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
-		{ "path": "../../packages/data" }
+		{ "path": "../../packages/data/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]

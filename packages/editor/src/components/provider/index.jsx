@@ -9,6 +9,7 @@ import {
 	EntityProvider,
 	useEntityBlockEditor,
 	store as coreStore,
+	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -43,6 +44,7 @@ import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+const { PrivateEntityProvider } = unlock( coreDataPrivateApis );
 
 const noop = () => {};
 
@@ -185,6 +187,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			postTypeEntities,
 			isInRevisionsMode,
 			currentRevisionId,
+			browserBackup,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -194,6 +197,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getDefaultRenderingMode,
 					isRevisionsMode: _isRevisionsMode,
 					getCurrentRevisionId: _getCurrentRevisionId,
+					getBrowserBackup: _getBrowserBackup,
 				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
@@ -240,6 +244,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							: null,
 					isInRevisionsMode: _isRevisionsMode(),
 					currentRevisionId: _getCurrentRevisionId(),
+					browserBackup: _getBrowserBackup(),
 				};
 			},
 			[ post.type, post.id, hasTemplate, renderingMode ]
@@ -424,13 +429,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return null;
 		}
 
+		// Selections should not be synced when in revision or preview modes.
+		const shouldSyncSelection =
+			! isInRevisionsMode && ! settings.isPreviewMode;
+
 		return (
 			<EntityProvider kind="root" type="site">
-				<EntityProvider
+				<PrivateEntityProvider
 					kind="postType"
 					type={ post.type }
 					id={ post.id }
 					revisionId={ currentRevisionId ?? undefined }
+					revision={ browserBackup ?? undefined }
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
@@ -438,10 +448,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							onChange={ onChange }
 							onInput={ onInput }
 							selection={
-								isInRevisionsMode ? undefined : selection
+								shouldSyncSelection ? selection : undefined
 							}
 							onChangeSelection={
-								isInRevisionsMode ? noop : onChangeSelection
+								shouldSyncSelection ? onChangeSelection : noop
 							}
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
@@ -470,7 +480,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							) }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
-				</EntityProvider>
+				</PrivateEntityProvider>
 			</EntityProvider>
 		);
 	}

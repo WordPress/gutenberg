@@ -126,11 +126,12 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 _Parameters_
 
 - _props_ `Object`: Component props.
-- _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+- _props.rootLabelText_ `[string]`: Translated label for the root element of the breadcrumb trail.
+- _props.className_ `[string]`: Additional class name for the breadcrumb navigation.
 
 _Returns_
 
-- `Element`: Block Breadcrumb.
+- `React.JSX.Element`: Block Breadcrumb.
 
 ### BlockCanvas
 
@@ -416,7 +417,7 @@ _Parameters_
 - _props_ `Object`:
 - _props.label_ `?string`: A label for the control.
 - _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
-- _props.value_ `string`: The current dimension value.
+- _props.value_ `string|number`: The current dimension value.
 - _props.placeholder_ `?string`: Placeholder text for the custom-value input.
 - _props.className_ `?string`: Additional CSS class on the wrapping fieldset.
 - _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
@@ -430,6 +431,18 @@ _Returns_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
+
+### getBackgroundClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's background support attributes.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: Background block support derived CSS classes & styles.
 
 ### getColorClassName
 
@@ -657,11 +670,11 @@ Dropdown for selecting a heading level (1 through 6) or paragraph (0).
 
 _Parameters_
 
-- _props_ `WPHeadingLevelDropdownProps`: Component props.
+- _props_ `HeadingLevelDropdownProps`: Component props.
 
 _Returns_
 
-- `ComponentType`: The toolbar.
+- `ReactElement`: The toolbar.
 
 ### HeightControl
 
@@ -678,7 +691,7 @@ _Parameters_
 - _props_ `Object`:
 - _props.label_ `?string`: A label for the control.
 - _props.onChange_ `( value: string ) => void`: Called when the height changes.
-- _props.value_ `string`: The current height value.
+- _props.value_ `string|number`: The current height value.
 
 _Returns_
 
@@ -777,7 +790,7 @@ Pre-populate the search input with a default value:
 
 _Parameters_
 
-- _props_ `WPLinkControlProps`: Component props.
+- _props_ `LinkControlProps`: Component props.
 
 ### MediaPlaceholder
 
@@ -871,7 +884,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private `@wordpress/block-editor` APIs.
 
 ### RecursionProvider
 
@@ -1033,6 +1046,20 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBackgroundProps
+
+Derives the background related props for a block from its background block support attributes.
+
+Prefer this in edit components so editor settings can be resolved later without a new API.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: ClassName & style props from background block support.
+
 ### useBlockBindingsUtils
 
 Retrieves the existing utils needed to update the block `bindings` metadata. They can be used to create, modify, or remove connections from the existing block attributes.
@@ -1077,7 +1104,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+- `?BlockBindingsUtils`: Object containing the block bindings utils.
 
 _Changelog_
 
@@ -1099,7 +1126,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+- `?BlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 ### useBlockEditContext
 

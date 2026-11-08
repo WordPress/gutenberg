@@ -44,7 +44,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	}
 
 	return (
-		<nav aria-label={ _x( 'Breadcrumbs', 'area label' ) }>
+		<nav aria-label={ _x( 'Breadcrumbs', 'aria label' ) }>
 			<Stack
 				render={ <ul /> }
 				direction="row"

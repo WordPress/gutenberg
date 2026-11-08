@@ -3,8 +3,7 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
 		"allowImportingTsExtensions": true,
-		// Tests run on Vitest and import their globals, so no jest types.
-		"types": []
+		"types": [ "gutenberg-vitest-test-env", "node" ]
 	},
 	"references": [ { "path": "./tsconfig.build.json" } ]
 }

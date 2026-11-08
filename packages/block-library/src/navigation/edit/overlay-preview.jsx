@@ -2,7 +2,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
@@ -80,7 +80,7 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 	if ( ! hasResolved ) {
 		return (
 			<div className="wp-block-navigation__overlay-preview-loading">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

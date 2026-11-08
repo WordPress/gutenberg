@@ -10,6 +10,18 @@
 
 -   Add `convertHeicSequenceToVideo` to re-encode a demuxed HEIC/HEIF image sequence (Live Photo / burst) to a web-safe video, decoding its HEVC frames with the WebCodecs `VideoDecoder`. Any display rotation carried by the sequence is baked into the encoded frames, and the same total-pixel budget as the GIF path applies ([#79642](https://github.com/WordPress/gutenberg/issues/79642), [#79647](https://github.com/WordPress/gutenberg/pull/79647)).
 
+## 0.10.0 (2026-11-04)
+
+## 0.9.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.8.0 (2026-10-07)
+
+## 0.7.0 (2026-09-23)
+
 ## 0.6.0 (2026-09-10)
 
 ### Internal
