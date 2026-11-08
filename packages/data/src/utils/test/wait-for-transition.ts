@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createRegistry } from '../registry';
-import { waitForTransition } from '../utils';
+import { createRegistry } from '../../registry';
+import { waitForTransition } from '../wait-for-transition';
 
 type SavingState = { saving: boolean };
 type SavingAction = { type: string; saving: boolean };
@@ -35,7 +35,7 @@ describe( 'waitForTransition', () => {
 	it( 'should resolve when predicate transitions from true to false', async () => {
 		const promise = waitForTransition(
 			() => registry.select( 'test' ).isSaving(),
-			registry
+			{ registry }
 		);
 
 		// Transition to true.
@@ -51,7 +51,7 @@ describe( 'waitForTransition', () => {
 		let resolved = false;
 		const promise = waitForTransition(
 			() => registry.select( 'test' ).isSaving(),
-			registry
+			{ registry }
 		).then( () => {
 			resolved = true;
 		} );
@@ -74,7 +74,7 @@ describe( 'waitForTransition', () => {
 		let resolveCount = 0;
 		const promise = waitForTransition(
 			() => registry.select( 'test' ).isSaving(),
-			registry
+			{ registry }
 		).then( () => {
 			resolveCount++;
 		} );
@@ -94,7 +94,7 @@ describe( 'waitForTransition', () => {
 	it( 'should call predicate only once per state change', async () => {
 		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
 
-		const promise = waitForTransition( predicate, registry );
+		const promise = waitForTransition( predicate, { registry } );
 
 		// Transition to true.
 		registry.dispatch( 'test' ).setSaving( true );
@@ -110,7 +110,7 @@ describe( 'waitForTransition', () => {
 	it( 'should unsubscribe after resolving', async () => {
 		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
 
-		const promise = waitForTransition( predicate, registry );
+		const promise = waitForTransition( predicate, { registry } );
 
 		// Complete the transition.
 		registry.dispatch( 'test' ).setSaving( true );
@@ -138,7 +138,7 @@ describe( 'waitForTransition', () => {
 			return registry.select( 'test' ).isSaving();
 		} );
 
-		const promise = waitForTransition( predicate, registry );
+		const promise = waitForTransition( predicate, { registry } );
 
 		// Arrange for the next predicate() invocation (inside the subscribe
 		// listener) to throw.
@@ -161,12 +161,87 @@ describe( 'waitForTransition', () => {
 
 		const promise = waitForTransition(
 			() => registry.select( 'test' ).isSaving(),
-			registry
+			{ registry }
 		);
 
 		// Transition to false - should resolve.
 		registry.dispatch( 'test' ).setSaving( false );
 
 		await expect( promise ).resolves.toBeUndefined();
+	} );
+
+	it( 'should pass the registry select to the predicate', async () => {
+		const promise = waitForTransition(
+			( select ) => select( 'test' ).isSaving(),
+			{ registry }
+		);
+
+		registry.dispatch( 'test' ).setSaving( true );
+		registry.dispatch( 'test' ).setSaving( false );
+
+		await expect( promise ).resolves.toBeUndefined();
+	} );
+
+	it( 'should only run the predicate for changes to the given store', async () => {
+		registry.registerStore( 'other', {
+			reducer: ( state: number = 0, action: { type: string } ) =>
+				action.type === 'INCREMENT' ? state + 1 : state,
+			selectors: {},
+			actions: {
+				increment: () => ( { type: 'INCREMENT' } ),
+			},
+		} );
+		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
+
+		const promise = waitForTransition( predicate, {
+			registry,
+			store: 'test',
+		} );
+		registry.dispatch( 'other' ).increment();
+		registry.dispatch( 'other' ).increment();
+
+		// Only the initial check has run.
+		expect( predicate ).toHaveBeenCalledTimes( 1 );
+
+		registry.dispatch( 'test' ).setSaving( true );
+		registry.dispatch( 'test' ).setSaving( false );
+
+		await expect( promise ).resolves.toBeUndefined();
+		expect( predicate ).toHaveBeenCalledTimes( 3 );
+	} );
+
+	it( 'should reject and unsubscribe when aborted', async () => {
+		const controller = new AbortController();
+		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
+
+		const promise = waitForTransition( predicate, {
+			registry,
+			signal: controller.signal,
+		} );
+		registry.dispatch( 'test' ).setSaving( true );
+
+		const reason = new Error( 'cancelled' );
+		controller.abort( reason );
+
+		await expect( promise ).rejects.toBe( reason );
+
+		const callCountAfterAbort = predicate.mock.calls.length;
+		registry.dispatch( 'test' ).setSaving( false );
+		expect( predicate ).toHaveBeenCalledTimes( callCountAfterAbort );
+	} );
+
+	it( 'should reject without subscribing when already aborted', async () => {
+		const controller = new AbortController();
+		const reason = new Error( 'cancelled' );
+		controller.abort( reason );
+		const predicate = vi.fn( () => registry.select( 'test' ).isSaving() );
+
+		await expect(
+			waitForTransition( predicate, {
+				registry,
+				signal: controller.signal,
+			} )
+		).rejects.toBe( reason );
+		expect( predicate ).not.toHaveBeenCalled();
 	} );
 } );

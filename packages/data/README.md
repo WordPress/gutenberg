@@ -913,22 +913,26 @@ _Returns_
 
 ### waitForTransition
 
-Given a predicate function and an optional registry, returns a Promise that resolves once the predicate has transitioned from `true` to `false`. If the predicate is already `true` when called, the Promise will resolve on the next transition to `false`.
+Returns a Promise that resolves once the predicate has transitioned from `true` to `false`. If the predicate is already `true` when called, the Promise resolves on the next transition to `false`.
 
-Useful for running code after an asynchronous operation that is tracked in a data store (such as saving a post) has completed.
+Useful for running code after an asynchronous operation tracked in a data store, such as saving a post, has completed.
+
+The predicate is checked after each store change, so a `true` then `false` sequence that happens within a single `registry.batch()` is not seen. If the operation has already finished when this is called, the Promise waits for the next one; pass a `signal` to stop waiting.
 
 ```js
 import { waitForTransition } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
-// Wait for isSavingPost() to transition to true, then back to false.
-await waitForTransition( () => wp.data.select( 'core/editor' ).isSavingPost() );
+await waitForTransition( ( select ) => select( editorStore ).isSavingPost(), {
+	store: editorStore,
+} );
 console.log( 'Post saved!' );
 ```
 
 _Parameters_
 
-- _predicate_ `() => boolean`: A function that returns a boolean derived from store state.
-- _registry_ `DataRegistry`: Registry to observe. Defaults to the global registry.
+- _predicate_ `( select: DataRegistry[ 'select' ] ) => boolean`: Receives the registry's `select` and returns a boolean derived from store state.
+- _options_ `WaitForTransitionOptions`: Optional `registry`, `store` and `signal`.
 
 _Returns_
 
