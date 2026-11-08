@@ -17,6 +17,7 @@ import {
 import type { ThunkArgs } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
+import { ImageFile } from '../../image-file';
 import {
 	vipsEditImage,
 	vipsHasTransparency,
@@ -1638,16 +1639,16 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'editImageItem', () => {
-		const modifiers = [ { type: 'rotate', args: { angle: 90 } } ];
+		const modifiers = [ { type: 'rotate' as const, args: { angle: 90 } } ];
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
 
 		function createDispatch() {
-			const dispatch = vi.fn();
-			dispatch.finishOperation = vi.fn();
-			dispatch.cancelItem = vi.fn();
-			return dispatch;
+			return Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				cancelItem: vi.fn(),
+			} );
 		}
 
 		beforeEach( () => {
@@ -1655,10 +1656,14 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'replaces the item file and source file with the edited one', async () => {
-			const edited = new File( [ 'edited' ], 'photo-edited.jpg', {
-				type: 'image/jpeg',
-			} );
-			vipsEditImage.mockResolvedValue( edited );
+			const edited = new ImageFile(
+				new File( [ 'edited' ], 'photo-edited.jpg', {
+					type: 'image/jpeg',
+				} ),
+				200,
+				300
+			);
+			vi.mocked( vipsEditImage ).mockResolvedValue( edited );
 			const abortController = new AbortController();
 			const dispatch = createDispatch();
 
@@ -1668,7 +1673,7 @@ describe( 'private actions', () => {
 					getSettings: () => ( { imageQuality: 0.9 } ),
 				},
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( vipsEditImage ).toHaveBeenCalledWith(
 				'item-1',
@@ -1693,7 +1698,7 @@ describe( 'private actions', () => {
 					getSettings: () => ( {} ),
 				},
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( vipsEditImage ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
@@ -1722,7 +1727,7 @@ describe( 'private actions', () => {
 					getSettings: () => ( {} ),
 				},
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( vipsEditImage ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
@@ -1738,7 +1743,9 @@ describe( 'private actions', () => {
 		it( 'cancels the item with an edit error when vips fails', async () => {
 			// Nothing has reached the server at this point, so the error
 			// code lets a caller fall back to the REST `/edit` endpoint.
-			vipsEditImage.mockRejectedValue( new Error( 'unsupported' ) );
+			vi.mocked( vipsEditImage ).mockRejectedValue(
+				new Error( 'unsupported' )
+			);
 			const dispatch = createDispatch();
 
 			await editImageItem( 'item-1', { modifiers } )( {
@@ -1747,7 +1754,7 @@ describe( 'private actions', () => {
 					getSettings: () => ( {} ),
 				},
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledWith(

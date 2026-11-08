@@ -75,7 +75,7 @@ describe( 'isOriginalTooLargeForClient', () => {
 		expect(
 			isOriginalTooLargeForClient( {
 				...media,
-				media_details: { width: 20000, height: 20000 },
+				media_details: { width: 25000, height: 25000 },
 			} )
 		).toBe( true );
 	} );
@@ -239,7 +239,7 @@ describe( 'editImageClientSide', () => {
 				registry,
 				media: {
 					...media,
-					media_details: { width: 20000, height: 20000 },
+					media_details: { width: 25000, height: 25000 },
 				},
 				modifiers,
 				additionalData: {},
