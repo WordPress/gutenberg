@@ -1,6 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { isKeyboardEvent } from '@wordpress/keycodes';
+import type { WPEventKeyHandler } from '@wordpress/keycodes';
 import { store as keyboardShortcutsStore } from '../store';
 
 /**
@@ -11,7 +12,7 @@ import { store as keyboardShortcutsStore } from '../store';
  */
 export default function useShortcutEventMatch(): (
 	name: string,
-	event: KeyboardEvent
+	event: Parameters< WPEventKeyHandler >[ 0 ]
 ) => boolean {
 	const { getAllShortcutKeyCombinations } = useSelect(
 		keyboardShortcutsStore
@@ -27,7 +28,7 @@ export default function useShortcutEventMatch(): (
 	 * @return True if the event matches the shortcuts, false if not.
 	 */
 	return useCallback(
-		( name: string, event: KeyboardEvent ) => {
+		( name: string, event: Parameters< WPEventKeyHandler >[ 0 ] ) => {
 			return getAllShortcutKeyCombinations( name ).some(
 				( combination ) => {
 					if ( ! combination ) {

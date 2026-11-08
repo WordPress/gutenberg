@@ -28,16 +28,12 @@ import {
 	getGradientFromCSSColors,
 } from '../duotone-picker/utils';
 import Popover from '../popover';
-import {
-	PaletteEditStyles,
-	PaletteHeading,
-	IndicatorStyled,
-	NameContainer,
-	NameInputControl,
-	DoneButton,
-	RemoveButton,
-	PaletteEditContents,
-} from './styles';
+import { Heading } from '../heading';
+import { View } from '../view';
+import InputControl from '../input-control';
+import ColorIndicator from '../color-indicator';
+import { VisuallyHidden } from '../visually-hidden';
+import styles from './style.module.scss';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 import type {
@@ -228,7 +224,8 @@ function getResetLabel( variant: PaletteVariant ) {
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
-		<NameInputControl
+		<InputControl
+			className={ styles[ 'name-input' ] }
 			size="compact"
 			label={ label }
 			hideLabelFromVision
@@ -244,19 +241,25 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 export function deduplicateElementSlugs< T extends PaletteElement >(
 	elements: T[]
 ) {
-	const slugCounts: { [ slug: string ]: number } = {};
+	// Reserve every existing slug so a duplicate cannot take a later item's ID.
+	const usedSlugs = new Set( elements.map( ( { slug } ) => slug ) );
+	const nextSuffixes = new Map< string, number >();
 
 	return elements.map( ( element ) => {
-		let newSlug: string | undefined;
-
 		const { slug } = element;
-		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+		let newSlug = slug;
+		let suffix = nextSuffixes.get( slug ) ?? 1;
 
-		if ( slugCounts[ slug ] > 1 ) {
-			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		if ( nextSuffixes.has( slug ) ) {
+			do {
+				newSlug = `${ slug }-${ suffix }`;
+				suffix++;
+			} while ( usedSlugs.has( newSlug ) );
+			usedSlugs.add( newSlug );
 		}
+		nextSuffixes.set( slug, suffix );
 
-		return { ...element, slug: newSlug ?? slug };
+		return { ...element, slug: newSlug };
 	} );
 }
 
@@ -319,6 +322,16 @@ function ColorPickerPopover< T extends PaletteElement >( {
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const dismissButton = (
+		<VisuallyHidden
+			as="button"
+			type="button"
+			tabIndex={ -1 }
+			onClick={ onClose }
+		>
+			{ __( 'Close' ) }
+		</VisuallyHidden>
+	);
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
 			() => ( {
@@ -339,7 +352,21 @@ function ColorPickerPopover< T extends PaletteElement >( {
 		);
 
 	return (
-		<Popover { ...popoverProps } onClose={ onClose }>
+		<Popover
+			role="dialog"
+			aria-label={ sprintf(
+				// translators: %s is a color, gradient or duotone name, e.g. "Red".
+				__( 'Edit: %s' ),
+				element.name.trim().length
+					? element.name
+					: getElementValue( element, variant ) || ''
+			) }
+			{ ...popoverProps }
+			onClose={ onClose }
+		>
+			{ /* Screen reader users can dismiss from either end of the popup
+			     without adding a visible control or a keyboard Tab stop. */ }
+			{ dismissButton }
 			{ variant === 'color' && (
 				<ColorPicker
 					color={ element.color }
@@ -407,6 +434,7 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					</VStack>
 				</div>
 			) }
+			{ dismissButton }
 		</Popover>
 	);
 }
@@ -450,7 +478,10 @@ function Option< T extends PaletteElement >( {
 					) }
 					style={ { padding: 0 } }
 				>
-					<IndicatorStyled colorValue={ value } />
+					<ColorIndicator
+						className={ styles.indicator }
+						colorValue={ value }
+					/>
 				</Button>
 				<FlexBlock>
 					{ ! canOnlyChangeValues ? (
@@ -465,17 +496,18 @@ function Option< T extends PaletteElement >( {
 							}
 						/>
 					) : (
-						<NameContainer>
+						<div className={ styles.name }>
 							{ element.name.trim().length
 								? element.name
 								: /* Fall back to non-breaking space to maintain height */
 									'\u00A0' }
-						</NameContainer>
+						</div>
 					) }
 				</FlexBlock>
 				{ ! canOnlyChangeValues && (
 					<FlexItem>
-						<RemoveButton
+						<Button
+							className={ styles.remove }
 							size="small"
 							icon={ lineSolid }
 							label={ sprintf(
@@ -681,17 +713,19 @@ export function PaletteEdit( {
 	);
 
 	return (
-		<PaletteEditStyles>
+		<View className={ styles.palette }>
 			<HStack>
-				<PaletteHeading
+				<Heading
+					className={ styles.heading }
 					id={ paletteLabelId }
 					level={ paletteLabelHeadingLevel }
 				>
 					{ paletteLabel }
-				</PaletteHeading>
+				</Heading>
 				<Stack direction="row" gap="xs">
 					{ hasElements && isEditing && (
-						<DoneButton
+						<Button
+							className={ styles.done }
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
@@ -699,7 +733,7 @@ export function PaletteEdit( {
 							} }
 						>
 							{ __( 'Done' ) }
-						</DoneButton>
+						</Button>
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
@@ -814,7 +848,7 @@ export function PaletteEdit( {
 				</Stack>
 			</HStack>
 			{ hasElements && (
-				<PaletteEditContents>
+				<View className={ styles.contents }>
 					{ isEditing && (
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
@@ -889,12 +923,12 @@ export function PaletteEdit( {
 							disableCustomColors
 						/>
 					) }
-				</PaletteEditContents>
+				</View>
 			) }
 			{ ! hasElements && emptyMessage && (
-				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
+				<View className={ styles.contents }>{ emptyMessage }</View>
 			) }
-		</PaletteEditStyles>
+		</View>
 	);
 }
 

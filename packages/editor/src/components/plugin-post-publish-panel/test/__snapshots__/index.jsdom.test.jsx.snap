@@ -30,7 +30,6 @@ exports[`PluginPostPublishPanel > renders fill properly 1`] = `
           >
             <path
               d="M7 13L12 9L17 13"
-              vector-effect="non-scaling-stroke"
             />
           </svg>
         </span>

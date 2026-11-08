@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
@@ -359,28 +359,33 @@ describe( 'Tooltip', () => {
 			);
 			onMouseEnterMock.mockClear();
 			onMouseLeaveMock.mockClear();
-			// Hover over the anchor, tooltip hasn't appeared yet
-			await userEvent.hover( anchor );
-			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
-			expectTooltipToBeHidden();
+			// Keep browser command latency from consuming the hover delay.
+			vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+			try {
+				await userEvent.hover( anchor );
+				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+				expectTooltipToBeHidden();
 
-			// Advance time, tooltip hasn't appeared yet because TOOLTIP_DELAY time
-			// hasn't passed yet
-			await sleep( TOOLTIP_DELAY - HOVER_OUTSIDE_ANTICIPATION );
-			expectTooltipToBeHidden();
+				await act( async () => {
+					vi.advanceTimersByTime(
+						TOOLTIP_DELAY - HOVER_OUTSIDE_ANTICIPATION
+					);
+				} );
+				expectTooltipToBeHidden();
 
-			// Hover outside of the anchor, tooltip still hasn't appeared yet
-			await hoverOutside();
-			expectTooltipToBeHidden();
+				await hoverOutside();
+				expectTooltipToBeHidden();
+				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+				expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
-			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
-			expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
-
-			// Advance time again, so that we reach the full TOOLTIP_DELAY time
-			await sleep( HOVER_OUTSIDE_ANTICIPATION );
-
-			// Tooltip won't show, since the mouse has left the tooltip anchor
-			expectTooltipToBeHidden();
+				// Reach the original deadline after leaving the anchor.
+				await act( async () => {
+					vi.advanceTimersByTime( HOVER_OUTSIDE_ANTICIPATION );
+				} );
+				expectTooltipToBeHidden();
+			} finally {
+				vi.useRealTimers();
+			}
 		} );
 	} );
 
