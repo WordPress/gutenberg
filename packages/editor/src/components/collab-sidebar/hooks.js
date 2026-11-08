@@ -44,6 +44,7 @@ import {
 	pickNoteForCaret,
 } from './utils/note-selection';
 import { focusNoteThread } from './utils/dom';
+import { useReattachOrphanedNotes } from './use-reattach-orphaned-notes';
 import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -68,6 +69,9 @@ export function useNoteThreads( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
+	// Restored anchors change block attributes only, which the threads
+	// below don't otherwise track.
+	const anchorsVersion = useReattachOrphanedNotes( threads, hasResolved );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants } = select( blockEditorStore );
@@ -185,12 +189,12 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- Recompute once anchors are restored.
+	}, [ clientIds, threads, getBlockAttributes, anchorsVersion ] );
 
 	return {
 		notes,
 		unresolvedNotes,
-		hasResolved,
 	};
 }
 

@@ -1,12 +1,12 @@
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { findNoteAnchors, type NoteAnchorSnapshot } from './find-note-anchors';
+import { getNoteIdsFromMetadata } from './utils/metadata';
 
-interface NoteThread {
+interface Note {
 	id: number;
 	parent: number;
-	blockClientId: string | null;
 	meta?: { _wp_note_anchor?: NoteAnchorSnapshot[] };
 }
 
@@ -19,14 +19,16 @@ interface NoteThread {
  * level. Notes orphaned later in the session, eg. by deleting their block,
  * are left alone.
  *
- * @param notes       Note threads from `useNoteThreads`.
+ * @param notes       Note records.
  * @param hasResolved Whether the notes have finished loading.
+ * @return A counter that changes once anchors were restored.
  */
 export function useReattachOrphanedNotes(
-	notes: NoteThread[],
+	notes: Note[] | null | undefined,
 	hasResolved: boolean
 ) {
 	const registry = useRegistry();
+	const [ version, setVersion ] = useState( 0 );
 	const hasRunRef = useRef( false );
 
 	useEffect( () => {
@@ -35,13 +37,23 @@ export function useReattachOrphanedNotes(
 		}
 		hasRunRef.current = true;
 
-		const orphans = notes
-			.filter( ( note ) => note.parent === 0 && ! note.blockClientId )
+		const { getBlocks, getBlockAttributes, getClientIdsWithDescendants } =
+			registry.select( blockEditorStore );
+		const anchored = new Set(
+			getClientIdsWithDescendants().flatMap( ( clientId ) =>
+				getNoteIdsFromMetadata(
+					getBlockAttributes( clientId )?.metadata
+				)
+			)
+		);
+		const orphans = ( notes ?? [] )
+			.filter(
+				( note ) => note.parent === 0 && ! anchored.has( note.id )
+			)
 			.map( ( note ) => ( {
 				id: note.id,
 				anchors: note.meta?._wp_note_anchor ?? [],
 			} ) );
-		const { getBlocks } = registry.select( blockEditorStore );
 		const attributesByClientId = findNoteAnchors( orphans, getBlocks() );
 		const clientIds = Object.keys( attributesByClientId );
 		if ( ! clientIds.length ) {
@@ -58,5 +70,8 @@ export function useReattachOrphanedNotes(
 			uniqueByBlock: true,
 		} );
 		__unstableMarkLastChangeAsPersistent();
+		setVersion( ( current ) => current + 1 );
 	}, [ registry, notes, hasResolved ] );
+
+	return version;
 }
