@@ -444,6 +444,12 @@ test.describe( 'Post revisions', () => {
 test.describe( 'Post revisions with classic meta boxes', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-plugin-meta-box' );
+		// The deep link tests open the editor directly rather than through
+		// `createNewPost`, so a preceding spec's `resetPreferences` would
+		// otherwise bring back the welcome guide and hide the notice.
+		await requestUtils.setPreferences( 'core/edit-post', {
+			welcomeGuide: false,
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
