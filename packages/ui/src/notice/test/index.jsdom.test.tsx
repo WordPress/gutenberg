@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import * as Notice from '../index';
+
+vi.mock( import( '@wordpress/a11y' ), () => ( {
+	speak: vi.fn(),
+} ) );
 
 describe( 'Notice', () => {
 	describe( 'basic behaviour', () => {
@@ -13,7 +18,7 @@ describe( 'Notice', () => {
 			const actionsRef = createRef< HTMLDivElement >();
 			const actionButtonRef = createRef< HTMLButtonElement >();
 			const actionLinkRef = createRef< HTMLAnchorElement >();
-			const closeIconRef = createRef< HTMLButtonElement >();
+			const closeIconButtonRef = createRef< HTMLButtonElement >();
 
 			render(
 				<Notice.Root ref={ rootRef }>
@@ -32,7 +37,7 @@ describe( 'Notice', () => {
 							Action Link
 						</Notice.ActionLink>
 					</Notice.Actions>
-					<Notice.CloseIcon ref={ closeIconRef } />
+					<Notice.CloseIconButton ref={ closeIconButtonRef } />
 				</Notice.Root>
 			);
 			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
@@ -43,7 +48,9 @@ describe( 'Notice', () => {
 				HTMLButtonElement
 			);
 			expect( actionLinkRef.current ).toBeInstanceOf( HTMLAnchorElement );
-			expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+			expect( closeIconButtonRef.current ).toBeInstanceOf(
+				HTMLButtonElement
+			);
 		} );
 
 		it( 'renders content', () => {
@@ -63,15 +70,15 @@ describe( 'Notice', () => {
 		} );
 	} );
 
-	describe( 'dismissing via CloseIcon', () => {
-		it( 'renders dismiss button when CloseIcon included', async () => {
+	describe( 'dismissing via CloseIconButton', () => {
+		it( 'renders dismiss button when CloseIconButton included', async () => {
 			const user = userEvent.setup();
 			const handleDismiss = vi.fn();
 
 			render(
 				<Notice.Root>
 					<Notice.Description>Dismissible</Notice.Description>
-					<Notice.CloseIcon onClick={ handleDismiss } />
+					<Notice.CloseIconButton onClick={ handleDismiss } />
 				</Notice.Root>
 			);
 
@@ -81,7 +88,7 @@ describe( 'Notice', () => {
 			expect( handleDismiss ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'does not render dismiss button when CloseIcon omitted', () => {
+		it( 'does not render dismiss button when CloseIconButton omitted', () => {
 			render(
 				<Notice.Root>
 					<Notice.Description>Non-dismissible</Notice.Description>
@@ -93,11 +100,11 @@ describe( 'Notice', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'supports custom CloseIcon label', () => {
+		it( 'supports custom CloseIconButton label', () => {
 			render(
 				<Notice.Root>
 					<Notice.Description>Test</Notice.Description>
-					<Notice.CloseIcon
+					<Notice.CloseIconButton
 						label="Close notification"
 						onClick={ vi.fn() }
 					/>
@@ -177,31 +184,23 @@ describe( 'Notice', () => {
 		} );
 	} );
 
-	describe( 'announcing to screen readers', () => {
-		it( 'creates a polite live region for non-error intents', () => {
-			render(
-				<Notice.Root intent="info">
-					<Notice.Description>Update available.</Notice.Description>
-				</Notice.Root>
-			);
-			expect(
-				screen.getByText( 'Update available.', {
-					selector: '[aria-live="polite"]',
-				} )
-			).toBeInTheDocument();
-		} );
-
-		it( 'creates an assertive live region for error intent', () => {
-			render(
+	describe( 'screen reader announcements', () => {
+		it( 'renders without announcing its content', () => {
+			const { container } = render(
 				<Notice.Root intent="error">
 					<Notice.Description>Something failed.</Notice.Description>
 				</Notice.Root>
 			);
+
+			expect( speak ).not.toHaveBeenCalled();
+			// Disable reason: no accessible query can find an element by an
+			// `aria-live` attribute when that element has no live-region role.
 			expect(
-				screen.getByText( 'Something failed.', {
-					selector: '[aria-live="assertive"]',
-				} )
-			).toBeInTheDocument();
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector(
+					'[aria-live], [role="alert"], [role="status"]'
+				)
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

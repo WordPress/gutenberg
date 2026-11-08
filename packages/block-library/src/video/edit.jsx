@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Spinner,
+	Spinner as WCSpinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
@@ -13,9 +13,13 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -30,7 +34,6 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation } from './variations';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -42,9 +45,19 @@ function VideoEdit( {
 	insertBlocksAfter,
 	onReplace,
 } ) {
-	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks, width, height } = attributes;
-	const isGif = isGifVariation( attributes );
+	const {
+		id,
+		controls,
+		poster,
+		src,
+		tracks,
+		width,
+		height,
+		autoplay,
+		loop,
+		muted,
+		playsInline,
+	} = attributes;
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -54,10 +67,16 @@ function VideoEdit( {
 	// swap. A non-`auto` ratio governs the box height throughout the load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const videoStyle = {
+		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
+		...getShadowClassesAndStyles( attributes ).style,
+	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	const prefersReducedMotion = useReducedMotion();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -66,37 +85,21 @@ function VideoEdit( {
 		onError: onUploadError,
 	} );
 
-	useEffect( () => {
-		// Placeholder may be rendered.
-		if ( videoPlayer.current ) {
-			videoPlayer.current.load();
-		}
-	}, [ poster ] );
-
-	// The GIF variation plays like an animated GIF in the editor (the playback
-	// attributes are applied to the preview <video> below). Regular videos do
-	// not autoplay in the editor, so only nudge GIFs into playing after a
-	// source change in case the muted autoplay did not start on its own.
-	useEffect( () => {
-		if ( isGif ) {
-			// Browsers allow muted videos to be played programmatically.
-			videoPlayer.current?.play().catch( () => {} );
-		}
-	}, [ isGif, src, poster ] );
+	// `autoPlay` only applies when the video loads, so reload it when reduced
+	// motion changes.
+	const videoRef = useRefEffect(
+		( node ) => {
+			node.load();
+		},
+		[ poster, prefersReducedMotion ]
+	);
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// In this case there was an error
-			// previous attributes should be removed
-			// because they may be temporary blob urls.
-			setAttributes( {
-				src: undefined,
-				id: undefined,
-				poster: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current video, poster and caption intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -121,6 +124,17 @@ function VideoEdit( {
 					? media.image?.src
 					: undefined ),
 			caption: media.caption,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetVideo() {
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			poster: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -214,62 +228,64 @@ function VideoEdit( {
 							onSelect={ onSelectVideo }
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
-							onReset={ () => onSelectVideo( undefined ) }
+							onReset={ onResetVideo }
 							variant="toolbar"
 						/>
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					/>
+					<PosterImage
+						poster={ poster }
+						onChange={ ( posterImage ) =>
 							setAttributes( {
-								autoplay: false,
-								controls: true,
-								loop: false,
-								muted: false,
-								playsInline: false,
-								preload: 'metadata',
-								poster: undefined,
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<PosterImage
-							poster={ poster }
-							onChange={ ( posterImage ) =>
-								setAttributes( {
-									poster: posterImage?.url,
-								} )
-							}
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+								poster: posterImage?.url,
+							} )
+						}
+					/>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
-					ref={ videoPlayer }
-					autoPlay={ isGif }
-					loop={ isGif }
-					muted={ isGif }
-					playsInline={ isGif }
+					ref={ videoRef }
+					autoPlay={ autoplay && ! prefersReducedMotion }
+					loop={ loop }
+					muted={ muted }
+					playsInline={ playsInline }
 					width={ width }
 					height={ height }
-					style={ aspectRatio ? { aspectRatio } : undefined }
+					style={
+						Object.keys( videoStyle ).length
+							? videoStyle
+							: undefined
+					}
 				>
 					<Tracks tracks={ tracks } />
 				</video>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

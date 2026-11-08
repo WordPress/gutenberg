@@ -550,7 +550,7 @@ export function MediaUploadModal( {
 										uploadedToLabel ??
 										__( 'Uploaded to this item' ),
 								},
-						  ]
+							]
 						: [] ),
 					{
 						value: 'unattached',
@@ -690,7 +690,7 @@ export function MediaUploadModal( {
 
 	const paginationInfo = useMemo(
 		() => ( {
-			totalItems,
+			totalItems: totalItems ?? 0,
 			totalPages,
 		} ),
 		[ totalItems, totalPages ]

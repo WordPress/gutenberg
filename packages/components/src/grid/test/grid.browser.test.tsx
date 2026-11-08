@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { View } from '../../view';
 import { Grid } from '..';
-import CONFIG from '../../utils/config-values';
 
 describe( 'props', () => {
 	const readStyle = () => getComputedStyle( screen.getByTestId( 'grid' ) );
@@ -28,9 +27,7 @@ describe( 'props', () => {
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
 		expectEqualTracks( style.gridTemplateColumns, 2 );
-		expect( style.gap ).toBe(
-			`${ Number.parseFloat( CONFIG.gridBase ) * 3 }px`
-		);
+		expect( style.gap ).toBe( '12px' );
 	} );
 
 	test( 'should render gap', async () => {
@@ -45,9 +42,7 @@ describe( 'props', () => {
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
 		expectEqualTracks( style.gridTemplateColumns, 3 );
-		expect( style.gap ).toBe(
-			`${ Number.parseFloat( CONFIG.gridBase ) * 4 }px`
-		);
+		expect( style.gap ).toBe( '16px' );
 	} );
 
 	test( 'should render custom columns', async () => {
@@ -105,6 +100,21 @@ describe( 'props', () => {
 		expect( style.display ).toBe( 'grid' );
 		expect( style.alignItems ).toBe( 'center' );
 		expect( style.justifyContent ).toBe( 'space-between' );
+	} );
+
+	test( 'should render alignment bottomLeft', async () => {
+		await render(
+			<Grid alignment="bottomLeft" data-testid="grid">
+				<View />
+				<View />
+				<View />
+			</Grid>
+		);
+
+		const style = readStyle();
+		expect( style.display ).toBe( 'grid' );
+		expect( style.alignItems ).toBe( 'flex-end' );
+		expect( style.justifyContent ).toBe( 'flex-start' );
 	} );
 
 	test( 'should ignore unsupported runtime alignment values', async () => {

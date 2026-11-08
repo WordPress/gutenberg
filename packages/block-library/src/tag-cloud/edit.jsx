@@ -2,8 +2,7 @@ import {
 	Flex,
 	FlexItem,
 	ToggleControl,
-	SelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -21,6 +20,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -66,23 +66,21 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 		[]
 	);
 
-	const getTaxonomyOptions = () => {
-		const selectOption = {
+	const taxonomyItems = [
+		{
 			label: __( '- Select -' ),
 			value: '',
 			disabled: true,
-		};
-		const taxonomyOptions = ( taxonomies ?? [] )
+		},
+		...( taxonomies ?? [] )
 			.filter( ( tax ) => !! tax.show_cloud )
 			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			} );
-
-		return [ selectOption, ...taxonomyOptions ];
-	};
+			} ),
+	];
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
@@ -133,10 +131,20 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 				>
 					<SelectControl
 						label={ __( 'Taxonomy' ) }
-						options={ getTaxonomyOptions() }
-						value={ taxonomy }
-						onChange={ ( selectedTaxonomy ) =>
-							setAttributes( { taxonomy: selectedTaxonomy } )
+						items={ taxonomyItems }
+						itemToStringValue={ ( item ) =>
+							`taxonomy:${ item.value }`
+						}
+						placeholder=""
+						value={
+							taxonomyItems.find(
+								( item ) => item.value === taxonomy
+							) ??
+							taxonomyItems.find( ( item ) => ! item.disabled ) ??
+							null
+						}
+						onValueChange={ ( item ) =>
+							item && setAttributes( { taxonomy: item.value } )
 						}
 					/>
 				</ToolsPanelItem>
@@ -237,7 +245,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			{ inspectorControls }
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

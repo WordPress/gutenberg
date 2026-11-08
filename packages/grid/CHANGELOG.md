@@ -2,8 +2,49 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-04)
+
+### Enhancements
+
+-   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+-   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).
+
 ### Internal
 
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Type check tests through the default dev project, replacing `tsconfig.test.json` ([#85516](https://github.com/WordPress/gutenberg/pull/85516)).
+
+## 0.10.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
+
+## 0.9.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Enhancements
+
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+## 0.8.0 (2026-09-23)
+
+### Internal
+
+-   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
+-   Disable `custom-property-pattern` for this package so private `--_wp-*` tokens remain allowed ([#83075](https://github.com/WordPress/gutenberg/pull/83075)).
 -   Run rendered Grid tests in Vitest Browser Mode ([#80995](https://github.com/WordPress/gutenberg/pull/80995)).
 
 ## 0.7.0 (2026-09-10)

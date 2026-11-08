@@ -5,7 +5,9 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-import { Input, SpinButton, styles } from './styles/number-control-styles';
+import InputControl from '../input-control';
+import Button from '../button';
+import styles from './style.module.scss';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import type { StateReducer } from '../input-control/reducer/state';
 import { add, subtract, clamp, ensureValidStep } from '../utils/math';
@@ -14,7 +16,6 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
-import { useCx } from '../utils';
 
 const noop = () => {};
 
@@ -72,9 +73,12 @@ function UnforwardedNumberControl(
 	const baseValue = constrainValue( 0 );
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
-	const classes = clsx( 'components-number-control', className );
-	const cx = useCx();
-	const spinButtonClasses = cx( size === 'small' && styles.smallSpinButtons );
+	const classes = clsx( 'components-number-control', className, {
+		[ styles[ 'hide-html-arrows' ] ]: spinControls !== 'native',
+	} );
+	const spinButtonClasses = clsx( styles[ 'spin-button' ], {
+		[ styles[ 'is-small' ] ]: size === 'small',
+	} );
 
 	const spinValue = (
 		value: string | number | undefined,
@@ -180,7 +184,7 @@ function UnforwardedNumberControl(
 			nextState.value = applyEmptyValue
 				? currentValue
 				: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-				  constrainValue( currentValue );
+					constrainValue( currentValue );
 		}
 
 		return stateReducerProp?.( nextState, action ) ?? nextState;
@@ -199,13 +203,12 @@ function UnforwardedNumberControl(
 			} );
 
 	return (
-		<Input
+		<InputControl
 			autoComplete={ autoComplete }
 			inputMode="numeric"
 			{ ...restProps }
 			className={ classes }
 			dragDirection={ dragDirection }
-			hideHTMLArrows={ spinControls !== 'native' }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
 			max={ max === Infinity ? undefined : max }
@@ -224,7 +227,7 @@ function UnforwardedNumberControl(
 						{ suffix }
 						<Spacer marginBottom={ 0 } marginRight={ 2 }>
 							<HStack spacing={ 1 }>
-								<SpinButton
+								<Button
 									className={ spinButtonClasses }
 									icon={ plusIcon }
 									size="small"
@@ -233,7 +236,7 @@ function UnforwardedNumberControl(
 										'up'
 									) }
 								/>
-								<SpinButton
+								<Button
 									className={ spinButtonClasses }
 									icon={ resetIcon }
 									size="small"

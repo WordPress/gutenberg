@@ -1,21 +1,35 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
-	SelectControl,
 	Button,
-	Popover,
+	Popover as WCPopover,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { SelectControl, Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
-import type {
-	LanguageEditProps,
-	InlineLanguageUIProps,
-	LanguageFormat,
-} from '../types';
+import type { FormatEditProps } from '../types';
+
+interface LanguageFormat {
+	name: string;
+	title: string;
+	tagName: string;
+	className: null;
+	attributes: {
+		lang: string;
+		dir: string;
+	};
+	edit: ( props: FormatEditProps ) => React.ReactNode;
+}
+
+interface InlineLanguageUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	contentRef: React.RefObject< HTMLElement >;
+	onClose: () => void;
+}
 
 const name = 'core/language';
 const title = __( 'Language' );
@@ -32,7 +46,7 @@ export const language = {
 	edit: Edit,
 } satisfies LanguageFormat;
 
-function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
+function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );
@@ -41,6 +55,7 @@ function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="language"
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
@@ -80,9 +95,13 @@ function InlineLanguageUI( {
 
 	const [ lang, setLang ] = useState( '' );
 	const [ dir, setDir ] = useState< 'ltr' | 'rtl' >( 'ltr' );
+	const directionItems = [
+		{ label: __( 'Left to right' ), value: 'ltr' },
+		{ label: __( 'Right to left' ), value: 'rtl' },
+	];
 
 	return (
-		<Popover
+		<WCPopover
 			className="block-editor-format-toolbar__language-popover"
 			anchor={ popoverAnchor }
 			onClose={ onClose }
@@ -116,18 +135,16 @@ function InlineLanguageUI( {
 				/>
 				<SelectControl
 					label={ __( 'Text direction' ) }
-					value={ dir }
-					options={ [
-						{
-							label: __( 'Left to right' ),
-							value: 'ltr',
-						},
-						{
-							label: __( 'Right to left' ),
-							value: 'rtl',
-						},
-					] }
-					onChange={ ( val ) => setDir( val ) }
+					value={
+						directionItems.find( ( item ) => item.value === dir ) ??
+						null
+					}
+					items={ directionItems }
+					onValueChange={ ( item ) => {
+						if ( item?.value === 'ltr' || item?.value === 'rtl' ) {
+							setDir( item.value );
+						}
+					} }
 				/>
 				<Stack justify="right">
 					<Button
@@ -138,6 +155,6 @@ function InlineLanguageUI( {
 					/>
 				</Stack>
 			</Stack>
-		</Popover>
+		</WCPopover>
 	);
 }

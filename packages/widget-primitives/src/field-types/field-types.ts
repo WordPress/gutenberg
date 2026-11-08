@@ -47,8 +47,9 @@ type FieldTypeDefaults< Item > = Pick<
  * built-in defaults (sort, operators, validation semantics)
  * the resolved field inherits for anything not provided here.
  */
-export interface FieldTypeDefinition< Item = unknown >
-	extends FieldTypeDefaults< Item > {
+export interface FieldTypeDefinition<
+	Item = unknown,
+> extends FieldTypeDefaults< Item > {
 	name: RegisteredFieldTypeName;
 	baseType?: FieldTypeName;
 }

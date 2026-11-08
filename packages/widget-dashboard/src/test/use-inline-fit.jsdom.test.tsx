@@ -11,7 +11,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	useResizeObserver: ( ( callback: ( entries: unknown[] ) => void ) => {
 		notifyResize = callback;
 		return () => {};
-	} ) as typeof import('@wordpress/compose').useResizeObserver,
+	} ) as typeof import( '@wordpress/compose' ).useResizeObserver,
 } ) );
 
 let availableSize: number | null = null;

@@ -206,6 +206,12 @@ declare module './base-entity-records' {
 			 */
 			post: ContextualField< number | null, 'view' | 'edit', C >;
 			/**
+			 * The ID of the edit root attachment this attachment was edited
+			 * from, or 0 when it has no edit lineage. Embeddable via the
+			 * `wp:edit-root` link.
+			 */
+			edit_root: ContextualField< number, 'edit', C >;
+			/**
 			 * URL to the original attachment file.
 			 */
 			source_url: string;
@@ -235,7 +241,7 @@ type AttachmentFileDetails< C extends Context > = C extends 'view' | 'edit'
 			filename?: string | null;
 			/** Attachment file size in bytes, or null when unavailable. */
 			filesize?: number | null;
-	  }
+		}
 	: Record< never, never >;
 
 type AttachmentEditDetails< C extends Context > = C extends 'edit'
@@ -251,7 +257,7 @@ type AttachmentEditDetails< C extends Context > = C extends 'edit'
 				default: number;
 				sizes: Record< string, number >;
 			};
-	  }
+		}
 	: Record< never, never >;
 
 export type Attachment< C extends Context = 'edit' > = OmitNevers<

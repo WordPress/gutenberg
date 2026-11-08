@@ -59,8 +59,8 @@ _Usage_
 
 _Parameters_
 
--   _props_ `BreadcrumbsProps`:
--   _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
+- _props_ `BreadcrumbsProps`:
+- _props.items_ `BreadcrumbsProps[ 'items' ]`: The breadcrumb items to display.
 
 ### getAdminThemeColors
 
@@ -68,7 +68,7 @@ Reads the active WordPress admin color scheme from the `admin-color-*` body clas
 
 _Returns_
 
--   `AdminThemeColors`: The primary and background colors for the active admin color scheme.
+- `AdminThemeColors`: The primary and background colors for the active admin color scheme.
 
 ### NavigableRegion
 

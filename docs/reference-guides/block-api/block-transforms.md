@@ -116,7 +116,7 @@ To switch between variations of a block that is *already* of the target type, de
 
 **Example: from Paragraph block to Heading block**
 
-To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
+To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createblock).
 
 ```js
 transforms: {
@@ -293,7 +293,7 @@ transforms: {
 
 When pasting content it's possible to define a [content model](https://html.spec.whatwg.org/multipage/dom.html#content-models) that will be used to validate and process pasted content. It's often the case that HTML pasted into the editor will contain a mixture of elements that _should_ transfer as well as elements that _shouldn't_. For example, consider pasting `<span class="time">12:04 pm</span>` into the editor. We want to copy `12:04 pm` and omit the `<span>` and its `class` attribute because those won't carry the same meaning or structure as they originally did from where they were copied.
 
-When writing `raw` transforms you can control this by supplying a `schema` which describes allowable content and which will be applied to clean up the pasted content before attempting to match with your block. The schemas are passed into [`cleanNodeList` from `@wordpress/dom`](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/dom/clean-node-list.js); check there for a [complete description of the schema](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/phrasing-content.js).
+When writing `raw` transforms you can control this by supplying a `schema` which describes allowable content and which will be applied to clean up the pasted content before attempting to match with your block. The schemas are passed into [`cleanNodeList` from `@wordpress/dom`](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/dom/clean-node-list.ts); check there for a [complete description of the schema](https://github.com/wordpress/gutenberg/blob/trunk/packages/dom/src/dom/types.ts).
 
 ```js
 schema = { span: { children: { '#text': {} } } };
@@ -407,7 +407,7 @@ transforms: {
 
 **Example: shortcode with wrapped content to block with InnerBlocks**
 
-Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawhandler) inside `transform`.
 
 ```js
 transforms: {

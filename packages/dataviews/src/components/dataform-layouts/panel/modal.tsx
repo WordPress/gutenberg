@@ -54,7 +54,7 @@ function ModalContent< Item >( {
 			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+					[ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);

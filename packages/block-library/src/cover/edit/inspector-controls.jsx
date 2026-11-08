@@ -10,7 +10,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSettings,
@@ -23,8 +23,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { getFilename } from '@wordpress/url';
 import { Link } from '@wordpress/ui';
-import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import {
+	ALLOWED_MEDIA_TYPES,
+	COVER_MIN_HEIGHT,
+	mediaPosition,
+} from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import {
@@ -35,13 +40,11 @@ import {
 } from '../../utils/style-state';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import PosterImage from '../../utils/poster-image';
+import { MediaControl } from '../../utils/media-control';
 
-const {
-	cleanEmptyObject,
-	isDefaultBlockStyleState,
-	ResolutionTool,
-	HTMLElementControl,
-} = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
 
 function CoverHeightInput( {
 	onChange,
@@ -98,8 +101,13 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	onSelectMedia,
+	onUploadError,
+	toggleUseFeaturedImage,
 	updateDimRatio,
+	onClearMedia,
 	featuredImage,
+	isSelected,
 } ) {
 	const {
 		useFeaturedImage,
@@ -125,21 +133,23 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { imageSizes, selectedStyleState } = useSelect(
+	const { imageSizes, selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
-			const { getSettings, getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getSettings,
+				getSelectedBlockStyleState,
+				hasSelectedBlockStyleState,
+			} = select( blockEditorStore );
 
 			return {
 				imageSizes: getSettings()?.imageSizes,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
+
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const stateMinHeight = getActiveDimensionValue( {
 		attributes,
@@ -173,7 +183,7 @@ export default function CoverInspectorControls( {
 						'attachment',
 						id,
 						{ context: 'view' }
-				  )
+					)
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -217,6 +227,8 @@ export default function CoverInspectorControls( {
 
 	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
+	const prefersReducedMotion = useReducedMotion();
+
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
 			? [ mediaElement.current.style, 'objectPosition' ]
@@ -242,7 +254,7 @@ export default function CoverInspectorControls( {
 								? undefined
 								: `${ nextMinHeight }${
 										nextUnit || activeMinHeightUnit || 'px'
-								  }`,
+									}`,
 						aspectRatio: undefined,
 					},
 				} )
@@ -277,8 +289,49 @@ export default function CoverInspectorControls( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	/*
+	 * Rendered whether or not media has been set, so that a cover in its setup
+	 * state can be given media from the inspector as well as from the toolbar.
+	 * The settings below stay behind their own condition, having nothing to
+	 * configure until there is media to configure.
+	 */
+	const mediaInspectorPanel = isSelected ? (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ onClearMedia }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Media' ) }
+					hasValue={ () => !! url || !! useFeaturedImage }
+					onDeselect={ onClearMedia }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ id }
+						mediaUrl={ url }
+						filename={
+							image?.media_details?.sizes?.full?.file ||
+							image?.slug ||
+							getFilename( url )
+						}
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onSelect={ onSelectMedia }
+						onError={ onUploadError }
+						onReset={ onClearMedia }
+						useFeaturedImage={ useFeaturedImage }
+						onToggleFeaturedImage={ toggleUseFeaturedImage }
+						emptyLabel={ __( 'Add media' ) }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	) : null;
+
 	return (
 		<>
+			{ mediaInspectorPanel }
 			{ ( !! url || useFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -345,8 +398,15 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
+									// `autoPlay` only applies when the
+									// video loads, so remount the picker
+									// to stop a preview that is already
+									// playing when the user turns on
+									// reduced motion.
+									key={ prefersReducedMotion }
 									label={ __( 'Focal point' ) }
 									url={ url }
+									autoPlay={ ! prefersReducedMotion }
 									value={ focalPoint }
 									onDragStart={ imperativeFocalPointPreview }
 									onDrag={ imperativeFocalPointPreview }

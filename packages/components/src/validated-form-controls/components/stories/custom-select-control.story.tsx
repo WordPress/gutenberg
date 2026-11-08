@@ -10,7 +10,7 @@ const meta: Meta< typeof ValidatedCustomSelectControl > = {
 		a11y: { test: 'todo' },
 	},
 
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
+	title: 'Components/@wordpress-components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
 	id: 'components-validatedcustomselectcontrol',
 	component: ValidatedCustomSelectControl,
 	tags: [ 'status-private' ],
@@ -44,7 +44,7 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 						? {
 								type: 'invalid',
 								message: 'Option A is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

@@ -1,0 +1,119 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../../utils/theme-variables" as *;
+
+.wrapper {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+}
+
+.navigator {
+	grid-template-columns: 0.5fr repeat(5, 1fr) 0.5fr;
+	justify-items: center;
+	margin-bottom: $grid-unit-20;
+}
+
+.navigator.navigator {
+	// Keep the calendar grid over HStack's Flex display in either style order.
+	display: grid;
+}
+
+.previous-month {
+	grid-column: 1 / 2;
+}
+
+.next-month {
+	grid-column: 7 / 8;
+}
+
+.heading {
+	grid-column: 2 / 7;
+
+	strong {
+		font-weight: 600;
+	}
+}
+
+.heading.heading {
+	// Preserve the existing override of Heading's typography.
+	font-size: $font-size-medium;
+	font-weight: 400;
+}
+
+.calendar {
+	column-gap: $grid-unit-10;
+	display: grid;
+	grid-template-columns: 0.5fr repeat(5, 1fr) 0.5fr;
+	justify-items: center;
+	row-gap: $grid-unit-10;
+}
+
+.day-of-week {
+	color: $components-color-gray-700;
+	font-size: $font-size-medium;
+	line-height: 1.4;
+}
+
+.day {
+	grid-column: var(--_wp-components-date-picker-column);
+	position: relative;
+	justify-content: center;
+	padding: 0;
+
+	&:where(:disabled) {
+		pointer-events: none;
+	}
+
+	&:where(.has-events)::before {
+		border: 2px solid $components-color-accent;
+		border-radius: $radius-round;
+		content: " ";
+		/* stylelint-disable-next-line logical-css/require-logical-properties -- Preserve the physical center and translate offset in both directions. */
+		left: 50%;
+		position: absolute;
+		transform: translate(-50%, 9px);
+	}
+
+	&:where(.has-events.is-selected)::before {
+		border-color: $components-color-accent-inverted;
+	}
+}
+
+.day.day.day {
+	// Preserve the original specificity over Button and wp-admin styles.
+	border-radius: $radius-round;
+	height: 28px;
+	width: 28px;
+	font-weight: 400;
+
+	&:where(.is-selected) {
+		background: $components-color-accent;
+
+		&,
+		&:hover:not(:disabled, [aria-disabled="true"]) {
+			color: $components-color-accent-inverted;
+		}
+
+		&:focus:not(:disabled) {
+			border: 1.5px solid currentColor;
+		}
+
+		// Highlight the selected day for high-contrast mode.
+		&::after {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			inset: 0;
+			border-radius: inherit;
+			border: 1px solid transparent;
+		}
+	}
+
+	&:where(.is-today) {
+		background: $components-color-gray-200;
+	}
+}

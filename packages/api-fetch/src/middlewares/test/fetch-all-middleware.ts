@@ -13,9 +13,8 @@ describe( 'Fetch All Middleware', () => {
 			return 'ok';
 		};
 
-		const { default: fetchAllMiddleware } = await import(
-			'../fetch-all-middleware'
-		);
+		const { default: fetchAllMiddleware } =
+			await import( '../fetch-all-middleware' );
 
 		await fetchAllMiddleware( originalOptions, next );
 	} );
@@ -53,9 +52,8 @@ describe( 'Fetch All Middleware', () => {
 
 			return { default: mockApiFetch };
 		} );
-		const { default: fetchAllMiddleware } = await import(
-			'../fetch-all-middleware'
-		);
+		const { default: fetchAllMiddleware } =
+			await import( '../fetch-all-middleware' );
 		const result = await fetchAllMiddleware(
 			originalOptions,
 			async () => {}

@@ -1,11 +1,23 @@
 import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
 import fetch from 'node-fetch';
 import { gte } from 'semver';
 
 const REPO = 'WordPress/gutenberg';
-const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const { values, positionals } = parseArgs( {
+	options: {
+		'dry-run': {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	allowPositionals: true,
+	strict: false,
+} );
+const DRY_RUN = values[ 'dry-run' ];
+const LABEL = positionals[ 0 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 // Earlier versions query the sunset Projects (classic) API and always fail on
@@ -44,7 +56,9 @@ async function main() {
 		);
 		process.exit( 1 );
 	}
-
+	console.log( `Label: "${ LABEL }"` );
+	console.log( `Dry run: ${ DRY_RUN }` );
+	console.log( '' );
 	console.log( `You are on branch "${ BRANCH }".` );
 	console.log( `This script will:` );
 	console.log(
@@ -60,6 +74,9 @@ async function main() {
 	console.log( `` );
 	await promptDoYouWantToProceed();
 
+	// Captured before pulling, so a dry run can restore the branch exactly.
+	const headBeforeRun = cli( 'git', [ 'rev-parse', 'HEAD' ] );
+
 	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
 	cli( 'git', [ 'pull', 'origin', BRANCH, '--rebase' ], true );
 
@@ -71,15 +88,32 @@ async function main() {
 	const [ successes, failures ] = cherryPickAll( PRs );
 	console.log( 'Cherry-picking finished!' );
 
+	if ( DRY_RUN ) {
+		console.log(
+			'Dry run: resetting branch to original HEAD, no commits will be kept.'
+		);
+		cli( 'git', [ 'reset', '--hard', headBeforeRun ] );
+	}
+
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
-		console.log( `About to push to origin/${ BRANCH }` );
-		await promptDoYouWantToProceed();
-		cli( 'git', [ 'push', 'origin', BRANCH ] );
+		if ( DRY_RUN ) {
+			console.log(
+				'Dry run: skipping push, comments, and label removal.'
+			);
+			console.log( 'PRs that would be cherry-picked:' );
+			successes.forEach( ( PR ) =>
+				console.log( indent( prToString( PR, false ) ) )
+			);
+		} else {
+			console.log( `About to push to origin/${ BRANCH }` );
+			await promptDoYouWantToProceed();
+			cli( 'git', [ 'push', 'origin', BRANCH ] );
 
-		console.log( `Commenting and removing labels...` );
-		successes.forEach( GHcommentAndRemoveLabel );
+			console.log( `Commenting and removing labels...` );
+			successes.forEach( GHcommentAndRemoveLabel );
+		}
 	}
 	if ( failures.length ) {
 		console.log( 'PRs that could not be cherry-picked automatically:' );
@@ -382,6 +416,9 @@ function reportSummaryNextSteps( successes, failures ) {
 	console.log( '' );
 
 	const nextSteps = [];
+	if ( DRY_RUN && successes.length ) {
+		nextSteps.push( 'Run again without --dry-run to apply these changes' );
+	}
 	if ( failures.length ) {
 		nextSteps.push( 'Manually cherry-pick the PRs that failed' );
 	}

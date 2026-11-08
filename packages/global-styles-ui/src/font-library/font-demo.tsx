@@ -72,7 +72,7 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	// loaded state is tracked per URL.
 	const isAssetLoaded = isPreviewImage
 		? !! previewUrl &&
-		  ( loadedPreviews.has( previewUrl ) || resolvedUrl === previewUrl )
+			( loadedPreviews.has( previewUrl ) || resolvedUrl === previewUrl )
 		: isFontLoaded;
 
 	// The previews scale with the label, so estimate ~12px per character.
