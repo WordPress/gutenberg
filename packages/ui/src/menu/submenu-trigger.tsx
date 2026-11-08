@@ -2,7 +2,7 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { chevronRightSmall } from '@wordpress/icons';
+import { chevronRight } from '@wordpress/icons';
 import { Icon } from '../icon';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
@@ -66,8 +66,10 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 						trailing={
 							<Icon
 								className={ styles[ 'submenu-chevron' ] }
-								icon={ chevronRightSmall }
-								size={ 24 }
+								icon={ chevronRight }
+								size={ 16 }
+								// Keeps the 1.5px stroke the icon has at 24px.
+								strokeWidth={ 2.25 }
 								aria-hidden="true"
 							/>
 						}
