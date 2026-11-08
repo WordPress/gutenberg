@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { filterOutDuplicatesByName } from './utils';
@@ -64,9 +57,14 @@ export default function usePatternSettings() {
 			...restStoredSettings
 		} = storedSettings;
 
+		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
+		const nonGlobalStyles = ( styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
 		return {
 			...restStoredSettings,
-			styles: globalStyles,
+			styles: [ ...nonGlobalStyles, ...globalStyles ],
 			__experimentalFeatures: globalSettings,
 			[ globalStylesDataKey ]: mergedConfig.styles ?? {},
 			__experimentalBlockPatterns: blockPatterns,

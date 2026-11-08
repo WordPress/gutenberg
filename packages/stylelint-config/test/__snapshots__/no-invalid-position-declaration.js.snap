@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`flags warnings when invalidly positioned declarations are found > snapshot matches warnings 1`] = `
+[
+  {
+    "column": 1,
+    "endColumn": 18,
+    "endLine": 1,
+    "line": 1,
+    "rule": "no-invalid-position-declaration",
+    "severity": "error",
+    "text": "Invalid position for declaration (no-invalid-position-declaration)",
+  },
+  {
+    "column": 1,
+    "endColumn": 13,
+    "endLine": 2,
+    "line": 2,
+    "rule": "no-invalid-position-declaration",
+    "severity": "error",
+    "text": "Invalid position for declaration (no-invalid-position-declaration)",
+  },
+  {
+    "column": 2,
+    "endColumn": 19,
+    "endLine": 5,
+    "line": 5,
+    "rule": "no-invalid-position-declaration",
+    "severity": "error",
+    "text": "Invalid position for declaration (no-invalid-position-declaration)",
+  },
+]
+`;

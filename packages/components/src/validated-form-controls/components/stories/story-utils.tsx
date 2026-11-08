@@ -1,15 +1,4 @@
-/**
- * WordPress dependencies
- */
-
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Button from '../../../button';
 
 export const formDecorator: Meta[ 'decorators' ] = ( Story ) => (

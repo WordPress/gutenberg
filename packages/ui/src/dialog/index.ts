@@ -1,5 +1,6 @@
 import { Action } from './action';
-import { CloseIcon } from './close-icon';
+import { CloseIconButton } from './close-icon-button';
+import { Content } from './content';
 import { Description } from './description';
 import { Footer } from './footer';
 import { Header } from './header';
@@ -11,7 +12,8 @@ import { Trigger } from './trigger';
 
 export {
 	Action,
-	CloseIcon,
+	CloseIconButton,
+	Content,
 	Description,
 	Footer,
 	Header,

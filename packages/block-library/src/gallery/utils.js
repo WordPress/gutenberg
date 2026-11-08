@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,

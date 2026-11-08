@@ -1,5 +1,7 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import type { RootProps } from './types';
+import { DirectionProvider } from '../utils/direction-provider';
+import { useIframeDismissalBridge } from '../utils/use-iframe-dismissal-bridge';
 
 /**
  * An accessible popup anchored to a trigger element.
@@ -12,8 +14,11 @@ import type { RootProps } from './types';
  *
  * - `Popover.Root` — provides open state and context to all sub-components.
  * - `Popover.Trigger` — the button that toggles the popup.
- * - `Popover.Popup` — the floating container (positioning, collision
- *   avoidance); portals by default or via `portal={ <Popover.Portal /> }`.
+ * - `Popover.Popup` — the floating container. Portals by default or via
+ *   `portal={ <Popover.Portal /> }`, and is positioned by default or via
+ *   `positioner={ <Popover.Positioner /> }`.
+ * - `Popover.Positioner` — controls placement, alignment, offset, collision
+ *   behavior, and anchor for the floating content.
  * - `Popover.Arrow` — an optional arrow pointing toward the anchor.
  * - `Popover.Title` — **required** heading that labels the popover for
  *   accessibility (can be visually hidden).
@@ -35,7 +40,22 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	return <_Popover.Root { ...props } />;
+	const iframeDismissalProps = useIframeDismissalBridge<
+		_Popover.Root.Actions,
+		_Popover.Root.ChangeEventDetails
+	>( {
+		defaultOpen: props.defaultOpen,
+		modal: props.modal ?? false,
+		onOpenChange: ( nextOpen, eventDetails ) =>
+			props.onOpenChange?.( nextOpen, eventDetails ),
+		open: props.open,
+	} );
+
+	return (
+		<DirectionProvider>
+			<_Popover.Root { ...props } { ...iframeDismissalProps } />
+		</DirectionProvider>
+	);
 }
 
 export { Root };

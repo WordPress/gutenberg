@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 
 // This is the "fast" module that loads immediately. It imports

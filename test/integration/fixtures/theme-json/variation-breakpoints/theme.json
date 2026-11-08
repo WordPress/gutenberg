@@ -1,0 +1,41 @@
+{
+	"$schema": "../../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"variations": {
+					"custom-variation": {
+						"color": {
+							"text": "var(--wp--preset--color--primary)"
+						},
+						"@mobile": {
+							"typography": {
+								"fontSize": "1rem"
+							}
+						},
+						"@tablet": {
+							"typography": {
+								"fontSize": "1.25rem"
+							}
+						}
+					}
+				}
+			}
+		},
+		"variations": {
+			"shared-variation": {
+				"color": {
+					"text": "var(--wp--preset--color--primary)"
+				},
+				"@mobile": {
+					"spacing": {
+						"padding": {
+							"top": "1rem"
+						}
+					}
+				}
+			}
+		}
+	}
+}

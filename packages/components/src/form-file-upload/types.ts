@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, InputHTMLAttributes, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type Icon from '../icon';
 
 // TODO: Replace `children` and `icon` types with props from Button once Button is typed.
@@ -13,7 +6,8 @@ export type FormFileUploadProps = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
@@ -51,7 +45,6 @@ export type FormFileUploadProps = {
 	 *
 	 * ```jsx
 	 * <FormFileUpload
-	 *   __next40pxDefaultSize
 	 *   onClick={ ( event ) => ( event.target.value = '' ) }
 	 *   onChange={ onChange }
 	 * >

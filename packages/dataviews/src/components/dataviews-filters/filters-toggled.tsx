@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import Filters from './filters';
 

@@ -41,6 +41,12 @@ console.log( getAbilities() );
 console.log( await executeAbility( 'core/get-site-info' ) );
 ```
 
+To defer the network requests until a feature actually needs abilities, import the package dynamically from that feature — the module (and therefore its requests) only loads when the `import()` call runs:
+
+```js
+await import( '@wordpress/core-abilities' );
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

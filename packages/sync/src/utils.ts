@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-
-/**
- * Internal dependencies
- */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
@@ -52,8 +45,8 @@ export function initializeYjsDoc( ydoc: CRDTDoc ): void {
 }
 
 /**
- * Record that the entity was saved (persisted to the database) in the CRDT
- * document record metadata.
+ * Record that the entity was saved by a user-facing entity save in the CRDT
+ * document metadata. Background CRDT snapshots should not update this marker.
  *
  * @param {CRDTDoc} ydoc CRDT document.
  */
@@ -68,8 +61,21 @@ function pseudoRandomID(): number {
 }
 
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
+	// Encode a compacted copy of the doc rather than the doc itself. The live
+	// doc can be much larger than its current content: Y.UndoManager flags
+	// items deleted by tracked transactions with `keep`, which blocks garbage
+	// collection while they sit on the undo stack, so the encoded state would
+	// include the full content of everything deleted during the session. The
+	// `keep` flag is not serialized, so applying the state to a temporary doc
+	// garbage-collects that content. Struct identities are preserved, meaning
+	// peers merge the compacted state exactly as they would the original.
+	const tempDoc = createYjsDoc();
+	Y.applyUpdateV2( tempDoc, Y.encodeStateAsUpdateV2( crdtDoc ) );
+	const compactedUpdate = Y.encodeStateAsUpdateV2( tempDoc );
+	tempDoc.destroy();
+
 	return JSON.stringify( {
-		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		document: buffer.toBase64( compactedUpdate ),
 		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }

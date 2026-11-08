@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-ds-tokens';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -32,7 +35,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 	],
 	invalid: [
 		{
-			code: `const style = 'color: var(--wpds-color-fg-content-neutral)';`,
+			code: `const style = 'color: var(--wpds-color-foreground-content-neutral)';`,
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -40,7 +43,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const style = `color: var(--wpds-color-fg-content-neutral)`;',
+			code: 'const style = `color: var(--wpds-color-foreground-content-neutral)`;',
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -48,7 +51,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
+			code: `<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />`,
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -64,7 +67,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `const token = '--wpds-color-fg-content-neutral';`,
+			code: `const token = '--wpds-color-foreground-content-neutral';`,
 			errors: [
 				{
 					messageId: 'disallowed',
@@ -72,7 +75,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
 			],
 		},
 		{
-			code: 'const style = `--wpds-color-fg-content-neutral: red`;',
+			code: 'const style = `--wpds-color-foreground-content-neutral: red`;',
 			errors: [
 				{
 					messageId: 'disallowed',

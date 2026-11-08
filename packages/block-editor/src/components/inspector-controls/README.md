@@ -96,7 +96,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
 						<CheckboxControl
-							heading="Checkbox Field"
 							label="Tick Me"
 							help="Additional help text"
 							checked={ checkboxField }
@@ -114,7 +113,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<TextControl
-							__next40pxDefaultSize
 							label="Text Field"
 							help="Additional help text"
 							value={ textField }
@@ -204,7 +202,6 @@ function MyBlockEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<InspectorAdvancedControls>
 				<TextControl
-					__next40pxDefaultSize
 					label="HTML anchor"
 					value={ attributes.anchor }
 					onChange={ ( nextValue ) => {

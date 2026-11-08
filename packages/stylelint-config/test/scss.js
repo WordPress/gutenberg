@@ -1,8 +1,5 @@
-/**
- * Internal dependencies
- */
-const utils = require( './utils' );
-const getStylelintResult = utils.getStylelintResult;
+import { beforeEach, describe, expect, it } from 'vitest';
+import { getStylelintResult } from './utils';
 
 describe( 'flags no warnings with valid scss', () => {
 	let result;
@@ -35,7 +32,7 @@ describe( 'flags warnings with invalid scss', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 7 )
 		);
 	} );
 

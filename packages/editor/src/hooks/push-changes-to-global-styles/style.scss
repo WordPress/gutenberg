@@ -1,4 +1,35 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-push-changes-to-global-styles-control .components-button {
 	justify-content: center;
 	width: 100%;
+}
+
+.editor-push-changes-to-global-styles-modal p {
+	margin-top: 0;
+}
+
+.editor-push-changes-to-global-styles-modal {
+	.dataviews-layout__container {
+		overflow-x: hidden;
+
+		@media ( max-width: #{ $break-small } ) {
+			overflow-x: auto;
+		}
+	}
+
+	.components-modal__content {
+		padding-bottom: 0;
+	}
+
+	.dataviews-footer {
+		padding-bottom: $grid-unit-30;
+	}
+}
+
+.editor-push-changes-to-global-styles-modal__value {
+	color: $gray-900;
+	overflow-wrap: anywhere;
 }

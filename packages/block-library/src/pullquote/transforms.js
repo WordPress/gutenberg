@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { create, join, toHTMLString } from '@wordpress/rich-text';
 

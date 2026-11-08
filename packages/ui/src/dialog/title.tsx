@@ -1,5 +1,4 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
-import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
@@ -26,7 +25,7 @@ import type { TitleProps } from './types';
  * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function DialogTitle( { children, className, ...props }, forwardedRef ) {
+	function DialogTitle( { children, ...props }, forwardedRef ) {
 		const validationContext = useDialogValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
@@ -43,7 +42,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 				ref={ mergedRef }
 				variant="heading-xl"
 				render={ <_Dialog.Title { ...props } /> }
-				className={ clsx( styles.title, className ) }
+				className={ styles.title }
 			>
 				{ children }
 			</Text>

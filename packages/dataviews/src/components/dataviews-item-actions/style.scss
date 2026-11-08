@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 .dataviews-action-modal {
@@ -10,5 +8,5 @@
 // from wordpress/ui package, but we're not ready to use it yet.
 // See https://github.com/WordPress/gutenberg/pull/75721/
 .dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
-	padding: 0 $grid-unit-05;
+	padding: 0 var(--wpds-dimension-padding-xs);
 }

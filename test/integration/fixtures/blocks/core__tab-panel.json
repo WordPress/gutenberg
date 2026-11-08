@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/tab-panel",
+		"isValid": true,
+		"attributes": {
+			"label": "Tab 1"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Panel 1",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
