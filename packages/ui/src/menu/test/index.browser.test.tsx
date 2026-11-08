@@ -346,10 +346,16 @@ describe( 'Menu', () => {
 					variant === 'radio' ? 'menuitemradio' : 'menuitem'
 				);
 				const labelElement = within( item ).getByText( labelText );
-				const firstLineCenter =
-					labelElement.getBoundingClientRect().top +
-					parseFloat( getComputedStyle( labelElement ).lineHeight ) /
-						2;
+				const labelBox = labelElement.getBoundingClientRect();
+				const lineHeight = parseFloat(
+					getComputedStyle( labelElement ).lineHeight
+				);
+				// The long label must really wrap, or this case would only
+				// cover a single line.
+				expect( labelBox.height > lineHeight * 1.5 ).toBe(
+					Boolean( wrapped )
+				);
+				const firstLineCenter = labelBox.top + lineHeight / 2;
 
 				// The prefix is hidden from assistive technology, so it has no
 				// accessible name to query by.
