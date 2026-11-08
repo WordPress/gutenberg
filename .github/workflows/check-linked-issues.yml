@@ -44,23 +44,39 @@ jobs:
                       //   - `GH-1234`            (alternative short form)
                       //   - Full URLs to issues or pulls in this repo
                       //
+                      // A reference is skipped when the text before it on the same line
+                      // marks it as informational (e.g. "Related to", "Part of", "See"),
+                      // since linking it would close that issue on merge.
+                      //
                       // Numbers are collected into a Set so duplicates collapse.
                       // -----------------------------------------------------------------
                       const referenced = new Set();
 
-                      const shortRefRegex = /(?:^|[^&\w])(?:GH-|#)(\d+)\b/gi;
-                      let m;
-                      while ( ( m = shortRefRegex.exec( visibleBody ) ) ) {
-                          referenced.add( Number( m[ 1 ] ) );
-                      }
+                      const informationalRegex =
+                          /\b(?:related|relates|part of|see|follow[- ]?ups?|refs?|references?|cc|reverts?|similar|blocked by|depends on|alternative|supersedes|split from|extracted from|inspired by|builds? on)\b/i;
+                      const isInformational = ( index ) => {
+                          const lineStart = visibleBody.lastIndexOf( '\n', index - 1 ) + 1;
+                          return informationalRegex.test(
+                              visibleBody.slice( lineStart, index )
+                          );
+                      };
 
-                      const urlRegex = new RegExp(
-                          `https?://github\\.com/${ owner }/${ repo }/(?:issues|pull)/(\\d+)`,
-                          'gi'
+                      const collect = ( regex ) => {
+                          let m;
+                          while ( ( m = regex.exec( visibleBody ) ) ) {
+                              if ( ! isInformational( m.index ) ) {
+                                  referenced.add( Number( m[ 1 ] ) );
+                              }
+                          }
+                      };
+
+                      collect( /(?:^|[^&\w])(?:GH-|#)(\d+)\b/gi );
+                      collect(
+                          new RegExp(
+                              `https?://github\\.com/${ owner }/${ repo }/(?:issues|pull)/(\\d+)`,
+                              'gi'
+                          )
                       );
-                      while ( ( m = urlRegex.exec( visibleBody ) ) ) {
-                          referenced.add( Number( m[ 1 ] ) );
-                      }
 
                       // The PR's own number can appear in URLs (e.g. a screenshot link)
                       // and is never an "issue mention" of itself.
@@ -207,7 +223,10 @@ jobs:
                           '- Replace the mention with a closing keyword in the PR description (e.g. `Closes #1234`, `Fixes #1234`, or `Resolves #1234`), **or**',
                           '- Manually link the issue from the *Development* section on the right sidebar of this PR.',
                           '',
-                          'If a reference is intentionally informational (e.g. *Follow up to #1234*, *See #1234*), no action is needed. This check is advisory and will not block the PR.',
+                          '> [!WARNING]',
+                          '> Either way, GitHub closes a linked issue when this PR is merged. Only link issues this PR fully resolves.',
+                          '',
+                          'If a reference is informational, no action is needed. Prefixing it with a phrase like *Related to*, *Part of*, or *See* on the same line clears this notice. This check is advisory and will not block the PR.',
                       ].join( '\n' );
 
                       // -----------------------------------------------------------------
