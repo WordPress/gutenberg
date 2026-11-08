@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `sideloadMedia`, previously only available as a private API ([#84988](https://github.com/WordPress/gutenberg/pull/84988)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Enhancements
