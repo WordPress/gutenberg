@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `build` and `start`: With `--experimental-modules`, clean the output directory as without the flag, so the files of a renamed or deleted Block no longer stay in `build/`. The `fonts/` and `images/` directories are still kept ([#86342](https://github.com/WordPress/gutenberg/pull/86342)).
+
 ## 37.1.0 (2026-11-04)
 
 ### Internal
