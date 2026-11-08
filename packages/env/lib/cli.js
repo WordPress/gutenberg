@@ -11,6 +11,8 @@ const {
 	getRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 } = require( './runtime' );
 
 // Spinner.
@@ -39,7 +41,9 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof UnsupportedCommandError ||
-					error instanceof EnvironmentNotInitializedError
+					error instanceof EnvironmentNotInitializedError ||
+					error instanceof DatabaseDowngradeError ||
+					error instanceof MissingImageError
 				) {
 					// Error is a known user-facing error.
 					spinner.fail( error.message );
@@ -140,7 +144,7 @@ module.exports = function cli() {
 			args.option( 'runtime', {
 				type: 'string',
 				describe:
-					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
+					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental), "php" uses the PHP installed on this computer (experimental).',
 				choices: getAvailableRuntimes(),
 				default: 'docker',
 			} );

@@ -52,7 +52,7 @@ function render_block_core_template_part( $attributes ) {
 				__FUNCTION__,
 				sprintf(
 					/* translators: 1: Template part ID, 2: Error message. */
-					__( 'Error when loading the template part %1$s from the database: %2$s' ),
+					__( 'Error loading the template part %1$s from the database: %2$s' ),
 					$template_part_id,
 					$block_template->get_error_message()
 				)
@@ -263,14 +263,14 @@ function build_template_part_block_instance_variations() {
 			// block description. This is a bit hacky, but prevent the fallback
 			// by using a non-breaking space so that the value of description
 			// isn't falsey.
-			'description' => $template_part->description || '&nbsp;',
+			'description' => '' !== trim( $template_part->description ) ? $template_part->description : "\u{00A0}",
 			'attributes'  => array(
 				'slug'  => $template_part->slug,
 				'theme' => $template_part->theme,
 				'area'  => $template_part->area,
 			),
 			'scope'       => $scope,
-			'icon'        => $icon_by_area[ $template_part->area ] ?? null,
+			'icon'        => $icon_by_area[ $template_part->area ?? '' ] ?? null,
 			'example'     => array(
 				'attributes' => array(
 					'slug'  => $template_part->slug,

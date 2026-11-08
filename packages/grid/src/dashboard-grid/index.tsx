@@ -25,6 +25,7 @@ import {
 } from '@wordpress/element';
 import { GridItem } from './grid-item';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
+import { resolveColumnCount } from '../shared/column-policy';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -136,9 +137,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef<
-			DashboardGridLayoutItem[] | undefined
-		>();
+		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+			undefined
+		);
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
@@ -199,18 +200,16 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				setGapPx( parsed );
 			}
 		}, [ gridRoot ] );
-		const effectiveColumns = useMemo( () => {
-			if ( ! minColumnWidth ) {
-				return columns ?? DEFAULT_COLUMNS;
-			}
-
-			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxFit = Math.max(
-				1,
-				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
-			);
-			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
-		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
+		const effectiveColumns = useMemo(
+			() =>
+				resolveColumnCount(
+					{ columns, minColumnWidth },
+					containerWidth,
+					gapPx,
+					DEFAULT_COLUMNS
+				),
+			[ minColumnWidth, gapPx, containerWidth, columns ]
+		);
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
@@ -359,10 +358,13 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 					// Strip `actionableArea` so it does not leak to the DOM;
 					// the grid lifts it to a slot separately.
-					const { actionableArea } = child.props;
+					const typedChild = child as React.ReactElement< {
+						actionableArea?: React.ReactNode;
+					} >;
+					const { actionableArea } = typedChild.props;
 					const stripped =
 						actionableArea !== undefined
-							? cloneElement( child, {
+							? cloneElement( typedChild, {
 									actionableArea: undefined,
 								} )
 							: child;

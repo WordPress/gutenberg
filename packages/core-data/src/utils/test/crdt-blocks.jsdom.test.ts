@@ -21,7 +21,7 @@ vi.mock( import( 'uuid' ), () => ( {
 } ) );
 
 /**
- * Mock @wordpress/blocks module
+ * Mock `@wordpress/blocks` module
  */
 vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),

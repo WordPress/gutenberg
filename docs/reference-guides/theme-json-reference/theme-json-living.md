@@ -343,7 +343,7 @@ Spacing styles.
 
 | Property | Description | Type |
 | -------- | ----------- | ---- |
-| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. | `string`, `{ ref }` |
+| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now. | `string`, `{ ref }`, `{ top, left }` |
 | margin | Margin styles. | `{ top, right, bottom, left }` |
 | padding | Padding styles. | `{ top, right, bottom, left }` |
 

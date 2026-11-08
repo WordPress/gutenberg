@@ -4,8 +4,6 @@ import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
@@ -18,6 +16,10 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	tags: [ 'manifest' ],
@@ -25,6 +27,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
+		'Autocomplete.LoadingIndicator': Autocomplete.LoadingIndicator,
 		'Autocomplete.Portal': Autocomplete.Portal,
 		'Autocomplete.Positioner': Autocomplete.Positioner,
 		'Autocomplete.Popup': Autocomplete.Popup,
@@ -197,15 +200,17 @@ function HiddenResultCount() {
 }
 
 /**
- * Fetches matching items asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Autocomplete.LoadingIndicator` inside `Autocomplete.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Autocomplete.Root
@@ -216,7 +221,9 @@ export const AsyncItems: Story = {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
-					clearTimeout( timeoutRef.current );
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
@@ -226,7 +233,7 @@ export const AsyncItems: Story = {
 							)
 						);
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 			>
@@ -237,10 +244,7 @@ export const AsyncItems: Story = {
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Autocomplete.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
@@ -759,4 +763,34 @@ export const Grid: Story = {
 			</Autocomplete.Root>
 		);
 	},
+};
+
+/**
+ * Use `width` on `Autocomplete.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems.map( ( item ) => item.label ),
+	},
+	render: ( args ) => (
+		<Autocomplete.Root { ...args }>
+			<Autocomplete.Input aria-label="Label" />
+			<Autocomplete.Popup width="sm">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: string ) => (
+								<Autocomplete.Item key={ item } value={ item }>
+									<Autocomplete.ItemLabel>
+										{ item }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };

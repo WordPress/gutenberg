@@ -38,6 +38,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
   - `backgroundImage`: `true`

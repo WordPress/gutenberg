@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).
+
+## 3.1.0 (2026-11-04)
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+
+## 2.57.0 (2026-10-07)
+
 ### New Features
 
 -   Add a `background.backgroundClip` style rule that generates `background-clip`, along with the `-webkit-background-clip` and `-webkit-text-fill-color` declarations needed for the text clipping case ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
@@ -17,7 +35,6 @@
 ## 2.54.0 (2026-08-26)
 
 ## 2.53.0 (2026-08-12)
-
 
 ## 2.52.0 (2026-07-29)
 

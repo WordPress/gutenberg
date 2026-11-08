@@ -1,9 +1,13 @@
 import process from 'node:process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Popover from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
@@ -24,6 +28,62 @@ function collectUncaughtErrors() {
 }
 
 describe( 'Popover', () => {
+	it( 'keeps a popup portaled into an iframe open for inside presses and closes it for outside presses', async () => {
+		const user = userEvent.setup();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const iframeDocument = iframe.contentDocument;
+
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		try {
+			const outsideTarget = iframeDocument.createElement( 'button' );
+			iframeDocument.body.appendChild( outsideTarget );
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup
+						portal={
+							<Popover.Portal container={ iframeDocument.body } />
+						}
+					>
+						<Popover.Title>Title</Popover.Title>
+						<button>Duplicate</button>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			const portaledPopup = await within(
+				iframeDocument.body
+			).findByRole( 'dialog' );
+			const item = within( portaledPopup ).getByRole( 'button', {
+				name: 'Duplicate',
+			} );
+
+			act( () => {
+				item.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			expect( portaledPopup ).toBeVisible();
+
+			act( () => {
+				outsideTarget.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			await waitFor( () => {
+				expect( portaledPopup ).not.toBeInTheDocument();
+			} );
+		} finally {
+			iframe.remove();
+		}
+	} );
+
 	describe( 'forwards ref', () => {
 		it( 'should forward ref on Trigger', () => {
 			const ref = createRef< HTMLButtonElement >();
@@ -218,6 +278,48 @@ describe( 'Popover', () => {
 			expect( errors ).toHaveLength( errorCountAfterInitial );
 
 			cleanup();
+		} );
+	} );
+} );
+
+describe( 'Popover.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Popover.Root defaultOpen>
+				<Popover.Trigger>Open Popover</Popover.Trigger>
+				<div data-testid="portal-target" />
+				<Popover.Popup
+					portal={ <Popover.Portal container={ container } /> }
+				>
+					<Popover.Title>Popover title</Popover.Title>
+					Portal content
+				</Popover.Popup>
+			</Popover.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		await waitFor( () => {
+			expect(
+				within( target ).getByText( 'Portal content' )
+			).toBeVisible();
 		} );
 	} );
 } );

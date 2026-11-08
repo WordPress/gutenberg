@@ -142,3 +142,4 @@ export function getCSSRules(
 
 // Export style utils.
 export { getCSSValueFromRawStyle } from './styles/utils';
+export { VALID_BACKGROUND_CLIP_VALUES } from './styles/background';
