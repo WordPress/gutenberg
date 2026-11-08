@@ -1,9 +1,19 @@
+import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useEffect } from '@wordpress/element';
 import { useCropOptions } from '../use-crop-options';
-import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
-import { MediaEditorStateProvider } from '../../../state';
+import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+
+const IMAGE = {
+	src: 'test.jpg',
+	naturalWidth: 1200,
+	naturalHeight: 600,
+};
 
 function CropOptionsHarness() {
+	// Load the image through the session, as the canvas does.
+	const { setSourceImage } = useMediaEditor();
+	useEffect( () => setSourceImage( IMAGE ), [ setSourceImage ] );
 	const cropOptions = useCropOptions( {
 		aspectRatioPresets: [
 			{ label: 'Square', value: 1 },
@@ -27,7 +37,13 @@ function CropOptionsHarness() {
 			<button
 				onClick={ () =>
 					cropOptions.setAspectRatioValue(
-						ORIGINAL_ASPECT_RATIO.toString()
+						// "Original" is the default preset with a negative
+						// value, as the dropdown offers it.
+						String(
+							cropOptions.aspectRatioOptions.find(
+								( option ) => option.value < 0
+							)?.value
+						)
 					)
 				}
 			>
@@ -39,22 +55,13 @@ function CropOptionsHarness() {
 			<button onClick={ () => cropOptions.setAspectRatioValue( '0' ) }>
 				Free
 			</button>
-			<button onClick={ cropOptions.resetCropOptions }>Reset</button>
 		</div>
 	);
 }
 
 function renderHarness() {
 	render(
-		<MediaEditorStateProvider
-			initialCropperState={ {
-				image: {
-					src: 'test.jpg',
-					naturalWidth: 1200,
-					naturalHeight: 600,
-				},
-			} }
-		>
+		<MediaEditorStateProvider>
 			<CropOptionsHarness />
 		</MediaEditorStateProvider>
 	);
@@ -69,7 +76,7 @@ describe( 'useCropOptions', () => {
 		).toHaveTextContent( '0,-1,1,1.3333333333333333' );
 	} );
 
-	it( 'resolves the Original aspect ratio from the cropper image dimensions', () => {
+	it( 'resolves the Original aspect ratio from the loaded image dimensions', () => {
 		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Original' } ) );
@@ -88,16 +95,5 @@ describe( 'useCropOptions', () => {
 		expect(
 			screen.getByTestId( 'resolved-aspect-ratio' )
 		).toHaveTextContent( 'undefined' );
-	} );
-
-	it( 'reset returns cropOptions to defaults', () => {
-		renderHarness();
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
-		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
-
-		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
-			'0'
-		);
 	} );
 } );

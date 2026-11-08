@@ -1,5 +1,8 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { SelectControl, TextControl } from '@wordpress/components';
+import {
+	SelectControl as WCSelectControl,
+	TextControl,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -7,6 +10,10 @@ import { TemplatePartImportControls } from './import-controls';
 import { unlock } from '../../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+
+// The default tag name is stored as an empty string, but the select treats an
+// empty value as no selection and shows its placeholder.
+const DEFAULT_TAG_NAME = '__default';
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -57,7 +64,7 @@ export function TemplatePartAdvancedControls( {
 						} }
 						onFocus={ ( event ) => event.target.select() }
 					/>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }
@@ -67,8 +74,12 @@ export function TemplatePartAdvancedControls( {
 				</>
 			) }
 			<HTMLElementControl
-				tagName={ tagName || '' }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+				tagName={ tagName || DEFAULT_TAG_NAME }
+				onChange={ ( value ) =>
+					setAttributes( {
+						tagName: value === DEFAULT_TAG_NAME ? '' : value,
+					} )
+				}
 				clientId={ clientId }
 				options={ [
 					{
@@ -77,7 +88,7 @@ export function TemplatePartAdvancedControls( {
 							__( 'Default based on area (%s)' ),
 							`<${ defaultWrapper }>`
 						),
-						value: '',
+						value: DEFAULT_TAG_NAME,
 					},
 					{ label: '<header>', value: 'header' },
 					{ label: '<main>', value: 'main' },

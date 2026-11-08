@@ -6,7 +6,6 @@ import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockType,
-	Block,
 	BlockVariation,
 	BlockVariationScope,
 	BlockStyle,
@@ -449,7 +448,8 @@ export function getBlockTypes(): BlockType[] {
  * Returns the block support value for a feature, if defined.
  *
  * @param nameOrType      Block name or type object
- * @param feature         Feature to retrieve
+ * @param feature         Feature to retrieve, as a dot-separated path or an
+ *                        array of path segments
  * @param defaultSupports Default value to return if not
  *                        explicitly defined
  *
@@ -457,7 +457,7 @@ export function getBlockTypes(): BlockType[] {
  */
 export function getBlockSupport(
 	nameOrType: string | BlockType,
-	feature: string,
+	feature: string | string[],
 	defaultSupports?: unknown
 ): unknown {
 	return select( blocksStore ).getBlockSupport(
@@ -471,7 +471,8 @@ export function getBlockSupport(
  * Returns true if the block defines support for a feature, or false otherwise.
  *
  * @param nameOrType      Block name or type object.
- * @param feature         Feature to test.
+ * @param feature         Feature to test, as a dot-separated path or an array
+ *                        of path segments.
  * @param defaultSupports Whether feature is supported by
  *                        default if not explicitly defined.
  *
@@ -479,7 +480,7 @@ export function getBlockSupport(
  */
 export function hasBlockSupport(
 	nameOrType: string | BlockType,
-	feature: string,
+	feature: string | string[],
 	defaultSupports?: boolean
 ): boolean {
 	return select( blocksStore ).hasBlockSupport(
@@ -499,7 +500,7 @@ export function hasBlockSupport(
  * @return Whether the given block is a reusable block.
  */
 export function isReusableBlock(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/block';
 }
@@ -514,7 +515,7 @@ export function isReusableBlock(
  * @return Whether the given block is a template part.
  */
 export function isTemplatePart(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/template-part';
 }
@@ -628,7 +629,7 @@ export const unregisterBlockStyle = (
 
 /**
  * Returns an array with the variations of a given block type.
- * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ * Ignored from documentation as the recommended usage is via useSelect from `@wordpress/data`.
  *
  * @ignore
  *

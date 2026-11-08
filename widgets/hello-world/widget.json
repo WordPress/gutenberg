@@ -3,6 +3,18 @@
 	"title": "Hello World",
 	"description": "A minimal example widget.",
 	"icon": "dashboard-widgets/wordpress",
+	"attributes": [
+		{
+			"id": "message",
+			"type": "text",
+			"label": "Message"
+		}
+	],
+	"example": {
+		"attributes": {
+			"message": "Hello World"
+		}
+	},
 	"category": "demo",
 	"presentation": "full-bleed",
 	"textdomain": "default"

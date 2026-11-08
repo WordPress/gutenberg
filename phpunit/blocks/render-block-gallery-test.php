@@ -331,6 +331,61 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_gap_styles_skipped_when_theme_opts_out_of_layout_styles() {
+		$attachment_id = self::$attachment_ids[0];
+		$image_url     = wp_get_attachment_image_url( $attachment_id, 'large' );
+		$markup        = sprintf(
+			'<!-- wp:gallery {"linkTo":"none"} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":%1$d,"sizeSlug":"large"} --><figure class="wp-block-image size-large"><img src="%2$s" alt="" class="wp-image-%1$d"/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->',
+			$attachment_id,
+			$image_url
+		);
+
+		// Baseline: the render generates per-instance gap styles, scoped by a
+		// unique classname added to the gallery wrapper.
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		$output     = $this->render_in_loop( $markup );
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+		$this->assertMatchesRegularExpression(
+			'/wp-block-gallery-\d/',
+			$output,
+			'By default the gallery wrapper should carry a unique gap-scoping classname.'
+		);
+		$this->assertStringContainsString(
+			'--wp--style--unstable-gallery-gap',
+			$stylesheet,
+			'By default the gallery gap styles should be generated.'
+		);
+
+		// A theme that opts out of layout styles opts out of the generated gap
+		// styles too, and of the unique classname that exists only to scope them.
+		add_theme_support( 'disable-layout-styles' );
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		try {
+			$output     = $this->render_in_loop( $markup );
+			$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		} finally {
+			remove_theme_support( 'disable-layout-styles' );
+		}
+
+		$this->assertDoesNotMatchRegularExpression(
+			'/wp-block-gallery-\d/',
+			$output,
+			'Themes opting out of layout styles should not get the unique gap-scoping classname.'
+		);
+		$this->assertStringNotContainsString(
+			'--wp--style--unstable-gallery-gap',
+			$stylesheet,
+			'Themes opting out of layout styles should not get generated gallery gap styles.'
+		);
+		// The gallery itself still renders.
+		$this->assertStringContainsString(
+			'wp-image-' . $attachment_id,
+			$output,
+			'Opting out of layout styles should not affect the gallery markup itself.'
+		);
+	}
+
 	public function test_dynamic_lightbox_link_adds_interactivity_directives() {
 		$output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"linkTo":"lightbox"} /-->'
@@ -356,6 +411,83 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
 		$this->assertStringContainsString( '@media (width <= 480px)', $stylesheet );
 		$this->assertStringContainsString( 'width:100%', $stylesheet );
+	}
+
+	public function test_static_gallery_outputs_viewport_aspect_ratio_style_in_any_layout() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// A Grid Gallery: the column and crop rules don't apply to it, but the
+		// aspect ratio does, so it still needs the per-instance stylesheet.
+		$output     = do_blocks(
+			'<!-- wp:gallery {"layout":{"type":"grid"},"style":{"@mobile":{"aspectRatio":"16/9"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
+		$this->assertStringContainsString( '@media (width <= 480px)', $stylesheet );
+		$this->assertStringContainsString( 'aspect-ratio:16/9 !important', $stylesheet );
+		$this->assertStringContainsString( 'object-fit:cover !important', $stylesheet );
+		$this->assertStringNotContainsString( 'is-layout-flex', $stylesheet );
+	}
+
+	public function test_dynamic_gallery_outputs_viewport_aspect_ratio_style() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// A dynamic gallery has no inner image blocks to carry the ratio, so
+		// the Gallery's own responsive CSS has to supply it.
+		$output     = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"style":{"@tablet":{"aspectRatio":"4/3"}}} /-->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
+		$this->assertStringContainsString( '@media (480px < width <= 782px)', $stylesheet );
+		$this->assertStringContainsString( 'aspect-ratio:4/3 !important', $stylesheet );
+	}
+
+	public function test_static_gallery_cancels_base_aspect_ratio_for_viewport() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		do_blocks(
+			'<!-- wp:gallery {"aspectRatio":"16/9","style":{"@mobile":{"aspectRatio":"auto"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		/*
+		 * `auto` would override the `width`/`height` presentational hint a
+		 * lazy-loaded image relies on for its placeholder ratio, collapsing it to
+		 * zero height until it loads, so the declaration is rolled out of the
+		 * cascade instead.
+		 */
+		$this->assertStringContainsString( 'aspect-ratio:revert-layer !important', $stylesheet );
+		$this->assertStringNotContainsString( 'aspect-ratio:auto', $stylesheet );
+	}
+
+	public function test_static_gallery_ignores_unsafe_viewport_aspect_ratio() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// The value is interpolated into a generated rule rather than an inline
+		// style, so anything that isn't a plain ratio is dropped instead of
+		// being emitted and closing the rule early.
+		do_blocks(
+			'<!-- wp:gallery {"style":{"@mobile":{"aspectRatio":"16/9;} body{display:none;"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertStringNotContainsString( 'aspect-ratio', $stylesheet );
+		$this->assertStringNotContainsString( 'display:none', $stylesheet );
 	}
 
 	public function test_static_gallery_outputs_viewport_crop_style() {

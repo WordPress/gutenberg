@@ -1,4 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
+import type { ReactElement } from 'react';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 import type {
@@ -66,6 +68,25 @@ describe( 'createInterpolateElement', () => {
 			createInterpolateElement( testString, { 'spaced token': <em /> } )
 		).toEqual( expectedElement );
 	} );
+	it.each( [
+		'This is a <constructor>fun</constructor> string',
+		'This is a <__proto__/> string',
+	] )(
+		'returns same string when the tag in "%s" is not in the conversion map',
+		( testString ) => {
+			expect(
+				createInterpolateElement( testString, { item: <em /> } )
+			).toEqual( <>{ testString }</> );
+		}
+	);
+	it( 'returns same string when the tag is a non-enumerable key of the conversion map', () => {
+		const testString = 'This is a <hidden>happy</hidden> string';
+		const conversionMap: Record< string, ReactElement > = { item: <em /> };
+		Object.defineProperty( conversionMap, 'hidden', { value: 'text' } );
+		expect( createInterpolateElement( testString, conversionMap ) ).toEqual(
+			<>{ testString }</>
+		);
+	} );
 	it( 'warns and stops interpolating when there is an unmatched closing tag', () => {
 		const testString = 'This is a </item> string';
 		const expectedElement = <>{ testString }</>;
@@ -90,6 +111,8 @@ describe( 'createInterpolateElement', () => {
 			JSON.stringify(
 				createInterpolateElement( partialString, {
 					em: <em />,
+					// @ts-expect-error - The unmatched closing tag is
+					// intentionally included to exercise runtime recovery.
 					strong: <strong />,
 				} )
 			)
@@ -146,7 +169,7 @@ describe( 'createInterpolateElement', () => {
 		'returns expected output for a custom component with children ' +
 			'replacement',
 		() => {
-			const TestComponent = ( props ) => {
+			const TestComponent = ( props: React.ComponentProps< 'div' > ) => {
 				return <div { ...props }>{ props.children }</div>;
 			};
 			const testString =
@@ -167,7 +190,7 @@ describe( 'createInterpolateElement', () => {
 		}
 	);
 	it( 'returns expected output for self closing custom component', () => {
-		const TestComponent = ( props ) => {
+		const TestComponent = ( props: React.ComponentProps< 'div' > ) => {
 			return <div { ...props } />;
 		};
 		const testString =
@@ -227,7 +250,7 @@ describe( 'createInterpolateElement', () => {
 		).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'renders expected components across renders for keys in use', () => {
-		const TestComponent = ( { switchKey } ) => {
+		const TestComponent = ( { switchKey }: { switchKey: boolean } ) => {
 			const elementConfig = switchKey
 				? { item: <em /> }
 				: { item: <strong /> };
@@ -281,7 +304,7 @@ describe( 'createInterpolateElement', () => {
 		const tags: Tags[] = [ 'Name', 'Link' ];
 		expect( tags ).toHaveLength( 2 );
 	} );
-	it( 'handles parsing emojii correctly', () => {
+	it( 'handles parsing emoji correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';
 		const expectedElement = createElement(
 			Fragment,

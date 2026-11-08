@@ -25,9 +25,13 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
+/.npmrc                                         @manzoorwanijk
+# Emptied out by #83033; the entry stays so anything reappearing there gets reviewed.
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
+/tools/phpstan                                  @westonruter
+/phpstan.neon.dist                              @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
@@ -35,6 +39,7 @@
 /packages/nux                                   @peterwilsoncc
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
+/packages/theme-build-tools                     @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox
@@ -66,3 +71,10 @@
 /lib/block-supports/layout.php                  @tellthemachines
 /lib/class-wp-theme-json-gutenberg.php          @tellthemachines
 /lib/compat/*/html-api                          @dmsnell
+
+# Exclusions
+# An entry without an owner cancels the rules above it, and last match wins,
+# so these stay at the end. Removing them brings back the review requests.
+/tools/eslint/suppressions.json
+/tools/stylelint/stylelint-suppressions.json
+/tools/validation/check-private-apis.config.json

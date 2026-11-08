@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PanelRow should render with the custom class name 1`] = `
+exports[`PanelRow > should render with the custom class name 1`] = `
 <div>
   <div
     class="components-panel__row custom"
@@ -8,7 +8,7 @@ exports[`PanelRow should render with the custom class name 1`] = `
 </div>
 `;
 
-exports[`PanelRow should render with the default class name 1`] = `
+exports[`PanelRow > should render with the default class name 1`] = `
 <div>
   <div
     class="components-panel__row"

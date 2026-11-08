@@ -1,13 +1,10 @@
-@use "../utils/theme-variables" as *;
-
 $indeterminate-indicator-width: 50%;
 
 .track {
 	position: relative;
 	overflow: hidden;
 	height: 1.5px;
-	/* Text color at 10% opacity */
-	background-color: color-mix(in srgb, $components-color-foreground, transparent 90%);
+	background-color: var(--wpds-color-background-track-neutral);
 	border-radius: 9999px;
 
 	// Windows high contrast mode.
@@ -25,20 +22,27 @@ $indeterminate-indicator-width: 50%;
 	top: 0;
 	height: 100%;
 	border-radius: 9999px;
-	/* Text color at 90% opacity */
-	background-color: color-mix(in srgb, $components-color-foreground, transparent 10%);
+	background-color: var(--wpds-color-background-thumb-neutral);
 
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
 	outline-offset: -2px;
 
 	width: var(--indicator-width);
-	transition: width 0.4s ease-in-out;
+
+	@media not (prefers-reduced-motion) {
+		transition: width 0.4s ease-in-out;
+	}
 
 	&.is-indeterminate {
 		--indicator-width: #{$indeterminate-indicator-width};
 		animation: indeterminate-slide 1.5s ease-in-out infinite;
 		transition: none;
+
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 3s;
+			animation-timing-function: steps(4, end);
+		}
 	}
 }
 

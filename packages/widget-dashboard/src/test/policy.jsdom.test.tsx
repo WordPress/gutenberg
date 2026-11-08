@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
@@ -19,11 +19,14 @@ import type {
 	DashboardWidget,
 } from '../types';
 
-jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
-	useInlineFit: jest.fn(),
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockResizeObserver();
+
+vi.mock( import( '../components/widget-attributes/use-inline-fit' ), () => ( {
+	useInlineFit: vi.fn(),
 } ) );
 
-const mockedUseInlineFit = jest.mocked( useInlineFit );
+const mockedUseInlineFit = vi.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,
@@ -225,7 +228,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 	} );
 
 	it( 'asks with the placed widget and its type', async () => {
-		const canPerform = jest.fn< boolean, [ unknown ] >( () => true );
+		const canPerform = vi.fn< CanPerformDashboardOperation >( () => true );
 		render( <Harness canPerform={ canPerform } editMode /> );
 		await screen.findByTestId( 'label' );
 
@@ -274,18 +277,22 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'keeps the tile fixed when move is denied', async () => {
+	it( 'omits the drag activator while preserving permitted controls when move is denied', async () => {
 		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
 		const { container } = render(
 			<Harness canPerform={ deny( 'move' ) } editMode />
 		);
-		await screen.findByTestId( 'label' );
+		const content = await screen.findByTestId( 'label' );
 
 		const activator = container.querySelector(
 			'[aria-roledescription="sortable"]'
 		);
-		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( activator ).toBeNull();
+		expect( content.closest( '[aria-disabled="true"]' ) ).toBeNull();
 		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+		expect(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		).toBeEnabled();
 	} );
 
 	it( 'treats a non-boolean answer as a denial on every surface', async () => {
@@ -298,16 +305,17 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		const { container } = render(
 			<Harness canPerform={ canPerform } editMode />
 		);
-		await screen.findByTestId( 'label' );
+		const content = await screen.findByTestId( 'label' );
 
 		const activator = container.querySelector(
 			'[aria-roledescription="sortable"]'
 		);
-		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( activator ).toBeNull();
+		expect( content.closest( '[aria-disabled="true"]' ) ).toBeNull();
 		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
 		expect(
 			screen.getByRole( 'button', { name: 'Widget options' } )
-		).toBeInTheDocument();
+		).toBeEnabled();
 	} );
 
 	it( 'renders the widget read-only and without attribute controls when edit is denied', async () => {
@@ -452,7 +460,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		};
 
 		it( 'holds a move-denied instance and publishes nothing on Done', async () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			const pinFirst: CanPerformDashboardOperation = ( request ) =>
 				! (
 					request.operation === 'move' && request.widget.uuid === 'w1'
@@ -488,7 +496,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		} );
 
 		it( 'publishes only the allowed changes on Done', async () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			const lockFirstEdit: CanPerformDashboardOperation = ( request ) =>
 				! (
 					request.operation === 'edit' && request.widget.uuid === 'w1'
@@ -533,7 +541,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		} );
 
 		it( 'publishes nothing through the inline auto-save when every staged change was denied', async () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			render(
 				<Harness
 					canPerform={ deny( 'edit' ) }
@@ -544,7 +552,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 			);
 			await screen.findByTestId( 'label' );
 
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			try {
 				act( () => {
 					const [ first ] = readEngine().layout;
@@ -561,17 +569,17 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 				} );
 
 				act( () => {
-					jest.runOnlyPendingTimers();
+					vi.runOnlyPendingTimers();
 				} );
 
 				expect( onLayoutChange ).not.toHaveBeenCalled();
 			} finally {
-				jest.useRealTimers();
+				vi.useRealTimers();
 			}
 		} );
 
 		it( 'drops an insertion of a rejected type before it reaches a commit', async () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			const rejectInserts: CanPerformDashboardOperation = ( request ) =>
 				request.operation !== 'insert';
 			render(
@@ -606,7 +614,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		} );
 
 		it( 're-asserts the spans of a resize-denied instance in staging', async () => {
-			const onLayoutChange = jest.fn();
+			const onLayoutChange = vi.fn();
 			render(
 				<Harness
 					canPerform={ deny( 'resize' ) }

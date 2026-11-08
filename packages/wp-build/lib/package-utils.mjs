@@ -66,7 +66,7 @@ function findPackageRoot( startDir ) {
  * and external dependencies in pnpm/yarn/npm workspaces.
  *
  * @param {string}      fullPackageName The full package name (e.g., '@wordpress/blocks').
- * @param {string|null} resolveDir      Optional directory context for resolution (from esbuild).
+ * @param {string|null} resolveDir      Optional directory context for resolution (the importer's directory).
  * @return {PackageJson|null} Package.json object or null if not found.
  */
 export function getPackageInfo( fullPackageName, resolveDir = null ) {
@@ -90,7 +90,7 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	} catch ( error ) {
 		// Treat a genuine resolution miss (package not installed, or it doesn't
 		// expose its package.json) as `null` so callers can fall through to
-		// esbuild's own resolution. Rethrow anything unexpected so real errors
+		// the bundler's own resolution. Rethrow anything unexpected so real errors
 		// (invalid specifiers, resolver bugs) aren't silently swallowed.
 		const code = /** @type {NodeJS.ErrnoException} */ ( error ).code;
 		if (

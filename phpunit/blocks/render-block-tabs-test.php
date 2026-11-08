@@ -97,25 +97,31 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			<!-- /wp:tabs -->
 		BLOCK_CONTENT;
 
-		// Another block on the page consumes the shared `wp_unique_id()` counter
-		// before each tabs block is rendered.
-		wp_unique_id( 'unrelated-' );
-		$first_block = do_blocks( $tabs_block );
-		wp_unique_id( 'unrelated-' );
+		$first_block  = do_blocks( $tabs_block );
 		$second_block = do_blocks( $tabs_block );
 
-		$processor = new WP_HTML_Tag_Processor( $first_block );
-		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+		// Another block on the page consumes the shared `wp_unique_id()` counter.
+		wp_unique_id( 'unrelated-' );
 
-		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
-		$tabs_id = $context['tabsId'] ?? '';
-		$this->assertStringStartsWith( 'tabs_', $tabs_id );
+		$third_block = do_blocks( $tabs_block );
 
-		$tabs_number = (int) substr( $tabs_id, strlen( 'tabs_' ) );
+		$first_number  = $this->get_tabs_number( $first_block );
+		$second_number = $this->get_tabs_number( $second_block );
+		$third_number  = $this->get_tabs_number( $third_block );
 
-		$processor = new WP_HTML_Tag_Processor( $first_block . $second_block );
+		/*
+		 * Rendering a tabs block advances the `tabs_` counter by a fixed amount,
+		 * so the unrelated ID must leave the gap between two blocks unchanged.
+		 */
+		$this->assertSame(
+			$second_number - $first_number,
+			$third_number - $second_number,
+			'The unrelated ID should not have advanced the tabs counter.'
+		);
 
-		foreach ( array( $tabs_number, $tabs_number + 1 ) as $number ) {
+		$processor = new WP_HTML_Tag_Processor( $first_block . $second_block . $third_block );
+
+		foreach ( array( $first_number, $second_number, $third_number ) as $number ) {
 			foreach ( array( 1, 2 ) as $tab_number ) {
 				$tab_id = "tabs_{$number}-tab-{$tab_number}";
 
@@ -132,6 +138,24 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 				$this->assertSame( "tab__{$tab_id}", $processor->get_attribute( 'aria-labelledby' ) );
 			}
 		}
+	}
+
+	/**
+	 * Reads the instance number out of the `tabsId` a rendered tabs block was given.
+	 *
+	 * @param string $rendered_block Rendered tabs block.
+	 *
+	 * @return int Tabs instance number.
+	 */
+	private function get_tabs_number( string $rendered_block ): int {
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$tabs_id = $context['tabsId'] ?? '';
+		$this->assertStringStartsWith( 'tabs_', $tabs_id );
+
+		return (int) substr( $tabs_id, strlen( 'tabs_' ) );
 	}
 
 	/**
@@ -196,5 +220,61 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 				"Panel $index should activate its tab when the browser reveals it."
 			);
 		}
+	}
+
+	/**
+	 * A default tab index past the last tab, for example one left behind when
+	 * the default tab was removed, falls back to the first tab so that a panel
+	 * is still shown.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 *
+	 * @dataProvider data_default_tab_index
+	 *
+	 * @param int $saved_index    Default tab index saved in the block.
+	 * @param int $expected_index Default tab index passed to the front end.
+	 */
+	public function test_should_fall_back_to_first_tab_when_default_tab_index_is_out_of_range( int $saved_index, int $expected_index ): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs {"activeTabIndex":%d} -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Description</button><button type="button" role="tab">Reviews</button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Description"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel {"label":"Reviews"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$processor = new WP_HTML_Tag_Processor( do_blocks( sprintf( $tabs_block, $saved_index ) ) );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( $expected_index, $context['activeTabIndex'] ?? null );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_default_tab_index(): array {
+		return array(
+			'existing default tab'          => array(
+				'saved_index'    => 1,
+				'expected_index' => 1,
+			),
+			'default tab past the last tab' => array(
+				'saved_index'    => 2,
+				'expected_index' => 0,
+			),
+		);
 	}
 }

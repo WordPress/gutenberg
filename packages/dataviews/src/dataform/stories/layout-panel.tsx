@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import DataForm from '../index';
 import type {
@@ -19,6 +20,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -38,6 +40,7 @@ const fields: Field< SamplePost >[] = [
 		id: 'title',
 		label: 'Title',
 		type: 'text',
+		placeholder: 'Add a title',
 	},
 	{
 		id: 'order',
@@ -135,6 +138,23 @@ const fields: Field< SamplePost >[] = [
 		label: 'Dimensions',
 		type: 'text',
 		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
+		readOnly: true,
+	},
+	{
+		// A read-only field whose value is an interactive control.
+		id: 'attachment',
+		label: 'Attachment',
+		readOnly: true,
+		render: () => (
+			<Button variant="link" href="#">
+				View file
+			</Button>
+		),
 	},
 	{
 		id: 'tags',
@@ -265,11 +285,13 @@ const getPanelLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	editVisibility,
+	showPlaceholderIfEmpty,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: PanelLayout[ 'openAs' ];
 	editVisibility?: 'default' | EditVisibility;
+	showPlaceholderIfEmpty?: boolean;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -291,6 +313,10 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.editVisibility = editVisibility;
 	}
 
+	if ( showPlaceholderIfEmpty ) {
+		panelLayout.showPlaceholderIfEmpty = true;
+	}
+
 	return panelLayout;
 };
 
@@ -298,15 +324,19 @@ const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs: openAsArg,
 	editVisibility,
+	showPlaceholderIfEmpty,
 	applyLabel,
 	cancelLabel,
+	disabled = false,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
 	editVisibility: 'default' | EditVisibility;
+	showPlaceholderIfEmpty: boolean;
 	applyLabel?: string;
 	cancelLabel?: string;
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -318,6 +348,7 @@ const LayoutPanelComponent = ( {
 		birthdate: '1950-02-23T12:00:00',
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		address1: '123 Main St',
 		address2: 'Apt 4B',
@@ -330,6 +361,17 @@ const LayoutPanelComponent = ( {
 		gate: 'A12',
 		seat: '14F',
 	} );
+
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
 
 	const form: Form = useMemo( () => {
 		let openAs: PanelLayout[ 'openAs' ];
@@ -348,6 +390,7 @@ const LayoutPanelComponent = ( {
 				labelPosition,
 				openAs,
 				editVisibility,
+				showPlaceholderIfEmpty,
 			} ),
 			fields: [
 				'title',
@@ -360,12 +403,15 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				'order',
 				'author',
 				'filesize',
 				'dimensions',
+				'file_type',
+				'attachment',
 				'tags',
 				{
 					id: 'discussion',
@@ -376,6 +422,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -387,6 +434,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -403,6 +451,7 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 				{
@@ -414,16 +463,24 @@ const LayoutPanelComponent = ( {
 						labelPosition,
 						openAs,
 						editVisibility,
+						showPlaceholderIfEmpty,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAsArg, applyLabel, cancelLabel, editVisibility ] );
+	}, [
+		labelPosition,
+		openAsArg,
+		applyLabel,
+		cancelLabel,
+		editVisibility,
+		showPlaceholderIfEmpty,
+	] );
 
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

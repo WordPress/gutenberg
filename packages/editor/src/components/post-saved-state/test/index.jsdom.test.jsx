@@ -1,33 +1,32 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import PostSavedState from '../';
 
-const mockSavePost = jest.fn();
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
+const mockSavePost = vi.fn();
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	return {
+		...( await importOriginal() ),
 		useDispatch: () => ( { savePost: mockSavePost } ),
-		useDispatchWithMap: jest.fn(),
+		useDispatchWithMap: vi.fn(),
+		useSelect: vi.fn(),
 	};
 } );
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useViewportMatch: vi.fn(),
+} ) );
 
-jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
-
-jest.mock( '@wordpress/icons/src/icon', () => () => (
-	<div data-testid="test-icon" />
-) );
+vi.mock( import( '@wordpress/icons' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	Icon: () => <div data-testid="test-icon" />,
+} ) );
 
 describe( 'PostSavedState', () => {
 	it( 'should display saving while save in progress, even if not saveable', () => {

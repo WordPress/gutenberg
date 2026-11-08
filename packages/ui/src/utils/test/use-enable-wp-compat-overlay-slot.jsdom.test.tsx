@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import {
 	WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE,

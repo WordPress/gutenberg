@@ -12,6 +12,7 @@ export default function WelcomeGuideMenuItem() {
 	return (
 		<MoreMenuItem
 			onClick={ () => toggle( 'core/edit-site', 'welcomeGuide' ) }
+			aria-haspopup="dialog"
 		>
 			{ __( 'Welcome Guide' ) }
 		</MoreMenuItem>

@@ -13,6 +13,43 @@ import getLabelClassName from './utils/get-label-classname';
 import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
+function SummaryValue< Item >( {
+	item,
+	field,
+	showPlaceholderIfEmpty,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+	showPlaceholderIfEmpty: boolean;
+} ) {
+	if ( ! showPlaceholderIfEmpty || ! field.placeholder ) {
+		return <field.render item={ item } field={ field } />;
+	}
+
+	const placeholder = (
+		<span className="dataforms-layouts-panel__field-placeholder">
+			{ field.placeholder }
+		</span>
+	);
+
+	// The same notion of empty as the `required` validator.
+	if ( [ undefined, null, '' ].includes( field.getValue( { item } ) ) ) {
+		return placeholder;
+	}
+
+	// A value can still render nothing, like an id matching no record, which
+	// the field may only learn after fetching it. The placeholder follows the
+	// render output, and the styles show it only when that output is empty.
+	return (
+		<>
+			<span className="dataforms-layouts-panel__field-value">
+				<field.render item={ item } field={ field } />
+			</span>
+			{ placeholder }
+		</>
+	);
+}
+
 export default function SummaryButton< Item >( {
 	data,
 	field,
@@ -34,7 +71,7 @@ export default function SummaryButton< Item >( {
 	isOpen: boolean;
 	onClick: () => void;
 } ) {
-	const { labelPosition, editVisibility } =
+	const { labelPosition, editVisibility, showPlaceholderIfEmpty } =
 		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
@@ -61,12 +98,12 @@ export default function SummaryButton< Item >( {
 				// translators: %s: Field name.
 				_x( 'Edit %s (has errors)', 'field' ),
 				fieldLabel || ''
-		  )
+			)
 		: sprintf(
 				// translators: %s: Field name.
 				_x( 'Edit %s', 'field' ),
 				fieldLabel || ''
-		  );
+			);
 
 	return (
 		<div className={ className }>
@@ -106,19 +143,23 @@ export default function SummaryButton< Item >( {
 								key={ summaryField.id }
 								style={ { width: '100%' } }
 							>
-								<summaryField.render
+								<SummaryValue
 									item={ data }
 									field={ summaryField }
+									showPlaceholderIfEmpty={
+										showPlaceholderIfEmpty
+									}
 								/>
 							</span>
 						) ) }
 					</span>
 				) : (
 					summaryFields.map( ( summaryField ) => (
-						<summaryField.render
+						<SummaryValue
 							key={ summaryField.id }
 							item={ data }
 							field={ summaryField }
+							showPlaceholderIfEmpty={ showPlaceholderIfEmpty }
 						/>
 					) )
 				) }

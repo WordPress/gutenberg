@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { __ } from '@wordpress/i18n';
 import { enhanceNavigationLinkVariations } from '../hooks';
 

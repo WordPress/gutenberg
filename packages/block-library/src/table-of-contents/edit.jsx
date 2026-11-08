@@ -9,13 +9,13 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	ToggleControl,
-	SelectControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -30,12 +30,23 @@ import {
 } from '@wordpress/icons';
 import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+const HEADING_LEVEL_ITEMS = [
+	{ value: 'all', label: __( 'All levels' ) },
+	{ value: '1', label: __( 'Heading 1' ) },
+	{ value: '2', label: __( 'Heading 2' ) },
+	{ value: '3', label: __( 'Heading 3' ) },
+	{ value: '4', label: __( 'Heading 4' ) },
+	{ value: '5', label: __( 'Heading 5' ) },
+	{ value: '6', label: __( 'Heading 6' ) },
+];
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
 function TableOfContentsToolbar( {
+	canDetach,
 	clientId,
 	headingTree,
 	ordered,
@@ -77,7 +88,7 @@ function TableOfContentsToolbar( {
 						isActive={ ordered === true }
 					/>
 				</ToolbarGroup>
-				{ canInsertList && (
+				{ canDetach && canInsertList && (
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => setIsConfirmingDetach( true ) }
@@ -117,16 +128,31 @@ function TableOfContentsToolbar( {
 }
 
 export default function TableOfContentsEdit( {
-	attributes: {
-		headings = [],
-		onlyIncludeCurrentPage,
-		maxLevel,
-		ordered = true,
-	},
+	attributes: { onlyIncludeCurrentPage, maxLevel, ordered = true },
 	clientId,
+	context: { postId, postType },
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId );
+	const postHeadings = useHeadings( {
+		clientId,
+		postId,
+		postType,
+		onlyIncludeCurrentPage,
+		maxLevel,
+	} );
+	// Without a post in context, e.g. in a template or a block preview, show
+	// sample entries standing in for the headings of the post being viewed.
+	const headings = postId
+		? postHeadings
+		: [
+				{
+					content: __(
+						'Headings from the post being viewed appear here'
+					),
+					level: 2,
+				},
+				{ content: __( 'Subheading' ), level: 3 },
+			];
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
@@ -147,8 +173,11 @@ export default function TableOfContentsEdit( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
+	// Without a post, the entries are samples, so there is nothing to detach.
+	// The list style still applies, so its buttons stay available.
 	const toolbarControls = (
 		<TableOfContentsToolbar
+			canDetach={ !! postId }
 			clientId={ clientId }
 			headingTree={ headingTree }
 			ordered={ ordered }
@@ -187,10 +216,10 @@ export default function TableOfContentsEdit( {
 							onlyIncludeCurrentPage
 								? __(
 										'Only including headings from the current page (if the post is paginated).'
-								  )
+									)
 								: __(
 										'Include headings from all pages (if the post is paginated).'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>
@@ -204,29 +233,30 @@ export default function TableOfContentsEdit( {
 				>
 					<SelectControl
 						label={ __( 'Include headings down to level' ) }
-						value={ maxLevel || '' }
-						options={ [
-							{ value: '', label: __( 'All levels' ) },
-							{ value: '1', label: __( 'Heading 1' ) },
-							{ value: '2', label: __( 'Heading 2' ) },
-							{ value: '3', label: __( 'Heading 3' ) },
-							{ value: '4', label: __( 'Heading 4' ) },
-							{ value: '5', label: __( 'Heading 5' ) },
-							{ value: '6', label: __( 'Heading 6' ) },
-						] }
-						onChange={ ( value ) =>
+						value={
+							HEADING_LEVEL_ITEMS.find(
+								( item ) =>
+									item.value ===
+									( maxLevel ? String( maxLevel ) : 'all' )
+							) ?? HEADING_LEVEL_ITEMS[ 0 ]
+						}
+						items={ HEADING_LEVEL_ITEMS }
+						onValueChange={ ( item ) =>
 							setAttributes( {
-								maxLevel: value ? parseInt( value ) : undefined,
+								maxLevel:
+									item?.value && item.value !== 'all'
+										? parseInt( item.value, 10 )
+										: undefined,
 							} )
 						}
-						help={
+						description={
 							! maxLevel
 								? __(
 										'Including all heading levels in the table of contents.'
-								  )
+									)
 								: __(
 										'Only include headings up to and including this level.'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>
@@ -245,7 +275,7 @@ export default function TableOfContentsEdit( {
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
 						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+							'Start adding Heading blocks to create a table of contents automatically.'
 						) }
 					/>
 				</div>

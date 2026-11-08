@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { Icon } from '../index';
@@ -21,8 +22,11 @@ describe( 'Icon', () => {
 		);
 
 		const icon = screen.getByTestId( 'test-icon' );
-		expect( icon ).toHaveStyle( 'fill: none' );
-		expect( icon ).toHaveStyle( 'opacity: 1' );
-		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-style -- This jsdom test checks normalized inline style values without browser layout.
+		expect( icon.style.fill ).toBe( 'none' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-style -- This jsdom test checks normalized inline style values without browser layout.
+		expect( icon.style.opacity ).toBe( '1' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-style -- This jsdom test checks normalized inline style values without browser layout.
+		expect( icon.style.marginInlineStart ).toBe( '4px' );
 	} );
 } );

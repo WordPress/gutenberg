@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from '@wordpress/element';
 import SandBox, { VIEWPORT_UNIT_VALUE_REGEX, buildSandBoxDocument } from '..';

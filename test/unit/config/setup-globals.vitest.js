@@ -1,11 +1,11 @@
 import ResizeObserverPolyfill from 'resize-observer-polyfill';
-import { afterAll, beforeAll, vi } from 'vitest';
+import { afterAll, beforeEach, vi } from 'vitest';
 
 function mockCSSSupports() {
 	const originalCSS = globalThis.CSS;
 	const originalSupports = globalThis.CSS?.supports;
 
-	beforeAll( () => {
+	const install = () => {
 		if ( ! globalThis.CSS ) {
 			Reflect.set( globalThis, 'CSS', {} );
 		}
@@ -14,8 +14,10 @@ function mockCSSSupports() {
 			'supports',
 			vi.fn( () => false )
 		);
-	} );
+	};
 
+	install();
+	beforeEach( install );
 	afterAll( () => {
 		if ( originalSupports ) {
 			Reflect.set( globalThis.CSS, 'supports', originalSupports );
@@ -33,19 +35,25 @@ function mockMatchMedia() {
 	}
 
 	const originalMatchMedia = window.matchMedia;
-	const mockedMatchMedia = vi.fn( ( query ) => ( {
-		matches: /prefers-reduced-motion/.test( query ),
-		media: query,
-		onchange: null,
-		addListener: vi.fn(),
-		addEventListener: vi.fn(),
-		dispatchEvent: vi.fn(),
-		removeListener: vi.fn(),
-		removeEventListener: vi.fn(),
-	} ) );
+	const install = () => {
+		Reflect.set(
+			window,
+			'matchMedia',
+			vi.fn( ( query ) => ( {
+				matches: /prefers-reduced-motion/.test( query ),
+				media: query,
+				onchange: null,
+				addListener: vi.fn(),
+				addEventListener: vi.fn(),
+				dispatchEvent: vi.fn(),
+				removeListener: vi.fn(),
+				removeEventListener: vi.fn(),
+			} ) )
+		);
+	};
 
-	Reflect.set( window, 'matchMedia', mockedMatchMedia );
-
+	install();
+	beforeEach( install );
 	afterAll( () => {
 		if ( originalMatchMedia ) {
 			Reflect.set( window, 'matchMedia', originalMatchMedia );
@@ -58,10 +66,12 @@ function mockMatchMedia() {
 function mockResizeObserver() {
 	const originalResizeObserver = globalThis.ResizeObserver;
 
-	beforeAll( () => {
+	const install = () => {
 		Reflect.set( globalThis, 'ResizeObserver', ResizeObserverPolyfill );
-	} );
+	};
 
+	install();
+	beforeEach( install );
 	afterAll( () => {
 		if ( originalResizeObserver ) {
 			Reflect.set( globalThis, 'ResizeObserver', originalResizeObserver );
@@ -74,19 +84,20 @@ function mockResizeObserver() {
 function mockPointerEvent() {
 	const originalPointerEvent = globalThis.PointerEvent;
 
-	beforeAll( () => {
-		class PointerEvent extends globalThis.MouseEvent {
-			constructor( type, init = {} ) {
-				super( type, init );
-				this.pointerId = init.pointerId ?? 0;
-				this.pointerType = init.pointerType ?? '';
-				this.isPrimary = init.isPrimary ?? false;
-			}
+	class PointerEvent extends globalThis.MouseEvent {
+		constructor( type, init = {} ) {
+			super( type, init );
+			this.pointerId = init.pointerId ?? 0;
+			this.pointerType = init.pointerType ?? '';
+			this.isPrimary = init.isPrimary ?? false;
 		}
-
+	}
+	const install = () => {
 		Reflect.set( globalThis, 'PointerEvent', PointerEvent );
-	} );
+	};
 
+	install();
+	beforeEach( install );
 	afterAll( () => {
 		if ( originalPointerEvent ) {
 			Reflect.set( globalThis, 'PointerEvent', originalPointerEvent );
@@ -99,10 +110,12 @@ function mockPointerEvent() {
 function mockScrollIntoView() {
 	const originalScrollIntoView = globalThis.Element.prototype.scrollIntoView;
 
-	beforeAll( () => {
+	const install = () => {
 		Reflect.set( globalThis.Element.prototype, 'scrollIntoView', vi.fn() );
-	} );
+	};
 
+	install();
+	beforeEach( install );
 	afterAll( () => {
 		if ( originalScrollIntoView ) {
 			Reflect.set(
@@ -119,85 +132,6 @@ function mockScrollIntoView() {
 	} );
 }
 
-class FakeDOMRectList extends Array {
-	/**
-	 * @param {number} index Index of the rectangle to return.
-	 * @return {DOMRect | null} The rectangle at the requested index.
-	 */
-	item( index ) {
-		return this[ index ] ?? null;
-	}
-}
-
-/**
- * @param {Element} element Element to inspect.
- * @return {boolean} Whether the element has a layout box.
- */
-function hasAssociatedLayoutBox( element ) {
-	if ( ! element.isConnected ) {
-		return false;
-	}
-
-	let current = element;
-	while ( current ) {
-		if (
-			current instanceof globalThis.HTMLElement &&
-			( current.hidden || current.style.display === 'none' )
-		) {
-			return false;
-		}
-
-		if (
-			current === element &&
-			current instanceof globalThis.HTMLElement &&
-			current.style.display === 'contents'
-		) {
-			return false;
-		}
-
-		current = current.parentElement;
-	}
-
-	return true;
-}
-
-function mockVisibleElements() {
-	const originalGetClientRects = globalThis.Element.prototype.getClientRects;
-
-	beforeAll( () => {
-		Reflect.set(
-			globalThis.Element.prototype,
-			'getClientRects',
-			function () {
-				const rects = [];
-
-				if ( hasAssociatedLayoutBox( this ) ) {
-					rects.push( {
-						bottom: 1,
-						height: 1,
-						left: 0,
-						right: 1,
-						top: 0,
-						width: 1,
-						x: 0,
-						y: 0,
-					} );
-				}
-
-				return new FakeDOMRectList( ...rects );
-			}
-		);
-	} );
-
-	afterAll( () => {
-		Reflect.set(
-			globalThis.Element.prototype,
-			'getClientRects',
-			originalGetClientRects
-		);
-	} );
-}
-
 // Keep these opt-in mocks on `globalThis` so `vi.hoisted()` can call them
 // synchronously before static imports run.
 globalThis.wpVitest = {
@@ -206,11 +140,21 @@ globalThis.wpVitest = {
 	mockPointerEvent,
 	mockResizeObserver,
 	mockScrollIntoView,
-	mockVisibleElements,
 	timers: vi,
 };
 
 if ( typeof globalThis.window !== 'undefined' ) {
+	// Node 26 has its own `localStorage` and `sessionStorage` globals, which are
+	// `undefined` unless Node runs with `--localstorage-file`. The Vitest jsdom
+	// environment does not copy a window property over a global that already
+	// exists, so point these back at the jsdom window.
+	for ( const key of [ 'localStorage', 'sessionStorage' ] ) {
+		Object.defineProperty( globalThis, key, {
+			configurable: true,
+			get: () => globalThis.jsdom.window[ key ],
+		} );
+	}
+
 	globalThis.window.tinyMCEPreInit = {
 		baseURL: 'about:blank',
 	};

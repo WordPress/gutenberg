@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Navigation } from '..';
 import type { NavigationLinkProps } from '../types';
@@ -15,7 +16,6 @@ describe( 'Navigation', () => {
 					/>
 				)
 			).toThrow( /item "Products" is missing an `href` prop/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should throw when two items share the same `href`', () => {
@@ -29,7 +29,6 @@ describe( 'Navigation', () => {
 					/>
 				)
 			).toThrow( /duplicate `href` "\/overview"/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should not throw when all items have `href`', () => {

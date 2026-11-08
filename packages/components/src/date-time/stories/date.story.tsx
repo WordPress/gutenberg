@@ -4,7 +4,7 @@ import DatePicker from '../date-picker';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DatePicker > = {
-	title: 'Components/Selection & Input/Time & Date/DatePicker',
+	title: 'Components/@wordpress-components/Selection & Input/Time & Date/DatePicker',
 	id: 'components-datepicker',
 	component: DatePicker,
 	argTypes: {

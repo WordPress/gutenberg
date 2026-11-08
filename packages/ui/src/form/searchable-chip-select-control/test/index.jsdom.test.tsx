@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import { SearchableChipSelectControl } from '../index';
@@ -45,6 +46,31 @@ describe( 'SearchableChipSelectControl', () => {
 				name: 'Fruits',
 				description: 'Choose your favorite fruits',
 			} )
+		).toBeVisible();
+	} );
+
+	it( 'includes the field description and the selection hint when items are selected', () => {
+		render(
+			<SearchableChipSelectControl
+				label="Fruits"
+				description="Choose your favorite fruits"
+				items={ mockItems }
+				defaultValue={ [ mockItems[ 0 ], mockItems[ 1 ] ] }
+			/>
+		);
+
+		const combobox = screen.getByRole( 'combobox', { name: 'Fruits' } );
+
+		expect( combobox ).toHaveAccessibleDescription(
+			expect.stringContaining( 'Choose your favorite fruits' )
+		);
+		expect( combobox ).toHaveAccessibleDescription(
+			expect.stringContaining(
+				'2 items selected. From the start of the input, press Left Arrow to move to the selected items.'
+			)
+		);
+		expect(
+			screen.getByRole( 'toolbar', { name: 'Selected items' } )
 		).toBeVisible();
 	} );
 } );

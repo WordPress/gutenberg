@@ -10,7 +10,7 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner, ToolbarGroup } from '@wordpress/components';
+import { Spinner as WCSpinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
 
@@ -75,7 +75,9 @@ export default function PostTemplateEdit( {
 		query: {
 			perPage,
 			offset = 0,
-			postType,
+			// Match `build_query_vars_from_query_block()`, which queries posts when
+			// `query` has no post type.
+			postType = 'post',
 			order,
 			orderBy,
 			author,
@@ -286,7 +288,7 @@ export default function PostTemplateEdit( {
 	if ( ! posts ) {
 		return (
 			<p { ...blockProps }>
-				<Spinner />
+				<WCSpinner />
 			</p>
 		);
 	}

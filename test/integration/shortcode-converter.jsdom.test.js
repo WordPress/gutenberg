@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handling/shortcode-converter';
@@ -228,6 +229,13 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect(
 			segmentHTMLToShortcodeBlock( originalMultipleShortcodes, 0 )
 		).toEqual( [ originalMultipleShortcodes ] );
+	} );
+
+	it( 'should not convert a shortcode at the start of text if its block is not aligned', () => {
+		const original = `<p>[foo align="alignright"] text</p>`;
+		expect( segmentHTMLToShortcodeBlock( original, 0 ) ).toEqual( [
+			original,
+		] );
 	} );
 
 	it( 'should convert a shortcode between br tags', () => {

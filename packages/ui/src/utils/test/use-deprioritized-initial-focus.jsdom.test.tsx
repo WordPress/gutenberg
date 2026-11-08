@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef, useEffect } from '@wordpress/element';
 import { useDeprioritizedInitialFocus } from '../use-deprioritized-initial-focus';
@@ -19,13 +20,14 @@ function TestHarness( {
 		initialFocus,
 		deprioritizedAttributes: [ ATTR ],
 	} );
+	const { popupRef } = result;
 
 	useEffect( () => {
 		onResolved( result );
 	} );
 
 	return (
-		<div ref={ result.popupRef } data-testid="popup">
+		<div ref={ popupRef } data-testid="popup">
 			<button { ...{ [ ATTR ]: '' } }>Close</button>
 			<button>Action</button>
 			<input type="text" />
@@ -158,13 +160,14 @@ describe( 'useDeprioritizedInitialFocus', () => {
 					initialFocus: undefined,
 					deprioritizedAttributes: [ ATTR ],
 				} );
+				const { popupRef } = result;
 
 				useEffect( () => {
 					onResolvedProp( result );
 				} );
 
 				return (
-					<div ref={ result.popupRef } data-testid="popup">
+					<div ref={ popupRef } data-testid="popup">
 						<button { ...{ [ ATTR ]: '' } }>Close</button>
 						<p>No other tabbable elements</p>
 					</div>

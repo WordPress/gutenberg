@@ -1,6 +1,14 @@
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
+
+type NoticesStore = ( typeof import( '@wordpress/notices' ) )[ 'store' ];
+type PreferencesStore =
+	( typeof import( '@wordpress/preferences' ) )[ 'store' ];
+type EditorStore = ( typeof import( '../../../store' ) )[ 'store' ];
+type CoreStore = ( typeof import( '@wordpress/core-data' ) )[ 'store' ];
+type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
 
 // --- Mocks ---
 //
@@ -8,23 +16,33 @@ import { useCollaboratorNotifications } from '../use-collaborator-notifications'
 // the core-data private APIs it unlocks, so tests can drive the join/leave/
 // save callbacks directly instead of simulating real awareness events.
 
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	useDispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
+	useRegistry: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( { store: 'core/notices' } ) );
+vi.mock( import( '@wordpress/notices' ), () => ( {
+	store: 'core/notices' as unknown as NoticesStore,
+} ) );
 
-jest.mock( '@wordpress/preferences', () => ( { store: 'core/preferences' } ) );
+vi.mock( import( '@wordpress/preferences' ), () => ( {
+	store: 'core/preferences' as unknown as PreferencesStore,
+} ) );
 
 // Avoids pulling in the full editor store (blocks, rich-text, etc.).
-jest.mock( '../../../store', () => ( { store: 'core/editor' } ) );
+vi.mock( import( '../../../store' ), () => ( {
+	store: 'core/editor' as unknown as EditorStore,
+} ) );
 
-jest.mock( '@wordpress/core-data', () => ( { privateApis: {} } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( {
+	privateApis: {},
+	store: 'core' as unknown as CoreStore,
+} ) );
 
 // Captures the callbacks and postIds the hook registers with each of the
 // three core-data subscriptions it unlocks. Must be prefixed with `mock`
-// so jest's module factory hoisting allows referencing it below.
+// so Vitest's module factory hoisting allows referencing it below.
 const mockRegistered: {
 	join: Function | null;
 	leave: Function | null;
@@ -41,8 +59,8 @@ const mockRegistered: {
 	savePostId: undefined,
 };
 
-jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( ( value: unknown ) => ( {
+vi.mock( import( '../../../lock-unlock' ), () => {
+	const unlock = vi.fn( ( value: unknown ) => ( {
 		...( value as object ),
 		useOnCollaboratorJoin: (
 			postId: unknown,
@@ -64,8 +82,10 @@ jest.mock( '../../../lock-unlock', () => ( {
 			mockRegistered.savePostId = postId;
 			mockRegistered.save = cb;
 		},
-	} ) ),
-} ) );
+	} ) ) as unknown as Unlock;
+
+	return { unlock };
+} );
 
 // --- Fixtures ---
 
@@ -106,18 +126,67 @@ const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
 
 // --- Setup ---
 
-const mockCreateNotice = jest.fn();
+const mockCreateNotice = vi.fn();
+
+// Stands in for `resolveSelect( coreStore ).getEntityRecord()`. Spied so
+// tests can prove a status is only requested when a message names it.
+const mockGetEntityRecord = vi.fn(
+	async ( kind: string, name: string, key: string ) => {
+		if ( kind !== 'root' || name !== 'status' ) {
+			return undefined;
+		}
+		if ( state.postStatuses === undefined ) {
+			throw new Error( 'rest_no_route' );
+		}
+		return state.postStatuses.find( ( record ) => record.slug === key );
+	}
+);
+
+type PostStatusRecord = { slug: string; name: string };
 
 type PreferenceState = {
 	postStatus: string | undefined;
+	// Singular label the post type's item labels are built from; undefined
+	// mimics a post type that has not resolved yet.
+	postTypeLabel: string | undefined;
+	// Records the statuses endpoint can resolve; undefined mimics a failed
+	// request.
+	postStatuses: PostStatusRecord[] | undefined;
 	isCollaborationEnabled: boolean;
 	showCollaborationJoinNotifications: boolean;
 	showCollaborationLeaveNotifications: boolean;
 	showCollaborationPostSaveNotifications: boolean;
 };
 
+// Statuses the REST API can resolve: a plugin-registered one, plus a core
+// status whose REST label differs from the editor's own, to prove core
+// statuses never reach the lookup.
+const REGISTERED_STATUSES: PostStatusRecord[] = [
+	{ slug: 'pending', name: 'Pending review (from REST)' },
+	{ slug: 'embargo', name: 'Embargoed' },
+];
+
+/**
+ * Builds the item labels WordPress registers for a post type, as the
+ * `/wp/v2/types` endpoint returns them.
+ *
+ * @param singular Singular name, e.g. "Post".
+ */
+function makeLabels( singular: string ) {
+	return {
+		singular_name: singular,
+		item_published: `${ singular } published.`,
+		item_published_privately: `${ singular } published privately.`,
+		item_reverted_to_draft: `${ singular } reverted to draft.`,
+		item_scheduled: `${ singular } scheduled.`,
+		item_updated: `${ singular } updated.`,
+	};
+}
+
 const DEFAULT_STATE: PreferenceState = {
 	postStatus: 'draft',
+	postTypeLabel: 'Post',
+	postStatuses: REGISTERED_STATUSES,
 	isCollaborationEnabled: true,
 	showCollaborationJoinNotifications: true,
 	showCollaborationLeaveNotifications: true,
@@ -127,6 +196,14 @@ const DEFAULT_STATE: PreferenceState = {
 let state: PreferenceState = { ...DEFAULT_STATE };
 
 function mockSelect( storeKey: string ) {
+	if ( storeKey === 'core' ) {
+		return {
+			getPostType: ( slug: string ) =>
+				state.postTypeLabel === undefined
+					? undefined
+					: { slug, labels: makeLabels( state.postTypeLabel ) },
+		};
+	}
 	if ( storeKey === 'core/preferences' ) {
 		return {
 			get: ( scope: string, name: string ) =>
@@ -162,10 +239,14 @@ beforeEach( () => {
 	mockRegistered.leavePostId = undefined;
 	mockRegistered.savePostId = undefined;
 	mockCreateNotice.mockClear();
-	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
+	mockGetEntityRecord.mockClear();
+	( useSelect as Mock ).mockImplementation( ( selector: Function ) =>
 		selector( mockSelect )
 	);
-	( useDispatch as jest.Mock ).mockReturnValue( {
+	( useRegistry as Mock ).mockReturnValue( {
+		resolveSelect: () => ( { getEntityRecord: mockGetEntityRecord } ),
+	} );
+	( useDispatch as Mock ).mockReturnValue( {
 		createNotice: mockCreateNotice,
 	} );
 } );
@@ -315,7 +396,7 @@ describe( 'useCollaboratorNotifications', () => {
 				postStatus: 'publish',
 				saveEventStatus: 'publish',
 				prevEvent: null,
-				expected: 'Post updated by Alice.',
+				expected: 'Post updated. By Alice.',
 			},
 			{
 				description:
@@ -323,7 +404,7 @@ describe( 'useCollaboratorNotifications', () => {
 				postStatus: 'draft',
 				saveEventStatus: 'publish',
 				prevEvent: null,
-				expected: 'Post published by Alice.',
+				expected: 'Post published. By Alice.',
 			},
 			{
 				description:
@@ -335,14 +416,91 @@ describe( 'useCollaboratorNotifications', () => {
 					savedByClientId: 1,
 					postStatus: 'draft',
 				},
-				expected: 'Post published by Alice.',
+				expected: 'Post published. By Alice.',
+			},
+			{
+				description: 'a draft is scheduled',
+				postStatus: 'draft',
+				saveEventStatus: 'future',
+				prevEvent: null,
+				expected: 'Post scheduled. By Alice.',
+			},
+			{
+				description: 'a draft is published privately',
+				postStatus: 'draft',
+				saveEventStatus: 'private',
+				prevEvent: null,
+				expected: 'Post published privately. By Alice.',
+			},
+			{
+				description: 'a scheduled post is updated',
+				postStatus: 'future',
+				saveEventStatus: 'future',
+				prevEvent: null,
+				expected: 'Post updated. By Alice.',
+			},
+			{
+				description: 'a published post is reverted to draft',
+				postStatus: 'publish',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Post reverted to draft. By Alice.',
+			},
+			{
+				description: 'a draft is submitted for review',
+				postStatus: 'draft',
+				saveEventStatus: 'pending',
+				prevEvent: null,
+				expected: 'Status set to Pending by Alice.',
+			},
+			{
+				description: 'a pending post is saved again',
+				postStatus: 'pending',
+				saveEventStatus: 'pending',
+				prevEvent: null,
+				expected: 'Saved by Alice.',
+			},
+			{
+				description: 'a draft is moved to a custom status',
+				postStatus: 'draft',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Status set to Embargoed by Alice.',
+			},
+			{
+				description: 'a published post is moved to a custom status',
+				postStatus: 'publish',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Status set to Embargoed by Alice.',
+			},
+			{
+				description: 'a post in a custom status is saved again',
+				postStatus: 'embargo',
+				saveEventStatus: 'embargo',
+				prevEvent: null,
+				expected: 'Saved by Alice.',
+			},
+			{
+				description: 'a post in a custom status is moved back to draft',
+				postStatus: 'embargo',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Status set to Draft by Alice.',
+			},
+			{
+				description: 'a pending post is moved back to draft',
+				postStatus: 'pending',
+				saveEventStatus: 'draft',
+				prevEvent: null,
+				expected: 'Status set to Draft by Alice.',
 			},
 		] )(
 			'fires "$expected" when $description',
-			( { postStatus, saveEventStatus, prevEvent, expected } ) => {
+			async ( { postStatus, saveEventStatus, prevEvent, expected } ) => {
 				renderNotifications( { postStatus } );
 
-				mockRegistered.save?.(
+				await mockRegistered.save?.(
 					{
 						savedAt: Date.now(),
 						savedByClientId: alice.clientId,
@@ -364,10 +522,237 @@ describe( 'useCollaboratorNotifications', () => {
 			}
 		);
 
-		it( 'does not fire when postStatus is unknown', () => {
+		it.each( [
+			{
+				description: 'publishing',
+				postStatus: 'draft',
+				saveEventStatus: 'publish',
+				expected: 'Story published. By Alice.',
+			},
+			{
+				description: 'scheduling',
+				postStatus: 'draft',
+				saveEventStatus: 'future',
+				expected: 'Story scheduled. By Alice.',
+			},
+			{
+				description: 'updating',
+				postStatus: 'publish',
+				saveEventStatus: 'publish',
+				expected: 'Story updated. By Alice.',
+			},
+		] )(
+			'uses the registered post type label when $description',
+			async ( { postStatus, saveEventStatus, expected } ) => {
+				renderNotifications( { postStatus, postTypeLabel: 'Story' } );
+
+				await mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: saveEventStatus,
+					},
+					alice,
+					null
+				);
+
+				expect( mockCreateNotice ).toHaveBeenCalledWith(
+					'info',
+					expected,
+					expect.anything()
+				);
+			}
+		);
+
+		it( 'only requests a status the editor does not know', async () => {
+			renderNotifications( { postStatus: 'draft' } );
+
+			// Core transitions have their own wording and need no label.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).not.toHaveBeenCalled();
+
+			// A core status the message names uses the editor's own label.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'pending',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).not.toHaveBeenCalled();
+			expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+				'info',
+				'Status set to Pending by Alice.',
+				expect.anything()
+			);
+
+			// A move to another status resolves just that status.
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'embargo',
+				},
+				alice,
+				null
+			);
+			expect( mockGetEntityRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockGetEntityRecord ).toHaveBeenCalledWith(
+				'root',
+				'status',
+				'embargo'
+			);
+		} );
+
+		it( 'names the status when the post type has not resolved', async () => {
+			renderNotifications( {
+				postStatus: 'draft',
+				postTypeLabel: undefined,
+			} );
+
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				null
+			);
+
+			// Without the post type's "Post published." label, the registered
+			// status label still says what happened.
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Status set to Published by Alice.',
+				expect.anything()
+			);
+		} );
+
+		describe( 'while a status lookup is still in flight', () => {
+			// Hands control of the pending lookup to the test. The save that
+			// triggers it returns a promise the test settles later.
+			function startPendingEmbargoSave() {
+				let resolveLookup: (
+					record: PostStatusRecord
+				) => void = () => {};
+				mockGetEntityRecord.mockImplementationOnce(
+					() =>
+						new Promise< PostStatusRecord >( ( resolve ) => {
+							resolveLookup = resolve;
+						} )
+				);
+				const pendingSave = mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: 'embargo',
+					},
+					alice,
+					null
+				);
+				return {
+					pendingSave,
+					finishLookup: () =>
+						resolveLookup( { slug: 'embargo', name: 'Embargoed' } ),
+				};
+			}
+
+			it( 'drops the older notice when a newer save already posted', async () => {
+				renderNotifications( { postStatus: 'draft' } );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				// A publish needs no lookup, so its notice posts right away.
+				await mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: 'publish',
+					},
+					alice,
+					{ savedAt: 0, savedByClientId: 1, postStatus: 'embargo' }
+				);
+				expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+				expect( mockCreateNotice ).toHaveBeenCalledWith(
+					'info',
+					'Post published. By Alice.',
+					expect.anything()
+				);
+
+				// The older lookup finishing must not replace the newer notice.
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			it( 'drops the notice when the preference was turned off', async () => {
+				const { rerender } = renderNotifications( {
+					postStatus: 'draft',
+				} );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				state = {
+					...state,
+					showCollaborationPostSaveNotifications: false,
+				};
+				rerender();
+
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).not.toHaveBeenCalled();
+			} );
+
+			it( 'drops the notice when the component unmounted', async () => {
+				const { unmount } = renderNotifications( {
+					postStatus: 'draft',
+				} );
+				const { pendingSave, finishLookup } = startPendingEmbargoSave();
+
+				unmount();
+
+				finishLookup();
+				await pendingSave;
+				expect( mockCreateNotice ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		it( 'reports a plain save when the status cannot be resolved', async () => {
+			renderNotifications( {
+				postStatus: 'draft',
+				postStatuses: undefined,
+			} );
+
+			await mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'embargo',
+				},
+				alice,
+				null
+			);
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Saved by Alice.',
+				expect.anything()
+			);
+		} );
+
+		it( 'does not fire when postStatus is unknown', async () => {
 			renderNotifications( { postStatus: undefined } );
 
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,
@@ -380,7 +765,7 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 
-		it( 'does not fire when post-save notifications are disabled', () => {
+		it( 'does not fire when post-save notifications are disabled', async () => {
 			renderNotifications( {
 				showCollaborationPostSaveNotifications: false,
 			} );
@@ -391,7 +776,7 @@ describe( 'useCollaboratorNotifications', () => {
 			expect( mockRegistered.joinPostId ).toBe( 123 );
 			expect( mockRegistered.leavePostId ).toBe( 123 );
 
-			mockRegistered.save?.(
+			await mockRegistered.save?.(
 				{
 					savedAt: Date.now(),
 					savedByClientId: alice.clientId,

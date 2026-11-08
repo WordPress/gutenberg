@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
@@ -5,11 +6,16 @@ import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 interface TestComponentProps {
 	text: string | ( () => string );
 	onSuccess?: () => void;
+	onError?: () => void;
 }
 
 describe( 'useCopyToClipboard', () => {
-	const TestComponent = ( { text, onSuccess }: TestComponentProps ) => {
-		const ref = useCopyToClipboard( text, onSuccess );
+	const TestComponent = ( {
+		text,
+		onSuccess,
+		onError,
+	}: TestComponentProps ) => {
+		const ref = useCopyToClipboard( text, onSuccess, onError );
 		return <button ref={ ref }>Copy</button>;
 	};
 
@@ -17,7 +23,7 @@ describe( 'useCopyToClipboard', () => {
 		const user = userEvent.setup();
 		render( <TestComponent text="test text" /> );
 
-		const writeTextMock = jest
+		const writeTextMock = vi
 			.spyOn( navigator.clipboard, 'writeText' )
 			.mockResolvedValue();
 
@@ -29,7 +35,7 @@ describe( 'useCopyToClipboard', () => {
 
 	it( 'should call onSuccess when copy succeeds', async () => {
 		const user = userEvent.setup();
-		const onSuccess = jest.fn();
+		const onSuccess = vi.fn();
 		render( <TestComponent text="test text" onSuccess={ onSuccess } /> );
 
 		await user.click( screen.getByRole( 'button' ) );
@@ -39,7 +45,7 @@ describe( 'useCopyToClipboard', () => {
 
 	it( 'should call onSuccess when copy empty text', async () => {
 		const user = userEvent.setup();
-		const onSuccess = jest.fn();
+		const onSuccess = vi.fn();
 		render( <TestComponent text="" onSuccess={ onSuccess } /> );
 
 		await user.click( screen.getByRole( 'button' ) );
@@ -49,10 +55,10 @@ describe( 'useCopyToClipboard', () => {
 
 	it( 'should not call onSuccess when copy fails', async () => {
 		const user = userEvent.setup();
-		const onSuccess = jest.fn();
+		const onSuccess = vi.fn();
 		render( <TestComponent text="test text" onSuccess={ onSuccess } /> );
 
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
 			new Error()
 		);
 
@@ -61,17 +67,57 @@ describe( 'useCopyToClipboard', () => {
 		expect( onSuccess ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should call onError when copy fails', async () => {
+		const user = userEvent.setup();
+		const onError = vi.fn();
+		render( <TestComponent text="test text" onError={ onError } /> );
+
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+			new Error()
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should call onError after the node unmounts', async () => {
+		const user = userEvent.setup();
+		let rejectPromise: ( reason?: unknown ) => void;
+		const delayedPromise = new Promise< void >( ( _, reject ) => {
+			rejectPromise = reject;
+		} );
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+			delayedPromise
+		);
+
+		const onError = vi.fn();
+		const { unmount } = render(
+			<TestComponent text="test" onError={ onError } />
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+		unmount();
+
+		await act( async () => {
+			rejectPromise( new Error() );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		} );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'should call onSuccess after the node unmounts', async () => {
+		const user = userEvent.setup();
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
 		} );
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
 			delayedPromise
 		);
 
-		const user = userEvent.setup();
-		const onSuccess = jest.fn();
+		const onSuccess = vi.fn();
 		const { unmount } = render(
 			<TestComponent text="test" onSuccess={ onSuccess } />
 		);
@@ -88,19 +134,19 @@ describe( 'useCopyToClipboard', () => {
 	} );
 
 	it( 'should not restore focus after the node unmounts', async () => {
+		const user = userEvent.setup();
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
 		} );
-		jest.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
 			delayedPromise
 		);
 
-		const user = userEvent.setup();
 		const { unmount } = render( <TestComponent text="test" /> );
 
 		const button = screen.getByRole( 'button' );
-		const focusSpy = jest.spyOn( button, 'focus' );
+		const focusSpy = vi.spyOn( button, 'focus' );
 
 		await user.click( button );
 		unmount();
@@ -129,7 +175,7 @@ describe( 'copyToClipboard', () => {
 
 		// JSDOM does not implement execCommand; add a mock for the fallback path.
 		// See: https://github.com/jsdom/jsdom/issues/1742
-		const execCommandMock = jest.fn().mockReturnValue( true );
+		const execCommandMock = vi.fn().mockReturnValue( true );
 		Object.defineProperty( document, 'execCommand', {
 			value: execCommandMock,
 			configurable: true,
@@ -154,7 +200,7 @@ describe( 'restoreFocus', () => {
 	it( 'should focus the trigger element', () => {
 		const trigger = document.createElement( 'button' );
 		document.body.appendChild( trigger );
-		const focusMock = jest.spyOn( trigger, 'focus' );
+		const focusMock = vi.spyOn( trigger, 'focus' );
 
 		restoreFocus( trigger );
 

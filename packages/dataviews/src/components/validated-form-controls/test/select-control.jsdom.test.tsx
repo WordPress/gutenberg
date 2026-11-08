@@ -1,7 +1,10 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRef } from '@wordpress/element';
 import { ValidatedSelectControl } from '../select-control';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ValidatedSelectControl', () => {
 	const options = [

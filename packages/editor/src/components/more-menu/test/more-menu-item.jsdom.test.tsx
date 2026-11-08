@@ -2,8 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import { describe, expect, it, vi } from 'vitest';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import MoreMenuItem from '../more-menu-item';
 
 function renderMenu( children: ReactNode ) {
@@ -126,7 +129,7 @@ describe( 'MoreMenuItem', () => {
 
 		it( 'runs the click handler of a checkbox with the event', async () => {
 			const user = userEvent.setup();
-			const onClick = jest.fn();
+			const onClick = vi.fn();
 			renderMenu(
 				<MoreMenuItem
 					role="menuitemcheckbox"
@@ -184,6 +187,21 @@ describe( 'MoreMenuItem', () => {
 				'target',
 				'_blank'
 			);
+		} );
+
+		it( 'renders a disabled link as an inert item', async () => {
+			const user = userEvent.setup();
+			renderMenu(
+				<MoreMenuItem href="/help" disabled>
+					Help
+				</MoreMenuItem>
+			);
+			await openMenu( user );
+
+			const item = screen.getByRole( 'menuitem', { name: 'Help' } );
+
+			expect( item ).not.toHaveAttribute( 'href' );
+			expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
 

@@ -1,7 +1,7 @@
-import '@testing-library/jest-dom';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
@@ -11,6 +11,8 @@ import type {
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 /*
  * The real fit pipeline runs in these tests; only the resize observer is
  * simulated, dispatching by mockObserved element so the header, the inline
@@ -18,15 +20,15 @@ import type { DashboardWidget } from '../types';
  */
 const mockObserved = new Map< Element, ( entries: unknown[] ) => void >();
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useResizeObserver: ( ( callback: ( entries: unknown[] ) => void ) => {
 		return ( element: Element | null ) => {
 			if ( element ) {
 				mockObserved.set( element, callback );
 			}
 		};
-	},
+	} ) as typeof import( '@wordpress/compose' ).useResizeObserver,
 } ) );
 
 /**
@@ -35,16 +37,15 @@ jest.mock( '@wordpress/compose', () => ( {
  * @param frame   Padding and border to report around that width.
  */
 function notifyResize( element: Element, width: number, frame = 0 ) {
-	act(
-		() =>
-			mockObserved.get( element )?.( [
-				{
-					target: element,
-					contentRect: { width },
-					contentBoxSize: [ { inlineSize: width } ],
-					borderBoxSize: [ { inlineSize: width + frame } ],
-				},
-			] )
+	act( () =>
+		mockObserved.get( element )?.( [
+			{
+				target: element,
+				contentRect: { width },
+				contentBoxSize: [ { inlineSize: width } ],
+				borderBoxSize: [ { inlineSize: width + frame } ],
+			},
+		] )
 	);
 }
 

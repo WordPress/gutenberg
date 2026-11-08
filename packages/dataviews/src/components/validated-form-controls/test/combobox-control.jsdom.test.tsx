@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedComboboxControl } from '../combobox-control';
@@ -11,7 +12,6 @@ describe( 'ValidatedComboboxControl', () => {
 		{ label: 'Banana', value: 'banana' },
 	];
 
-	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'should preserve the help description', () => {
 		render(
 			<ValidatedComboboxControl
@@ -27,7 +27,6 @@ describe( 'ValidatedComboboxControl', () => {
 		).toHaveAccessibleDescription( 'Pick a fruit.' );
 	} );
 
-	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'should append the validation error alongside the help description', async () => {
 		const user = userEvent.setup();
 		render(

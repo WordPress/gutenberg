@@ -1,4 +1,5 @@
 import { render, act, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import { GRID_ITEM_DATA_KEY } from '../../shared/grid-item-key';
 import { useLanePlacement } from '../use-lane-placement';
@@ -54,20 +55,20 @@ let originalSupports: typeof CSS.supports | undefined;
 let originalRaf: typeof requestAnimationFrame;
 
 function installMockObserver() {
-	originalResizeObserver = global.ResizeObserver;
+	originalResizeObserver = globalThis.ResizeObserver;
 	MockResizeObserver.reset();
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		MockResizeObserver;
 }
 
 function restoreObserver() {
-	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
+	( globalThis as unknown as { ResizeObserver: unknown } ).ResizeObserver =
 		originalResizeObserver;
 }
 
 function setNativeSupport( supported: boolean ) {
 	if ( typeof CSS === 'undefined' ) {
-		( global as unknown as { CSS: unknown } ).CSS = {
+		( globalThis as unknown as { CSS: unknown } ).CSS = {
 			supports: () => supported,
 		};
 		return;
@@ -100,20 +101,20 @@ function restoreSupport() {
 function flushRaf() {
 	// jsdom polyfills `requestAnimationFrame` via `setTimeout`; an
 	// `act` boundary lets React commit any state set inside the rAF.
-	jest.runAllTimers();
+	vi.runAllTimers();
 }
 
 beforeEach( () => {
 	installMockObserver();
-	originalRaf = global.requestAnimationFrame;
-	global.requestAnimationFrame = ( cb ) =>
+	originalRaf = globalThis.requestAnimationFrame;
+	globalThis.requestAnimationFrame = ( cb ) =>
 		setTimeout( () => cb( performance.now() ), 0 ) as unknown as number;
-	jest.useFakeTimers();
+	vi.useFakeTimers();
 } );
 
 afterEach( () => {
-	jest.useRealTimers();
-	global.requestAnimationFrame = originalRaf;
+	vi.useRealTimers();
+	globalThis.requestAnimationFrame = originalRaf;
 	restoreObserver();
 	restoreSupport();
 } );

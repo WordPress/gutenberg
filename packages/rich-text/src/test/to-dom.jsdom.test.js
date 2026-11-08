@@ -1,15 +1,14 @@
-import { toDom, applyValue } from '../to-dom';
+import { describe, expect, it } from 'vitest';
+import '../store';
+import { toDom, apply, applyValue } from '../to-dom';
 import { createElement } from '../create-element';
+import { create } from '../create';
+import { registerFormatType } from '../register-format-type';
+import { unregisterFormatType } from '../unregister-format-type';
 import { spec } from './helpers';
 
 describe( 'recordToDom', () => {
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
-
 	spec.forEach( ( { description, record, startPath, endPath } ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const { body, selection } = toDom( {
 				value: record,
@@ -17,6 +16,35 @@ describe( 'recordToDom', () => {
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
 		} );
+	} );
+} );
+
+describe( 'apply', () => {
+	spec.forEach( ( { description, record } ) => {
+		it( `should set the same tree in an empty unfocused element: ${ description }`, () => {
+			const current = document.createElement( 'div' );
+			apply( { value: record, current, __unstableDomOnly: true } );
+			expect( current.innerHTML ).toBe(
+				toDom( { value: record } ).body.innerHTML
+			);
+		} );
+	} );
+
+	it( 'should set the same tree in an empty unfocused element for a non-editable format', () => {
+		registerFormatType( 'test/math', {
+			title: 'Math',
+			tagName: 'math',
+			className: null,
+			contentEditable: false,
+			edit() {},
+		} );
+		const value = create( { html: 'a <math><mi>x</mi></math>' } );
+		const current = document.createElement( 'div' );
+		apply( { value, current, __unstableDomOnly: true } );
+		const expected = toDom( { value } ).body.innerHTML;
+		unregisterFormatType( 'test/math' );
+
+		expect( current.innerHTML ).toBe( expected );
 	} );
 } );
 
@@ -97,7 +125,6 @@ describe( 'applyValue', () => {
 	];
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode(

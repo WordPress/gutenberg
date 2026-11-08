@@ -1,18 +1,14 @@
 @use "@wordpress/base-styles/variables" as *;
 
-.linked-border-control {
+.linked-border-control.linked-border-control {
 	/* Preserve the original `&&` specificity so this beats BorderControl's margin reset. */
-	&#{&} {
-		flex: 1;
-		margin-inline-end: 24px;
-	}
+	flex: 1;
+	margin-inline-end: 24px;
 }
 
 /* No inline-end gutter is needed when the toggle sits in the header row. */
-.linked-border-control-full-width {
-	&#{&} {
-		margin-inline-end: 0;
-	}
+.linked-border-control-full-width.linked-border-control-full-width {
+	margin-inline-end: 0;
 }
 
 /* The label row the linked/unlinked toggle joins when a visible label is
@@ -66,9 +62,17 @@
 
 .centered-border-control {
 	grid-column: span 2;
-	margin: 0 auto;
+
+	/* Same raised specificity as `.linked-border-control`: BorderControl's own
+	   `margin: 0` is registered after this stylesheet, so at equal specificity
+	   it would win and drop the control out of the centre of the row. */
+	&#{&} {
+		margin: 0 auto;
+	}
 }
 
-.right-border-control {
+.right-border-control.right-border-control {
+	/* Physical `margin: 0` and logical `margin-inline-start` cascade together,
+	   so this needs the same specificity boost as the centred control. */
 	margin-inline-start: auto;
 }
