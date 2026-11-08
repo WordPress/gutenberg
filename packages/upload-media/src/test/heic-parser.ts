@@ -750,7 +750,7 @@ describe( 'parseHeicSequence', () => {
 	 * sequence with a single sync sample followed by 119 delta frames.
 	 */
 	const buffer = readFileSync(
-		join( __dirname, 'fixtures', 'msf1.heic' )
+		join( import.meta.dirname, 'fixtures', 'msf1.heic' )
 	).buffer;
 
 	it( 'demuxes all temporal frames from the track', () => {
@@ -813,7 +813,7 @@ describe( 'parseHeicSequence', () => {
 
 describe( 'isHeicSequence', () => {
 	const sequenceBuffer = readFileSync(
-		join( __dirname, 'fixtures', 'msf1.heic' )
+		join( import.meta.dirname, 'fixtures', 'msf1.heic' )
 	).buffer;
 
 	it( 'detects a real image sequence despite its .heic extension', () => {

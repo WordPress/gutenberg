@@ -743,7 +743,7 @@ describe( 'private actions', () => {
 		 * has to cope with.
 		 */
 		const sequenceBytes = readFileSync(
-			join( __dirname, '../../test/fixtures/msf1.heic' )
+			join( import.meta.dirname, '../../test/fixtures/msf1.heic' )
 		);
 
 		function createSequenceFile() {
@@ -756,23 +756,24 @@ describe( 'private actions', () => {
 			type: 'image/jpeg',
 		} );
 
-		function flattenOperations( operations ) {
+		function flattenOperations( operations?: unknown[] ) {
 			return ( operations || [] ).map( ( op ) =>
 				Array.isArray( op ) ? op[ 0 ] : op
 			);
 		}
 
-		async function runPrepareItem( file ) {
+		async function runPrepareItem( file: File ) {
 			const item = { id: 'seq-id', file, additionalData: {} };
 
-			let dispatchedOperations;
-			const dispatch = ( action ) => {
-				if ( action?.type === 'ADD_OPERATIONS' ) {
-					dispatchedOperations = action.operations;
-				}
-			};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
+			let dispatchedOperations: unknown[] | undefined;
+			const dispatch = Object.assign(
+				( action: { type?: string; operations?: unknown[] } ) => {
+					if ( action?.type === 'ADD_OPERATIONS' ) {
+						dispatchedOperations = action.operations;
+					}
+				},
+				{ cancelItem: vi.fn(), finishOperation: vi.fn() }
+			);
 
 			const select = {
 				getItem: () => item,
@@ -780,24 +781,27 @@ describe( 'private actions', () => {
 			};
 
 			const thunk = prepareItem( 'seq-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			return { operations: dispatchedOperations, dispatch, item };
 		}
 
+		const globals = global as unknown as Record< string, unknown >;
+
 		beforeEach( () => {
-			convertHeicSequenceToStillJpeg.mockReset();
-			convertHeicSequenceToStillJpeg.mockResolvedValue( stillJpeg );
-			global.VideoDecoder = function () {};
-			global.VideoDecoder.isConfigSupported = vi.fn( async () => ( {
-				supported: true,
-			} ) );
-			global.VideoEncoder = function () {};
+			vi.mocked( convertHeicSequenceToStillJpeg ).mockReset();
+			vi.mocked( convertHeicSequenceToStillJpeg ).mockResolvedValue(
+				stillJpeg
+			);
+			globals.VideoDecoder = Object.assign( function () {}, {
+				isConfigSupported: vi.fn( async () => ( { supported: true } ) ),
+			} );
+			globals.VideoEncoder = function () {};
 		} );
 
 		afterEach( () => {
-			delete global.VideoDecoder;
-			delete global.VideoEncoder;
+			delete globals.VideoDecoder;
+			delete globals.VideoEncoder;
 		} );
 
 		it( 'uploads the still frame as the attachment, through the image pipeline', async () => {
@@ -836,13 +840,14 @@ describe( 'private actions', () => {
 		it( 'decodes the still from the sequence it demuxed', async () => {
 			await runPrepareItem( createSequenceFile() );
 
-			const [ sequence ] = convertHeicSequenceToStillJpeg.mock.calls[ 0 ];
+			const [ sequence ] = vi.mocked( convertHeicSequenceToStillJpeg )
+				.mock.calls[ 0 ];
 			expect( sequence.samples ).toHaveLength( 120 );
 			expect( sequence.codedWidth ).toBe( 256 );
 		} );
 
 		it( 'uploads the original untouched when WebCodecs is unavailable', async () => {
-			delete global.VideoDecoder;
+			delete globals.VideoDecoder;
 
 			const { operations, dispatch } =
 				await runPrepareItem( createSequenceFile() );
@@ -865,7 +870,9 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'uploads the original untouched when the platform lacks the HEVC codec', async () => {
-			global.VideoDecoder.isConfigSupported = vi.fn( async () => ( {
+			(
+				globals.VideoDecoder as { isConfigSupported: unknown }
+			 ).isConfigSupported = vi.fn( async () => ( {
 				supported: false,
 			} ) );
 
@@ -880,7 +887,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'uploads the original untouched when the still decode fails', async () => {
-			convertHeicSequenceToStillJpeg.mockRejectedValue(
+			vi.mocked( convertHeicSequenceToStillJpeg ).mockRejectedValue(
 				new Error( 'decoder exploded' )
 			);
 
@@ -914,9 +921,10 @@ describe( 'private actions', () => {
 			} );
 			const item = { id: 'heic-id', file, additionalData: {} };
 
-			const dispatch = () => {};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
+			const dispatch = Object.assign( () => {}, {
+				cancelItem: vi.fn(),
+				finishOperation: vi.fn(),
+			} );
 
 			const select = {
 				getItem: () => item,
@@ -1344,8 +1352,17 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'generateThumbnails (HEIC sequence video sideload)', () => {
-		function runGenerate( { item, settings } ) {
-			const dispatchFn = vi.fn();
+		function runGenerate( {
+			item,
+			settings,
+		}: {
+			item: { id: string };
+			settings: object;
+		} ) {
+			const dispatchFn = vi.fn() as Mock & {
+				finishOperation: Mock;
+				addSideloadItem: Mock;
+			};
 			dispatchFn.finishOperation = vi.fn();
 			dispatchFn.addSideloadItem = vi.fn();
 			const select = {
@@ -1353,10 +1370,18 @@ describe( 'private actions', () => {
 				getSettings: () => settings,
 			};
 			const thunk = generateThumbnails( item.id );
-			return thunk( { select, dispatch: dispatchFn } ).then(
-				() => dispatchFn
-			);
+			return thunk( {
+				select,
+				dispatch: dispatchFn,
+			} as unknown as ThunkArgs ).then( () => dispatchFn );
 		}
+
+		type Sideload = {
+			file: File;
+			parentId: string;
+			operations: unknown[];
+			additionalData: Record< string, unknown >;
+		};
 
 		const sequence = new File( [ 'seq' ], 'live-photo.heic', {
 			type: 'image/heic',
@@ -1365,7 +1390,7 @@ describe( 'private actions', () => {
 			type: 'image/jpeg',
 		} );
 
-		function makeItem( id, extra = {} ) {
+		function makeItem( id: string, extra = {} ) {
 			return {
 				id,
 				sourceFile: still,
@@ -1383,22 +1408,23 @@ describe( 'private actions', () => {
 			} );
 
 			const sideloads = dispatchFn.addSideloadItem.mock.calls.map(
-				( [ arg ] ) => arg
+				( call ) => call[ 0 ] as Sideload
 			);
 			const video = sideloads.find(
-				( s ) => s.additionalData.image_size === 'animated_video'
+				( s: Sideload ) =>
+					s.additionalData.image_size === 'animated_video'
 			);
 
-			expect( video.file ).toBe( sequence );
-			expect( video.parentId ).toBe( 's1' );
-			expect( video.additionalData ).toEqual(
+			expect( video?.file ).toBe( sequence );
+			expect( video?.parentId ).toBe( 's1' );
+			expect( video?.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
 					image_size: 'animated_video',
 					convert_format: false,
 				} )
 			);
-			expect( video.operations ).toEqual( [
+			expect( video?.operations ).toEqual( [
 				[
 					OperationType.TranscodeHeicSequence,
 					{ outputFormat: 'mp4' },
@@ -1414,7 +1440,7 @@ describe( 'private actions', () => {
 			} );
 
 			const sizes = dispatchFn.addSideloadItem.mock.calls.map(
-				( [ arg ] ) => arg.additionalData.image_size
+				( call ) => ( call[ 0 ] as Sideload ).additionalData.image_size
 			);
 			expect( sizes ).not.toContain( 'animated_video_poster' );
 		} );
@@ -1426,11 +1452,12 @@ describe( 'private actions', () => {
 			} );
 
 			const video = dispatchFn.addSideloadItem.mock.calls
-				.map( ( [ arg ] ) => arg )
+				.map( ( call ) => call[ 0 ] as Sideload )
 				.find(
-					( s ) => s.additionalData.image_size === 'animated_video'
+					( s: Sideload ) =>
+						s.additionalData.image_size === 'animated_video'
 				);
-			expect( video.operations[ 0 ] ).toEqual( [
+			expect( video?.operations[ 0 ] ).toEqual( [
 				OperationType.TranscodeHeicSequence,
 				{ outputFormat: 'webm' },
 			] );
@@ -1467,12 +1494,12 @@ describe( 'private actions', () => {
 			const video = new File( [ 'mp4' ], 'live-photo.mp4', {
 				type: 'video/mp4',
 			} );
-			convertHeicSequenceToVideo.mockResolvedValue( video );
+			vi.mocked( convertHeicSequenceToVideo ).mockResolvedValue( video );
 
 			const { dispatch, select } = buildArgs();
 			await transcodeHeicSequenceItem( 'seq-1', {
 				outputFormat: 'mp4',
-			} )( { select, dispatch } );
+			} )( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( convertHeicSequenceToVideo ).toHaveBeenCalledWith(
 				'seq-1',
@@ -1487,12 +1514,15 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'silently drops the companion when conversion is unsupported', async () => {
-			convertHeicSequenceToVideo.mockRejectedValue(
+			vi.mocked( convertHeicSequenceToVideo ).mockRejectedValue(
 				new Error( 'Unsupported: HEVC decoder not supported' )
 			);
 
 			const { dispatch, select } = buildArgs();
-			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+			await transcodeHeicSequenceItem( 'seq-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			// Silent: the still attachment stands alone, and the user sees no
 			// error on what they uploaded as a photo.
@@ -1505,14 +1535,17 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'silently drops the companion when the sequence is over budget', async () => {
-			convertHeicSequenceToVideo.mockRejectedValue(
+			vi.mocked( convertHeicSequenceToVideo ).mockRejectedValue(
 				new Error(
 					'Unsupported: exceeds maximum conversion size (sequence is 4000x3000 x 120 frames = 1440000000 pixels; limit is 300000000)'
 				)
 			);
 
 			const { dispatch, select } = buildArgs();
-			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+			await transcodeHeicSequenceItem( 'seq-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
 				'seq-1',
@@ -1522,12 +1555,15 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'silently drops the companion when conversion times out', async () => {
-			convertHeicSequenceToVideo.mockRejectedValue(
+			vi.mocked( convertHeicSequenceToVideo ).mockRejectedValue(
 				new Error( 'GIF to video conversion timed out after 30000ms' )
 			);
 
 			const { dispatch, select } = buildArgs();
-			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+			await transcodeHeicSequenceItem( 'seq-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
 				'seq-1',
@@ -1539,12 +1575,15 @@ describe( 'private actions', () => {
 		it( 'silently drops the companion on a hard engine failure', async () => {
 			// eslint-disable-next-line no-console
 			console.error = vi.fn();
-			convertHeicSequenceToVideo.mockRejectedValue(
+			vi.mocked( convertHeicSequenceToVideo ).mockRejectedValue(
 				new Error( 'encoder exploded' )
 			);
 
 			const { dispatch, select } = buildArgs();
-			await transcodeHeicSequenceItem( 'seq-1' )( { select, dispatch } );
+			await transcodeHeicSequenceItem( 'seq-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
 				'seq-1',
