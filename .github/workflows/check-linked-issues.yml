@@ -7,16 +7,21 @@ on:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
+# Serialize runs per PR so two quick events can't both post a comment.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+
 jobs:
     check-linked-issues:
         name: Flag issue mentions that are not linked
         runs-on: 'ubuntu-24.04'
         if: ${{ github.event.pull_request.state == 'open' && github.repository == 'WordPress/gutenberg' }}
         permissions:
+            issues: read
             pull-requests: write
         steps:
             - name: Detect unlinked issue mentions
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
               with:
                   script: |
                       // -----------------------------------------------------------------
@@ -32,9 +37,13 @@ jobs:
                       //
                       // HTML comments are stripped so placeholders like
                       // `Closes <!-- #ISSUE-NUMBER -->` in the PR template don't match
-                      // as real issue references.
+                      // as real issue references. Code blocks and inline code are
+                      // stripped so values like `color: #333` aren't read as issues.
                       // -----------------------------------------------------------------
-                      const visibleBody = body.replace( /<!--[\s\S]*?-->/g, '' );
+                      const visibleBody = body
+                          .replace( /<!--[\s\S]*?-->/g, '' )
+                          .replace( /^ {0,3}(`{3,}|~{3,})[\s\S]*?^ {0,3}\1/gm, '' )
+                          .replace( /`[^`\n]*`/g, '' );
 
                       // -----------------------------------------------------------------
                       // Step 3: Extract every issue number mentioned in the description.
@@ -46,7 +55,8 @@ jobs:
                       //
                       // A reference is skipped when the phrase directly before it marks it
                       // as informational (e.g. "Related to #1", "Part of #2, #3", "See:
-                      // #4"), since linking it would close that issue on merge.
+                      // #4"), since linking it would close that issue on merge. A
+                      // WordPress core Trac ticket ("Trac #62345") is skipped too.
                       //
                       // Numbers are collected into a Set so duplicates collapse.
                       // -----------------------------------------------------------------
@@ -54,10 +64,12 @@ jobs:
 
                       const informationalRegex =
                           /\b(?:related|relates|part of|see|follow[- ]?ups?|refs?|references?|cc|reverts?|similar|blocked by|depends on|alternative|supersedes|split from|extracted from|inspired by|builds? on)\b(?:\s+(?:to|of|on|in|by|from|for))?[\s:,-]*(?:issues?\s*)?(?:(?:GH-|#)\d+[\s,]*(?:and\s+|&\s+)?)*$/i;
+                      const tracRegex = /\b(?:trac|core)(?:\s+ticket)?[\s:]*$/i;
                       const isInformational = ( index ) => {
                           const lineStart = visibleBody.lastIndexOf( '\n', index - 1 ) + 1;
-                          return informationalRegex.test(
-                              visibleBody.slice( lineStart, index )
+                          const before = visibleBody.slice( lineStart, index );
+                          return (
+                              informationalRegex.test( before ) || tracRegex.test( before )
                           );
                       };
 
@@ -102,19 +114,25 @@ jobs:
                               per_page: 100,
                           }
                       );
-                      const existing = comments.find(
+                      const botComments = comments.filter(
                           ( c ) => c.body && c.body.includes( marker )
                       );
+                      const existing = botComments[ 0 ];
 
-                      const clearExistingComment = async () => {
-                          if ( existing ) {
+                      const deleteComments = async ( list ) => {
+                          for ( const comment of list ) {
                               await github.rest.issues.deleteComment( {
                                   owner,
                                   repo,
-                                  comment_id: existing.id,
+                                  comment_id: comment.id,
                               } );
                           }
                       };
+                      const clearExistingComment = () =>
+                          deleteComments( botComments.slice( 0, 1 ) );
+
+                      // Remove duplicates left by earlier overlapping runs.
+                      await deleteComments( botComments.slice( 1 ) );
 
                       // -----------------------------------------------------------------
                       // Step 5: Early-exit when the description mentions no issues.
@@ -134,62 +152,84 @@ jobs:
                       // `closingIssuesReferences` is the exact set of issues that power
                       // the *Development* section of the right sidebar — populated
                       // either by closing keywords in the body or by manual linking
-                      // via the UI.
+                      // via the UI. It can include issues from other repositories, so
+                      // only this repository's issues count.
                       // -----------------------------------------------------------------
-                      const query = `
+                      const linkedQuery = `
                           query($owner: String!, $repo: String!, $number: Int!) {
                               repository(owner: $owner, name: $repo) {
                                   pullRequest(number: $number) {
-                                      closingIssuesReferences(first: 50) {
-                                          nodes { number }
+                                      closingIssuesReferences(first: 100) {
+                                          nodes { number repository { nameWithOwner } }
                                       }
                                   }
                               }
                           }
                       `;
-                      const result = await github.graphql( query, {
-                          owner,
-                          repo,
-                          number: prNumber,
-                      } );
-                      const linked = new Set(
-                          ( result.repository.pullRequest.closingIssuesReferences.nodes || [] ).map(
-                              ( n ) => n.number
-                          )
-                      );
+                      const fullName = `${ owner }/${ repo }`.toLowerCase();
+                      const fetchLinked = async () => {
+                          const result = await github.graphql( linkedQuery, {
+                              owner,
+                              repo,
+                              number: prNumber,
+                          } );
+                          return new Set(
+                              (
+                                  result.repository.pullRequest.closingIssuesReferences
+                                      .nodes || []
+                              )
+                                  .filter(
+                                      ( n ) =>
+                                          n.repository.nameWithOwner.toLowerCase() ===
+                                          fullName
+                                  )
+                                  .map( ( n ) => n.number )
+                          );
+                      };
+                      const candidatesFrom = ( linked ) =>
+                          [ ...referenced ].filter( ( n ) => ! linked.has( n ) );
+
+                      let candidates = candidatesFrom( await fetchLinked() );
+
+                      // GitHub resolves closing keywords asynchronously, so a keyword
+                      // added in this very edit may not be linked yet. Check once more.
+                      if ( candidates.length > 0 ) {
+                          await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
+                          candidates = candidatesFrom( await fetchLinked() );
+                      }
 
                       // -----------------------------------------------------------------
-                      // Step 7: Reduce `referenced` to the set that is truly unlinked
-                      // and is a real issue in this repository.
+                      // Step 7: Reduce the candidates to real issues in this repository.
                       //
-                      // `issues.get` is also used to filter out:
-                      //   - references that are actually pull requests (data.pull_request
-                      //     is set for PRs),
-                      //   - numbers that don't exist (404), which can happen for
-                      //     cross-repo or stale references that happened to match the
-                      //     `#N` pattern.
+                      // One batched query drops numbers that are pull requests or that
+                      // don't exist (stale references that happen to match `#N`).
                       // -----------------------------------------------------------------
-                      const unlinked = [];
-                      for ( const number of referenced ) {
-                          if ( linked.has( number ) ) {
-                              continue;
-                          }
+                      let unlinked = [];
+                      if ( candidates.length > 0 ) {
+                          const fields = candidates
+                              .map(
+                                  ( n ) =>
+                                      `n${ n }: issueOrPullRequest(number: ${ n }) { __typename }`
+                              )
+                              .join( '\n' );
+                          const typesQuery = `
+                              query($owner: String!, $repo: String!) {
+                                  repository(owner: $owner, name: $repo) { ${ fields } }
+                              }
+                          `;
+                          let data;
                           try {
-                              const { data } = await github.rest.issues.get( {
-                                  owner,
-                                  repo,
-                                  issue_number: number,
-                              } );
-                              if ( data.pull_request ) {
-                                  continue;
-                              }
-                              unlinked.push( number );
+                              data = await github.graphql( typesQuery, { owner, repo } );
                           } catch ( err ) {
-                              if ( err.status === 404 ) {
-                                  continue;
+                              // A missing number fails only its own field; keep the rest.
+                              if ( ! err.data ) {
+                                  throw err;
                               }
-                              throw err;
+                              data = err.data;
                           }
+                          unlinked = candidates.filter(
+                              ( n ) => data.repository?.[ `n${ n }` ]?.__typename === 'Issue'
+                          );
                       }
 
                       // -----------------------------------------------------------------
@@ -223,7 +263,7 @@ jobs:
                           'Release leads and folks writing release notes rely on the *Development* relationship to find every PR associated with a ticket. To link an issue, please either:',
                           '',
                           '- Replace the mention with a closing keyword in the PR description (e.g. `Closes #1234`, `Fixes #1234`, or `Resolves #1234`), **or**',
-                          '- Manually link the issue from the *Development* section on the right sidebar of this PR.',
+                          '- Manually link the issue from the *Development* section on the right sidebar of this PR. GitHub does not re-run this check for sidebar changes, so this notice updates on the next push or description edit.',
                           '',
                           '> [!WARNING]',
                           '> Either way, GitHub closes a linked issue when this PR is merged. Only link issues this PR fully resolves.',
