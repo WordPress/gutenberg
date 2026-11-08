@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
 	useDebounce,
+	useEvent,
 	__experimentalUseFocusOutside as useFocusOutside,
 } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -24,12 +25,12 @@ import {
 	useNoteDraft,
 	usePickNote,
 } from './hooks';
+import { getNoteExcerpt } from './utils/display';
 import {
 	focusNoteThread,
-	getNoteExcerpt,
-	hasFocusWithin,
+	isFocusInBlocks,
 	scrollNoteThreadIntoView,
-} from './utils';
+} from './utils/dom';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNoteLock } from './use-note-lock';
@@ -83,22 +84,24 @@ export function NoteThread( {
 	note,
 	focusThreadOrAdjacent,
 	isSelected,
+	expandReplies = false,
 	sidebarRef,
 	floating,
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
 	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
-	const debouncedToggleBlockHighlight = useDebounce(
-		toggleBlockHighlight,
-		50
+	const setBlockHighlight = useEvent( ( isHighlighted ) =>
+		toggleBlockHighlight( note.blockClientId, isHighlighted )
 	);
+	const debouncedSetBlockHighlight = useDebounce( setBlockHighlight, 50 );
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
@@ -130,13 +133,22 @@ export function NoteThread( {
 	// Scroll the thread into view when it becomes selected, and re-scroll
 	// when its floating position or height settles after `useFloatingBoard`
 	// recomputes. The canvas room follows the height, so an expanding thread
-	// can only scroll fully into view once it's measured.
+	// can only scroll fully into view once it's measured. An unplaced thread
+	// sits at the panel's top, and scrolling to it scrolls the canvas there.
+	const isPlaced = ! floating || floating.y !== undefined;
 	useEffect( () => {
-		if ( ! isSelected || note.id === 'new' ) {
+		if ( ! isSelected || ! isPlaced || note.id === 'new' ) {
 			return;
 		}
 		scrollNoteThreadIntoView( note.id, sidebarRef.current );
-	}, [ isSelected, floating?.y, floating?.height, note.id, sidebarRef ] );
+	}, [
+		isSelected,
+		isPlaced,
+		floating?.y,
+		floating?.height,
+		note.id,
+		sidebarRef,
+	] );
 
 	/*
 	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
@@ -158,12 +170,17 @@ export function NoteThread( {
 		// Drop the highlight, unless another note (possibly on the same block) now owns it.
 		if ( ! isNoteFocused ) {
 			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
-			debouncedToggleBlockHighlight.cancel();
-			toggleBlockHighlight( note.blockClientId, false );
+			debouncedSetBlockHighlight.cancel();
+			setBlockHighlight( false );
 		}
 
-		// In the note's block, the caret events decide; deselecting here too would race them.
-		if ( hasFocusWithin( relatedBlockElement ) ) {
+		// In the note's blocks, the caret events decide; deselecting here too would race them.
+		if (
+			isFocusInBlocks(
+				relatedBlockElement?.ownerDocument,
+				note.blockClientIds
+			)
+		) {
 			return;
 		}
 
@@ -178,19 +195,19 @@ export function NoteThread( {
 	} );
 
 	function onMouseEnter() {
-		debouncedToggleBlockHighlight( note.blockClientId, true );
+		debouncedSetBlockHighlight( true );
 	}
 
 	function onMouseLeave() {
-		debouncedToggleBlockHighlight( note.blockClientId, false );
+		debouncedSetBlockHighlight( false );
 	}
 
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
 		setHasFocus( true );
-		debouncedToggleBlockHighlight.cancel();
-		toggleBlockHighlight( note.blockClientId, true );
+		debouncedSetBlockHighlight.cancel();
+		setBlockHighlight( true );
 	}
 
 	function onSelectNote() {
@@ -204,7 +221,7 @@ export function NoteThread( {
 
 	function onDeselectNote() {
 		selectNote( undefined );
-		toggleBlockHighlight( note.blockClientId, false );
+		setBlockHighlight( false );
 	}
 
 	function handleResolve() {
@@ -242,6 +259,8 @@ export function NoteThread( {
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
+	// Search can match a collapsed reply, so show them all while searching.
+	const showAllReplies = isSelected || expandReplies;
 
 	const noteExcerpt = getNoteExcerpt(
 		stripHTML( note.content?.rendered ),
@@ -263,8 +282,7 @@ export function NoteThread( {
 		return (
 			<AddNote
 				key={ note.blockClientId }
-				clientId={ note.blockClientId }
-				sidebarRef={ sidebarRef }
+				clientIds={ note.blockClientIds }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
 		);
@@ -332,7 +350,7 @@ export function NoteThread( {
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
 			/>
-			{ isSelected &&
+			{ showAllReplies &&
 				allReplies.map( ( reply ) => (
 					<Note
 						key={ reply.id }
@@ -344,7 +362,7 @@ export function NoteThread( {
 						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
-			{ ! isSelected && restReplies.length > 0 && (
+			{ ! showAllReplies && restReplies.length > 0 && (
 				<Stack
 					direction="row"
 					align="center"
@@ -372,7 +390,7 @@ export function NoteThread( {
 					</Button>
 				</Stack>
 			) }
-			{ ! isSelected && lastReply && (
+			{ ! showAllReplies && lastReply && (
 				<Note
 					note={ lastReply }
 					parentNote={ note }
@@ -403,6 +421,10 @@ export function NoteThread( {
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						relatedBlockElement?.focus();
+						// Another of the note's blocks can be selected, and an
+						// unselected block can't take focus while the canvas is
+						// an editing host.
+						selectBlock( note.blockClientId, true );
 					} }
 				>
 					{ __( 'Back to block' ) }

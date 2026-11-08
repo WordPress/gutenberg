@@ -1,5 +1,7 @@
-import { Fragment, useContext, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { Fragment, useContext, useEffect, useMemo } from '@wordpress/element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice, Stack, Text } from '@wordpress/ui';
 import {
@@ -8,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import { focusNoteThread } from './utils/dom';
 import {
 	NoteDraftsContext,
 	useFloatingBoard,
@@ -18,30 +20,42 @@ import {
 } from './hooks';
 import { useNoteLock } from './use-note-lock';
 import { AddNote } from './add-note';
+import {
+	DEFAULT_NOTES_FILTERS,
+	filterNotes,
+	hasActiveNotesFilters,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	filters = DEFAULT_NOTES_FILTERS,
+} ) {
 	const { onDiscard } = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { isFullyLocked } = useNoteLock();
 
-	const { selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientIds, orderedBlockIds } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
+			const { getSelectedBlockClientIds, getClientIdsWithDescendants } =
 				select( blockEditorStore );
 			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
+	// A note added to several blocks shows at the first.
+	const [ selectedBlockClientId ] = selectedBlockClientIds;
 	const selectedNote = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -54,10 +68,11 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		// entry at the selected block's position so the board can float it
 		// alongside regular threads.
 		if ( ! isFloating || selectedNote !== 'new' ) {
-			return notes;
+			return filterNotes( notes, filters, selectedNote );
 		}
 		const newNoteThread = {
 			id: 'new',
+			blockClientIds: selectedBlockClientIds,
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
@@ -77,11 +92,29 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		return out;
 	}, [
 		notes,
+		filters,
 		isFloating,
 		selectedNote,
+		selectedBlockClientIds,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
+
+	const isFiltered = hasActiveNotesFilters( filters );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	useEffect( () => {
+		if ( ! isFiltered ) {
+			debouncedSpeak.cancel();
+			return;
+		}
+		debouncedSpeak(
+			sprintf(
+				/* translators: %d: Number of notes found. */
+				_n( '%d note found.', '%d notes found.', threads.length ),
+				threads.length
+			)
+		);
+	}, [ isFiltered, threads.length, debouncedSpeak ] );
 
 	const { notePositions, heights, registerThread, unregisterThread } =
 		useFloatingBoard( {
@@ -98,10 +131,11 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	/*
 	 * Focuses the thread, or its neighbor when the thread is leaving the list,
 	 * so focus doesn't fall to the document body. `nextThread` is the thread
-	 * as it will be after the change, or `null` when it's being removed.
+	 * as it will be after the change, or `null` when it's being removed. A
+	 * thread the filters would hide is leaving too.
 	 */
 	function focusThreadOrAdjacent( thread, nextThread ) {
-		if ( nextThread ) {
+		if ( nextThread && filterNotes( [ nextThread ], filters ).length ) {
 			focusNoteThread( thread.id, sidebarRef.current );
 			return;
 		}
@@ -171,15 +205,20 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	// "Resolved" divider can be rendered above them. Resolved notes (status
 	// 'approved' with a still-present block) always sort after the active
 	// ones, so the first match marks the boundary. The floating view only
-	// lists unresolved notes, so it needs no divider.
-	const firstResolvedIndex = isFloating
-		? -1
-		: threads.findIndex(
-				( thread ) =>
-					thread.status === 'approved' && !! thread.blockClientId
-			);
+	// lists unresolved notes, so it needs no divider. Neither does a list
+	// filtered by status, where orphaned notes would land above it.
+	const firstResolvedIndex =
+		isFloating || filters.status !== 'all'
+			? -1
+			: threads.findIndex(
+					( thread ) =>
+						thread.status === 'approved' && !! thread.blockClientId
+				);
 	const isAddingNote =
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
+
+	const showNoResults = isFiltered && ! isAddingNote && ! threads.length;
+	const expandReplies = filters.search.trim() !== '';
 
 	return (
 		<>
@@ -196,6 +235,14 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 						) }
 					</Notice.Description>
 				</Notice.Root>
+			) }
+			{ showNoResults && (
+				<Text
+					className="editor-collab-sidebar-panel__no-results"
+					render={ <p /> }
+				>
+					{ __( 'No notes found.' ) }
+				</Text>
 			) }
 			<Stack
 				className="editor-collab-sidebar-panel"
@@ -217,8 +264,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 				{ isAddingNote && (
 					<AddNote
 						key={ selectedBlockClientId }
-						clientId={ selectedBlockClientId }
-						sidebarRef={ sidebarRef }
+						clientIds={ selectedBlockClientIds }
 					/>
 				) }
 				{ threads.map( ( thread, index ) => (
@@ -240,6 +286,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 							note={ thread }
 							focusThreadOrAdjacent={ focusThreadOrAdjacent }
 							isSelected={ selectedNote === thread.id }
+							expandReplies={ expandReplies }
 							sidebarRef={ sidebarRef }
 							floating={
 								isFloating
