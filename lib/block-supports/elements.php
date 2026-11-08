@@ -152,6 +152,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	// @phpstan-ignore arguments.count (WordPress 7.0 requires the block, which 7.1 no longer takes and ignores.)
 	$class_name         = wp_get_elements_class_name( $parsed_block );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] ) ? $parsed_block['attrs']['className'] . " $class_name" : $class_name;
 

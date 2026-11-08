@@ -29,7 +29,7 @@ This package ships no stylesheets; there is nothing to enqueue or import.
 The contract types, `<WidgetRender>`, and `useWidgetTypes()` work in any
 React application. The host fetches the widget-module records however it
 wants and passes them in; `useWidgetTypes( records )` imports each record's
-metadata module and returns the resolved `WidgetType[]`.
+metadata module, when it declares one, and returns the resolved `WidgetType[]`.
 
 On a WordPress site the records come from the `/wp/v2/widget-modules` REST
 endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
@@ -45,13 +45,17 @@ the hook in its loading state: `widgetTypes` is empty and
 
 ### `<WidgetRender>`
 
-It's the entry point for any host that mounts a widget. It resolves the render module via a host-provided `resolveWidgetModule` and mounts the component using the `attributes` / `setAttributes` contract.
+It's the entry point for any host that mounts a widget. It resolves the render module via a host-provided `resolveWidgetModule` and mounts the component using the `attributes` / `setAttributes` contract. It also lends the subtree the type's identity for `useWidgetIdentity`.
 
 Error handling and chrome stay with the host, which wraps the lazy render in a `Suspense` boundary.
 
+### `useWidgetIdentity()`
+
+It is how a mounted widget reads its type's identity consistently — today the translated `title`. `WidgetRender` provides it from the `widgetType` it already holds, so any host that mounts through that entry point needs no extra wiring. Absent a provider, the hook returns `{}`. The Widget Identity Storybook page covers the contract and the flow.
+
 ### `useWidgetTypes( records )`
 
-It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
+It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module when it declares one. A record without one resolves from its own fields. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
 
 ### `useWidgetActions( actions )`
 

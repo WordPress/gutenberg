@@ -1,6 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { Notice } from '@wordpress/components';
+import { Notice as WCNotice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
@@ -94,7 +94,7 @@ function Editor( {
 	return (
 		<>
 			{ hasLoadedPost && ! post && (
-				<Notice
+				<WCNotice
 					status={ !! error ? 'error' : 'warning' }
 					isDismissible={ false }
 				>
@@ -103,7 +103,7 @@ function Editor( {
 								"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
 							)
 						: error }
-				</Notice>
+				</WCNotice>
 			) }
 			{ !! post && (
 				<ExperimentalEditorProvider

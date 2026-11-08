@@ -35,7 +35,7 @@ import type { FormatType, State } from '../types';
  * @return Format types.
  */
 export const getFormatTypes = createSelector(
-	( state: State ) => Object.values( state.formatTypes ),
+	( state: State ): FormatType[] => Object.values( state.formatTypes ),
 	( state: State ) => [ state.formatTypes ]
 );
 
@@ -113,7 +113,7 @@ export function getFormatType(
 export function getFormatTypeForBareElement(
 	state: State,
 	bareElementTagName: string
-) {
+): FormatType | undefined {
 	const formatTypes = getFormatTypes( state );
 	return (
 		formatTypes.find( ( { className, tagName } ) => {
@@ -155,7 +155,7 @@ export function getFormatTypeForBareElement(
 export function getFormatTypeForClassName(
 	state: State,
 	elementClassName: string
-) {
+): FormatType | undefined {
 	return getFormatTypes( state ).find( ( { className } ) => {
 		if ( className === null ) {
 			return false;

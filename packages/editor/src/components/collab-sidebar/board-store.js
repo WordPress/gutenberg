@@ -1,5 +1,5 @@
 import { getScrollContainer } from '@wordpress/dom';
-import { getHiddenBlockAnchorRect, getNoteAnchorRect } from './utils';
+import { getHiddenBlockAnchorRect, getNoteAnchorRect } from './utils/dom';
 
 const EMPTY_SNAPSHOT = {
 	heights: {},

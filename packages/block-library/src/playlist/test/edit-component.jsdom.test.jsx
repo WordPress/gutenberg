@@ -60,30 +60,10 @@ vi.mock( import( '@wordpress/blocks' ), () => ( {
 	} ) ),
 } ) );
 
-vi.mock( import( '@wordpress/blob' ), () => ( {
-	createBlobURL: vi.fn( () => 'blob:track' ),
-} ) );
-
-vi.mock( import( '@wordpress/components' ), () => ( {
-	Disabled: ( { children } ) => <div>{ children }</div>,
-	SelectControl: () => <div />,
-	ToggleControl: () => <div />,
-	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
-	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
-} ) );
-
-vi.mock( import( '@wordpress/data' ), () => ( {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	useDispatch: vi.fn(),
 	useSelect: vi.fn(),
-} ) );
-
-vi.mock( import( '@wordpress/i18n' ), () => ( {
-	__: ( text ) => text,
-	_x: ( text ) => text,
-} ) );
-
-vi.mock( import( '@wordpress/icons' ), () => ( {
-	playlist: 'playlist',
 } ) );
 
 vi.mock( import( '@wordpress/notices' ), () => ( {

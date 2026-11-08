@@ -1,6 +1,11 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { Spinner, Flex, FlexItem, Composite } from '@wordpress/components';
+import {
+	Spinner as WCSpinner,
+	Flex,
+	FlexItem,
+	Composite,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useContext, useRef } from '@wordpress/element';
@@ -523,7 +528,7 @@ function ViewPickerGrid< Item >( {
 					>
 						{ isLoading ? (
 							<p>
-								<Spinner />
+								<WCSpinner />
 							</p>
 						) : (
 							empty
@@ -533,7 +538,7 @@ function ViewPickerGrid< Item >( {
 			}
 			{ hasData && isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

@@ -993,7 +993,7 @@ conditions under which a different value would be returned.
 
 _Parameters_
 
-- _mapDispatchToProps_ `( dispatch: DataRegistry[ 'dispatch' ], ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, ( , ...args: unknown[] ) => unknown >`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
+- _mapDispatchToProps_ `( dispatch: DataRegistry[ 'dispatch' ], ownProps: Record< string, unknown >, registry: DataRegistry ) => Record< string, ( , ...args: never[] ) => unknown >`: A function of returning an object of prop names where value is a dispatch-bound action creator, or a function to be called with the component's props and returning an action creator.
 
 _Returns_
 
