@@ -5,6 +5,7 @@ import type {
 	ConvertImageOptions,
 	EditImageOptions,
 	ImageEditModifier,
+	EncodePixelsOptions,
 	ResizeImageOptions,
 } from './types.ts';
 import type { WorkerAPI } from './worker.ts';
@@ -201,6 +202,28 @@ export async function vipsEditImage(
 } > {
 	const api = getWorkerAPI();
 	return api.editImage( id, buffer, type, modifiers, options );
+}
+
+/**
+ * Encodes raw RGBA pixels as a JPEG using vips in a worker, optionally
+ * carrying over the EXIF block from the file the pixels were decoded from.
+ *
+ * @param id      Item ID.
+ * @param pixels  Tightly packed 8-bit RGBA pixel data.
+ * @param width   Image width in pixels.
+ * @param height  Image height in pixels.
+ * @param options Encoding options.
+ * @return JPEG file data.
+ */
+export async function vipsEncodePixelsAsJpeg(
+	id: ItemId,
+	pixels: ArrayBuffer,
+	width: number,
+	height: number,
+	options: EncodePixelsOptions = {}
+): Promise< ArrayBuffer | ArrayBufferLike > {
+	const api = getWorkerAPI();
+	return api.encodePixelsAsJpeg( id, pixels, width, height, options );
 }
 
 /**

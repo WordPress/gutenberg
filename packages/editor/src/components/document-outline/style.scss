@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
 
 .document-outline {
@@ -61,10 +62,12 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Override style from wp-admin common.css.
+		box-shadow: none;
 
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
+		&:not(:active) {
+			@include mixins.outset-ring__focus();
+		}
 	}
 }
 

@@ -1,9 +1,10 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import { Elevation } from '..';
+import Elevation from '../deprecated';
 
 const meta: Meta< typeof Elevation > = {
 	component: Elevation,
-	title: 'Components/Elevation',
+	title: 'Components/@wordpress-components/Deprecated/Elevation',
+	id: 'components-elevation',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		borderRadius: { control: { type: 'text' } },
@@ -17,7 +18,7 @@ const meta: Meta< typeof Elevation > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation. Use [`elevation tokens`](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
+			notes: 'Deprecated. Use [`elevation tokens`](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
 		},
 	},
 };

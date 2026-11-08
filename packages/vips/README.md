@@ -59,25 +59,23 @@ _Parameters_
 - _outputType_ `string`: Output mime type.
 - _options_ `ConvertImageOptions`: Conversion options.
 
-### editImage
+### encodePixelsAsJpeg
 
-Applies a list of edits (flip, rotate, crop) to an image.
+Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block from the file the pixels were decoded from.
 
-Mirrors what `WP_REST_Attachments_Controller::edit_media_item()` does on the server: any pending EXIF orientation is applied first, so the edits run in the upright frame the user previewed, then the modifiers are applied in order. The full-size result keeps its metadata (EXIF, ICC profile) and, for UltraHDR JPEGs, its gain map, which is transformed in step with the base image.
-
-Only the first frame of an animated image is edited, as core's GD editor does.
+This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser decodes HEIC to pixels with its platform codecs, and a canvas re-encode would drop all metadata. libvips reads the source's EXIF from the container header alone, so no HEVC decoding is needed here either.
 
 _Parameters_
 
 - _id_ `ItemId`: Item ID.
-- _buffer_ `ArrayBuffer`: Original file buffer.
-- _type_ `string`: Mime type.
-- _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
-- _options_ `EditImageOptions`: Edit options.
+- _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+- _width_ `number`: Image width in pixels.
+- _height_ `number`: Image height in pixels.
+- _options_ `EncodePixelsOptions`: Encoding options.
 
 _Returns_
 
-- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
 
 ### getUltraHdrInfo
 
@@ -113,7 +111,9 @@ Resizes an image using vips.
 
 UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
-Sub-sizes of animated images are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+Sub-sizes of animated GIF and WebP images keep every frame when `preserveAnimation` is set, as it is by default from the `wp_generate_animated_image_subsizes` filter. Cropped sizes cut every frame with the same rectangle. Animations whose decoded frames would not fit the WASM heap flatten to the first frame, so the upload gets a static sub-size rather than failing. See <https://github.com/WordPress/gutenberg/issues/80383>.
+
+Without `preserveAnimation`, sub-sizes are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing. Re-encoding every frame takes longer, and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
 
 _Parameters_
 
@@ -185,25 +185,23 @@ _Parameters_
 - _outputType_ `string`: Output mime type.
 - _options_ `ConvertImageOptions`: Conversion options.
 
-### vipsEditImage
+### vipsEncodePixelsAsJpeg
 
-Applies a list of edits (flip, rotate, crop) to an image.
+Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block from the file the pixels were decoded from.
 
-Mirrors what `WP_REST_Attachments_Controller::edit_media_item()` does on the server: any pending EXIF orientation is applied first, so the edits run in the upright frame the user previewed, then the modifiers are applied in order. The full-size result keeps its metadata (EXIF, ICC profile) and, for UltraHDR JPEGs, its gain map, which is transformed in step with the base image.
-
-Only the first frame of an animated image is edited, as core's GD editor does.
+This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser decodes HEIC to pixels with its platform codecs, and a canvas re-encode would drop all metadata. libvips reads the source's EXIF from the container header alone, so no HEVC decoding is needed here either.
 
 _Parameters_
 
 - _id_ `ItemId`: Item ID.
-- _buffer_ `ArrayBuffer`: Original file buffer.
-- _type_ `string`: Mime type.
-- _modifiers_ `ImageEditModifier[]`: Edits to apply, in order.
-- _options_ `EditImageOptions`: Edit options.
+- _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+- _width_ `number`: Image width in pixels.
+- _height_ `number`: Image height in pixels.
+- _options_ `EncodePixelsOptions`: Encoding options.
 
 _Returns_
 
-- `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Edited file data plus the new dimensions.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
 
 ### vipsGetUltraHdrInfo
 
@@ -239,7 +237,9 @@ Resizes an image using vips.
 
 UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
-Sub-sizes of animated images are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+Sub-sizes of animated GIF and WebP images keep every frame when `preserveAnimation` is set, as it is by default from the `wp_generate_animated_image_subsizes` filter. Cropped sizes cut every frame with the same rectangle. Animations whose decoded frames would not fit the WASM heap flatten to the first frame, so the upload gets a static sub-size rather than failing. See <https://github.com/WordPress/gutenberg/issues/80383>.
+
+Without `preserveAnimation`, sub-sizes are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing. Re-encoding every frame takes longer, and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
 
 _Parameters_
 

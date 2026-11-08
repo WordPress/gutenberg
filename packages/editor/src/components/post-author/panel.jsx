@@ -6,7 +6,7 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import PostAuthorCheck from './check';
-import PostAuthorForm from './index';
+import PostAuthorControl from './index';
 import PostPanelRow from '../post-panel-row';
 import { BASE_QUERY } from './constants';
 import { store as editorStore } from '../../store';
@@ -19,7 +19,7 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 		};
 	}, [] );
 	const authorName =
-		decodeEntities( postAuthor?.name ) || __( '(No author)' );
+		decodeEntities( postAuthor?.name ) || __( '(no author)' );
 	return (
 		<Button
 			size="compact"
@@ -76,7 +76,7 @@ export function PostAuthor() {
 								title={ __( 'Author' ) }
 								onClose={ onClose }
 							/>
-							<PostAuthorForm onClose={ onClose } />
+							<PostAuthorControl />
 						</div>
 					) }
 				/>

@@ -19,7 +19,7 @@ const deprecateSlot = ( name ) => {
 
 /* eslint-disable jsdoc/require-param */
 /**
- * @see PluginMoreMenuItem in @wordpress/editor package.
+ * @see PluginMoreMenuItem in `@wordpress/editor` package.
  */
 export function PluginMoreMenuItem( props ) {
 	if ( ! isSiteEditor ) {
@@ -30,7 +30,7 @@ export function PluginMoreMenuItem( props ) {
 }
 
 /**
- * @see PluginSidebar in @wordpress/editor package.
+ * @see PluginSidebar in `@wordpress/editor` package.
  */
 export function PluginSidebar( props ) {
 	if ( ! isSiteEditor ) {
@@ -41,7 +41,7 @@ export function PluginSidebar( props ) {
 }
 
 /**
- * @see PluginSidebarMoreMenuItem in @wordpress/editor package.
+ * @see PluginSidebarMoreMenuItem in `@wordpress/editor` package.
  */
 export function PluginSidebarMoreMenuItem( props ) {
 	if ( ! isSiteEditor ) {

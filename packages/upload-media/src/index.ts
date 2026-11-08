@@ -16,6 +16,7 @@ export {
 	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
 } from './feature-detection';
+export { isHeicFile } from './utils';
 
 export type { ImageFormat } from './store/types';
 export type { ImageEditModifier } from '@wordpress/vips/worker';

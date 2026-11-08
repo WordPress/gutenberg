@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -10,6 +11,11 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBackgroundProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -18,9 +24,10 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
-	attributes: { type, label, showTitle, linkLabel, arrow, taxonomy },
+	attributes,
 	setAttributes,
 } ) {
+	const { type, label, showTitle, linkLabel, arrow, taxonomy } = attributes;
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -41,7 +48,28 @@ export default function PostNavigationLinkEdit( {
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
-	const blockProps = useBlockProps();
+
+	/*
+	 * Background, border, dimensions, shadow and spacing serialization is
+	 * skipped for this block so the styles are not applied to the empty
+	 * wrapper the front end renders when there is no adjacent post. The editor
+	 * always renders the link, so they always apply here.
+	 */
+	const backgroundProps = useBackgroundProps( attributes );
+	const borderProps = useBorderProps( attributes );
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const blockProps = useBlockProps( {
+		className: clsx( backgroundProps.className, borderProps.className ),
+		style: {
+			...backgroundProps.style,
+			...borderProps.style,
+			...dimensionsProps.style,
+			...shadowProps.style,
+			...spacingProps.style,
+		},
+	} );
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );

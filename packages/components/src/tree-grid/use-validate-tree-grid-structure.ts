@@ -76,7 +76,9 @@ function isOwnedByRowInTreeGrid(
 
 export function useValidateTreeGridStructure(
 	componentName: 'TreeGridRow' | 'TreeGridCell',
-	elementRef: React.RefObject< HTMLElement >
+	elementRef: React.RefObject<
+		HTMLTableCellElement | HTMLTableRowElement | null
+	>
 ) {
 	useEffect( () => {
 		const element = elementRef.current;

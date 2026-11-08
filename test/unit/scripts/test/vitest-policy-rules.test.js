@@ -418,6 +418,27 @@ describe( 'Vitest policy rules', () => {
 		}
 	} );
 
+	it( 'rejects ES module exports from test suites', () => {
+		for ( const source of [
+			'export const value = true;',
+			'export default true;',
+			"export * from './helpers';",
+		] ) {
+			expectViolation(
+				`import { test } from 'vitest'; ${ source }`,
+				'Do not export from a test file',
+				{ project: 'node', isVitestTest: true }
+			);
+		}
+	} );
+
+	it( 'allows ES module exports from shared test helpers', () => {
+		expectValid(
+			"import { test, expect } from 'vitest'; export function suite() { test( 'example', () => { expect( true ).toBe( true ); } ); }",
+			{ project: 'node' }
+		);
+	} );
+
 	it( 'allows properties on local module-like objects', () => {
 		expectValid(
 			'const module = { exports: {} };\nmodule.exports.value = true;\nconst exports = {};\nexports.value = true;',

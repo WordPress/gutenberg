@@ -299,6 +299,11 @@ export interface NormalizedResolver {
 	 * Optional function to check if the resolver should be invalidated.
 	 */
 	shouldInvalidate?: ( action: any, ...args: any[] ) => boolean;
+	/**
+	 * Optional. Derives the cache key from the selector arguments, so several
+	 * selector calls can share a single resolver run.
+	 */
+	getResolutionArgs?: ( ...args: any[] ) => any[];
 }
 
 /**
@@ -313,7 +318,7 @@ export interface BoundSelector {
 	/**
 	 * Optional function to normalize the arguments.
 	 */
-	__unstableNormalizeArgs?: ( args: any[] ) => any[];
+	normalizeArgs?: ( args: any[] ) => any[];
 	/**
 	 * Whether this selector is a registry selector.
 	 */
@@ -423,10 +428,20 @@ export type ActionCreatorsOf< T > =
 export type PromisifiedActionCreators< ActionCreators > = {
 	[
 		Action in keyof ActionCreators
-	]: ActionCreators[ Action ] extends ActionCreator
-		? PromisifyActionCreator< ActionCreators[ Action ] >
-		: ActionCreators[ Action ];
+	]: ActionCreators[ Action ] extends ActionCreatorWithCustomDispatchSignature
+		? ActionCreators[ Action ][ 'DispatchSignature' ]
+		: ActionCreators[ Action ] extends ActionCreator
+			? PromisifyActionCreator< ActionCreators[ Action ] >
+			: ActionCreators[ Action ];
 };
+
+/**
+ * Lets a generic action creator declare its dispatched signature, whose type
+ * parameters `PromisifyActionCreator` would erase.
+ */
+export interface ActionCreatorWithCustomDispatchSignature {
+	DispatchSignature: Function;
+}
 
 // Wraps action creator return types with a Promise and handles thunks and generators.
 export type PromisifyActionCreator< Action extends ActionCreator > = (

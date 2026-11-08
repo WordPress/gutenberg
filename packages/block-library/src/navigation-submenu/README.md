@@ -41,6 +41,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
@@ -69,6 +70,12 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Provides context:**
 
 - `core/isInsideSubmenu` → attribute `isParentSubmenu`
+
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **shadow**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
 
 ## Block Markup
 

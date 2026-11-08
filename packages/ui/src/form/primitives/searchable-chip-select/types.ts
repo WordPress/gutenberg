@@ -13,6 +13,10 @@ export type Item = {
 	value: string;
 	disabled?: boolean;
 	/**
+	 * Supplementary text for the item in the popup.
+	 */
+	description?: string;
+	/**
 	 * When `true`, the item renders in the list footer, not the main list,
 	 * when it is in the filtered items.
 	 */
@@ -65,7 +69,7 @@ export function hasGroupedItems(
 
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
-	'children' | 'items' | 'multiple'
+	'children' | 'items' | 'multiple' | 'readOnly'
 > &
 	Partial<
 		Pick<
@@ -107,6 +111,9 @@ export type SearchableChipSelectProps = Omit<
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
 		 * A render function for custom rendering the selected chips.
+		 *
+		 * The chip is named from its content. Pass `aria-label` when that
+		 * content is not a usable name.
 		 *
 		 * ```jsx
 		 * chipsContent={ ( value ) =>

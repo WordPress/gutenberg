@@ -1,21 +1,15 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { focus } from '@wordpress/dom';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useId,
-} from '@wordpress/element';
+import { useContext, useEffect, useRef, useId } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { escapeAttribute } from '@wordpress/escape-html';
 import warning from '@wordpress/warning';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
-import * as styles from '../styles';
+import styles from '../style.module.scss';
 import type { NavigatorScreenProps } from '../types';
 import { useScreenAnimatePresence } from './use-screen-animate-presence';
 
@@ -58,18 +52,17 @@ function UnconnectedNavigatorScreen(
 	}, [ screenId, path, addScreen, removeScreen ] );
 
 	// Animation.
-	const { animationStyles, shouldRenderScreen, screenProps } =
-		useScreenAnimatePresence( {
-			isMatch,
-			isBack,
-			onAnimationEnd: onAnimationEndProp,
-			skipAnimation: skipAnimationAndFocusRestoration,
-		} );
+	const { shouldRenderScreen, screenProps } = useScreenAnimatePresence( {
+		isMatch,
+		isBack,
+		onAnimationEnd: onAnimationEndProp,
+		skipAnimation: skipAnimationAndFocusRestoration,
+	} );
 
-	const cx = useCx();
-	const classes = useMemo(
-		() => cx( styles.navigatorScreen, animationStyles, className ),
-		[ className, cx, animationStyles ]
+	const classes = clsx(
+		styles.screen,
+		styles[ 'screen-animation' ],
+		className
 	);
 
 	// Focus restoration

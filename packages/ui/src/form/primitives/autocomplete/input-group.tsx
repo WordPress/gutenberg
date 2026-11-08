@@ -11,6 +11,6 @@ import type { AutocompleteInputGroupProps } from './types';
 export const InputGroup = forwardRef<
 	HTMLDivElement,
 	AutocompleteInputGroupProps
->( function InputGroup( props, ref ) {
+>( function UnforwardedInputGroup( props, ref ) {
 	return <_Autocomplete.InputGroup ref={ ref } { ...props } />;
 } );

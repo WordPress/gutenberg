@@ -15,7 +15,8 @@ import { Button } from '../index';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Components/Button',
+	title: 'Components/@wordpress-ui/Button',
+	id: 'design-system-components-button',
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,
