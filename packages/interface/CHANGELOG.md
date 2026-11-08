@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a dot over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+
 ## 11.1.0 (2026-11-04)
 
 ### Internal
@@ -13,10 +17,6 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### Enhancements
-
--   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a dot over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
 ### Internal
 
