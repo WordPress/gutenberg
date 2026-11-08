@@ -78,3 +78,12 @@ parameters:
 			message: '#^WP_REST_Request(?:<.+>)? does not accept .+\.$#'
 			identifier: offsetAssign.valueType
 			reportUnmatched: false
+
+		# Level 4:
+		# The Navigation block checks for WP_Theme_JSON_Gutenberg::get_viewport_media_queries() before falling back to
+		# WP_Theme_JSON. PHPStan sees the Gutenberg class as always defined, but the block library also runs in
+		# WordPress Core, where it is not, so the check is needed there.
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			path: packages/block-library/src/navigation/index.php
