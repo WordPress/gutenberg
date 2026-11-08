@@ -10,7 +10,7 @@ import {
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, serialize } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -61,7 +61,7 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords(
+	const { records: threads, hasResolved } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -190,6 +190,7 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+		hasResolved,
 	};
 }
 
@@ -198,9 +199,12 @@ export function useNoteActions() {
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
+		getBlock,
 		getBlockAttributes,
 		getBlockCount,
+		getBlockIndex,
 		getBlockName,
+		getBlockParents,
 		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
@@ -351,6 +355,17 @@ export function useNoteActions() {
 		} );
 	};
 
+	// The note's blocks as they stand, with the draft marker of an inline
+	// note. The anchor written below only persists with the post, so this
+	// lets a later load re-attach the note if the post isn't saved.
+	const getNoteAnchorSnapshot = ( clientIds ) =>
+		clientIds.map( ( clientId ) => ( {
+			path: [ ...getBlockParents( clientId ), clientId ].map(
+				getBlockIndex
+			),
+			content: serialize( getBlock( clientId ) ),
+		} ) );
+
 	const onCreate = async ( { content, parent } ) => {
 		try {
 			// Capture the target blocks *before* the async save: selection may
@@ -366,6 +381,11 @@ export function useNoteActions() {
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
+					...( clientIds.length && {
+						meta: {
+							_wp_note_anchor: getNoteAnchorSnapshot( clientIds ),
+						},
+					} ),
 				},
 				{ throwOnError: true }
 			);
