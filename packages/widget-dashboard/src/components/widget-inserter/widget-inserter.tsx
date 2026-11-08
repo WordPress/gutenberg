@@ -1,7 +1,9 @@
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Dialog } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Dialog,
+} from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
@@ -51,7 +53,7 @@ export function WidgetInserter() {
 			>
 				<Dialog.Header>
 					<Dialog.Title>{ __( 'Add widget' ) }</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 
 				<Dialog.Content>

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-11-04)
+
+### Enhancements
+
+-   Make the `routes` and `matchResolverArgs` properties of `RouterProvider` optional in its TypeScript declaration, matching the existing behavior ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).
+
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 1.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
 ## 1.56.0 (2026-09-23)
 
 ## 1.55.0 (2026-09-10)

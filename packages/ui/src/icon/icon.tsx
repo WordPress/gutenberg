@@ -11,23 +11,22 @@ import type { IconProps } from './types';
  * <Icon icon={ wordpress } />
  * ```
  */
-export const Icon = forwardRef< SVGSVGElement, IconProps >( function Icon(
-	{ icon, size = 24, style, ...restProps },
-	ref
-) {
-	const mergedStyle =
-		icon.props.style || style
-			? { ...icon.props.style, ...style }
-			: undefined;
+export const Icon = forwardRef< SVGSVGElement, IconProps >(
+	function UnforwardedIcon( { icon, size = 24, style, ...restProps }, ref ) {
+		const mergedStyle =
+			icon.props.style || style
+				? { ...icon.props.style, ...style }
+				: undefined;
 
-	return (
-		<SVG
-			ref={ ref }
-			{ ...icon.props }
-			{ ...restProps }
-			{ ...( mergedStyle ? { style: mergedStyle } : {} ) }
-			width={ size }
-			height={ size }
-		/>
-	);
-} );
+		return (
+			<SVG
+				ref={ ref }
+				{ ...icon.props }
+				{ ...restProps }
+				{ ...( mergedStyle ? { style: mergedStyle } : {} ) }
+				width={ size }
+				height={ size }
+			/>
+		);
+	}
+);

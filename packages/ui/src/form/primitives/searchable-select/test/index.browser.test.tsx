@@ -47,6 +47,30 @@ describe( 'SearchableSelect', () => {
 		mockedWarning.mockClear();
 	} );
 
+	it( 'describes default items without adding the description to the trigger', async () => {
+		await render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ [
+					{
+						value: 'apple',
+						label: 'Apple',
+						description: 'Fresh fruit.',
+					},
+				] }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await userEvent.click( trigger );
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( 'Fresh fruit.' );
+	} );
+
 	it( 'passes aria-label and aria-describedby props to the appropriate components', async () => {
 		const user = userEvent;
 
@@ -182,7 +206,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>
@@ -224,7 +250,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>
@@ -332,7 +360,9 @@ describe( 'SearchableSelect', () => {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableSelect.ItemLabel>
+								{ item.label }
+							</SearchableSelect.ItemLabel>
 						</SearchableSelect.Item>
 					) }
 				/>
@@ -380,7 +410,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>
@@ -434,7 +466,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>
@@ -588,7 +622,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>

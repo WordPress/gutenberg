@@ -148,7 +148,10 @@ function ColorSample( {
 }
 
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { label, ramps, warnings = [] }, forwardedRef ) {
+	function UnforwardedRampTable(
+		{ label, ramps, warnings = [] },
+		forwardedRef
+	) {
 		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
 			isSeedAdjusted( seed.value, ramp[ seed.name ] )
 		);

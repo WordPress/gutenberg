@@ -1,5 +1,6 @@
 import type { Color } from '@wordpress/global-styles-engine';
 import { useSetting, useStyle } from './hooks';
+import { prioritizePaletteColors } from './palette-colors';
 
 export function useStylesPreviewColors(): {
 	paletteColors: Color[];
@@ -24,9 +25,13 @@ export function useStylesPreviewColors(): {
 	const [ customColors ] =
 		useSetting< Color[] >( 'color.palette.custom' ) || [];
 
-	const paletteColors: Color[] = ( themeColors ?? [] )
-		.concat( customColors ?? [] )
-		.concat( coreColors ?? [] );
+	const paletteColors = prioritizePaletteColors(
+		( themeColors ?? [] )
+			.concat( customColors ?? [] )
+			.concat( coreColors ?? [] ),
+		backgroundColor,
+		textColor
+	);
 
 	const textColorObject = paletteColors.filter(
 		( { color } ) => color === textColor

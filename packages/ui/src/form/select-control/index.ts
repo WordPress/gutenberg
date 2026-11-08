@@ -3,8 +3,11 @@ import { Group } from '../primitives/select/group';
 import { GroupLabel } from '../primitives/select/group-label';
 import { ItemDescription } from '../primitives/select/item-description';
 import { ItemLabel } from '../primitives/select/item-label';
+import { Separator } from '../primitives/select/separator';
 import { Item } from './item';
+import { Trigger } from './trigger';
 
+Trigger.displayName = 'SelectControl.Trigger';
 Group.displayName = 'SelectControl.Group';
 GroupLabel.displayName = 'SelectControl.GroupLabel';
 Item.displayName = 'SelectControl.Item';
@@ -15,6 +18,11 @@ ItemDescription.displayName = 'SelectControl.ItemDescription';
  * A complete select field with integrated label and description.
  */
 export const SelectControl = Object.assign( _SelectControl, {
+	/**
+	 * The trigger button, passed through the `trigger` prop to customize
+	 * its props while retaining the control's label and selected content.
+	 */
+	Trigger,
 	/**
 	 * Groups related items together with an associated label rendered by
 	 * `SelectControl.GroupLabel`.
@@ -37,4 +45,8 @@ export const SelectControl = Object.assign( _SelectControl, {
 	 * `aria-describedby`.
 	 */
 	ItemDescription,
+	/**
+	 * Renders a visual separator between items or groups.
+	 */
+	Separator,
 } );
