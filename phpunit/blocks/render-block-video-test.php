@@ -91,12 +91,12 @@ class Tests_Blocks_Render_Video extends WP_UnitTestCase {
 	}
 
 	/**
-	 * An autoplaying loop, such as a converted GIF, plays in pure HTML and
-	 * needs no script.
+	 * An autoplaying loop, such as a converted GIF, is not a Live photo. It
+	 * only gets the reduced motion directive every autoplaying video gets.
 	 *
 	 * @covers ::render_block_core_video
 	 */
-	public function test_autoplaying_loop_gets_no_directives() {
+	public function test_autoplaying_loop_gets_no_live_photo_directives() {
 		$this->add_motion_companion();
 
 		$rendered = gutenberg_render_block_core_video(
@@ -104,7 +104,9 @@ class Tests_Blocks_Render_Video extends WP_UnitTestCase {
 			$this->get_content( 'autoplay loop muted playsinline' )
 		);
 
-		$this->assertStringNotContainsString( 'data-wp-interactive', $rendered );
+		$this->assertStringNotContainsString( 'actions.playLivePhoto', $rendered );
+		$this->assertStringNotContainsString( 'tabindex', $rendered );
+		$this->assertStringContainsString( 'callbacks.stopAutoplay', $rendered );
 	}
 
 	/**
