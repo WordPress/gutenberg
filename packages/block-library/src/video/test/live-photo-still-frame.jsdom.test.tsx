@@ -9,23 +9,28 @@ globalThis.wpVitest.mockMatchMedia();
 
 const mockCreateErrorNotice = vi.fn();
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( { default: vi.fn() } ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
-vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	useDispatch: () => ( { createErrorNotice: mockCreateErrorNotice } ),
-} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		useDispatch: ( () => ( {
+			createErrorNotice: mockCreateErrorNotice,
+		} ) ) as unknown as typeof actual.useDispatch,
+	};
+} );
 
 /*
  * jsdom's FormData only accepts its own Blob class, not the File the component
  * builds; this records what was appended instead.
  */
 class RecordingFormData {
-	fields = new Map();
-	append( name, value ) {
+	fields = new Map< string, unknown >();
+	append( name: string, value: unknown ) {
 		this.fields.set( name, value );
 	}
-	get( name ) {
+	get( name: string ) {
 		return this.fields.get( name );
 	}
 }
@@ -39,9 +44,10 @@ const STILL_IMAGE = {
  * Renders the picker and reports the preview video's metadata as loaded, so
  * the controls enable as they would once the companion is available.
  *
- * @param {Object} props Props to override.
+ * @param props        Props to override.
+ * @param props.poster URL of the still frame the block rests on.
  */
-function renderPicker( props = {} ) {
+function renderPicker( props: { poster?: string } = {} ) {
 	const onChange = vi.fn();
 	render(
 		createElement( LivePhotoStillFrame, {
@@ -55,7 +61,7 @@ function renderPicker( props = {} ) {
 
 	// A video without controls has no role to query it by.
 	// eslint-disable-next-line testing-library/no-node-access
-	const video = document.querySelector( 'video' );
+	const video = document.querySelector( 'video' ) as HTMLVideoElement;
 	Object.defineProperties( video, {
 		duration: { value: 3, configurable: true },
 		videoWidth: { value: 256, configurable: true },
@@ -72,7 +78,12 @@ describe( 'LivePhotoStillFrame', () => {
 		vi.spyOn(
 			window.HTMLCanvasElement.prototype,
 			'getContext'
-		).mockImplementation( () => ( { drawImage: vi.fn() } ) );
+		).mockImplementation(
+			() =>
+				( {
+					drawImage: vi.fn(),
+				} ) as unknown as CanvasRenderingContext2D
+		);
 		vi.spyOn(
 			window.HTMLCanvasElement.prototype,
 			'toBlob'
@@ -109,11 +120,10 @@ describe( 'LivePhotoStillFrame', () => {
 		);
 
 		const [ sideload, finalize ] = vi.mocked( apiFetch ).mock.calls;
+		const body = sideload[ 0 ].body as unknown as RecordingFormData;
 		expect( sideload[ 0 ].path ).toBe( '/wp/v2/media/42/sideload' );
-		expect( sideload[ 0 ].body.get( 'image_size' ) ).toBe(
-			'live_photo_still'
-		);
-		expect( sideload[ 0 ].body.get( 'file' ).type ).toBe( 'image/jpeg' );
+		expect( body.get( 'image_size' ) ).toBe( 'live_photo_still' );
+		expect( ( body.get( 'file' ) as File ).type ).toBe( 'image/jpeg' );
 		// Finalize echoes what the sideload produced, which it verifies.
 		expect( finalize[ 0 ] ).toMatchObject( {
 			path: '/wp/v2/media/42/finalize',

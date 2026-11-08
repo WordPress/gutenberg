@@ -1,12 +1,13 @@
-const path = require( 'path' );
-const fs = require( 'fs/promises' );
-const os = require( 'os' );
-const { randomUUID } = require( 'crypto' );
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * @typedef {import('@playwright/test').Page} Page
- */
+import path from 'path';
+import fs from 'fs/promises';
+import os from 'os';
+import { randomUUID } from 'crypto';
+import type { Locator, Page } from '@playwright/test';
+import {
+	test as base,
+	expect,
+	type Editor,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 
@@ -26,9 +27,9 @@ const STILL_IMAGE_FIXTURE = '1024x768_e2e_test_image_size.jpeg';
  * Asserts a block carries the Live photo playback signature: muted, looping
  * and inline, with neither controls nor autoplay, so it rests on its poster.
  *
- * @param {Object} attributes Video block attributes.
+ * @param attributes Video block attributes.
  */
-function expectLivePhotoPlayback( attributes ) {
+function expectLivePhotoPlayback( attributes: Record< string, unknown > ) {
 	expect( attributes ).toMatchObject( {
 		controls: false,
 		loop: true,
@@ -38,18 +39,13 @@ function expectLivePhotoPlayback( attributes ) {
 	expect( attributes.autoplay ).toBeFalsy();
 }
 
-test.use( {
-	sequenceUtils: async ( { page }, use ) => {
-		await use( new ImageSequenceUtils( { page } ) );
-	},
-} );
-
 /**
  * Shared utilities for the image-sequence e2e tests.
  */
 class ImageSequenceUtils {
-	constructor( { page } ) {
-		/** @type {Page} */
+	page: Page;
+
+	constructor( { page }: { page: Page } ) {
 		this.page = page;
 	}
 
@@ -57,11 +53,11 @@ class ImageSequenceUtils {
 	 * Upload a file to the given input element.
 	 * Copies the asset to a unique temp file to avoid cross-test collisions.
 	 *
-	 * @param {import('@playwright/test').Locator} inputElement File input locator.
-	 * @param {string}                             fileName     File name in the assets directory.
-	 * @return {Promise<string>} Unique file name (without extension).
+	 * @param inputElement File input locator.
+	 * @param fileName     File name in the assets directory.
+	 * @return Unique file name (without extension).
 	 */
-	async upload( inputElement, fileName ) {
+	async upload( inputElement: Locator, fileName: string ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-sequence-' )
 		);
@@ -76,13 +72,14 @@ class ImageSequenceUtils {
 	/**
 	 * Wait for the upload-media store queue to drain.
 	 *
-	 * @param {number} timeout Timeout in milliseconds.
+	 * @param timeout Timeout in milliseconds.
 	 */
 	async waitForUploadQueueEmpty( timeout = 120000 ) {
 		await this.page.waitForFunction(
 			() =>
-				window.wp.data.select( 'core/upload-media' ).getItems()
-					.length === 0,
+				( window as any ).wp.data
+					.select( 'core/upload-media' )
+					.getItems().length === 0,
 			undefined,
 			{ timeout }
 		);
@@ -91,14 +88,16 @@ class ImageSequenceUtils {
 	/**
 	 * Returns the blocks currently in the canvas.
 	 *
-	 * @return {Promise<Array<{name: string, attributes: Object}>>} Blocks.
+	 * @return Blocks.
 	 */
-	async getBlocks() {
+	async getBlocks(): Promise<
+		Array< { name: string; attributes: Record< string, any > } >
+	> {
 		return this.page.evaluate( () =>
-			window.wp.data
+			( window as any ).wp.data
 				.select( 'core/block-editor' )
 				.getBlocks()
-				.map( ( block ) => ( {
+				.map( ( block: { name: string; attributes: unknown } ) => ( {
 					name: block.name,
 					attributes: block.attributes,
 				} ) )
@@ -113,19 +112,21 @@ class ImageSequenceUtils {
 	 * actually create, so waiting for it to paint would be waiting for
 	 * something that cannot happen.
 	 *
-	 * @param {string[]} names   Expected block names, in order.
-	 * @param {number}   timeout Timeout in milliseconds.
+	 * @param names   Expected block names, in order.
+	 * @param timeout Timeout in milliseconds.
 	 */
-	async waitForBlockNames( names, timeout = 30000 ) {
+	async waitForBlockNames( names: string[], timeout = 30000 ) {
 		await this.page.waitForFunction(
 			( expected ) => {
-				const actual = window.wp.data
+				const actual = ( window as any ).wp.data
 					.select( 'core/block-editor' )
 					.getBlocks()
-					.map( ( block ) => block.name );
+					.map( ( block: { name: string } ) => block.name );
 				return (
 					actual.length === expected.length &&
-					actual.every( ( name, i ) => name === expected[ i ] )
+					actual.every(
+						( name: string, i: number ) => name === expected[ i ]
+					)
 				);
 			},
 			names,
@@ -140,12 +141,15 @@ class ImageSequenceUtils {
 	 * decoder, which CI's Linux Chromium does not have. Tests that only need
 	 * the editor behavior use the companion test plugin instead of this guard.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object.
+	 * @param testInstance      The test object.
+	 * @param testInstance.skip Skips the test when its condition is true.
 	 */
-	async skipIfSequenceConversionInactive( testInstance ) {
+	async skipIfSequenceConversionInactive( testInstance: {
+		skip: ( condition: boolean, description: string ) => void;
+	} ) {
 		const isActive = await this.page.evaluate( async () => {
 			if (
-				! window.__clientSideMediaProcessing ||
+				! ( window as any ).__clientSideMediaProcessing ||
 				typeof VideoDecoder === 'undefined' ||
 				typeof VideoEncoder === 'undefined' ||
 				window.crossOriginIsolated !== true
@@ -169,6 +173,12 @@ class ImageSequenceUtils {
 		);
 	}
 }
+
+const test = base.extend< { sequenceUtils: ImageSequenceUtils } >( {
+	sequenceUtils: async ( { page }, use ) => {
+		await use( new ImageSequenceUtils( { page } ) );
+	},
+} );
 
 test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -264,11 +274,17 @@ test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 		 * Uploads the still fixture into an Image block and waits for the
 		 * automatic conversion to a Live photo.
 		 *
-		 * @param {Object} fixtures               Playwright fixtures.
-		 * @param {Object} fixtures.editor        Editor utils.
-		 * @param {Object} fixtures.sequenceUtils Sequence utils.
+		 * @param fixtures               Playwright fixtures.
+		 * @param fixtures.editor        Editor utils.
+		 * @param fixtures.sequenceUtils Sequence utils.
 		 */
-		async function uploadAndConvert( { editor, sequenceUtils } ) {
+		async function uploadAndConvert( {
+			editor,
+			sequenceUtils,
+		}: {
+			editor: Editor;
+			sequenceUtils: ImageSequenceUtils;
+		} ) {
 			await expect(
 				editor.canvas.getByRole( 'document', {
 					name: 'Add default block',
@@ -434,14 +450,15 @@ test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 			// Stand in for a frame picked in the Still frame panel, which
 			// needs a playable companion the fixtures do not provide.
 			const pickedFrame = await page.evaluate( () => {
-				const { getBlocks } =
-					window.wp.data.select( 'core/block-editor' );
+				const { getBlocks } = ( window as any ).wp.data.select(
+					'core/block-editor'
+				);
 				const [ block ] = getBlocks();
 				const frame = block.attributes.poster.replace(
 					/\.(\w+)$/,
 					'-still.$1'
 				);
-				window.wp.data
+				( window as any ).wp.data
 					.dispatch( 'core/block-editor' )
 					.updateBlockAttributes( block.clientId, { poster: frame } );
 				return frame;

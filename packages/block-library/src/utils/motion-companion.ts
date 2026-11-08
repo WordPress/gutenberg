@@ -14,6 +14,24 @@
  * companion is found and addressed.
  */
 
+type CarriedAttributes = {
+	align?: string;
+	anchor?: string;
+	className?: string;
+	style?: { spacing?: { margin?: string | Record< string, string > } };
+};
+
+type AttachmentRecord = {
+	source_url?: string;
+	mime_type?: string;
+	media_details?: {
+		animated_video?: string;
+		animated_video_poster?: string;
+		width?: number;
+		height?: number;
+	};
+};
+
 /**
  * Returns the subset of Image block attributes to carry over when converting
  * to the Video block that plays its motion companion.
@@ -28,10 +46,12 @@
  * carried: the Video block has no equivalent, so copying them would leave
  * attributes the target block cannot represent.
  *
- * @param {Object} attributes Source block attributes.
- * @return {Object} Attributes to spread into the converted block.
+ * @param attributes Source block attributes.
+ * @return Attributes to spread into the converted block.
  */
-export function getCarriedMotionConversionAttributes( attributes ) {
+export function getCarriedMotionConversionAttributes(
+	attributes: CarriedAttributes
+): CarriedAttributes {
 	const { align, anchor, className, style } = attributes;
 	const margin = style?.spacing?.margin;
 
@@ -46,11 +66,16 @@ export function getCarriedMotionConversionAttributes( attributes ) {
 /**
  * Reads an attachment record's motion companion.
  *
- * @param {Object} record Resolved attachment record.
- * @return {Object|null} Absolute `src`/`poster` URLs and the image's intrinsic
- *                       `width`/`height`, or `null` when there is no companion.
+ * @param record Resolved attachment record.
+ * @return Absolute `src`/`poster` URLs and the image's intrinsic
+ *         `width`/`height`, or `null` when there is no companion.
  */
-export function getMotionCompanion( record ) {
+export function getMotionCompanion( record?: AttachmentRecord | null ): {
+	src: string;
+	poster: string;
+	width?: number;
+	height?: number;
+} | null {
 	const details = record?.media_details;
 	if ( ! details?.animated_video || ! record?.source_url ) {
 		return null;
@@ -84,10 +109,12 @@ export function getMotionCompanion( record ) {
  * what tells them apart: a GIF stays a GIF, while a sequence was replaced by a
  * still frame in whatever format the editor produced.
  *
- * @param {Object} record Resolved attachment record.
- * @return {boolean} Whether the record describes a converted image sequence.
+ * @param record Resolved attachment record.
+ * @return Whether the record describes a converted image sequence.
  */
-export function isConvertedImageSequence( record ) {
+export function isConvertedImageSequence(
+	record?: AttachmentRecord | null
+): boolean {
 	return (
 		!! record?.media_details?.animated_video &&
 		record?.mime_type !== 'image/gif'
