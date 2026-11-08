@@ -49,7 +49,7 @@
 	}
 
 	&[aria-expanded="true"],
-	&:hover:not(:disabled, [aria-disabled="true"]) {
+	&:hover:not(:disabled, [aria-disabled="true"], [role^="menuitem"], [role="option"]) {
 		color: $components-color-accent;
 	}
 

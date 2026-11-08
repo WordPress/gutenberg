@@ -1,0 +1,87 @@
+name: Check new e2e tests on trunk
+
+# A bug fix needs at least one new or changed e2e test that fails without the
+# fix. This runs those tests against trunk's code and warns when none fail.
+on:
+    pull_request:
+        types: [opened, reopened, synchronize, labeled, unlabeled]
+        paths:
+            - 'test/e2e/specs/**'
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    label:
+        name: Check for the bug label
+        runs-on: 'ubuntu-slim'
+        # Other labels change nothing here.
+        if: ${{ ! contains( fromJSON( '["labeled", "unlabeled"]' ), github.event.action ) || github.event.label.name == '[Type] Bug' }}
+        permissions:
+            pull-requests: read
+        timeout-minutes: 5
+        outputs:
+            bug: ${{ steps.check.outputs.bug }}
+        steps:
+            # Read the labels now rather than from the event payload, which a
+            # re-run of an older run would still use.
+            - id: check
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PR_NUMBER: ${{ github.event.number }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  if gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" --jq '.[].name' | grep -qxF '[Type] Bug'; then
+                    echo "bug=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+    e2e-on-trunk:
+        name: Run new e2e tests on trunk
+        needs: label
+        if: ${{ needs.label.outputs.bug == 'true' }}
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        permissions:
+            contents: read
+        timeout-minutes: 45
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.event.number }}
+            cancel-in-progress: true
+
+        steps:
+            # The merge commit's first parent is trunk.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  fetch-depth: 2
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # Keeps all test-only code and this workflow's script from the pull
+            # request, so a test that needs a new helper or test plugin still runs.
+            - name: Use trunk's code with the pull request's tests
+              run: |
+                  git checkout HEAD^1
+                  git checkout "$GITHUB_SHA" -- test/e2e packages/e2e-test-utils-playwright packages/e2e-tests .github/workflows/scripts/e2e-trunk-check.js
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build
+
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Check the new tests on trunk
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/results.json
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- node .github/workflows/scripts/e2e-trunk-check.js "$GITHUB_SHA"

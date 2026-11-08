@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 test.use( {
 	postEditorTemplateMode: async (
@@ -81,8 +82,9 @@ test.describe( 'Post Editor Template mode', () => {
 		const previewPage = await editor.openPreviewPage();
 
 		await expect(
-			previewPage.locator(
-				'text="Just a random paragraph added to the template"'
+			previewPage.getByText(
+				'Just a random paragraph added to the template',
+				{ exact: true }
 			)
 		).toBeVisible();
 	} );
@@ -99,24 +101,29 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
 		// Change to a custom template, save and reload.
-		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
-		await page.getByRole( 'option', { name: 'Custom' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
+		await page
+			.getByRole( 'option', { name: 'Custom', exact: true } )
+			.click();
+		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.getByRole( 'button', { name: 'Template options' } )
-		).toHaveText( 'Custom' );
+			page.getByRole( 'button', { name: 'Edit Template' } )
+		).toHaveAccessibleDescription( 'Custom' );
 		await editor.saveDraft();
 		await page.reload();
 		await expect(
-			page.getByRole( 'button', { name: 'Template options' } )
-		).toHaveText( 'Custom' );
+			page.getByRole( 'button', { name: 'Edit Template' } )
+		).toHaveAccessibleDescription( 'Custom' );
 		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Use default template' } )
+			.getByRole( 'option', { name: 'Single Entries', exact: true } )
 			.click();
+		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.getByRole( 'button', { name: 'Template options' } )
-		).toHaveText( 'Single Entries' );
+			page.getByRole( 'button', { name: 'Edit Template' } )
+		).toHaveAccessibleDescription( 'Single Entries' );
 	} );
 
 	test( 'Allow creating custom block templates in classic themes', async ( {
@@ -145,8 +152,9 @@ test.describe( 'Post Editor Template mode', () => {
 		const previewPage = await editor.openPreviewPage();
 
 		await expect(
-			previewPage.locator(
-				'text="Just a random paragraph added to the template"'
+			previewPage.getByText(
+				'Just a random paragraph added to the template',
+				{ exact: true }
 			)
 		).toBeVisible();
 	} );
@@ -160,12 +168,12 @@ class PostEditorTemplateMode {
 		this.pageUtils = pageUtils;
 		this.requestUtils = requestUtils;
 
-		this.editorSettingsSidebar = this.page.locator(
-			'role=region[name="Editor settings"i]'
-		);
-		this.editorTopBar = this.page.locator(
-			'role=region[name="Editor top bar"i]'
-		);
+		this.editorSettingsSidebar = this.page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		this.editorTopBar = this.page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
 	}
 
 	async disableTemplateWelcomeGuide() {
@@ -176,30 +184,32 @@ class PostEditorTemplateMode {
 	}
 
 	async openTemplatePopover() {
-		await this.editor.openDocumentSettingsSidebar();
+		await openPostSummary( { editor: this.editor, page: this.page } );
 
-		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
 		await this.editorSettingsSidebar
-			.getByRole( 'button', {
-				name: 'Template options',
-			} )
+			.getByRole( 'button', { name: 'Edit Template' } )
 			.click();
 	}
 
 	async switchToTemplateMode() {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.openTemplatePopover();
-		await this.page
-			.getByRole( 'menuitem', {
-				name: 'Edit template',
-			} )
+		await openPostSummary( { editor: this.editor, page: this.page } );
+		await this.editorSettingsSidebar
+			.getByRole( 'button', { name: 'Template: Single Entries' } )
+			.click();
+		await this.editorSettingsSidebar
+			.getByRole( 'button', { name: 'Edit', exact: true } )
 			.click();
 
 		// Check that we switched properly to edit mode.
-		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Editing template. Changes made here affect all posts and pages that use the template.'
-		);
+		await expect(
+			this.page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.getByText(
+					'Editing template. Changes made here affect all posts and pages that use the template.'
+				)
+		).toBeVisible();
 
 		const title = this.editorTopBar.getByRole( 'heading', {
 			name: 'Single Entries',
@@ -229,28 +239,28 @@ class PostEditorTemplateMode {
 	async createNewTemplate( templateName ) {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.openTemplatePopover();
-
-		const newTemplateButton = this.page.locator(
-			'role=button[name="Add template"i]'
-		);
-		await newTemplateButton.click();
+		await openPostSummary( { editor: this.editor, page: this.page } );
+		await this.editorSettingsSidebar
+			.getByRole( 'button', { name: 'Template', exact: true } )
+			.click();
+		await this.editorSettingsSidebar
+			.getByRole( 'button', { name: 'Create block template' } )
+			.click();
 
 		// Fill the template title and submit.
-		const newTemplateDialog = this.page.locator(
-			'role=dialog[name="Create custom template"i]'
-		);
-		const templateNameInput = newTemplateDialog.locator(
-			'role=textbox[name="Name"i]'
-		);
-		await templateNameInput.fill( templateName );
+		await this.page
+			.getByRole( 'dialog', { name: 'Create custom template' } )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( templateName );
 		await this.page.keyboard.press( 'Enter' );
 
 		// Check that we switched properly to edit mode.
 		await expect(
-			this.page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Custom template created. You\'re in template mode now.'
-			)
+			this.page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.getByText(
+					"Custom template created. You're in template mode now."
+				)
 		).toBeVisible();
 
 		// Wait for the editor to be fully loaded and ready before making changes.

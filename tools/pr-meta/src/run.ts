@@ -96,10 +96,16 @@ async function run() {
 	 * a pull request targets, so a caller can reach a branch whose own writers
 	 * are older than this and would re-cut the section on their next write.
 	 */
-	const requireBase = getInput( 'require-base' );
-	if ( requireBase && pullRequest.baseRef !== requireBase ) {
+	const requireBaseContains = getInput( 'require-base-contains' );
+	if (
+		requireBaseContains &&
+		! ( await api.branchContains(
+			pullRequest.baseRef,
+			requireBaseContains
+		) )
+	) {
 		info(
-			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, not ${ requireBase }.`
+			`Skipped the "${ section }" section: ${ pullRequest.baseRef } does not contain ${ requireBaseContains }.`
 		);
 		return;
 	}

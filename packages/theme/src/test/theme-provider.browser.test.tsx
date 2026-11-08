@@ -6,7 +6,6 @@ import { ThemeProvider } from '../theme-provider';
 import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 import styles from '../style.module.css';
 // Browser Mode verifies the generated design-token stylesheet itself.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../prebuilt/css/design-tokens.css';
 
 // The "strong" brand background resolves to the `color.primary` seed itself, and
@@ -114,7 +113,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not report warnings for accessible active fill pairs', async () => {
+	it( 'reports low-contrast highlights even when their text is accessible', async () => {
 		const onColorWarnings =
 			vi.fn<
 				( warnings: readonly ThemeProviderColorWarning[] ) => void
@@ -129,7 +128,20 @@ describe( 'ThemeProvider', () => {
 			/>
 		);
 
-		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
+		expect( onColorWarnings ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				{
+					type: 'contrast',
+					backgroundToken: 'background.surface.neutral-strong',
+					backgroundColor: '#563b79',
+					foregroundToken:
+						'background.interactive.brand-strong-active',
+					foregroundColor: '#6e8f26',
+					requiredContrast: 3,
+					achievedContrast: expect.closeTo( 2.4462, 4 ),
+				},
+			] )
+		);
 
 		onColorWarnings.mockClear();
 		await rerender(

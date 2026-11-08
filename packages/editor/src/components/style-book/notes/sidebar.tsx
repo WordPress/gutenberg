@@ -8,7 +8,7 @@ import { NoteThread } from '../../collab-sidebar/note-thread';
 import { NoteCard } from '../../collab-sidebar/note-card';
 import { NoteForm } from '../../collab-sidebar/note-form';
 import { useNoteActions } from '../../collab-sidebar/hooks';
-import { focusNoteThread } from '../../collab-sidebar/utils';
+import { focusNoteThread } from '../../collab-sidebar/utils/dom';
 import { NOTE_ANCHOR_META, UNKNOWN_ANCHOR, getThreadAnchor } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 import { useStyleBookNotesContext } from './context';
@@ -351,9 +351,13 @@ export function StyleBookNotesPanel( {
 								<NoteThread
 									note={ thread }
 									anchorLabel={ group.label }
-									onAddReply={ onCreate }
-									onDeleteNote={ handleDelete }
-									onEditNote={ onEditNote }
+									// Notes live on the global styles post, not the
+									// edited one. `handleDelete` moves focus itself.
+									actions={ {
+										onCreate,
+										onEdit: onEditNote,
+										onDelete: handleDelete,
+									} }
 									onSelect={ () =>
 										setActiveAnchor( group.anchor )
 									}

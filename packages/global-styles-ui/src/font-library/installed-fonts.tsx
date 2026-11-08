@@ -1,3 +1,4 @@
+import { Progress } from '@wordpress/ui';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -9,8 +10,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Notice,
-	ProgressBar,
+	Notice as WCNotice,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
@@ -272,7 +272,14 @@ function InstalledFonts() {
 		<div className="font-library__tabpanel-layout">
 			{ isResolvingLibrary && (
 				<div className="font-library__loading">
-					<ProgressBar />
+					<Progress.Root
+						value={ null }
+						aria-label={ __( 'Loading fonts' ) }
+					>
+						<Progress.Track>
+							<Progress.Indicator />
+						</Progress.Track>
+					</Progress.Root>
 				</div>
 			) }
 			{ ! isResolvingLibrary && (
@@ -285,12 +292,12 @@ function InstalledFonts() {
 						<Navigator.Screen path="/">
 							<VStack spacing="8">
 								{ notice && (
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 								) }
 								{ ! hasFonts && (
 									<WCText as="p">
@@ -432,12 +439,12 @@ function InstalledFonts() {
 							{ notice && (
 								<>
 									<Spacer margin={ 1 } />
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 									<Spacer margin={ 1 } />
 								</>
 							) }
@@ -488,7 +495,16 @@ function InstalledFonts() {
 					</Navigator>
 
 					<HStack justify="flex-end" className="font-library__footer">
-						{ isInstalling && <ProgressBar /> }
+						{ isInstalling && (
+							<Progress.Root
+								value={ null }
+								aria-label={ __( 'Installing fonts' ) }
+							>
+								<Progress.Track>
+									<Progress.Indicator />
+								</Progress.Track>
+							</Progress.Root>
+						) }
 						{ shouldDisplayDeleteButton && (
 							<Button
 								__next40pxDefaultSize

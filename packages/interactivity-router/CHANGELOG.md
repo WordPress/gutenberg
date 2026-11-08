@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+-   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
+## 3.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Load new script modules during client-side navigation without `eval()` or WebAssembly, so the Content Security Policy doesn't need `'unsafe-eval'` or `'wasm-unsafe-eval'`. ([#84056](https://github.com/WordPress/gutenberg/pull/84056))
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.57.0 (2026-10-07)
+
+### New Features
+
+-   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Bug Fixes
+
+-   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
 ## 2.56.0 (2026-09-23)
 
 ## 2.55.0 (2026-09-10)
@@ -68,6 +100,12 @@
 
 ## 2.34.0 (2025-10-29)
 
+## 2.33.4 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.33.0 (2025-10-17)
 
 ## 2.32.0 (2025-10-01)
@@ -119,6 +157,12 @@
 
 ## 2.20.0 (2025-03-13)
 
+## 2.19.2 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.19.0 (2025-02-28)
 
 ### Bug Fixes
@@ -159,6 +203,12 @@
 
 ## 2.9.0 (2024-10-03)
 
+## 2.8.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
@@ -174,6 +224,12 @@
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)
+
+## 2.0.3 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 2.0.0 (2024-05-31)
 
@@ -199,6 +255,12 @@
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.2.0 (2024-02-21)
+
+## 1.1.7 (2026-10-28)
+
+### Bug Fixes
+
+-   Harden client-side navigation.
 
 ## 1.1.0 (2024-02-09)
 

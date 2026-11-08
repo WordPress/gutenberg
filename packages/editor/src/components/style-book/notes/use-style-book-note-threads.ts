@@ -4,7 +4,7 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import {
 	materializeNoteThreads,
 	partitionNoteThreadsByStatus,
-} from '../../collab-sidebar/utils';
+} from '../../collab-sidebar/utils/threads';
 import { countThreadsByAnchor, groupThreadsByAnchor } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 
