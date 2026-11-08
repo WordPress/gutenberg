@@ -7,7 +7,7 @@
  */
 
 /**
- * Tests for the Calendar block render callback.
+ * Tests for the Calendar block.
  *
  * @group blocks
  */
@@ -83,59 +83,6 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
-	 */
-	public function test_normalize_gap_value_converts_spacing_preset_to_custom_property() {
-		$css = gutenberg_block_core_calendar_normalize_gap_value( 'var:preset|spacing|40' );
-
-		$this->assertSame( 'var(--wp--preset--spacing--40)', $css );
-	}
-
-	/**
-	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
-	 */
-	public function test_normalize_gap_value_rejects_unsafe_values() {
-		$css = gutenberg_block_core_calendar_normalize_gap_value( '1px) url(https://example.com)' );
-
-		$this->assertSame( '', $css );
-	}
-
-	/**
-	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
-	 */
-	public function test_normalize_gap_value_rejects_semicolon_delimited_declarations() {
-		$css = gutenberg_block_core_calendar_normalize_gap_value( '1px;color:red' );
-
-		$this->assertSame( '', $css );
-	}
-
-	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
-	 */
-	public function test_get_block_gap_css_returns_instance_value() {
-		$css = gutenberg_block_core_calendar_get_block_gap_css(
-			array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => '2rem',
-					),
-				),
-			)
-		);
-
-		$this->assertSame( '2rem', $css );
-	}
-
-	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
-	 */
-	public function test_get_block_gap_css_returns_empty_without_instance_value() {
-		$css = gutenberg_block_core_calendar_get_block_gap_css( array() );
-
-		$this->assertSame( '', $css );
-	}
-
-	/**
 	 * @covers ::gutenberg_block_core_calendar_merge_style_attribute
 	 */
 	public function test_merge_style_attribute_keeps_existing_declarations() {
@@ -144,34 +91,91 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 		gutenberg_block_core_calendar_merge_style_attribute( $processor, 'color:#111111' );
 
 		$this->assertSame(
-			'<table style="display:table;color:#111111">',
+			'<table style="display:table;color:#111111;">',
 			$processor->get_updated_html()
 		);
 	}
 
 	/**
 	 * @covers ::gutenberg_render_block_core_calendar
+	 *
+	 * @dataProvider data_color_classes_and_styles
+	 *
+	 * @param array       $attributes     Block attributes.
+	 * @param string      $expected_class Expected table class attribute.
+	 * @param string|null $expected_style Expected table style attribute.
 	 */
-	public function test_render_applies_text_color_to_table_without_dropping_existing_styles() {
-		$html = gutenberg_render_block_core_calendar(
-			array(
-				'style' => array(
-					'color' => array(
-						'text' => '#111111',
-					),
-				),
-			)
-		);
+	public function test_applies_color_classes_and_styles_to_table( $attributes, $expected_class, $expected_style ) {
+		$html = gutenberg_render_block_core_calendar( $attributes );
 
 		$processor = new WP_HTML_Tag_Processor( $html );
-		$processor->next_tag( 'TABLE' );
-		$style = (string) $processor->get_attribute( 'style' );
 
-		$this->assertStringContainsString( 'display:table', $style );
-		$this->assertStringContainsString( 'color:#111111', $style );
+		$this->assertTrue( $processor->next_tag( 'TABLE' ) );
+		$this->assertSame( $expected_class, $processor->get_attribute( 'class' ) );
+		$this->assertSame( $expected_style, $processor->get_attribute( 'style' ) );
 	}
 
 	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_color_classes_and_styles() {
+		return array(
+			'preset colors'           => array(
+				'attributes'     => array(
+					'textColor'       => 'contrast',
+					'backgroundColor' => 'base',
+				),
+				'expected_class' => 'wp-calendar-table has-text-color has-contrast-color has-background has-base-background-color',
+				'expected_style' => 'display:table',
+			),
+			'custom colors'           => array(
+				'attributes'     => array(
+					'style' => array(
+						'color' => array(
+							'text'       => '#123456',
+							'background' => '#abcdef',
+						),
+					),
+				),
+				'expected_class' => 'wp-calendar-table has-text-color has-background',
+				'expected_style' => 'display:table;color:#123456;background-color:#abcdef;',
+			),
+			'link color'              => array(
+				'attributes'     => array(
+					'textColor' => 'contrast',
+					'style'     => array(
+						'elements' => array(
+							'link' => array(
+								'color' => array(
+									'text' => '#ff0000',
+								),
+							),
+						),
+					),
+				),
+				'expected_class' => 'wp-calendar-table has-text-color has-contrast-color has-link-color',
+				'expected_style' => 'display:table',
+			),
+			'gradient is not applied' => array(
+				'attributes'     => array(
+					'gradient' => 'vivid-cyan-blue-to-vivid-purple',
+					'style'    => array(
+						'color' => array(
+							'gradient' => 'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)',
+						),
+					),
+				),
+				'expected_class' => 'wp-calendar-table',
+				'expected_style' => 'display:table',
+			),
+		);
+	}
+
+	/**
+	 * Background stays on the table so nav links are not painted (#42029).
+	 *
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
 	public function test_render_applies_background_to_table_not_wrapper() {
@@ -190,10 +194,22 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'has-background', (string) $processor->get_attribute( 'class' ) );
 
 		$processor->next_tag( 'TABLE' );
-		$this->assertStringContainsString( 'background-color:#eeeeee', (string) $processor->get_attribute( 'style' ) );
+		$this->assertSame(
+			array(
+				'background-color' => '#eeeeee',
+				'display'          => 'table',
+			),
+			$this->parse_style_attribute( $processor->get_attribute( 'style' ) )
+		);
+		$this->assertContains(
+			'has-background',
+			preg_split( '/\s+/', (string) $processor->get_attribute( 'class' ), -1, PREG_SPLIT_NO_EMPTY )
+		);
 	}
 
 	/**
+	 * Flat borders go on the table; cells inherit via style.scss.
+	 *
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
 	public function test_render_applies_custom_borders_to_table_only() {
@@ -211,20 +227,115 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
 		$processor = new WP_HTML_Tag_Processor( $html );
 		$processor->next_tag( 'TABLE' );
-		$table_style = (string) $processor->get_attribute( 'style' );
 
-		$this->assertStringContainsString( '3px', $table_style );
-		$this->assertStringContainsString( 'border', $table_style );
+		$this->assertSame(
+			array(
+				'border-color' => '#111111',
+				'border-style' => 'dashed',
+				'border-width' => '3px',
+				'display'      => 'table',
+			),
+			$this->parse_style_attribute( $processor->get_attribute( 'style' ) )
+		);
+		$this->assertSame(
+			array( 'wp-calendar-table', 'has-border-color' ),
+			preg_split( '/\s+/', (string) $processor->get_attribute( 'class' ), -1, PREG_SPLIT_NO_EMPTY )
+		);
 
 		while ( $processor->next_tag( 'TD' ) ) {
-			$this->assertSame( '', (string) $processor->get_attribute( 'style' ) );
+			$this->assertNull( $processor->get_attribute( 'style' ) );
+			$this->assertNull( $processor->get_attribute( 'class' ) );
 		}
 	}
 
 	/**
+	 * Preset borderColor must add has-border-color so SCSS inheritance fires.
+	 *
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
-	public function test_render_applies_per_side_borders_to_table_only() {
+	public function test_render_applies_border_color_preset_and_has_border_color_class() {
+		$html = gutenberg_render_block_core_calendar(
+			array(
+				'borderColor' => 'contrast',
+				'style'       => array(
+					'border' => array(
+						'width' => '2px',
+						'style' => 'solid',
+					),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+		$classes = preg_split( '/\s+/', (string) $processor->get_attribute( 'class' ), -1, PREG_SPLIT_NO_EMPTY );
+
+		$this->assertContains( 'wp-calendar-table', $classes );
+		$this->assertContains( 'has-border-color', $classes );
+		$this->assertContains( 'has-contrast-border-color', $classes );
+		$this->assertSame(
+			array(
+				'border-style' => 'solid',
+				'border-width' => '2px',
+				'display'      => 'table',
+			),
+			$this->parse_style_attribute( $processor->get_attribute( 'style' ) )
+		);
+	}
+
+	/**
+	 * Linked identical per-side borders flatten onto the table for cell inheritance.
+	 *
+	 * @covers ::gutenberg_render_block_core_calendar
+	 * @covers ::gutenberg_block_core_calendar_normalize_border_attributes
+	 */
+	public function test_render_flattens_uniform_per_side_borders_onto_table() {
+		$side = array(
+			'width' => '2px',
+			'color' => '#111111',
+			'style' => 'solid',
+		);
+		$html = gutenberg_render_block_core_calendar(
+			array(
+				'style' => array(
+					'border' => array(
+						'top'    => $side,
+						'right'  => $side,
+						'bottom' => $side,
+						'left'   => $side,
+					),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+
+		$this->assertSame(
+			array(
+				'border-color' => '#111111',
+				'border-style' => 'solid',
+				'border-width' => '2px',
+				'display'      => 'table',
+			),
+			$this->parse_style_attribute( $processor->get_attribute( 'style' ) )
+		);
+		$this->assertContains(
+			'has-border-color',
+			preg_split( '/\s+/', (string) $processor->get_attribute( 'class' ), -1, PREG_SPLIT_NO_EMPTY )
+		);
+
+		while ( $processor->next_tag( 'TD' ) ) {
+			$this->assertNull( $processor->get_attribute( 'style' ) );
+		}
+	}
+
+	/**
+	 * Mixed per-side borders stay on the table for edge SCSS; cells stay clean.
+	 *
+	 * @covers ::gutenberg_render_block_core_calendar
+	 */
+	public function test_render_keeps_mixed_per_side_borders_on_table_only() {
 		$html = gutenberg_render_block_core_calendar(
 			array(
 				'style' => array(
@@ -241,46 +352,80 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
 		$processor = new WP_HTML_Tag_Processor( $html );
 		$processor->next_tag( 'TABLE' );
-		$table_style = (string) $processor->get_attribute( 'style' );
 
-		$this->assertStringContainsString( 'border', $table_style );
+		$this->assertSame(
+			array(
+				'border-top-color' => '#111111',
+				'border-top-style' => 'solid',
+				'border-top-width' => '2px',
+				'display'          => 'table',
+			),
+			$this->parse_style_attribute( $processor->get_attribute( 'style' ) )
+		);
 
 		while ( $processor->next_tag( 'TD' ) ) {
-			$this->assertSame( '', (string) $processor->get_attribute( 'style' ) );
+			$this->assertNull( $processor->get_attribute( 'style' ) );
+		}
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+		while ( $processor->next_tag( 'TH' ) ) {
+			$this->assertNull( $processor->get_attribute( 'style' ) );
 		}
 	}
 
 	/**
-	 * @covers ::gutenberg_render_block_core_calendar
+	 * Parses a style attribute into a property => value map.
+	 *
+	 * @param string|null $style Style attribute.
+	 * @return array<string, string>
 	 */
-	public function test_render_applies_block_spacing_to_caption() {
-		$html = gutenberg_render_block_core_calendar(
-			array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => '2rem',
-					),
-				),
-			)
-		);
-
-		$processor = new WP_HTML_Tag_Processor( $html );
-		$processor->next_tag( 'CAPTION' );
-
-		$this->assertStringContainsString(
-			'margin-bottom:2rem',
-			(string) $processor->get_attribute( 'style' )
-		);
+	private function parse_style_attribute( $style ) {
+		$declarations = array();
+		foreach ( explode( ';', (string) $style ) as $part ) {
+			$part = trim( $part );
+			if ( '' === $part || ! str_contains( $part, ':' ) ) {
+				continue;
+			}
+			list( $property, $value ) = array_map( 'trim', explode( ':', $part, 2 ) );
+			$declarations[ $property ] = $value;
+		}
+		ksort( $declarations );
+		return $declarations;
 	}
 
 	/**
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
-	public function test_render_does_not_insert_spacer_when_calendar_markup_is_empty() {
+	public function test_render_does_not_fail_when_calendar_markup_is_empty() {
 		$this->calendar_markup = '';
 		$html                  = gutenberg_render_block_core_calendar( array() );
 
-		$this->assertStringNotContainsString( '&nbsp;', $html );
 		$this->assertStringContainsString( 'wp-block-calendar', $html );
+		$this->assertStringNotContainsString( '<table', $html );
+	}
+
+	/**
+	 * Default / colored calendars must not invent border markup (trunk compat).
+	 *
+	 * @covers ::gutenberg_render_block_core_calendar
+	 */
+	public function test_render_without_border_support_values_matches_color_only_output() {
+		$html = gutenberg_render_block_core_calendar(
+			array(
+				'textColor'       => 'contrast',
+				'backgroundColor' => 'base',
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+
+		$this->assertSame(
+			'wp-calendar-table has-text-color has-contrast-color has-background has-base-background-color',
+			$processor->get_attribute( 'class' )
+		);
+		$this->assertSame( 'display:table', $processor->get_attribute( 'style' ) );
+		$this->assertStringNotContainsString( 'has-border-color', (string) $processor->get_attribute( 'class' ) );
+		$this->assertStringNotContainsString( 'border-', (string) $processor->get_attribute( 'style' ) );
 	}
 }

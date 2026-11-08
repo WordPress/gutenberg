@@ -43,80 +43,38 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Text and background are skip-serialized onto the table (#42029).
-	$style_attributes = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
-		? $attributes['style']
-		: array();
-
-	$color_block_styles = array();
-
-	$color_styles = ( isset( $style_attributes['color'] ) && is_array( $style_attributes['color'] ) )
-		? $style_attributes['color']
-		: array();
-
-	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
-	$custom_text_color          = $color_styles['text'] ?? null;
-	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
-
-	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes )
-		? "var:preset|color|{$attributes['backgroundColor']}"
-		: null;
-	$custom_background_color          = $color_styles['background'] ?? null;
-	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
-
-	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$inline_styles = $styles['css'] ?? '';
-	$classnames    = empty( $styles['classnames'] ) ? array() : explode( ' ', $styles['classnames'] );
-	$elements      = ( isset( $style_attributes['elements'] ) && is_array( $style_attributes['elements'] ) )
-		? $style_attributes['elements']
-		: array();
-	if ( isset( $elements['link']['color']['text'] ) ) {
-		$classnames[] = 'has-link-color';
+	/*
+	 * Text, background, and border are skip-serialized onto the table (#42029).
+	 * Cell borders inherit from the table via style.scss (same pattern as Table).
+	 */
+	$color_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor' ) ) );
+	foreach ( array( 'text', 'background' ) as $feature ) {
+		if ( isset( $attributes['style']['color'][ $feature ] ) ) {
+			$color_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
+		}
 	}
 
-	$border_block_styles = ( isset( $style_attributes['border'] ) && is_array( $style_attributes['border'] ) )
-		? $style_attributes['border']
-		: array();
+	$color_styles  = wp_get_color_classes_and_styles( $color_attributes );
+	$border_styles = wp_get_border_classes_and_styles(
+		block_core_calendar_normalize_border_attributes( $attributes )
+	);
 
-	if ( isset( $attributes['borderColor'] ) ) {
-		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
+	$table_styles  = ( $color_styles['style'] ?? '' ) . ( $border_styles['style'] ?? '' );
+	$table_classes = trim( ( $color_styles['class'] ?? '' ) . ' ' . ( $border_styles['class'] ?? '' ) );
+
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$table_classes .= ' has-link-color';
 	}
 
-	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$border_styles  = $border_engine['css'] ?? '';
-	$border_classes = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
-	$block_gap_css  = block_core_calendar_get_block_gap_css( $attributes );
-
-	$calendar = get_calendar( true, false );
-
-	if ( empty( $calendar ) ) {
-		$calendar = '';
-	}
-
+	$calendar  = get_calendar( array( 'display' => false ) );
+	$calendar  = is_string( $calendar ) ? $calendar : '';
 	$processor = new WP_HTML_Tag_Processor( $calendar );
 
-	while ( $processor->next_tag() ) {
-		$tag_name = $processor->get_tag();
+	if ( $processor->next_tag( 'TABLE' ) ) {
+		block_core_calendar_merge_style_attribute( $processor, $table_styles );
 
-		if ( 'TABLE' === $tag_name ) {
-			block_core_calendar_merge_style_attribute( $processor, $inline_styles );
-			block_core_calendar_merge_style_attribute( $processor, $border_styles );
-
-			foreach ( $classnames as $classname ) {
-				if ( ! empty( $classname ) ) {
-					$processor->add_class( $classname );
-				}
-			}
-
-			foreach ( $border_classes as $border_class ) {
-				if ( ! empty( $border_class ) ) {
-					$processor->add_class( $border_class );
-				}
-			}
-		}
-
-		if ( 'CAPTION' === $tag_name && '' !== $block_gap_css ) {
-			block_core_calendar_merge_style_attribute( $processor, 'margin-bottom:' . $block_gap_css );
+		foreach ( preg_split( '/\s+/', $table_classes, -1, PREG_SPLIT_NO_EMPTY ) as $classname ) {
+			$processor->add_class( $classname );
 		}
 	}
 
@@ -152,6 +110,71 @@ function register_block_core_calendar() {
 add_action( 'init', 'register_block_core_calendar' );
 
 /**
+ * Normalizes border attributes for application on the calendar table.
+ *
+ * Linked "all sides" selections are often stored as four identical per-side
+ * objects. Flatten those so table inheritance paints a full cell grid. Mixed
+ * per-side borders are left as-is for the edge SCSS selectors.
+ *
+ * @since 7.1.0
+ *
+ * @param array $attributes Block attributes.
+ * @return array Attributes with a normalized border value.
+ */
+function block_core_calendar_normalize_border_attributes( $attributes ) {
+	$border = $attributes['style']['border'] ?? null;
+	if ( ! is_array( $border ) ) {
+		return $attributes;
+	}
+
+	// Already a flat / all-sides border.
+	if ( isset( $border['width'] ) || isset( $border['color'] ) || isset( $border['style'] ) ) {
+		return $attributes;
+	}
+
+	$sides  = array( 'top', 'right', 'bottom', 'left' );
+	$shared = null;
+
+	foreach ( $sides as $side ) {
+		if ( empty( $border[ $side ] ) || ! is_array( $border[ $side ] ) ) {
+			return $attributes;
+		}
+
+		$current = array(
+			'width' => $border[ $side ]['width'] ?? null,
+			'color' => $border[ $side ]['color'] ?? null,
+			'style' => $border[ $side ]['style'] ?? null,
+		);
+
+		if ( null === $shared ) {
+			$shared = $current;
+			continue;
+		}
+
+		foreach ( array( 'width', 'color', 'style' ) as $property ) {
+			if ( ( $shared[ $property ] ?? null ) !== ( $current[ $property ] ?? null ) ) {
+				return $attributes;
+			}
+		}
+	}
+
+	$flat_border = array_filter(
+		$shared,
+		static function ( $value ) {
+			return null !== $value && '' !== $value;
+		}
+	);
+
+	if ( array() === $flat_border ) {
+		return $attributes;
+	}
+
+	$attributes['style']['border'] = $flat_border;
+
+	return $attributes;
+}
+
+/**
  * Merges CSS declarations into a tag's existing style attribute.
  *
  * @since 7.1.0
@@ -164,88 +187,17 @@ function block_core_calendar_merge_style_attribute( $processor, $additional_css 
 		return;
 	}
 
-	$current_style  = $processor->get_attribute( 'style' ) ?? '';
-	$combined_style = trim( (string) $current_style, ';' );
+	$current_style = $processor->get_attribute( 'style' ) ?? '';
+	$parts         = array_filter(
+		array_map(
+			static function ( $part ) {
+				return trim( $part, " \t;" );
+			},
+			explode( ';', (string) $current_style . ';' . $additional_css )
+		)
+	);
 
-	if ( '' !== $combined_style ) {
-		$combined_style .= ';';
-	}
-
-	$processor->set_attribute( 'style', $combined_style . trim( $additional_css, ';' ) );
-}
-
-/**
- * Returns the instance blockGap value for caption spacing.
- *
- * Only per-block instance values are supported. Global Styles blockGap is not
- * resolved in the render callback because the Calendar block does not have
- * layout support.
- *
- * @since 7.1.0
- *
- * @param array $attributes Block attributes.
- * @return string CSS gap value, or an empty string when unset.
- */
-function block_core_calendar_get_block_gap_css( $attributes ) {
-	$style_attr = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
-		? $attributes['style']
-		: array();
-
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/calendar' );
-	}
-
-	$spacing = ( isset( $style_attr['spacing'] ) && is_array( $style_attr['spacing'] ) )
-		? $style_attr['spacing']
-		: array();
-
-	if ( ! array_key_exists( 'blockGap', $spacing ) ) {
-		return '';
-	}
-
-	return block_core_calendar_normalize_gap_value( $spacing['blockGap'] );
-}
-
-/**
- * Normalizes a blockGap value to a CSS-ready string.
- *
- * @since 7.1.0
- *
- * @param mixed $gap Block gap value.
- * @return string CSS gap value, or an empty string when unset or unsafe.
- */
-function block_core_calendar_normalize_gap_value( $gap ) {
-	if ( is_array( $gap ) ) {
-		$gap = $gap['top'] ?? $gap['left'] ?? '';
-	}
-
-	// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-	$gap = is_string( $gap ) ? $gap : '';
-
-	if ( '' === $gap ) {
-		return '';
-	}
-
-	// Skip if gap value contains unsupported characters.
-	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-	// because we only want to match against the value, not the CSS attribute.
-	$gap = $gap && preg_match( '%[;\\\(&=}]|/\*%', $gap ) ? '' : $gap;
-
-	if ( '' === $gap ) {
-		return '';
-	}
-
-	if ( str_contains( $gap, 'var:preset|spacing|' ) ) {
-		$index_to_splice = strrpos( $gap, '|' ) + 1;
-		$slug            = _wp_to_kebab_case( substr( $gap, $index_to_splice ) );
-		return "var(--wp--preset--spacing--$slug)";
-	}
-
-	return $gap;
+	$processor->set_attribute( 'style', implode( ';', $parts ) . ';' );
 }
 
 /**

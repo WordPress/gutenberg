@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
 
 .wp-block-calendar {
 	text-align: center;
@@ -7,7 +6,6 @@
 	th,
 	td {
 		padding: 0.25em;
-		border: $border-width solid;
 	}
 
 	th {
@@ -16,6 +14,8 @@
 
 	caption {
 		background-color: inherit;
+		// Month/year title must not pick up table border inheritance.
+		border: none;
 	}
 
 	table {
@@ -23,7 +23,7 @@
 		border-collapse: collapse;
 
 		&.has-background th {
-			background-color: transparent;
+			background-color: inherit;
 		}
 
 		&.has-text-color th {
@@ -31,19 +31,44 @@
 		}
 	}
 
-	// Default text color only. Do not pin border-color here: Global Styles
-	// text color targets the table and does not add `has-text-color`, so a
-	// `$gray-300` border would stay grey instead of following the text.
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
 	}
 
+	/*
+	 * Defaults: keep `.wp-block-calendar` outside `:where()` so specificity
+	 * stays (0,1,0) — beats bare theme `td`/`th` resets (trunk BC), while
+	 * still allowing later Global Styles `:root :where(.wp-block-calendar th/td)`
+	 * to win. Split from the `border` shorthand so it does not set
+	 * `border-color: currentColor` and override the `$gray-300` fallback.
+	 */
+	:where(th),
+	:where(td) {
+		border-width: 1px;
+		border-style: solid;
+	}
+
+	:where(table:not(.has-text-color) th),
+	:where(table:not(.has-text-color) td) {
+		border-color: $gray-300;
+	}
+
+	:where(table.has-text-color:not(.has-border-color) th),
+	:where(table.has-text-color:not(.has-border-color) td) {
+		border-color: currentColor;
+	}
+}
+
+.wp-block-calendar {
 	// Border Styles
 	//
-	// Allow any custom border color, style or width selections to be inherited
-	// from the table element that receives the border support props.
+	// Instance borders are applied on the table; th/td inherit color,
+	// style, and width. Do not inherit onto `caption` (month/year title).
+	// Per-side outer edges use the edge map below.
+	// Global Styles target the cells via block.json selectors.
 	table.has-border-color {
-		> *,
+		thead,
+		tbody,
 		tr,
 		th,
 		td {
@@ -51,52 +76,9 @@
 		}
 	}
 
-	table[style*="border-top-color"] {
-		> thead,
-		> thead > tr:first-child,
-		> thead > tr:first-child > * {
-			border-top-color: inherit;
-		}
-	}
-
-	table[style*="border-right-color"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :last-child,
-		> tbody > tr > :last-child,
-		> tfoot > tr > :last-child {
-			border-right-color: inherit;
-		}
-	}
-
-	table[style*="border-bottom-color"] {
-		> tbody:last-child,
-		> tbody:last-child > tr:last-child,
-		> tbody:last-child > tr:last-child > * {
-			border-bottom-color: inherit;
-		}
-	}
-
-	table[style*="border-left-color"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :first-child,
-		> tbody > tr > :first-child,
-		> tfoot > tr > :first-child {
-			border-left-color: inherit;
-		}
-	}
-
 	table[style*="border-style"] {
-		> *,
+		thead,
+		tbody,
 		tr,
 		th,
 		td {
@@ -104,52 +86,9 @@
 		}
 	}
 
-	table[style*="border-top-style"] {
-		> thead,
-		> thead > tr:first-child,
-		> thead > tr:first-child > * {
-			border-top-style: inherit;
-		}
-	}
-
-	table[style*="border-right-style"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :last-child,
-		> tbody > tr > :last-child,
-		> tfoot > tr > :last-child {
-			border-right-style: inherit;
-		}
-	}
-
-	table[style*="border-bottom-style"] {
-		> tbody:last-child,
-		> tbody:last-child > tr:last-child,
-		> tbody:last-child > tr:last-child > * {
-			border-bottom-style: inherit;
-		}
-	}
-
-	table[style*="border-left-style"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :first-child,
-		> tbody > tr > :first-child,
-		> tfoot > tr > :first-child {
-			border-left-style: inherit;
-		}
-	}
-
 	table[style*="border-width"] {
-		> *,
+		thead,
+		tbody,
 		tr,
 		th,
 		td {
@@ -158,51 +97,37 @@
 		}
 	}
 
-	table[style*="border-top-width"] {
-		> thead,
-		> thead > tr:first-child,
-		> thead > tr:first-child > * {
-			border-top-width: inherit;
-			border-top-style: inherit;
+	table[style*="border-color"] {
+		thead,
+		tbody,
+		tr,
+		th,
+		td {
+			border-color: inherit;
 		}
 	}
 
-	table[style*="border-right-width"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :last-child,
-		> tbody > tr > :last-child,
-		> tfoot > tr > :last-child {
-			border-right-width: inherit;
-			border-right-style: inherit;
-		}
-	}
+	// The calendar table comes from `get_calendar()`, so the markup is fixed:
+	// one thead with a single row, one tbody, no tfoot. Avoid `> *` so the
+	// caption never picks up table edge borders.
+	$calendar-border-edges: (
+		"top": "> thead, > thead > tr, > thead > tr > *",
+		"right": "> thead, > tbody, > thead > tr, > tbody > tr, > thead > tr > :last-child, > tbody > tr > :last-child",
+		"bottom": "> tbody, > tbody > tr:last-child, > tbody > tr:last-child > *",
+		"left": "> thead, > tbody, > thead > tr, > tbody > tr, > thead > tr > :first-child, > tbody > tr > :first-child"
+	);
 
-	table[style*="border-bottom-width"] {
-		> tbody:last-child,
-		> tbody:last-child > tr:last-child,
-		> tbody:last-child > tr:last-child > * {
-			border-bottom-width: inherit;
-			border-bottom-style: inherit;
-		}
-	}
+	@each $edge, $selectors in $calendar-border-edges {
+		@each $property in ("color", "style", "width") {
+			table[style*="border-#{$edge}-#{$property}"] {
+				#{$selectors} {
+					border-#{$edge}-#{$property}: inherit;
 
-	table[style*="border-left-width"] {
-		> thead,
-		> tbody,
-		> tfoot,
-		> thead > tr,
-		> tbody > tr,
-		> tfoot > tr,
-		> thead > tr > :first-child,
-		> tbody > tr > :first-child,
-		> tfoot > tr > :first-child {
-			border-left-width: inherit;
-			border-left-style: inherit;
+					@if $property == "width" {
+						border-#{$edge}-style: inherit;
+					}
+				}
+			}
 		}
 	}
 }

@@ -2016,7 +2016,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Custom Calendar borders from Global Styles target the table element.
+	 * Custom Calendar borders from Global Styles target the table header and data cells.
 	 */
 	public function test_get_stylesheet_calendar_border_targets_table() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -2037,8 +2037,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$this->assertStringContainsString( '.wp-block-calendar table', $stylesheet );
-		$this->assertStringNotContainsString( '.wp-block-calendar td', $stylesheet );
+		$this->assertStringContainsString( '.wp-block-calendar th', $stylesheet );
+		$this->assertStringContainsString( '.wp-block-calendar td', $stylesheet );
 	}
 
 	/**
