@@ -638,7 +638,8 @@ export function autosaves(
 				...state,
 				[ postId ]: [
 					...( state[ postId ] ?? [] ).filter(
-						( autosave ) => ! receivedAuthors.has( authorOf( autosave ) )
+						( autosave ) =>
+							! receivedAuthors.has( authorOf( autosave ) )
 					),
 					...autosavesData,
 				],

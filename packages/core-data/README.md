@@ -414,7 +414,7 @@ _Parameters_
 - _state_ `State`: State tree.
 - _postType_ `string`: The type of the parent post.
 - _postId_ `EntityRecordKey`: The id of the parent post.
-- _authorId_ `EntityRecordKey`: The id of the author.
+- _authorId_ `EntityRecordKey | undefined`: The id of the author.
 
 _Returns_
 
@@ -913,7 +913,7 @@ _Parameters_
 - _state_ `State`: State tree.
 - _postType_ `string`: The type of the parent post.
 - _postId_ `EntityRecordKey`: The id of the parent post.
-- _authorId_ `EntityRecordKey`: The id of the author.
+- _authorId_ `EntityRecordKey | undefined`: The id of the author.
 
 _Returns_
 

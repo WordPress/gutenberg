@@ -1420,7 +1420,7 @@ export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	state: State,
 	postType: string,
 	postId: EntityRecordKey,
-	authorId: EntityRecordKey
+	authorId: EntityRecordKey | undefined
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
@@ -1483,7 +1483,7 @@ export const hasFetchedAutosave = createRegistrySelector(
 			state: State,
 			postType: string,
 			postId: EntityRecordKey,
-			authorId: EntityRecordKey
+			authorId: EntityRecordKey | undefined
 		): boolean => {
 			if ( authorId === undefined ) {
 				return false;

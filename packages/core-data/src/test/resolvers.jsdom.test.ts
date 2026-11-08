@@ -1176,9 +1176,9 @@ describe( 'getAutosave', () => {
 	const postId = 1;
 	const restBase = 'posts';
 
-	const setUp = ( response ) => {
-		triggerFetch.mockReset();
-		triggerFetch.mockImplementation( () => response );
+	const setUp = ( response: unknown ) => {
+		apiFetchMock.mockReset();
+		apiFetchMock.mockImplementation( () => response );
 
 		return {
 			dispatch: Object.assign( vi.fn(), {
@@ -1200,7 +1200,7 @@ describe( 'getAutosave', () => {
 			postType,
 			postId,
 			AUTHOR_ID
-		)( { dispatch, resolveSelect } );
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&author=${ AUTHOR_ID }`,
@@ -1218,7 +1218,7 @@ describe( 'getAutosave', () => {
 			postType,
 			postId,
 			AUTHOR_ID
-		)( { dispatch, resolveSelect } );
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
 	} );
@@ -1230,7 +1230,7 @@ describe( 'getAutosave', () => {
 			postType,
 			postId,
 			undefined
-		)( { dispatch, resolveSelect } );
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
 		expect( resolveSelect.getPostType ).not.toHaveBeenCalled();
@@ -1249,7 +1249,7 @@ describe( 'getAutosave', () => {
 			postType,
 			postId,
 			AUTHOR_ID
-		)( { dispatch, resolveSelect } );
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
 	} );
@@ -1257,7 +1257,10 @@ describe( 'getAutosave', () => {
 	it( 'leaves the getAutosaves resolver behavior unchanged', async () => {
 		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
 
-		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+		await getAutosaves(
+			postType,
+			postId
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,

@@ -1,9 +1,10 @@
-const {
+import type { Browser, BrowserContext, Page } from '@playwright/test';
+import {
 	test,
 	expect,
 	Editor,
 	RequestUtils,
-} = require( '@wordpress/e2e-test-utils-playwright' );
+} from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Second editor, used to prove the request stays scoped to one author.
@@ -21,6 +22,13 @@ const POST_CONTENT = `<!-- wp:paragraph -->
 <p>Autosave loading</p>
 <!-- /wp:paragraph -->`;
 
+// Leaves the date to the server, as a draft created in the editor would.
+const DRAFT_POST = {
+	title: 'Autosave loading',
+	content: POST_CONTENT,
+	status: 'draft',
+} as Parameters< RequestUtils[ 'createPost' ] >[ 0 ];
+
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
 /**
@@ -29,10 +37,10 @@ const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
  * REST requests reach the server either as `/wp-json/<route>` or as
  * `index.php?rest_route=<route>`, depending on the permalink structure.
  *
- * @param {string} url Request URL.
- * @return {string} The REST route.
+ * @param url Request URL.
+ * @return The REST route.
  */
-function getRestRoute( url ) {
+function getRestRoute( url: string ): string {
 	const parsed = new URL( url );
 
 	return parsed.searchParams.get( 'rest_route' ) ?? parsed.pathname;
@@ -41,11 +49,11 @@ function getRestRoute( url ) {
 /**
  * Records every GET to a post's autosaves collection made by a page.
  *
- * @param {import('@playwright/test').Page} page Page to observe.
- * @return {URL[]} Live array, appended to as requests are made.
+ * @param page Page to observe.
+ * @return Live array, appended to as requests are made.
  */
-function trackAutosaveRequests( page ) {
-	const requests = [];
+function trackAutosaveRequests( page: Page ): URL[] {
+	const requests: URL[] = [];
 
 	page.on( 'request', ( request ) => {
 		if (
@@ -62,10 +70,10 @@ function trackAutosaveRequests( page ) {
 /**
  * Waits for the editor to finish resolving autosaves for a post.
  *
- * @param {import('@playwright/test').Page} page   Page to poll.
- * @param {number}                          postId Post being edited.
+ * @param page   Page to poll.
+ * @param postId Post being edited.
  */
-async function waitForAutosaveResolution( page, postId ) {
+async function waitForAutosaveResolution( page: Page, postId: number ) {
 	await page.waitForFunction( () => window?.wp?.data );
 	await expect
 		.poll( () =>
@@ -90,10 +98,10 @@ async function waitForAutosaveResolution( page, postId ) {
  * The preload cache serves each entry once, so a re-resolution is the only way
  * to observe the request the editor makes on a page that was preloaded.
  *
- * @param {import('@playwright/test').Page} page   Page to refetch in.
- * @param {number}                          postId Post being edited.
+ * @param page   Page to refetch in.
+ * @param postId Post being edited.
  */
-async function refetchAutosave( page, postId ) {
+async function refetchAutosave( page: Page, postId: number ) {
 	await page.evaluate( ( id ) => {
 		const { dispatch, resolveSelect, select } = window.wp.data;
 		const authorId = select( 'core' ).getCurrentUser()?.id;
@@ -111,11 +119,14 @@ async function refetchAutosave( page, postId ) {
 /**
  * Logs a user in through the login form in a fresh browser context.
  *
- * @param {import('@playwright/test').Browser} browser Browser to open in.
- * @param {Object}                             user    Credentials.
- * @return {Promise<{page: import('@playwright/test').Page, editor: Editor, context: import('@playwright/test').BrowserContext}>} The session.
+ * @param browser Browser to open in.
+ * @param user    Credentials.
+ * @return The session.
  */
-async function loginAs( browser, user ) {
+async function loginAs(
+	browser: Browser,
+	user: typeof SECOND_USER
+): Promise< { page: Page; editor: Editor; context: BrowserContext } > {
 	// Persist the preferences that suppress the welcome guide before the
 	// editor ever mounts. Dispatching them after load races the guide, which
 	// then swallows clicks on the canvas.
@@ -148,10 +159,10 @@ async function loginAs( browser, user ) {
 /**
  * Navigates an already-authenticated page to the post editor.
  *
- * @param {import('@playwright/test').Page} page   Page to navigate.
- * @param {number}                          postId Post to edit.
+ * @param page   Page to navigate.
+ * @param postId Post to edit.
  */
-async function gotoPostEditor( page, postId ) {
+async function gotoPostEditor( page: Page, postId: number ) {
 	await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
 	await page.waitForFunction( () => window?.wp?.data && window?.wp?.blocks );
 	await expect(
@@ -162,11 +173,11 @@ async function gotoPostEditor( page, postId ) {
 /**
  * Types into the post's first paragraph and triggers a server autosave.
  *
- * @param {import('@playwright/test').Page} page   Page to edit in.
- * @param {Editor}                          editor Editor utils for that page.
- * @param {string}                          text   Text to append.
+ * @param page   Page to edit in.
+ * @param editor Editor utils for that page.
+ * @param text   Text to append.
  */
-async function editAndAutosave( page, editor, text ) {
+async function editAndAutosave( page: Page, editor: Editor, text: string ) {
 	await editor.canvas
 		.getByRole( 'document', { name: 'Block: Paragraph' } )
 		.click();
@@ -197,11 +208,7 @@ test.describe( 'Autosave loading', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const post = await requestUtils.createPost( {
-			title: 'Autosave loading',
-			content: POST_CONTENT,
-			status: 'draft',
-		} );
+		const post = await requestUtils.createPost( DRAFT_POST );
 
 		const requests = trackAutosaveRequests( page );
 
@@ -236,11 +243,7 @@ test.describe( 'Autosave loading', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const post = await requestUtils.createPost( {
-			title: 'Autosave loading',
-			content: POST_CONTENT,
-			status: 'draft',
-		} );
+		const post = await requestUtils.createPost( DRAFT_POST );
 
 		await admin.editPost( post.id );
 		await waitForAutosaveResolution( page, post.id );
@@ -279,11 +282,7 @@ test.describe( 'Autosave loading', () => {
 		browser,
 		requestUtils,
 	} ) => {
-		const post = await requestUtils.createPost( {
-			title: 'Autosave loading',
-			content: POST_CONTENT,
-			status: 'draft',
-		} );
+		const post = await requestUtils.createPost( DRAFT_POST );
 
 		const {
 			page: secondUserPage,

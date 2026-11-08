@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
+import type { Mock } from 'vitest';
 import { store as coreDataStore } from '../index';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
+
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
 
 describe( 'autosaves', () => {
 	const AUTHOR_ID = 7;
@@ -28,24 +32,26 @@ describe( 'autosaves', () => {
 	 * `getEntityRecord` and expects an unparsed response. Everything else is
 	 * served by `getAutosaves`.
 	 *
-	 * @param {Function} getAutosaves Called with the requested path, returns the
-	 *                                autosaves collection to serve.
+	 * @param getAutosaves Called with the requested path, returns the autosaves
+	 *                     collection to serve.
 	 */
-	const mockFetch = ( getAutosaves ) => {
-		triggerFetch.mockImplementation( ( { path, parse } ) => {
-			if ( path.startsWith( '/wp/v2/types' ) ) {
-				if ( parse === false ) {
-					return {
-						json: async () => POST_TYPE,
-						headers: { get: () => '' },
-					};
+	const mockFetch = ( getAutosaves: ( path: string ) => unknown ) => {
+		apiFetchMock.mockImplementation(
+			( { path, parse }: { path: string; parse?: boolean } ) => {
+				if ( path.startsWith( '/wp/v2/types' ) ) {
+					if ( parse === false ) {
+						return {
+							json: async () => POST_TYPE,
+							headers: { get: () => '' },
+						};
+					}
+
+					return POST_TYPE;
 				}
 
-				return POST_TYPE;
+				return getAutosaves( path );
 			}
-
-			return getAutosaves( path );
-		} );
+		);
 	};
 
 	const createTestRegistry = () => {
@@ -55,7 +61,7 @@ describe( 'autosaves', () => {
 	};
 
 	beforeEach( () => {
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	/**
