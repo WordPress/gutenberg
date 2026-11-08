@@ -1,0 +1,32 @@
+{
+	"name": "@wordpress/smart-crop-corpus-tools",
+	"version": "0.0.0",
+	"description": "Benchmarks smart crop against a corpus of real-world images.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"smart crop"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/smart-crop-corpus/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/smart-crop-corpus"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"type": "module",
+	"dependencies": {
+		"wasm-vips": "^0.0.19"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

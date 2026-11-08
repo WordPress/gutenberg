@@ -18,10 +18,8 @@
  * @see packages/vips/src/index.ts
  */
 
-// wasm-vips is a dependency of packages/vips rather than of the root package.
-// Resolving it from the workspace is the point: this harness has to crop with
-// the same pinned build the browser bundle ships.
-// eslint-disable-next-line import/no-extraneous-dependencies
+// Keep the wasm-vips version in sync with packages/vips: this harness has to
+// crop with the same build the browser bundle ships.
 import Vips from 'wasm-vips';
 
 /**
@@ -257,7 +255,7 @@ export function probeSubject( { vips, source, buffer, size } ) {
 							focalPoint.x - 0.5,
 							focalPoint.y - 0.5
 						).toFixed( 4 )
-				  )
+					)
 				: 0,
 			// How much a strategy that has never heard of saliency still moves
 			// the frame away from the centre.
@@ -350,7 +348,7 @@ export function cropPair( { vips, source, buffer, size, quality = 82 } ) {
 								focalPoint.x - 0.5,
 								focalPoint.y - 0.5
 							).toFixed( 4 )
-					  )
+						)
 					: null,
 				// Candidate 2: agreement between the attention and entropy
 				// strategies, measured on their outputs rather than their rects,
