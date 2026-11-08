@@ -53,17 +53,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
@@ -104,17 +104,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
@@ -315,15 +315,20 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 		return null;
 	}
 
+	// Allow valid CSS custom property references, e.g. var(--wp--preset--spacing--32).
+	if ( preg_match( '/^var\(--[a-zA-Z0-9_-]+\)$/', $gap_value ) ) {
+		return $gap_value;
+	}
+
 	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 }
 
 /**
  * Returns child layout styles for a block affected by its parent's layout.
  *
- * @param string     $selector         CSS selector.
- * @param array      $child_layout     Child layout values.
- * @param array      $parent_layout    Parent layout values.
+ * @param string     $selector           CSS selector.
+ * @param array      $child_layout       Child layout values.
+ * @param array      $parent_layout      Parent layout values.
  * @param array|null $viewport_overrides Optional. Child viewport layout overrides to emit.
  * @return array Child layout style rules.
  */
@@ -438,7 +443,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		$column_start_number = floatval( $column_start );
 		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 		$parent_column_value = floatval( $parent_column_width );
-		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+		$parent_column_unit  = explode( (string) $parent_column_value, $parent_column_width );
 
 		$num_cols_to_break_at = 2;
 		if ( $column_span_number && $column_start_number ) {
@@ -790,6 +795,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		if ( 'horizontal' === $layout_orientation ) {
 			/*
+			 * `row` is the flex default, so the base layout never declares it. A viewport
+			 * override that switches a vertical base layout to horizontal has to declare
+			 * it explicitly, otherwise the base `flex-direction: column` keeps applying.
+			 */
+			if ( null !== $viewport_overrides && $has_viewport_property_override( 'orientation' ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'flex-direction' => 'row' ),
+				);
+			}
+			/*
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
@@ -974,8 +990,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * but it is unique across the life of the PHP process and it's stable per
  * prefix.
  *
- * @param  string $prefix Prefix for the returned ID.
- * @return string         Incremental ID per prefix.
+ * @param string $prefix Prefix for the returned ID.
+ * @return string Incremental ID per prefix.
  */
 function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 	static $id_counters = array();
@@ -1006,19 +1022,14 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 /**
  * Renders the layout config to the block wrapper.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	static $global_styles = null;
-
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block['blockName']
-	);
+	$style_attr            = $block['attrs']['style'] ?? array();
 	/*
 	 * A block with no layout support and no style attribute at all cannot
 	 * produce layout output, so return before resolving global settings.
@@ -1229,10 +1240,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
-		$block_name = $block['blockName'] ?? '';
-		if ( null === $global_styles ) {
-			$global_styles = gutenberg_get_global_styles();
-		}
+		$block_name    = $block['blockName'] ?? '';
+		$global_styles = gutenberg_get_global_styles();
 
 		// Check if the block has an active style variation with a blockGap value.
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
@@ -1529,9 +1538,9 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * to restore the inner div for the group block
  * to avoid breaking styles relying on that div.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$tag_name_attr                    = $block['attrs']['tagName'] ?? null;
@@ -1603,7 +1612,7 @@ add_filter( 'render_block_core/group', 'gutenberg_restore_group_inner_container'
  * to avoid breaking styles relying on that div.
  *
  * @param string $block_content Rendered block content.
- * @param  array  $block        Block object.
+ * @param array  $block         Block object.
  * @return string Filtered block content.
  */
 function gutenberg_restore_image_outer_container( $block_content, $block ) {

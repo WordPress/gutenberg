@@ -79,14 +79,17 @@ const { state, actions } = store(
 			},
 			get isSubmenuOpen() {
 				const ctx = getContext();
-				// Once the overlay itself is open, its styles always expand
-				// every submenu regardless of hover/click/focus state, so the
-				// toggle's `aria-expanded` should reflect that immediately
-				// instead of waiting for a hover/click/focus interaction.
-				const isOverlayOpen =
+				const isDefaultOverlayOpen =
+					! ctx.hasCustomOverlay &&
 					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
 						.length > 0;
-				return isOverlayOpen || state.isMenuOpen;
+
+				// A submenu can be opened by user interaction or by being in a default overlay.
+				// If it is a regular navigation or within a custom overlay, it is opened by user interaction.
+				// If it's in a default overlay, it is forced opened via CSS.
+				// Because default overlays always force submenus open, we return true
+				// if the default overlay is open.
+				return isDefaultOverlayOpen || state.isMenuOpen;
 			},
 		},
 		actions: {

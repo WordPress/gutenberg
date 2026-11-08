@@ -18,7 +18,7 @@ import type { View } from '../types';
  */
 function captureAnchorElement(
 	container: HTMLElement,
-	anchorElementRef: React.MutableRefObject< {
+	anchorElementRef: React.RefObject< {
 		posinset: number;
 		viewportOffset: number;
 		scrollTop: number;
@@ -69,7 +69,7 @@ type UseInfiniteScrollProps = {
 		totalItems: number;
 		totalPages: number;
 	};
-	containerRef: React.MutableRefObject< HTMLDivElement | null >;
+	containerRef: React.RefObject< HTMLDivElement | null >;
 	setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 };
 

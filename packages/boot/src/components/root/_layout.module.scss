@@ -36,6 +36,11 @@
 
 .layout .notices-snackbar {
 	@include mixins.snackbar-container();
+
+	// The mixin's descendant selector is local in this CSS Module.
+	:global(.components-snackbar) {
+		margin-inline: auto;
+	}
 }
 
 .sidebar-backdrop {

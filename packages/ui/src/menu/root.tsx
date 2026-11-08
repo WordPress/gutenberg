@@ -1,7 +1,8 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import { DirectionProvider } from '../utils/direction-provider';
-import { MenuContext } from './context';
+import { MenuContext, MenuGroupContext } from './context';
 import type { RootProps } from './types';
+import { useIframeDismissalBridge } from '../utils/use-iframe-dismissal-bridge';
 
 /**
  * Groups all parts of a menu.
@@ -23,10 +24,10 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	const { onOpenChange, ...rootProps } = props;
+	const { onOpenChange } = props;
 
 	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
-		open,
+		nextOpen,
 		eventDetails
 	) => {
 		const trigger = eventDetails.trigger;
@@ -40,10 +41,10 @@ function Root( props: RootProps ) {
 				? eventTarget.closest( '[role="menu"]' )
 				: null;
 
-		onOpenChange?.( open, eventDetails );
+		onOpenChange?.( nextOpen, eventDetails );
 
 		if (
-			! open &&
+			! nextOpen &&
 			eventDetails.reason === 'item-press' &&
 			! eventDetails.isCanceled &&
 			TriggerElement &&
@@ -61,14 +62,23 @@ function Root( props: RootProps ) {
 			trigger.focus();
 		}
 	};
+	const iframeDismissalProps = useIframeDismissalBridge<
+		_Menu.Root.Actions,
+		_Menu.Root.ChangeEventDetails
+	>( {
+		actionsRef: props.actionsRef,
+		defaultOpen: props.defaultOpen,
+		modal: props.modal,
+		onOpenChange: handleOpenChange,
+		open: props.open,
+	} );
 
 	return (
 		<DirectionProvider>
 			<MenuContext.Provider value={ { isSubmenu: false } }>
-				<_Menu.Root
-					{ ...rootProps }
-					onOpenChange={ handleOpenChange }
-				/>
+				<MenuGroupContext.Provider value={ null }>
+					<_Menu.Root { ...props } { ...iframeDismissalProps } />
+				</MenuGroupContext.Provider>
 			</MenuContext.Provider>
 		</DirectionProvider>
 	);

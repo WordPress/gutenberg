@@ -1,0 +1,397 @@
+import clsx from 'clsx';
+import { DELETE, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	BlockControls,
+	InspectorControls,
+	URLPopover,
+	URLInput,
+	useBlockEditingMode,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import {
+	flushSync,
+	useState,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
+import {
+	Icon as WCIcon,
+	Button,
+	Dropdown,
+	TextControl,
+	ToolbarButton,
+	ExternalLink,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
+import { useMergeRefs } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { keyboardReturn } from '@wordpress/icons';
+import { store as blocksStore } from '@wordpress/blocks';
+import { getProtocol, isEmail, prependHTTPS } from '@wordpress/url';
+import { getSocialService } from './social-list';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import ViewLinkButton from '../utils/view-link-button';
+import isValidLink from './is-valid-link';
+
+const INVALID_LINK = {
+	type: 'invalid',
+	message: __( 'Please enter a valid URL.' ),
+};
+
+/**
+ * Shows an error for an invalid Social Icon link once it is checked, without
+ * rejecting the link. The error is only set when the link is checked, on blur,
+ * because `URLInput` remounts its input the first time it is given
+ * a validity, which would otherwise interrupt typing.
+ *
+ * @param {string} url The link.
+ * @return {Object} The `URLInput` props, and `validate`, which checks the link
+ *                  and returns whether it is valid.
+ */
+function useLinkValidity( url ) {
+	const [ customValidity, setCustomValidity ] = useState();
+	const inputRef = useRef();
+
+	// Clear the error as soon as the link is valid again.
+	if ( customValidity && isValidLink( url ) ) {
+		setCustomValidity( undefined );
+	}
+
+	const validate = () => {
+		if ( isValidLink( url ) ) {
+			return true;
+		}
+		// Render the validated input before revealing its error.
+		flushSync( () => setCustomValidity( INVALID_LINK ) );
+		// A synthetic `invalid` event shows the error without moving focus.
+		inputRef.current?.dispatchEvent( new window.Event( 'invalid' ) );
+		return false;
+	};
+
+	return { customValidity, inputRef, validate };
+}
+
+/**
+ * Returns the link the front end renders for a valid Social Icon link: an
+ * email address becomes a `mailto:` link, and a link without a protocol uses
+ * HTTPS.
+ *
+ * Keep this in sync with how `render_block_core_social_link()` in `index.php`
+ * builds the link, so View opens the same URL as the front end.
+ *
+ * @param {string} url The link.
+ * @return {string|undefined} The rendered link.
+ */
+const getRenderedLink = ( url ) => {
+	// There is nothing to view for a link that isn't valid.
+	if ( ! url || ! isValidLink( url ) ) {
+		return undefined;
+	}
+	// Unlike PHP's `is_email()`, `isEmail()` also matches `mailto:` links.
+	if ( isEmail( url ) && ! getProtocol( url ) ) {
+		return `mailto:${ url }`;
+	}
+	// PHP's `parse_url()` reads up to five digits after the colon, as in
+	// `localhost:8080`, as a port rather than a protocol, so it adds HTTPS.
+	if ( /^[^:/?#]+:\d{1,5}(?:\/|$)/.test( url ) ) {
+		return `https://${ url }`;
+	}
+	return prependHTTPS( url );
+};
+
+const SocialLinkURLPopover = ( {
+	url,
+	setAttributes,
+	setPopover,
+	popoverAnchor,
+	clientId,
+} ) => {
+	const { removeBlock } = useDispatch( blockEditorStore );
+	return (
+		<URLPopover
+			anchor={ popoverAnchor }
+			aria-label={ __( 'Edit social link' ) }
+			onClose={ () => {
+				setPopover( false );
+				popoverAnchor?.focus();
+			} }
+			// Leave focus where it moved, such as a field in the inspector.
+			onFocusOutside={ () => setPopover( false ) }
+		>
+			<form
+				className="block-editor-url-popover__link-editor"
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					setPopover( false );
+					popoverAnchor?.focus();
+				} }
+			>
+				<div className="block-editor-url-input">
+					<URLInput
+						value={ url }
+						onChange={ ( nextURL ) =>
+							setAttributes( { url: nextURL } )
+						}
+						placeholder={ __( 'Enter social link' ) }
+						label={ __( 'Enter social link' ) }
+						hideLabelFromVision
+						disableSuggestions
+						onKeyDown={ ( event ) => {
+							if (
+								!! url ||
+								event.defaultPrevented ||
+								! [ BACKSPACE, DELETE ].includes(
+									event.keyCode
+								)
+							) {
+								return;
+							}
+							removeBlock( clientId );
+						} }
+						suffix={
+							<InputControlSuffixWrapper variant="control">
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
+									size="small"
+								/>
+							</InputControlSuffixWrapper>
+						}
+					/>
+				</div>
+			</form>
+		</URLPopover>
+	);
+};
+
+const SocialLinkEdit = ( {
+	attributes,
+	context,
+	isSelected,
+	setAttributes,
+	clientId,
+	name,
+} ) => {
+	const { url, service, label = '', rel } = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const {
+		showLabels,
+		iconColor,
+		iconColorValue,
+		iconBackgroundColor,
+		iconBackgroundColorValue,
+	} = context;
+	const [ showURLPopover, setPopover ] = useState( false );
+	const {
+		customValidity: linkValidity,
+		inputRef: linkInputRef,
+		validate: validateLink,
+	} = useLinkValidity( url );
+	const wrapperClasses = clsx(
+		'wp-social-link',
+		// Manually adding this class for backwards compatibility of CSS when moving the
+		// blockProps from the li to the button: https://github.com/WordPress/gutenberg/pull/64883
+		'wp-block-social-link',
+		'wp-social-link-' + service,
+		{
+			'wp-social-link__is-incomplete': ! url,
+			[ `has-${ iconColor }-color` ]: iconColor,
+			[ `has-${ iconBackgroundColor }-background-color` ]:
+				iconBackgroundColor,
+		}
+	);
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
+
+	const { activeVariation } = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation } = select( blocksStore );
+			return {
+				activeVariation: getActiveBlockVariation( name, attributes ),
+			};
+		},
+		[ name, attributes ]
+	);
+
+	const { icon, label: socialLinkName } = getSocialService( activeVariation );
+	// The initial label (ie. the link text) is an empty string.
+	// We want to prevent empty links so that the link text always fallbacks to
+	// the social name, even when users enter and save an empty string or only
+	// spaces. The PHP render callback fallbacks to the social name as well.
+	const socialLinkText = label.trim() === '' ? socialLinkName : label;
+
+	const ref = useRef();
+	const blockProps = useBlockProps( {
+		className: 'wp-block-social-link-anchor',
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onClick: () => setPopover( true ),
+		onKeyDown: ( event ) => {
+			if ( event.keyCode === ENTER ) {
+				event.preventDefault();
+				setPopover( true );
+			}
+		},
+	} );
+
+	return (
+		<>
+			{ isContentOnlyMode && showLabels && (
+				// Add an extra control to modify the label attribute when content only mode is active.
+				// With content only mode active, the inspector is hidden, so users need another way
+				// to edit this attribute.
+				<BlockControls group="other">
+					<Dropdown
+						popoverProps={ { placement: 'bottom-start' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+							>
+								{ __( 'Text' ) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
+							<TextControl
+								className="wp-block-social-link__toolbar_content_text"
+								label={ __( 'Text' ) }
+								help={ __(
+									'Provide a text label or use the default.'
+								) }
+								value={ label }
+								onChange={ ( value ) =>
+									setAttributes( { label: value } )
+								}
+								placeholder={ socialLinkName }
+							/>
+						) }
+					/>
+				</BlockControls>
+			) }
+			<InspectorControls group="content">
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( { url: undefined, label: undefined } );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Text' ) }
+						hasValue={ () => !! label }
+						onDeselect={ () => {
+							setAttributes( { label: undefined } );
+						} }
+					>
+						<TextControl
+							label={ __( 'Text' ) }
+							help={ __(
+								'The text is visible when enabled from the parent Social Icons block.'
+							) }
+							value={ label }
+							onChange={ ( value ) =>
+								setAttributes( { label: value } )
+							}
+							placeholder={ socialLinkName }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Link to' ) }
+						hasValue={ () => !! url }
+						onDeselect={ () => {
+							setAttributes( { url: undefined } );
+						} }
+					>
+						<div onBlur={ validateLink }>
+							<URLInput
+								className="wp-block-social-link__url-input"
+								label={ __( 'Link to' ) }
+								placeholder={ __( 'Enter social link' ) }
+								value={ url || '' }
+								onChange={ ( value ) =>
+									setAttributes( { url: value || undefined } )
+								}
+								disableSuggestions
+								isFullWidth
+								required={ false }
+								inputRef={ linkInputRef }
+								customValidity={ linkValidity }
+							/>
+						</div>
+					</ToolsPanelItem>
+					<ViewLinkButton url={ getRenderedLink( url ) } />
+				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
+					value={ rel || '' }
+					onChange={ ( value ) => setAttributes( { rel: value } ) }
+				/>
+			</InspectorControls>
+			{ /*
+			 * Because the `<ul>` element has a role=document, the `<li>` is
+			 * not semantically correct, so adding role=presentation is cleaner.
+			 * https://github.com/WordPress/gutenberg/pull/64883#issuecomment-2472874551
+			 */ }
+			<li
+				role="presentation"
+				className={ wrapperClasses }
+				style={ {
+					color: iconColorValue,
+					backgroundColor: iconBackgroundColorValue,
+				} }
+			>
+				{ /*
+				 * Disable reason: The `button` ARIA role is redundant but
+				 * blockProps has a role of `document` automatically applied
+				 * which breaks the semantics of this button since it removes
+				 * the information about the popover.
+				 */
+				/* eslint-disable jsx-a11y/no-redundant-roles */ }
+				<button aria-haspopup="dialog" { ...blockProps } role="button">
+					<WCIcon icon={ icon } />
+					<span
+						className={ clsx( 'wp-block-social-link-label', {
+							'screen-reader-text': ! showLabels,
+						} ) }
+					>
+						{ socialLinkText }
+					</span>
+				</button>
+				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+				{ isSelected && showURLPopover && (
+					<SocialLinkURLPopover
+						url={ url }
+						setAttributes={ setAttributes }
+						setPopover={ setPopover }
+						popoverAnchor={ popoverAnchor }
+						clientId={ clientId }
+					/>
+				) }
+			</li>
+		</>
+	);
+};
+
+export default SocialLinkEdit;

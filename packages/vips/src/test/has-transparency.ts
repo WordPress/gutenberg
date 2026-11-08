@@ -1,32 +1,52 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { hasTransparency } from '../';
 
-const mockHasAlpha = jest.fn();
-const mockExtractBand = jest.fn();
-const mockMin = jest.fn();
+const {
+	MockAlphaBand,
+	MockImage,
+	mockExtractBand,
+	mockHasAlpha,
+	mockMin,
+	mockNewFromBuffer,
+} = vi.hoisted( () => {
+	const hasAlphaMock = vi.fn();
+	const extractBandMock = vi.fn();
+	const minMock = vi.fn();
 
-class MockAlphaBand {
-	min = mockMin;
-}
+	class AlphaBandMock {
+		min = minMock;
+	}
 
-class MockImage {
-	hasAlpha = mockHasAlpha;
-	extractBand = mockExtractBand;
-	bands = 4;
-	format = 'uchar';
-}
+	class ImageMock {
+		hasAlpha = hasAlphaMock;
+		extractBand = extractBandMock;
+		bands = 4;
+		format = 'uchar';
+	}
 
-const mockNewFromBuffer = jest.fn( () => new MockImage() );
+	const newFromBufferMock = vi.fn( () => new ImageMock() );
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	return {
+		MockAlphaBand: AlphaBandMock,
+		MockImage: ImageMock,
+		mockExtractBand: extractBandMock,
+		mockHasAlpha: hasAlphaMock,
+		mockMin: minMock,
+		mockNewFromBuffer: newFromBufferMock,
+	};
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: {
 			newFromBuffer: mockNewFromBuffer,
 		},
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'hasTransparency', () => {
 	beforeEach( () => {
@@ -34,7 +54,7 @@ describe( 'hasTransparency', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'returns false when the image has no alpha channel', async () => {

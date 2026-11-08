@@ -1,0 +1,61 @@
+{
+	"wpds-border": {
+		"radius": {
+			"xs": {
+				"$type": "dimension",
+				"$value": {
+					"value": 1,
+					"unit": "px"
+				},
+				"$description": "Buttons and other elements nested inside controls.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": {
+					"value": 2,
+					"unit": "px"
+				},
+				"$description": "Standalone buttons, inputs, and compact controls.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"$description": "Menus, popovers, and other small portaled overlays.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"$description": "Cards, dialogs, notices, and other larger content containers.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				},
+				"$description": "Page and app shell surfaces.",
+				"$extensions": {
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			}
+		}
+	}
+}

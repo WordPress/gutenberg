@@ -19,6 +19,7 @@ import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import ErrorBoundary from '../error-boundary';
+import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
@@ -32,9 +33,7 @@ export default function Root() {
 	const location = useLocation();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
@@ -57,6 +56,7 @@ export default function Root() {
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
+				<PluginArea />
 				<ThemeProvider
 					isRoot
 					color={ { ...themeColors, background: '#f8f8f8' } }
@@ -159,7 +159,8 @@ export default function Root() {
 								<ThemeProvider
 									color={ {
 										...themeColors,
-										background: '#ffffff',
+										// Reset to the default background color.
+										background: '#fcfcfc',
 									} }
 								>
 									<Outlet />

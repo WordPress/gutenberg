@@ -9,14 +9,14 @@
  * Render callback for core/tab-list.
  *
  * Injects IAPI directives into the saved button HTML. The buttons already
- * carry color/border/padding styles from save.js; this callback adds
- * tab-specific attributes (id, aria-controls, context) and interactivity
+ * carry background/color/border/padding styles from save.jsx; this callback
+ * adds tab-specific attributes (id, aria-controls) and interactivity
  * directives using data from the tabs-list context.
  *
  * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content (rendered buttons from save.js).
+ * @param string    $content    Block content (rendered buttons from save.jsx).
  * @param \WP_Block $block      WP_Block instance.
  *
  * @return string Updated HTML.
@@ -49,10 +49,6 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 		$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
 		$tag_processor->set_attribute( 'data-wp-bind--aria-selected', 'state.isActiveTab' );
 		$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
-		$tag_processor->set_attribute(
-			'data-wp-context',
-			wp_json_encode( array( 'tabIndex' => $tab_index ) )
-		);
 
 		++$tab_index;
 	}

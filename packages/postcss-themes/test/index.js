@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import postcss from 'postcss';
 import plugin from '../';
 

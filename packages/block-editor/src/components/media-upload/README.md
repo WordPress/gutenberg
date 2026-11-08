@@ -139,6 +139,14 @@ If true, the component will initiate all the states required to represent a gall
 -   Required: No
 -   Default: `false`
 
+### featuredImageFlow
+
+If true, the media modal opens as the featured image frame, with the featured image state and its "Set featured image" action, as the post featured image panel does. Callbacks on the `editor.MediaUpload` filter receive it and can recognize the featured image by it.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ## render
 
 A callback invoked to render the Button opening the media library.

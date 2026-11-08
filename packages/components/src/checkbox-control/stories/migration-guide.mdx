@@ -1,0 +1,106 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as CheckboxControlStories from './index.story';
+
+<Meta of={ CheckboxControlStories } name="Migration Guide" />
+
+# CheckboxControl migration guide
+
+Migrate from [`CheckboxControl`](?path=/docs/components-checkboxcontrol--docs) in `@wordpress/components` to [`CheckboxControl`](?path=/docs/design-system-components-form-checkboxcontrol--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Update the import and replace the callback and help props:
+
+```jsx
+// Before
+import { CheckboxControl } from '@wordpress/components';
+
+<CheckboxControl
+	label="Is author"
+	checked={ isChecked }
+	onChange={ setChecked }
+	help="Give this user author permissions."
+/>;
+
+// After
+import { CheckboxControl } from '@wordpress/ui';
+
+<CheckboxControl
+	label="Is author"
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+	description="Give this user author permissions."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`onChange\` | \`onCheckedChange\` | Receives the next checked state as a boolean. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`checked\` | \`checked\` | Continue passing the state for a controlled checkbox. |
+` }</Markdown>
+
+## Form values
+
+When a checked checkbox has a `name` but no `value`, the legacy component submits `"1"` with the form, while the new component submits `"on"`, the native default for checkboxes. If your form handler expects the legacy value, pass `value="1"` to the new component:
+
+```jsx
+<CheckboxControl
+	name="isAuthor"
+	value="1"
+	label="Is author"
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+/>
+```
+
+If the legacy component already has a custom `value`, keep that value instead.
+
+## Labels
+
+The new `CheckboxControl` requires a `label` prop with a plain `string` value. The legacy component treats `label` as optional. Give every checkbox a descriptive label, even when the text is already visible elsewhere:
+
+```jsx
+<CheckboxControl
+	label="Receive notifications"
+	hideLabelFromVision
+	checked={ isChecked }
+	onCheckedChange={ setChecked }
+/>
+```
+
+For a custom label layout, compose the [`Checkbox`](?path=/docs/design-system-components-form-primitives-checkbox--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
+
+## Checkbox groups
+
+If a legacy checkbox uses `indeterminate` to show that only some items are selected, move the selected items into a `CheckboxGroup` instead of calculating the parent checkbox state yourself. Pass the child values to `allValues` and mark the select-all checkbox with `parent`. The group updates the parent checkbox when children change and selects or clears all children when the parent is clicked.
+
+```jsx
+import { useState } from '@wordpress/element';
+import { CheckboxControl, CheckboxGroup } from '@wordpress/ui';
+
+function FruitCheckboxes() {
+	const [ selectedFruits, setSelectedFruits ] = useState( [ 'apple' ] );
+
+	return (
+		<CheckboxGroup
+			value={ selectedFruits }
+			onValueChange={ setSelectedFruits }
+			allValues={ [ 'apple', 'orange' ] }
+			aria-label="Fruit"
+		>
+			<CheckboxControl parent value="fruit" label="Select all fruit" />
+			<CheckboxGroup.NestedItems>
+				<CheckboxControl value="apple" label="Apple" />
+				<CheckboxControl value="orange" label="Orange" />
+			</CheckboxGroup.NestedItems>
+		</CheckboxGroup>
+	);
+}
+```
+
+See the [Checkbox Groups stories](?path=/docs/design-system-components-form-checkbox-groups--docs) for other grouping patterns.
