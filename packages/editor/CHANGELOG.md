@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add an "Optimize" inspector control to image-bearing blocks (image, cover, media-text, post-featured-image, site-logo) that re-processes a previously uploaded image client-side and repoints the block at the optimized attachment. Gated behind the "Optimize existing media" experiment and shown only when client-side media processing is active ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+-   Optimizing existing media opens a dialog that compares the original and optimized image, shows both file sizes, and offers a quality slider. The optimized copy is only uploaded once the user accepts it ([#83411](https://github.com/WordPress/gutenberg/pull/83411)).
 
 ### Enhancements
 
