@@ -90,7 +90,7 @@ describe( 'ControlWithError', () => {
 							? setCustomValidity( {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
-							  } )
+								} )
 							: setCustomValidity( undefined )
 					}
 					customValidity={ customValidity }
@@ -224,8 +224,8 @@ describe( 'ControlWithError', () => {
 									type: 'invalid',
 									message: 'Please enter a valid URL.',
 								} );
-								requestAnimationFrame(
-									() => inputRef.current?.reportValidity()
+								requestAnimationFrame( () =>
+									inputRef.current?.reportValidity()
 								);
 							} }
 						>
@@ -277,8 +277,8 @@ describe( 'ControlWithError', () => {
 									type: 'invalid',
 									message: 'Please enter a valid URL.',
 								} );
-								requestAnimationFrame(
-									() => inputRef.current?.reportValidity()
+								requestAnimationFrame( () =>
+									inputRef.current?.reportValidity()
 								);
 							} }
 						>
@@ -330,7 +330,10 @@ describe( 'ControlWithError', () => {
 					value: string;
 					onChange: ( value: string ) => void;
 				}
-			>( function ClampedNumberInput( { label, value, onChange }, ref ) {
+			>( function UnforwardedClampedNumberInput(
+				{ label, value, onChange },
+				ref
+			) {
 				const [ innerValue, setInnerValue ] = useState( value );
 				useIsomorphicLayoutEffect( () => {
 					setInnerValue( value );

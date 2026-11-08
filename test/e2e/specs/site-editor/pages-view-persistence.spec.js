@@ -63,9 +63,10 @@ test.describe( 'Pages View Persistence', () => {
 		await expect( modifiedIndicator ).toBeVisible();
 
 		// Navigate to Drafts view
-		await ( isSiteEditorV2
-			? page.getByRole( 'tab', { name: 'Drafts', exact: true } )
-			: page.getByRole( 'button', { name: 'Drafts', exact: true } )
+		await (
+			isSiteEditorV2
+				? page.getByRole( 'tab', { name: 'Drafts', exact: true } )
+				: page.getByRole( 'button', { name: 'Drafts', exact: true } )
 		).click();
 
 		// With unified persistence, Drafts tab should also show the changed
@@ -76,9 +77,10 @@ test.describe( 'Pages View Persistence', () => {
 		await expect( modifiedIndicator ).toBeVisible();
 
 		// Navigate back to All Pages
-		await ( isSiteEditorV2
-			? page.getByRole( 'tab', { name: 'All Pages' } )
-			: page.getByRole( 'button', { name: 'All Pages' } )
+		await (
+			isSiteEditorV2
+				? page.getByRole( 'tab', { name: 'All Pages' } )
+				: page.getByRole( 'button', { name: 'All Pages' } )
 		).click();
 
 		// Verify the changed layout persisted

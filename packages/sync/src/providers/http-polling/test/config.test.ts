@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-type SyncConfig = typeof import('../config');
+type SyncConfig = typeof import( '../config' );
 
 function loadConfigWithFilteredIntervals(
 	filteredIntervals: Record< string, unknown >

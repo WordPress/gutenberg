@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	SelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { Text } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { SelectControl, Text } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,
@@ -30,6 +30,13 @@ import {
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+
+const PRELOAD_ITEMS = [
+	{ value: null, label: __( 'Browser default' ) },
+	{ value: 'auto', label: __( 'Auto' ) },
+	{ value: 'metadata', label: __( 'Metadata' ) },
+	{ value: 'none', label: _x( 'None', 'Preload value' ) },
+];
 
 /**
  * Renders the `core/audio` block on the editor.
@@ -94,14 +101,9 @@ function AudioEdit( {
 
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// In this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls.
-			setAttributes( {
-				src: undefined,
-				id: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current audio and its caption intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -118,6 +120,16 @@ function AudioEdit( {
 			src: media.url,
 			id: media.id,
 			caption: media.caption,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetAudio() {
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -159,7 +171,7 @@ function AudioEdit( {
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onReset={ () => onSelectAudio( undefined ) }
+						onReset={ onResetAudio }
 						variant="toolbar"
 					/>
 				</BlockControls>
@@ -228,22 +240,20 @@ function AudioEdit( {
 								'Preload',
 								'noun; Audio block parameter'
 							) }
-							value={ preload || '' }
+							items={ PRELOAD_ITEMS }
+							value={
+								PRELOAD_ITEMS.find(
+									( item ) =>
+										item.value === ( preload || null )
+								) ?? PRELOAD_ITEMS[ 0 ]
+							}
 							// `undefined` is required for the preload attribute to be unset.
-							onChange={ ( value ) =>
+							onValueChange={ ( item ) =>
+								item &&
 								setAttributes( {
-									preload: value || undefined,
+									preload: item.value || undefined,
 								} )
 							}
-							options={ [
-								{ value: '', label: __( 'Browser default' ) },
-								{ value: 'auto', label: __( 'Auto' ) },
-								{ value: 'metadata', label: __( 'Metadata' ) },
-								{
-									value: 'none',
-									label: _x( 'None', 'Preload value' ),
-								},
-							] }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -251,10 +261,10 @@ function AudioEdit( {
 			<figure { ...blockProps }>
 				<audio
 					controls="controls"
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					src={ src ?? temporaryURL }
 				/>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

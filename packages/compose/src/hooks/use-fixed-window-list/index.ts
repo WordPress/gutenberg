@@ -36,7 +36,7 @@ interface FixedWindowListOptions {
  * @return Array with the fixed window list and setter
  */
 export default function useFixedWindowList(
-	elementRef: React.RefObject< HTMLElement >,
+	elementRef: React.RefObject< HTMLElement | null >,
 	itemHeight: number,
 	totalItems: number,
 	options?: FixedWindowListOptions
@@ -86,7 +86,7 @@ export default function useFixedWindowList(
 		// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 		const overscan = initRender
 			? visibleItems
-			: windowOverscan ?? visibleItems;
+			: ( windowOverscan ?? visibleItems );
 		const firstViewableIndex = Math.floor(
 			scrollContainer.scrollTop / itemHeight
 		);

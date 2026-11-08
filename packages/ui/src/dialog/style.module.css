@@ -74,6 +74,16 @@
 				min-width: var(--wpds-dimension-surface-width-md);
 			}
 
+			&.is-auto {
+				min-width: min(var(--wpds-dimension-surface-width-sm), calc(100vw - 2 * var(--viewport-inset)));
+				width: max-content;
+				max-width: calc(100vw - 2 * var(--viewport-inset));
+
+				@media (min-width: 480px) {
+					min-width: min(var(--wpds-dimension-surface-width-md), calc(100vw - 2 * var(--viewport-inset)));
+				}
+			}
+
 			&.is-small {
 				max-width: var(--wpds-dimension-surface-width-md);
 			}

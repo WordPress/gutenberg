@@ -550,11 +550,11 @@ function CalendarDateRangeControl< Item >( {
 								end: endOfMonth( currentMonth ),
 							},
 							{ inclusive: true }
-					  )
+						)
 					: [ from, to ].some(
 							( date ) =>
 								date && isSameMonth( date, currentMonth )
-					  );
+						);
 			return targetMonth && ! isRangeVisible ? targetMonth : currentMonth;
 		} );
 	}, [ fromValue, toValue ] );

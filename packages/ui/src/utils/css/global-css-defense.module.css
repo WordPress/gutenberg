@@ -126,3 +126,13 @@ p.p {
 .li {
 	margin: var(--_gcd-li-margin, 0);
 }
+
+/* Admin tree styles assume every aria-hidden span is a Dashicon. */
+[role="treeitem"] span.span[aria-hidden] {
+	position: var(--_gcd-span-position, static);
+	display: var(--_gcd-span-display, inline);
+	font-family: var(--_gcd-span-font-family, inherit);
+	font-size: var(--_gcd-span-font-size, inherit);
+	line-height: var(--_gcd-span-line-height, 1);
+	pointer-events: var(--_gcd-span-pointer-events, auto);
+}

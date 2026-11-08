@@ -9,6 +9,7 @@ import {
 	getQueriedTotalItems,
 	getQueriedTotalPages,
 } from './queried-data';
+import type { QueriesState } from './queried-data/types';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
@@ -17,8 +18,8 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
-import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -38,10 +39,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
-	syncUndoManagerState: {
-		hasRedo: boolean;
-		hasUndo: boolean;
-	};
+	undoManagerReference: Record< string, never >;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -53,6 +51,11 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
+	fieldsConfigs: Record< string, Record< string, FieldsConfig > >;
+	entityActionsConfigs: Record<
+		string,
+		Record< string, EntityActionsConfig >
+	>;
 }
 
 type EntityRecordKey = string | number;
@@ -63,19 +66,19 @@ interface EntitiesState {
 }
 
 interface QueriedData {
-	items: Record< ET.Context, Record< number, ET.EntityRecord > >;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	items: Record< ET.Context, Record< EntityRecordKey, ET.EntityRecord > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 type RevisionRecord =
-	| Record< ET.Context, Record< number, ET.PostRevision > >
-	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+	| Record< ET.Context, Record< EntityRecordKey, ET.PostRevision > >
+	| Record< ET.Context, Record< EntityRecordKey, ET.GlobalStylesRevision > >;
 
 interface RevisionsQueriedData {
 	items: RevisionRecord;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 interface EntityState< EntityRecord extends ET.EntityRecord > {
@@ -332,8 +335,7 @@ export interface GetEntityRecord {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -355,8 +357,7 @@ export interface GetEntityRecord {
 		): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -383,8 +384,7 @@ export interface GetEntityRecord {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query > | undefined >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -392,7 +392,7 @@ export interface GetEntityRecord {
 			query?: GetRecordsHttpQuery
 		): Promise< EntityRecord | undefined >;
 	};
-	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
+	normalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -411,8 +411,7 @@ export interface GetEntityRecord {
  */
 export const getEntityRecord = ( <
 	EntityRecord extends
-		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >,
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -451,7 +450,7 @@ export const getEntityRecord = ( <
  * @param args EntityRecordArgs the selector arguments.
  * @return EntityRecordArgs the normalized arguments.
  */
-getEntityRecord.__unstableNormalizeArgs = (
+getEntityRecord.normalizeArgs = (
 	args: EntityRecordArgs
 ): EntityRecordArgs => {
 	const newArgs = [ ...args ] as EntityRecordArgs;
@@ -503,7 +502,7 @@ export function hasEntityRecord(
 
 	// When `query._fields` is provided, check that each requested field exists,
 	// including any nested paths, on the item; return false if any part is missing.
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;
@@ -653,8 +652,7 @@ export interface GetEntityRecords {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -674,8 +672,7 @@ export interface GetEntityRecords {
 		): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -695,8 +692,7 @@ export interface GetEntityRecords {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query >[] | null >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -718,8 +714,7 @@ export interface GetEntityRecords {
  */
 export const getEntityRecords = ( <
 	EntityRecord extends
-		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >,
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -735,10 +730,11 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
+	// The caller names the record type of the entity it queries.
 	return getQueriedItems( queriedState, query, {
 		supportsPagination: !! getEntityConfig( state, kind, name )
 			?.supportsPagination,
-	} );
+	} ) as Array< EntityRecord > | null;
 } ) as GetEntityRecords;
 
 /**
@@ -860,7 +856,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
@@ -913,7 +909,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
@@ -1238,9 +1234,6 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasUndo;
-	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1253,9 +1246,6 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasRedo;
-	}
 	return getUndoManager( state ).hasRedo();
 }
 
@@ -1669,7 +1659,7 @@ export function hasRevision(
 		return false;
 	}
 
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;

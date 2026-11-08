@@ -107,14 +107,12 @@ exports[`recordToDom > should create a value without formatting 1`] = `
 
 exports[`recordToDom > should create an empty value 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
 
 exports[`recordToDom > should create an empty value from empty tags 1`] = `
 <body>
-  
   ﻿
 </body>
 `;
@@ -156,7 +154,6 @@ exports[`recordToDom > should handle br 1`] = `
   <br
     data-rich-text-line-break="true"
   />
-  
   ﻿
 </body>
 `;
@@ -172,7 +169,6 @@ exports[`recordToDom > should handle br with formatting 1`] = `
     />
     
   </em>
-  
   ﻿
 </body>
 `;
@@ -327,7 +323,6 @@ exports[`recordToDom > should preserve non breaking space 1`] = `
 
 exports[`recordToDom > should remove padding 1`] = `
 <body>
-  
   ﻿
 </body>
 `;

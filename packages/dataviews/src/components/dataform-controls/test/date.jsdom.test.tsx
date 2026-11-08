@@ -11,7 +11,8 @@ import type { DataFormControlProps } from '../../../types';
 
 vi.mock(
 	import( '@wordpress/a11y' ),
-	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
+	() =>
+		( { speak: vi.fn() } ) as unknown as typeof import( '@wordpress/a11y' )
 );
 
 globalThis.wpVitest.mockMatchMedia();

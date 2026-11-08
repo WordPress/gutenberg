@@ -31,11 +31,15 @@ describe( 'ContentEditableControl', () => {
 		expect( screen.getByRole( 'textbox' ) ).toHaveFocus();
 	} );
 
-	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
+	it( 'names the textbox without rendering the label when `hideLabelFromVision` is set', () => {
 		render( <ContentEditableControl label="Note" hideLabelFromVision /> );
 
-		const label = screen.getByText( 'Note' );
-		expect( label ).toHaveClass( 'components-visually-hidden' );
+		// A rendered hidden label would be read as page text and then again
+		// as the field's name.
+		expect( screen.queryByText( 'Note' ) ).not.toBeInTheDocument();
+		const textbox = screen.getByRole( 'textbox' );
+		expect( textbox ).not.toHaveAttribute( 'aria-labelledby' );
+		expect( textbox ).toHaveAccessibleName( 'Note' );
 	} );
 
 	it( 'is multiline by default and accepts an `aria-multiline` override', () => {
@@ -67,6 +71,21 @@ describe( 'ContentEditableControl', () => {
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'false' );
 	} );
 
+	it( 'keeps a disabled field focusable but out of the tab order', () => {
+		const { rerender } = render( <ContentEditableControl label="Note" /> );
+
+		expect( screen.getByRole( 'textbox' ) ).not.toHaveAttribute(
+			'tabindex'
+		);
+
+		rerender( <ContentEditableControl label="Note" disabled /> );
+
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+			'tabindex',
+			'-1'
+		);
+	} );
+
 	it( 'exposes `required` via aria-required', () => {
 		render( <ContentEditableControl label="Note" required /> );
 
@@ -86,11 +105,7 @@ describe( 'ContentEditableControl', () => {
 
 	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
 		render(
-			<ContentEditableControl
-				label="Custom id"
-				// eslint-disable-next-line no-restricted-syntax
-				id="my-custom-id"
-			/>
+			<ContentEditableControl label="Custom id" id="my-custom-id" />
 		);
 
 		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(

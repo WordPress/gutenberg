@@ -133,7 +133,7 @@ export type PanelLayout = {
 	/**
 	 * Whether the summary shows the field's `placeholder` instead of its
 	 * `render` output when the value is `undefined`, `null`, or an empty
-	 * string. `false` by default.
+	 * string, or when the `render` output is empty. `false` by default.
 	 */
 	showPlaceholderIfEmpty?: boolean;
 };
@@ -168,7 +168,8 @@ export type NormalizedPanelLayout = {
 	editVisibility: EditVisibility;
 
 	/**
-	 * Whether the summary shows the field's `placeholder` when the value is empty.
+	 * Whether the summary shows the field's `placeholder` when the value or its
+	 * `render` output is empty.
 	 */
 	showPlaceholderIfEmpty: boolean;
 };
@@ -406,11 +407,7 @@ export type NormalizedDetailsLayout = {
  * The layout configuration for a form or a form field.
  */
 export type Layout =
-	| RegularLayout
-	| PanelLayout
-	| CardLayout
-	| RowLayout
-	| DetailsLayout;
+	RegularLayout | PanelLayout | CardLayout | RowLayout | DetailsLayout;
 
 /**
  * The normalized version of {@link Layout}, with defaults applied.
@@ -426,8 +423,7 @@ export type NormalizedLayout =
  * A normalized summary field, for panel or card layouts.
  */
 export type NormalizedSummaryField =
-	| NormalizedPanelSummaryField
-	| NormalizedCardSummaryField;
+	NormalizedPanelSummaryField | NormalizedCardSummaryField;
 
 /**
  * A field within a form. Can also be expressed as a plain string (the field id).

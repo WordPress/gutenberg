@@ -48,7 +48,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 	const wrappedOnChangeProp = onChangeProp
 		? ( v: string | number | null ) => {
 				onChangeProp( v ?? undefined );
-		  }
+			}
 		: undefined;
 
 	const radio = Ariakit.useRadioStore( {

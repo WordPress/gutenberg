@@ -33,13 +33,13 @@ Create an i18n instance
 
 _Parameters_
 
--   _initialData_ `[LocaleData< TextDomain >]`: Locale data configuration.
--   _initialDomain_ `[TextDomain]`: Domain for which configuration applies.
--   _hooks_ `[Hooks]`: Hooks implementation.
+- _initialData_ `[LocaleData< TextDomain >]`: Locale data configuration.
+- _initialDomain_ `[TextDomain]`: Domain for which configuration applies.
+- _hooks_ `[Hooks]`: Hooks implementation.
 
 _Returns_
 
--   `I18n< TextDomain >`: I18n instance.
+- `I18n< TextDomain >`: I18n instance.
 
 ### defaultI18n
 
@@ -51,15 +51,15 @@ Returns locale data by domain in a Jed-formatted JSON object shape.
 
 _Related_
 
--   <http://messageformat.github.io/Jed/>
+- <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
--   _domain_ `[ string | undefined ]`: Domain for which to get the data.
+- _domain_ `[ string | undefined ]`: Domain for which to get the data.
 
 _Returns_
 
--   `LocaleData`: Locale data.
+- `LocaleData`: Locale data.
 
 ### hasTranslation
 
@@ -67,13 +67,13 @@ Check if there is a translation for a given string (in singular form).
 
 _Parameters_
 
--   _single_ `string`: Singular form of the string to look up.
--   _context_ `string`: Context information for the translators.
--   _domain_ `string`: Domain to retrieve the translated text.
+- _single_ `string`: Singular form of the string to look up.
+- _context_ `string`: Context information for the translators.
+- _domain_ `string`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `boolean`: Whether the translation exists or not.
+- `boolean`: Whether the translation exists or not.
 
 ### isRTL
 
@@ -83,7 +83,7 @@ Check if current locale is RTL.
 
 _Returns_
 
--   `boolean`: Whether locale is RTL.
+- `boolean`: Whether locale is RTL.
 
 ### resetLocaleData
 
@@ -91,12 +91,12 @@ Resets all current Tannin instance locale data and sets the specified locale dat
 
 _Related_
 
--   <http://messageformat.github.io/Jed/>
+- <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
--   _data_ `[LocaleData]`: Locale data configuration.
--   _domain_ `[string | undefined]`: Domain for which configuration applies.
+- _data_ `[LocaleData]`: Locale data configuration.
+- _domain_ `[string | undefined]`: Domain for which configuration applies.
 
 ### setLocaleData
 
@@ -104,12 +104,12 @@ Merges locale data into the Tannin instance by domain. Accepts data in a Jed-for
 
 _Related_
 
--   <http://messageformat.github.io/Jed/>
+- <http://messageformat.github.io/Jed/>
 
 _Parameters_
 
--   _data_ `[LocaleData ]`: Locale data configuration.
--   _domain_ `[string | undefined]`: Domain for which configuration applies.
+- _data_ `[LocaleData ]`: Locale data configuration.
+- _domain_ `[string | undefined]`: Domain for which configuration applies.
 
 ### sprintf
 
@@ -117,16 +117,16 @@ Returns a formatted string.
 
 _Related_
 
--   <https://www.npmjs.com/package/@tannin/sprintf>
+- <https://www.npmjs.com/package/@tannin/sprintf>
 
 _Parameters_
 
--   _format_ `T | TransformedText< T >`: The format of the string to generate.
--   _args_ `DistributeSprintfArgs< T >`: Arguments to apply to the format.
+- _format_ `T | TransformedText< T >`: The format of the string to generate.
+- _args_ `DistributeSprintfArgs< T >`: Arguments to apply to the format.
 
 _Returns_
 
--   `TransformedText< T >`: The formatted string.
+- `TransformedText< T >`: The formatted string.
 
 ### subscribe
 
@@ -134,11 +134,11 @@ Subscribes to changes of locale data
 
 _Parameters_
 
--   _callback_ `SubscribeCallback`: Subscription callback
+- _callback_ `SubscribeCallback`: Subscription callback
 
 _Returns_
 
--   `UnsubscribeCallback`: Unsubscribe callback
+- `UnsubscribeCallback`: Unsubscribe callback
 
 ### \_n
 
@@ -146,18 +146,18 @@ Translates and retrieves the singular or plural form based on the supplied numbe
 
 _Related_
 
--   <https://developer.wordpress.org/reference/functions/_n/>
+- <https://developer.wordpress.org/reference/functions/_n/>
 
 _Parameters_
 
--   _single_ `Single`: The text to be used if the number is singular.
--   _plural_ `Plural`: The text to be used if the number is plural.
--   _number_ `number`: The number to compare against to use either the singular or plural form.
--   _domain_ `string | undefined`: Domain to retrieve the translated text.
+- _single_ `Single`: The text to be used if the number is singular.
+- _plural_ `Plural`: The text to be used if the number is plural.
+- _number_ `number`: The number to compare against to use either the singular or plural form.
+- _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `TransformedText<Single | Plural>`: The translated singular or plural form.
+- `TransformedText<Single | Plural>`: The translated singular or plural form.
 
 ### \_nx
 
@@ -165,20 +165,20 @@ Translates and retrieves the singular or plural form based on the supplied numbe
 
 _Related_
 
--   <https://developer.wordpress.org/reference/functions/_nx/>
+- <https://developer.wordpress.org/reference/functions/_nx/>
 
 _Parameters_
 
--   _single_ `Single`: The text to be used if the number is singular.
--   _single_ `Single`: The text to be used if the number is singular.
--   _plural_ `Plural`: The text to be used if the number is plural.
--   _number_ `number`: The number to compare against to use either the singular or plural form.
--   _context_ `string`: Context information for the translators.
--   _domain_ `[string | undefined]`: Domain to retrieve the translated text.
+- _single_ `Single`: The text to be used if the number is singular.
+- _single_ `Single`: The text to be used if the number is singular.
+- _plural_ `Plural`: The text to be used if the number is plural.
+- _number_ `number`: The number to compare against to use either the singular or plural form.
+- _context_ `string`: Context information for the translators.
+- _domain_ `[string | undefined]`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `TransformedText<Single | Plural>`: The translated singular or plural form.
+- `TransformedText<Single | Plural>`: The translated singular or plural form.
 
 ### \_x
 
@@ -186,17 +186,17 @@ Retrieve translated string with gettext context.
 
 _Related_
 
--   <https://developer.wordpress.org/reference/functions/_x/>
+- <https://developer.wordpress.org/reference/functions/_x/>
 
 _Parameters_
 
--   _text_ `Text`: Text to translate.
--   _context_ `string`: Context information for the translators.
--   _domain_ `string | undefined`: Domain to retrieve the translated text.
+- _text_ `Text`: Text to translate.
+- _context_ `string`: Context information for the translators.
+- _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `TransformedText<Text>`: Translated context string without pipe.
+- `TransformedText<Text>`: Translated context string without pipe.
 
 ### \_\_
 
@@ -204,16 +204,16 @@ Retrieve the translation of text.
 
 _Related_
 
--   <https://developer.wordpress.org/reference/functions/__/>
+- <https://developer.wordpress.org/reference/functions/__/>
 
 _Parameters_
 
--   _text_ `Text`: Text to translate.
--   _domain_ `string | undefined`: Domain to retrieve the translated text.
+- _text_ `Text`: Text to translate.
+- _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
--   `TransformedText<Text>`: Translated text.
+- `TransformedText<Text>`: Translated text.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
