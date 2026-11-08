@@ -66,15 +66,15 @@ Any display rotation carried by the sequence is baked into the encoded frames, s
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _sequence_ `HeicSequenceInput`: Demuxed sequence (codec config + samples).
--   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
--   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
--   _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
+- _id_ `ItemId`: Item ID.
+- _sequence_ `HeicSequenceInput`: Demuxed sequence (codec config + samples).
+- _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+- _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+- _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
 
 _Returns_
 
--   `Promise< ArrayBuffer >`: Encoded video buffer.
+- `Promise< ArrayBuffer >`: Encoded video buffer.
 
 ### DEFAULT_MAX_TOTAL_PIXELS
 
