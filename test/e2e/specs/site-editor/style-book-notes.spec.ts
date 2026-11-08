@@ -1,4 +1,6 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { Admin, RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import type { Page } from '@playwright/test';
 
 /**
  * Resolves the current theme's user global styles post - the record Style Book
@@ -8,7 +10,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @param {Object} requestUtils Playwright request utils.
  * @return {Promise<number|undefined>} The post id.
  */
-async function getGlobalStylesId( requestUtils ) {
+async function getGlobalStylesId(
+	requestUtils: RequestUtils
+): Promise< number | undefined > {
 	const themes = await requestUtils.rest( {
 		path: '/wp/v2/themes',
 		params: { status: 'active' },
@@ -28,7 +32,7 @@ async function getGlobalStylesId( requestUtils ) {
  *
  * @param {Object} requestUtils Playwright request utils.
  */
-async function deleteStyleBookNotes( requestUtils ) {
+async function deleteStyleBookNotes( requestUtils: RequestUtils ) {
 	const globalStylesId = await getGlobalStylesId( requestUtils );
 	if ( ! globalStylesId ) {
 		return;
@@ -45,7 +49,7 @@ async function deleteStyleBookNotes( requestUtils ) {
 	} );
 
 	await Promise.all(
-		notes.map( ( note ) =>
+		notes.map( ( note: { id: number } ) =>
 			requestUtils.rest( {
 				method: 'DELETE',
 				path: `/wp/v2/comments/${ note.id }`,
@@ -81,7 +85,15 @@ test.describe( 'Style Book notes', () => {
 	 * @param {Object} context.page    Playwright page.
 	 * @param {string} [context.theme] Active theme slug.
 	 */
-	async function openStyleBook( { admin, page, theme = 'emptytheme' } ) {
+	async function openStyleBook( {
+		admin,
+		page,
+		theme = 'emptytheme',
+	}: {
+		admin: Admin;
+		page: Page;
+		theme?: string;
+	} ) {
 		await admin.visitSiteEditor( {
 			postId: `${ theme }//index`,
 			postType: 'wp_template',
@@ -98,7 +110,7 @@ test.describe( 'Style Book notes', () => {
 		await page.getByRole( 'tab', { name: 'Text' } ).click();
 	}
 
-	const styleBookFrame = ( page ) =>
+	const styleBookFrame = ( page: Page ) =>
 		page.frameLocator( '[name="style-book-canvas"]' );
 
 	test( 'adds a note to an example and lists it under that example', async ( {
@@ -381,10 +393,11 @@ test.describe( 'Style Book notes', () => {
 		await expect( sidebar.getByText( 'Anchored note.' ) ).toBeVisible();
 
 		const globalStylesId = await getGlobalStylesId( requestUtils );
+		expect( globalStylesId ).toBeDefined();
 		const notes = await requestUtils.rest( {
 			path: '/wp/v2/comments',
 			params: {
-				post: globalStylesId,
+				post: globalStylesId as number,
 				type: 'note',
 				status: 'all',
 			},

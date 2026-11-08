@@ -1,4 +1,10 @@
-import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
@@ -7,7 +13,7 @@ import { Stack, Text } from '@wordpress/ui';
 import { NoteThread } from '../../collab-sidebar/note-thread';
 import { NoteCard } from '../../collab-sidebar/note-card';
 import { NoteForm } from '../../collab-sidebar/note-form';
-import { useNoteActions } from '../../collab-sidebar/hooks';
+import { NoteDraftsContext, useNoteActions } from '../../collab-sidebar/hooks';
 import { focusNoteThread } from '../../collab-sidebar/utils/dom';
 import { NOTE_ANCHOR_META, UNKNOWN_ANCHOR, getThreadAnchor } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
@@ -52,6 +58,8 @@ export function StyleBookNotesPanel( {
 		[]
 	);
 	const addNoteRef = useRef< HTMLDivElement | null >( null );
+	// Unsent replies, which `NoteThread` keeps across remounts.
+	const [ drafts ] = useState( () => new Map< number | string, string >() );
 
 	/*
 	 * The request to add a note comes from the canvas, so focus has to follow
@@ -205,181 +213,189 @@ export function StyleBookNotesPanel( {
 	}
 
 	return (
-		<Stack
-			className="editor-collab-sidebar-panel editor-style-book-notes"
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node: HTMLElement | null ) => {
-				if ( node ) {
-					sidebarRef.current = node;
-				}
-			} }
-			aria-label={ __( 'Style Book notes' ) }
-		>
-			{ !! pendingAnchor && (
-				/*
-				 * Keyed by the anchor so switching examples starts a fresh
-				 * draft: `NoteForm` holds the text in state, and reusing the
-				 * instance would file what was typed for one example against
-				 * another.
-				 */
-				<div
-					key={ pendingAnchor }
-					ref={ addNoteRef }
-					className="editor-style-book-notes__add-note"
-					role="treeitem"
-					tabIndex={ 0 }
-					aria-label={
-						pendingLabel
-							? sprintf(
-									// translators: %s: Style Book example title, e.g. "Button".
-									__( 'New note on %s' ),
-									pendingLabel
-								)
-							: __( 'New note' )
+		<NoteDraftsContext.Provider value={ drafts }>
+			<Stack
+				className="editor-collab-sidebar-panel editor-style-book-notes"
+				role="tree"
+				direction="column"
+				gap="md"
+				justify="flex-start"
+				ref={ ( node: HTMLElement | null ) => {
+					if ( node ) {
+						sidebarRef.current = node;
 					}
-				>
-					<NoteCard>
-						<NoteForm
-							onSubmit={ async ( inputComment: string ) => {
-								/*
-								 * The create action resolves `undefined` when
-								 * the save fails (it surfaces its own error
-								 * notice); keep the form open so the draft is
-								 * not lost.
-								 */
-								const savedRecord = await onCreate( {
-									content: inputComment,
-								} );
-								if ( savedRecord ) {
-									setPendingAnchor( null );
-									selectNote( savedRecord.id );
-									focusNoteThread(
-										savedRecord.id,
-										sidebarRef.current
-									);
-								}
-								return savedRecord;
-							} }
-							onCancel={ () => setPendingAnchor( null ) }
-							labels={ {
-								input: pendingLabel
-									? sprintf(
-											// translators: %s: Style Book example title, e.g. "Button".
-											__( 'New note on %s' ),
-											pendingLabel
-										)
-									: __( 'New note' ),
-								placeholder: __( 'Add a note or @ mention' ),
-							} }
-						/>
-					</NoteCard>
-				</div>
-			) }
-			{ groups.map( ( group ) => {
-				// Unresolved threads sort first, so the first resolved one
-				// marks where the divider goes.
-				const firstResolvedIndex = group.threads.findIndex(
-					( thread ) => thread.status === 'approved'
-				);
-
-				return (
-					<Stack
-						key={ group.anchor }
-						role="group"
-						aria-label={ group.label }
-						direction="column"
-						gap="md"
-						justify="flex-start"
-					>
-						<Stack
-							direction="row"
-							align="center"
-							justify="space-between"
-							gap="sm"
-						>
-							<Text
-								variant="heading-sm"
-								className="editor-style-book-notes__group-title"
-								render={ <h3 /> }
-							>
-								{ group.label }
-							</Text>
-							{ /*
-							 * An example that already has a note still needs a
-							 * way to take another one: its canvas button has
-							 * become a link to the notes it has. The unknown
-							 * bucket gets none - there is no example on screen
-							 * to anchor a new note to.
-							 */ }
-							{ group.anchor !== UNKNOWN_ANCHOR && (
-								<Button
-									size="small"
-									icon={ plus }
-									className="editor-style-book-notes__add-note-button"
-									label={ sprintf(
+				} }
+				aria-label={ __( 'Style Book notes' ) }
+			>
+				{ !! pendingAnchor && (
+					/*
+					 * Keyed by the anchor so switching examples starts a fresh
+					 * draft: `NoteForm` holds the text in state, and reusing the
+					 * instance would file what was typed for one example against
+					 * another.
+					 */
+					<div
+						key={ pendingAnchor }
+						ref={ addNoteRef }
+						className="editor-style-book-notes__add-note"
+						role="treeitem"
+						tabIndex={ 0 }
+						aria-label={
+							pendingLabel
+								? sprintf(
 										// translators: %s: Style Book example title, e.g. "Button".
-										__( 'Add note on %s' ),
-										group.label
-									) }
-									onClick={ () =>
-										setPendingAnchor( group.anchor )
+										__( 'New note on %s' ),
+										pendingLabel
+									)
+								: __( 'New note' )
+						}
+					>
+						<NoteCard>
+							<NoteForm
+								onSubmit={ async ( inputComment: string ) => {
+									/*
+									 * The create action resolves `undefined` when
+									 * the save fails (it surfaces its own error
+									 * notice); keep the form open so the draft is
+									 * not lost.
+									 */
+									const savedRecord = await onCreate( {
+										content: inputComment,
+									} );
+									if ( savedRecord ) {
+										setPendingAnchor( null );
+										selectNote( savedRecord.id );
+										focusNoteThread(
+											savedRecord.id,
+											sidebarRef.current
+										);
 									}
-								/>
-							) }
-						</Stack>
-						{ group.threads.map( ( thread, index ) => (
-							<Fragment key={ thread.id }>
-								{ index === firstResolvedIndex && (
-									<Stack
-										direction="row"
-										align="center"
-										justify="center"
-										gap="sm"
-										className="editor-collab-sidebar-panel__status-separator"
-									>
-										<Text
-											variant="heading-sm"
-											render={ <p /> }
-										>
-											{ __( 'Resolved' ) }
-										</Text>
-									</Stack>
+									return savedRecord;
+								} }
+								onCancel={ () => setPendingAnchor( null ) }
+								labels={ {
+									input: pendingLabel
+										? sprintf(
+												// translators: %s: Style Book example title, e.g. "Button".
+												__( 'New note on %s' ),
+												pendingLabel
+											)
+										: __( 'New note' ),
+									placeholder: __(
+										'Add a note or @ mention'
+									),
+								} }
+							/>
+						</NoteCard>
+					</div>
+				) }
+				{ groups.map( ( group ) => {
+					// Unresolved threads sort first, so the first resolved one
+					// marks where the divider goes.
+					const firstResolvedIndex = group.threads.findIndex(
+						( thread ) => thread.status === 'approved'
+					);
+
+					return (
+						<Stack
+							key={ group.anchor }
+							role="group"
+							aria-label={ group.label }
+							direction="column"
+							gap="md"
+							justify="flex-start"
+						>
+							<Stack
+								direction="row"
+								align="center"
+								justify="space-between"
+								gap="sm"
+							>
+								<Text
+									variant="heading-sm"
+									className="editor-style-book-notes__group-title"
+									render={ <h3 /> }
+								>
+									{ group.label }
+								</Text>
+								{ /*
+								 * An example that already has a note still needs a
+								 * way to take another one: its canvas button has
+								 * become a link to the notes it has. The unknown
+								 * bucket gets none - there is no example on screen
+								 * to anchor a new note to.
+								 */ }
+								{ group.anchor !== UNKNOWN_ANCHOR && (
+									<Button
+										size="small"
+										icon={ plus }
+										className="editor-style-book-notes__add-note-button"
+										label={ sprintf(
+											// translators: %s: Style Book example title, e.g. "Button".
+											__( 'Add note on %s' ),
+											group.label
+										) }
+										onClick={ () =>
+											setPendingAnchor( group.anchor )
+										}
+									/>
 								) }
-								<NoteThread
-									note={ thread }
-									anchorLabel={ group.label }
-									// Notes live on the global styles post, not the
-									// edited one. `handleDelete` moves focus itself.
-									actions={ {
-										onCreate,
-										onEdit: onEditNote,
-										onDelete: handleDelete,
-									} }
-									onSelect={ () =>
-										setActiveAnchor( group.anchor )
-									}
-									onDeselect={ () => setActiveAnchor( null ) }
-									isSelected={ selectedNote === thread.id }
-									sidebarRef={ sidebarRef }
-									onKeyDown={ (
-										event: React.KeyboardEvent< HTMLElement >
-									) =>
-										navigate(
-											event,
-											thread,
-											group.anchor,
+							</Stack>
+							{ group.threads.map( ( thread, index ) => (
+								<Fragment key={ thread.id }>
+									{ index === firstResolvedIndex && (
+										<Stack
+											direction="row"
+											align="center"
+											justify="center"
+											gap="sm"
+											className="editor-collab-sidebar-panel__status-separator"
+										>
+											<Text
+												variant="heading-sm"
+												render={ <p /> }
+											>
+												{ __( 'Resolved' ) }
+											</Text>
+										</Stack>
+									) }
+									<NoteThread
+										note={ thread }
+										anchorLabel={ group.label }
+										// Notes live on the global styles post, not the
+										// edited one. `handleDelete` moves focus itself.
+										actions={ {
+											onCreate,
+											onEdit: onEditNote,
+											onDelete: handleDelete,
+										} }
+										onSelect={ () =>
+											setActiveAnchor( group.anchor )
+										}
+										onDeselect={ () =>
+											setActiveAnchor( null )
+										}
+										isSelected={
 											selectedNote === thread.id
-										)
-									}
-								/>
-							</Fragment>
-						) ) }
-					</Stack>
-				);
-			} ) }
-		</Stack>
+										}
+										sidebarRef={ sidebarRef }
+										onKeyDown={ (
+											event: React.KeyboardEvent< HTMLElement >
+										) =>
+											navigate(
+												event,
+												thread,
+												group.anchor,
+												selectedNote === thread.id
+											)
+										}
+									/>
+								</Fragment>
+							) ) }
+						</Stack>
+					);
+				} ) }
+			</Stack>
+		</NoteDraftsContext.Provider>
 	);
 }
