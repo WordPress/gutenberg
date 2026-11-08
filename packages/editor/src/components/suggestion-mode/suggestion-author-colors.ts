@@ -8,7 +8,7 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_FORMAT,
 } from '../inline-suggestions';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { parseSuggestionPayload } from './operations';
 import { store as editorStore } from '../../store';

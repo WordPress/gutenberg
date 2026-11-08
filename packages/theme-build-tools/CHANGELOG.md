@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 (2026-11-04)
+
 -   Initial release, with the build and Stylelint plugins moved from `@wordpress/theme` ([#83568](https://github.com/WordPress/gutenberg/pull/83568), [#85388](https://github.com/WordPress/gutenberg/pull/85388)).
 -   Update the Vite development dependency to 8.3.5 for build plugin tests ([#85739](https://github.com/WordPress/gutenberg/pull/85739)).
 

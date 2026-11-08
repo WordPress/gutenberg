@@ -82,7 +82,7 @@ import {
 } from './operations';
 import type { BlockTreeReader, PlanStep } from './operations';
 import { rememberWithdrawnAnchor } from './decision-state';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import {
 	planStoreContentEdit,
