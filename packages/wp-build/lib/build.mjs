@@ -2689,6 +2689,10 @@ async function watchMode() {
 			const copyTime = Date.now() - startTime;
 			console.log( `✅ ${ relativePath } (copied) (${ copyTime }ms)` );
 		} catch ( error ) {
+			// The file was removed since; its removal rebuilds the package.
+			if ( error.code === 'ENOENT' ) {
+				return;
+			}
 			console.log( `❌ ${ relativePath } - Error: ${ error.message }` );
 		}
 	}
