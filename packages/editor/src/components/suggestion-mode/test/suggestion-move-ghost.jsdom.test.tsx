@@ -35,7 +35,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	} as unknown as typeof original;
 } );
 
-vi.mock( import( '../../collab-sidebar/utils' ), () => ( {
+vi.mock( import( '../../collab-sidebar/utils/display' ), () => ( {
 	getAvatarBorderColor: ( id: any ) => `#color${ id }`,
 } ) );
 
