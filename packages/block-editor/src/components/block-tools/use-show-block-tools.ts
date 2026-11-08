@@ -30,7 +30,10 @@ export function useShowBlockTools() {
 			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
-			clientId && ! isTyping() && isEmptyDefaultBlock;
+			clientId &&
+			! isTyping() &&
+			isEmptyDefaultBlock &&
+			! getSettings().isDistractionFree;
 		const _showBlockToolbarPopover =
 			! isBlockInterfaceHidden() &&
 			! getSettings().hasFixedToolbar &&

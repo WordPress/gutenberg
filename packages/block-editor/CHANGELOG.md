@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Distraction free: Hide the inserter beside a selected empty paragraph when `isDistractionFree` is on ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 
