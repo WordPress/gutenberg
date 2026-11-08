@@ -675,6 +675,38 @@ describe( 'actions', () => {
 					.resumeItemByPostId
 			).toBeUndefined();
 		} );
+
+		it( 'cancels sideload item when file exceeds maxUploadFileSize', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxUploadFileSize: 1,
+			} );
+
+			// jpegFile is 3 bytes ('foo'), which exceeds maxUploadFileSize of 1.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: 'fake-parent-id',
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// mediaSideload should NOT be called since we cancel before sending.
+			expect( mediaSideload ).not.toHaveBeenCalled();
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			const sideloadItem = items.find(
+				( item ) => item.parentId === 'fake-parent-id'
+			);
+
+			// Item should be removed by cancelItem.
+			expect( sideloadItem ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'cancelItem', () => {
