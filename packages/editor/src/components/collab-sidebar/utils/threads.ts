@@ -3,7 +3,7 @@
  */
 export interface NoteComment {
 	id: number;
-	parent: number;
+	parent?: number;
 	status?: string;
 	[ key: string ]: unknown;
 }
@@ -47,7 +47,7 @@ export function materializeNoteThreads< T extends NoteComment >(
 	}
 
 	for ( const item of comments ) {
-		if ( item.parent !== 0 ) {
+		if ( item.parent !== 0 && item.parent !== undefined ) {
 			// A reply whose root is gone from the response is dropped rather
 			// than surfaced parentless.
 			const reply = threadsById.get( item.id );

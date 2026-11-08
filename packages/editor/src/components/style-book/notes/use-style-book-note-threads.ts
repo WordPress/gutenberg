@@ -74,7 +74,9 @@ export function useStyleBookNoteThreads( {
 			};
 		}
 
-		const { rootThreads } = materializeNoteThreads( records );
+		const { rootThreads } = materializeNoteThreads(
+			records as StyleBookNoteThread[]
+		);
 
 		/*
 		 * Unresolved threads sort ahead of resolved ones within each example,

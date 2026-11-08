@@ -3,9 +3,14 @@ import {
 	materializeNoteThreads,
 	partitionNoteThreadsByStatus,
 } from '../utils/threads';
+import type { NoteComment } from '../utils/threads';
 
 describe( 'materializeNoteThreads', () => {
-	const comment = ( id, parent = 0, extra = {} ) => ( {
+	const comment = (
+		id: number,
+		parent = 0,
+		extra: Record< string, unknown > = {}
+	): NoteComment => ( {
 		id,
 		parent,
 		status: 'hold',
@@ -74,7 +79,7 @@ describe( 'materializeNoteThreads', () => {
 			comment( 2, 1 ),
 		] );
 
-		expect( threadsById.get( 2 ).parent ).toBe( 1 );
+		expect( threadsById.get( 2 )?.parent ).toBe( 1 );
 	} );
 
 	it( 'drops replies whose parent is missing rather than throwing', () => {
@@ -93,7 +98,10 @@ describe( 'materializeNoteThreads', () => {
 			comment( 1, 0, { meta: { _wp_note_anchor: 'core/button' } } ),
 		] );
 
-		expect( rootThreads[ 0 ].meta._wp_note_anchor ).toBe( 'core/button' );
+		expect(
+			( rootThreads[ 0 ].meta as Record< string, unknown > )
+				._wp_note_anchor
+		).toBe( 'core/button' );
 	} );
 } );
 
