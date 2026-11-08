@@ -24,6 +24,7 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { boolConfigVal, copyPackageFile, getCopyFiles } from './copy-files.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -109,20 +110,6 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
 // declare one. Pages rendering outside the menu page callback flow must
 // enforce this themselves.
 const DEFAULT_PAGE_CAPABILITY = 'manage_options';
-
-/**
- * Interprets a configuration value as a boolean, where `"true"` and `"1"`
- * are considered true while all other values are false.
- *
- * @param {string|undefined} value The configuration value to interpret.
- * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
- */
-const boolConfigVal = ( value ) => {
-	if ( value === undefined ) {
-		return undefined;
-	}
-	return [ 'true', '1' ].includes( value.toLowerCase() );
-};
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -417,137 +404,6 @@ export default bytes;`,
  */
 function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
-}
-
-function transformPhpContent( content, transforms ) {
-	const {
-		functionPrefix = '',
-		classSuffix = '',
-		prefixFunctions = [],
-		suffixClasses = [],
-		addActionPriority,
-	} = transforms;
-
-	content = content.toString();
-
-	/*
-	 * Transforms are used to modify PHP files that are committed to version
-	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
-	 * class prefixes, etc.). When building for WordPress Core, it's not
-	 * necessary to perform these steps.
-	 */
-	if (
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
-	) {
-		return content;
-	}
-
-	if ( prefixFunctions.length ) {
-		content = content.replace(
-			new RegExp( prefixFunctions.join( '|' ), 'g' ),
-			( match ) => `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
-		);
-	}
-
-	if ( suffixClasses.length ) {
-		content = content.replace(
-			new RegExp( suffixClasses.join( '|' ), 'g' ),
-			( match ) => `${ match }${ classSuffix }`
-		);
-	}
-
-	if ( functionPrefix ) {
-		content = Array.from(
-			content.matchAll( /^\s*function ([^\(]+)/gm )
-		).reduce( ( result, [ , functionName ] ) => {
-			return result.replace(
-				new RegExp( functionName + '(?![a-zA-Z0-9_])', 'g' ),
-				( match ) => functionPrefix + match.replace( /^wp_/, '' )
-			);
-		}, content );
-	}
-
-	if ( addActionPriority ) {
-		content = content.replace(
-			/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-			`$1, ${ addActionPriority }`
-		);
-	}
-
-	return content;
-}
-
-/**
- * Find the source files a package copies to the build with `wpCopyFiles`.
- *
- * @param {string} packageDir  Package directory.
- * @param {Object} packageJson Package's package.json.
- * @return {Promise<string[]>} Absolute paths of the files to copy.
- */
-async function getCopyFiles( packageDir, packageJson ) {
-	if ( ! packageJson.wpCopyFiles ) {
-		return [];
-	}
-	// Glob relative to the package, so that its path is not read as a pattern.
-	return glob( packageJson.wpCopyFiles.files, {
-		cwd: packageDir,
-		absolute: true,
-	} );
-}
-
-/**
- * Copy one of a package's `wpCopyFiles` to the build, transforming PHP files.
- *
- * @param {string} sourceFile  Absolute path of the file to copy.
- * @param {string} packageDir  Package directory.
- * @param {string} packageName Package name (short name).
- * @param {Object} packageJson Package's package.json.
- */
-async function copyPackageFile(
-	sourceFile,
-	packageDir,
-	packageName,
-	packageJson
-) {
-	const { transforms = {} } = packageJson.wpCopyFiles;
-	const relativePath = path.relative(
-		path.join( packageDir, 'src' ),
-		sourceFile
-	);
-	let destPath = path.join( BUILD_DIR, 'scripts', packageName, relativePath );
-
-	if ( ! sourceFile.endsWith( '.php' ) || ! transforms.php ) {
-		await mkdir( path.dirname( destPath ), { recursive: true } );
-		await copyFile( sourceFile, destPath );
-		return;
-	}
-
-	const content = await readFile( sourceFile, 'utf8' );
-	const transformed = transformPhpContent( content, transforms.php );
-
-	if ( transforms.php.filenameSuffix ) {
-		const ext = path.extname( destPath );
-		const base = path.basename( destPath, ext );
-		destPath = path.join(
-			path.dirname( destPath ),
-			`${ base }${ transforms.php.filenameSuffix }${ ext }`
-		);
-	}
-
-	// Check if we should flatten index.php files
-	if (
-		transforms.php.flattenIndexFiles &&
-		path.basename( sourceFile ) === 'index.php'
-	) {
-		// Flatten: button/index.php → button.php
-		const parentDir = path.dirname( destPath );
-		const blockName = path.basename( parentDir );
-		destPath = path.join( path.dirname( parentDir ), `${ blockName }.php` );
-	}
-
-	await mkdir( path.dirname( destPath ), { recursive: true } );
-	await writeFile( destPath, transformed );
 }
 
 /**
@@ -975,7 +831,12 @@ async function bundlePackage( packageName, options = {} ) {
 
 	for ( const sourceFile of await getCopyFiles( packageDir, packageJson ) ) {
 		builds.push(
-			copyPackageFile( sourceFile, packageDir, packageName, packageJson )
+			copyPackageFile(
+				sourceFile,
+				packageDir,
+				path.join( BUILD_DIR, 'scripts', packageName ),
+				packageJson
+			)
 		);
 	}
 
@@ -2822,7 +2683,7 @@ async function watchMode() {
 			await copyPackageFile(
 				filename,
 				path.join( PACKAGES_DIR, packageName ),
-				packageName,
+				path.join( BUILD_DIR, 'scripts', packageName ),
 				fullToPackageJson.get( shortToFull.get( packageName ) )
 			);
 			const copyTime = Date.now() - startTime;
