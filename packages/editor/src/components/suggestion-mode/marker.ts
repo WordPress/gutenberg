@@ -10,7 +10,7 @@
  * outermost suggestion; deciding it lifts the first nested entry out.
  */
 import { isAttributeEqual } from './operations';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 
 export const PENDING_ATTRIBUTES = 'pending-attributes';
 
