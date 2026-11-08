@@ -1519,13 +1519,14 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 
-			// The footer leaves out the tone, which the emoji already shows.
+			// The footer leaves out the tone, which the emoji already shows,
+			// and names a default reaction by its own label.
 			await tonedCell.hover();
 			await expect(
 				page.locator(
 					'.editor-collab-sidebar-panel__picker-footer-name'
 				)
-			).toHaveText( 'thumbs up' );
+			).toHaveText( 'Thumbs up' );
 
 			await tonedCell.click();
 
