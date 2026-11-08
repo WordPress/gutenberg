@@ -1,13 +1,5 @@
-/**
- * WordPress dependencies
- */
 // @wordpress/blocks imports are not typed.
-// @ts-expect-error
 import { getCategories } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import type {
 	BlockExample,
 	StyleBookCategory,

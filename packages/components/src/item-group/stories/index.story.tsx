@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ItemGroup } from '../item-group/component';
 import { Item } from '../item/component';
 
@@ -14,17 +7,18 @@ type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
 	subcomponents: { Item },
-	title: 'Components/ItemGroup',
+	id: 'components-itemgroup',
+	title: 'Components/@wordpress-components/ItemGroup',
 	argTypes: {
 		as: { control: false },
 		children: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

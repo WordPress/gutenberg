@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import { describe, expect, it } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import Delta from '../Delta';
 
 describe( 'Delta.diffWithCursor', () => {

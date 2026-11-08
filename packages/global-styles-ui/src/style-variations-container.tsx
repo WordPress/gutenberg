@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
@@ -10,10 +7,6 @@ import type {
 	GlobalStylesConfig,
 	StyleVariation,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 import { GlobalStylesContext } from './context';
@@ -100,7 +93,7 @@ function StyleVariationsContainer( {
 								css: `${ variation.styles?.css || '' } ${
 									userStyles?.css || ''
 								}`,
-						  }
+							}
 						: {};
 
 				const blocks =

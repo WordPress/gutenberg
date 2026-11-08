@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import StylesPreviewColors from '../preview-colors';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../hooks';
 import { Subtitle } from '../subtitle';

@@ -39,7 +39,7 @@ An array of all of the completers to apply to the current element.
 A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
 
 -   Required: Yes
--   `MutableRefObject< HTMLElement | undefined >`
+-   `RefObject< HTMLElement | undefined >`
 
 ### children
 
@@ -78,7 +78,7 @@ In addition, a completer may optionally declare:
 
 #### name
 
-The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks.
+The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks. Each completer should have a unique name.
 
 -   Type: `String`
 -   Required: Yes

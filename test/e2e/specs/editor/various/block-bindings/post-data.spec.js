@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Data source', () => {
@@ -8,8 +5,9 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost( { title: 'Test bindings' } );
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -19,6 +17,7 @@ test.describe( 'Post Data source', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
+
 	test.describe( 'Post Data bindings UI.', () => {
 		test( 'should not include post data fields in UI to connect attributes on non date blocks', async ( {
 			editor,

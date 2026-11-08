@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { PageControlIcon } from './icons';
 import type { PageControlProps } from './types';

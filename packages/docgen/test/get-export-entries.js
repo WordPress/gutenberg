@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
-const engine = require( '../lib/engine' );
-const getExportEntries = require( '../lib/get-export-entries' );
+import { describe, expect, it } from 'vitest';
+import engine from '../lib/engine';
+import getExportEntries from '../lib/get-export-entries';
 
 /**
  * Parses sample code into testable structure.
@@ -114,9 +112,6 @@ describe( 'Export entries', () => {
 	it( 'default import (named)', () => {
 		const testCode = firstExport(
 			`
-			/**
-			 * Internal dependencies
-			 */
 			import { functionDeclaration as fnDeclaration } from './module-code';
 
 			export default fnDeclaration;
@@ -143,9 +138,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import fnDeclaration from './module-code';
 
 				export default fnDeclaration;
@@ -406,9 +398,6 @@ describe( 'Export entries', () => {
 		expect(
 			firstExport(
 				`
-				/**
-				 * Internal dependencies
-				 */
 				import * as variables from './module-code';
 
 				export { variables };

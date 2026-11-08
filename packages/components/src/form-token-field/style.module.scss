@@ -1,0 +1,6 @@
+@use "@wordpress/base-styles/mixins" as mixins;
+
+.tokens-and-input {
+	padding: 7px;
+	@include mixins.reset;
+}

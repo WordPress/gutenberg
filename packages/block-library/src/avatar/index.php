@@ -18,18 +18,19 @@
 function render_block_core_avatar( $attributes, $content, $block ) {
 	$size               = $attributes['size'] ?? 96;
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$border_attributes  = get_block_core_avatar_border_attributes( $attributes );
+	$image_attributes   = wp_get_block_supports_classes_and_styles( $attributes, array( 'border', 'shadow' ) );
 
 	// Class gets passed through `esc_attr` via `get_avatar`.
-	$image_classes = ! empty( $border_attributes['class'] )
-		? "wp-block-avatar__image {$border_attributes['class']}"
+	$image_classes = ! empty( $image_attributes['class'] )
+		? "wp-block-avatar__image {$image_attributes['class']}"
 		: 'wp-block-avatar__image';
 
 	// Unlike class, `get_avatar` doesn't filter the styles via `esc_attr`.
-	// The style engine does pass the border styles through
+	// The style engine does pass the border and shadow styles through
 	// `safecss_filter_attr` however.
-	$image_styles = ! empty( $border_attributes['style'] )
-		? sprintf( ' style="%s"', esc_attr( $border_attributes['style'] ) )
+	$image_css    = $image_attributes['style'] ?? '';
+	$image_styles = ! empty( $image_css )
+		? sprintf( ' style="%s"', esc_attr( $image_css ) )
 		: '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
@@ -67,7 +68,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			// translators: 1: Author archive link. 2: Link target. %3$s Aria label. %4$s Avatar image.
 			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 		}
-		return sprintf( '<div %1s>%2s</div>', $wrapper_attributes, $avatar_block );
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 	}
 	$comment = get_comment( $block->context['commentId'] );
 	if ( ! $comment ) {
@@ -85,7 +86,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			'class'      => $image_classes,
 		)
 	);
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && '' !== $comment->comment_author_url ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			// translators: %s: Comment author name.
@@ -93,7 +94,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		}
 		$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( $comment->comment_author_url ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 	}
-	return sprintf( '<div %1s>%2s</div>', $wrapper_attributes, $avatar_block );
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 }
 
 /**
@@ -106,48 +107,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
  * @return array The border-related classnames and styles for the block.
  */
 function get_block_core_avatar_border_attributes( $attributes ) {
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	// Border radius.
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-
-	// Border style.
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-
-	// Border width.
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	// Border color.
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	// Individual border styles e.g. top, left etc.
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => $border['color'] ?? null,
-			'style' => $border['style'] ?? null,
-			'width' => $border['width'] ?? null,
-		);
-	}
-
-	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
-	$attributes = array();
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
-	}
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
-	}
-	return $attributes;
+	return wp_get_border_classes_and_styles( $attributes );
 }
 
 /**

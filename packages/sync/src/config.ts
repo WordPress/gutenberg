@@ -24,13 +24,13 @@ export const CRDT_RECORD_MAP_KEY = 'document';
 export const CRDT_STATE_MAP_KEY = 'state';
 
 /**
- * Y.Map key representing the timestamp of the last save operation.
+ * Y.Map key representing the timestamp of the last user-facing entity save.
  */
 export const CRDT_STATE_MAP_SAVED_AT_KEY = 'savedAt';
 
 /**
- * Y.Map key representing the Y.Doc client ID of the user who performed the last
- * save operation.
+ * Y.Map key representing the Y.Doc client ID of the user who performed the
+ * last user-facing entity save.
  */
 export const CRDT_STATE_MAP_SAVED_BY_KEY = 'savedBy';
 

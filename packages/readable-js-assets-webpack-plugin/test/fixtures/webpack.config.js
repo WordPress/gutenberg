@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 const TerserPlugin = require( 'terser-webpack-plugin' );
-
-/**
- * Internal dependencies
- */
 const ReadableJsAssetsWebpackPlugin = require( '../..' );
 
 module.exports = {

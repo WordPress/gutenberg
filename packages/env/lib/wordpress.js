@@ -1,15 +1,8 @@
 'use strict';
-/**
- * External dependencies
- */
 const dns = require( 'dns' ).promises;
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
-
-/**
- * Internal dependencies
- */
 const { getCache, setCache } = require( './cache' );
 
 /**

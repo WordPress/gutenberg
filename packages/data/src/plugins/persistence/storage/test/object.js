@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it } from 'vitest';
 import objectStorage from '../object';
 
 describe( 'objectStorage', () => {

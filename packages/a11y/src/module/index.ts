@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 export { speak } from '../shared/index';
 
 /**

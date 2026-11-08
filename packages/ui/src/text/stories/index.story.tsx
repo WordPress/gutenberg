@@ -3,8 +3,16 @@ import { Text } from '../index';
 import { Stack } from '../../stack';
 
 const meta: Meta< typeof Text > = {
-	title: 'Design System/Components/Text',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Text',
+	id: 'design-system-components-text',
 	component: Text,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -17,12 +25,16 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * Important: Setting the `variant` prop to a `heading` variant will not automatically render a heading element.
+ * Use the `render` prop to render a heading element with the appropriate level.
+ */
 export const AllVariants: Story = {
 	render: () => (
 		<Stack
 			direction="column"
 			gap="lg"
-			style={ { color: 'var(--wpds-color-fg-content-neutral)' } }
+			style={ { color: 'var(--wpds-color-foreground-content-neutral)' } }
 		>
 			{ (
 				[

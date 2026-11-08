@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 import '@wordpress/interactivity-router';
 

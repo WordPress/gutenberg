@@ -1,0 +1,79 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as TextareaControlStories from './index.story';
+
+<Meta of={ TextareaControlStories } name="Migration Guide" />
+
+# TextareaControl migration guide
+
+Migrate from [`TextareaControl`](?path=/docs/components-textareacontrol--docs) in `@wordpress/components` to [`TextareaControl`](?path=/docs/design-system-components-form-textareacontrol--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Update the import and swap the callback prop:
+
+```jsx
+// Before
+import { TextareaControl } from '@wordpress/components';
+
+<TextareaControl
+	label="Description"
+	value={ value }
+	onChange={ setValue }
+	help="Enter a short description."
+/>;
+
+// After
+import { TextareaControl } from '@wordpress/ui';
+
+<TextareaControl
+	label="Description"
+	value={ value }
+	onValueChange={ setValue }
+	description="Enter a short description."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`onChange\` | \`onValueChange\` | Receives the next string value on every change. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`hideLabelFromVision\` | \`hideLabelFromVision\` | Same behavior. |
+| \`rows\` | \`rows\` | Same default (\`4\`). |
+` }</Markdown>
+
+## Labels
+
+`TextareaControl` requires a `label` prop with a plain `string` value. The legacy component treats `label` as optional.
+
+When the visible label text already exists elsewhere, pass a descriptive string and hide it visually:
+
+```jsx
+<TextareaControl
+	label="Notes"
+	hideLabelFromVision
+	value={ value }
+	onValueChange={ setValue }
+/>;
+```
+
+When the label is not a plain string, or you need a custom layout, compose the [`Textarea`](?path=/docs/design-system-components-form-primitives-textarea--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives instead of `TextareaControl`:
+
+```jsx
+import { Field, Textarea } from '@wordpress/ui';
+
+<Field.Root>
+	<Field.Label>
+		Custom <strong>label</strong> content
+	</Field.Label>
+	<Textarea
+		value={ value }
+		onValueChange={ setValue }
+	/>
+</Field.Root>
+```
+
+See the [`Field` stories](?path=/docs/design-system-components-form-primitives-field--docs) for other association patterns, such as external labels with `aria-labelledby`.

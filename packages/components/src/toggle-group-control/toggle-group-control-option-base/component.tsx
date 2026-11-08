@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import type {
@@ -20,11 +10,8 @@ import type {
 	WithToolTipProps,
 } from '../types';
 import { useToggleGroupControlContext } from '../context';
-import * as styles from './styles';
-import { useCx } from '../../utils/hooks';
+import styles from './style.module.scss';
 import Tooltip from '../../tooltip';
-
-const { ButtonContentView, LabelView } = styles;
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
@@ -63,11 +50,8 @@ function ToggleGroupControlOptionBase(
 		'ToggleGroupControlOptionBase'
 	);
 
-	const {
-		isBlock = false,
-		isDeselectable = false,
-		size = 'default',
-	} = toggleGroupControlContext;
+	const { isBlock = false, isDeselectable = false } =
+		toggleGroupControlContext;
 
 	const {
 		className,
@@ -79,24 +63,22 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
-	const isPressed = toggleGroupControlContext.value === value;
-	const cx = useCx();
-	const labelViewClasses = useMemo(
-		() => cx( isBlock && styles.labelBlock ),
-		[ cx, isBlock ]
+	const isOptionDisabled = Boolean(
+		toggleGroupControlContext.disabled || disabled
 	);
-	const itemClasses = useMemo(
-		() =>
-			cx(
-				styles.buttonView( {
-					isDeselectable,
-					isIcon,
-					isPressed,
-					size,
-				} ),
-				className
-			),
-		[ cx, isDeselectable, isIcon, isPressed, size, className ]
+	const isPressed = toggleGroupControlContext.value === value;
+	const labelClasses = clsx(
+		styles.label,
+		isBlock && styles[ 'label-block' ]
+	);
+	const itemClasses = clsx(
+		styles.button,
+		{
+			[ styles[ 'is-deselectable' ] ]: isDeselectable,
+			[ styles[ 'is-icon' ] ]: isIcon,
+			[ styles[ 'is-pressed' ] ]: isPressed,
+		},
+		className
 	);
 
 	const buttonOnClick = () => {
@@ -114,6 +96,13 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
+	// Text labels reserve the width of their emphasized (pressed) weight, so
+	// that pressing an option doesn't change the width of the control.
+	const buttonContentProps = {
+		className: styles[ 'button-content' ],
+		'data-label': typeof children === 'string' ? children : undefined,
+	};
+
 	const labelRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( isPressed && labelRef.current ) {
@@ -122,7 +111,7 @@ function ToggleGroupControlOptionBase(
 	}, [ isPressed, toggleGroupControlContext ] );
 
 	return (
-		<LabelView ref={ labelRef } className={ labelViewClasses }>
+		<div ref={ labelRef } className={ labelClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }
@@ -130,12 +119,12 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						disabled={ disabled }
+						disabled={ isOptionDisabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
 					>
-						<ButtonContentView>{ children }</ButtonContentView>
+						<div { ...buttonContentProps }>{ children }</div>
 					</button>
 				) : (
 					<Ariakit.Radio
@@ -157,11 +146,11 @@ function ToggleGroupControlOptionBase(
 						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
-						<ButtonContentView>{ children }</ButtonContentView>
+						<div { ...buttonContentProps }>{ children }</div>
 					</Ariakit.Radio>
 				) }
 			</WithToolTip>
-		</LabelView>
+		</div>
 	);
 }
 

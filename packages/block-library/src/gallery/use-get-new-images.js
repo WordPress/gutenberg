@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 
 /**

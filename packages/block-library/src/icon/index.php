@@ -15,15 +15,17 @@
  * @return string Returns the Icon.
  */
 function render_block_core_icon( $attributes ) {
-	if ( empty( $attributes['icon'] ) ) {
-		return;
+	if ( empty( $attributes['icon'] ) || ! is_string( $attributes['icon'] ) ) {
+		return '';
 	}
 
-	$registry = WP_Icons_Registry::get_instance();
-	$icon     = $registry->get_registered_icon( $attributes['icon'] );
-
-	if ( is_null( $icon ) ) {
-		return;
+	// Icons in non-public collections are not available in the editor, so do not render them either.
+	$registered_icon = WP_Icons_Registry::get_instance()->get_registered_icon( $attributes['icon'] );
+	if ( null !== $registered_icon ) {
+		$icon_collection = WP_Icon_Collections_Registry::get_instance()->get_registered( $registered_icon['collection'] );
+		if ( null !== $icon_collection && ! $icon_collection['public'] ) {
+			return '';
+		}
 	}
 
 	// Text color and background color.
@@ -37,80 +39,114 @@ function render_block_core_icon( $attributes ) {
 	$custom_background_color    = $attributes['style']['color']['background'] ?? null;
 	$color_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
-	// Border.
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
+	// Background image, size and gradient. Icon has no clip support, so ignore a stale value.
+	$background = $attributes['style']['background'] ?? null;
+	if ( is_array( $background ) ) {
+		unset( $background['backgroundClip'] );
 	}
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
+	$background_styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
 
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
+	// Shadow.
+	$shadow_styles = $attributes['style']['shadow'] ?? null;
 
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => $border['color'] ?? null,
-			'style' => $border['style'] ?? null,
-			'width' => $border['width'] ?? null,
-		);
-	}
-
-	// Spacing (Padding).
-	$spacing_styles = array();
-	if ( isset( $attributes['style']['spacing']['padding'] ) ) {
-		$spacing_styles['padding'] = $attributes['style']['spacing']['padding'];
-	}
-
-	// Dimensions (Width).
+	// Dimensions (Width, Min width, Min height).
 	$dimensions_styles = array();
-	if ( isset( $attributes['style']['dimensions']['width'] ) ) {
-		$dimensions_styles['width'] = $attributes['style']['dimensions']['width'];
+	foreach ( array( 'width', 'minWidth', 'minHeight' ) as $dimension ) {
+		if ( isset( $attributes['style']['dimensions'][ $dimension ] ) ) {
+			$dimensions_styles[ $dimension ] = $attributes['style']['dimensions'][ $dimension ];
+		}
 	}
 
-	// Generate styles and classes.
-	$styles = wp_style_engine_get_styles(
+	// Border sits between color and shadow in the style engine's order.
+	$styles_before_border = wp_style_engine_get_styles( array( 'color' => $color_styles ) );
+	$border_styles        = wp_get_border_classes_and_styles( $attributes );
+	$styles_after_border  = wp_style_engine_get_styles(
 		array(
-			'color'      => $color_styles,
-			'border'     => $border_styles,
-			'spacing'    => $spacing_styles,
+			'shadow'     => $shadow_styles,
 			'dimensions' => $dimensions_styles,
-		),
+		)
+	);
+	$spacing_styles       = wp_get_spacing_classes_and_styles(
+		array(
+			'style' => array(
+				'spacing' => array(
+					'padding' => $attributes['style']['spacing']['padding'] ?? null,
+				),
+			),
+		)
+	);
+	$styles               = array(
+		'classnames' => implode( ' ', array_filter( array( $styles_before_border['classnames'] ?? '', $border_styles['class'] ?? '', $styles_after_border['classnames'] ?? '' ) ) ),
+		'css'        => ( $styles_before_border['css'] ?? '' ) . ( $border_styles['style'] ?? '' ) . ( $styles_after_border['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 
-	$processor = new WP_HTML_Tag_Processor( $icon['content'] );
-	$processor->next_tag( 'svg' );
+	// The style engine outputs background before the other groups, so it leads here too.
+	$css = ( $background_styles['style'] ?? '' ) . $styles['css'];
 
-	if ( ! empty( $styles['css'] ) ) {
-		$processor->set_attribute( 'style', $styles['css'] );
-	}
-	if ( ! empty( $styles['classnames'] ) ) {
-		$processor->add_class( $styles['classnames'] );
-	}
+	$svg = wp_get_icon(
+		$attributes['icon'],
+		array(
+			// Width is applied via the dimensions block support styles below.
+			'size'  => null,
+			'class' => $styles['classnames'],
+			'label' => $attributes['ariaLabel'] ?? '',
+		)
+	);
 
-	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : '';
-
-	if ( ! $aria_label ) {
-		// Icon is decorative, hide it from screen readers.
-		$processor->set_attribute( 'aria-hidden', 'true' );
-		$processor->set_attribute( 'focusable', 'false' );
-	} else {
-		$processor->set_attribute( 'role', 'img' );
-		$processor->set_attribute( 'aria-label', $aria_label );
+	if ( '' === $svg ) {
+		return '';
 	}
 
-	// Return the updated SVG markup.
-	$svg        = $processor->get_updated_html();
-	$attributes = get_block_wrapper_attributes();
-	return sprintf( '<div %s>%s</div>', $attributes, $svg );
+	$processor = new WP_HTML_Tag_Processor( $svg );
+	if ( $processor->next_tag( 'svg' ) ) {
+		if ( '' !== $css ) {
+			// Merge with the SVG's intrinsic style (e.g. `fill: none` on
+			// stroke-based icons) so it is preserved. The block styles come last
+			// so they win on any conflicting property.
+			$existing_style = $processor->get_attribute( 'style' );
+			$trimmed_style  = is_string( $existing_style )
+				? rtrim( trim( $existing_style ), ';' )
+				: '';
+			$merged_style   = '' !== $trimmed_style
+				? $trimmed_style . '; ' . $css
+				: $css;
+			$processor->set_attribute( 'style', $merged_style );
+		}
+
+		if ( ! empty( $background_styles['class'] ) ) {
+			$processor->add_class( $background_styles['class'] );
+		}
+
+		// Apply flip classes to the SVG.
+		$flip_horizontal = $attributes['flipHorizontal'] ?? false;
+		$flip_vertical   = $attributes['flipVertical'] ?? false;
+
+		if ( $flip_horizontal ) {
+			$processor->add_class( 'is-flip-horizontal' );
+		}
+		if ( $flip_vertical ) {
+			$processor->add_class( 'is-flip-vertical' );
+		}
+
+		$rotation = isset( $attributes['rotation'] ) ? (int) $attributes['rotation'] : 0;
+
+		if ( $rotation ) {
+			$current_style = $processor->get_attribute( 'style' ) ?? '';
+			$rotation_css  = 'rotate: ' . $rotation . 'deg;';
+			$trimmed_style = is_string( $current_style )
+				? rtrim( trim( $current_style ), ';' )
+				: '';
+			$merged_style  = '' !== $trimmed_style
+				? $trimmed_style . '; ' . $rotation_css
+				: $rotation_css;
+			$processor->set_attribute( 'style', $merged_style );
+		}
+
+		$svg = $processor->get_updated_html();
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes();
+	return sprintf( '<div %s>%s</div>', $wrapper_attributes, $svg );
 }
 
 

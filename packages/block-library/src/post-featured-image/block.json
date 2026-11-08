@@ -74,6 +74,7 @@
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
+			"style": true,
 			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
@@ -98,6 +99,7 @@
 		}
 	},
 	"selectors": {
+		"dimensions": ".wp-block-post-featured-image img",
 		"border": ".wp-block-post-featured-image img, .wp-block-post-featured-image .block-editor-media-placeholder, .wp-block-post-featured-image .wp-block-post-featured-image__overlay",
 		"shadow": ".wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder",
 		"filter": {

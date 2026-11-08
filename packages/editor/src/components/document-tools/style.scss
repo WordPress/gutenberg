@@ -56,9 +56,8 @@
 			background: $gray-900;
 		}
 
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
-			outline: $border-width solid transparent;
+		&:focus:not(:active) {
+			@include outset-ring__focus();
 		}
 
 		&::before {

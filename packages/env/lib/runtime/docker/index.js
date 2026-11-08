@@ -1,26 +1,18 @@
 'use strict';
-/**
- * External dependencies
- */
 const { spawn, execSync } = require( 'child_process' );
 const path = require( 'path' );
 const util = require( 'util' );
+const exec = util.promisify( require( 'child_process' ).exec );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Promisified dependencies
- */
-const exec = util.promisify( require( 'child_process' ).exec );
-
-/**
- * Internal dependencies
- */
 const {
 	writeDockerFiles,
 	ensureDockerInitialized,
 } = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
+const { findDatabaseDowngrade } = require( './database-downgrade' );
+const { findMissingImages } = require( './missing-images' );
+const { DatabaseDowngradeError, MissingImageError } = require( '../errors' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
 const {
@@ -173,7 +165,27 @@ class DockerRuntime {
 				// stop wp-env from working correctly.
 			}
 
-			await dockerCompose.pullAll( dockerComposeConfig );
+			try {
+				await dockerCompose.pullAll( dockerComposeConfig );
+			} catch ( error ) {
+				// An image that is neither pullable nor cached, such as a MariaDB
+				// version that does not exist, would only fail later with a less
+				// clear error, so stop here and name it.
+				const missingImages = await findMissingImages(
+					dockerComposeConfigPath
+				);
+				if ( missingImages.length ) {
+					throw new MissingImageError( missingImages, error?.err );
+				}
+
+				// Note: pulling the images requires connecting to the Docker
+				// registry, which may be unavailable (e.g., offline or an
+				// outage). Locally cached images will be used instead, so this
+				// error should not stop wp-env from working correctly.
+				spinner.info(
+					'Could not pull docker images; using cached images instead.'
+				);
+			}
 			spinner.text = 'Downloading sources.';
 		}
 
@@ -229,12 +241,31 @@ class DockerRuntime {
 		if ( testsEnabled ) {
 			wpServices.push( 'tests-wordpress', 'tests-cli' );
 		}
-		await dockerCompose.upMany( wpServices, {
-			...dockerComposeConfig,
-			commandOptions: shouldConfigureWp
-				? [ '--build', '--force-recreate' ]
-				: [],
-		} );
+		try {
+			await dockerCompose.upMany( wpServices, {
+				...dockerComposeConfig,
+				commandOptions: shouldConfigureWp
+					? [ '--build', '--force-recreate' ]
+					: [],
+			} );
+		} catch ( error ) {
+			// The WordPress services wait for a healthy database, so a database
+			// that cannot start fails here. Docker only reports that a
+			// dependency failed, so explain the case users can act on: a
+			// database last used by a newer MariaDB version.
+			const downgrade = await findDatabaseDowngrade(
+				mysqlServices,
+				dockerComposeConfig
+			);
+			if ( downgrade ) {
+				throw new DatabaseDowngradeError(
+					downgrade.service === 'mysql' ? 'development' : 'tests',
+					downgrade.dataVersion,
+					downgrade.serverVersion
+				);
+			}
+			throw error;
+		}
 
 		if ( fullConfig.env.development.phpmyadmin ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
@@ -312,7 +343,7 @@ class DockerRuntime {
 					'phpmyadmin',
 					80,
 					dockerComposeConfig
-			  )
+				)
 			: null;
 
 		const message = [
@@ -335,7 +366,7 @@ class DockerRuntime {
 						'tests-phpmyadmin',
 						80,
 						dockerComposeConfig
-				  )
+					)
 				: null;
 
 			message.push(
@@ -787,7 +818,7 @@ class DockerRuntime {
 			hostUser.fullUser,
 		];
 
-		if ( ! process.stdout.isTTY ) {
+		if ( ! process.stdout.isTTY || ! process.stdin.isTTY ) {
 			composeCommand.push( '-T' );
 		}
 

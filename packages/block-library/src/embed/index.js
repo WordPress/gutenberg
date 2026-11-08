@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';

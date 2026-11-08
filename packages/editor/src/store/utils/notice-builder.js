@@ -1,12 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { ATTACHMENT_POST_TYPE } from '../constants';
+
+const AUTO_SAVE_FAILURE_NOTICE = __(
+	'Auto-save failed. You can also save manually.'
+);
+
+const AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE = __(
+	'Auto-save failed because there was no response from the server. You can also save manually.'
+);
+
+const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
+	'Auto-save failed because you were offline. You can also save manually once you’re back online.'
+);
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -89,7 +94,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  *                 notification should be sent.
  */
 export function getNotificationArgumentsForSaveFail( data ) {
-	const { post, edits, error } = data;
+	const { post, edits, error, options } = data;
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.
@@ -98,6 +103,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
+	const id = options?.isAutosave ? 'editor-autosave' : 'editor-save';
 
 	if ( error.code === 'offline_error' ) {
 		const messages = {
@@ -115,19 +121,31 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			),
 		};
 
-		const noticeMessage =
+		let noticeMessage =
 			! isPublished && edits.status in messages
 				? messages[ edits.status ]
 				: messages.default;
 
-		return [ noticeMessage, { id: 'editor-save' } ];
+		if ( options?.isAutosave ) {
+			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
+		}
+
+		return [ noticeMessage, { id } ];
 	}
 
 	const messages = {
-		publish: __( 'Publishing failed.' ),
-		private: __( 'Publishing failed.' ),
-		future: __( 'Scheduling failed.' ),
-		default: __( 'Updating failed.' ),
+		publish: __(
+			'Publishing failed. Keep this page open and try publishing again.'
+		),
+		private: __(
+			'Publishing failed. Keep this page open and try publishing again.'
+		),
+		future: __(
+			'Scheduling failed. Keep this page open and try scheduling again.'
+		),
+		default: __(
+			'Updating failed. Keep this page open and try updating again.'
+		),
 	};
 
 	let noticeMessage =
@@ -135,17 +153,14 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			? messages[ edits.status ]
 			: messages.default;
 
-	// Check if message string contains HTML. Notice text is currently only
-	// supported as plaintext, and stripping the tags may muddle the meaning.
-	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
-		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
+	if ( options?.isAutosave ) {
+		noticeMessage =
+			error.code === 'fetch_error'
+				? AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE
+				: AUTO_SAVE_FAILURE_NOTICE;
 	}
-	return [
-		noticeMessage,
-		{
-			id: 'editor-save',
-		},
-	];
+
+	return [ noticeMessage, { id } ];
 }
 
 /**

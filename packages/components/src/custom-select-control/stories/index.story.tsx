@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
-	title: 'Components/Selection & Input/Common/CustomSelectControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
 	argTypes: {
@@ -31,9 +21,9 @@ const meta: Meta< typeof CustomSelectControl > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now. See the [migration guide](?path=/docs/components-customselectcontrol--migration-guide).',
 		},
 	},
 	decorators: [
@@ -62,7 +52,6 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ onChange }
 			value={ value }
@@ -72,7 +61,6 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Label',
 	options: [
 		{
@@ -141,6 +129,32 @@ WithHints.args = {
 			key: 'full',
 			name: 'Full Size',
 			hint: '1600x1600',
+		},
+	],
+};
+
+export const WithCustomColors = Template.bind( {} );
+WithCustomColors.args = {
+	label: 'Custom colors',
+	options: [
+		{ key: 'default', name: 'Default' },
+		{
+			key: 'aquamarine',
+			name: 'Aquamarine',
+			style: {
+				backgroundColor: '#7fffd4',
+				color: '#16352b',
+				fontWeight: 600,
+			},
+		},
+		{
+			key: 'rose',
+			name: 'Rose',
+			style: {
+				backgroundColor: '#fff3f6',
+				color: '#6b2345',
+				fontStyle: 'italic',
+			},
 		},
 	],
 };

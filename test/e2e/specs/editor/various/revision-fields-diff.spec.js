@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Revision Fields Diff Panel', () => {
@@ -14,7 +11,7 @@ test.describe( 'Revision Fields Diff Panel', () => {
 	} ) => {
 		// Revision 1: paragraph with footnote "alpha".
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph one' );
 		await editor.showBlockToolbar();
@@ -51,7 +48,9 @@ test.describe( 'Revision Fields Diff Panel', () => {
 		} );
 		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
 		await settingsSidebar
-			.getByRole( 'button', { name: '2', exact: true } )
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Restore' } )

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Font Library', () => {
@@ -16,16 +13,16 @@ test.describe( 'Font Library', () => {
 			);
 		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-delete-installed-fonts'
-			);
-		} );
-
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitAdminPage(
 				'admin.php',
 				'page=font-library-wp-admin'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-delete-installed-fonts'
 			);
 		} );
 
@@ -70,7 +67,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'button', { name: 'Typography options' } )
 				.click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show Font' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Font, show' } )
 				.click();
 			await page.getByRole( 'combobox', { name: 'Font' } ).click();
 			await page.getByRole( 'option', { name: 'Exo 2' } ).click();

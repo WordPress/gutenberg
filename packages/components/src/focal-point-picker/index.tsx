@@ -1,31 +1,17 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
-import {
-	Container,
-	MediaWrapper,
-	MediaContainer,
-} from './styles/focal-point-picker-style';
+import { View } from '../view';
+import styles from './style.module.scss';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -44,14 +30,17 @@ const GRID_OVERLAY_TIMEOUT = 600;
 /**
  * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
  *
- * This component addresses a specific problem: with large background images it is common to see undesirable crops,
- * especially when viewing on smaller viewports such as mobile phones. This component allows the selection of
- * the point with the most important visual information and returns it as a pair of numbers between 0 and 1.
- * This value can be easily converted into the CSS `background-position` attribute, and will ensure that the
- * focal point is never cropped out, regardless of viewport.
+ * It addresses two common issues when displaying images in cropped containers. First, large
+ * background images can be cropped in undesirable ways, especially on smaller viewports such as
+ * mobile devices. Second, the CSS aspect-ratio property can inadvertently crop out the area of
+ * highest visual interest. This component allows the selection of the point with the most
+ * important visual information and returns it as a pair of numbers between 0 and 1.
+ * The output value can be applied to either CSS `background-position` (for elements with
+ * `background-image`) or `object-position` (for `<img>` / `<video>` elements rendered with
+ * `object-fit: cover`).
  *
- * - Example focal point picker value: `{ x: 0.5, y: 0.1 }`
- * - Corresponding CSS: `background-position: 50% 10%;`
+ * - Example focal point picker value: `{ x: 0.5, y: 0.1 }`;
+ * - Corresponding CSS: `object-position: 50% 10%`;
  *
  * ```jsx
  * import { FocalPointPicker } from '@wordpress/components';
@@ -60,15 +49,17 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * const Example = () => {
  * 	const [ focalPoint, setFocalPoint ] = useState( {
  * 		x: 0.5,
- * 		y: 0.5,
+ * 		y: 0.1,
  * 	} );
  *
  * 	const url = '/path/to/image';
  *
  * 	// Example function to render the CSS styles based on Focal Point Picker value
  * 	const style = {
- * 		backgroundImage: `url(${ url })`,
- * 		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
+ * 		width: '100%',
+ * 		aspectRatio: '16 / 9',
+ * 		objectFit: 'cover',
+ * 		objectPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
  * 	};
  *
  * 	return (
@@ -80,7 +71,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 				onDrag={ setFocalPoint }
  * 				onChange={ setFocalPoint }
  * 			/>
- * 			<div style={ style } />
+ * 			<img src={ url } alt="" style={ style } />
  * 		</>
  * 	);
  * };
@@ -89,6 +80,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
 export function FocalPointPicker( {
 	// Prevent passing to internal component.
 	__nextHasNoMarginBottom: _,
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	autoPlay = true,
 	className,
 	help,
@@ -237,8 +229,11 @@ export function FocalPointPicker( {
 		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = clsx( 'components-focal-point-picker-control', className );
-	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
+	const classes = clsx(
+		styles.root,
+		'components-focal-point-picker-control',
+		className
+	);
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -250,12 +245,34 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<Container { ...restProps } as="fieldset" className={ classes }>
-			{ !! label && <Label as="legend">{ label }</Label> }
-			<MediaWrapper className="components-focal-point-picker-wrapper">
-				<MediaContainer
-					className="components-focal-point-picker"
+		<View { ...restProps } as="fieldset" className={ classes }>
+			{ !! label &&
+				( hideLabelFromVision ? (
+					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				) : (
+					<StyledLabel as="legend">{ label }</StyledLabel>
+				) ) }
+			<div
+				className={ clsx(
+					styles[ 'media-wrapper' ],
+					'components-focal-point-picker-wrapper'
+				) }
+			>
+				<div
+					className={ clsx(
+						styles[ 'media-container' ],
+						'components-focal-point-picker'
+					) }
 					onKeyDown={ arrowKeyStep }
+					onPointerDown={ ( event ) => {
+						if ( event.button !== 0 ) {
+							return;
+						}
+						// Keep the gesture when the pointer crosses into the editor canvas iframe.
+						event.currentTarget.setPointerCapture(
+							event.pointerId
+						);
+					} }
 					onMouseDown={ startDrag }
 					onBlur={ () => {
 						if ( isDragging ) {
@@ -277,8 +294,8 @@ export function FocalPointPicker( {
 						{ ...focalPointPosition }
 						isDragging={ isDragging }
 					/>
-				</MediaContainer>
-			</MediaWrapper>
+				</div>
+			</div>
 			<Controls
 				hasHelpText={ !! help }
 				point={ { x, y } }
@@ -287,7 +304,7 @@ export function FocalPointPicker( {
 				} }
 			/>
 			{ !! help && <StyledHelp>{ help }</StyledHelp> }
-		</Container>
+		</View>
 	);
 }
 

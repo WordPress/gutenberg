@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 
 .edit-site-sidebar-navigation-screen {
 	display: flex;
@@ -24,7 +23,7 @@
 	padding: 0 $grid-unit-20;
 
 	.components-text {
-		color: $gray-400;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	.components-heading {
@@ -35,11 +34,12 @@
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;
-	background: $gray-900;
-	padding-top: $grid-unit-60;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	padding-top: $grid-unit-40;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
+	// Title needs to appear above other UI in the section content.
+	z-index: 1;
 }
 
 .edit-site-sidebar-navigation-screen__title {
@@ -95,11 +95,11 @@
 .edit-site-sidebar-navigation-screen__footer {
 	position: sticky;
 	bottom: 0;
-	background-color: $gray-900;
+	background-color: var(--wpds-color-background-surface-neutral-weak);
 	gap: 0;
 	padding: $grid-unit-10 $grid-unit-20;
 	margin: $grid-unit-20 0 0;
-	border-top: 1px solid $gray-800;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.edit-site-sidebar-navigation-screen-details-footer {
 		margin-left: -$grid-unit-20;
@@ -116,20 +116,20 @@
 .edit-site-sidebar-navigation-screen__input-control {
 	width: 100%;
 	.components-input-control__container {
-		background: $gray-800;
+		background: var(--wpds-color-background-interactive-neutral-weak);
 
 		.components-button {
-			color: $gray-200 !important;
+			color: var(--wpds-color-foreground-interactive-neutral) !important;
 		}
 	}
 	.components-input-control__input {
-		color: $gray-200 !important;
-		background: $gray-800 !important;
+		color: var(--wpds-color-foreground-interactive-neutral) !important;
+		background: var(--wpds-color-background-interactive-neutral-weak) !important;
 	}
 	.components-input-control__backdrop {
 		border: 4px !important;
 	}
 	.components-base-control__help {
-		color: $gray-600;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }

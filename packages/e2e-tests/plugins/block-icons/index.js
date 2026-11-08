@@ -19,6 +19,7 @@
 	registerBlockType( 'test/test-single-svg-icon', {
 		apiVersion: 3,
 		title: 'TestSimpleSvgIcon',
+		template: [ [ 'core/paragraph', { content: 'TestSimpleSvgIcon' } ] ],
 		icon: svg,
 		category: 'text',
 
@@ -29,14 +30,6 @@
 			} );
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				template: [
-					[
-						'core/paragraph',
-						{
-							content: 'TestSimpleSvgIcon',
-						},
-					],
-				],
 			} );
 			return el( 'div', innerBlocksProps );
 		},
@@ -56,6 +49,7 @@
 	registerBlockType( 'test/test-dash-icon', {
 		apiVersion: 3,
 		title: 'TestSimpleDashIcon',
+		template: [ [ 'core/paragraph', { content: 'TestDashIcon' } ] ],
 		icon: 'cart',
 		category: 'text',
 
@@ -66,14 +60,6 @@
 			} );
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				template: [
-					[
-						'core/paragraph',
-						{
-							content: 'TestDashIcon',
-						},
-					],
-				],
 			} );
 			return el( 'div', innerBlocksProps );
 		},
@@ -93,6 +79,7 @@
 	registerBlockType( 'test/test-function-icon', {
 		apiVersion: 3,
 		title: 'TestFunctionIcon',
+		template: [ [ 'core/paragraph', { content: 'TestFunctionIcon' } ] ],
 		icon() {
 			return svg;
 		},
@@ -105,14 +92,6 @@
 			} );
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				template: [
-					[
-						'core/paragraph',
-						{
-							content: 'TestFunctionIcon',
-						},
-					],
-				],
 			} );
 			return el( 'div', innerBlocksProps );
 		},
@@ -132,6 +111,7 @@
 	registerBlockType( 'test/test-dash-icon-colors', {
 		apiVersion: 3,
 		title: 'TestDashIconColors',
+		template: [ [ 'core/paragraph', { content: 'TestIconColors' } ] ],
 		icon: {
 			background: '#010000',
 			foreground: '#fe0000',
@@ -146,14 +126,6 @@
 			} );
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				template: [
-					[
-						'core/paragraph',
-						{
-							content: 'TestIconColors',
-						},
-					],
-				],
 			} );
 			return el( 'div', innerBlocksProps );
 		},
@@ -173,6 +145,7 @@
 	registerBlockType( 'test/test-svg-icon-background', {
 		apiVersion: 3,
 		title: 'TestSvgIconBackground',
+		template: [ [ 'core/paragraph', { content: 'TestIconColors' } ] ],
 		icon: {
 			background: '#010000',
 			src: svg,
@@ -186,14 +159,6 @@
 			} );
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				template: [
-					[
-						'core/paragraph',
-						{
-							content: 'TestIconColors',
-						},
-					],
-				],
 			} );
 			return el( 'div', innerBlocksProps );
 		},
