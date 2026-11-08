@@ -15,7 +15,11 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
-import { addNoteIdToMetadata, getNoteIdsFromMetadata, removeNoteIdFromMetadata } from '../collab-sidebar/utils/metadata';
+import {
+	addNoteIdToMetadata,
+	getNoteIdsFromMetadata,
+	removeNoteIdFromMetadata,
+} from '../collab-sidebar/utils/metadata';
 import { unlock } from '../../lock-unlock';
 import { buildSuggestionPayload } from './operations';
 import type { SuggestionOperation } from './operations';
