@@ -561,7 +561,7 @@ function renderRow( row, index ) {
 						image.pageUrl
 							? `<a href="${ escapeHtml(
 									image.pageUrl
-							  ) }" target="_blank" rel="noreferrer">source</a>`
+								) }" target="_blank" rel="noreferrer">source</a>`
 							: ''
 					}
 				</div>
@@ -596,7 +596,7 @@ function renderRow( row, index ) {
 				${
 					row.probe
 						? `<br>entropy shift <code>${ row.probe.entropyShift }</code>` +
-						  `<br>detail spread <code>${ row.probe.detailSpread }</code>`
+							`<br>detail spread <code>${ row.probe.detailSpread }</code>`
 						: ''
 				}
 				${ result.unchanged ? '<br><span class="pill">no visible change</span>' : '' }
