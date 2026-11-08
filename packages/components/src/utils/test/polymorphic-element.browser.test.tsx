@@ -1,14 +1,8 @@
 import { describe, expect, it } from 'vitest';
-// Direct Emotion usage provides a minimal compiler and browser-style fixture.
-// eslint-disable-next-line no-restricted-imports
-import styled from '@emotion/styled';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { PolymorphicElement } from '../polymorphic-element';
-
-const StyledPolymorphicElement = styled( PolymorphicElement )( {
-	color: 'rgb(255, 0, 0)',
-} );
+import styles from './polymorphic-element.module.scss';
 
 describe( 'PolymorphicElement styles', () => {
 	it( 'applies inline styles to intrinsic elements', async () => {
@@ -25,9 +19,10 @@ describe( 'PolymorphicElement styles', () => {
 		).toBe( 'rgb(255, 0, 0)' );
 	} );
 
-	it( 'applies generated and inline styles to styled elements', async () => {
+	it( 'applies CSS Module and inline styles to intrinsic elements', async () => {
 		await render(
-			<StyledPolymorphicElement
+			<PolymorphicElement
+				className={ styles.red }
 				data-testid="styled-element"
 				style={ { backgroundColor: 'rgb(0, 0, 255)' } }
 			/>

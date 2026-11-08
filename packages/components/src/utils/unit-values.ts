@@ -23,18 +23,3 @@ export function parseCSSUnitValue(
 
 	return [ numParsed, unit ];
 }
-
-/**
- * Combines a value and a unit into a unit value.
- *
- * @param value
- * @param unit
- *
- * @return The unit value.
- */
-export function createCSSUnitValue(
-	value: string | number,
-	unit: string
-): string {
-	return `${ value }${ unit }`;
-}
