@@ -44,16 +44,16 @@ jobs:
                       //   - `GH-1234`            (alternative short form)
                       //   - Full URLs to issues or pulls in this repo
                       //
-                      // A reference is skipped when the text before it on the same line
-                      // marks it as informational (e.g. "Related to", "Part of", "See"),
-                      // since linking it would close that issue on merge.
+                      // A reference is skipped when the phrase directly before it marks it
+                      // as informational (e.g. "Related to #1", "Part of #2, #3", "See:
+                      // #4"), since linking it would close that issue on merge.
                       //
                       // Numbers are collected into a Set so duplicates collapse.
                       // -----------------------------------------------------------------
                       const referenced = new Set();
 
                       const informationalRegex =
-                          /\b(?:related|relates|part of|see|follow[- ]?ups?|refs?|references?|cc|reverts?|similar|blocked by|depends on|alternative|supersedes|split from|extracted from|inspired by|builds? on)\b/i;
+                          /\b(?:related|relates|part of|see|follow[- ]?ups?|refs?|references?|cc|reverts?|similar|blocked by|depends on|alternative|supersedes|split from|extracted from|inspired by|builds? on)\b(?:\s+(?:to|of|on|in|by|from|for))?[\s:,-]*(?:issues?\s*)?(?:(?:GH-|#)\d+[\s,]*(?:and\s+|&\s+)?)*$/i;
                       const isInformational = ( index ) => {
                           const lineStart = visibleBody.lastIndexOf( '\n', index - 1 ) + 1;
                           return informationalRegex.test(
@@ -64,7 +64,9 @@ jobs:
                       const collect = ( regex ) => {
                           let m;
                           while ( ( m = regex.exec( visibleBody ) ) ) {
-                              if ( ! isInformational( m.index ) ) {
+                              // Skip the leading delimiter the short-form regex consumes.
+                              const start = m.index + m[ 0 ].search( /GH-|#|https?:/i );
+                              if ( ! isInformational( start ) ) {
                                   referenced.add( Number( m[ 1 ] ) );
                               }
                           }
