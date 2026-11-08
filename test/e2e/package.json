@@ -22,6 +22,7 @@
 	},
 	"devDependencies": {
 		"@flakiness/playwright": "^2.0.1",
+		"@playwright/cli": "^0.1.22",
 		"@playwright/test": "^1.63.0",
 		"@types/node": "^24.13.3",
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
@@ -39,6 +40,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"browse": "node bin/browse.mjs",
 		"test:e2e:update-timings": "flakiness-playwright-timings fetch -c ./playwright.config.ts -o timings.json",
 		"test:e2e": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:debug": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json --ui",

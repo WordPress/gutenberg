@@ -6,7 +6,7 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-import { lockOutline } from '@wordpress/icons';
+import { lock } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
@@ -132,7 +132,7 @@ const lockCardWidgetType: WidgetType = {
 	title: 'Lock Card',
 	description:
 		'Shows its canonical position and which operations the policy allows on it.',
-	icon: lockOutline,
+	icon: lock,
 	renderModule: 'demo/widgets/lock-card/render',
 	attributes: [
 		{ id: 'label', label: 'Label', type: 'text', relevance: 'high' },

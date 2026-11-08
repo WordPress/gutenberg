@@ -30,6 +30,8 @@
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
+/tools/phpstan                                  @westonruter
+/phpstan.neon.dist                              @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components

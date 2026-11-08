@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
-	Notice,
+	Notice as WCNotice,
 	FormFileUpload,
 	FlexItem,
 } from '@wordpress/components';
@@ -206,7 +206,7 @@ function UploadFonts() {
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library__local-fonts" justify="start">
 				{ notice && (
-					<Notice
+					<WCNotice
 						status={ notice.type }
 						__unstableHTML
 						onRemove={ () => setNotice( null ) }
@@ -219,7 +219,7 @@ function UploadFonts() {
 								) ) }
 							</ul>
 						) }
-					</Notice>
+					</WCNotice>
 				) }
 				{ isUploading && (
 					<FlexItem>

@@ -71,6 +71,33 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 	// END CHANGE.
 
+	// START CHANGE: New Gutenberg-only helper, not in core.
+	/**
+	 * Checks whether a note belongs to a resolved thread.
+	 *
+	 * Resolving a thread approves its root note.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $note A root note or a reply.
+	 * @return bool True if the note's thread is resolved.
+	 */
+	protected function is_thread_resolved( $note ): bool {
+		$thread_root = $note;
+		$visited     = array( (int) $thread_root->comment_ID => true );
+		while ( $thread_root->comment_parent ) {
+			$ancestor = get_comment( $thread_root->comment_parent );
+			// Stop at a missing ancestor or a corrupt, cyclic chain.
+			if ( ! $ancestor || isset( $visited[ (int) $ancestor->comment_ID ] ) ) {
+				break;
+			}
+			$visited[ (int) $ancestor->comment_ID ] = true;
+			$thread_root                            = $ancestor;
+		}
+		return '1' === $thread_root->comment_approved;
+	}
+	// END CHANGE.
+
 	/**
 	 * Check if post type supports notes.
 	 *
@@ -336,6 +363,83 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Checks if a comment can be edited or deleted.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction requires
+	 * the same edit access to the note's post as the note it belongs to.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return bool Whether the comment can be edited or deleted.
+	 */
+	protected function check_edit_permission( $comment ) {
+		if ( 0 === (int) get_current_user_id() ) {
+			return false;
+		}
+
+		// START CHANGE: Check notes and reactions against the note's post.
+		/*
+		 * Notes and their reactions are editorial content, so require edit access
+		 * to the note's post rather than the moderate_comments capability.
+		 */
+		if ( in_array( strtolower( $comment->comment_type ), array( 'note', 'reaction' ), true ) ) {
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+		// END CHANGE.
+
+		if ( current_user_can( 'moderate_comments' ) ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
+	}
+
+	/**
+	 * Checks if a given request has access to delete a comment.
+	 *
+	 * A reaction speaks for its author, so only they can remove it, and
+	 * reactions on a resolved thread are frozen like new ones.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to delete the item, error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$check = parent::delete_item_permissions_check( $request );
+		if ( true !== $check ) {
+			return $check;
+		}
+
+		// START CHANGE: Only the author can remove a reaction, and not on a resolved thread.
+		$comment = $this->get_comment( $request['id'] );
+		if ( 'reaction' !== $comment->comment_type ) {
+			return true;
+		}
+
+		if ( get_current_user_id() !== (int) $comment->user_id ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'Sorry, you can only remove your own reactions.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		$note = get_comment( $comment->comment_parent );
+		if ( $note && $this->is_thread_resolved( $note ) ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'A reaction cannot be removed from a resolved note.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+		// END CHANGE.
+
+		return true;
+	}
+
+	/**
 	 * Checks if a given request has access to create a comment.
 	 *
 	 * Copied from core, extended to the 'reaction' type. A reaction can only
@@ -582,18 +686,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			 * Resolving a thread approves its root note, and the editor
 			 * disables reactions from then on; hold stale tabs to that too.
 			 */
-			$thread_root = $parent_comment;
-			$visited     = array( (int) $thread_root->comment_ID => true );
-			while ( $thread_root->comment_parent ) {
-				$ancestor = get_comment( $thread_root->comment_parent );
-				// Stop at a missing ancestor or a corrupt, cyclic chain.
-				if ( ! $ancestor || isset( $visited[ (int) $ancestor->comment_ID ] ) ) {
-					break;
-				}
-				$visited[ (int) $ancestor->comment_ID ] = true;
-				$thread_root                            = $ancestor;
-			}
-			if ( '1' === $thread_root->comment_approved ) {
+			if ( $this->is_thread_resolved( $parent_comment ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction cannot be added to a resolved note.', 'gutenberg' ),
@@ -968,6 +1061,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 */
 		$prefetch = null;
 		if (
+			// @phpstan-ignore function.alreadyNarrowedType (The stubs are generated from trunk, but the method does not exist before WordPress 7.2.)
 			! method_exists( 'WP_REST_Comments_Controller', 'prefetch_reaction_summaries' ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )
