@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Videos are now transcoded to a web-safe format (MP4/H.264 or WebM/VP9) in the browser before upload, downscaling past `DEFAULT_VIDEO_SIZE_THRESHOLD` and skipping videos that are already web-safe and within budget. The original upload is kept alongside the optimized companion by default; set the `videoKeepOriginal` upload setting to `false` to store only the optimized file. Adds the `TRANSCODABLE_VIDEO_MIME_TYPES`, `WEB_SAFE_VIDEO_MIME_TYPES`, `WEB_SAFE_VIDEO_CODECS` and `DEFAULT_VIDEO_SIZE_THRESHOLD` exports. ([#79375](https://github.com/WordPress/gutenberg/pull/79375))
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   Request the `video_keep_original` field on the base site entity so the editor receives the video transcoding keep-original setting ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
 
 ## 9.1.0 (2026-11-04)
 

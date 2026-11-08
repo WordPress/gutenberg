@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Pass the `videoKeepOriginal` media upload setting through to the upload pipeline, so a site can opt out of keeping the original video file alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Bug Fixes
 
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).

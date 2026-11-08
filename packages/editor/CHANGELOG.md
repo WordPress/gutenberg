@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Read the `video_keep_original` setting from the REST API index into the block editor settings as `videoKeepOriginal`, so the upload pipeline knows whether to keep the original video upload alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
 

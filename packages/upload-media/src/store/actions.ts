@@ -27,6 +27,7 @@ import type {
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
+import { OPTIONAL_COMPANION_IMAGE_SIZES } from './constants';
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
 import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
@@ -255,7 +256,10 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				dispatch.processItem( pending.id );
 			}
 		}
-		if ( currentOperation === OperationType.TranscodeGif ) {
+		if (
+			currentOperation === OperationType.TranscodeGif ||
+			currentOperation === OperationType.TranscodeVideo
+		) {
 			for ( const pending of select.getPendingVideoProcessing() ) {
 				dispatch.processItem( pending.id );
 			}
@@ -277,15 +281,16 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			const parentItem = select.getItem( parentId );
 			if ( parentItem ) {
 				/*
-				 * The converted video and its poster are optional companions
-				 * of an animated GIF: the parent GIF attachment is fine
-				 * without them. Their failure must never be treated as a total
-				 * parent failure (which would delete the already-uploaded GIF),
-				 * even when the companion is the only child sideload.
+				 * The animated-GIF video and poster and the web-safe video
+				 * transcode are optional companions: the parent attachment is
+				 * fine without them. Their failure must never be treated as a
+				 * total parent failure (which would delete the already-uploaded
+				 * parent), even when the companion is the only child sideload.
 				 */
+				const imageSize = item.additionalData?.image_size;
 				const isOptionalCompanion =
-					item.additionalData?.image_size === 'animated_video' ||
-					item.additionalData?.image_size === 'animated_video_poster';
+					typeof imageSize === 'string' &&
+					OPTIONAL_COMPANION_IMAGE_SIZES.includes( imageSize );
 
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so

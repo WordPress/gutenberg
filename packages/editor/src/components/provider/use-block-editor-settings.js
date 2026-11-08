@@ -150,6 +150,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		imageStripMeta,
 		imageMaxBitDepth,
 		generateAnimatedImageSubsizes,
+		videoKeepOriginal,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -230,6 +231,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
 				generateAnimatedImageSubsizes:
 					baseData?.generate_animated_image_subsizes,
+				videoKeepOriginal: baseData?.video_keep_original,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -387,6 +389,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			imageStripMeta,
 			imageMaxBitDepth,
 			generateAnimatedImageSubsizes,
+			videoKeepOriginal,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode,
@@ -514,6 +517,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		imageStripMeta,
 		imageMaxBitDepth,
 		generateAnimatedImageSubsizes,
+		videoKeepOriginal,
 		isNavigationOverlayContext,
 	] );
 }

@@ -20,7 +20,7 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 	// order) or the browser discards the preloaded response, so any field
 	// added to entities.js has to be reflected here too.
 	// @see packages/core-data/src/entities.ts rootEntitiesConfig.__unstableBase
-	$root_fields = 'description,generate_animated_image_subsizes,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
+	$root_fields = 'description,generate_animated_image_subsizes,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,video_keep_original,page_for_posts,page_on_front,show_on_front';
 
 	foreach ( $paths as $key => $path ) {
 		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
