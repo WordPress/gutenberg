@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { debounce, useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
@@ -24,11 +25,16 @@ import BlockStylesPreviewPanel from './preview-panel';
 import useStylesForBlocks from './use-styles-for-block';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 import { getDefaultStyle } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const canEdit = useSelect(
+		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
+		[ clientId ]
+	);
 	const {
 		onSelect,
 		stylesToRender,
@@ -43,7 +49,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	if ( ! canEdit || ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 

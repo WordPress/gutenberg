@@ -92,6 +92,7 @@
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
 	color: $gray-700;
+	text-transform: capitalize;
 
 	.components-base-control__label {
 		display: inline;

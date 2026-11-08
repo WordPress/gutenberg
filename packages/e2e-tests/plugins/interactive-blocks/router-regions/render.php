@@ -164,6 +164,9 @@
 	</p>
 </div>
 
+<a data-testid="hash-link" href="#hash-link-target">Go to anchor</a>
+<div id="hash-link-target" data-testid="hash-link-target"></div>
+
 <div id="regions-with-attach-to" data-testid="regions-with-attach-to">
 	<?php
 	/*

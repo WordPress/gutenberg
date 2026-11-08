@@ -17,6 +17,7 @@ import { unseen } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 
@@ -56,10 +57,16 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 		[ clientId ]
 	);
 
-	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context.
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: currentBlockVisibility,
 		deviceType: selectedDeviceType,
+		view: canvasView,
 	} );
 
 	/*

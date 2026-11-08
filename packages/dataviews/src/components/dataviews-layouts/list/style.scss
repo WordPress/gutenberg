@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "../../../dataviews/style" as *;
 
 div.dataviews-view-list {
 	list-style-type: none;
@@ -270,6 +271,10 @@ div.dataviews-view-list {
 				}
 			}
 		}
+	}
+
+	&.is-refreshing {
+		@include dataviews-refreshing();
 	}
 }
 

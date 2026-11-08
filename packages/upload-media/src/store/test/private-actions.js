@@ -6,7 +6,7 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation } from '../private-actions';
+import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
 import { OperationType } from '../types';
 import { vipsHasTransparency } from '../utils';
 
@@ -249,6 +249,101 @@ describe( 'private actions', () => {
 			);
 
 			expect( result ).toBeNull();
+		} );
+	} );
+
+	describe( 'finalizeItem', () => {
+		it( 'should call mediaFinalize with the attachment ID', async () => {
+			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should not call mediaFinalize when no callback is provided', async () => {
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+				} ),
+				getSettings: () => ( {} ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should not call mediaFinalize when there is no attachment ID', async () => {
+			const mediaFinalize = jest.fn();
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: {},
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).not.toHaveBeenCalled();
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should handle mediaFinalize errors gracefully', async () => {
+			const mediaFinalize = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Network error' ) );
+			const finishOperation = jest.fn();
+			const warnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( warnSpy ).toHaveBeenCalledWith(
+				'Media finalization failed:',
+				expect.any( Error )
+			);
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			warnSpy.mockRestore();
+		} );
+
+		it( 'should return early when item is not found', async () => {
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => undefined,
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( finishOperation ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

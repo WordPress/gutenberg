@@ -539,6 +539,31 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/72053.
+	test( 'should navigate contenteditable with border radius', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			document.activeElement.style.borderRadius = '50px';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+	} );
+
 	test( 'should not prematurely multi-select', async ( {
 		editor,
 		page,
@@ -1168,6 +1193,41 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).not.toBeFocused();
+	} );
+
+	// Regression test: ArrowDown should not skip over a paragraph that contains
+	// a link. See https://github.com/WordPress/gutenberg/issues/77473.
+	test( 'should not skip paragraph with link when navigating down with ArrowDown', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<a href="#">a</a>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+
+		// Position cursor at the start of the first paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+
+		// ArrowDown should move to the second paragraph (with the link),
+		// not skip over it to the third.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// The focused element should be the second paragraph, which contains a link.
+		const focusedElement = editor.canvas.locator( ':focus' );
+		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
 	} );
 } );
 

@@ -202,11 +202,12 @@ export default function DataviewsPatterns() {
 			<Page
 				className="edit-site-page-patterns-dataviews"
 				title={ title }
+				headingLevel={ 2 }
 				subTitle={ description }
 				actions={
 					<PatternsActions
 						categoryId={ categoryId }
-						postType={ postType }
+						type={ postType }
 					/>
 				}
 			>

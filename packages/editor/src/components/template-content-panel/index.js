@@ -6,8 +6,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
-import { applyFilters } from '@wordpress/hooks';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,54 +13,30 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import usePostContentBlockTypes from '../provider/use-post-content-block-types';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
-const POST_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
-
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
-export default function TemplateContentPanel() {
-	const postContentBlockTypes = useMemo(
-		() =>
-			applyFilters(
-				'editor.postContentBlockTypes',
-				POST_CONTENT_BLOCK_TYPES
-			),
-		[]
-	);
+function TemplateContentPanelInner( { postType } ) {
+	const postContentBlockTypes = usePostContentBlockTypes();
 
-	const { clientIds, postType, renderingMode } = useSelect(
+	const clientIds = useSelect(
 		( select ) => {
-			const {
-				getCurrentPostType,
-				getPostBlocksByName,
-				getRenderingMode,
-			} = unlock( select( editorStore ) );
-			const _postType = getCurrentPostType();
-			return {
-				postType: _postType,
-				clientIds: getPostBlocksByName(
-					TEMPLATE_POST_TYPE === _postType
-						? TEMPLATE_PART_BLOCK
-						: postContentBlockTypes
-				),
-				renderingMode: getRenderingMode(),
-			};
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName(
+				TEMPLATE_POST_TYPE === postType
+					? TEMPLATE_PART_BLOCK
+					: postContentBlockTypes
+			);
 		},
-		[ postContentBlockTypes ]
+		[ postType, postContentBlockTypes ]
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	if (
-		( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) ||
-		clientIds.length === 0
-	) {
+	if ( clientIds.length === 0 ) {
 		return null;
 	}
 
@@ -76,4 +50,22 @@ export default function TemplateContentPanel() {
 			/>
 		</PanelBody>
 	);
+}
+
+export default function TemplateContentPanel() {
+	const { postType, renderingMode } = useSelect( ( select ) => {
+		const { getCurrentPostType, getRenderingMode } = unlock(
+			select( editorStore )
+		);
+		return {
+			postType: getCurrentPostType(),
+			renderingMode: getRenderingMode(),
+		};
+	}, [] );
+
+	if ( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
+		return null;
+	}
+
+	return <TemplateContentPanelInner postType={ postType } />;
 }

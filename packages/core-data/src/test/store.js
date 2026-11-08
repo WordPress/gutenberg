@@ -113,6 +113,122 @@ describe( 'getEntityRecord', () => {
 	} );
 } );
 
+describe( 'getEntityRecords', () => {
+	const POSTS = [
+		createTestPost( 1 ),
+		createTestPost( 2 ),
+		createTestPost( 3 ),
+	];
+
+	let registry;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		triggerFetch.mockReset();
+	} );
+
+	it( 'preserves collection when getEntityRecord resolves after getEntityRecords', async () => {
+		let resolveSlowFetch;
+		const slowFetchPromise = new Promise( ( resolve ) => {
+			resolveSlowFetch = resolve;
+		} );
+
+		triggerFetch.mockImplementation( ( { path } ) => {
+			// Single post fetch (e.g. /wp/v2/posts/1): return slow promise.
+			if ( /\/wp\/v2\/posts\/\d+/.test( path ) ) {
+				return slowFetchPromise;
+			}
+			// Collection fetch: return immediately.
+			return Promise.resolve( {
+				json: () => Promise.resolve( POSTS ),
+				headers: {
+					get: ( header ) => {
+						if ( header === 'X-WP-Total' ) {
+							return String( POSTS.length );
+						}
+						if ( header === 'X-WP-TotalPages' ) {
+							return '1';
+						}
+						return null;
+					},
+				},
+			} );
+		} );
+
+		const resolveSelectStore = registry.resolveSelect( coreDataStore );
+
+		// Start getEntityRecord first (slow), then getEntityRecords (fast).
+		const singlePromise = resolveSelectStore.getEntityRecord(
+			'postType',
+			'post',
+			1,
+			{ context: 'edit' }
+		);
+		await resolveSelectStore.getEntityRecords( 'postType', 'post', {
+			context: 'edit',
+		} );
+
+		// Now resolve the slow single-record fetch.
+		resolveSlowFetch( {
+			json: () => Promise.resolve( POSTS[ 0 ] ),
+			headers: { get: () => null },
+		} );
+		await singlePromise;
+
+		// Wait for all pending thunks to settle.
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		const allPosts = registry
+			.select( coreDataStore )
+			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
+		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'preserves collection when getEntityRecord is called after getEntityRecords', async () => {
+		triggerFetch.mockImplementation( ( { path } ) => {
+			// Collection fetch.
+			if ( ! /\/wp\/v2\/posts\/\d+/.test( path ) ) {
+				return Promise.resolve( {
+					json: () => Promise.resolve( POSTS ),
+					headers: {
+						get: ( header ) => {
+							if ( header === 'X-WP-Total' ) {
+								return String( POSTS.length );
+							}
+							if ( header === 'X-WP-TotalPages' ) {
+								return '1';
+							}
+							return null;
+						},
+					},
+				} );
+			}
+			// Single post fetch.
+			return Promise.resolve( {
+				json: () => Promise.resolve( POSTS[ 0 ] ),
+				headers: { get: () => null },
+			} );
+		} );
+
+		const resolveSelectStore = registry.resolveSelect( coreDataStore );
+
+		// First resolve the collection.
+		await resolveSelectStore.getEntityRecords( 'postType', 'post', {
+			context: 'edit',
+		} );
+
+		// Then resolve a single record.
+		await resolveSelectStore.getEntityRecord( 'postType', 'post', 1, {
+			context: 'edit',
+		} );
+
+		const allPosts = registry
+			.select( coreDataStore )
+			.getEntityRecords( 'postType', 'post', { context: 'edit' } );
+		expect( allPosts.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
+	} );
+} );
+
 describe( 'clearEntityRecordEdits', () => {
 	let registry;
 

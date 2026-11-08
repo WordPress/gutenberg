@@ -21,7 +21,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
@@ -143,10 +144,12 @@ export default {
 		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations.
 		let fallbackGapValue = '1.2rem';
 		if ( globalBlockGapValue ) {
-			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
-			const gapParts = processedGap.split( ' ' );
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
 			fallbackGapValue =
-				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'1.2rem';
 		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,

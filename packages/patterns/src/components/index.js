@@ -22,6 +22,7 @@ export default function PatternsMenuItems( { rootClientId } ) {
 					{ selectedClientIds.length === 1 && (
 						<PatternsManageButton
 							clientId={ selectedClientIds[ 0 ] }
+							onClose={ onClose }
 						/>
 					) }
 				</>

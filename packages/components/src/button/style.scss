@@ -48,11 +48,6 @@
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 	}
 
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	&:focus {
-		outline: 3px solid transparent;
-	}
-
 	/**
 	 * Primary button style.
 	 */
@@ -274,6 +269,14 @@
 		&[aria-disabled="true"] {
 			color: $gray-600;
 		}
+	}
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	// This rule is placed after variant outline declarations (e.g. is-primary,
+	// is-secondary, is-tertiary) to ensure it wins by source order at the same
+	// specificity, while not using `:not(:active)` to avoid outline flicker.
+	&:focus {
+		outline: 3px solid transparent;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {

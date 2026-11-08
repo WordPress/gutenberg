@@ -177,6 +177,7 @@ export default function NavigationLinkEdit( {
 		clientId,
 		attributes,
 		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(

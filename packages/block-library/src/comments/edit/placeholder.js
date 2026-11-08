@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { createInterpolateElement } from '@wordpress/element';
@@ -109,7 +109,10 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 									'Reply to A WordPress Commenter'
 								) }
 							>
-								{ __( 'Reply' ) }
+								{
+									/* translators: Comment reply button text. */
+									_x( 'Reply', 'verb' )
+								}
 							</a>
 						</div>
 					</article>

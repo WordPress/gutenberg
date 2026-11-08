@@ -33,7 +33,7 @@
 		position: fixed;
 		top: 0;
 		bottom: 0;
-		left: 0;
+		inset-inline-start: 0;
 		width: 300px;
 		max-width: 85vw;
 		background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
@@ -51,6 +51,7 @@
 	.boot-layout--single-page & {
 		top: variables.$admin-bar-height-big;
 	}
+
 	z-index: 3;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	padding: variables.$grid-unit-20;
@@ -76,7 +77,7 @@
 
 		.boot-layout--single-page & {
 			margin-top: 0;
-			margin-left: 0;
+			margin-inline-start: 0;
 		}
 	}
 }
@@ -112,6 +113,10 @@
 		height: auto;
 		border-radius: 8px;
 		margin: 0;
+
+		.boot-layout--single-page & {
+			height: auto;
+		}
 	}
 }
 
@@ -164,6 +169,10 @@
 		height: auto;
 		border-radius: 8px;
 		z-index: auto;
+
+		.boot-layout--single-page & {
+			height: auto;
+		}
 	}
 }
 
@@ -210,6 +219,7 @@
 
 		@include mixins.break-medium {
 			top: variables.$admin-bar-height;
+
 		}
 	}
 }

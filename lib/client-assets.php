@@ -448,7 +448,9 @@ function gutenberg_enqueue_latex_to_mathml_loader() {
  *
  * @see packages/vips/src/loader.ts
  */
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+}
 function gutenberg_enqueue_vips_loader() {
 	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }

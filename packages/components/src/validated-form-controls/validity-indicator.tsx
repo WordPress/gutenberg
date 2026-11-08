@@ -15,9 +15,11 @@ import Icon from '../icon';
 import Spinner from '../spinner';
 
 export function ValidityIndicator( {
+	id,
 	type,
 	message,
 }: {
+	id?: string;
 	type: 'validating' | 'valid' | 'invalid';
 	message?: string;
 } ) {
@@ -27,6 +29,7 @@ export function ValidityIndicator( {
 	};
 	return (
 		<p
+			id={ id }
 			className={ clsx(
 				'components-validated-control__indicator',
 				`is-${ type }`

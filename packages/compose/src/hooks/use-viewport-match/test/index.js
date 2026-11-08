@@ -44,15 +44,18 @@ describe( 'useViewportMatch', () => {
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 3 );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			1,
-			'(max-width: 1280px)'
+			'(max-width: 1280px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			2,
-			'(min-width: 782px)'
+			'(min-width: 782px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			3,
-			'(min-width: 600px)'
+			'(min-width: 600px)',
+			window
 		);
 	} );
 
@@ -76,15 +79,18 @@ describe( 'useViewportMatch', () => {
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 3 );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			1,
-			'(min-width: 1440px)'
+			'(min-width: 1440px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			2,
-			'(max-width: 960px)'
+			'(max-width: 960px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			3,
-			'(max-width: 480px)'
+			'(max-width: 480px)',
+			window
 		);
 	} );
 
@@ -121,9 +127,25 @@ describe( 'useViewportMatch', () => {
 
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 4 );
 		// `useMediaQuery` is expected to receive `undefined` when simulating width.
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 1, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 2, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 3, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 4, undefined );
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			1,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			2,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			3,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			4,
+			undefined,
+			window
+		);
 	} );
 } );

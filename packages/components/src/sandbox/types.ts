@@ -1,5 +1,16 @@
 export type SandBoxProps = {
 	/**
+	 * Whether to include `allow-same-origin` in the iframe's sandbox
+	 * attribute. When true, nested iframes (such as third-party embeds)
+	 * can access their own origin's cookies and storage.
+	 *
+	 * Only enable this for content that is NOT directly user-controlled,
+	 * such as server-fetched oEmbed previews.
+	 *
+	 * @default false
+	 */
+	allowSameOrigin?: boolean;
+	/**
 	 * The HTML to render in the body of the iframe document.
 	 *
 	 * @default ''

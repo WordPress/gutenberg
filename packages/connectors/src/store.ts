@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, createSelector, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,16 +16,27 @@ const DEFAULT_STATE: ConnectorsState = {
 };
 
 const actions = {
-	registerConnector( slug: string, config: Omit< ConnectorConfig, 'slug' > ) {
+	registerConnector(
+		slug: string,
+		config: Partial< Omit< ConnectorConfig, 'slug' > >
+	) {
 		return {
 			type: 'REGISTER_CONNECTOR' as const,
 			slug,
 			config,
 		};
 	},
+	unregisterConnector( slug: string ) {
+		return {
+			type: 'UNREGISTER_CONNECTOR' as const,
+			slug,
+		};
+	},
 };
 
-type Action = ReturnType< typeof actions.registerConnector >;
+type Action =
+	| ReturnType< typeof actions.registerConnector >
+	| ReturnType< typeof actions.unregisterConnector >;
 
 function reducer(
 	state: ConnectorsState = DEFAULT_STATE,
@@ -38,20 +49,33 @@ function reducer(
 				connectors: {
 					...state.connectors,
 					[ action.slug ]: {
+						...state.connectors[ action.slug ],
 						slug: action.slug,
 						...action.config,
 					},
 				},
 			};
+		case 'UNREGISTER_CONNECTOR': {
+			if ( ! state.connectors[ action.slug ] ) {
+				return state;
+			}
+			const { [ action.slug ]: _, ...rest } = state.connectors;
+			return {
+				...state,
+				connectors: rest,
+			};
+		}
 		default:
 			return state;
 	}
 }
 
 const selectors = {
-	getConnectors( state: ConnectorsState ): ConnectorConfig[] {
-		return Object.values( state.connectors );
-	},
+	getConnectors: createSelector(
+		( state: ConnectorsState ): ConnectorConfig[] =>
+			Object.values( state.connectors ),
+		( state: ConnectorsState ) => [ state.connectors ]
+	),
 	getConnector(
 		state: ConnectorsState,
 		slug: string

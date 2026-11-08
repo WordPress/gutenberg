@@ -82,13 +82,16 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	}
 
 	/**
-	 * Emit connection status.
+	 * Emit connection status, passing the full object through so that
+	 * additional fields (e.g. `willAutoRetryInMs`) are preserved for consumers.
 	 *
-	 * @param status        The connection status
-	 * @param status.error  Optional error information when status is 'disconnected'
-	 * @param status.status The connection status ('connected', 'connecting', 'disconnected')
+	 * @param connectionStatus The connection status object
 	 */
-	protected emitStatus = ( { error, status }: ConnectionStatus ): void => {
+	protected emitStatus = ( connectionStatus: ConnectionStatus ): void => {
+		const { status } = connectionStatus;
+		const error =
+			status === 'disconnected' ? connectionStatus.error : undefined;
+
 		if ( this.status === status && ! error ) {
 			return;
 		}
@@ -102,23 +105,34 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 		// ObservableV2 expects arguments as an array
 		this.status = status;
-		this.emit( 'status', [ { error, status } ] );
+		this.emit( 'status', [ connectionStatus ] );
 	};
 
 	/**
 	 * Log debug messages if debugging is enabled.
 	 *
-	 * @param message The debug message
-	 * @param debug   Additional debug information
+	 * @param message    The debug message
+	 * @param debug      Additional debug information
+	 * @param errorLevel The console method to use for logging
+	 * @param force      Whether to force logging regardless of debug setting
 	 */
-	protected log = ( message: string, debug: object = {} ): void => {
-		if ( this.options.debug ) {
-			// eslint-disable-next-line no-console
-			console.log( `[${ this.constructor.name }]: ${ message }`, {
-				room: this.options.room,
-				...debug,
-			} );
+	protected log = (
+		message: string,
+		debug: object = {},
+		errorLevel: 'log' | 'warn' | 'error' = 'log',
+		force = false
+	): void => {
+		if ( ! this.options.debug && ! force ) {
+			return;
 		}
+
+		// eslint-disable-next-line no-console
+		const logFn = console[ errorLevel ] || console.log;
+
+		logFn( `[${ this.constructor.name }]: ${ message }`, {
+			room: this.options.room,
+			...debug,
+		} );
 	};
 
 	/**

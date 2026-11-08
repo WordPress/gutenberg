@@ -19,6 +19,7 @@ import getComputedStyle from './get-computed-style';
 export default function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	const originalZIndex = container.style.zIndex;
 	const originalPosition = container.style.position;
+	const originalBorderRadius = container.style.borderRadius;
 
 	const { position = 'static' } = getComputedStyle( container );
 
@@ -29,10 +30,17 @@ export default function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 
 	container.style.zIndex = '10000';
 
+	// When an element has border radius, the x/y coordinates can incorrectly fall
+	// outside the element because of the radius. Temporarily reset the value
+	// to ensure the coordinates are tested against a rectangle and not a pill-shaped
+	// element. See https://github.com/WordPress/gutenberg/issues/72053 for more info.
+	container.style.borderRadius = '0';
+
 	const range = caretRangeFromPoint( doc, x, y );
 
 	container.style.zIndex = originalZIndex;
 	container.style.position = originalPosition;
+	container.style.borderRadius = originalBorderRadius;
 
 	return range;
 }

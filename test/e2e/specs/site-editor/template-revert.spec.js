@@ -14,8 +14,10 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-		// Cross-origin isolation (COEP) prevents page navigations
-		// from working properly during template creation.
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template revert involves visitSiteEditor() page navigations to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);

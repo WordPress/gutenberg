@@ -135,6 +135,7 @@ export async function vipsHasTransparency( url: string ) {
  * @param addSuffix    Whether to add dimension suffix to filename.
  * @param signal       Optional abort signal to cancel the operation.
  * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
+ * @param quality      Desired quality (0-1). Defaults to 0.82.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -144,7 +145,8 @@ export async function vipsResizeImage(
 	smartCrop: boolean,
 	addSuffix: boolean,
 	signal?: AbortSignal,
-	scaledSuffix?: boolean
+	scaledSuffix?: boolean,
+	quality?: number
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -157,7 +159,8 @@ export async function vipsResizeImage(
 			await file.arrayBuffer(),
 			file.type,
 			resize,
-			smartCrop
+			smartCrop,
+			quality
 		);
 
 	let fileName = file.name;

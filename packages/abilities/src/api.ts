@@ -21,8 +21,8 @@ import { validateValueFromSchema } from './validation';
 /**
  * Get all available abilities with optional filtering.
  *
- * @param args Optional query arguments to filter. Defaults to empty object.
- * @return Array of abilities.
+ * @param args Optional query arguments for filtering abilities.
+ * @return Array of matching abilities.
  */
 export function getAbilities( args: AbilitiesQueryArgs = {} ): Ability[] {
 	return select( store ).getAbilities( args );
@@ -62,11 +62,8 @@ export function getAbilityCategory(
 /**
  * Register a client-side ability.
  *
- * Client abilities are executed locally in the browser and must include
- * a callback function. The ability will be validated by the store action,
- * and an error will be thrown if validation fails.
- *
- * The category must already be registered before registering abilities.
+ * Client-side abilities are executed locally in the browser and must include
+ * a callback function. The ability's category must already be registered.
  *
  * @param  ability The ability definition including callback.
  * @throws {Error} If the ability fails validation.
@@ -97,12 +94,10 @@ export function registerAbility( ability: Ability ): void {
 }
 
 /**
- * Unregister an ability from the store.
+ * Unregister a client-side ability from the store.
  *
- * Remove a client-side ability from the store.
- * Note: This will return an error for server-side abilities.
- *
- * @param name The ability name to unregister.
+ * @param  name The ability name to unregister.
+ * @throws {Error} If the ability is server-side and cannot be unregistered.
  */
 export function unregisterAbility( name: string ): void {
 	dispatch( store ).unregisterAbility( name );
@@ -111,10 +106,9 @@ export function unregisterAbility( name: string ): void {
 /**
  * Register a client-side ability category.
  *
- * Categories registered on the client are stored alongside server-side categories
- * in the same store and can be used when registering client side abilities.
- * This is useful when registering client-side abilities that introduce new
- * categories not defined by the server.
+ * Use this when registering client-side abilities that belong to a category
+ * not already defined by the server. Client-side categories are stored
+ * alongside server-side categories in the same store.
  *
  * @param  slug Category slug (lowercase alphanumeric with dashes only).
  * @param  args Category arguments (label, description, optional meta).
@@ -151,8 +145,6 @@ export function registerAbilityCategory(
 /**
  * Unregister an ability category.
  *
- * Removes a category from the store.
- *
  * @param slug The category slug to unregister.
  *
  * @example
@@ -167,13 +159,16 @@ export function unregisterAbilityCategory( slug: string ): void {
 /**
  * Execute an ability.
  *
- * Executes abilities with validation for client-side abilities only.
- * Server abilities bypass validation as it's handled on the server.
+ * Validates input and output against their schemas when defined. For
+ * server-side abilities, input is validated on the client first to avoid
+ * unnecessary network roundtrips, then both input and output are validated on
+ * the server. The client also re-validates the output to ensure data
+ * compatibility between server and client.
  *
- * @param name  The ability name.
- * @param input Optional input parameters for the ability.
+ * @param  name  The ability name.
+ * @param  input Optional input parameters for the ability.
  * @return Promise resolving to the ability execution result.
- * @throws Error if the ability is not found or execution fails.
+ * @throws {Error} If the ability is not found, permission is denied, input or output validation fails, or execution throws.
  */
 export async function executeAbility(
 	name: string,

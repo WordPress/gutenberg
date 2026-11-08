@@ -75,6 +75,80 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the permissions check bypasses the image editor support check
+	 * when generate_sub_sizes is false (client handles processing).
+	 *
+	 * Tests the permissions check directly with file params set, since the core
+	 * check uses get_file_params() which is only populated for multipart uploads.
+	 *
+	 * @covers ::create_item_permissions_check
+	 */
+	public function test_create_item_skips_image_editor_support_check_when_not_generating_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'name'     => 'canola.jpg',
+					'type'     => 'image/jpeg',
+					'tmp_name' => DIR_TESTDATA . '/images/canola.jpg',
+					'error'    => 0,
+					'size'     => filesize( DIR_TESTDATA . '/images/canola.jpg' ),
+				),
+			)
+		);
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$result     = $controller->create_item_permissions_check( $request );
+
+		// Should pass because the bypass filter was applied (client handles processing).
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Verifies that the permissions check still enforces the image editor support check
+	 * when generate_sub_sizes is true (server handles processing).
+	 *
+	 * Tests the permissions check directly with file params set, since the core
+	 * check uses get_file_params() which is only populated for multipart uploads.
+	 *
+	 * @covers ::create_item_permissions_check
+	 */
+	public function test_create_item_enforces_image_editor_support_check_when_generating_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'name'     => 'canola.jpg',
+					'type'     => 'image/jpeg',
+					'tmp_name' => DIR_TESTDATA . '/images/canola.jpg',
+					'error'    => 0,
+					'size'     => filesize( DIR_TESTDATA . '/images/canola.jpg' ),
+				),
+			)
+		);
+		// Explicitly set generate_sub_sizes since defaults aren't applied outside REST dispatch.
+		$request->set_param( 'generate_sub_sizes', true );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$result     = $controller->create_item_permissions_check( $request );
+
+		// Should fail because the server needs to generate sub-sizes but can't.
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_upload_image_type_not_supported', $result->get_error_code() );
+	}
+
+	/**
 	 * Verifies that skipping sub-size generation works.
 	 *
 	 * @covers ::create_item
@@ -122,8 +196,6 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
-
-		remove_filter( 'wp_generate_attachment_metadata', '__return_empty_array', 1 );
 
 		$this->assertSame( 201, $response->get_status() );
 
@@ -839,8 +911,6 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request_server = new WP_REST_Request( 'POST', '/wp/v2/media' );
 		$request_server->set_header( 'Content-Type', 'image/jpeg' );
 		$request_server->set_header( 'Content-Disposition', 'attachment; filename=server-side-upload.jpg' );
-		$request_server->set_param( 'generate_sub_sizes', true );
-
 		$request_server->set_body( file_get_contents( DIR_TESTDATA . '/images/2004-07-22-DSC_0008.jpg' ) );
 		$response_server = rest_get_server()->dispatch( $request_server );
 		$data_server     = $response_server->get_data();

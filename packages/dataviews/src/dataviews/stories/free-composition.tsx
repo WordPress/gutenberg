@@ -134,11 +134,6 @@ export const FreeCompositionComponent = () => {
 		page: 1,
 		perPage: 10,
 		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
 			enableMoving: false,
 		},
 		filters: [],

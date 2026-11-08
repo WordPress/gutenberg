@@ -10,3 +10,4 @@ export const deviceTypeKey = Symbol( 'deviceTypeKey' );
 export const isNavigationOverlayContextKey = Symbol(
 	'isNavigationOverlayContext'
 );
+export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );

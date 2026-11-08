@@ -1,6 +1,10 @@
 # Sync
 
-Sync data between multiple peers and persist in a local database.
+Sync entity data between peers for real-time collaboration using [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) documents.
+
+This package provides the syncing layer for real-time collaboration in the WordPress editor. It is built on [Yjs](https://docs.yjs.dev/), a CRDT implementation that enables multiple users to edit shared data concurrently without conflicts.
+
+See [CODE.md](./CODE.md) for architecture details.
 
 ## Installation
 
@@ -16,7 +20,7 @@ npm install @wordpress/sync --save
 
 ### Awareness
 
-Similar to Yjs, the Awareness protocol should not be considered a public API. It is a third-party library that will experience breaking changes in the future.
+The Awareness protocol should not be considered a public API. It is a third-party library that will experience breaking changes in the future.
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 
@@ -26,33 +30,9 @@ Private @wordpress/sync APIs.
 
 ### Y
 
-Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future. However, in order to allow third-party plugins to provide their own Yjs providers / sync transport, they must import and consume **our instance** of Yjs due to this bug / feature:
+Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future. It is re-exported here so that internal `@wordpress/*` consumers of this bundled package have a single import path for Yjs.
 
-<https://github.com/yjs/yjs/issues/438>
-
-In other words, external code must be able to import Yjs from the `@wordpress/sync` package in their code, e.g.:
-
-```ts
-import { Y } from '@wordpress/sync';
-```
-
-Additionally, this import must resolve to `wp.sync` via `DependencyExtractionWebpackPlugin`. If you are using an older version of `@wordpress/scripts` that does not treat `@wordpress/sync` as an unbundled package, then you can use Webpack externals to manually resolve the package to the global `wp.sync` variable:
-
-```ts
-externals: {
-  ...existingConfig.externals,
-  // Resolve @wordpress/sync to the global `wp.sync` provided by WordPress.
-  '@wordpress/sync': 'wp.sync',
-
-  // Resolve Yjs to the global `wp.sync.Y` provided by the sync package.
-  // Since dependencies import 'yjs' directly, we need to avoid importing
-  // and packaging two different Yjs instances, which would result in this
-  // conflict:
-  //
-  // https://github.com/yjs/yjs/issues/438
-  yjs: 'wp.sync.Y',
-},
-```
+Note: this package is bundled into its consumers, so each consumer ends up with its own copy of Yjs. Sharing Yjs documents across separately-bundled scripts is not supported — see <https://github.com/yjs/yjs/issues/438>.
 
 ### YJS_VERSION
 

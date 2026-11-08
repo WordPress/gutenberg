@@ -1,0 +1,66 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.notice {
+		--icon-height: 24px;
+		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-font-line-height-sm)) / 2);
+
+		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
+		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
+		--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
+		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
+
+		container-type: inline-size;
+		display: grid;
+		align-items: start;
+		grid-template-columns: auto 1fr auto;
+		padding: var(--wpds-dimension-padding-md);
+		border: 1px solid var(--wp-ui-notice-border-color);
+		border-radius: var(--wpds-border-radius-lg);
+		background-color: var(--wp-ui-notice-background-color);
+	}
+
+	.icon {
+		grid-row: 1;
+		grid-column: 1;
+		margin-inline-end: var(--wpds-dimension-gap-xs);
+		color: var(--wp-ui-notice-decorative-icon-color);
+	}
+
+	.description {
+		grid-column: 2;
+
+		padding-block: var(--text-vertical-padding);
+
+		text-wrap: pretty;
+		color: var(--wp-ui-notice-text-color);
+	}
+
+	.is-info {
+		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-info-weak);
+		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
+		--wp-ui-notice-text-color: var(--wpds-color-fg-content-info);
+		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-info-weak);
+	}
+
+	.is-warning {
+		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
+		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
+		--wp-ui-notice-text-color: var(--wpds-color-fg-content-warning);
+		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-warning-weak);
+	}
+
+	.is-success {
+		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-success-weak);
+		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
+		--wp-ui-notice-text-color: var(--wpds-color-fg-content-success);
+		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-success-weak);
+	}
+
+	.is-error {
+		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-error-weak);
+		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
+		--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
+		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
+	}
+}

@@ -29,6 +29,14 @@ export const getRegionRootFragment = (
 // Initial vDOM regions associated with its DOM element.
 export const initialVdom = new WeakMap< Element, ComponentChild >();
 
+// Promise that resolves with the populated initialVdom after hydration completes.
+let resolveInitialVdom!: ( map: WeakMap< Element, ComponentChild > ) => void;
+export const initialVdomPromise = new Promise<
+	WeakMap< Element, ComponentChild >
+>( ( resolve ) => {
+	resolveInitialVdom = resolve;
+} );
+
 // Initialize the router with the initial DOM.
 export const hydrateRegions = async () => {
 	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
@@ -43,4 +51,7 @@ export const hydrateRegions = async () => {
 			hydrate( vdom, fragment );
 		}
 	}
+
+	// Resolve the promise with the fully populated initialVdom after all regions are hydrated.
+	resolveInitialVdom( initialVdom );
 };

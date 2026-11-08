@@ -258,6 +258,7 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
+			headingLevel={ 2 }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }

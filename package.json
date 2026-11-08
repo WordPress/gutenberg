@@ -28,10 +28,11 @@
 				"id": "site-editor-v2",
 				"init": [
 					"@wordpress/edit-site-init"
-				]
+				],
+				"experimental": true
 			},
 			"font-library",
-			"connectors"
+			"options-connectors"
 		]
 	},
 	"config": {

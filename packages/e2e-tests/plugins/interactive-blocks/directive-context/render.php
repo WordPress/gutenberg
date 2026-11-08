@@ -12,7 +12,7 @@
 	>
 		<pre
 			data-testid="parent context"
-			data-wp-bind--children="state.renderContext"
+			data-wp-text="state.renderContext"
 		>
 			<!-- rendered during hydration -->
 		</pre>
@@ -62,7 +62,7 @@
 		>
 			<pre
 				data-testid="child context"
-				data-wp-bind--children="state.renderContext"
+				data-wp-text="state.renderContext"
 			>
 				<!-- rendered during hydration -->
 			</pre>

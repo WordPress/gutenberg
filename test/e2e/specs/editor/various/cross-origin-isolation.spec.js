@@ -6,6 +6,19 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /** @typedef {import('@playwright/test').Page} Page */
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor */
 
+/**
+ * Returns the major Chromium version from the browser's user agent, or 0 if not Chromium.
+ *
+ * @param {Page} page Playwright page object.
+ * @return {Promise<number>} Major Chromium version.
+ */
+async function getChromiumMajorVersion( page ) {
+	return page.evaluate( () => {
+		const match = window.navigator.userAgent.match( /Chrome\/(\d+)/ );
+		return match ? parseInt( match[ 1 ], 10 ) : 0;
+	} );
+}
+
 const EMBED_URLS = [
 	'/oembed/1.0/proxy',
 	`rest_route=${ encodeURIComponent( '/oembed/1.0/proxy' ) }`,
@@ -20,36 +33,36 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
-const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
-	url: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
-	html: '<iframe width="16" height="9" src="https://www.youtube.com/embed/lXMskKTw3Bc"></iframe>',
-	type: 'video',
-	provider_name: 'YouTube',
-	provider_url: 'https://youtube.com',
-	version: '1.0',
-};
-
 test.use( {
 	embedUtils: async ( { page, editor }, use ) => {
 		await use( new EmbedUtils( { page, editor } ) );
 	},
 } );
 
-test.describe( 'Cross-origin isolation', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'Document-Isolation-Policy', () => {
+	test.beforeEach( async ( { admin, page } ) => {
+		// These tests only apply to Chromium 137+.
+		test.skip(
+			( await getChromiumMajorVersion( page ) ) < 137,
+			'Document-Isolation-Policy requires Chromium 137+'
+		);
+
 		await admin.createNewPost();
 	} );
 
-	test( 'should be cross-origin isolated by default', async ( { page } ) => {
-		// Verify that cross-origin isolation IS enabled (default state
-		// now that client-side media processing is graduated).
-		const isCrossOriginIsolated = await page.evaluate(
-			() => window.crossOriginIsolated
+	test( 'should send Document-Isolation-Policy header', async ( {
+		page,
+	} ) => {
+		// Navigate and capture response headers.
+		const response = await page.goto( page.url() );
+		const headers = response.headers();
+
+		expect( headers[ 'document-isolation-policy' ] ).toBe(
+			'isolate-and-credentialless'
 		);
-		expect( isCrossOriginIsolated ).toBe( true );
 	} );
 
-	test( 'should render embed previews when cross-origin isolated', async ( {
+	test( 'should render all embed previews normally with DIP', async ( {
 		editor,
 		embedUtils,
 	} ) => {
@@ -59,123 +72,15 @@ test.describe( 'Cross-origin isolation', () => {
 
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
 
-		// Verify the embed iframe is visible.
+		// With DIP, the embed should render its preview iframe normally.
 		const embedBlock = editor.canvas
 			.getByRole( 'document', { name: 'Block' } )
 			.last();
 		const iframe = embedBlock.locator( 'iframe' );
 		await expect(
 			iframe,
-			'Embed should render iframe when cross-origin isolated'
+			'Embed should render iframe preview with DIP active'
 		).toHaveAttribute( 'title', 'Embedded content from twitter.com' );
-	} );
-
-	test( 'should render video embeds with aspect ratio when cross-origin isolated', async ( {
-		editor,
-		embedUtils,
-	} ) => {
-		await embedUtils.interceptRequests( {
-			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
-				MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed(
-			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
-		);
-
-		// Verify the embed renders with aspect ratio class.
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-		await expect(
-			embedBlock,
-			'Video embed should have aspect ratio class'
-		).toHaveClass( /wp-embed-aspect-16-9/ );
-	} );
-
-	test( 'should add crossorigin attribute to embed iframes', async ( {
-		editor,
-		embedUtils,
-	} ) => {
-		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
-
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-		const iframe = embedBlock.locator( 'iframe.components-sandbox' );
-
-		await expect(
-			iframe,
-			'Embed iframe should have crossorigin attribute'
-		).toHaveAttribute( 'crossorigin', 'anonymous' );
-	} );
-
-	test( 'should add credentialless attribute to embed iframes when supported', async ( {
-		page,
-		editor,
-		embedUtils,
-	} ) => {
-		// Check if browser supports credentialless iframes.
-		const supportsCredentialless = await page.evaluate(
-			() => 'credentialless' in window.HTMLIFrameElement.prototype
-		);
-
-		test.skip(
-			! supportsCredentialless,
-			'Browser does not support credentialless iframes'
-		);
-
-		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
-
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-		const iframe = embedBlock.locator( 'iframe.components-sandbox' );
-
-		await expect(
-			iframe,
-			'Embed iframe should have credentialless attribute'
-		).toHaveAttribute( 'credentialless', '' );
-	} );
-
-	test( 'should show placeholder for denylisted providers when credentialless not supported', async ( {
-		page,
-		editor,
-		embedUtils,
-	} ) => {
-		// This test only applies when credentialless is NOT supported.
-		const supportsCredentialless = await page.evaluate(
-			() => 'credentialless' in window.HTMLIFrameElement.prototype
-		);
-
-		test.skip(
-			supportsCredentialless,
-			'Browser supports credentialless iframes'
-		);
-
-		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-		} );
-
-		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
-
-		const embedBlock = editor.canvas
-			.getByRole( 'document', { name: 'Block' } )
-			.last();
-
-		// When credentialless is not supported, embeds should show a placeholder.
-		await expect(
-			embedBlock.locator( '.components-placeholder__error' ),
-			'Should show placeholder when credentialless not supported'
-		).toContainText( "can't be previewed" );
 	} );
 } );
 

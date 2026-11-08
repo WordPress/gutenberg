@@ -147,7 +147,7 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 	] )
 );
 
@@ -170,7 +170,7 @@ export const getEnabledBlockParents = createSelector(
 	},
 	( state ) => [
 		state.blocks.parents,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
 	]
@@ -501,10 +501,13 @@ function isSectionBlockCandidate( state, clientId ) {
 	const disableContentOnlyForUnsyncedPatterns =
 		state.settings?.disableContentOnlyForUnsyncedPatterns;
 
+	const disableContentOnlyForTemplateParts =
+		state.settings?.disableContentOnlyForTemplateParts;
+
 	if (
 		( ( ! disableContentOnlyForUnsyncedPatterns &&
 			attributes?.metadata?.patternName ) ||
-			isTemplatePart ) &&
+			( isTemplatePart && ! disableContentOnlyForTemplateParts ) ) &&
 		! isIsolatedEditor
 	) {
 		return true;

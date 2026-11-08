@@ -325,6 +325,7 @@ export default function PageTemplates() {
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
+			headingLevel={ 2 }
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews

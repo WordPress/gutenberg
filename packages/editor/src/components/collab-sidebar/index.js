@@ -252,11 +252,14 @@ function NotesSidebar( { postId } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, editorMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getEditorMode } = select( editorStore );
+	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
+			select( editorStore )
+		);
 		return {
 			postId: getCurrentPostId(),
 			editorMode: getEditorMode(),
+			revisionsMode: isRevisionsMode(),
 		};
 	}, [] );
 
@@ -264,8 +267,8 @@ export default function NotesSidebarContainer() {
 		return null;
 	}
 
-	// Hide Notes sidebar in Code Editor mode since block-level commenting.
-	if ( editorMode === 'text' ) {
+	// Hide Notes sidebar for Code Editor and in-editor revision mode.
+	if ( editorMode === 'text' || revisionsMode ) {
 		return null;
 	}
 

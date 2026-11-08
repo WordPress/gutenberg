@@ -16,15 +16,22 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { getCachedRichTextData } from './crdt-text';
 import { Delta } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
+interface BlockAttributeType {
+	role?: string;
+	type?: string;
+	query?: Record< string, BlockAttributeType >;
+}
+
 interface BlockType {
+	attributes?: Record< string, BlockAttributeType >;
 	name: string;
-	attributes?: Record< string, { type?: string } >;
 }
 
 // A block as represented in Gutenberg's data store.
@@ -57,14 +64,49 @@ export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
+/**
+ * Recursively walk an attribute value and convert any RichTextData instances
+ * to their string (HTML) representation. This is necessary for array-type and
+ * object-type attributes, which can contain nested RichTextData.
+ *
+ * @param value The attribute value to serialize.
+ * @return The value with all RichTextData instances replaced by strings.
+ */
+function serializeAttributeValue( value: unknown ): unknown {
+	if ( value instanceof RichTextData ) {
+		return value.valueOf();
+	}
+
+	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
+	if ( Array.isArray( value ) ) {
+		return value.map( serializeAttributeValue );
+	}
+
+	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
+	if ( value && typeof value === 'object' ) {
+		const result: Record< string, unknown > = {};
+
+		for ( const [ k, v ] of Object.entries( value ) ) {
+			result[ k ] = serializeAttributeValue( v );
+		}
+		return result;
+	}
+
+	return value;
+}
+
 function makeBlockAttributesSerializable(
+	blockName: string,
 	attributes: BlockAttributes
 ): BlockAttributes {
 	const newAttributes = { ...attributes };
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
+		if ( isLocalAttribute( blockName, key ) ) {
+			delete newAttributes[ key ];
+			continue;
 		}
+
+		newAttributes[ key ] = serializeAttributeValue( value );
 	}
 	return newAttributes;
 }
@@ -76,8 +118,87 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 		return {
 			...rest,
 			name,
-			attributes: makeBlockAttributesSerializable( attributes ),
+			attributes: makeBlockAttributesSerializable( name, attributes ),
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
+/**
+ * Recursively walk an attribute value and convert any strings that correspond
+ * to rich-text schema nodes into RichTextData instances. This is the inverse
+ * of serializeAttributeValue and handles nested structures like table cells.
+ *
+ * @param schema The attribute type definition for this value.
+ * @param value  The attribute value from CRDT (toJSON).
+ * @return The value with rich-text strings replaced by RichTextData.
+ */
+function deserializeAttributeValue(
+	schema: BlockAttributeType | undefined,
+	value: unknown
+): unknown {
+	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
+		return getCachedRichTextData( value );
+	}
+
+	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
+	if ( Array.isArray( value ) ) {
+		return value.map( ( item ) =>
+			deserializeAttributeValue( schema, item )
+		);
+	}
+
+	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
+	if ( value && typeof value === 'object' ) {
+		const result: Record< string, unknown > = {};
+
+		for ( const [ key, innerValue ] of Object.entries(
+			value as Record< string, unknown >
+		) ) {
+			result[ key ] = deserializeAttributeValue(
+				schema?.query?.[ key ],
+				innerValue
+			);
+		}
+
+		return result;
+	}
+
+	return value;
+}
+
+/**
+ * Convert blocks from their CRDT-serialized form back to the runtime form
+ * expected by the block editor. Rich-text attributes are stored as Y.Text in
+ * the CRDT document, which serializes to plain strings via toJSON(). This
+ * function restores them to RichTextData instances so that block edit
+ * components that rely on RichTextData methods (e.g. `.text`) work correctly.
+ *
+ * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @return Blocks with rich-text attributes restored to RichTextData.
+ */
+export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
+
+		const newAttributes = { ...attributes };
+
+		for ( const [ key, value ] of Object.entries( attributes ) ) {
+			const schema = getBlockAttributeType( name, key );
+
+			if ( schema ) {
+				newAttributes[ key ] = deserializeAttributeValue(
+					schema,
+					value
+				);
+			}
+		}
+
+		return {
+			...rest,
+			name,
+			attributes: newAttributes,
+			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
 }
@@ -202,12 +323,7 @@ export function mergeCrdtBlocks(
 			makeBlocksSerializable( incomingBlocks )
 		);
 	}
-	const allBlocks = serializableBlocksCache.get( incomingBlocks ) ?? [];
-
-	// Ensure we skip blocks that we don't want to sync at the moment
-	const blocksToSync = allBlocks.filter( ( block ) =>
-		shouldBlockBeSynced( block )
-	);
+	const blocksToSync = serializableBlocksCache.get( incomingBlocks ) ?? [];
 
 	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
 	// approach.
@@ -383,32 +499,6 @@ export function mergeCrdtBlocks(
 }
 
 /**
- * Determine if a block should be synced.
- *
- * Ex: A gallery block should not be synced until the images have been
- * uploaded to WordPress, and their url is available. Before that,
- * it's not possible to access the blobs on a client as those are
- * local.
- *
- * @param block The block to check.
- * @return True if the block should be synced, false otherwise.
- */
-function shouldBlockBeSynced( block: Block ): boolean {
-	// Verify that the gallery block is ready to be synced.
-	// This means that, all images have had their blobs converted to full URLs.
-	// Checking for only the blobs ensures that blocks that have just been inserted work as well.
-	if ( 'core/gallery' === block.name ) {
-		return ! block.innerBlocks.some(
-			( innerBlock ) =>
-				innerBlock.attributes && innerBlock.attributes.blob
-		);
-	}
-
-	// Allow all other blocks to be synced.
-	return true;
-}
-
-/**
  * Update a single attribute on a Yjs block attributes map (currentAttributes).
  *
  * For rich-text attributes that already exist as Y.Text instances, the update
@@ -448,38 +538,35 @@ function updateYBlockAttribute(
 	}
 }
 
-// Cached types for block attributes.
-let cachedBlockAttributeTypes: Map< string, Map< string, string > >;
+// Cached block attribute types, populated once from getBlockTypes().
+let cachedBlockAttributeTypes: Map< string, Map< string, BlockAttributeType > >;
 
 /**
- * Get the defined attribute type for a block attribute.
+ * Get the attribute type definition for a block attribute.
  *
  * @param blockName     The name of the block, e.g. 'core/paragraph'.
  * @param attributeName The name of the attribute, e.g. 'content'.
- * @return The type of the attribute, e.g. 'rich-text' or 'string'.
+ * @return The type definition of the attribute.
  */
 function getBlockAttributeType(
 	blockName: string,
 	attributeName: string
-): string | undefined {
+): BlockAttributeType | undefined {
 	if ( ! cachedBlockAttributeTypes ) {
 		// Parse the attributes for all blocks once.
-		cachedBlockAttributeTypes = new Map< string, Map< string, string > >();
+		cachedBlockAttributeTypes = new Map();
 
 		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			const blockAttributeTypeMap = new Map< string, string >();
-
-			for ( const [ name, definition ] of Object.entries(
-				blockType.attributes ?? {}
-			) ) {
-				if ( definition.type ) {
-					blockAttributeTypeMap.set( name, definition.type );
-				}
-			}
-
 			cachedBlockAttributeTypes.set(
 				blockType.name,
-				blockAttributeTypeMap
+				new Map< string, BlockAttributeType >(
+					Object.entries( blockType.attributes ?? {} ).map(
+						( [ name, definition ] ) => {
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
+						}
+					)
+				)
 			);
 		}
 	}
@@ -503,16 +590,30 @@ function isExpectedAttributeType(
 	const expectedAttributeType = getBlockAttributeType(
 		blockName,
 		attributeName
-	);
+	)?.type;
 
 	if ( expectedAttributeType === 'rich-text' ) {
 		return attributeValue instanceof Y.Text;
-	} else if ( expectedAttributeType === 'string' ) {
+	}
+
+	if ( expectedAttributeType === 'string' ) {
 		return typeof attributeValue === 'string';
 	}
 
 	// No other types comparisons use special logic.
 	return true;
+}
+
+/**
+ * Given a block name and attribute key, return true if the attribute is local
+ * and should not be synced.
+ *
+ * @param blockName     The name of the block, e.g. 'core/image'.
+ * @param attributeName The name of the attribute to check, e.g. 'blob'.
+ * @return True if the attribute is local, false otherwise.
+ */
+function isLocalAttribute( blockName: string, attributeName: string ): boolean {
+	return 'local' === getBlockAttributeType( blockName, attributeName )?.role;
 }
 
 /**
@@ -526,7 +627,9 @@ function isRichTextAttribute(
 	blockName: string,
 	attributeName: string
 ): boolean {
-	return 'rich-text' === getBlockAttributeType( blockName, attributeName );
+	return (
+		'rich-text' === getBlockAttributeType( blockName, attributeName )?.type
+	);
 }
 
 let localDoc: Y.Doc;
