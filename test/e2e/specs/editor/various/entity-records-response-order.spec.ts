@@ -1,5 +1,5 @@
-const path = require( 'path' );
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { join } from 'node:path';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 /*
  * The exact query the inserter's Media tab resolves for its "Images" source:
@@ -50,15 +50,15 @@ test.describe( 'Entity records response order', () => {
 		const LIST_REQUEST_MATCHER = /wp\/v2\/media\?.*media_type=image/;
 
 		let holding = false;
-		let staleBodyRead = () => {};
+		let staleBodyRead: ( value?: unknown ) => void = () => {};
 		const staleBodyReadGate = new Promise( ( resolve ) => {
 			staleBodyRead = resolve;
 		} );
-		let releaseStaleResponse = () => {};
+		let releaseStaleResponse: ( value?: unknown ) => void = () => {};
 		const staleResponseGate = new Promise( ( resolve ) => {
 			releaseStaleResponse = resolve;
 		} );
-		let staleResponseDelivered = Promise.resolve();
+		let staleResponseDelivered: Promise< void > = Promise.resolve();
 
 		await page.route( LIST_REQUEST_MATCHER, async ( route ) => {
 			if ( route.request().method() !== 'GET' || holding ) {
@@ -88,7 +88,7 @@ test.describe( 'Entity records response order', () => {
 
 		// A new image is uploaded while that response is held.
 		const media = await requestUtils.uploadMedia(
-			path.join(
+			join(
 				__dirname,
 				'..',
 				'..',
@@ -119,7 +119,9 @@ test.describe( 'Entity records response order', () => {
 					!! window.wp.data
 						.select( 'core' )
 						.getEntityRecords( 'postType', 'attachment', query )
-						?.some( ( record ) => record.id === id ),
+						?.some(
+							( record: { id: number } ) => record.id === id
+						),
 				{ query: IMAGES_QUERY, id: media.id }
 			);
 
