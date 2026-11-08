@@ -136,8 +136,9 @@ function UnforwardedModal(
 
 	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		ariaHelper.modalize( ref.current! );
-		return () => ariaHelper.unmodalize();
+		const modalElement = ref.current!;
+		ariaHelper.modalize( modalElement );
+		return () => ariaHelper.unmodalize( modalElement );
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.

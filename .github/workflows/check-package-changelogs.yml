@@ -24,6 +24,7 @@ on:
             - 'packages/fields/**'
             - 'packages/grid/**'
             - 'packages/icons/**'
+            - 'packages/image-editor/**'
             - 'packages/interface/**'
             - 'packages/npm-package-json-lint-config/**'
             - 'packages/postcss-plugins-preset/**'
@@ -35,6 +36,7 @@ on:
             - 'packages/style-runtime/**'
             - 'packages/stylelint-config/**'
             - 'packages/theme/**'
+            - 'packages/theme-build-tools/**'
             - 'packages/ui/**'
             - 'packages/undo-manager/**'
             - 'packages/views/**'
@@ -102,6 +104,7 @@ jobs:
                       fields
                       grid
                       icons
+                      image-editor
                       interface
                       style-runtime
                       ui
@@ -134,6 +137,7 @@ jobs:
                       readable-js-assets-webpack-plugin
                       scripts
                       stylelint-config
+                      theme-build-tools
                   )
 
                   # Files that don't warrant a CHANGELOG entry:
@@ -147,7 +151,7 @@ jobs:
                   # Dev tooling configs at the package root. Configs a package
                   # ships, such as `packages/scripts/config/`, and TypeScript
                   # configs that can affect the build (`tsconfig.json`,
-                  # `tsconfig.build.json`, `tsconfig.plugins.json`) still count.
+                  # `tsconfig.build.json`, `tsconfig.prebuilt.json`) still count.
                   ignored+="|(tsconfig\.(stories|test|bin)\.json|\.(stylelintrc|eslintrc|prettierrc)[^/]*|\.gitignore)$"
                   ignored+=")"
 

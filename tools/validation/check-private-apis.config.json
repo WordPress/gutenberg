@@ -14,7 +14,7 @@
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "fields",
-			"via": "packages/core-data/src/index.js"
+			"via": "packages/core-data/src/index.ts"
 		},
 		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
@@ -64,7 +64,7 @@
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "global-styles-ui",
-			"via": "packages/core-data/src/index.js"
+			"via": "packages/core-data/src/index.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
@@ -89,7 +89,7 @@
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "media-editor",
-			"via": "packages/core-data/src/index.js"
+			"via": "packages/core-data/src/index.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
@@ -109,7 +109,7 @@
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "media-fields",
-			"via": "packages/core-data/src/index.js"
+			"via": "packages/core-data/src/index.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
@@ -124,7 +124,7 @@
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "views",
-			"via": "packages/core-data/src/index.js"
+			"via": "packages/core-data/src/index.ts"
 		},
 		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",

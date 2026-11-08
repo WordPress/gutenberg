@@ -5,7 +5,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { Button, Popover } from '@wordpress/components';
+import { Button, Popover as WCPopover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
@@ -44,7 +44,7 @@ export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 			>
 				<BlockToolbar hideDragHandle />
 			</div>
-			<Popover.Slot name="block-toolbar" />
+			<WCPopover.Slot name="block-toolbar" />
 
 			<Button
 				className="editor-collapsible-block-toolbar__toggle"

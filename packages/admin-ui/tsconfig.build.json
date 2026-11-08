@@ -9,7 +9,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../route" },
+		{ "path": "../route/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" }
 	]

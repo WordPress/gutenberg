@@ -286,6 +286,29 @@ jobs:
                   # Pull request builds only need to outlive Playground previews of active pull requests.
                   retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
+            - name: Build Storybook preview bundle
+              id: storybook
+              if: ${{ github.event_name == 'pull_request' && matrix.IS_GUTENBERG_PLUGIN }}
+              continue-on-error: true
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: production
+              run: |
+                  npm run --workspace @wordpress/storybook storybook:build
+                  BUNDLE="$RUNNER_TEMP/storybook-preview"
+                  mkdir -p "$BUNDLE"
+                  cp .github/storybook-preview/blueprint.json "$BUNDLE/blueprint.json"
+                  ( cd storybook/build && zip --recurse-paths --no-dir-entries --quiet "$BUNDLE/storybook.zip" . )
+                  ( cd "$BUNDLE" && zip --quiet "$GITHUB_WORKSPACE/storybook-preview.zip" blueprint.json storybook.zip )
+
+            - name: Upload Storybook preview bundle
+              if: ${{ steps.storybook.outcome == 'success' }}
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+              with:
+                  path: ./storybook-preview.zip
+                  archive: false
+                  retention-days: 14
+
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               env:
@@ -354,7 +377,7 @@ jobs:
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+              uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}

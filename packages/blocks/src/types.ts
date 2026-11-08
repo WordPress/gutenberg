@@ -212,6 +212,7 @@ export interface BlockAttribute {
 	role?: string;
 	__experimentalRole?: string;
 	query?: Record< string, BlockAttribute >;
+	items?: BlockAttribute;
 	enum?: unknown[];
 	multiline?: string;
 	__unstablePreserveWhiteSpace?: boolean;

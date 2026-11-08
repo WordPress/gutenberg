@@ -6,3 +6,4 @@ import './navigation-link-view-button';
 import './template-part-navigation-edit-button';
 import './push-changes-to-global-styles';
 import './note-format';
+import './note-merge';

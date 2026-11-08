@@ -127,7 +127,7 @@ Without this, the router will not load your script module when navigating to a p
 
 ### Setting up router regions
 
-A router region is a section of your page that the router updates during client-side navigation. You define one by adding both `data-wp-router-region` and `data-wp-interactive` to the same element — both directives are required at this moment.
+A router region is a section of your page that the router updates during client-side navigation. You define one by adding `data-wp-router-region` to an element that has `data-wp-interactive` or sits inside an element that does. A region with its own `data-wp-interactive` uses that namespace; a region without one uses the namespace of its nearest `data-wp-interactive` ancestor. A router region with neither is not updated during navigation.
 
 The `data-wp-router-region` directive takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched. Each region ID must be unique within a page; if two regions share the same ID, the router won't know which one to update.
 
@@ -169,30 +169,40 @@ Router regions can be placed anywhere on the page. Their behavior depends on whe
     <div data-wp-interactive="myPlugin">
     	<h1>This heading is never updated during navigation</h1>
 
-    	<div
-    		data-wp-interactive="myPlugin"
-    		data-wp-router-region="myPlugin/posts"
-    	>
+    	<div data-wp-router-region="myPlugin/posts">
     		<!-- This content is updated during navigation -->
     	</div>
     </div>
     ```
 
-    Note that the router region still needs its own `data-wp-interactive` directive, even though it is already inside one.
+    The region doesn't need its own `data-wp-interactive`. It inherits the namespace of its nearest `data-wp-interactive` ancestor, and after navigation, and after the user goes back or forward in history, its directives without a `namespace::` prefix resolve against the namespace of the ancestor on the page that supplied the content, as they do when that page loads directly. The ancestor can use the string form (`data-wp-interactive="myPlugin"`) or the object form (`data-wp-interactive='{ "namespace": "myPlugin" }'`). If the ancestor's namespace differs between two pages, each page's content uses its own. An element that the router keeps between the two pages, though, keeps what it set up when it mounted — `data-wp-watch` callbacks, `data-wp-on-window` and `data-wp-on-document` listeners, and `data-wp-init` — with the namespace and references it had then; give it a different `data-wp-key` on each page to mount it again (see [Preserving elements with `data-wp-key`](#preserving-elements-with-data-wp-key)). A `data-wp-interactive` on the region itself, or on an element inside it, takes precedence for that element and its descendants, and a `namespace::` prefix in a directive value takes precedence for that directive. Repeating the enclosing namespace in a `data-wp-interactive` on the region is allowed.
 
 -   **Inside another router region** — When a router region is nested inside another router region, it becomes part of the parent region. The parent region is updated as a single unit during navigation; the nested region is not processed independently:
 
     ```html
     <div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/main">
     	<!-- This inner region is part of "myPlugin/main" -->
-    	<div
-    		data-wp-interactive="myPlugin"
-    		data-wp-router-region="myPlugin/sidebar"
-    	>
+    	<div data-wp-router-region="myPlugin/sidebar">
     		<!-- Updated together with the parent region -->
     	</div>
     </div>
     ```
+
+-   **Inside `data-wp-html` content** — The router ignores a router region inside the content of a [`data-wp-html`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-html) element, whether that's the server-rendered fallback or HTML the directive inserted, because the Interactivity API treats that content as [inert](/docs/reference-guides/interactivity-api/directives-and-store.md#inert-content). Navigation behaves as if the region's `data-wp-router-region` attribute were absent, on the initial page and on every page the router fetches or restores from history: the region never supplies content for a region with the same ID, and its `attachTo` never attaches anything.
+
+    ```html
+    <div data-wp-interactive="myPlugin">
+    	<div data-wp-html="state.description">
+    		<!-- Fallback content: this region is ignored during navigation -->
+    		<div
+    			data-wp-interactive="myPlugin"
+    			data-wp-router-region="myPlugin/sidebar"
+    		></div>
+    	</div>
+    </div>
+    ```
+
+    In this guide, a `data-wp-html` element is one whose content is inert: it's inside an interactive region and doesn't also have `data-wp-text`, `data-wp-each` or `data-wp-router-region` (see [Conflicts with other directives](/docs/reference-guides/interactivity-api/directives-and-store.md#conflicts-with-other-directives)). `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence.
 
 ### Implementing navigation
 
@@ -387,7 +397,7 @@ The pattern above only runs for navigations this action started. To also cover n
 
 ### Adding new regions on navigation
 
-Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page.
+Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page. The region itself doesn't have to be on the current page, but the element it attaches to does. As with any router region, it can leave out `data-wp-interactive` when it sits inside an element that has one on the destination page; its directives then use that element's namespace.
 
 **Defining a region with `attachTo`:**
 
@@ -405,7 +415,9 @@ Sometimes you need UI elements — like modals, sidebars, or notification panels
 </div>
 ```
 
-The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the region will be created and appended to the element matching the selector.
+The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the router creates the region and appends it to the first element on the current page that matches the selector and is neither a [`data-wp-html`](/docs/reference-guides/interactivity-api/directives-and-store.md#wp-html) element nor inside its [inert content](/docs/reference-guides/interactivity-api/directives-and-store.md#inert-content).
+
+If there is no such element, the region is not attached and the rest of the navigation completes as if the destination page didn't have the region: the other regions update, the title and URL change, and no error is thrown. This happens when the selector matches nothing, when every match is a `data-wp-html` element or inside one, or when the value isn't a valid CSS selector. The router resolves the selector every time it renders the page, so restoring the page from history tries again against the document as it is then.
 
 **Example: Modal that appears on navigation**
 
@@ -455,6 +467,8 @@ _Page with modal (page-2.php):_
 ```
 
 When navigating from Page 1 to Page 2, the modal region is created and appended to `<body>`. When navigating back to Page 1, the modal is automatically removed.
+
+The router renders attached regions synchronously, inside `navigate()`, before the browser's URL changes. The callbacks Preact runs during that render, such as effects, layout effects, ref callbacks and the cleanups of content the render unmounts, run without a directive scope, so they never read the scope of the element that called `navigate()`. `getContext()`, `getElement()` and `getServerContext()` throw in them, and a `navigate()` call from them without the `initiator` option publishes `null` on `state.initiator`. The callbacks the runtime binds to their own element, like those of `data-wp-watch`, `data-wp-init` and `data-wp-on`, keep that element's scope, and so do functions wrapped with [`withScope()`](/docs/reference-guides/interactivity-api/directives-and-store.md#withscope).
 
 ### Preserving elements with `data-wp-key`
 
@@ -860,7 +874,8 @@ A derived initiator is the region's ID as you wrote it, not the raw attribute te
 -   **The visitor used the browser's back or forward button.** No block started the navigation, which is what lets a block tell a traversal apart from a navigation it started itself.
 -   **A link was handled by the document-level listener of full-page mode**, wherever the link sits. A plain link inside a block's region was not started by that block.
 -   **`navigate()` was called with no directive scope**, for example from a module that imports the router and calls it from its own code rather than from an action bound to an element.
--   **`navigate()` was called from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url`.** That callback runs without a directive scope, so the call does not inherit the initiator of the navigation it is reacting to. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
+-   **`navigate()` was called from inside a `watch()`, or from the cleanup it returns, that reacts to `state.navigating`, `state.initiator` or `state.url`.** Neither runs with a directive scope, so the call does not inherit the initiator of the navigation it is reacting to. A `data-wp-watch` reacting to the same change runs a frame later and derives its own region as usual.
+-   **`navigate()` was called from a cleanup returned by a `data-wp-watch` or `data-wp-init` callback**, or from a callback Preact runs directly while the router renders [attached regions](#adding-new-regions-on-navigation), such as an effect or a ref callback. None of them runs with a directive scope.
 
 In full-page mode, the `<body>` element itself carries `data-wp-router-region="core/body"`, so an element with a directive that calls `navigate()` from outside every block's router region derives `core/body`, where the same markup in region-based mode derives `null`. See [Full-page client-side navigation](#full-page-client-side-navigation-experimental).
 
@@ -878,8 +893,8 @@ A derived initiator identifies the region, not the element: two blocks inside th
 
 Where you read the two properties decides when your code runs and what it can see:
 
--   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it. It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
--   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes and has **no directive scope** — `getContext()` and `getElement()` are not available inside it. Use it for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
+-   **`data-wp-watch`** runs in the element's directive scope, so `getContext()` and `getElement()` are available inside it, but the cleanup it returns runs without one unless you wrap it with [`withScope()`](/docs/reference-guides/interactivity-api/directives-and-store.md#withscope). It is deferred by a frame and coalesces changes landing within the same frame, and a callback reacting to the end of a navigation sees the newly committed DOM. Derived state getters evaluated through a directive run in that element's scope too.
+-   **`watch()`**, the utility from `@wordpress/interactivity`, runs **synchronously** at the moment a value changes and has **no directive scope**, nor does the cleanup it returns — `getContext()` and `getElement()` are not available inside either. Use it for page-level work that only touches store state. Because it runs synchronously, a `watch()` keyed on `state.url` runs before the new region content has been rendered and observes the _old_ DOM; keyed on the end of a navigation it runs after the commit and observes the new one. See the [`watch()` reference](/docs/reference-guides/interactivity-api/directives-and-store.md#watch).
 -   **`data-wp-init`** runs in scope once per element, which makes it the place for setup that belongs to hydration rather than to a navigation.
 
 "The new DOM" above assumes the navigation rendered its content. In the two cases described in [When a navigation ends without new content](#when-a-navigation-ends-without-new-content), a callback reacting to the end with either primitive may find the previous page or a partially updated one, so look elements up inside the callback and check that they exist.
@@ -1119,7 +1134,7 @@ Router regions are the sections of your page that the router knows how to update
 
 **Defining router regions**
 
-You define a router region by adding the `data-wp-router-region` attribute to an element alongside `data-wp-interactive` (as described in [Setting up router regions](#setting-up-router-regions) above).
+You define a router region by adding the `data-wp-router-region` attribute to an element that has `data-wp-interactive` or sits inside an element that does (as described in [Setting up router regions](#setting-up-router-regions) above).
 
 The attribute value serves as a unique identifier for that region. You can specify it in two ways:
 
@@ -1152,9 +1167,9 @@ When the router fetches a new page (either through `prefetch()` or as part of `n
 
 First, the router parses the fetched HTML into a document structure using the browser's built-in HTML parser. This gives it a complete DOM tree to work with, just as if the page had been loaded normally.
 
-Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
+Next, the router scans this document for all elements with a `data-wp-router-region` attribute that have `data-wp-interactive` themselves or sit inside an element that does. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content. The scan skips router regions inside `data-wp-html` content, as described in [Where to place router regions](#where-to-place-router-regions), so they never supply a region's content or get attached. The router filters the initial page the same way.
 
-For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently by the Interactivity API. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
+For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently by the Interactivity API. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation. The conversion happens while the region is still in the document that supplied it, so a region without its own `data-wp-interactive` gets the namespace of its nearest `data-wp-interactive` ancestor on that page.
 
 Finally, each region's virtual DOM is stored in the page cache entry, indexed by its region ID. The cache entry now contains a map of region IDs to their corresponding virtual DOM trees.
 
@@ -1178,16 +1193,18 @@ The reconciliation algorithm relies on heuristics that can fail when elements sh
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
-Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router will dynamically create it.
+Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router dynamically creates it, provided the current page has an element to attach it to.
 
 The `attachTo` property contains a CSS selector that identifies where in the current page the new region should be appended. When the router encounters such a region, it:
 
-1. Finds the element matching the `attachTo` selector in the current page
+1. Finds the first element in the current page that matches the `attachTo` selector and is neither a `data-wp-html` element nor inside its content
 2. Creates new DOM elements for the region
 3. Appends these elements to the matched parent
 4. Renders the region's virtual DOM into the newly created elements
 
-This allows content that exists on one page but not another to appear smoothly during navigation, without requiring the target element to exist in advance.
+When step 1 finds no element, the router skips the region, as described in [Adding new regions on navigation](#adding-new-regions-on-navigation). Skipping a region doesn't change the cached page, so a later render can attach it if the selector then matches a usable element. A region that an earlier navigation attached also shows nothing on a page whose `attachTo` has no usable element, as it would on a page without the region.
+
+This allows content that exists on one page but not another to appear smoothly during navigation, without the region having to exist on the current page in advance.
 
 **Scenario 3: Region exists only on the current page (remove)**
 
@@ -1508,7 +1525,7 @@ When `navigate()` is called (for example, on link click):
     - In a batch for efficiency:
         - Server state is merged with client state.
         - Each router region is updated with its new virtual DOM.
-        - Regions with `attachTo` that don't exist are created and appended.
+        - Regions with `attachTo` that don't exist are created and appended to the first usable element matching their selector. A region with no such element in the current page is skipped, as described in [Adding new regions on navigation](#adding-new-regions-on-navigation).
     - The document title is updated.
 7. Browser history is updated (pushState or replaceState).
 8. Screen reader announcement is made for accessibility.

@@ -54,4 +54,8 @@ export type MenuItemProps = Pick<
 	 * Human-readable label for item.
 	 */
 	label?: string;
+	/**
+	 * The URL to link to, which renders the item as a link.
+	 */
+	href?: string;
 };

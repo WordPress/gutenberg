@@ -2,9 +2,41 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
+-   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+
 ### Bug Fixes
 
+-   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
+-   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
+-   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
+-   PostSchedule: Mark the posts of the month in the site's timezone, including posts at the first and last second of the month ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
+-   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
+-   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+-   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
+-   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+
+## 16.1.0 (2026-11-04)
+
+### New Features
+
+-   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
+
+### Enhancements
+
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
+-   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
+-   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
 
 ## 16.0.0 (2026-10-20)
 
