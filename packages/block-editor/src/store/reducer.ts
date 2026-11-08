@@ -2,6 +2,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
@@ -190,28 +191,12 @@ export function isUpdatingSameBlockAttribute(
 function updateBlockTreeForBlocks( state: BlocksState, blocks: Block[] ) {
 	const treeToUpdate = state.tree;
 	const stack = [ ...blocks ];
-	const flattenedBlocks = [ ...blocks ];
 	while ( stack.length ) {
 		const block = stack.shift()!;
 		stack.push( ...block.innerBlocks );
-		flattenedBlocks.push( ...block.innerBlocks );
-	}
-	// Create objects before mutating them, that way it's always defined.
-	for ( const block of flattenedBlocks ) {
-		treeToUpdate.set( block.clientId, {} as TreeBlock );
-	}
-	for ( const block of flattenedBlocks ) {
-		treeToUpdate.set(
-			block.clientId,
-			Object.assign( treeToUpdate.get( block.clientId ) as TreeBlock, {
-				...state.byClientId.get( block.clientId ),
-				attributes: state.attributes.get( block.clientId ),
-				innerBlocks: block.innerBlocks.map(
-					( subBlock ) =>
-						treeToUpdate.get( subBlock.clientId ) as TreeBlock
-				),
-			} )
-		);
+		// A block already has the shape of a tree node, so it becomes the
+		// node. Tree nodes are never mutated, only replaced.
+		treeToUpdate.set( block.clientId, block as TreeBlock );
 	}
 }
 
@@ -569,6 +554,67 @@ const withInnerBlocksRemoveCascade =
 	};
 
 /**
+ * Returns `oldMap` when `newMap` holds the same values for the same keys.
+ *
+ * @param oldMap Previous map.
+ * @param newMap New map.
+ *
+ * @return The map to keep.
+ */
+function keepMapIfSame< K, V >( oldMap: Map< K, V >, newMap: Map< K, V > ) {
+	if ( oldMap.size !== newMap.size ) {
+		return newMap;
+	}
+	for ( const [ key, value ] of newMap ) {
+		if ( oldMap.get( key ) !== value ) {
+			return newMap;
+		}
+	}
+	return oldMap;
+}
+
+/**
+ * After a reset, keeps the previous entries of blocks that the reset handed
+ * back unchanged. Undo and redo hand back the previous tree nodes themselves,
+ * so a block is unchanged when its node is the same object.
+ *
+ * @param state    Previous blocks state.
+ * @param newState Blocks state rebuilt from the reset blocks.
+ *
+ * @return The blocks state to keep.
+ */
+function keepUnchangedBlocks( state: BlocksState, newState: BlocksState ) {
+	for ( const [ clientId, node ] of newState.tree ) {
+		if (
+			node === state.tree.get( clientId ) &&
+			state.byClientId.has( clientId )
+		) {
+			newState.byClientId.set(
+				clientId,
+				state.byClientId.get( clientId )!
+			);
+		}
+	}
+	for ( const [ clientId, order ] of newState.order ) {
+		const oldOrder = state.order.get( clientId );
+		if ( oldOrder && isShallowEqual( oldOrder, order ) ) {
+			newState.order.set( clientId, oldOrder );
+		}
+	}
+	newState.byClientId = keepMapIfSame(
+		state.byClientId,
+		newState.byClientId
+	);
+	newState.attributes = keepMapIfSame(
+		state.attributes,
+		newState.attributes
+	);
+	newState.order = keepMapIfSame( state.order, newState.order );
+	newState.parents = keepMapIfSame( state.parents, newState.parents );
+	return newState;
+}
+
+/**
  * Higher-order reducer which targets the combined blocks reducer and handles
  * the `RESET_BLOCKS` action. When dispatched, this action will replace all
  * blocks that exist in the post, leaving blocks that exist only in state (e.g.
@@ -645,8 +691,9 @@ const withBlockReset =
 			// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
 			// built tree entries using action.blocks' inner block structure
 			// (entity-level IDs), but we need them to reference the preserved
-			// cloned inner blocks instead. Mutating the existing object
-			// preserves references held by ancestor tree entries.
+			// cloned inner blocks instead. The entries are the blocks from the
+			// action, so they are replaced, and their ancestors after them.
+			const fixedClientIds: string[] = [];
 			for ( const clientId of newState.controlledInnerBlocks ) {
 				const controlledOrder = newState.order.get( clientId );
 				if ( ! controlledOrder?.length ) {
@@ -657,7 +704,11 @@ const withBlockReset =
 				);
 				const existingEntry = newState.tree.get( clientId );
 				if ( existingEntry ) {
-					existingEntry.innerBlocks = innerBlocks;
+					newState.tree.set( clientId, {
+						...existingEntry,
+						innerBlocks,
+					} );
+					fixedClientIds.push( clientId );
 				}
 				newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
 				const preserveTreeEntry = ( blockId: string ) => {
@@ -671,6 +722,7 @@ const withBlockReset =
 				};
 				controlledOrder.forEach( preserveTreeEntry );
 			}
+			updateParentInnerBlocksInTree( newState, fixedClientIds, false );
 
 			// Preserve block editing modes for blocks that are not removed.
 			const preservedBlockEditingModes =
@@ -682,7 +734,7 @@ const withBlockReset =
 				newState.blockEditingModes.set( clientId, mode );
 			}
 
-			return newState;
+			return state ? keepUnchangedBlocks( state, newState ) : newState;
 		}
 
 		return reducer( state, action );

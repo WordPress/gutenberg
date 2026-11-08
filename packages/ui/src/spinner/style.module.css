@@ -16,7 +16,8 @@
 		.indicator {
 			fill: transparent;
 			stroke: currentColor;
-			stroke-width: var(--wpds-border-width-sm);
+			/* Scales with the rendered size, like the 1.5px stroke of 24px icons. */
+			stroke-width: 1.5;
 			stroke-linecap: round;
 			transform-origin: 50% 50%;
 

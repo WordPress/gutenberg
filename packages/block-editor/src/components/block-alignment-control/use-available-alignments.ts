@@ -1,9 +1,16 @@
 import { useSelect } from '@wordpress/data';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useLayout } from '../block-list/layout';
+import { useBlockEditContext } from '../block-edit';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
-import type { Layout, LayoutAlignment, LayoutType } from '../../layouts/types';
+import type {
+	Layout,
+	LayoutAlignment,
+	LayoutBlockSupport,
+	LayoutType,
+} from '../../layouts/types';
 import type { AlignmentMenu, AlignmentSettings } from './types';
 
 const EMPTY_ARRAY: never[] = [];
@@ -33,6 +40,46 @@ function useAlignmentSettings( isNoneOnly: boolean ): AlignmentSettings {
 			};
 		},
 		[ isNoneOnly ]
+	);
+}
+
+/**
+ * Whether the layout of the current block's parent can be edited by the user.
+ * When it cannot, alignments the layout withholds are not something to offer
+ * a way out of, so they are not listed as unavailable. A parent without layout
+ * support has no layout setting to change, so the same applies.
+ *
+ * @return False when the parent lacks layout support or has `allowEditing` set to false.
+ */
+function useIsParentLayoutEditable(): boolean {
+	const { clientId } = useBlockEditContext();
+	return useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return true;
+			}
+			const { getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			const parentName = rootClientId && getBlockName( rootClientId );
+			if ( ! rootClientId || ! parentName ) {
+				return true;
+			}
+			// Only the block type's support determines whether its layout is editable.
+			const layoutSupport =
+				getBlockSupport( parentName, 'layout' ) ||
+				getBlockSupport( parentName, '__experimentalLayout' );
+			if ( ! layoutSupport ) {
+				return false;
+			}
+			const supportAllowEditing = ( layoutSupport as LayoutBlockSupport )
+				.allowEditing;
+			if ( typeof supportAllowEditing === 'boolean' ) {
+				return supportAllowEditing;
+			}
+			return true;
+		},
+		[ clientId ]
 	);
 }
 
@@ -151,6 +198,7 @@ export function useAlignmentMenu(
 	const settings = useAlignmentSettings( isNoneOnly );
 	const layout = useLayout();
 	const [ globalLayout ] = useSettings( 'layout' );
+	const isParentLayoutEditable = useIsParentLayoutEditable();
 
 	if ( isNoneOnly ) {
 		return { enabled: EMPTY_ARRAY, unavailable: EMPTY_ARRAY };
@@ -163,7 +211,7 @@ export function useAlignmentMenu(
 		settings
 	).length;
 
-	if ( ! layoutOffersAlignments ) {
+	if ( ! layoutOffersAlignments || ! isParentLayoutEditable ) {
 		return { enabled, unavailable: EMPTY_ARRAY };
 	}
 
