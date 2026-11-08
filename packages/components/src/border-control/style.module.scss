@@ -49,14 +49,6 @@
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;
 		border: $border-width solid $components-color-border;
-
-		&:focus,
-		&:hover:not(:disabled) {
-			box-shadow: inset 0 0 0 0.5px $components-color-accent;
-			border-color: $components-color-accent;
-			z-index: 1;
-			position: relative;
-		}
 	}
 }
 

@@ -88,9 +88,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'gradient' => '--wp--preset--gradient--$slug',
 					),
 					'path'          => array( 'background', 'gradient' ),
-					'classnames'    => array(
-						'has-background' => true,
-					),
 				),
 				'backgroundClip'       => array(
 					'value_func' => array( self::class, 'get_background_clip_css_declarations' ),
@@ -383,7 +380,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 		 *
-		 * @param string $style_value  A single CSS preset value.
+		 * @param mixed  $style_value  A single CSS preset value.
 		 * @param string $property_key The CSS property that is the second element of the preset string. Used for matching.
 		 *
 		 * @return string The slug, or empty string if not found.
@@ -421,7 +418,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Util: Checks whether an incoming block style value is valid.
 		 *
-		 * @param string? $style_value A single css preset value.
+		 * @param mixed $style_value A single raw style value.
 		 *
 		 * @return bool
 		 */
@@ -437,8 +434,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
 		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
 		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
-		 *
-		 * @return void.
 		 */
 		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ) {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
@@ -516,18 +511,46 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], $css_declarations );
 					}
 				}
+
+				if ( 'background' === $definition_group_key && static::has_box_background( $block_styles['background'] ) ) {
+					$parsed_styles['classnames'][] = 'has-background';
+				}
 			}
 
 			return $parsed_styles;
 		}
 
 		/**
+		 * Checks whether a background object paints the block's box, which is
+		 * what the `has-background` class announces. Mirror of
+		 * `wp_get_background_classes_and_styles()`: an image or a gradient
+		 * does, unless it is clipped to the text, which paints the glyphs
+		 * instead.
+		 *
+		 * @param mixed $background_styles The `background` object from the block styles.
+		 *
+		 * @return bool
+		 */
+		protected static function has_box_background( $background_styles ) {
+			if ( ! is_array( $background_styles ) ) {
+				return false;
+			}
+
+			$has_background = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
+
+			return $has_background && 'text' !== ( $background_styles['backgroundClip'] ?? null );
+		}
+
+		/**
 		 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., '`var:preset|<PRESET_TYPE>|<PRESET_SLUG>`'.
 		 *
-		 * @param array $style_value      A single raw style value or css preset property from the $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param mixed  $style_value      A single raw style value or CSS preset property from the $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
-		 * @return array|string[] An array of CSS classnames, or empty array.
+		 * @return string[] An array of CSS classnames, or empty array.
+		 *
+		 * @phpstan-param array{ classnames?: array<string, string|true>, ... } $style_definition
+		 * @phpstan-return list<string>
 		 */
 		protected static function get_classnames( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
@@ -564,7 +587,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param array $style_value      A single raw style value from $block_styles array.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
 		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 * @param array $options          {
 		 *     Optional. An array of options. Default empty array.
@@ -724,14 +747,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string $style_value      A single raw style value from $block_styles array.
 		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
 		 */
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
 		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
-			if ( empty( $style_value ) || ! is_string( $style_value ) ) {
-				return array();
-			}
-
 			if ( ! in_array( $style_value, static::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 				return array();
 			}

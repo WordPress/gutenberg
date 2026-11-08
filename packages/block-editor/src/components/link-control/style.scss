@@ -158,12 +158,11 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.components-menu-item__shortcut {
-		color: $gray-700;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
-	&[aria-selected] {
-		background: $gray-100;
+	&:not(:focus, [aria-selected="true"]) .components-menu-item__shortcut {
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }
 
@@ -215,6 +214,8 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__preview-title {
+		display: flex;
+		align-items: baseline;
 		line-height: var(--wpds-typography-line-height-sm);
 
 		mark {
@@ -225,17 +226,6 @@ $block-editor-link-control-number-of-actions: 1;
 
 		span {
 			font-weight: 400;
-		}
-
-		.components-external-link__icon {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			padding: 0;
-			margin: -1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			border: 0;
 		}
 	}
 }

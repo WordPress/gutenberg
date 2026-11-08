@@ -13,7 +13,7 @@ import Popover from '..';
 import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
-import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,

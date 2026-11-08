@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	ExternalLink,
 	__experimentalTruncate as Truncate,
 	__experimentalHStack as HStack,
 	Flex,
@@ -21,7 +20,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { Badge } from '@wordpress/ui';
+import { Badge, Link } from '@wordpress/ui';
 import { ViewerSlot } from './viewer-slot';
 import useRichUrlData from './use-rich-url-data';
 import type { LinkPreviewProps } from './types';
@@ -132,14 +131,20 @@ export default function LinkPreview( {
 					>
 						{ ! isEmptyURL ? (
 							<>
-								<ExternalLink
+								<Link
 									className="block-editor-link-control__preview-title"
 									href={ value.url! }
+									openInNewTab
+									onClick={ ( event ) => {
+										if ( value.url?.startsWith( '#' ) ) {
+											event.preventDefault();
+										}
+									} }
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
 									</Truncate>
-								</ExternalLink>
+								</Link>
 								<span className="block-editor-link-control__preview-info">
 									<Truncate numberOfLines={ 1 }>
 										{ displayURL }

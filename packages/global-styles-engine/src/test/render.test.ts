@@ -6,6 +6,7 @@ import {
 	getNodesWithSettings,
 	generateCustomProperties,
 	transformToStyles,
+	transformToStylesWithTextClipBase,
 	getBlockSelectors,
 	generateGlobalStyles,
 } from '../core/render';
@@ -167,6 +168,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector: '.my-heading1, .my-heading2',
 					name: 'core/heading',
+					sourceStyles: tree.styles.blocks[ 'core/heading' ],
 				},
 				{
 					styles: {
@@ -214,6 +216,7 @@ describe( 'global styles renderer', () => {
 					selector: '.my-image',
 					name: 'core/image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
+					sourceStyles: tree.styles.blocks[ 'core/image' ],
 				},
 			] );
 		} );
@@ -391,6 +394,24 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+		const textInputSelectorWith = ( pseudoSelector: string ) =>
+			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])${ pseudoSelector }`;
+		const transformTextInputStyles = (
+			textInputStyles: Record< string, unknown >
+		) =>
+			transformToStyles(
+				Object.freeze( {
+					styles: {
+						elements: { textInput: textInputStyles },
+					},
+				} as unknown as GlobalStylesConfig ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
 
 		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
 			const tree: GlobalStylesConfig = {
@@ -567,7 +588,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( transformToStyles( tree, blockSelectors ) ).toEqual(
-				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }body{background-color: red;margin: 10px;padding: 10px;}a:where(:not(.wp-element-button)){color: blue;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}:root :where(a:where(:not(.wp-element-button)):focus){color: orange;}h1{font-size: 42px;}:root :where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:root :where(h1,h2,h3,h4,h5,h6){color: orange;}:root :where(h1 a:where(:not(.wp-element-button)),h2 a:where(:not(.wp-element-button)),h3 a:where(:not(.wp-element-button)),h4 a:where(:not(.wp-element-button)),h5 a:where(:not(.wp-element-button)),h6 a:where(:not(.wp-element-button))){color: hotpink;}:root :where(h1 a:where(:not(.wp-element-button)):hover,h2 a:where(:not(.wp-element-button)):hover,h3 a:where(:not(.wp-element-button)):hover,h4 a:where(:not(.wp-element-button)):hover,h5 a:where(:not(.wp-element-button)):hover,h6 a:where(:not(.wp-element-button)):hover){color: red;}:root :where(h1 a:where(:not(.wp-element-button)):focus,h2 a:where(:not(.wp-element-button)):focus,h3 a:where(:not(.wp-element-button)):focus,h4 a:where(:not(.wp-element-button)):focus,h5 a:where(:not(.wp-element-button)):focus,h6 a:where(:not(.wp-element-button)):focus){color: red;}:root :where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:root :where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-color{color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
+				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-flow > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-constrained > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }body{background-color: red;margin: 10px;padding: 10px;}a:where(:not(.wp-element-button)){color: blue;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}:root :where(a:where(:not(.wp-element-button)):focus){color: orange;}h1{font-size: 42px;}:root :where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:root :where(h1,h2,h3,h4,h5,h6){color: orange;}:root :where(h1 a:where(:not(.wp-element-button)),h2 a:where(:not(.wp-element-button)),h3 a:where(:not(.wp-element-button)),h4 a:where(:not(.wp-element-button)),h5 a:where(:not(.wp-element-button)),h6 a:where(:not(.wp-element-button))){color: hotpink;}:root :where(h1 a:where(:not(.wp-element-button)):hover,h2 a:where(:not(.wp-element-button)):hover,h3 a:where(:not(.wp-element-button)):hover,h4 a:where(:not(.wp-element-button)):hover,h5 a:where(:not(.wp-element-button)):hover,h6 a:where(:not(.wp-element-button)):hover){color: red;}:root :where(h1 a:where(:not(.wp-element-button)):focus,h2 a:where(:not(.wp-element-button)):focus,h3 a:where(:not(.wp-element-button)):focus,h4 a:where(:not(.wp-element-button)):focus,h5 a:where(:not(.wp-element-button)):focus,h6 a:where(:not(.wp-element-button)):focus){color: red;}:root :where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:root :where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-color{color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
 
@@ -609,7 +630,7 @@ describe( 'global styles renderer', () => {
 			expect(
 				transformToStyles( Object.freeze( tree ), blockSelectors )
 			).toEqual(
-				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }:root :where(.wp-image-spacing){padding-top: 1px;}:root :where(.wp-image-border-color){border-color: red;}:root :where(.wp-image-border){border-radius: 9999px;}:root :where(.wp-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-flow > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-constrained > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }:root :where(.wp-image-spacing){padding-top: 1px;}:root :where(.wp-image-border-color){border-color: red;}:root :where(.wp-image-border){border-radius: 9999px;}:root :where(.wp-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
 
@@ -807,6 +828,100 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'renders text input focus color styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':focus'
+				) }){color: blue;}`
+			);
+		} );
+
+		it( 'renders text input user-invalid spacing styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':user-invalid': { spacing: { padding: { top: '1rem' } } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':user-invalid'
+				) }){padding-top: 1rem;}`
+			);
+		} );
+
+		it( 'renders text input placeholder typography styles with the pseudo-element after :where()', () => {
+			const css = transformTextInputStyles( {
+				'::placeholder': { typography: { fontStyle: 'italic' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					''
+				) })::placeholder{font-style: italic;}`
+			);
+		} );
+
+		it( 'outputs focus after validation states so focus color wins when both states match', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+				':user-valid': { color: { text: 'green' } },
+				':user-invalid': { color: { text: 'red' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':user-valid'
+				) }){color: green;}` +
+					`:root :where(${ textInputSelectorWith(
+						':user-invalid'
+					) }){color: red;}` +
+					`:root :where(${ textInputSelectorWith(
+						':focus'
+					) }){color: blue;}`
+			);
+		} );
+
+		it( 'should handle select element pseudo selectors', () => {
+			const tree = {
+				styles: {
+					elements: {
+						select: {
+							color: {
+								text: 'red',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							':visited': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'select{color: red;}:root :where(select:hover){color: blue;}'
+			);
+		} );
+
 		it( 'outputs default pseudo styles after responsive base styles', () => {
 			const tree = {
 				styles: {
@@ -912,6 +1027,39 @@ describe( 'global styles renderer', () => {
 
 				expect( result ).toContain(
 					'@media (width <= 480px){:root :where(.wp-block-paragraph){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'restores the fill on the color feature selector', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/search': {
+									...textGradient,
+									'@mobile': { color: { text: '#00ff00' } },
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/search': {
+							selector: '.wp-block-search',
+							featureSelectors: {
+								color: '.wp-block-search__button',
+								background: '.wp-block-search__button',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-search__button){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
 				);
 			} );
 
@@ -1078,6 +1226,144 @@ describe( 'global styles renderer', () => {
 				// The breakpoint already escaped the clip, so no fill is needed.
 				expect( result ).toContain(
 					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
+				);
+			} );
+		} );
+
+		describe( 'block style variation instances over a block type text clip', () => {
+			const textGradient = {
+				background: {
+					gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+					backgroundClip: 'text',
+				},
+			};
+			const blockSelectors = {
+				'core/paragraph': {
+					selector: '.wp-block-paragraph',
+					styleVariationSelectors: {
+						'hl-1': '.is-style-hl-1.wp-block-paragraph',
+					},
+				},
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-2': '.is-style-section-2.wp-block-group',
+					},
+				},
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						'hover-3': '.is-style-hover-3.wp-block-button',
+					},
+				},
+			};
+			// The instance-only config shape the editor passes.
+			const renderInstance = (
+				blockName: string,
+				variation: string,
+				variationStyles: Record< string, unknown >,
+				textClipBaseBlocks?: Record< string, unknown >
+			) =>
+				transformToStylesWithTextClipBase(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								[ blockName ]: {
+									variations: {
+										[ variation ]: variationStyles,
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true },
+					textClipBaseBlocks
+				);
+
+			it( 'refills the letters for a variation text color', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{ color: { text: '#00aa00' } },
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-hl-1.wp-block-paragraph){color: #00aa00;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'refills the letters for an inner block color', () => {
+				expect(
+					renderInstance(
+						'core/group',
+						'section-2',
+						{
+							blocks: {
+								'core/paragraph': {
+									color: { text: '#aa00aa' },
+								},
+							},
+						},
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-section-2.wp-block-group .wp-block-paragraph){color: #aa00aa;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'refills the letters for a variation breakpoint color', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{ '@mobile': { color: { text: '#0000aa' } } },
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					'@media (width <= 480px){:root :where(.is-style-hl-1.wp-block-paragraph){color: #0000aa;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'refills the letters for a variation pseudo state color', () => {
+				expect(
+					renderInstance(
+						'core/button',
+						'hover-3',
+						{ ':hover': { color: { text: '#aa0000' } } },
+						{ 'core/button': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-hover-3.wp-block-button:hover){color: #aa0000;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'adds nothing when the block type has no text clip', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{
+							color: { text: '#00aa00' },
+							'@mobile': {
+								background: { backgroundClip: 'border-box' },
+							},
+						},
+						{
+							'core/paragraph': {
+								background: {
+									gradient: textGradient.background.gradient,
+								},
+							},
+						}
+					)
+				).toEqual(
+					':root :where(.is-style-hl-1.wp-block-paragraph){color: #00aa00;}@media (width <= 480px){:root :where(.is-style-hl-1.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;}}'
 				);
 			} );
 		} );
@@ -1832,6 +2118,75 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'appends responsive style variation pseudo-element selectors after the :where() wrapper', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								'section-1': {
+									'@mobile': {
+										elements: {
+											textInput: {
+												':focus': {
+													color: { text: 'blue' },
+												},
+												'::placeholder': {
+													color: { text: 'green' },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-1': '.wp-block-group.is-style-section-1',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			const scoped = ( pseudoSelector: string ) =>
+				textInputSelectorWith( pseudoSelector )
+					.split( ', ' )
+					.map(
+						( part ) =>
+							`.wp-block-group.is-style-section-1 ${ part }`
+					)
+					.join( ', ' );
+
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					':focus'
+				) }){color: blue;}}`
+			);
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					''
+				) })::placeholder{color: green;}}`
+			);
+		} );
+
 		it( 'should handle duotone filter', () => {
 			const tree = {
 				styles: {
@@ -1855,7 +2210,7 @@ describe( 'global styles renderer', () => {
 			expect(
 				transformToStyles( Object.freeze( tree ), blockSelectors )
 			).toEqual(
-				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }.wp-image img{filter: blur(5px);}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-flow > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-left: 0; margin-right: 2em; }.is-layout-constrained > .alignright { float: right; margin-left: 2em; margin-right: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }.wp-image img{filter: blur(5px);}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
 

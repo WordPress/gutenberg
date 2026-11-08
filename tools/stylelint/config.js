@@ -6,11 +6,10 @@ module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
 	plugins: [
 		'stylelint-plugin-logical-css',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	reportNeedlessDisables: true,
 	rules: {
-		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
 		'declaration-property-value-disallowed-list': [

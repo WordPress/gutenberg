@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import type {
 	BoxControlInputControlProps,
 	BoxControlProps,
@@ -117,6 +118,22 @@ export function isValuesDefined( values?: BoxControlValue ) {
 			( value ) => !! value && /\d/.test( value )
 		).length > 0
 	);
+}
+
+/**
+ * Extracts the unit of each side from the given box values.
+ *
+ * @param values Box values.
+ *
+ * @return Units for each side.
+ */
+export function getSelectedUnits( values?: BoxControlValue ): BoxControlValue {
+	return {
+		top: parseQuantityAndUnitFromRawValue( values?.top )[ 1 ],
+		right: parseQuantityAndUnitFromRawValue( values?.right )[ 1 ],
+		bottom: parseQuantityAndUnitFromRawValue( values?.bottom )[ 1 ],
+		left: parseQuantityAndUnitFromRawValue( values?.left )[ 1 ],
+	};
 }
 
 /**

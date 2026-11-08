@@ -11,37 +11,45 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
-	const { blockName, isValid, isInTemplatePart, shortcut } = useSelect(
+function NoteMenuItem( { clientIds, onClick, isDistractionFree } ) {
+	const { isValid, isClassicBlock, isInTemplatePart, shortcut } = useSelect(
 		( select ) => {
 			const { getBlockName, isBlockValid, getBlockParentsByBlockName } =
 				select( blockEditorStore );
 			return {
-				blockName: getBlockName( clientId ),
-				isValid: isBlockValid( clientId ),
-				isInTemplatePart:
-					getBlockParentsByBlockName( clientId, 'core/template-part' )
-						.length > 0,
+				isValid: clientIds.every(
+					( clientId ) =>
+						isBlockValid( clientId ) &&
+						getBlockName( clientId ) !==
+							getUnregisteredTypeHandlerName()
+				),
+				isClassicBlock: clientIds.some(
+					( clientId ) => getBlockName( clientId ) === 'core/freeform'
+				),
+				isInTemplatePart: clientIds.some(
+					( clientId ) =>
+						getBlockParentsByBlockName( clientId, 'core/template-part' )
+							.length > 0
+				),
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
 			};
 		},
-		[ clientId ]
+		[ clientIds ]
 	);
 
-	if ( ! isValid || blockName === getUnregisteredTypeHandlerName() ) {
+	if ( ! isValid ) {
 		return null;
 	}
 
-	const isDisabled =
-		isDistractionFree || blockName === 'core/freeform' || isInTemplatePart;
+	const isDisabled = isDistractionFree || isClassicBlock || isInTemplatePart;
 
 	let infoText;
 
 	if ( isDistractionFree ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
-	} else if ( blockName === 'core/freeform' ) {
+	} else if ( isClassicBlock ) {
 		infoText = __( 'Convert to blocks to add notes.' );
 	} else if ( isInTemplatePart ) {
 		// The block saves to the template part, but its notes would attach to
@@ -64,12 +72,12 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 	return (
 		<NoteIconSlotFill.Fill>
-			{ ( { clientId, onClose } ) => (
+			{ ( { clientIds, onClose } ) => (
 				<NoteMenuItem
-					clientId={ clientId }
+					clientIds={ clientIds }
 					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
-						onClick( clientId );
+						onClick( clientIds );
 						onClose();
 					} }
 				/>

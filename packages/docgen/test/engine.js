@@ -12,9 +12,9 @@ describe( 'Engine', () => {
 		expect( ir ).toHaveLength( 0 );
 	} );
 
-	it( 'parses JSX in JavaScript without a Babel configuration', () => {
+	it.each( [ 'js', 'jsx' ] )( 'parses JSX in .%s files', ( extension ) => {
 		const { ast } = engine(
-			'example.js',
+			`example.${ extension }`,
 			'export const element = <div />;'
 		);
 
@@ -23,45 +23,66 @@ describe( 'Engine', () => {
 		);
 	} );
 
-	it( 'parses TypeScript type assertions without enabling JSX', () => {
+	it.each( [ 'ts', 'mts', 'cts' ] )(
+		'parses type assertions in .%s files without enabling JSX',
+		( extension ) => {
+			const { ast } = engine(
+				`example.${ extension }`,
+				'export const value = <number>1;'
+			);
+
+			expect(
+				ast.body[ 0 ].declaration.declarations[ 0 ].init.type
+			).toBe( 'TSTypeAssertion' );
+		}
+	);
+
+	it( 'parses JSX in TypeScript files', () => {
 		const { ast } = engine(
-			'example.ts',
-			'export const value = <number>1;'
+			'example.tsx',
+			'export const element: JSX.Element = <div />;'
 		);
 
-		expect( ast.body[ 0 ].declaration.declarations[ 0 ].init.type ).toBe(
-			'TSTypeAssertion'
+		const declaration = ast.body[ 0 ].declaration.declarations[ 0 ];
+		expect( declaration.init.type ).toBe( 'JSXElement' );
+		expect( declaration.id.typeAnnotation.typeAnnotation.type ).toBe(
+			'TSTypeReference'
 		);
 	} );
 
-	it( 'honors custom Babel parser options', () => {
+	it( 'parses JSX and TypeScript without loading project Babel configuration', () => {
 		const project = mkdtempSync( join( tmpdir(), 'docgen-babel-config-' ) );
 
 		try {
 			writeFileSync(
-				join( project, 'babel.config.json' ),
-				JSON.stringify( { parserOpts: { plugins: [ 'flow' ] } } )
+				join( project, 'babel.config.cjs' ),
+				'throw new Error("Babel configuration must not be loaded");'
 			);
 
-			// A separate process gives Babel the consumer's project root.
+			// Run from a consumer project so configuration discovery would find it.
 			const output = execFileSync(
 				process.execPath,
 				[
 					'-e',
 					`const engine = require(process.argv[1]);
-					process.stdout.write(JSON.stringify(engine('example.js', 'export const value: number = 1;').ast));`,
+					process.stdout.write(JSON.stringify([
+						engine('example.js', 'export const element = <div />;').ast,
+						engine('example.ts', 'export const value = <number>1;').ast,
+					]));`,
 					fileURLToPath(
 						new URL( '../lib/engine.js', import.meta.url )
 					),
 				],
 				{ cwd: project, encoding: 'utf8' }
 			);
-			const ast = JSON.parse( output );
+			const [ jsx, typescript ] = JSON.parse( output );
 
 			expect(
-				ast.body[ 0 ].declaration.declarations[ 0 ].id.typeAnnotation
-					.typeAnnotation.type
-			).toBe( 'NumberTypeAnnotation' );
+				jsx.body[ 0 ].declaration.declarations[ 0 ].init.type
+			).toBe( 'JSXElement' );
+			expect(
+				typescript.body[ 0 ].declaration.declarations[ 0 ].init.type
+			).toBe( 'TSTypeAssertion' );
 		} finally {
 			rmSync( project, { recursive: true, force: true } );
 		}

@@ -13,6 +13,27 @@ import LeafMoreMenu from './leaf-more-menu';
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
 
+// The sidebar's link search lists only these blocks, which work as menu items
+// without editing them from the sidebar, which is not available yet. The other
+// allowed blocks stay reachable from the "Add block" pane. The extensible site
+// editor keeps every block on purpose. This wrapper, and the
+// `allowedBlockNames` prop it sets, can go when this sidebar does.
+const ALLOWED_BLOCK_NAMES = [
+	'core/home-link',
+	'core/search',
+	'core/loginout',
+	'core/site-title',
+];
+
+function SidebarNavigationLinkUI( props ) {
+	return (
+		<NavigationLinkUI
+			{ ...props }
+			allowedBlockNames={ ALLOWED_BLOCK_NAMES }
+		/>
+	);
+}
+
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
@@ -87,7 +108,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					additionalBlockContent={ NavigationLinkUI }
+					additionalBlockContent={ SidebarNavigationLinkUI }
 					showContentPopover
 					isExpanded
 				/>

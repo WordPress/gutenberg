@@ -7,7 +7,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
 	RichTextData,
@@ -227,8 +227,12 @@ function Fields( {
 	contentRef,
 }: FieldsProps ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceBlocks, selectionChange } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		replaceBlocks,
+		selectionChange,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
@@ -261,9 +265,9 @@ function Fields( {
 			const fields = clientIds.map( ( clientId, i ) =>
 				getFieldFormatSettings( clientId, keys[ i ] )
 			);
-			const lists: string[][] = fields
+			const lists = fields
 				.map( ( field ) => field?.allowedFormats )
-				.filter( Boolean );
+				.filter( ( list ): list is readonly string[] => !! list );
 			return {
 				allowedFormats: lists.length
 					? lists.reduce( ( a, b ) =>
@@ -334,6 +338,8 @@ function Fields( {
 				),
 				{ uniqueByBlock: true }
 			);
+			// The next change to these blocks starts a new undo level.
+			__unstableMarkLastChangeAsPersistent();
 			return;
 		}
 		// The selected text was replaced, by an inline image or a
@@ -374,7 +380,7 @@ function Fields( {
 		<BlockEditContextProvider value={ BLOCK_EDIT_CONTEXT }>
 			<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 				<InputEventContext.Provider value={ inputEvents }>
-					<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+					<WCPopover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 						<FormatEdit
 							value={ value }
 							onChange={ onChange }
@@ -382,7 +388,7 @@ function Fields( {
 							formatTypes={ formatTypes }
 							forwardedRef={ contentRef }
 						/>
-					</Popover.__unstableSlotNameProvider>
+					</WCPopover.__unstableSlotNameProvider>
 				</InputEventContext.Provider>
 			</KeyboardShortcutContext.Provider>
 			<FormatToolbarContainer
