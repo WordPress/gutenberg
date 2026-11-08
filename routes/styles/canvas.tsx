@@ -1,7 +1,7 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEditorAssets, useEditorSettings } from '@wordpress/lazy-editor';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
@@ -88,7 +88,7 @@ function Canvas() {
 					height: '100%',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

@@ -4,12 +4,41 @@ import {
 	DEFAULT_GRID,
 	DEFAULT_ROW_HEIGHT,
 	normalizeGridSettings,
-	WIDGET_DASHBOARD_COLUMN_COUNT,
+	ROW_HEIGHT_PRESETS,
 } from '@wordpress/widget-dashboard';
 import type { WidgetGridSettings } from '@wordpress/widget-dashboard';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardGridSettings';
+
+/**
+ * The column policy of the wp-admin dashboard: one column from 0px, two
+ * from 600px, four from 960px of container width. The page decides this,
+ * not the package. The removed Columns and Minimum tile width controls
+ * persisted other values into the preference; stating the policy on read
+ * keeps those stale values inert.
+ */
+const COLUMN_POLICY: Pick< WidgetGridSettings, 'columns' | 'minColumnWidth' > =
+	{
+		columns: { 0: 1, 600: 2, 960: 4 },
+		minColumnWidth: undefined,
+	};
+
+/**
+ * The removed Row height control wrote presets into the preference. The
+ * package now honors any positive row height, so the page keeps snapping
+ * the stored value to the nearest preset, the way it always rendered it.
+ *
+ * @param rowHeight Stored row height in pixels.
+ * @return The nearest preset.
+ */
+function snapRowHeight( rowHeight: number ): number {
+	return Object.values( ROW_HEIGHT_PRESETS ).reduce( ( closest, preset ) =>
+		Math.abs( preset - rowHeight ) < Math.abs( closest - rowHeight )
+			? preset
+			: closest
+	);
+}
 
 /**
  * Reads the persisted dashboard grid-settings preference, normalized, with
@@ -23,14 +52,20 @@ export function useDashboardGridSettings(): WidgetGridSettings {
 	return useSelect( ( select ) => {
 		const stored = select( preferencesStore ).get( SCOPE, KEY ) as
 			WidgetGridSettings | undefined;
-		return {
+		const settings = {
 			...normalizeGridSettings(
 				stored ?? DEFAULT_GRID,
 				DEFAULT_ROW_HEIGHT
 			),
-			// The removed Columns control persisted other counts into this
-			// preference; pinning on read keeps those stale values inert.
-			columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+			...COLUMN_POLICY,
 		};
+		return settings.model === 'masonry'
+			? settings
+			: {
+					...settings,
+					rowHeight: snapRowHeight(
+						settings.rowHeight ?? DEFAULT_ROW_HEIGHT
+					),
+				};
 	}, [] );
 }

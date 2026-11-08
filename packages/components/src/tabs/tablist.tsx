@@ -1,4 +1,4 @@
-import { useStoreState } from '@ariakit/react';
+import { useStoreState, TabList as AriakitTabList } from '@ariakit/react';
 import clsx from 'clsx';
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
@@ -7,7 +7,7 @@ import type { TabListProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import type { ElementOffsetRect } from '../utils/element-rect';
 import { useTabsContext } from './context';
-import { StyledTabList } from './styles';
+import styles from './style.module.scss';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
@@ -104,10 +104,10 @@ export const TabList = forwardRef<
 	}
 
 	return (
-		<StyledTabList
+		<AriakitTabList
 			ref={ refs }
 			store={ store }
-			render={ ( props ) => (
+			render={ ( props: React.HTMLAttributes< HTMLDivElement > ) => (
 				<div
 					{ ...props }
 					// Fallback to -1 to prevent browsers from making the tablist
@@ -118,12 +118,13 @@ export const TabList = forwardRef<
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
+				styles[ 'tab-list' ],
 				overflow.first && 'is-overflowing-first',
 				overflow.last && 'is-overflowing-last',
 				otherProps.className
 			) }
 		>
 			{ children }
-		</StyledTabList>
+		</AriakitTabList>
 	);
 } );

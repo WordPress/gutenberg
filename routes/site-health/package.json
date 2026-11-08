@@ -19,6 +19,6 @@
 		"@wordpress/ui": "file:../../packages/ui"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^19.3.0"
 	}
 }
