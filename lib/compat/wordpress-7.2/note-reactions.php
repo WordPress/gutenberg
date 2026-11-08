@@ -257,31 +257,31 @@ function gutenberg_get_note_reaction_emoji_settings() {
 	$default_emojis = array(
 		array(
 			'hexcode' => '1F44D',
-			'label'   => _x( 'thumbs up', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Thumbs up', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '2795',
-			'label'   => _x( 'plus', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Plus', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '2764',
-			'label'   => _x( 'heart', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Heart', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '1F389',
-			'label'   => _x( 'celebration', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Celebration', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '1F604',
-			'label'   => _x( 'smile', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Smile', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '1F440',
-			'label'   => _x( 'eyes', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Eyes', 'emoji reaction', 'gutenberg' ),
 		),
 		array(
 			'hexcode' => '1F680',
-			'label'   => _x( 'rocket', 'emoji reaction', 'gutenberg' ),
+			'label'   => _x( 'Rocket', 'emoji reaction', 'gutenberg' ),
 		),
 	);
 

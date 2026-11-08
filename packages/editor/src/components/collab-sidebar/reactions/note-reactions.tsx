@@ -137,8 +137,9 @@ function ReactionButton( {
 		names?.length === count
 			? formatReactorNames(
 					names,
-					overrideLabel ||
-						emoji?.sentenceLabel ||
+					// A default emoji keeps its own mid-sentence form.
+					emoji?.sentenceLabel ||
+						overrideLabel ||
 						resolvedLabel ||
 						glyph
 				)
