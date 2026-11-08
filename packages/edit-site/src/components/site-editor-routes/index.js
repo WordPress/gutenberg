@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
+import { identityRoute } from './identity';
 import { stylesRoute } from './styles';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
@@ -33,6 +27,7 @@ const routes = [
 	patternsRoute,
 	navigationItemRoute,
 	navigationRoute,
+	identityRoute,
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,

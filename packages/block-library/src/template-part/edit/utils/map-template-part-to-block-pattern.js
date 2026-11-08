@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { createTemplatePartId } from './create-template-part-id';
 
 /**

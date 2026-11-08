@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useRef, Children } from '@wordpress/element';
 import { useKeyboardShortcut } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { KeyboardShortcutProps, KeyboardShortcutsProps } from './types';
 
 function KeyboardShortcut( {
@@ -61,7 +54,7 @@ function KeyboardShortcuts( {
 	bindGlobal,
 	eventName,
 }: KeyboardShortcutsProps ) {
-	const target = useRef( null );
+	const target = useRef< HTMLDivElement >( null );
 
 	const element = Object.entries( shortcuts ?? {} ).map(
 		( [ shortcut, callback ] ) => (

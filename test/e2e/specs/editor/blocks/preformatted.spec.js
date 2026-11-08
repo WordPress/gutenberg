@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preformatted', () => {
@@ -10,9 +7,17 @@ test.describe( 'Preformatted', () => {
 
 	test( 'should preserve character newlines', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/html' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( '<pre>1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2</pre>' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
@@ -54,5 +59,43 @@ test.describe( 'Preformatted', () => {
 
 		// Expect preformatted block to be deleted.
 		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
+	test( 'should keep multi-line text pasted into an empty block', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		pageUtils.setClipboardData( {
+			plainText: 'first part\n\nsecond part',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'first part<br><br>second part' },
+			},
+		] );
+	} );
+
+	test( 'should apply active formatting when pasting plain text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '13' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: '2' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/preformatted',
+				attributes: { content: '<strong>123</strong>' },
+			},
+		] );
 	} );
 } );

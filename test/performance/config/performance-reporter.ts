@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { writeFileSync } from 'fs';
 import type {
@@ -9,10 +6,6 @@ import type {
 	TestCase,
 	TestResult,
 } from '@playwright/test/reporter';
-
-/**
- * Internal dependencies
- */
 import { stats, round } from '../utils';
 
 export interface WPRawPerformanceResults {
@@ -30,6 +23,9 @@ export interface WPRawPerformanceResults {
 	typeWithTopToolbar: number[];
 	typeContainer: number[];
 	focus: number[];
+	firstFocus: number[];
+	selectAll: number[];
+	undo: number[];
 	inserterOpen: number[];
 	inserterSearch: number[];
 	inserterHover: number[];
@@ -42,6 +38,13 @@ export interface WPRawPerformanceResults {
 	wpTotal: number[];
 	wpMemoryUsage: number[];
 	wpDbQueries: number[];
+	mediaProcessingJpeg: number[];
+	mediaProcessingAvif: number[];
+	mediaProcessingJpegToAvif: number[];
+	jpegUploadProcessing: number[];
+	pngUploadProcessing: number[];
+	largeJpegUploadProcessing: number[];
+	multipleImageUploadProcessing: number[];
 }
 
 type PerformanceStats = {
@@ -66,6 +69,9 @@ export interface WPPerformanceResults {
 	typeWithTopToolbar?: PerformanceStats;
 	typeContainer?: PerformanceStats;
 	focus?: PerformanceStats;
+	firstFocus?: PerformanceStats;
+	selectAll?: PerformanceStats;
+	undo?: PerformanceStats;
 	inserterOpen?: PerformanceStats;
 	inserterSearch?: PerformanceStats;
 	inserterHover?: PerformanceStats;
@@ -78,6 +84,13 @@ export interface WPPerformanceResults {
 	wpTotal?: PerformanceStats;
 	wpMemoryUsage?: PerformanceStats;
 	wpDbQueries?: PerformanceStats;
+	mediaProcessingJpeg?: PerformanceStats;
+	mediaProcessingAvif?: PerformanceStats;
+	mediaProcessingJpegToAvif?: PerformanceStats;
+	jpegUploadProcessing?: PerformanceStats;
+	pngUploadProcessing?: PerformanceStats;
+	largeJpegUploadProcessing?: PerformanceStats;
+	multipleImageUploadProcessing?: PerformanceStats;
 }
 
 /**
@@ -104,6 +117,9 @@ export function curateResults(
 		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
 		typeContainer: stats( results.typeContainer ),
 		focus: stats( results.focus ),
+		firstFocus: stats( results.firstFocus ),
+		selectAll: stats( results.selectAll ),
+		undo: stats( results.undo ),
 		inserterOpen: stats( results.inserterOpen ),
 		inserterSearch: stats( results.inserterSearch ),
 		inserterHover: stats( results.inserterHover ),
@@ -116,6 +132,15 @@ export function curateResults(
 		wpTotal: stats( results.wpTotal ),
 		wpMemoryUsage: stats( results.wpMemoryUsage ),
 		wpDbQueries: stats( results.wpDbQueries ),
+		mediaProcessingJpeg: stats( results.mediaProcessingJpeg ),
+		mediaProcessingAvif: stats( results.mediaProcessingAvif ),
+		mediaProcessingJpegToAvif: stats( results.mediaProcessingJpegToAvif ),
+		jpegUploadProcessing: stats( results.jpegUploadProcessing ),
+		pngUploadProcessing: stats( results.pngUploadProcessing ),
+		largeJpegUploadProcessing: stats( results.largeJpegUploadProcessing ),
+		multipleImageUploadProcessing: stats(
+			results.multipleImageUploadProcessing
+		),
 	};
 
 	return Object.fromEntries(

@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 /**
  * Editor Normalization Styles
  *
@@ -93,7 +95,7 @@
 
 	select {
 		font-family: system-ui;
-		-webkit-appearance: revert;
+		appearance: revert;
 		color: revert;
 		border: revert;
 		border-radius: revert;

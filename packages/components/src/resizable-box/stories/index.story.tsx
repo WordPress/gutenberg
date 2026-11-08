@@ -1,30 +1,25 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import ResizableBox from '..';
 
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
 const meta: Meta< typeof ResizableBox > = {
-	title: 'Components/Utilities/ResizableBox',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Utilities/ResizableBox',
 	id: 'components-resizablebox',
 	component: ResizableBox,
 	argTypes: {
 		children: { control: false },
 		enable: { control: 'object' },
 		onResizeStop: { action: 'onResizeStop' },
+		__experimentalShowTooltip: { control: 'boolean' },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -90,4 +85,14 @@ DisabledDirections.args = {
 		bottomLeft: false,
 		topLeft: false,
 	},
+};
+
+/**
+ * The resize size label is hidden by default. Enable it with
+ * `__experimentalShowTooltip`, or toggle that control in Storybook.
+ */
+export const WithResizeTooltip = Template.bind( {} );
+WithResizeTooltip.args = {
+	...Default.args,
+	__experimentalShowTooltip: true,
 };

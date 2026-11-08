@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -43,6 +32,7 @@ import type { WordPressComponentProps } from '../context';
  */
 export function DropZoneComponent( {
 	className,
+	icon = upload,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
@@ -124,7 +114,7 @@ export function DropZoneComponent( {
 			<div className="components-drop-zone__content">
 				<div className="components-drop-zone__content-inner">
 					<Icon
-						icon={ upload }
+						icon={ icon }
 						className="components-drop-zone__content-icon"
 					/>
 					<span className="components-drop-zone__content-text">

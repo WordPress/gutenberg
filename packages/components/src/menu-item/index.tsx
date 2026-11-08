@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
@@ -30,6 +19,7 @@ function UnforwardedMenuItem(
 		iconPosition = 'right',
 		shortcut,
 		isSelected,
+		onMouseMove,
 		role = 'menuitem',
 		suffix,
 		...buttonProps
@@ -56,7 +46,7 @@ function UnforwardedMenuItem(
 
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -67,7 +57,21 @@ function UnforwardedMenuItem(
 			role={ role }
 			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
+			accessibleWhenDisabled
 			{ ...buttonProps }
+			onMouseMove={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
+				onMouseMove?.( event );
+				const menu = event.currentTarget.closest( '[role="menu"]' );
+				if (
+					! event.defaultPrevented &&
+					role.startsWith( 'menuitem' ) &&
+					menu?.contains(
+						event.currentTarget.ownerDocument.activeElement
+					)
+				) {
+					event.currentTarget.focus( { preventScroll: true } );
+				}
+			} }
 		>
 			<span className="components-menu-item__item">{ children }</span>
 			{ ! suffix && (
@@ -108,5 +112,6 @@ function UnforwardedMenuItem(
  * ```
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
+MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

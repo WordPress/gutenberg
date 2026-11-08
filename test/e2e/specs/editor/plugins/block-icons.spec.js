@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const dashIconRegex = /<span.*?class=".*?dashicons-cart.*?">.*?<\/span>/;
@@ -46,7 +43,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block.
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestSimpleSvgIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestSimpleSvgIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.
@@ -84,7 +83,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestSimpleDashIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestSimpleDashIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.
@@ -120,7 +121,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block.
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestFunctionIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestFunctionIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.

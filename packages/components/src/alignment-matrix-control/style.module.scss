@@ -1,0 +1,94 @@
+@use "sass:math";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+$point-size: 6px;
+$point-size-active: 10px;
+
+.grid-container {
+	direction: ltr;
+
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+
+	box-sizing: border-box;
+	aspect-ratio: 1;
+
+	border: 1px solid transparent;
+	border-radius: $radius-medium;
+	outline: none;
+
+	cursor: var(--wpds-cursor-control);
+}
+
+.grid-row {
+	grid-column: 1 / -1;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.cell {
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+
+	appearance: none;
+	border: none;
+	outline: none;
+
+	// Keep the focus ring outside the point's scale transform.
+	&[data-focus-visible]::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: $point-size-active;
+		height: $point-size-active;
+		@include outset-ring__focus();
+	}
+}
+
+.point {
+	display: block;
+	contain: strict;
+
+	box-sizing: border-box;
+	width: $point-size;
+	aspect-ratio: 1;
+
+	margin: auto;
+
+	color: $components-color-gray-400;
+
+	/* Use border instead of background color so that the point shows
+	in Windows High Contrast Mode */
+	border: math.div($point-size, 2) solid currentColor;
+
+	/* Highlight active item */
+	.cell[data-active-item] & {
+		color: $components-color-foreground;
+		transform: scale(math.div($point-size-active, $point-size));
+	}
+
+	/* Hover styles for non-active items */
+	.cell:not([data-active-item]):hover & {
+		color: $components-color-accent;
+	}
+
+	@media not (prefers-reduced-motion) {
+		transition-property: color, transform;
+		transition-duration: 120ms;
+		transition-timing-function: linear;
+	}
+}
+

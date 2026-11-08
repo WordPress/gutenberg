@@ -1,0 +1,49 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	},
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	},
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n"
+		]
+	}
+]

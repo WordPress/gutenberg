@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'iframed enqueue block assets', () => {
@@ -29,6 +26,7 @@ test.describe( 'iframed enqueue block assets', () => {
 	test( 'should load styles added through enqueue_block_assets', async ( {
 		editor,
 	} ) => {
+		const canvasHtml = editor.canvas.locator( 'html' );
 		const canvasBody = editor.canvas.locator( 'body' );
 
 		await expect( canvasBody ).toHaveCSS(
@@ -36,7 +34,7 @@ test.describe( 'iframed enqueue block assets', () => {
 			'rgb(33, 117, 155)'
 		);
 		await expect( canvasBody ).toHaveCSS( 'padding', '20px' );
-		await expect( canvasBody ).toHaveAttribute(
+		await expect( canvasHtml ).toHaveAttribute(
 			'data-iframed-enqueue-block-assets-l10n',
 			'Iframed Enqueue Block Assets!'
 		);

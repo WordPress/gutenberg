@@ -1,8 +1,4 @@
-/**
- * Internal dependencies
- */
 import type { Context, ContextualField, OmitNevers } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -28,7 +24,7 @@ declare module './base-entity-records' {
 			 * Meta fields.
 			 */
 			meta: ContextualField<
-				Record< string, string >,
+				Record< string, unknown >,
 				'view' | 'edit',
 				C
 			>;

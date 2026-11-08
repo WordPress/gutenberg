@@ -25,11 +25,26 @@ add_action(
 		 * required to ensure that client hydration works even when the rendered
 		 * HTML contains unbalanced tags and it couldn't be processed in the server.
 		 */
-		if ( 'true' === $_GET['disable_server_directive_processing'] ) {
+		if (
+			isset( $_GET['disable_server_directive_processing'] ) &&
+			'true' === $_GET['disable_server_directive_processing']
+		) {
 			// Ensure the interactivity API is loaded.
 			wp_interactivity();
 			// But remove the server directive processing.
 			add_filter( 'interactivity_process_directives', '__return_false' );
+		}
+	}
+);
+
+add_action(
+	'send_headers',
+	function () {
+		if (
+			isset( $_GET['require_trusted_types'] ) &&
+			'true' === $_GET['require_trusted_types']
+		) {
+			header( "Content-Security-Policy: require-trusted-types-for 'script'" );
 		}
 	}
 );

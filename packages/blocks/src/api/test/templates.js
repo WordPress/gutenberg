@@ -1,6 +1,5 @@
-/**
- * Internal dependencies
- */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import '../../store';
 import { createBlock } from '../factory';
 import {
 	getBlockTypes,
@@ -15,11 +14,6 @@ import {
 const noop = () => {};
 
 describe( 'templates', () => {
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -28,6 +22,7 @@ describe( 'templates', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
@@ -35,6 +30,7 @@ describe( 'templates', () => {
 		} );
 
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
@@ -42,6 +38,7 @@ describe( 'templates', () => {
 		} );
 
 		registerBlockType( 'core/missing', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',

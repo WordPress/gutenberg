@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const BLOCK1_NAME = 'block-directory-test-block/main-block';
@@ -79,14 +76,17 @@ const MOCK_BLOCK2 = {
 const block = `( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
+	var useBlockProps = wp.blockEditor.useBlockProps;
 
 	registerBlockType( '${ MOCK_BLOCK1.name }', {
+		apiVersion: 3,
 		title: 'Block Directory Test Block',
 		icon: 'hammer',
 		category: 'text',
 		attributes: {},
 		edit: function( props ) {
-			return el( 'p', null, 'Test Copy' );
+			var blockProps = useBlockProps();
+			return el( 'p', blockProps, 'Test Copy' );
 		},
 		save: function() {
 			return null;
@@ -150,7 +150,10 @@ test.describe( 'Block Directory', () => {
 		);
 	} );
 
-	test( 'Should be able to add (the first) block', async ( { page } ) => {
+	test( 'Should be able to add (the first) block', async ( {
+		editor,
+		page,
+	} ) => {
 		// Mock response for search with the block.
 		await page.route(
 			( url ) => matchUrl( url, SEARCH_URLS ),
@@ -240,7 +243,7 @@ test.describe( 'Block Directory', () => {
 			.waitFor();
 
 		await expect(
-			page.getByRole( 'document', {
+			editor.canvas.getByRole( 'document', {
 				name: `Block: ${ MOCK_BLOCK1.title }`,
 			} )
 		).toBeVisible();

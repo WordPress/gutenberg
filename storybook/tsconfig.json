@@ -1,0 +1,20 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"rootDir": ".",
+		"noEmit": true,
+		"types": [ "style-imports" ]
+	},
+	"include": [
+		"**/*.tsx",
+		"**/*.ts",
+		"**/*.mts",
+		"**/*.cts",
+		"**/*.mjs",
+		"**/*.cjs"
+	],
+	// Override the base exclusions so Storybook stories remain type-checked.
+	"exclude": []
+}

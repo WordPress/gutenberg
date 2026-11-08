@@ -1,75 +1,43 @@
-/**
- * WordPress dependencies
- */
-import { useEffect, useMemo } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
-
-/**
- * Internal dependencies
- */
+import type { BasePostWithEmbeddedAuthor } from '../../dataviews/types';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-
-interface UsePostFieldsReturn {
-	isLoading: boolean;
-	fields: Field< BasePostWithEmbeddedAuthor >[];
-}
-
-interface Author {
-	id: number;
-	name: string;
-}
+import { useFields } from '../../dataviews/fields-loader';
 
 function usePostFields( {
 	postType,
 }: {
 	postType: string;
-} ): UsePostFieldsReturn {
+} ): Field< BasePostWithEmbeddedAuthor >[] {
+	// The fields come from the server. The schema only fires
+	// `core.registerPostTypeSchema`, for the code listening to it.
 	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
 		registerPostTypeSchema( postType );
 	}, [ registerPostTypeSchema, postType ] );
 
-	const { defaultFields } = useSelect(
-		( select ) => {
-			const { getEntityFields } = unlock( select( editorStore ) );
-			return {
-				defaultFields: getEntityFields( 'postType', postType ),
-			};
-		},
-		[ postType ]
-	);
+	const { fields, error } = useFields< BasePostWithEmbeddedAuthor >( {
+		kind: 'postType',
+		name: postType,
+	} );
 
-	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords< Author >( 'root', 'user', { per_page: -1 } );
+	// The callers only get the fields, so a failed request would leave their
+	// screen without fields and without a word. The notice id is per post
+	// type, so the screens that share the fields show it once.
+	const { createErrorNotice } = useDispatch( noticesStore );
+	useEffect( () => {
+		if ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: `editor-post-fields-${ postType }`,
+			} );
+		}
+	}, [ createErrorNotice, error, postType ] );
 
-	const fields = useMemo(
-		() =>
-			defaultFields.map(
-				( field: Field< BasePostWithEmbeddedAuthor > ) => {
-					if ( field.id === 'author' ) {
-						return {
-							...field,
-							elements: authors?.map( ( { id, name } ) => ( {
-								value: id,
-								label: name,
-							} ) ),
-						};
-					}
-
-					return field;
-				}
-			) as Field< BasePostWithEmbeddedAuthor >[],
-		[ authors, defaultFields ]
-	);
-
-	return {
-		isLoading: isLoadingAuthors,
-		fields,
-	};
+	return fields;
 }
 
 /**

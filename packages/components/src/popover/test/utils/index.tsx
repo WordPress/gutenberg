@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createPortal, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Popover from '../..';
 import { Provider as SlotFillProvider } from '../../../slot-fill';
 import type { WordPressComponentProps } from '../../../context';
@@ -22,7 +15,7 @@ const GenericIframe = ( {
 			title="My Iframe"
 			srcDoc="<!doctype html><html><body></body></html>"
 			// Waiting for the load event ensures that this works in Firefox.
-			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
+			// See: https://github.com/facebook/react/issues/22847#issuecomment-991394558
 			onLoad={ ( event ) => {
 				if ( event.currentTarget.contentDocument ) {
 					setContainerNode(
@@ -46,7 +39,6 @@ export const PopoverInsideIframeRenderedInExternalSlot = (
 
 	return (
 		<SlotFillProvider>
-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
 			<Popover.Slot name={ SLOT_NAME } />
 			<GenericIframe
 				style={ {

@@ -21,14 +21,19 @@ function render_block_core_comments_pagination( $attributes, $content ) {
 	}
 
 	if ( post_password_required() ) {
-		return;
+		return '';
 	}
 
 	$classes            = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'aria-label' => __( 'Comments pagination' ),
+			'class'      => $classes,
+		)
+	);
 
 	return sprintf(
-		'<div %1$s>%2$s</div>',
+		'<nav %1$s>%2$s</nav>',
 		$wrapper_attributes,
 		$content
 	);

@@ -1,0 +1,22 @@
+import { __ } from '@wordpress/i18n';
+import type { Attachment, Updatable } from '@wordpress/core-data';
+import type { Field } from '@wordpress/dataviews';
+import { getRawContent } from '../utils/get-raw-content';
+
+const descriptionField: Partial< Field< Updatable< Attachment > > > = {
+	id: 'description',
+	type: 'text',
+	label: __( 'Description' ),
+	getValue: ( { item } ) => getRawContent( item?.description ),
+	render: ( { item } ) => (
+		<div>{ getRawContent( item?.description ) || '-' }</div>
+	),
+	Edit: {
+		control: 'textarea',
+		rows: 5,
+	},
+	enableSorting: false,
+	filterBy: false,
+};
+
+export default descriptionField;

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-card-panel {
 	&__content {
 		flex-grow: 1;
@@ -14,7 +18,8 @@
 			flex-wrap: wrap;
 			column-gap: $grid-unit-10;
 			row-gap: $grid-unit-05;
-			word-break: break-word;
+			word-break: normal;
+			overflow-wrap: anywhere;
 		}
 	}
 

@@ -1,6 +1,2 @@
-@import "./components/create-template-part-modal/style.scss";
-@import "./fields/slug/style.scss";
-@import "./fields/featured-image/style.scss";
-@import "./fields/template/style.scss";
-@import "./fields/title/style.scss";
-@import "./fields/pattern-title/style.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/media-edit/style.scss" as *;

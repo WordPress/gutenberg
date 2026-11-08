@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
+import { isRTL } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { Tooltip } from './styles/range-control-styles';
-
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import moduleStyles from './style.module.scss';
 import type { TooltipProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -22,7 +12,7 @@ export default function SimpleTooltip(
 	const {
 		className,
 		inputRef,
-		tooltipPosition,
+		tooltipPlacement,
 		show = false,
 		style = {},
 		value = 0,
@@ -30,48 +20,56 @@ export default function SimpleTooltip(
 		zIndex = 100,
 		...restProps
 	} = props;
-	const position = useTooltipPosition( { inputRef, tooltipPosition } );
-	const classes = clsx( 'components-simple-tooltip', className );
+	const placement = useTooltipPlacement( { inputRef, tooltipPlacement } );
+	const classes = clsx(
+		'components-simple-tooltip',
+		moduleStyles.tooltip,
+		className,
+		{
+			[ moduleStyles[ 'is-visible' ] ]: show,
+			[ moduleStyles[ 'is-rtl' ] ]: isRTL(),
+			[ moduleStyles[ 'is-bottom' ] ]: placement === 'bottom',
+		}
+	);
 	const styles = {
 		...style,
 		zIndex,
 	};
 
 	return (
-		<Tooltip
+		<PolymorphicElement
+			as="span"
 			{ ...restProps }
 			aria-hidden="false"
 			className={ classes }
-			position={ position }
-			show={ show }
 			role="tooltip"
 			style={ styles }
 		>
 			{ renderTooltipContent( value ) }
-		</Tooltip>
+		</PolymorphicElement>
 	);
 }
 
-function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
-	const [ position, setPosition ] = useState< string >();
+function useTooltipPlacement( { inputRef, tooltipPlacement }: TooltipProps ) {
+	const [ placement, setPlacement ] = useState< string >();
 
-	const setTooltipPosition = useCallback( () => {
+	const setTooltipPlacement = useCallback( () => {
 		if ( inputRef && inputRef.current ) {
-			setPosition( tooltipPosition );
+			setPlacement( tooltipPlacement );
 		}
-	}, [ tooltipPosition, inputRef ] );
+	}, [ tooltipPlacement, inputRef ] );
 
 	useEffect( () => {
-		setTooltipPosition();
-	}, [ setTooltipPosition ] );
+		setTooltipPlacement();
+	}, [ setTooltipPlacement ] );
 
 	useEffect( () => {
-		window.addEventListener( 'resize', setTooltipPosition );
+		window.addEventListener( 'resize', setTooltipPlacement );
 
 		return () => {
-			window.removeEventListener( 'resize', setTooltipPosition );
+			window.removeEventListener( 'resize', setTooltipPlacement );
 		};
 	} );
 
-	return position;
+	return placement;
 }

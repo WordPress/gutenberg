@@ -90,8 +90,6 @@ const MyRangeControl = () => {
 
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label="Columns"
 			value={ columns }
 			onChange={ ( value ) => setColumns( value ) }
@@ -328,6 +326,13 @@ Forcing the Tooltip UI to show or hide. This is overridden to `false` when `step
 -   Required: No
 -   Platform: Web
 
+### `size`: `'default' | 'compact'`
+
+Adjusts the size of the control.
+
+-   Required: No
+-   Default: `'default'`
+
 ### `step`: `number | 'any'`
 
 The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
@@ -362,20 +367,6 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 
 -   Required: No
 -   Platform: Web
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`
-
-### `__nextHasNoMarginBottom`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Required: No
--   Default: `false`
 
 ## Related components
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -45,6 +42,7 @@ const transforms = {
 					style,
 					textColor,
 					url,
+					useFeaturedImage,
 				},
 				innerBlocks
 			) => {
@@ -90,6 +88,7 @@ const transforms = {
 						mediaType: backgroundType,
 						mediaUrl: url,
 						textColor,
+						useFeaturedImage,
 						...additionalAttributes,
 					},
 					innerBlocks
@@ -143,6 +142,7 @@ const transforms = {
 					mediaUrl,
 					style,
 					textColor,
+					useFeaturedImage,
 				},
 				innerBlocks
 			) => {
@@ -169,13 +169,14 @@ const transforms = {
 					alt: mediaAlt,
 					anchor,
 					backgroundType: mediaType,
-					dimRatio: !! mediaUrl ? 50 : 100,
+					dimRatio: !! mediaUrl || useFeaturedImage ? 50 : 100,
 					focalPoint,
 					gradient,
 					id: mediaId,
 					overlayColor: backgroundColor,
 					textColor,
 					url: mediaUrl,
+					useFeaturedImage,
 					...additionalAttributes,
 				};
 

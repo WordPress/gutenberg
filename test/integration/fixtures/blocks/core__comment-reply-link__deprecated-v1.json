@@ -1,0 +1,38 @@
+[
+	{
+		"name": "core/comment-reply-link",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comment-reply-link",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/comment-reply-link",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

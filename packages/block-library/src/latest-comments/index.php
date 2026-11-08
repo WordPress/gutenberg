@@ -42,7 +42,14 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
  *
  * @return string Returns the post content with latest comments added.
  */
-function render_block_core_latest_comments( $attributes = array() ) {
+function render_block_core_latest_comments( $attributes ) {
+	// Handle backward compatibility: check for old displayExcerpt attribute
+	if ( isset( $attributes['displayExcerpt'] ) ) {
+		$display_content = $attributes['displayExcerpt'] ? 'excerpt' : 'none';
+	} else {
+		$display_content = $attributes['displayContent'] ?? 'excerpt';
+	}
+
 	$comments = get_comments(
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
 		apply_filters(
@@ -83,7 +90,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 			$list_items_markup .= '<footer class="wp-block-latest-comments__comment-meta">';
 			$author_url         = get_comment_author_url( $comment );
 			if ( empty( $author_url ) && ! empty( $comment->user_id ) ) {
-				$author_url = get_author_posts_url( $comment->user_id );
+				$author_url = get_author_posts_url( (int) $comment->user_id );
 			}
 
 			$author_markup = '';
@@ -105,14 +112,23 @@ function render_block_core_latest_comments( $attributes = array() ) {
 			);
 
 			if ( $attributes['displayDate'] ) {
-				$list_items_markup .= sprintf(
-					'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
-					esc_attr( get_comment_date( 'c', $comment ) ),
-					date_i18n( get_option( 'date_format' ), get_comment_date( 'U', $comment ) )
-				);
+				$datetime  = get_comment_date( 'c', $comment );
+				$timestamp = get_comment_date( 'U', $comment );
+				if ( false !== $datetime && false !== $timestamp ) {
+					$list_items_markup .= sprintf(
+						'<time datetime="%1$s" class="wp-block-latest-comments__comment-date">%2$s</time>',
+						esc_attr( $datetime ),
+						date_i18n( get_option( 'date_format' ), $timestamp )
+					);
+				}
 			}
 			$list_items_markup .= '</footer>';
-			if ( $attributes['displayExcerpt'] ) {
+			if ( 'full' === $display_content ) {
+				$comment_text       = post_password_required( $comment->comment_post_ID )
+					? __( 'Password protected' )
+					: get_comment_text( $comment );
+				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( $comment_text ) . '</div>';
+			} elseif ( 'excerpt' === $display_content ) {
 				$list_items_markup .= '<div class="wp-block-latest-comments__comment-excerpt">' . wpautop( get_comment_excerpt( $comment ) ) . '</div>';
 			}
 			$list_items_markup .= '</article></li>';
@@ -126,7 +142,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( $attributes['displayDate'] ) {
 		$classnames[] = 'has-dates';
 	}
-	if ( $attributes['displayExcerpt'] ) {
+	if ( 'none' !== $display_content ) {
 		$classnames[] = 'has-excerpts';
 	}
 	if ( empty( $comments ) ) {

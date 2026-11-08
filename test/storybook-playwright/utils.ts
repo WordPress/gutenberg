@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
@@ -9,7 +6,6 @@ const STORYBOOK_PORT = '50241';
 type Decorators = {
 	css?: 'none' | 'basic' | 'wordpress';
 	direction?: 'ltr' | 'rtl';
-	marginChecker?: 'show' | 'hide';
 	customE2EControls?: 'show' | 'hide';
 };
 type Options = { decorators?: Decorators };

@@ -2,7 +2,7 @@
 /**
  * Test `gutenberg_override_script`.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class Override_Script_Test extends WP_UnitTestCase {
@@ -25,9 +25,57 @@ class Override_Script_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that script is localized.
+	 * Tests that attached localized data survives script override.
 	 */
 	public function test_localizes_script() {
+		global $wp_scripts;
+
+		wp_localize_script(
+			'gutenberg-dummy-script',
+			'dummyData',
+			array( 'key' => 'value' )
+		);
+
+		gutenberg_override_script(
+			$wp_scripts,
+			'gutenberg-dummy-script',
+			'https://example.com/',
+			array( 'dependency' ),
+			'version',
+			false
+		);
+
+		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
+		$this->assertSame( array( 'dependency' ), $script->deps );
+		$this->assertSame(
+			'var dummyData = {"key":"value"};',
+			$script->extra['data']
+		);
+	}
+
+	/**
+	 * Tests that translations are set when the script depends on wp-i18n.
+	 */
+	public function test_sets_translations_when_depending_on_wp_i18n() {
+		global $wp_scripts;
+
+		gutenberg_override_script(
+			$wp_scripts,
+			'gutenberg-dummy-script',
+			'https://example.com/',
+			array( 'wp-i18n' ),
+			'version',
+			false
+		);
+
+		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
+		$this->assertSame( 'default', $script->textdomain );
+	}
+
+	/**
+	 * Tests that translations are not set when the script does not depend on wp-i18n.
+	 */
+	public function test_does_not_set_translations_without_wp_i18n() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -40,7 +88,8 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
-		$this->assertEquals( array( 'dependency' ), $script->deps );
+		$this->assertNull( $script->textdomain );
+		$this->assertSame( array( 'dependency' ), $script->deps );
 	}
 
 	/**
@@ -59,9 +108,9 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
-		$this->assertEquals( 'https://example.com/updated', $script->src );
-		$this->assertEquals( array( 'updated-dependency' ), $script->deps );
-		$this->assertEquals( 'updated-version', $script->ver );
+		$this->assertSame( 'https://example.com/updated', $script->src );
+		$this->assertSame( array( 'updated-dependency' ), $script->deps );
+		$this->assertSame( 'updated-version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}
 
@@ -81,9 +130,9 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 
 		$script = $wp_scripts->query( 'gutenberg-second-dummy-script', 'registered' );
-		$this->assertEquals( 'https://example.com/', $script->src );
-		$this->assertEquals( array( 'dependency' ), $script->deps );
-		$this->assertEquals( 'version', $script->ver );
+		$this->assertSame( 'https://example.com/', $script->src );
+		$this->assertSame( array( 'dependency' ), $script->deps );
+		$this->assertSame( 'version', $script->ver );
 		$this->assertSame( 1, $script->args );
 	}
 }

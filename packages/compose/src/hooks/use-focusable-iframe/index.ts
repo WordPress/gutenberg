@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { RefCallback } from 'react';
-
-/**
- * Internal dependencies
- */
 import useRefEffect from '../use-ref-effect';
 
 /**

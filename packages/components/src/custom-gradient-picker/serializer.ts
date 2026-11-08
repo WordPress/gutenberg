@@ -1,7 +1,5 @@
-/**
- * External dependencies
- */
 import type gradientParser from 'gradient-parser';
+import type { GradientAST } from './types';
 
 export function serializeGradientColor( {
 	type,
@@ -13,6 +11,17 @@ export function serializeGradientColor( {
 	if ( type === 'hex' ) {
 		return `#${ value }`;
 	}
+	if ( type === 'var' ) {
+		return `var(${ value })`;
+	}
+	if ( type === 'hsl' ) {
+		const [ hue, saturation, lightness ] = value;
+		return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
+	}
+	if ( type === 'hsla' ) {
+		const [ hue, saturation, lightness, alpha = '1' ] = value;
+		return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
+	}
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
@@ -23,6 +32,9 @@ export function serializeGradientPosition(
 		return '';
 	}
 	const { value, type } = position;
+	if ( type === 'calc' ) {
+		return `calc(${ value })`;
+	}
 	return `${ value }${ type }`;
 }
 
@@ -47,15 +59,23 @@ export function serializeGradientOrientation(
 	) {
 		return;
 	}
-	return `${ orientation.value }deg`;
+	return `${ orientation.value }${ orientation.unit }`;
 }
 
 export function serializeGradient( {
 	type,
+	colorInterpolation,
 	orientation,
 	colorStops,
-}: gradientParser.GradientNode ) {
-	const serializedOrientation = serializeGradientOrientation( orientation );
+}: GradientAST ) {
+	// The color interpolation method shares the first argument with the
+	// orientation, e.g. `linear-gradient(in oklch 160deg, …)`.
+	const serializedOrientation = [
+		colorInterpolation,
+		serializeGradientOrientation( orientation ),
+	]
+		.filter( Boolean )
+		.join( ' ' );
 	const serializedColorStops = colorStops
 		.sort( ( colorStop1, colorStop2 ) => {
 			const getNumericStopValue = (

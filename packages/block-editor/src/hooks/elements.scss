@@ -1,0 +1,8 @@
+.elements-block-support-panel {
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.elements-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+}

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
-import { DropdownMenu } from '..';
-import MenuItem from '../../menu-item';
-import MenuGroup from '../../menu-group';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+import { useState } from '@wordpress/element';
 import {
+	check,
 	menu,
 	arrowUp,
 	arrowDown,
@@ -21,15 +10,26 @@ import {
 	more,
 	trash,
 } from '@wordpress/icons';
+import { DropdownMenu } from '..';
+import MenuItem from '../../menu-item';
+import MenuGroup from '../../menu-group';
+import MenuItemsChoice from '../../menu-items-choice';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/Actions/DropdownMenu',
+	title: 'Components/@wordpress-components/Actions/DropdownMenu',
 	component: DropdownMenu,
 	id: 'components-dropdownmenu',
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use [`Menu`](?path=/docs/design-system-components-menu--docs) from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
+		},
+	},
+	args: {
+		onToggle: fn(),
 	},
 	argTypes: {
 		icon: {
@@ -115,5 +115,92 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 				</MenuGroup>
 			</>
 		),
+	},
+};
+
+/**
+ * Use `MenuItemsChoice` for mutually exclusive selections. It renders radio menu
+ * items and a check icon for the selected choice. This example keeps the popup
+ * open when the selection changes.
+ */
+export const SingleSelection: StoryObj< typeof DropdownMenu > = {
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
+	args: {
+		label: 'Editor options',
+		icon: more,
+	},
+	render: function Render( args ) {
+		const [ mode, setMode ] = useState( 'visual' );
+
+		return (
+			<DropdownMenu { ...args }>
+				{ () => (
+					<MenuGroup label="Editor">
+						<MenuItemsChoice
+							choices={ [
+								{ value: 'visual', label: 'Visual editor' },
+								{ value: 'code', label: 'Code editor' },
+							] }
+							value={ mode }
+							onSelect={ setMode }
+						/>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+		);
+	},
+};
+
+/**
+ * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
+ * Set `isSelected` and a check icon for each selected item. Keep the popup open
+ * by updating the selection without calling `onClose`.
+ */
+export const MultiSelection: StoryObj< typeof DropdownMenu > = {
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
+	args: {
+		label: 'Typography options',
+		icon: more,
+	},
+	render: function Render( args ) {
+		const [ selectedOptions, setSelectedOptions ] = useState( [ 'Font' ] );
+		const toggleOption = ( option: string ) => {
+			setSelectedOptions( ( options ) =>
+				options.includes( option )
+					? options.filter( ( item ) => item !== option )
+					: [ ...options, option ]
+			);
+		};
+
+		return (
+			<DropdownMenu { ...args }>
+				{ () => (
+					<MenuGroup label="Typography">
+						{ [ 'Font', 'Font size', 'Line height' ].map(
+							( option ) => {
+								const isSelected =
+									selectedOptions.includes( option );
+
+								return (
+									<MenuItem
+										key={ option }
+										role="menuitemcheckbox"
+										isSelected={ isSelected }
+										icon={ isSelected ? check : null }
+										onClick={ () => toggleOption( option ) }
+									>
+										{ option }
+									</MenuItem>
+								);
+							}
+						) }
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+		);
 	},
 };

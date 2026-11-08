@@ -1,5 +1,6 @@
 const processingInstructions = `
 	<div>
+		<div>Processing instruction is <?xpacket ##last-child## ?></div>
 		<?xpacket ##1## ?>
 		<div data-testid="it should keep this node between processing instructions">
 			Processing instructions inner node

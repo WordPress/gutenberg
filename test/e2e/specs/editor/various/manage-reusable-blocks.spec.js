@@ -1,11 +1,3 @@
-/**
- * External dependencies
- */
-import path from 'path';
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Managing reusable blocks', () => {
@@ -17,21 +9,18 @@ test.describe( 'Managing reusable blocks', () => {
 		const originalEntries = await page.locator( '.hentry' ).count();
 
 		// Import Reusable block.
-		await page.click( 'role=button[name="Import from JSON"i]' );
+		await page.getByRole( 'button', { name: 'Import from JSON' } ).click();
 
 		// Select the file to upload.
-		const testReusableBlockFile = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'greeting-reusable-block.json'
-		);
-		await page.setInputFiles( 'input[type="file"]', testReusableBlockFile );
+		const testReusableBlockFile = './assets/greeting-reusable-block.json';
+		await page
+			.locator( 'input[type="file"]' )
+			.setInputFiles( testReusableBlockFile );
 
 		// Submit the form.
-		await page.click( 'role=button[name="Import"i]' );
+		await page
+			.getByRole( 'button', { name: 'Import', exact: true } )
+			.click();
 
 		// Wait for the success notice.
 		await expect(

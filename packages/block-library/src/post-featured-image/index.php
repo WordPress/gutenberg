@@ -22,13 +22,14 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$size_slug      = $attributes['sizeSlug'] ?? 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		if ( get_the_title( $post_ID ) ) {
-			$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		$title = get_the_title( $post_ID );
+		if ( $title ) {
+			$attr['alt'] = trim( strip_tags( $title ) );
 		} else {
 			$attr['alt'] = sprintf(
 				// translators: %d is the post ID.
@@ -39,23 +40,33 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$extra_styles = '';
+	$has_width    = array_key_exists( 'width', $attributes ) && null !== $attributes['width'] && '' !== $attributes['width'];
+	$has_height   = array_key_exists( 'height', $attributes ) && null !== $attributes['height'] && '' !== $attributes['height'];
 
-	// Aspect ratio with a height set needs to override the default width/height.
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
-		$extra_styles .= 'width:100%;height:100%;';
-	} elseif ( ! empty( $attributes['height'] ) ) {
-		$extra_styles .= "height:{$attributes['height']};";
+		// If there's no non-default value set, let the image's width and height attributes determine its intrinsic aspect ratio.
+		if ( 'auto' !== $attributes['aspectRatio'] ) {
+			$extra_styles .= esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';';
+		}
+		$extra_styles .= 'width:100%;';
+	}
+
+	if ( $has_height ) {
+		$extra_styles .= esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';';
+	} elseif ( $has_width ) {
+		$extra_styles .= 'height:auto;';
+	}
+
+	if ( $has_width ) {
+		$extra_styles .= esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';';
 	}
 
 	if ( ! empty( $attributes['scale'] ) ) {
-		$extra_styles .= "object-fit:{$attributes['scale']};";
+		$extra_styles .= esc_attr( safecss_filter_attr( 'object-fit:' . $attributes['scale'] ) ) . ';';
 	}
-	if ( ! empty( $attributes['style']['shadow'] ) ) {
-		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
-
-		if ( ! empty( $shadow_styles['css'] ) ) {
-			$extra_styles .= $shadow_styles['css'];
-		}
+	$shadow_attributes = wp_get_shadow_classes_and_styles( $attributes );
+	if ( ! empty( $shadow_attributes['style'] ) ) {
+		$extra_styles .= $shadow_attributes['style'];
 	}
 
 	if ( ! empty( $extra_styles ) ) {
@@ -89,6 +100,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
 				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
 			}
+			if ( ! empty( $attr['style'] ) ) {
+				$existing_style = $tag_html->get_attribute( 'style' );
+				$style          = is_string( $existing_style ) && '' !== $existing_style
+					? rtrim( $existing_style, ';' ) . ';' . $attr['style']
+					: $attr['style'];
+				$tag_html->set_attribute( 'style', $style );
+			}
 			$featured_image = $tag_html->get_updated_html();
 		}
 	}
@@ -100,13 +118,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$height         = ! empty( $attributes['height'] ) ? 'style="' . esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . '"' : '';
 		$featured_image = sprintf(
-			'<a href="%1$s" target="%2$s" %3$s %4$s>%5$s%6$s</a>',
-			get_the_permalink( $post_ID ),
+			'<a href="%1$s" target="%2$s" %3$s>%4$s%5$s</a>',
+			esc_url( get_the_permalink( $post_ID ) ),
 			esc_attr( $link_target ),
 			$rel,
-			$height,
 			$featured_image,
 			$overlay_markup
 		);
@@ -114,20 +130,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
-		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
-		: '';
-	$width        = ! empty( $attributes['width'] )
-		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
-		: '';
-	$height       = ! empty( $attributes['height'] )
-		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
-		: '';
-	if ( ! $height && ! $width && ! $aspect_ratio ) {
-		$wrapper_attributes = get_block_wrapper_attributes();
-	} else {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $aspect_ratio . $width . $height ) );
-	}
+	$wrapper_attributes = get_block_wrapper_attributes();
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
 
@@ -165,10 +168,8 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	}
 
 	// Apply overlay and gradient classes.
-	if ( $has_dim_background ) {
-		$class_names[] = 'has-background-dim';
-		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
-	}
+	$class_names[] = 'has-background-dim';
+	$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
 
 	if ( $has_solid_overlay ) {
 		$class_names[] = "has-{$attributes['overlayColor']}-background-color";
@@ -208,48 +209,7 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
  * @return array The border-related classnames and styles for the block.
  */
 function get_block_core_post_featured_image_border_attributes( $attributes ) {
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	// Border radius.
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-
-	// Border style.
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-
-	// Border width.
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	// Border color.
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	// Individual border styles e.g. top, left etc.
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
-		);
-	}
-
-	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
-	$attributes = array();
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
-	}
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
-	}
-	return $attributes;
+	return wp_get_border_classes_and_styles( $attributes );
 }
 
 /**

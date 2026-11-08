@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 // Link input
 $input-padding: $grid-unit $grid-unit $grid-unit $grid-unit-15;
 $input-size: 300px;
@@ -51,28 +55,28 @@ $input-size: 300px;
 	}
 }
 
-.block-editor-url-input__suggestion {
+.block-editor-url-input__suggestion.components-button {
 	min-height: $button-size;
 	height: auto;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	display: block;
 	font-size: $default-font-size;
-	cursor: pointer;
-	background: $white;
+	cursor: var(--wpds-cursor-control);
 	width: 100%;
 	border: none;
 	text-align: left;
 	box-shadow: none;
 
-	&:hover {
-		background: $gray-300;
-	}
-
-	&:focus,
-	&.is-selected {
-		background: var(--wp-admin-theme-color-darker-20);
-		color: $white;
+	&:is(:focus, .is-selected):not(:disabled, [aria-disabled="true"]) {
+		background: var(--wpds-color-background-interactive-brand-strong-active);
+		color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		outline: none;
+
+		@media ( forced-colors: active ) {
+			forced-color-adjust: none;
+			background: Highlight;
+			color: HighlightText;
+		}
 	}
 }
 

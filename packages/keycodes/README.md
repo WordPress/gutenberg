@@ -42,6 +42,39 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
+### ariaKeyShortcut
+
+An object that contains functions to get shortcuts in a format compatible with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+
+**Note**: The provided shortcut character strings (ie. not the modifiers) should follow the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown", "Escape", "Plus", or "F1". The spacebar key should be represented with the "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
+
+_Related_
+
+- <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
+- <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
+- <https://www.w3.org/TR/uievents-key/>
+
+_Usage_
+
+```js
+// Assuming macOS:
+ariaKeyShortcut.primary( 'm' );
+// "Meta+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Meta+Alt+M"
+
+// Assuming Windows:
+ariaKeyShortcut.primary( 'm' );
+// "Control+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Control+Alt+M"
+
+ariaKeyShortcut.primaryShift( 'del' );
+// "Control+Shift+Delete"
+```
+
 ### BACKSPACE
 
 Keycode for BACKSPACE key.
@@ -70,9 +103,7 @@ displayShortcut.primary( 'm' );
 // "⌘M"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
+Keyed map of functions to display shortcuts.
 
 ### displayShortcutList
 
@@ -86,9 +117,7 @@ displayShortcutList.primary( 'm' );
 // [ "⌘", "M" ]
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
+Keyed map of functions to shortcut sequences.
 
 ### DOWN
 
@@ -120,11 +149,11 @@ Return true if platform is MacOS.
 
 _Parameters_
 
--   _\_window_ `Window?`: window object by default; used for DI testing.
+- _\_window_ `Window`: window object by default; used for DI testing.
 
 _Returns_
 
--   `boolean`: True if MacOS; false otherwise.
+- `boolean`: True if MacOS; false otherwise.
 
 ### isKeyboardEvent
 
@@ -138,9 +167,29 @@ isKeyboardEvent.primary( event, 'm' );
 // true
 ```
 
-_Type_
+Keyed map of functions to match events.
 
--   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
+### keyboardShortcut
+
+An object that contains functions returning the three values used to display and describe a keyboard shortcut: its display string, its `aria-keyshortcuts` value and its plain-text label.
+
+The raw representation is not included; use `rawShortcut` for that.
+
+Use it in place of calling `displayShortcut`, `ariaKeyShortcut` and `shortcutAriaLabel` separately, for example to build the `shortcut` prop of the `@wordpress/ui` components.
+
+_Usage_
+
+```js
+// Assuming macOS:
+keyboardShortcut.primaryShift( 'm' );
+// {
+//   displayShortcut: "⇧⌘M",
+//   ariaKeyShortcut: "Shift+Meta+M",
+//   label: "Shift Command M",
+// }
+```
+
+Keyed map of functions to shortcut display values.
 
 ### LEFT
 
@@ -152,7 +201,7 @@ Object that contains functions that return the available modifier depending on p
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
+- `WPModifierHandler< WPModifier >`
 
 ### PAGEDOWN
 
@@ -166,19 +215,15 @@ Keycode for PAGEUP key.
 
 An object that contains functions to get raw shortcuts.
 
-These are intended for user with the KeyboardShortcuts.
+These are intended for use with the KeyboardShortcuts.
 
 _Usage_
 
 ```js
 // Assuming macOS:
 rawShortcut.primary( 'm' );
-// "meta+m""
+// "meta+m"
 ```
-
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
 
 ### RIGHT
 
@@ -200,9 +245,7 @@ shortcutAriaLabel.primary( '.' );
 // "Command + Period"
 ```
 
-_Type_
-
--   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
+Keyed map of functions to shortcut ARIA labels.
 
 ### SPACE
 
@@ -215,6 +258,20 @@ Keycode for TAB key.
 ### UP
 
 Keycode for UP key.
+
+### withIgnoreIMEEvents
+
+A higher-order function that wraps a keyboard event handler to ensure it is not an IME event.
+
+In CJK languages, an IME (Input Method Editor) is used to input complex characters. During an IME composition, keyboard events (e.g. Enter or Escape) can be fired which are intended to control the IME and not the application. These events should be ignored by any application logic.
+
+_Parameters_
+
+- _handler_ `( event: E ) => void`: The keyboard event handler to execute after ensuring it was not an IME event.
+
+_Returns_
+
+- A wrapped version of the given event handler that ignores IME events.
 
 ### ZERO
 
