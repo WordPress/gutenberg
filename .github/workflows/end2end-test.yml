@@ -151,15 +151,16 @@ jobs:
                   workspace: '@wordpress/e2e-tests-playwright'
                   browsers: chromium firefox webkit
 
-            - name: Install WordPress and start the server
+            - name: Install WordPress and start one server per two cores
               run: |
-                  npm run wp-env-test start
+                  urls=$( test/e2e/wp-env-instances.sh )
+                  echo "WP_BASE_URLS=$urls" >> "$GITHUB_ENV"
 
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }} --fully-parallel
 
             - name: Archive blob reports (HTML)
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

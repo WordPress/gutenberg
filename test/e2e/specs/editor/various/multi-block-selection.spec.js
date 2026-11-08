@@ -992,6 +992,55 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should select a single list item with a link on triple click', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'One <a href="#">two</a> three' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: 'Second' },
+				},
+			],
+		} );
+
+		// The browser extends the forward selection to offset 0 of the next
+		// list item's rich text, which has no previous sibling in its block.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: List item' } )
+			.first()
+			.getByText( 'One' )
+			.click( { clickCount: 3 } );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/list-item' } ] );
+
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'Second' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should place the caret at the click inside a multi block selection', async ( {
 		page,
 		editor,

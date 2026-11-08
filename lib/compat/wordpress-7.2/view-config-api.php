@@ -25,8 +25,9 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
+							'type'                   => 'panel',
+							'labelPosition'          => 'top',
+							'showPlaceholderIfEmpty' => true,
 						),
 					),
 					array(
@@ -286,6 +287,172 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 	);
 }
 add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
+
+/**
+ * Shows the placeholder of the `excerpt` field in its panel row when the
+ * excerpt is empty.
+ *
+ * The field renders nothing for an empty value, so DataViews lists stay empty,
+ * but the panel row then showed only its label. The patch merges into the
+ * existing `excerpt` member by id, leaving the rest of its layout untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_excerpt_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `excerpt` layout on top of the view configuration of every post
+ * type whose form lists the `excerpt` field: those using the default form,
+ * including custom post types registered at any point, and patterns.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_excerpt_layout_7_2( $post_type ) {
+	if (
+		'wp_block' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_excerpt_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_excerpt_layout_7_2' );
+
+/**
+ * Shows the placeholder of the `author` field in its panel row when the post
+ * has no author, as the post summary did before it moved to the form.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_author_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'author',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `author` layout on top of the view configuration of every post
+ * type whose form lists the `author` field at its top level: those using the
+ * default form, including custom post types registered at any point, and
+ * attachments.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_author_layout_7_2( $post_type ) {
+	if (
+		'attachment' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_author_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_author_layout_7_2' );
+
+/**
+ * Summarizes the `date` panel of the post form with the `publish_date` field,
+ * which reads "Immediately" while the post has no date of its own, as the post
+ * summary did before it moved to the form.
+ *
+ * Only the form changes: lists keep showing the `date` field, which can't say
+ * "Immediately" since a floating date is still a date there. The patch merges
+ * into the existing `date` member by id, leaving the rest of the form untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_date_summary_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'date',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'publish_date',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `date` summary on top of the view configuration of every post
+ * type that uses the default form, including custom post types registered at
+ * any point.
+ *
+ * A member that is absent would be appended instead of merged, so post types
+ * whose base definition provides its own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_date_summary_7_2( $post_type ) {
+	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_date_summary_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_date_summary_7_2' );
 
 /**
  * Registers the entity view configuration filters that layer on top of the base

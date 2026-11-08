@@ -226,6 +226,11 @@
 			color: var(--wp-ui-button-foreground-color);
 			pointer-events: none;
 
+			/* Heavier than the Spinner default to match the emphasized label weight. */
+			> * {
+				stroke-width: 2.75;
+			}
+
 			@media ( prefers-reduced-motion ) {
 				> * {
 					animation: none;

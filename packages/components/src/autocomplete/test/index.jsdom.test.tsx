@@ -172,6 +172,7 @@ describe( 'AutocompleterUI', () => {
 							selectedIndex={ 0 }
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }
+							onHover={ () => {} }
 							contentRef={ contentRef }
 							reset={ resetSpy }
 						/>

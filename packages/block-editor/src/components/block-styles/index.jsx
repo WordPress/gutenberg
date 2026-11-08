@@ -7,8 +7,11 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Tooltip,
+} from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
@@ -153,51 +156,59 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 								className="block-editor-block-styles__row"
 							>
 								{ row.map( ( style ) => (
-									<Composite.Item
-										key={ style.name }
-										id={ getCompositeItemId(
-											instanceId,
-											style
-										) }
-										render={
-											<Button
-												className="block-editor-block-styles__item"
-												tone="neutral"
-												variant={
-													activeStyle.name ===
-													style.name
-														? 'solid'
-														: 'outline'
-												}
-											/>
-										}
-										role="radio"
-										aria-checked={
-											activeStyle.name === style.name
-										}
-										onMouseEnter={ () =>
-											styleItemHandler( style )
-										}
-										onFocus={ () =>
-											styleItemHandler( style )
-										}
-										onMouseLeave={ () =>
-											styleItemHandler( null )
-										}
-										onBlur={ () =>
-											styleItemHandler( null )
-										}
-										onClick={ () =>
-											onSelectStylePreview( style )
-										}
-									>
-										<Truncate
-											numberOfLines={ 3 }
-											className="block-editor-block-styles__item-text"
+									<Tooltip.Root key={ style.name }>
+										<Composite.Item
+											id={ getCompositeItemId(
+												instanceId,
+												style
+											) }
+											render={
+												<Tooltip.Trigger
+													render={
+														<Button
+															className="block-editor-block-styles__item"
+															tone="neutral"
+															variant={
+																activeStyle.name ===
+																style.name
+																	? 'solid'
+																	: 'outline'
+															}
+														/>
+													}
+												/>
+											}
+											role="radio"
+											aria-checked={
+												activeStyle.name === style.name
+											}
+											onMouseEnter={ () =>
+												styleItemHandler( style )
+											}
+											onFocus={ () =>
+												styleItemHandler( style )
+											}
+											onMouseLeave={ () =>
+												styleItemHandler( null )
+											}
+											onBlur={ () =>
+												styleItemHandler( null )
+											}
+											onClick={ () =>
+												onSelectStylePreview( style )
+											}
 										>
+											<Truncate
+												numberOfLines={ 2 }
+												className="block-editor-block-styles__item-text"
+											>
+												{ style.label || style.name }
+											</Truncate>
+										</Composite.Item>
+										<Tooltip.Popup>
 											{ style.label || style.name }
-										</Truncate>
-									</Composite.Item>
+										</Tooltip.Popup>
+									</Tooltip.Root>
 								) ) }
 							</Composite.Row>
 						) ) }

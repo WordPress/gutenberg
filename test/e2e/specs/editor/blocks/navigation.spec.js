@@ -1014,6 +1014,7 @@ test.describe( 'Navigation block', () => {
 	// See https://github.com/WordPress/gutenberg/issues/76803.
 	test.describe( 'Block search results', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
 			// Each shares its first word with a block, so the block is listed
 			// in the same results as a page.
 			await requestUtils.createPage( {

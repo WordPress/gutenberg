@@ -57,6 +57,7 @@
 		"build-module/bindings/**"
 	],
 	"dependencies": {
+		"@base-ui/react": "^1.9.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",

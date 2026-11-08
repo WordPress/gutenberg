@@ -429,6 +429,7 @@ export default function URLInput( props: URLInputProps ) {
 					isLoading={ isLoading }
 					renderSuggestions={ renderSuggestions }
 					selectedSuggestion={ selectedSuggestion }
+					onSuggestionHover={ setSelectedSuggestion }
 					suggestionNodesRef={ suggestionNodesRef }
 					suggestionOptionIdPrefix={ suggestionOptionIdPrefix }
 					suggestions={ suggestions }
@@ -492,6 +493,7 @@ function Suggestions( {
 	isLoading,
 	renderSuggestions,
 	selectedSuggestion,
+	onSuggestionHover,
 	suggestionNodesRef,
 	suggestionOptionIdPrefix,
 	suggestions,
@@ -517,6 +519,11 @@ function Suggestions( {
 				suggestionNodesRef.current[ index ] = node;
 			},
 			'aria-selected': index === selectedSuggestion ? true : undefined,
+			onMouseMove: () => {
+				if ( ! isLoading ) {
+					onSuggestionHover( index );
+				}
+			},
 		};
 	};
 

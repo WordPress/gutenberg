@@ -928,4 +928,75 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'Bound text', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.beforeEach( async ( { editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+						},
+					},
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'existing ' },
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'should copy the text when the entire bound text is selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const boundParagraph = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+			await editor.selectBlocks( boundParagraph );
+			await boundParagraph.click();
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			await editor.canvas.getByText( 'existing' ).click();
+			await page.keyboard.press( 'ArrowDown' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: { source: 'core/post-meta' },
+							},
+						},
+					},
+				},
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'existing Value of the text custom field',
+					},
+				},
+			] );
+		} );
+	} );
 } );

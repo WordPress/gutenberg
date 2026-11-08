@@ -59,6 +59,27 @@ export function recordLifecycle() {
 }
 
 /**
+ * Builds the HTML page response that `fetch` returns for a requested URL.
+ *
+ * @param url    The requested URL, which the response URL is resolved from.
+ * @param html   The response body.
+ * @param status The response status.
+ * @return The response.
+ */
+const pageResponse = ( url: string, html: string, status: number ) => {
+	const response = new Response( html, {
+		status,
+		headers: { 'Content-Type': 'text/html; charset=UTF-8' },
+	} );
+	// A constructed response has an empty URL. Give it the requested URL,
+	// as a fetched response has.
+	Object.defineProperty( response, 'url', {
+		value: new URL( url, window.location.href ).href,
+	} );
+	return response;
+};
+
+/**
  * Replaces `window.fetch` with a mock whose responses the test delivers.
  *
  * @return The pending requests, in call order.
@@ -70,11 +91,11 @@ export function mockFetch() {
 	vi.stubGlobal(
 		'fetch',
 		vi.fn(
-			() =>
+			( url: string ) =>
 				new Promise( ( resolve ) => {
 					requests.push( {
 						respond: ( html, status = 200 ) =>
-							resolve( { status, text: async () => html } ),
+							resolve( pageResponse( url, html, status ) ),
 					} );
 				} )
 		)

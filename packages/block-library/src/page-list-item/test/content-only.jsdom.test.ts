@@ -6,6 +6,7 @@ import {
 } from '@wordpress/blocks';
 import type { BlockConfiguration } from '@wordpress/blocks';
 import { createRegistry } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import navigationMetadata from '../../navigation/block.json';
 import pageListMetadata from '../../page-list/block.json';

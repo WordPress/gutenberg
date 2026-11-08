@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove the format boundary highlight from a field when the selection moves to another field ([#86168](https://github.com/WordPress/gutenberg/pull/86168)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes

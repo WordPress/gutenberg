@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `data-wp-html` elements that the client creates instead of hydrating, such as `data-wp-each` items added after hydration or elements added by client-side navigation, now show their fallback while their value is pending or `{ "wpServerHtml": true }`, including on sites enforcing Trusted Types ([#84924](https://github.com/WordPress/gutenberg/pull/84924)).
+-   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+-   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+-   `data-wp-html` elements that client-side navigation keeps in a router region now show the new page's server-rendered content when their value on the new page is pending or `{ "wpServerHtml": true }`, instead of the content they had before navigating. The content is copied as nodes, so showing it calls no Trusted Types policy ([#86416](https://github.com/WordPress/gutenberg/pull/86416)).
+
+### Internal
+
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   The private `toVdom()` accepts an optional initial namespace for the unprefixed directives that no `data-wp-interactive` within the converted node governs, and expose `getInteractiveNamespace()` through `privateApis()`, so the router can convert a `data-wp-router-region` nested in an interactive element with the namespace of that element ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+-   Expose `runWithoutScope()` through `privateApis()` for the router ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
