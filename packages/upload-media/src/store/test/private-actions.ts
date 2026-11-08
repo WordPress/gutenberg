@@ -1697,7 +1697,10 @@ describe( 'private actions', () => {
 				finishOperation: vi.fn(),
 			} );
 
-			await prepareItem( 'v1' )( { select, dispatch } );
+			await prepareItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: Type.AddOperations,
@@ -1727,7 +1730,7 @@ describe( 'private actions', () => {
 			const posterFile = new File( [ 'p' ], 'movie-poster.jpeg', {
 				type: 'image/jpeg',
 			} );
-			getPosterFromVideo.mockResolvedValue( posterFile );
+			vi.mocked( getPosterFromVideo ).mockResolvedValue( posterFile );
 			const file = new File( [ 'v' ], 'movie.mp4', {
 				type: 'video/mp4',
 			} );
@@ -1735,7 +1738,10 @@ describe( 'private actions', () => {
 			const select = { getItem: () => ( { id: 'v1', file } ) };
 			const dispatch = { finishOperation };
 
-			await addPosterForItem( 'v1' )( { select, dispatch } );
+			await addPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( getPosterFromVideo ).toHaveBeenCalledWith(
 				'blob:mock-url',
@@ -1763,14 +1769,19 @@ describe( 'private actions', () => {
 			};
 			const dispatch = { finishOperation };
 
-			await addPosterForItem( 'v1' )( { select, dispatch } );
+			await addPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( getPosterFromVideo ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
 		} );
 
 		it( 'finishes without a poster when extraction fails', async () => {
-			getPosterFromVideo.mockRejectedValue( new Error( 'no codec' ) );
+			vi.mocked( getPosterFromVideo ).mockRejectedValue(
+				new Error( 'no codec' )
+			);
 			const finishOperation = vi.fn();
 			const select = {
 				getItem: () => ( {
@@ -1782,7 +1793,10 @@ describe( 'private actions', () => {
 			};
 			const dispatch = { finishOperation };
 
-			await addPosterForItem( 'v1' )( { select, dispatch } );
+			await addPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
 			expect( revokeBlobURL ).toHaveBeenCalledWith( 'blob:mock-url' );
@@ -1793,7 +1807,10 @@ describe( 'private actions', () => {
 			const select = { getItem: () => undefined };
 			const dispatch = { finishOperation };
 
-			await addPosterForItem( 'v1' )( { select, dispatch } );
+			await addPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
 		} );
@@ -1812,7 +1829,10 @@ describe( 'private actions', () => {
 			};
 			const dispatch = { finishOperation, addItem };
 
-			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+			await uploadPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( addItem ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
@@ -1829,7 +1849,10 @@ describe( 'private actions', () => {
 			};
 			const dispatch = { finishOperation, addItem };
 
-			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+			await uploadPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( addItem ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
@@ -1854,7 +1877,10 @@ describe( 'private actions', () => {
 			};
 			const dispatch = { finishOperation, addItem };
 
-			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+			await uploadPosterForItem( 'v1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			// The video item completes immediately; the poster uploads
 			// independently.
