@@ -1218,7 +1218,7 @@ test.describe( 'Client-side media processing', () => {
 			const defaultSizeText = await optimizedSize.textContent();
 
 			await dialog
-				.getByRole( 'checkbox', { name: 'Adjust quality' } )
+				.getByRole( 'switch', { name: 'Adjust quality' } )
 				.click();
 			await dialog
 				.getByRole( 'spinbutton', { name: 'Quality' } )

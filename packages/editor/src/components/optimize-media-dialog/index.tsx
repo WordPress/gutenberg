@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import {
-	Button,
-	Modal,
-	Notice,
-	RangeControl,
-	Spinner,
-	ToggleControl,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Button, Modal, RangeControl } from '@wordpress/components';
+import { Notice, Spinner, Stack, SwitchControl } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -278,9 +271,9 @@ export default function OptimizeMediaDialog( {
 		>
 			<Stack direction="column" gap="lg">
 				{ error && (
-					<Notice status="error" isDismissible={ false }>
-						{ error }
-					</Notice>
+					<Notice.Root intent="error" role="alert">
+						<Notice.Description>{ error }</Notice.Description>
+					</Notice.Root>
 				) }
 				{ ! error && ! originalUrl && <Spinner /> }
 				{ originalUrl && (
@@ -317,10 +310,10 @@ export default function OptimizeMediaDialog( {
 						{ isEncoding && <Spinner /> }
 					</Stack>
 				) }
-				<ToggleControl
+				<SwitchControl
 					label={ __( 'Adjust quality' ) }
 					checked={ showQuality }
-					onChange={ setShowQuality }
+					onCheckedChange={ setShowQuality }
 				/>
 				{ showQuality && (
 					<RangeControl
