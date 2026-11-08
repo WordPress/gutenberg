@@ -58,7 +58,16 @@ function useTemplates( postType ) {
 	);
 }
 
-export function useAvailableTemplates() {
+/**
+ * Returns the templates the edited post can switch to.
+ *
+ * @param {Object}  [options]
+ * @param {boolean} [options.includeDefaultTemplate] Whether to append the default template.
+ * @return {Array|false} The templates, or `false` when switching is not allowed.
+ */
+export function useAvailableTemplates( {
+	includeDefaultTemplate = true,
+} = {} ) {
 	const { postType, postId } = useEditedPostContext();
 	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
@@ -69,8 +78,7 @@ export function useAvailableTemplates() {
 	// `allowSwitchingTemplate` above.
 	const defaultTemplate = useSelect(
 		( select ) => {
-			// Only append the default template if the experiment is enabled.
-			if ( ! window?.__experimentalDataFormInspector ) {
+			if ( ! includeDefaultTemplate ) {
 				return null;
 			}
 			// If the default template is already assigned, no need
@@ -95,7 +103,7 @@ export function useAvailableTemplates() {
 			}
 			return getEntityRecord( 'postType', 'wp_template', templateId );
 		},
-		[ currentTemplateSlug, postSlug, postType ]
+		[ includeDefaultTemplate, currentTemplateSlug, postSlug, postType ]
 	);
 	return useMemo(
 		() =>

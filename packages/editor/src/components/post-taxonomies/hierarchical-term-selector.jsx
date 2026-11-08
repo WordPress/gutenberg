@@ -9,7 +9,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	TreeSelect,
 	withFilters,
 	SearchControl,
@@ -65,7 +65,7 @@ const TermCheckbox = memo( function Checkbox( {
 	onToggle,
 } ) {
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			checked={ checked }
 			onChange={ () => onToggle( id ) }
 			label={ decodeEntities( name ) }
@@ -436,6 +436,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ loading && (
 				<Stack
+					align="center"
 					justify="center"
 					style={ {
 						// Match SearchControl height to prevent layout shift.

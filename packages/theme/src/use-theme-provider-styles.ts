@@ -19,6 +19,7 @@ import {
 	type RampResult,
 } from './color-ramps/index.ts';
 import { getColorString } from './color-ramps/lib/color-utils.ts';
+import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
@@ -32,6 +33,28 @@ type Entry = [ string, string ];
 // Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+
+/*
+ * Building a ramp is costly, and the ramps of the default seeds are prebuilt,
+ * so use them when a seed is the default: with the default background, and
+ * the default admin color scheme, no ramp is built at all.
+ */
+function getBgRamp( seed: string ): RampResult {
+	return seed === DEFAULT_SEED_COLORS.background
+		? DEFAULT_RAMPS.background
+		: getCachedBgRamp( seed );
+}
+
+function getAccentRamp(
+	rampName: Exclude< ThemeProviderColorRampName, 'background' >,
+	seed: string,
+	bgRamp: RampResult
+): RampResult {
+	return bgRamp === DEFAULT_RAMPS.background &&
+		seed === DEFAULT_SEED_COLORS[ rampName ]
+		? DEFAULT_RAMPS[ rampName ]
+		: getCachedAccentRamp( seed, bgRamp );
+}
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
@@ -183,7 +206,7 @@ function generateThemeProviderColors(
 		ThemeProviderColorRampName,
 		RampResult
 	>();
-	const bgRamp = getCachedBgRamp( seeds.background );
+	const bgRamp = getBgRamp( seeds.background );
 
 	for ( const [ rawRampName, seed ] of Object.entries( seeds ) ) {
 		const rampName = rawRampName as ThemeProviderColorRampName;
@@ -191,7 +214,7 @@ function generateThemeProviderColors(
 			rampName,
 			rampName === 'background'
 				? bgRamp
-				: getCachedAccentRamp( seed, bgRamp )
+				: getAccentRamp( rampName, seed, bgRamp )
 		);
 	}
 	const colorEntries = colorTokensCSS( computedColorRamps );

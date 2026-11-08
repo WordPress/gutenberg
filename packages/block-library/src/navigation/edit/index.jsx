@@ -28,15 +28,15 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
-	Notice,
+	Spinner as WCSpinner,
+	Notice as WCNotice,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
@@ -238,6 +238,7 @@ function Navigation( {
 	attributes,
 	setAttributes,
 	clientId,
+	name,
 	isSelected,
 	className,
 	backgroundColor,
@@ -295,10 +296,8 @@ function Navigation( {
 		hasSelectedStyleState,
 	} = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				hasSelectedStyleState: hasSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			const { getSettings, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			const settings = getSettings();
 
 			return {
@@ -592,6 +591,7 @@ function Navigation( {
 			setAttributes( {
 				submenuVisibility: 'always',
 				layout: {
+					...getBlockSupport( name, 'layout' )?.default,
 					...attributes.layout,
 					orientation: 'vertical',
 				},
@@ -601,6 +601,7 @@ function Navigation( {
 	}, [
 		attributes.layout,
 		isWithinOverlay,
+		name,
 		overlayMenu,
 		ref,
 		setAttributes,
@@ -894,14 +895,14 @@ function Navigation( {
 								</ToolsPanelItem>
 
 								{ submenuAccessibilityNotice && (
-									<Notice
+									<WCNotice
 										spokenMessage={ null }
 										status="warning"
 										isDismissible={ false }
 										className="wp-block-navigation__submenu-accessibility-notice"
 									>
 										{ submenuAccessibilityNotice }
-									</Notice>
+									</WCNotice>
 								) }
 							</>
 						) }
@@ -962,10 +963,6 @@ function Navigation( {
 			<>
 				<MenuInspectorControls
 					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
@@ -1016,10 +1013,6 @@ function Navigation( {
 			<>
 				<MenuInspectorControls
 					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
@@ -1087,8 +1080,6 @@ function Navigation( {
 		<>
 			<MenuInspectorControls
 				clientId={ clientId }
-				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-				createNavigationMenuIsError={ createNavigationMenuIsError }
 				currentMenuId={ ref }
 				isNavigationMenuMissing={ isNavigationMenuMissing }
 				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
@@ -1141,7 +1132,7 @@ function Navigation( {
 					>
 						{ isLoading && ! isHiddenByDefault && (
 							<div className="wp-block-navigation__loading-indicator-container">
-								<Spinner className="wp-block-navigation__loading-indicator" />
+								<WCSpinner className="wp-block-navigation__loading-indicator" />
 							</div>
 						) }
 

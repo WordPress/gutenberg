@@ -1,14 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	createBlock,
+	getBlockTypes,
 	getBlockContent,
 	pasteHandler,
 	rawHandler,
 	registerBlockType,
 	serialize,
+	unregisterBlockType,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '../../packages/editor/src/hooks';
@@ -23,99 +25,99 @@ function readFile( filePath ) {
 		: '';
 }
 
-describe( 'Blocks raw handling', () => {
-	beforeAll( () => {
-		registerCoreBlocks();
-		registerBlockType( 'test/gallery', {
-			apiVersion: 3,
-			title: 'Test Gallery',
-			category: 'text',
-			attributes: {
-				ids: {
-					type: 'array',
-					default: [],
+beforeAll( () => {
+	registerCoreBlocks();
+	registerBlockType( 'test/gallery', {
+		apiVersion: 3,
+		title: 'Test Gallery',
+		category: 'text',
+		attributes: {
+			ids: {
+				type: 'array',
+				default: [],
+			},
+		},
+		transforms: {
+			from: [
+				{
+					type: 'shortcode',
+					tag: 'gallery',
+					isMatch( { named: { ids } } ) {
+						return ids.indexOf( 42 ) > -1;
+					},
+					attributes: {
+						ids: {
+							type: 'array',
+							shortcode: ( { named: { ids } } ) =>
+								ids
+									.split( ',' )
+									.map( ( id ) => parseInt( id, 10 ) ),
+						},
+					},
+					priority: 9,
 				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'shortcode',
-						tag: 'gallery',
-						isMatch( { named: { ids } } ) {
-							return ids.indexOf( 42 ) > -1;
-						},
-						attributes: {
-							ids: {
-								type: 'array',
-								shortcode: ( { named: { ids } } ) =>
-									ids
-										.split( ',' )
-										.map( ( id ) => parseInt( id, 10 ) ),
-							},
-						},
-						priority: 9,
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/non-inline-block', {
-			apiVersion: 3,
-			title: 'Test Non Inline Block',
-			category: 'text',
-			supports: {
-				pasteTextInline: false,
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return (
-								'words to live by' === node.textContent.trim()
-							);
-						},
-						transform: () => {
-							return createBlock( 'core/embed', {
-								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-							} );
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
-
-		registerBlockType( 'test/transform-to-multiple-blocks', {
-			apiVersion: 3,
-			title: 'Test Transform to Multiple Blocks',
-			category: 'text',
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
-						},
-						transform: ( node ) => {
-							return node.textContent
-								.split( ' ' )
-								.map( ( chunk ) =>
-									createBlock( 'core/paragraph', {
-										content: chunk.substring( 1 ),
-									} )
-								);
-						},
-					},
-				],
-			},
-			save: () => null,
-		} );
+			],
+		},
+		save: () => null,
 	} );
 
+	registerBlockType( 'test/non-inline-block', {
+		apiVersion: 3,
+		title: 'Test Non Inline Block',
+		category: 'text',
+		supports: {
+			pasteTextInline: false,
+		},
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return 'words to live by' === node.textContent.trim();
+					},
+					transform: () => {
+						return createBlock( 'core/embed', {
+							url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+						} );
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+
+	registerBlockType( 'test/transform-to-multiple-blocks', {
+		apiVersion: 3,
+		title: 'Test Transform to Multiple Blocks',
+		category: 'text',
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => {
+						return node.textContent
+							.split( ' ' )
+							.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+					},
+					transform: ( node ) => {
+						return node.textContent.split( ' ' ).map( ( chunk ) =>
+							createBlock( 'core/paragraph', {
+								content: chunk.substring( 1 ),
+							} )
+						);
+					},
+				},
+			],
+		},
+		save: () => null,
+	} );
+} );
+
+afterAll( () => {
+	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+} );
+
+describe( 'Blocks raw handling', () => {
 	it( 'should filter inline content', () => {
 		const filtered = pasteHandler( {
 			HTML: '<h2><em>test</em></h2>',
@@ -283,6 +285,74 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toBe( 'test<br>test' );
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should replace non-breaking spaces at the edges of pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;c&nbsp;d</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a <a href="#">b</a> c&nbsp;d</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of pasted lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>a&nbsp;</p><p>b&nbsp;<br>c</p>',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a</p><p>b<br>c</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should replace non-breaking spaces at the edges of inline pasted text', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a&nbsp;<strong>b</strong>&nbsp;',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'a <strong>b</strong>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should paste a lone non-breaking space', () => {
+		const filtered = pasteHandler( {
+			HTML: '&nbsp;',
+			plainText: '\u00a0',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( '&nbsp;' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should remove non-breaking spaces at the end of pasted plain text lines', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: 'a\u00a0\nb\u00a0',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a<br>b</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should keep non-breaking spaces in raw handling', () => {
+		const filtered = rawHandler( {
+			HTML: '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toBe( '<p>a&nbsp;<a href="#">b</a>&nbsp;</p>' );
 	} );
 
 	it( 'should normalize decomposed characters', () => {
@@ -528,6 +598,19 @@ describe( 'Blocks raw handling', () => {
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
+
+		it( 'should preserve anchors on headings and paragraphs', () => {
+			const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+			const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+
+			expect( blocks ).toHaveLength( 2 );
+			expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+			expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+			expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+			expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 
@@ -570,6 +653,59 @@ describe( 'rawHandler', () => {
 			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a shortcode that is the whole content', () => {
+		const HTML = '[gallery ids="1,2"]';
+		expect( rawHandler( { HTML } ) ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{ name: 'core/image', attributes: { id: 1 } },
+					{ name: 'core/image', attributes: { id: 2 } },
+				],
+			},
+		] );
+	} );
+
+	it( 'should keep a caption shortcode in the middle of text', () => {
+		const HTML =
+			'<p>Look: [caption align="alignright"]<img src="a.png" /> A cat[/caption] nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: [caption align="alignright"]<img src="a.png"> A cat[/caption] nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignright"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->\n\n<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the end of a paragraph', () => {
+		const HTML =
+			'<p>Look: nice.[caption align="alignright"]<img src="a.png" /> A cat[/caption]</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->'
+		);
+	} );
+
+	it( 'should keep an unaligned caption shortcode at the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignnone"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>[caption align="alignnone"]<img src="a.png"> A cat[/caption]Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should keep a shortcode with HTML in a list item', () => {
+		const HTML =
+			'<ul><li>First[note]A <a href="https://example.com">link</a>.[/note]</li><li>Second</li></ul>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:list -->\n<ul class="wp-block-list"><!-- wp:list-item -->\n<li>First[note]A <a href="https://example.com">link</a>.[/note]</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Second</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->'
+		);
 	} );
 
 	it( 'should convert a list with attributes', () => {
@@ -630,5 +766,36 @@ describe( 'rawHandler', () => {
 			// Image blocks don't have a default sizeSlug, so when not provided it should be undefined
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
 		} );
+	} );
+
+	it( 'should preserve anchors on headings and paragraphs', () => {
+		const HTML = `<h2 id="section-one">Section one</h2>
+<p id="intro">Intro text</p>`;
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].name ).toBe( 'core/heading' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'section-one' );
+		expect( blocks[ 1 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 1 ].attributes.anchor ).toBe( 'intro' );
+	} );
+
+	it( 'should preserve the anchor and class of a raw transform without a transform function', () => {
+		const HTML = '<hr id="divider" class="is-fancy">';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/separator' );
+		expect( blocks[ 0 ].attributes.anchor ).toBe( 'divider' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'is-fancy' );
+	} );
+
+	it( 'should not copy the class a block adds itself into className', () => {
+		const HTML = '<ul class="wp-block-list fancy"><li>One</li></ul>';
+		const blocks = rawHandler( { HTML } );
+
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/list' );
+		expect( blocks[ 0 ].attributes.className ).toBe( 'fancy' );
 	} );
 } );

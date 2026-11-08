@@ -97,9 +97,11 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$collection = $request->get_param( 'collection' );
+		$collection            = $request->get_param( 'collection' );
+		$collections_registry  = WP_Icon_Collections_Registry::get_instance();
+		$registered_collection = null !== $collection ? $collections_registry->get_registered( $collection ) : null;
 
-		if ( null !== $collection && ! WP_Icon_Collections_Registry::get_instance()->is_registered( $collection ) ) {
+		if ( null !== $collection && ( null === $registered_collection || ! $registered_collection['public'] ) ) {
 			return new WP_Error(
 				'rest_icon_collection_not_found',
 				sprintf(
@@ -116,10 +118,11 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$icons    = WP_Icons_Registry::get_instance()->get_registered_icons( $search );
 
 		foreach ( $icons as $icon ) {
-			if ( false === ( $icon['public'] ?? true ) ) {
+			if ( null !== $collection && ( ! isset( $icon['collection'] ) || $icon['collection'] !== $collection ) ) {
 				continue;
 			}
-			if ( null !== $collection && ( ! isset( $icon['collection'] ) || $icon['collection'] !== $collection ) ) {
+			$icon_collection = $collections_registry->get_registered( $icon['collection'] );
+			if ( null === $icon_collection || ! $icon_collection['public'] ) {
 				continue;
 			}
 			$prepared_icon = $this->prepare_item_for_response( $icon, $request );
@@ -132,8 +135,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Retrieves a specific icon from the registry.
 	 *
-	 * Icons registered as non-public are reported as not found. Icons registered
-	 * without an explicit `public` property are public.
+	 * Icons belonging to non-public collections are reported as not found.
 	 *
 	 * @param string $name Icon name.
 	 * @return array|WP_Error Icon data on success, or WP_Error object on failure.
@@ -141,7 +143,12 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	public function get_icon( $name ) {
 		$icon = parent::get_icon( $name );
 
-		if ( ! is_wp_error( $icon ) && false === ( $icon['public'] ?? true ) ) {
+		if ( is_wp_error( $icon ) ) {
+			return $icon;
+		}
+
+		$collection = WP_Icon_Collections_Registry::get_instance()->get_registered( $icon['collection'] );
+		if ( null === $collection || ! $collection['public'] ) {
 			return new WP_Error(
 				'rest_icon_not_found',
 				sprintf(
@@ -159,8 +166,8 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Prepare a raw icon before it gets output in a REST API response.
 	 *
-	 * Adds a `collection` field to the base response while keeping the
-	 * namespaced icon name (e.g. `core/arrow-left`) as the `name` field.
+	 * Adds `collection` and `keywords` fields to the base response while keeping
+	 * the namespaced icon name (e.g. `core/arrow-left`) as the `name` field.
 	 *
 	 * @param array           $item    Raw icon as registered.
 	 * @param WP_REST_Request $request Request object.
@@ -173,6 +180,12 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		if ( rest_is_field_included( 'collection', $fields ) && isset( $item['collection'] ) ) {
 			$data               = $response->get_data();
 			$data['collection'] = $item['collection'];
+			$response->set_data( $data );
+		}
+
+		if ( rest_is_field_included( 'keywords', $fields ) ) {
+			$data             = $response->get_data();
+			$data['keywords'] = isset( $item['keywords'] ) ? array_values( $item['keywords'] ) : array();
 			$response->set_data( $data );
 		}
 
@@ -194,6 +207,14 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$schema['properties']['collection'] = array(
 			'description' => __( 'The slug of the collection this icon belongs to.', 'gutenberg' ),
 			'type'        => 'string',
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
+
+		$schema['properties']['keywords'] = array(
+			'description' => __( 'Additional search terms for the icon.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array( 'type' => 'string' ),
 			'readonly'    => true,
 			'context'     => array( 'view', 'edit', 'embed' ),
 		);

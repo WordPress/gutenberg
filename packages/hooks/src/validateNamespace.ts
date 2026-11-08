@@ -6,7 +6,7 @@
  *
  * @return Whether the namespace is valid.
  */
-function validateNamespace( namespace: string ): boolean {
+function validateNamespace( namespace: unknown ): boolean {
 	if ( 'string' !== typeof namespace || '' === namespace ) {
 		// eslint-disable-next-line no-console
 		console.error( 'The namespace must be a non-empty string.' );
