@@ -60,7 +60,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionOverlay } from './overlay-context';
 import type { OverlayEntry } from './overlay-context';
 import { operationsFromOverlay } from './provider';
-import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
+import { removeNoteIdFromMetadata } from '../collab-sidebar/utils/metadata';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
