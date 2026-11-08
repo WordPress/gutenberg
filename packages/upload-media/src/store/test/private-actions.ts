@@ -1061,47 +1061,59 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'prepareItem video transcoding', () => {
-		function flattenOperations( operations ) {
+		function flattenOperations( operations?: unknown[] ) {
 			return ( operations || [] ).map( ( op ) =>
 				Array.isArray( op ) ? op[ 0 ] : op
 			);
 		}
 
-		async function runPrepareItem( { file, settings = {} } ) {
+		async function runPrepareItem( {
+			file,
+			settings = {},
+		}: {
+			file: File;
+			settings?: object;
+		} ) {
 			const item = { id: 'video-id', file, additionalData: {} };
 
-			let dispatchedOperations;
-			const dispatch = ( action ) => {
-				if ( action?.type === 'ADD_OPERATIONS' ) {
-					dispatchedOperations = action.operations;
-				}
-			};
-			dispatch.cancelItem = vi.fn();
-			dispatch.finishOperation = vi.fn();
+			let dispatchedOperations: unknown[] | undefined;
+			const dispatch = Object.assign(
+				( action: { type?: string; operations?: unknown[] } ) => {
+					if ( action?.type === 'ADD_OPERATIONS' ) {
+						dispatchedOperations = action.operations;
+					}
+				},
+				{ cancelItem: vi.fn(), finishOperation: vi.fn() }
+			);
 
 			const select = {
 				getItem: () => item,
 				getSettings: () => settings,
 			};
 
-			await prepareItem( 'video-id' )( { select, dispatch } );
+			await prepareItem( 'video-id' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 			return { operations: dispatchedOperations, dispatch, item };
 		}
 
+		const globals = global as unknown as Record< string, unknown >;
+
 		beforeEach( () => {
-			global.VideoEncoder = function () {};
-			getVideoMetadata.mockReset();
+			globals.VideoEncoder = function () {};
+			vi.mocked( getVideoMetadata ).mockReset();
 		} );
 
 		afterEach( () => {
-			delete global.VideoEncoder;
+			delete globals.VideoEncoder;
 		} );
 
 		it( 'enqueues the companion pipeline for a non-web-safe video', async () => {
 			const file = new File( [ 'mov' ], 'clip.mov', {
 				type: 'video/quicktime',
 			} );
-			getVideoMetadata.mockResolvedValue( {
+			vi.mocked( getVideoMetadata ).mockResolvedValue( {
 				codec: 'hevc',
 				width: 1280,
 				height: 720,
@@ -1129,7 +1141,7 @@ describe( 'private actions', () => {
 			const file = new File( [ 'mp4' ], 'clip.mp4', {
 				type: 'video/mp4',
 			} );
-			getVideoMetadata.mockResolvedValue( {
+			vi.mocked( getVideoMetadata ).mockResolvedValue( {
 				codec: 'avc',
 				width: 1280,
 				height: 720,
@@ -1153,7 +1165,7 @@ describe( 'private actions', () => {
 			const file = new File( [ 'mp4' ], 'clip.mp4', {
 				type: 'video/mp4',
 			} );
-			getVideoMetadata.mockResolvedValue( {
+			vi.mocked( getVideoMetadata ).mockResolvedValue( {
 				codec: 'avc',
 				width: 3840,
 				height: 2160,
@@ -1171,7 +1183,7 @@ describe( 'private actions', () => {
 			const file = new File( [ 'mov' ], 'clip.mov', {
 				type: 'video/quicktime',
 			} );
-			getVideoMetadata.mockResolvedValue( {
+			vi.mocked( getVideoMetadata ).mockResolvedValue( {
 				codec: 'hevc',
 				width: 1280,
 				height: 720,
@@ -1183,7 +1195,7 @@ describe( 'private actions', () => {
 				settings: { videoKeepOriginal: false },
 			} );
 
-			expect( operations[ 0 ] ).toEqual( [
+			expect( operations?.[ 0 ] ).toEqual( [
 				OperationType.TranscodeVideo,
 				{ outputFormat: 'mp4' },
 			] );
@@ -1203,7 +1215,7 @@ describe( 'private actions', () => {
 			const file = new File( [ 'mov' ], 'clip.mov', {
 				type: 'video/quicktime',
 			} );
-			delete global.VideoEncoder;
+			delete globals.VideoEncoder;
 
 			const { operations } = await runPrepareItem( { file } );
 
@@ -1217,7 +1229,9 @@ describe( 'private actions', () => {
 			const file = new File( [ 'mov' ], 'clip.mov', {
 				type: 'video/quicktime',
 			} );
-			getVideoMetadata.mockRejectedValue( new Error( 'no track' ) );
+			vi.mocked( getVideoMetadata ).mockRejectedValue(
+				new Error( 'no track' )
+			);
 
 			const { operations, dispatch } = await runPrepareItem( { file } );
 
@@ -1239,7 +1253,7 @@ describe( 'private actions', () => {
 		} );
 
 		// parentId set => companion sideload; absent => replace-primary.
-		function buildArgs( { parentId } = {} ) {
+		function buildArgs( { parentId }: { parentId?: string } = {} ) {
 			const dispatch = Object.assign( vi.fn(), {
 				finishOperation: vi.fn(),
 				cancelItem: vi.fn(),
@@ -1257,30 +1271,21 @@ describe( 'private actions', () => {
 			return { select, dispatch };
 		}
 
-		let consoleError;
-
 		beforeEach( () => {
-			transcodeVideo.mockReset();
-			consoleError = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-		} );
-
-		afterEach( () => {
-			consoleError.mockRestore();
+			vi.mocked( transcodeVideo ).mockReset();
 		} );
 
 		it( 'hands the transcoded video to the next Upload via finishOperation', async () => {
 			const videoFile = new File( [ 'mp4' ], 'clip.mp4', {
 				type: 'video/mp4',
 			} );
-			transcodeVideo.mockResolvedValue( videoFile );
+			vi.mocked( transcodeVideo ).mockResolvedValue( videoFile );
 			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
 
 			await transcodeVideoItem( 'video-1', { outputFormat: 'mp4' } )( {
 				select,
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( transcodeVideo ).toHaveBeenCalledWith(
 				'video-1',
@@ -1296,12 +1301,15 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'silently cancels the companion sideload on an Unsupported error', async () => {
-			transcodeVideo.mockRejectedValue(
+			vi.mocked( transcodeVideo ).mockRejectedValue(
 				new Error( 'Unsupported: encoder codec not supported' )
 			);
 			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
 
-			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+			await transcodeVideoItem( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -1309,18 +1317,21 @@ describe( 'private actions', () => {
 				dispatch.cancelItem.mock.calls[ 0 ];
 			expect( cancelledId ).toBe( 'video-1' );
 			expect( silent ).toBe( true );
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 		} );
 
 		it( 'uploads the original on an Unsupported error in replace-primary mode', async () => {
 			// No parentId => the video is the primary item; falling back to
 			// uploading the original must not lose the user's file.
-			transcodeVideo.mockRejectedValue(
+			vi.mocked( transcodeVideo ).mockRejectedValue(
 				new Error( 'Unsupported: WebCodecs unavailable' )
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+			await transcodeVideoItem( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
@@ -1331,12 +1342,15 @@ describe( 'private actions', () => {
 
 		it( 'uploads the original on a hard failure in replace-primary mode', async () => {
 			const cause = new Error( 'Encoder produced empty output' );
-			transcodeVideo.mockRejectedValue( cause );
+			vi.mocked( transcodeVideo ).mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs();
 
-			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+			await transcodeVideoItem( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
-			expect( consoleError ).toHaveBeenCalled();
+			expect( console ).toHaveErrored();
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith(
 				'video-1',
@@ -1346,10 +1360,13 @@ describe( 'private actions', () => {
 
 		it( 'silently cancels the companion sideload on a hard failure', async () => {
 			const cause = new Error( 'Encoder produced empty output' );
-			transcodeVideo.mockRejectedValue( cause );
+			vi.mocked( transcodeVideo ).mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs( { parentId: 'parent-1' } );
 
-			await transcodeVideoItem( 'video-1' )( { select, dispatch } );
+			await transcodeVideoItem( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -1359,7 +1376,7 @@ describe( 'private actions', () => {
 			expect( error.code ).toBe( 'VIDEO_TRANSCODING_ERROR' );
 			expect( error.cause ).toBe( cause );
 			expect( silent ).toBe( true );
-			expect( consoleError ).toHaveBeenCalled();
+			expect( console ).toHaveErrored();
 		} );
 	} );
 
@@ -1368,7 +1385,7 @@ describe( 'private actions', () => {
 			type: 'video/quicktime',
 		} );
 
-		function buildArgs( item ) {
+		function buildArgs( item: object ) {
 			const dispatch = Object.assign( vi.fn(), {
 				finishOperation: vi.fn(),
 				addSideloadItem: vi.fn(),
@@ -1389,7 +1406,10 @@ describe( 'private actions', () => {
 				attachment: { id: 42 },
 			} );
 
-			await generateVideoCompanion( 'video-1' )( { select, dispatch } );
+			await generateVideoCompanion( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const sideload = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
@@ -1416,7 +1436,10 @@ describe( 'private actions', () => {
 				attachment: { id: 42 },
 			} );
 
-			await generateVideoCompanion( 'video-1' )( { select, dispatch } );
+			await generateVideoCompanion( 'video-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith(

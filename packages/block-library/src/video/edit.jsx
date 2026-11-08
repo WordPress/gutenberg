@@ -11,16 +11,17 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -44,6 +45,7 @@ function VideoEdit( {
 	isSelected: isSingleSelected,
 	attributes,
 	className,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -76,12 +78,6 @@ function VideoEdit( {
 		...getShadowClassesAndStyles( attributes ).style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
-	/*
-	 * Attachment whose web-safe companion should replace the block's src once
-	 * its record is known. Set when a video is chosen from the Media Library,
-	 * whose selection object carries no `media_details`.
-	 */
-	const [ pendingCompanionId, setPendingCompanionId ] = useState();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -103,32 +99,36 @@ function VideoEdit( {
 		[ poster, prefersReducedMotion ]
 	);
 
-	const pendingCompanionSrc = useSelect(
-		( select ) => {
-			if ( ! pendingCompanionId || pendingCompanionId !== id ) {
-				return undefined;
-			}
-			const record = select( coreStore ).getEntityRecord(
-				'postType',
-				'attachment',
-				id,
-				{ context: 'view' }
-			);
-			const companion = record?.media_details?.optimized_video;
-			return companion && record.source_url
-				? companionUrl( record.source_url, companion )
-				: undefined;
-		},
-		[ pendingCompanionId, id ]
-	);
+	const registry = useRegistry();
 
-	useEffect( () => {
-		if ( ! pendingCompanionSrc ) {
-			return;
-		}
-		setPendingCompanionId( undefined );
-		setAttributes( { src: pendingCompanionSrc } );
-	}, [ pendingCompanionSrc, setAttributes ] );
+	/*
+	 * A Media Library pick carries no `media_details`, so swap to the web-safe
+	 * companion once the attachment record is known, unless the block has
+	 * moved on to another video by then.
+	 */
+	function swapToCompanionWhenKnown( attachmentId ) {
+		registry
+			.resolveSelect( coreStore )
+			.getEntityRecord( 'postType', 'attachment', attachmentId, {
+				context: 'view',
+			} )
+			.then( ( record ) => {
+				const companion = record?.media_details?.optimized_video;
+				const currentId = registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )?.id;
+				if (
+					companion &&
+					record.source_url &&
+					currentId === attachmentId
+				) {
+					setAttributes( {
+						src: companionUrl( record.source_url, companion ),
+					} );
+				}
+			} )
+			.catch( () => {} );
+	}
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -163,7 +163,7 @@ function VideoEdit( {
 				media.media_details.optimized_video
 			);
 		} else if ( media.id && ! media.media_details ) {
-			setPendingCompanionId( media.id );
+			swapToCompanionWhenKnown( media.id );
 		}
 
 		// Sets the block's attribute and updates the edit component from the

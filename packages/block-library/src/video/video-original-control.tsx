@@ -1,5 +1,4 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { BlockControls } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';

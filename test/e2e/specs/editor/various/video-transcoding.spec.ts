@@ -1,8 +1,8 @@
-const path = require( 'path' );
-const fs = require( 'fs/promises' );
-const os = require( 'os' );
-const { randomUUID } = require( 'crypto' );
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import { randomUUID } from 'node:crypto';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * @typedef {import('@playwright/test').Page} Page
