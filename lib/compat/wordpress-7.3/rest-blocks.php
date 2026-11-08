@@ -137,17 +137,19 @@ function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
 }
 
 /**
- * Registers `content.blocks` for each REST-enabled post type that supports
- * the editor.
+ * Registers `content.blocks` for a REST-enabled post type.
+ *
+ * Post types without a `content` field are skipped when the response is built.
+ *
+ * @param string       $post_type        Post type slug.
+ * @param WP_Post_Type $post_type_object Post type object.
  */
-function gutenberg_register_post_rest_blocks(): void {
-	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
-		if ( ! post_type_supports( $post_type, 'editor' ) ) {
-			continue;
-		}
-
-		add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_blocks_to_post_rest_response', 10, 3 );
-		add_filter( "rest_{$post_type}_item_schema", 'gutenberg_add_blocks_to_post_rest_schema' );
+function gutenberg_register_post_rest_blocks( $post_type, $post_type_object ): void {
+	if ( ! is_string( $post_type ) || ! $post_type_object instanceof WP_Post_Type || ! $post_type_object->show_in_rest ) {
+		return;
 	}
+
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_blocks_to_post_rest_response', 10, 3 );
+	add_filter( "rest_{$post_type}_item_schema", 'gutenberg_add_blocks_to_post_rest_schema' );
 }
-add_action( 'rest_api_init', 'gutenberg_register_post_rest_blocks' );
+add_action( 'registered_post_type', 'gutenberg_register_post_rest_blocks', 10, 2 );

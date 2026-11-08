@@ -55,7 +55,7 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		// Rebuild the REST server so `rest_api_init` adds the filters again.
+		// Rebuild the REST server so each test gets fresh schemas.
 		$GLOBALS['wp_rest_server'] = null;
 	}
 
