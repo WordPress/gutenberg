@@ -1,6 +1,7 @@
 /* eslint-disable playwright/expect-expect */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 import { PerfUtils } from '../fixtures';
+import { typeLikeAUser } from '../utils.js';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
@@ -190,12 +191,7 @@ test.describe( 'Site Editor Performance', () => {
 			await metrics.startTracing();
 
 			// Type the testing sequence into the empty paragraph.
-			await paragraph.type( 'x'.repeat( iterations ), {
-				delay: BROWSER_IDLE_WAIT,
-				// The extended timeout is needed because the typing is very slow
-				// and the `delay` value itself does not extend it.
-				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
-			} );
+			await typeLikeAUser( paragraph, 'x'.repeat( iterations ) );
 
 			// Stop tracing.
 			await metrics.stopTracing( 'site-editor-type' );
