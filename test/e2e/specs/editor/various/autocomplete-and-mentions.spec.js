@@ -53,7 +53,9 @@ const userList = [
 
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all(
+		// Failures are ignored: a user left over from a previous attempt is
+		// valid test data, and a missing one fails the tests that need it.
+		await Promise.allSettled(
 			userList.map( ( user ) =>
 				requestUtils.createUser( {
 					email: `${ user.username }@example.com`,
@@ -383,7 +385,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
 				await expect(
-					page.locator( 'role=option', { hasText: '🍇 Grape' } )
+					page.getByRole( 'option', {
+						name: '🍇 Grape',
+						selected: true,
+					} )
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
@@ -452,9 +457,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
 				await expect(
-					page.locator(
-						`role=option[name="${ testData.optionText }"i]`
-					)
+					page.getByRole( 'option', {
+						name: testData.optionText,
+						selected: true,
+					} )
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' test' );

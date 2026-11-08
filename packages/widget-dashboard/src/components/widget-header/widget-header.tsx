@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useCallback, useMemo, useState } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
@@ -158,7 +159,7 @@ export function WidgetHeader( {
 					align="center"
 					gap="sm"
 					className={ styles.identity }
-					{ ...( editMode ? { inert: 'true' } : {} ) }
+					inert={ inertValue( editMode ) }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">

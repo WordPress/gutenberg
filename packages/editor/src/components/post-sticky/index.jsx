@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
@@ -19,7 +19,7 @@ export default function PostSticky() {
 
 	return (
 		<PostStickyCheck>
-			<CheckboxControl
+			<WCCheckboxControl
 				className="editor-post-sticky__checkbox-control"
 				label={ __( 'Sticky' ) }
 				help={ __( 'Pin this post to the top of the blog.' ) }

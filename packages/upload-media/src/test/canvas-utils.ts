@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	HeicUnsupportedError,
+	IMAGE_DECODER_TIMEOUT,
+} from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
 /*
@@ -10,7 +14,7 @@ import { getHeicUnsupportedMessage } from '../heic-support';
  * told apart from a browser without a codec.
  */
 const validHeic = readFileSync(
-	join( __dirname, 'fixtures', 'exif-rotated-90cw.heic' )
+	join( import.meta.dirname, 'fixtures', 'exif-rotated-90cw.heic' )
 );
 
 function heicFile( bytes: Uint8Array ) {
@@ -307,6 +311,88 @@ describe( 'canvasConvertToJpeg', () => {
 			);
 		} );
 
+		it( 'should not wait forever on a decode that never settles', async () => {
+			vi.useFakeTimers();
+			try {
+				global.createImageBitmap = vi
+					.fn()
+					.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+				// Strategy 2 claims the type, then the decode never settles,
+				// which is what a missing platform codec looks like.
+				// See https://github.com/WordPress/gutenberg/issues/81043.
+				const close = vi.fn();
+				( global as any ).ImageDecoder = vi.fn( function () {
+					return {
+						decode: vi.fn( () => new Promise( () => {} ) ),
+						close,
+					};
+				} );
+				( global as any ).ImageDecoder.isTypeSupported = vi
+					.fn()
+					.mockResolvedValue( true );
+				delete ( global as any ).VideoDecoder;
+
+				const outcome = canvasConvertToJpeg(
+					heicFile( validHeic )
+				).then(
+					() => 'converted',
+					( error ) => error
+				);
+				await vi.advanceTimersByTimeAsync( IMAGE_DECODER_TIMEOUT );
+
+				// Falls through to strategy 3, which is absent here.
+				await expect( outcome ).resolves.toBeInstanceOf(
+					HeicUnsupportedError
+				);
+				expect( close ).toHaveBeenCalled();
+			} finally {
+				vi.useRealTimers();
+			}
+		} );
+
+		it( 'should report a canvas failure after a successful decode as a processing error', async () => {
+			global.createImageBitmap = vi
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+			// Strategy 2 decodes fine: the browser can read HEIC.
+			const videoFrame = {
+				displayWidth: 10,
+				displayHeight: 10,
+				close: vi.fn(),
+			};
+			( global as any ).ImageDecoder = vi.fn( function () {
+				return {
+					decode: vi.fn().mockResolvedValue( { image: videoFrame } ),
+					close: vi.fn(),
+				};
+			} );
+			( global as any ).ImageDecoder.isTypeSupported = vi
+				.fn()
+				.mockResolvedValue( true );
+			// The canvas is what fails.
+			global.OffscreenCanvas = vi
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi.fn().mockReturnValue( null ),
+						convertToBlob: vi.fn(),
+					};
+				} );
+			delete ( global as any ).VideoDecoder;
+
+			// Falling through to strategy 3 would blame the codec instead.
+			const rejection = canvasConvertToJpeg( heicFile( validHeic ) );
+			await expect( rejection ).rejects.toThrow(
+				'Could not get canvas 2d context'
+			);
+			await expect( rejection ).rejects.not.toBeInstanceOf(
+				HeicUnsupportedError
+			);
+			expect( videoFrame.close ).toHaveBeenCalled();
+		} );
+
 		it( 'should fall through Strategy 1 failure to subsequent strategies', async () => {
 			// Strategy 1 fails.
 			global.createImageBitmap = vi
@@ -328,6 +414,82 @@ describe( 'canvasConvertToJpeg', () => {
 			expect(
 				( global as any ).ImageDecoder.isTypeSupported
 			).toHaveBeenCalledWith( 'image/heic' );
+		} );
+	} );
+
+	describe( 'encoder injection', () => {
+		const setupStrategy1 = ( canvasJpeg: Blob ) => {
+			const mockBitmap = { width: 32, height: 32, close: vi.fn() };
+			const convertToBlob = vi.fn().mockResolvedValue( canvasJpeg );
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
+				.fn()
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						width: 32,
+						height: 32,
+						getContext: vi
+							.fn()
+							.mockReturnValue( { drawImage: vi.fn() } ),
+						convertToBlob,
+					};
+				} );
+			return convertToBlob;
+		};
+
+		const file = new File( [ 'data' ], 'photo.heic', {
+			type: 'image/heic',
+		} );
+
+		it( 'encodes the decoded canvas with the given encoder', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi
+				.fn()
+				.mockResolvedValue(
+					new Blob( [ 'vips-jpeg' ], { type: 'image/jpeg' } )
+				);
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( encode ).toHaveBeenCalledWith(
+				expect.objectContaining( { width: 32, height: 32 } ),
+				0.5
+			);
+			expect( convertToBlob ).not.toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'vips-jpeg' );
+			expect( result.name ).toBe( 'photo.jpg' );
+			expect( result.type ).toBe( 'image/jpeg' );
+		} );
+
+		it( 'falls back to the canvas encoder when the encoder declines', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi.fn().mockResolvedValue( null );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalledWith( {
+				type: 'image/jpeg',
+				quality: 0.5,
+			} );
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
+		} );
+
+		it( 'falls back to the canvas encoder when the encoder fails', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = vi
+				.fn()
+				.mockRejectedValue( new Error( 'worker crashed' ) );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
 		} );
 	} );
 } );

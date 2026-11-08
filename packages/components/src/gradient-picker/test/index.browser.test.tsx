@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { logged } from '@wordpress/deprecated';
 import GradientPicker from '..';
 
 const GRADIENT_A =
@@ -13,6 +14,13 @@ const DUPLICATE_GRADIENTS = [
 	{ name: 'Dark Background', slug: 'dark-background', gradient: GRADIENT_A },
 	{ name: 'Dark Text', slug: 'dark-text', gradient: GRADIENT_A },
 ];
+
+const DEPRECATION_MESSAGE =
+	'`asButtons` prop in wp.components.GradientPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 describe( 'GradientPicker', () => {
 	it( 'should use matching values only for display in command button presentation', async () => {
@@ -49,6 +57,7 @@ describe( 'GradientPicker', () => {
 	} );
 
 	it( 'should warn for asButtons and prefer an explicit presentation', async () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		await render(
 			<GradientPicker
 				aria-label="Gradients"
@@ -66,9 +75,7 @@ describe( 'GradientPicker', () => {
 				name: 'Gradient: Dark Background',
 			} )
 		).not.toHaveAttribute( 'aria-pressed' );
-		expect( console ).toHaveWarnedWith(
-			'`asButtons` prop in wp.components.GradientPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( 'should preserve asButtons as a toggle-button alias', async () => {
@@ -223,5 +230,29 @@ describe( 'GradientPicker', () => {
 			// multiple-origin behavior.
 			expect( onChange ).toHaveBeenCalledWith( GRADIENT_B, 0, 'blush' );
 		} );
+	} );
+
+	it( 'should render only the custom gradient editor without presets or a Clear button', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			<GradientPicker
+				clearable={ false }
+				value={ GRADIENT_B }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Clear' } )
+		).not.toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Type' } ) );
+		await user.click( screen.getByRole( 'option', { name: 'Radial' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			'radial-gradient(rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
+		);
 	} );
 } );

@@ -2,7 +2,7 @@ import {
 	Flex,
 	FlexItem,
 	Modal,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	SearchControl,
 } from '@wordpress/components';
 import { Stack, Tabs, Text } from '@wordpress/ui';
@@ -35,6 +35,11 @@ const ALL_PATTERNS_CATEGORY = {
 	label: _x( 'All', 'patterns' ),
 };
 
+/**
+ * Returns the patterns that can start the current post.
+ *
+ * @return {Object[]} The start patterns.
+ */
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
 	// and it has no postTypes declared and the current post type is page or if
@@ -262,7 +267,7 @@ function StartPageOptionsModal( { onClose } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<CheckboxControl
+					<WCCheckboxControl
 						checked={ showStartPatterns }
 						label={ __(
 							'Always show starter patterns for new pages'
