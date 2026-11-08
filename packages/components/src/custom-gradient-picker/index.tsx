@@ -1,10 +1,10 @@
 import { type LinearGradientNode } from 'gradient-parser';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
 import { Flex, FlexBlock } from '../flex';
-import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
 import {
 	getGradientAstWithDefault,
@@ -92,11 +92,20 @@ const GradientTypePicker = ( {
 		);
 	};
 
-	const handleOnChange = ( next: string ) => {
-		if ( next === 'linear-gradient' ) {
+	const selectedOption =
+		GRADIENT_OPTIONS.find(
+			( option ) => hasGradient && option.value === type
+		) ?? GRADIENT_OPTIONS[ 0 ];
+
+	const handleTypeChange = ( nextType: string | null | undefined ) => {
+		if ( ! nextType || nextType === selectedOption.value ) {
+			return;
+		}
+
+		if ( nextType === 'linear-gradient' ) {
 			onSetLinearGradient();
 		}
-		if ( next === 'radial-gradient' ) {
+		if ( nextType === 'radial-gradient' ) {
 			onSetRadialGradient();
 		}
 	};
@@ -105,10 +114,9 @@ const GradientTypePicker = ( {
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
-			labelPosition="top"
-			onChange={ handleOnChange }
-			options={ GRADIENT_OPTIONS }
-			value={ hasGradient ? type : undefined }
+			items={ GRADIENT_OPTIONS }
+			value={ selectedOption }
+			onValueChange={ ( item ) => handleTypeChange( item?.value ) }
 		/>
 	);
 };
@@ -124,6 +132,8 @@ export function CustomGradientPicker( {
 	enableAlpha = true,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
+	useEnableWpCompatOverlaySlot();
+
 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
 
 	// On radial gradients the bar should display a linear gradient.

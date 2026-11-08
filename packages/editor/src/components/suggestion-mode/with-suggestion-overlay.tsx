@@ -26,7 +26,7 @@ import {
 } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
 import {

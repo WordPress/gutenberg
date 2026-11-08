@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.44.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
