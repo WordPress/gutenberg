@@ -686,7 +686,12 @@ test.describe( 'Client-side media processing', () => {
 						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
 					await page
-						.getByRole( 'option', { name: 'Square (1:1)' } )
+						// The popup renders outside the modal, which hides
+						// its siblings from the accessibility tree.
+						.getByRole( 'option', {
+							name: 'Square (1:1)',
+							includeHidden: true,
+						} )
 						.click();
 				}
 			);
@@ -738,7 +743,12 @@ test.describe( 'Client-side media processing', () => {
 						.getByRole( 'combobox', { name: 'Aspect ratio' } )
 						.click();
 					await page
-						.getByRole( 'option', { name: 'Square (1:1)' } )
+						// The popup renders outside the modal, which hides
+						// its siblings from the accessibility tree.
+						.getByRole( 'option', {
+							name: 'Square (1:1)',
+							includeHidden: true,
+						} )
 						.click();
 				}
 			);
