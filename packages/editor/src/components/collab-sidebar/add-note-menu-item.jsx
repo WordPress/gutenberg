@@ -28,8 +28,10 @@ function NoteMenuItem( { clientIds, onClick, isDistractionFree } ) {
 				),
 				isInTemplatePart: clientIds.some(
 					( clientId ) =>
-						getBlockParentsByBlockName( clientId, 'core/template-part' )
-							.length > 0
+						getBlockParentsByBlockName(
+							clientId,
+							'core/template-part'
+						).length > 0
 				),
 				shortcut: select(
 					keyboardShortcutsStore
