@@ -394,7 +394,6 @@ add_action( 'init', '_gutenberg_footnotes_kses_init' );
 add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
 
-
 /**
  * Extract the blocks from post content for the REST API post response.
  *
@@ -414,7 +413,8 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 
 	// Loop thru the blocks, adding rendered content when available.
 	foreach ( $blocks as $block ) {
-		foreach( $attributes as $attribute ) {
+		$item = array();
+		foreach ( $attributes as $attribute ) {
 			if ( isset( $block[ $attribute ] ) ) {
 				$item[ $attribute ] = $block[ $attribute ];
 			}
