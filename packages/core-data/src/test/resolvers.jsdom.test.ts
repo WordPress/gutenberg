@@ -819,19 +819,19 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'ignores a list response delivered after a newer one for the same query', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			receiveUserPermissions: jest.fn(),
-			finishResolutions: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityRecords: vi.fn(),
+			receiveUserPermissions: vi.fn(),
+			finishResolutions: vi.fn(),
+			__unstableAcquireStoreLock: vi.fn(),
+			__unstableReleaseStoreLock: vi.fn(),
 		} );
 
 		const STALE_RECORDS = [ { id: 1 } ];
 		const FRESH_RECORDS = [ { id: 1 }, { id: 2 } ];
 		const QUERY = { media_type: 'image' };
 
-		let deliverStaleResponse;
+		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
 		const staleResponseGate = new Promise( ( resolve ) => {
 			deliverStaleResponse = resolve;
 		} );
@@ -840,7 +840,7 @@ describe( 'getEntityRecords', () => {
 			[ 'X-WP-Total', '2' ],
 			[ 'X-WP-TotalPages', '1' ],
 		] );
-		triggerFetch
+		apiFetchMock
 			.mockImplementationOnce( () => ( {
 				json: () => staleResponseGate.then( () => STALE_RECORDS ),
 				headers,
@@ -855,7 +855,7 @@ describe( 'getEntityRecords', () => {
 			'postType',
 			'attachment',
 			QUERY
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// ...while the resolution is invalidated and requested again.
@@ -863,7 +863,7 @@ describe( 'getEntityRecords', () => {
 			'postType',
 			'attachment',
 			QUERY
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
@@ -890,18 +890,18 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'does not discard a list response because a different query was received', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			receiveUserPermissions: jest.fn(),
-			finishResolutions: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityRecords: vi.fn(),
+			receiveUserPermissions: vi.fn(),
+			finishResolutions: vi.fn(),
+			__unstableAcquireStoreLock: vi.fn(),
+			__unstableReleaseStoreLock: vi.fn(),
 		} );
 
 		const IMAGES = [ { id: 1 } ];
 		const VIDEOS = [ { id: 2 } ];
 
-		let deliverImagesResponse;
+		let deliverImagesResponse: ( value?: unknown ) => void = () => {};
 		const imagesResponseGate = new Promise( ( resolve ) => {
 			deliverImagesResponse = resolve;
 		} );
@@ -910,7 +910,7 @@ describe( 'getEntityRecords', () => {
 			[ 'X-WP-Total', '1' ],
 			[ 'X-WP-TotalPages', '1' ],
 		] );
-		triggerFetch
+		apiFetchMock
 			.mockImplementationOnce( () => ( {
 				json: () => imagesResponseGate.then( () => IMAGES ),
 				headers,
@@ -923,12 +923,12 @@ describe( 'getEntityRecords', () => {
 		// One query's request stays in flight while another one completes.
 		const imagesRequest = getEntityRecords( 'postType', 'attachment', {
 			media_type: 'image',
-		} )( { dispatch, registry, resolveSelect } );
+		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		await getEntityRecords( 'postType', 'attachment', {
 			media_type: 'video',
-		} )( { dispatch, registry, resolveSelect } );
+		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		deliverImagesResponse();
 		await imagesRequest;
@@ -957,21 +957,21 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'stops delivering intermediate pages once a newer response for the same query arrives', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			finishResolutions: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityRecords: vi.fn(),
+			finishResolutions: vi.fn(),
+			__unstableAcquireStoreLock: vi.fn(),
+			__unstableReleaseStoreLock: vi.fn(),
 		} );
 
 		const QUERY = { per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true };
 
-		let deliverStalePage;
+		let deliverStalePage: ( value?: unknown ) => void = () => {};
 		const stalePageGate = new Promise( ( resolve ) => {
 			deliverStalePage = resolve;
 		} );
 
-		triggerFetch
+		apiFetchMock
 			// The stale run's first page, delivered normally.
 			.mockImplementationOnce( () => ( {
 				json: () => Promise.resolve( [ { id: 1 } ] ),
@@ -1005,7 +1005,7 @@ describe( 'getEntityRecords', () => {
 			'postType',
 			'attachment',
 			QUERY
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// ...while the resolution is invalidated and a newer run completes.
@@ -1013,7 +1013,7 @@ describe( 'getEntityRecords', () => {
 			'postType',
 			'attachment',
 			QUERY
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		const callsBeforeStalePage =
 			dispatch.receiveEntityRecords.mock.calls.length;
