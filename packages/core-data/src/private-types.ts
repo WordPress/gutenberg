@@ -13,7 +13,7 @@ import type {
 	ReceiveItemsAction,
 	RemoveItemsAction,
 } from './queried-data/types';
-import type { EntityConfig, EntityProviderProps } from './types';
+import type { EntityConfig, EntityProviderProps, RestRecord } from './types';
 
 /**
  * The IDs of the provided entities, by kind and name, and their revisions
@@ -133,11 +133,14 @@ export type Action =
 			Partial< EntityActionTarget > & {
 				invalidateCache?: boolean | null;
 			} )
-	| { type: 'RECEIVE_NAVIGATION_FALLBACK_ID'; fallbackId: ItemId | null }
+	| {
+			type: 'RECEIVE_NAVIGATION_FALLBACK_ID';
+			fallbackId: ItemId | null | undefined;
+	  }
 	| {
 			type: 'RECEIVE_REGISTERED_POST_META';
 			postType: string;
-			registeredPostMeta: Record< string, unknown >;
+			registeredPostMeta: Record< string, unknown > | undefined;
 	  }
 	| {
 			type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS';
@@ -194,6 +197,14 @@ export type Action =
 	  };
 
 /**
+ * The store action of the given type.
+ */
+export type ActionOf< Type extends Action[ 'type' ] > = Extract<
+	Action,
+	{ type: Type }
+>;
+
+/**
  * An entity action, with the entity's record key that the entity reducer
  * injects. An action's own `key` overrides the injected one.
  */
@@ -243,27 +254,79 @@ export interface UsersState {
  * actions.
  */
 export type CoreDataThunkArgs = ThunkArgs<
-	typeof import( '.' ).store,
+	typeof import( './index' ).store,
 	typeof import( './private-selectors' ),
 	typeof import( './private-actions' )
 >;
 
 /**
- * A record received from the REST API.
+ * A modifier to apply to a media item.
  */
-export type RestRecord = Record< string, unknown > & {
-	_links?: RestLinks;
+export interface MediaEditModifier {
+	/**
+	 * The type of modifier.
+	 */
+	type: string;
+	/**
+	 * The arguments of the modifier.
+	 */
+	args: Record< string, unknown >;
+}
+
+/**
+ * Edits to apply to a duplicated media item.
+ */
+export interface MediaEdits {
+	/**
+	 * The URL of the media item.
+	 */
+	src: string;
+	/**
+	 * The modifiers to apply to the media item.
+	 */
+	modifiers?: Array< MediaEditModifier >;
+}
+
+/**
+ * The attachment the REST API responds with when editing a media item.
+ */
+export type EditedMediaRecord = RestRecord & {
+	id: number;
+	source_url: string;
 };
 
 /**
- * The links of a REST API record that core data reads.
+ * A dirty record to save, or an edited property of the site entity.
  */
-export interface RestLinks {
-	self?: Array< {
-		href?: string;
-		targetHints?: { allow?: ReadonlyArray< string > };
-	} >;
-	'version-history'?: Array< { href?: string } >;
-	'wp:user-global-styles'?: Array< { href?: string } >;
-	[ relation: string ]: unknown;
+export interface SavableRecord {
+	kind: string;
+	name: string;
+	key?: string | number;
+	property?: string;
+}
+
+/**
+ * Options of `saveDirtyEntities`.
+ */
+export interface SaveDirtyEntitiesOptions {
+	/**
+	 * Callback when saving happens.
+	 */
+	onSave?: () => unknown;
+	/**
+	 * Array of dirty entities.
+	 */
+	dirtyEntityRecords?: Array< SavableRecord >;
+	/**
+	 * Array of entities to skip saving.
+	 */
+	entitiesToSkip?: Array< SavableRecord >;
+	/**
+	 * Callback when the actions is called. It should be consolidated with `onSave`.
+	 */
+	close?: ( entities: Array< SavableRecord > ) => void;
+	/**
+	 * Optional custom success notice content. Defaults to 'Site updated.'.
+	 */
+	successNoticeContent?: string;
 }

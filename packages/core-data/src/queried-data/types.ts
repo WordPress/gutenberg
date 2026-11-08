@@ -90,7 +90,7 @@ export interface QueriedItemsOptions {
 /**
  * An action signalling that items have been received.
  */
-export interface ReceiveItemsAction {
+export type ReceiveItemsAction = {
 	type: 'RECEIVE_ITEMS';
 	items: QueriedItem | Array< QueriedItem >;
 	persistedEdits?: Record< string, unknown > | null;
@@ -98,18 +98,18 @@ export interface ReceiveItemsAction {
 	query?: Query | null;
 	key?: string;
 	invalidateCache?: boolean;
-}
+};
 
 /**
  * An action signalling that items have been removed.
  */
-export interface RemoveItemsAction {
+export type RemoveItemsAction = {
 	type: 'REMOVE_ITEMS';
 	itemIds: Array< ItemId >;
 	kind: string;
 	name: string;
 	invalidateCache: boolean;
-}
+};
 
 /**
  * An action the queried data reducers handle.

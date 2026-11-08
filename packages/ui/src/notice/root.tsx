@@ -18,9 +18,8 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 
 /**
  * A notice component that communicates system status and provides actions.
- * It does not announce its content to assistive technology. Consumers are
- * responsible for announcing dynamic updates, for example with `speak()` from
- * `@wordpress/a11y`.
+ * Render inside `Notice.List` to announce added or changed messages. Outside
+ * a list, it does not announce its content to assistive technology.
  *
  * ```jsx
  * import { Notice } from '@wordpress/ui';
@@ -40,7 +39,15 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
  * ```
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
-	{ intent = 'neutral', children, icon, render, ...restProps },
+	{
+		intent = 'neutral',
+		children,
+		icon,
+		render,
+		politeness = 'polite',
+		spokenMessage,
+		...restProps
+	},
 	ref
 ) {
 	const iconElement = icon === null ? null : ( icon ?? icons[ intent ] );
@@ -51,27 +58,24 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		resetStyles[ 'box-sizing' ]
 	);
 
+	const defaultProps = {
+		className: mergedClassName,
+		'data-wp-ui-notice-politeness': politeness,
+		'data-wp-ui-notice-spoken-message': spokenMessage,
+		children: (
+			<>
+				{ children }
+				{ iconElement && (
+					<Icon className={ styles.icon } icon={ iconElement } />
+				) }
+			</>
+		),
+	};
 	const element = useRender( {
 		defaultTagName: 'div',
 		render,
 		ref,
-		props: mergeProps< 'div' >(
-			{
-				className: mergedClassName,
-				children: (
-					<>
-						{ children }
-						{ iconElement && (
-							<Icon
-								className={ styles.icon }
-								icon={ iconElement }
-							/>
-						) }
-					</>
-				),
-			},
-			restProps
-		),
+		props: mergeProps< 'div' >( defaultProps, restProps ),
 	} );
 
 	return element;
