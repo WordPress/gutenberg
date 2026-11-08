@@ -23,7 +23,7 @@ import {
 	withoutOutdatedProposals,
 	withoutProposedAttributes,
 } from './marker';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import {
 	formatDeltaFromOriginal,
 	rebaseFormatDelta,

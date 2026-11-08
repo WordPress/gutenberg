@@ -1,0 +1,265 @@
+// Handle touch target size — used for the handle ::before hit area. The
+// inner canvas inset must stay at least half this (22px) so the handles'
+// reach isn't clipped by the root.
+$handle-touch-target-size: 44px;
+
+// The --wpds-* tokens are defined in @wordpress/theme
+// (packages/theme/tokens/color.json and dimension.json). The canvas uses a
+// consumer's value first, then a design token if available, then the defaults
+// written here. These defaults also let an app use this SCSS on its own.
+/* stylelint-disable plugin-wpds/no-token-fallback-values -- This SCSS also works when the design tokens are not loaded. */
+$accent-color: var(--wp-image-editor-accent-color, var(--wpds-color-stroke-focus, var(--wp-admin-theme-color, #3858e9)));
+$foreground-color: var(--wp-image-editor-foreground-color, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+$surface-color: var(--wp-image-editor-surface-color, var(--wpds-color-background-surface-neutral-strong, #fff));
+$canvas-inset: var(--wp-image-editor-canvas-inset, var(--wpds-dimension-padding-2xl, 24px));
+// The default wash follows the neutral surface from light or dark token
+// scopes. The mix resolves to #e0e0e0 at 60% opacity in the default theme.
+$dimming-color: var(--wp-image-editor-dimming-color, color-mix(in srgb, color-mix(in srgb, var(--wpds-color-background-surface-neutral-weak, #f4f4f4) 90.65%, var(--wpds-color-foreground-content-neutral, #1e1e1e)) 60%, transparent));
+/* stylelint-enable plugin-wpds/no-token-fallback-values */
+
+// Geometry, not text direction: the camera and `stencil-math.ts` address
+// this canvas in physical pixels, and JS sets the image's `left` inline.
+// Mirrored, `nw` would resize the right edge and the image would pin to the
+// stage edge. ResizableBox ignores its own handle offsets for the same reason.
+/*!rtl:begin:ignore*/
+.wp-image-editor {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+	user-select: none;
+	cursor: grab;
+
+	// Inner gutter for resize handles. Handles use negative offsets and a
+	// touch target that extends past the crop edge; the root clips overflow
+	// (required for the dimming overlay's box-shadow trick), so a flush
+	// handle would be clipped. The inner `__canvas` wrapper is inset to
+	// reserve reach room on all sides while keeping the root as the clipping
+	// boundary. The inset must stay at least half the 44px touch target.
+	&__canvas {
+		position: absolute;
+		inset: max(22px, $canvas-inset);
+		min-height: 100px;
+		min-width: 100px;
+
+		// Suppress the browser's default focus ring — the crop rectangle
+		// border provides the custom keyboard-focus indicator instead.
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// Inner stage — receives the viewport pan transform so the canvas div
+	// itself stays fixed, preventing the root background from showing through.
+	&__stage {
+		position: absolute;
+		inset: 0;
+	}
+
+	&--dragging {
+		cursor: grabbing;
+	}
+
+	&__image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		will-change: transform;
+		transform-origin: center center;
+	}
+
+	&__stencil {
+		position: absolute;
+		pointer-events: none;
+	}
+
+	&__dimming {
+		position: absolute;
+		pointer-events: none;
+		/* Large shadow spread washes everything outside the crop area.
+		   It is lighter during drag so the image stays visible. */
+		box-shadow: 0 0 0 9999px $dimming-color;
+		transition: box-shadow 0.15s ease;
+	}
+
+	&--dragging &__dimming {
+		box-shadow: 0 0 0 9999px color-mix(in srgb, $dimming-color 66.667%, transparent);
+	}
+
+	&__grid {
+		position: absolute;
+		pointer-events: none;
+		overflow: hidden;
+		transition: opacity 0.15s ease;
+	}
+
+	&__canvas--grid-interactive &__grid {
+		opacity: 0;
+		transition-delay: 0.1s;
+	}
+
+	&__canvas--show-grid &__grid {
+		opacity: 1;
+		transition-delay: 0s;
+	}
+
+	&__canvas--settling &__grid {
+		opacity: 0;
+		transition: none;
+	}
+
+	&__grid-line {
+		position: absolute;
+		background: var(--wp-image-editor-grid-color, rgba(255, 255, 255, 0.4));
+
+		&--horizontal {
+			left: 0;
+			width: 100%;
+			height: 1px;
+		}
+
+		&--vertical {
+			top: 0;
+			height: 100%;
+			width: 1px;
+		}
+	}
+
+	&__dimensions-tooltip {
+		position: absolute;
+		padding: 2px 6px;
+		background: $surface-color;
+		color: $foreground-color;
+		font-size: 11px;
+		line-height: 1.4;
+		font-variant-numeric: tabular-nums;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.08);
+		pointer-events: none;
+		white-space: nowrap;
+		z-index: 2;
+	}
+
+	&__stencil-rect {
+		position: absolute;
+		// The foreground colour keeps the crop boundary legible over the wash.
+		border: 1px solid $foreground-color;
+		box-sizing: border-box;
+		pointer-events: none;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	// Accent border on the crop rectangle when the canvas has keyboard focus.
+	// Uses a JS-controlled class rather than :focus-visible — browsers can
+	// restore :focus-visible across programmatic focus calls, making pure
+	// CSS unreliable for pointer-to-keyboard transitions. The :focus check
+	// on the canvas ensures the outline appears only when the canvas
+	// itself is focused, not when focus is on a child handle.
+	&__canvas--focus-visible:focus &__stencil-rect {
+		border-color: $accent-color;
+		box-shadow: 0 0 0 1px $accent-color;
+	}
+
+	&__handle {
+		// Reset native <button> UA styles — the handle is a button for
+		// accessibility (native keyboard focus, button semantics), but
+		// it's styled as a small draggable circle.
+		appearance: none;
+		margin: 0;
+		padding: 0;
+		font: inherit;
+		cursor: default;
+
+		position: absolute;
+		width: 12px;
+		height: 12px;
+		// Surface fill and accent border keep handles distinct from the image.
+		background: $surface-color;
+		border: 1px solid $accent-color;
+		border-radius: 50%;
+		box-sizing: border-box;
+		pointer-events: auto;
+		transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+		&:focus {
+			outline: none;
+		}
+
+		// Double ring (surface inner + accent outer) for a clear
+		// keyboard-focus state on the handle. Gated on the JS-controlled
+		// keyboard-active class so that mouse interactions after a
+		// keyboard session — e.g., clicking a handle to start a drag —
+		// don't leave the active ring stuck on the handle.
+		.wp-image-editor__canvas--focus-visible &:focus {
+			background: $accent-color;
+			border-color: transparent;
+			box-shadow: 0 0 0 2px $surface-color, 0 0 0 4px $accent-color;
+		}
+
+		// Extend touch target to the minimum accessible hit area.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: $handle-touch-target-size;
+			height: $handle-touch-target-size;
+			transform: translate(-50%, -50%);
+		}
+
+		/* Offset by half the handle width (12px / 2 = 6px) to center on crop edge */
+		&--n {
+			top: -6px;
+			left: 50%;
+			margin-left: -6px;
+			cursor: ns-resize;
+		}
+
+		&--s {
+			bottom: -6px;
+			left: 50%;
+			margin-left: -6px;
+			cursor: ns-resize;
+		}
+
+		&--e {
+			top: 50%;
+			right: -6px;
+			margin-top: -6px;
+			cursor: ew-resize;
+		}
+
+		&--w {
+			top: 50%;
+			left: -6px;
+			margin-top: -6px;
+			cursor: ew-resize;
+		}
+
+		&--nw {
+			top: -6px;
+			left: -6px;
+			cursor: nwse-resize;
+		}
+
+		&--ne {
+			top: -6px;
+			right: -6px;
+			cursor: nesw-resize;
+		}
+
+		&--sw {
+			bottom: -6px;
+			left: -6px;
+			cursor: nesw-resize;
+		}
+
+		&--se {
+			bottom: -6px;
+			right: -6px;
+			cursor: nwse-resize;
+		}
+	}
+
+}
+/*!rtl:end:ignore*/

@@ -2,7 +2,7 @@
  * Finders over a payload's operations and over a block tree, by note id.
  * Pure: the tree is read through the accessors the caller passes in.
  */
-import { getNoteIdsFromMetadata } from '../../collab-sidebar/utils';
+import { getNoteIdsFromMetadata } from '../../collab-sidebar/utils/metadata';
 import type { SuggestionOperation } from './payload';
 
 /**

@@ -66,7 +66,7 @@ import {
 	readSuggestionMarker,
 } from './marker';
 import { rememberRedo } from './decision-state';
-import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
+import { removeNoteIdFromMetadata } from '../collab-sidebar/utils/metadata';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
