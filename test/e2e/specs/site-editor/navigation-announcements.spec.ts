@@ -1,9 +1,12 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 // Whether the run targets the extensible site editor (v2), which lives at
 // `admin.php?page=site-editor-v2` and routes via the `p` query param.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 const rootTitle = isSiteEditorV2 ? 'Home' : 'Design';
+
+// The page window, with the list the init script records messages in.
+type WindowWithMessages = Window & { __assertiveMessages: string[] };
 
 test.describe( 'Site editor navigation announcements', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -21,16 +24,17 @@ test.describe( 'Site editor navigation announcements', () => {
 		// Record every assertive message from the first load on. speak()
 		// clears the region before each message, so a repeat is recorded too.
 		await page.addInitScript( () => {
-			window.__assertiveMessages = [];
+			const win = window as unknown as WindowWithMessages;
+			win.__assertiveMessages = [];
 			let previous = '';
-			new window.MutationObserver( () => {
+			new MutationObserver( () => {
 				const text =
 					document.getElementById( 'a11y-speak-assertive' )
 						?.textContent ?? '';
 				if ( text !== previous ) {
 					previous = text;
 					if ( text.trim() ) {
-						window.__assertiveMessages.push( text.trim() );
+						win.__assertiveMessages.push( text.trim() );
 					}
 				}
 			} ).observe( document, {
@@ -40,7 +44,11 @@ test.describe( 'Site editor navigation announcements', () => {
 			} );
 		} );
 		const messages = () =>
-			page.evaluate( () => window.__assertiveMessages );
+			page.evaluate(
+				() =>
+					( window as unknown as WindowWithMessages )
+						.__assertiveMessages
+			);
 
 		await admin.visitSiteEditor();
 		await expect( page ).toHaveTitle( new RegExp( `^${ rootTitle } ‹` ) );
