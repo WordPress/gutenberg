@@ -1,4 +1,5 @@
 // Selection marks reserve menu-wide space. Action prefixes indent only their row.
+.menu.menu,
 :global([role="menu"]):has(.item) {
 	--_wp-components-menu-selection-width: var(--wpds-dimension-size-2xs);
 	--_wp-components-menu-item-inset: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
@@ -18,13 +19,15 @@
 	}
 }
 
-.item:global(.components-button.has-icon.has-text) {
+// Outrank DropdownMenu's padding defaults regardless of stylesheet order.
+.item.item:global(.components-menu-item__button.components-button) {
 	gap: 0;
 	padding-block: var(--wpds-dimension-padding-xs);
 	padding-inline-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
 	padding-inline-end: var(--wpds-dimension-padding-sm);
 
-	> :global(.components-menu-items__item-icon) {
+	> .indicator {
+		flex: 0 0 auto;
 		width: var(--wpds-dimension-size-2xs);
 		height: var(--wpds-dimension-size-2xs);
 		margin: 0;
@@ -33,10 +36,14 @@
 		margin-inline-end: calc(var(--wpds-dimension-gap-xs) / 2);
 	}
 
+	> :global(.components-menu-items__item-icon):not(.indicator):not(:global(.has-icon-right)) {
+		margin-inline-end: var(--wpds-dimension-gap-xs);
+	}
+
 	&:has(:global(.components-menu-item__info-wrapper)) {
 		align-items: flex-start;
 
-		> :global(.components-menu-items__item-icon) {
+		> .indicator {
 			// Center the selection mark on the title line.
 			translate: 0 calc((1lh - 100%) / 2);
 		}
@@ -47,7 +54,7 @@
 	}
 
 	// Keep the leading space for unchecked rows and actions in a selection menu.
-	&:not([aria-checked="true"]) > :global(.components-menu-items__item-icon) {
+	&:not([aria-checked="true"]) > .indicator {
 		visibility: hidden;
 	}
 }

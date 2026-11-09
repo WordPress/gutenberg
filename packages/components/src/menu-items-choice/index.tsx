@@ -1,7 +1,4 @@
-import clsx from 'clsx';
-import { check } from '@wordpress/icons';
 import MenuItem from '../menu-item';
-import selectionStyles from '../menu-item/selection-style.module.scss';
 import type { MenuItemsChoiceProps } from './types';
 
 const noop = () => {};
@@ -54,15 +51,11 @@ function MenuItemsChoice( {
 						key={ item.value }
 						role="menuitemradio"
 						disabled={ item.disabled }
-						icon={ check }
-						iconPosition="left"
+						showSelectionIndicator
 						info={ item.info }
 						isSelected={ isSelected }
 						shortcut={ item.shortcut }
-						className={ clsx(
-							'components-menu-items-choice',
-							selectionStyles.item
-						) }
+						className="components-menu-items-choice"
 						onClick={ () => {
 							if ( ! isSelected ) {
 								onSelect( item.value );

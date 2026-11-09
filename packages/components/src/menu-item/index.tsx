@@ -1,11 +1,13 @@
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
 import { cloneElement, forwardRef } from '@wordpress/element';
+import { check } from '@wordpress/icons';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
 import type { WordPressComponentProps } from '../context';
 import type { MenuItemProps } from './types';
+import selectionStyles from './selection-style.module.scss';
 
 function UnforwardedMenuItem(
 	props: WordPressComponentProps< MenuItemProps, 'button', false >,
@@ -19,13 +21,19 @@ function UnforwardedMenuItem(
 		iconPosition = 'right',
 		shortcut,
 		isSelected,
+		showSelectionIndicator = false,
 		onMouseMove,
 		role = 'menuitem',
 		suffix,
 		...buttonProps
 	} = props;
 
-	className = clsx( 'components-menu-item__button', className );
+	const hasSelectionIndicator =
+		showSelectionIndicator &&
+		( role === 'menuitemcheckbox' || role === 'menuitemradio' );
+	className = clsx( 'components-menu-item__button', className, {
+		[ selectionStyles.item ]: hasSelectionIndicator,
+	} );
 
 	if ( info ) {
 		children = (
@@ -55,7 +63,11 @@ function UnforwardedMenuItem(
 					: undefined
 			}
 			role={ role }
-			icon={ iconPosition === 'left' ? icon : undefined }
+			icon={
+				iconPosition === 'left' && ! hasSelectionIndicator
+					? icon
+					: undefined
+			}
 			className={ className }
 			accessibleWhenDisabled
 			{ ...buttonProps }
@@ -73,6 +85,18 @@ function UnforwardedMenuItem(
 				}
 			} }
 		>
+			{ hasSelectionIndicator && (
+				<Icon
+					icon={ check }
+					className={ clsx(
+						'components-menu-items__item-icon',
+						selectionStyles.indicator
+					) }
+				/>
+			) }
+			{ hasSelectionIndicator && icon && iconPosition === 'left' && (
+				<Icon icon={ icon } />
+			) }
 			<span className="components-menu-item__item">{ children }</span>
 			{ ! suffix && (
 				<Shortcut
@@ -100,7 +124,7 @@ function UnforwardedMenuItem(
  *
  * 	return (
  * 		<MenuItem
- * 			icon={ isActive ? 'yes' : 'no' }
+ * 			showSelectionIndicator
  * 			isSelected={ isActive }
  * 			role="menuitemcheckbox"
  * 			onClick={ () => setIsActive( ( state ) => ! state ) }

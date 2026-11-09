@@ -6,6 +6,12 @@ When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. O
 
 ![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuExample.png)
 
+## Usage guidelines
+
+Use `MenuItemsChoice` for mutually exclusive choices. For independent toggles, use `MenuItem` with `role="menuitemcheckbox"`, `isSelected`, and `showSelectionIndicator`. Use ordinary `MenuItem` rows for actions. Selection indicators reserve a leading column across the menu so labels stay aligned when an option is unchecked.
+
+The `icon` prop describes an additional item icon. Its position is independent of the built-in selection indicator. Existing caller-supplied selection icons remain supported, but new selection compositions should use the built-in indicator.
+
 ## Anatomy
 
 ![Anatomy of a DropdownMenu.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuAnatomy.png)
