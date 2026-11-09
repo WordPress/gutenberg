@@ -277,7 +277,7 @@ export const WrappedItems: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Uses long text to demonstrate wrapping and disabled items. Keep product menu labels short and descriptions rare.',
+				story: 'Uses long text to demonstrate wrapping, multiple descriptions, and disabled items. Keep product menu labels short and descriptions rare.',
 			},
 		},
 	},
@@ -295,6 +295,19 @@ export const WrappedItems: Story = {
 							This deliberately long description should wrap below
 							the label without overlapping the suffix or
 							shortcut.
+						</Menu.ItemDescription>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>
+							An item with more than one description
+						</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							The first description wraps, and stays clear of the
+							label above it.
+						</Menu.ItemDescription>
+						<Menu.ItemDescription>
+							A second description sits below the first with the
+							same gap.
 						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
