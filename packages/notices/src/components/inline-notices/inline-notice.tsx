@@ -150,10 +150,7 @@ export default function InlineNotice( {
 							text={ `${ content }\n\n${ details }` }
 							label={
 								status === 'error'
-									? _x(
-											'Copy error',
-											'button label: copy the error message'
-										)
+									? _x( 'Copy error', 'button label' )
 									: __( 'Copy message' )
 							}
 						/>

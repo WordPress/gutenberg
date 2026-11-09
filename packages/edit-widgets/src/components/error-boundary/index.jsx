@@ -168,10 +168,7 @@ export default class ErrorBoundary extends Component {
 								getErrorReport( error, componentStack )
 							}
 						>
-							{ _x(
-								'Copy error',
-								'button label: copy the error message'
-							) }
+							{ _x( 'Copy error', 'button label' ) }
 						</CopyButton>
 					</Notice.Actions>
 				</Notice.Root>

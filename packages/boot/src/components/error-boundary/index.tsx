@@ -66,7 +66,7 @@ function CopyErrorButton( { error }: { error: Error } ) {
 			ref={ ref }
 			icon={ RESULT_ICON[ feedback.result ] }
 		>
-			{ _x( 'Copy error', 'button label: copy the error message' ) }
+			{ _x( 'Copy error', 'button label' ) }
 		</Button>
 	);
 }
