@@ -36,7 +36,7 @@
 
 ### Documentation
 
--   `Notice`: Add a Storybook example showing a `Link` inside `Notice.Description` for each intent ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
+-   `Notice`: Add a Storybook example showing a neutral-toned `Link` inside `Notice.Description` ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
 
 ## 0.26.0 (2026-11-04)
 

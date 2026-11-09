@@ -138,46 +138,23 @@ export const WithoutActions: Story = {
 };
 
 /**
- * Use the `Link` component for inline links within the description.
+ * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and avoid an awkward mismatch between brand and notice colors.
  *
  * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
  */
 export const WithLinkInDescription: Story = {
 	render: () => (
-		<Stack direction="column" gap="md">
-			<Notice.Root intent="info">
-				<Notice.Title>Autosave is on</Notice.Title>
-				<Notice.Description>
-					Your changes are saved as you work.{ ' ' }
-					<Link href="#">Learn more about autosave</Link>.
-				</Notice.Description>
-				<Notice.CloseIconButton />
-			</Notice.Root>
-			<Notice.Root intent="warning">
-				<Notice.Title>Unsaved changes</Notice.Title>
-				<Notice.Description>
-					Save your changes before leaving this page.{ ' ' }
-					<Link href="#">Learn more about saving</Link>.
-				</Notice.Description>
-				<Notice.CloseIconButton />
-			</Notice.Root>
-			<Notice.Root intent="success">
-				<Notice.Title>Backup complete</Notice.Title>
-				<Notice.Description>
-					Your site was backed up successfully.{ ' ' }
-					<Link href="#">Learn more about backups</Link>.
-				</Notice.Description>
-				<Notice.CloseIconButton />
-			</Notice.Root>
-			<Notice.Root intent="error">
-				<Notice.Title>Changes not saved</Notice.Title>
-				<Notice.Description>
-					Check your connection and try again.{ ' ' }
-					<Link href="#">Learn more about troubleshooting</Link>.
-				</Notice.Description>
-				<Notice.CloseIconButton />
-			</Notice.Root>
-		</Stack>
+		<Notice.Root intent="info">
+			<Notice.Title>Autosave is on</Notice.Title>
+			<Notice.Description>
+				Your changes are saved as you work.{ ' ' }
+				<Link href="#" tone="neutral">
+					Learn more about autosave
+				</Link>
+				.
+			</Notice.Description>
+			<Notice.CloseIconButton />
+		</Notice.Root>
 	),
 };
 
