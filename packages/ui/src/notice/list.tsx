@@ -11,7 +11,6 @@ const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
 
 type Announcement = {
 	id: number;
-	announcementKey: string | undefined;
 	message: string;
 	politeness: NonNullable< RootProps[ 'politeness' ] >;
 };
@@ -96,29 +95,17 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 								notice.closest( LIST_SELECTOR ) === element &&
 								! isHidden( notice, element )
 						)
-						.map( ( notice ) => {
-							const before = previous.get( notice );
-							const announcementKey =
-								notice.dataset.wpUiNoticeAnnouncementKey;
-							const id =
-								before &&
-								before.announcementKey === announcementKey
-									? before.id
-									: nextId++;
-							return [
-								notice,
-								{
-									id,
-									announcementKey,
-									message:
-										notice.dataset
-											.wpUiNoticeSpokenMessage ??
-										readMessage( notice ),
-									politeness: notice.dataset
-										.wpUiNoticePoliteness as Announcement[ 'politeness' ],
-								},
-							] as const;
-						} )
+						.map( ( notice ) => [
+							notice,
+							{
+								id: previous.get( notice )?.id ?? nextId++,
+								message:
+									notice.dataset.wpUiNoticeSpokenMessage ??
+									readMessage( notice ),
+								politeness: notice.dataset
+									.wpUiNoticePoliteness as Announcement[ 'politeness' ],
+							},
+						] )
 				);
 			// Establish initial content without populating the live regions.
 			previous = readNotices();
@@ -136,8 +123,6 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 						announcement.message &&
 						announcement.politeness !== 'off' &&
 						( announcement.message !== before?.message ||
-							announcement.announcementKey !==
-								before?.announcementKey ||
 							announcement.politeness !== before?.politeness )
 					) {
 						changed.set( notice, announcement );
@@ -172,7 +157,6 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 					'aria-hidden',
 					'data-wp-ui-notice-politeness',
 					'data-wp-ui-notice-spoken-message',
-					'data-wp-ui-notice-announcement-key',
 				],
 			} );
 			return () => observer.disconnect();

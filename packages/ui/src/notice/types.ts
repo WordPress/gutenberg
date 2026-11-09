@@ -32,12 +32,6 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 	spokenMessage?: string;
 
 	/**
-	 * Identifies the notification to announce. Change this value to repeat an
-	 * unchanged message without remounting the notice. Only used inside `Notice.List`.
-	 */
-	announcementKey?: string | number;
-
-	/**
 	 * The semantic intent of the notice, communicating its meaning through color.
 	 * Available intents: neutral, info, warning, success, and error.
 	 *

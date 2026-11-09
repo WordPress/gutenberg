@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
+
+vi.mock( import( '@wordpress/a11y' ), { spy: true } );
 
 function getInlineNoticesWrapper( container: HTMLElement ) {
 	return container.querySelector< HTMLElement >(
@@ -226,6 +229,97 @@ describe( 'InlineNotices', () => {
 			).toBeInTheDocument();
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		} );
+
+		it.each( [ 'error', 'success' ] as const )(
+			'announces identical %s replacements once',
+			async ( status ) => {
+				const { registry, rerender } = renderInlineNotices();
+				const role = status === 'error' ? 'alert' : 'status';
+				await act( async () => {
+					registry
+						.dispatch( noticesStore )
+						.createNotice( status, 'First message.', {
+							id: 'editor-save',
+						} );
+				} );
+				await act( async () => {
+					registry
+						.dispatch( noticesStore )
+						.createNotice( status, 'Repeated message.', {
+							id: 'editor-save',
+						} );
+				} );
+				expect( screen.getByRole( role ) ).toHaveTextContent(
+					/^Repeated message\.$/
+				);
+				expect( speak ).not.toHaveBeenCalled();
+
+				await act( async () => {
+					registry
+						.dispatch( noticesStore )
+						.createNotice( status, 'Repeated message.', {
+							id: 'editor-save',
+						} );
+				} );
+				expect( speak ).toHaveBeenCalledExactlyOnceWith(
+					'Repeated message.',
+					status === 'error' ? 'assertive' : 'polite'
+				);
+
+				// An unrelated render must not announce the notification again.
+				rerender(
+					<RegistryProvider value={ registry }>
+						<InlineNotices className="updated" />
+					</RegistryProvider>
+				);
+				expect( speak ).toHaveBeenCalledTimes( 1 );
+			}
+		);
+
+		it( 'keeps a replacement created with speak:false silent', async () => {
+			const { registry } = renderInlineNotices();
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+					} );
+			} );
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+						speak: false,
+					} );
+			} );
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'announces an urgency change through the list without an extra announcement', async () => {
+			const { registry } = renderInlineNotices();
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', 'Connection lost.', {
+						id: 'connection',
+					} );
+			} );
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Connection lost.', {
+						id: 'connection',
+					} );
+			} );
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Connection lost\.$/
+			);
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

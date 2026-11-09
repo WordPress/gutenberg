@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Children, useState } from '@wordpress/element';
+import { Children } from '@wordpress/element';
 import { Notice } from '@wordpress/ui';
 import { store as noticesStore } from '../../store';
 import type { Notice as NoticeType } from '../../store/types';
@@ -18,28 +18,13 @@ type InlineNoticesProps = {
 type NoticeListProps = {
 	notices: NoticeType[];
 	className: string;
-	getAnnouncementKey: ( notice: NoticeType ) => number;
 	onRemove?: ( id: string ) => void;
 	children?: ReactNode;
 };
 
-function createAnnouncementKeyGenerator() {
-	const announcementKeys = new WeakMap< NoticeType, number >();
-	let nextAnnouncementKey = 0;
-	return ( notice: NoticeType ) => {
-		let key = announcementKeys.get( notice );
-		if ( key === undefined ) {
-			key = nextAnnouncementKey++;
-			announcementKeys.set( notice, key );
-		}
-		return key;
-	};
-}
-
 function NoticeList( {
 	notices,
 	className,
-	getAnnouncementKey,
 	onRemove,
 	children,
 }: NoticeListProps ) {
@@ -49,7 +34,6 @@ function NoticeList( {
 			{ [ ...notices ].reverse().map( ( notice ) => (
 				<InlineNotice
 					key={ notice.id }
-					announcementKey={ getAnnouncementKey( notice ) }
 					notice={ notice }
 					onRemove={ () => onRemove?.( notice.id ) }
 				/>
@@ -69,7 +53,6 @@ export default function InlineNotices( {
 	dismissibleNoticesClassName,
 	context,
 }: InlineNoticesProps ) {
-	const [ getAnnouncementKey ] = useState( createAnnouncementKeyGenerator );
 	const notices = useSelect(
 		( select ) => select( noticesStore ).getNotices( context ),
 		[ context ]
@@ -99,7 +82,6 @@ export default function InlineNotices( {
 					{ hasPinnedNotices && (
 						<NoticeList
 							notices={ nonDismissibleNotices }
-							getAnnouncementKey={ getAnnouncementKey }
 							className={ clsx(
 								'components-notices__pinned',
 								pinnedNoticesClassName
@@ -109,7 +91,6 @@ export default function InlineNotices( {
 					{ hasDismissibleNotices && (
 						<NoticeList
 							notices={ dismissibleNotices }
-							getAnnouncementKey={ getAnnouncementKey }
 							className={ clsx(
 								'components-notices__dismissible',
 								dismissibleNoticesClassName

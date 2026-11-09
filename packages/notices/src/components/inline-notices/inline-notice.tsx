@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
+import { speak } from '@wordpress/a11y';
 import { Slot } from '@wordpress/components';
-import { RawHTML, useState } from '@wordpress/element';
+import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
@@ -25,7 +26,6 @@ type NoticeAction = NoticeActionType & {
 
 type InlineNoticeProps = {
 	notice: NoticeType;
-	announcementKey: number;
 	onRemove: () => void;
 };
 
@@ -75,7 +75,6 @@ function NoticeActionControl( {
 
 export default function InlineNotice( {
 	notice,
-	announcementKey,
 	onRemove,
 }: InlineNoticeProps ) {
 	const {
@@ -90,6 +89,27 @@ export default function InlineNotice( {
 	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
+	const previousNoticeRef = useRef( notice );
+
+	useEffect( () => {
+		const previousNotice = previousNoticeRef.current;
+		previousNoticeRef.current = notice;
+
+		// Notice.List handles new messages and urgency changes. An identical
+		// replacement needs a separate announcement without resetting controls.
+		if (
+			previousNotice !== notice &&
+			notice.spokenMessage &&
+			previousNotice.spokenMessage === notice.spokenMessage &&
+			( previousNotice.status === 'error' ) ===
+				( notice.status === 'error' )
+		) {
+			speak(
+				notice.spokenMessage,
+				notice.status === 'error' ? 'assertive' : 'polite'
+			);
+		}
+	}, [ notice ] );
 
 	// Copying HTML content would put its tags on the clipboard.
 	const canCopy = !! details && ! __unstableHTML;
@@ -163,7 +183,6 @@ export default function InlineNotice( {
 	const politeness = status === 'error' ? 'assertive' : 'polite';
 	const rootProps = {
 		intent: status,
-		announcementKey,
 		spokenMessage: notice.spokenMessage ?? '',
 		politeness: notice.spokenMessage ? politeness : 'off',
 		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),

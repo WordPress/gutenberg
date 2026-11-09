@@ -46,7 +46,6 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		render,
 		politeness = 'polite',
 		spokenMessage,
-		announcementKey,
 		...restProps
 	},
 	ref
@@ -63,7 +62,6 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		className: mergedClassName,
 		'data-wp-ui-notice-politeness': politeness,
 		'data-wp-ui-notice-spoken-message': spokenMessage,
-		'data-wp-ui-notice-announcement-key': announcementKey,
 		children: (
 			<>
 				{ children }

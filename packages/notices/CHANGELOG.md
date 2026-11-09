@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InlineNotices`: Announce added and replaced notices through persistent live regions; notices present on mount stay silent ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
+-   `InlineNotices`: Use `Notice.List` to announce added and changed messages; notices present on mount stay silent ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 
 ## 6.1.0 (2026-11-04)
 
