@@ -216,7 +216,7 @@ export default function CategoriesEdit( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ Array.isArray( taxonomies ) && (
+					{ taxonomyItems.length > 0 && (
 						<ToolsPanelItem
 							hasValue={ () => {
 								return taxonomySlug !== 'category';
@@ -227,24 +227,21 @@ export default function CategoriesEdit( {
 							} }
 							isShownByDefault
 						>
-							{ taxonomyItems.length > 0 && (
-								<SelectControl
-									label={ __( 'Taxonomy' ) }
-									items={ taxonomyItems }
-									value={
-										taxonomyItems.find(
-											( item ) =>
-												item.value === taxonomySlug
-										) ?? taxonomyItems[ 0 ]
-									}
-									onValueChange={ ( item ) =>
-										item &&
-										setAttributes( {
-											taxonomy: item.value,
-										} )
-									}
-								/>
-							) }
+							<SelectControl
+								label={ __( 'Taxonomy' ) }
+								items={ taxonomyItems }
+								value={
+									taxonomyItems.find(
+										( item ) => item.value === taxonomySlug
+									) ?? taxonomyItems[ 0 ]
+								}
+								onValueChange={ ( item ) =>
+									item &&
+									setAttributes( {
+										taxonomy: item.value,
+									} )
+								}
+							/>
 						</ToolsPanelItem>
 					) }
 					<ToolsPanelItem
