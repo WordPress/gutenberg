@@ -11,6 +11,10 @@
 -   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
 
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes

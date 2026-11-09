@@ -21,6 +21,10 @@
 -   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).
 -   `Menu`: Align the selection indicator, prefix, suffix, shortcut, and submenu chevron with the first line of the label. Prefix icons larger than 16px and tall suffixes no longer sit above the label, and the row grows around them. The suffix, shortcut, and chevron of an item with a wrapped label now follow the first line instead of centering on the whole label ([#86135](https://github.com/WordPress/gutenberg/pull/86135)).
 
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+
 ## 0.26.0 (2026-11-04)
 
 ### Breaking Changes
