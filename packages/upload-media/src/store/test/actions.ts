@@ -701,7 +701,7 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems();
 			const sideloadItem = items.find(
-				( item ) => item.parentId === 'fake-parent-id'
+				( item: QueueItem ) => item.parentId === 'fake-parent-id'
 			);
 
 			// Item should be removed by cancelItem.
