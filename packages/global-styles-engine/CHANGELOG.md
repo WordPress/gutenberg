@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
+-   `getDimensionPresetCssVar`: Kebab-case the preset slug, so a slug such as `wideColumn` or `size2` resolves to the custom property that was declared for it. It previously kept the raw slug and pointed at a property that does not exist ([#76684](https://github.com/WordPress/gutenberg/pull/76684)).
 
 ## 2.1.0 (2026-11-04)
 
@@ -55,7 +56,6 @@
 ### Bug Fixes
 
 -   `generateGlobalStyles`: Treat a missing `spacing.blockGap` setting like a `null` one, as the server's `isset()` check does. WordPress stores `null` for themes that do not opt into block gap, but `getSetting` returns `undefined` for it, so the editor considered block gap supported and rendered the global block gap instead of the fallback gap styles the front end renders, such as the Columns block's `2em` default ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
--   `getDimensionPresetCssVar`: Kebab-case the preset slug, so a slug such as `wideColumn` or `size2` resolves to the custom property that was declared for it. It previously kept the raw slug and pointed at a property that does not exist ([#76684](https://github.com/WordPress/gutenberg/pull/76684)).
 
 ## 1.22.0 (2026-09-10)
 
