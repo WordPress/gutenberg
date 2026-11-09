@@ -671,6 +671,11 @@
 							],
 							"default": false
 						},
+						"direction": {
+							"description": "This value signals that a block supports setting its text direction. When it does, the block editor will show a UI control for the user to set the block's `dir` HTML attribute to `ltr`, `rtl`, or `auto`.\n\nWhen the block declares support for direction, its attributes definition is extended to include the direction attribute.",
+							"type": "boolean",
+							"default": false
+						},
 						"fitText": {
 							"description": "Enable fit text support for the block. This allows text content to automatically adjust its font size to fit within the block's dimensions.",
 							"type": "boolean",

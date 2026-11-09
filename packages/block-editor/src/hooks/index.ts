@@ -22,6 +22,7 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import textShadow from './text-shadow';
 import fitText from './fit-text';
+import direction from './direction';
 import border from './border';
 import customCSS from './custom-css';
 import position from './position';
@@ -46,6 +47,7 @@ createBlockEditFilter(
 		customCSS,
 		duotone,
 		fitText,
+		direction,
 		position,
 		layout,
 		blockHooks,
@@ -68,6 +70,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	textShadow,
 	fitText,
+	direction,
 	border,
 	customCSS,
 	position,
@@ -83,6 +86,7 @@ createBlockSaveFilter( [
 	border,
 	customCSS,
 	fitText,
+	direction,
 	color,
 	style,
 	fontFamily,

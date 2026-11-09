@@ -35,6 +35,12 @@ export function getTransformedAttributes(
 	) {
 		transformedAttributes.ariaLabel = attributes.ariaLabel;
 	}
+	if (
+		hasBlockSupport( newBlockType, 'typography.direction' ) &&
+		attributes.direction
+	) {
+		transformedAttributes.direction = attributes.direction;
+	}
 
 	// Handle metadata transformation.
 	if ( attributes.metadata ) {

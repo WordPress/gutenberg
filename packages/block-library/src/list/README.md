@@ -37,6 +37,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+  - [`direction`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-direction): `true`
 - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
   - `backgroundImage`: `true`
   - `backgroundSize`: `true`

@@ -1,0 +1,19 @@
+[
+	{
+		"blockName": "core/paragraph",
+		"attrs": {
+			"direction": "rtl",
+			"style": {
+				"typography": {
+					"textAlign": "center",
+					"letterSpacing": "2px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<p class=\"has-text-align-center\" dir=\"rtl\" style=\"letter-spacing:2px\">مرحبا بالعالم</p>\n",
+		"innerContent": [
+			"\n<p class=\"has-text-align-center\" dir=\"rtl\" style=\"letter-spacing:2px\">مرحبا بالعالم</p>\n"
+		]
+	}
+]

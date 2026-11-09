@@ -114,7 +114,6 @@ function ParagraphBlock( {
 		className: clsx( {
 			'has-drop-cap': hasDropCapDisabled( textAlign ) ? false : dropCap,
 		} ),
-		style: { direction },
 		'aria-label': RichText.isEmpty( content )
 			? __(
 					'Empty block; start writing or type forward slash to choose a block'

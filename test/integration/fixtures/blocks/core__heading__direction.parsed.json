@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"direction": "auto"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading\" dir=\"auto\">שלום עולם</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading\" dir=\"auto\">שלום עולם</h2>\n"
+		]
+	}
+]

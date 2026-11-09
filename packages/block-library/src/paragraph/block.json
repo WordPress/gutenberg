@@ -23,7 +23,7 @@
 		},
 		"direction": {
 			"type": "string",
-			"enum": [ "ltr", "rtl" ]
+			"enum": [ "ltr", "rtl", "auto" ]
 		}
 	},
 	"supports": {
@@ -68,6 +68,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"direction": true,
 			"textColumns": true,
 			"textIndent": true,
 			"__experimentalFontFamily": true,

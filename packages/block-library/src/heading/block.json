@@ -71,6 +71,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"direction": true,
 			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,

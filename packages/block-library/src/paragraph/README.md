@@ -18,7 +18,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `content` | `rich-text` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `p`. [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `dropCap` | `boolean` | `false` | — |
 | `placeholder` | `string` | — | — |
-| `direction` | `string` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `ltr`, `rtl` |
+| `direction` | `string` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `ltr`, `rtl`, `auto` |
 
 ## Supports
 
@@ -47,6 +47,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
+  - [`direction`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-direction): `true`
   - `textColumns`: `true`
   - `textIndent`: `true`
   - [`textShadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textshadow): `true`

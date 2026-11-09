@@ -1098,6 +1098,7 @@ supports: {
 -   Type: `Object`
 -   Default value: `null`
 -   Subproperties:
+    -   `direction`: type `boolean`, default value `false`
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
     -   `textAlign`: type `boolean` or `array`, default value `false`
@@ -1115,6 +1116,33 @@ supports: {
         // Enable support and UI control for text alignment.
         textAlign: true,
     },
+}
+```
+
+### typography.direction
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports setting its text direction. When it does, the block editor will show a UI control in the Typography panel for the user to choose left to right, right to left, or automatic direction, in both left-to-right and right-to-left locales. The choice is applied to the block's wrapper as the HTML `dir` attribute (`ltr`, `rtl`, or `auto`). When no direction is chosen, the block inherits the direction of its surroundings.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for text direction.
+        direction: true,
+    },
+}
+```
+
+When the block declares support for `direction`, the attributes definition is extended to include a new attribute `direction` of `string` type with no default assigned, accepting `ltr`, `rtl`, or `auto`. Unlike most typography supports, the value is not stored in the `style` attribute, because it is an HTML attribute and not a CSS property, so it can't vary between style states such as hover or a viewport. The block can define its own `direction` attribute, for example to offer fewer values; the control then only shows the values it accepts. For example:
+
+```js
+attributes: {
+    direction: {
+        type: 'string',
+        enum: [ 'ltr', 'rtl' ],
+    }
 }
 ```
 

@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "שלום עולם",
+			"level": 2,
+			"direction": "auto"
+		},
+		"innerBlocks": []
+	}
+]

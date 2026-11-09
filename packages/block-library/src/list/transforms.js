@@ -26,7 +26,13 @@ function getListContentSchema( { phrasingContentSchema } ) {
 function getListContentFlat( blocks ) {
 	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
 		if ( name === 'core/list-item' ) {
-			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+			return [
+				{
+					content: attributes.content,
+					direction: attributes.direction,
+				},
+				...getListContentFlat( innerBlocks ),
+			];
 		}
 		return getListContentFlat( innerBlocks );
 	} );
@@ -41,9 +47,14 @@ const transforms = {
 			transform: ( blockAttributes ) => {
 				let childBlocks = [];
 				if ( blockAttributes.length > 1 ) {
-					childBlocks = blockAttributes.map( ( { content } ) => {
-						return createBlock( 'core/list-item', { content } );
-					} );
+					childBlocks = blockAttributes.map(
+						( { content, direction } ) => {
+							return createBlock( 'core/list-item', {
+								content,
+								direction,
+							} );
+						}
+					);
 				} else if ( blockAttributes.length === 1 ) {
 					const value = create( {
 						html: blockAttributes[ 0 ].content,
@@ -51,6 +62,7 @@ const transforms = {
 					childBlocks = split( value, '\n' ).map( ( result ) => {
 						return createBlock( 'core/list-item', {
 							content: toHTMLString( { value: result } ),
+							direction: blockAttributes[ 0 ].direction,
 						} );
 					} );
 				}
@@ -100,10 +112,12 @@ const transforms = {
 			type: 'block',
 			blocks: [ block ],
 			transform: ( _attributes, childBlocks ) => {
-				return getListContentFlat( childBlocks ).map( ( content ) =>
-					createBlock( block, {
-						content,
-					} )
+				return getListContentFlat( childBlocks ).map(
+					( { content, direction } ) =>
+						createBlock( block, {
+							content,
+							direction,
+						} )
 				);
 			},
 		} ) ),

@@ -1108,6 +1108,14 @@ export interface TypographyProps {
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign
 	 */
 	textAlign: boolean | Array< 'left' | 'center' | 'right' >;
+
+	/**
+	 * This value signals that a block supports setting its text direction
+	 * through the `dir` HTML attribute.
+	 *
+	 * (default) false
+	 */
+	direction: boolean;
 }
 
 /**
