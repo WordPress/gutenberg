@@ -277,6 +277,45 @@ describe( 'InlineNotices', () => {
 			}
 		);
 
+		it.each( [
+			[ 'added', undefined, 'Technical details.' ],
+			[ 'removed', 'Technical details.', undefined ],
+		] )(
+			'announces an identical replacement once when details are %s',
+			async ( _, previousDetails, details ) => {
+				const registry = createRegistry();
+				registry.register( noticesStore );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+						details: previousDetails,
+					} );
+				render(
+					<RegistryProvider value={ registry }>
+						<InlineNotices />
+					</RegistryProvider>
+				);
+				expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+
+				await act( async () => {
+					registry
+						.dispatch( noticesStore )
+						.createNotice( 'error', 'Updating failed.', {
+							id: 'editor-save',
+							details,
+						} );
+				} );
+
+				expect( speak ).toHaveBeenCalledExactlyOnceWith(
+					'Updating failed.',
+					'assertive'
+				);
+				// The list must not also announce a replacement with an unchanged message.
+				expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+			}
+		);
+
 		it( 'keeps a replacement created with speak:false silent', async () => {
 			const { registry } = renderInlineNotices();
 			await act( async () => {

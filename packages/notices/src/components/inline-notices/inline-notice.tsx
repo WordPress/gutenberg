@@ -188,10 +188,8 @@ export default function InlineNotice( {
 		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
 	} satisfies ComponentProps< typeof Notice.Root >;
 
-	if ( ! details ) {
-		return <Notice.Root { ...rootProps }>{ children }</Notice.Root>;
-	}
-
+	// Keep the root mounted when details change so the list does not also
+	// announce an identical replacement as a newly added notice.
 	return (
 		<Collapsible.Root
 			open={ isOpen }
