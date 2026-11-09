@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
@@ -18,6 +19,10 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 
 ## 16.1.0 (2026-11-04)
 
