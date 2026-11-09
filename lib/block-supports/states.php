@@ -519,7 +519,7 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 				$group['style'],
 				$rules_group,
 				$base_style,
-				$block_type->name ?? null
+				$block_type->name
 			);
 		}
 	}
