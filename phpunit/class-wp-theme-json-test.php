@@ -1884,6 +1884,95 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_breakpoint_pseudo_state_reads_the_default_pseudo_state_clip() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							':hover'  => array(
+								'background' => array(
+									'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+									'backgroundClip' => 'text',
+								),
+							),
+							'@mobile' => array(
+								':hover' => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_breakpoint_pseudo_state_reads_the_variation_pseudo_state_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							'variations' => array(
+								'flashy' => array(
+									':hover'  => array(
+										'background' => array(
+											'gradient' => 'linear-gradient(135deg,#ff0000,#0000ff)',
+											'backgroundClip' => 'text',
+										),
+									),
+									'@mobile' => array(
+										':hover' => array( 'color' => array( 'text' => '#00ff00' ) ),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button' ),
+				'selector'   => '.wp-block-button',
+				'css'        => '.wp-block-button',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$actual_styles
+		);
+	}
+
 	public function test_get_stylesheet_omits_tablet_styles_when_its_breakpoint_is_not_larger_than_mobile() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
