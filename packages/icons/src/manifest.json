@@ -68,8 +68,6 @@
 		"slug": "archive",
 		"label": "Archive",
 		"filePath": "library/archive.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-archive" ],
 		"keywords": [ "folder" ]
 	},
 	{
@@ -320,49 +318,54 @@
 		"label": "Chevron Down",
 		"filePath": "library/chevron-down.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-down-alt2" ]
+		"dashicons": [ "dashicons-arrow-down-alt2", "dashicons-arrow-down" ]
 	},
 	{
 		"slug": "chevron-down-small",
 		"label": "Chevron Down Small",
 		"filePath": "library/chevron-down-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-down" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-left",
 		"label": "Chevron Left",
 		"filePath": "library/chevron-left.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-admin-collapse", "dashicons-arrow-left-alt2" ]
+		"dashicons": [
+			"dashicons-admin-collapse",
+			"dashicons-arrow-left-alt2",
+			"dashicons-arrow-left"
+		]
 	},
 	{
 		"slug": "chevron-left-small",
 		"label": "Chevron Left Small",
 		"filePath": "library/chevron-left-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-left" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-right",
 		"label": "Chevron Right",
 		"filePath": "library/chevron-right.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-right-alt2" ]
+		"dashicons": [ "dashicons-arrow-right-alt2", "dashicons-arrow-right" ]
 	},
 	{
 		"slug": "chevron-right-small",
 		"label": "Chevron Right Small",
 		"filePath": "library/chevron-right-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-right" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-up",
 		"label": "Chevron Up",
 		"filePath": "library/chevron-up.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-up-alt2" ]
+		"dashicons": [
+			"dashicons-arrow-up-alt2",
+			"dashicons-arrow-up",
+			"dashicons-arrow-up-duplicate"
+		]
 	},
 	{
 		"slug": "chevron-up-down",
@@ -375,8 +378,7 @@
 		"slug": "chevron-up-small",
 		"label": "Chevron Up Small",
 		"filePath": "library/chevron-up-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-up", "dashicons-arrow-up-duplicate" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "classic",
@@ -819,23 +821,12 @@
 	{
 		"slug": "fullscreen",
 		"label": "Fullscreen",
-		"filePath": "library/fullscreen.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [
-			"dashicons-fullscreen-alt",
-			"dashicons-editor-expand",
-			"dashicons-editor-distractionfree"
-		]
+		"filePath": "library/fullscreen.svg"
 	},
 	{
 		"slug": "fullscreen-exit",
 		"label": "Fullscreen Exit",
-		"filePath": "library/fullscreen-exit.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [
-			"dashicons-fullscreen-exit-alt",
-			"dashicons-editor-contract"
-		]
+		"filePath": "library/fullscreen-exit.svg"
 	},
 	{
 		"slug": "funnel",
@@ -1147,9 +1138,7 @@
 	{
 		"slug": "list-view",
 		"label": "List View",
-		"filePath": "library/list-view.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-list-view" ]
+		"filePath": "library/list-view.svg"
 	},
 	{
 		"slug": "lock",
@@ -1662,8 +1651,6 @@
 		"slug": "seen",
 		"label": "Seen",
 		"filePath": "library/seen.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-visibility" ],
 		"keywords": [ "eye", "show", "visible" ]
 	},
 	{
@@ -1989,9 +1976,7 @@
 	{
 		"slug": "text-color",
 		"label": "Text Color",
-		"filePath": "library/text-color.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-editor-textcolor" ]
+		"filePath": "library/text-color.svg"
 	},
 	{
 		"slug": "text-horizontal",
@@ -2094,8 +2079,6 @@
 		"slug": "unseen",
 		"label": "Unseen",
 		"filePath": "library/unseen.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-hidden" ],
 		"keywords": [ "eye", "hide", "hidden" ]
 	},
 	{
@@ -2144,6 +2127,6 @@
 		"label": "WordPress",
 		"filePath": "library/wordpress.svg",
 		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-wordpress", "dashicons-wordpress-alt" ]
+		"dashicons": [ "dashicons-wordpress" ]
 	}
 ]

@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   `manifest.json`: Map 114 more Dashicons to `core-admin` icons. To do so, add 80 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `formatBold` and `undo`, and add `chevronUpDown` and `file` from the `core` collection to the `core-admin` collection too ([#86466](https://github.com/WordPress/gutenberg/pull/86466)).
+-   `manifest.json`: Map 102 more Dashicons to `core-admin` icons. To do so, add 73 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `formatBold` and `undo`, and add `chevronUpDown` from the `core` collection to the `core-admin` collection too. Remove `chevronUpSmall`, `chevronDownSmall`, `chevronLeftSmall` and `chevronRightSmall` from the `core-admin` collection, and map `dashicons-arrow-up`, `dashicons-arrow-down`, `dashicons-arrow-left` and `dashicons-arrow-right` to `chevronUp`, `chevronDown`, `chevronLeft` and `chevronRight` instead ([#86466](https://github.com/WordPress/gutenberg/pull/86466)).
 -   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `wordCount`: redraw the number sign to match `postCommentsCount` ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
