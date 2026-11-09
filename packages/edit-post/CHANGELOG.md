@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Meta Boxes: Name the panel with the `meta_boxes` label of the post type when it has one, so plugins can replace "Meta Boxes" with a name such as "Event Details" ([#86522](https://github.com/WordPress/gutenberg/pull/86522)).
+
 ## 9.1.0 (2026-11-04)
 
 ### Enhancements
