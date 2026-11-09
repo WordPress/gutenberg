@@ -8,8 +8,19 @@ $panelPadding: $grid-unit-20;
 
 .format-library__inline-color-popover {
 
-	[role="tabpanel"] {
+	.components-popover__content {
 		padding: $panelPadding;
 		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
 	}
+}
+
+// Give the color indicator the 24px footprint of the icon it replaces so the
+// menu item text lines up with the other items.
+.format-library-text-color-indicator {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
 }
