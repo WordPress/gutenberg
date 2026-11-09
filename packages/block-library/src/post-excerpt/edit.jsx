@@ -117,11 +117,7 @@ export default function PostExcerptEditor( props ) {
 	);
 	const record = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			),
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
 	);
 
@@ -129,8 +125,7 @@ export default function PostExcerptEditor( props ) {
 	 * While a revision or a browser backup is displayed, `useEntityProp` reads
 	 * the excerpt from it instead of from the stored post.
 	 */
-	const isShowingRevision =
-		!! fullExcerpt && fullExcerpt !== record?.excerpt;
+	const isShowingRevision = !! fullExcerpt && fullExcerpt !== record?.excerpt;
 
 	/*
 	 * `excerpt_length` only changes the response for posts without a stored
