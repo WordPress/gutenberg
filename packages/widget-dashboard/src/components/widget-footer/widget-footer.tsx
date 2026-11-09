@@ -56,11 +56,9 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 							<HostLink
 								href={ action.href }
 								download={ action.download }
-								{ ...( action.openInNewTab
-									? {
-											target: '_blank',
-										}
-									: {} ) }
+								target={
+									action.openInNewTab ? '_blank' : undefined
+								}
 							/>
 						}
 					/>
