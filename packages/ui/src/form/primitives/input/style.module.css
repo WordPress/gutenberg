@@ -70,6 +70,15 @@
 			@media (min-width: 600px) {
 				font-size: var(--wpds-typography-font-size-md);
 			}
+
+			/* Keep the text at full contrast, since read-only values are still meant to be read. */
+			&:has(> .input[readonly]) {
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					border-color: GrayText;
+				}
+			}
 		}
 	}
 }

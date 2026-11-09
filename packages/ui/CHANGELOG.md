@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast.
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 
 ## 0.26.0 (2026-11-04)

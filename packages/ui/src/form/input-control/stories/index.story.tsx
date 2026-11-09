@@ -168,3 +168,11 @@ export const Disabled: Story = {
 		disabled: true,
 	},
 };
+
+export const ReadOnly: Story = {
+	args: {
+		...Default.args,
+		defaultValue: 'Read-only value',
+		readOnly: true,
+	},
+};
