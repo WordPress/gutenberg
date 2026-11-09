@@ -13,11 +13,13 @@ export type OnResolved = (
 
 export type RunCommand = ( command: Command, close: () => void ) => void;
 
-export interface CommandGroup {
+// A type alias rather than an interface, so that it satisfies the index
+// signature of the `Group` type that `Autocomplete.Root` accepts.
+export type CommandGroup = {
 	key: string;
 	label: string;
 	items: Command[];
-}
+};
 
 export interface CommandItemProps {
 	command: Command;

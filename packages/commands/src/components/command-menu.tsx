@@ -1,4 +1,4 @@
-import { Autocomplete, Input, InputLayout, Stack } from '@wordpress/ui';
+import { Autocomplete, Icon, Input, InputLayout, Stack } from '@wordpress/ui';
 import type { JSX } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -17,7 +17,7 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
-import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
+import { search as inputIcon, arrowRight } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -376,8 +376,9 @@ function CommandPalette( { onClose }: { onClose: () => void } ) {
 		>
 			<div className="commands-command-menu__container">
 				<Autocomplete.Root
-					items={ groups }
-					mode="none"
+					items={ allCommands }
+					filteredItems={ groups }
+					mode="list"
 					value={ search }
 					onValueChange={ setSearch }
 					open
