@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `isClientSideProcessable()` to tell whether client-side media processing can process a file, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats.
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

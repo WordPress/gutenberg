@@ -1,4 +1,7 @@
-import { HEIC_MIME_TYPES } from './store/constants';
+import {
+	CLIENT_SIDE_SUPPORTED_MIME_TYPES,
+	HEIC_MIME_TYPES,
+} from './store/constants';
 
 /**
  * Converts a Blob to a File with a default name like "image.png".
@@ -270,4 +273,32 @@ export async function isHeicFile( file: File ): Promise< boolean > {
 		// An unreadable file is left to the upload itself to report.
 		return false;
 	}
+}
+
+/**
+ * Whether client-side media processing can process a file.
+ *
+ * Accepts any object with a name and type, such as a plupload file, so
+ * callers outside the store can decide which files to route to it. HEIC
+ * and HEIF are also matched by extension, since a browser without a HEIC
+ * codec may give them no type.
+ *
+ * @param file      File, or an object describing one.
+ * @param file.name File name.
+ * @param file.type MIME type.
+ * @return Whether the file can be processed client-side.
+ */
+export function isClientSideProcessable( file: {
+	name?: string;
+	type?: string;
+} ): boolean {
+	const type = ( file.type || '' ).toLowerCase();
+	if (
+		CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( type ) ||
+		HEIC_MIME_TYPES.includes( type )
+	) {
+		return true;
+	}
+
+	return /\.hei[cf]$/i.test( file.name || '' );
 }
