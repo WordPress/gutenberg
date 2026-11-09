@@ -63,7 +63,7 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			bgFill1: '#0090ff',
 			bgFill2: '#007fec',
-			fgFill: '#0f1317',
+			fgFill: '#101419',
 			surface2: '#f3f9ff',
 			surface6: '#bbd4f1',
 			surface5: '#d2e3f7',

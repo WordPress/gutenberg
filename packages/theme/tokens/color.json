@@ -183,8 +183,8 @@
 				"fgFill": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.059, 0.075, 0.09 ],
-						"hex": "#0f1317"
+						"components": [ 0.063, 0.078, 0.098 ],
+						"hex": "#101419"
 					}
 				},
 				"surface2": {

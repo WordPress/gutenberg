@@ -99,9 +99,9 @@ describe( 'collectThemeProviderColorWarnings', () => {
 				backgroundToken: 'background.surface.neutral-strong',
 				backgroundColor: '#252525',
 				foregroundToken: 'background.interactive.brand-strong',
-				foregroundColor: '#0d745c',
+				foregroundColor: '#0f755d',
 				requiredContrast: 3,
-				achievedContrast: expect.closeTo( 2.6786, 4 ),
+				achievedContrast: expect.closeTo( 2.7173, 4 ),
 			},
 		] );
 	} );

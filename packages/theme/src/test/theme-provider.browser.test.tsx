@@ -136,9 +136,9 @@ describe( 'ThemeProvider', () => {
 					backgroundColor: '#563c79',
 					foregroundToken:
 						'background.interactive.brand-strong-active',
-					foregroundColor: '#6f9028',
+					foregroundColor: '#6e8f27',
 					requiredContrast: 3,
-					achievedContrast: expect.closeTo( 2.4571, 4 ),
+					achievedContrast: expect.closeTo( 2.4249, 4 ),
 				},
 			] )
 		);
