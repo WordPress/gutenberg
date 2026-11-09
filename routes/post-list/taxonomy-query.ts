@@ -23,7 +23,7 @@ type QueryTaxonomy = {
  * REST API's `include_children` defaults to false. A filter with no terms
  * leaves the query alone.
  *
- * The media upload modal in @wordpress/media-utils has a copy of this
+ * The media upload modal in `@wordpress/media-utils` has a copy of this
  * function, so change both together.
  *
  * @param filters    The view's filters.
