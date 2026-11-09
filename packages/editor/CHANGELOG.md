@@ -19,6 +19,10 @@
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
 
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+
 ## 16.1.0 (2026-11-04)
 
 ### New Features
