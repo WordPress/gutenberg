@@ -37,6 +37,7 @@
 				}
 
 				@media ( forced-colors: active ) {
+					--_gcd-input-color-disabled: GrayText;
 					color: GrayText;
 				}
 			}
