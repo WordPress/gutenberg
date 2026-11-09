@@ -1141,24 +1141,27 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
-		const startTime = performance.now();
-
-		// Check each generated sub-size against the upload limit before sideloading.
 		// If the resized file exceeds maxUploadFileSize, cancel with a user-facing error
-		// instead of silently dropping it on the server.
 		const maxUploadFileSize = select.getSettings().maxUploadFileSize;
 		if ( maxUploadFileSize && item.file.size > maxUploadFileSize ) {
-			dispatch.cancelItem( id, new UploadError( {
-				code: ErrorCode.SIZE_ABOVE_LIMIT,
-				message: sprintf(
-					// translators: %s: file name.
-					__( '%s: This file exceeds the maximum upload size for this site.' ),
-					item.file.name
-				),
-				file: item.file,
-			} ) );
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.SIZE_ABOVE_LIMIT,
+					message: sprintf(
+						// translators: %s: file name.
+						__(
+							'%s: This file exceeds the maximum upload size for this site.'
+						),
+						item.file.name
+					),
+					file: item.file,
+				} )
+			);
 			return;
 		}
+
+		const startTime = performance.now();
 
 		mediaSideload( {
 			file: item.file,
