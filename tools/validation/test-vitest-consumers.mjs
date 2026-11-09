@@ -31,6 +31,9 @@ const root = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
+const repositoryPackage = JSON.parse(
+	readFileSync( path.join( root, 'package.json' ), 'utf8' )
+);
 const directory = mkdtempSync( path.join( tmpdir(), 'wp-vitest-consumer-' ) );
 const consumer = path.join( directory, 'consumer' );
 mkdirSync( consumer );
@@ -131,6 +134,24 @@ function pack( name ) {
 	const packed = readNpmPackResult( stdout, manifest.name );
 	return `file:${ path.join( directory, packed.filename ) }`;
 }
+// Keep this check dependency-free: CI does not install repository dependencies.
+const npmVersion = execute( 'npm', [ '--version' ], consumer ).stdout.trim();
+const requiredNpmVersion = repositoryPackage.engines.npm;
+assert.match( requiredNpmVersion, /^>=\d+\.\d+\.\d+$/ );
+assert.match( npmVersion, /^\d+\.\d+\.\d+$/ );
+const minimumNpmVersion = requiredNpmVersion
+	.slice( 2 )
+	.split( '.' )
+	.map( Number );
+const npmComparison =
+	npmVersion
+		.split( '.' )
+		.map( ( part, index ) => Number( part ) - minimumNpmVersion[ index ] )
+		.find( ( difference ) => difference !== 0 ) ?? 0;
+assert.ok(
+	npmComparison >= 0,
+	`Vitest consumers require npm ${ requiredNpmVersion }; found ${ npmVersion }. Upgrade npm before running this check.`
+);
 const scripts = values.scripts ?? pack( 'scripts' );
 const eslintPlugin = values[ 'eslint-plugin' ] ?? pack( 'eslint-plugin' );
 write(
@@ -139,9 +160,7 @@ write(
 		name: 'wp-vitest-consumer',
 		private: true,
 		type: 'module',
-		allowScripts: JSON.parse(
-			readFileSync( path.join( root, 'package.json' ), 'utf8' )
-		).allowScripts,
+		allowScripts: repositoryPackage.allowScripts,
 		devDependencies: {
 			'@wordpress/scripts': scripts,
 			'@wordpress/eslint-plugin': eslintPlugin,

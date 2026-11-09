@@ -12,6 +12,7 @@ on:
             - '.npmrc'
             - 'package.json'
             - 'package-lock.json'
+            - '.github/setup-npm/**'
             - '.github/workflows/vitest-consumers.yml'
     workflow_dispatch:
 
@@ -47,6 +48,8 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
                   package-manager-cache: false
+            - name: Set up npm
+              uses: ./.github/setup-npm
             - name: Test isolated public tooling
               env:
                   VITE_VERSION: ${{ matrix.vite }}
