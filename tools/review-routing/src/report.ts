@@ -40,9 +40,9 @@ export function renderReport(
 ): string {
 	const rows = decisions.map(
 		( { rule, probability, requestReview } ) =>
-			// Team names are in code format, so that a new comment does not
-			// notify the team. The review request is what notifies.
-			`| ${ rule.id } | \`${ rule.team }\` | ${ probability.toFixed(
+			// Reviewers are in code format, so that a new comment does not
+			// notify them. The review request is what notifies.
+			`| ${ rule.id } | \`${ rule.reviewer }\` | ${ probability.toFixed(
 				2
 			) } | ${ rule.threshold.toFixed( 2 ) } | ${
 				requestReview ? 'Request review' : 'No request'
@@ -52,7 +52,7 @@ export function renderReport(
 	const tokens = Math.round( stats.characters / 4 ).toLocaleString( 'en' );
 
 	return [
-		'| Rule | Team | Probability | Threshold | Decision |',
+		'| Rule | Reviewer | Probability | Threshold | Decision |',
 		'| --- | --- | --- | --- | --- |',
 		...rows,
 		'',

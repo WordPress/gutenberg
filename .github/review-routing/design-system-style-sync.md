@@ -1,5 +1,5 @@
 ---
-team: WordPress/gutenberg-components
+reviewer: WordPress/gutenberg-components
 threshold: 0.8
 ---
 
