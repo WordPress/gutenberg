@@ -11,10 +11,6 @@ vi.mock( import( '../../hooks' ), () => ( {
 	useStyle: vi.fn(),
 } ) );
 
-vi.mock( import( '@wordpress/components' ), () => ( {
-	__experimentalItemGroup: vi.fn( ( { children } ) => children ),
-} ) );
-
 describe( 'useBlockVariations', () => {
 	const mockUseStyle = vi.mocked( useStyle );
 	let registry;
