@@ -59,7 +59,6 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 								{ ...( action.openInNewTab
 									? {
 											target: '_blank',
-											rel: 'noopener noreferrer',
 										}
 									: {} ) }
 							/>
