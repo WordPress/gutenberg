@@ -29,6 +29,7 @@ jobs:
         name: Detect changes relevant to E2E tests
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         permissions:
             pull-requests: read
         outputs:
@@ -326,7 +327,7 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        if: ${{ ! cancelled() && ( ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) ) }}
         needs:
             [
                 detect-relevant-changes,
