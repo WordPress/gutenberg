@@ -131,7 +131,9 @@
 		) {
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
 			color: var(--wpds-color-foreground-interactive-brand-active);
-			background-color: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			&:not(.is-busy) {
+				background-color: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			}
 		}
 
 		&:focus:not(:active, .is-destructive) {
@@ -157,7 +159,9 @@
 			[aria-disabled="true"],
 			.is-pressed
 		) {
-			background-color: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			&:not(.is-busy) {
+				background-color: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
+			}
 			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 
@@ -266,7 +270,9 @@
 
 			&:is(:hover, :active):not(:disabled, [aria-disabled="true"], .is-pressed) {
 				color: var(--wpds-color-foreground-interactive-error-active);
-				background-color: var(--wpds-color-background-interactive-error-weak-active);
+				&:not(.is-busy) {
+					background-color: var(--wpds-color-background-interactive-error-weak-active);
+				}
 			}
 
 			&:is(:disabled, [aria-disabled="true"]) {

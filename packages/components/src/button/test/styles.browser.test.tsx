@@ -14,11 +14,25 @@ import Button from '..';
 import ButtonGroup from '../../button-group';
 import { Toolbar, ToolbarButton } from '../../toolbar';
 
-function pixels( color: string ) {
+function pixels( color: string, background?: string ) {
 	const context = document.createElement( 'canvas' ).getContext( '2d' )!;
+	if ( background ) {
+		context.fillStyle = background;
+		context.fillRect( 0, 0, 1, 1 );
+	}
 	context.fillStyle = color;
 	context.fillRect( 0, 0, 1, 1 );
 	return Array.from( context.getImageData( 0, 0, 1, 1 ).data );
+}
+
+function expectVisibleStripes(
+	style: Pick< CSSStyleDeclaration, 'backgroundImage' | 'backgroundColor' >
+) {
+	const colors = style.backgroundImage.match( /(?:rgba?|color)\([^()]+\)/g );
+	expect( colors ).toHaveLength( 4 );
+	expect( pixels( colors![ 0 ], style.backgroundColor ) ).not.toEqual(
+		pixels( colors![ 1 ], style.backgroundColor )
+	);
 }
 
 function contrast( foreground: string, background: string, surface: string ) {
@@ -63,23 +77,34 @@ describe( 'Button styles', () => {
 	] as const )(
 		'keeps busy stripes during pointer and Space activation for %s, destructive %s',
 		async ( variant, isDestructive ) => {
-			let mouseDownImage: string | undefined;
+			let mouseDownStyle:
+				| Pick<
+						CSSStyleDeclaration,
+						'backgroundImage' | 'backgroundColor'
+				  >
+				| undefined;
 			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					isDestructive={ isDestructive }
-					isBusy
-					onMouseDown={ (
-						event: MouseEvent< HTMLButtonElement >
-					) => {
-						mouseDownImage = getComputedStyle(
-							event.currentTarget
-						).backgroundImage;
-					} }
-				>
-					Saving
-				</Button>
+				<ThemeProvider color={ { background: '#1e1e1e' } }>
+					<Button
+						__next40pxDefaultSize
+						variant={ variant }
+						isDestructive={ isDestructive }
+						isBusy
+						onMouseDown={ (
+							event: MouseEvent< HTMLButtonElement >
+						) => {
+							const style = getComputedStyle(
+								event.currentTarget
+							);
+							mouseDownStyle = {
+								backgroundImage: style.backgroundImage,
+								backgroundColor: style.backgroundColor,
+							};
+						} }
+					>
+						Saving
+					</Button>
+				</ThemeProvider>
 			);
 			const button = screen.getByRole( 'button', { name: 'Saving' } );
 			await userEvent.unhover( button );
@@ -89,14 +114,17 @@ describe( 'Button styles', () => {
 			expect( getComputedStyle( button ).backgroundImage ).toBe(
 				stripes
 			);
+			expectVisibleStripes( getComputedStyle( button ) );
 			await userEvent.click( button );
-			expect( mouseDownImage ).toBe( stripes );
+			expect( mouseDownStyle!.backgroundImage ).toBe( stripes );
+			expectVisibleStripes( mouseDownStyle! );
 			await userEvent.unhover( button );
 			await userEvent.keyboard( '[Space>]' );
 			expect( button.matches( ':active' ) ).toBe( true );
 			expect( getComputedStyle( button ).backgroundImage ).toBe(
 				stripes
 			);
+			expectVisibleStripes( getComputedStyle( button ) );
 			await userEvent.keyboard( '[/Space]' );
 		}
 	);
