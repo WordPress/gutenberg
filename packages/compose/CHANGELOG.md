@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   `useCopyToClipboard`: Add an optional `onError` callback for a failed copy ([#85269](https://github.com/WordPress/gutenberg/pull/85269)).
@@ -11,6 +13,7 @@
 -   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
 -   `useMergeRefs`: Accept disabled refs and object refs that start `undefined` ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 -   `useDebounce`: Accept partial options ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
+-   `useDropZone`: Call `onDragEnd` for drags that reach the document with a `dragover` but no `dragenter`, which browsers can skip in an iframe ([#85412](https://github.com/WordPress/gutenberg/pull/85412)).
 
 ## 9.0.0 (2026-10-20)
 
