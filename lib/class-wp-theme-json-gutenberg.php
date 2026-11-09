@@ -3524,9 +3524,9 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		$block_options = $options;
+		$block_options                                     = $options;
 		$block_options['include_block_style_variations'] ??= true;
-		$block_nodes = self::get_block_nodes( $theme_json, $selectors, $block_options );
+		$block_nodes                                       = self::get_block_nodes( $theme_json, $selectors, $block_options );
 		foreach ( $block_nodes as $block_node ) {
 			$nodes[] = $block_node;
 		}
