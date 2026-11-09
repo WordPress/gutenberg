@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
-const STORYBOOK_PORT = '50241';
+const STORYBOOK_PORT = process.env.STORYBOOK_PORT || '50241';
 
 type Decorators = {
 	css?: 'none' | 'basic' | 'wordpress';

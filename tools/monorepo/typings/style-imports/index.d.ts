@@ -10,3 +10,8 @@ declare module '*.module.scss' {
 
 declare module '*.css';
 declare module '*.scss';
+
+declare module '*.scss?inline' {
+	const css: string;
+	export default css;
+}

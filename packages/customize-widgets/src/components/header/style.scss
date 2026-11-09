@@ -52,6 +52,18 @@
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
+		// The toolbar fill is hidden here, so paint the system colors on the button.
+		@media ( forced-colors: active ) {
+			&.is-pressed {
+				background: SelectedItem !important;
+
+				&:disabled,
+				&[aria-disabled="true"] {
+					background: GrayText !important;
+				}
+			}
+		}
+
 		&:focus:not(:active) {
 			@include outset-ring__focus();
 		}

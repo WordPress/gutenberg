@@ -20,6 +20,7 @@ export default {
 		},
 	},
 	stories: [
+		'../../../packages/editor/src/components/document-tools/stories/e2e/*.story.tsx',
 		'../../../packages/components/src/**/stories/e2e/*.story.@(tsx|mdx)',
 		'../../../packages/ui/src/**/stories/e2e/*.story.@(ts|tsx|mts|cts|mdx)',
 	],
