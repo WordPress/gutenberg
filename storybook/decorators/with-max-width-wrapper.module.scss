@@ -2,12 +2,14 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	box-sizing: border-box;
 	height: 32px;
-	background: #e0e0e0;
+	/* Muted label: weak content on a neutral surface, so it follows the selected theme. */
+	background: var(--wpds-color-background-surface-neutral);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	/* Meets the 4.5:1 text contrast ratio on the background above. */
-	color: #5a5a5a;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-top: 24px;
 }
