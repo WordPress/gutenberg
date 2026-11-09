@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
+
 ### Bug Fixes
 
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
