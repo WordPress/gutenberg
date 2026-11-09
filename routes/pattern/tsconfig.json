@@ -9,7 +9,7 @@
 		"composite": false,
 		"types": []
 	},
-	"references": [ { "path": "../../packages/route" } ],
+	"references": [ { "path": "../../packages/route/tsconfig.build.json" } ],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]
 }

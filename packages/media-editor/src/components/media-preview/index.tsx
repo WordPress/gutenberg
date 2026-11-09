@@ -15,7 +15,7 @@ export interface MediaPreviewProps {
  * Props for MediaPreviewContent component.
  */
 interface MediaPreviewContentProps {
-	mediaType: { type: string };
+	previewType: string;
 	mediaUrl: string;
 	altText?: string;
 	displayTitle?: string;
@@ -25,8 +25,36 @@ interface MediaPreviewContentProps {
 	loadingState: 'loading' | 'loaded' | 'error';
 }
 
+interface MediaPreviewFileInfoProps {
+	mediaUrl: string;
+	displayTitle?: string;
+	mimeType?: string;
+}
+
+function MediaPreviewFileInfo( {
+	mediaUrl,
+	displayTitle,
+	mimeType,
+}: MediaPreviewFileInfoProps ) {
+	return (
+		<div className="media-editor-preview__file-info">
+			<p className="media-editor-preview__file-name">{ displayTitle }</p>
+			<p className="media-editor-preview__mime-type">{ mimeType }</p>
+			{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
+			<a
+				href={ mediaUrl }
+				target="_blank"
+				rel="noopener"
+				className="media-editor-preview__download-link"
+			>
+				{ __( 'View file' ) }
+			</a>
+		</div>
+	);
+}
+
 function MediaPreviewContent( {
-	mediaType,
+	previewType,
 	mediaUrl,
 	altText,
 	displayTitle,
@@ -35,7 +63,7 @@ function MediaPreviewContent( {
 	onError,
 	loadingState,
 }: MediaPreviewContentProps ) {
-	switch ( mediaType.type ) {
+	switch ( previewType ) {
 		case 'image':
 			return (
 				<img
@@ -58,25 +86,33 @@ function MediaPreviewContent( {
 					{ displayTitle }
 				</audio>
 			);
+		case 'pdf':
+			// The browser renders the children instead of the PDF when it
+			// can't display it, e.g. when the request fails.
+			return (
+				<object
+					className="media-editor-preview__pdf"
+					// Ask the viewer to fit the whole page rather than the
+					// width. Chrome reads `view`, Firefox reads `zoom`, and
+					// Safari ignores both.
+					data={ `${ mediaUrl }#view=Fit&zoom=page-fit` }
+					type="application/pdf"
+					aria-label={ __( 'Embed of the selected PDF file.' ) }
+				>
+					<MediaPreviewFileInfo
+						mediaUrl={ mediaUrl }
+						displayTitle={ displayTitle }
+						mimeType={ mimeType }
+					/>
+				</object>
+			);
 		default:
 			return (
-				<div className="media-editor-preview__file-info">
-					<p className="media-editor-preview__file-name">
-						{ displayTitle }
-					</p>
-					<p className="media-editor-preview__mime-type">
-						{ mimeType }
-					</p>
-					{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
-					<a
-						href={ mediaUrl }
-						target="_blank"
-						rel="noopener"
-						className="media-editor-preview__download-link"
-					>
-						{ __( 'View file' ) }
-					</a>
-				</div>
+				<MediaPreviewFileInfo
+					mediaUrl={ mediaUrl }
+					displayTitle={ displayTitle }
+					mimeType={ mimeType }
+				/>
 			);
 	}
 }
@@ -103,6 +139,13 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 
 	const mediaType = getMediaTypeFromMimeType( mimeType );
 
+	// Without a built-in PDF viewer (e.g. on most mobile browsers), show
+	// the file info instead of an embed that can't render.
+	const previewType =
+		mimeType === 'application/pdf' && window.navigator.pdfViewerEnabled
+			? 'pdf'
+			: mediaType.type;
+
 	if ( ! mediaUrl ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--empty">
@@ -126,15 +169,15 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	return (
 		<div
 			{ ...props }
-			className={ `media-editor-preview media-editor-preview--${ mediaType.type }` }
+			className={ `media-editor-preview media-editor-preview--${ previewType }` }
 		>
-			{ mediaType.type === 'image' && loadingState === 'loading' && (
+			{ previewType === 'image' && loadingState === 'loading' && (
 				<div className="media-editor-preview__spinner">
 					<WCSpinner />
 				</div>
 			) }
 			<MediaPreviewContent
-				mediaType={ mediaType }
+				previewType={ previewType }
 				mediaUrl={ mediaUrl }
 				altText={ altText }
 				displayTitle={ displayTitle }

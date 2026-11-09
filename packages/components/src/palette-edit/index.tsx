@@ -241,19 +241,25 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 export function deduplicateElementSlugs< T extends PaletteElement >(
 	elements: T[]
 ) {
-	const slugCounts: { [ slug: string ]: number } = {};
+	// Reserve every existing slug so a duplicate cannot take a later item's ID.
+	const usedSlugs = new Set( elements.map( ( { slug } ) => slug ) );
+	const nextSuffixes = new Map< string, number >();
 
 	return elements.map( ( element ) => {
-		let newSlug: string | undefined;
-
 		const { slug } = element;
-		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+		let newSlug = slug;
+		let suffix = nextSuffixes.get( slug ) ?? 1;
 
-		if ( slugCounts[ slug ] > 1 ) {
-			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		if ( nextSuffixes.has( slug ) ) {
+			do {
+				newSlug = `${ slug }-${ suffix }`;
+				suffix++;
+			} while ( usedSlugs.has( newSlug ) );
+			usedSlugs.add( newSlug );
 		}
+		nextSuffixes.set( slug, suffix );
 
-		return { ...element, slug: newSlug ?? slug };
+		return { ...element, slug: newSlug };
 	} );
 }
 

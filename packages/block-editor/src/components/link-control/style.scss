@@ -158,12 +158,11 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.components-menu-item__shortcut {
-		color: $gray-700;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
-	&[aria-selected] {
-		background: $gray-100;
+	&:not(:focus, [aria-selected="true"]) .components-menu-item__shortcut {
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }
 
