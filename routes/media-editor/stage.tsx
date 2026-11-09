@@ -192,9 +192,6 @@ function MediaEditorRoute() {
 	// True only when the router added the previous history entry, so going
 	// back stays in the app.
 	const canGoBack = useCanGoBack();
-	// Goes back to where the user came from, as long as that is in this
-	// wp-admin, or else to the media list. `replace` keeps the editor's URL
-	// out of the history when there's no going back to it.
 	const navigateBack = useCallback(
 		( { replace = false }: { replace?: boolean } = {} ) => {
 			if ( canGoBack ) {

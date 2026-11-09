@@ -372,7 +372,7 @@ function MoreMenu( { actions = [], item }: MoreMenuProps ) {
 	const [ activeModalAction, setActiveModalAction ] =
 		useState< ActionModal< Media > | null >( null );
 
-	const items = useMemo( () => ( item ? [ item ] : [] ), [ item ] );
+	const items = item ? [ item ] : [];
 	const eligibleActions = useMemo(
 		() =>
 			item
