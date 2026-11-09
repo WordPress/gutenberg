@@ -242,13 +242,7 @@ function InlineUI( {
 					// Enter picks the top result once the user has typed.
 					autoHighlight
 					value={ query }
-					onValueChange={ ( nextQuery: string, { reason } ) => {
-						// Picking a cell would otherwise write it into the field.
-						if ( reason === 'item-press' ) {
-							return;
-						}
-						setQuery( nextQuery );
-					} }
+					onValueChange={ setQuery }
 					onItemHighlighted={ ( option?: CharacterOption ) =>
 						setHighlighted( option )
 					}
