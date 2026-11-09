@@ -380,6 +380,7 @@ Additional metadata for custom templates defined in the templates folder.
 | name | Filename, without extension, of the template in the templates folder. | `string` |
 | title | Title of the template, translatable. | `string` |
 | postTypes | List of post types that can use this custom template. | `[ string ]` |
+| viewportWidth | Width, in pixels, of the viewport used to render the template's preview thumbnail. Defaults to 1200 when omitted. | `integer` |
 
 ## templateParts
 

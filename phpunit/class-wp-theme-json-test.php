@@ -5170,6 +5170,42 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_custom_templates_includes_viewport_width() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'         => 3,
+				'customTemplates' => array(
+					array(
+						'name'          => 'page-wide',
+						'title'         => 'Wide template',
+						'viewportWidth' => 1600,
+					),
+					array(
+						'name'          => 'page-invalid-string',
+						'title'         => 'Invalid string width',
+						'viewportWidth' => '1600',
+					),
+					array(
+						'name'          => 'page-invalid-negative',
+						'title'         => 'Invalid negative width',
+						'viewportWidth' => -10,
+					),
+					array(
+						'name'  => 'page-default',
+						'title' => 'Default template',
+					),
+				),
+			)
+		);
+
+		$page_templates = $theme_json->get_custom_templates();
+
+		$this->assertSame( 1600, $page_templates['page-wide']['viewportWidth'] );
+		$this->assertArrayNotHasKey( 'viewportWidth', $page_templates['page-invalid-string'] );
+		$this->assertArrayNotHasKey( 'viewportWidth', $page_templates['page-invalid-negative'] );
+		$this->assertArrayNotHasKey( 'viewportWidth', $page_templates['page-default'] );
+	}
+
 	public function test_get_template_parts() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
