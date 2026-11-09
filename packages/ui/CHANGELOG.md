@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the popup while their group's items scroll
+-   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the popup while their group's items scroll ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 
 ### Bug Fixes
