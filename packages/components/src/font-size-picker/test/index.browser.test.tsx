@@ -76,6 +76,50 @@ describe( 'FontSizePicker', () => {
 		}
 	);
 
+	test.each( [
+		{ value: '1em', expectedValue: '1.1em' },
+		{ value: '1rem', expectedValue: '1.1rem' },
+		{ value: '16px', expectedValue: '17px' },
+	] )(
+		'should call onChange( $expectedValue ) after pressing ArrowUp when value is $value',
+		async ( { value, expectedValue } ) => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePicker value={ value } onChange={ onChange } />
+			);
+			await user.click(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			);
+			await user.keyboard( '{ArrowUp}' );
+			expect( onChange ).toHaveBeenLastCalledWith( expectedValue );
+		}
+	);
+
+	it( 'should keep two decimals of a typed em value', async () => {
+		const user = userEvent;
+		const onChange = vi.fn();
+		const Wrapper = () => {
+			const [ fontSize, setFontSize ] = useState<
+				string | number | undefined
+			>( '1em' );
+			return (
+				<FontSizePicker
+					value={ fontSize }
+					onChange={ ( newFontSize ) => {
+						setFontSize( newFontSize );
+						onChange( newFontSize );
+					} }
+				/>
+			);
+		};
+		await render( <Wrapper /> );
+		const input = screen.getByRole( 'spinbutton', { name: 'Font size' } );
+		await user.fill( input, '1.25' );
+		await user.tab();
+		expect( onChange ).toHaveBeenLastCalledWith( '1.25em' );
+	} );
+
 	describe( 'with > 5 homogeneous font sizes', () => {
 		const fontSizes = [
 			{
