@@ -613,6 +613,11 @@ export function userPermissions(
 /**
  * Reducer returning autosaves keyed by their parent's post id.
  *
+ * Autosaves arrive from two resolvers with different scopes: `getAutosaves`
+ * returns every autosave for the post, `getAutosave` returns one author's.
+ * Incoming records are merged by author so the narrower response updates the
+ * author it covers instead of truncating the collection.
+ *
  * @param state  Current state.
  * @param action Dispatched action.
  *
@@ -625,10 +630,19 @@ export function autosaves(
 	switch ( action.type ) {
 		case 'RECEIVE_AUTOSAVES':
 			const { postId, autosaves: autosavesData } = action;
+			const authorOf = ( autosave: unknown ) =>
+				( autosave as { author?: number } ).author;
+			const receivedAuthors = new Set( autosavesData.map( authorOf ) );
 
 			return {
 				...state,
-				[ postId ]: autosavesData,
+				[ postId ]: [
+					...( state[ postId ] ?? [] ).filter(
+						( autosave ) =>
+							! receivedAuthors.has( authorOf( autosave ) )
+					),
+					...autosavesData,
+				],
 			};
 	}
 

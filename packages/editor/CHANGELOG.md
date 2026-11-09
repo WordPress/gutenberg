@@ -19,6 +19,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   `isEditedPostAutosaveable`: Read `hasFetchedAutosave` for the current user rather than `hasFetchedAutosaves` for the whole collection, so it tracks the request the editor actually makes. It no longer reports the post as autosaveable before the current user is known ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
 
 ### Internal
 

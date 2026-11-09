@@ -104,8 +104,8 @@ selectorNames.forEach( ( name ) => {
 				return state.getCurrentUser && state.getCurrentUser();
 			},
 
-			hasFetchedAutosaves() {
-				return state.hasFetchedAutosaves && state.hasFetchedAutosaves();
+			hasFetchedAutosave() {
+				return state.hasFetchedAutosave && state.hasFetchedAutosave();
 			},
 
 			getAutosave() {
@@ -1415,7 +1415,7 @@ describe( 'selectors', () => {
 				postAutosavingLock: {},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return false;
 				},
 				getAutosave() {
@@ -1445,7 +1445,7 @@ describe( 'selectors', () => {
 				postAutosavingLock: {},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return true;
 				},
 				getAutosave() {
@@ -1474,7 +1474,7 @@ describe( 'selectors', () => {
 				},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return true;
 				},
 				getAutosave() {},
@@ -1502,7 +1502,7 @@ describe( 'selectors', () => {
 				},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return true;
 				},
 				getAutosave() {
@@ -1532,7 +1532,7 @@ describe( 'selectors', () => {
 				},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return true;
 				},
 				getAutosave() {
@@ -1571,7 +1571,7 @@ describe( 'selectors', () => {
 						},
 						saving: {},
 						getCurrentUser() {},
-						hasFetchedAutosaves() {
+						hasFetchedAutosave() {
 							return true;
 						},
 						getAutosave() {
@@ -1614,7 +1614,7 @@ describe( 'selectors', () => {
 				},
 				saving: {},
 				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				hasFetchedAutosave() {
 					return true;
 				},
 				getAutosave() {},
