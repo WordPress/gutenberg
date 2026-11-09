@@ -1,4 +1,4 @@
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Path, SVG } from '@wordpress/components';
 import {
@@ -11,8 +11,7 @@ import {
 	Text,
 	VisuallyHidden,
 } from '@wordpress/ui';
-import { useDebounce } from '@wordpress/compose';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { search } from '@wordpress/icons';
@@ -159,32 +158,6 @@ function InlineUI( {
 		} ) );
 	}, [ categories, isSearching, query ] );
 
-	/*
-	 * Announce the result count once typing pauses, so a screen reader
-	 * doesn't speak after every keystroke. `Autocomplete.Status` stays
-	 * mounted, so changing its text is announced reliably.
-	 */
-	const resultCount = isSearching ? items.length : 0;
-	let statusMessage = '';
-	if ( isSearching ) {
-		statusMessage = resultCount
-			? sprintf(
-					/* translators: %d: Number of characters found. */
-					_n(
-						'%d character found.',
-						'%d characters found.',
-						resultCount
-					),
-					resultCount
-				)
-			: __( 'No characters found.' );
-	}
-	const [ announcedStatus, setAnnouncedStatus ] = useState( '' );
-	const announceStatus = useDebounce( setAnnouncedStatus, 500 );
-	useEffect( () => {
-		announceStatus( statusMessage );
-	}, [ announceStatus, statusMessage ] );
-
 	function onSelect( option: CharacterOption ) {
 		onChange( insert( value, option.value ) );
 		onClose();
@@ -318,9 +291,7 @@ function InlineUI( {
 						className="format-library-special-characters__viewport"
 						tabIndex={ -1 }
 					>
-						{ /* Shown, but announced through `Autocomplete.Status`, so
-						it isn't spoken twice. */ }
-						<Autocomplete.Empty aria-hidden="true">
+						<Autocomplete.Empty>
 							{ __( 'No characters found.' ) }
 						</Autocomplete.Empty>
 						<Autocomplete.List
@@ -353,9 +324,6 @@ function InlineUI( {
 									) }
 						</Autocomplete.List>
 					</div>
-					<Autocomplete.Status>
-						<VisuallyHidden>{ announcedStatus }</VisuallyHidden>
-					</Autocomplete.Status>
 					{ /* A sighted-user aid only: each cell's accessible name
 					already carries the same name and code point. */ }
 					<div
