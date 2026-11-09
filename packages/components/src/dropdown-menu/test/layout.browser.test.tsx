@@ -3,12 +3,13 @@ import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
-import { more } from '@wordpress/icons';
+import { check, more } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
 import DropdownMenu from '..';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
+import { NavigableMenu } from '../../navigable-container';
 import '../../style.scss';
 
 const centerY = ( element: Element ) => {
@@ -33,6 +34,70 @@ const textLeft = ( label: string ) => {
 
 // Popover covers the opening animation; these fixtures measure the final layout.
 describe( 'DropdownMenu row layout', () => {
+	it( 'keeps selection marks inside standalone rows', async () => {
+		await render(
+			<NavigableMenu>
+				<MenuItemsChoice
+					choices={ [ { value: 'code', label: 'Code editor' } ] }
+					value="code"
+					onSelect={ () => {} }
+				/>
+			</NavigableMenu>
+		);
+		const item = screen.getByRole( 'menuitemradio', {
+			name: 'Code editor',
+		} );
+		await expect.element( item ).toBeVisible();
+		// The decorative selection mark has no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const icon = item.querySelector( 'svg' )!;
+		expect( icon.getBoundingClientRect().left ).toBeGreaterThanOrEqual(
+			item.getBoundingClientRect().left
+		);
+	} );
+
+	it( 'preserves trailing checks and descriptions in custom menu items', async () => {
+		await render(
+			<DropdownMenu
+				defaultOpen
+				label="Editor"
+				popoverProps={ { animate: false } }
+			>
+				{ () => (
+					<MenuGroup>
+						<MenuItemsChoice
+							choices={ [
+								{ value: 'code', label: 'Code editor' },
+							] }
+							value="code"
+							onSelect={ () => {} }
+						/>
+						<MenuItem
+							role="menuitemcheckbox"
+							isSelected
+							icon={ check }
+							info="Keep the existing custom item layout."
+						>
+							Show details
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</DropdownMenu>
+		);
+		const item = screen.getByRole( 'menuitemcheckbox', {
+			name: /Show details/,
+		} );
+		await expect.element( item ).toBeVisible();
+		// The decorative check has no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const icon = item.querySelector( 'svg' )!;
+		expect( item ).toBeChecked();
+		expect( icon.getBoundingClientRect().left ).toBeGreaterThan(
+			textLeft( 'Show details' )
+		);
+		expect( centerY( icon ) ).toBeCloseTo( centerY( item ), 1 );
+	} );
+
 	it( 'keeps mixed row labels aligned when a choice changes', async () => {
 		const MixedMenu = () => {
 			const [ value, setValue ] = useState( 'visual' );

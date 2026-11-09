@@ -1,12 +1,7 @@
 // Selection marks reserve menu-wide space. Action prefixes indent only their row.
-:global([role="menu"]) {
-	--_wp-components-menu-selection-width: 0px;
-	--_wp-components-menu-item-inset: var(--wpds-dimension-padding-sm);
-}
-
 :global([role="menu"]):has(.item) {
 	--_wp-components-menu-selection-width: var(--wpds-dimension-size-2xs);
-	--_wp-components-menu-item-inset: 0px;
+	--_wp-components-menu-item-inset: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
 
 	:global(.components-menu-item__button):not(.item),
 	:global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
@@ -26,8 +21,7 @@
 .item:global(.components-button.has-icon.has-text) {
 	gap: 0;
 	padding-block: var(--wpds-dimension-padding-xs);
-	// Dropdowns already provide the leading inset around each group.
-	padding-inline-start: 0;
+	padding-inline-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
 	padding-inline-end: var(--wpds-dimension-padding-sm);
 
 	> :global(.components-menu-items__item-icon) {
@@ -37,6 +31,19 @@
 		// Match UI's optical offset without narrowing the selection slot.
 		margin-inline-start: calc(var(--wpds-dimension-gap-xs) / -2);
 		margin-inline-end: calc(var(--wpds-dimension-gap-xs) / 2);
+	}
+
+	&:has(:global(.components-menu-item__info-wrapper)) {
+		align-items: flex-start;
+
+		> :global(.components-menu-items__item-icon) {
+			// Center the selection mark on the title line.
+			translate: 0 calc((1lh - 100%) / 2);
+		}
+
+		:global(.components-menu-item__shortcut) {
+			align-self: flex-start;
+		}
 	}
 
 	// Keep the leading space for unchecked rows and actions in a selection menu.

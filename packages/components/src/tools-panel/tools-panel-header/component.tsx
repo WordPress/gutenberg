@@ -226,9 +226,6 @@ const ToolsPanelHeader = (
 							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
-									icon={ check }
-									iconPosition="left"
-									className={ selectionStyles.item }
 									aria-disabled={ ! canResetAll }
 									// @ts-expect-error - TODO: If this "tertiary" style is something we really want to allow on MenuItem,
 									// we should rename it and explicitly allow it as an official API. All the other Button variants

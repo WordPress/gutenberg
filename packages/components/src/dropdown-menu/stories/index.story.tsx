@@ -155,9 +155,9 @@ export const SingleSelection: StoryObj< typeof DropdownMenu > = {
 };
 
 /**
- * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
- * Set `isSelected` and a check icon for each selected item. Keep the popup open
- * by updating the selection without calling `onClose`.
+ * Existing `MenuItem` compositions can provide trailing selection icons.
+ * This example preserves that supported layout. For new menus in Gutenberg,
+ * use `Menu` from `@wordpress/ui` with leading selection indicators.
  */
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
@@ -214,6 +214,7 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 	args: { label: 'Mixed menu', icon: more },
 	render: function Render( args ) {
 		const [ mode, setMode ] = useState( 'code' );
+		const [ showDetails, setShowDetails ] = useState( true );
 		return (
 			<DropdownMenu { ...args }>
 				{ ( { onClose } ) => (
@@ -239,6 +240,17 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 									},
 								] }
 							/>
+							<MenuItem
+								role="menuitemcheckbox"
+								isSelected={ showDetails }
+								icon={ showDetails ? check : null }
+								info="Keep the existing custom item layout."
+								onClick={ () =>
+									setShowDetails( ! showDetails )
+								}
+							>
+								Show details
+							</MenuItem>
 							<MenuItem shortcut="Ctrl+P" onClick={ onClose }>
 								Preview
 							</MenuItem>
