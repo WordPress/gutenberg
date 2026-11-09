@@ -43,7 +43,7 @@ describe( 'useCopyToClipboard', () => {
 		const user = userEvent.setup();
 		const onSuccess = vi.fn();
 		const onError = vi.fn();
-		render(
+		const { rerender } = render(
 			<TestComponent
 				text="test text"
 				onSuccess={ onSuccess }
@@ -62,6 +62,18 @@ describe( 'useCopyToClipboard', () => {
 		expect( writeTextMock ).not.toHaveBeenCalled();
 		expect( onSuccess ).not.toHaveBeenCalled();
 		expect( onError ).not.toHaveBeenCalled();
+
+		rerender(
+			<TestComponent
+				text="test text"
+				onSuccess={ onSuccess }
+				onError={ onError }
+			/>
+		);
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( writeTextMock ).toHaveBeenCalledTimes( 1 );
+		expect( onSuccess ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should call onSuccess when copy succeeds', async () => {
