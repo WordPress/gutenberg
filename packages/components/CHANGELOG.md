@@ -8,6 +8,7 @@
 -   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
+-   `AnglePickerControl`: Add `min` and `max` props to set the range of angles that can be entered. The defaults stay `0` and `360` ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ### Bug Fixes
 
@@ -29,6 +30,7 @@
 ### Internal
 
 -   `ProgressBar`: Use the new `--wpds-color-background-indicator-neutral` token for the filled portion. The color is unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   Add a private `PrivateAnglePickerControl` whose `allowEmpty` option reports a cleared input as `undefined` instead of `0` ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 

@@ -41,6 +41,22 @@ The HTML element or React component to render the component as.
 
 Label to use for the angle picker.
 
+### `max`
+
+ - Type: `number`
+ - Required: No
+ - Default: `360`
+
+The maximum angle, in degrees, that can be entered.
+
+### `min`
+
+ - Type: `number`
+ - Required: No
+ - Default: `0`
+
+The minimum angle, in degrees, that can be entered.
+
 ### `onChange`
 
  - Type: `(value: number) => void`
@@ -54,4 +70,4 @@ A function that receives the new value of the input.
  - Required: Yes
 
 The current value of the input. The value represents an angle in degrees
-and should be a value between 0 and 360.
+and should be a value between `min` and `max`.

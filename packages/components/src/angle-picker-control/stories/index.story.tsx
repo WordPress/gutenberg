@@ -49,3 +49,13 @@ const AnglePickerWithState: StoryFn< typeof AnglePickerControl > = ( {
 };
 
 export const Default = AnglePickerWithState.bind( {} );
+
+/**
+ * Use `min` and `max` to change the range of angles that can be entered,
+ * for example to allow negative angles.
+ */
+export const WithCustomRange = AnglePickerWithState.bind( {} );
+WithCustomRange.args = {
+	min: -180,
+	max: 180,
+};
