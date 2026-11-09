@@ -244,6 +244,9 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
+						// Keep request interception for now. Full-suite runs with import-map
+						// mocks intermittently lose their Chromium connection.
+						importMapMocks: false,
 						provider: createPlaywrightProvider(),
 						commands: {
 							...browserTraces?.commands,
