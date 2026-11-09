@@ -5,11 +5,11 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field, Form } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 interface MediaEditorModalProps {
 	/**

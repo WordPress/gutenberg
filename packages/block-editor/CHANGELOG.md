@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+-   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
+-   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 -   Template validation: Respect nested InnerBlocks ownership and preserve matching unlocked or locally templated descendants when resetting the root template ([#84805](https://github.com/WordPress/gutenberg/pull/84805)).
 
 ## 20.0.0 (2026-11-04)
