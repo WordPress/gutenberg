@@ -12,6 +12,12 @@ In CI, the tests are executed across multiple shards, and [@flakiness/playwright
 npm run test:e2e:update-timings
 ```
 
+## Checking new tests on trunk
+
+`npm run test:e2e:trunk -- <pull request commit>` runs new or changed tests against the checked-out implementation. It expects the pull request's test files to be in place and `PLAYWRIGHT_JSON_OUTPUT_FILE` to point to the JSON report. The [trunk check workflow](../../.github/workflows/e2e-trunk-check.yml) prepares this checkout, builds it, and starts WordPress before running the command.
+
+The script lives in `bin/e2e-trunk-check.mts` so the workspace's existing lint and TypeScript configuration cover it.
+
 ## Site editor v2 (extensible site editor)
 
 The site editor specs also run against the extensible site editor — the
