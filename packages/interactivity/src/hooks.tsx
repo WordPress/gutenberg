@@ -421,16 +421,20 @@ const Directives = ( {
 		evaluate: scope.evaluate,
 	};
 
+	// The element's scope is removed whether the callbacks return or throw, so
+	// a throwing directive leaves no scope on the stack.
 	setScope( scope );
-
-	for ( const directiveName of currentPriorityLevel ) {
-		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) {
-			props.children = wrapper;
+	try {
+		for ( const directiveName of currentPriorityLevel ) {
+			const wrapper =
+				directiveCallbacks[ directiveName ]?.( directiveArgs );
+			if ( wrapper !== undefined ) {
+				props.children = wrapper;
+			}
 		}
+	} finally {
+		resetScope();
 	}
-
-	resetScope();
 
 	return props.children;
 };

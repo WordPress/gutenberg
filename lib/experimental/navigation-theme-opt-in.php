@@ -123,12 +123,15 @@ add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_block_nav_menu_item' );
  * @param stdClass $args        An object of wp_nav_menu() arguments.
  *
  * @return string The menu item's updated HTML output.
+ *
+ * @phpstan-param WP_Post&object{type: string, content?: string} $item
+ * @phpstan-param stdClass&object{before: string, after: string} $args
  */
 function gutenberg_output_block_nav_menu_item( $item_output, $item, $depth, $args ) {
 	if ( 'block' === $item->type ) {
 		$item_output = $args->before;
 		/** This filter is documented in wp-includes/post-template.php */
-		$item_output .= apply_filters( 'the_content', $item->content );
+		$item_output .= apply_filters( 'the_content', $item->content ?? '' );
 		$item_output .= $args->after;
 	}
 
@@ -154,13 +157,17 @@ add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_block_nav_menu_item', 
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_remove_block_nav_menu_items( $menu_items ) {
-	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @link https://github.com/WordPress/gutenberg/issues/34265.
-	/*if ( current_theme_supports( 'block-nav-menus' ) ) {*/
-	if ( false ) {
-		return $menu_items;
-	}
-
+	/*
+	 * Block menu items are always removed since the theme opt-in for the
+	 * block-nav-menus feature is disabled. When the feature becomes stable, the
+	 * menu items should be returned unchanged when the theme supports it:
+	 *
+	 *     if ( current_theme_supports( 'block-nav-menus' ) ) {
+	 *         return $menu_items;
+	 *     }
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/34265
+	 */
 	return array_filter(
 		$menu_items,
 		static function ( $menu_item ) {
@@ -249,10 +256,7 @@ function gutenberg_convert_menu_items_to_blocks(
  * @return string|null Nav menu output to short-circuit with.
  */
 function gutenberg_output_block_nav_menu( $output, $args ) {
-	// We should uncomment the line below when the block-nav-menus feature becomes stable.
-	// @link https://github.com/WordPress/gutenberg/issues/34265.
-	/*if ( ! current_theme_supports( 'block-nav-menus' ) ) {*/
-	if ( true ) {
+	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
 		return null;
 	}
 
@@ -318,7 +322,9 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 
 	return render_block( $navigation_block );
 }
-add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
+// We should uncomment the line below when the block-nav-menus feature becomes stable.
+// @link https://github.com/WordPress/gutenberg/issues/34265.
+// add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
 
 /**
  * Shim that makes nav-menus.php nicely display a menu item with its `type` set to
@@ -335,6 +341,8 @@ add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
  *
  * @param int     $item_id Menu item ID.
  * @param WP_Post $item    Menu item data object.
+ *
+ * @phpstan-param WP_Post&object{type: string, content?: string} $item
  */
 function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 	if ( 'block' === $item->type ) {
@@ -342,7 +350,7 @@ function gutenberg_output_block_menu_item_custom_fields( $item_id, $item ) {
 		<p class="field-content description description-wide">
 			<label for="edit-menu-item-content-<?php echo $item_id; ?>">
 				<?php _e( 'Content', 'gutenberg' ); ?><br />
-				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ) ); ?></textarea>
+				<textarea id="edit-menu-item-content-<?php echo $item_id; ?>" class="widefat" rows="3" cols="20" name="menu-item-content[<?php echo $item_id; ?>]" readonly><?php echo esc_textarea( trim( $item->content ?? '' ) ); ?></textarea>
 			</label>
 		</p>
 		<?php
