@@ -11,6 +11,7 @@ export default {
 	rules: {
 		// Allow this package's own private properties while keeping other private prefixes restricted.
 		'custom-property-pattern': '^(?:_wp-components-.+|(?!_(?:gcd|wp)-).+)',
+		// Allow this package to define the `--wp-components-color-*` variables it owns.
 		'property-disallowed-list': [
 			disallowedProperties.filter(
 				( property ) => property !== '/^--wp-components-color-/'
