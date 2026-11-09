@@ -1103,6 +1103,8 @@ supports: {
 }
 ```
 
+An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen.
+
 Transforms are applied to the block wrapper. A block can apply them to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies a transform itself can opt out of its output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
