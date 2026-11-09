@@ -677,7 +677,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'cancels sideload item when file exceeds maxUploadFileSize', async () => {
-			const mediaSideload = jest.fn();
+			const mediaSideload = vi.fn();
 
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				mediaSideload,
