@@ -61,7 +61,7 @@
 			outline: var(--_gcd-input-outline-focus, none);
 		}
 
-		&:disabled {
+		&:is(:disabled, [aria-disabled="true"]) {
 			background: var(--_gcd-input-background-disabled, transparent);
 			border-color: var(--_gcd-input-border-color-disabled, transparent);
 			box-shadow: var(--_gcd-input-box-shadow-disabled, none);

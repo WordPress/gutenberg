@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Input` and `Textarea`: Use the disabled text color for fields with `aria-disabled="true"` ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Input`, `Combobox`, `Autocomplete`, and their controls: Prevent wp-admin form styles from adding a grey background to read-only and disabled fields, and from changing the text color of disabled fields ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 
 ## 0.26.0 (2026-11-04)
