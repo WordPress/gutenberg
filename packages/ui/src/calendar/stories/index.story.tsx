@@ -39,6 +39,7 @@ export const Default: Story = {};
 /**
  * Resize the container or change `numberOfMonths` to try the fluid layout.
  * The container scrolls when it becomes narrower than one month's minimum.
+ * The current month keeps the today marker visible at every width.
  */
 export const FluidWidth: Story = {
 	decorators: [
@@ -57,8 +58,7 @@ export const FluidWidth: Story = {
 		),
 	],
 	args: {
-		defaultMonth: new Date( 2026, 0, 1 ),
-		defaultValue: new Date( 2026, 0, 15 ),
+		defaultMonth: new Date(),
 	},
 };
 

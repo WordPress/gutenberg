@@ -172,13 +172,13 @@
 
 		/* DAY MODIFIERS */
 
-		/* Today's date: show a dot in the top-right corner of the button */
+		/* Keep today's dot beside the centered date as the cell widens. */
 		.today::after {
 			content: "";
 			position: absolute;
 			z-index: 1;
 			inset-block-start: 2px;
-			inset-inline-end: 2px;
+			inset-inline-end: calc(50% - var(--wp-ui-calendar-cell-size) / 2 + 2px);
 			width: 0;
 			height: 0;
 			border-radius: 50%;
