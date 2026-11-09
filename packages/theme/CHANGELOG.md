@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
@@ -16,7 +20,6 @@
 
 ### Enhancements
 
--   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
 -   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
 
 ### Bug Fixes
