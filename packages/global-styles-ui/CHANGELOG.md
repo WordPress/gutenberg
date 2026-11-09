@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Avoid saving `null` top-level `border` properties when editing split borders in Global Styles ([#86428](https://github.com/WordPress/gutenberg/pull/86428)).
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
 
 ## 2.1.0 (2026-11-04)
