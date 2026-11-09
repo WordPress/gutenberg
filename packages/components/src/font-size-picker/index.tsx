@@ -104,6 +104,7 @@ const UnforwardedFontSizePicker = (
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+	const isValueUnitEmOrRem = valueUnit === 'em' || valueUnit === 'rem';
 	const isDisabled = value === undefined;
 
 	return (
@@ -217,6 +218,11 @@ const UnforwardedFontSizePicker = (
 								} }
 								units={ hasUnits ? units : [] }
 								min={ 0 }
+								// Keep the `0.01` step of `em` and `rem`, so typed values keep
+								// two decimals, but move by `0.1` per arrow key, as the slider does.
+								spinFactor={
+									isValueUnitEmOrRem ? 10 : undefined
+								}
 							/>
 						</FlexItem>
 						{ withSlider && (

@@ -33,6 +33,7 @@ function SizeControl( props: SizeControlProps ) {
 
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+	const isValueUnitEmOrRem = valueUnit === 'em' || valueUnit === 'rem';
 
 	// Receives the new value from the UnitControl component as a string containing the value and unit.
 	const handleUnitControlChange = ( newValue: string | undefined ) => {
@@ -59,6 +60,9 @@ function SizeControl( props: SizeControlProps ) {
 						onChange={ handleUnitControlChange }
 						units={ units }
 						min={ 0 }
+						// Keep the `0.01` step of `em` and `rem`, so typed values keep
+						// two decimals, but move by `0.1` per arrow key, as the slider does.
+						spinFactor={ isValueUnitEmOrRem ? 10 : undefined }
 						disabled={ disabled }
 					/>
 				</FlexItem>
