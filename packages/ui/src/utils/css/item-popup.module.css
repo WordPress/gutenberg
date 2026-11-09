@@ -108,9 +108,9 @@
 				padding-block: var(--wp-ui-popup-padding);
 			}
 
-			/* The group label's min-height, so highlighted items don't scroll under a stuck label. */
+			/* Add the group label's min-height, so highlighted items don't scroll under a stuck label. */
 			&:has(.group-label) {
-				scroll-padding-block-start: var(--wpds-dimension-size-sm);
+				scroll-padding-block-start: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-popup-padding));
 			}
 		}
 
