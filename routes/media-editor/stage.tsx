@@ -45,14 +45,11 @@ const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
 // show.
 const DELETE_ACTION_IDS = [ 'move-to-trash', 'permanently-delete' ];
 
-// Actions left out of this screen:
-// - `duplicate-post`: duplicating an attachment needs a new file upload,
-//   which the action doesn't do.
-// - `rename-post`: it saves all of the attachment's pending edits, not just
-//   the title, so it would also save the Details panel's unsaved changes.
-//   The title can be edited in the Details panel instead. It could come back
-//   if the action saved only `title` (e.g. with
-//   `__experimentalSaveSpecifiedEntityEdits`).
+// Left out of this screen:
+// - `duplicate-post` copies the attachment without its file, which the media
+//   endpoint rejects.
+// - `rename-post` saves every pending edit, not just the title, so it would
+//   also save unsaved changes in the Details panel.
 const EXCLUDED_ACTION_IDS = [ 'duplicate-post', 'rename-post' ];
 
 /*
