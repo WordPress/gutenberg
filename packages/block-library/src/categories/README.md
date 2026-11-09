@@ -16,7 +16,9 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `taxonomy` | `string` | `"category"` | — |
-| `displayAsDropdown` | `boolean` | `false` | — |
+| `displayLayout` | `string` | `"list"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `list`, `dropdown`, `inline` |
+| `delimiter` | `string` | `"comma"` | — |
+| `customDelimiter` | `string` | `""` | — |
 | `showHierarchy` | `boolean` | `false` | — |
 | `showPostCounts` | `boolean` | `false` | — |
 | `showOnlyTopLevel` | `boolean` | `false` | — |

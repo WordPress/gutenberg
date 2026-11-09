@@ -19,3 +19,19 @@
 	width: 100%;
 	display: block;
 }
+
+// Inline display layout.
+.wp-block-categories-inline {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0;
+
+	.wp-block-categories__inline-item {
+		display: inline;
+	}
+
+	.wp-block-categories__inline-delimiter {
+		margin: 0 0.25em;
+	}
+}
