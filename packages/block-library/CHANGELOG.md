@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
 -   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
