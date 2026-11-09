@@ -440,3 +440,62 @@ function gutenberg_add_page_homepage_action_links( $response, $post, $request ) 
 	return $response;
 }
 add_filter( 'rest_prepare_page', 'gutenberg_add_page_homepage_action_links', 10, 3 );
+
+/**
+ * Only includes revisioned meta in revision and autosave responses.
+ *
+ * Only the meta keys from `wp_post_revision_meta_keys()` are stored on a
+ * revision, but the revisions endpoint returns every `show_in_rest` meta key
+ * of the parent post type. The others come back as their default value, and
+ * restoring the revision in the editor saves those defaults over the post's
+ * real values.
+ *
+ * When an author autosaves their own draft, the autosaves controller updates
+ * the post itself and returns it, so it keeps all of its meta.
+ *
+ * Once WordPress limits the meta in `WP_REST_Revisions_Controller` itself,
+ * this leaves those responses unchanged. Unlike the Core fix, this doesn't
+ * change the `meta` schema.
+ *
+ * @see https://core.trac.wordpress.org/ticket/66329
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     The revision or autosave.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_rest_only_include_revisioned_meta( $response, $post ) {
+	if ( ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post || 'revision' !== $post->post_type ) {
+		return $response;
+	}
+
+	$data = $response->get_data();
+	if ( empty( $data['meta'] ) || ! is_array( $data['meta'] ) ) {
+		return $response;
+	}
+
+	$post_type = get_post_type( $post->post_parent );
+	if ( ! $post_type ) {
+		return $response;
+	}
+
+	// Map the revisioned keys to their REST names, like `WP_REST_Meta_Fields::get_registered_fields()` does.
+	$meta_args  = array_merge( get_registered_meta_keys( 'post' ), get_registered_meta_keys( 'post', $post_type ) );
+	$rest_names = array();
+	foreach ( (array) wp_post_revision_meta_keys( $post_type ) as $meta_key ) {
+		// The keys are filterable, so ignore anything that isn't a meta key.
+		if ( ! is_string( $meta_key ) ) {
+			continue;
+		}
+
+		$show_in_rest = $meta_args[ $meta_key ]['show_in_rest'] ?? false;
+		if ( $show_in_rest ) {
+			$rest_names[] = empty( $show_in_rest['name'] ) ? $meta_key : $show_in_rest['name'];
+		}
+	}
+
+	$data['meta'] = array_intersect_key( $data['meta'], array_flip( $rest_names ) );
+	$response->set_data( $data );
+
+	return $response;
+}
+add_filter( 'rest_prepare_revision', 'gutenberg_rest_only_include_revisioned_meta', 10, 2 );

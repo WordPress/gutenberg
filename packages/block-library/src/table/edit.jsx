@@ -350,11 +350,10 @@ function TableEdit( {
 		);
 	}
 
-	useEffect( () => {
-		if ( ! isSingleSelected ) {
-			setSelectedCell();
-		}
-	}, [ isSingleSelected ] );
+	// Clear the selected cell when the block is deselected.
+	if ( ! isSingleSelected && selectedCell ) {
+		setSelectedCell();
+	}
 
 	useEffect( () => {
 		if ( hasTableCreated ) {

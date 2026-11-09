@@ -6,6 +6,20 @@
 
 -   Fix `wp-env` wrongly detecting that it is offline on some Windows machines, by checking access to WordPress.org with `dns.lookup` instead of `dns.resolve` ([#85522](https://github.com/WordPress/gutenberg/pull/85522)).
 
+## 12.1.0 (2026-11-04)
+
+### New Features
+
+-   Add an experimental `php` runtime that serves WordPress with the installed PHP's built-in web server and a SQLite database, without Docker ([#85512](https://github.com/WordPress/gutenberg/pull/85512), [#85574](https://github.com/WordPress/gutenberg/pull/85574)).
+
+### Bug Fixes
+
+-   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes

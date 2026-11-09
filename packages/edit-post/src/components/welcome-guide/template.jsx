@@ -1,18 +1,20 @@
 import { useDispatch } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
 import WelcomeGuideImage from './image';
-import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideTemplate() {
-	const { toggleFeature } = useDispatch( editPostStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	return (
 		<Guide
 			className="edit-template-welcome-guide"
 			contentLabel={ __( 'Welcome to the template editor' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuideTemplate' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-post', 'welcomeGuideTemplate', false )
+			}
 			pages={ [
 				{
 					image: (

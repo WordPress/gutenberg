@@ -655,6 +655,50 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeFocused();
 	} );
 
+	test( 'can create a new menu again after creating one fails', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		// Start from one menu, so the menu list ends in "Create new Menu".
+		await requestUtils.deleteAllMenus();
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		// Fail the first request that creates a menu.
+		let failedRequests = 0;
+		await page.route( '**/wp/v2/navigation**', async ( route ) => {
+			if ( route.request().method() === 'POST' && failedRequests === 0 ) {
+				failedRequests++;
+				await route.fulfill( {
+					status: 500,
+					json: { code: 'test_error', message: 'Test error' },
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'tabpanel' )
+			.getByRole( 'button', { name: 'Test Menu' } )
+			.click();
+		await page.keyboard.press( 'ArrowUp' );
+		const createNewMenu = page.getByRole( 'menuitem', {
+			name: 'Create new Menu',
+		} );
+		await expect( createNewMenu ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		await expect( page.getByTestId( 'snackbar' ) ).toHaveText(
+			'Failed to create Navigation Menu.'
+		);
+		expect( failedRequests ).toBe( 1 );
+
+		await expect( createNewMenu ).toBeEnabled();
+	} );
+
 	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
 		page,
 		editor,
@@ -969,6 +1013,81 @@ test.describe( 'Navigation block - List view editing', () => {
 				return { linkTarget, rel };
 			}, clientId )
 		).toEqual( { linkTarget: undefined, rel: undefined } );
+	} );
+
+	test( 'edits a Social Icon from the List View popover in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content:
+				navMenuBlocksFixture.content +
+				`<!-- wp:social-links -->` +
+				`<ul class="wp-block-social-links">` +
+				`<!-- wp:social-link {"url":"https://wordpress.org/","service":"wordpress"} /-->` +
+				`</ul>` +
+				`<!-- /wp:social-links -->`,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// The popover offers the icon's text and link.
+		await listView.getByRole( 'link', { name: 'WordPress' } ).click();
+
+		const popover = page.locator(
+			'.block-editor-inspector-list-view-content-popover'
+		);
+		await expect(
+			popover.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
+		const urlInput = popover.getByRole( 'combobox', { name: 'Link to' } );
+		await expect( urlInput ).toHaveValue( 'https://wordpress.org/' );
+		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits reach the block.
+		await textInput.fill( 'WP' );
+		await urlInput.fill( 'https://wordpress.org/news/' );
+
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/news/' );
+		const socialLink = editor.canvas.locator(
+			'[data-type="core/social-link"]'
+		);
+		expect(
+			await page.evaluate(
+				( id ) =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getBlockAttributes( id ),
+				await socialLink.getAttribute( 'data-block' )
+			)
+		).toMatchObject( {
+			label: 'WP',
+			url: 'https://wordpress.org/news/',
+		} );
 	} );
 } );
 

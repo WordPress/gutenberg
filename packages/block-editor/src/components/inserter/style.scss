@@ -39,6 +39,13 @@ $block-inserter-tabs-height: 44px;
 		gap: 0;
 	}
 
+	.block-editor-tabbed-sidebar__tabpanel:has(
+		> .block-editor-inserter__search
+	) {
+		// Reserve space for the sticky search control, its padding, and bottom border.
+		scroll-padding-top: $button-size-next-default-40px + $grid-unit-20 * 2 + $border-width;
+	}
+
 	.block-editor-tabbed-sidebar {
 		@include break-medium() {
 			width: $secondary-sidebar-width;
@@ -226,6 +233,11 @@ $block-inserter-tabs-height: 44px;
 		padding-right: 0;
 		padding-bottom: $grid-unit-05;
 	}
+}
+
+.block-editor-inserter__preview-disabled-note {
+	padding-top: $grid-unit-05;
+	color: $gray-900;
 }
 
 .block-editor-inserter__insertable-blocks-at-selection:not(:empty) + .block-editor-inserter__all-blocks:not(:empty) {
