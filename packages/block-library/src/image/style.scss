@@ -330,9 +330,6 @@
 			min-height: var(--wp--lightbox-image-height);
 			width: var(--wp--lightbox-image-width);
 			height: var(--wp--lightbox-image-height);
-			// The enlarged image copies the image's classes, so it would pick up
-			// a rotation. State styles are important, so this has to be too.
-			rotate: none !important;
 		}
 
 		figcaption {
@@ -343,6 +340,13 @@
 	.lightbox-thumbnail-container {
 		--wp--lightbox-image-width: var(--wp--lightbox-thumbnail-width);
 		--wp--lightbox-image-height: var(--wp--lightbox-thumbnail-height);
+	}
+
+	// The enlarged figure copies the block's classes and inline styles, so it
+	// would pick up a rotation. State styles are important and print later, so
+	// this has to be important and more specific.
+	.lightbox-image-container .wp-block-image {
+		rotate: none !important;
 	}
 
 	button {

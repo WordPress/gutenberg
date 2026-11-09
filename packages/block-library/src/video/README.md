@@ -57,7 +57,6 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 
 - **dimensions**: `.wp-block-video video`
 - **shadow**: `.wp-block-video video`
-- **transform**: `.wp-block-video video`
 - **filter**:
   - duotone: `.wp-block-video video`
 

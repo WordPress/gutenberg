@@ -3289,9 +3289,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 		unregister_block_style( 'core/image', 'tilted' );
 
-		$this->assertStringContainsString( ':root :where(.wp-block-image img){rotate: 0.25turn;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img){rotate: 0;}}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-tilted img){rotate: -5deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 0.25turn;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image){rotate: 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-tilted){rotate: -5deg;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
