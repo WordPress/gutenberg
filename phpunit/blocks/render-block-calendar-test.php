@@ -151,7 +151,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 				),
 				// Per-side colours do not add has-border-color; only flat borderColor / border.color do.
 				'expected_class' => 'wp-calendar-table',
-				'expected_style' => 'border-top-color:#111111;border-top-style:solid;border-top-width:2px;border-right-color:#111111;border-right-style:solid;border-right-width:2px;border-bottom-color:#111111;border-bottom-style:solid;border-bottom-width:2px;border-left-color:#111111;border-left-style:solid;border-left-width:2px;',
+				'expected_style' => 'border-top-width:2px;border-top-color:#111111;border-top-style:solid;border-right-width:2px;border-right-color:#111111;border-right-style:solid;border-bottom-width:2px;border-bottom-color:#111111;border-bottom-style:solid;border-left-width:2px;border-left-color:#111111;border-left-style:solid;',
 			),
 			'single-side border'      => array(
 				'attributes'     => array(
@@ -166,7 +166,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 					),
 				),
 				'expected_class' => 'wp-calendar-table',
-				'expected_style' => 'border-top-color:#111111;border-top-style:solid;border-top-width:2px;',
+				'expected_style' => 'border-top-width:2px;border-top-color:#111111;border-top-style:solid;',
 			),
 		);
 	}
