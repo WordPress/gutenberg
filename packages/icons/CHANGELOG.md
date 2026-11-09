@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+
 ### Enhancements
 
 -   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).

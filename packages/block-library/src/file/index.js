@@ -1,5 +1,5 @@
 import { _x } from '@wordpress/i18n';
-import { file as icon } from '@wordpress/icons';
+import { folder as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';

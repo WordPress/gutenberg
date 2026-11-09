@@ -615,7 +615,7 @@
 		"label": "File",
 		"filePath": "library/file.svg",
 		"collections": [ "core" ],
-		"keywords": [ "archive", "document", "folder" ]
+		"keywords": [ "document", "attachment" ]
 	},
 	{
 		"slug": "filter",
@@ -631,6 +631,13 @@
 		"slug": "flip-vertical",
 		"label": "Flip Vertical",
 		"filePath": "library/flip-vertical.svg"
+	},
+	{
+		"slug": "folder",
+		"label": "Folder",
+		"filePath": "library/folder.svg",
+		"collections": [ "core" ],
+		"keywords": [ "archive", "directory" ]
 	},
 	{
 		"slug": "footer",

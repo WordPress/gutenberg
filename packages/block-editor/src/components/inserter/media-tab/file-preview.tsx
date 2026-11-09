@@ -1,6 +1,6 @@
 import { Icon as WCIcon } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { audio, file } from '@wordpress/icons';
+import { audio, folder } from '@wordpress/icons';
 import { getFilename } from '@wordpress/url';
 
 const PREVIEW_ICONS: Record< string, React.JSX.Element > = {
@@ -26,7 +26,7 @@ export default function FilePreview( {
 			justify="center"
 			className="block-editor-inserter__media-grid__file-preview"
 		>
-			<WCIcon icon={ PREVIEW_ICONS[ mediaType ] ?? file } size={ 24 } />
+			<WCIcon icon={ PREVIEW_ICONS[ mediaType ] ?? folder } size={ 24 } />
 			{ !! filename && (
 				<span className="block-editor-inserter__media-grid__file-preview__name">
 					{ filename }
