@@ -9,6 +9,10 @@ import { type DirectiveEntry } from './hooks';
 
 /** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
 const htmlFallbacks = new WeakMap< object, DocumentFragment >();
+/** Opaque HTML props whose snapshot holds an element's server-rendered content, not `<template>` content. */
+const htmlServerContents = new WeakSet< object >();
+/** Number of `<template>` element contents being converted around the current conversion. */
+let templateContentDepth = 0;
 
 const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
@@ -185,6 +189,25 @@ export function getHtmlFallback(
 ): DocumentFragment | undefined {
 	const htmlProps = element.props.dangerouslySetInnerHTML;
 	return htmlProps && htmlFallbacks.get( htmlProps );
+}
+
+/**
+ * Reads the script-free snapshot of an element's server-rendered content: the
+ * snapshot that {@link getHtmlFallback} returns, when `toVdom()` built the
+ * vnode from markup outside every `<template>` element's content. Callers must
+ * leave it detached and unmodified; insert a clone.
+ *
+ * @param element The element vnode passed to a directive callback.
+ * @return The detached snapshot, or `undefined` for a vnode built from
+ *         `<template>` content or not built by `toVdom()`.
+ */
+export function getHtmlServerContent(
+	element: VNode< any >
+): DocumentFragment | undefined {
+	const htmlProps = element.props.dangerouslySetInnerHTML;
+	return htmlProps && htmlServerContents.has( htmlProps )
+		? htmlFallbacks.get( htmlProps )
+		: undefined;
 }
 
 /**
@@ -482,11 +505,20 @@ function convertToVdom( root: Node ): ComponentChild {
 					getTemplateContentsOwnerDocument().createDocumentFragment();
 				copyFallbackChildren( elementNode, snapshot );
 				htmlFallbacks.set( htmlProps, snapshot );
+				if ( ! templateContentDepth ) {
+					htmlServerContents.add( htmlProps );
+				}
 			}
 		} else if ( localName === 'template' ) {
-			props.content = [
-				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			templateContentDepth++;
+			try {
+				props.content = [
+					...( elementNode as HTMLTemplateElement ).content
+						.childNodes,
+				].map( ( childNode ) => toVdom( childNode ) );
+			} finally {
+				templateContentDepth--;
+			}
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
