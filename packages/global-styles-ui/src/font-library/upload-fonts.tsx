@@ -167,7 +167,7 @@ function UploadFonts() {
 				sprintf(
 					// translators: %s: Name of the uploaded font file.
 					__(
-						'%s does not include a font family name, so it cannot be installed. Try a different file.'
+						"%s cannot be installed because it does not include a font family name. Try a different version of this font, for example one downloaded from the font's official source."
 					),
 					fontFile.name
 				)
