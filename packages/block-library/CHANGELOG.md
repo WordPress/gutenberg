@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Title: Keep the title editable inside synced patterns ([#71981](https://github.com/WordPress/gutenberg/issues/71981)).
+
 ### Bug Fixes
 
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
