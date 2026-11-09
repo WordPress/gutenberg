@@ -1,5 +1,6 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GridRect } from './utils';
@@ -15,8 +16,10 @@ interface AutoSpanItemState {
 	extraRowSpan: number;
 	autoColumnSpan: number;
 	autoRowSpan: number;
-	cellWidth: number;
-	cellHeight: number;
+	gridWidth: number;
+	hasUserColumnSpanOverride: boolean;
+	hasUserRowSpanOverride: boolean;
+	preserveUserResize: boolean;
 	columnSpanWasImplicit: boolean;
 	rowSpanWasImplicit: boolean;
 }
@@ -40,7 +43,6 @@ interface GridItemDimensions {
 // switching previews. Client IDs are unique within an editor session.
 const autoSpanStates = new Map< string, AutoSpanState >();
 
-const STYLE_ATTRIBUTE_KEY = new Set( [ 'style' ] );
 const LAYOUT_STYLE_KEY = new Set( [ 'layout' ] );
 const GRID_PLACEMENT_KEYS = new Set( [
 	'columnStart',
@@ -80,19 +82,45 @@ function areObjectsEqualExcept(
 }
 
 /**
- * Checks whether block attributes other than grid placement are unchanged.
+ * Checks whether the content attributes of a block are unchanged.
  *
- * @param first  First set of block attributes.
- * @param second Second set of block attributes.
+ * @param first                First set of block attributes.
+ * @param second               Second set of block attributes.
+ * @param contentAttributeKeys Names of attributes with the content role.
  *
- * @return Whether the content-affecting attributes are equal.
+ * @return Whether the content attributes are equal.
  */
 function areContentAttributesEqual(
 	first: GridItemAttributes,
-	second: GridItemAttributes
+	second: GridItemAttributes,
+	contentAttributeKeys: readonly string[]
+): boolean {
+	return contentAttributeKeys.every( ( key ) =>
+		Object.is( first[ key ], second[ key ] )
+	);
+}
+
+/**
+ * Checks whether user-controlled attributes other than content and grid
+ * placement are unchanged.
+ *
+ * @param first                First set of block attributes.
+ * @param second               Second set of block attributes.
+ * @param contentAttributeKeys Names of attributes with the content role.
+ *
+ * @return Whether the user-controlled attributes are equal.
+ */
+function areUserControlledAttributesEqual(
+	first: GridItemAttributes,
+	second: GridItemAttributes,
+	contentAttributeKeys: readonly string[]
 ): boolean {
 	return (
-		areObjectsEqualExcept( first, second, STYLE_ATTRIBUTE_KEY ) &&
+		areObjectsEqualExcept(
+			first,
+			second,
+			new Set( [ 'style', ...contentAttributeKeys ] )
+		) &&
 		areObjectsEqualExcept( first.style, second.style, LAYOUT_STYLE_KEY ) &&
 		areObjectsEqualExcept(
 			first.style?.layout,
@@ -420,6 +448,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 
 			const updates: Record< string, Record< string, unknown > > = {};
 			let needsFollowUpCheck = false;
+			const childBlocksById = new Map(
+				childBlocks.map( ( block ) => [ block.clientId, block ] )
+			);
 			for ( const element of getItemElements() ) {
 				const childId = element.getAttribute( 'data-block' );
 				if ( ! childId ) {
@@ -432,13 +463,31 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				}
 				const itemLayout = attributes.style?.layout ?? {};
 				let itemState = autoSpanState.items.get( childId );
+				const childBlock = childBlocksById.get( childId );
+				const contentAttributeKeys = childBlock
+					? getBlockAttributesNamesByRole(
+							childBlock.name,
+							'content'
+						)
+					: [];
 				const contentAttributesChanged =
 					itemState &&
 					! areContentAttributesEqual(
 						itemState.attributes,
-						attributes
+						attributes,
+						contentAttributeKeys
 					);
-				const canShrink = allowShrink || contentAttributesChanged;
+				const userControlledAttributesChanged =
+					itemState &&
+					! areUserControlledAttributesEqual(
+						itemState.attributes,
+						attributes,
+						contentAttributeKeys
+					);
+				const renderedAttributesChanged =
+					!! contentAttributesChanged ||
+					!! userControlledAttributesChanged;
+				const canShrink = allowShrink || renderedAttributesChanged;
 				let columnSpanChanged = false;
 				let rowSpanChanged = false;
 				if (
@@ -496,16 +545,33 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 							)
 						: 1
 				);
-				const cellWidthChanged =
+				const gridWidthChanged =
 					itemState &&
-					Math.abs(
-						itemState.cellWidth - oneCellDimensions.offsetWidth
-					) > 1;
+					Math.abs( itemState.gridWidth - gridWidth ) > 1;
+				let hasUserColumnSpanOverride =
+					itemState?.hasUserColumnSpanOverride ?? false;
+				let hasUserRowSpanOverride =
+					itemState?.hasUserRowSpanOverride ?? false;
+				let preserveUserResize = itemState?.preserveUserResize ?? false;
+				hasUserColumnSpanOverride ||= columnSpanChanged;
+				hasUserRowSpanOverride ||= rowSpanChanged;
+				preserveUserResize ||= columnSpanChanged || rowSpanChanged;
+				if ( renderedAttributesChanged ) {
+					hasUserColumnSpanOverride = false;
+					hasUserRowSpanOverride = false;
+					preserveUserResize = false;
+				} else if ( allowShrink || gridWidthChanged ) {
+					preserveUserResize = false;
+				}
+				const preserveColumnSpan =
+					hasUserColumnSpanOverride || preserveUserResize;
+				const preserveRowSpan =
+					hasUserRowSpanOverride || preserveUserResize;
 				// Responsive content can adapt after an item grows, making a
 				// resize-only follow-up appear to fit in one cell. Keep the span
-				// from that content until the content or cell width changes.
+				// from that content until the content or grid width changes.
 				const autoColumnSpan =
-					itemState && ! canShrink && ! cellWidthChanged
+					itemState && ! canShrink && ! gridWidthChanged
 						? Math.max(
 								itemState.autoColumnSpan,
 								measuredAutoColumnSpan
@@ -519,16 +585,24 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					columnCount,
 					autoColumnSpan + extraColumnSpan
 				);
-				const desiredWidthRect = getExpandedColumnRect(
+				const contentDrivenWidthRect = getExpandedColumnRect(
 					childId,
 					oneCellRect,
 					desiredColumnSpan,
 					columnCount,
 					rects
 				);
+				const desiredWidthRect = preserveColumnSpan
+					? new GridRect( {
+							columnStart: rect.columnStart,
+							rowStart: userRowStart,
+							columnSpan: rect.columnSpan,
+							rowSpan: 1,
+						} )
+					: contentDrivenWidthRect;
 
-				// Measure height at the content-driven width because widening can reduce
-				// the height of wrapped content.
+				// Measure height at the chosen width because widening can reduce the
+				// height of wrapped content.
 				const desiredWidthDimensions = measureElementAtRect(
 					element,
 					desiredWidthRect,
@@ -575,16 +649,10 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 						measuredAutoRowSpan = 1;
 					}
 				}
-				const cellHeightChanged =
-					itemState &&
-					Math.abs(
-						itemState.cellHeight - oneCellDimensions.offsetHeight
-					) > 1;
 				const autoRowSpan =
 					itemState &&
 					! canShrink &&
-					! cellWidthChanged &&
-					! cellHeightChanged &&
+					! gridWidthChanged &&
 					desiredWidthRect.columnSpan ===
 						itemState.appliedRect.columnSpan
 						? Math.max( itemState.autoRowSpan, measuredAutoRowSpan )
@@ -597,7 +665,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					columnStart: desiredWidthRect.columnStart,
 					rowStart: userRowStart,
 					columnSpan: desiredWidthRect.columnSpan,
-					rowSpan: autoRowSpan + extraRowSpan,
+					rowSpan: preserveRowSpan
+						? rect.rowSpan
+						: autoRowSpan + extraRowSpan,
 				} );
 
 				if ( ! itemState ) {
@@ -610,8 +680,10 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 						extraRowSpan,
 						autoColumnSpan,
 						autoRowSpan,
-						cellWidth: oneCellDimensions.offsetWidth,
-						cellHeight: oneCellDimensions.offsetHeight,
+						gridWidth,
+						hasUserColumnSpanOverride,
+						hasUserRowSpanOverride,
+						preserveUserResize,
 						columnSpanWasImplicit: ! isPositiveInteger(
 							itemLayout.columnSpan
 						),
@@ -626,8 +698,11 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					itemState.extraRowSpan = extraRowSpan;
 					itemState.autoColumnSpan = autoColumnSpan;
 					itemState.autoRowSpan = autoRowSpan;
-					itemState.cellWidth = oneCellDimensions.offsetWidth;
-					itemState.cellHeight = oneCellDimensions.offsetHeight;
+					itemState.gridWidth = gridWidth;
+					itemState.hasUserColumnSpanOverride =
+						hasUserColumnSpanOverride;
+					itemState.hasUserRowSpanOverride = hasUserRowSpanOverride;
+					itemState.preserveUserResize = preserveUserResize;
 				}
 				if ( areGridRectsEqual( desiredRect, rect ) ) {
 					itemState.appliedRect = rect;
@@ -718,6 +793,14 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			characterData: true,
 			subtree: true,
 		} );
+		// Replaced images can finish loading after their content attributes have
+		// already been measured. Remeasure once their intrinsic size is available.
+		const handleImageLoad = ( event: Event ) => {
+			if ( event.target instanceof view.HTMLImageElement ) {
+				scheduleCheck( true );
+			}
+		};
+		gridElement.addEventListener( 'load', handleImageLoad, true );
 		const resizeObserver = new view.ResizeObserver( ( entries ) => {
 			for ( const { target } of entries ) {
 				if (
@@ -747,6 +830,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		return () => {
 			mutationObserver.disconnect();
 			resizeObserver.disconnect();
+			gridElement.removeEventListener( 'load', handleImageLoad, true );
 			if ( frame !== undefined ) {
 				view.cancelAnimationFrame( frame );
 			}
