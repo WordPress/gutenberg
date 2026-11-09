@@ -151,7 +151,9 @@ describe( 'loadImage', () => {
 		try {
 			await expect(
 				loadImage( 'https://example.com/broken.jpg' )
-			).rejects.toBe( loadError );
+			).rejects.toThrow(
+				'Could not load the image at https://example.com/broken.jpg.'
+			);
 		} finally {
 			global.Image = originalImage;
 		}

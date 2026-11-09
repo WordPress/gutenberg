@@ -300,6 +300,19 @@ describe( 'the public API', () => {
 		);
 	} );
 
+	it( 'rejects with an Error when the image fails to load', async () => {
+		const state = createImageEditorState( {
+			image: {
+				src: 'missing.png',
+				naturalWidth: 1200,
+				naturalHeight: 600,
+			},
+		} );
+		const rejection = exportImage( state );
+		await expect( rejection ).rejects.toBeInstanceOf( Error );
+		await expect( rejection ).rejects.toThrow( 'missing.png' );
+	} );
+
 	it( 'exports the framed region at the size getOutputSize reports, in the type asked for', async () => {
 		const state = createImageEditorState( {
 			image: paintedImage( 1200, 600 ),

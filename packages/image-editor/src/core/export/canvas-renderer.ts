@@ -15,7 +15,11 @@ export function loadImage( src: string ): Promise< HTMLImageElement > {
 	return new Promise( ( resolve, reject ) => {
 		const image = new Image();
 		image.addEventListener( 'load', () => resolve( image ) );
-		image.addEventListener( 'error', ( error ) => reject( error ) );
+		// The event carries no message, so reject with an Error a consumer
+		// can show, as the other failures here do.
+		image.addEventListener( 'error', () =>
+			reject( new Error( `Could not load the image at ${ src }.` ) )
+		);
 		image.crossOrigin = 'anonymous';
 		image.src = src;
 	} );
@@ -125,8 +129,8 @@ export function canvasToDataURL(
  * Load an image, render with transforms, and export as a Blob.
  *
  * Throws on failure so callers can distinguish error cases:
- * - Image load failures (network errors, 404s) throw the native
- *   load error from the Image element.
+ * - Image load failures (network errors, 404s) throw an Error naming
+ *   the URL.
  * - Cross-origin failures manifest as tainted-canvas errors from
  *   `canvas.toBlob()` — the browser rejects reading pixel data
  *   from a canvas that drew an image without valid CORS headers.
