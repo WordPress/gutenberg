@@ -36,8 +36,9 @@ const ELLIPSIS = '…';
  * requested again, leaving the block showing whichever length was fetched last.
  * Generated excerpts are therefore kept in state keyed by their request.
  *
- * Only `excerpt.rendered` is read, which the REST API builds the same way in
- * every context, so the request asks for the least privileged one.
+ * Only `excerpt.rendered` is read, so the request asks for the least
+ * privileged context. In that context the REST API returns an empty excerpt
+ * for password protected posts, which callers therefore do not request.
  *
  * @param {string}           postType  Post type of the post to request.
  * @param {number|string}    postId    ID of the post to request.
@@ -135,10 +136,13 @@ export default function PostExcerptEditor( props ) {
 	 * already loaded instead of spending a request per length on a response
 	 * that cannot differ. An excerpt that has been edited but not yet stored
 	 * is displayed as typed, so it does not need a generated excerpt either.
+	 * Password protected posts keep the excerpt loaded in the edit context,
+	 * since a request in the view context returns it empty.
 	 */
 	const needsGeneratedExcerpt =
 		! isShowingRevision &&
 		!! record &&
+		! fullExcerpt?.protected &&
 		! fullExcerpt?.raw?.trim() &&
 		! rawExcerpt?.trim();
 
