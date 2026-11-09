@@ -1,7 +1,7 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import type { Action } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -219,10 +219,21 @@ function MediaEditorRoute() {
 	const openAttachment = ( newId: number ) =>
 		navigate( { to: `/media-editor/${ newId }`, replace: true } );
 
+	const registry = useRegistry();
 	const { removeAllNotices } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
 		( actionId: string ) => {
-			if ( ! DELETE_ACTION_IDS.includes( actionId ) ) {
+			if (
+				! DELETE_ACTION_IDS.includes( actionId ) ||
+				// The trash action calls this even when it fails.
+				registry
+					.select( coreStore )
+					.getLastEntityDeleteError(
+						'postType',
+						'attachment',
+						attachmentId
+					)
+			) {
 				return;
 			}
 			// A full page load loses the action's snackbar, so go to the
@@ -239,7 +250,13 @@ function MediaEditorRoute() {
 			}
 			navigateBack( { replace: true } );
 		},
-		[ attachmentId, isStandaloneAdminPage, navigateBack, removeAllNotices ]
+		[
+			attachmentId,
+			isStandaloneAdminPage,
+			navigateBack,
+			registry,
+			removeAllNotices,
+		]
 	);
 	const postActions: Action< Media >[] = usePostActions( {
 		postType: 'attachment',
