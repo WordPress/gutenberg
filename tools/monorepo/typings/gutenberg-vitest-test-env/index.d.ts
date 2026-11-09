@@ -1,4 +1,5 @@
 import 'vitest';
+import 'vitest/browser';
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 
 interface GutenbergVitestMatchers< R > {
@@ -24,6 +25,12 @@ interface GutenbergVitestEnvironment {
 
 declare global {
 	var wpVitest: GutenbergVitestEnvironment;
+}
+
+declare module 'vitest/browser' {
+	interface BrowserCommands {
+		hoverWithManualTimers: ( selector: string ) => Promise< void >;
+	}
 }
 
 declare module 'vitest' {
