@@ -4,6 +4,7 @@ import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
+import * as Popover from '../../../../popover';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
@@ -761,6 +762,126 @@ export const Grid: Story = {
 					</Autocomplete.List>
 				</div>
 			</Autocomplete.Root>
+		);
+	},
+};
+
+/**
+ * For a searchable picker that opens from a button, such as an emoji or
+ * special character picker, render an inline `Autocomplete` inside a
+ * `Popover`. Don't use `Autocomplete.Popup` for this: it is the suggestion
+ * list for an input outside it, and has no trigger of its own.
+ *
+ * The popover provides the trigger, the dialog semantics, and the focus
+ * handling. It moves focus to the search input when it opens, and returns
+ * focus to the trigger when it closes. Escape in the search input closes the
+ * popover. To close it after a pick, control `open` on `Popover.Root` and
+ * close it from each item's `onClick`. With `autoHighlight`, Enter picks the
+ * top result after typing.
+ *
+ * To open the popover at a position other than its trigger, such as the caret
+ * in a text field, pass an `anchor` to `Popover.Positioner`.
+ */
+export const InlineInPopover: Story = {
+	args: {
+		items: EMOJI_GROUPS,
+		inline: true,
+		open: true,
+		grid: true,
+		autoHighlight: true,
+	},
+	render: function Template( args ) {
+		const [ isPopoverOpen, setIsPopoverOpen ] = useState( false );
+		const [ pickedEmoji, setPickedEmoji ] = useState< string >();
+
+		return (
+			<>
+				<Popover.Root
+					open={ isPopoverOpen }
+					onOpenChange={ setIsPopoverOpen }
+				>
+					<Popover.Trigger>Insert emoji</Popover.Trigger>
+					<Popover.Popup>
+						<VisuallyHidden render={ <Popover.Title /> }>
+							Insert emoji
+						</VisuallyHidden>
+						<Autocomplete.Root { ...args }>
+							<Autocomplete.Input
+								aria-label="Search emojis"
+								placeholder="Search emojis"
+							/>
+							<div
+								style={ {
+									marginTop: 'var(--wpds-dimension-gap-sm)',
+								} }
+							>
+								<Autocomplete.Empty>
+									No matching emojis.
+								</Autocomplete.Empty>
+								<Autocomplete.List>
+									{ (
+										group: ( typeof EMOJI_GROUPS )[ number ]
+									) => (
+										<Autocomplete.Group
+											key={ group.value }
+											items={ group.items }
+										>
+											<Autocomplete.GroupLabel>
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											{ chunkItems(
+												group.items,
+												EMOJI_COLUMNS
+											).map( ( row, rowIndex ) => (
+												<Autocomplete.Row
+													key={ rowIndex }
+													style={
+														emojiPickerRowStyle
+													}
+												>
+													{ row.map( ( emoji ) => (
+														<Autocomplete.Item
+															key={ emoji.value }
+															value={ emoji }
+															aria-label={
+																emoji.label
+															}
+															style={
+																emojiPickerCellStyle
+															}
+															onClick={ () => {
+																setPickedEmoji(
+																	emoji.emoji
+																);
+																setIsPopoverOpen(
+																	false
+																);
+															} }
+														>
+															<Autocomplete.ItemLabel
+																style={
+																	emojiPickerLabelStyle
+																}
+															>
+																<span aria-hidden="true">
+																	{
+																		emoji.emoji
+																	}
+																</span>
+															</Autocomplete.ItemLabel>
+														</Autocomplete.Item>
+													) ) }
+												</Autocomplete.Row>
+											) ) }
+										</Autocomplete.Group>
+									) }
+								</Autocomplete.List>
+							</div>
+						</Autocomplete.Root>
+					</Popover.Popup>
+				</Popover.Root>
+				<p>Picked emoji: { pickedEmoji ?? 'None' }</p>
+			</>
 		);
 	},
 };
