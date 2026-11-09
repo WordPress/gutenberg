@@ -7,6 +7,92 @@ import { unlock } from '../lock-unlock';
 
 const { isBlockAllowedInParent } = unlock( blocksPrivateApis );
 
+function getLayout( attributes ) {
+	const { layout } = attributes;
+	return layout && typeof layout === 'object' && ! Array.isArray( layout )
+		? layout
+		: {};
+}
+
+function getColumnCount( layout ) {
+	return Number.isInteger( layout.columnCount ) && layout.columnCount > 0
+		? layout.columnCount
+		: undefined;
+}
+
+function getMinimumColumnWidth( layout ) {
+	return typeof layout.minimumColumnWidth === 'string' &&
+		layout.minimumColumnWidth
+		? layout.minimumColumnWidth
+		: undefined;
+}
+
+const canvasTransform = {
+	type: 'block',
+	blocks: [ 'core/group' ],
+	variationName: 'group-canvas',
+	isMatch: ( attributes ) => {
+		const layout = getLayout( attributes );
+		return (
+			!! window.__experimentalEnableGridInteractivity &&
+			layout.type === 'grid' &&
+			! layout.isManualPlacement
+		);
+	},
+	transform: ( attributes, innerBlocks ) => {
+		const layout = getLayout( attributes );
+		const columnCount = getColumnCount( layout ) ?? 3;
+		const minimumColumnWidth = getMinimumColumnWidth( layout );
+
+		return createBlock(
+			'core/group',
+			{
+				...attributes,
+				layout: {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount,
+					rowCount: 3,
+					...( minimumColumnWidth && { minimumColumnWidth } ),
+				},
+			},
+			innerBlocks
+		);
+	},
+};
+
+const gridTransform = {
+	type: 'block',
+	blocks: [ 'core/group' ],
+	variationName: 'group-grid',
+	isMatch: ( attributes ) => {
+		const layout = getLayout( attributes );
+		return (
+			!! window.__experimentalEnableGridInteractivity &&
+			layout.type === 'grid' &&
+			!! layout.isManualPlacement
+		);
+	},
+	transform: ( attributes, innerBlocks ) => {
+		const layout = getLayout( attributes );
+		const columnCount = getColumnCount( layout );
+		const minimumColumnWidth = getMinimumColumnWidth( layout );
+
+		return createBlock(
+			'core/group',
+			{
+				...attributes,
+				layout: {
+					type: 'grid',
+					...( columnCount && { columnCount } ),
+					...( minimumColumnWidth && { minimumColumnWidth } ),
+				},
+			},
+			innerBlocks
+		);
+	},
+};
+
 const transforms = {
 	from: [
 		{
@@ -52,6 +138,7 @@ const transforms = {
 			},
 		},
 	],
+	to: [ canvasTransform, gridTransform ],
 };
 
 export default transforms;

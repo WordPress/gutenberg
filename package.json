@@ -99,8 +99,7 @@
 		"lint-staged": "^16.4.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.14.1",
-		"syncpack": "^15.3.1",
-		"wait-on": "^8.0.1"
+		"syncpack": "^15.3.1"
 	},
 	"overrides": {
 		"@y/websocket-server": {
@@ -177,8 +176,8 @@
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
+		"storybook:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook storybook:dev\"",
+		"storybook:e2e:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
 		"test": "npm run lint && npm run test:unit",
