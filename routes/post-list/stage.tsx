@@ -172,7 +172,6 @@ function PostListView( {
 			hasTaxonomies
 				? select( coreStore ).getTaxonomies( {
 						type: postType,
-						per_page: -1,
 					} )
 				: undefined,
 		[ hasTaxonomies, postType ]

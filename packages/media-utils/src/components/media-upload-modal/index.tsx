@@ -287,7 +287,7 @@ export function MediaUploadModal( {
 	const taxonomies = useSelect( ( select ) => {
 		const { getPostType, getTaxonomies } = select( coreStore );
 		return getPostType( 'attachment' )?.taxonomies?.length
-			? getTaxonomies( { type: 'attachment', per_page: -1 } )
+			? getTaxonomies( { type: 'attachment' } )
 			: undefined;
 	}, [] );
 

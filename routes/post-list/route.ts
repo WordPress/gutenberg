@@ -67,7 +67,6 @@ export const route = {
 		const taxonomies = postType?.taxonomies?.length
 			? await resolveSelect( coreStore ).getTaxonomies( {
 					type: params.type,
-					per_page: -1,
 				} )
 			: [];
 		const query = viewToQuery( view, params.type, taxonomies ?? [] );
