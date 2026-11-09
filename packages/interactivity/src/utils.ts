@@ -7,7 +7,7 @@ import {
 	type Inputs,
 } from 'preact/hooks';
 import { effect, signal } from '@preact/signals';
-import { getScope, setScope, resetScope } from './scopes';
+import { getScope, resetScope, runWithoutScope, setScope } from './scopes';
 import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 
 interface Flusher {
@@ -101,8 +101,9 @@ export const onDOMReady = ( callback: () => void ) => {
 
 /**
  * Subscribes to changes in any signal accessed inside the callback, re-running
- * the callback whenever those signals change. The callback runs without an
- * ambient directive scope and the previous scope is restored afterwards.
+ * the callback whenever those signals change. The callback and any cleanup it
+ * returns run without an ambient directive scope; when either returns or
+ * throws, the scope frame that was on top before it ran is on top again.
  *
  * @example
  * ```js
@@ -118,14 +119,14 @@ export const onDOMReady = ( callback: () => void ) => {
  * @return A cleanup function to stop watching.
  */
 export const watch: typeof effect = ( callback ) =>
-	effect( () => {
-		setScope();
-		try {
-			return callback();
-		} finally {
-			resetScope();
-		}
-	} );
+	effect( () =>
+		runWithoutScope( () => {
+			const cleanup = callback();
+			return typeof cleanup === 'function'
+				? () => runWithoutScope( cleanup )
+				: cleanup;
+		} )
+	);
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
