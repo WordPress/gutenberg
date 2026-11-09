@@ -56,6 +56,17 @@ const MOCK_CANT_EMBED_RESPONSE = {
 	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
+// What the proxy returns for an untrusted provider whose HTML has no iframe:
+// core drops the HTML but keeps the type.
+const MOCK_UNTRUSTED_NO_IFRAME_RESPONSE = {
+	url: 'https://mastodon.social/@Mastodon/117466985005297414',
+	html: false,
+	type: 'rich',
+	provider_name: 'mastodon.social',
+	provider_url: 'https://mastodon.social',
+	version: '1.0',
+};
+
 const MOCK_BAD_WORDPRESS_RESPONSE = {
 	code: 'oembed_invalid_url',
 	message: 'Not Found',
@@ -77,6 +88,7 @@ test.describe( 'Embedding content', () => {
 	} );
 
 	test( 'should render embeds in the correct state', async ( {
+		page,
 		editor,
 		embedUtils,
 	} ) => {
@@ -87,6 +99,8 @@ test.describe( 'Embedding content', () => {
 			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
+			'https://mastodon.social/@Mastodon/117466985005297414':
+				MOCK_UNTRUSTED_NO_IFRAME_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
 				MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
@@ -126,6 +140,24 @@ test.describe( 'Embedding content', () => {
 			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'Provider whose oembed API has gone wrong. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/thatbunty' );
+
+		// Check the result once the preview response is handled.
+		const mastodonPreview = page.waitForResponse(
+			( response ) =>
+				new URL( response.url() ).searchParams.get( 'url' ) ===
+				'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await embedUtils.insertEmbed(
+			'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await mastodonPreview;
+		await expect(
+			currentEmbedBlock.getByText(
+				'Sorry, this content could not be embedded.',
+				{ exact: true }
+			),
+			'Untrusted provider whose html core dropped. Should render failed, edit state.'
+		).toBeVisible();
 
 		await embedUtils.insertEmbed(
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/'

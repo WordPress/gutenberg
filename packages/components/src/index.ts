@@ -94,7 +94,7 @@ export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle/deprecated';
 export { default as FormTokenField } from './form-token-field';
 export { default as GradientPicker } from './gradient-picker';
-export { default as CustomGradientPicker } from './custom-gradient-picker';
+export { default as CustomGradientPicker } from './custom-gradient-picker/deprecated';
 export { Grid as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
