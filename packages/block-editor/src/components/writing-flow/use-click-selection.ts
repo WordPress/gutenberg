@@ -62,8 +62,9 @@ export default function useClickSelection() {
 					clickedClientId &&
 					clickedClientId === startClientId &&
 					node.contentEditable === 'true' &&
-					// Not `activeElement`: it stays on the body after the
-					// keyboard is hidden, when nothing has focus.
+					// Not `activeElement`: with nothing focused, as after the
+					// keyboard is hidden, it falls back to the body, which in
+					// the iframe is this wrapper.
 					node.matches( ':focus' )
 				) {
 					event.preventDefault();
