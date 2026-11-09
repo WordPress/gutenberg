@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Template: Add a `render_block_core_post_template_item` filter for the markup of each post item ([#86396](https://github.com/WordPress/gutenberg/issues/86396)).
+
 ### Bug Fixes
 
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).

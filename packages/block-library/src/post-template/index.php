@@ -131,7 +131,23 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
 
-		$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+		$item = '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+
+		/**
+		 * Filters the markup of a single post item rendered by the Post Template block.
+		 *
+		 * The inner blocks are rendered under the internal `core/null` block name,
+		 * so `render_block` filters do not see the item and its wrapper. This
+		 * filter receives the complete `li` element.
+		 *
+		 * @since 7.3.0
+		 *
+		 * @param string   $item          The `li` element, including the post classes and inner blocks.
+		 * @param string   $block_content The rendered inner blocks, without the `li` wrapper.
+		 * @param int      $post_id       The ID of the post rendered by this item.
+		 * @param WP_Block $block         The Post Template block instance.
+		 */
+		$content .= apply_filters( 'render_block_core_post_template_item', $item, $block_content, $post_id, $block );
 	}
 
 	/*
