@@ -6,7 +6,7 @@
 
 -   When client-side image processing generates a sub-size that exceeds
     `maxUploadFileSize`, the item is now cancelled with a user-facing error
-    instead of being silently dropped by the server. ([#86456](https://github.com/WordPress/gutenberg/issues/86456)).
+    instead of being silently dropped by the server. ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
 
 ## 0.44.0 (2026-11-04)
 
