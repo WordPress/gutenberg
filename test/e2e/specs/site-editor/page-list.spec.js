@@ -198,10 +198,10 @@ test.describe( 'Page List', () => {
 					const dateEl = page
 						.getByRole( 'button', { name: 'Edit Date' } )
 						.locator( '..' );
-					const date = new Date();
-					const yy = String( date.getFullYear() );
 
-					await expect( dateEl ).toContainText( yy );
+					// A recent date reads as "Today at 10:28 am" or "November
+					// 3 10:28 am", without the year, but always has the time.
+					await expect( dateEl ).toContainText( /\d{1,2}:\d{2}/ );
 				},
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
