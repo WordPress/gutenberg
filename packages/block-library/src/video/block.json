@@ -121,7 +121,6 @@
 	"selectors": {
 		"dimensions": ".wp-block-video video",
 		"shadow": ".wp-block-video video",
-		"transform": ".wp-block-video video",
 		"filter": {
 			"duotone": ".wp-block-video video"
 		}
