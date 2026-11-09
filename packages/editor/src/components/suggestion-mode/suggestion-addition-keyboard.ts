@@ -672,7 +672,8 @@ export default function SuggestionAdditionKeyboard() {
 				isDeferredInsertion( clientId ) ||
 				isPartOfPendingInsertion(
 					{ getBlockAttributes, getBlockParents },
-					clientId
+					clientId,
+					authorId
 				)
 			) {
 				resetRun();
@@ -733,13 +734,13 @@ export default function SuggestionAdditionKeyboard() {
 				}
 			}
 			/*
-			 * Typing over a selection, or at a caret, that someone else's
-			 * marker would have to share is declined: the new text cannot sit
-			 * inside their addition or deletion, and the replaced text cannot
-			 * be deleted twice. Over someone's formatting change it is a
-			 * replacement of its own. The gesture is consumed, so the caller
-			 * cancels the native edit and the existing suggestion stays
-			 * exactly as it was.
+			 * Typing at a caret or over a selection inside someone else's
+			 * suggestion nests in it: the new text rides on their addition,
+			 * sits between the halves of their deletion, and the replaced
+			 * text gains a second deletion. What is still declined (a
+			 * gesture over the author's own markers that no path above took)
+			 * is consumed, so the caller cancels the native edit and the
+			 * existing suggestion stays exactly as it was.
 			 */
 			const authorToken =
 				authorId === null || authorId === undefined
@@ -766,10 +767,7 @@ export default function SuggestionAdditionKeyboard() {
 					: null;
 			if ( verdict?.verdict === 'refuse' ) {
 				resetRun();
-				notifyEditRefused( registry, {
-					reason: verdict.reason!,
-					blocking: verdict.blocking,
-				} );
+				notifyEditRefused( registry );
 				return true;
 			}
 			const run = runRef.current;

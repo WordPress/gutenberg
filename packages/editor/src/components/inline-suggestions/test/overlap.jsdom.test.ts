@@ -1,6 +1,7 @@
 /**
  * The overlap matrix: which gestures may land on text that already carries
- * another suggestion's marker, now that each marker kind has its own format.
+ * another suggestion's marker. Markers stack, so only formatting over
+ * formatting, or across an addition's edge, is still refused.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { create } from '@wordpress/rich-text';
@@ -75,15 +76,7 @@ describe( 'classifyOverlap', () => {
 		]
 	> = [
 		// Insert at a caret.
-		[
-			'insert inside an addition',
-			'add',
-			'insert',
-			4,
-			4,
-			'refuse',
-			'add-in-add',
-		],
+		[ 'insert inside an addition', 'add', 'insert', 4, 4, 'allow' ],
 		[
 			'insert at an addition’s trailing edge',
 			'add',
@@ -100,15 +93,7 @@ describe( 'classifyOverlap', () => {
 			2,
 			'allow',
 		],
-		[
-			'insert inside a deletion',
-			'del',
-			'insert',
-			4,
-			4,
-			'refuse',
-			'insert-in-del',
-		],
+		[ 'insert inside a deletion', 'del', 'insert', 4, 4, 'allow' ],
 		[
 			'insert at a deletion’s trailing edge',
 			'del',
@@ -128,24 +113,8 @@ describe( 'classifyOverlap', () => {
 		// Delete a range.
 		[ 'delete inside an addition', 'add', 'delete', 3, 5, 'allow' ],
 		[ 'delete an addition and plain text', 'add', 'delete', 0, 4, 'allow' ],
-		[
-			'delete inside a deletion',
-			'del',
-			'delete',
-			3,
-			5,
-			'refuse',
-			'del-over-del',
-		],
-		[
-			'delete across a deletion',
-			'del',
-			'delete',
-			0,
-			4,
-			'refuse',
-			'del-over-del',
-		],
+		[ 'delete inside a deletion', 'del', 'delete', 3, 5, 'allow' ],
+		[ 'delete across a deletion', 'del', 'delete', 0, 4, 'allow' ],
 		[
 			'delete inside a formatting change',
 			'format',
@@ -165,15 +134,7 @@ describe( 'classifyOverlap', () => {
 		// Toggle a format over a range.
 		[ 'format inside an addition', 'add', 'format', 3, 5, 'allow' ],
 		[ 'format the whole addition', 'add', 'format', 2, 6, 'allow' ],
-		[
-			'format across an addition’s edge',
-			'add',
-			'format',
-			0,
-			4,
-			'refuse',
-			'format-straddles-add',
-		],
+		[ 'format across an addition’s edge', 'add', 'format', 0, 4, 'allow' ],
 		[ 'format inside a deletion', 'del', 'format', 3, 5, 'allow' ],
 		[ 'format across a deletion', 'del', 'format', 0, 4, 'allow' ],
 		[
@@ -182,8 +143,7 @@ describe( 'classifyOverlap', () => {
 			'format',
 			3,
 			5,
-			'refuse',
-			'format-on-format',
+			'allow',
 		],
 		[
 			'format across a formatting change',
@@ -191,28 +151,11 @@ describe( 'classifyOverlap', () => {
 			'format',
 			0,
 			4,
-			'refuse',
-			'format-on-format',
+			'allow',
 		],
 		// Type over a selection.
-		[
-			'type over inside an addition',
-			'add',
-			'type-over',
-			3,
-			5,
-			'refuse',
-			'add-in-add',
-		],
-		[
-			'type over inside a deletion',
-			'del',
-			'type-over',
-			3,
-			5,
-			'refuse',
-			'del-over-del',
-		],
+		[ 'type over inside an addition', 'add', 'type-over', 3, 5, 'allow' ],
+		[ 'type over inside a deletion', 'del', 'type-over', 3, 5, 'allow' ],
 		[
 			'type over inside a formatting change',
 			'format',
@@ -269,29 +212,24 @@ describe( 'classifyOverlap', () => {
 		expect( verdict( unauthored, 'delete', 3, 5, null ).reason ).toBe(
 			'own-marker'
 		);
-		expect( verdict( fixture( 'del' ), 'delete', 3, 5, null ).reason ).toBe(
-			'del-over-del'
-		);
+		expect(
+			verdict( fixture( 'del' ), 'delete', 3, 5, null ).verdict
+		).toBe( 'allow' );
 	} );
 
-	it( 'reports a replacement’s halves by their kind', () => {
+	it( 'allows typing inside either half of a replacement', () => {
 		const formats = create( {
 			html: `a${ mark( 'add', 9, 'NEW' ) }${ mark( 'del', 9, 'old' ) }z`,
 		} ).formats;
-		expect( verdict( formats, 'insert', 2, 2 ).reason ).toBe(
-			'add-in-add'
-		);
-		expect( verdict( formats, 'insert', 5, 5 ).reason ).toBe(
-			'insert-in-del'
-		);
-		// The caret between the halves is a trailing edge of the add half
-		// and a leading edge of the del half.
-		expect( verdict( formats, 'insert', 4, 4 ).verdict ).toBe( 'allow' );
+		for ( const caret of [ 2, 4, 5 ] ) {
+			expect( verdict( formats, 'insert', caret, caret ).verdict ).toBe(
+				'allow'
+			);
+		}
 	} );
 
-	it( 'names the blocking marker in a nested stack', () => {
-		// A deletion by author 3 nested in an addition by author 2: deleting
-		// over the nested deletion is blocked by the deletion, not the add.
+	it( 'allows a deletion over a deletion nested in an addition', () => {
+		// A deletion by author 3 nested in an addition by author 2.
 		const formats = create( {
 			html: `a${ mark(
 				'add',
@@ -299,13 +237,42 @@ describe( 'classifyOverlap', () => {
 				`bc${ mark( 'del', 5, 'de', '3' ) }f`
 			) }g`,
 		} ).formats;
-		expect( verdict( formats, 'delete', 2, 5 ) ).toEqual( {
-			verdict: 'refuse',
-			reason: 'del-over-del',
-			blocking: { id: '5', kind: 'del', authorId: '3' },
-		} );
+		expect( verdict( formats, 'delete', 2, 5 ).verdict ).toBe( 'allow' );
 		// Formatting inside the addition, over the nested deletion, is fine.
 		expect( verdict( formats, 'format', 2, 5 ).verdict ).toBe( 'allow' );
+	} );
+
+	it( 'allows formatting across the edge of a stacked addition', () => {
+		// An addition by author 3 nested in an addition by author 2.
+		const formats = create( {
+			html: `a${ mark(
+				'add',
+				4,
+				`bc${ mark( 'add', 5, 'de', '3' ) }f`
+			) }g`,
+		} ).formats;
+		// Inside the nested addition only.
+		expect( verdict( formats, 'format', 3, 5 ).verdict ).toBe( 'allow' );
+		// From the outer addition into the nested one, across its edge.
+		expect( verdict( formats, 'format', 2, 5 ) ).toEqual( {
+			verdict: 'allow',
+		} );
+	} );
+
+	it( 'declines a gesture over the author’s own marker in a stack', () => {
+		// The author's own addition nested in someone else's.
+		const formats = create( {
+			html: `a${ mark(
+				'add',
+				4,
+				`bc${ mark( 'add', 5, 'de', OWN ) }f`
+			) }g`,
+		} ).formats;
+		expect( verdict( formats, 'delete', 3, 5 ) ).toEqual( {
+			verdict: 'refuse',
+			reason: 'own-marker',
+			blocking: { id: '5', kind: 'add', authorId: OWN },
+		} );
 	} );
 
 	it( 'tolerates a missing formats array and an out-of-range span', () => {

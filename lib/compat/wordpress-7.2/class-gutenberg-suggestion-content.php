@@ -62,6 +62,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * anchor form, any marker the pairing walk sees as unbalanced, and the
 		 * markers of `$exclude`d notes.
 		 *
+		 * An addition takes every marker inside it verbatim, so suggestions
+		 * nested in another addition (more additions, deletions) are stored on
+		 * the outermost addition's note, and the anchor index finds them in the
+		 * re-inflated content.
+		 *
 		 * @param string             $content Serialized content, as kses left it.
 		 * @param array<int, true>   $notes   Suggestion note ids of the post.
 		 * A formatting change is only moved out when its note recorded the
@@ -292,12 +297,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( ! $marker ) {
 					continue;
 				}
-				$owner = self::block_owner( $block, $notes );
-				if ( 0 === $owner || isset( $exclude[ $owner ] ) ) {
-					continue;
-				}
+				$owner    = self::block_owner( $block, $notes );
+				$is_owned = 0 !== $owner && ! isset( $exclude[ $owner ] );
 
-				if ( 'pending-insert' === $marker['type'] ) {
+				if ( $is_owned && 'pending-insert' === $marker['type'] ) {
 					$swallow = $block['end'];
 					if ( $owner < 0 ) {
 						$edits[] = array( $block['start'], $block['end'], '' );
@@ -315,7 +318,25 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 					continue;
 				}
 
-				if ( ! isset( $marker['after'] ) || ! is_array( $marker['after'] ) || empty( $marker['after'] ) ) {
+				/*
+				 * Attribute proposals: the marker's own, and those of other
+				 * authors nested on it, each moved onto its note. One rewrite
+				 * of the opener anchors them all.
+				 */
+				$proposals = array();
+				if ( $is_owned && isset( $marker['after'] ) && is_array( $marker['after'] ) && ! empty( $marker['after'] ) ) {
+					$proposals[] = array( null, $owner, $marker['after'] );
+				}
+				foreach ( isset( $marker['nested'] ) && is_array( $marker['nested'] ) ? $marker['nested'] : array() as $index => $entry ) {
+					if ( ! is_array( $entry ) || ! isset( $entry['after'] ) || ! is_array( $entry['after'] ) || empty( $entry['after'] ) ) {
+						continue;
+					}
+					$entry_owner = self::nested_owner( $entry, $notes );
+					if ( 0 !== $entry_owner && ! isset( $exclude[ $entry_owner ] ) ) {
+						$proposals[] = array( $index, $entry_owner, $entry['after'] );
+					}
+				}
+				if ( ! $proposals ) {
 					continue;
 				}
 				$opener = substr( $content, $block['start'], $block['opener_length'] );
@@ -323,24 +344,32 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( ! $attrs || ! isset( $attrs->metadata->suggestion ) || ! is_object( $attrs->metadata->suggestion ) ) {
 					continue;
 				}
-				unset( $attrs->metadata->suggestion->after );
-				$run = null;
-				if ( $owner > 0 ) {
-					$run                              = $next_run( $owner );
-					$attrs->metadata->suggestion->run = $run;
+				$nested = isset( $attrs->metadata->suggestion->nested ) && is_array( $attrs->metadata->suggestion->nested ) ? $attrs->metadata->suggestion->nested : array();
+				$runs   = array();
+				foreach ( $proposals as $key => $proposal ) {
+					list( $index, $note_id ) = $proposal;
+					$target                  = null === $index ? $attrs->metadata->suggestion : ( $nested[ $index ] ?? null );
+					if ( ! is_object( $target ) ) {
+						continue;
+					}
+					unset( $target->after );
+					if ( $note_id > 0 ) {
+						$runs[ $key ] = $next_run( $note_id );
+						$target->run  = $runs[ $key ];
+					}
 				}
 				$anchor = Gutenberg_Suggestion_Block_Scanner::rewrite_opener( $opener, $attrs );
 				if ( null === $anchor ) {
 					continue;
 				}
 				$edits[] = array( $block['start'], $block['start'] + $block['opener_length'], $anchor );
-				if ( null !== $run ) {
-					$items[ $owner ][] = array(
+				foreach ( $runs as $key => $run ) {
+					$items[ $proposals[ $key ][1] ][] = array(
 						'kind'     => 'after',
 						'run'      => $run,
 						'anchor'   => $anchor,
 						'original' => $opener,
-						'after'    => $marker['after'],
+						'after'    => $proposals[ $key ][2],
 					);
 				}
 			}
@@ -605,8 +634,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		/**
 		 * Block-level inflation.
 		 *
-		 * @param string $content Content.
-		 * @param array  $lookup  Items by note id and `kind:run`.
+		 * @param string                                   $content Content.
+		 * @param array<int, array<string, array<mixed>>> $lookup  Items by note id and `kind:run`.
 		 * @return string Content.
 		 */
 		private static function inflate_blocks( $content, $lookup ) {
@@ -634,34 +663,55 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				}
 
 				$marker = Gutenberg_Suggestion_Block_Scanner::marker( $block );
-				if ( ! $marker || ! isset( $marker['run'] ) || ! is_numeric( $marker['run'] ) ) {
+				if ( ! $marker ) {
 					continue;
 				}
-				list( $comment_id, $note_ids ) = Gutenberg_Suggestion_Block_Scanner::marker_note_ids( $block );
-				$item                          = null;
-				foreach ( null !== $comment_id ? array( $comment_id ) : $note_ids as $note_id ) {
-					if ( isset( $lookup[ $note_id ][ 'after:' . (int) $marker['run'] ] ) ) {
-						$item = $lookup[ $note_id ][ 'after:' . (int) $marker['run'] ];
-						break;
+				// The proposal items anchored here: the marker's own (key
+				// `outer`) and each nested entry's (key: its index).
+				$found = array();
+				if ( isset( $marker['run'] ) && is_numeric( $marker['run'] ) ) {
+					list( $comment_id, $note_ids ) = Gutenberg_Suggestion_Block_Scanner::marker_note_ids( $block );
+					foreach ( null !== $comment_id ? array( $comment_id ) : $note_ids as $note_id ) {
+						if ( isset( $lookup[ $note_id ][ 'after:' . (int) $marker['run'] ] ) ) {
+							$found['outer'] = $lookup[ $note_id ][ 'after:' . (int) $marker['run'] ];
+							break;
+						}
 					}
 				}
-				if ( ! $item ) {
+				foreach ( isset( $marker['nested'] ) && is_array( $marker['nested'] ) ? $marker['nested'] : array() as $index => $entry ) {
+					if ( is_array( $entry ) && isset( $entry['run'], $entry['commentId'] ) && is_numeric( $entry['run'] ) && is_numeric( $entry['commentId'] ) ) {
+						$item = $lookup[ (int) $entry['commentId'] ][ 'after:' . (int) $entry['run'] ] ?? null;
+						if ( $item ) {
+							$found[ $index ] = $item;
+						}
+					}
+				}
+				if ( ! $found ) {
 					continue;
 				}
 				$opener = substr( $content, $block['start'], $block['opener_length'] );
-				if ( $opener === $item['anchor'] ) {
-					$edits[] = array( $block['start'], $block['start'] + $block['opener_length'], $item['original'] );
-					continue;
+				foreach ( $found as $item ) {
+					if ( $opener === $item['anchor'] ) {
+						$edits[] = array( $block['start'], $block['start'] + $block['opener_length'], $item['original'] );
+						continue 2;
+					}
 				}
 				// The opener changed since (another writer re-encoded or edited
-				// it): put the proposal back into what is there now.
+				// it): put each proposal back into what is there now.
 				$attrs = Gutenberg_Suggestion_Block_Scanner::opener_attributes( $opener );
-				if ( ! $attrs || ! isset( $attrs->metadata->suggestion ) || ! is_object( $attrs->metadata->suggestion ) || ! isset( $item['after'] ) ) {
+				if ( ! $attrs || ! isset( $attrs->metadata->suggestion ) || ! is_object( $attrs->metadata->suggestion ) ) {
 					continue;
 				}
-				unset( $attrs->metadata->suggestion->run );
-				$attrs->metadata->suggestion->after = json_decode( wp_json_encode( $item['after'] ) );
-				$merged                             = Gutenberg_Suggestion_Block_Scanner::rewrite_opener( $opener, $attrs );
+				$nested = isset( $attrs->metadata->suggestion->nested ) && is_array( $attrs->metadata->suggestion->nested ) ? $attrs->metadata->suggestion->nested : array();
+				foreach ( $found as $key => $item ) {
+					$target = 'outer' === $key ? $attrs->metadata->suggestion : ( $nested[ $key ] ?? null );
+					if ( ! is_object( $target ) || ! isset( $item['after'] ) ) {
+						continue;
+					}
+					unset( $target->run );
+					$target->after = json_decode( wp_json_encode( $item['after'] ) );
+				}
+				$merged = Gutenberg_Suggestion_Block_Scanner::rewrite_opener( $opener, $attrs );
 				if ( null !== $merged ) {
 					$edits[] = array( $block['start'], $block['start'] + $block['opener_length'], $merged );
 				}
@@ -723,12 +773,35 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			if ( null !== $comment_id && $comment_id > 0 ) {
 				return isset( $notes[ $comment_id ] ) ? $comment_id : -1;
 			}
+			// Notes of suggestions nested on the marker are not the marker's.
+			$marker = Gutenberg_Suggestion_Block_Scanner::marker( $block );
+			$nested = array();
+			foreach ( $marker && isset( $marker['nested'] ) && is_array( $marker['nested'] ) ? $marker['nested'] : array() as $entry ) {
+				if ( is_array( $entry ) && isset( $entry['commentId'] ) && is_numeric( $entry['commentId'] ) ) {
+					$nested[ (int) $entry['commentId'] ] = true;
+				}
+			}
 			foreach ( $note_ids as $note_id ) {
-				if ( isset( $notes[ $note_id ] ) ) {
+				if ( isset( $notes[ $note_id ] ) && ! isset( $nested[ $note_id ] ) ) {
 					return $note_id;
 				}
 			}
 			return 0;
+		}
+
+		/**
+		 * The note a suggestion nested on a block's marker belongs to.
+		 *
+		 * @param array<mixed>     $entry Nested marker entry.
+		 * @param array<int, true> $notes Suggestion note ids of the post.
+		 * @return int The note id; 0 when the entry names no note yet; -1 when
+		 *             its `commentId` is not a suggestion note of the post.
+		 */
+		private static function nested_owner( array $entry, array $notes ): int {
+			if ( ! isset( $entry['commentId'] ) || ! is_numeric( $entry['commentId'] ) || (int) $entry['commentId'] <= 0 ) {
+				return 0;
+			}
+			return isset( $notes[ (int) $entry['commentId'] ] ) ? (int) $entry['commentId'] : -1;
 		}
 
 		/**

@@ -218,25 +218,23 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'refuses typing inside another author addition, naming it', () => {
+	it( 'nests typing inside another author addition', () => {
 		const prev = rtd( add( 7, 'ab', 2 ) );
 		const next = rtd( add( 7, 'aXb', 2 ) );
 		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
 			kind: 'insert',
-			actions: [],
-			refusal: {
-				reason: 'add-in-add',
-				blocking: { id: '7', kind: 'add', authorId: '2' },
-			},
+			actions: [
+				{ type: 'insert-add', at: 1, text: 'X', newNote: true },
+			],
 		} );
 	} );
 
-	it( 'refuses typing inside another author deletion', () => {
+	it( 'adds typing inside another author deletion', () => {
 		const prev = rtd( del( 7, 'ab', 2 ) );
 		const next = rtd( del( 7, 'aXb', 2 ) );
-		expect(
-			planEditMarkers( prev, next, { authorId: 9 } ).refusal?.reason
-		).toBe( 'insert-in-del' );
+		const plan = planEditMarkers( prev, next, { authorId: 9 } );
+		expect( plan.refusal ).toBeUndefined();
+		expect( plan.actions ).toMatchObject( [ { type: 'insert-add' } ] );
 	} );
 
 	it( 'adds next to the author own pending deletion', () => {

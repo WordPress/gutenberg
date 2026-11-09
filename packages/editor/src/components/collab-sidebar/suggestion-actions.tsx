@@ -21,6 +21,7 @@ import {
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
 import { isAttributeEqual } from '../suggestion-mode/operations';
+import { readSuggestionMarkers } from '../suggestion-mode/marker';
 import { unlock } from '../../lock-unlock';
 import {
 	describeAnchor,
@@ -44,7 +45,10 @@ import {
 	suggestionRelations,
 	suggestionsEmptiedBy,
 } from '../inline-suggestions';
-import { suggestionContextLines } from './suggestion-context';
+import {
+	blockSuggestionContextLines,
+	suggestionContextLines,
+} from './suggestion-context';
 import SuggestionSizeNotice from './suggestion-size-notice';
 
 const EMPTY_ARRAY: Array< string | null > = [];
@@ -179,8 +183,29 @@ export function useSuggestionDecision( thread: any ) {
 			const inlineOp = payload?.operations?.find(
 				( op: any ) => op.type === 'inline-suggestion' && op.attribute
 			);
-			if ( ! inlineOp || ! thread?.blockClientId ) {
+			if ( ! thread?.blockClientId ) {
 				return EMPTY_LINES;
+			}
+			// A block suggestion sharing its block with other authors'.
+			if ( ! inlineOp ) {
+				const { getEntityRecord: getRecord } = select(
+					coreStore
+				) as any;
+				const blockLines = blockSuggestionContextLines( {
+					markers: readSuggestionMarkers(
+						select( blockEditorStore ).getBlockAttributes(
+							thread.blockClientId
+						)
+					),
+					noteId: String( thread.id ),
+					nameOf: ( noteId ) =>
+						getRecord( 'root', 'comment', Number( noteId ) )
+							?.author_name || undefined,
+					isResolved: ! isPendingStatus(
+						getSuggestionStatus( thread )
+					),
+				} );
+				return blockLines.length ? blockLines : EMPTY_LINES;
 			}
 			const value = select( blockEditorStore ).getBlockAttributes(
 				thread.blockClientId

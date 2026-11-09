@@ -17,6 +17,8 @@ import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import {
 	SUGGESTION_TYPE_FORMAT,
 	applyFormatPlan,
+	formatDeltaFromOriginal,
+	isEmptyFormatDelta,
 	rejectInlineFormat,
 } from '../inline-suggestions';
 import type { FormatPlan } from '../inline-suggestions/reconcile-format';
@@ -36,8 +38,9 @@ import { store as editorStore } from '../../store';
  * single mounted component registers the heavy handler (note creation + marker
  * write) so `useSuggestionsProvider` isn't pulled into every block's render.
  *
- * The handler opens a `format` suggestion note (recording the original run as
- * `beforeHTML` so a reject can restore it), then writes the reformatted run
+ * The handler opens a `format` suggestion note (recording what the change
+ * adds and removes per character as its `delta`, and the run before and
+ * after for the summary), then writes the reformatted run
  * wrapped in one `core/suggestion-format` marker to the live block, bypassing the
  * suggest-mode interceptor exactly as the addition keyboard writes its markers.
  * The text is shown once, carrying the proposed formatting (the Google Docs
@@ -265,7 +268,15 @@ export default function SuggestionFormatKeyboard() {
 			 * turned the note into a discussion, in which case the note (and its
 			 * marker, which anchors it) is kept and revised to propose nothing.
 			 */
-			const retracting = plan.afterHTML === beforeHTML;
+			const proposed = applyFormatPlan( nextContent, plan );
+			const delta = formatDeltaFromOriginal(
+				proposed,
+				commentId,
+				beforeHTML
+			);
+			const retracting =
+				plan.afterHTML === beforeHTML ||
+				( delta !== null && isEmptyFormatDelta( delta ) );
 			const keepForReplies = retracting && mayHaveReplies( commentId );
 			try {
 				if ( retracting && ! keepForReplies ) {
@@ -292,6 +303,7 @@ export default function SuggestionFormatKeyboard() {
 							suggestionType: SUGGESTION_TYPE_FORMAT,
 							beforeHTML,
 							afterHTML: plan.afterHTML,
+							...( delta && { delta } ),
 						},
 					],
 				} );
@@ -301,7 +313,7 @@ export default function SuggestionFormatKeyboard() {
 					notifyDropped();
 					return;
 				}
-				writeContent( clientId, applyFormatPlan( nextContent, plan ) );
+				writeContent( clientId, proposed );
 				if ( keepForReplies ) {
 					notifyKept();
 				}
@@ -328,6 +340,22 @@ export default function SuggestionFormatKeyboard() {
 		async ( request: any ) => {
 			const { clientId, blockName, prevContent, nextContent, plan } =
 				request;
+			/*
+			 * Formatting only the author's own proposed text revises that
+			 * proposal in place: the addition carries the formatting, so no
+			 * note is opened.
+			 */
+			if ( plan.kind === 'merge-own' ) {
+				if (
+					contentKey( getBlockAttributes( clientId )?.content ) !==
+					contentKey( prevContent )
+				) {
+					notifyDropped();
+					return;
+				}
+				writeContent( clientId, nextContent );
+				return;
+			}
 			// A plan naming an existing marker revises that suggestion instead
 			// of creating a second one over the same run.
 			if ( plan.extendsId ) {
@@ -359,6 +387,7 @@ export default function SuggestionFormatKeyboard() {
 							suggestionType: SUGGESTION_TYPE_FORMAT,
 							beforeHTML: plan.beforeHTML,
 							afterHTML: plan.afterHTML,
+							delta: plan.delta,
 						},
 					],
 				} );
@@ -416,7 +445,8 @@ export default function SuggestionFormatKeyboard() {
 			if (
 				! request?.clientId ||
 				! request?.plan ||
-				request.plan.kind !== 'format' ||
+				( request.plan.kind !== 'format' &&
+					request.plan.kind !== 'merge-own' ) ||
 				contentKey( request.prevContent ) === null
 			) {
 				return false;

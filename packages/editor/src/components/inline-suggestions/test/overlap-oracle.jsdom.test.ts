@@ -1,6 +1,9 @@
 /**
- * annezazu's example (#73411), every accept/reject order, through the real
+ * The shared overlap fixtures, every accept/reject order, through the real
  * operations, checked against the character model in `fixtures/`.
+ *
+ * A fixture whose phase of the overlap plan has not landed is skipped here
+ * (see `fixtures/overlap-phases.ts`); the oracle still checks it on its own.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -16,44 +19,49 @@ import {
 	isSuggestionFormat,
 } from '../format';
 import { rebaseFormatOriginal, resolveInlineSuggestion } from '../resolution';
+import { rebaseFormatDelta } from '../format-delta';
+import type { FormatDelta } from '../format-delta';
 import {
-	ANNEZAZU,
-	ANNEZAZU_V2,
-	ANNEZAZU_V3,
-	allSequences,
+	HTML_TAGS,
 	applyDecision,
+	buildFixtureState,
+	displayed,
+	formatDelta,
 	formatOriginalHTML,
-	publishedText,
+	label,
+	render,
+	sampleSequences,
+	sequencesFor,
 	toContentHTML,
 } from './fixtures/overlap-oracle';
 import type { OracleState, Step } from './fixtures/overlap-oracle';
-
-const BOLD = 'test/oracle-bold';
+import { FIXTURES } from './fixtures/overlaps';
+import { randomFixture } from './fixtures/overlap-fuzz';
+import { isPhaseLanded } from './fixtures/overlap-phases';
 
 /**
- * Render a value the way the oracle does: text with bold runs in `<b>`.
+ * Render a value the way the oracle does: text with content formats in
+ * nested tags, markers ignored.
  *
  * @param value Rich-text value.
  * @return Rendering.
  */
 function renderValue( value: RichTextData ): string {
-	let out = '';
-	let bold = false;
 	const formats = value.formats as any[];
-	for ( let i = 0; i < value.text.length; i++ ) {
-		const isBold = !! formats[ i ]?.some( ( f: any ) => f.type === BOLD );
-		if ( isBold !== bold ) {
-			out += isBold ? '<b>' : '</b>';
-			bold = isBold;
-		}
-		out += value.text[ i ];
-	}
-	return out + ( bold ? '</b>' : '' );
+	return render(
+		[ ...value.text ].map( ( ch, i ) => ( {
+			ch,
+			formats: ( formats[ i ] ?? [] )
+				.filter( ( f: any ) => ! isSuggestionFormat( f ) )
+				.map( ( f: any ) => f.type ),
+		} ) )
+	);
 }
 
 /**
  * Drive one decision sequence through `resolveInlineSuggestion`, keeping each
- * pending formatting change's original rebased as the real decision hook does,
+ * pending formatting change's delta and original current as the real
+ * decision hook does,
  * and compare with the oracle after every step.
  *
  * @param start    Starting state.
@@ -61,11 +69,14 @@ function renderValue( value: RichTextData ): string {
  */
 function replay( start: OracleState, sequence: Step[] ) {
 	let value = RichTextData.fromHTMLString( toContentHTML( start ) );
+	expect( renderValue( value ) ).toBe( displayed( start ) );
 	let oracle = start;
 	const originals = new Map< string, string >();
+	const deltas = new Map< string, FormatDelta >();
 	for ( const s of start.suggestions ) {
 		if ( s.kind === 'format' ) {
 			originals.set( s.id, formatOriginalHTML( start, s.id ) );
+			deltas.set( s.id, formatDelta( start, s.id ) );
 		}
 	}
 	const outdated = new Set< string >();
@@ -79,6 +90,7 @@ function replay( start: OracleState, sequence: Step[] ) {
 			suggestionType: suggestion.kind,
 			decision: step.decision,
 			beforeHTML: originals.get( step.id ),
+			formatDeltas: ( id ) => deltas.get( id ),
 		} );
 		expect( effect.restored ).not.toBe( false );
 		value = effect.value;
@@ -92,15 +104,14 @@ function replay( start: OracleState, sequence: Step[] ) {
 				id,
 				rebaseFormatOriginal( originals.get( id )!, offsets )
 			);
+			deltas.set( id, rebaseFormatDelta( deltas.get( id )!, offsets ) );
+		}
+		for ( const [ id, revision ] of effect.formatRevisions ) {
+			originals.set( id, revision.beforeHTML );
+			deltas.set( id, revision.delta );
 		}
 		oracle = applyDecision( oracle, step );
-		expect( renderValue( value ) ).toBe(
-			publishedText( {
-				...oracle,
-				// Pending markers do not change text or formatting.
-				chars: oracle.chars,
-			} )
-		);
+		expect( renderValue( value ) ).toBe( displayed( oracle ) );
 		expect( [ ...outdated ].sort() ).toEqual(
 			oracle.suggestions
 				.filter( ( s ) => s.status === 'outdated' )
@@ -114,129 +125,80 @@ function replay( start: OracleState, sequence: Step[] ) {
 			stack?.some( isSuggestionFormat )
 		)
 	).toBe( false );
-	return { published: renderValue( value ), oracle };
+	expect( renderValue( value ) ).toBe( displayed( oracle ) );
 }
 
-const label = ( sequence: Step[] ) =>
-	sequence
-		.map(
-			( { id, decision } ) =>
-				`${ decision === 'accept' ? '+' : '-' }${
-					{ 1: 'a', 2: 'b', 3: 'c' }[ id ]
-				}`
-		)
-		.join( ' ' );
+const registered: string[] = [];
 
-describe( 'overlapping suggestions oracle', () => {
+describe( 'overlapping suggestions through the operations', () => {
 	beforeAll( () => {
 		registerSuggestionFormat();
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType( BOLD )
-		) {
-			registerFormatType( BOLD, {
-				title: 'Bold',
-				tagName: 'strong',
-				className: null,
-				edit: () => null,
-			} as any );
+		for ( const [ type, tagName ] of Object.entries( HTML_TAGS ) ) {
+			if (
+				! ( select( richTextStore as any ) as any ).getFormatType(
+					type
+				)
+			) {
+				registerFormatType( type, {
+					title: type,
+					tagName,
+					className: null,
+					edit: () => null,
+				} as any );
+				registered.push( type );
+			}
 		}
 	} );
 
 	afterAll( () => {
 		unregisterSuggestionFormats();
-		unregisterFormatType( BOLD );
-	} );
-
-	it( 'has 37 decision sequences with five published texts', () => {
-		const sequences = allSequences( ANNEZAZU );
-		expect( sequences ).toHaveLength( 37 );
-		const finals = new Map< string, number >();
-		for ( const sequence of sequences ) {
-			let state = ANNEZAZU;
-			for ( const step of sequence ) {
-				state = applyDecision( state, step );
-			}
-			const published = publishedText( state );
-			finals.set( published, ( finals.get( published ) ?? 0 ) + 1 );
+		for ( const type of registered ) {
+			unregisterFormatType( type );
 		}
-		expect( Object.fromEntries( finals ) ).toEqual( {
-			'Intro.': 13,
-			'Intro. Bright <b>red apples</b> fell.': 6,
-			'Intro. Bright <b>red </b>.': 6,
-			'Intro. Bright red apples fell.': 6,
-			'Intro. Bright red .': 6,
-		} );
 	} );
 
-	it( 'serializes the example in canonical marker order', () => {
-		const html = toContentHTML( ANNEZAZU );
-		const value = RichTextData.fromHTMLString( html );
-		expect( value.toHTMLString() ).toBe( html );
-	} );
+	for ( const fixture of FIXTURES ) {
+		describe.skipIf( ! isPhaseLanded( fixture.phase ) )(
+			`${ fixture.name } (phase ${ fixture.phase })`,
+			() => {
+				const state = buildFixtureState( fixture );
 
-	describe( 'annezazu', () => {
-		it.each(
-			allSequences( ANNEZAZU ).map( ( sequence ) => [
-				label( sequence ),
-				sequence,
-			] )
-		)( '%s', ( _label, sequence ) => {
-			const { published, oracle } = replay(
-				ANNEZAZU,
-				sequence as Step[]
-			);
-			expect( published ).toBe( publishedText( oracle ) );
-		} );
-	} );
+				it( 'round-trips its content in canonical order', () => {
+					const html = toContentHTML( state );
+					expect(
+						RichTextData.fromHTMLString( html ).toHTMLString()
+					).toBe( html );
+				} );
 
-	describe( 'variant: the deletion covers all of the bolded words', () => {
-		it.each(
-			allSequences( ANNEZAZU_V2 ).map( ( sequence ) => [
-				label( sequence ),
-				sequence,
-			] )
-		)( '%s', ( _label, sequence ) => {
-			const { published, oracle } = replay(
-				ANNEZAZU_V2,
-				sequence as Step[]
-			);
-			expect( published ).toBe( publishedText( oracle ) );
-		} );
+				it.each(
+					sequencesFor( state ).sequences.map( ( sequence ) => [
+						label( sequence, state ),
+						sequence,
+					] )
+				)( '%s', ( _label, sequence ) => {
+					expect.hasAssertions();
+					replay( state, sequence as Step[] );
+				} );
+			}
+		);
+	}
 
-		it( 'accepting the deletion outdates the formatting change', () => {
-			const state = applyDecision( ANNEZAZU_V2, {
-				id: '3',
-				decision: 'accept',
-			} );
-			expect(
-				state.suggestions.find( ( s ) => s.id === '2' )!.status
-			).toBe( 'outdated' );
-		} );
-	} );
-
-	describe( 'variant: the deletion spans original text and the addition', () => {
-		it.each(
-			allSequences( ANNEZAZU_V3 ).map( ( sequence ) => [
-				label( sequence ),
-				sequence,
-			] )
-		)( '%s', ( _label, sequence ) => {
-			const { published, oracle } = replay(
-				ANNEZAZU_V3,
-				sequence as Step[]
-			);
-			expect( published ).toBe( publishedText( oracle ) );
-		} );
-
-		it( 'rejecting the addition shrinks the deletion instead', () => {
-			const state = applyDecision( ANNEZAZU_V3, {
-				id: '1',
-				decision: 'reject',
-			} );
-			expect(
-				state.suggestions.find( ( s ) => s.id === '3' )!.status
-			).toBe( 'pending' );
-			expect( publishedText( state ) ).toBe( 'Intro.' );
-		} );
+	describe.each( [
+		[ 'A', [ 'add', 'del' ] ],
+		[ 'B', [ 'add', 'del', 'format' ] ],
+	] as const )( 'property fuzz (phase %s)', ( phase, kinds ) => {
+		const seeds = Array.from( { length: 25 }, ( _, i ) => 2000 + i );
+		it.skipIf( ! isPhaseLanded( phase ) ).each( seeds )(
+			'seed %i',
+			( seed ) => {
+				const state = buildFixtureState(
+					randomFixture( seed, { kinds: [ ...kinds ] } )
+				);
+				expect.hasAssertions();
+				for ( const sequence of sampleSequences( state, 10, seed ) ) {
+					replay( state, sequence );
+				}
+			}
+		);
 	} );
 } );

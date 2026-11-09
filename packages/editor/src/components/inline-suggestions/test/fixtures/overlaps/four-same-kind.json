@@ -1,0 +1,71 @@
+{
+	"name": "four-same-kind",
+	"description": "A adds words, B types inside A's addition (nested insertion), C deletes across both, D bolds B's word.",
+	"phase": "A",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob",
+		"C": "overlap-carl",
+		"D": "overlap-dana"
+	},
+	"base": "The fox.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"kind": "add",
+			"text": " quick red",
+			"at": 3
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "add",
+			"text": " brown",
+			"at": 9,
+			"inside": [ "A" ]
+		},
+		{ "key": "C", "author": "C", "kind": "del", "range": [ 4, 15 ] },
+		{
+			"key": "D",
+			"author": "D",
+			"kind": "format",
+			"range": [ 10, 15 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		}
+	],
+	"expect": {
+		"all-accepted": "The  red fox.",
+		"all-rejected": "The fox."
+	},
+	"cases": [
+		{
+			"decisions": {
+				"A": "accept",
+				"B": "accept",
+				"C": "reject",
+				"D": "accept"
+			},
+			"published": "The quick <b>brown</b> red fox."
+		},
+		{
+			"decisions": {
+				"A": "accept",
+				"B": "reject",
+				"C": "reject",
+				"D": "accept"
+			},
+			"published": "The quick red fox."
+		},
+		{
+			"decisions": {
+				"A": "reject",
+				"B": "accept",
+				"C": "reject",
+				"D": "accept"
+			},
+			"published": "The fox."
+		}
+	]
+}

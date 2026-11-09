@@ -310,7 +310,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			if ( ! self::saver_can_change_notes( $post_id ) || ! self::has_provisional_notes( $post_id ) ) {
 				return;
 			}
-			$notes = get_comments(
+			$notes   = get_comments(
 				array(
 					'post_id'    => $post_id,
 					'type'       => 'note',
@@ -326,7 +326,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					),
 				)
 			);
-			$post  = get_post( $post_id );
+			$post    = get_post( $post_id );
+			$applied = false;
 			foreach ( $notes as $note ) {
 				$note_id = (int) $note->comment_ID;
 				$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
@@ -336,6 +337,44 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$status = self::status_of( $note_id );
 				if ( 'rejected-unsaved' === $status || self::post_holds_proposal( $post, $payload ) ) {
 					self::resolve( $note_id, 'applied-unsaved' === $status ? 'applied' : 'rejected', get_current_user_id() );
+					$applied = $applied || 'applied-unsaved' === $status;
+				}
+			}
+			if ( $applied && $post instanceof WP_Post ) {
+				self::outdate_held_post_field_proposals( $post );
+			}
+		}
+
+		/**
+		 * Marks `outdated` another author's pending post-field suggestion that
+		 * an accepted one left with nothing to change: the post already holds
+		 * every value it proposes. The saver's own notes are left to the editor,
+		 * as on the content save pass.
+		 *
+		 * @param WP_Post $post Post.
+		 */
+		private static function outdate_held_post_field_proposals( WP_Post $post ): void {
+			$user_id = get_current_user_id();
+			$pending = get_comments(
+				array(
+					'post_id'      => $post->ID,
+					'type'         => 'note',
+					'parent'       => 0,
+					'status'       => 'hold',
+					'meta_key'     => '_wp_suggestion', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_key
+					'meta_compare' => 'EXISTS',
+					'number'       => 0,
+				)
+			);
+			foreach ( $pending as $note ) {
+				$note_id = (int) $note->comment_ID;
+				if ( 'pending' !== self::status_of( $note_id ) || ( 0 !== $user_id && (int) $note->user_id === $user_id ) ) {
+					continue;
+				}
+				$raw     = get_comment_meta( $note_id, '_wp_suggestion', true );
+				$payload = json_decode( is_string( $raw ) ? $raw : '', true );
+				if ( is_array( $payload ) && 'post' === self::anchor_kind( $payload ) && self::post_holds_proposal( $post, $payload ) ) {
+					self::resolve( $note_id, 'outdated', $user_id );
 				}
 			}
 		}

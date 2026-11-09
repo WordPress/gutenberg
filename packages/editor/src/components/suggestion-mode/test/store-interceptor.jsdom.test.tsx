@@ -182,10 +182,15 @@ describe( 'adoptSystemMetadata', () => {
  * staged status edit, and both reads go through `core`. These registries are
  * minimal, so answer the two selectors with nothing.
  */
-function createStubCoreStore( comments: Record< number, any > = {} ) {
+function createStubCoreStore(
+	comments: Record< number, any > = {},
+	currentUserId?: number
+) {
 	return createReduxStore( 'core', {
 		reducer: ( state = {} ) => state,
 		selectors: {
+			getCurrentUser: () =>
+				currentUserId === undefined ? undefined : { id: currentUserId },
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
 			getEntityRecord: (
@@ -232,7 +237,12 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 	function setup( {
 		initialBlocks,
 		comments,
-	}: { initialBlocks?: any[]; comments?: Record< number, any > } = {} ) {
+		currentUserId,
+	}: {
+		initialBlocks?: any[];
+		comments?: Record< number, any >;
+		currentUserId?: number;
+	} = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
@@ -242,7 +252,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.register( createStubCoreStore( comments ) );
+		registry.register( createStubCoreStore( comments, currentUserId ) );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
@@ -1878,6 +1888,264 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			registry.select( blockEditorStore ).isLastBlockChangePersistent()
 		).toBe( false );
+	} );
+	describe( 'on another author’s suggested block', () => {
+		const anne = 3;
+		const bob = 7;
+		const twoBlocks = ( marker: any ) => [
+			createBlock( TEST_BLOCK_NAME, {
+				content: 'First',
+				metadata: { suggestion: marker },
+			} ),
+			createBlock( TEST_BLOCK_NAME, { content: 'Second' } ),
+		];
+
+		it( 'nests a removal of the block instead of deleting it', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-insert',
+				authorId: anne,
+				commentId: 12,
+			} );
+			const { registry, getOverlay } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry.dispatch( blockEditorStore ).removeBlock( clientId );
+			} );
+			await flushSubscribers();
+
+			expect( markerOf( registry, clientId ) ).toEqual( {
+				type: 'pending-insert',
+				authorId: anne,
+				commentId: 12,
+				nested: [
+					expect.objectContaining( {
+						type: 'pending-remove',
+						authorId: bob,
+					} ),
+				],
+			} );
+			expect( captureOf( getOverlay, clientId )?.type ).toBe(
+				'block-remove'
+			);
+		} );
+
+		it( 'still lets the author take back their own suggested block', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-insert',
+				authorId: bob,
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.removeBlock( blocks[ 0 ].clientId );
+			} );
+			await flushSubscribers();
+
+			expect(
+				registry.select( blockEditorStore ).getBlockOrder()
+			).toEqual( [ blocks[ 1 ].clientId ] );
+		} );
+
+		it( 'adds a second removal to another author’s removal', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-remove',
+				authorId: anne,
+				commentId: 12,
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry.dispatch( blockEditorStore ).removeBlock( clientId );
+			} );
+			await flushSubscribers();
+
+			expect( markerOf( registry, clientId ) ).toMatchObject( {
+				type: 'pending-remove',
+				authorId: anne,
+				commentId: 12,
+				nested: [ { type: 'pending-remove', authorId: bob } ],
+			} );
+		} );
+
+		it( 'nests a removal over another author’s move, leaving the move', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-move',
+				authorId: anne,
+				commentId: 12,
+				fromAnchorClientId: null,
+				fromParentClientId: null,
+				fromIndex: 1,
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry.dispatch( blockEditorStore ).removeBlock( clientId );
+			} );
+			await flushSubscribers();
+
+			expect(
+				registry.select( blockEditorStore ).getBlockOrder()
+			).toEqual( [ clientId, blocks[ 1 ].clientId ] );
+			expect( markerOf( registry, clientId ) ).toMatchObject( {
+				type: 'pending-move',
+				authorId: anne,
+				commentId: 12,
+				nested: [ { type: 'pending-remove', authorId: bob } ],
+			} );
+		} );
+
+		it( 'keys an attribute change as the second author’s own proposal', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-attributes',
+				authorId: anne,
+				commentId: 12,
+				after: { content: 'Anne' },
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( clientId, { content: 'Bob' } );
+			} );
+			await flushSubscribers();
+
+			expect( attributesOf( registry, clientId ).content ).toBe(
+				'First'
+			);
+			expect( markerOf( registry, clientId ) ).toMatchObject( {
+				type: 'pending-attributes',
+				authorId: anne,
+				after: { content: 'Anne' },
+				nested: [
+					{
+						type: 'pending-attributes',
+						authorId: bob,
+						after: { content: 'Bob' },
+					},
+				],
+			} );
+		} );
+
+		it( 'moves a block another author suggested changing, nesting their change', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-attributes',
+				authorId: anne,
+				commentId: 12,
+				after: { content: 'Anne' },
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.moveBlockToPosition( clientId, '', '', 1 );
+			} );
+			await flushSubscribers();
+
+			expect(
+				registry.select( blockEditorStore ).getBlockOrder()
+			).toEqual( [ blocks[ 1 ].clientId, clientId ] );
+			expect( markerOf( registry, clientId ) ).toMatchObject( {
+				type: 'pending-move',
+				authorId: bob,
+				fromIndex: 0,
+				nested: [
+					{
+						type: 'pending-attributes',
+						authorId: anne,
+						commentId: 12,
+						after: { content: 'Anne' },
+					},
+				],
+			} );
+		} );
+
+		it( 'puts back a move of a block another author suggested moving', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-move',
+				authorId: anne,
+				commentId: 12,
+				fromAnchorClientId: null,
+				fromParentClientId: null,
+				fromIndex: 1,
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.moveBlockToPosition( clientId, '', '', 1 );
+			} );
+			await flushSubscribers();
+
+			expect(
+				registry.select( blockEditorStore ).getBlockOrder()
+			).toEqual( [ clientId, blocks[ 1 ].clientId ] );
+			expect( markerOf( registry, clientId ) ).toMatchObject( {
+				type: 'pending-move',
+				authorId: anne,
+				commentId: 12,
+			} );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice: any ) => notice.id )
+			).toContain( 'suggestion-move-over-move' );
+		} );
+
+		it( 'turns an edit inside another author’s suggested block into a proposal', async () => {
+			const blocks = twoBlocks( {
+				type: 'pending-insert',
+				authorId: anne,
+				commentId: 12,
+			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( clientId, { content: 'Bob' } );
+			} );
+			await flushSubscribers();
+
+			expect( attributesOf( registry, clientId ).content ).toBe(
+				'First'
+			);
+			expect(
+				markerOf( registry, clientId )?.nested?.[ 0 ]
+			).toMatchObject( {
+				type: 'pending-attributes',
+				authorId: bob,
+				after: { content: 'Bob' },
+			} );
+		} );
 	} );
 } );
 

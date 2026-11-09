@@ -17,7 +17,9 @@
  *   included, since the Tag Processor sees each opener.
  * - a structural marker type (`pending-insert`, `pending-remove`,
  *   `pending-move`, `pending-attributes`): `metadata.suggestion` on a block,
- *   linked to its notes by `metadata.noteId` and `metadata.suggestion.commentId`.
+ *   or an entry other authors nested on it (`metadata.suggestion.nested`),
+ *   each linked to its note by its `commentId`. A marker without one falls
+ *   back to the block's `metadata.noteId` links that no entry claims.
  * - `pending-attributes` also for any marker that carries a non-empty `after`,
  *   since an attribute edit can ride on another marker type, or the `run` the
  *   save pass leaves in its place.
@@ -85,19 +87,37 @@ function gutenberg_index_structural_suggestion_anchors( $blocks, &$index ) {
 		if ( ! $marker || ! isset( $marker['type'] ) || ! in_array( $marker['type'], $types, true ) ) {
 			continue;
 		}
-		$ids = isset( $metadata['noteId'] ) ? (array) $metadata['noteId'] : array();
-		if ( isset( $marker['commentId'] ) ) {
-			$ids[] = $marker['commentId'];
-		}
-		$proposes = ( isset( $marker['after'] ) && is_array( $marker['after'] ) && ! empty( $marker['after'] ) ) || isset( $marker['run'] );
-		foreach ( $ids as $id ) {
-			$id = is_numeric( $id ) ? (int) $id : 0;
-			if ( $id <= 0 ) {
-				continue;
+		// The marker, then the suggestions other authors nested on it.
+		$entries = array( $marker );
+		foreach ( isset( $marker['nested'] ) && is_array( $marker['nested'] ) ? $marker['nested'] : array() as $entry ) {
+			if ( is_array( $entry ) && isset( $entry['type'] ) && in_array( $entry['type'], $types, true ) ) {
+				$entries[] = $entry;
 			}
-			$index[ $id ][ $marker['type'] ] = true;
-			if ( $proposes ) {
-				$index[ $id ]['pending-attributes'] = true;
+		}
+		$claimed = array();
+		foreach ( $entries as $entry ) {
+			if ( isset( $entry['commentId'] ) && is_numeric( $entry['commentId'] ) && (int) $entry['commentId'] > 0 ) {
+				$claimed[ (int) $entry['commentId'] ] = true;
+			}
+		}
+		$links = array();
+		foreach ( isset( $metadata['noteId'] ) ? (array) $metadata['noteId'] : array() as $id ) {
+			$id = is_numeric( $id ) ? (int) $id : 0;
+			if ( $id > 0 && ! isset( $claimed[ $id ] ) ) {
+				$links[] = $id;
+			}
+		}
+		foreach ( $entries as $entry ) {
+			// An entry anchors its own note; one saved before it had a note
+			// id falls back to the block's note links no entry claims.
+			$own      = isset( $entry['commentId'] ) && is_numeric( $entry['commentId'] ) ? (int) $entry['commentId'] : 0;
+			$ids      = $own > 0 ? array( $own ) : $links;
+			$proposes = ( isset( $entry['after'] ) && is_array( $entry['after'] ) && ! empty( $entry['after'] ) ) || isset( $entry['run'] );
+			foreach ( $ids as $id ) {
+				$index[ $id ][ $entry['type'] ] = true;
+				if ( $proposes ) {
+					$index[ $id ]['pending-attributes'] = true;
+				}
 			}
 		}
 	}

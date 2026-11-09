@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
 import {
 	registerFormatType,
@@ -57,11 +57,14 @@ export const SUGGESTION_TYPE_FORMAT = 'format';
 export type SuggestionMarkerKind = 'add' | 'del' | 'format';
 
 /**
- * One rich-text format per marker kind. Rich text keeps one format of a type
- * per character, so a single shared format would let a second author's marker
- * over the same text replace the first and take its attribution. With one
- * format per kind, a deletion or a formatting change can sit inside someone
- * else's addition. Same-kind overlap is still refused by the editing paths.
+ * One rich-text format per marker kind, so markers of different kinds share
+ * characters without re-attributing each other. Markers of one kind stack: a
+ * character may carry several, one per suggestion (an addition typed inside
+ * someone's addition, two people deleting the same words), told apart by id.
+ * They nest as one `<mark>` per suggestion. Rich text's `applyFormat`,
+ * `removeFormat` and `toggleFormat` keep one format of a type per character,
+ * so marker writers edit the stacks directly (`addSuggestionMarker`,
+ * `removeSuggestionMarker`) instead.
  *
  * Each kind serializes as `<mark class="wp-suggestion-<kind>">` plus the
  * `data-suggestion-id`, `data-suggestion-type` and `data-author` attributes.
@@ -156,8 +159,57 @@ export function suggestionFormatNameFor( kind: SuggestionMarkerKind ): string {
 }
 
 /**
- * The markers in one character's format stack, by kind. A stack holds at most
- * one marker of each kind.
+ * The id a marker carries, as a string.
+ *
+ * @param marker Marker format.
+ * @return Note id, or '' when absent.
+ */
+export function suggestionMarkerId( marker: any ): string {
+	return String( marker?.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ?? '' );
+}
+
+/**
+ * Order two note ids, oldest first. Comment ids grow monotonically per site;
+ * a non-numeric id sorts after numeric ones, by string.
+ *
+ * @param a First id.
+ * @param b Second id.
+ * @return Negative when `a` is older.
+ */
+export function compareSuggestionIds( a: string, b: string ): number {
+	const numberA = Number( a );
+	const numberB = Number( b );
+	const isNumberA = a !== '' && Number.isFinite( numberA );
+	const isNumberB = b !== '' && Number.isFinite( numberB );
+	if ( isNumberA && isNumberB ) {
+		return numberA - numberB;
+	}
+	if ( isNumberA !== isNumberB ) {
+		return isNumberA ? -1 : 1;
+	}
+	return a < b ? -1 : Number( a > b );
+}
+
+/**
+ * Canonical order of two markers: by kind (`SUGGESTION_KIND_ORDER`), then by
+ * id, oldest first.
+ *
+ * @param a Marker format.
+ * @param b Marker format.
+ * @return Negative when `a` sits outside `b`.
+ */
+function compareMarkers( a: any, b: any ): number {
+	return (
+		SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( a )! ) -
+			SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( b )! ) ||
+		compareSuggestionIds( suggestionMarkerId( a ), suggestionMarkerId( b ) )
+	);
+}
+
+/**
+ * The outermost marker of each kind in one character's format stack. In a
+ * canonical stack that is the oldest suggestion of the kind; use
+ * `suggestionMarkerListsAt` where a stack can hold several of one kind.
  *
  * @param stack Per-character format stack.
  * @return Markers present, keyed by kind.
@@ -173,6 +225,29 @@ export function suggestionMarkersAt(
 		}
 	}
 	return markers;
+}
+
+/**
+ * Every marker of each kind in one character's format stack, outermost first.
+ *
+ * @param stack Per-character format stack.
+ * @return Marker lists, keyed by kind; a kind not present has none.
+ */
+export function suggestionMarkerListsAt(
+	stack: any[] | undefined | null
+): Record< SuggestionMarkerKind, any[] > {
+	const lists: Record< SuggestionMarkerKind, any[] > = {
+		add: [],
+		format: [],
+		del: [],
+	};
+	for ( const format of stack ?? [] ) {
+		const kind = suggestionKindOf( format );
+		if ( kind ) {
+			lists[ kind ].push( format );
+		}
+	}
+	return lists;
 }
 
 /**
@@ -208,15 +283,17 @@ function isSameMarker( a: any, b: any ): boolean {
 }
 
 /**
- * Reorder every character's format stack so markers come first, in
- * `SUGGESTION_KIND_ORDER`, followed by the other formats in their existing
- * order, and let adjacent characters share one object for the same marker.
+ * Reorder every character's format stack so markers come first, by kind in
+ * `SUGGESTION_KIND_ORDER` and within a kind by id, oldest outermost, followed
+ * by the other formats in their existing order. A marker repeated on a
+ * character (same kind and id) is kept once. Adjacent characters share one
+ * object for the same marker.
  *
- * `applyFormat` slots a new format in at the shallowest depth its whole range
- * shares, so the nesting of two markers - and with it the serialized bytes -
- * would depend on the order they were written in. One fixed order keeps the
- * HTML identical for the same state (stable round trips and RTC merges) and
- * never splits a format marker around a nested deletion.
+ * One fixed order keeps the HTML identical for the same state, whatever order
+ * the markers were written in (stable round trips and RTC merges), and never
+ * splits a format marker around a nested deletion. Older suggestions sit
+ * outside newer ones, and ids grow monotonically, so the order is the same on
+ * every peer.
  *
  * `toTree` reuses an element while the formats at each depth stay the same
  * objects, so a marker parsed from two adjacent elements (or written in two
@@ -240,12 +317,16 @@ export function canonicalizeSuggestionStack< T extends { formats: any[] } >(
 			previous = [];
 			continue;
 		}
-		markers.sort(
-			( a, b ) =>
-				SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( a )! ) -
-				SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( b )! )
+		markers.sort( compareMarkers );
+		const unique = markers.filter(
+			( marker, i ) =>
+				i === 0 ||
+				suggestionKindOf( marker ) !==
+					suggestionKindOf( markers[ i - 1 ] ) ||
+				suggestionMarkerId( marker ) !==
+					suggestionMarkerId( markers[ i - 1 ] )
 		);
-		const unified = markers.map(
+		const unified = unique.map(
 			( marker ) =>
 				previous.find( ( candidate ) =>
 					isSameMarker( candidate, marker )
@@ -258,13 +339,136 @@ export function canonicalizeSuggestionStack< T extends { formats: any[] } >(
 				( format: any ) => ! isSuggestionFormat( format )
 			),
 		];
-		if ( ordered.every( ( format, i ) => format === stack[ i ] ) ) {
+		if (
+			ordered.length === stack.length &&
+			ordered.every( ( format, i ) => format === stack[ i ] )
+		) {
 			continue;
 		}
 		formats ??= record.formats.slice();
 		formats[ index ] = ordered;
 	}
 	return formats ? { ...record, formats } : record;
+}
+
+/**
+ * Whether two markers are the same suggestion's marker: same kind and id.
+ *
+ * @param a Marker format.
+ * @param b Marker format.
+ * @return True when they mark the same suggestion.
+ */
+function isSameSuggestion( a: any, b: any ): boolean {
+	return (
+		suggestionKindOf( a ) === suggestionKindOf( b ) &&
+		suggestionMarkerId( a ) === suggestionMarkerId( b )
+	);
+}
+
+/**
+ * Add a marker to every character of `[start, end)`, keeping every other
+ * marker there, including others of the same kind, and put the stacks in
+ * canonical order. A character already carrying the suggestion's marker gets
+ * this one in its place, so the run shares one object.
+ *
+ * @param record Rich-text record.
+ * @param marker Marker format.
+ * @param start  Range start.
+ * @param end    Range end (exclusive).
+ * @return The record with the marker added.
+ */
+export function addSuggestionMarker< T extends { formats: any[] } >(
+	record: T,
+	marker: any,
+	start: number,
+	end: number
+): T {
+	const formats = record.formats.slice();
+	for ( let i = Math.max( 0, start ); i < end && i < formats.length; i++ ) {
+		const stack: any[] = formats[ i ] ?? [];
+		formats[ i ] = [
+			marker,
+			...stack.filter(
+				( format ) => ! isSameSuggestion( format, marker )
+			),
+		];
+	}
+	return canonicalizeSuggestionStack( { ...record, formats } );
+}
+
+/**
+ * Remove one suggestion's marker of one kind from every character of
+ * `[start, end)`, leaving every other marker, including others of the same
+ * kind.
+ *
+ * @param record Rich-text record.
+ * @param kind   Marker kind.
+ * @param id     Note id the marker carries.
+ * @param start  Range start.
+ * @param end    Range end (exclusive).
+ * @return The record without that marker in the range.
+ */
+export function removeSuggestionMarker< T extends { formats: any[] } >(
+	record: T,
+	kind: SuggestionMarkerKind,
+	id: number | string,
+	start: number,
+	end: number
+): T {
+	const target = String( id );
+	const formats = record.formats.slice();
+	for ( let i = Math.max( 0, start ); i < end && i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! Array.isArray( stack ) ) {
+			continue;
+		}
+		const kept = stack.filter(
+			( format ) =>
+				suggestionKindOf( format ) !== kind ||
+				suggestionMarkerId( format ) !== target
+		);
+		if ( kept.length ) {
+			formats[ i ] = kept;
+		} else {
+			// A hole, as rich text leaves one: `normaliseFormats` skips
+			// holes but not an explicit undefined.
+			delete formats[ i ];
+		}
+	}
+	return canonicalizeSuggestionStack( { ...record, formats } );
+}
+
+/**
+ * Remove every marker, of every kind and id, from `[start, end)`.
+ *
+ * @param record Rich-text record.
+ * @param start  Range start.
+ * @param end    Range end (exclusive).
+ * @return The record without markers in the range.
+ */
+export function removeAllSuggestionMarkers< T extends { formats: any[] } >(
+	record: T,
+	start: number,
+	end: number
+): T {
+	const formats = record.formats.slice();
+	for ( let i = Math.max( 0, start ); i < end && i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! Array.isArray( stack ) ) {
+			continue;
+		}
+		const kept = stack.filter(
+			( format ) => ! isSuggestionFormat( format )
+		);
+		if ( kept.length ) {
+			formats[ i ] = kept;
+		} else {
+			// A hole, as rich text leaves one: `normaliseFormats` skips
+			// holes but not an explicit undefined.
+			delete formats[ i ];
+		}
+	}
+	return { ...record, formats };
 }
 
 /**
@@ -358,6 +562,9 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
 	}
 }
 
+/** How many stacked markers on one character are announced. */
+export const SUGGESTION_A11Y_MAX_ANNOUNCED = 3;
+
 /**
  * Editor-only decoration pass that gives suggestion markers screen-reader
  * semantics. A bare `<mark class="wp-suggestion-del">` is invisible to
@@ -374,11 +581,13 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
  * DOM but are ignored when the DOM is parsed back into a value (see
  * `toFormat` in `@wordpress/rich-text`), exactly like `core/annotation`.
  *
- * Every marker in a stack gets its own decoration, so nested suggestions read
- * as outer start, inner start, text, inner end, outer end. One decoration
- * object is reused across each marker's run (rich text merges adjacent
- * identical format references into a single element), so a marker gains
- * exactly one nested role element.
+ * Each marker in a stack gets its own decoration, so nested suggestions read
+ * as outer start, inner start, text, inner end, outer end. Only the innermost
+ * `SUGGESTION_A11Y_MAX_ANNOUNCED` markers on a character are announced; the
+ * outermost of those also says how many more there are, so a deep stack does
+ * not bury the text in announcements. One decoration object is reused across
+ * each marker's run (rich text merges adjacent identical format references
+ * into a single element), so a marker gains one nested role element.
  *
  * Each decoration is spliced in directly after its marker rather than pushed
  * onto the end of the stack. `toTree` decides whether to reuse an element by
@@ -396,15 +605,33 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 		return formats;
 	}
 	let out: any[] | null = null;
-	const decorations = new Map< any, any >();
-	const decorationFor = ( marker: any ) => {
-		let decoration = decorations.get( marker );
+	const decorations = new Map< string, any >();
+	const markerKeys = new Map< any, number >();
+	const decorationFor = ( marker: any, more: number ) => {
+		if ( ! markerKeys.has( marker ) ) {
+			markerKeys.set( marker, markerKeys.size );
+		}
+		const key = `${ markerKeys.get( marker ) }:${ more }`;
+		let decoration = decorations.get( key );
 		if ( decoration ) {
 			return decoration;
 		}
 		const type = suggestionKindOf( marker )!;
 		const author = marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
-		const { start, end, role } = getSuggestionA11yDescriptor( type );
+		const descriptor = getSuggestionA11yDescriptor( type );
+		const { end, role } = descriptor;
+		const start = more
+			? sprintf(
+					/* translators: 1: announcement of a suggestion's start, 2: number of further suggestions on the same text. */
+					_n(
+						'%1$s %2$d more suggestion on this text.',
+						'%1$s %2$d more suggestions on this text.',
+						more
+					),
+					descriptor.start,
+					more
+				)
+			: descriptor.start;
 		/*
 		 * Absent values are omitted rather than set to a falsy one: rich
 		 * text renders every key in this object, so an undefined entry would
@@ -426,7 +653,7 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 				...( author !== undefined && { author } ),
 			},
 		};
-		decorations.set( marker, decoration );
+		decorations.set( key, decoration );
 		return decoration;
 	};
 	for ( let i = 0; i < formats.length; i++ ) {
@@ -435,11 +662,19 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 			continue;
 		}
 		out ??= formats.slice();
+		const markers = stack.filter( isSuggestionFormat );
+		const skipped = Math.max(
+			0,
+			markers.length - SUGGESTION_A11Y_MAX_ANNOUNCED
+		);
 		const decorated: any[] = [];
 		for ( const format of stack ) {
 			decorated.push( format );
-			if ( isSuggestionFormat( format ) ) {
-				decorated.push( decorationFor( format ) );
+			const depth = markers.indexOf( format );
+			if ( depth >= skipped ) {
+				decorated.push(
+					decorationFor( format, depth === skipped ? skipped : 0 )
+				);
 			}
 		}
 		out[ i ] = decorated;

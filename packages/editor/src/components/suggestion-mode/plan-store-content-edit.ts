@@ -5,7 +5,7 @@ import {
 	analyzeTextEdit,
 	isSuggestionFormat,
 	planEditMarkers,
-	suggestionMarkersAt,
+	suggestionMarkerListsAt,
 } from '../inline-suggestions';
 import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 
@@ -167,20 +167,21 @@ export function settleStoreContentRemoval(
 		 * author's deletion or formatting change nested in it goes with it:
 		 * it described text that is no longer proposed.
 		 */
-		const addition = suggestionMarkersAt( stack ).add;
-		const attributes = ( addition?.attributes ?? {} ) as Record<
-			string,
-			string
-		>;
-		if (
-			! addition ||
-			String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
-				authorToken
-		) {
+		const own = suggestionMarkerListsAt( stack ).add.filter(
+			( addition ) =>
+				String(
+					addition.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+				) === authorToken
+		);
+		if ( ! own.length ) {
 			return { refuse: true };
 		}
 		retract[ i ] = true;
-		retractedIds.add( String( attributes[ SUGGESTION_ID_ATTRIBUTE ] ) );
+		for ( const addition of own ) {
+			retractedIds.add(
+				String( addition.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
+			);
+		}
 		marked = true;
 	}
 	if ( ! marked ) {
