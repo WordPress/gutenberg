@@ -46,24 +46,24 @@ function render_block_core_calendar( $attributes ) {
 	/*
 	 * Text, background, and border are skip-serialized onto the table (#42029).
 	 * Cell borders inherit from the table via style.scss (same pattern as Table).
+	 * Calendar applies only text and background colors, not gradients.
 	 */
-	$color_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor' ) ) );
+	$support_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor', 'borderColor' ) ) );
 	foreach ( array( 'text', 'background' ) as $feature ) {
 		if ( isset( $attributes['style']['color'][ $feature ] ) ) {
-			$color_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
+			$support_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
 		}
 	}
+	if ( isset( $attributes['style']['border'] ) ) {
+		$support_attributes['style']['border'] = $attributes['style']['border'];
+	}
 
-	$color_styles  = wp_get_color_classes_and_styles( $color_attributes );
-	$border_styles = wp_get_border_classes_and_styles(
-		block_core_calendar_normalize_border_attributes( $attributes )
-	);
-
-	$table_styles  = ( $color_styles['style'] ?? '' ) . ( $border_styles['style'] ?? '' );
-	$table_classes = trim( ( $color_styles['class'] ?? '' ) . ' ' . ( $border_styles['class'] ?? '' ) );
+	$styles        = wp_get_block_supports_classes_and_styles( $support_attributes, array( 'color', 'border' ) );
+	$table_styles  = $styles['style'] ?? '';
+	$table_classes = $styles['class'] ?? '';
 
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$table_classes .= ' has-link-color';
+		$table_classes = trim( $table_classes . ' has-link-color' );
 	}
 
 	$calendar  = get_calendar( array( 'display' => false ) );
@@ -71,7 +71,9 @@ function render_block_core_calendar( $attributes ) {
 	$processor = new WP_HTML_Tag_Processor( $calendar );
 
 	if ( $processor->next_tag( 'TABLE' ) ) {
-		block_core_calendar_merge_style_attribute( $processor, $table_styles );
+		if ( '' !== $table_styles ) {
+			$processor->set_attribute( 'style', $table_styles );
+		}
 
 		foreach ( preg_split( '/\s+/', $table_classes, -1, PREG_SPLIT_NO_EMPTY ) as $classname ) {
 			$processor->add_class( $classname );
@@ -108,97 +110,6 @@ function register_block_core_calendar() {
 }
 
 add_action( 'init', 'register_block_core_calendar' );
-
-/**
- * Normalizes border attributes for application on the calendar table.
- *
- * Linked "all sides" selections are often stored as four identical per-side
- * objects. Flatten those so table inheritance paints a full cell grid. Mixed
- * per-side borders are left as-is for the edge SCSS selectors.
- *
- * @since 7.3.0
- *
- * @param array $attributes Block attributes.
- * @return array Attributes with a normalized border value.
- */
-function block_core_calendar_normalize_border_attributes( $attributes ) {
-	$border = $attributes['style']['border'] ?? null;
-	if ( ! is_array( $border ) ) {
-		return $attributes;
-	}
-
-	// Already a flat / all-sides border.
-	if ( isset( $border['width'] ) || isset( $border['color'] ) || isset( $border['style'] ) ) {
-		return $attributes;
-	}
-
-	$sides  = array( 'top', 'right', 'bottom', 'left' );
-	$shared = null;
-
-	foreach ( $sides as $side ) {
-		if ( empty( $border[ $side ] ) || ! is_array( $border[ $side ] ) ) {
-			return $attributes;
-		}
-
-		$current = array(
-			'width' => $border[ $side ]['width'] ?? null,
-			'color' => $border[ $side ]['color'] ?? null,
-			'style' => $border[ $side ]['style'] ?? null,
-		);
-
-		if ( null === $shared ) {
-			$shared = $current;
-			continue;
-		}
-
-		foreach ( array( 'width', 'color', 'style' ) as $property ) {
-			if ( ( $shared[ $property ] ?? null ) !== ( $current[ $property ] ?? null ) ) {
-				return $attributes;
-			}
-		}
-	}
-
-	$flat_border = array_filter(
-		$shared,
-		static function ( $value ) {
-			return null !== $value && '' !== $value;
-		}
-	);
-
-	if ( array() === $flat_border ) {
-		return $attributes;
-	}
-
-	$attributes['style']['border'] = $flat_border;
-
-	return $attributes;
-}
-
-/**
- * Merges CSS declarations into a tag's existing style attribute.
- *
- * @since 7.3.0
- *
- * @param WP_HTML_Tag_Processor $processor      Tag processor positioned on a tag.
- * @param string                $additional_css CSS declarations to append.
- */
-function block_core_calendar_merge_style_attribute( $processor, $additional_css ) {
-	if ( ! is_string( $additional_css ) || '' === $additional_css ) {
-		return;
-	}
-
-	$current_style = $processor->get_attribute( 'style' ) ?? '';
-	$parts         = array_filter(
-		array_map(
-			static function ( $part ) {
-				return trim( $part, " \t;" );
-			},
-			explode( ';', (string) $current_style . ';' . $additional_css )
-		)
-	);
-
-	$processor->set_attribute( 'style', implode( ';', $parts ) . ';' );
-}
 
 /**
  * Returns whether or not there are any published posts.

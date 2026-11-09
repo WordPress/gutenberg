@@ -14,8 +14,6 @@
 
 	caption {
 		background-color: inherit;
-		// Month/year title must not pick up table border inheritance.
-		border: none;
 	}
 
 	table {
@@ -36,26 +34,18 @@
 	}
 
 	/*
-	 * Defaults: keep `.wp-block-calendar` outside `:where()` so specificity
-	 * stays (0,1,0) — beats bare theme `td`/`th` resets (trunk BC), while
-	 * still allowing later Global Styles `:root :where(.wp-block-calendar th/td)`
-	 * to win. Split from the `border` shorthand so it does not set
-	 * `border-color: currentColor` and override the `$gray-300` fallback.
+	 * Keep `.wp-block-calendar` outside `:where()` so the specificity stays
+	 * (0,1,0). This beats bare theme `td`/`th` rules while still allowing
+	 * Global Styles to override it.
 	 */
 	:where(th),
 	:where(td) {
-		border-width: 1px;
-		border-style: solid;
+		border: 1px solid;
 	}
 
 	:where(table:not(.has-text-color) th),
 	:where(table:not(.has-text-color) td) {
 		border-color: $gray-300;
-	}
-
-	:where(table.has-text-color:not(.has-border-color) th),
-	:where(table.has-text-color:not(.has-border-color) td) {
-		border-color: currentColor;
 	}
 }
 
@@ -63,8 +53,7 @@
 	// Border Styles
 	//
 	// Instance borders are applied on the table; th/td inherit color,
-	// style, and width. Do not inherit onto `caption` (month/year title).
-	// Per-side outer edges use the edge map below.
+	// style, and width. Per-side values are treated as outer edges.
 	// Global Styles target the cells via block.json selectors.
 	table.has-border-color {
 		thead,
@@ -133,7 +122,7 @@
 }
 
 // Keep the hard-coded header background color for backward compatibility.
-// Global Styles also targets `th` (see block.json selectors.color.background).
+// Global Styles also targets `th` (see block.json selectors.color).
 :where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
 }
