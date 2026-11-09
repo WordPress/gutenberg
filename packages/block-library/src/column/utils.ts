@@ -7,7 +7,12 @@ import { unlock } from '../lock-unlock';
 const { isColumnFillWidth } = unlock( globalStylesEnginePrivateApis );
 
 const PRESET_PREFIX = 'var:preset|dimension|';
-const FILL_STYLE = { flexBasis: '0', flexGrow: '1' };
+const FILL_STYLE: ColumnStyle = { flexBasis: '0', flexGrow: '1' };
+
+type ColumnStyle = {
+	flexBasis?: string;
+	flexGrow?: string;
+};
 
 /**
  * Converts a column width into the inline style that sizes the column within
@@ -17,14 +22,16 @@ const FILL_STYLE = { flexBasis: '0', flexGrow: '1' };
  * stopped from growing by the `[style*="flex-basis"]` rule in the Columns
  * block's stylesheet, and leaving it out keeps existing markup unchanged.
  *
- * @param {string|number|undefined} width Column width.
+ * @param width Column width.
  *
- * @return {Object|undefined} Style object, or undefined when there is no width.
+ * @return Style object, or undefined when there is no width.
  */
-export function getColumnStyle( width ) {
+export function getColumnStyle(
+	width: string | number | undefined
+): ColumnStyle | undefined {
 	// Numbers are handled for backward compatibility as they can still be
 	// provided by templates and patterns. Zero has always meant no width.
-	if ( Number.isFinite( width ) ) {
+	if ( typeof width === 'number' && Number.isFinite( width ) ) {
 		return width ? { flexBasis: `${ width }%` } : undefined;
 	}
 
