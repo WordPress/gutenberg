@@ -3562,6 +3562,68 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that removing insecure properties keeps a valid offset object, and
+	 * drops an offset with an invalid axis.
+	 *
+	 * @dataProvider data_remove_insecure_properties_translate
+	 *
+	 * @param array      $translate Offset to save.
+	 * @param array|null $expected  Offset expected after removing insecure properties.
+	 */
+	public function test_remove_insecure_properties_keeps_valid_translate( $translate, $expected ) {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate'    => '5deg',
+								'translate' => $translate,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$transform = array( 'rotate' => '5deg' );
+		if ( null !== $expected ) {
+			$transform['translate'] = $expected;
+		}
+		$this->assertSame( $transform, $actual['styles']['blocks']['core/heading']['transform'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_remove_insecure_properties_translate() {
+		return array(
+			'one axis'     => array( array( 'x' => '3rem' ), array( 'x' => '3rem' ) ),
+			'two axes'     => array(
+				array(
+					'x' => '10px',
+					'y' => '-50%',
+				),
+				array(
+					'x' => '10px',
+					'y' => '-50%',
+				),
+			),
+			'calc() axis'  => array( array( 'x' => 'calc(1px + 2px)' ), null ),
+			'invalid axis' => array(
+				array(
+					'x' => '10px',
+					'y' => 'url(x)',
+				),
+				null,
+			),
+		);
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

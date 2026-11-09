@@ -5495,6 +5495,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Allow indirect properties used outside of `compute_style_properties`.
+	 * @since 7.3.0 Keep the `transform.translate` axes when their declaration is safe.
 	 *
 	 * @param array $input Node to process.
 	 * @return array
@@ -5512,6 +5513,19 @@ class WP_Theme_JSON_Gutenberg {
 				$value = _wp_array_get( $input, $path, array() );
 				if ( ! is_array( $value ) ) {
 					_wp_array_set( $output, $path, $value );
+				} elseif ( 'translate' === $declaration['name'] ) {
+					// The declaration only exists when every axis is valid.
+					_wp_array_set(
+						$output,
+						$path,
+						array_intersect_key(
+							$value,
+							array(
+								'x' => true,
+								'y' => true,
+							)
+						)
+					);
 				}
 			}
 		}
