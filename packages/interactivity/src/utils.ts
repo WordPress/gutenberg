@@ -83,19 +83,34 @@ export const splitTask =
  *
  * This function depends on `PerformanceNavigationTiming` (see
  * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
- * detect whether the event has been dispatched.
+ * detect whether the event has been dispatched. When there is no navigation
+ * entry, it falls back to `document.readyState`, with `load` as a backstop for
+ * the `interactive` state.
  *
  * @param callback Function to execute on `DOMContentLoaded`.
  */
 export const onDOMReady = ( callback: () => void ) => {
-	const [ navigation ] = performance.getEntriesByType( 'navigation' );
-	if (
-		( navigation as PerformanceNavigationTiming )
-			.domContentLoadedEventStart > 0
-	) {
+	const [ navigation ] = performance.getEntriesByType(
+		'navigation'
+	) as PerformanceNavigationTiming[];
+	if ( navigation ) {
+		if ( navigation.domContentLoadedEventStart > 0 ) {
+			callback();
+		} else {
+			document.addEventListener( 'DOMContentLoaded', callback );
+		}
+	} else if ( document.readyState === 'complete' ) {
 		callback();
 	} else {
-		document.addEventListener( 'DOMContentLoaded', callback );
+		let called = false;
+		const run = () => {
+			if ( ! called ) {
+				called = true;
+				callback();
+			}
+		};
+		document.addEventListener( 'DOMContentLoaded', run );
+		window.addEventListener( 'load', run );
 	}
 };
 

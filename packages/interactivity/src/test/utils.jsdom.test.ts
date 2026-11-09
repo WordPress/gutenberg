@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { kebabToCamelCase, withScope, afterNextFrame } from '../utils';
+import {
+	kebabToCamelCase,
+	withScope,
+	afterNextFrame,
+	onDOMReady,
+} from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';
 
@@ -40,6 +45,38 @@ describe( 'Interactivity API', () => {
 			expect( callback ).not.toHaveBeenCalled();
 
 			vi.runAllTimers();
+			expect( callback ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'onDOMReady', () => {
+		beforeEach( () => {
+			vi.spyOn( performance, 'getEntriesByType' ).mockReturnValue( [] );
+		} );
+
+		afterEach( () => {
+			vi.restoreAllMocks();
+		} );
+
+		it( 'runs the callback right away without a navigation entry when the document is complete', () => {
+			vi.spyOn( document, 'readyState', 'get' ).mockReturnValue(
+				'complete'
+			);
+			const callback = vi.fn();
+			onDOMReady( callback );
+			expect( callback ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'runs the callback once on DOMContentLoaded without a navigation entry while the document is loading', () => {
+			vi.spyOn( document, 'readyState', 'get' ).mockReturnValue(
+				'loading'
+			);
+			const callback = vi.fn();
+			onDOMReady( callback );
+			expect( callback ).not.toHaveBeenCalled();
+
+			document.dispatchEvent( new Event( 'DOMContentLoaded' ) );
+			window.dispatchEvent( new Event( 'load' ) );
 			expect( callback ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
