@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content.
 -   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).
 
 ## 0.26.0 (2026-11-04)
