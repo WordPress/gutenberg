@@ -553,6 +553,236 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should show what changed since a revision as code', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await page.getByRole( 'radio', { name: 'Code' } ).click();
+
+		const changes = page.getByRole( 'region', {
+			name: 'Changes since this revision',
+		} );
+		await expect(
+			changes.getByRole( 'row', {
+				name: /Removed.*"background": "blue"/,
+			} )
+		).toBeVisible();
+		await expect(
+			changes.getByRole( 'row', { name: /Added.*"background": "red"/ } )
+		).toBeVisible();
+
+		// The visual preview comes back in place of the code.
+		await page.getByRole( 'radio', { name: 'Visual' } ).click();
+		await expect( changes ).toBeHidden();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+	} );
+
+	test( 'should say when a revision matches the current styles', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'green' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// The newest revision is the styles the editor shows.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+		await page.getByRole( 'radio', { name: 'Code' } ).click();
+
+		const changes = page.getByRole( 'region', {
+			name: 'Changes since this revision',
+		} );
+		await expect( changes ).toHaveText(
+			'This revision matches the current styles.'
+		);
+		await expect( changes.getByRole( 'table' ) ).toBeHidden();
+	} );
+
+	test( 'should show the selected revision next to the current version', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(255, 0, 0)' );
+	} );
+
+	test( 'should scroll the selected revision and the current version together', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		// Different padding makes the two previews scroll by different
+		// lengths, so following by position alone would fall out of step.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			spacing: { padding: { top: '2000px' } },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			spacing: { padding: { top: '3000px' } },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Revisions are listed newest first, so the second one is the
+		// smaller padding saved before the current one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'padding-top', '2000px' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'padding-top', '3000px' );
+
+		const selected = await (
+			await page.locator( 'iframe[name="revisions"]' ).elementHandle()
+		).contentFrame();
+		const current = await (
+			await page
+				.locator( 'iframe[name="revisions-current"]' )
+				.elementHandle()
+		).contentFrame();
+		const scrollTo = ( frame, fraction ) =>
+			frame.evaluate( ( _fraction ) => {
+				const scroller = document.scrollingElement;
+				scroller.scrollTo( {
+					top:
+						_fraction *
+						( scroller.scrollHeight - scroller.clientHeight ),
+					behavior: 'instant',
+				} );
+			}, fraction );
+		const getScrollFraction = ( frame ) =>
+			frame.evaluate( () => {
+				const scroller = document.scrollingElement;
+				return (
+					scroller.scrollTop /
+					( scroller.scrollHeight - scroller.clientHeight )
+				);
+			} );
+
+		// Halfway down the selected revision is halfway down the current
+		// version, though the current version is the longer of the two.
+		await scrollTo( selected, 0.5 );
+		await expect
+			.poll( () => getScrollFraction( current ) )
+			.toBeCloseTo( 0.5, 1 );
+
+		// Either one can lead.
+		await scrollTo( current, 0 );
+		await expect.poll( () => getScrollFraction( selected ) ).toBe( 0 );
+	} );
+
+	test( 'should show a single preview when the current version is selected', async ( {
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'green' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// The newest revision is the styles the editor shows.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions-current"]' )
+		).toBeHidden();
+	} );
+
+	test( 'should keep unsaved changes in the current version after comparing', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid amber' } )
+			.click( { force: true } );
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Compare the saved revision with the unsaved changes.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.first()
+			.click();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+		await expect(
+			page.frameLocator( '[name="revisions-current"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(252, 185, 0)' );
+
+		// Back on the current version, the unsaved changes still show.
+		await page.getByRole( 'option', { name: /^Unsaved changes/ } ).click();
+		await expect(
+			page.locator( 'iframe[name="revisions-current"]' )
+		).toBeHidden();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(252, 185, 0)' );
+
+		// Later tests start from saved styles.
+		await editor.saveSiteEditorEntities();
+	} );
+
 	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
 		// Create > 10 revisions to display pagination navigation component.
 		for ( let i = 9; i < 21; i++ ) {
