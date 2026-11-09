@@ -1,7 +1,7 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import { Component, isValidElement } from '@wordpress/element';
+import { Component, createElement, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
@@ -24,6 +24,176 @@ extend( [ namesPlugin, a11yPlugin ] );
  * was not explicitly set but the icon background color was.
  */
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
+
+/**
+ * Matches what SVG files can have before the `svg` element: whitespace, an XML
+ * prolog, comments and a doctype.
+ */
+const SVG_PREAMBLE =
+	/^(?:\s|<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>[]*(?:\[[\s\S]*?\]\s*)?>)*/i;
+
+/**
+ * Matches attributes that must not reach React as string props: event handlers
+ * and the props React gives a special meaning.
+ */
+const UNSAFE_SVG_ATTRIBUTE =
+	/^(?:on.*|dangerouslysetinnerhtml|children|key|ref)$/i;
+
+/**
+ * Converts an inline style string to the object React expects.
+ *
+ * @param style The value of a `style` attribute.
+ * @return The style object.
+ */
+function parseInlineStyle( style: string ): Record< string, string > {
+	const result: Record< string, string > = {};
+	// Ignore semicolons inside parentheses, such as in a data URL.
+	for ( const declaration of style.split( /;(?![^(]*\))/ ) ) {
+		const separator = declaration.indexOf( ':' );
+		const name = declaration.slice( 0, Math.max( separator, 0 ) ).trim();
+		const value = declaration.slice( separator + 1 ).trim();
+		if ( name && value ) {
+			const key = name.startsWith( '--' )
+				? name
+				: name.replace( /-([a-z])/g, ( _, letter ) =>
+						letter.toUpperCase()
+					);
+			result[ key ] = value;
+		}
+	}
+	return result;
+}
+
+/**
+ * Returns the React prop name for an SVG attribute, such as `strokeWidth` for
+ * `stroke-width`.
+ *
+ * @param name The attribute name.
+ * @return The prop name, or null if the attribute should be dropped.
+ */
+function getSvgPropName( name: string ): string | null {
+	if ( UNSAFE_SVG_ATTRIBUTE.test( name ) ) {
+		return null;
+	}
+	// Editors add namespaced attributes, such as `sketch:type`. Only `xlink` and
+	// `xml` have a meaning in the DOM. React adds `xmlns` itself.
+	if (
+		name === 'xmlns' ||
+		( name.includes( ':' ) && ! /^xlink:|^xml:/.test( name ) )
+	) {
+		return null;
+	}
+	if ( name === 'class' ) {
+		return 'className';
+	}
+	if ( /^(?:aria|data)-/.test( name ) ) {
+		return name;
+	}
+	return name.replace( /[-:]([a-z])/g, ( _, letter ) =>
+		letter.toUpperCase()
+	);
+}
+
+/**
+ * Recursively converts a DOM node to a React element.
+ *
+ * @param node The DOM node to convert.
+ * @return A React element representing the DOM node.
+ */
+function domNodeToReactElement(
+	node: globalThis.Element | globalThis.Text
+): React.ReactNode {
+	if ( node.nodeType === Node.TEXT_NODE ) {
+		const text = ( node as globalThis.Text ).textContent;
+		if ( text?.trim() ) {
+			return text;
+		}
+		return null;
+	}
+
+	if ( node.nodeType !== Node.ELEMENT_NODE ) {
+		return null;
+	}
+
+	const element = node as globalThis.Element;
+	// SVG names are case-sensitive, so `linearGradient` must keep its case.
+	const tagName = element.tagName;
+	// Skip elements that aren't part of the image: `style` would apply to the
+	// whole page, and editors add namespaced ones such as `sodipodi:namedview`.
+	if ( /^(?:script|style)$/i.test( tagName ) || tagName.includes( ':' ) ) {
+		return null;
+	}
+
+	const props: Record< string, unknown > = {};
+
+	for ( let i = 0; i < element.attributes.length; i++ ) {
+		const attr = element.attributes[ i ];
+		const propName = getSvgPropName( attr.name );
+		if ( propName ) {
+			props[ propName ] =
+				propName === 'style'
+					? parseInlineStyle( attr.value )
+					: attr.value;
+		}
+	}
+
+	const children: React.ReactNode[] = [];
+	for ( let i = 0; i < element.childNodes.length; i++ ) {
+		const child = element.childNodes[ i ];
+		if (
+			child.nodeType === Node.ELEMENT_NODE ||
+			child.nodeType === Node.TEXT_NODE
+		) {
+			const converted = domNodeToReactElement(
+				child as globalThis.Element | globalThis.Text
+			);
+			if ( converted !== null ) {
+				children.push( converted );
+			}
+		}
+	}
+
+	if ( children.length > 0 ) {
+		return createElement( tagName, props, ...children );
+	}
+
+	return createElement( tagName, props );
+}
+
+/**
+ * Converts an SVG markup string to a React element.
+ *
+ * Uses the browser's native DOMParser to safely parse the SVG without
+ * executing any scripts. The resulting React element can be rendered
+ * by the `<Icon>` component which handles `icon.type === 'svg'`.
+ *
+ * @param icon The icon value, possibly an SVG string.
+ * @return A React element if the input is an SVG string, otherwise the original value.
+ */
+export function convertSvgStringToIconElement( icon: unknown ): unknown {
+	if ( typeof icon !== 'string' ) {
+		return icon;
+	}
+
+	const svgContent = icon.replace( SVG_PREAMBLE, '' );
+	if ( ! svgContent.startsWith( '<svg' ) ) {
+		return icon;
+	}
+
+	try {
+		const doc = new window.DOMParser().parseFromString(
+			svgContent,
+			'image/svg+xml'
+		);
+		const svgElement = doc.querySelector( 'svg' );
+		if ( ! svgElement || doc.querySelector( 'parsererror' ) ) {
+			return icon;
+		}
+		return domNodeToReactElement( svgElement );
+	} catch {
+		return icon;
+	}
+}
 
 /**
  * Determines whether the block's attributes are equal to the default attributes

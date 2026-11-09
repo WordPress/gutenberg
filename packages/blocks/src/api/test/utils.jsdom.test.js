@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { isValidElement } from '@wordpress/element';
 import '../../store';
 import { createBlock } from '../factory';
 import {
@@ -17,6 +18,7 @@ import {
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	isContentBlock,
+	convertSvgStringToIconElement,
 } from '../utils';
 
 const noop = () => {};
@@ -546,5 +548,137 @@ describe( 'isUnmodifiedBlock', () => {
 			},
 		} );
 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+} );
+
+describe( 'convertSvgStringToIconElement', () => {
+	it( 'should return a non-string value unchanged', () => {
+		const icon = () => null;
+		expect( convertSvgStringToIconElement( icon ) ).toBe( icon );
+	} );
+
+	it( 'should return a dashicon slug unchanged', () => {
+		expect( convertSvgStringToIconElement( 'smile' ) ).toBe( 'smile' );
+	} );
+
+	it( 'should convert an SVG markup string to an element', () => {
+		const result = convertSvgStringToIconElement( '<svg></svg>' );
+
+		expect( isValidElement( result ) ).toBe( true );
+		expect( result.type ).toBe( 'svg' );
+	} );
+
+	it( 'should convert an SVG markup string preceded by an XML prolog', () => {
+		const result = convertSvgStringToIconElement(
+			'<?xml version="1.0" encoding="UTF-8"?><svg></svg>'
+		);
+
+		expect( isValidElement( result ) ).toBe( true );
+		expect( result.type ).toBe( 'svg' );
+	} );
+
+	it( 'should preserve the attributes of the SVG element', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg viewBox="0 0 24 24" fill="none"></svg>'
+		);
+
+		expect( result.props.viewBox ).toBe( '0 0 24 24' );
+		expect( result.props.fill ).toBe( 'none' );
+	} );
+
+	it( 'should omit the xmlns attribute', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>'
+		);
+
+		expect( result.props ).not.toHaveProperty( 'xmlns' );
+		expect( result.props.viewBox ).toBe( '0 0 24 24' );
+	} );
+
+	it( 'should preserve the case of child element names', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg><linearGradient id="a"></linearGradient></svg>'
+		);
+
+		expect( result.props.children.type ).toBe( 'linearGradient' );
+	} );
+
+	it.each( [
+		[ 'a comment', '<!-- Generator --><svg></svg>' ],
+		[
+			'a prolog and a comment',
+			'<?xml version="1.0"?>\n<!-- a -->\n<svg></svg>',
+		],
+		[
+			'a doctype',
+			'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg></svg>',
+		],
+		[
+			'a doctype with an internal subset',
+			'<!DOCTYPE svg [<!ENTITY a "b">]><svg></svg>',
+		],
+	] )( 'should convert an SVG preceded by %s', ( _, svg ) => {
+		const result = convertSvgStringToIconElement( svg );
+
+		expect( isValidElement( result ) ).toBe( true );
+		expect( result.type ).toBe( 'svg' );
+	} );
+
+	it( 'should return malformed SVG markup unchanged', () => {
+		const icon = '<svg><path></svg>';
+
+		expect( convertSvgStringToIconElement( icon ) ).toBe( icon );
+	} );
+
+	it( 'should convert an inline style to an object', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg style="fill-opacity: 0.5; --my-color: red; background: url(data:image/png;base64,a)"></svg>'
+		);
+
+		expect( result.props.style ).toEqual( {
+			fillOpacity: '0.5',
+			'--my-color': 'red',
+			background: 'url(data:image/png;base64,a)',
+		} );
+	} );
+
+	it( 'should convert attribute names to React prop names', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg class="a" stroke-width="2" clip-path="url(#a)" aria-hidden="true" data-id="b"></svg>'
+		);
+
+		expect( result.props ).toEqual( {
+			className: 'a',
+			strokeWidth: '2',
+			clipPath: 'url(#a)',
+			'aria-hidden': 'true',
+			'data-id': 'b',
+		} );
+	} );
+
+	it( 'should drop unsafe and editor-specific attributes', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" sketch:type="a" onload="x()" dangerouslySetInnerHTML="a" ref="b" key="c" fill="none"></svg>'
+		);
+
+		expect( result.key ).toBeNull();
+		expect( result.props ).toEqual( { fill: 'none' } );
+	} );
+
+	it( 'should drop script, style and editor-specific elements', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"><style>.a{}</style><script>x()</script><sodipodi:namedview></sodipodi:namedview><path d="M0 0"></path></svg>'
+		);
+
+		expect( result.props.children.type ).toBe( 'path' );
+	} );
+
+	it( 'should convert child elements of the SVG element', () => {
+		const result = convertSvgStringToIconElement(
+			'<svg><path d="M5 5h10v10H5z"></path></svg>'
+		);
+
+		expect( result.props.children.type ).toBe( 'path' );
+		expect( result.props.children.props.d ).toBe( 'M5 5h10v10H5z' );
 	} );
 } );
