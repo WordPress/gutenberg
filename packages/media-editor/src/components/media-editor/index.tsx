@@ -4,6 +4,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	Modal,
 	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__unstableAnimatePresence as AnimatePresence,
@@ -11,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { NavigableRegion } from '@wordpress/admin-ui';
 import {
@@ -20,10 +21,11 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	backup,
 	close,
@@ -39,7 +41,7 @@ import {
 	isKeyboardEvent,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { Action, ActionModal, Field, Form } from '@wordpress/dataviews';
 import type {
 	KeyboardEvent as ReactKeyboardEvent,
 	ReactElement,
@@ -314,10 +316,75 @@ function PanelToggle() {
 	);
 }
 
-function MoreMenu() {
-	const { isImage } = useMediaEditorFrameContext();
+function getActionLabel( action: Action< Media >, items: Media[] ) {
+	return typeof action.label === 'string'
+		? action.label
+		: action.label( items );
+}
+
+interface MediaActionModalProps {
+	action: ActionModal< Media >;
+	items: Media[];
+	closeModal: () => void;
+}
+
+// A copy of the `ActionModal` in `@wordpress/dataviews`, which isn't
+// exported. It could be replaced if dataviews exports it.
+function MediaActionModal( {
+	action,
+	items,
+	closeModal,
+}: MediaActionModalProps ) {
+	const header =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
+	return (
+		<Modal
+			title={ header || getActionLabel( action, items ) }
+			__experimentalHideHeader={ !! action.hideModalHeader }
+			onRequestClose={ closeModal }
+			focusOnMount={ action.modalFocusOnMount ?? true }
+			size={ action.modalSize || 'medium' }
+		>
+			<action.RenderModal items={ items } closeModal={ closeModal } />
+		</Modal>
+	);
+}
+
+export interface MoreMenuProps {
+	/**
+	 * Actions for the attachment, such as those from the entity actions API.
+	 * Only the ones whose `isEligible` passes for `item` are shown.
+	 */
+	actions?: Action< Media >[];
+	/**
+	 * The attachment the actions apply to, with anything their `isEligible`
+	 * checks need, such as `permissions`. Without it no actions are shown.
+	 */
+	item?: Media;
+}
+
+function MoreMenu( { actions = [], item }: MoreMenuProps ) {
+	const { isImage, isSaving } = useMediaEditorFrameContext();
+	const registry = useRegistry();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
-	if ( ! isImage ) {
+	const [ activeModalAction, setActiveModalAction ] =
+		useState< ActionModal< Media > | null >( null );
+
+	const items = item ? [ item ] : [];
+	const eligibleActions = useMemo(
+		() =>
+			item
+				? actions.filter(
+						( action ) =>
+							! action.isEligible || action.isEligible( item )
+					)
+				: [],
+		[ actions, item ]
+	);
+
+	if ( ! isImage && ! eligibleActions.length ) {
 		return null;
 	}
 	return (
@@ -328,23 +395,75 @@ function MoreMenu() {
 				toggleProps={ { size: 'compact' } }
 			>
 				{ ( { onClose: closeMenu } ) => (
-					<MenuGroup>
-						<MenuItem
-							icon={ keyboard }
-							iconPosition="left"
-							onClick={ () => {
-								setIsShortcutsModalOpen( true );
-								closeMenu();
-							} }
-						>
-							{ __( 'Keyboard shortcuts' ) }
-						</MenuItem>
-					</MenuGroup>
+					<>
+						{ isImage && (
+							<MenuGroup>
+								<MenuItem
+									icon={ keyboard }
+									iconPosition="left"
+									onClick={ () => {
+										setIsShortcutsModalOpen( true );
+										closeMenu();
+									} }
+								>
+									{ __( 'Keyboard shortcuts' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+						{ !! eligibleActions.length && (
+							<MenuGroup>
+								{ eligibleActions.map( ( action ) => {
+									const label = getActionLabel(
+										action,
+										items
+									);
+									return (
+										<MenuItem
+											key={ action.id }
+											disabled={
+												isSaving || action.disabled
+											}
+											onClick={ () => {
+												closeMenu();
+												if ( 'RenderModal' in action ) {
+													setActiveModalAction(
+														action
+													);
+													return;
+												}
+												action.callback( items, {
+													registry,
+												} );
+											} }
+										>
+											{ 'RenderModal' in action
+												? sprintf(
+														/* translators: %s: Action label. Use the ellipsis and spacing appropriate for your language. */
+														_x(
+															'%s…',
+															'menu item requiring further input'
+														),
+														label
+													)
+												: label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</>
 				) }
 			</DropdownMenu>
 			{ isShortcutsModalOpen && (
 				<MediaEditorKeyboardShortcutsModal
 					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
+			{ activeModalAction && (
+				<MediaActionModal
+					action={ activeModalAction }
+					items={ items }
+					closeModal={ () => setActiveModalAction( null ) }
 				/>
 			) }
 		</>

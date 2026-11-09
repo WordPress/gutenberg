@@ -45,8 +45,16 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  *
  * @since 7.1.0
  *
- * @param array $layout Layout configuration.
- * @return array Navigation layout custom property declarations.
+ * @param array<mixed> $layout Layout configuration.
+ * @return array<string, string> Navigation layout custom property declarations.
+ *
+ * @phpstan-return array{
+ *     '--navigation-layout-justification-setting': 'flex-start'|'center'|'flex-end'|'space-between',
+ *     '--navigation-layout-direction': 'column'|'row',
+ *     '--navigation-layout-wrap': 'nowrap'|'wrap',
+ *     '--navigation-layout-justify': 'initial'|'flex-start'|'center'|'flex-end'|'space-between',
+ *     '--navigation-layout-align': 'flex-start'|'center'|'flex-end',
+ * }
  */
 function block_core_navigation_get_layout_custom_property_declarations( $layout ) {
 	$justification_values = array(
@@ -55,25 +63,30 @@ function block_core_navigation_get_layout_custom_property_declarations( $layout 
 		'right'         => 'flex-end',
 		'space-between' => 'space-between',
 	);
-	$justify_content      = is_array( $layout ) ? ( $layout['justifyContent'] ?? 'left' ) : 'left';
+	$justify_content      = $layout['justifyContent'] ?? 'left';
 	if ( ! is_string( $justify_content ) || ! isset( $justification_values[ $justify_content ] ) ) {
 		$justify_content = 'left';
 	}
 
 	$justification = $justification_values[ $justify_content ];
-	$is_vertical   = is_array( $layout ) && 'vertical' === ( $layout['orientation'] ?? null );
+	$is_vertical   = 'vertical' === ( $layout['orientation'] ?? null );
 	$align         = 'center';
 	$justify       = $justification;
 
 	if ( $is_vertical ) {
-		$align   = in_array( $justify_content, array( 'center', 'right' ), true ) ? $justification : 'flex-start';
+		$vertical_align_values = array(
+			'center' => 'center',
+			'right'  => 'flex-end',
+		);
+
+		$align   = $vertical_align_values[ $justify_content ] ?? 'flex-start';
 		$justify = 'left' === $justify_content ? 'initial' : $justification;
 	}
 
 	return array(
 		'--navigation-layout-justification-setting' => $justification,
 		'--navigation-layout-direction'             => $is_vertical ? 'column' : 'row',
-		'--navigation-layout-wrap'                  => is_array( $layout ) && 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
+		'--navigation-layout-wrap'                  => 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
 		'--navigation-layout-justify'               => $justify,
 		'--navigation-layout-align'                 => $align,
 	);
@@ -1866,7 +1879,7 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback() instead.
  *
- * @return object WP_Term The classic navigation.
+ * @return WP_Term|null The classic navigation, or null if there are no classic menus.
  */
 function block_core_navigation_get_classic_menu_fallback() {
 
@@ -1903,6 +1916,8 @@ function block_core_navigation_get_classic_menu_fallback() {
 		);
 		return $classic_nav_menus[0];
 	}
+
+	return null;
 }
 
 /**
