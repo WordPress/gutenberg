@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import type { MouseEvent } from 'react';
 import { ThemeProvider } from '@wordpress/theme';
 import { plus } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
@@ -50,6 +51,56 @@ function contrast( foreground: string, background: string, surface: string ) {
 }
 
 describe( 'Button styles', () => {
+	it.each( [
+		[ undefined, false ],
+		[ 'primary', false ],
+		[ 'secondary', false ],
+		[ 'tertiary', false ],
+		[ undefined, true ],
+		[ 'primary', true ],
+		[ 'secondary', true ],
+		[ 'tertiary', true ],
+	] as const )(
+		'keeps busy stripes during pointer and Space activation for %s, destructive %s',
+		async ( variant, isDestructive ) => {
+			let mouseDownImage: string | undefined;
+			await render(
+				<Button
+					__next40pxDefaultSize
+					variant={ variant }
+					isDestructive={ isDestructive }
+					isBusy
+					onMouseDown={ (
+						event: MouseEvent< HTMLButtonElement >
+					) => {
+						mouseDownImage = getComputedStyle(
+							event.currentTarget
+						).backgroundImage;
+					} }
+				>
+					Saving
+				</Button>
+			);
+			const button = screen.getByRole( 'button', { name: 'Saving' } );
+			await userEvent.unhover( button );
+			const stripes = getComputedStyle( button ).backgroundImage;
+			expect( stripes ).toContain( 'linear-gradient(' );
+			await userEvent.hover( button );
+			expect( getComputedStyle( button ).backgroundImage ).toBe(
+				stripes
+			);
+			await userEvent.click( button );
+			expect( mouseDownImage ).toBe( stripes );
+			await userEvent.unhover( button );
+			await userEvent.keyboard( '[Space>]' );
+			expect( button.matches( ':active' ) ).toBe( true );
+			expect( getComputedStyle( button ).backgroundImage ).toBe(
+				stripes
+			);
+			await userEvent.keyboard( '[/Space]' );
+		}
+	);
+
 	it.each( [
 		[ 'secondary', '#1e1e1e', '#3858e9' ],
 		[ 'primary', '#fcfcfc', '#ff9900' ],
