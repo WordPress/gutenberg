@@ -1,5 +1,6 @@
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
+import { getMarkerSelector } from '../../inline-markers/marker-selector';
 import type { NoteId } from './types';
 
 const { ownsSelection } = unlock< {
@@ -15,23 +16,7 @@ const { ownsSelection } = unlock< {
  * @return Selector for the note's marker element(s).
  */
 export function getNoteMarkerSelector( noteId: NoteId ): string {
-	/*
-	 * `noteId` is a server comment ID (always a positive integer), but the
-	 * value composes a selector from stored data, so escape it defensively.
-	 *
-	 * Deliberately not `CSS.escape`: that escapes for *identifier* context,
-	 * where a leading digit is illegal, so it renders the id 7 as `\37 `.
-	 * That is valid, and matches, but it makes every rule
-	 * `buildHighlightCss` generates unreadable. Inside a quoted attribute
-	 * value the only characters that need escaping are the quote, the
-	 * backslash, and raw line breaks (a parse error in a CSS string).
-	 */
-	const escapedId = String( noteId ).replace( /["\\\n\r\f]/g, ( char ) =>
-		char === '"' || char === '\\'
-			? `\\${ char }`
-			: `\\${ char.charCodeAt( 0 ).toString( 16 ) } `
-	);
-	return `mark.wp-note[data-id="${ escapedId }"]`;
+	return getMarkerSelector( 'wp-note', 'data-id', noteId );
 }
 
 /**

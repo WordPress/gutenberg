@@ -29,7 +29,7 @@ function PostTitleRaw( _, forwardedRef ) {
 
 	const [ isSelected, setIsSelected ] = useState( false );
 
-	const { title, setTitle: onUpdate } = usePostTitle();
+	const { title, setTitle: onUpdate, isSuggestionPending } = usePostTitle();
 	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
 
 	function onChange( value ) {
@@ -49,6 +49,7 @@ function PostTitleRaw( _, forwardedRef ) {
 	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
 		'is-raw-text': true,
+		'is-suggestion-pending': isSuggestionPending,
 	} );
 
 	const decodedPlaceholder =
