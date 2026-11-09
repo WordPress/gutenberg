@@ -31,14 +31,14 @@ Restart the two-second feedback timeout after each copy result, including repeat
 
 ## Text field
 
-When the value is in a text field, put the copy action in the field's suffix so it stays with the value. Wrap the button in `InputLayout.Slot` with `padding="minimal"`. Use `variant="minimal"`, `tone="neutral"`, and `size="small"` so the button fits the field. Don't use a snackbar here: the button is still visible.
+When the value is in a text field, put the copy action in the field's suffix so it stays with the value. Wrap the button in `InputLayout.Slot` with `padding="minimal"`. Don't use a snackbar here: the button is still visible.
 
 <Canvas
 	of={ CopyFromFieldStories.CopyFromField }
 	source={ { code: CopyFromFieldSource, language: 'tsx', type: 'code' } }
 />
 
-Copy the field's current value, so an edit is what gets copied. The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
+Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
 
 The first field uses `Button` with the icon and the word "Copy". The second uses `IconButton` with `label="Copy"`. That label is the accessible name and the tooltip. Use the icon-only button when the field is too narrow for a visible label.
 
