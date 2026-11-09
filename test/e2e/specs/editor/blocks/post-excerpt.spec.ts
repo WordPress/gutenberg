@@ -1,4 +1,9 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import {
+	test,
+	expect,
+	type Editor,
+} from '@wordpress/e2e-test-utils-playwright';
 
 /*
  * Long enough that the excerpt the server generates from it is longer than the
@@ -16,11 +21,11 @@ const CONTENT = `<!-- wp:paragraph --><p>${ WORDS }</p><!-- /wp:paragraph -->`;
  * The block shows the untrimmed excerpt while it is selected, so it has to be
  * deselected before the length it renders can be read.
  *
- * @param {Object} editor Editor utils.
+ * @param editor Editor utils.
  *
- * @return {Promise<string[]>} The displayed words.
+ * @return The displayed words.
  */
-async function getDisplayedWords( editor ) {
+async function getDisplayedWords( editor: Editor ): Promise< string[] > {
 	const text = await editor.canvas.getByLabel( 'Excerpt text' ).innerText();
 	return text.replace( /…\s*$/, '' ).split( /\s+/ ).filter( Boolean );
 }
@@ -28,11 +33,11 @@ async function getDisplayedWords( editor ) {
 /**
  * Sets the block's "Max number of words" and deselects the block afterwards.
  *
- * @param {Object} editor Editor utils.
- * @param {Object} page   Playwright page.
- * @param {number} length Length to set.
+ * @param editor Editor utils.
+ * @param page   Playwright page.
+ * @param length Length to set.
  */
-async function setExcerptLength( editor, page, length ) {
+async function setExcerptLength( editor: Editor, page: Page, length: number ) {
 	await editor.canvas
 		.getByRole( 'document', { name: 'Block: Excerpt' } )
 		.click();
@@ -48,14 +53,14 @@ async function setExcerptLength( editor, page, length ) {
 /**
  * Resolves once no post request has been recorded for `quietMs`.
  *
- * @param {string[]} requests          Live array of recorded request URLs.
- * @param {Object}   [options]
- * @param {number}   [options.quietMs] Required idle window, in milliseconds.
- * @param {number}   [options.maxMs]   Overall cap, in milliseconds.
+ * @param requests        Live array of recorded request URLs.
+ * @param options
+ * @param options.quietMs Required idle window, in milliseconds.
+ * @param options.maxMs   Overall cap, in milliseconds.
  */
 async function waitForRequestsToSettle(
-	requests,
-	{ quietMs = 1000, maxMs = 10000 } = {}
+	requests: string[],
+	{ quietMs = 1000, maxMs = 10000 }: { quietMs?: number; maxMs?: number } = {}
 ) {
 	const deadline = Date.now() + maxMs;
 	let lastCount = requests.length;
@@ -98,7 +103,7 @@ test.describe( 'Post Excerpt', () => {
 		await editor.insertBlock( { name: 'core/post-excerpt' } );
 		await editor.openDocumentSettingsSidebar();
 
-		const postRequests = [];
+		const postRequests: string[] = [];
 		page.on( 'request', ( request ) => {
 			if (
 				request.method() === 'GET' &&
@@ -150,7 +155,7 @@ test.describe( 'Post Excerpt', () => {
 		await editor.insertBlock( { name: 'core/post-excerpt' } );
 		await editor.openDocumentSettingsSidebar();
 
-		const postRequests = [];
+		const postRequests: string[] = [];
 		page.on( 'request', ( request ) => {
 			if (
 				request.method() === 'GET' &&
