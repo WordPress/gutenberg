@@ -1048,7 +1048,7 @@ When the block declares support for `shadow`, the attributes definition is exten
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
-    -   `blockGap`: type `boolean` or `array`, default value `false`
+    -   `blockGap`: type `boolean`, `array`, or `object`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#spacing-control).
 
@@ -1081,7 +1081,7 @@ A spacing property may define an array of allowable sides – 'top', 'right', 'b
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 
-Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
+Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides. The sides can also be declared with an object that has a `sides` property, which takes the same values as the array.
 
 ```js
 supports: {
@@ -1089,6 +1089,16 @@ supports: {
         margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
         padding: true,                           // Enable padding for all sides.
         blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
+    }
+}
+```
+
+```js
+supports: {
+    spacing: {
+        blockGap: {
+            sides: [ 'horizontal', 'vertical' ], // Same as the array form above.
+        },
     }
 }
 ```
