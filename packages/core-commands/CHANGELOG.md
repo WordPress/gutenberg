@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   Add native TypeScript support and export the command palette settings and admin menu command types ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).

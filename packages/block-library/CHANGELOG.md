@@ -2,17 +2,39 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
+-   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
+-   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
+-   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Tabs: Open the tab panels when an HTML anchor on the Tabs block or a Tab Panel contains a character such as `&` or `'`, instead of leaving them hidden ([#86415](https://github.com/WordPress/gutenberg/pull/86415)).
+-   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
+-   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
+-   Table: Preserve captions when converting pasted HTML into blocks ([#85439](https://github.com/WordPress/gutenberg/pull/85439)).
+
+## 12.1.0 (2026-11-04)
+
 ### Enhancements
 
+-   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
+-   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
+-   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).
+-   Audio: Use the UI SelectControl for the Preload setting ([#86194](https://github.com/WordPress/gutenberg/pull/86194)).
 -   List: Use the UI SelectControl for the List style setting ([#86141](https://github.com/WordPress/gutenberg/pull/86141)).
 -   Latest Comments: Use the UI SelectControl for the Display content setting ([#86138](https://github.com/WordPress/gutenberg/pull/86138)).
 -   Post Author: Use the UI SelectControl for the Avatar size setting ([#86160](https://github.com/WordPress/gutenberg/pull/86160)).
 -   Archives: Use the UI SelectControl for the Group by setting ([#86137](https://github.com/WordPress/gutenberg/pull/86137)).
 -   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
+-   Playlist: Use the UI SelectControl for the Order and Shape settings ([#86161](https://github.com/WordPress/gutenberg/pull/86161)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Social Icon: Add Link to and View controls to inspector Content tab ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
+-   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
+-   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
+-   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
 -   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
 -   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
 -   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
@@ -33,7 +55,7 @@
 -   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
--   Table: Preserve captions when converting pasted HTML into blocks ([#85439](https://github.com/WordPress/gutenberg/pull/85439)).
+-   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
 
 ## 12.0.0 (2026-10-20)
 
