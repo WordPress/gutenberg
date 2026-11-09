@@ -1,13 +1,5 @@
 import type { CSSProperties } from 'react';
-import {
-	ColorSpace,
-	clone,
-	set,
-	to,
-	sRGB,
-	HSL,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
+import { ColorSpace, to, sRGB } from 'colorjs.io/fn';
 import memoize from 'memize';
 import { useMemo, useContext } from '@wordpress/element';
 import { ThemeContext } from './context.ts';
@@ -18,7 +10,6 @@ import {
 	DEFAULT_SEED_COLORS,
 	type RampResult,
 } from './color-ramps/index.ts';
-import { getColorString } from './color-ramps/lib/color-utils.ts';
 import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
@@ -112,43 +103,29 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 ];
 
-function customRgbFormat( color: PlainColorObject ): string {
+function customRgbFormat( color: string ): string {
 	const rgb = to( color, sRGB );
 	return rgb.coords
 		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
 		.join( ', ' );
 }
 
-function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+function legacyWpAdminThemeOverridesCSS( {
+	bgFill1,
+	bgFill2,
+}: RampResult[ 'ramp' ] ): Entry[] {
 	ColorSpace.register( sRGB );
-	const parsedAccent = to( accent, HSL );
-	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
-	// Create darker version of accent —
-	const darker10 = set(
-		clone( parsedAccent ),
-		[ HSL, 'l' ],
-		Math.max( 0, parsedL - 5 ) // L reduced by 5%
-	);
-	const darker20 = set(
-		clone( parsedAccent ),
-		[ HSL, 'l' ],
-		Math.max( 0, parsedL - 10 ) // L reduced by 10%
-	);
-
+	// Use the fills paired with the semantic foreground, including any seed
+	// adjustment. Both legacy interaction shades use the active fill, which
+	// can be lighter than the resting fill on dark backgrounds.
 	return [
-		[ '--wp-admin-theme-color', getColorString( parsedAccent ) ],
-		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
-		[ '--wp-admin-theme-color-darker-10', getColorString( darker10 ) ],
-		[
-			'--wp-admin-theme-color-darker-10--rgb',
-			customRgbFormat( darker10 ),
-		],
-		[ '--wp-admin-theme-color-darker-20', getColorString( darker20 ) ],
-		[
-			'--wp-admin-theme-color-darker-20--rgb',
-			customRgbFormat( darker20 ),
-		],
+		[ '--wp-admin-theme-color', bgFill1 ],
+		[ '--wp-admin-theme-color--rgb', customRgbFormat( bgFill1 ) ],
+		[ '--wp-admin-theme-color-darker-10', bgFill2 ],
+		[ '--wp-admin-theme-color-darker-10--rgb', customRgbFormat( bgFill2 ) ],
+		[ '--wp-admin-theme-color-darker-20', bgFill2 ],
+		[ '--wp-admin-theme-color-darker-20--rgb', customRgbFormat( bgFill2 ) ],
 	];
 }
 
@@ -173,10 +150,10 @@ function colorTokensCSS(
 }
 
 function generateStyles( {
-	primary,
+	primaryRamp,
 	colorEntries,
 }: {
-	primary: string;
+	primaryRamp: RampResult[ 'ramp' ];
 	colorEntries: Entry[];
 } ): CSSProperties {
 	return Object.fromEntries(
@@ -184,7 +161,7 @@ function generateStyles( {
 			// Semantic color tokens
 			colorEntries,
 			// Legacy overrides
-			legacyWpAdminThemeOverridesCSS( primary ),
+			legacyWpAdminThemeOverridesCSS( primaryRamp ),
 			legacyWpComponentsOverridesCSS,
 		].flat()
 	);
@@ -221,7 +198,7 @@ function generateThemeProviderColors(
 
 	return {
 		styles: generateStyles( {
-			primary: seeds.primary,
+			primaryRamp: computedColorRamps.get( 'primary' )!.ramp,
 			colorEntries,
 		} ),
 		warnings: collectThemeProviderColorWarnings(

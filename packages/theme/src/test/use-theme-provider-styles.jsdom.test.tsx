@@ -188,7 +188,7 @@ describe( 'useThemeProviderStyles', () => {
 	} );
 
 	describe( 'legacy wp-admin / wp-components bridge', () => {
-		it( 'derives the wp-admin theme color from the primary seed', () => {
+		it( 'uses the generated fills for wp-admin colors and their RGB companions', () => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
 			);
@@ -198,6 +198,18 @@ describe( 'useThemeProviderStyles', () => {
 			expect( styles[ '--wp-admin-theme-color--rgb' ] ).toBe(
 				'30, 144, 255'
 			);
+			for ( const shade of [ '10', '20' ] ) {
+				expect(
+					styles[ `--wp-admin-theme-color-darker-${ shade }` ]
+				).toBe(
+					styles[
+						'--wpds-color-background-interactive-brand-strong-active'
+					]
+				);
+				expect(
+					styles[ `--wp-admin-theme-color-darker-${ shade }--rgb` ]
+				).toBe( '0, 128, 238' );
+			}
 		} );
 
 		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
