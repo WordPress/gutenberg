@@ -818,7 +818,7 @@ export const InlineInPopover: Story = {
 								<Autocomplete.Empty>
 									No matching emojis.
 								</Autocomplete.Empty>
-								<Autocomplete.List>
+								<Autocomplete.List aria-label="Emojis">
 									{ (
 										group: ( typeof EMOJI_GROUPS )[ number ]
 									) => (
