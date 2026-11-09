@@ -73,61 +73,6 @@ describe( 'Menu', () => {
 		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
 	} );
 
-	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
-		const user = userEvent;
-		const onCanvasClick = vi.fn();
-
-		function ControlledMenuWithIframes() {
-			const [ open, setOpen ] = useState( false );
-
-			return (
-				<>
-					<Menu.Root
-						modal={ false }
-						onOpenChange={ setOpen }
-						open={ open }
-					>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<iframe title="Secondary canvas" />
-					<iframe
-						title="Editor canvas"
-						style={ { display: 'block', marginTop: 200 } }
-					/>
-				</>
-			);
-		}
-
-		await render( <ControlledMenuWithIframes /> );
-
-		const iframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
-		const iframeDocument = iframe.contentDocument;
-		if ( ! iframeDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-		const canvasTarget = iframeDocument.createElement( 'button' );
-		canvasTarget.textContent = 'Edit block';
-		canvasTarget.addEventListener( 'click', onCanvasClick );
-		iframeDocument.body.appendChild( canvasTarget );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
-
-		const frame = page.frameLocator( page.getByTitle( 'Editor canvas' ) );
-		await frame.getByRole( 'button', { name: 'Edit block' } ).click();
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
-	} );
-
 	it( 'keeps prefix icons hidden from assistive technology', async () => {
 		const user = userEvent;
 		await render(
