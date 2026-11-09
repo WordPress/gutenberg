@@ -72,7 +72,8 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * bordered overlay in its author's color.
  *
  * Block-level is per block, see `getBlockLevelClientIds`. When a block has
- * several, the first one supplies the color.
+ * several, the first one supplies the color. Suggestions are skipped: their
+ * own markers already show what they change.
  *
  * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
@@ -87,7 +88,7 @@ export function buildBlockHighlightCss(
 	const rules = [];
 	const highlightedBlocks = new Set();
 	const anchors = ( threads ?? [] ).flatMap( ( thread ) =>
-		thread?.id
+		thread?.id && ! thread.meta?._wp_suggestion
 			? getBlockLevelClientIds(
 					thread.id,
 					thread.blockClientIds,
