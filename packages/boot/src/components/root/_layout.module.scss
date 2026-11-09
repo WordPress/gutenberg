@@ -61,6 +61,11 @@
 	position: relative;
 	overflow: hidden;
 
+	// Matches the width of the admin submenu column.
+	.layout[data-admin-navigation-rail] &:not(.is-mobile) {
+		width: 124px;
+	}
+
 	&.is-mobile {
 		position: fixed;
 		top: 0;
@@ -254,6 +259,11 @@
 
 		}
 	}
+}
+
+// Leaves the admin navigation rail in view.
+.layout.has-full-canvas[data-admin-navigation-rail] .canvas {
+	inset-inline-start: var(--wp-admin--admin-menu--width, 0);
 }
 
 @media (max-width: #{breakpoints.$break-medium}) {
