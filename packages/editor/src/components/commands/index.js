@@ -13,6 +13,7 @@ import {
 	layout,
 	rotateRight,
 	rotateLeft,
+	backup,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -21,6 +22,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
+import { addQueryArgs } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
@@ -617,6 +619,71 @@ const getManipulateDocumentCommands = () =>
 		};
 	};
 
+const getRevisionsCommands = () =>
+	function useRevisionsCommands() {
+		const {
+			lastRevisionId,
+			revisionsCount,
+			supportsRevisions,
+			isRevisionsMode,
+			disableVisualRevisions,
+		} = useSelect( ( select ) => {
+			const {
+				getCurrentPostType,
+				getCurrentPostLastRevisionId,
+				getCurrentPostRevisionsCount,
+				getEditorSettings,
+			} = select( editorStore );
+			const postType =
+				select( coreStore ).getPostType( getCurrentPostType() );
+			return {
+				lastRevisionId: getCurrentPostLastRevisionId(),
+				revisionsCount: getCurrentPostRevisionsCount(),
+				supportsRevisions: !! postType?.supports?.revisions,
+				isRevisionsMode: unlock(
+					select( editorStore )
+				).isRevisionsMode(),
+				disableVisualRevisions:
+					!! getEditorSettings().disableVisualRevisions,
+			};
+		}, [] );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+
+		// Same conditions as the Revisions row in the document sidebar.
+		if (
+			isRevisionsMode ||
+			! supportsRevisions ||
+			! lastRevisionId ||
+			revisionsCount < 2
+		) {
+			return { isLoading: false, commands: [] };
+		}
+
+		return {
+			isLoading: false,
+			commands: [
+				{
+					name: 'core/open-revisions',
+					label: __( 'Open revisions' ),
+					icon: backup,
+					category: 'view',
+					callback: ( { close } ) => {
+						close();
+						if ( disableVisualRevisions ) {
+							document.location.href = addQueryArgs(
+								'revision.php',
+								{ revision: lastRevisionId }
+							);
+							return;
+						}
+						setCurrentRevisionId( lastRevisionId );
+					},
+				},
+			],
+		};
+	};
+
 export default function useCommands() {
 	useCommandLoader( {
 		name: 'core/editor/edit-ui',
@@ -639,6 +706,11 @@ export default function useCommands() {
 		name: 'core/editor/page-content-focus',
 		hook: getPageContentFocusCommands(),
 		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/revisions',
+		hook: getRevisionsCommands(),
 	} );
 
 	useCommandLoader( {

@@ -32,7 +32,9 @@ export default function SidebarNavigationScreenDetailsFooter( {
 	 * which means the revision.php page won't display a proper diff.
 	 * See: https://github.com/WordPress/gutenberg/issues/49164.
 	 */
-	if ( lastRevisionId && revisionsCount > 1 ) {
+	// A click handler means the caller opens revisions itself (e.g. in the
+	// editor's visual revisions view), so don't also link to revision.php.
+	if ( ! otherProps.onClick && lastRevisionId && revisionsCount > 1 ) {
 		hrefProps.href = addQueryArgs( 'revision.php', {
 			revision: record?._links[ 'predecessor-version' ][ 0 ].id,
 		} );
@@ -49,7 +51,7 @@ export default function SidebarNavigationScreenDetailsFooter( {
 				{ ...otherProps }
 			>
 				{ sprintf(
-					/* translators: %d: Number of Styles revisions. */
+					/* translators: %d: Number of revisions. */
 					_n( '%d Revision', '%d Revisions', revisionsCount ),
 					revisionsCount
 				) }

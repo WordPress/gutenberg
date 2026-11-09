@@ -8,9 +8,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { seen } from '@wordpress/icons';
+import { seen, backup } from '@wordpress/icons';
+import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import useOpenGlobalStylesRevisions from '../sidebar-navigation-screen-global-styles/use-open-global-styles-revisions';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
@@ -30,6 +32,9 @@ const GlobalStylesPageActions = ( {
 	onChangeSection,
 } ) => {
 	const history = useHistory();
+	const { revisionsCount, isLoading: isLoadingRevisions } =
+		useGlobalStylesRevisions();
+	const { openRevisions } = useOpenGlobalStylesRevisions();
 
 	return (
 		<HStack className="edit-site-styles__header-actions">
@@ -45,6 +50,14 @@ const GlobalStylesPageActions = ( {
 					// Navigate to the updated path.
 					history.navigate( updatedPath );
 				} }
+				size="compact"
+			/>
+			<Button
+				icon={ backup }
+				label={ __( 'Revisions' ) }
+				onClick={ openRevisions }
+				accessibleWhenDisabled
+				disabled={ isLoadingRevisions || ! revisionsCount }
 				size="compact"
 			/>
 			<GlobalStylesActionMenu
