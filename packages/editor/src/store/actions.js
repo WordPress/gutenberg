@@ -95,6 +95,41 @@ function getFailureDetails( message ) {
 }
 
 /**
+ * Explains an `invalid_json` save failure from the response's HTTP status.
+ *
+ * @param {number}  [status]     HTTP status of the response.
+ * @param {boolean} [redirected] Whether the request was redirected.
+ *
+ * @return {string} The explanation.
+ */
+function getInvalidResponseDetails( status, redirected ) {
+	if ( status >= 200 && status < 300 ) {
+		return redirected
+			? __(
+					'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.'
+				)
+			: __(
+					'Your site’s response was cut off or had unexpected text in it.'
+				);
+	}
+
+	if ( status === 429 ) {
+		return __(
+			'Your site is receiving too many requests. Wait a moment, then try again.'
+		);
+	}
+	if ( status === 500 ) {
+		return __( 'Your site ran into an error while saving. Try again.' );
+	}
+	if ( status >= 502 && status <= 504 ) {
+		return __(
+			'Your site didn’t respond in time. Wait a moment, then try again.'
+		);
+	}
+	return __( 'Your site sent back a response the editor couldn’t read.' );
+}
+
+/**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -424,6 +459,12 @@ export const savePost =
 								/* translators: %d: HTTP status code, such as 500. */
 								__( 'Error code %d.' ),
 								status
+							)
+						: '',
+					error.code === 'invalid_json'
+						? getInvalidResponseDetails(
+								status,
+								error.data?.redirected
 							)
 						: '',
 					message,

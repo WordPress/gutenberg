@@ -134,24 +134,42 @@ test.describe( 'Autosave failure notice', () => {
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		[ 'HTML error page', 'bad-gateway', withDetails( 'Error code 502.' ) ],
+		[
+			'HTML error page',
+			'bad-gateway',
+			withDetails(
+				'Error code 502. Your site didn’t respond in time. Wait a moment, then try again.'
+			),
+		],
+		[
+			'server error page',
+			'server-error-page',
+			withDetails(
+				'Error code 500. Your site ran into an error while saving. Try again.'
+			),
+		],
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'Error code 429.' ),
+			withDetails(
+				'Error code 429. Your site is receiving too many requests. Wait a moment, then try again.'
+			),
 		],
 		// The error is printed before the headers, so the status stays 200.
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			AUTOSAVE_FAILED,
+			withDetails(
+				'Your site’s response was cut off or had unexpected text in it.'
+			),
 		],
-		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			AUTOSAVE_FAILED,
+			withDetails(
+				'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.'
+			),
 		],
 		[
 			'redirected to another site',
@@ -230,7 +248,9 @@ test.describe( 'Autosave failure notice', () => {
 		const title = await autosaveFailure.autosave();
 		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			AUTOSAVE_FAILED,
+			withDetails(
+				'Your site’s response was cut off or had unexpected text in it.'
+			),
 		] );
 
 		const postId = await page.evaluate( () =>

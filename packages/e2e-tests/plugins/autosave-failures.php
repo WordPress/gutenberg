@@ -97,6 +97,12 @@ function gutenberg_test_autosave_failure( $result, $server, $request ) {
 			echo '<html><body><h1>502 Bad Gateway</h1></body></html>';
 			exit;
 
+		case 'server-error-page':
+			status_header( 500 );
+			header( 'Content-Type: text/html' );
+			echo '<html><body><h1>500 Internal Server Error</h1></body></html>';
+			exit;
+
 		case 'dropped-connection':
 			posix_kill( getmypid(), 9 );
 			break;

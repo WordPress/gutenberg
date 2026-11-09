@@ -4,6 +4,9 @@ import { __ } from '@wordpress/i18n';
  * Reads the response body as JSON, normalizing a parse failure into an
  * `invalid_json` error.
  *
+ * The error includes the response's `status` and `redirected` in `data`, so a
+ * failed save can say more than "not a valid JSON response".
+ *
  * Only the success path passes `allowEmptyBody`: `parseAndThrowError` throws
  * whatever this returns, and callers read `code` off it.
  *
@@ -32,7 +35,10 @@ async function parseJsonAndNormalizeError(
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
-			data: { status: response.status },
+			data: {
+				status: response.status,
+				redirected: response.redirected,
+			},
 		};
 	}
 }

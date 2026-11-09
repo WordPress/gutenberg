@@ -249,7 +249,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
-			data: { status: 200 },
+			data: { status: 200, redirected: false },
 		} );
 	} );
 
@@ -259,7 +259,24 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
-			data: { status: 500 },
+			data: { status: 500, redirected: false },
+		} );
+	} );
+
+	it( 'should keep whether a response that is not JSON was redirected', async () => {
+		fetchMock.mockResolvedValue( {
+			ok: true,
+			status: 200,
+			redirected: true,
+			async text() {
+				return '<!DOCTYPE html><title>Log In</title>';
+			},
+		} as Response );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+			data: { status: 200, redirected: true },
 		} );
 	} );
 

@@ -445,16 +445,16 @@ describe( 'Post actions', () => {
 					message: 'The response is not a valid JSON response.',
 					data: { status: 502 },
 				},
-				'Error code 502.',
+				'Error code 502. Your site didn’t respond in time. Wait a moment, then try again.',
 			],
 			[
-				'shows no details for a successful response that is not JSON',
+				'explains a successful response that is not JSON',
 				{
 					code: 'invalid_json',
 					message: 'The response is not a valid JSON response.',
 					data: { status: 200 },
 				},
-				undefined,
+				'Your site’s response was cut off or had unexpected text in it.',
 			],
 		] )( '%s', async ( _description, serverError, expectedDetails ) => {
 			const post = {
@@ -605,6 +605,84 @@ describe( 'Post actions', () => {
 				expect( notice.__unstableHTML ).toBeUndefined();
 			} );
 		} );
+
+		// The status explains the failure, not "not a valid JSON response".
+		it.each( [
+			[
+				429,
+				false,
+				'Error code 429. Your site is receiving too many requests. Wait a moment, then try again.',
+			],
+			[
+				500,
+				false,
+				'Error code 500. Your site ran into an error while saving. Try again.',
+			],
+			[
+				200,
+				true,
+				'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.',
+			],
+			[
+				403,
+				false,
+				'Error code 403. Your site sent back a response the editor couldn’t read.',
+			],
+			[
+				undefined,
+				undefined,
+				'Your site sent back a response the editor couldn’t read.',
+			],
+		] )(
+			'explains an invalid JSON response with status %s',
+			async ( status, redirected, expectedDetails ) => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
+				};
+
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
+
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw {
+							code: 'invalid_json',
+							message:
+								'The response is not a valid JSON response.',
+							data: { status, redirected },
+						};
+					}
+
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.details ).toBe( expectedDetails );
+			}
+		);
 	} );
 
 	describe( 'savePost() attaching media', () => {
