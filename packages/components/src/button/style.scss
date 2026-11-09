@@ -134,7 +134,7 @@
 			background: var(--_wp-components-button-background-weak-active, var(--wpds-color-background-interactive-brand-weak-active));
 		}
 
-		&:focus:not(:active) {
+		&:focus:not(:active, .is-destructive) {
 			border-color: var(--wpds-color-stroke-interactive-brand);
 		}
 
