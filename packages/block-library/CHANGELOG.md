@@ -4,10 +4,13 @@
 
 ### Bug Fixes
 
+-   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 -   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
 -   Tabs: Open the tab panels when an HTML anchor on the Tabs block or a Tab Panel contains a character such as `&` or `'`, instead of leaving them hidden ([#86415](https://github.com/WordPress/gutenberg/pull/86415)).
+-   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
+-   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
 
 ## 12.1.0 (2026-11-04)
 

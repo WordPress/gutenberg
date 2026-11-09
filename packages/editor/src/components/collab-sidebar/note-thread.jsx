@@ -28,7 +28,7 @@ import {
 import { getNoteExcerpt } from './utils/display';
 import {
 	focusNoteThread,
-	hasFocusWithin,
+	isFocusInBlocks,
 	scrollNoteThreadIntoView,
 } from './utils/dom';
 import { store as editorStore } from '../../store';
@@ -163,8 +163,13 @@ export function NoteThread( {
 			setBlockHighlight( false );
 		}
 
-		// In the note's block, the caret events decide; deselecting here too would race them.
-		if ( hasFocusWithin( relatedBlockElement ) ) {
+		// In the note's blocks, the caret events decide; deselecting here too would race them.
+		if (
+			isFocusInBlocks(
+				relatedBlockElement?.ownerDocument,
+				note.blockClientIds
+			)
+		) {
 			return;
 		}
 
