@@ -1,0 +1,29 @@
+{
+	"name": "annezazu-v2",
+	"description": "annezazu, with C's deletion covering all of the bolded words, so accepting it outdates B.",
+	"phase": "current",
+	"users": { "A": "overlap-anne", "B": "overlap-bob", "C": "overlap-carl" },
+	"base": "Intro.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"kind": "add",
+			"text": " Bright red apples fell.",
+			"at": 6
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 14, 24 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		},
+		{ "key": "C", "author": "C", "kind": "del", "range": [ 14, 29 ] }
+	],
+	"expect": {
+		"all-accepted": "Intro. Bright .",
+		"all-rejected": "Intro."
+	}
+}

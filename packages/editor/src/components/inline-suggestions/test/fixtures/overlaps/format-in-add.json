@@ -1,0 +1,22 @@
+{
+	"name": "format-in-add",
+	"description": "B italicizes a word inside A's addition.",
+	"phase": "current",
+	"users": { "A": "overlap-anne", "B": "overlap-bob" },
+	"base": "Hi.",
+	"suggestions": [
+		{ "key": "A", "author": "A", "kind": "add", "text": " there", "at": 2 },
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 3, 8 ],
+			"added": [ "core/italic" ],
+			"removed": []
+		}
+	],
+	"expect": {
+		"all-accepted": "Hi <i>there</i>.",
+		"all-rejected": "Hi."
+	}
+}

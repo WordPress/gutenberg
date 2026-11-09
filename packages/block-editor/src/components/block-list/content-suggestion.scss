@@ -1,0 +1,276 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// Visual treatment for blocks and RichText runs tagged with a pending
+// suggestion. Lives in `block-editor` because the canvas iframe loads
+// `wp-block-editor-content` (compiled from this package) but does NOT load
+// the editor-package chrome stylesheets — keeping these rules here is what
+// makes them apply inside the iframe. The `--wpds-*` design tokens are
+// available there too: `wp-theme` is the first dependency of the iframe's
+// `wp-edit-blocks` bundle.
+//
+// - Block-level classes (`is-suggestion-pending*`) are set by the editor
+//   suggestion system via `metadata.suggestion`.
+// - Inline markers live in block content (Option B), one class per kind:
+//   `.wp-suggestion-add`, `.wp-suggestion-del` and `.wp-suggestion-format`.
+//   Markers of different kinds nest over the same text (someone's deletion
+//   inside someone else's addition), always add outermost, then format, then
+//   del.
+//
+// Blocks and formatting markers consume `--suggestion-author-color`, which the
+// suggestion system writes from the suggester's avatar color — so those
+// suggestions tint to their author the same way live cursors do. Additions and
+// deletions use green and red instead.
+
+// Author color with the default that applies when the suggester's avatar
+// color can't be resolved (e.g., anonymous edits or pre-collab sessions).
+$suggestion-color: var(--suggestion-author-color, var(--wpds-color-stroke-surface-success-strong));
+
+// Text-safe variants: the author palette (AVATAR_BORDER_COLORS) is chosen for
+// borders, and several entries fall short of the 4.5:1 WCAG AA text threshold
+// on their own. Mixing the color with the inherited text color pulls it
+// toward whatever the theme already contrasts against its background: darker
+// on light themes, lighter on dark ones, and per block, so a Cover with light
+// text over a dark image gets a light tint. At this share every palette entry
+// and both defaults clear 4.5:1 against white and against dark backgrounds
+// down to #333, and the move tab's label below clears it on the tab's own
+// fill (see the contrast table in PR #80429). Use these wherever the author
+// color paints text or a line-through (which crosses text); keep the raw
+// color for borders, outlines, underlines and backgrounds.
+$suggestion-mix: 45%;
+$suggestion-text-color: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, currentColor);
+
+// The note marker's vernacular (`NoteHighlightStyles`): a 25% tint of the
+// author's color behind the run, and a 1.5px rule mixed with 30%
+// `currentColor`, which keeps every palette color above 3:1 on light and dark
+// canvases. Blocks get the same rule, all the way around, with no offset or
+// radius. An addition is green and a deletion red, tint and rule alike,
+// whoever suggested it, so they read apart from notes at a glance; the line
+// style (underline, line-through) carries the same meaning without color.
+// Formatting keeps the author's tint, with a dotted underline.
+$suggestion-rule-width: 1.5px;
+$suggestion-rule-offset: 0.15em;
+$suggestion-tint: color-mix(in srgb, var(--suggestion-author-color, transparent) 25%, transparent);
+$suggestion-rule-color: color-mix(in srgb, currentColor 30%, #{$suggestion-color});
+$suggestion-addition-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds-color-stroke-surface-success-strong));
+$suggestion-deletion-rule-color: color-mix(in srgb, currentColor 30%, var(--wpds-color-stroke-surface-error-strong));
+$suggestion-addition-tint: color-mix(in srgb, var(--wpds-color-stroke-surface-success-strong) 25%, transparent);
+$suggestion-deletion-tint: color-mix(in srgb, var(--wpds-color-stroke-surface-error-strong) 25%, transparent);
+$suggestion-deletion-text-color: color-mix(in srgb, var(--wpds-color-stroke-surface-error-strong) $suggestion-mix, currentColor);
+
+// A block with a pending attribute proposal (font size, alignment, heading
+// level), which the block already renders. A solid rule in the author's
+// color, like a block-level note's. Drawn with an outline so it layers above
+// block content without affecting layout, and leaves `::after` to the
+// editor's selection outline.
+.block-editor-block-list__block.is-suggestion-pending {
+	outline: $suggestion-rule-width solid $suggestion-rule-color;
+}
+
+// Pending-remove: the block is still real (selection, focus, and toolbar
+// keep working) but the visual treatment communicates "proposed for
+// deletion". Strikethrough + suggestion-tinted text on every line so
+// multi-line paragraphs read clearly as "delete me", matching Google
+// Docs' suggesting-mode strike-through. The decoration is applied to
+// the wrapper and propagates to inline rich-text descendants.
+.block-editor-block-list__block.is-suggestion-pending-remove {
+	color: $suggestion-deletion-text-color;
+	text-decoration: line-through $suggestion-rule-width $suggestion-deletion-rule-color;
+}
+
+// Pending-insert: the block was inserted in Suggest mode but isn't yet
+// "real". A dashed rule in the addition tone distinguishes it from the solid
+// one on pending attribute edits. Edits to a pending-insert block bypass the
+// suggestion overlay (see `with-suggestion-overlay.js`) so the content syncs
+// and shows up here.
+.block-editor-block-list__block.is-suggestion-pending-insert {
+	outline: $suggestion-rule-width dashed $suggestion-addition-rule-color;
+}
+
+// Pending-move: the block has been dragged to a new position but the move
+// isn't yet committed. A dotted outline distinguishes it from the
+// dashed pending-insert (the block existed before — only its position is
+// suggested). The "Suggested move" tab pinned to the top corner makes the
+// preview state unambiguous. The tab text comes from the
+// `data-suggestion-move-label` attribute (set by the editor-package HOC) so
+// it is translatable rather than a hardcoded English string baked into CSS.
+// No opacity: it would dim the block's own text and the tab's label below
+// 4.5:1 (2.71:1 for the amber palette entry's tab on white).
+.block-editor-block-list__block.is-suggestion-pending-move {
+	position: relative;
+	outline: $suggestion-rule-width dotted $suggestion-rule-color;
+
+	// The tab's label sits on the tab's own fill rather than on the canvas,
+	// so it cannot lean on the inherited-color mix above (in `background`,
+	// `currentColor` is the pseudo-element's own text color). Mix the author
+	// color toward the neutral foreground token instead, which always comes
+	// out dark, and pair it with the light "on strong" foreground. Under
+	// `.is-dark-theme` (set on the canvas body by `EditorStyles` from the
+	// theme's background luminance) invert both so the tab still stands out
+	// from a dark canvas.
+	&::before {
+		content: attr(data-suggestion-move-label);
+		position: absolute;
+		top: calc(-1 * var(--wpds-typography-line-height-xs));
+		left: -$grid-unit-05;
+		padding: 0 var(--wpds-dimension-padding-sm);
+		background: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, var(--wpds-color-foreground-content-neutral));
+		color: var(--wpds-color-foreground-interactive-neutral-strong);
+		font-size: var(--wpds-typography-font-size-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: var(--wpds-typography-line-height-xs);
+		border-radius: var(--wpds-border-radius-sm) var(--wpds-border-radius-sm) 0 0;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.is-dark-theme &::before {
+		background: color-mix(in srgb, #{$suggestion-color} $suggestion-mix, var(--wpds-color-background-surface-neutral-strong));
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+}
+
+// Inline suggestion markers that live in block content (Option B). The
+// kind-specific visual is keyed off the marker's class, which is the
+// authoritative kind (`data-suggestion-type` is written alongside it); the
+// marker is also decorated at runtime through the annotations API
+// (`.annotation-text-core-suggestion`). The default `<mark>` highlight is
+// neutralized so the deletion/addition treatment reads cleanly. A formatting
+// marker's tint comes from `--suggestion-author-color`, set per `data-author`.
+:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format) {
+	// The marker is a `<mark>`, which browsers paint black on yellow by
+	// default. Inherit the text color so the run follows the theme (and the
+	// mixes below start from it) instead of going black on a dark canvas.
+	background-color: $suggestion-tint;
+	color: inherit;
+	text-decoration-thickness: $suggestion-rule-width;
+	text-underline-offset: $suggestion-rule-offset;
+
+	// The runtime annotation decoration nests a `<mark class="annotation-text">`
+	// inside the suggestion marker. Suggestion threads are `note`-type comments,
+	// so `NoteHighlightStyles` tints that inner mark with the author's color by
+	// id (and the browser otherwise paints `<mark>` black on yellow). Here the
+	// marker's own strikethrough/underline is the visual, so the highlight box
+	// — whose rounded edges read as stray vertical bars around the run and any
+	// trailing space — is redundant. Neutralize it; `!important` overrides the
+	// id-specificity rule `NoteHighlightStyles` injects per thread. The marker
+	// carries the author's tint itself.
+	mark.annotation-text {
+		background-color: transparent !important;
+		color: inherit;
+	}
+
+	// Text decorations propagate to nested markers, so a deletion inside an
+	// addition shows both the addition's underline and its own line-through.
+	&.wp-suggestion-del {
+		background-color: $suggestion-deletion-tint;
+		text-decoration-line: line-through;
+		text-decoration-color: $suggestion-deletion-rule-color;
+	}
+
+	&.wp-suggestion-add {
+		background-color: $suggestion-addition-tint;
+		text-decoration-line: underline;
+		text-decoration-color: $suggestion-addition-rule-color;
+	}
+
+	// A pending formatting change (bold/italic/link toggled over a run): the
+	// run already renders WITH the proposed formatting, so without a cue it
+	// reads as committed. A dotted underline in the author color marks it as
+	// provisional while staying visually lighter than the solid `add`
+	// underline (the text itself isn't new).
+	&.wp-suggestion-format {
+		text-decoration-line: underline;
+		text-decoration-style: dotted;
+		text-decoration-color: $suggestion-rule-color;
+	}
+
+	// A formatting change inside someone's addition would draw its dotted
+	// underline on top of the addition's solid one. Drop it lower so both
+	// read: the solid line says "proposed text", the dotted one below it
+	// "proposed formatting".
+	&.wp-suggestion-add .wp-suggestion-format {
+		text-underline-offset: 0.35em;
+	}
+
+	// An addition typed inside someone's addition. Both underlines would
+	// sit on one line, so the inner one drops lower, and its tint stacks on
+	// the outer one's. Two deletions of the same text keep the one
+	// line-through.
+	&.wp-suggestion-add .wp-suggestion-add {
+		text-underline-offset: 0.35em;
+	}
+
+	// Everything above is color and text-decoration, which conveys nothing to
+	// a screen reader: a proposed deletion reads as ordinary prose. The editor
+	// nests a `.wp-suggestion-a11y` span inside each marker (a rich-text
+	// decoration that never serializes) carrying the announcement for its type
+	// and author; paint it as generated content so the marker is bracketed in
+	// the reading order.
+	//
+	// Generated content rather than a real text node on purpose: this lives
+	// inside a `contenteditable`, where a hidden text node would be reachable
+	// by the caret, land in the selection and ride along on copy. A
+	// pseudo-element cannot be edited, selected or copied. The strings arrive
+	// through `data-` attributes (the same trick the pending-move tab uses
+	// above) so they stay translatable instead of being baked into CSS.
+	.wp-suggestion-a11y {
+		&::before,
+		&::after {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+			pointer-events: none;
+			user-select: none;
+		}
+
+		&::before {
+			content: attr(data-suggestion-a11y-start);
+		}
+
+		&::after {
+			content: attr(data-suggestion-a11y-end);
+		}
+	}
+}
+
+// Move ghost: a non-interactive placeholder rendered at a moved block's
+// original position (by the editor-package suggestion HOC) so a reviewer
+// can see where the block came from. Struck-through and tinted with the
+// suggester's color (shared with the decorated block at the destination via
+// `--suggestion-author-color`), with a small "Moved from here" label so the
+// ghost reads as one half of a move pair. Only the icon is dimmed: the text
+// color is already mixed for contrast, and opacity would undo that.
+.is-suggestion-move-ghost {
+	display: block;
+	position: relative;
+	margin: var(--wpds-dimension-gap-md) 0;
+	padding: var(--wpds-dimension-padding-md);
+	color: $suggestion-text-color;
+	border: var(--wpds-border-width-xs) dotted $suggestion-color;
+	border-radius: var(--wpds-border-radius-sm);
+	text-decoration: line-through;
+	pointer-events: none;
+	user-select: none;
+
+	.is-suggestion-move-ghost__label {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-xs);
+		font-size: var(--wpds-typography-font-size-xs);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		text-decoration: none;
+
+		svg {
+			opacity: 0.6;
+		}
+	}
+
+	.is-suggestion-move-ghost__excerpt {
+		display: block;
+		margin-top: var(--wpds-dimension-gap-xs);
+		font-size: var(--wpds-typography-font-size-md);
+	}
+}
