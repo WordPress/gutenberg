@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { store as coreStore } from '@wordpress/core-data';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	RichText,
@@ -14,7 +14,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -109,37 +109,28 @@ export default function PostExcerptEditor( props ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 
-	const { editEntityRecord } = useDispatch( coreStore );
-	const setExcerpt = useCallback(
-		( newValue ) => {
-			void editEntityRecord( 'postType', postType, postId, {
-				excerpt: newValue,
-			} );
-		},
-		[ editEntityRecord, postType, postId ]
+	const [ rawExcerpt, setExcerpt, fullExcerpt ] = useEntityProp(
+		'postType',
+		postType,
+		'excerpt',
+		postId
 	);
-
-	const { record, rawExcerpt } = useSelect(
-		( select ) => {
-			const _record = select( coreStore ).getEntityRecord(
+	const record = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId
-			);
-			const editedRecord = select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-
-			return {
-				record: _record,
-				rawExcerpt:
-					_record && editedRecord ? editedRecord.excerpt : null,
-			};
-		},
+			),
 		[ postType, postId ]
 	);
+
+	/*
+	 * While a revision or a browser backup is displayed, `useEntityProp` reads
+	 * the excerpt from it instead of from the stored post.
+	 */
+	const isShowingRevision =
+		!! fullExcerpt && fullExcerpt !== record?.excerpt;
 
 	/*
 	 * `excerpt_length` only changes the response for posts without a stored
@@ -151,7 +142,10 @@ export default function PostExcerptEditor( props ) {
 	 * is displayed as typed, so it does not need a generated excerpt either.
 	 */
 	const needsGeneratedExcerpt =
-		!! record && ! record.excerpt?.raw?.trim() && ! rawExcerpt?.trim();
+		! isShowingRevision &&
+		!! record &&
+		! fullExcerpt?.raw?.trim() &&
+		! rawExcerpt?.trim();
 
 	/*
 	 * The excerpt length is sent to the REST API so that the excerpt is
@@ -184,9 +178,9 @@ export default function PostExcerptEditor( props ) {
 	 * displayed, so that changing the length never blanks the block.
 	 */
 	const renderedExcerpt = needsGeneratedExcerpt
-		? ( generatedExcerpt ?? record?.excerpt?.rendered )
-		: record?.excerpt?.rendered;
-	const isProtected = record?.excerpt?.protected;
+		? ( generatedExcerpt ?? fullExcerpt?.rendered )
+		: fullExcerpt?.rendered;
+	const isProtected = fullExcerpt?.protected;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
