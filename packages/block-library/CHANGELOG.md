@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Audio: Pause the Audio block that is playing when another one starts, so two never play at once ([#86453](https://github.com/WordPress/gutenberg/issues/86453)).
+
 ### Bug Fixes
 
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
