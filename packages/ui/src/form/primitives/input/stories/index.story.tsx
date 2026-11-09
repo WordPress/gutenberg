@@ -54,6 +54,7 @@ export const WithSuffixControl: Story = {
 export const Disabled: Story = {
 	args: {
 		...Default.args,
+		defaultValue: 'Disabled value',
 		disabled: true,
 	},
 };
