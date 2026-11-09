@@ -19,7 +19,7 @@ Two types are wider inside the package than outside it:
 | Public | Internal | What the internal one adds |
 | --- | --- | --- |
 | `ImageEditorState` | `InternalImageEditorState` | The base pan, zoom and rotation the reducer keeps for fine rotation. They are on the stored object, so a state the consumer passes back carries them. |
-| `ImageEditorController` | `InternalImageEditorController` | The methods only the canvas calls (`adjustCropRectForViewport`, `settleCrop`, `setZoomAtPoint`), and `getCroppedImage`. |
+| `ImageEditorController` | `InternalImageEditorController` | The methods only the canvas calls (`adjustCropRectForViewport`, `settleCrop`, `setZoomAtPoint`). |
 
 The internal types fit where the public ones are expected, so there are only two casts: `useInternalImageEditor` treats the state it receives as the internal one, and `ImageEditorCanvas` treats its controller as the internal one.
 
