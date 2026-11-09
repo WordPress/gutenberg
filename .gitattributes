@@ -26,3 +26,10 @@ tsconfig*.json linguist-language=jsonc
 
 # PHPStan stub files are PHP.
 *.stub linguist-language=PHP diff=php
+
+# Generated files. GitHub collapses their diffs in pull requests, and
+# tools/review-routing leaves their diffs out. GitHub already collapses
+# lockfiles, but other tools only see what this file lists.
+package-lock.json linguist-generated=true
+packages/theme/src/prebuilt/** linguist-generated=true
+**/__snapshots__/** linguist-generated=true
