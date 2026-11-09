@@ -120,6 +120,12 @@ function Root( {
 	// dismiss+reopen cycle is silently discarded.
 	const confirmIdRef = useRef( 0 );
 
+	useEffect( () => {
+		return () => {
+			confirmIdRef.current += 1;
+		};
+	}, [] );
+
 	// Safety net: if the consumer keeps `open={true}` after a confirm
 	// (i.e. does not react to `onOpenChange`), the phase would be stuck
 	// at 'closing'. Detect the contradiction and reset to idle.
