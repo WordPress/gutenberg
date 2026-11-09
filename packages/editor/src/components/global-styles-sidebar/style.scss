@@ -93,7 +93,7 @@
 			// ... and display labels.
 			&::after {
 				content: attr(aria-label);
-				font-size: $helptext-font-size;
+				font-size: var(--wpds-typography-font-size-sm);
 			}
 		}
 	}
@@ -124,7 +124,7 @@
 	}
 
 	&__text {
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		line-height: 1.4;
 		margin: 0 0 $grid-unit-20 0;
 		padding: 0 $grid-unit-40;

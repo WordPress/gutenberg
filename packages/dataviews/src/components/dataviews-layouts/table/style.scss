@@ -160,7 +160,7 @@
 			background-color: inherit;
 			padding-top: var(--wpds-dimension-padding-sm);
 			padding-bottom: var(--wpds-dimension-padding-sm);
-			font-size: 11px;
+			font-size: var(--wpds-typography-font-size-xs);
 			text-transform: uppercase;
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 
@@ -210,7 +210,7 @@
 	}
 	.dataviews-view-table-header-button {
 		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
-		font-size: 11px;
+		font-size: var(--wpds-typography-font-size-xs);
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 

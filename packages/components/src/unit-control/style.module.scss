@@ -21,7 +21,7 @@
 	height: 24px;
 	margin-inline-end: $grid-unit-10;
 	padding: $grid-unit-05;
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 1;
 	text-align-last: center;
 	white-space: nowrap;

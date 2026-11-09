@@ -16,7 +16,7 @@
 	// Label
 	.rich-text {
 		position: relative;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		font-family: $default-font;

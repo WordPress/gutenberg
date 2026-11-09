@@ -12,7 +12,7 @@
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	padding: $grid-unit-05 $grid-unit-10;
 	z-index: z-index(".components-tooltip");
 	box-shadow: $elevation-small;

@@ -185,7 +185,7 @@ div.dataviews-view-list {
 		gap: var(--wpds-dimension-gap-md);
 		row-gap: var(--wpds-dimension-gap-xs);
 		flex-wrap: wrap;
-		font-size: 12px;
+		font-size: var(--wpds-typography-font-size-sm);
 
 		&:empty {
 			display: none;

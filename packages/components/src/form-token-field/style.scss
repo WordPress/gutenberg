@@ -48,7 +48,7 @@
 		// Resolves Zooming on iOS devices
 		// https://github.com/WordPress/gutenberg/issues/27405
 		@include break-small() {
-			font-size: 13px;
+			font-size: var(--wpds-typography-font-size-md);
 		}
 
 		&:focus,
@@ -64,7 +64,7 @@
 
 // Tokens
 .components-form-token-field__token {
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	display: flex;
 	color: $gray-900;
 	max-width: 100%;
@@ -193,7 +193,7 @@
 .components-form-token-field__suggestion {
 	color: var(--wpds-color-foreground-interactive-neutral);
 	display: block;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	padding: $grid-unit-10 $grid-unit-15;
 	min-height: $button-size-compact;
 	margin: 0;

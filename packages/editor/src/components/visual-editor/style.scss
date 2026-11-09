@@ -44,7 +44,7 @@
 	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		padding: 6px 12px;
 
 		&.is-tertiary,

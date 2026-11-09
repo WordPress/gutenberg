@@ -6,7 +6,7 @@
 
 .components-snackbar {
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
 	backdrop-filter: blur($grid-unit-20) saturate(180%);
 	border-radius: $radius-medium;
@@ -42,7 +42,7 @@
 	.components-snackbar__icon {
 		position: absolute;
 		left: $grid-unit-10 * -1;
-		top: calc((#{$icon-size - ($default-font-size * $default-line-height)}) / -2);
+		top: calc((#{$icon-size} - (var(--wpds-typography-font-size-md) * #{$default-line-height})) / -2);
 	}
 
 	.components-snackbar__dismiss-button {

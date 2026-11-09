@@ -28,7 +28,7 @@
 	display: inline-flex;
 	text-decoration: none;
 	font-family: inherit;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin: 0;
 	cursor: var(--wpds-cursor-control);
@@ -294,7 +294,7 @@
 		height: var(--wpds-dimension-size-sm);
 		line-height: 22px;
 		padding: 0 8px;
-		font-size: 11px;
+		font-size: var(--wpds-typography-font-size-xs);
 
 		&.has-icon:not(.has-text) {
 			padding: 0;

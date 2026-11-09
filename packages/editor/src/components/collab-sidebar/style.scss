@@ -127,18 +127,18 @@
 }
 
 .editor-collab-sidebar-panel__user-name {
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	font-weight: 400;
-	line-height: 16px;
+	line-height: var(--wpds-typography-line-height-xs);
 	text-align: left;
 	color: $gray-700;
 	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	font-weight: 400;
-	line-height: 16px;
+	line-height: var(--wpds-typography-line-height-xs);
 	text-align: left;
 	color: $gray-700;
 }
@@ -232,8 +232,8 @@
 // form needs to the editable element as rendered inside the note form. The
 // shell exposes no stable class name, so target the editable by its role.
 .editor-collab-sidebar-panel__note-form [role="textbox"] {
-	line-height: 20px;
-	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
+	line-height: var(--wpds-typography-line-height-sm);
+	max-height: calc(var(--wpds-typography-line-height-sm) * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
 	white-space: pre-wrap;
 	overflow-wrap: break-word;

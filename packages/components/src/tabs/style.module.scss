@@ -116,7 +116,7 @@
 	line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
 	font-family: $font-family-body;
 	font-weight: 400;
-	font-size: $font-size-medium;
+	font-size: var(--wpds-typography-font-size-md);
 	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:is([aria-selected="true"], [aria-disabled="true"]) {

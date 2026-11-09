@@ -20,7 +20,7 @@
 .global-styles-ui-screen-revisions__date {
 	text-transform: uppercase;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 }
 
 .global-styles-ui-screen-revisions__description {
@@ -34,7 +34,7 @@
 .global-styles-ui-screen-revisions__meta {
 	// Dark enough to keep AA contrast over the selected row's tint.
 	color: $gray-800;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 }
 
 .global-styles-ui-screen-revisions__meta {

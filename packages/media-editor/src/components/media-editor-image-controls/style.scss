@@ -32,7 +32,7 @@
 	// their labels (Zoom, Aspect ratio) so the groups read as section
 	// headings. Matches InputControl's label typography in `@wordpress/components`.
 	&__label {
-		font-size: 11px;
+		font-size: var(--wpds-typography-font-size-xs);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		line-height: 1.4;
 		text-transform: uppercase;

@@ -85,7 +85,7 @@
 		padding: $grid-unit-15 $grid-unit-20;
 		h3 {
 			margin: 0;
-			font-size: 13px;
+			font-size: var(--wpds-typography-font-size-md);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
@@ -120,6 +120,6 @@
 		white-space: nowrap;
 		min-width: 0;
 		flex: 1;
-		font-size: 12px;
+		font-size: var(--wpds-typography-font-size-sm);
 	}
 }

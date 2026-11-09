@@ -23,7 +23,7 @@
 	border-radius: $radius-small;
 	box-sizing: border-box;
 	font-family: $default-font;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	color: $components-color-foreground-inverted;
 	padding: $grid-unit-05 $grid-unit-10;
 	position: relative;
@@ -34,7 +34,7 @@
 .label-text.label-text.label-text {
 	color: $components-color-foreground-inverted;
 	display: block;
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 1.4;
 	white-space: nowrap;
 }

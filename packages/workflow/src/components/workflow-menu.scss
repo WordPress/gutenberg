@@ -82,7 +82,7 @@
 
 .workflows-workflow-menu__output-hint {
 	margin: 0;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	color: $gray-700;
 }
 
@@ -95,7 +95,7 @@
 		padding: $grid-unit-15;
 		background: $gray-100;
 		border-radius: $radius-small;
-		font-size: 12px;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 1.5;
 		white-space: pre-wrap;
 		overflow-wrap: anywhere;
@@ -112,7 +112,7 @@
 
 	p {
 		margin: 0;
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
 

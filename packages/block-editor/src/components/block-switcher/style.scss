@@ -76,7 +76,7 @@
 
 			.block-editor-block-switcher__preview-patterns-container-list__item-title {
 				padding: $grid-unit-05;
-				font-size: 12px;
+				font-size: var(--wpds-typography-font-size-sm);
 				text-align: center;
 				cursor: var(--wpds-cursor-control);
 			}

@@ -4,7 +4,7 @@
 .wrapper {
 	box-sizing: border-box;
 	font-family: $font-family-body;
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 
 	*,
 	*::before,
@@ -23,7 +23,7 @@
 	display: block;
 	margin-bottom: 8px;
 	padding: 0;
-	font-size: 11px;
+	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 1.4;
 	text-transform: uppercase;
@@ -33,7 +33,7 @@
 .help {
 	margin-top: 8px;
 	margin-bottom: 0;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	font-style: normal;
 	color: $components-color-gray-700;
 	text-wrap: pretty;

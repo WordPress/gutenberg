@@ -255,7 +255,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		font-size: var(--wpds-typography-font-size-sm);
-		line-height: 16px;
+		line-height: var(--wpds-typography-line-height-xs);
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 }
@@ -330,7 +330,7 @@
 	padding: 0 var(--wpds-dimension-padding-xs);
 	text-align: center;
 	border-radius: var(--wpds-border-radius-lg);
-	font-size: 11px;
+	font-size: var(--wpds-typography-font-size-xs);
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-background-surface-neutral-strong);
 	color: var(--wpds-color-foreground-interactive-neutral-strong);
 	box-sizing: border-box;

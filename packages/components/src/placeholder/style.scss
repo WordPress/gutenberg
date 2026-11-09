@@ -4,7 +4,7 @@
 
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	box-sizing: border-box;
 	position: relative;
 	padding: $grid-unit-30;
@@ -33,7 +33,7 @@
 .components-placeholder__label,
 .components-placeholder__fieldset {
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	// Global Styles can affect this so we are resetting.
 	letter-spacing: initial;
 	line-height: initial;
@@ -70,7 +70,7 @@
 
 	p {
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
 

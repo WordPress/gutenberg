@@ -32,7 +32,7 @@ fieldset.media-edit {
 	}
 
 	.media-edit__description {
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 1.5;
 	}
 

@@ -157,7 +157,7 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 		figcaption {
 			color: $white;
 			text-shadow: 0 0 1.5px $black;
-			font-size: $default-font-size;
+			font-size: var(--wpds-typography-font-size-md);
 			margin: 0;
 			overflow: auto;
 			padding: 1em;

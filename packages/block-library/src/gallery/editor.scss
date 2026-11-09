@@ -136,7 +136,7 @@
 	.wp-block-gallery__source-description {
 		margin: 0;
 		color: $gray-700;
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 	}
 
 	// Full-width action button, matching other inspector buttons (e.g. the

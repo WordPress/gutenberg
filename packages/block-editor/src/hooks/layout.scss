@@ -9,7 +9,7 @@
 
 .block-editor-hooks__layout-constrained-helptext {
 	color: $gray-700;
-	font-size: $helptext-font-size;
+	font-size: var(--wpds-typography-font-size-sm);
 	margin-bottom: 0; // Cancel out margins added by common.css
 }
 

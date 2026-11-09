@@ -57,7 +57,7 @@
 	}
 
 	& > div > span {
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: $default-line-height;
 		color: $gray-700;
 	}

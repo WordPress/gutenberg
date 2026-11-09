@@ -110,8 +110,8 @@
 
 	.dataviews-view-picker-grid__fields {
 		position: relative;
-		font-size: 12px;
-		line-height: 16px;
+		font-size: var(--wpds-typography-font-size-sm);
+		line-height: var(--wpds-typography-line-height-xs);
 
 		&:not(:empty) {
 			padding: 0 0 var(--wpds-dimension-padding-md);

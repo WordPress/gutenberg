@@ -1,5 +1,5 @@
 .panel-wrapper {
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 
 	:global(.components-dropdown-menu__menu) {
 		max-width: 220px;

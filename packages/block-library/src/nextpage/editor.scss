@@ -15,7 +15,7 @@
 
 	// Label
 	> span {
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		position: relative;
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);

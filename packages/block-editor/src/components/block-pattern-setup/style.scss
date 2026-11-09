@@ -58,7 +58,7 @@
 
 				.block-editor-block-pattern-setup-list__item-title {
 					padding-top: $grid-unit-10;
-					font-size: 12px;
+					font-size: var(--wpds-typography-font-size-sm);
 					text-align: center;
 					cursor: var(--wpds-cursor-control);
 				}

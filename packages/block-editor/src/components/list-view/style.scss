@@ -268,7 +268,7 @@
 		box-sizing: border-box;
 		color: inherit;
 		font-family: inherit;
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
 		font-weight: 400;
 		margin: 0;
 		text-decoration: none;
@@ -435,8 +435,8 @@
 		border-radius: $radius-small;
 		background: $gray-100;
 		color: $gray-800;
-		font-size: $font-size-small;
-		line-height: $font-line-height-small;
+		font-size: var(--wpds-typography-font-size-sm);
+		line-height: var(--wpds-typography-line-height-sm);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

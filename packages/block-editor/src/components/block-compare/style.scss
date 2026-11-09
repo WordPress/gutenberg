@@ -35,7 +35,7 @@
 
 	.block-editor-block-compare__html {
 		font-family: $editor-html-font;
-		font-size: 12px;
+		font-size: var(--wpds-typography-font-size-sm);
 		color: $gray-900;
 		border-bottom: 1px solid #ddd;
 		padding-bottom: 15px;
@@ -70,7 +70,7 @@
 		padding-top: $grid-unit-20;
 
 		p {
-			font-size: 12px;
+			font-size: var(--wpds-typography-font-size-sm);
 			margin-top: 0;
 		}
 	}

@@ -104,10 +104,10 @@
 		grid-template-columns: subgrid;
 	}
 
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	font-family: inherit;
 	font-weight: 400;
-	line-height: 20px;
+	line-height: var(--wpds-typography-line-height-sm);
 
 	color: var(--wpds-color-foreground-interactive-neutral);
 	border-radius: $radius-small;
@@ -271,14 +271,14 @@
 }
 
 .item-label {
-	font-size: $default-font-size;
-	line-height: 20px;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 	color: inherit;
 }
 
 .item-help-text {
-	font-size: $helptext-font-size;
-	line-height: 16px;
+	font-size: var(--wpds-typography-font-size-sm);
+	line-height: var(--wpds-typography-line-height-xs);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	overflow-wrap: anywhere;
 

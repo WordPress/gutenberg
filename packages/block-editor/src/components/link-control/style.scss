@@ -69,7 +69,7 @@ $block-editor-link-control-number-of-actions: 1;
 	padding: 0 $grid-unit-20;
 	margin-top: -$grid-unit-10;
 	margin-bottom: 0;
-	font-size: $helptext-font-size;
+	font-size: var(--wpds-typography-font-size-sm);
 	font-style: normal;
 	color: $gray-700;
 }
@@ -183,7 +183,7 @@ $block-editor-link-control-number-of-actions: 1;
 		.block-editor-link-control__preview-info {
 			color: $gray-700;
 			line-height: 1.1;
-			font-size: $helptext-font-size;
+			font-size: var(--wpds-typography-font-size-sm);
 			word-break: break-all;
 		}
 	}

@@ -96,7 +96,7 @@
 
 			&.description {
 				color: $gray-700;
-				font-size: $helptext-font-size;
+				font-size: var(--wpds-typography-font-size-sm);
 			}
 		}
 	}

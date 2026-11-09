@@ -64,7 +64,7 @@
 }
 
 .wp-block-icon__inserter-grid-icons-list-item-title {
-	font-size: $font-size-small;
+	font-size: var(--wpds-typography-font-size-sm);
 	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
 	overflow-wrap: break-word;
 }

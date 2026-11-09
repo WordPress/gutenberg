@@ -24,7 +24,7 @@
 
 	&#{&},
 	&#{&} .title {
-		line-height: variables.$font-line-height-x-large;
+		line-height: var(--wpds-typography-line-height-xl);
 		color: var(--wpds-color-foreground-content-neutral);
 	}
 }

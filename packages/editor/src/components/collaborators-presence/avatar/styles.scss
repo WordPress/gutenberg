@@ -76,7 +76,7 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: $font-size-x-small;
+	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	border: 0;
 	background-clip: border-box;
@@ -91,9 +91,9 @@ $-accent-color: var(--wp-admin-theme-color, #3858e9);
 }
 
 .editor-avatar__name {
-	font-size: $font-size-medium;
+	font-size: var(--wpds-typography-font-size-md);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	line-height: $font-line-height-small;
+	line-height: var(--wpds-typography-line-height-sm);
 	color: var(--editor-avatar-name-color, $white);
 	min-width: 0;
 	padding-bottom: calc($grid-unit-05 / 2);

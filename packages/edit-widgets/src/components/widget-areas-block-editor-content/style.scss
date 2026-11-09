@@ -28,7 +28,7 @@
 	// This is copied from edit-post/src/components/style.scss but without the padding.
 	& .components-button {
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 
 		&.is-tertiary,
 		&.has-icon {

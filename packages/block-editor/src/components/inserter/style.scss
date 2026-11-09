@@ -22,7 +22,7 @@ $block-inserter-tabs-height: 44px;
 	border: none;
 	padding: 0;
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 0;
 
 	@include break-medium {
@@ -176,7 +176,7 @@ $block-inserter-tabs-height: 44px;
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
-	font-size: 11px;
+	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
@@ -209,7 +209,7 @@ $block-inserter-tabs-height: 44px;
 	align-items: center;
 
 	h2 {
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 
 	.block-editor-block-icon {
@@ -546,7 +546,7 @@ $media-grid-loading-min-height: 500px;
 
 	.block-editor-inserter__media-grid__range {
 		color: $gray-700;
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 		white-space: nowrap;
 	}
 
@@ -583,7 +583,7 @@ $media-grid-loading-min-height: 500px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-typography-font-size-sm);
 
 		// Too narrow to read, so the icon carries it alone.
 		@container (max-width: 90px) {

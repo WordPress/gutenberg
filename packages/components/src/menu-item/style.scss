@@ -69,7 +69,7 @@
 
 .components-menu-item__info {
 	margin-top: $grid-unit-05;
-	font-size: $helptext-font-size;
+	font-size: var(--wpds-typography-font-size-sm);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	white-space: normal;
 }

@@ -249,7 +249,7 @@
 			// ... and display labels.
 			&::after {
 				content: attr(aria-label);
-				font-size: $helptext-font-size;
+				font-size: var(--wpds-typography-font-size-sm);
 			}
 		}
 

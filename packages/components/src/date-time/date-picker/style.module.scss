@@ -40,7 +40,7 @@
 
 .heading.heading {
 	// Preserve the existing override of Heading's typography.
-	font-size: $font-size-medium;
+	font-size: var(--wpds-typography-font-size-md);
 	font-weight: 400;
 }
 
@@ -54,7 +54,7 @@
 
 .day-of-week {
 	color: $components-color-gray-700;
-	font-size: $font-size-medium;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 1.4;
 }
 

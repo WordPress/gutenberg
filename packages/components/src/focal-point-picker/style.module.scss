@@ -6,7 +6,7 @@
 	padding: 0;
 	margin: 0;
 	font-family: variables.$font-family-body;
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 	box-sizing: border-box;
 
 	*,

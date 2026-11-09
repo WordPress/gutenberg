@@ -36,7 +36,7 @@
 	}
 
 	h2 {
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		color: $gray-900;
 		margin-bottom: 1.5em;
@@ -44,7 +44,7 @@
 
 	// Subheading style.
 	h3 {
-		font-size: 11px;
+		font-size: var(--wpds-typography-font-size-xs);
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		color: $gray-900;

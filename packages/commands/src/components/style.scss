@@ -65,8 +65,8 @@ $palette-header-height: 48px;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
-		font-size: 15px;
-		line-height: 24px;
+		font-size: var(--wpds-typography-font-size-lg);
+		line-height: var(--wpds-typography-line-height-md);
 		border-radius: 0;
 
 		&::placeholder {
@@ -85,7 +85,7 @@ $palette-header-height: 48px;
 		align-items: center;
 		padding: $grid-unit-05 0;
 		color: $gray-900;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 
 		&[aria-disabled="true"] {
 			color: $gray-600;
@@ -143,7 +143,7 @@ $palette-header-height: 48px;
 			margin-top: $grid-unit-10;
 			padding: $grid-unit-10 $grid-unit-20;
 			line-height: $grid-unit-20;
-			font-size: $font-size-x-small;
+			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 			text-transform: uppercase;
 			color: $gray-900;
@@ -183,7 +183,7 @@ $palette-header-height: 48px;
 	margin-left: auto;
 	padding-left: $grid-unit-30;
 	color: $gray-700;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: $default-line-height;
 	text-align: right;
 

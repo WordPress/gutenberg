@@ -38,7 +38,7 @@
 	overflow: hidden;
 
 	@media (min-width: 600px) {
-		font-size: 13px;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 
 	&:where(.is-small, .is-compact) {

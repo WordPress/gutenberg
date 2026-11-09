@@ -173,7 +173,7 @@
 	gap: $grid-unit-05 $grid-unit-10;
 	margin: 0;
 	color: $gray-900;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 }
 
 .editor-styles-canvas-revision-details__current {

@@ -72,7 +72,7 @@
 	h2 {
 		line-height: $button-size-next-default-40px;
 		margin: 0 auto 0 0;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		color: $gray-900;
 	}
 }

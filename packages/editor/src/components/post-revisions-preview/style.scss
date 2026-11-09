@@ -21,7 +21,7 @@ $revision-code-diff-marker-width: 3ch;
 
 .editor-revisions-header__no-revisions {
 	color: $gray-700;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 }
 
 .editor-revisions-canvas__loading {
@@ -62,7 +62,7 @@ $revision-code-diff-marker-width: 3ch;
 	border-collapse: separate;
 	border-spacing: 0;
 	font-family: $editor-html-font;
-	font-size: $text-editor-font-size;
+	font-size: var(--wpds-typography-font-size-lg);
 	line-height: 1.6;
 }
 

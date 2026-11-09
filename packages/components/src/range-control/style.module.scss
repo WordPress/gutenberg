@@ -119,7 +119,7 @@
 
 .mark-label {
 	color: $components-color-gray-300;
-	font-size: 11px;
+	font-size: var(--wpds-typography-font-size-xs);
 	position: absolute;
 	top: 8px;
 	white-space: nowrap;
@@ -216,7 +216,7 @@
 	background: rgba(0, 0, 0, 0.8);
 	border-radius: $radius-small;
 	color: #fff;
-	font-size: 12px;
+	font-size: var(--wpds-typography-font-size-sm);
 	min-width: 32px;
 	padding: 4px 8px;
 	pointer-events: none;
@@ -254,7 +254,7 @@
 // Preserve the existing NumberControl composition and reset-button sizing.
 .input-number {
 	display: inline-block;
-	font-size: 13px;
+	font-size: var(--wpds-typography-font-size-md);
 	margin-top: 0;
 	:where(.root:not(.is-rtl)) & {
 		margin-left: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */

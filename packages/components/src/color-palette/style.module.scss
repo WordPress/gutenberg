@@ -4,8 +4,8 @@
 	// Triple specificity overrides the base Heading styles. Repeat the selector
 	// via interpolation because Dart Sass disallows `&&&`.
 	&#{&}#{&} {
-		font-size: 11px;
-		line-height: 24px;
+		font-size: var(--wpds-typography-font-size-xs);
+		line-height: var(--wpds-typography-line-height-md);
 		margin-bottom: 0;
 	}
 }

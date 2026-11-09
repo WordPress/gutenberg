@@ -49,7 +49,7 @@
 	flex-basis: 33%;
 	display: flex;
 	flex-direction: column;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	color: $gray-900;
 	padding-right: $grid-unit-10;
 	margin-bottom: 0;
@@ -71,6 +71,6 @@
 .table-of-contents__title {
 	display: block;
 	margin-top: 20px;
-	font-size: 15px;
+	font-size: var(--wpds-typography-font-size-lg);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
