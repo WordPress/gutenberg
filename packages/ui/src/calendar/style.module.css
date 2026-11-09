@@ -127,7 +127,6 @@
 		.months {
 			position: relative;
 			display: flex;
-			justify-content: center;
 			flex-wrap: wrap;
 			gap: var(--wpds-dimension-gap-lg);
 		}
@@ -282,7 +281,6 @@
 			inset: 0;
 			width: 100%;
 			height: 100%;
-			overflow: hidden;
 			pointer-events: none;
 			color: var(--wpds-color-stroke-interactive-neutral);
 

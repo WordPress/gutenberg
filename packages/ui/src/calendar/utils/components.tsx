@@ -32,13 +32,11 @@ export function Day(
 		<td { ...tdProps }>
 			{ modifiers.preview && (
 				<svg
-					xmlns="http://www.w3.org/2000/svg"
 					aria-hidden="true"
 					fill="none"
 					stroke="currentColor"
 					strokeDasharray="4 4"
 					strokeDashoffset="2"
-					strokeWidth="1"
 					data-preview-start={ modifiers.preview_start || undefined }
 					data-preview-end={ modifiers.preview_end || undefined }
 				>
