@@ -85,7 +85,7 @@
 		"postcss": "^8.4.38",
 		"source-map": "^0.6.1",
 		"stylelint": "^17.14.1",
-		"vite": "^8.3.5",
+		"vite": "^8.3.6",
 		"vitest": "^5.0.5"
 	},
 	"peerDependencies": {
