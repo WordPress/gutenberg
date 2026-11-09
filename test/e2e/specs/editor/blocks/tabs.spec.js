@@ -2,6 +2,30 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Tabs', () => {
 	test.describe( 'Editor functionality', () => {
+		// Makes a tab the default tab with its Tab Panel's "Default tab" setting.
+		async function makeDefaultTab( { editor, page }, label ) {
+			await editor.canvas.getByRole( 'tab', { name: label } ).click();
+
+			// Only the active Tab Panel is visible, so this selects the one for
+			// the clicked tab.
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Tab Panel',
+					exact: true,
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'checkbox', { name: 'Default tab' } )
+				.check();
+		}
+
+		// The default tab is saved as the Tabs block's `activeTabIndex`.
+		async function getDefaultTabIndex( editor ) {
+			return ( await editor.getBlocks() )[ 0 ].attributes.activeTabIndex;
+		}
+
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.createNewPost();
 			await editor.insertBlock( {
@@ -277,6 +301,68 @@ test.describe( 'Tabs', () => {
 				'Tab 2',
 			] );
 		} );
+
+		test( 'keeps the default tab when a tab is added before it', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			// Add a tab between the first tab and the default tab.
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 1' } ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveCount( 3 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 2 );
+
+			// Undo removes the new tab and restores the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
+
+		test( 'falls back to the first tab when the default tab is removed', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
+			await editor.clickBlockToolbarButton( 'Remove tab' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveCount( 1 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 0 );
+
+			// Undo brings the tab back as the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveCount( 2 );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
+
+		test( 'keeps the default tab on the moved tab', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await makeDefaultTab( { editor, page }, 'Tab 2' );
+
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 2' } ).click();
+			await editor.clickBlockToolbarButton( 'Move tab before' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveText( [ 'Tab 2', 'Tab 1' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 0 );
+
+			// Undo restores the order and the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveText( [ 'Tab 1', 'Tab 2' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
 	} );
 
 	// TODO: Extend this with the remaining front-end interactions
@@ -358,6 +444,64 @@ test.describe( 'Tabs', () => {
 			await expect(
 				page.getByRole( 'tab', { name: 'Tab 2' } )
 			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		test( 'moves focus between tabs with the arrow keys and leaves them to fields in a panel when the Tabs block has an anchor', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				// The anchor gives the Tabs wrapper an `id`.
+				attributes: { anchor: 'product-tabs' },
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 1' },
+								innerBlocks: [ { name: 'core/search' } ],
+							},
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 2' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const tab1 = page.getByRole( 'tab', { name: 'Tab 1' } );
+			const tab2 = page.getByRole( 'tab', { name: 'Tab 2' } );
+
+			await tab1.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( tab2 ).toBeFocused();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( tab1 ).toBeFocused();
+
+			// Keys pressed in a field inside a panel stay with the field.
+			const searchField = page
+				.getByRole( 'tabpanel', { name: 'Tab 1' } )
+				.getByRole( 'searchbox', { name: 'Search' } );
+			await searchField.fill( 'hello' );
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( searchField ).toBeFocused();
 		} );
 
 		const tabsWithAnchoredTarget = {
