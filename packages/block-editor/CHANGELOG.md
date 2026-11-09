@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+
 ### Bug Fixes
 
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
