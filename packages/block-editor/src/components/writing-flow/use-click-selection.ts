@@ -39,6 +39,14 @@ export default function useClickSelection() {
 				pointerType = event.pointerType;
 				isHandedBack = false;
 
+				if (
+					! placesCaretOnTap ||
+					pointerType !== 'touch' ||
+					node.contentEditable !== 'true'
+				) {
+					return;
+				}
+
 				const clientId = getBlockClientId( event.target as Element );
 
 				// A touch on a block that is edited on its own element:
@@ -46,13 +54,7 @@ export default function useClickSelection() {
 				// caret there and then loses it once focus moves to the field.
 				// Give focus back to the field with the caret before iOS
 				// handles the touch, so it handles a tap into another field.
-				if (
-					! placesCaretOnTap ||
-					pointerType !== 'touch' ||
-					node.contentEditable !== 'true' ||
-					! clientId ||
-					canHostEditableRoot( clientId )
-				) {
+				if ( ! clientId || canHostEditableRoot( clientId ) ) {
 					return;
 				}
 
