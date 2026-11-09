@@ -168,6 +168,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector: '.my-heading1, .my-heading2',
 					name: 'core/heading',
+					sourceStyles: tree.styles.blocks[ 'core/heading' ],
 				},
 				{
 					styles: {
@@ -215,6 +216,7 @@ describe( 'global styles renderer', () => {
 					selector: '.my-image',
 					name: 'core/image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
+					sourceStyles: tree.styles.blocks[ 'core/image' ],
 				},
 			] );
 		} );
@@ -1025,6 +1027,39 @@ describe( 'global styles renderer', () => {
 
 				expect( result ).toContain(
 					'@media (width <= 480px){:root :where(.wp-block-paragraph){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'restores the fill on the color feature selector', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/search': {
+									...textGradient,
+									'@mobile': { color: { text: '#00ff00' } },
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/search': {
+							selector: '.wp-block-search',
+							featureSelectors: {
+								color: '.wp-block-search__button',
+								background: '.wp-block-search__button',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-search__button){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
 				);
 			} );
 

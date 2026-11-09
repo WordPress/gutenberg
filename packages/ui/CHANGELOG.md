@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+
+### Enhancements
+
+-   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
+
+### Bug Fixes
+
+-   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content ([#86497](https://github.com/WordPress/gutenberg/pull/86497)).
+-   `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels and squashed icons in a prefix or suffix. ([#86446](https://github.com/WordPress/gutenberg/pull/86446))
+-   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).
+
 ## 0.26.0 (2026-11-04)
 
 ### Breaking Changes
@@ -34,6 +48,7 @@
 
 ### Documentation
 
+-   `Calendar` and `RangeCalendar`: Document the `numberOfMonths` limits ([#86261](https://github.com/WordPress/gutenberg/pull/86261)).
 -   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
 
 ## 0.25.0 (2026-10-20)

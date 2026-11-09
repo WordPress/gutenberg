@@ -47,6 +47,26 @@ export const resetScope = () => {
 	scopeStack.pop();
 };
 
+/**
+ * Runs a callback without inheriting an ambient directive scope.
+ *
+ * Installs an empty execution frame on top of the scope stack, runs the
+ * callback, and removes that frame whether the callback returns or throws, as
+ * `withScope()` does with the scope it captured. Errors thrown by the callback
+ * are rethrown.
+ *
+ * @param fn Callback to execute without an ambient directive scope.
+ * @return The callback's return value.
+ */
+export const runWithoutScope = < Result >( fn: () => Result ): Result => {
+	setScope();
+	try {
+		return fn();
+	} finally {
+		resetScope();
+	}
+};
+
 const throwNotInScope = ( method: string ) => {
 	throw Error(
 		`Cannot call \`${ method }()\` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like \`setTimeout\`, please wrap the callback with \`withScope(callback)\`.`
