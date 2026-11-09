@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add serifs to the `formatItalic` icon so it reads as an italic "I" instead of a slash ([#86467](https://github.com/WordPress/gutenberg/pull/86467)).
+
 ### Bug Fixes
 
 -   `cover`: Redraw the icon on the frame the other container icons share, such as `image` and `caption`, correcting a footprint that read a size larger than its neighbors, and align the bookmark with the top edge of that frame ([#86420](https://github.com/WordPress/gutenberg/pull/86420)).
