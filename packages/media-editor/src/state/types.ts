@@ -1,22 +1,20 @@
-import type { CropperState, NormalizedRect, Size } from '../image-editor';
-import type { CropperAction } from '../image-editor/core';
+import type { ImageEditorState } from '@wordpress/image-editor';
 
 /**
- * Sidebar control state for the cropper. Lives in the composite store
- * so it participates in the same undo history as cropper geometry.
+ * Sidebar control state for the image editor, kept in the same undo history
+ * as the crop.
  */
 export interface CropOptionsSlice {
 	/**
 	 * Selected aspect-ratio preset as a string (round-trippable through
 	 * `<SelectControl>`). `'0'` = Free, `'-1'` = Original, any positive
-	 * decimal = fixed ratio.
+	 * decimal = fixed ratio. The image editor holds the resolved ratio itself.
 	 */
 	aspectRatioValue: string;
 }
 
 /**
- * Default values for the crop-options slice. Mirrors the initial state
- * used by the sidebar before the user has touched anything.
+ * The crop options a session starts from.
  */
 export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 	aspectRatioValue: '0',
@@ -46,81 +44,33 @@ export type EditValue =
 export type EditsSlice = Record< string, EditValue >;
 
 /**
- * The full composite state for the media editor — cropper geometry,
- * the sidebar control slice, and named edits.
+ * The full state of the media editor: the image editor's state, the sidebar
+ * crop options and named edits.
  *
  * Every undo/redo snapshot is a full `MediaEditorState`. Slices stay
  * referentially equal across actions that don't touch them.
  */
 export interface MediaEditorState {
-	cropper: CropperState;
+	imageEditor: ImageEditorState;
 	cropOptions: CropOptionsSlice;
 	edits: EditsSlice;
 }
 
-/**
- * Composite reducer action union.
- *
- * Cropper geometry actions are wrapped in a `CROPPER` envelope and
- * delegated to the pure `cropperReducer`. Sidebar and history
- * concerns are first-class actions on this reducer.
- */
+/** Actions the media editor reducer handles. */
 export type MediaEditorAction =
-	/**
-	 * Delegate to the underlying cropper reducer. Used for every
-	 * geometry transition (pan / zoom / rotation / flip / cropRect /
-	 * settle / etc.).
-	 */
-	| {
-			type: 'CROPPER';
-			action: CropperAction;
-	  }
-	/**
-	 * Set the aspect-ratio preset. Atomically updates the preset key
-	 * and the cropRect (computed from the resolved ratio and the
-	 * current visualSize). One transaction = one undo entry.
-	 */
-	| {
-			type: 'SET_ASPECT_RATIO_VALUE';
-			payload: {
-				/** Preset key as it appears in the dropdown. */
-				presetKey: string;
-				/**
-				 * Resolved width/height ratio. `undefined` = Free
-				 * (no lock; cropRect stays where it is).
-				 */
-				resolved: number | undefined;
-				/**
-				 * Rendered image size used to compute the inscribed
-				 * rect. Caller supplies it because the reducer is
-				 * framework-agnostic and has no DOM access.
-				 */
-				visualSize: Size;
-			};
-	  }
-	/**
-	 * Put every slice back to its starting state, keeping the image:
-	 * default geometry, default crop options, no edits. One action,
-	 * so one undo entry.
-	 */
-	| { type: 'RESET' }
+	/** Replace the image editor's state with the next one it reports. */
+	| { type: 'SET_IMAGE_EDITOR'; payload: ImageEditorState }
+	/** Set the aspect-ratio preset the dropdown shows. */
+	| { type: 'SET_ASPECT_RATIO_VALUE'; payload: string }
 	/** Set a named edit, or remove it when `value` is `undefined`. */
 	| {
 			type: 'SET_EDIT';
 			payload: { name: string; value: EditValue | undefined };
 	  }
 	/**
-	 * Replace the entire composite state with `payload`. Used by
-	 * undo/redo to restore a full snapshot atomically.
+	 * Put every slice back to its starting state, keeping the image. One
+	 * action, so one undo entry.
 	 */
-	| { type: 'RESTORE_SNAPSHOT'; payload: MediaEditorState }
-	/**
-	 * Adjust the cropper's cropRect in response to a viewport change
-	 * (e.g., window resize). Behaviorally identical to a `CROPPER
-	 * SET_CROP_RECT` dispatch, but tagged so the hook layer can skip
-	 * history recording — viewport reshapes aren't editor actions.
-	 */
-	| {
-			type: 'VIEWPORT_ADJUST_CROP_RECT';
-			payload: NormalizedRect;
-	  };
+	| { type: 'RESET' }
+	/** Replace the whole state with a snapshot (undo/redo). */
+	| { type: 'RESTORE_SNAPSHOT'; payload: MediaEditorState };

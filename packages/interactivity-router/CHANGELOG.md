@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+-   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
 ## 3.1.0 (2026-11-04)
 
 ### Bug Fixes
