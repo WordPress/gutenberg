@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Font library: load the font parser when a font is first uploaded, not when the editor loads ([#86280](https://github.com/WordPress/gutenberg/pull/86280)).
+
 ## 2.1.0 (2026-11-04)
 
 ### Enhancements
