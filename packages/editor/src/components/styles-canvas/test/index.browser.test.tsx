@@ -146,7 +146,7 @@ describe( 'Style Book focus order', () => {
 		await expect.element( opener ).toHaveFocus();
 	} );
 
-	it( 'keeps the Close button before a revisions-only preview', async () => {
+	it( 'keeps Close before revision controls and preview', async () => {
 		vi.mocked( useSelect ).mockReturnValue( {
 			...selection,
 			showStylebook: false,
@@ -154,13 +154,25 @@ describe( 'Style Book focus order', () => {
 		} );
 		await render( <CanvasFixture /> );
 		await page.getByRole( 'button', { name: 'Open Style Book' } ).click();
-		await expect
-			.element(
-				page.getByRole( 'button', { name: 'Close', exact: true } )
-			)
-			.toHaveFocus();
+		const close = page.getByRole( 'button', {
+			name: 'Close',
+			exact: true,
+		} );
+		const visualView = page.getByRole( 'radio', {
+			name: 'Visual',
+			exact: true,
+			checked: true,
+		} );
+		await expect.element( close ).toHaveFocus();
+		await userEvent.tab();
+		await expect.element( visualView ).toHaveFocus();
+		await expect.element( visualView ).toBeChecked();
 		await userEvent.tab();
 		await expect.element( page.getByTitle( 'revisions' ) ).toHaveFocus();
+		await userEvent.tab( { shift: true } );
+		await expect.element( visualView ).toHaveFocus();
+		await userEvent.tab( { shift: true } );
+		await expect.element( close ).toHaveFocus();
 	} );
 
 	it( 'keeps Close available while a Style Book revision is loading', async () => {
