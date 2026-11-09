@@ -19,7 +19,7 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 		};
 	}, [] );
 	const authorName =
-		decodeEntities( postAuthor?.name ) || __( '(No author)' );
+		decodeEntities( postAuthor?.name ) || __( '(no author)' );
 	return (
 		<Button
 			size="compact"

@@ -4,7 +4,7 @@ import { useCallback } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
@@ -16,20 +16,29 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreenGlobalStyles() {
 	const history = useHistory();
-	const { path } = useLocation();
+	const { path, query } = useLocation();
 	const {
 		revisions,
 		isLoading: isLoadingRevisions,
 		revisionsCount,
 	} = useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setStylesPath } = unlock( useDispatch( editorStore ) );
+	const { setStylesPath, setShowStylebook } = unlock(
+		useDispatch( editorStore )
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
-		history.navigate( addQueryArgs( path, { canvas: 'edit' } ), {
-			transition: 'canvas-mode-edit-transition',
-		} );
+		// The style book preview replaces the editor, so it can't stay in
+		// the URL when the editor opens.
+		history.navigate(
+			addQueryArgs( removeQueryArgs( path, 'preview' ), {
+				canvas: 'edit',
+			} ),
+			{
+				transition: 'canvas-mode-edit-transition',
+			}
+		);
 		return Promise.all( [
 			setPreference( 'core', 'distractionFree', false ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
@@ -40,8 +49,11 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		// Select revisions before opening the sidebar. The sidebar resets its
 		// navigation as it opens, so a path set afterwards would be discarded.
 		setStylesPath( '/revisions' );
+		if ( query.preview === 'stylebook' ) {
+			setShowStylebook( true );
+		}
 		await openGlobalStyles();
-	}, [ openGlobalStyles, setStylesPath ] );
+	}, [ openGlobalStyles, setStylesPath, setShowStylebook, query.preview ] );
 
 	// If there are no revisions, do not render a footer.
 	const shouldShowGlobalStylesFooter =
