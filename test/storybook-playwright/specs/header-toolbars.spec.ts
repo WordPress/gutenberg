@@ -1,6 +1,34 @@
 import { expect, test } from '@playwright/test';
 import { gotoStoryId } from '../utils';
 
+for ( const theme of [ 'light', 'dark' ] as const ) {
+	test( `keeps pressed disabled primary header buttons filled in the ${ theme } theme`, async ( {
+		page,
+	} ) => {
+		await gotoStoryId( page, 'editor-header-toolbars--pressed', {
+			decorators: { dsColorTheme: theme },
+		} );
+		for ( const name of [ 'Editor', 'Widgets', 'Customizer' ] ) {
+			const button = page
+				.getByRole( 'toolbar', { name, exact: true } )
+				.getByRole( 'button', { name: 'Disabled', exact: true } );
+			const disabledFill = await button.evaluate( ( element ) => {
+				const probe = document.createElement( 'span' );
+				probe.style.backgroundColor =
+					'var(--wpds-color-background-interactive-brand-strong-disabled)';
+				element.append( probe );
+				const color = getComputedStyle( probe ).backgroundColor;
+				probe.remove();
+				return color;
+			} );
+			await expect( button ).toHaveCSS(
+				'background-color',
+				disabledFill
+			);
+		}
+	} );
+}
+
 test( 'keeps pressed header buttons filled in forced colors', async ( {
 	page,
 } ) => {

@@ -4,6 +4,7 @@ import { expect } from '@playwright/test';
 const STORYBOOK_PORT = process.env.STORYBOOK_PORT || '50241';
 
 type Decorators = {
+	dsColorTheme?: 'light' | 'dark';
 	css?: 'none' | 'basic' | 'wordpress';
 	direction?: 'ltr' | 'rtl';
 	customE2EControls?: 'show' | 'hide';

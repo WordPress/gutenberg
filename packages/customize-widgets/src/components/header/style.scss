@@ -52,6 +52,10 @@
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
+		&.is-primary.is-pressed:is(:disabled, [aria-disabled="true"]) {
+			background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
+		}
+
 		// The toolbar fill is hidden here, so paint the system colors on the button.
 		@media ( forced-colors: active ) {
 			&.is-pressed {
