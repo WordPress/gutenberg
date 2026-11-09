@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { Form } from '@base-ui/react/form';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import { Textarea } from '../index';
+import * as Field from '../../field';
 
 describe( 'Textarea', () => {
 	it( 'forwards ref', () => {
@@ -101,6 +103,48 @@ describe( 'Textarea', () => {
 	} );
 
 	describe( 'render prop', () => {
+		it( 'preserves refs, classes and change handlers from a custom render element', async () => {
+			const user = userEvent.setup();
+			const ref = createRef< HTMLTextAreaElement >();
+			const renderRef = createRef< HTMLTextAreaElement >();
+			const onChange = vi.fn();
+			const renderOnChange = vi.fn();
+			const onValueChange = vi.fn();
+			const { unmount } = render(
+				<Textarea
+					ref={ ref }
+					onChange={ onChange }
+					onValueChange={ onValueChange }
+					render={
+						<textarea
+							ref={ renderRef }
+							className="custom-textarea"
+							onChange={ renderOnChange }
+						/>
+					}
+				/>
+			);
+			const textarea = screen.getByRole( 'textbox' );
+
+			expect( ref.current ).toBe( textarea );
+			expect( renderRef.current ).toBe( textarea );
+			expect( textarea ).toHaveClass( 'custom-textarea' );
+
+			await user.type( textarea, 'a' );
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( renderOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( onValueChange ).toHaveBeenCalledExactlyOnceWith(
+				'a',
+				expect.any( Object )
+			);
+
+			unmount();
+
+			expect( ref.current ).toBeNull();
+			expect( renderRef.current ).toBeNull();
+		} );
+
 		it( 'correctly merges props with custom render function', () => {
 			render(
 				<Textarea
@@ -127,6 +171,74 @@ describe( 'Textarea', () => {
 			expect( screen.getByTestId( 'my-render' ) ).toHaveAttribute(
 				'data-my-attribute'
 			);
+		} );
+	} );
+
+	describe( 'Field integration', () => {
+		it( 'tracks whether the textarea is filled', async () => {
+			const user = userEvent.setup();
+			render(
+				<Field.Root>
+					<Field.Label>Comment</Field.Label>
+					<Textarea defaultValue="Initial" />
+				</Field.Root>
+			);
+			const textarea = screen.getByRole( 'textbox', { name: 'Comment' } );
+
+			expect( textarea ).toHaveAttribute( 'data-filled' );
+
+			await user.clear( textarea );
+
+			expect( textarea ).not.toHaveAttribute( 'data-filled' );
+
+			await user.type( textarea, 'New content' );
+
+			expect( textarea ).toHaveAttribute( 'data-filled' );
+		} );
+
+		it( 'validates a required textarea on blur', async () => {
+			const user = userEvent.setup();
+			render(
+				<Form validationMode="onBlur">
+					<Field.Root>
+						<Field.Label>Comment</Field.Label>
+						<Textarea required />
+					</Field.Root>
+				</Form>
+			);
+			const textarea = screen.getByRole( 'textbox', { name: 'Comment' } );
+
+			expect( textarea ).not.toHaveAttribute( 'aria-invalid', 'true' );
+
+			await user.type( textarea, 'Comment' );
+			await user.clear( textarea );
+			await user.tab();
+
+			await waitFor( () => {
+				expect( textarea ).toHaveAttribute( 'aria-invalid', 'true' );
+			} );
+		} );
+
+		it( 'returns to pristine when the default value is restored', async () => {
+			const user = userEvent.setup();
+			render(
+				<Field.Root>
+					<Field.Label>Comment</Field.Label>
+					<Textarea defaultValue="Initial" />
+				</Field.Root>
+			);
+			const textarea = screen.getByRole( 'textbox', { name: 'Comment' } );
+
+			expect( textarea ).not.toHaveAttribute( 'data-dirty' );
+
+			await user.type( textarea, ' changed' );
+
+			expect( textarea ).toHaveAttribute( 'data-dirty' );
+
+			await user.clear( textarea );
+			await user.type( textarea, 'Initial' );
+
+			expect( textarea ).not.toHaveAttribute( 'data-dirty' );
 		} );
 	} );
 
