@@ -11,6 +11,7 @@ import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import useTypeScript from './rules/use-typescript.mjs';
 import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
+import noComponentsColorVariables from './rules/no-components-color-variables.mjs';
 import componentsImportAliases from './components-import-aliases.mjs';
 import {
 	discoverTestFiles,
@@ -23,6 +24,7 @@ const gutenbergPlugin = {
 	rules: {
 		'use-typescript': useTypeScript,
 		'no-broad-component-suppression': noBroadComponentSuppression,
+		'no-components-color-variables': noComponentsColorVariables,
 	},
 };
 const gutenbergStorybookPlugin = {
@@ -916,6 +918,22 @@ export default dedupePlugins( [
 						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
 				},
 			],
+		},
+	},
+
+	// Override: Everything but the packages that own them — no
+	// `--wp-components-color-*` variables, since they will be removed.
+	{
+		files: [ `**/*.${ SCRIPT_EXT }` ],
+		ignores: [
+			'packages/components/**',
+			'packages/theme/**',
+			// Lint configs and rules that enforce this.
+			'tools/eslint/**',
+			'tools/stylelint/**',
+		],
+		rules: {
+			'gutenberg/no-components-color-variables': 'error',
 		},
 	},
 

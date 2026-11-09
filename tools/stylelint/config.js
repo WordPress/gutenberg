@@ -1,6 +1,9 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
+const COMPONENTS_COLOR_VARIABLES_MESSAGE =
+	'`--wp-components-color-*` variables will be removed. Use semantic WPDS design tokens (`--wpds-*`) instead, and `ThemeProvider` from `@wordpress/theme` to customize colors.';
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -42,7 +45,7 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+					return `Avoid using "${ value }" in "${ property }". ${ COMPONENTS_COLOR_VARIABLES_MESSAGE }`;
 				},
 			},
 		],
@@ -50,10 +53,14 @@ module.exports = {
 		'@stylistic/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [
-			[ 'order' ],
+			[ 'order', '/^--wp-components-color-/' ],
 			{
-				message:
-					'Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction.',
+				message: ( property ) => {
+					if ( property === 'order' ) {
+						return 'Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction.';
+					}
+					return `Avoid setting "${ property }". ${ COMPONENTS_COLOR_VARIABLES_MESSAGE }`;
+				},
 			},
 		],
 		'rule-empty-line-before': null,
