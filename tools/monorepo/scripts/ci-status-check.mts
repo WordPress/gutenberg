@@ -12,18 +12,28 @@
  *
  * Usage:
  *
- *     node ci-status-check.js --ignore '<job name>[,<job name>]...'
+ *     node tools/monorepo/scripts/ci-status-check.mts --ignore '<job name>[,<job name>]...'
  *
  * `--ignore` exempts a job, and must name the job running this script plus any
  * job still running alongside it; repeat the flag for a name containing a
  * comma. Anything else left unfinished fails the status check rather than
  * pass unevaluated.
- *
- * Tests live in `tools/monorepo/test/ci-status-check.ts`, since this directory
- * is not a workspace that can depend on Vitest.
  */
 
-const { parseArgs } = require( 'node:util' );
+import { parseArgs } from 'node:util';
+
+type Job = {
+	id: number;
+	name: string;
+	status: string;
+	conclusion: string | null;
+	html_url: string;
+};
+
+type JobsResponse = {
+	jobs: Job[];
+	total_count: number;
+};
 
 const PASSING_CONCLUSIONS = [ 'success', 'skipped' ];
 const COMPLETED = 'completed';
@@ -36,25 +46,25 @@ const RETRY_BASE_DELAY_MS = 3000;
 /**
  * The delay before an attempt, doubling each time: 3s, 6s, 12s, 24s.
  *
- * @param {number} attempt The attempt that just failed, counting from 1.
- * @return {number} Delay in milliseconds.
+ * @param attempt The attempt that just failed, counting from 1.
+ * @return Delay in milliseconds.
  */
-function retryDelay( attempt ) {
+function retryDelay( attempt: number ): number {
 	return RETRY_BASE_DELAY_MS * 2 ** ( attempt - 1 );
 }
 
 const { GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
 const ACTIONS_API_URL = `https://api.github.com/repos/${ GITHUB_REPOSITORY }/actions`;
 
-let ignoredJobs = [];
+let ignoredJobs: string[] = [];
 
 /**
  * Reads the exempt job names off the command line.
  *
- * @param {string[]} args The command-line arguments, without `node` and the script path.
- * @return {string[]} The job names.
+ * @param args The command-line arguments, without `node` and the script path.
+ * @return The job names.
  */
-function parseIgnoredJobs( args ) {
+function parseIgnoredJobs( args: string[] ): string[] {
 	const { values } = parseArgs( {
 		args,
 		options: {
@@ -71,10 +81,10 @@ function parseIgnoredJobs( args ) {
 /**
  * Resolves after the given delay.
  *
- * @param {number} ms Delay in milliseconds.
- * @return {Promise<void>} Resolves once the delay has elapsed.
+ * @param ms Delay in milliseconds.
+ * @return Resolves once the delay has elapsed.
  */
-function sleep( ms ) {
+function sleep( ms: number ): Promise< void > {
 	return new Promise( ( resolve ) => {
 		setTimeout( resolve, ms );
 	} );
@@ -83,11 +93,11 @@ function sleep( ms ) {
 /**
  * Fetches a GitHub REST API URL as JSON.
  *
- * @param {string} url         The URL.
- * @param {string} description What the request does, e.g. `read job 123`.
- * @return {Promise<Object>} The response body.
+ * @param url         The URL.
+ * @param description What the request does, e.g. `read job 123`.
+ * @return The response body.
  */
-async function fetchApi( url, description ) {
+async function fetchApi< T >( url: string, description: string ): Promise< T > {
 	const response = await fetch( url, {
 		headers: {
 			accept: 'application/vnd.github+json',
@@ -97,10 +107,12 @@ async function fetchApi( url, description ) {
 	} );
 
 	if ( ! response.ok ) {
-		const error = new Error(
-			`Could not ${ description }: ${ response.status } ${ response.statusText }.`
+		const error = Object.assign(
+			new Error(
+				`Could not ${ description }: ${ response.status } ${ response.statusText }.`
+			),
+			{ retryable: response.status >= 500 || response.status === 429 }
 		);
-		error.retryable = response.status >= 500 || response.status === 429;
 		throw error;
 	}
 
@@ -110,13 +122,13 @@ async function fetchApi( url, description ) {
 /**
  * Fetches every job of the current run, following pagination.
  *
- * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs.
+ * @return The jobs.
  */
-async function fetchJobs() {
-	const jobs = [];
+async function fetchJobs(): Promise< Job[] > {
+	const jobs: Job[] = [];
 
 	for ( let page = 1; ; page++ ) {
-		const body = await fetchApi(
+		const body = await fetchApi< JobsResponse >(
 			`${ ACTIONS_API_URL }/runs/${ GITHUB_RUN_ID }/jobs?per_page=100&page=${ page }`,
 			`list the jobs of run ${ GITHUB_RUN_ID }`
 		);
@@ -139,17 +151,17 @@ async function fetchJobs() {
  * Reads again, from each job's own endpoint, every job the run's job list
  * reports as unfinished, since that list lags behind.
  *
- * @param {Array<{id: number, name: string, status: string, conclusion: string, html_url: string}>} jobs The listed jobs.
- * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs, the unfinished ones re-read.
+ * @param jobs The listed jobs.
+ * @return The jobs, the unfinished ones re-read.
  */
-function refreshJobs( jobs ) {
+function refreshJobs( jobs: Job[] ): Promise< Job[] > {
 	return Promise.all(
 		jobs.map( ( job ) => {
 			if ( job.status === COMPLETED ) {
 				return job;
 			}
 
-			return fetchApi(
+			return fetchApi< Job >(
 				`${ ACTIONS_API_URL }/jobs/${ job.id }`,
 				`read job ${ job.id }`
 			);
@@ -161,12 +173,12 @@ function refreshJobs( jobs ) {
  * Fetches the jobs this run is evaluated on, once none of them is still
  * running.
  *
- * @return {Promise<Array<{name: string, status: string, conclusion: string, html_url: string}>>} The jobs.
+ * @return The jobs.
  */
-async function fetchEvaluatedJobs() {
+async function fetchEvaluatedJobs(): Promise< Job[] > {
 	for ( let attempt = 1; ; attempt++ ) {
 		const lastAttempt = attempt === ATTEMPTS;
-		let jobs;
+		let jobs: Job[];
 
 		try {
 			const listed = ( await fetchJobs() ).filter(
@@ -174,10 +186,11 @@ async function fetchEvaluatedJobs() {
 			);
 			jobs = await refreshJobs( listed );
 		} catch ( error ) {
-			if ( lastAttempt || error.retryable === false ) {
+			const apiError = error as Error & { retryable?: boolean };
+			if ( lastAttempt || apiError.retryable === false ) {
 				throw error;
 			}
-			console.log( `${ error.message } Retrying.` );
+			console.log( `${ apiError.message } Retrying.` );
 			await sleep( retryDelay( attempt ) );
 			continue;
 		}
@@ -211,9 +224,9 @@ async function fetchEvaluatedJobs() {
 /**
  * Evaluates every job of the current run, throwing if any did not pass.
  *
- * @param {string[]} args The command-line arguments, without `node` and the script path.
+ * @param args The command-line arguments, without `node` and the script path.
  */
-async function main( args ) {
+export async function main( args: string[] ): Promise< void > {
 	if ( ! GITHUB_REPOSITORY || ! GITHUB_RUN_ID || ! GITHUB_TOKEN ) {
 		throw new Error(
 			'GITHUB_REPOSITORY, GITHUB_RUN_ID and GITHUB_TOKEN must all be set.'
@@ -230,7 +243,7 @@ async function main( args ) {
 
 	const jobs = await fetchEvaluatedJobs();
 	const failed = jobs.filter(
-		( job ) => ! PASSING_CONCLUSIONS.includes( job.conclusion )
+		( job ) => ! PASSING_CONCLUSIONS.includes( job.conclusion ?? '' )
 	);
 
 	if ( failed.length > 0 ) {
@@ -247,11 +260,9 @@ async function main( args ) {
 	);
 }
 
-if ( require.main === module ) {
+if ( import.meta.main ) {
 	main( process.argv.slice( 2 ) ).catch( ( error ) => {
 		console.log( `::error::${ error.message }` );
 		process.exitCode = 1;
 	} );
 }
-
-module.exports = { main };
