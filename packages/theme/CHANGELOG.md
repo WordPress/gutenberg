@@ -9,7 +9,7 @@
 ### Bug Fixes
 
 -   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
--   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases.
+-   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
 
 ### Internal
 
