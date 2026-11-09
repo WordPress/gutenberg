@@ -1,12 +1,14 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Locator } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-const getRotate = ( locator ) =>
+const getRotate = ( locator: Locator ) =>
 	locator.evaluate(
 		( element ) => window.getComputedStyle( element ).rotate
 	);
 
 test.describe( 'Transform rotate block support', () => {
-	let uploadedMedia;
+	let uploadedMedia: Awaited< ReturnType< RequestUtils[ 'uploadMedia' ] > >;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
@@ -56,9 +58,9 @@ test.describe( 'Transform rotate block support', () => {
 		await expect
 			.poll( async () => {
 				const [ block ] = await editor.getBlocks();
-				return block.attributes.style?.transform?.rotate;
+				return block.attributes.style;
 			} )
-			.toBe( '30deg' );
+			.toMatchObject( { transform: { rotate: '30deg' } } );
 
 		const editorImage = editor.canvas.locator( '.wp-block-image img' );
 		await expect.poll( () => getRotate( editorImage ) ).toBe( '30deg' );
