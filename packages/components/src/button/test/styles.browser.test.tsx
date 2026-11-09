@@ -155,6 +155,32 @@ describe( 'Button styles', () => {
 		await userEvent.keyboard( '[/Space]' );
 	} );
 
+	it( 'keeps a destructive secondary border in the error palette during keyboard focus', async () => {
+		await render(
+			<ThemeProvider color={ { background: '#1e1e1e' } }>
+				<Button __next40pxDefaultSize variant="secondary" isDestructive>
+					Delete
+				</Button>
+			</ThemeProvider>
+		);
+		const button = screen.getByRole( 'button', { name: 'Delete' } );
+		await userEvent.unhover( button );
+		await userEvent.tab();
+		expect( button.matches( ':focus' ) ).toBe( true );
+		const style = getComputedStyle( button );
+		// Finish the border transition before comparing its final color.
+		await Promise.all(
+			button.getAnimations().map( ( animation ) => animation.finished )
+		);
+		expect( pixels( style.borderTopColor ) ).toEqual(
+			pixels(
+				style.getPropertyValue(
+					'--wpds-color-stroke-interactive-error'
+				)
+			)
+		);
+	} );
+
 	it.each( [ 'primary', 'tertiary' ] as const )(
 		'uses readable error colors for a destructive %s button during Space activation',
 		async ( variant ) => {
