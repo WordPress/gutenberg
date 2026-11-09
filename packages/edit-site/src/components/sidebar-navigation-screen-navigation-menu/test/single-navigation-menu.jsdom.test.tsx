@@ -10,7 +10,13 @@ vi.mock( import( '../../../lock-unlock' ), () => ( {
 } ) );
 
 vi.mock( import( '../../sidebar-navigation-screen-navigation-menus' ), () => ( {
-	SidebarNavigationScreenWrapper: ( { children, footer } ) => (
+	SidebarNavigationScreenWrapper: ( {
+		children,
+		footer,
+	}: {
+		children: React.ReactNode;
+		footer?: React.ReactNode;
+	} ) => (
 		<div>
 			{ children }
 			{ footer && <footer>{ footer }</footer> }
@@ -19,7 +25,13 @@ vi.mock( import( '../../sidebar-navigation-screen-navigation-menus' ), () => ( {
 } ) );
 
 vi.mock( import( '../../sidebar-navigation-screen-details-footer' ), () => ( {
-	default: ( { revisionsCount, onClick } ) => (
+	default: ( {
+		revisionsCount,
+		onClick,
+	}: {
+		revisionsCount: number;
+		onClick: () => void;
+	} ) => (
 		<button onClick={ onClick }>{ `${ revisionsCount } Revisions` }</button>
 	),
 } ) );
@@ -29,7 +41,13 @@ vi.mock( import( '../navigation-menu-editor' ), () => ( {
 	default: () => null,
 } ) );
 
-function createMenu( { count, lastRevisionId } ) {
+function createMenu( {
+	count,
+	lastRevisionId,
+}: {
+	count: number;
+	lastRevisionId?: number;
+} ) {
 	return {
 		id: 7,
 		status: 'publish',
@@ -49,23 +67,23 @@ describe( 'SingleNavigationMenu', () => {
 	} );
 
 	it( 'does not render a revisions footer with fewer than two revisions', () => {
-		const { container } = render(
+		render(
 			<SingleNavigationMenu
 				navigationMenu={ createMenu( { count: 1, lastRevisionId: 3 } ) }
 			/>
 		);
 
-		expect( container.querySelector( 'footer' ) ).toBeNull();
+		expect( screen.queryByRole( 'contentinfo' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'does not render a revisions footer without a last revision', () => {
-		const { container } = render(
+		render(
 			<SingleNavigationMenu
 				navigationMenu={ createMenu( { count: 4 } ) }
 			/>
 		);
 
-		expect( container.querySelector( 'footer' ) ).toBeNull();
+		expect( screen.queryByRole( 'contentinfo' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'opens the latest revision in the editor', async () => {
