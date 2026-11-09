@@ -37,7 +37,12 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
-- **border**: `.wp-block-calendar th, .wp-block-calendar td`
+- **border**:
+  - root: `.wp-block-calendar th, .wp-block-calendar td`
+  - top: `.wp-block-calendar thead th`
+  - right: `.wp-block-calendar tr > :last-child`
+  - bottom: `.wp-block-calendar tbody tr:last-child > *`
+  - left: `.wp-block-calendar tr > :first-child`
 - **color**: `.wp-block-calendar table, .wp-block-calendar th`
 
 ## Block Markup

@@ -51,7 +51,13 @@
 	},
 	"style": "wp-block-calendar",
 	"selectors": {
-		"border": ".wp-block-calendar th, .wp-block-calendar td",
+		"border": {
+			"root": ".wp-block-calendar th, .wp-block-calendar td",
+			"top": ".wp-block-calendar thead th",
+			"right": ".wp-block-calendar tr > :last-child",
+			"bottom": ".wp-block-calendar tbody tr:last-child > *",
+			"left": ".wp-block-calendar tr > :first-child"
+		},
 		"color": ".wp-block-calendar table, .wp-block-calendar th"
 	}
 }

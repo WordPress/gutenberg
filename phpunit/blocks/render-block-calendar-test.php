@@ -149,7 +149,8 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class' => 'wp-calendar-table has-border-color',
+				// Per-side colours do not add has-border-color; only flat borderColor / border.color do.
+				'expected_class' => 'wp-calendar-table',
 				'expected_style' => 'border-top-color:#111111;border-top-style:solid;border-top-width:2px;border-right-color:#111111;border-right-style:solid;border-right-width:2px;border-bottom-color:#111111;border-bottom-style:solid;border-bottom-width:2px;border-left-color:#111111;border-left-style:solid;border-left-width:2px;',
 			),
 			'single-side border'      => array(
@@ -164,14 +165,15 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class' => 'wp-calendar-table has-border-color',
+				'expected_class' => 'wp-calendar-table',
 				'expected_style' => 'border-top-color:#111111;border-top-style:solid;border-top-width:2px;',
 			),
 		);
 	}
 
 	/**
-	 * Borders and colors are applied on the table; cells stay free of inline styles.
+	 * Borders and colors are applied on the table; cells stay free of inline styles
+	 * and support classes. Empty pad cells from get_calendar() may still have class="pad".
 	 *
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
@@ -200,7 +202,10 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 			$tag = $processor->get_tag();
 			if ( 'TH' === $tag || 'TD' === $tag ) {
 				$this->assertNull( $processor->get_attribute( 'style' ) );
-				$this->assertNull( $processor->get_attribute( 'class' ) );
+				$class = $processor->get_attribute( 'class' );
+				if ( null !== $class ) {
+					$this->assertSame( 'pad', $class );
+				}
 			}
 		}
 	}

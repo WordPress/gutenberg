@@ -47,14 +47,13 @@
 	:where(table:not(.has-text-color) td) {
 		border-color: $gray-300;
 	}
-}
 
-.wp-block-calendar {
 	// Border Styles
 	//
 	// Instance borders are applied on the table; th/td inherit color,
 	// style, and width. Per-side values are treated as outer edges.
-	// Global Styles target the cells via block.json selectors.
+	// Global Styles target cells via block.json selectors.
+	// Flat border colors always add has-border-color (style engine).
 	table.has-border-color {
 		thead,
 		tbody,
@@ -83,16 +82,6 @@
 		td {
 			border-width: inherit;
 			border-style: inherit;
-		}
-	}
-
-	table[style*="border-color"] {
-		thead,
-		tbody,
-		tr,
-		th,
-		td {
-			border-color: inherit;
 		}
 	}
 
