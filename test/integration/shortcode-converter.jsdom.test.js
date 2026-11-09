@@ -231,6 +231,13 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		).toEqual( [ originalMultipleShortcodes ] );
 	} );
 
+	it( 'should not convert a shortcode at the start of text if its block is not aligned', () => {
+		const original = `<p>[foo align="alignright"] text</p>`;
+		expect( segmentHTMLToShortcodeBlock( original, 0 ) ).toEqual( [
+			original,
+		] );
+	} );
+
 	it( 'should convert a shortcode between br tags', () => {
 		const original = `<p>Some text<br />\n[foo bar="apple"]<br />\nSome other text</p>`;
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );

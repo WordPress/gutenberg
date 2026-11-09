@@ -2,14 +2,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Switch } from '../';
 
 const meta: Meta< typeof Switch > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/Primitives/Switch',
 	id: 'design-system-components-form-primitives-switch',
 	component: Switch,
+	argTypes: {
+		onCheckedChange: { action: 'onCheckedChange' },
+	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

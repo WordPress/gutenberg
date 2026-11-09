@@ -140,9 +140,9 @@ async function resetRepository(): Promise< void > {
 }
 
 /**
- * Deletes the icons WordPress Core does not ship. An icon ships when its
- * manifest entry carries a `public` property, whether that property is `true`
- * or `false`.
+ * Deletes the icons WordPress Core does not ship. An icon ships when its manifest
+ * entry belongs to at least one collection, matching the entries
+ * `generateManifestPHP()` writes to `manifest.php`.
  *
  * This runs after the build so that icon collection validation still sees the
  * full library.
@@ -150,14 +150,12 @@ async function resetRepository(): Promise< void > {
 function prunePrivateIcons(): void {
 	status( 'Pruning non-public icons for WordPress Core... ✂️' );
 
-	const manifest: { filePath: string; public?: boolean }[] = JSON.parse(
+	const manifest: { filePath: string; collections?: string[] }[] = JSON.parse(
 		fs.readFileSync( path.join( ICONS_DIR, 'manifest.json' ), 'utf8' )
 	);
 	const shipped = new Set(
 		manifest
-			.filter(
-				( icon ) => icon.public !== undefined && icon.public !== null
-			)
+			.filter( ( icon ) => ( icon.collections?.length ?? 0 ) > 0 )
 			.map( ( icon ) => icon.filePath )
 	);
 
@@ -284,7 +282,7 @@ async function main(): Promise< void > {
 
 	/*
 	 * This script runs in Node, so it reads the real environment. The rules
-	 * below point at the globals esbuild defines for bundled sources instead.
+	 * below point at the globals the build defines for bundled sources instead.
 	 */
 	// eslint-disable-next-line @wordpress/no-wp-process-env, @wordpress/wp-global-usage
 	const isWordPressCore = process.env.IS_WORDPRESS_CORE === 'true';

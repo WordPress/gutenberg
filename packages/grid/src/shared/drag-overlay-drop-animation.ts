@@ -11,8 +11,8 @@ export const DROP_ANIMATION_DURATION_MS = 200;
 const DROP_ANIMATION_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
 /**
- * Composes @dnd-kit/core’s default overlay drop translation with preview
- * exit keyframes (via side effects). When the pointer never moves, @dnd-kit
+ * Composes `@dnd-kit/core`’s default overlay drop translation with preview
+ * exit keyframes (via side effects). When the pointer never moves, `@dnd-kit`
  * skips the drop animation and these side effects do not run.
  *
  * @param dragPreviewFrameClassName Hashed class for `.drag-preview-frame`.

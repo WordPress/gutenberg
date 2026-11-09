@@ -1,26 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
-import type { CropperState } from '../../../image-editor';
-import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
 function setup(
 	props: MediaEditorImageControlsProps = {},
-	initialCropperState?: Partial< CropperState >
+	zoom?: number | 'max'
 ) {
 	render(
-		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
+		<MediaEditorStateProvider>
 			<MediaEditorImageControls { ...props } />
-			<CurrentState />
+			<CurrentState zoom={ zoom } />
 		</MediaEditorStateProvider>
 	);
 }
 
-function CurrentState() {
-	const { state, cropOptions } = useMediaEditor();
+function CurrentState( { zoom }: { zoom?: number | 'max' } ) {
+	const {
+		imageEditor: { state, setZoom, maxZoom },
+		cropOptions,
+	} = useMediaEditor();
+	// Start the cases that need it zoomed in. `setZoom` is a session edit,
+	// so these cases begin with one undo entry; none of them checks history.
+	useEffect( () => {
+		if ( zoom !== undefined ) {
+			setZoom( zoom === 'max' ? maxZoom : zoom );
+		}
+	}, [ setZoom, zoom, maxZoom ] );
 
 	return (
 		<>
@@ -72,7 +80,7 @@ describe( 'MediaEditorImageControls', () => {
 	} );
 
 	it( 'zoom in multiplies the zoom and zoom out divides it', () => {
-		setup( {}, { zoom: 2 } );
+		setup( {}, 2 );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Zoom in' } ) );
 		const zoomedIn = Number(
@@ -87,18 +95,18 @@ describe( 'MediaEditorImageControls', () => {
 	} );
 
 	it( 'honors a custom zoomFactor', () => {
-		setup( { zoomFactor: 2 }, { zoom: 2 } );
+		setup( { zoomFactor: 2 }, 2 );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Zoom in' } ) );
 
-		// A factor of 2 from zoom 2 lands at 4 (within [minZoom, MAX_ZOOM]).
+		// A factor of 2 from zoom 2 lands at 4 (within [minZoom, maxZoom]).
 		expect(
 			Number( screen.getByTestId( 'current-zoom' ).textContent )
 		).toBe( 4 );
 	} );
 
 	it( 'disables Zoom in at the maximum zoom', () => {
-		setup( {}, { zoom: MAX_ZOOM } );
+		setup( {}, 'max' );
 		// Buttons use `accessibleWhenDisabled`, so the disabled state is
 		// expressed via aria-disabled, not the `disabled` attribute.
 		expect(

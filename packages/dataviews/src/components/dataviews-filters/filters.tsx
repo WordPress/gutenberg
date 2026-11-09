@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { memo, useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import Filter from './filter';
@@ -56,9 +57,8 @@ function Filters( { className }: { className?: string } ) {
 			direction="row"
 			justify="flex-start"
 			gap="sm"
-			style={ { width: 'fit-content' } }
 			wrap="wrap"
-			className={ className }
+			className={ clsx( 'dataviews-filters__summary', className ) }
 		>
 			{ filterComponents }
 		</Stack>

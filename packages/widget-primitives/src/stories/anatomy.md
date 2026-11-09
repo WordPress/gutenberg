@@ -16,6 +16,8 @@ What the widget is: `name`, `title`, `description`, `help`, `icon`, `category`, 
 
 The host shows this almost verbatim, in pickers, headers, and help. It decides _where_ identity appears and _whether_ to show it, never _what it says_. Identity is copied, not interpreted: two hosts displaying the same widget show the same title.
 
+When the render body itself needs identity data, it reads it through `useWidgetIdentity`, which `<WidgetRender>` lends from the `WidgetType` it already holds. See **Widget Identity**.
+
 ## Framing
 
 How the widget asks to sit in the host's frame. Today this layer holds one property, `presentation`.
@@ -66,6 +68,8 @@ Alongside its data, a widget can declare `actions`: the verbs a user triggers, s
 The pattern matches attributes: the widget declares the intent, and the host decides the surface. It never says "put this in a toolbar"; it names the action, and the host materializes the affordance and places it.
 
 The host never interprets what an action _means_, only how to offer it: which primitive to mount, and where. For a link that means mounting a real link primitive wherever the surface allows one, and deciding how to reach the target, which the widget cannot know (see **Actions**).
+
+A mounted widget can also declare actions at runtime, through `useWidgetActions`, for the verbs its declaration cannot know (see **Actions**).
 
 ## Why the split matters
 

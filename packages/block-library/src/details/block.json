@@ -44,6 +44,8 @@
 		"color": {
 			"gradients": true,
 			"link": true,
+			"heading": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
@@ -64,6 +66,9 @@
 				"margin": false,
 				"padding": false
 			}
+		},
+		"dimensions": {
+			"minWidth": true
 		},
 		"typography": {
 			"fontSize": true,

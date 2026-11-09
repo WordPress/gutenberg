@@ -8,15 +8,8 @@
 	"description": "Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.",
 	"keywords": [ "document outline", "summary" ],
 	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
 	"attributes": {
-		"headings": {
-			"type": "array",
-			"items": {
-				"type": "object"
-			},
-			"default": [],
-			"role": "local"
-		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
 			"default": false
@@ -52,6 +45,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
