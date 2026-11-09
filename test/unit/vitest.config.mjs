@@ -244,8 +244,10 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						// Keep request interception for now. Full-suite runs with import-map
-						// mocks intermittently lose their Chromium connection.
+						// Keep request interception while investigating Chromium disconnects.
+						// Both mock modes can fail. Related report; cause here still unconfirmed:
+						// https://github.com/vitest-dev/vitest/issues/11702
+						// Re-enable import-map mocks after verifying stable shuffled full-suite runs.
 						importMapMocks: false,
 						provider: createPlaywrightProvider(),
 						commands: {
