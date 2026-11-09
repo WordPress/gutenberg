@@ -31,10 +31,13 @@
 	}
 }
 
+// Fallback for browsers without initial-letter support.
 // This is the equivalent of the `body.rtl` style.scss rule for RTL,
 // but it's applied to the html element instead of the body element
 // since the `body.rtl` style is not applied to the iframe in the editor.
-html[dir="rtl"] .has-drop-cap:not(:focus)::first-letter {
-	float: initial;
-	margin-left: 0.1em;
+@supports not ((initial-letter: 1) or (-webkit-initial-letter: 1)) {
+	html[dir="rtl"] .has-drop-cap:not(:focus)::first-letter {
+		float: initial;
+		margin-left: 0.1em;
+	}
 }
