@@ -256,7 +256,7 @@ Background styles.
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
 | backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
-| gradient | Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image. | `string`, `{ ref }` |
+| gradient | Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image. | `string` |
 
 ---
 

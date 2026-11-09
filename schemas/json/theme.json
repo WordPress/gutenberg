@@ -1490,10 +1490,7 @@
 						},
 						"gradient": {
 							"description": "Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image.",
-							"oneOf": [
-								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
-							]
+							"type": "string"
 						}
 					},
 					"additionalProperties": false
