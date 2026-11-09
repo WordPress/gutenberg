@@ -6,17 +6,13 @@ import {
 	Icon,
 	Input,
 	InputLayout,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Hosts the inline Autocomplete at the caret; Popover is not allowlisted yet.
+	Popover,
 	Text,
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-import {
-	createPortal,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { search } from '@wordpress/icons';
@@ -228,21 +224,15 @@ function InlineUI( {
 			</Autocomplete.Row>
 		) );
 
-	/*
-	 * Rendered into the page's body, not where the format renders. Format
-	 * controls render next to the editable text, inside the editor canvas,
-	 * and the popup places hidden focus guards beside its React position.
-	 * There they would sit among the blocks: the paragraph would no longer
-	 * be the first child, pick up block spacing, and shift down while the
-	 * picker is open.
-	 */
-	return createPortal(
-		<Autocomplete.Root
+	return (
+		<Popover.Root
 			// Mounted only while visible, so it is always open.
 			open
+			// Keeps Tab inside, since there is no trigger for focus to return
+			// to. Unlike `modal`, clicks and scrolling outside still work.
+			modal="trap-focus"
 			onOpenChange={ ( nextOpen: boolean, { reason } ) => {
-				// Picking a cell closes through `onSelect`.
-				if ( nextOpen || reason === 'item-press' ) {
+				if ( nextOpen ) {
 					return;
 				}
 				onClose();
@@ -252,138 +242,147 @@ function InlineUI( {
 					onFocus();
 				}
 			} }
-			grid
-			// Sections while browsing, a flat list while searching. Base UI
-			// takes either at runtime, but its overloads can't take the union.
-			items={ items as readonly CharacterOption[] }
-			filter={ null }
-			// Enter picks the top result once the user has typed.
-			autoHighlight
-			value={ query }
-			onValueChange={ ( nextQuery: string, { reason } ) => {
-				// Picking a cell would otherwise write it into the field.
-				if ( reason === 'item-press' ) {
-					return;
-				}
-				setQuery( nextQuery );
-			} }
-			onItemHighlighted={ ( option?: CharacterOption ) =>
-				setHighlighted( option )
-			}
 		>
-			<Autocomplete.Popup
-				className="format-library-special-characters__popup"
-				// The search field inside makes this a dialog, which needs a name.
-				aria-label={ title }
-				width="content"
+			<Popover.Popup
+				className="format-library-special-characters__popover"
 				// There is no trigger to return to: the format puts the caret
 				// back itself, and only after Escape or a pick.
 				initialFocus={ inputRef }
 				finalFocus={ false }
 				positioner={
 					// Below the caret, rather than below a trigger button.
-					<Autocomplete.Positioner anchor={ popoverAnchor } />
+					<Popover.Positioner anchor={ popoverAnchor } />
 				}
 			>
-				<div className="format-library-special-characters__search">
-					<Autocomplete.InputGroup>
-						<Autocomplete.Input
-							ref={ inputRef }
-							aria-label={ __( 'Search special characters' ) }
-							placeholder={ __( 'Search' ) }
-							render={
-								<Input
-									prefix={
-										<InputLayout.Slot padding="minimal">
-											<Icon icon={ search } />
-										</InputLayout.Slot>
-									}
-									suffix={
-										isSearching ? (
-											<InputLayout.Slot padding="minimal">
-												<Autocomplete.Clear
-													aria-label={ __(
-														'Reset search'
-													) }
-												/>
-											</InputLayout.Slot>
-										) : undefined
-									}
-								/>
-							}
-						/>
-					</Autocomplete.InputGroup>
-				</div>
-				{ /*
-				 * The arrow keys in the search field drive the grid, so keep
-				 * its scroller out of the Tab order. Browsers would otherwise
-				 * make it a Tab stop, since none of the cells are tabbable.
-				 */ }
-				<div
-					className="format-library-special-characters__viewport"
-					tabIndex={ -1 }
-				>
-					{ /* Shown, but announced through `Autocomplete.Status`, so it
-					isn't spoken twice. */ }
-					<Autocomplete.Empty aria-hidden="true">
-						{ __( 'No characters found.' ) }
-					</Autocomplete.Empty>
-					<Autocomplete.List
-						aria-label={ __( 'Characters' ) }
-						className={
-							isSearching
-								? 'format-library-special-characters__list is-searching'
-								: 'format-library-special-characters__list'
+				<VisuallyHidden render={ <Popover.Title /> }>
+					{ title }
+				</VisuallyHidden>
+				<Autocomplete.Root
+					inline
+					open
+					grid
+					// Sections while browsing, a flat list while searching. Base
+					// UI takes either at runtime, but its overloads can't take
+					// the union.
+					items={ items as readonly CharacterOption[] }
+					filter={ null }
+					// Enter picks the top result once the user has typed.
+					autoHighlight
+					value={ query }
+					onValueChange={ ( nextQuery: string, { reason } ) => {
+						// Picking a cell would otherwise write it into the field.
+						if ( reason === 'item-press' ) {
+							return;
 						}
-					>
-						{ isSearching
-							? renderRows(
-									items as CharacterOption[],
-									__( 'Search results' )
-								)
-							: ( group: CharacterOptionGroup ) => (
-									<Autocomplete.Group
-										key={ group.key }
-										items={ group.items }
-										className="format-library-special-characters__group"
-									>
-										<Autocomplete.GroupLabel className="format-library-special-characters__group-label">
-											{ group.label }
-										</Autocomplete.GroupLabel>
-										{ renderRows(
-											group.items,
-											group.label
-										) }
-									</Autocomplete.Group>
-								) }
-					</Autocomplete.List>
-				</div>
-				<Autocomplete.Status>
-					<VisuallyHidden>{ announcedStatus }</VisuallyHidden>
-				</Autocomplete.Status>
-				{ /* A sighted-user aid only: each cell's accessible name already
-				carries the same name and code point. */ }
-				<div
-					className="format-library-special-characters__preview"
-					aria-hidden="true"
+						setQuery( nextQuery );
+					} }
+					onItemHighlighted={ ( option?: CharacterOption ) =>
+						setHighlighted( option )
+					}
 				>
-					{ highlighted && (
-						<>
-							<span className="format-library-special-characters__preview-character">
-								{ highlighted.value }
-							</span>
-							<Text
-								variant="body-sm"
-								className="format-library-special-characters__preview-name"
-							>
-								{ describeCharacter( highlighted ) }
-							</Text>
-						</>
-					) }
-				</div>
-			</Autocomplete.Popup>
-		</Autocomplete.Root>,
-		document.body
+					<div className="format-library-special-characters__search">
+						<Autocomplete.InputGroup>
+							<Autocomplete.Input
+								ref={ inputRef }
+								aria-label={ __( 'Search special characters' ) }
+								placeholder={ __( 'Search' ) }
+								render={
+									<Input
+										prefix={
+											<InputLayout.Slot padding="minimal">
+												<Icon icon={ search } />
+											</InputLayout.Slot>
+										}
+										suffix={
+											isSearching ? (
+												<InputLayout.Slot padding="minimal">
+													<Autocomplete.Clear
+														aria-label={ __(
+															'Reset search'
+														) }
+													/>
+												</InputLayout.Slot>
+											) : undefined
+										}
+									/>
+								}
+							/>
+						</Autocomplete.InputGroup>
+					</div>
+					{ /*
+					 * The arrow keys in the search field drive the grid, so keep
+					 * its scroller out of the Tab order. Browsers would otherwise
+					 * make it a Tab stop, since none of the cells are tabbable.
+					 */ }
+					<div
+						className="format-library-special-characters__viewport"
+						tabIndex={ -1 }
+					>
+						{ /* Shown, but announced through `Autocomplete.Status`, so
+						it isn't spoken twice. */ }
+						<Autocomplete.Empty aria-hidden="true">
+							{ __( 'No characters found.' ) }
+						</Autocomplete.Empty>
+						<Autocomplete.List
+							aria-label={ __( 'Characters' ) }
+							className={
+								isSearching
+									? 'format-library-special-characters__list is-searching'
+									: 'format-library-special-characters__list'
+							}
+						>
+							{ isSearching
+								? renderRows(
+										items as CharacterOption[],
+										__( 'Search results' )
+									)
+								: ( group: CharacterOptionGroup ) => (
+										<Autocomplete.Group
+											key={ group.key }
+											items={ group.items }
+											className="format-library-special-characters__group"
+										>
+											<Autocomplete.GroupLabel className="format-library-special-characters__group-label">
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											{ renderRows(
+												group.items,
+												group.label
+											) }
+										</Autocomplete.Group>
+									) }
+						</Autocomplete.List>
+					</div>
+					<Autocomplete.Status>
+						<VisuallyHidden>{ announcedStatus }</VisuallyHidden>
+					</Autocomplete.Status>
+					{ /* A sighted-user aid only: each cell's accessible name
+					already carries the same name and code point. */ }
+					<div
+						className="format-library-special-characters__preview"
+						aria-hidden="true"
+					>
+						{ highlighted && (
+							<>
+								<span className="format-library-special-characters__preview-character">
+									{ highlighted.value }
+								</span>
+								<Text
+									variant="body-sm"
+									className="format-library-special-characters__preview-name"
+								>
+									{ describeCharacter( highlighted ) }
+								</Text>
+							</>
+						) }
+					</div>
+				</Autocomplete.Root>
+				{ /* Required by `trap-focus`, so screen reader users can leave. */ }
+				<VisuallyHidden render={ <Popover.Close /> }>
+					{ __( 'Close' ) }
+				</VisuallyHidden>
+			</Popover.Popup>
+		</Popover.Root>
 	);
 }
 

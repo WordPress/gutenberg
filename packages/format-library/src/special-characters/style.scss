@@ -1,34 +1,30 @@
-.format-library-special-characters__popup {
-	// Grid geometry: eight square cells with an extra small gap, padded on
-	// both sides. The popup sizes to it, so it never resizes as results
-	// change.
+.format-library-special-characters__popover {
+	// Grid geometry: eight square cells with an extra small gap. The popover
+	// sizes to it, so it never resizes as results change.
 	--special-characters-cell-size: var(--wpds-dimension-size-md);
 	--special-characters-gap: var(--wpds-dimension-gap-xs);
+	// Matches the Popover surface's padding, so the scroller and the preview
+	// strip can reach its edges.
 	--special-characters-padding: var(--wpds-dimension-padding-lg);
 	--special-characters-grid-width: calc(var(--special-characters-cell-size) * 8 + var(--special-characters-gap) * 7);
-
-	// Stack the search, grid and preview, instead of the Design System
-	// popup's header and status rows.
-	display: flex;
-	flex-direction: column;
-	// The grid scrolls inside its own viewport.
-	overflow: hidden;
 }
 
 .format-library-special-characters__search {
-	padding: var(--special-characters-padding) var(--special-characters-padding) var(--wpds-dimension-padding-sm);
+	padding-block-end: var(--wpds-dimension-padding-sm);
 	// Stretch to the grid's width rather than widening the popover.
 	contain: inline-size;
 }
 
 .format-library-special-characters__viewport {
-	// A fixed height, so the popup keeps one size as search results change
+	// A fixed height, so the popover keeps one size as search results change
 	// and does not jump when it opens above the text.
 	height: 260px;
 	overflow: auto;
 	// Overlay scrollbars reserve nothing; classic ones get an equal gutter on
 	// both edges, so the grid stays centered either way.
 	scrollbar-gutter: stable both-edges;
+	// Extend to the surface's edges, so the scrollbar sits there.
+	margin-inline: calc(-1 * var(--special-characters-padding));
 	padding-inline: var(--special-characters-padding);
 	// A keyboard-scrolled cell stays clear of the sticky section heading.
 	scroll-padding-block: var(--wpds-dimension-size-sm) 0;
@@ -90,6 +86,9 @@
 	// Reserve two lines, so the popup does not resize as the highlight moves
 	// between short and long names.
 	min-height: calc(2lh + var(--wpds-dimension-padding-sm) * 2);
+	// Span the surface's full width, down to its bottom edge.
+	margin-inline: calc(-1 * var(--special-characters-padding));
+	margin-block-end: calc(-1 * var(--special-characters-padding));
 	padding: var(--wpds-dimension-padding-sm) var(--special-characters-padding);
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
