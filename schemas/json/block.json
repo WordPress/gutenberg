@@ -165,7 +165,8 @@
 								"html",
 								"raw",
 								"query",
-								"meta"
+								"meta",
+								"tag"
 							]
 						},
 						"selector": {
@@ -361,6 +362,11 @@
 							"default": false
 						}
 					}
+				},
+				"editableRoot": {
+					"description": "When set to `true`, the block declares that it keeps working when an ancestor element (the editor canvas) is the `contenteditable` editing host, with focus and the native selection residing there instead of on the block's own editable elements. The editor uses this to keep the canvas editable while such a block is selected, enabling native partial selection across blocks.",
+					"type": "boolean",
+					"default": false
 				},
 				"filter": {
 					"description": "This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific filter property, its attributes definition is extended to include the style attribute.",
@@ -625,6 +631,34 @@
 									}
 								}
 							]
+						},
+						"blockGap": {
+							"description": "Allow blocks to define the spacing between their inner blocks. Only applies to blocks that also use `layout`.\n\nWhen set to an array or an object with `sides`, the axial sides (`vertical` and `horizontal`) can be set separately, which adjust the row and column gap values.",
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "vertical", "horizontal" ]
+									}
+								},
+								{
+									"type": "object",
+									"properties": {
+										"sides": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [ "vertical", "horizontal" ]
+											}
+										}
+									}
+								}
+							],
+							"default": false
 						}
 					}
 				},
@@ -669,6 +703,11 @@
 									}
 								}
 							],
+							"default": false
+						},
+						"textColumns": {
+							"description": "This value signals that a block supports the column-count CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for textColumns, its attributes definition is extended to include the style attribute.",
+							"type": "boolean",
 							"default": false
 						},
 						"fitText": {

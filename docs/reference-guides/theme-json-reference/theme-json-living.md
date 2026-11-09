@@ -43,13 +43,13 @@ Please note that when using this setting, `styles.spacing.padding` should always
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage, backgroundSize
+- background: backgroundImage, backgroundSize, gradient
 - border: color, radius, style, width
 - color: link, heading, button, caption
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
-- typography: lineHeight
+- typography: lineHeight, textColumns
 
 ---
 
@@ -256,6 +256,7 @@ Background styles.
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
 | backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
+| gradient | Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image. | `string`, `{ ref }` |
 
 ---
 
