@@ -168,6 +168,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		// Tiles wait for the first measurement; see the effect below.
 		const [ hasMeasured, setHasMeasured ] = useState( false );
+		const measureRef = useRef< HTMLDivElement | null >( null );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
@@ -175,6 +176,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			}
 		);
 		const mergedGridRef = useMergeRefs( [
+			measureRef,
 			setGridRoot,
 			resizeObserverRef,
 			ref,
@@ -190,11 +192,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// would read the unmeasured one-column span and size. The update
 		// renders synchronously before paint, so no empty frame shows.
 		useLayoutEffect( () => {
-			if ( ! gridRoot ) {
+			const node = measureRef.current;
+			if ( ! node ) {
 				return;
 			}
 			setHasMeasured( true );
-			const { width, height } = gridRoot.getBoundingClientRect();
+			const { width, height } = node.getBoundingClientRect();
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
@@ -202,12 +205,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				setContainerHeight( height );
 			}
 			const parsed = Number.parseFloat(
-				window.getComputedStyle( gridRoot ).columnGap
+				window.getComputedStyle( node ).columnGap
 			);
 			if ( Number.isFinite( parsed ) && parsed > 0 ) {
 				setGapPx( parsed );
 			}
-		}, [ gridRoot ] );
+		}, [] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(

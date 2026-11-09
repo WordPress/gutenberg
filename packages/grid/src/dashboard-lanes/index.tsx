@@ -151,12 +151,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		// Tiles wait for the first measurement; see the effect below.
 		const [ hasMeasured, setHasMeasured ] = useState( false );
+		const measureRef = useRef< HTMLDivElement | null >( null );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
 			}
 		);
 		const mergedRootRef = useMergeRefs( [
+			measureRef,
 			setContainer,
 			resizeObserverRef,
 			ref,
@@ -171,21 +173,22 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		// would read the unmeasured one-column span and size. The update
 		// renders synchronously before paint, so no empty frame shows.
 		useLayoutEffect( () => {
-			if ( ! container ) {
+			const node = measureRef.current;
+			if ( ! node ) {
 				return;
 			}
 			setHasMeasured( true );
-			const { width } = container.getBoundingClientRect();
+			const { width } = node.getBoundingClientRect();
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
 			const parsed = Number.parseFloat(
-				window.getComputedStyle( container ).columnGap
+				window.getComputedStyle( node ).columnGap
 			);
 			if ( Number.isFinite( parsed ) && parsed > 0 ) {
 				setGapPx( parsed );
 			}
-		}, [ container ] );
+		}, [] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(
