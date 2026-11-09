@@ -23,7 +23,7 @@ import type {
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
-import { getTaxonomyQueryArgs, useView } from '@wordpress/views';
+import { useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -46,6 +46,7 @@ import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
 import { UploadStatusPopover } from './upload-status-popover';
 import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
+import { getTaxonomyQueryArgs } from './taxonomy-query';
 import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );

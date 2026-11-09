@@ -19,7 +19,12 @@ type QueryTaxonomy = {
  * - `isAll` matches items with every one of the terms.
  * - `isNot` and `isNone` match items with none of the terms.
  *
- * A filter with no terms leaves the query alone.
+ * A filter matches the chosen terms only, not their child terms, because the
+ * REST API's `include_children` defaults to false. A filter with no terms
+ * leaves the query alone.
+ *
+ * The media upload modal in @wordpress/media-utils has a copy of this
+ * function, so change both together.
  *
  * @param filters    The view's filters.
  * @param taxonomies The taxonomies of the entity, as `getTaxonomies()` returns them.

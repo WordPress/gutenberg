@@ -1,8 +1,9 @@
-import { getTaxonomyQueryArgs, loadView } from '@wordpress/views';
+import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { getTaxonomyQueryArgs } from './taxonomy-query';
 
 /**
  * A layer merged on top of a view. Mirrors the `ViewOverrides` type of

@@ -5,6 +5,7 @@ const TAXONOMIES = [
 	{ slug: 'category', rest_base: 'categories' },
 	{ slug: 'post_tag', rest_base: 'tags' },
 	{ slug: 'genre' },
+	{ slug: 'place', rest_base: 'places', hierarchical: true },
 ];
 
 describe( 'getTaxonomyQueryArgs', () => {
@@ -33,6 +34,18 @@ describe( 'getTaxonomyQueryArgs', () => {
 				TAXONOMIES
 			)
 		).toEqual( { tags_exclude: [ 7 ] } );
+	} );
+
+	it( 'leaves `include_children` at the REST default of false', () => {
+		expect(
+			getTaxonomyQueryArgs(
+				[
+					{ field: 'places', operator: 'isAny', value: [ 9 ] },
+					{ field: 'places', operator: 'isNone', value: [ 10 ] },
+				],
+				TAXONOMIES
+			)
+		).toEqual( { places: [ 9 ], places_exclude: [ 10 ] } );
 	} );
 
 	it( 'takes a single term for `is` and `isNot`', () => {
