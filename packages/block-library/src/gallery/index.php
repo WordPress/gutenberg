@@ -362,7 +362,6 @@ function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attr
 
 	if ( ! empty( $attrs['href'] ) && '_blank' === ( $attributes['linkTarget'] ?? '' ) ) {
 		$attrs['linkTarget'] = '_blank';
-		$attrs['rel']        = 'noopener';
 	}
 
 	return $attrs;
