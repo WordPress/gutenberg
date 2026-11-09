@@ -21,15 +21,25 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import PagesPanel from './pages-panel';
+import {
+	getPagesByParentId,
+	getPageRows,
+	getMenuOrderEdits,
+	getPageTitle,
+	getVisiblePages,
+} from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+const EMPTY_ARRAY = [];
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
@@ -129,14 +139,12 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { parentPageID } = attributes;
+	const { parentPageID, excludedPageIDs = EMPTY_ARRAY } = attributes;
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
+	const { records: savedPages, hasResolved: hasResolvedPages } =
+		useEntityRecords( 'postType', 'page', {
 			per_page: MAX_PAGE_COUNT,
 			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
 			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
@@ -144,7 +152,43 @@ export default function PageListEdit( {
 			// sort.
 			orderby: 'menu_order',
 			order: 'asc',
-		}
+		} );
+
+	// Reordering edits each page's `menu_order`, and those edits stay unsaved
+	// until the page entities are saved, so they're merged in here.
+	// The map of page IDs to edited orders is returned directly, so `useSelect`
+	// compares its values and doesn't re-render while they're unchanged.
+	const menuOrderEdits = useSelect(
+		( select ) => {
+			const { getEntityRecordEdits } = select( coreStore );
+			return Object.fromEntries(
+				( savedPages ?? [] ).map( ( page ) => [
+					page.id,
+					getEntityRecordEdits( 'postType', 'page', page.id )
+						?.menu_order,
+				] )
+			);
+		},
+		[ savedPages ]
+	);
+
+	const canReorderPages = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'page',
+			} ),
+		[]
+	);
+
+	const pages = useMemo(
+		() =>
+			savedPages?.map( ( page ) =>
+				menuOrderEdits[ page.id ] === undefined
+					? page
+					: { ...page, menu_order: menuOrderEdits[ page.id ] }
+			) ?? savedPages,
+		[ savedPages, menuOrderEdits ]
 	);
 
 	const allowConvertToLinks =
@@ -152,31 +196,15 @@ export default function PageListEdit( {
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
 
-	const pagesByParentId = useMemo( () => {
-		if ( pages === null ) {
-			return new Map();
-		}
+	const pagesByParentId = useMemo(
+		() => getPagesByParentId( pages ),
+		[ pages ]
+	);
 
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = pages.sort( ( a, b ) => {
-			if ( a.menu_order === b.menu_order ) {
-				return a.title.rendered.localeCompare( b.title.rendered );
-			}
-			return a.menu_order - b.menu_order;
-		} );
-
-		return sortedPages.reduce( ( accumulator, page ) => {
-			const { parent } = page;
-			if ( accumulator.has( parent ) ) {
-				accumulator.get( parent ).push( page );
-			} else {
-				accumulator.set( parent, [ page ] );
-			}
-			return accumulator;
-		}, new Map() );
-	}, [ pages ] );
+	const excludedIds = useMemo(
+		() => new Set( excludedPageIDs ),
+		[ excludedPageIDs ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-page-list', {
@@ -228,7 +256,13 @@ export default function PageListEdit( {
 			}
 
 			return childPages.reduce( ( template, page ) => {
-				const hasChildren = pagesByParentId.has( page.id );
+				// A hidden page is left out with its child pages, matching
+				// the `exclude_tree` the block renders with.
+				if ( excludedIds.has( page.id ) ) {
+					return template;
+				}
+				const children = getBlockList( page.id );
+				const hasChildren = children.length > 0;
 				const pageProps = {
 					id: page.id,
 					label:
@@ -244,9 +278,7 @@ export default function PageListEdit( {
 					link: page.url,
 					hasChildren,
 				};
-				let item = null;
-				const children = getBlockList( page.id );
-				item = createBlock(
+				const item = createBlock(
 					'core/page-list-item',
 					pageProps,
 					children
@@ -256,21 +288,18 @@ export default function PageListEdit( {
 				return template;
 			}, [] );
 		},
-		[ pagesByParentId, parentPageID ]
+		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const {
-		hasSelectedChild,
-		parentClientId,
-		hasDraggedChild,
-		isChildOfNavigation,
-	} = useSelect(
+	const pageRows = useMemo(
+		() => getPageRows( pagesByParentId, parentPageID, excludedIds ),
+		[ pagesByParentId, parentPageID, excludedIds ]
+	);
+
+	const { hasSelectedChild, parentClientId, isChildOfNavigation } = useSelect(
 		( select ) => {
-			const {
-				getBlockParentsByBlockName,
-				hasSelectedInnerBlock,
-				hasDraggedInnerBlock,
-			} = select( blockEditorStore );
+			const { getBlockParentsByBlockName, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
@@ -279,16 +308,21 @@ export default function PageListEdit( {
 			return {
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
-				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
 
+	// Detaching keeps what the block shows: its order, without hidden pages.
+	const visiblePages = useMemo(
+		() => getVisiblePages( pagesByParentId, excludedIds ),
+		[ pagesByParentId, excludedIds ]
+	);
+
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,
-		pages,
+		pages: visiblePages,
 		parentClientId,
 		parentPageID,
 	} );
@@ -296,23 +330,77 @@ export default function PageListEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
+		// Pages are reordered and hidden from the Pages panel, so they can't
+		// be moved out of the Page List, into the Navigation around it.
+		templateLock: 'all',
 		onInput: NOOP,
 		onChange: NOOP,
 		value: blockList,
 	} );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
+	// Selecting a page selects the Page List, whose Pages panel is where pages
+	// are reordered and hidden.
 	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			setIsConfirmingDetach( true );
-			selectBlock( parentClientId );
+		if ( hasSelectedChild ) {
+			selectBlock( clientId );
 		}
-	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
+	}, [ hasSelectedChild, clientId, selectBlock ] );
+
+	const togglePage = ( pageId ) => {
+		const isExcluded = excludedIds.has( pageId );
+		setAttributes( {
+			excludedPageIDs: isExcluded
+				? excludedPageIDs.filter( ( id ) => id !== pageId )
+				: [ ...excludedPageIDs, pageId ],
+		} );
+	};
+
+	const movePage = ( row, toIndex ) => {
+		const siblings = pagesByParentId.get( row.page.parent ) ?? [];
+		const edits = getMenuOrderEdits( siblings, row.page.id, toIndex );
+		if ( ! edits.length ) {
+			return;
+		}
+		// The first edit opens an undo level and the rest are staged into it,
+		// so one undo puts every page back.
+		edits.forEach( ( { id, menu_order: menuOrder }, index ) =>
+			editEntityRecord(
+				'postType',
+				'page',
+				id,
+				{ menu_order: menuOrder },
+				{ isCached: index > 0 }
+			)
+		);
+		speak(
+			sprintf(
+				/* translators: 1: Page title. 2: New position. 3: Number of pages at that level. */
+				__( '%1$s moved to position %2$d of %3$d.' ),
+				getPageTitle( row.page ),
+				toIndex + 1,
+				siblings.length
+			)
+		);
+	};
 
 	return (
 		<>
+			{ isChildOfNavigation &&
+				hasResolvedPages &&
+				pageRows.length > 0 && (
+					<InspectorControls>
+						<PagesPanel
+							rows={ pageRows }
+							excludedIds={ excludedPageIDs }
+							canReorder={ canReorderPages }
+							onToggle={ togglePage }
+							onMove={ movePage }
+						/>
+					</InspectorControls>
+				) }
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel

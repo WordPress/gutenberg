@@ -22,3 +22,8 @@ export {
 	isBlockSuggestion,
 	useBlockSuggestions,
 } from './use-block-suggestions';
+export {
+	useIsInPageListNavigation,
+	removePageSuggestions,
+	getLinkSuggestionsQuery,
+} from './use-is-in-page-list-navigation';
