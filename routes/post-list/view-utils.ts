@@ -168,9 +168,9 @@ export function viewToQuery( view: View, postType: string ) {
 		}
 	}
 
-	// For attachments, we need to embed the parent (attached to) post to get its title.
+	// For attachments, also embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
-		result._embed = 'wp:attached-to';
+		result._embed = 'author,wp:attached-to';
 	}
 
 	return result;
