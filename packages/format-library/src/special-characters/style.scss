@@ -20,12 +20,13 @@
 	// and does not jump when it opens above the text.
 	height: 260px;
 	overflow: auto;
-	// Overlay scrollbars reserve nothing; classic ones get an equal gutter on
-	// both edges, so the grid stays centered either way.
-	scrollbar-gutter: stable both-edges;
-	// Extend to the surface's edges, so the scrollbar sits there.
-	margin-inline: calc(-1 * var(--special-characters-padding));
-	padding-inline: var(--special-characters-padding);
+	// Reserve room for a classic scrollbar, so the popover keeps its width
+	// when search results stop overflowing.
+	scrollbar-gutter: stable;
+	// Put the scrollbar at the popover's edge, clear of the last column. The
+	// grid still starts at the search field's edge.
+	margin-inline-end: calc(-1 * var(--special-characters-padding));
+	padding-inline-end: var(--special-characters-padding);
 	// A keyboard-scrolled cell stays clear of the sticky section heading.
 	scroll-padding-block: var(--wpds-dimension-size-sm) 0;
 }
