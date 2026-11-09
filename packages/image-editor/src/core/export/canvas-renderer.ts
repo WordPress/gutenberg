@@ -1,5 +1,7 @@
+import { mat2d } from 'gl-matrix';
 import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
+import { degreesToRadians } from '../math/rotation';
 import { getOutputSize } from '../../get-output-size';
 import { mapEditToOriginal } from '../../map-edit-to-original';
 
@@ -57,23 +59,9 @@ export function renderToCanvas(
 	const outW = Math.round( outputSize.width );
 	const outH = Math.round( outputSize.height );
 
-	// When the crop is too near full to be saved, the file is the whole
-	// image and only the flip and rotation apply. Drawing it through the
-	// state's zoom and pan would scale it by a hair and resample every
-	// pixel, so draw it at 1:1 instead, as the server path leaves it.
 	const hasCrop = mapEditToOriginal( sizedState ).some(
 		( edit ) => edit.type === 'crop'
 	);
-	const drawState: InternalImageEditorState = hasCrop
-		? state
-		: {
-				...state,
-				zoom: 1,
-				baseZoom: 1,
-				pan: { x: 0, y: 0 },
-				basePan: { x: 0, y: 0 },
-				cropRect: { x: 0, y: 0, width: 1, height: 1 },
-			};
 
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = outW;
@@ -85,10 +73,32 @@ export function renderToCanvas(
 		);
 	}
 
-	const camera = createExportCamera( drawState, imageSize, {
-		width: outW,
-		height: outH,
-	} );
+	// When the crop is too near full to be saved, the file is the whole
+	// image and only the flip and rotation apply, as the server path leaves
+	// it. The export camera would still scale it by the zoom and stretch the
+	// crop frame onto the output, resampling every pixel, so the image is
+	// placed directly instead: at 1:1, turned about its centre, in the
+	// middle of its rotated bounds. The order of flip and rotation matches
+	// `createExportCamera`, so the pixels agree with the preview.
+	let camera;
+	if ( hasCrop ) {
+		camera = createExportCamera( state, imageSize, {
+			width: outW,
+			height: outH,
+		} );
+	} else {
+		camera = mat2d.create();
+		mat2d.translate( camera, camera, [ outW / 2, outH / 2 ] );
+		mat2d.scale( camera, camera, [
+			state.flip.horizontal ? -1 : 1,
+			state.flip.vertical ? -1 : 1,
+		] );
+		mat2d.rotate( camera, camera, degreesToRadians( state.rotation ) );
+		mat2d.translate( camera, camera, [
+			-naturalWidth / 2,
+			-naturalHeight / 2,
+		] );
+	}
 	ctx.setTransform(
 		camera[ 0 ],
 		camera[ 1 ],
