@@ -134,17 +134,29 @@ function Root( {
 			nextOpen: boolean,
 			eventDetails: _AlertDialog.Root.ChangeEventDetails
 		) => {
-			// Block dismiss while a confirm action is pending.
-			if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
+			// Only the completed confirm action can close a pending dialog.
+			if (
+				! nextOpen &&
+				lifecycle.getValue().phase === 'pending' &&
+				eventDetails.reason !== 'imperative-action'
+			) {
+				eventDetails.cancel();
 				return;
 			}
 
-			if ( ! nextOpen && lifecycle.getValue().phase === 'idle' ) {
+			onOpenChange?.( nextOpen, eventDetails );
+			if ( eventDetails.isCanceled ) {
+				if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
+					lifecycle.update( { phase: 'idle', showSpinner: false } );
+				}
+				return;
+			}
+
+			if ( ! nextOpen ) {
 				lifecycle.update( { phase: 'closing' } );
 			}
 
 			setInternalOpen( nextOpen );
-			onOpenChange?.( nextOpen, eventDetails );
 		},
 		[ lifecycle, onOpenChange ]
 	);
@@ -189,7 +201,6 @@ function Root( {
 			const shouldClose = result?.close !== false;
 
 			if ( shouldClose ) {
-				lifecycle.update( { phase: 'closing' } );
 				actionsRef.current?.close();
 			} else {
 				lifecycle.update( { phase: 'idle', showSpinner: false } );
