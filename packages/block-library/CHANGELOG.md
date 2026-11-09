@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Page List: In a Navigation block, reorder pages and switch them on or off from a new Pages panel, without converting the list to links. Reordering changes the pages' order. Hidden pages are saved in a new `excludedPageIDs` attribute and left out with their child pages. While a Navigation block has a Page List, its other links can't link to pages.
+-   Page List: In a Navigation block, reorder pages and switch them on or off from a new Pages panel, without converting the list to links. Reordering changes the pages' order. Hidden pages are saved in a new `excludedPageIDs` attribute and left out with their child pages. While a Navigation block has a Page List, its other links can't link to pages ([#86525](https://github.com/WordPress/gutenberg/pull/86525)).
 
 ### Bug Fixes
 
