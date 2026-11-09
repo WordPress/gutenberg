@@ -45,8 +45,8 @@ const env = {
 // Do not inherit repository-specific runner options in the isolated consumer.
 delete env.NODE_OPTIONS;
 delete env.NODE_PATH;
-/* npm exports every resolved config as npm_config_*, so the repository supply
-   chain policy would otherwise reject the consumer's own tarball install. */
+// npm exports resolved config as npm_config_*, which would override the
+// consumer's .npmrc, including its exception for the packed fixture tarballs.
 for ( const key of Object.keys( env ) ) {
 	if ( key.toLowerCase().startsWith( 'npm_config_' ) ) {
 		delete env[ key ];
@@ -139,6 +139,9 @@ write(
 		name: 'wp-vitest-consumer',
 		private: true,
 		type: 'module',
+		allowScripts: JSON.parse(
+			readFileSync( path.join( root, 'package.json' ), 'utf8' )
+		).allowScripts,
 		devDependencies: {
 			'@wordpress/scripts': scripts,
 			'@wordpress/eslint-plugin': eslintPlugin,
@@ -161,6 +164,19 @@ write(
 		},
 		overrides: { '@wordpress/eslint-plugin': '$@wordpress/eslint-plugin' },
 	} )
+);
+write(
+	'.npmrc',
+	[
+		readFileSync( path.join( root, '.npmrc' ), 'utf8' ),
+		// Exercise the default consumer layout rather than the monorepo's links.
+		'install-strategy = hoisted',
+		// The ESLint 10 compatibility checks include plugins with older peer ranges.
+		'strict-peer-deps = false',
+		// Permit only direct fixture tarballs, keeping transitive files blocked.
+		'allow-file = root',
+		'',
+	].join( '\n' )
 );
 if ( values.lockfile ) {
 	cpSync(
