@@ -97,16 +97,9 @@ function VideoEdit( {
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// In this case there was an error
-			// previous attributes should be removed
-			// because they may be temporary blob urls.
-			setAttributes( {
-				src: undefined,
-				id: undefined,
-				poster: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current video, poster and caption intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -125,6 +118,17 @@ function VideoEdit( {
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
 			caption: media.caption,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetVideo() {
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			poster: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -218,7 +222,7 @@ function VideoEdit( {
 							onSelect={ onSelectVideo }
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
-							onReset={ () => onSelectVideo( undefined ) }
+							onReset={ onResetVideo }
 							variant="toolbar"
 						/>
 					</BlockControls>
