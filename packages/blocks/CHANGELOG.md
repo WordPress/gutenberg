@@ -2,9 +2,14 @@
 
 ## Unreleased
 
-### Enhancements
+### Bug Fixes
 
 -   `pasteHandler`: Add a `convertMarkdown` option to preserve literal Markdown while retaining paragraph boundaries ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
+
+## 17.1.0 (2026-11-04)
+
+### Enhancements
+
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
 
 ### Bug Fixes
