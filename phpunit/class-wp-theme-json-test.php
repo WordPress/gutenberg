@@ -5550,6 +5550,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_export_data_flattens_spacing_scale() {
+		$theme = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => array(
+							'operator'   => '+',
+							'increment'  => 16,
+							'steps'      => 0,
+							'mediumStep' => 32,
+							'unit'       => 'px',
+						),
+					),
+				),
+			)
+		);
+		$user  = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => array(
+							'mediumStep' => 24,
+						),
+					),
+				),
+			),
+			'custom'
+		);
+
+		$theme->merge( $user );
+		$actual   = $theme->get_data();
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'spacing' => array(
+					'spacingScale' => array(
+						'operator'   => '+',
+						'increment'  => 16,
+						'steps'      => 0,
+						'mediumStep' => 24,
+						'unit'       => 'px',
+					),
+					'spacingSizes' => array(),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_export_data_sets_appearance_tools() {
 		$theme = new WP_Theme_JSON_Gutenberg(
 			array(
