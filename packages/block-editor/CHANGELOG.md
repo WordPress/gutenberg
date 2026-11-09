@@ -15,6 +15,7 @@
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
+-   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 
 ## 19.0.0 (2026-10-20)
 
