@@ -186,7 +186,7 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
  *
  * Keep in sync with `packages/global-styles-engine/src/utils/column-width.ts`.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param string|int|float $width Column width.
  * @return bool Whether the column should fill the remaining space.
@@ -212,7 +212,7 @@ function gutenberg_is_column_fill_width( $width ) {
  *
  * Keep in sync with `packages/global-styles-engine/src/utils/column-width.ts`.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param string $width Column width, resolved to a CSS value.
  * @return array Map of CSS property to value.
@@ -235,7 +235,7 @@ function gutenberg_get_column_flex_declarations( $width ) {
  * Accepts the style engine's `name`/`value` declaration list used by
  * `WP_Theme_JSON_Gutenberg`.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param array $declarations An array of CSS declarations.
  * @return array The updated declarations.
