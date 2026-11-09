@@ -6,6 +6,12 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
+declare module 'vitest/browser' {
+	interface BrowserCommands {
+		hoverWithManualTimers: ( selector: string ) => Promise< void >;
+	}
+}
+
 const props = {
 	children: <button>Tooltip anchor</button>,
 	text: 'tooltip text',
