@@ -156,6 +156,8 @@ export async function typeLikeAUser( locator, text ) {
 	for ( let i = 0; i < text.length; i++ ) {
 		await page.keyboard.press( text[ i ], { delay: KEY_HOLD } );
 		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-		await page.waitForTimeout( KEY_PRESS_GAPS[ i % KEY_PRESS_GAPS.length ] );
+		await page.waitForTimeout(
+			KEY_PRESS_GAPS[ i % KEY_PRESS_GAPS.length ]
+		);
 	}
 }
