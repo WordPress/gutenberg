@@ -11,67 +11,67 @@
 @use "./long-content-fade";
 
 @mixin _text-heading() {
-	font-family: variables.$font-family-headings;
+	font-family: wpds.var("--wpds-typography-font-family-heading");
 	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
 }
 
 @mixin _text-body() {
-	font-family: variables.$font-family-body;
+	font-family: wpds.var("--wpds-typography-font-family-body");
 	font-weight: wpds.var("--wpds-typography-font-weight-default");
 }
 
 @mixin heading-small() {
 	@include _text-heading();
-	font-size: variables.$font-size-x-small;
-	line-height: variables.$font-line-height-x-small;
+	font-size: wpds.var("--wpds-typography-font-size-xs");
+	line-height: wpds.var("--wpds-typography-line-height-xs");
 }
 
 @mixin heading-medium() {
 	@include _text-heading();
-	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-md");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin heading-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-lg");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin heading-x-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-medium;
+	font-size: wpds.var("--wpds-typography-font-size-xl");
+	line-height: wpds.var("--wpds-typography-line-height-md");
 }
 
 @mixin heading-2x-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-2x-large;
-	line-height: variables.$font-line-height-2x-large;
+	font-size: wpds.var("--wpds-typography-font-size-2xl");
+	line-height: wpds.var("--wpds-typography-line-height-2xl");
 }
 
 @mixin body-small() {
 	@include _text-body();
-	font-size: variables.$font-size-small;
-	line-height: variables.$font-line-height-x-small;
+	font-size: wpds.var("--wpds-typography-font-size-sm");
+	line-height: wpds.var("--wpds-typography-line-height-xs");
 }
 
 @mixin body-medium() {
 	@include _text-body();
-	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-md");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin body-large() {
 	@include _text-body();
-	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-medium;
+	font-size: wpds.var("--wpds-typography-font-size-lg");
+	line-height: wpds.var("--wpds-typography-line-height-md");
 }
 
 @mixin body-x-large() {
 	@include _text-body();
-	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-x-large;
+	font-size: wpds.var("--wpds-typography-font-size-xl");
+	line-height: wpds.var("--wpds-typography-line-height-xl");
 }
 
 /**
@@ -245,7 +245,7 @@
 
 @mixin caption-style-theme() {
 	color: #555;
-	font-size: variables.$default-font-size;
+	font-size: wpds.var("--wpds-typography-font-size-md");
 	text-align: center;
 
 	.is-dark-theme & {
@@ -280,7 +280,7 @@
 }
 
 @mixin input-control() {
-	font-family: variables.$default-font;
+	font-family: wpds.var("--wpds-typography-font-family-body");
 	padding: 6px 8px;
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: variables.$mobile-text-min-font-size;
@@ -289,7 +289,7 @@
 	@include input-style__neutral();
 
 	@include break-small {
-		font-size: variables.$default-font-size;
+		font-size: wpds.var("--wpds-typography-font-size-md");
 		/* Override core line-height. To be reviewed. */
 		line-height: normal;
 	}
@@ -348,7 +348,7 @@
 	// Fonts smaller than 16px causes mobile safari to zoom.
 	font-size: variables.$mobile-text-min-font-size !important;
 	@include break-small {
-		font-size: variables.$default-font-size !important;
+		font-size: wpds.var("--wpds-typography-font-size-md") !important;
 	}
 
 	&:focus {
