@@ -284,13 +284,12 @@ function entity( entityConfig: EntityConfig ) {
 								Record< string, unknown >
 							>( ( acc, key ) => {
 								if ( entityConfig.partialEdits?.[ key ] ) {
+									const partial = edits[ key ] as Record<
+										string,
+										unknown
+									>;
 									const remaining = Object.fromEntries(
-										Object.entries(
-											edits[ key ] as Record<
-												string,
-												unknown
-											>
-										).filter(
+										Object.entries( partial ).filter(
 											( [ itemKey, value ] ) =>
 												! fastDeepEqual(
 													value,
@@ -320,8 +319,16 @@ function entity( entityConfig: EntityConfig ) {
 													) )
 										)
 									);
-									if ( Object.keys( remaining ).length ) {
-										acc[ key ] = remaining;
+									const remainingCount =
+										Object.keys( remaining ).length;
+									if ( remainingCount ) {
+										// Filtering only removes keys, so keep the original
+										// object when receiving data clears no partial edits.
+										acc[ key ] =
+											remainingCount ===
+											Object.keys( partial ).length
+												? partial
+												: remaining;
 									}
 									return acc;
 								}

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-import { createRegistry } from '@wordpress/data';
+import { createRegistry, RegistryProvider, useSelect } from '@wordpress/data';
+import { createElement, useEffect } from '@wordpress/element';
+import { render } from '@testing-library/react';
 import { store as coreDataStore } from '../index';
 import { registerEntitySyncManager } from '../entity-sync';
 import type { EntitySyncManager } from '../entity-sync';
@@ -130,6 +132,181 @@ describe( 'saving edited post metadata', () => {
 			data: { id: 1, meta },
 		} );
 	}
+
+	it.each( [ false, true ] )(
+		'preserves the resolved metadata reference across non-meta edits (pending meta: %s)',
+		( pendingMeta ) => {
+			if ( pendingMeta ) {
+				editMeta( { first: 'edited first' } );
+			}
+			const meta = getMeta();
+
+			actions.editEntityRecord(
+				'postType',
+				'post',
+				post.id,
+				{ content: 'Edited content' },
+				{ isCached: true }
+			);
+			expect( getMeta() ).toBe( meta );
+			receive( { ...post, title: 'Server title' } );
+			expect( getMeta() ).toBe( meta );
+			actions.editEntityRecord(
+				'postType',
+				'post',
+				post.id,
+				{ selection: { start: 0, end: 0 } },
+				{ undoIgnore: true }
+			);
+			expect( getMeta() ).toBe( meta );
+
+			editMeta( { second: 'edited second' } );
+			const updatedMeta = getMeta();
+			expect( updatedMeta ).not.toBe( meta );
+			expect( updatedMeta ).toEqual( {
+				first: pendingMeta ? 'edited first' : 'saved first',
+				second: 'edited second',
+			} );
+
+			receive( {
+				...post,
+				meta: { ...post.meta, third: 'server third' },
+			} );
+			expect( getMeta() ).not.toBe( updatedMeta );
+			expect( getMeta() ).toEqual( {
+				...updatedMeta,
+				third: 'server third',
+			} );
+		}
+	);
+
+	it( 'preserves references for interleaved records with missing raw metadata', () => {
+		actions.addEntities( [
+			{
+				kind: 'custom',
+				name: 'record',
+				baseURL: '/custom/record',
+				key: 'id',
+				mergedEdits: { meta: true },
+				partialEdits: { meta: true },
+			},
+		] );
+		actions.receiveEntityRecords( 'custom', 'record', [
+			{ id: 1, title: 'First record' },
+			{ id: 2, title: 'Second record' },
+		] );
+		for ( const id of [ 1, 2 ] ) {
+			actions.finishResolution( 'getEntityRecord', [
+				'custom',
+				'record',
+				id,
+			] );
+			actions.editEntityRecord( 'custom', 'record', id, {
+				meta: { field: `Record ${ id }` },
+			} );
+		}
+		const getCustomMeta = ( id: number ) =>
+			(
+				selectors.getEditedEntityRecord( 'custom', 'record', id ) as {
+					meta: Meta;
+				}
+			 ).meta;
+		const firstMeta = getCustomMeta( 1 );
+		const secondMeta = getCustomMeta( 2 );
+
+		actions.editEntityRecord( 'custom', 'record', 1, {
+			title: 'Updated first record',
+		} );
+		expect( getCustomMeta( 1 ) ).toBe( firstMeta );
+		actions.editEntityRecord( 'custom', 'record', 2, {
+			title: 'Updated second record',
+		} );
+		expect( getCustomMeta( 2 ) ).toBe( secondMeta );
+		expect( apiFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'preserves references for partial properties with missing persisted values', () => {
+		actions.addEntities( [
+			{
+				kind: 'custom',
+				name: 'record',
+				baseURL: '/custom/record',
+				key: 'id',
+				mergedEdits: { meta: true, preferences: true },
+				partialEdits: { meta: true, preferences: true },
+			},
+		] );
+		actions.receiveEntityRecords( 'custom', 'record', { id: 1 } );
+		actions.finishResolution( 'getEntityRecord', [
+			'custom',
+			'record',
+			1,
+		] );
+		actions.editEntityRecord( 'custom', 'record', 1, {
+			meta: { field: 'Metadata value' },
+			preferences: { field: 'Preference value' },
+		} );
+		const before = selectors.getEditedEntityRecord(
+			'custom',
+			'record',
+			1
+		) as unknown as { meta: Meta; preferences: Meta };
+
+		actions.editEntityRecord( 'custom', 'record', 1, {
+			title: 'Updated record',
+		} );
+		const after = selectors.getEditedEntityRecord(
+			'custom',
+			'record',
+			1
+		) as unknown as { meta: Meta; preferences: Meta };
+		expect( after.meta ).toBe( before.meta );
+		expect( after.preferences ).toBe( before.preferences );
+		expect( apiFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not retrigger a metadata consumer for transient-only edits', () => {
+		editMeta( { first: 'edited first' } );
+		let effectCalls = 0;
+
+		function MetaConsumer() {
+			const { meta } = useSelect(
+				( select ) => ( {
+					meta: (
+						select( coreDataStore ).getEditedEntityRecord(
+							'postType',
+							'post',
+							post.id
+						) as TestPost
+					 ).meta,
+				} ),
+				[]
+			);
+			useEffect( () => {
+				effectCalls++;
+				// Bound the feedback path so a regression cannot hang the test.
+				if ( effectCalls < 4 ) {
+					actions.editEntityRecord(
+						'postType',
+						'post',
+						post.id,
+						{ selection: { start: 0, end: 0 } },
+						{ undoIgnore: true }
+					);
+				}
+			}, [ meta ] );
+			return null;
+		}
+
+		render(
+			createElement(
+				RegistryProvider,
+				{ value: registry },
+				createElement( MetaConsumer )
+			)
+		);
+		expect( effectCalls ).toBe( 1 );
+	} );
 
 	it( 'sends only the edited key and keeps untouched default and invalid values out of the request', async () => {
 		post.meta = {

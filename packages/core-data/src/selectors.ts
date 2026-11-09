@@ -1020,6 +1020,34 @@ export function hasEditsForEntityRecord(
 	);
 }
 
+// Cache each merged property independently of edits to the rest of the record.
+// Consumers can then depend on metadata without reacting to content or selection.
+const getMergedPartialEntityProperty = createSelector(
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey | undefined,
+		property: string
+	) => {
+		const raw = getRawEntityRecord( state, kind, name, recordId );
+		const edited = getEntityRecordEdits( state, kind, name, recordId );
+		return { ...raw?.[ property ], ...edited?.[ property ] };
+	},
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey | undefined,
+		property: string
+	) => [
+		// Keep the edited object first so a missing persisted value does not
+		// share the memoizer's primitive cache with other records or properties.
+		getEntityRecordEdits( state, kind, name, recordId )?.[ property ],
+		getRawEntityRecord( state, kind, name, recordId )?.[ property ],
+	]
+);
+
 /**
  * Returns the specified entity record, merged with its edits.
  *
@@ -1055,7 +1083,13 @@ export const getEditedEntityRecord = createSelector(
 			getEntityConfig( state, kind, name ) || {};
 		for ( const key of Object.keys( partialEdits ) ) {
 			if ( partialEdits[ key ] && edited?.[ key ] !== undefined ) {
-				merged[ key ] = { ...raw?.[ key ], ...edited[ key ] };
+				merged[ key ] = getMergedPartialEntityProperty(
+					state,
+					kind,
+					name,
+					recordId,
+					key
+				);
 			}
 		}
 		return merged;
