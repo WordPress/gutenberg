@@ -183,6 +183,8 @@ function gutenberg_state_paints_own_background( array $state_style ): bool {
  * @param array<string, mixed> $state_style State style object.
  * @param string               $base_clip   Background clip of the styles the state layers over.
  * @return array<string, string> CSS declarations, empty when no escape is needed.
+ *
+ * @phpstan-return array{ 'background-image'?: 'unset' }
  */
 function gutenberg_get_state_text_clip_escape( array $state_style, string $base_clip ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
@@ -205,6 +207,8 @@ function gutenberg_get_state_text_clip_escape( array $state_style, string $base_
  *
  * @param array<string, mixed> $state_style State style object.
  * @return array<string, string> CSS declarations, empty when no reset is needed.
+ *
+ * @phpstan-return array{ '-webkit-text-fill-color'?: 'currentColor' }
  */
 function gutenberg_get_state_text_fill_reset( array $state_style ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
@@ -288,9 +292,11 @@ function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
 /**
  * Splits a state style object into groups based on block feature selectors.
  *
- * @param array $state_style     State style object.
- * @param array $block_selectors Block selectors metadata.
+ * @param array<string, mixed>                        $state_style     State style object.
+ * @param array<string, string|array<string, string>> $block_selectors Block selectors metadata.
  * @return array[] Selector/style groups.
+ *
+ * @phpstan-param array{ root?: string, ...<string, string|array<string, string>> } $block_selectors
  */
 function gutenberg_get_state_style_groups( $state_style, $block_selectors ) {
 	$groups = array();
