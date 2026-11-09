@@ -1222,9 +1222,6 @@
 				"core/paragraph": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
-				"core/pattern": {
-					"$ref": "#/definitions/settingsBlockPropertiesComplete"
-				},
 				"core/playlist": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
@@ -2917,9 +2914,6 @@
 				"core/paragraph": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/pattern": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/playlist": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -3487,9 +3481,6 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/paragraph": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
-				},
-				"core/pattern": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/playlist": {
