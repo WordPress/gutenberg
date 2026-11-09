@@ -48,7 +48,7 @@
 
 	/* Also targets textarea elements, which the `Input` primitive can render as. We combine these textarea defenses
 	   into the input defenses to minimize the number of tokens, but they should be split if it ever becomes necessary. */
-	&:is(textarea, :not([type]), [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
+	&:is(textarea, [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
 		box-shadow: var(--_gcd-input-box-shadow, 0 0 0 transparent);
 		border-radius: var(--_gcd-input-border-radius, 0);
 		border: var(--_gcd-input-border, none);
@@ -61,7 +61,7 @@
 			outline: var(--_gcd-input-outline-focus, none);
 		}
 
-		&:is(:disabled, [aria-disabled="true"]) {
+		&:disabled {
 			background: var(--_gcd-input-background-disabled, transparent);
 			border-color: var(--_gcd-input-border-color-disabled, transparent);
 			box-shadow: var(--_gcd-input-box-shadow-disabled, none);
@@ -69,10 +69,22 @@
 		}
 	}
 
-	&:is(textarea, :not([type]), [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
+	&:is(textarea, [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
 		padding: var(--_gcd-input-padding, 0);
 		line-height: var(--_gcd-input-line-height, inherit);
 		min-height: var(--_gcd-input-min-height, auto);
+	}
+
+	/* Untyped inputs only match the forms.css rules for read-only and disabled inputs. */
+	&:is(input):not([type]) {
+		&[readonly] {
+			background-color: var(--_gcd-input-background-color, transparent);
+		}
+
+		&:disabled {
+			background: var(--_gcd-input-background-disabled, transparent);
+			color: var(--_gcd-input-color-disabled, var(--wpds-color-foreground-interactive-neutral-disabled));
+		}
 	}
 }
 
