@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `DashboardGrid` and `DashboardLanes` mount tiles after they measure their container, so a tile that reads its span or size when it mounts gets the measured column count instead of one column.
+-   `DashboardGrid` and `DashboardLanes` mount tiles after they measure their container, so a tile that reads its span or size when it mounts gets the measured column count instead of one column ([#86508](https://github.com/WordPress/gutenberg/pull/86508)).
 
 ### Internal
 
