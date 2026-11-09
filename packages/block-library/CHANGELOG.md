@@ -11,6 +11,7 @@
 -   Tabs: Open the tab panels when an HTML anchor on the Tabs block or a Tab Panel contains a character such as `&` or `'`, instead of leaving them hidden ([#86415](https://github.com/WordPress/gutenberg/pull/86415)).
 -   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
 -   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
+-   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 
 ## 12.1.0 (2026-11-04)
 
@@ -137,7 +138,6 @@
 -   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
 -   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
 -   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
--   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 
 ### Internal
 
