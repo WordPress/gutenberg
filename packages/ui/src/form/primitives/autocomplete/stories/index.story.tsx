@@ -695,73 +695,6 @@ function chunkItems< T >( items: T[], size: number ): T[][] {
 	return rows;
 }
 
-type EmojiGroup = ( typeof EMOJI_GROUPS )[ number ];
-type Emoji = EmojiGroup[ 'items' ][ number ];
-
-function EmojiGrid( {
-	onItemClick,
-}: {
-	onItemClick?: ( emoji: Emoji ) => void;
-} ) {
-	return (
-		<>
-			<Autocomplete.Input
-				aria-label="Search emojis"
-				placeholder="Search emojis"
-			/>
-			<div
-				style={ {
-					marginTop: 'var(--wpds-dimension-gap-sm)',
-				} }
-			>
-				<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
-				<Autocomplete.List aria-label="Emojis">
-					{ ( group: EmojiGroup ) => (
-						<Autocomplete.Group
-							key={ group.value }
-							items={ group.items }
-						>
-							<Autocomplete.GroupLabel>
-								{ group.label }
-							</Autocomplete.GroupLabel>
-							{ chunkItems( group.items, EMOJI_COLUMNS ).map(
-								( row, rowIndex ) => (
-									<Autocomplete.Row
-										key={ rowIndex }
-										style={ emojiPickerRowStyle }
-									>
-										{ row.map( ( emoji ) => (
-											<Autocomplete.Item
-												key={ emoji.value }
-												value={ emoji }
-												aria-label={ emoji.label }
-												style={ emojiPickerCellStyle }
-												onClick={ () =>
-													onItemClick?.( emoji )
-												}
-											>
-												<Autocomplete.ItemLabel
-													style={
-														emojiPickerLabelStyle
-													}
-												>
-													<span aria-hidden="true">
-														{ emoji.emoji }
-													</span>
-												</Autocomplete.ItemLabel>
-											</Autocomplete.Item>
-										) ) }
-									</Autocomplete.Row>
-								)
-							) }
-						</Autocomplete.Group>
-					) }
-				</Autocomplete.List>
-			</div>
-		</>
-	);
-}
-
 /**
  * `Autocomplete.Row` groups multiple `Autocomplete.Item` cells into grid rows.
  * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
@@ -773,11 +706,64 @@ export const Grid: Story = {
 		open: true,
 		grid: true,
 	},
-	render: ( args ) => (
-		<Autocomplete.Root { ...args }>
-			<EmojiGrid />
-		</Autocomplete.Root>
-	),
+	render: function Template( args ) {
+		return (
+			<Autocomplete.Root { ...args }>
+				<Autocomplete.Input
+					aria-label="Search emojis"
+					placeholder="Search emojis"
+				/>
+				<div
+					style={ {
+						marginTop: 'var(--wpds-dimension-gap-sm)',
+					} }
+				>
+					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
+					<Autocomplete.List aria-label="Emojis">
+						{ ( group: ( typeof EMOJI_GROUPS )[ number ] ) => (
+							<Autocomplete.Group
+								key={ group.value }
+								items={ group.items }
+							>
+								<Autocomplete.GroupLabel>
+									{ group.label }
+								</Autocomplete.GroupLabel>
+								{ chunkItems( group.items, EMOJI_COLUMNS ).map(
+									( row, rowIndex ) => (
+										<Autocomplete.Row
+											key={ rowIndex }
+											style={ emojiPickerRowStyle }
+										>
+											{ row.map( ( emoji ) => (
+												<Autocomplete.Item
+													key={ emoji.value }
+													value={ emoji }
+													aria-label={ emoji.label }
+													style={
+														emojiPickerCellStyle
+													}
+												>
+													<Autocomplete.ItemLabel
+														style={
+															emojiPickerLabelStyle
+														}
+													>
+														<span aria-hidden="true">
+															{ emoji.emoji }
+														</span>
+													</Autocomplete.ItemLabel>
+												</Autocomplete.Item>
+											) ) }
+										</Autocomplete.Row>
+									)
+								) }
+							</Autocomplete.Group>
+						) }
+					</Autocomplete.List>
+				</div>
+			</Autocomplete.Root>
+		);
+	},
 };
 
 /**
@@ -811,12 +797,77 @@ export const InlineInPopover: Story = {
 							Insert emoji
 						</VisuallyHidden>
 						<Autocomplete.Root { ...args }>
-							<EmojiGrid
-								onItemClick={ ( emoji ) => {
-									setPickedEmoji( emoji.emoji );
-									setIsPopoverOpen( false );
-								} }
+							<Autocomplete.Input
+								aria-label="Search emojis"
+								placeholder="Search emojis"
 							/>
+							<div
+								style={ {
+									marginTop: 'var(--wpds-dimension-gap-sm)',
+								} }
+							>
+								<Autocomplete.Empty>
+									No matching emojis.
+								</Autocomplete.Empty>
+								<Autocomplete.List aria-label="Emojis">
+									{ (
+										group: ( typeof EMOJI_GROUPS )[ number ]
+									) => (
+										<Autocomplete.Group
+											key={ group.value }
+											items={ group.items }
+										>
+											<Autocomplete.GroupLabel>
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											{ chunkItems(
+												group.items,
+												EMOJI_COLUMNS
+											).map( ( row, rowIndex ) => (
+												<Autocomplete.Row
+													key={ rowIndex }
+													style={
+														emojiPickerRowStyle
+													}
+												>
+													{ row.map( ( emoji ) => (
+														<Autocomplete.Item
+															key={ emoji.value }
+															value={ emoji }
+															aria-label={
+																emoji.label
+															}
+															style={
+																emojiPickerCellStyle
+															}
+															onClick={ () => {
+																setPickedEmoji(
+																	emoji.emoji
+																);
+																setIsPopoverOpen(
+																	false
+																);
+															} }
+														>
+															<Autocomplete.ItemLabel
+																style={
+																	emojiPickerLabelStyle
+																}
+															>
+																<span aria-hidden="true">
+																	{
+																		emoji.emoji
+																	}
+																</span>
+															</Autocomplete.ItemLabel>
+														</Autocomplete.Item>
+													) ) }
+												</Autocomplete.Row>
+											) ) }
+										</Autocomplete.Group>
+									) }
+								</Autocomplete.List>
+							</div>
 						</Autocomplete.Root>
 					</Popover.Popup>
 				</Popover.Root>
