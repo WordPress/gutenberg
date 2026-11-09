@@ -623,6 +623,13 @@ describe( 'sortResults', () => {
 				type: 'page',
 				kind: 'post-type',
 			},
+			{
+				id: 4,
+				title: '“Coffee Beans”',
+				url: 'http://wordpress.local/coffee-beans-3/',
+				type: 'page',
+				kind: 'post-type',
+			},
 		];
 
 		expect(
@@ -632,6 +639,7 @@ describe( 'sortResults', () => {
 		).toEqual( [
 			'Coffee Beans', // the words searched
 			'Coffee Beans.', // the words searched, ending with a period
+			'“Coffee Beans”', // the words searched, in quotes, so it does not begin with the search
 			'Coffee Beans, Lightly Roasted', // begins with the search, but has words the search does not
 		] );
 	} );
