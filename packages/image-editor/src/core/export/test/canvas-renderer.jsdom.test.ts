@@ -724,6 +724,12 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		const { width, height } = renderToCanvas( mockImage, state );
 
 		expect( { width, height } ).toEqual( { width: 20000, height: 10000 } );
+		// The whole image is drawn 1:1, not through the 1.0005 zoom, so no
+		// pixel is resampled and the edges are not clipped.
+		const matrix = mockCtx.setTransform.mock.calls[ 0 ].map(
+			( value: number ) => Math.round( value * 1e6 ) / 1e6
+		);
+		expect( matrix ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
 	} );
 
 	it( 'horizontal flip should negate the x-scale component', () => {

@@ -1,6 +1,7 @@
 import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
 import { getOutputSize } from '../../get-output-size';
+import { mapEditToOriginal } from '../../map-edit-to-original';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
 const DEFAULT_QUALITY = 0.92;
@@ -48,12 +49,31 @@ export function renderToCanvas(
 	// and treats a crop within a hair of the full frame as no crop, as the
 	// server path does. The element is what gets drawn, so its natural size
 	// is the one that counts, whatever `state.image` says.
-	const outputSize = getOutputSize( {
+	const sizedState = {
 		...state,
 		image: { src: state.image?.src ?? '', naturalWidth, naturalHeight },
-	} ) ?? { width: 0, height: 0 };
+	};
+	const outputSize = getOutputSize( sizedState ) ?? { width: 0, height: 0 };
 	const outW = Math.round( outputSize.width );
 	const outH = Math.round( outputSize.height );
+
+	// When the crop is too near full to be saved, the file is the whole
+	// image and only the flip and rotation apply. Drawing it through the
+	// state's zoom and pan would scale it by a hair and resample every
+	// pixel, so draw it at 1:1 instead, as the server path leaves it.
+	const hasCrop = mapEditToOriginal( sizedState ).some(
+		( edit ) => edit.type === 'crop'
+	);
+	const drawState: InternalImageEditorState = hasCrop
+		? state
+		: {
+				...state,
+				zoom: 1,
+				baseZoom: 1,
+				pan: { x: 0, y: 0 },
+				basePan: { x: 0, y: 0 },
+				cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			};
 
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = outW;
@@ -65,7 +85,7 @@ export function renderToCanvas(
 		);
 	}
 
-	const camera = createExportCamera( state, imageSize, {
+	const camera = createExportCamera( drawState, imageSize, {
 		width: outW,
 		height: outH,
 	} );
