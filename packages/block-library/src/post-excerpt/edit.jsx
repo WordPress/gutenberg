@@ -147,8 +147,10 @@ export default function PostExcerptEditor( props ) {
 	 * trimmed on the server, using the same filters that run on the front end.
 	 * Dragging the range control would otherwise trigger a request for every
 	 * intermediate value, so the length used for the request is debounced.
-	 * The control itself and the client-side trimming below keep using the
-	 * attribute directly, so the UI stays responsive while dragging.
+	 * It is updated from the events that change the length, since blocks
+	 * avoid effects. The control itself and the client-side trimming below
+	 * keep using the attribute directly, so the UI stays responsive while
+	 * dragging.
 	 */
 	const [ requestedExcerptLength, setRequestedExcerptLength ] =
 		useState( excerptLength );
@@ -156,9 +158,10 @@ export default function PostExcerptEditor( props ) {
 		setRequestedExcerptLength,
 		300
 	);
-	useEffect( () => {
-		debouncedSetRequestedExcerptLength( excerptLength );
-	}, [ excerptLength, debouncedSetRequestedExcerptLength ] );
+	const setExcerptLength = ( value ) => {
+		setAttributes( { excerptLength: value } );
+		debouncedSetRequestedExcerptLength( value );
+	};
 
 	const generatedExcerpt = useGeneratedExcerpt(
 		postType,
@@ -344,6 +347,7 @@ export default function PostExcerptEditor( props ) {
 							showMoreOnNewLine: true,
 							excerptLength: 55,
 						} );
+						debouncedSetRequestedExcerptLength( 55 );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -368,17 +372,13 @@ export default function PostExcerptEditor( props ) {
 					<ToolsPanelItem
 						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
-						onDeselect={ () =>
-							setAttributes( { excerptLength: 55 } )
-						}
+						onDeselect={ () => setExcerptLength( 55 ) }
 						isShownByDefault
 					>
 						<RangeControl
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
-							onChange={ ( value ) => {
-								setAttributes( { excerptLength: value } );
-							} }
+							onChange={ setExcerptLength }
 							min="10"
 							max="100"
 						/>
