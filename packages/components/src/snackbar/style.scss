@@ -42,7 +42,7 @@
 	.components-snackbar__icon {
 		position: absolute;
 		left: $grid-unit-10 * -1;
-		top: calc((#{$icon-size - ($default-font-size * $default-line-height)}) / -2);
+		top: calc((#{$icon-size} - (#{$default-font-size} * #{$default-line-height})) / -2);
 	}
 
 	.components-snackbar__dismiss-button {

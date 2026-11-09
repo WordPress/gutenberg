@@ -7,6 +7,7 @@
  */
 
 @use "./colors";
+@use "./internal/wpds-token-fallbacks" as wpds;
 
 /**
  * Fonts & basic variables.
@@ -24,20 +25,20 @@ $default-line-height: 1.4; // Todo: deprecate in favor of $line-height tokens
  */
 
 // Sizes
-$font-size-x-small: 11px;
-$font-size-small: 12px;
-$font-size-medium: 13px;
-$font-size-large: 15px;
-$font-size-x-large: 20px;
-$font-size-2x-large: 32px;
+$font-size-x-small: wpds.var("--wpds-typography-font-size-xs");
+$font-size-small: wpds.var("--wpds-typography-font-size-sm");
+$font-size-medium: wpds.var("--wpds-typography-font-size-md");
+$font-size-large: wpds.var("--wpds-typography-font-size-lg");
+$font-size-x-large: wpds.var("--wpds-typography-font-size-xl");
+$font-size-2x-large: wpds.var("--wpds-typography-font-size-2xl");
 
 // Line heights
-$font-line-height-x-small: 16px;
-$font-line-height-small: 20px;
-$font-line-height-medium: 24px;
-$font-line-height-large: 28px;
-$font-line-height-x-large: 32px;
-$font-line-height-2x-large: 40px;
+$font-line-height-x-small: wpds.var("--wpds-typography-line-height-xs");
+$font-line-height-small: wpds.var("--wpds-typography-line-height-sm");
+$font-line-height-medium: wpds.var("--wpds-typography-line-height-md");
+$font-line-height-large: wpds.var("--wpds-typography-line-height-lg");
+$font-line-height-x-large: wpds.var("--wpds-typography-line-height-xl");
+$font-line-height-2x-large: wpds.var("--wpds-typography-line-height-2xl");
 
 /**
  * Grid System.
@@ -125,7 +126,7 @@ $widget-area-width: 700px;
 $secondary-sidebar-width: 350px;
 $editor-font-size: 16px;
 $default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
-$text-editor-font-size: 15px;
+$text-editor-font-size: wpds.var("--wpds-typography-font-size-lg");
 $editor-line-height: 1.8;
 $editor-html-font: $font-family-mono;
 
@@ -137,7 +138,7 @@ $block-toolbar-height: $grid-unit-60;
 $border-width: 1px;
 $border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 1.5px;
-$helptext-font-size: 12px;
+$helptext-font-size: wpds.var("--wpds-typography-font-size-sm");
 $radio-input-size: 16px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
