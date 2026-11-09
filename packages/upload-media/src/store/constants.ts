@@ -55,3 +55,16 @@ export const HEIC_MIME_TYPES: readonly string[] = [
 	'image/heic',
 	'image/heif',
 ] as const;
+
+/**
+ * HEIC/HEIF image sequence MIME types.
+ *
+ * These are multi-frame HEVC sequences (Apple Live Photos, Android bursts)
+ * stored in an ISOBMFF movie track rather than a single still image. The
+ * server cannot decode them (GD/Imagick read only one frame), so they are
+ * converted client-side to a web-safe video before upload.
+ */
+export const HEIC_SEQUENCE_MIME_TYPES: readonly string[] = [
+	'image/heic-sequence',
+	'image/heif-sequence',
+] as const;

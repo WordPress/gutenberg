@@ -14,7 +14,12 @@ import type {
 	ScheduleRetryAction,
 	State,
 } from './types';
-import { ItemStatus, OperationType, Type } from './types';
+import {
+	isVideoProcessingOperation,
+	ItemStatus,
+	OperationType,
+	Type,
+} from './types';
 import {
 	calculateRetryDelay,
 	clearRetryTimer,
@@ -255,7 +260,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				dispatch.processItem( pending.id );
 			}
 		}
-		if ( currentOperation === OperationType.TranscodeGif ) {
+		if ( isVideoProcessingOperation( currentOperation ) ) {
 			for ( const pending of select.getPendingVideoProcessing() ) {
 				dispatch.processItem( pending.id );
 			}

@@ -138,4 +138,84 @@ class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 		$this->assertFileDoesNotExist( $video_path );
 		$this->assertFileDoesNotExist( $poster_path );
 	}
+
+	/**
+	 * A HEIC/HEIF image sequence uploads as a JPEG still with only a video
+	 * companion — no poster, since the still is already the first frame. The
+	 * cleanup must not depend on the parent being a GIF, nor require a poster
+	 * to be present.
+	 *
+	 * @covers ::gutenberg_delete_animated_gif_video
+	 */
+	public function test_deletes_video_companion_of_a_still_image_attachment() {
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			DIR_TESTDATA . '/images/canola.jpg'
+		);
+
+		$dir        = dirname( get_attached_file( $attachment_id, true ) );
+		$video_name = 'live-photo-test-video.mp4';
+		$video_path = $dir . '/' . $video_name;
+		file_put_contents( $video_path, 'video' );
+		$this->companion_files[] = $video_path;
+
+		$metadata                   = wp_get_attachment_metadata( $attachment_id, true );
+		$metadata                   = is_array( $metadata ) ? $metadata : array();
+		$metadata['animated_video'] = $video_name;
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$this->assertFileExists( $video_path );
+
+		wp_delete_attachment( $attachment_id, true );
+
+		$this->assertFileDoesNotExist( $video_path );
+	}
+
+	/**
+	 * Still frames picked for a Live photo are companions too, and are removed
+	 * with the attachment. Only their basenames are trusted.
+	 *
+	 * @covers ::gutenberg_get_live_photo_still_paths
+	 * @covers ::gutenberg_delete_animated_gif_video
+	 */
+	public function test_deletes_picked_live_photo_stills() {
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			DIR_TESTDATA . '/images/canola.jpg'
+		);
+		$dir           = dirname( get_attached_file( $attachment_id, true ) );
+
+		$stills = array( 'live-photo-still-1.jpg', 'live-photo-still-2.jpg' );
+		foreach ( $stills as $still ) {
+			file_put_contents( $dir . '/' . $still, 'still' );
+			$this->companion_files[] = $dir . '/' . $still;
+		}
+
+		$metadata                      = wp_get_attachment_metadata( $attachment_id, true );
+		$metadata                      = is_array( $metadata ) ? $metadata : array();
+		$metadata['animated_video']    = 'live-photo-test-video.mp4';
+		$metadata['live_photo_stills'] = array( $stills[0], '../../' . $stills[1] );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$this->assertSame(
+			array( $dir . '/' . $stills[0], $dir . '/' . $stills[1] ),
+			gutenberg_get_live_photo_still_paths( $attachment_id )
+		);
+
+		wp_delete_attachment( $attachment_id, true );
+
+		$this->assertFileDoesNotExist( $dir . '/' . $stills[0] );
+		$this->assertFileDoesNotExist( $dir . '/' . $stills[1] );
+	}
+
+	/**
+	 * Registering the sequence MIME types is what lets the original file be
+	 * stored alongside the still the editor uploads in its place.
+	 *
+	 * @covers ::gutenberg_add_heic_upload_mimes
+	 */
+	public function test_registers_heic_sequence_upload_mimes() {
+		$mimes = gutenberg_add_heic_upload_mimes( array() );
+
+		$this->assertSame( 'image/heic-sequence', $mimes['heics'] );
+		$this->assertSame( 'image/heif-sequence', $mimes['heifs'] );
+	}
 }
