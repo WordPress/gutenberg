@@ -878,6 +878,7 @@
       - label
       - role
       - shortcut
+      - showSelectionIndicator
       - suffix
 - name: MenuItemsChoice
   props:

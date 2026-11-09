@@ -34,6 +34,94 @@ const textLeft = ( label: string ) => {
 
 // Popover covers the opening animation; these fixtures measure the final layout.
 describe( 'DropdownMenu row layout', () => {
+	it( 'keeps leading selection labels and menu width stable when toggled', async () => {
+		const CheckboxMenu = () => {
+			const [ selected, setSelected ] = useState( true );
+			return (
+				<DropdownMenu
+					defaultOpen
+					label="Display options"
+					popoverProps={ { animate: false } }
+				>
+					{ () => (
+						<MenuGroup>
+							<MenuItem
+								role="menuitemcheckbox"
+								isSelected={ selected }
+								showSelectionIndicator
+								onClick={ () => setSelected( ! selected ) }
+							>
+								Show details
+							</MenuItem>
+							<MenuItem
+								role="menuitemcheckbox"
+								isSelected={ false }
+								showSelectionIndicator
+							>
+								Show outlines
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+			);
+		};
+		const user = userEvent.setup();
+		await render( <CheckboxMenu /> );
+		const item = screen.getByRole( 'menuitemcheckbox', {
+			name: 'Show details',
+		} );
+		await expect.element( item ).toBeVisible();
+		// The decorative selection mark has no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const indicator = item.querySelector( 'svg' )!;
+		await expect.element( indicator ).toBeVisible();
+		const left = textLeft( 'Show details' );
+		expect( textLeft( 'Show outlines' ) ).toBe( left );
+		expect( indicator.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			left
+		);
+		const menu = screen.getByRole( 'menu' );
+		const width = menu.getBoundingClientRect().width;
+		await user.click( item );
+		expect( item ).not.toBeChecked();
+		expect( indicator ).not.toBeVisible();
+		expect( textLeft( 'Show details' ) ).toBe( left );
+		expect( menu.getBoundingClientRect().width ).toBe( width );
+	} );
+
+	it( 'preserves custom icons and suffixes alongside a selection indicator', async () => {
+		await render(
+			<NavigableMenu>
+				<MenuItem
+					role="menuitemcheckbox"
+					isSelected
+					showSelectionIndicator
+					icon={ <span>Prefix</span> }
+					iconPosition="left"
+					suffix={ <span>Draft</span> }
+				>
+					Show details
+				</MenuItem>
+			</NavigableMenu>
+		);
+		const item = screen.getByRole( 'menuitemcheckbox', {
+			name: /Show details/,
+		} );
+		await expect.element( item ).toBeVisible();
+		// The decorative selection mark has no accessible role to query.
+		// eslint-disable-next-line testing-library/no-node-access
+		const indicator = item.querySelector( 'svg' )!;
+		await expect.element( indicator ).toBeVisible();
+		expect( screen.getByText( 'Prefix' ) ).toBeVisible();
+		expect( screen.getByText( 'Draft' ) ).toBeVisible();
+		expect( indicator.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			screen.getByText( 'Prefix' ).getBoundingClientRect().left
+		);
+		expect( textLeft( 'Show details' ) ).toBeGreaterThan(
+			screen.getByText( 'Prefix' ).getBoundingClientRect().right
+		);
+	} );
+
 	it( 'keeps selection marks inside standalone rows', async () => {
 		await render(
 			<NavigableMenu>

@@ -1,7 +1,7 @@
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
-import { check, moreVertical, plus } from '@wordpress/icons';
+import { moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
@@ -40,12 +40,7 @@ const DefaultControlsGroup = ( {
 					return (
 						<MenuItem
 							key={ label }
-							className={ clsx(
-								itemClassName,
-								selectionStyles.item
-							) }
-							icon={ check }
-							iconPosition="left"
+							className={ itemClassName }
 							role="menuitem"
 							label={ sprintf(
 								// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the reset action, to match the visible menu label order.
@@ -73,12 +68,8 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ check }
-						iconPosition="left"
-						className={ clsx(
-							itemClassName,
-							selectionStyles.item
-						) }
+						showSelectionIndicator
+						className={ itemClassName }
 						role="menuitemcheckbox"
 						isSelected
 						aria-disabled
@@ -117,9 +108,7 @@ const OptionalControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						icon={ check }
-						iconPosition="left"
-						className={ selectionStyles.item }
+						showSelectionIndicator
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
@@ -203,7 +192,12 @@ const ToolsPanelHeader = (
 					{ ...dropdownMenuProps }
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
-					menuProps={ { className: dropdownMenuClassName } }
+					menuProps={ {
+						className: clsx(
+							dropdownMenuClassName,
+							selectionStyles.menu
+						),
+					} }
 					toggleProps={ {
 						size: 'small',
 						description: dropdownMenuDescriptionText,

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import {
-	check,
 	menu,
 	arrowUp,
 	arrowDown,
@@ -155,9 +154,9 @@ export const SingleSelection: StoryObj< typeof DropdownMenu > = {
 };
 
 /**
- * Existing `MenuItem` compositions can provide trailing selection icons.
- * This example preserves that supported layout. For new menus in Gutenberg,
- * use `Menu` from `@wordpress/ui` with leading selection indicators.
+ * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
+ * Set `showSelectionIndicator` to render the check from `isSelected` and keep
+ * labels aligned when unchecked.
  */
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
@@ -191,7 +190,7 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 										key={ option }
 										role="menuitemcheckbox"
 										isSelected={ isSelected }
-										icon={ isSelected ? check : null }
+										showSelectionIndicator
 										onClick={ () => toggleOption( option ) }
 									>
 										{ option }
@@ -243,8 +242,8 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 							<MenuItem
 								role="menuitemcheckbox"
 								isSelected={ showDetails }
-								icon={ showDetails ? check : null }
-								info="Keep the existing custom item layout."
+								showSelectionIndicator
+								info="Display additional information."
 								onClick={ () =>
 									setShowDetails( ! showDetails )
 								}

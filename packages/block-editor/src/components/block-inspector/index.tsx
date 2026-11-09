@@ -12,7 +12,6 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import type { ReactNode } from 'react';
-import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
@@ -507,7 +506,7 @@ const BlockInspectorSingleBlock = ( {
 								<MenuItem
 									role="menuitemcheckbox"
 									isSelected={ showStateOnCanvas }
-									icon={ showStateOnCanvas ? check : null }
+									showSelectionIndicator
 									// Previewing is only meaningful while a
 									// non-default pseudo state is selected.
 									disabled={
