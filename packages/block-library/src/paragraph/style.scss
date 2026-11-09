@@ -16,23 +16,42 @@
 	font-size: 3em;
 }
 
-// Don't show the drop cap when editing the paragraph's content. It causes a
-// number of bugs in combination with `contenteditable` fields. The caret
-// cannot be set around it, caret position calculation fails in Chrome, and
-// typing at the end of the paragraph doesn't work.
-.has-drop-cap:not(:focus)::first-letter {
-	float: left;
-	font-size: 8.4em;
-	line-height: 0.68;
-	font-weight: 100;
-	margin: 0.05em 0.1em 0 0;
+// Base drop cap styling.
+.has-drop-cap::first-letter {
 	text-transform: uppercase;
 	font-style: normal;
 }
 
-body.rtl .has-drop-cap:not(:focus)::first-letter {
-	float: initial;
-	margin-left: 0.1em;
+// For browsers that support initial-letter, keep the drop cap in normal text flow
+// without floating. This keeps the initial letter visible during editing and
+// avoids layout reflows that displace the caret when clicking into the paragraph.
+@supports (initial-letter: 1) or (-webkit-initial-letter: 1) {
+	.has-drop-cap::first-letter {
+		margin: 0;
+		margin-inline-end: 0.1em;
+		-webkit-initial-letter: 3;
+		initial-letter: 3;
+	}
+}
+
+// Fallback for browsers without initial-letter support.
+// Don't show the float-based drop cap when editing the paragraph's content. It causes a
+// number of bugs in combination with `contenteditable` fields. The caret
+// cannot be set around it, caret position calculation fails in Chrome, and
+// typing at the end of the paragraph doesn't work.
+@supports not ((initial-letter: 1) or (-webkit-initial-letter: 1)) {
+	.has-drop-cap:not(:focus)::first-letter {
+		float: left;
+		font-size: 8.4em;
+		line-height: 0.68;
+		font-weight: 100;
+		margin: 0.05em 0.1em 0 0;
+	}
+
+	body.rtl .has-drop-cap:not(:focus)::first-letter {
+		float: initial;
+		margin-left: 0.1em;
+	}
 }
 
 // Prevent the dropcap from breaking out of the box when a background is applied.
