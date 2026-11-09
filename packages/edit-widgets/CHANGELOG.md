@@ -6,6 +6,7 @@
 
 -   Load sidebar widgets when an empty block-widget instance has no content, preserving its editable paragraph and widget ID ([#85044](https://github.com/WordPress/gutenberg/pull/85044)).
 
+
 ## 7.1.0 (2026-11-04)
 
 ## 7.0.0 (2026-10-20)
