@@ -38,6 +38,8 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 			$this->get_the_terms_filter = null;
 		}
 
+		remove_theme_support( 'block-template-parts' );
+
 		parent::tear_down();
 	}
 
@@ -196,5 +198,100 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		$this->assertSame( $expected, $output );
 		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
 		$this->assertSame( 1, $error_action->get_call_count(), 'One error should be reported.' );
+	}
+
+	/**
+	 * Tests that template part variations preserve descriptions when set,
+	 * and fall back to a non-breaking space when empty or whitespace-only.
+	 *
+	 * @covers ::gutenberg_build_template_part_block_instance_variations
+	 */
+	public function test_build_template_part_block_instance_variations_description() {
+		add_theme_support( 'block-template-parts' );
+
+		$with_desc_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Header with Description',
+				'post_name'    => 'header-with-desc',
+				'post_excerpt' => 'Site header navigation description',
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $with_desc_id );
+		wp_set_post_terms( $with_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $with_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
+
+		$empty_desc_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Header Empty Description',
+				'post_name'    => 'header-empty-desc',
+				'post_excerpt' => '',
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $empty_desc_id );
+		wp_set_post_terms( $empty_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $empty_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
+
+		$whitespace_desc_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Header Whitespace Description',
+				'post_name'    => 'header-whitespace-desc',
+				'post_excerpt' => "  \n\t ",
+				'post_content' => self::POST_CONTENT,
+			),
+			true
+		);
+		$this->assertNotWPError( $whitespace_desc_id );
+		$whitespace_desc_post = get_post( $whitespace_desc_id );
+		$this->assertInstanceOf( WP_Post::class, $whitespace_desc_post );
+		$this->assertSame( "  \n\t ", $whitespace_desc_post->post_excerpt, 'The whitespace-only excerpt should be stored unchanged.' );
+		wp_set_post_terms( $whitespace_desc_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $whitespace_desc_id, array( WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part_area' );
+
+		$variations = gutenberg_build_template_part_block_instance_variations();
+
+		$with_desc_variation       = null;
+		$empty_desc_variation      = null;
+		$whitespace_desc_variation = null;
+
+		foreach ( $variations as $variation ) {
+			if ( 'instance_header-with-desc' === $variation['name'] ) {
+				$with_desc_variation = $variation;
+			} elseif ( 'instance_header-empty-desc' === $variation['name'] ) {
+				$empty_desc_variation = $variation;
+			} elseif ( 'instance_header-whitespace-desc' === $variation['name'] ) {
+				$whitespace_desc_variation = $variation;
+			}
+		}
+
+		$this->assertNotNull( $with_desc_variation, 'Variation with description should exist.' );
+		$this->assertSame(
+			'Site header navigation description',
+			$with_desc_variation['description'],
+			'Template part with description should retain its description string.'
+		);
+
+		$this->assertNotNull( $empty_desc_variation, 'Variation with empty description should exist.' );
+		$this->assertSame(
+			"\u{00A0}",
+			$empty_desc_variation['description'],
+			'Template part with empty description should fall back to non-breaking space (U+00A0).'
+		);
+
+		$this->assertIsArray( $whitespace_desc_variation, 'Variation with whitespace-only description should exist.' );
+		$this->assertSame(
+			"\u{00A0}",
+			$whitespace_desc_variation['description'],
+			'Template part with whitespace-only description should fall back to non-breaking space (U+00A0).'
+		);
 	}
 }

@@ -19,7 +19,6 @@ import {
 	MAX_ZOOM,
 } from '../../core/constants';
 import { getMinZoom } from '../../core/containment';
-import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
 	areImageEditorStatesEqual,
@@ -70,11 +69,6 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	maxZoom: number;
 	/** How far fine rotation goes either way of a quarter turn, in degrees. */
 	maxRotationOffset: number;
-	/**
-	 * Export the cropped image as a Blob. Throws on failure — see
-	 * `exportCroppedImage` for error semantics.
-	 */
-	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
 	 * Called by `ImageEditorCanvas` when the viewport changes (window or canvas
 	 * resize); not for consumers to call. Like `setCropRect`, except that
@@ -309,23 +303,6 @@ export function useInternalImageEditor(
 
 	const isDirty = isStateDirty( state, baseline );
 
-	const getCroppedImage = useCallback(
-		( mimeType?: string, quality?: number ): Promise< Blob > => {
-			if ( ! state.image ) {
-				return Promise.reject(
-					new Error( 'No image loaded — call setImage first.' )
-				);
-			}
-			return exportCroppedImage(
-				state.image.src,
-				state,
-				mimeType,
-				quality
-			);
-		},
-		[ state ]
-	);
-
 	// A refit after a window resize is not something the person did.
 	const adjustCropRectForViewport = useCallback(
 		( rect: NormalizedRect ) => {
@@ -349,7 +326,6 @@ export function useInternalImageEditor(
 				minZoom,
 				maxZoom: MAX_ZOOM,
 				maxRotationOffset: MAX_ROTATION_OFFSET,
-				getCroppedImage,
 				adjustCropRectForViewport,
 			} ) as InternalImageEditorController,
 		[
@@ -359,7 +335,6 @@ export function useInternalImageEditor(
 			reset,
 			isDirty,
 			minZoom,
-			getCroppedImage,
 			adjustCropRectForViewport,
 		]
 	);

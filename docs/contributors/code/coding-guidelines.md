@@ -816,7 +816,40 @@ The easiest way to use PHPCS is [local environment](/docs/contributors/code/gett
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
 
-PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in `lib/`, and all the PHP that WordPress core ships from this repository: the PHP in packages such as `block-library`, and the PHP templates in `packages/wp-build/templates`. The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves. After running `composer install` and `npm run build`, which generates PHP files that the analysis needs, run `composer phpstan`, or `npm run typecheck:php` to run it in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment). Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched; regenerate the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`) and commit the result. The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: `tools/phpstan/wordpress-stubs/composer.json` records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access. To update them to the latest trunk, run `composer phpstan:generate-wordpress-stubs -- --commit=trunk`, then `composer update` and `composer phpstan:baselines`, and commit the updated `composer.json`. When a change depends on a wordpress-develop pull request, generate the stubs from that pull request with `--pr=<number>`, so that the analysis knows what the pull request adds, and commit the `composer.json` with the change. While working on both, `--checkout` generates them from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, but those stubs cannot be generated in CI, so use `--pr` before pushing. Once the core change is committed, regenerate them with `--commit=trunk` before merging. To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of `phpstan.neon.dist`. The tests in `phpunit/` are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
+### Static analysis with PHPStan
+
+PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in [`lib/`](https://github.com/WordPress/gutenberg/tree/HEAD/lib), and all the PHP that WordPress core ships from this repository: the PHP in packages such as [`block-library`](/packages/block-library/README.md), and the PHP templates in [`packages/wp-build/templates`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/templates). The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves.
+
+#### Running the analysis
+
+First run `composer install` and `npm run build`, which generates PHP files that the analysis needs. Then run the analysis in either of these ways:
+
+-   `composer phpstan`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php`, in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment).
+
+#### The baseline
+
+Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched. Regenerate the baseline in either of these ways, and commit the result:
+
+-   `composer phpstan:baselines`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:baselines`, in the local environment.
+
+#### WordPress stubs
+
+The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: [`tools/phpstan/wordpress-stubs/composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access.
+
+The stubs are generated by [`tools/phpstan/generate-wordpress-stubs.php`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/generate-wordpress-stubs.php), run with `composer phpstan:generate-wordpress-stubs -- <option>`, where the option is one of:
+
+-   `--commit=trunk`: Updates the stubs to the latest core trunk.
+-   `--pr=<number>`: Generates the stubs from a wordpress-develop pull request that a change depends on, so that the analysis knows what the pull request adds.
+-   `--checkout`: Generates the stubs from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, while working on both. Those stubs cannot be generated in CI, so use `--pr` before pushing.
+-   `--checkout --pr=<number>`: Once the pull request's branch is checked out with no uncommitted changes and pushed, records the same source as `--pr` without fetching anything.
+
+After generating them, run `composer update` and `composer phpstan:baselines`, and commit the updated [`composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) with the change. When the stubs come from a pull request, regenerate them with `--commit=trunk` once the core change is committed, before merging.
+
+#### Local configuration
+
+To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist). The tests in [`phpunit/`](https://github.com/WordPress/gutenberg/tree/HEAD/phpunit) are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
 
 ```neon
 includes:
