@@ -172,13 +172,19 @@ export default function PageListEdit( {
 		[ savedPages ]
 	);
 
+	// Asking about the collection only answers whether pages can be created,
+	// so this asks about a page. The default roles that can edit one page can
+	// edit them all.
+	const firstPageId = savedPages?.[ 0 ]?.id;
 	const canReorderPages = useSelect(
 		( select ) =>
+			!! firstPageId &&
 			!! select( coreStore ).canUser( 'update', {
 				kind: 'postType',
 				name: 'page',
+				id: firstPageId,
 			} ),
-		[]
+		[ firstPageId ]
 	);
 
 	const pages = useMemo(
