@@ -1,8 +1,3 @@
-/**
- * Reports strings that read or set a `--wp-components-color-*` variable.
- * The config turns it off in the packages that still own these variables.
- */
-
 const PATTERN = /--wp-components-color-/;
 
 /** @type {import('eslint').Rule.RuleModule} */
