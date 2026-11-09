@@ -103,6 +103,15 @@ function getEventConstructor( interfaceName: string ) {
 }
 
 /**
+ * Whether an event carries modifier state. Only the keyboard and mouse interfaces have it.
+ *
+ * @param event Event from the iframe document.
+ */
+function hasModifierState( event: Event ): event is KeyboardEvent | MouseEvent {
+	return 'getModifierState' in event;
+}
+
+/**
  * Copies an iframe document event into an event of the parent document, ready
  * to dispatch on the outer `<iframe>` element.
  *
@@ -127,10 +136,12 @@ export function cloneEvent( event: Event, frame: HTMLIFrameElement ) {
 		];
 	}
 
-	for ( const member in MODIFIER_MEMBERS ) {
-		init[ member ] = ( event as KeyboardEvent ).getModifierState(
-			MODIFIER_MEMBERS[ member as keyof typeof MODIFIER_MEMBERS ]
-		);
+	if ( hasModifierState( event ) ) {
+		for ( const [ member, modifier ] of Object.entries(
+			MODIFIER_MEMBERS
+		) ) {
+			init[ member ] = event.getModifierState( modifier );
+		}
 	}
 
 	// Check if the event is a MouseEvent generated within the iframe.
