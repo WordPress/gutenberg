@@ -35,5 +35,4 @@ $components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-fo
 $components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);
 
 // Semantic aliases (prefer these over raw gray values when applicable).
-$components-color-border: #{ $components-color-gray-600 };
 $components-color-disabled: #{ $components-color-gray-600 };

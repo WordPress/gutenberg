@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .border-control {
 	border: 0;
@@ -48,7 +47,7 @@
 		border-end-start-radius: $radius-small;
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;
-		border: $border-width solid $components-color-border;
+		border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 	}
 }
 

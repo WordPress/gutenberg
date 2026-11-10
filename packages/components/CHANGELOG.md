@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders.
+
 ### Bug Fixes
 
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).

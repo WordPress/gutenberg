@@ -3,7 +3,7 @@
 
 .circle-root {
 	border-radius: $radius-round;
-	border: $border-width solid $components-color-border;
+	border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 	box-sizing: border-box;
 	cursor: grab;
 	height: 32px;
