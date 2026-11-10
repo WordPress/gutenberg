@@ -9,33 +9,40 @@ $attributes = get_defined_vars()['attributes'];
 $page       = $attributes['page'];
 $html       = '<p>' . esc_html( ucfirst( $attributes['label'] ?? $page ) ) . '</p>';
 // The value that data-wp-watch callbacks copy from this page's server data.
-// The server doesn't render a context value into its element, so the context
-// element holds this page's HTML in its markup.
 $synced = empty( $attributes['syncedNull'] ) ? wp_interactivity_as_dangerous_html( $html ) : null;
 
 wp_interactivity_state(
 	'router-html-server',
 	array(
-		'html'     => wp_interactivity_as_dangerous_html( $html ),
+		'html'          => wp_interactivity_as_dangerous_html( $html ),
 		/**
 		 * Supplies this page's HTML as derived state the client doesn't define.
 		 *
 		 * @return WP_Interactivity_Dangerous_HTML The page's HTML.
 		 */
-		'late'     => function () use ( $html ) {
+		'late'          => function () use ( $html ) {
 			return wp_interactivity_as_dangerous_html( $html );
 		},
-		'same'     => wp_interactivity_as_dangerous_html( '<p>Same</p>' ),
+		'same'          => wp_interactivity_as_dangerous_html( '<p>Same</p>' ),
 		/**
 		 * Supplies HTML shared by every page as derived state the client
 		 * doesn't define.
 		 *
 		 * @return WP_Interactivity_Dangerous_HTML The shared HTML.
 		 */
-		'sameLate' => function () {
+		'sameLate'      => function () {
 			return wp_interactivity_as_dangerous_html( '<p>Same</p>' );
 		},
-		'synced'   => $synced,
+		'synced'        => $synced,
+		/**
+		 * Supplies the HTML of the value the client reads from context, since
+		 * the server never resolves a context value to a token.
+		 *
+		 * @return WP_Interactivity_Dangerous_HTML|null The page's HTML, if any.
+		 */
+		'syncedContext' => function () use ( $synced ) {
+			return $synced;
+		},
 	)
 );
 ?>
@@ -49,7 +56,7 @@ wp_interactivity_state(
 		<div data-testid="same-pending-html" data-wp-html="state.sameLate"></div>
 		<div data-testid="synced-state-html" data-wp-html="state.synced"></div>
 		<div <?php echo wp_interactivity_data_wp_context( array( 'synced' => $synced ) ); ?> data-wp-watch="callbacks.syncContext">
-			<div data-testid="synced-context-html" data-wp-html="context.synced"><?php echo wp_kses_post( $html ); ?></div>
+			<div data-testid="synced-context-html" data-wp-html="state.syncedContext"></div>
 		</div>
 		<p data-testid="hydrated" data-wp-text="state.hydrated">no</p>
 		<?php if ( ! empty( $attributes['next'] ) ) : ?>
