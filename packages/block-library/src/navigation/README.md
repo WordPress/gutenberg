@@ -89,6 +89,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 
 ## Context
 

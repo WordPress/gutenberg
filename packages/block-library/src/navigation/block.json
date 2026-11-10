@@ -146,7 +146,11 @@
 			}
 		},
 		"interactivity": true,
-		"renaming": false
+		"renaming": false,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		}
 	},
 	"selectors": {
 		"css": ".wp-block-navigation:not(.wp-block-navigation__container)"
