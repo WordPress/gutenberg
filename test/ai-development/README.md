@@ -147,6 +147,16 @@ npm --prefix test/ai-development run view
 
 Results under `results/` are gitignored and may contain source code and tool output.
 
+## Flaky E2E investigation command
+
+`specs/testing-skill-routing/flaky-e2e-command.eval.js` asks for the first test command to investigate a hypothetical flaky paragraph test. The subject has read-only tools and can invoke skills, but cannot execute the proposed command or edit files. The scenario states that the build and test environment are ready, so the answer can focus on investigating the test.
+
+```bash
+npm run test:agent-evals -- --config specs/testing-skill-routing/flaky-e2e-command.eval.js
+```
+
+The command-quality metric grades a scoped, headless repeat run and its explanation independently of skill invocation and reference reads. A good answer can pass that metric without reading the skill, and reading the skill cannot make a poor command pass. This measures the proposed investigation step, not whether it reproduces or fixes a flake. It does not establish that the skill improves quality; comparing guidance versions remains separate work in [#82000](https://github.com/WordPress/gutenberg/pull/82000).
+
 ## Authoring
 
 For each spec:
