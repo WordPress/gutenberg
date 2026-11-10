@@ -2,10 +2,17 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
+import {
+	isReusableBlock,
+	isTemplatePart,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
 import type { InlineEditButtonProps } from './types';
+import { unlock } from '../../lock-unlock';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 function InlineEditButton( {
 	clientId,
@@ -14,6 +21,7 @@ function InlineEditButton( {
 	stopEditingContentOnlySection,
 }: InlineEditButtonProps ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { getBlockName } = useSelect( blockEditorStore );
 	const handleClick = () => {
 		if ( ! editedContentOnlySection ) {
 			editContentOnlySection( clientId );
@@ -21,7 +29,11 @@ function InlineEditButton( {
 		} else {
 			stopEditingContentOnlySection();
 			// Keep the selected section pattern or content block selected after exiting.
-			selectBlock( clientId );
+			selectBlock(
+				isContentBlock( getBlockName( clientId ) )
+					? clientId
+					: editedContentOnlySection
+			);
 		}
 	};
 
