@@ -2,13 +2,9 @@ import type { AnyAction } from 'redux';
 import { describe, expect, it } from 'vitest';
 import { keyedReducer } from '../keyed-reducer';
 
-interface CallerAction extends AnyAction {
-	caller?: number | string;
-}
-
 describe( 'keyedReducer', () => {
 	function createEnhancedReducer( actionProperty: string ) {
-		const enhanceReducer = keyedReducer< string, CallerAction >(
+		const enhanceReducer = keyedReducer< string, AnyAction >(
 			actionProperty
 		);
 		return enhanceReducer(

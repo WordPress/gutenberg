@@ -29,7 +29,7 @@ describe( 'combineReducers', () => {
 	it( 'returns identical substate when there is no change', () => {
 		const reducer = combineReducers( {
 			foo: counterReducer,
-			bar: combineReducers( { baz: ( s: number = 0 ) => s } ),
+			bar: combineReducers( { baz: ( s: unknown ) => s } ),
 		} );
 		const prevState = { foo: 1, bar: { baz: 1 } };
 		const nextState = reducer( prevState, { type: 'INC' } );
