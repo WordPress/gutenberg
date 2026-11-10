@@ -87,8 +87,9 @@ const MainContent = ( {
 			) }
 			{ /*
 			 * A Page List's pages are edited here rather than in the list
-			 * view, where it's one row. The list view is only needed for the
-			 * menu's other items, so a menu of pages has an Add link button.
+			 * view, which leaves the Page List out. The list view is only
+			 * needed for the menu's other items, so a menu of only pages has
+			 * an Add link button.
 			 */ }
 			{ pageListClientId && (
 				<PageListPagesControl

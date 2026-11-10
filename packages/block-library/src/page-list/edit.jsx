@@ -8,9 +8,9 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	ToolbarButton,
 	Spinner as WCSpinner,
 	Notice as WCNotice,
@@ -23,11 +23,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useConvertToNavigationLinks,
-	useAddLinkAfterPage,
-} from './use-convert-to-navigation-links';
-import PageListPagesControl from './pages-control';
+import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
 import { getVisiblePages } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -277,7 +273,11 @@ export default function PageListEdit( {
 	} );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const addLinkAfterPage = useAddLinkAfterPage( clientId );
+
+	// In a Navigation block, the Navigation block's sidebar lists the pages
+	// in place of the Page List, so the Page List itself can't be selected and
+	// isn't in the list view. Adding a link after one of its pages detaches it.
+	useBlockEditingMode( isChildOfNavigation ? 'disabled' : undefined );
 
 	// Selecting a page selects the Page List, whose Pages panel is where pages
 	// are reordered and hidden.
@@ -289,16 +289,6 @@ export default function PageListEdit( {
 
 	return (
 		<>
-			{ isChildOfNavigation && hasResolvedPages && pages?.length > 0 && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Pages' ) }>
-						<PageListPagesControl
-							clientId={ clientId }
-							onAddLinkAfter={ addLinkAfterPage }
-						/>
-					</PanelBody>
-				</InspectorControls>
-			) }
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel

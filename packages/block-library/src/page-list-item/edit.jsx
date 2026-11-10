@@ -34,8 +34,8 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const frontPageId = useFrontPageId();
 
 	// In a Navigation block, pages are reordered and hidden from the Pages
-	// controls, so the items themselves can't be selected, and the Navigation
-	// block's list view shows the Page List as one row.
+	// controls in the Navigation block's sidebar, so the items themselves
+	// can't be selected and aren't in its list view.
 	useBlockEditingMode( isNavigationChild ? 'disabled' : undefined );
 
 	// Get submenu visibility from context. The Navigation block handles
