@@ -1,12 +1,14 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Locator } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-const getRotate = ( locator ) =>
+const getRotate = ( locator: Locator ) =>
 	locator.evaluate(
 		( element ) => window.getComputedStyle( element ).rotate
 	);
 
 test.describe( 'Transform rotate block support', () => {
-	let uploadedMedia;
+	let uploadedMedia: Awaited< ReturnType< RequestUtils[ 'uploadMedia' ] > >;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
@@ -23,7 +25,7 @@ test.describe( 'Transform rotate block support', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'rotates the image but not its caption or enlarged lightbox image', async ( {
+	test( 'rotates the image with its caption but not the enlarged lightbox image', async ( {
 		editor,
 		page,
 	} ) => {
@@ -56,37 +58,34 @@ test.describe( 'Transform rotate block support', () => {
 		await expect
 			.poll( async () => {
 				const [ block ] = await editor.getBlocks();
-				return block.attributes.style?.transform?.rotate;
+				return block.attributes.style;
 			} )
-			.toBe( '30deg' );
+			.toMatchObject( { transform: { rotate: '30deg' } } );
 
-		const editorImage = editor.canvas.locator( '.wp-block-image img' );
-		await expect.poll( () => getRotate( editorImage ) ).toBe( '30deg' );
-		expect(
-			await getRotate(
-				editor.canvas.locator( '.wp-block-image figcaption' )
-			)
-		).toBe( 'none' );
+		const editorFigure = editor.canvas.locator( 'figure.wp-block-image' );
+		await expect.poll( () => getRotate( editorFigure ) ).toBe( '30deg' );
+		await expect( editorFigure.locator( 'figcaption' ) ).toBeVisible();
+		expect( await getRotate( editorFigure.locator( 'img' ) ) ).toBe(
+			'none'
+		);
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		const image = page.locator( '.wp-lightbox-container img' );
-		expect( await getRotate( image ) ).toBe( '30deg' );
-		expect(
-			await getRotate( page.locator( '.wp-lightbox-container' ) )
-		).toBe( 'none' );
-		expect(
-			await getRotate(
-				page.locator( '.wp-lightbox-container figcaption' )
-			)
-		).toBe( 'none' );
+		const figure = page.locator( '.wp-lightbox-container' );
+		const image = figure.locator( 'img' );
+		expect( await getRotate( figure ) ).toBe( '30deg' );
+		await expect( figure.locator( 'figcaption' ) ).toBeVisible();
+		expect( await getRotate( image ) ).toBe( 'none' );
 
 		await image.click();
-		const enlargedImage = page
-			.locator( '.wp-lightbox-overlay .wp-block-image img' )
-			.first();
-		await expect( enlargedImage ).toBeVisible();
-		expect( await getRotate( enlargedImage ) ).toBe( 'none' );
+		const enlargedFigure = page
+			.locator( '.wp-lightbox-overlay .wp-block-image' )
+			.last();
+		await expect( enlargedFigure.locator( 'img' ) ).toBeVisible();
+		expect( await getRotate( enlargedFigure ) ).toBe( 'none' );
+		expect( await getRotate( enlargedFigure.locator( 'img' ) ) ).toBe(
+			'none'
+		);
 	} );
 } );
