@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -183,15 +183,11 @@ export default function Edit( {
 								} }
 							>
 								<ToggleGroupControlOption
-									label={
-										isRTL() ? __( 'Right' ) : __( 'Left' )
-									}
+									label={ __( 'Start' ) }
 									value="left"
 								/>
 								<ToggleGroupControlOption
-									label={
-										isRTL() ? __( 'Left' ) : __( 'Right' )
-									}
+									label={ __( 'End' ) }
 									value="right"
 								/>
 							</ToggleGroupControl>
