@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
 
@@ -39,7 +40,6 @@
 
 ### Bug Fixes
 
--   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
 
