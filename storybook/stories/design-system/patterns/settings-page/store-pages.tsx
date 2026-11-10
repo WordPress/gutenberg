@@ -71,8 +71,8 @@ type HeaderProps = Pick<
 >;
 
 /**
- * The settings area at the root of every adjacent page's trail. There is no
- * separate Settings page, so it leads to the first adjacent page.
+ * The settings area at the root of a subpage's trail. There is no separate
+ * Settings page, so it leads to the first adjacent page.
  */
 export const SETTINGS_CRUMB = {
 	label: 'Settings',
@@ -80,17 +80,12 @@ export const SETTINGS_CRUMB = {
 };
 
 /**
- * Header props for a page that sits among adjacent pages. The breadcrumb
- * names the current page, and the navigation shows its peers.
+ * Header props for a page that sits among adjacent pages. The title names
+ * the area, and the navigation shows which page is current.
  */
 export function adjacentPageHeader( currentHref: string ): HeaderProps {
-	const page = ADJACENT_PAGES.find( ( { href } ) => href === currentHref );
 	return {
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [ SETTINGS_CRUMB, { label: page?.label ?? '' } ] }
-			/>
-		),
+		title: 'Settings',
 		navigation: { items: ADJACENT_PAGES, currentHref },
 		components: { link: RouterNavLink },
 	};
