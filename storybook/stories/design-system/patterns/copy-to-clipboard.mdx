@@ -4,13 +4,9 @@ import * as CopyFromMenuStories from './copy-from-menu.story';
 import * as CopyToClipboardStories from './copy-to-clipboard.story';
 import CopyFromFieldSource from './copy-from-field.tsx?raw';
 import CopyToClipboardSource from './copy-to-clipboard.tsx?raw';
-import CopyFeedbackSource from './use-copy-feedback.ts?raw';
 import CopyFromMenuSource from './copy-from-menu.tsx?raw';
 
-<Meta
-	title="Design System/Patterns/Copy to Clipboard"
-	tags={ [ 'manifest' ] }
-/>
+<Meta title="Design System/Patterns/Copy to Clipboard" tags={ [ 'manifest' ] } />
 
 # Copy to Clipboard
 
@@ -22,11 +18,7 @@ Put the confirmation on the button so it stays with the control that produced th
 
 <Canvas
 	of={ CopyToClipboardStories.CopyExample }
-	source={ {
-		code: `${ CopyFeedbackSource }\n${ CopyToClipboardSource }`,
-		language: 'tsx',
-		type: 'code',
-	} }
+	source={ { code: CopyToClipboardSource, language: 'tsx', type: 'code' } }
 />
 
 The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure, so the control is not renamed while it has focus. Copy with `useCopyToClipboard` from `@wordpress/compose`, and use its `onError` callback when the write fails. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails, to announce the outcome politely. Focus stays on the button.

@@ -1,4 +1,7 @@
-import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { useCopyToClipboard } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
+import { check, copy, error } from '@wordpress/icons';
 import {
 	Button,
 	IconButton,
@@ -6,9 +9,49 @@ import {
 	InputLayout,
 	Stack,
 } from '@wordpress/ui';
-import { RESULT_ICON, useCopyFeedback } from './use-copy-feedback';
 
 const SAMPLE_PATH = '/hello-world';
+const FEEDBACK_TIMEOUT = 2000;
+
+type CopyResult = 'idle' | 'copied' | 'error';
+
+const RESULT_ICON = {
+	idle: copy,
+	copied: check,
+	error,
+};
+
+function useCopyFeedback( text: string ) {
+	const [ feedback, setFeedback ] = useState< { result: CopyResult } >( {
+		result: 'idle',
+	} );
+
+	useEffect( () => {
+		if ( feedback.result === 'idle' ) {
+			return;
+		}
+		const timeoutId = setTimeout(
+			() => setFeedback( { result: 'idle' } ),
+			FEEDBACK_TIMEOUT
+		);
+		return () => clearTimeout( timeoutId );
+	}, [ feedback ] );
+
+	const ref = useCopyToClipboard(
+		text,
+		() => {
+			// A new feedback object restarts the timeout for repeated copies.
+			setFeedback( { result: 'copied' } );
+			speak( 'Copied to clipboard' );
+		},
+		() => {
+			setFeedback( { result: 'error' } );
+			speak( "Couldn't copy to clipboard." );
+		}
+	);
+
+	return { result: feedback.result, ref };
+}
 
 /**
  * Composes `InputControl` with a suffix `Button` that copies the field value.
