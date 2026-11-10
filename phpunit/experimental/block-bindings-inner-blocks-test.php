@@ -150,6 +150,12 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wp-block-group', $output );
 	}
 
+	public function test_empty_value_removes_inner_blocks_without_wrapper_markup() {
+		$this->value = '';
+		$output      = render_block( parse_blocks( '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '"}}}} --><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --><!-- /wp:group -->' )[0] );
+		$this->assertSame( '', $output );
+	}
+
 	public function test_without_value_keeps_own_inner_blocks() {
 		$this->assertStringContainsString( '>Default</p>', $this->render_group() );
 	}
@@ -274,6 +280,13 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Level 3</p>', $output );
 		$this->assertStringNotContainsString( 'own', $output );
 		$this->assertSame( 3, $this->inner_blocks_calls );
+	}
+
+	public function test_bindings_with_other_attributes_inside_the_value_resolve() {
+		$this->value = '<!-- wp:group {"tagName":"section","metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '"}}}} --><section class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></section><!-- /wp:group -->';
+		$output      = $this->render_group();
+		$this->assertSame( 2, substr_count( $output, '<section class="wp-block-group">' ) );
+		$this->assertSame( 1, substr_count( $output, 'Nested own' ) );
 	}
 
 	public function test_bindings_with_other_context_inside_the_value_resolve() {

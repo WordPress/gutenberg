@@ -81,7 +81,8 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 
 /**
  * Returns what a block asks its block bindings source for `innerBlocks`: the
- * source, the arguments of the binding, and the context the source uses.
+ * source, the arguments of the binding, the context the source uses, and the
+ * attributes of the block.
  *
  * Two blocks with the same request get the same inner blocks from the source.
  *
@@ -98,7 +99,7 @@ function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $sourc
 			$context[ $context_name ] = $block_instance->context[ $context_name ];
 		}
 	}
-	return array( $source_name, $source_args, $context );
+	return array( $source_name, $source_args, $context, $block_instance->attributes );
 }
 
 /**
@@ -177,6 +178,9 @@ function gutenberg_block_bindings_parse_inner_blocks( $markup, $source_name, $so
 	 * the attributes of the blocks included. A source whose markup comes from
 	 * trusted code, not from users, may keep it as supplied. Custom CSS is
 	 * removed from the blocks either way.
+	 *
+	 * Sanitizing keeps the block delimiters that `serialize_blocks()` writes,
+	 * which escapes the characters `wp_kses_post()` rewrites inside comments.
 	 *
 	 * @since 7.3.0
 	 *
@@ -341,6 +345,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->parsed_block['innerContent'] = $inner_content;
 	$block_instance->parsed_block['innerHTML']    = implode( '', array_filter( $inner_content, 'is_string' ) );
 	$block_instance->inner_blocks                 = new WP_Block_List( array() );
+	$block_instance->inner_content                = $inner_content;
+	$block_instance->inner_html                   = $block_instance->parsed_block['innerHTML'];
 	$block_instance->refresh_parsed_block_dependents();
 
 	$gutenberg_block_bindings_rendering_inner_blocks[] = array(
