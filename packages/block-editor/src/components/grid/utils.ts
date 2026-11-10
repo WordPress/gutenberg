@@ -73,6 +73,24 @@ export class GridRect {
 	}
 }
 
+/**
+ * Gets the smallest range of grid cells that contains two other ranges,
+ * whichever way round they are.
+ *
+ * @param rectA A range of grid cells.
+ * @param rectB Another range of grid cells.
+ *
+ * @return The cells from one range to the other.
+ */
+export function getBoundingGridRect( rectA: GridRect, rectB: GridRect ) {
+	return new GridRect( {
+		columnStart: Math.min( rectA.columnStart, rectB.columnStart ),
+		rowStart: Math.min( rectA.rowStart, rectB.rowStart ),
+		columnEnd: Math.max( rectA.columnEnd, rectB.columnEnd ),
+		rowEnd: Math.max( rectA.rowEnd, rectB.rowEnd ),
+	} );
+}
+
 export function getComputedCSS( element: Element, property: string ) {
 	// The element is rendered in a window.
 	return element.ownerDocument
@@ -386,4 +404,21 @@ export function getRowEndForResize(
 		( position - lastTrack.end ) / ( averageRowHeight + gap )
 	);
 	return extraRows > 0 ? rowTracks.length + extraRows : closestRowEnd;
+}
+
+/**
+ * Gets the names of the blocks dragged from an inserter, which it adds to the
+ * drag's data types as `wp-block:<name>`, since only the types can be read
+ * while dragging. Each name is listed once.
+ *
+ * @param dataTransfer The drag's data, if any.
+ *
+ * @return The block names, or none when the drag isn't from an inserter.
+ */
+export function getInserterDragBlockNames(
+	dataTransfer: Pick< DataTransfer, 'types' > | null | undefined
+): string[] {
+	return Array.from( dataTransfer?.types ?? [] )
+		.filter( ( type ) => type.startsWith( 'wp-block:' ) )
+		.map( ( type ) => type.slice( 'wp-block:'.length ) );
 }
