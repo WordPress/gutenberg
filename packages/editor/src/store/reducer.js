@@ -455,6 +455,21 @@ export function revisionId( state = null, action ) {
 }
 
 /**
+ * Reducer for a revision to open once its post becomes the current post.
+ *
+ * @param {Object|null} state  Pending revision: `{ postType, postId, revisionId }`.
+ * @param {Object}      action Dispatched action.
+ * @return {Object|null} Updated state.
+ */
+export function pendingRevision( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_PENDING_REVISION':
+			return action.pendingRevision;
+	}
+	return state;
+}
+
+/**
  * Reducer for the browser backup shown in the revisions view, shaped like a
  * revision, or null when it isn't shown.
  *
@@ -550,6 +565,7 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	revisionId,
+	pendingRevision,
 	browserBackup,
 	revisionPage,
 	showRevisionDiff,

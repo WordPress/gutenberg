@@ -1861,4 +1861,40 @@ describe( 'Editor actions', () => {
 			expect( warning ).not.toHaveBeenCalled();
 		} );
 	} );
+	describe( 'openRevisionOfPost', () => {
+		it( 'waits for the post to become current before opening the revision', () => {
+			const registry = createRegistryWithStores();
+			const editor = () => unlock( registry.select( editorStore ) );
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+
+			unlock( registry.dispatch( editorStore ) ).openRevisionOfPost( {
+				postType: 'wp_navigation',
+				postId: 7,
+				revisionId: 12,
+			} );
+
+			expect( editor().getCurrentRevisionId() ).toBeNull();
+			expect( editor().getPendingRevision() ).toEqual( {
+				postType: 'wp_navigation',
+				postId: 7,
+				revisionId: 12,
+			} );
+		} );
+
+		it( 'opens the revision straight away when its post is current', () => {
+			apiFetch.setFetchHandler( async () => [] );
+			const registry = createRegistryWithStores();
+			const editor = () => unlock( registry.select( editorStore ) );
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+
+			unlock( registry.dispatch( editorStore ) ).openRevisionOfPost( {
+				postType: 'post',
+				postId: String( postId ),
+				revisionId: 12,
+			} );
+
+			expect( editor().getCurrentRevisionId() ).toBe( 12 );
+			expect( editor().getPendingRevision() ).toBeNull();
+		} );
+	} );
 } );
