@@ -43,9 +43,10 @@ export interface SourceRegion {
  * whole is not an axis-aligned region of the image and can fall outside
  * it.
  *
- * That makes it right for telling someone the size of what they are
- * framing, which is what it is for, and wrong as a region to crop with.
- * For the size on its own, prefer the public `getOutputSize`.
+ * It exists for the snapping helpers below, which round the crop's edges
+ * to whole source pixels while a handle is dragged; the Debug story shows
+ * it too. It is wrong as a region to crop with: `mapEditToOriginal` gives
+ * that, and `getOutputSize` gives the size on its own.
  *
  * Rotation and flip come back as separate fields because they are
  * transforms rather than part of a region.
