@@ -203,8 +203,7 @@ const BASE_RAMP_CONFIG: RampConfig = {
 			reference: 'bgFill1',
 			additionalReferences: [ 'bgFill2' ],
 			followDirection: 'best',
-			// Preserve the 4.5:1 WCAG floor after 8-bit sRGB serialization.
-			target: 4.55,
+			target: 4.5,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
@@ -231,23 +230,24 @@ const BASE_RAMP_CONFIG: RampConfig = {
 	},
 };
 
-const withSeedChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
+const withNearGrayChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
 	step.taperChromaOptions
 		? {
 				...step,
 				taperChromaOptions: {
 					...step.taperChromaOptions,
-					limitToSeedChroma: true,
+					nearGrayChromaRatio: 1,
+					nearGrayChroma: 0.02,
 				},
 			}
 		: step;
 
-// Keep neutral ramps at or below the seed's chroma, independently of the
-// accent ramp's chroma treatment.
+// Carry faint tints at close to their seed chroma. The quadratic allowance
+// releases the bound for richer backgrounds; accent ramps retain their treatment.
 export const BG_RAMP_CONFIG = Object.fromEntries(
 	Object.entries( BASE_RAMP_CONFIG ).map( ( [ stepName, step ] ) => [
 		stepName,
-		withSeedChromaLimit( step ),
+		withNearGrayChromaLimit( step ),
 	] )
 ) as RampConfig;
 

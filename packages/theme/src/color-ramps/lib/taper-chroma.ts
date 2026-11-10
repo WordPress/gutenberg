@@ -16,7 +16,6 @@ export interface TaperChromaOptions {
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
 	kLight?: number; // floor multiplier near lighter side (default 0.85)
 	kDark?: number; // floor multiplier near darker side (default 0.85)
-	limitToSeedChroma?: boolean; // keep C at or below the tapered seed C (default false)
 	// Near-gray handling: cap C at C_seed * nearGrayChromaRatio * (1 + (C_seed / nearGrayChroma)²)
 	nearGrayChromaRatio?: number; // cap multiplier for a near-gray seed (default 4)
 	nearGrayChroma?: number; // seed C above which the cap quickly stops binding (default 0.005)
@@ -27,7 +26,6 @@ export interface TaperChromaOptions {
  * - C_intended = Cmax(Lt,H0) * alpha * (seedRelative^carry)
  * - Continuous taper vs |Lt - Ls| to softly reduce chroma for neighbors
  * - C capped relative to C_seed, so a near-gray seed stays near-gray
- *   (or at most C_seed itself with `limitToSeedChroma`)
  * - Seeds without a hue produce grayscale
  * - Downward-only clamp on C (preserve L & H)
  * @param seed
@@ -107,10 +105,7 @@ export function createChromaTaper(
 			kLight,
 			kDark,
 		} );
-		const cPlanned = Math.min(
-			cWithCarry * t,
-			options.limitToSeedChroma ? cSeed * t : cCap
-		);
+		const cPlanned = Math.min( cWithCarry * t, cCap );
 
 		// Downward-only clamp (preserve L & H)
 		const lOut = clamp01( lTarget );

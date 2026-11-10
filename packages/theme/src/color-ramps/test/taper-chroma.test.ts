@@ -45,8 +45,8 @@ describe( 'taperChroma', () => {
 		expect( chromas[ 0 ] ).toBeLessThan( 0.0005 * 5 );
 	} );
 
-	it.each( [ 0.0005, 0.0045, 0.05 ] )(
-		'keeps chroma at or below a seed chroma of %s with limitToSeedChroma',
+	it.each( [ 0.0005, 0.0045, 0.005 ] )(
+		'keeps a faint tint close to seed chroma %s with the neutral ceiling',
 		( chroma ) => {
 			const seed: PlainColorObject = {
 				space: OKLCH,
@@ -56,17 +56,34 @@ describe( 'taperChroma', () => {
 
 			for ( const lightness of [ 0.2, 0.5, 0.8, 0.98 ] ) {
 				const limited = getTaperedChroma( seed, lightness, {
-					limitToSeedChroma: true,
+					nearGrayChromaRatio: 1,
+					nearGrayChroma: 0.02,
 				} );
 
 				expect( limited ).toBeGreaterThan( 0 );
-				expect( limited ).toBeLessThanOrEqual( chroma );
+				expect( limited ).toBeLessThanOrEqual( chroma * 1.0625 );
 				expect( limited ).toBeLessThanOrEqual(
 					getTaperedChroma( seed, lightness )
 				);
 			}
 		}
 	);
+
+	it( 'releases the neutral ceiling for a richer seed', () => {
+		const seed: PlainColorObject = {
+			space: OKLCH,
+			coords: [ 0.93, 0.05, 170 ],
+			alpha: 1,
+		};
+		for ( const lightness of [ 0.2, 0.5, 0.8, 0.98 ] ) {
+			expect(
+				getTaperedChroma( seed, lightness, {
+					nearGrayChromaRatio: 1,
+					nearGrayChroma: 0.02,
+				} )
+			).toBe( getTaperedChroma( seed, lightness ) );
+		}
+	} );
 
 	it( 'keeps a gray seed gray', () => {
 		const result = taperChroma(

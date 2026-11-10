@@ -8,6 +8,7 @@ import {
 	isStateDirty,
 } from '../state';
 import { computeInscribedRect } from '../crop-rect';
+import { getOutputSize } from '../../get-output-size';
 import {
 	createCamera,
 	screenToWorld,
@@ -582,6 +583,23 @@ describe( 'imageEditorReducer — SET_ZOOM_AT_POINT', () => {
 } );
 
 describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
+	function makePannedLockedState() {
+		const locked = imageEditorReducer(
+			makeState( {
+				image: {
+					src: 'four-by-three.jpg',
+					naturalWidth: 1600,
+					naturalHeight: 1200,
+				},
+			} ),
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		return imageEditorReducer( locked, {
+			type: 'SET_PAN',
+			payload: { x: 0, y: 0.1 },
+		} );
+	}
+
 	it( 'swaps crop width and height around the same center', () => {
 		const state = makeState( {
 			cropRect: { x: 0.1, y: 0.2, width: 0.6, height: 0.4 },
@@ -657,6 +675,74 @@ describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
 		expect( result.pan.y ).toBeCloseTo( state.pan.y, 5 );
 	} );
 
+	it( 'restores a panned locked crop after four turns clamp its intermediate pan', () => {
+		let state = makePannedLockedState();
+		const originalPan = state.pan;
+		for ( let i = 0; i < 4; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expect( originalPan.y ).toBeCloseTo( 0.1, 6 );
+		expect( state.pan.x ).toBeCloseTo( originalPan.x, 6 );
+		expect( state.pan.y ).toBeCloseTo( originalPan.y, 6 );
+	} );
+
+	it( 'keeps the remembered pan when an attempted pan hits the boundary', () => {
+		let state = makePannedLockedState();
+		state = imageEditorReducer( state, {
+			type: 'SNAP_ROTATE_90',
+			payload: { direction: 1 },
+		} );
+		const clamped = state;
+		state = imageEditorReducer( state, {
+			type: 'SET_PAN',
+			payload: { x: -0.1, y: 0 },
+		} );
+		expect( state ).toBe( clamped );
+		for ( let i = 0; i < 3; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expect( state.pan.y ).toBeCloseTo( 0.1, 6 );
+	} );
+
+	it( 'compares the same edit as equal when an unchanged zoom resets the hidden pan', () => {
+		let state = makePannedLockedState();
+		state = imageEditorReducer( state, {
+			type: 'SNAP_ROTATE_90',
+			payload: { direction: 1 },
+		} );
+		const next = imageEditorReducer( state, {
+			type: 'SET_ZOOM',
+			payload: state.zoom,
+		} );
+
+		expect( next.basePan.x ).not.toBeCloseTo( state.basePan.x, 6 );
+		expect( areImageEditorStatesEqual( state, next ) ).toBe( true );
+	} );
+
+	it( 'restores a panned position after fine rotation and four turns', () => {
+		let state = makePannedLockedState();
+		state = imageEditorReducer( state, {
+			type: 'SET_ROTATION',
+			payload: 20,
+		} );
+		const originalPan = state.pan;
+		for ( let i = 0; i < 4; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		expect( state.rotation ).toBe( 20 );
+		expect( state.pan.x ).toBeCloseTo( originalPan.x, 6 );
+		expect( state.pan.y ).toBeCloseTo( originalPan.y, 6 );
+	} );
+
 	it( 'single-axis flip: direction=+1 means visual CW, so rotation field decreases', () => {
 		// `direction` is the visual rotation the caller wants. With a
 		// single-axis flip, on-screen rotation is reversed relative to
@@ -697,6 +783,59 @@ describe( 'imageEditorReducer — SNAP_ROTATE_90', () => {
 		expect( rotated.rotation ).toBe( 90 );
 		expect( rotated.pan.x ).toBeCloseTo( -0.2, 5 );
 		expect( rotated.pan.y ).toBeCloseTo( 0.1, 5 );
+	} );
+
+	it( 'restores the image region after a locked crop is resized and settled', () => {
+		let state = imageEditorReducer( makeState(), {
+			type: 'SET_ASPECT_RATIO',
+			payload: 16 / 9,
+		} );
+		state = imageEditorReducer( state, {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
+		} );
+		state = imageEditorReducer( state, { type: 'SETTLE_CROP' } );
+		const cropBefore = state.cropRect;
+		const outputBefore = getOutputSize( state )!;
+		const zoomBefore = state.zoom;
+		for ( let i = 0; i < 2; i++ ) {
+			state = imageEditorReducer( state, {
+				type: 'SNAP_ROTATE_90',
+				payload: { direction: 1 },
+			} );
+		}
+		const outputAfter = getOutputSize( state )!;
+		expect( state.cropRect.width ).toBeCloseTo( cropBefore.width, 6 );
+		expect( state.cropRect.height ).toBeCloseTo( cropBefore.height, 6 );
+		expect( state.zoom ).toBeCloseTo( zoomBefore, 6 );
+		expect( outputAfter.width ).toBeCloseTo( outputBefore.width, 6 );
+		expect( outputAfter.height ).toBeCloseTo( outputBefore.height, 6 );
+	} );
+
+	it( 'does not expand a maximum-size crop that was moved off centre', () => {
+		let state = imageEditorReducer(
+			makeState( {
+				image: {
+					src: 'portrait.jpg',
+					naturalWidth: PORTRAIT_IMAGE.width,
+					naturalHeight: PORTRAIT_IMAGE.height,
+				},
+			} ),
+			{ type: 'SET_ASPECT_RATIO', payload: 16 / 9 }
+		);
+		state = imageEditorReducer( state, {
+			type: 'SET_CROP_RECT',
+			payload: { ...state.cropRect, y: 0.2 },
+		} );
+		const turned = imageEditorReducer( state, {
+			type: 'SNAP_ROTATE_90',
+			payload: { direction: 1 },
+		} );
+
+		expect( state.cropRect.width ).toBeCloseTo( 1, 6 );
+		expect( state.cropRect.y ).toBeCloseTo( 0.2, 6 );
+		expect( turned.cropRect.width ).toBeCloseTo( 900 / 1600, 6 );
+		expect( turned.cropRect.width ).toBeLessThan( 1 );
 	} );
 } );
 
@@ -943,6 +1082,119 @@ describe( 'imageEditorReducer — SET_ASPECT_RATIO', () => {
 
 		expect( next.aspectRatio ).toBe( 1 );
 		expect( next.cropRect ).toEqual( state.cropRect );
+	} );
+
+	it( 'fits a full-frame crop to the locked ratio when an image loads', () => {
+		const next = imageEditorReducer(
+			makeState( { image: null, aspectRatio: 1 } ),
+			{
+				type: 'SET_IMAGE',
+				payload: {
+					src: 'test.jpg',
+					naturalWidth: IMAGE.width,
+					naturalHeight: IMAGE.height,
+				},
+			}
+		);
+
+		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
+	} );
+
+	it( 'leaves a crop that matches the locked ratio when an image loads', () => {
+		// A square on the 16:9 image: 0.3 of the height is 0.16875 of the
+		// width.
+		const cropRect = { x: 0.2, y: 0.2, width: 0.16875, height: 0.3 };
+		const next = imageEditorReducer(
+			makeState( { image: null, aspectRatio: 1, cropRect } ),
+			{
+				type: 'SET_IMAGE',
+				payload: {
+					src: 'test.jpg',
+					naturalWidth: IMAGE.width,
+					naturalHeight: IMAGE.height,
+				},
+			}
+		);
+
+		expect( next.cropRect ).toEqual( cropRect );
+	} );
+
+	it( 'fits a crop the setter sends to the locked ratio', () => {
+		const next = imageEditorReducer( makeState( { aspectRatio: 1 } ), {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0, y: 0, width: 1, height: 1 },
+		} );
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect.width ).toBeCloseTo(
+			computeInscribedRect( 1, IMAGE ).width,
+			10
+		);
+		expect( next.cropRect.height ).toBeCloseTo( 1, 10 );
+		expect( next.cropRect.x ).toBeCloseTo(
+			computeInscribedRect( 1, IMAGE ).x,
+			10
+		);
+	} );
+
+	it( 'keeps the centre of a crop it fits to the locked ratio', () => {
+		const next = imageEditorReducer( makeState( { aspectRatio: 1 } ), {
+			type: 'SET_CROP_RECT',
+			payload: { x: 0.1, y: 0.2, width: 0.3, height: 0.3 },
+		} );
+
+		// Same width and centre, with the height a square needs.
+		expect( next.cropRect.width ).toBeCloseTo( 0.3, 10 );
+		expect( next.cropRect.height ).toBeCloseTo( 0.3 / 0.5625, 10 );
+		expect( next.cropRect.x + next.cropRect.width / 2 ).toBeCloseTo(
+			0.25,
+			10
+		);
+		expect( next.cropRect.y + next.cropRect.height / 2 ).toBeCloseTo(
+			0.35,
+			10
+		);
+	} );
+
+	it( 'keeps a locked crop square when SET_ROTATION crosses a quarter turn', () => {
+		const square = computeInscribedRect( 1, IMAGE );
+		const next = imageEditorReducer(
+			makeState( { aspectRatio: 1, cropRect: square } ),
+			{ type: 'SET_ROTATION', payload: 90 }
+		);
+
+		// The view is now the image turned a quarter: 900 wide, 1600 tall.
+		expect(
+			( next.cropRect.width * PORTRAIT_IMAGE.width ) /
+				( next.cropRect.height * PORTRAIT_IMAGE.height )
+		).toBeCloseTo( 1, 6 );
+		expect( next.cropRect.x + next.cropRect.width / 2 ).toBeCloseTo(
+			0.5,
+			6
+		);
+	} );
+
+	it( 'leaves a locked crop alone while SET_ROTATION stays within a quarter turn', () => {
+		const square = computeInscribedRect( 1, IMAGE );
+		const next = imageEditorReducer(
+			makeState( { aspectRatio: 1, cropRect: square } ),
+			{ type: 'SET_ROTATION', payload: 30 }
+		);
+
+		expect( next.cropRect ).toEqual( square );
+	} );
+
+	it( 'fits the crop to a ratio RESET keeps', () => {
+		const next = imageEditorReducer(
+			makeState( {
+				rotation: 30,
+				cropRect: { x: 0.1, y: 0.1, width: 0.5, height: 0.5 },
+			} ),
+			{ type: 'RESET', payload: { aspectRatio: 1 } }
+		);
+
+		expect( next.aspectRatio ).toBe( 1 );
+		expect( next.cropRect ).toEqual( computeInscribedRect( 1, IMAGE ) );
 	} );
 
 	it( 'is unlocked again by RESET', () => {

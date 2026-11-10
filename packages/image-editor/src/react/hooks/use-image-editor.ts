@@ -19,11 +19,11 @@ import {
 	MAX_ZOOM,
 } from '../../core/constants';
 import { getMinZoom } from '../../core/containment';
-import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
+	areImageEditorStatesEqual,
 	enforceContainment,
-	getLockedCropRect,
+	fitCropToLockedRatio,
 	isStateDirty,
 	withBaseValues,
 } from '../../core/state';
@@ -70,11 +70,6 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	/** How far fine rotation goes either way of a quarter turn, in degrees. */
 	maxRotationOffset: number;
 	/**
-	 * Export the cropped image as a Blob. Throws on failure — see
-	 * `exportCroppedImage` for error semantics.
-	 */
-	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
-	/**
 	 * Called by `ImageEditorCanvas` when the viewport changes (window or canvas
 	 * resize); not for consumers to call. Like `setCropRect`, except that
 	 * `onChange` gets `isEdit: false`, since a viewport refit is not an
@@ -119,15 +114,14 @@ export function createImageEditorState(
 	options: CreateImageEditorStateOptions = {}
 ): ImageEditorState {
 	const { image = null, aspectRatio } = options;
-	const start = {
-		...DEFAULT_STATE,
-		image,
-		aspectRatio: aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
-	};
-	// Start a locked crop at the largest box of that ratio, the same shape
-	// `setAspectRatio` gives.
-	const cropRect = getLockedCropRect( start );
-	return enforceContainment( cropRect ? { ...start, cropRect } : start );
+	return enforceContainment(
+		fitCropToLockedRatio( {
+			...DEFAULT_STATE,
+			image,
+			aspectRatio:
+				aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
+		} )
+	);
 }
 
 /**
@@ -175,7 +169,16 @@ export function useInternalImageEditor(
 	// A state the consumer passes back is usually one the editor handed
 	// out, which carries the values the editor keeps for itself. One built
 	// by hand does not, so fill them in rather than read them as undefined.
-	const state = isControlled ? withBaseValues( controlledState ) : ownState;
+	const suppliedState = isControlled
+		? withBaseValues( controlledState )
+		: ownState;
+	const state =
+		isControlled && fitCropToLockedRatio( suppliedState ) !== suppliedState
+			? imageEditorReducer( suppliedState, {
+					type: 'SET_CROP_RECT',
+					payload: suppliedState.cropRect,
+				} )
+			: suppliedState;
 
 	// The clean state `isDirty` compares against and `reset` returns to.
 	// It starts as the consumer's starting state, and follows the changes
@@ -199,6 +202,19 @@ export function useInternalImageEditor(
 	useLayoutEffect( () => {
 		onChangeRef.current = onChange;
 	}, [ onChange ] );
+	// Correct a supplied crop before it can be read or edited. Send the
+	// correction back to the consumer without adding an undo entry.
+	useLayoutEffect( () => {
+		if ( ! isControlled || state === suppliedState ) {
+			return;
+		}
+		if ( ! hasEditedRef.current ) {
+			setBaseline( ( current ) =>
+				areImageEditorStatesEqual( current, state ) ? current : state
+			);
+		}
+		onChangeRef.current?.( state, { isEdit: false } );
+	}, [ isControlled, state, suppliedState ] );
 
 	const apply = useCallback(
 		( action: ImageEditorAction, isEdit = true ) => {
@@ -226,6 +242,15 @@ export function useInternalImageEditor(
 		( image: InternalImageEditorState[ 'image' ] ) => {
 			const current = latestRef.current;
 			if ( areImagesEqual( current.image, image ) ) {
+				// A state can arrive with its image already in it and a crop
+				// that does not match its locked ratio. Fit the crop now, as
+				// loading the image would have.
+				if ( fitCropToLockedRatio( current ) !== current ) {
+					apply(
+						{ type: 'SET_CROP_RECT', payload: current.cropRect },
+						false
+					);
+				}
 				return;
 			}
 			hasEditedRef.current = false;
@@ -278,23 +303,6 @@ export function useInternalImageEditor(
 
 	const isDirty = isStateDirty( state, baseline );
 
-	const getCroppedImage = useCallback(
-		( mimeType?: string, quality?: number ): Promise< Blob > => {
-			if ( ! state.image ) {
-				return Promise.reject(
-					new Error( 'No image loaded — call setImage first.' )
-				);
-			}
-			return exportCroppedImage(
-				state.image.src,
-				state,
-				mimeType,
-				quality
-			);
-		},
-		[ state ]
-	);
-
 	// A refit after a window resize is not something the person did.
 	const adjustCropRectForViewport = useCallback(
 		( rect: NormalizedRect ) => {
@@ -318,7 +326,6 @@ export function useInternalImageEditor(
 				minZoom,
 				maxZoom: MAX_ZOOM,
 				maxRotationOffset: MAX_ROTATION_OFFSET,
-				getCroppedImage,
 				adjustCropRectForViewport,
 			} ) as InternalImageEditorController,
 		[
@@ -328,7 +335,6 @@ export function useInternalImageEditor(
 			reset,
 			isDirty,
 			minZoom,
-			getCroppedImage,
 			adjustCropRectForViewport,
 		]
 	);

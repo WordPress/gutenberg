@@ -151,7 +151,9 @@ describe( 'loadImage', () => {
 		try {
 			await expect(
 				loadImage( 'https://example.com/broken.jpg' )
-			).rejects.toBe( loadError );
+			).rejects.toThrow(
+				'Could not load the image at https://example.com/broken.jpg.'
+			);
 		} finally {
 			global.Image = originalImage;
 		}
@@ -648,7 +650,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		expect( Math.sign( b ) ).not.toBe( Math.sign( c ) );
 	} );
 
-	it( 'zoom 2x should double the scale components', () => {
+	it( 'zoom 2x halves the output size and keeps a 1:1 pixel scale', () => {
 		setupMockCanvas();
 
 		// Render at zoom=1.
@@ -663,8 +665,13 @@ describe( 'renderToCanvas — export matrix verification', () => {
 			naturalWidth: 800,
 			naturalHeight: 600,
 		} as HTMLImageElement;
-		renderToCanvas( mockImage, stateZ1 );
+		const { width: widthZ1, height: heightZ1 } = renderToCanvas(
+			mockImage,
+			stateZ1
+		);
 		const [ a1, , , d1 ] = mockCtx.setTransform.mock.calls[ 0 ];
+		expect( widthZ1 ).toBe( 800 );
+		expect( heightZ1 ).toBe( 600 );
 
 		// Reset for zoom=2.
 		vi.restoreAllMocks();
@@ -676,12 +683,94 @@ describe( 'renderToCanvas — export matrix verification', () => {
 			pan: { x: 0, y: 0 },
 			cropRect: { x: 0, y: 0, width: 1, height: 1 },
 		} );
-		renderToCanvas( mockImage, stateZ2 );
+		const { width: widthZ2, height: heightZ2 } = renderToCanvas(
+			mockImage,
+			stateZ2
+		);
 		const [ a2, , , d2 ] = mockCtx.setTransform.mock.calls[ 0 ];
 
-		// The scale components should double.
-		expect( a2 ).toBeCloseTo( a1 * 2, 5 );
-		expect( d2 ).toBeCloseTo( d1 * 2, 5 );
+		// At 2x the full-frame crop frames the middle quarter of the image:
+		// 400x300 source pixels, the size `getOutputSize` reports. They are
+		// drawn 1:1, so the scale components do not change with the zoom.
+		expect( widthZ2 ).toBe( 400 );
+		expect( heightZ2 ).toBe( 300 );
+		expect( a2 ).toBeCloseTo( a1, 5 );
+		expect( d2 ).toBeCloseTo( d1, 5 );
+	} );
+
+	it( 'exports the full frame when the crop is too near full to be saved', () => {
+		setupMockCanvas();
+
+		// A zoom of 1.0005 frames all but a hair of the image. `getOutputSize`
+		// reports the full size because the mapper saves no crop that close
+		// to the frame, and the export has to match what a consumer read.
+		const state = createTestState( {
+			rotation: 0,
+			zoom: 1.0005,
+			flip: { horizontal: false, vertical: false },
+			pan: { x: 0, y: 0 },
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			image: {
+				src: 'big.jpg',
+				naturalWidth: 20000,
+				naturalHeight: 10000,
+			},
+		} );
+		const mockImage = {
+			naturalWidth: 20000,
+			naturalHeight: 10000,
+		} as HTMLImageElement;
+
+		const { width, height } = renderToCanvas( mockImage, state );
+
+		expect( { width, height } ).toEqual( { width: 20000, height: 10000 } );
+		// The whole image is drawn 1:1, not through the 1.0005 zoom, so no
+		// pixel is resampled and the edges are not clipped.
+		const matrix = mockCtx.setTransform.mock.calls[ 0 ].map(
+			( value: number ) => Math.round( value * 1e6 ) / 1e6
+		);
+		expect( matrix ).toEqual( [ 1, 0, 0, 1, 0, 0 ] );
+	} );
+
+	it( 'keeps unit scale and centres the image for a fine rotation too near full to crop', () => {
+		setupMockCanvas();
+
+		// At 0.01 degrees the full-frame crop is still within the mapper's
+		// tolerance, so the output is the image's rotated bounds. Mapping the
+		// crop frame onto those bounds would scale X and Y by different
+		// amounts; the image has to be drawn at 1:1 and only turned.
+		const state = createTestState( {
+			rotation: 0.01,
+			zoom: 1,
+			flip: { horizontal: false, vertical: false },
+			pan: { x: 0, y: 0 },
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			image: {
+				src: 'big.jpg',
+				naturalWidth: 20000,
+				naturalHeight: 10000,
+			},
+		} );
+		const mockImage = {
+			naturalWidth: 20000,
+			naturalHeight: 10000,
+		} as HTMLImageElement;
+
+		const { width, height } = renderToCanvas( mockImage, state );
+		const [ a, b, c, d, e, f ] = mockCtx.setTransform.mock.calls[ 0 ];
+
+		// The rotated bounds, as `getOutputSize` reports them: 20001.75 by
+		// 10003.49 before rounding.
+		expect( width ).toBe( 20002 );
+		expect( height ).toBe( 10003 );
+		// Unit scale on both axes: a pure rotation.
+		expect( Math.hypot( a, b ) ).toBeCloseTo( 1, 6 );
+		expect( Math.hypot( c, d ) ).toBeCloseTo( 1, 6 );
+		// The image's centre lands on the output's centre.
+		const centreX = a * 10000 + c * 5000 + e;
+		const centreY = b * 10000 + d * 5000 + f;
+		expect( centreX ).toBeCloseTo( width / 2, 6 );
+		expect( centreY ).toBeCloseTo( height / 2, 6 );
 	} );
 
 	it( 'horizontal flip should negate the x-scale component', () => {

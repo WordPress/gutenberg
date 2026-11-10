@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
 ### Bug Fixes
 
--   `ThemeProvider`: Near-gray background seeds, such as those of the "Modern" and "Light" admin color schemes, now carry their tint into the generated neutral surfaces and strokes instead of producing pure gray steps. Generated background ramp steps no longer exceed the seed's chroma ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
+-   `ThemeProvider`: Carry near-gray background tints into generated neutral surfaces and strokes with a smooth chroma ceiling that stays close to the seed for faint tints ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 4.0.0 (2026-11-04)
 
