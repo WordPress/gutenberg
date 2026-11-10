@@ -149,11 +149,13 @@
 		"renaming": false,
 		"dimensions": {
 			"minHeight": true,
-			"minWidth": true
+			"minWidth": true,
+			"__experimentalSkipSerialization": [ "minHeight", "minWidth" ]
 		}
 	},
 	"selectors": {
-		"css": ".wp-block-navigation:not(.wp-block-navigation__container)"
+		"css": ".wp-block-navigation:not(.wp-block-navigation__container)",
+		"dimensions": ".wp-block-navigation:not(.wp-block-navigation__container)"
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

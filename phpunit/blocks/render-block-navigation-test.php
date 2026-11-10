@@ -514,4 +514,79 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			$GLOBALS['wp_styles'] = $original_styles;
 		}
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation
+	 */
+	public function test_min_sizes_apply_only_to_the_navigation_wrapper() {
+		$markup = do_blocks( '<!-- wp:navigation {"overlayMenu":"mobile","style":{"dimensions":{"minWidth":"560px","minHeight":"340px"}}} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->' );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertStringContainsString( 'min-height:340px', $processor->get_attribute( 'style' ) );
+		$this->assertStringContainsString( 'min-width:560px', $processor->get_attribute( 'style' ) );
+
+		while ( $processor->next_tag() ) {
+			$this->assertStringNotContainsString(
+				'min-',
+				(string) $processor->get_attribute( 'style' ),
+				'The Navigation block min sizes must not reach its inner list or overlay.'
+			);
+		}
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_global_styles_min_sizes_target_only_the_navigation_wrapper() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => '480px',
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/navigation' => array(
+							'dimensions' => array(
+								'minWidth' => '560px',
+							),
+							'@mobile'    => array(
+								'dimensions' => array(
+									'minWidth' => '200px',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-navigation:not(.wp-block-navigation__container)){min-width: 560px;}',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-navigation:not(.wp-block-navigation__container)){min-width: 200px;}}',
+			$stylesheet
+		);
+		$this->assertStringNotContainsString( ':root :where(.wp-block-navigation){min-width', $stylesheet );
+	}
+
+	/**
+	 * @covers ::gutenberg_get_block_state_style_rules
+	 */
+	public function test_mobile_min_sizes_target_only_the_navigation_wrapper() {
+		$rules = gutenberg_get_block_state_style_rules(
+			array( '' => array( 'dimensions' => array( 'minWidth' => '200px' ) ) ),
+			WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation' ),
+			'@media (width <= 480px)'
+		);
+
+		$this->assertCount( 1, $rules );
+		$this->assertSame( '.wp-block-navigation:not(.wp-block-navigation__container)', $rules[0]['selector'] );
+	}
 }
