@@ -1,14 +1,14 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { Button, Modal } from '@wordpress/components';
 import {
-	Button,
-	CheckboxControl as WCCheckboxControl,
-	Flex,
-	FlexItem,
-	Icon as WCIcon,
-	Modal,
-	ToggleControl,
-} from '@wordpress/components';
+	CheckboxControl,
+	CheckboxGroup,
+	Fieldset,
+	Icon,
+	Stack,
+	SwitchControl,
+} from '@wordpress/ui';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
@@ -38,10 +38,6 @@ export default function BlockLockModal( {
 	clientId,
 	onClose,
 }: BlockLockModalProps ) {
-	const [ lock, setLock ] = useState< BlockLock >( {
-		move: false,
-		remove: false,
-	} );
 	const { isEditLocked, isMoveLocked, isRemoveLocked } =
 		useBlockLock( clientId );
 	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
@@ -60,21 +56,33 @@ export default function BlockLockModal( {
 		},
 		[ clientId ]
 	);
-	const [ applyTemplateLock, setApplyTemplateLock ] =
-		useState( !! templateLock );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const [ lockedFeatures, setLockedFeatures ] = useState< string[] >( () =>
+		[
+			allowsEditLocking && isEditLocked && 'edit',
+			isMoveLocked && 'move',
+			isRemoveLocked && 'remove',
+		].filter( ( feature ): feature is string => !! feature )
+	);
+	const [ applyTemplateLock, setApplyTemplateLock ] =
+		useState( !! templateLock );
 
-	useEffect( () => {
-		setLock( {
-			move: isMoveLocked,
-			remove: isRemoveLocked,
-			...( allowsEditLocking ? { edit: isEditLocked } : {} ),
-		} );
-	}, [ isEditLocked, isMoveLocked, isRemoveLocked, allowsEditLocking ] );
+	const lock: BlockLock = {
+		move: lockedFeatures.includes( 'move' ),
+		remove: lockedFeatures.includes( 'remove' ),
+		...( allowsEditLocking
+			? { edit: lockedFeatures.includes( 'edit' ) }
+			: {} ),
+	};
 
-	const isAllChecked = Object.values( lock ).every( Boolean );
-	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
+	const options = [
+		...( allowsEditLocking
+			? [ { value: 'edit', label: __( 'Lock editing' ) } ]
+			: [] ),
+		{ value: 'move', label: __( 'Lock movement' ) },
+		{ value: 'remove', label: __( 'Lock removal' ) },
+	];
 
 	const isDirty =
 		lock.move !== isMoveLocked ||
@@ -109,119 +117,59 @@ export default function BlockLockModal( {
 					onClose();
 				} }
 			>
-				<fieldset className="block-editor-block-lock-modal__options">
-					<legend>
-						{ __( 'Select the features you want to lock' ) }
-					</legend>
-					{ /*
-					 * Disable reason: The `list` ARIA role is redundant but
-					 * Safari+VoiceOver won't announce the list otherwise.
-					 */
-					/* eslint-disable jsx-a11y/no-redundant-roles */ }
-					<ul
-						role="list"
-						className="block-editor-block-lock-modal__checklist"
-					>
-						<li>
-							<WCCheckboxControl
-								className="block-editor-block-lock-modal__options-all"
-								label={ __( 'Lock all' ) }
-								checked={ isAllChecked }
-								indeterminate={ isMixed }
-								onChange={ ( newValue ) =>
-									setLock( {
-										move: newValue,
-										remove: newValue,
-										...( allowsEditLocking
-											? { edit: newValue }
-											: {} ),
-									} )
-								}
-							/>
-							<ul
-								role="list"
-								className="block-editor-block-lock-modal__checklist"
-							>
-								{ allowsEditLocking && (
-									<li className="block-editor-block-lock-modal__checklist-item">
-										<WCCheckboxControl
-											label={ __( 'Lock editing' ) }
-											checked={ !! lock.edit }
-											onChange={ ( edit ) =>
-												setLock( ( prevLock ) => ( {
-													...prevLock,
-													edit,
-												} ) )
-											}
-										/>
-										<WCIcon
-											className="block-editor-block-lock-modal__lock-icon"
-											icon={
-												lock.edit
-													? lockIcon
-													: unlockIcon
-											}
-										/>
-									</li>
+				<Stack direction="column" gap="xl">
+					<Fieldset.Root
+						render={
+							<CheckboxGroup
+								value={ lockedFeatures }
+								onValueChange={ setLockedFeatures }
+								allValues={ options.map(
+									( option ) => option.value
 								) }
-								<li className="block-editor-block-lock-modal__checklist-item">
-									<WCCheckboxControl
-										label={ __( 'Lock movement' ) }
-										checked={ lock.move }
-										onChange={ ( move ) =>
-											setLock( ( prevLock ) => ( {
-												...prevLock,
-												move,
-											} ) )
-										}
+							/>
+						}
+					>
+						<Fieldset.Legend>
+							{ __( 'Select the features you want to lock' ) }
+						</Fieldset.Legend>
+						<CheckboxControl
+							parent
+							value="all"
+							label={ __( 'Lock all' ) }
+						/>
+						<CheckboxGroup.NestedItems>
+							{ options.map( ( { value, label } ) => (
+								<Stack
+									key={ value }
+									justify="space-between"
+									align="center"
+									gap="md"
+								>
+									<CheckboxControl
+										value={ value }
+										label={ label }
 									/>
-									<WCIcon
-										className="block-editor-block-lock-modal__lock-icon"
+									<Icon
 										icon={
-											lock.move ? lockIcon : unlockIcon
+											lockedFeatures.includes( value )
+												? lockIcon
+												: unlockIcon
 										}
 									/>
-								</li>
-								<li className="block-editor-block-lock-modal__checklist-item">
-									<WCCheckboxControl
-										label={ __( 'Lock removal' ) }
-										checked={ lock.remove }
-										onChange={ ( remove ) =>
-											setLock( ( prevLock ) => ( {
-												...prevLock,
-												remove,
-											} ) )
-										}
-									/>
-									<WCIcon
-										className="block-editor-block-lock-modal__lock-icon"
-										icon={
-											lock.remove ? lockIcon : unlockIcon
-										}
-									/>
-								</li>
-							</ul>
-						</li>
-					</ul>
-					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+								</Stack>
+							) ) }
+						</CheckboxGroup.NestedItems>
+					</Fieldset.Root>
 					{ hasTemplateLock && (
-						<ToggleControl
+						<SwitchControl
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }
 							disabled={ lock.move && ! lock.remove }
-							onChange={ () =>
-								setApplyTemplateLock( ! applyTemplateLock )
-							}
+							onCheckedChange={ setApplyTemplateLock }
 						/>
 					) }
-				</fieldset>
-				<Flex
-					className="block-editor-block-lock-modal__actions"
-					justify="flex-end"
-					expanded={ false }
-				>
-					<FlexItem>
+					<Stack justify="flex-end" gap="sm">
 						<Button
 							variant="tertiary"
 							onClick={ onClose }
@@ -229,8 +177,6 @@ export default function BlockLockModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-					</FlexItem>
-					<FlexItem>
 						<Button
 							variant="primary"
 							type="submit"
@@ -240,8 +186,8 @@ export default function BlockLockModal( {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</Stack>
+				</Stack>
 			</form>
 		</Modal>
 	);
