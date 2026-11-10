@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ContentEditableControl from '..';
 
 // The presentational shell is deliberately decoupled from `@wordpress/rich-text`:
@@ -84,6 +85,25 @@ describe( 'ContentEditableControl', () => {
 			'tabindex',
 			'-1'
 		);
+	} );
+
+	it( 'does not focus a disabled field on click', async () => {
+		const user = userEvent.setup();
+		const onMouseDown = vi.fn();
+		render(
+			<ContentEditableControl
+				label="Note"
+				disabled
+				onMouseDown={ onMouseDown }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'textbox' ) );
+		expect( screen.getByRole( 'textbox' ) ).not.toHaveFocus();
+		expect( onMouseDown ).toHaveBeenCalledTimes( 1 );
+
+		await user.click( screen.getByText( 'Note' ) );
+		expect( screen.getByRole( 'textbox' ) ).not.toHaveFocus();
 	} );
 
 	it( 'exposes `required` via aria-required', () => {

@@ -35,7 +35,7 @@
 	&[aria-disabled="true"] {
 		cursor: default;
 
-		&::before {
+		&:empty::before {
 			color: inherit;
 		}
 	}
