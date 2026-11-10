@@ -45,8 +45,8 @@ export default function useClickSelection() {
 				// A press on a block that is edited on its own element: give
 				// focus back to the field with the caret before the browser
 				// handles the press, so it handles a press into another field.
-				// On iOS, a tap inside the focused editing host places the
-				// caret there and then loses it once focus moves to the field.
+				// A press inside the focused editing host loses the caret once
+				// focus moves to the field: Firefox drops it, and iOS moves it.
 				if ( ! clientId || canHostEditableRoot( clientId ) ) {
 					return;
 				}
@@ -64,6 +64,12 @@ export default function useClickSelection() {
 				setContentEditableWrapper( node, false );
 				field.focus( { preventScroll: true } );
 
+				// A mouse press is also cancelled when a native drag starts,
+				// which must leave the field as its own editing host.
+				if ( pointerType !== 'touch' ) {
+					return;
+				}
+
 				// The touch became a scroll: the wrapper hosts the field again.
 				function onPointerCancel() {
 					setContentEditableWrapper( node, true );
@@ -71,7 +77,7 @@ export default function useClickSelection() {
 				node.addEventListener( 'pointercancel', onPointerCancel, {
 					once: true,
 				} );
-				// A press: nothing to undo.
+				// A tap: nothing to undo.
 				node.addEventListener(
 					'pointerup',
 					() =>

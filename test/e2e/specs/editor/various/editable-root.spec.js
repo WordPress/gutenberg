@@ -118,7 +118,10 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			],
 		} );
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Heading' } )
+			.getByRole( 'document', {
+				name: 'Block: Heading 2',
+				exact: true,
+			} )
 			.click();
 		const [ heading, quote ] = await editor.getBlocks( { full: true } );
 		const quoteParagraph = quote.innerBlocks[ 0 ];
@@ -132,7 +135,10 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 
 		// The paragraph is wider than its text: the caret goes to the end.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				exact: true,
+			} )
 			.click();
 		await expect
 			.poll( getSelectedBlockClientId )
@@ -171,7 +177,10 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			],
 		} );
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Heading' } )
+			.getByRole( 'document', {
+				name: 'Block: Heading 2',
+				exact: true,
+			} )
 			.click();
 		const [ heading, quote ] = await editor.getBlocks( { full: true } );
 		const getSelectedBlockClientIds = () =>
@@ -185,7 +194,10 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			.toEqual( [ heading.clientId ] );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				exact: true,
+			} )
 			.click( { modifiers: [ 'Shift' ] } );
 
 		await expect
@@ -209,7 +221,10 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			},
 		} );
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Heading' } )
+			.getByRole( 'document', {
+				name: 'Block: Heading 2',
+				exact: true,
+			} )
 			.click();
 		const [ heading, image ] = await editor.getBlocks( { full: true } );
 		const getSelectedBlockClientId = () =>
@@ -234,5 +249,50 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			{ name: 'core/heading', attributes: { content: 'Heading' } },
 			{ name: 'core/image', attributes: { caption: 'CaptionX' } },
 		] );
+	} );
+
+	test( 'deletes an image with Backspace after dragging it from a heading', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'Heading' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading 2', exact: true } )
+			.click();
+		const [ heading, image ] = await editor.getBlocks( { full: true } );
+		const getSelectedBlockClientId = () =>
+			page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId()
+			);
+		await expect.poll( getSelectedBlockClientId ).toBe( heading.clientId );
+
+		// A native drag of the image, dropped where it was.
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Image', exact: true } )
+			.boundingBox();
+		const x = box.x + box.width / 2;
+		const y = box.y + box.height / 2;
+		await page.mouse.move( x, y );
+		await page.mouse.down();
+		await page.mouse.move( x + 20, y + 20, { steps: 5 } );
+		await page.mouse.move( x, y, { steps: 5 } );
+		await page.mouse.up();
+		await expect.poll( getSelectedBlockClientId ).toBe( image.clientId );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/heading', attributes: { content: 'Heading' } },
+			] );
 	} );
 } );
