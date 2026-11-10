@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
+
 ### Enhancements
 
 -   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
