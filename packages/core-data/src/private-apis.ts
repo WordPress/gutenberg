@@ -22,6 +22,7 @@ import {
 	getEntitySnapshot,
 	retrySyncConnection,
 } from './sync';
+import { registerBlockAttributeMergeStrategy } from './utils/crdt-attribute-sets';
 import {
 	SelectionType,
 	SelectionDirection,
@@ -40,6 +41,7 @@ const lockedApis = {
 	entityContainsSnapshot,
 	getEntitySnapshot,
 	retrySyncConnection,
+	registerBlockAttributeMergeStrategy,
 	useActiveCollaborators,
 	useResolvedSelection,
 	useOnCollaboratorJoin,

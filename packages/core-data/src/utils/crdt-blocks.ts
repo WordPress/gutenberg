@@ -12,6 +12,10 @@ import {
 	type YMapWrap,
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
+import {
+	collapseAttributeSets,
+	expandAttributeSets,
+} from './crdt-attribute-sets';
 import { Delta } from '../sync';
 import { type WPBlockSelection } from '../types';
 
@@ -117,7 +121,10 @@ function makeBlockAttributesSerializable(
 
 		newAttributes[ key ] = serializeAttributeValue( value );
 	}
-	return newAttributes;
+
+	// Store each element of a registered set under its own key, so that
+	// collaborators who change the set at the same time do not conflict.
+	return expandAttributeSets( newAttributes );
 }
 
 /**
@@ -206,8 +213,10 @@ function deserializeAttributeValue(
  */
 export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 	return blocks.map( ( block: Block ) => {
-		const { name, innerBlocks, attributes, ...rest } = block;
+		const { name, innerBlocks, ...rest } = block;
 
+		// Put the elements of registered sets back into their attributes.
+		const attributes = collapseAttributeSets( block.attributes );
 		const newAttributes = { ...attributes };
 
 		for ( const [ key, value ] of Object.entries( attributes ) ) {
