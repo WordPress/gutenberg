@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `AlertDialog`: Honor canceled open state changes and restore usable controls when closing after confirmation is canceled ([#86544](https://github.com/WordPress/gutenberg/pull/86544)).
 -   `Input`, `Combobox`, `Autocomplete`, and their controls: Prevent wp-admin form styles from adding a grey background to read-only and disabled fields, and from changing the text color of disabled fields ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content ([#86497](https://github.com/WordPress/gutenberg/pull/86497)).
 -   `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels and squashed icons in a prefix or suffix. ([#86446](https://github.com/WordPress/gutenberg/pull/86446))
