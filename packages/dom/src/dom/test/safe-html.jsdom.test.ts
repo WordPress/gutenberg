@@ -33,7 +33,7 @@ describe( 'safeHTML', () => {
 		);
 	} );
 
-	it.each( [ 'object', 'embed', 'base', 'meta', 'noscript' ] )(
+	it.each( [ 'object', 'embed', 'base', 'meta', 'noscript', 'template' ] )(
 		'should strip %s elements',
 		( tagName ) => {
 			expect( safeHTML( `<p>Text</p><${ tagName }>` ) ).toBe(

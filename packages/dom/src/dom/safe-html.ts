@@ -7,6 +7,7 @@ const UNSAFE_ELEMENTS = new Set( [
 	'noscript',
 	'object',
 	'script',
+	'template',
 ] );
 const IFRAME_SANDBOX = 'allow-scripts allow-presentation';
 const MAX_PASSES = 8;
