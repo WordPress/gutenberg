@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `wordCount`: redraw the number sign to match `postCommentsCount` ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `customPostType`: draw the asterisk with six spokes, matching the one in [#85442](https://github.com/WordPress/gutenberg/pull/85442) ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+
 ### Bug Fixes
 
 -   `cover`: Redraw the icon on the frame the other container icons share, such as `image` and `caption`, correcting a footprint that read a size larger than its neighbors, and align the bookmark with the top edge of that frame ([#86420](https://github.com/WordPress/gutenberg/pull/86420)).
