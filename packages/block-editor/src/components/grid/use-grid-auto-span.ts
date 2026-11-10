@@ -1,5 +1,5 @@
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
@@ -65,6 +65,9 @@ function areObjectsEqualExcept(
 	second: Record< string, unknown > | undefined,
 	ignoredKeys: ReadonlySet< string >
 ): boolean {
+	if ( first === second ) {
+		return true;
+	}
 	const firstKeys = Object.keys( first ?? {} ).filter(
 		( key ) => ! ignoredKeys.has( key )
 	);
@@ -268,6 +271,10 @@ function getExpandedColumnRect(
 		columnSpan,
 		rowSpan: rect.rowSpan,
 	} );
+	// With no alternative placement, checking other items cannot change the result.
+	if ( preferredStart <= minStart ) {
+		return preferredRect;
+	}
 
 	for (
 		let columnStart = preferredStart;
@@ -325,9 +332,11 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
-	const { getBlockAttributes, getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockAttributes, getBlockName, getBlockOrder } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const refreshRef = useRef< ( () => void ) | undefined >( undefined );
 
 	useEffect( () => {
 		let autoSpanState = autoSpanStates.get( clientId );
@@ -360,7 +369,12 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		// Capture item dimensions in the resize callback. Responsive child UI can
 		// adapt before the scheduled check and otherwise hide the overflow that
 		// caused the resize.
-		const resizeDimensions = new Map< string, GridItemDimensions >();
+		const resizeDimensions = new Map<
+			string,
+			Pick< GridItemDimensions, 'scrollWidth' | 'scrollHeight' > & {
+				attributes: GridItemAttributes | undefined;
+			}
+		>();
 
 		/**
 		 * Adjusts automatic spans to the current content and grid size.
@@ -455,9 +469,6 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 
 			const updates: Record< string, Record< string, unknown > > = {};
 			let needsFollowUpCheck = false;
-			const childBlocksById = new Map(
-				childBlocks.map( ( block ) => [ block.clientId, block ] )
-			);
 			for ( const element of getItemElements() ) {
 				const childId = element.getAttribute( 'data-block' );
 				if ( ! childId ) {
@@ -470,30 +481,24 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				}
 				const itemLayout = attributes.style?.layout ?? {};
 				let itemState = autoSpanState.items.get( childId );
-				const childBlock = childBlocksById.get( childId );
-				const contentAttributeKeys = childBlock
-					? getBlockAttributesNamesByRole(
-							childBlock.name,
-							'content'
-						)
-					: [];
-				const contentAttributesChanged =
-					itemState &&
-					! areContentAttributesEqual(
-						itemState.attributes,
-						attributes,
-						contentAttributeKeys
-					);
-				const userControlledAttributesChanged =
-					itemState &&
-					! areUserControlledAttributesEqual(
-						itemState.attributes,
-						attributes,
-						contentAttributeKeys
-					);
-				const renderedAttributesChanged =
-					!! contentAttributesChanged ||
-					!! userControlledAttributesChanged;
+				let renderedAttributesChanged = false;
+				if ( itemState && itemState.attributes !== attributes ) {
+					const blockName = getBlockName( childId );
+					const contentAttributeKeys = blockName
+						? getBlockAttributesNamesByRole( blockName, 'content' )
+						: [];
+					renderedAttributesChanged =
+						! areContentAttributesEqual(
+							itemState.attributes,
+							attributes,
+							contentAttributeKeys
+						) ||
+						! areUserControlledAttributesEqual(
+							itemState.attributes,
+							attributes,
+							contentAttributeKeys
+						);
+				}
 				const canShrink = allowShrink || renderedAttributesChanged;
 				let columnSpanChanged = false;
 				let rowSpanChanged = false;
@@ -533,8 +538,12 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					oneCellRect,
 					rowHeight
 				);
+				const capturedDimensions = resizeDimensions.get( childId );
+				// An edit may have invalidated an earlier resize notification.
 				const dimensionsBeforeResponsiveReflow =
-					resizeDimensions.get( childId );
+					capturedDimensions?.attributes === attributes
+						? capturedDimensions
+						: undefined;
 				resizeDimensions.delete( childId );
 				// Allow for sub-pixel rounding.
 				const contentWidth = Math.max(
@@ -592,13 +601,6 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					columnCount,
 					autoColumnSpan + extraColumnSpan
 				);
-				const contentDrivenWidthRect = getExpandedColumnRect(
-					childId,
-					oneCellRect,
-					desiredColumnSpan,
-					columnCount,
-					rects
-				);
 				const desiredWidthRect = preserveColumnSpan
 					? new GridRect( {
 							columnStart: rect.columnStart,
@@ -606,15 +608,26 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 							columnSpan: rect.columnSpan,
 							rowSpan: 1,
 						} )
-					: contentDrivenWidthRect;
+					: getExpandedColumnRect(
+							childId,
+							oneCellRect,
+							desiredColumnSpan,
+							columnCount,
+							rects
+						);
 
 				// Measure height at the chosen width because widening can reduce the
 				// height of wrapped content.
-				const desiredWidthDimensions = measureElementAtRect(
-					element,
-					desiredWidthRect,
-					rowHeight
-				);
+				const desiredWidthDimensions = areGridRectsEqual(
+					oneCellRect,
+					desiredWidthRect
+				)
+					? oneCellDimensions
+					: measureElementAtRect(
+							element,
+							desiredWidthRect,
+							rowHeight
+						);
 				const contentHeight = Math.max(
 					desiredWidthDimensions.offsetHeight,
 					desiredWidthDimensions.scrollHeight,
@@ -742,10 +755,10 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			// Growing past the last row adds rows. Shrinking back removes only
 			// rows that were added automatically. Row height stays the same
 			// because the grid's aspect ratio scales with the row count.
-			const bottomMostRow = Math.max(
-				0,
-				...[ ...rects.values() ].map( ( rect ) => rect.rowEnd )
-			);
+			let bottomMostRow = 0;
+			for ( const rect of rects.values() ) {
+				bottomMostRow = Math.max( bottomMostRow, rect.rowEnd );
+			}
 			const desiredRowCount = Math.max(
 				autoSpanRows.base,
 				bottomMostRow
@@ -761,10 +774,11 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				needsFollowUpCheck = true;
 			}
 
-			if ( Object.keys( updates ).length ) {
+			const updatedIds = Object.keys( updates );
+			if ( updatedIds.length ) {
 				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes(
-					Object.keys( updates ),
+					updatedIds,
 					updates,
 					/* uniqueByBlock: */ true
 				);
@@ -819,8 +833,8 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				const childId = target.getAttribute( 'data-block' );
 				if ( childId ) {
 					resizeDimensions.set( childId, {
-						offsetWidth: target.offsetWidth,
-						offsetHeight: target.offsetHeight,
+						attributes: getBlockAttributes( childId ) as
+							GridItemAttributes | undefined,
 						scrollWidth: target.scrollWidth,
 						scrollHeight: target.scrollHeight,
 					} );
@@ -829,12 +843,32 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			scheduleCheck();
 		} );
 		resizeObserver.observe( gridElement );
-		getItemElements().forEach( ( element ) =>
-			resizeObserver.observe( element )
-		);
-		scheduleCheck();
+		const observedItems = new Set< HTMLElement >();
+		const refresh = () => {
+			const itemElements = new Set( getItemElements() );
+			for ( const element of observedItems ) {
+				if ( ! itemElements.has( element ) ) {
+					resizeObserver.unobserve( element );
+					observedItems.delete( element );
+					const childId = element.getAttribute( 'data-block' );
+					if ( childId ) {
+						resizeDimensions.delete( childId );
+					}
+				}
+			}
+			for ( const element of itemElements ) {
+				if ( ! observedItems.has( element ) ) {
+					resizeObserver.observe( element );
+					observedItems.add( element );
+				}
+			}
+			scheduleCheck();
+		};
+		refreshRef.current = refresh;
+		refresh();
 
 		return () => {
+			refreshRef.current = undefined;
 			mutationObserver.disconnect();
 			resizeObserver.disconnect();
 			gridElement.removeEventListener( 'load', handleImageLoad, true );
@@ -844,12 +878,18 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		};
 	}, [
 		clientId,
-		childBlocks,
 		gridElement,
 		isManualPlacement,
 		getBlockAttributes,
+		getBlockName,
 		getBlockOrder,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	// Content and placement edits need another check, but keep observers and any
+	// captured overflow dimensions alive across those edits.
+	useEffect( () => {
+		refreshRef.current?.();
+	}, [ childBlocks ] );
 }
