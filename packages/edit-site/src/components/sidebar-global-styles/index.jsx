@@ -118,23 +118,31 @@ export default function SidebarGlobalStyles() {
 	// The preview on this route is the editor in preview mode, and its
 	// revisions canvas is driven by the editor store's styles path rather than
 	// this route's `section` query arg. Keep the store in sync while the
-	// revisions screen is open, so selecting a revision previews it.
+	// revisions screen is open, so selecting a revision previews it. The store
+	// is watched as well as the URL: on a fresh load the editor can reset the
+	// path after this page has set it.
 	//
 	// The path is reset only when revisions close, not on unmount: switching
 	// to edit mode unmounts this page, and the sidebar footer opens revisions
 	// in edit mode by setting the path just before that happens. Leaving the
 	// route is covered by the editor, which resets styles navigation there.
+	const stylesPath = useSelect(
+		( select ) => unlock( select( editorStore ) ).getStylesPath(),
+		[]
+	);
 	const { setStylesPath } = unlock( useDispatch( editorStore ) );
 	const wereRevisionsOpenedRef = useRef( false );
 	useEffect( () => {
 		if ( areRevisionsOpened ) {
-			setStylesPath( section );
+			if ( stylesPath !== section ) {
+				setStylesPath( section );
+			}
 			wereRevisionsOpenedRef.current = true;
 		} else if ( wereRevisionsOpenedRef.current ) {
 			setStylesPath( '/' );
 			wereRevisionsOpenedRef.current = false;
 		}
-	}, [ areRevisionsOpened, section, setStylesPath ] );
+	}, [ areRevisionsOpened, section, stylesPath, setStylesPath ] );
 	const settings = useSelect(
 		( select ) => select( editSiteStore ).getSettings(),
 		[]
