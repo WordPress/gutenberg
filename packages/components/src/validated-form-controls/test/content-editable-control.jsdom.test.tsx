@@ -18,11 +18,7 @@ describe( 'ValidatedContentEditableControl', () => {
 		).toHaveAccessibleDescription( 'A short bio.' );
 	} );
 
-	// The validity (and its description) lives on the hidden delegate input,
-	// not the editable that assistive technology interacts with. This is the
-	// same pre-existing limitation as the other delegate-based controls,
-	// tracked in #76741.
-	it.skip( 'should append the validation error alongside the help description', async () => {
+	it( 'should append the validation error alongside the help description', async () => {
 		const user = userEvent.setup();
 		render(
 			<form>
