@@ -12,7 +12,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
-import { copySmall } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { store as editorStore } from '../../store';
@@ -111,7 +111,7 @@ export default function PostURL( { onClose } ) {
 								suffix={
 									<InputControlSuffixWrapper variant="control">
 										<Button
-											icon={ copySmall }
+											icon={ copy }
 											ref={ copyButtonRef }
 											size="small"
 											label={ __( 'Copy' ) }

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
+### Bug Fixes
+
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
+### Internal
+
+-   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 4.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).

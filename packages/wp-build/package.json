@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.26.0",
+	"version": "0.27.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,7 +61,7 @@
 	"devDependencies": {
 		"@types/node": "^24.13.3",
 		"@wordpress/theme": "file:../theme",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"@wordpress/theme": "^3.0.0 || ^4.0.0"
