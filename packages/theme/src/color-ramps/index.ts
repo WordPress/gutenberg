@@ -9,6 +9,7 @@ import type {
 } from './lib/types.ts';
 import { getContrast } from './lib/color-utils.ts';
 import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
+import { enforcePrimaryFocusContrast } from './lib/primary-focus-contrast.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
 /**
@@ -63,6 +64,20 @@ export function buildAccentRamp(
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
 	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+}
+
+/**
+ * Create the brand ramp with focus and strong-fill contrast against its theme.
+ *
+ * @param seed   Primary seed color.
+ * @param bgRamp Background on which the brand colors are displayed.
+ */
+export function buildPrimaryRamp( seed: string, bgRamp: InternalRampResult ) {
+	return enforcePrimaryFocusContrast(
+		buildAccentRamp( seed, bgRamp ),
+		bgRamp,
+		getBgRampInfo( bgRamp )
+	);
 }
 
 /**

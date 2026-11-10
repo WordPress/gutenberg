@@ -188,9 +188,9 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 
 The callback reports failures from the generated ramp checks and a defined set of semantic foreground/background pairs. It does not validate every possible token pairing. It receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
-The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. They use the final generated colors after seed adjustments. These checks report failures without adjusting the colors. Text pairs retain their 4.5:1 minimum.
+The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. They use the final generated colors after seed adjustments. The primary ramp adjusts its seed when these constraints are not met, while retaining its text and active-state contrast targets. Unresolved pairs still produce warnings. Text pairs retain their 4.5:1 minimum.
 
-For example, with the default primary `#3858e9` and background `#1e1e1e`, the resting strong brand fill has 2.93:1 contrast against `background.surface.neutral` and 2.69:1 against `background.surface.neutral-strong`. The focus ring, active fill, and text pairs still meet their targets. Choose a different primary or background seed to resolve the reported pair; for example, the default primary with background `#000000` meets these checked contrast targets.
+For example, with the default primary `#3858e9` and background `#1e1e1e`, the primary fill adjusts to `#4368fb` so the brand fills and focus ring meet the checked 3:1 targets. The supplied primary seed remains available through the resolved provider settings and legacy admin color variables.
 
 ### TypeScript props and warnings
 

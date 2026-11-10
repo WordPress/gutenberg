@@ -15,6 +15,7 @@ import colorTokens from './prebuilt/ts/color-tokens.ts';
 import {
 	buildBgRamp,
 	buildAccentRamp,
+	buildPrimaryRamp,
 	DEFAULT_SEED_COLORS,
 	type RampResult,
 } from './color-ramps/index.ts';
@@ -33,6 +34,7 @@ type Entry = [ string, string ];
 // Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+const getCachedPrimaryRamp = memoize( buildPrimaryRamp, { maxSize: 10 } );
 
 /*
  * Building a ramp is costly, and the ramps of the default seeds are prebuilt,
@@ -50,9 +52,14 @@ function getAccentRamp(
 	seed: string,
 	bgRamp: RampResult
 ): RampResult {
-	return bgRamp === DEFAULT_RAMPS.background &&
+	if (
+		bgRamp === DEFAULT_RAMPS.background &&
 		seed === DEFAULT_SEED_COLORS[ rampName ]
-		? DEFAULT_RAMPS[ rampName ]
+	) {
+		return DEFAULT_RAMPS[ rampName ];
+	}
+	return rampName === 'primary'
+		? getCachedPrimaryRamp( seed, bgRamp )
 		: getCachedAccentRamp( seed, bgRamp );
 }
 

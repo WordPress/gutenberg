@@ -5,19 +5,23 @@ import { render } from 'vitest-browser-react';
 import { ThemeProvider } from '../theme-provider';
 import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 import styles from '../style.module.css';
+import { getContrast } from '../color-ramps/lib/color-utils';
+import {
+	SEMANTIC_FOCUS_CONTRAST_PAIRS,
+	getSemanticColorCustomProperty,
+} from '../semantic-color-contrast-pairs';
 // Browser Mode verifies the generated design-token stylesheet itself.
 import '../../prebuilt/css/design-tokens.css';
 
-// The "strong" brand background resolves to the `color.primary` seed itself, and
-// the neutral surface resolves to the `color.background` seed itself, which makes
-// the expected values predictable. (Extreme seeds get snapped into the accessible
-// ramp, so the seeds below are deliberately mid-range/light hex values that
-// round-trip. Ramp generation itself is covered by the color-ramps tests.)
+// The neutral surface resolves to the background seed used here. The primary
+// fill can move to satisfy focus contrast, so its generated value is asserted
+// separately. Ramp generation itself is covered by the color-ramps tests.
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
+const PRIMARY_FILL = '#1089f7';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
 const FORMER_WARNING_PRIMARY = '#608010';
@@ -86,7 +90,7 @@ describe( 'ThemeProvider', () => {
 		);
 
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
-		expect( readProp( provider, BRAND_BG ) ).toBe( PRIMARY );
+		expect( readProp( provider, BRAND_BG ) ).toBe( PRIMARY_FILL );
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
@@ -113,7 +117,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'reports low-contrast highlights even when their text is accessible', async () => {
+	it( 'keeps brand highlights visible against their neutral and brand surfaces', async () => {
 		const onColorWarnings =
 			vi.fn<
 				( warnings: readonly ThemeProviderColorWarning[] ) => void
@@ -125,23 +129,29 @@ describe( 'ThemeProvider', () => {
 					background: FORMER_WARNING_BACKGROUND,
 				} }
 				onColorWarnings={ onColorWarnings }
-			/>
+			>
+				<button>Focus contrast sample</button>
+			</ThemeProvider>
 		);
 
-		expect( onColorWarnings ).toHaveBeenCalledWith(
-			expect.arrayContaining( [
-				{
-					type: 'contrast',
-					backgroundToken: 'background.surface.neutral-strong',
-					backgroundColor: '#563c79',
-					foregroundToken:
-						'background.interactive.brand-strong-active',
-					foregroundColor: '#6e8f27',
-					requiredContrast: 3,
-					achievedContrast: expect.closeTo( 2.4249, 4 ),
-				},
-			] )
-		);
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
+		const sample = screen.getByRole( 'button', {
+			name: 'Focus contrast sample',
+		} );
+		for ( const pair of SEMANTIC_FOCUS_CONTRAST_PAIRS ) {
+			expect(
+				getContrast(
+					readProp(
+						sample,
+						getSemanticColorCustomProperty( pair.background )
+					),
+					readProp(
+						sample,
+						getSemanticColorCustomProperty( pair.foreground )
+					)
+				)
+			).toBeGreaterThanOrEqual( 3 );
+		}
 
 		onColorWarnings.mockClear();
 		await rerender(
@@ -240,7 +250,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY
+				PRIMARY_FILL
 			);
 		} );
 
@@ -264,7 +274,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY
+				PRIMARY_FILL
 			);
 
 			await unmount();
@@ -289,7 +299,7 @@ describe( 'ThemeProvider', () => {
 					) );
 
 					expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
-						PRIMARY
+						PRIMARY_FILL
 					);
 					expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe(
 						''
@@ -332,7 +342,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY
+				PRIMARY_FILL
 			);
 			expect( iframeDoc.documentElement ).toHaveAttribute(
 				'data-wpds-root-provider',
@@ -548,7 +558,7 @@ describe( 'ThemeProvider', () => {
 
 			// A nested provider with no settings of its own inherits everything
 			// and re-applies color tokens so portaled descendants have them.
-			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
+			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY_FILL );
 			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
 			expect( inheriting ).toHaveAttribute(
