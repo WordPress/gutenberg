@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { split } from '../split';
 import { getSparseArrayLength } from './helpers';
@@ -225,5 +226,17 @@ describe( 'split', () => {
 			text: '',
 		};
 		expect( split( deepFreeze( record ) ) ).toBe( undefined );
+	} );
+
+	it( 'should split at indices without selection', () => {
+		const record = {
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'abcd',
+		};
+		const [ before, after ] = split( deepFreeze( record ), 1, 3 );
+
+		expect( before.text ).toBe( 'a' );
+		expect( after.text ).toBe( 'd' );
 	} );
 } );

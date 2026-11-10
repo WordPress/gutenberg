@@ -3,6 +3,7 @@ import { Modal } from '@wordpress/components';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import useSaveShortcut from './use-save-shortcut';
+import styles from './style.module.scss';
 
 export default function SavePanel() {
 	const [ isOpen, setIsOpen ] = useState< boolean >( false );
@@ -14,7 +15,7 @@ export default function SavePanel() {
 	}
 	return (
 		<Modal
-			className="edit-site-save-panel__modal"
+			className={ styles.modal }
 			onRequestClose={ () => setIsOpen( false ) }
 			title={ __( 'Review changes' ) }
 			size="small"

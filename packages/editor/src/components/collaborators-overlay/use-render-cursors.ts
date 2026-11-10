@@ -10,7 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { computeSelectionVisual } from './compute-selection';
 import {
 	useDebouncedRecompute,
@@ -18,6 +18,7 @@ import {
 } from './use-debounced-recompute';
 import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -33,6 +34,10 @@ export interface CursorData {
 	clientId: number;
 	color: string;
 	avatarUrl?: string;
+	// The local clientId of the block this cursor sits in, so consumers can
+	// tell whether a collaborator is working in the same block as the local
+	// user. Absent when the selection could not be resolved to a block.
+	blockClientId?: string;
 	// x/y/height absent for multi-block selections — avatar comes from
 	// use-block-highlighting; only selectionRects are rendered here.
 	x?: number;
@@ -97,11 +102,16 @@ export function useRenderCursors(
 			return;
 		}
 
-		// Pre-compute the overlay rect once, same for every user.
-		const overlayRect = overlayElement.getBoundingClientRect();
-		const overlayContext = {
-			editorDocument: blockEditorDocument,
-			overlayRect,
+		// Measure the overlay rect once, same for every user, and only when
+		// there is a cursor to draw: measuring forces a layout.
+		let overlayContext:
+			{ editorDocument: Document; overlayRect: DOMRect } | undefined;
+		const getOverlayContext = () => {
+			overlayContext ??= {
+				editorDocument: blockEditorDocument,
+				overlayRect: overlayElement.getBoundingClientRect(),
+			};
+			return overlayContext;
 		};
 
 		const results: CursorData[] = [];
@@ -197,18 +207,22 @@ export function useRenderCursors(
 				}
 			}
 
-			const userName = user.collaboratorInfo.name;
+			const userName = getCollaboratorDisplayName(
+				user.collaboratorInfo
+			);
 			const clientId = user.clientId;
 			const color = user.isMe
 				? 'var(--wp-admin-theme-color)'
-				: getAvatarBorderColor( user.collaboratorInfo.id );
+				: getAvatarBorderColor(
+						user.collaboratorInfo.id ?? user.clientId
+					);
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(
 				selection,
 				start,
 				end,
-				overlayContext
+				getOverlayContext()
 			);
 
 			const hasCoords = Boolean( selectionVisual.coords );
@@ -221,6 +235,7 @@ export function useRenderCursors(
 					color,
 					avatarUrl,
 					isMe: user.isMe,
+					blockClientId: start.localClientId ?? undefined,
 					...( selectionVisual.coords ?? {} ),
 				};
 				if ( selectionVisual.selectionRects ) {

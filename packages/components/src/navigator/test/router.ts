@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { patternMatch, findParent } from '../utils/router';
 
 describe( 'patternMatch', () => {

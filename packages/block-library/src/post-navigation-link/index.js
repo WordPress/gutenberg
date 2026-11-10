@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { next as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -9,6 +10,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	icon,
 	edit,
 	variations,
 	deprecated,

@@ -19,19 +19,15 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
 		self::$post_id   = $factory->post->create( array( 'post_author' => self::$editor_id ) );
-		update_option( 'wp_collaboration_enabled', 1 );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$editor_id );
-		delete_option( 'wp_collaboration_enabled' );
 		wp_delete_post( self::$post_id, true );
 	}
 
 	public function set_up() {
 		parent::set_up();
-		update_option( 'wp_collaboration_enabled', 1 );
-
 		$this->reset_storage_post_id_cache();
 	}
 

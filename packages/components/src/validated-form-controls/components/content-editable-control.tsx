@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { useMergeRefs } from '@wordpress/compose';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import ContentEditableControl from '../../content-editable-control';
 
@@ -30,17 +31,22 @@ const UnforwardedValidatedContentEditableControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ editableRef, forwardedRef ] );
+	const getInteractiveTarget = () => editableRef.current;
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
+				className="components-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<ContentEditableControl
-					ref={ forwardedRef }
+					ref={ mergedRef }
 					className={ clsx(
 						'components-validated-control__content-editable',
 						className
@@ -61,11 +67,7 @@ const UnforwardedValidatedContentEditableControl = (
 				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
 				onChange={ () => {} }
-				onFocus={ ( e ) => {
-					e.target.previousElementSibling
-						?.querySelector< HTMLElement >( '[role="textbox"]' )
-						?.focus();
-				} }
+				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>
 		</div>
 	);

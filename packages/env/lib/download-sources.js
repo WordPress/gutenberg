@@ -5,7 +5,7 @@ const util = require( 'util' );
 const pipeline = util.promisify( require( 'stream' ).pipeline );
 const got = require( 'got' );
 const AdmZip = require( 'adm-zip' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const { rimraf } = require( 'rimraf' );
 
 /**
@@ -45,7 +45,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 
@@ -54,7 +54,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	};
 
 	log( 'Cloning or getting the repo.' );
-	const git = SimpleGit( { progress: progressHandler } );
+	const git = simpleGit( { progress: progressHandler } );
 
 	const isRepo =
 		fs.existsSync( source.clonePath ) &&
@@ -79,6 +79,15 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	log( 'Checking out the specified ref.' );
 	await git.checkout( source.ref );
 
+	// Checking out a ref which already exists as a local branch doesn't advance
+	// that branch to the commit which was just fetched, so the branch has to be
+	// moved explicitly for updates to have any effect. `FETCH_HEAD` is used
+	// rather than the ref itself because `source.ref` is undefined when the
+	// source string has no `#ref` part, in which case the repository's default
+	// branch is the intended target.
+	log( 'Resetting to the fetched commit.' );
+	await git.reset( [ '--hard', 'FETCH_HEAD' ] );
+
 	onProgress( 1 );
 }
 
@@ -96,7 +105,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 
