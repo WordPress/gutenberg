@@ -120,21 +120,33 @@ export default function SidebarGlobalStyles() {
 	// this route's `section` query arg. Keep the store in sync while the
 	// revisions screen is open, so selecting a revision previews it.
 	//
+	// The store is watched as well as the URL. The editor's Styles sidebar is
+	// mounted in browse mode too, and resets the path when it mounts while it
+	// isn't the active sidebar. On a fresh load the editor mounts after this
+	// page has synced the path, so without re-syncing the preview would show
+	// the site instead of the revisions.
+	//
 	// The path is reset only when revisions close, not on unmount: switching
 	// to edit mode unmounts this page, and the sidebar footer opens revisions
 	// in edit mode by setting the path just before that happens. Leaving the
 	// route is covered by the editor, which resets styles navigation there.
+	const stylesPath = useSelect(
+		( select ) => unlock( select( editorStore ) ).getStylesPath(),
+		[]
+	);
 	const { setStylesPath } = unlock( useDispatch( editorStore ) );
 	const wereRevisionsOpenedRef = useRef( false );
 	useEffect( () => {
 		if ( areRevisionsOpened ) {
-			setStylesPath( section );
+			if ( stylesPath !== section ) {
+				setStylesPath( section );
+			}
 			wereRevisionsOpenedRef.current = true;
 		} else if ( wereRevisionsOpenedRef.current ) {
 			setStylesPath( '/' );
 			wereRevisionsOpenedRef.current = false;
 		}
-	}, [ areRevisionsOpened, section, setStylesPath ] );
+	}, [ areRevisionsOpened, section, stylesPath, setStylesPath ] );
 	const settings = useSelect(
 		( select ) => select( editSiteStore ).getSettings(),
 		[]
