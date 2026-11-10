@@ -80,6 +80,10 @@
 				"fontSize": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
