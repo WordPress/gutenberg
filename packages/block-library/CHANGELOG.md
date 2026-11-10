@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
 -   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
