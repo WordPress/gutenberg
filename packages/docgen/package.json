@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,7 @@
 		"unified": "^7.1.0"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

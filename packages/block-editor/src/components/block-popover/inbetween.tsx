@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
@@ -225,7 +225,7 @@ function BlockPopoverInbetween( {
 	//
 	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
-		<Popover
+		<WCPopover
 			ref={ popoverScrollRef }
 			animate={ false }
 			anchor={ popoverAnchor }
@@ -251,7 +251,7 @@ function BlockPopoverInbetween( {
 			<div className="block-editor-block-popover__inbetween-container">
 				{ children }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }
 

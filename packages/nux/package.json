@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "11.0.0",
+	"version": "11.1.0",
 	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -56,7 +56,7 @@
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
