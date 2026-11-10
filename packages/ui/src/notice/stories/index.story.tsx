@@ -138,7 +138,7 @@ export const WithoutActions: Story = {
 };
 
 /**
- * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and avoid an awkward mismatch between brand and notice colors.
+ * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and blend with the notice colors.
  *
  * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
  */
