@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
+-   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
 
 ### Bug Fixes
 
@@ -36,7 +37,6 @@
 -   Playlist: Use the UI SelectControl for the Order and Shape settings ([#86161](https://github.com/WordPress/gutenberg/pull/86161)).
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 -   Social Icon: Add Link to and View controls to inspector Content tab ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
--   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
 
 ### Bug Fixes
 
