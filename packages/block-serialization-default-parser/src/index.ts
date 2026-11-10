@@ -412,11 +412,18 @@ function nextToken(): Token {
 	const hasAttrs = !! attrsMatch;
 	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
 
-	// This state isn't allowed
-	// This is an error.
 	if ( isCloser && ( isVoid || hasAttrs ) ) {
-		// We can ignore them since they don't hurt anything
-		// we may warn against this at some point or reject it.
+		// Although the closing flag and void flag are mutually exclusive,
+		// and closing tags should not contain JSON attributes, it's unlikely
+		// that almost-valid block delimiter syntax was accidentally produced.
+		// It's more likely that some code accidentally added the closing flag.
+		//
+		// In these cases, instead of treating the delimiter as non-block HTML
+		// content, the parser shall prefer treating the block delimiter as a
+		// void block if the void flag is present. Otherwise it shall ignore
+		// any attributes that exist on a closing delimiter.
+		//
+		// This particular error-resolution behavior may change in the future.
 	}
 
 	if ( isVoid ) {
