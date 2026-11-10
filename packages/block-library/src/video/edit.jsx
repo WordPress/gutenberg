@@ -13,6 +13,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -67,10 +68,12 @@ function VideoEdit( {
 	// swap. A non-`auto` ratio governs the box height throughout the load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const borderProps = useBorderProps( attributes );
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
 		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
+		...borderProps.style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -163,13 +166,17 @@ function VideoEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className={ clsx(
+					'block-editor-media-placeholder',
+					borderProps.className
+				) }
 				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
 				instructions={ __(
 					'Drag and drop a video, upload, or choose from your library.'
 				) }
+				style={ borderProps.style }
 			>
 				{ content }
 			</Placeholder>
@@ -264,6 +271,7 @@ function VideoEdit( {
 					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
+					className={ borderProps.className }
 					ref={ videoRef }
 					autoPlay={ autoplay && ! prefersReducedMotion }
 					loop={ loop }
