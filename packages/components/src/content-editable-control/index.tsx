@@ -1,6 +1,8 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
+import { InputLayout } from '@wordpress/ui';
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
@@ -46,25 +48,35 @@ function UnforwardedContentEditableControl(
 					{ label }
 				</BaseControl.VisualLabel>
 			) }
-			<div
-				className={ styles.editable }
-				role="textbox"
-				aria-multiline
-				// A hidden label is named directly, so it isn't also read as page text.
-				aria-label={ hideLabelFromVision ? label : undefined }
-				aria-labelledby={ hideLabelFromVision ? undefined : labelId }
-				aria-placeholder={ placeholder || undefined }
-				aria-disabled={ disabled || undefined }
-				aria-required={ required || undefined }
-				ref={ mergedRefs }
-				// Not editable and out of the tab order, but still focusable:
-				// a field disabled while focused keeps focus.
-				contentEditable={ ! disabled }
-				tabIndex={ disabled ? -1 : undefined }
-				suppressContentEditableWarning
-				{ ...additionalProps }
-				{ ...controlProps }
-			/>
+			<InputLayout
+				className={ clsx(
+					'components-content-editable-control__field',
+					styles.layout
+				) }
+				visuallyDisabled={ disabled }
+			>
+				<div
+					className={ styles.editable }
+					role="textbox"
+					aria-multiline
+					// A hidden label is named directly, so it isn't also read as page text.
+					aria-label={ hideLabelFromVision ? label : undefined }
+					aria-labelledby={
+						hideLabelFromVision ? undefined : labelId
+					}
+					aria-placeholder={ placeholder || undefined }
+					aria-disabled={ disabled || undefined }
+					aria-required={ required || undefined }
+					ref={ mergedRefs }
+					// Not editable and out of the tab order, but still focusable:
+					// a field disabled while focused keeps focus.
+					contentEditable={ ! disabled }
+					tabIndex={ disabled ? -1 : undefined }
+					suppressContentEditableWarning
+					{ ...additionalProps }
+					{ ...controlProps }
+				/>
+			</InputLayout>
 		</BaseControl>
 	);
 }
