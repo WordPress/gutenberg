@@ -115,7 +115,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	}
 
 	if ( post_password_required( $block->context['postId'] ) ) {
-		return;
+		return '';
 	}
 
 	$comment_query = new WP_Comment_Query(

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import { ContextSystemProvider } from '../../context';
 import { ToolsPanel, ToolsPanelItem } from '..';
 // The cascade contract includes Button's global icon-button defaults.

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useNavigate, useSearch } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
@@ -140,7 +140,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					padding: '2rem',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

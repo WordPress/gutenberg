@@ -9,16 +9,17 @@ import type {
 	FormatType,
 	ParsedFormat,
 	RichTextContent,
+	RichTextFormatList,
 	RichTextValue,
 	SelectionRange,
 } from './types';
 
-function createEmptyValue() {
+function createEmptyValue(): RichTextValue {
 	return {
 		formats: [],
 		replacements: [],
 		text: '',
-	} as unknown as RichTextValue;
+	};
 }
 
 function toFormat( {
@@ -167,7 +168,7 @@ export class RichTextData {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value as RichTextValue );
+		return getTextContent( this.#value );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
@@ -184,7 +185,7 @@ export class RichTextData {
 		return (
 			this.originalHTML ||
 			toHTMLString( {
-				value: this.#value as RichTextValue,
+				value: this.#value,
 				preserveWhiteSpace,
 			} )
 		);
@@ -256,12 +257,12 @@ for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param [$1]                          Optional named arguments.
- * @param [$1.element]                  Element to create value from.
- * @param [$1.text]                     Text to create value from.
- * @param [$1.html]                     HTML to create value from.
- * @param [$1.range]                    Range to create value from.
- * @param [$1.__unstableIsEditableTree]
+ * @param [options]                          Optional named arguments.
+ * @param [options.element]                  Element to create value from.
+ * @param [options.text]                     Text to create value from.
+ * @param [options.html]                     HTML to create value from.
+ * @param [options.range]                    Range to create value from.
+ * @param [options.__unstableIsEditableTree]
  * @return A rich text value.
  */
 export function create( {
@@ -276,13 +277,13 @@ export function create( {
 	html?: string | RichTextData;
 	range?: Range | null;
 	__unstableIsEditableTree?: boolean;
-} = {} ) {
+} = {} ): RichTextValue {
 	if ( html instanceof RichTextData ) {
 		return {
 			text: html.text,
 			formats: html.formats,
 			replacements: html.replacements,
-		} as RichTextValue;
+		};
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -290,7 +291,7 @@ export function create( {
 			formats: Array( text.length ),
 			replacements: Array( text.length ),
 			text,
-		} as RichTextValue;
+		};
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
@@ -438,9 +439,14 @@ function collapseWhiteSpace(
 	hasPrecedingSpace = false,
 	hasTrailingSpace = false
 ) {
-	const clone = element.cloneNode( true ) as HTMLElement;
-	clone.normalize();
-	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
+	// Copy once at the root, then collapse the copy in place.
+	if ( isRoot ) {
+		element = element.cloneNode( true ) as HTMLElement;
+		element.normalize();
+	}
+	const nodes = element.childNodes;
+	for ( let i = 0; i < nodes.length; i++ ) {
+		const node = nodes[ i ];
 		if ( node.nodeType === node.TEXT_NODE ) {
 			let newNodeValue = node.nodeValue!;
 
@@ -472,19 +478,15 @@ function collapseWhiteSpace(
 			const { previousSibling, nextSibling } = node;
 			const prevHasSpace = previousSibling?.textContent!.endsWith( ' ' );
 			const nextHasSpace = nextSibling?.textContent!.startsWith( ' ' );
-			node.replaceWith(
-				collapseWhiteSpace(
-					node as HTMLElement,
-					false,
-					previousSibling
-						? prevHasSpace
-						: isRoot || hasPrecedingSpace,
-					nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
-				)
+			collapseWhiteSpace(
+				node as HTMLElement,
+				false,
+				previousSibling ? prevHasSpace : isRoot || hasPrecedingSpace,
+				nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
 			);
 		}
-	} );
-	return clone;
+	}
+	return element;
 }
 
 /**
@@ -515,10 +517,10 @@ export function removeReservedCharacters( string: string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param $1                  Named arguments.
- * @param [$1.element]        Element to create value from.
- * @param [$1.range]          Range to create value from.
- * @param [$1.isEditableTree]
+ * @param options                  Named arguments.
+ * @param [options.element]        Element to create value from.
+ * @param [options.range]          Range to create value from.
+ * @param [options.isEditableTree]
  *
  * @return A rich text value.
  */
@@ -568,17 +570,17 @@ function createFromElement( {
 				( node as Element ).hasAttribute( 'data-rich-text-comment' ) )
 		) {
 			const value = {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: '#comment',
 						attributes: {
 							'data-rich-text-comment':
 								node.nodeType === node.COMMENT_NODE
-									? node.nodeValue
+									? node.nodeValue!
 									: ( node as Element ).getAttribute(
 											'data-rich-text-comment'
-										),
+										)!,
 						},
 					},
 				],
@@ -605,7 +607,7 @@ function createFromElement( {
 
 		if ( tagName === 'script' ) {
 			const value = {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: tagName,
@@ -644,7 +646,7 @@ function createFromElement( {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						...format,
@@ -679,7 +681,7 @@ function createFromElement( {
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
 				mergePair( accumulator, {
-					formats: [ , ],
+					formats: Array< RichTextFormatList >( 1 ),
 					replacements: [ format ],
 					text: OBJECT_REPLACEMENT_CHARACTER,
 				} );
@@ -723,8 +725,8 @@ function createFromElement( {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param $1         Named arguments.
- * @param $1.element Element to get attributes from.
+ * @param options         Named arguments.
+ * @param options.element Element to get attributes from.
  *
  * @return Attribute object or `undefined` if the element has no attributes.
  */
