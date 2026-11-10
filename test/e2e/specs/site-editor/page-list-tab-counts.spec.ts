@@ -1,19 +1,21 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 // Whether the run targets the extensible site editor (v2). Its Pages screen
 // renders the view list as tabs, the classic editor's as sidebar buttons.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 // Each view trails its label with the item count, as in "Drafts 3".
-const getCountName = ( label, count = '[\\d,]+' ) =>
+const getCountName = ( label: string, count: number | string = '[\\d,]+' ) =>
 	new RegExp( `^${ label } ?${ count }$` );
 
-const getTab = ( page, label ) =>
+const getTab = ( page: Page, label: string ) =>
 	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', {
 		name: getCountName( label ),
 	} );
 
-async function expectCounts( page, counts ) {
+async function expectCounts( page: Page, counts: Record< string, number > ) {
 	for ( const [ label, count ] of Object.entries( counts ) ) {
 		await expect( getTab( page, label ) ).toHaveAccessibleName(
 			getCountName( label, count )
@@ -21,7 +23,7 @@ async function expectCounts( page, counts ) {
 	}
 }
 
-async function openRowActions( page, title ) {
+async function openRowActions( page: Page, title: string ) {
 	const row = page.getByRole( 'row', { name: new RegExp( title ) } );
 	await row.hover();
 	await row.getByRole( 'button', { name: 'Actions' } ).click();
@@ -29,7 +31,7 @@ async function openRowActions( page, title ) {
 
 // Fails every request that would change the given page, so a bulk action on it
 // and another page only partly succeeds.
-async function failChangesToPage( page, id ) {
+async function failChangesToPage( page: Page, id: number ) {
 	await page.route(
 		( url ) =>
 			( url.searchParams.get( 'rest_route' ) ?? url.pathname ).endsWith(
@@ -54,7 +56,7 @@ async function failChangesToPage( page, id ) {
 
 // Creates two pages in the trash: one an action can change, and one whose
 // changes fail.
-async function trashTwoPages( page, requestUtils ) {
+async function trashTwoPages( page: Page, requestUtils: RequestUtils ) {
 	const changed = await requestUtils.createPage( {
 		title: 'Changed Page',
 		status: 'draft',
@@ -74,12 +76,12 @@ async function trashTwoPages( page, requestUtils ) {
 
 // The bulk actions show in a toolbar over the table header, outside the table
 // and apart from each row's own actions, such as Restore.
-const getBulkAction = ( page, name ) =>
+const getBulkAction = ( page: Page, name: string ) =>
 	page
 		.locator( '.dataviews-view-table__bulk-actions-overlay' )
 		.getByRole( 'button', { name, exact: true } );
 
-async function selectAllInTrash( page ) {
+async function selectAllInTrash( page: Page ) {
 	await getTab( page, 'Trash' ).click();
 	await page
 		.getByRole( 'table' )
