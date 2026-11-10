@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
 -   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 
@@ -19,6 +20,8 @@
 -   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
 -   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
 -   Latest Posts: Stop automatically adding `noopener` to links ([#86491](https://github.com/WordPress/gutenberg/pull/86491)).
+-   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
+-   Button: Fix 100% width buttons saved before the width block support shrinking to fit their text in vertical Buttons blocks ([#86536](https://github.com/WordPress/gutenberg/pull/86536)).
 
 ## 12.1.0 (2026-11-04)
 
