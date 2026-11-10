@@ -7004,21 +7004,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/redux-store/metadata/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/metadata/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/metadata/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/redux-store/test/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
