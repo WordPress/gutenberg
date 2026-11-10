@@ -12,7 +12,7 @@
 	// from the `aria-placeholder` attribute while the element has no content.
 	&[aria-placeholder]:empty::before {
 		content: attr(aria-placeholder);
-		color: $components-color-dark-gray-placeholder;
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	min-height: $grid-unit-50;

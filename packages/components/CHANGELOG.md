@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Color placeholders with design system tokens instead of `--wp-components-color-foreground` overrides.
+
 ### Bug Fixes
 
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
