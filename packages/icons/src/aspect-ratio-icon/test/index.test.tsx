@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import AspectRatioIcon from '..';
+import getAspectRatioIcon from '..';
+import aspectRatio from '../../library/aspect-ratio';
 import { getAspectRatioShape } from '../utils';
 
 describe( 'getAspectRatioShape', () => {
@@ -59,19 +59,21 @@ describe( 'getAspectRatioShape', () => {
 	);
 } );
 
-describe( 'AspectRatioIcon', () => {
-	it( 'hides the shape from assistive technology', () => {
-		render( <AspectRatioIcon ratio={ 16 / 9 } data-testid="icon" /> );
+describe( 'getAspectRatioIcon', () => {
+	it.each( [ undefined, null, 0, -1, NaN ] )(
+		'returns the generic aspect ratio icon for %s',
+		( ratio ) => {
+			expect( getAspectRatioIcon( ratio ) ).toBe( aspectRatio );
+		}
+	);
 
-		expect( screen.getByTestId( 'icon' ) ).toHaveAttribute(
-			'aria-hidden',
-			'true'
-		);
+	it( 'returns a different icon when there is a ratio to draw', () => {
+		expect( getAspectRatioIcon( 16 / 9 ) ).not.toBe( aspectRatio );
 	} );
 
-	it( 'renders the generic icon when there is no ratio', () => {
-		render( <AspectRatioIcon data-testid="icon" /> );
+	it( 'keeps the icon unfilled even when a parent sets a fill', () => {
+		const icon = getAspectRatioIcon( 16 / 9 );
 
-		expect( screen.getByTestId( 'icon' ) ).toBeVisible();
+		expect( icon.props.style ).toEqual( { fill: 'none' } );
 	} );
 } );

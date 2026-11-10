@@ -73,4 +73,19 @@ describe( 'MediaEditorCropPanel', () => {
 			Node.DOCUMENT_POSITION_FOLLOWING
 		);
 	} );
+
+	it( 'draws an icon for each aspect ratio option', async () => {
+		const user = userEvent.setup();
+		setupCropPanel();
+
+		await user.click(
+			screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+		);
+
+		const square = await screen.findByRole( 'option', { name: 'Square' } );
+
+		// The icon has no accessible name, so look for the SVG itself.
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( square.querySelector( 'svg' ) ).toBeInTheDocument();
+	} );
 } );

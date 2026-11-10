@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.media-editor-crop-panel__aspect-ratio-option {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+
+	svg {
+		flex-shrink: 0;
+	}
+}

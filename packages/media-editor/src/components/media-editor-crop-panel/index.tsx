@@ -1,5 +1,6 @@
 import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
 import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
@@ -66,7 +67,40 @@ export default function MediaEditorCropPanel( {
 				} }
 				disabled={ disabled }
 				items={ items }
-			/>
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ items.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+					>
+						<SelectControl.ItemLabel>
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</Stack>
 	);
 }

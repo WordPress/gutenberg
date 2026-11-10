@@ -1,19 +1,14 @@
-import {
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
-import { unlock } from '../../lock-unlock';
 import { findAspectRatioOption, parseAspectRatio } from './utils';
 import type {
 	AspectRatioPreset,
 	AspectRatioToolProps,
 	DimensionsToolOption,
 } from './types';
-
-const { AspectRatioIcon } = unlock( componentsPrivateApis );
 
 export default function AspectRatioTool( {
 	panelId,
@@ -106,11 +101,13 @@ export default function AspectRatioTool( {
 					<SelectControl.Trigger>
 						{ ( item ) => (
 							<span className="block-editor-dimensions-tool__aspect-ratio-option">
-								<AspectRatioIcon
-									ratio={ parseAspectRatio(
-										item.value === 'custom'
-											? value
-											: item.value
+								<Icon
+									icon={ getAspectRatioIcon(
+										parseAspectRatio(
+											item.value === 'custom'
+												? value
+												: item.value
+										)
 									) }
 								/>
 								<span className="block-editor-dimensions-tool__aspect-ratio-label">
@@ -130,8 +127,10 @@ export default function AspectRatioTool( {
 					>
 						<SelectControl.ItemLabel>
 							<span className="block-editor-dimensions-tool__aspect-ratio-option">
-								<AspectRatioIcon
-									ratio={ parseAspectRatio( item.value ) }
+								<Icon
+									icon={ getAspectRatioIcon(
+										parseAspectRatio( item.value )
+									) }
 								/>
 								{ item.label }
 							</span>

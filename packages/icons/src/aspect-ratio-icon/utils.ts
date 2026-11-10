@@ -1,4 +1,9 @@
-import type { AspectRatioShape } from './types';
+export type AspectRatioShape = {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+};
 
 // The icon is drawn inside a 24px box, leaving a 4px margin on every side.
 export const BOX_SIZE = 24;
@@ -15,8 +20,9 @@ function snapToPixels( size: number ) {
 }
 
 /**
- * Returns the shape that represents an aspect ratio, or `null` when the value
- * is not a ratio that can be drawn.
+ * Returns the position and size, in the coordinates of the icon's 24px box, of
+ * the rounded rectangle that represents an aspect ratio, or `null` when the
+ * value is not a ratio that can be drawn.
  *
  * @param ratio The aspect ratio, as width divided by height.
  */

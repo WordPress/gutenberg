@@ -6,7 +6,6 @@ import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import AspectRatioIcon from './aspect-ratio-icon';
 import {
 	ValidatedInputControl,
 	ValidatedContentEditableControl,
@@ -16,7 +15,6 @@ import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
 lock( privateApis, {
-	AspectRatioIcon,
 	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
