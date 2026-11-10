@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ## 7.1.0 (2026-11-04)
 
 ## 7.0.0 (2026-10-20)
