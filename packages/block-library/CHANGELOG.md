@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
