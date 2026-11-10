@@ -36,9 +36,7 @@ export default function useClickSelection() {
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
 
-				// Shift extends the selection across blocks, which needs the
-				// wrapper.
-				if ( event.shiftKey || node.contentEditable !== 'true' ) {
+				if ( node.contentEditable !== 'true' ) {
 					return;
 				}
 
