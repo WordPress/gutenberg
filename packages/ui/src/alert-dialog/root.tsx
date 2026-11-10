@@ -71,8 +71,6 @@ function Root( {
 	defaultOpen,
 	onConfirm,
 }: RootProps ) {
-	const [ internalOpen, setInternalOpen ] = useState( defaultOpen ?? false );
-
 	// Internal state machine for the confirm-and-close lifecycle.
 	//
 	// Phase transitions:
@@ -118,45 +116,35 @@ function Root( {
 	// dismiss+reopen cycle is silently discarded.
 	const confirmIdRef = useRef( 0 );
 
-	const effectiveOpen = openProp ?? internalOpen;
-
 	// Safety net: if the consumer keeps `open={true}` after a confirm
 	// (i.e. does not react to `onOpenChange`), the phase would be stuck
 	// at 'closing'. Detect the contradiction and reset to idle.
 	useEffect( () => {
-		if ( effectiveOpen && lifecycleState.phase === 'closing' ) {
+		if ( openProp && lifecycleState.phase === 'closing' ) {
 			lifecycle.update( { phase: 'idle', showSpinner: false } );
 		}
-	}, [ effectiveOpen, lifecycle, lifecycleState.phase ] );
+	}, [ openProp, lifecycle, lifecycleState.phase ] );
 
 	const handleOpenChange = useCallback(
 		(
 			nextOpen: boolean,
 			eventDetails: _AlertDialog.Root.ChangeEventDetails
 		) => {
-			// Only the completed confirm action can close a pending dialog.
-			if (
-				! nextOpen &&
-				lifecycle.getValue().phase === 'pending' &&
-				eventDetails.reason !== 'imperative-action'
-			) {
+			// Block dismiss while a confirm action is pending.
+			if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
 				eventDetails.cancel();
 				return;
 			}
 
 			onOpenChange?.( nextOpen, eventDetails );
-			if ( eventDetails.isCanceled ) {
-				if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
-					lifecycle.update( { phase: 'idle', showSpinner: false } );
-				}
-				return;
-			}
 
 			if ( ! nextOpen ) {
-				lifecycle.update( { phase: 'closing' } );
+				lifecycle.update(
+					eventDetails.isCanceled
+						? { phase: 'idle', showSpinner: false }
+						: { phase: 'closing' }
+				);
 			}
-
-			setInternalOpen( nextOpen );
 		},
 		[ lifecycle, onOpenChange ]
 	);
@@ -201,6 +189,7 @@ function Root( {
 			const shouldClose = result?.close !== false;
 
 			if ( shouldClose ) {
+				lifecycle.update( { phase: 'closing' } );
 				actionsRef.current?.close();
 			} else {
 				lifecycle.update( { phase: 'idle', showSpinner: false } );
@@ -241,7 +230,7 @@ function Root( {
 
 	return (
 		<_AlertDialog.Root
-			open={ effectiveOpen }
+			open={ openProp }
 			defaultOpen={ defaultOpen }
 			onOpenChange={ handleOpenChange }
 			onOpenChangeComplete={ handleOpenChangeComplete }
