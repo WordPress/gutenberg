@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Group: Behind the `gutenberg-grid-interactivity` experiment, make the Canvas variation a full width 12 by 12 grid with an example of placed blocks, and register it when the block is registered, so it does not depend on the order in which the experiment's flag is set ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
 -   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
 -   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
