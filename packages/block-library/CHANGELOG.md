@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Post Template: Add a `query_loop_block_item_html` filter for the markup of each post item ([#86396](https://github.com/WordPress/gutenberg/issues/86396)).
+-   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 
 ### Bug Fixes
