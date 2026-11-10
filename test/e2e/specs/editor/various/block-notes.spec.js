@@ -1030,9 +1030,14 @@ test.describe( 'Block Notes', () => {
 				).toBeVisible();
 			} );
 
-			// Remove the reaction.
-			await reactionButton.click();
+			// Remove the reaction by keyboard. The pill unmounts, so focus
+			// moves to the thread's toggle rather than dropping to the body.
+			await reactionButton.focus();
+			await page.keyboard.press( 'Enter' );
 			await expect( reactionButton ).toBeHidden();
+			await expect(
+				getThreadToggle( blockNoteUtils.getThread( 'Re-add reaction' ) )
+			).toBeFocused();
 
 			// Add the same reaction again. This used to fail two ways:
 			// 1) the parent note's cached `reaction_summary` still

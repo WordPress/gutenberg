@@ -151,8 +151,11 @@ function ReactionButton( {
 							// Removing the last reaction unmounts this pill.
 							if ( isActive && count === 1 ) {
 								( event.target as HTMLElement )
-									.closest< HTMLElement >(
+									.closest(
 										'.editor-collab-sidebar-panel__thread'
+									)
+									?.querySelector< HTMLElement >(
+										':scope > .editor-collab-sidebar-panel__thread-toggle'
 									)
 									?.focus();
 							}
