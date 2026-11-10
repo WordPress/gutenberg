@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import getNavigationMenuBySlug, {
+	getQueriedNavigationMenu,
 	normalizeNavigationMenuSlug,
 } from '../get-navigation-menu-by-slug';
 
@@ -66,5 +67,40 @@ describe( 'getNavigationMenuBySlug', () => {
 		expect( getNavigationMenuBySlug( [ draft, footer ], 'header' ) ).toBe(
 			draft
 		);
+	} );
+} );
+
+describe( 'getQueriedNavigationMenu', () => {
+	it( 'returns undefined when the server matched nothing', () => {
+		expect( getQueriedNavigationMenu( undefined ) ).toBeUndefined();
+		expect( getQueriedNavigationMenu( null ) ).toBeUndefined();
+		expect( getQueriedNavigationMenu( [] ) ).toBeUndefined();
+	} );
+
+	it( 'does not re-match the slug the server already matched', () => {
+		// The stored slug is percent encoded, which `cleanForSlug()` cannot
+		// produce from the slug as it was authored.
+		const encoded = {
+			id: 1,
+			slug: '%e4%bd%a0%e5%a5%bd',
+			status: 'publish',
+		};
+
+		expect( getQueriedNavigationMenu( [ encoded ] ) ).toBe( encoded );
+	} );
+
+	it( 'prefers a published menu over a draft', () => {
+		const draft = { id: 3, slug: 'header', status: 'draft' };
+		const published = { id: 1, slug: 'header', status: 'publish' };
+
+		expect( getQueriedNavigationMenu( [ draft, published ] ) ).toBe(
+			published
+		);
+	} );
+
+	it( 'falls back to a draft when there is no published menu', () => {
+		const draft = { id: 3, slug: 'header', status: 'draft' };
+
+		expect( getQueriedNavigationMenu( [ draft ] ) ).toBe( draft );
 	} );
 } );

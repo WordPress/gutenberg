@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
+import { getNavigationMenusBySlugArgs } from '../constants';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
@@ -61,6 +62,28 @@ function resolveRecords( registry, menus ) {
 		order: 'desc',
 		orderby: 'date',
 	} );
+}
+
+function startRecordsBySlugResolution( registry, slug ) {
+	registry
+		.dispatch( coreStore )
+		.startResolution(
+			'getEntityRecords',
+			getNavigationMenusBySlugArgs( slug )
+		);
+}
+
+function resolveRecordsBySlug( registry, slug, menus ) {
+	const dispatch = registry.dispatch( coreStore );
+	const args = getNavigationMenusBySlugArgs( slug );
+	dispatch.startResolution( 'getEntityRecords', args );
+	dispatch.finishResolution( 'getEntityRecords', args );
+	dispatch.receiveEntityRecords(
+		'postType',
+		'wp_navigation',
+		menus,
+		args[ 2 ]
+	);
 }
 
 function resolveReadPermission( registry, allowed ) {
@@ -252,16 +275,6 @@ describe( 'useNavigationMenus', () => {
 			expect( result.navigationMenu ).toEqual( headerMenu );
 		} );
 
-		it( 'Should report a slug matching no menu as missing', () => {
-			resolveRecords( registry, slugMenus );
-
-			const result = useNavigationMenu( undefined, 'sidebar' );
-
-			expect( result.navigationMenuId ).toBeUndefined();
-			expect( result.isNavigationMenuMissing ).toBe( true );
-			expect( result.isNavigationMenuResolved ).toBe( true );
-		} );
-
 		it( 'Should not report a slug as missing before the menus resolve', () => {
 			const result = useNavigationMenu( undefined, 'header' );
 
@@ -276,6 +289,47 @@ describe( 'useNavigationMenus', () => {
 			expect(
 				useNavigationMenu( undefined, 'Header' ).navigationMenuId
 			).toBe( 10 );
+		} );
+
+		it( 'Should resolve a slug the loaded menus do not match by asking the server', () => {
+			// `cleanForSlug()` cannot produce the percent encoded slug the
+			// server stored, and the collection is capped, so the loaded menus
+			// cannot match either case.
+			const encodedMenu = {
+				id: 12,
+				title: 'Ol\u00e1',
+				slug: 'ol%c3%a1',
+				status: 'publish',
+			};
+			resolveRecords( registry, slugMenus );
+			resolveRecordsBySlug( registry, 'ol\u00e1', [ encodedMenu ] );
+
+			const result = useNavigationMenu( undefined, 'ol\u00e1' );
+
+			expect( result.navigationMenuId ).toBe( 12 );
+			expect( result.isNavigationMenuMissing ).toBe( false );
+		} );
+
+		it( 'Should not report a slug as missing while the server is asked for it', () => {
+			resolveRecords( registry, slugMenus );
+			startRecordsBySlugResolution( registry, 'sidebar' );
+
+			const result = useNavigationMenu( undefined, 'sidebar' );
+
+			expect( result.navigationMenuId ).toBeUndefined();
+			expect( result.isNavigationMenuMissing ).toBe( false );
+			expect( result.isNavigationMenuResolved ).toBe( false );
+		} );
+
+		it( 'Should report a slug as missing once the server matched nothing', () => {
+			resolveRecords( registry, slugMenus );
+			resolveRecordsBySlug( registry, 'sidebar', [] );
+
+			const result = useNavigationMenu( undefined, 'sidebar' );
+
+			expect( result.navigationMenuId ).toBeUndefined();
+			expect( result.isNavigationMenuMissing ).toBe( true );
+			expect( result.isNavigationMenuResolved ).toBe( true );
 		} );
 
 		it( 'Should read permissions for the slug resolved menu', () => {

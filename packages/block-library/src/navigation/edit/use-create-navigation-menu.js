@@ -3,7 +3,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import useGenerateDefaultNavigationTitle from './use-generate-default-navigation-title';
-import { SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
+import {
+	getNavigationMenusBySlugArgs,
+	SELECT_NAVIGATION_MENUS_ARGS,
+} from '../constants';
 
 export const CREATE_NAVIGATION_MENU_SUCCESS = 'success';
 export const CREATE_NAVIGATION_MENU_ERROR = 'error';
@@ -71,12 +74,17 @@ export default function useCreateNavigationMenu( clientId ) {
 					setStatus( CREATE_NAVIGATION_MENU_SUCCESS );
 
 					// Slug references resolve against the Navigation Menus
-					// collection, so it has to be refetched for a newly
-					// created menu to be resolvable.
+					// collection, and against a query for the slug when that
+					// collection does not match. Both have to be refetched
+					// for a newly created menu to be resolvable.
 					if ( options.slug ) {
 						invalidateResolution(
 							'getEntityRecords',
 							SELECT_NAVIGATION_MENUS_ARGS
+						);
+						invalidateResolution(
+							'getEntityRecords',
+							getNavigationMenusBySlugArgs( options.slug )
 						);
 					}
 

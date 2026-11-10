@@ -4,8 +4,13 @@ import {
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
-import getNavigationMenuBySlug from './get-navigation-menu-by-slug';
+import {
+	getNavigationMenusBySlugArgs,
+	PRELOADED_NAVIGATION_MENUS_QUERY,
+} from './constants';
+import getNavigationMenuBySlug, {
+	getQueriedNavigationMenu,
+} from './get-navigation-menu-by-slug';
 
 /**
  * Resolves the Navigation Menu referenced by a Navigation block.
@@ -31,9 +36,31 @@ export default function useNavigationMenu( ref, slug ) {
 
 	// A slug is resolved against the loaded Navigation Menus, so the menu it
 	// points at is only known once that collection has resolved.
-	const navigationMenuId = slug
-		? getNavigationMenuBySlug( navigationMenus, slug )?.id
-		: ref;
+	const navigationMenuFromCollection = getNavigationMenuBySlug(
+		navigationMenus,
+		slug
+	);
+
+	// That collection is capped at 100 menus, and is matched against with
+	// `cleanForSlug()`, which only approximates `sanitize_title()`. So a slug
+	// it does not match may still match a menu the front end renders. Ask the
+	// server for that slug before treating the reference as missing: it
+	// sanitizes the `slug` parameter the way it sanitized the stored one.
+	const shouldQueryBySlug =
+		!! slug && hasResolvedNavigationMenus && ! navigationMenuFromCollection;
+
+	const {
+		records: navigationMenusMatchingSlug,
+		hasResolved: hasResolvedNavigationMenusMatchingSlug,
+	} = useEntityRecords( ...getNavigationMenusBySlugArgs( slug ), {
+		enabled: shouldQueryBySlug,
+	} );
+
+	const resolvedNavigationMenu =
+		navigationMenuFromCollection ??
+		getQueriedNavigationMenu( navigationMenusMatchingSlug );
+
+	const navigationMenuId = slug ? resolvedNavigationMenu?.id : ref;
 
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
@@ -52,10 +79,13 @@ export default function useNavigationMenu( ref, slug ) {
 		[ navigationMenuId ]
 	);
 
-	// A slug that matches no menu is only "missing" once the Navigation Menus
-	// have resolved, otherwise the block would flash a deleted menu warning
-	// while they load.
+	// A slug that matches no menu is only "missing" once both the Navigation
+	// Menus and the query for the slug have resolved, otherwise the block
+	// would flash a deleted menu warning while they load.
 	const hasUnmatchedSlug = !! slug && ! navigationMenuId;
+	const hasResolvedSlug =
+		hasResolvedNavigationMenus &&
+		( ! shouldQueryBySlug || hasResolvedNavigationMenusMatchingSlug );
 
 	const {
 		// Can the user create navigation menus?
@@ -78,10 +108,10 @@ export default function useNavigationMenu( ref, slug ) {
 		navigationMenu,
 		navigationMenuId,
 		isNavigationMenuResolved: hasUnmatchedSlug
-			? hasResolvedNavigationMenus
+			? hasResolvedSlug
 			: isNavigationMenuResolved,
 		isNavigationMenuMissing: hasUnmatchedSlug
-			? hasResolvedNavigationMenus
+			? hasResolvedSlug
 			: isNavigationMenuMissing,
 		navigationMenus,
 		isResolvingNavigationMenus,

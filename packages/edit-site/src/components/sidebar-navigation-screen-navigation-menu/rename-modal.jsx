@@ -4,8 +4,8 @@ import {
 	Button,
 	TextControl,
 	Modal,
-	Notice,
 } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -22,16 +22,22 @@ export default function RenameModal( {
 	onClose,
 	onSave,
 } ) {
+	const initialMenuSlug = menuSlug ?? '';
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
-	const [ editedMenuSlug, setEditedMenuSlug ] = useState( menuSlug ?? '' );
+	const [ editedMenuSlug, setEditedMenuSlug ] = useState( initialMenuSlug );
 
 	const normalizedEditedMenuSlug = cleanForSlug( editedMenuSlug );
 	const titleHasChanged = editedMenuTitle !== menuTitle;
-	const slugHasChanged = normalizedEditedMenuSlug !== menuSlug;
+
+	// Compared as it was typed rather than as it normalizes, so that a slug
+	// nobody edited is never submitted. `cleanForSlug()` only approximates
+	// `sanitize_title()`, so it cannot be trusted to leave a stored slug be.
+	const slugHasChanged = editedMenuSlug !== initialMenuSlug;
 
 	// Navigation blocks reference menus by slug, so a duplicate would silently
-	// repoint them. This is an early warning only; `wp_insert_post_data`
-	// enforces uniqueness on the server.
+	// repoint them. This only sees the loaded menus, so it is an early warning:
+	// `wp_insert_post_data` is what enforces uniqueness, and `onSave` reports
+	// the slug it ended up storing.
 	const { records: navigationMenus } = useEntityRecords(
 		'postType',
 		NAVIGATION_POST_TYPE,
@@ -50,8 +56,13 @@ export default function RenameModal( {
 	const isEditedMenuSlugValid =
 		! slugHasChanged ||
 		( notEmptyString( normalizedEditedMenuSlug ) && ! hasSlugConflict );
+
+	// An emptied name is never saved, so it cannot be left behind by a slug
+	// that can: it has to be put back, or the modal cancelled.
 	const canSave =
-		( isEditedMenuTitleValid || slugHasChanged ) && isEditedMenuSlugValid;
+		( isEditedMenuTitleValid || slugHasChanged ) &&
+		isEditedMenuSlugValid &&
+		( ! titleHasChanged || isEditedMenuTitleValid );
 
 	return (
 		<Modal
@@ -79,23 +90,32 @@ export default function RenameModal( {
 									'Use lowercase letters, numbers, and hyphens. Slugs must be unique.'
 								) }
 							/>
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'Changing this slug may disconnect blocks, templates, or patterns that reference the old slug.'
-								) }
-							</Notice>
-							{ slugHasChanged && ! normalizedEditedMenuSlug && (
-								<Notice status="error" isDismissible={ false }>
-									{ __( 'Enter a valid slug.' ) }
-								</Notice>
-							) }
-							{ hasSlugConflict && (
-								<Notice status="error" isDismissible={ false }>
+							<Notice.Root intent="warning">
+								<Notice.Description>
 									{ __(
-										'This slug is already used by another Navigation Menu.'
+										'Changing this slug may disconnect blocks, templates, or patterns that reference the old slug.'
 									) }
-								</Notice>
-							) }
+								</Notice.Description>
+							</Notice.Root>
+							<Notice.List>
+								{ slugHasChanged &&
+									! normalizedEditedMenuSlug && (
+										<Notice.Root intent="error">
+											<Notice.Description>
+												{ __( 'Enter a valid slug.' ) }
+											</Notice.Description>
+										</Notice.Root>
+									) }
+								{ hasSlugConflict && (
+									<Notice.Root intent="error">
+										<Notice.Description>
+											{ __(
+												'This slug is already used by another Navigation Menu.'
+											) }
+										</Notice.Description>
+									</Notice.Root>
+								) }
+							</Notice.List>
 						</VStack>
 					</details>
 					<HStack justify="right">

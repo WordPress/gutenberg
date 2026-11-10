@@ -20,9 +20,18 @@
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/url": "file:../../packages/url",
 		"@wordpress/views": "file:../../packages/views"
 	},
 	"devDependencies": {
-		"@types/react": "^19.3.0"
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.8",
+		"@types/react": "^19.3.0",
+		"vitest": "^5.1.0"
+	},
+	"peerDependencies": {
+		"react": "^18 || ^19"
 	}
 }

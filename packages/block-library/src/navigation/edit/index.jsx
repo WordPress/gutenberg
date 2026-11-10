@@ -39,6 +39,7 @@ import { page } from '@wordpress/icons';
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
+import { normalizeNavigationMenuSlug } from '../get-navigation-menu-by-slug';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -279,22 +280,58 @@ function Navigation( {
 		style: attributes.style,
 	} );
 
+	// Resolved here rather than where it is first read, because the recursion
+	// check below has to key on the menu a reference resolves to.
+	const {
+		hasResolvedNavigationMenus,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu,
+		canUserCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
+		navigationMenuId,
+		navigationMenus,
+	} = useNavigationMenu( ref, slug );
+
 	const setNavigationMenuReference = useCallback(
 		( menu ) => {
 			// A block that already references its menu by slug keeps doing so,
 			// so that switching menus does not silently downgrade a portable
 			// reference to a site specific post ID.
 			if ( slug && menu?.slug ) {
-				setAttributes( { slug: menu.slug, ref: undefined } );
+				// The reference may already resolve to this menu, as it does
+				// when a hand authored `Header Menu` created the `header-menu`
+				// the server stored. Leave the slug as it was authored then,
+				// rather than rewriting saved markup to no effect.
+				const isSameMenu =
+					menu.id === navigationMenuId ||
+					normalizeNavigationMenuSlug( menu.slug ) ===
+						normalizeNavigationMenuSlug( slug );
+
+				if ( isSameMenu && ref === undefined ) {
+					return;
+				}
+
+				setAttributes( {
+					slug: isSameMenu ? slug : menu.slug,
+					ref: undefined,
+				} );
 				return;
 			}
 
 			setAttributes( { ref: menu?.id, slug: undefined } );
 		},
-		[ slug, setAttributes ]
+		[ navigationMenuId, ref, slug, setAttributes ]
 	);
 
-	const recursionId = `navigationMenu/${ slug || ref }`;
+	// Keyed on the menu a reference resolves to, so that an outer block
+	// referencing a menu by slug and an inner block referencing the same menu
+	// by ID still detect each other.
+	const recursionId = `navigationMenu/${ navigationMenuId ?? slug ?? ref }`;
 
 	// Skip recursion check when in preview mode.
 	const recursionDetected = useHasRecursion( recursionId );
@@ -462,21 +499,6 @@ function Navigation( {
 		useState( false );
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
-
-	const {
-		hasResolvedNavigationMenus,
-		isNavigationMenuResolved,
-		isNavigationMenuMissing,
-		canUserUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu,
-		canUserDeleteNavigationMenu,
-		hasResolvedCanUserDeleteNavigationMenu,
-		canUserCreateNavigationMenus,
-		isResolvingCanUserCreateNavigationMenus,
-		hasResolvedCanUserCreateNavigationMenus,
-		navigationMenuId,
-		navigationMenus,
-	} = useNavigationMenu( ref, slug );
 
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
