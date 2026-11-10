@@ -1,7 +1,13 @@
-import { Spinner as WCSpinner } from '@wordpress/components';
+import { Button, Spinner as WCSpinner } from '@wordpress/components';
+import { useCopyToClipboard } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { copy, download, file } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
+import { Card, EmptyState, Icon, Stack, Text } from '@wordpress/ui';
 import { useMediaEditorContext } from '../media-editor-provider';
+import type { Media } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 
 /**
@@ -19,37 +25,112 @@ interface MediaPreviewContentProps {
 	mediaUrl: string;
 	altText?: string;
 	displayTitle?: string;
-	mimeType?: string;
+	fileName?: string;
+	fileDetails?: string;
 	onLoad: () => void;
 	onError: () => void;
 	loadingState: 'loading' | 'loaded' | 'error';
 }
 
-interface MediaPreviewFileInfoProps {
-	mediaUrl: string;
-	displayTitle?: string;
-	mimeType?: string;
+/**
+ * Returns the value of one of the attachment fields for the media, or an
+ * empty string if the field isn't available.
+ *
+ * @param fields  The attachment fields.
+ * @param fieldId The id of the field to read.
+ * @param media   The media record.
+ */
+function getFieldValue(
+	fields: Array< {
+		id: string;
+		getValue?: ( args: { item: Media } ) => unknown;
+	} >,
+	fieldId: string,
+	media: Media
+): string {
+	const field = fields.find( ( { id } ) => id === fieldId );
+	const value = field?.getValue?.( { item: media } );
+	return typeof value === 'string' ? value : '';
 }
 
-function MediaPreviewFileInfo( {
-	mediaUrl,
-	displayTitle,
-	mimeType,
-}: MediaPreviewFileInfoProps ) {
+function MediaPreviewFileActions( { mediaUrl }: { mediaUrl: string } ) {
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const copyRef = useCopyToClipboard( mediaUrl, () => {
+		createSuccessNotice( __( 'Copied URL to clipboard.' ), {
+			type: 'snackbar',
+		} );
+	} );
+
 	return (
-		<div className="media-editor-preview__file-info">
-			<p className="media-editor-preview__file-name">{ displayTitle }</p>
-			<p className="media-editor-preview__mime-type">{ mimeType }</p>
-			{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
-			<a
+		<>
+			{ /*
+			 * Browsers ignore `download` for cross-origin URLs, e.g. media
+			 * offloaded to a CDN, and open the file instead.
+			 */ }
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
 				href={ mediaUrl }
-				target="_blank"
-				rel="noopener"
-				className="media-editor-preview__download-link"
+				download
+				icon={ download }
 			>
-				{ __( 'View file' ) }
-			</a>
-		</div>
+				{ __( 'Download' ) }
+			</Button>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				ref={ copyRef }
+				icon={ copy }
+			>
+				{ __( 'Copy URL' ) }
+			</Button>
+		</>
+	);
+}
+
+interface MediaPreviewFileCardProps {
+	mediaUrl: string;
+	fileName?: string;
+	fileDetails?: string;
+}
+
+function MediaPreviewFileCard( {
+	mediaUrl,
+	fileName,
+	fileDetails,
+}: MediaPreviewFileCardProps ) {
+	return (
+		<Card.Root className="media-editor-preview__file-card">
+			<Card.Content>
+				<Stack direction="column" align="center" gap="md">
+					<Icon
+						className="media-editor-preview__file-icon"
+						icon={ file }
+					/>
+					<Stack direction="column" align="center" gap="xs">
+						{ !! fileName && (
+							<Text
+								variant="heading-sm"
+								className="media-editor-preview__file-name"
+							>
+								{ fileName }
+							</Text>
+						) }
+						{ !! fileDetails && (
+							<Text
+								variant="body-sm"
+								className="media-editor-preview__file-details"
+							>
+								{ fileDetails }
+							</Text>
+						) }
+					</Stack>
+					<Stack justify="center" gap="sm" wrap="wrap">
+						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
+					</Stack>
+				</Stack>
+			</Card.Content>
+		</Card.Root>
 	);
 }
 
@@ -58,7 +139,8 @@ function MediaPreviewContent( {
 	mediaUrl,
 	altText,
 	displayTitle,
-	mimeType,
+	fileName,
+	fileDetails,
 	onLoad,
 	onError,
 	loadingState,
@@ -99,19 +181,19 @@ function MediaPreviewContent( {
 					type="application/pdf"
 					aria-label={ __( 'Embed of the selected PDF file.' ) }
 				>
-					<MediaPreviewFileInfo
+					<MediaPreviewFileCard
 						mediaUrl={ mediaUrl }
-						displayTitle={ displayTitle }
-						mimeType={ mimeType }
+						fileName={ fileName }
+						fileDetails={ fileDetails }
 					/>
 				</object>
 			);
 		default:
 			return (
-				<MediaPreviewFileInfo
+				<MediaPreviewFileCard
 					mediaUrl={ mediaUrl }
-					displayTitle={ displayTitle }
-					mimeType={ mimeType }
+					fileName={ fileName }
+					fileDetails={ fileDetails }
 				/>
 			);
 	}
@@ -128,7 +210,7 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	const [ loadingState, setLoadingState ] = useState<
 		'loading' | 'loaded' | 'error'
 	>( 'loading' );
-	const { media } = useMediaEditorContext();
+	const { media, fields } = useMediaEditorContext();
 
 	const {
 		source_url: mediaUrl,
@@ -149,22 +231,54 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	if ( ! mediaUrl ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--empty">
-				<p>{ __( 'No media file available.' ) }</p>
-			</div>
-		);
-	}
-
-	if ( loadingState === 'error' ) {
-		return (
-			<div className="media-editor-preview media-editor-preview--error">
-				<p>{ __( 'Failed to load media file.' ) }</p>
-				<p className="media-editor-preview__url">{ mediaUrl }</p>
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ file } />
+					<EmptyState.Title>
+						{ __( 'No media file available.' ) }
+					</EmptyState.Title>
+				</EmptyState.Root>
 			</div>
 		);
 	}
 
 	const displayTitle =
 		typeof title === 'string' ? title : title?.rendered || title?.raw;
+
+	// Read through the attachment fields, so the values match the Details
+	// panel. Without a filename field, fall back to the title.
+	const fileName =
+		( media && getFieldValue( fields, 'filename', media ) ) || displayTitle;
+	const fileSize = media ? getFieldValue( fields, 'filesize', media ) : '';
+	const fileDetails =
+		mimeType && fileSize
+			? sprintf(
+					/* translators: 1: File type, e.g. "application/zip". 2: File size, e.g. "2.4 MB". */
+					_x( '%1$s · %2$s', 'file type and size' ),
+					mimeType,
+					fileSize
+				)
+			: mimeType || fileSize;
+
+	if ( loadingState === 'error' ) {
+		return (
+			<div className="media-editor-preview media-editor-preview--error">
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ file } />
+					<EmptyState.Title>
+						{ __( 'Failed to load media file.' ) }
+					</EmptyState.Title>
+					{ !! fileName && (
+						<EmptyState.Description className="media-editor-preview__file-name">
+							{ fileName }
+						</EmptyState.Description>
+					) }
+					<EmptyState.Actions className="media-editor-preview__error-actions">
+						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
+					</EmptyState.Actions>
+				</EmptyState.Root>
+			</div>
+		);
+	}
 
 	return (
 		<div
@@ -181,7 +295,8 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 				mediaUrl={ mediaUrl }
 				altText={ altText }
 				displayTitle={ displayTitle }
-				mimeType={ mimeType }
+				fileName={ fileName }
+				fileDetails={ fileDetails }
 				onLoad={ () => setLoadingState( 'loaded' ) }
 				onError={ () => setLoadingState( 'error' ) }
 				loadingState={ loadingState }

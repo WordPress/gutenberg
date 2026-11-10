@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `MediaEditor.MoreMenu` takes `actions` and `item` props, and lists the actions eligible for the item, such as "Permanently delete". It now also shows for media other than images when it has actions ([#86349](https://github.com/WordPress/gutenberg/pull/86349)).
+-   `MediaPreview` shows media without a preview, such as a zip file, as a card with the filename, file type and size, and Download and Copy URL buttons. The empty and error states use `EmptyState` from `@wordpress/ui`.
 
 ### Bug Fixes
 
