@@ -84,6 +84,13 @@ const setElementCollator = new Intl.Collator( 'en', { numeric: true } );
 /**
  * Whether a value can be stored as a set: a list of strings or numbers.
  *
+ * @example
+ * ```js
+ * isSetElementList( [ 3, 7 ] ); // => true
+ * isSetElementList( [ 3, { id: 7 } ] ); // => false
+ * isSetElementList( 3 ); // => false
+ * ```
+ *
  * @param value Value at a registered path.
  * @return True when the value is a list of strings or numbers.
  */
@@ -94,6 +101,23 @@ function isSetElementList( value: unknown ): value is SetElement[] {
 /**
  * Return a copy of an object with the value at a path replaced. An undefined
  * replacement removes the property, and with it any parent left empty.
+ *
+ * @example
+ * ```js
+ * const path = [ 'metadata', 'noteId' ];
+ *
+ * // Set a value. Missing parents are created.
+ * setValueAtPath( { metadata: { name: 'Intro' } }, path, [ 3, 7 ] );
+ * // => { metadata: { name: 'Intro', noteId: [ 3, 7 ] } }
+ *
+ * // Remove a value.
+ * setValueAtPath( { metadata: { name: 'Intro', noteId: [ 3 ] } }, path, undefined );
+ * // => { metadata: { name: 'Intro' } }
+ *
+ * // Remove a value that was the only property of its parent.
+ * setValueAtPath( { metadata: { noteId: [ 3 ] } }, path, undefined );
+ * // => {}
+ * ```
  *
  * @param object   Object to copy.
  * @param path     Property names to follow.
@@ -137,6 +161,19 @@ function setValueAtPath(
  * stored in the shared document. Each element of a registered set moves out of
  * its attribute and becomes its own key.
  *
+ * @example
+ * ```js
+ * // With `metadata.noteId` registered as a set.
+ * expandAttributeSets( {
+ *     metadata: { name: 'Intro', noteId: [ 3, 7 ] },
+ * } );
+ * // => {
+ * //     metadata: { name: 'Intro' },
+ * //     'metadata.noteId#3': 3,
+ * //     'metadata.noteId#7': 7,
+ * // }
+ * ```
+ *
  * @param attributes Block attributes from the block editor.
  * @return Block attributes to store in the shared document.
  */
@@ -164,6 +201,17 @@ export function expandAttributeSets(
 /**
  * Convert block attributes from the shape stored in the shared document to the
  * shape the block editor holds. This is the inverse of `expandAttributeSets`.
+ *
+ * @example
+ * ```js
+ * // With `metadata.noteId` registered as a set.
+ * collapseAttributeSets( {
+ *     metadata: { name: 'Intro' },
+ *     'metadata.noteId#7': 7,
+ *     'metadata.noteId#3': 3,
+ * } );
+ * // => { metadata: { name: 'Intro', noteId: [ 3, 7 ] } }
+ * ```
  *
  * @param attributes Block attributes from the shared document.
  * @return Block attributes for the block editor.
@@ -215,6 +263,37 @@ export function collapseAttributeSets(
 
 /**
  * Apply `collapseAttributeSets` to a list of blocks and their inner blocks.
+ *
+ * @example
+ * ```js
+ * // With `metadata.noteId` registered as a set.
+ * collapseAttributeSetsInBlocks( [
+ *     {
+ *         name: 'core/group',
+ *         attributes: { 'metadata.noteId#3': 3 },
+ *         innerBlocks: [
+ *             {
+ *                 name: 'core/paragraph',
+ *                 attributes: { 'metadata.noteId#7': 7 },
+ *                 innerBlocks: [],
+ *             },
+ *         ],
+ *     },
+ * ] );
+ * // => [
+ * //     {
+ * //         name: 'core/group',
+ * //         attributes: { metadata: { noteId: [ 3 ] } },
+ * //         innerBlocks: [
+ * //             {
+ * //                 name: 'core/paragraph',
+ * //                 attributes: { metadata: { noteId: [ 7 ] } },
+ * //                 innerBlocks: [],
+ * //             },
+ * //         ],
+ * //     },
+ * // ]
+ * ```
  *
  * @param blocks Blocks as read from the shared document.
  * @return Blocks for the block editor.
