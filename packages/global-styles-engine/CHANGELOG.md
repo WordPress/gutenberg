@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
+
+## 2.1.0 (2026-11-04)
+
 ### New Features
 
 -   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).

@@ -1,5 +1,9 @@
 # Image Cropper
 
+<div class="callout callout-warning">
+This package is deprecated and will be removed in a later release. It remains available so existing imports keep working. New code should use <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/image-editor/README.md"><code>@wordpress/image-editor</code></a>, which has the canvas and controller the media editor is built on. The one consumer in this repository, <code>wp.blockEditor.__experimentalImageEditor</code>, is deprecated too.
+</div>
+
 An implementation of [react-easy-crop](https://www.npmjs.com/package/react-easy-crop).
 
 ## Current features
