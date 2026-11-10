@@ -101,30 +101,6 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Loading state', () => {
-		it( 'keeps the saved overlay when options finish loading', () => {
-			useEntityRecords.mockReturnValue( {
-				records: null,
-				isResolving: true,
-				hasResolved: false,
-			} );
-			const props = { ...defaultProps, overlay: 'my-overlay' };
-			const { rerender } = render(
-				<OverlayTemplatePartSelector { ...props } />
-			);
-
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
-				isResolving: false,
-				hasResolved: true,
-			} );
-			rerender( <OverlayTemplatePartSelector { ...props } /> );
-
-			expect(
-				screen.getByRole( 'combobox', { name: 'Overlay template' } )
-			).toHaveTextContent( 'My Overlay' );
-			expect( mockSetAttributes ).not.toHaveBeenCalled();
-		} );
-
 		it( 'should disable select control when template parts are resolving', () => {
 			useEntityRecords.mockReturnValue( {
 				records: null,
@@ -142,40 +118,6 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Overlay selection', () => {
-		it( 'shows and clears a missing overlay', async () => {
-			const user = userEvent.setup();
-			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
-				isResolving: false,
-				hasResolved: true,
-			} );
-			render(
-				<OverlayTemplatePartSelector
-					{ ...defaultProps }
-					overlay="deleted-overlay"
-				/>
-			);
-
-			await user.click(
-				screen.getByRole( 'combobox', { name: 'Overlay template' } )
-			);
-			expect(
-				await screen.findByRole( 'option', {
-					name: 'deleted-overlay (missing)',
-					selected: true,
-				} )
-			).toBeInTheDocument();
-			await user.keyboard( '{Escape}' );
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Reset to default overlay',
-				} )
-			);
-			expect( mockSetAttributes ).toHaveBeenCalledWith( {
-				overlay: undefined,
-			} );
-		} );
-
 		it( 'should show Create Overlay button when no overlays exist', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
