@@ -304,7 +304,7 @@
 		"label": "Chart Bar",
 		"filePath": "library/chart-bar.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-chart-bar", "dashicons-analytics" ]
+		"dashicons": [ "dashicons-chart-bar" ]
 	},
 	{
 		"slug": "check",
@@ -831,9 +831,7 @@
 	{
 		"slug": "funnel",
 		"label": "Funnel",
-		"filePath": "library/funnel.svg",
-		"collections": [ "core-admin" ],
-		"dashicons": [ "dashicons-filter" ]
+		"filePath": "library/funnel.svg"
 	},
 	{
 		"slug": "gallery",

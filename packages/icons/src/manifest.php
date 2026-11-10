@@ -180,7 +180,7 @@ return array(
 		'label'       => _x( 'Chart Bar', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chart-bar.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-chart-bar', 'dashicons-analytics' ),
+		'dashicons'   => array( 'dashicons-chart-bar' ),
 	),
 	'check'                    => array(
 		'label'       => _x( 'Check', 'icon label', 'gutenberg' ),
@@ -447,12 +447,6 @@ return array(
 		'filePath'    => 'library/format-underline.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-editor-underline' ),
-	),
-	'funnel'                   => array(
-		'label'       => _x( 'Funnel', 'icon label', 'gutenberg' ),
-		'filePath'    => 'library/funnel.svg',
-		'collections' => array( 'core-admin' ),
-		'dashicons'   => array( 'dashicons-filter' ),
 	),
 	'gallery'                  => array(
 		'label'       => _x( 'Gallery', 'icon label', 'gutenberg' ),
