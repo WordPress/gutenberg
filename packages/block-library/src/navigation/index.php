@@ -1459,7 +1459,7 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  * variations, elements styles, and custom CSS are processed for referenced navigation
  * menus and fallbacks in document order.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param array $parsed_blocks The parsed blocks to filter.
  * @return array The filtered parsed blocks.
