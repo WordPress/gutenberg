@@ -14,6 +14,8 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import PageListPagesControl from '../../page-list/pages-control';
+import { useAddLinkAfterPage } from '../../page-list/use-convert-to-navigation-links';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -32,12 +34,23 @@ const MainContent = ( {
 	onCreateNew,
 	expandRevision,
 } ) => {
-	const hasChildren = useSelect(
+	const { hasChildren, pageListClientId, hasOtherItems } = useSelect(
 		( select ) => {
-			return !! select( blockEditorStore ).getBlockCount( clientId );
+			const { getBlockOrder, getBlockName } = select( blockEditorStore );
+			const order = getBlockOrder( clientId );
+			const pageList = order.find(
+				( id ) => getBlockName( id ) === 'core/page-list'
+			);
+			return {
+				hasChildren: order.length > 0,
+				pageListClientId: pageList,
+				hasOtherItems: order.length > ( pageList ? 1 : 0 ),
+			};
 		},
 		[ clientId ]
 	);
+
+	const addLinkAfterPage = useAddLinkAfterPage( pageListClientId );
 
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
@@ -72,16 +85,30 @@ const MainContent = ( {
 					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
-			<PrivateListView
-				key={ `${ clientId }-${ expandRevision }` }
-				rootClientId={ clientId }
-				isExpanded
-				description={ description }
-				showAppender
-				blockSettingsMenu={ LeafMoreMenu }
-				additionalBlockContent={ NavigationLinkUI }
-				onSelect={ openListViewContentPanel }
-			/>
+			{ /*
+			 * A Page List's pages are edited here rather than in the list
+			 * view, where it's one row. The list view is only needed for the
+			 * menu's other items, so a menu of pages has an Add link button.
+			 */ }
+			{ pageListClientId && (
+				<PageListPagesControl
+					clientId={ pageListClientId }
+					showAddLink={ ! hasOtherItems }
+					onAddLinkAfter={ addLinkAfterPage }
+				/>
+			) }
+			{ ( ! pageListClientId || hasOtherItems ) && (
+				<PrivateListView
+					key={ `${ clientId }-${ expandRevision }` }
+					rootClientId={ clientId }
+					isExpanded
+					description={ description }
+					showAppender
+					blockSettingsMenu={ LeafMoreMenu }
+					additionalBlockContent={ NavigationLinkUI }
+					onSelect={ openListViewContentPanel }
+				/>
+			) }
 		</div>
 	);
 };

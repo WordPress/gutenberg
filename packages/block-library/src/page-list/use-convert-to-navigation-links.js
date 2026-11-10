@@ -1,6 +1,10 @@
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
+import { usePageListPages } from './use-page-list-pages';
+import { getPageTitle, getVisiblePages } from './utils';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
 /**
@@ -132,5 +136,81 @@ export function useConvertToNavigationLinks( {
 
 		// Select the Navigation block to reveal the changes.
 		selectBlock( parentClientId );
+	};
+}
+
+/**
+ * Puts a block straight after the link to a page, at the same level, in a
+ * tree of links that isn't in the editor yet.
+ *
+ * @param {Array}  links  Navigation Link and Submenu blocks.
+ * @param {number} pageId ID of the page to add the block after.
+ * @param {Object} block  The block to add.
+ *
+ * @return {boolean} Whether the page's link was found.
+ */
+export function insertAfterPageLink( links, pageId, block ) {
+	const index = links.findIndex( ( link ) => link.attributes.id === pageId );
+	if ( index !== -1 ) {
+		links.splice( index + 1, 0, block );
+		return true;
+	}
+	return links.some( ( link ) =>
+		insertAfterPageLink( link.innerBlocks, pageId, block )
+	);
+}
+
+/**
+ * Returns a function that adds a link after one of a Page List's pages.
+ *
+ * A link can't go between two pages of a Page List, so adding one there turns
+ * the pages into links first, as Detach does: in the order shown, without
+ * hidden pages. The new link is selected, which opens its search.
+ *
+ * @param {string|undefined} clientId Client ID of the Page List block.
+ *
+ * @return {(pageId: number) => void} Called with a page ID.
+ */
+export function useAddLinkAfterPage( clientId ) {
+	const { pagesByParentId } = usePageListPages();
+	const attributes = useSelect(
+		( select ) =>
+			clientId
+				? select( blockEditorStore ).getBlockAttributes( clientId )
+				: null,
+		[ clientId ]
+	);
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+
+	return ( pageId ) => {
+		if ( ! clientId || ! attributes ) {
+			return;
+		}
+		const excludedIds = new Set(
+			Array.isArray( attributes.excludedPageIDs )
+				? attributes.excludedPageIDs
+				: []
+		);
+		const visiblePages = getVisiblePages( pagesByParentId, excludedIds );
+		const links = convertToNavigationLinks(
+			visiblePages,
+			attributes.parentPageID
+		);
+		const link = createBlock( 'core/navigation-link' );
+		if ( ! insertAfterPageLink( links, pageId, link ) ) {
+			return;
+		}
+		replaceBlock( clientId, links );
+		selectBlock( link.clientId );
+		const page = visiblePages.find( ( { id } ) => id === pageId );
+		speak(
+			sprintf(
+				/* translators: %s: Page title. */
+				__(
+					'The pages are now links, and a new link was added after %s.'
+				),
+				page ? getPageTitle( page ) : ''
+			)
+		);
 	};
 }

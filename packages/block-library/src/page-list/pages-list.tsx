@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { DragEvent } from 'react';
 import {
-	PanelBody,
+	Draggable,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -15,6 +15,9 @@ import {
 	moreVertical,
 	chevronUp,
 	chevronDown,
+	page as pageIcon,
+	plus,
+	Icon,
 } from '@wordpress/icons';
 import { Switch, VisuallyHidden } from '@wordpress/ui';
 import { getPageTitle } from './utils';
@@ -30,7 +33,7 @@ interface DropTarget {
 	isAfter: boolean;
 }
 
-interface PagesPanelProps {
+interface PagesListProps {
 	/** Rows from `getPageRows`. */
 	rows: PageRow[];
 	/** IDs of hidden pages. */
@@ -41,6 +44,8 @@ interface PagesPanelProps {
 	onToggle: ( pageId: number ) => void;
 	/** Called with a row and the position to move its page to. */
 	onMove: ( row: PageRow, toIndex: number ) => void;
+	/** Called with a row to add a link after its page, if links can be added. */
+	onAddLinkAfter?: ( ( row: PageRow ) => void ) | null;
 }
 
 interface PageRowItemProps {
@@ -54,10 +59,30 @@ interface PageRowItemProps {
 	onToggle: ( pageId: number ) => void;
 	onMove: ( row: PageRow, toIndex: number ) => void;
 	onKeyboardMove: ( row: PageRow, toIndex: number ) => void;
-	onDragStart: ( event: DragEvent< HTMLButtonElement > ) => void;
+	onAddLinkAfter?: ( ( row: PageRow ) => void ) | null;
+	onDragStart: () => void;
 	onDragEnd: () => void;
 	onDragOver: ( event: DragEvent< HTMLLIElement > ) => void;
 	onDrop: ( event: DragEvent< HTMLLIElement > ) => void;
+}
+
+/**
+ * Follows the cursor while a page is dragged, so it's clear which page is
+ * moving. It looks like the chip shown when dragging blocks.
+ *
+ * @param props       Component props.
+ * @param props.title The page's title.
+ */
+export function PageDragChip( { title }: { title: string } ) {
+	return (
+		<div className="wp-block-page-list__pages-panel-drag-chip">
+			<Icon icon={ pageIcon } size={ 20 } />
+			<span className="wp-block-page-list__pages-panel-drag-chip-title">
+				{ title }
+			</span>
+			<Icon icon={ dragHandle } size={ 18 } />
+		</div>
+	);
 }
 
 function PageRowItem( {
@@ -71,6 +96,7 @@ function PageRowItem( {
 	onToggle,
 	onMove,
 	onKeyboardMove,
+	onAddLinkAfter,
 	onDragStart,
 	onDragEnd,
 	onDragOver,
@@ -81,6 +107,7 @@ function PageRowItem( {
 	const isShown = ! isExcluded && ! isHiddenByAncestor;
 	const isFirst = index === 0;
 	const isLast = index === siblingIds.length - 1;
+	const hasOptions = canReorder || !! onAddLinkAfter;
 
 	return (
 		<li
@@ -94,31 +121,47 @@ function PageRowItem( {
 			onDrop={ onDrop }
 		>
 			{ canReorder && (
-				<button
-					ref={ handleRef }
-					type="button"
-					className="wp-block-page-list__pages-panel-handle"
-					draggable
+				<Draggable
+					// Only used without a drag component, to clone the element.
+					elementId={ `wp-block-page-list__pages-panel-page-${ page.id }` }
+					transferData={ { type: 'page', id: page.id } }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
-					onKeyDown={ ( event ) => {
-						if ( event.key === 'ArrowUp' && ! isFirst ) {
-							event.preventDefault();
-							onKeyboardMove( row, index - 1 );
-						} else if ( event.key === 'ArrowDown' && ! isLast ) {
-							event.preventDefault();
-							onKeyboardMove( row, index + 1 );
-						}
-					} }
-					aria-label={ sprintf(
-						/* translators: %s: Page title. */
-						__( 'Reorder %s' ),
-						title
-					) }
-					aria-describedby={ reorderHintId }
+					__experimentalDragComponent={
+						<PageDragChip title={ title } />
+					}
 				>
-					{ dragHandle }
-				</button>
+					{ ( { onDraggableStart, onDraggableEnd } ) => (
+						<button
+							ref={ handleRef }
+							type="button"
+							className="wp-block-page-list__pages-panel-handle"
+							draggable
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							onKeyDown={ ( event ) => {
+								if ( event.key === 'ArrowUp' && ! isFirst ) {
+									event.preventDefault();
+									onKeyboardMove( row, index - 1 );
+								} else if (
+									event.key === 'ArrowDown' &&
+									! isLast
+								) {
+									event.preventDefault();
+									onKeyboardMove( row, index + 1 );
+								}
+							} }
+							aria-label={ sprintf(
+								/* translators: %s: Page title. */
+								__( 'Reorder %s' ),
+								title
+							) }
+							aria-describedby={ reorderHintId }
+						>
+							{ dragHandle }
+						</button>
+					) }
+				</Draggable>
 			) }
 			<span
 				className="wp-block-page-list__pages-panel-title"
@@ -137,7 +180,7 @@ function PageRowItem( {
 					title
 				) }
 			/>
-			{ canReorder && (
+			{ hasOptions && (
 				<DropdownMenu
 					icon={ moreVertical }
 					label={ sprintf(
@@ -149,28 +192,49 @@ function PageRowItem( {
 					className="wp-block-page-list__pages-panel-options"
 				>
 					{ ( { onClose } ) => (
-						<MenuGroup>
-							<MenuItem
-								icon={ chevronUp }
-								disabled={ isFirst }
-								onClick={ () => {
-									onMove( row, index - 1 );
-									onClose();
-								} }
-							>
-								{ __( 'Move up' ) }
-							</MenuItem>
-							<MenuItem
-								icon={ chevronDown }
-								disabled={ isLast }
-								onClick={ () => {
-									onMove( row, index + 1 );
-									onClose();
-								} }
-							>
-								{ __( 'Move down' ) }
-							</MenuItem>
-						</MenuGroup>
+						<>
+							{ canReorder && (
+								<MenuGroup>
+									<MenuItem
+										icon={ chevronUp }
+										disabled={ isFirst }
+										onClick={ () => {
+											onMove( row, index - 1 );
+											onClose();
+										} }
+									>
+										{ __( 'Move up' ) }
+									</MenuItem>
+									<MenuItem
+										icon={ chevronDown }
+										disabled={ isLast }
+										onClick={ () => {
+											onMove( row, index + 1 );
+											onClose();
+										} }
+									>
+										{ __( 'Move down' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+							{ onAddLinkAfter && (
+								<MenuGroup>
+									<MenuItem
+										icon={ plus }
+										disabled={ ! isShown }
+										info={ __(
+											"Turns this menu's pages into links, which no longer update as pages change."
+										) }
+										onClick={ () => {
+											onClose();
+											onAddLinkAfter( row );
+										} }
+									>
+										{ __( 'Add link after' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+						</>
 					) }
 				</DropdownMenu>
 			) }
@@ -183,20 +247,22 @@ function PageRowItem( {
  * one and, for people who can edit pages, controls to reorder them among
  * their siblings. A page moves with its child pages.
  */
-export default function PagesPanel( {
+export default function PagesList( {
 	rows,
 	excludedIds,
 	canReorder,
 	onToggle,
 	onMove,
-}: PagesPanelProps ) {
+	onAddLinkAfter,
+}: PagesListProps ) {
 	const [ dragState, setDragState ] = useState< DragState | null >( null );
 	const [ dropTarget, setDropTarget ] = useState< DropTarget | null >( null );
 	const handleRefs = useRef( new Map< number, HTMLButtonElement >() );
 	const reorderHintId = useInstanceId(
-		PagesPanel,
+		PagesList,
 		'wp-block-page-list__pages-panel-hint'
 	) as string;
+	const hasOptions = canReorder || !! onAddLinkAfter;
 
 	// A moved row's handle can lose focus while the list re-renders in the
 	// new order, so focus goes back to it once the list has updated.
@@ -245,7 +311,7 @@ export default function PagesPanel( {
 	};
 
 	return (
-		<PanelBody title={ __( 'Pages' ) }>
+		<div className="wp-block-page-list__pages-panel">
 			<p className="wp-block-page-list__pages-panel-help">
 				{ canReorder
 					? __(
@@ -262,7 +328,8 @@ export default function PagesPanel( {
 			) }
 			<div
 				className={ clsx( 'wp-block-page-list__pages-panel-head', {
-					'is-reorderable': canReorder,
+					'has-handle': canReorder,
+					'has-options': hasOptions,
 				} ) }
 				aria-hidden="true"
 			>
@@ -296,18 +363,13 @@ export default function PagesPanel( {
 						onToggle={ onToggle }
 						onMove={ onMove }
 						onKeyboardMove={ moveWithKeyboard }
-						onDragStart={ ( event ) => {
-							event.dataTransfer.effectAllowed = 'move';
-							// Firefox doesn't start a drag without data.
-							event.dataTransfer.setData(
-								'text/plain',
-								String( row.page.id )
-							);
+						onAddLinkAfter={ onAddLinkAfter }
+						onDragStart={ () =>
 							setDragState( {
 								pageId: row.page.id,
 								parentId: row.page.parent,
-							} );
-						} }
+							} )
+						}
 						onDragEnd={ clearDrag }
 						onDragOver={ ( event ) => {
 							if ( ! isSiblingOfDragged( row ) ) {
@@ -335,6 +397,6 @@ export default function PagesPanel( {
 					/>
 				) ) }
 			</ul>
-		</PanelBody>
+		</div>
 	);
 }

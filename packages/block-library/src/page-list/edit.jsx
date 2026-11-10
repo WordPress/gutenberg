@@ -10,6 +10,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import {
+	PanelBody,
 	ToolbarButton,
 	Spinner as WCSpinner,
 	Notice as WCNotice,
@@ -21,23 +22,16 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { speak } from '@wordpress/a11y';
-import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
-import PagesPanel from './pages-panel';
 import {
-	getPagesByParentId,
-	getPageRows,
-	getMenuOrderEdits,
-	getPageTitle,
-	getVisiblePages,
-} from './utils';
+	useConvertToNavigationLinks,
+	useAddLinkAfterPage,
+} from './use-convert-to-navigation-links';
+import PageListPagesControl from './pages-control';
+import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
+import { getVisiblePages } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-// We only show the detach option when page count is <= MAX_PAGE_COUNT
-// Performance of Navigation Links is not good past this value.
-const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 const EMPTY_ARRAY = [];
 
@@ -143,69 +137,12 @@ export default function PageListEdit( {
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: savedPages, hasResolved: hasResolvedPages } =
-		useEntityRecords( 'postType', 'page', {
-			per_page: MAX_PAGE_COUNT,
-			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		} );
-
-	// Reordering edits each page's `menu_order`, and those edits stay unsaved
-	// until the page entities are saved, so they're merged in here.
-	// The map of page IDs to edited orders is returned directly, so `useSelect`
-	// compares its values and doesn't re-render while they're unchanged.
-	const menuOrderEdits = useSelect(
-		( select ) => {
-			const { getEntityRecordEdits } = select( coreStore );
-			return Object.fromEntries(
-				( savedPages ?? [] ).map( ( page ) => [
-					page.id,
-					getEntityRecordEdits( 'postType', 'page', page.id )
-						?.menu_order,
-				] )
-			);
-		},
-		[ savedPages ]
-	);
-
-	// Asking about the collection only answers whether pages can be created,
-	// so this asks about a page. The default roles that can edit one page can
-	// edit them all.
-	const firstPageId = savedPages?.[ 0 ]?.id;
-	const canReorderPages = useSelect(
-		( select ) =>
-			!! firstPageId &&
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'page',
-				id: firstPageId,
-			} ),
-		[ firstPageId ]
-	);
-
-	const pages = useMemo(
-		() =>
-			savedPages?.map( ( page ) =>
-				menuOrderEdits[ page.id ] === undefined
-					? page
-					: { ...page, menu_order: menuOrderEdits[ page.id ] }
-			) ?? savedPages,
-		[ savedPages, menuOrderEdits ]
-	);
+	const { pages, pagesByParentId, hasResolvedPages } = usePageListPages();
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
-
-	const pagesByParentId = useMemo(
-		() => getPagesByParentId( pages ),
-		[ pages ]
-	);
 
 	const excludedIds = useMemo(
 		() => new Set( excludedPageIDs ),
@@ -297,11 +234,6 @@ export default function PageListEdit( {
 		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const pageRows = useMemo(
-		() => getPageRows( pagesByParentId, parentPageID, excludedIds ),
-		[ pagesByParentId, parentPageID, excludedIds ]
-	);
-
 	const { hasSelectedChild, parentClientId, isChildOfNavigation } = useSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName, hasSelectedInnerBlock } =
@@ -345,7 +277,7 @@ export default function PageListEdit( {
 	} );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { editEntityRecord } = useDispatch( coreStore );
+	const addLinkAfterPage = useAddLinkAfterPage( clientId );
 
 	// Selecting a page selects the Page List, whose Pages panel is where pages
 	// are reordered and hidden.
@@ -355,58 +287,18 @@ export default function PageListEdit( {
 		}
 	}, [ hasSelectedChild, clientId, selectBlock ] );
 
-	const togglePage = ( pageId ) => {
-		const isExcluded = excludedIds.has( pageId );
-		setAttributes( {
-			excludedPageIDs: isExcluded
-				? excludedPageIDs.filter( ( id ) => id !== pageId )
-				: [ ...excludedPageIDs, pageId ],
-		} );
-	};
-
-	const movePage = ( row, toIndex ) => {
-		const siblings = pagesByParentId.get( row.page.parent ) ?? [];
-		const edits = getMenuOrderEdits( siblings, row.page.id, toIndex );
-		if ( ! edits.length ) {
-			return;
-		}
-		// The first edit opens an undo level and the rest are staged into it,
-		// so one undo puts every page back.
-		edits.forEach( ( { id, menu_order: menuOrder }, index ) =>
-			editEntityRecord(
-				'postType',
-				'page',
-				id,
-				{ menu_order: menuOrder },
-				{ isCached: index > 0 }
-			)
-		);
-		speak(
-			sprintf(
-				/* translators: 1: Page title. 2: New position. 3: Number of pages at that level. */
-				__( '%1$s moved to position %2$d of %3$d.' ),
-				getPageTitle( row.page ),
-				toIndex + 1,
-				siblings.length
-			)
-		);
-	};
-
 	return (
 		<>
-			{ isChildOfNavigation &&
-				hasResolvedPages &&
-				pageRows.length > 0 && (
-					<InspectorControls>
-						<PagesPanel
-							rows={ pageRows }
-							excludedIds={ excludedPageIDs }
-							canReorder={ canReorderPages }
-							onToggle={ togglePage }
-							onMove={ movePage }
+			{ isChildOfNavigation && hasResolvedPages && pages?.length > 0 && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Pages' ) }>
+						<PageListPagesControl
+							clientId={ clientId }
+							onAddLinkAfter={ addLinkAfterPage }
 						/>
-					</InspectorControls>
-				) }
+					</PanelBody>
+				</InspectorControls>
+			) }
 			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
 				<InspectorControls>
 					<ToolsPanel

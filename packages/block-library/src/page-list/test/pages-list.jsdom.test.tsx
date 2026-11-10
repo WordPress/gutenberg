@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PagesPanel from '../pages-panel';
+import PagesList, { PageDragChip } from '../pages-list';
 import { getPagesByParentId, getPageRows } from '../utils';
 
 const page = ( id: number, title: string, parent = 0, menuOrder = 0 ) => ( {
@@ -19,27 +19,34 @@ const PAGES = [
 function renderPanel( {
 	excludedIds = [] as number[],
 	canReorder = true,
-}: { excludedIds?: number[]; canReorder?: boolean } = {} ) {
+	canAddLinks = false,
+}: {
+	excludedIds?: number[];
+	canReorder?: boolean;
+	canAddLinks?: boolean;
+} = {} ) {
 	const onToggle = vi.fn();
 	const onMove = vi.fn();
+	const onAddLinkAfter = vi.fn();
 	const rows = getPageRows(
 		getPagesByParentId( PAGES ),
 		0,
 		new Set( excludedIds )
 	);
 	render(
-		<PagesPanel
+		<PagesList
 			rows={ rows }
 			excludedIds={ excludedIds }
 			canReorder={ canReorder }
 			onToggle={ onToggle }
 			onMove={ onMove }
+			onAddLinkAfter={ canAddLinks ? onAddLinkAfter : null }
 		/>
 	);
-	return { onToggle, onMove };
+	return { onToggle, onMove, onAddLinkAfter };
 }
 
-describe( 'PagesPanel', () => {
+describe( 'PagesList', () => {
 	it( 'shows a switch for every page, on unless hidden', () => {
 		renderPanel( { excludedIds: [ 3 ] } );
 
@@ -102,5 +109,35 @@ describe( 'PagesPanel', () => {
 		expect(
 			screen.getByRole( 'switch', { name: 'Show Shop in the menu' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'adds a link after a page from its options', async () => {
+		const { onAddLinkAfter } = renderPanel( { canAddLinks: true } );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Options for Shop' } )
+		);
+		fireEvent.click(
+			await screen.findByRole( 'menuitem', { name: /Add link after/ } )
+		);
+		expect( onAddLinkAfter ).toHaveBeenCalledWith(
+			expect.objectContaining( { page: PAGES[ 2 ] } )
+		);
+	} );
+
+	it( 'doesn’t add a link after a hidden page', async () => {
+		renderPanel( { canAddLinks: true, excludedIds: [ 3 ] } );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Options for Shop' } )
+		);
+		expect(
+			await screen.findByRole( 'menuitem', { name: /Add link after/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'shows the page being dragged in its drag chip', () => {
+		render( <PageDragChip title="Catering" /> );
+		expect( screen.getByText( 'Catering' ) ).toBeInTheDocument();
 	} );
 } );

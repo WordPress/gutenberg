@@ -65,8 +65,12 @@
 
 	// Lines the labels up with the titles and switches, past the drag handle
 	// and the options button.
-	&.is-reorderable {
-		padding-inline: calc(#{$grid-unit-30} + #{$grid-unit-05});
+	&.has-handle {
+		padding-inline-start: calc(#{$grid-unit-30} + #{$grid-unit-05});
+	}
+
+	&.has-options {
+		padding-inline-end: calc(#{$grid-unit-30} + #{$grid-unit-05});
 	}
 }
 
@@ -143,4 +147,40 @@
 .wp-block-page-list__pages-panel-toggle,
 .wp-block-page-list__pages-panel-options {
 	flex-shrink: 0;
+}
+
+.wp-block-page-list__pages-panel-add-link {
+	margin-top: $grid-unit-15;
+}
+
+// Follows the cursor while a page is dragged. It matches the chip shown when
+// dragging blocks.
+.wp-block-page-list__pages-panel-drag-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	// Centers the chip's drag handle under the cursor.
+	transform: translate(-50%, -50%);
+	max-width: 240px;
+	height: $grid-unit-60;
+	padding: 0 $grid-unit-15;
+	border-radius: $radius-small;
+	background-color: $gray-900;
+	box-shadow: $elevation-small;
+	color: $white;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	white-space: nowrap;
+	cursor: grabbing;
+	user-select: none;
+
+	svg {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+}
+
+.wp-block-page-list__pages-panel-drag-chip-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
