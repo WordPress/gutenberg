@@ -74,7 +74,7 @@ The design tokens use [the `$extensions` feature](https://www.designtokens.org/t
 
 Figma can import supported DTCG token types as variables through its [built-in design token importer](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7). The resolver itself is not an import file. Its inline contexts contain only value overrides; use the complete generated files below to create collections or update modes.
 
-#### Generate border collection files
+#### Generate Figma collection files
 
 Run the theme build from the repository root to generate and format the committed artifacts, including the Figma files:
 
@@ -82,16 +82,23 @@ Run the theme build from the repository root to generate and format the committe
 npm run --workspace @wordpress/theme build
 ```
 
-The generator applies `wpds.resolver.json` to produce six complete DTCG files under `packages/theme/prebuilt/figma/`. Radius and width use separate collections so designers can choose corner radius and pixel density independently.
+The generator applies `wpds.resolver.json` to produce seven complete Figma-compatible token files under `packages/theme/prebuilt/figma/`. Radius and width use separate collections so designers can choose corner radius and pixel density independently.
 
 | Collection    | Files relative to `packages/theme/prebuilt/figma/`                                         | Default mode | Variables                               |
 | ------------- | ------------------------------------------------------------------------------------------ | ------------ | --------------------------------------- |
 | Border radius | `radius/none.json`, `radius/subtle.json`, `radius/moderate.json`, `radius/pronounced.json` | `subtle`     | `wpds-border/radius/{xs,sm,md,lg,xl}`   |
 | Border width  | `width/standard.json`, `width/high-dpi.json`                                               | `high-dpi`   | `wpds-border/width/{xs,sm,md,lg,focus}` |
+| Typography | `typography/typography.json` | `typography` | `wpds-typography/{font-family,font-weight,font-size,line-height}/*` |
 
-Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases. Aliases within a collection were verified in Figma for both collection creation and mode updates.
+Each file includes every token in its collection, with values, types, descriptions, and per-token Figma scope metadata. The token hierarchy determines the variable names, and aliases remain references.
 
 These generated files are committed under `prebuilt/figma` and included in the npm package. Do not edit them as sources. `wpds.resolver.json` and its base sources remain canonical inputs for both CSS and Figma generation. Edit default values and metadata in `border.json`, and mode-specific value overrides in the resolver.
+
+#### Typography exports
+
+`typography/typography.json` adapts the canonical typography tokens for Figma's native importer. Font weights use `$type: "number"` with their original numeric values and `FONT_STYLE` scope metadata. Figma’s native JSON format uses `FONT_STYLE` for the Font weight scope on Number variables; the Plugin API calls this scope `FONT_WEIGHT`. Font families use `$type: "fontFamily"` with a single font name and the `FONT_FAMILY` scope: `SF Pro` for heading and body, and `Menlo` for mono. Font sizes and line heights retain their pixel dimensions and use `FONT_SIZE` and `LINE_HEIGHT` scopes. These mappings apply during Figma export. CSS generation uses the canonical token definitions and font-family stacks.
+
+Create an empty Typography collection and import `typography/typography.json`. Apply the imported variables through the font family, font weight, font size, and line height controls on text layers.
 
 #### Test in a Figma library branch
 
@@ -118,7 +125,7 @@ Expected pixel values:
 6. Add a temporary alias to another token within the same collection, regenerate, and test both creating a collection and updating a mode. Confirm that Figma preserves the alias relationship, then remove the temporary alias. Cross-collection aliases are outside these files; they need Figma's `com.figma.aliasData` extension. See the [same-file cross-collection alias example](#same-file-cross-collection-aliases) below.
 7. Inspect components bound to the collection being replaced. Record their variable IDs and bindings before testing the replacement. Rebind components in the library branch and check that their instances use the new variables. Reapply existing mode selections from the new collections on affected objects and pages, then verify the intended values. Matching names alone do not preserve bindings or mode selections. Keep the existing collection until all affected bindings and mode selections have been checked.
 
-Figma creates new variables only for supported tokens present with the same type in every imported file. Importing an existing mode updates variables with matching names and types. See [Figma's import documentation](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7) for those constraints and [the separate typography issue](https://github.com/WordPress/gutenberg/issues/74620) for unsupported typography types. The generated files cover only border radius and width.
+Figma creates new variables only for supported tokens present with the same type in every imported file. Importing an existing mode updates variables with matching names and types. See [Figma's import documentation](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7) for those constraints. The generated files cover border radius, width, and typography; import the generated typography file instead of the canonical font-family stacks and `fontWeight` tokens.
 
 Token definitions include Figma scopes to show variables in the relevant fields, such as corner radius. These use the `$extensions['com.figma.scopes']` extension. See [Figma's `VariableScope` developer documentation](https://developers.figma.com/docs/plugins/api/VariableScope/) for the supported scopes.
 
