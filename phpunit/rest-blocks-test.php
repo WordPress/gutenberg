@@ -59,6 +59,23 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 		$GLOBALS['wp_rest_server'] = null;
 	}
 
+	public function tear_down(): void {
+		$GLOBALS['wp_rest_server'] = null;
+
+		foreach ( array( 'gb_blocks_cpt', 'gb_blocks_no_editor' ) as $post_type ) {
+			if ( post_type_exists( $post_type ) ) {
+				unregister_post_type( $post_type );
+			}
+		}
+
+		$registry = WP_Block_Type_Registry::get_instance();
+		if ( $registry->is_registered( 'tests/hooked-block' ) ) {
+			$registry->unregister( 'tests/hooked-block' );
+		}
+
+		parent::tear_down();
+	}
+
 	/**
 	 * Creates a post with the test content.
 	 *
@@ -108,12 +125,16 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Requests a post as an editor and returns `content.blocks`.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int                  $post_id Post ID.
+	 * @param string               $route   REST route of the collection holding the post.
+	 * @param array<string, mixed> $params  Query parameters.
 	 * @return array<mixed> Block data.
 	 */
-	private function get_blocks( int $post_id ): array {
+	private function get_blocks( int $post_id, string $route = '/wp/v2/posts', array $params = self::BLOCKS_PARAMS ): array {
 		wp_set_current_user( self::$editor_id );
-		$content = $this->get_content( $post_id, self::BLOCKS_PARAMS );
+		$data = $this->get( $route . '/' . $post_id, $params );
+		$this->assertIsArray( $data['content'] );
+		$content = $data['content'];
 		$this->assertArrayHasKey( 'blocks', $content );
 		$this->assertIsArray( $content['blocks'] );
 
@@ -140,10 +161,125 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 	}
 
 	public function test_empty_attributes_encode_as_object(): void {
-		$json = wp_json_encode( $this->get_blocks( $this->create_post() ) );
+		$blocks = $this->get_blocks( $this->create_post() );
 
-		$this->assertIsString( $json );
-		$this->assertStringContainsString( '"name":"core\/group","attributes":{}', $json );
+		$this->assertIsArray( $blocks[1] );
+		$this->assertEquals( new stdClass(), $blocks[1]['attributes'] );
+	}
+
+	public function test_freeform_content_is_one_block(): void {
+		$html   = "<p>Classic</p>\n<p>Content</p>";
+		$blocks = $this->get_blocks( $this->create_post( array( 'post_content' => $html ) ) );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertIsArray( $blocks[0] );
+		$this->assertNull( $blocks[0]['name'] );
+		$this->assertSame( $html, $blocks[0]['inner_html'] );
+		$this->assertSame( array(), $blocks[0]['inner_blocks'] );
+	}
+
+	public function test_fields_can_be_an_array(): void {
+		$params = array(
+			'context' => 'edit',
+			'_fields' => array( 'id', 'content.blocks' ),
+		);
+
+		$this->assertCount( 2, $this->get_blocks( $this->create_post(), '/wp/v2/posts', $params ) );
+	}
+
+	public function test_blocks_are_added_for_custom_post_types(): void {
+		register_post_type(
+			'gb_blocks_cpt',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'editor' ),
+			)
+		);
+
+		$post_id = $this->create_post( array( 'post_type' => 'gb_blocks_cpt' ) );
+
+		$this->assertCount( 2, $this->get_blocks( $post_id, '/wp/v2/gb_blocks_cpt' ) );
+	}
+
+	public function test_post_types_without_content_are_skipped(): void {
+		register_post_type(
+			'gb_blocks_no_editor',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'title' ),
+			)
+		);
+
+		$post_id = $this->create_post( array( 'post_type' => 'gb_blocks_no_editor' ) );
+		wp_set_current_user( self::$editor_id );
+		$data = $this->get( '/wp/v2/gb_blocks_no_editor/' . $post_id, self::BLOCKS_PARAMS );
+
+		$this->assertArrayNotHasKey( 'content', $data );
+	}
+
+	public function test_blocks_include_hooked_blocks_like_raw_content(): void {
+		register_block_type(
+			'tests/hooked-block',
+			array(
+				'block_hooks' => array( 'core/group' => 'after' ),
+			)
+		);
+
+		$post_id = $this->create_post();
+		wp_set_current_user( self::$editor_id );
+		$content = $this->get_content(
+			$post_id,
+			array(
+				'context' => 'edit',
+				'_fields' => 'content.raw,content.blocks',
+			)
+		);
+
+		$this->assertIsString( $content['raw'] );
+		$this->assertIsArray( $content['blocks'] );
+		$raw_names = array_values( array_filter( wp_list_pluck( parse_blocks( $content['raw'] ), 'blockName' ) ) );
+		$this->assertSame( array( 'core/paragraph', 'core/group', 'tests/hooked-block' ), $raw_names );
+		$this->assertSame( $raw_names, wp_list_pluck( $content['blocks'], 'name' ) );
+	}
+
+	public function test_blocks_are_added_to_revisions(): void {
+		$post_id = $this->create_post();
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_content' => '<!-- wp:paragraph --><p>Updated</p><!-- /wp:paragraph -->',
+			)
+		);
+		$revision = wp_get_post_revisions( $post_id );
+		$revision = reset( $revision );
+		$this->assertInstanceOf( WP_Post::class, $revision );
+
+		$blocks = $this->get_blocks( $revision->ID, '/wp/v2/posts/' . $post_id . '/revisions' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertIsArray( $blocks[0] );
+		$this->assertSame( '<p>Updated</p>', $blocks[0]['inner_html'] );
+	}
+
+	public function test_blocks_are_added_to_autosaves(): void {
+		$post_id = $this->create_post( array( 'post_author' => self::$editor_id ) );
+		wp_set_current_user( self::$editor_id );
+		$autosave_id = wp_create_post_autosave(
+			array(
+				'post_ID'      => $post_id,
+				'post_content' => '<!-- wp:paragraph --><p>Autosaved</p><!-- /wp:paragraph -->',
+				'post_title'   => 'Autosave',
+				'post_type'    => 'post',
+				'post_excerpt' => '',
+			)
+		);
+		$this->assertIsInt( $autosave_id );
+
+		$blocks = $this->get_blocks( $autosave_id, '/wp/v2/posts/' . $post_id . '/autosaves' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertIsArray( $blocks[0] );
+		$this->assertSame( '<p>Autosaved</p>', $blocks[0]['inner_html'] );
 	}
 
 	public function test_password_protected_post_shows_blocks_to_editor(): void {
@@ -178,7 +314,7 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 		);
 	}
 
-	public function test_collection_skips_posts_the_user_cannot_edit(): void {
+	public function test_collection_only_includes_posts_the_user_can_edit(): void {
 		$own_post_id   = $this->create_post(
 			array(
 				'post_author' => self::$contributor_id,
@@ -198,8 +334,8 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 			$blocks_by_id[ $item['id'] ] = $item['content']['blocks'] ?? null;
 		}
 
-		// Core may leave the post out of an edit context collection entirely.
-		$this->assertNull( $blocks_by_id[ $other_post_id ] ?? null, 'Blocks should not be added for posts the user cannot edit.' );
+		// In the edit context, core leaves out posts the user cannot edit.
+		$this->assertArrayNotHasKey( $other_post_id, $blocks_by_id, 'Posts the user cannot edit should be left out.' );
 		$this->assertArrayHasKey( $own_post_id, $blocks_by_id );
 		$this->assertIsArray( $blocks_by_id[ $own_post_id ] );
 	}
@@ -214,5 +350,24 @@ class Gutenberg_REST_Blocks_Test extends WP_Test_REST_TestCase {
 		$this->assertIsArray( $data['schema']['properties']['content']['properties'] );
 		$this->assertIsArray( $data['schema']['properties']['content']['properties']['blocks'] );
 		$this->assertSame( array( 'edit' ), $data['schema']['properties']['content']['properties']['blocks']['context'] );
+		$this->assertTrue( $data['schema']['properties']['content']['properties']['blocks']['readonly'] );
+	}
+
+	public function test_schema_keeps_an_existing_blocks_definition(): void {
+		$schema = array(
+			'properties' => array(
+				'content' => array(
+					'properties' => array(
+						'blocks' => array( 'type' => 'array' ),
+					),
+				),
+			),
+		);
+
+		$this->assertSame( $schema, gutenberg_add_blocks_to_post_rest_schema( $schema ) );
+	}
+
+	public function test_schema_ignores_a_non_array_schema(): void {
+		$this->assertFalse( gutenberg_add_blocks_to_post_rest_schema( false ) );
 	}
 }

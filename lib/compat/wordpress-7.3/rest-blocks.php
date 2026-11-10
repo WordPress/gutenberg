@@ -42,11 +42,13 @@ function gutenberg_prepare_blocks_for_rest( array $parsed_blocks ): array {
 }
 
 /**
- * Adds `content.blocks` to a post REST API response.
+ * Adds `content.blocks` to a post or revision REST API response.
  *
  * Blocks hold the raw stored markup, so like `content.raw` they need the
- * `edit` context and permission to edit the post. They are also opt-in:
- * the request must name `content.blocks` in `_fields`.
+ * `edit` context, where the controllers only return posts the user can edit.
+ * They are also opt-in: the request must name `content.blocks` in `_fields`.
+ *
+ * Posts get the same Block Hooks as `content.raw`, so the two agree.
  *
  * @param WP_REST_Response|mixed $response The response object.
  * @param WP_Post|mixed          $post     Post object.
@@ -62,8 +64,7 @@ function gutenberg_add_blocks_to_post_rest_response( $response, $post, $request 
 	if (
 		'edit' !== $request['context'] ||
 		! ( is_string( $fields ) || is_array( $fields ) ) ||
-		! in_array( 'content.blocks', wp_parse_list( $fields ), true ) ||
-		! current_user_can( 'edit_post', $post->ID )
+		! in_array( 'content.blocks', wp_parse_list( $fields ), true )
 	) {
 		return $response;
 	}
@@ -73,7 +74,16 @@ function gutenberg_add_blocks_to_post_rest_response( $response, $post, $request 
 		return $response;
 	}
 
-	$data['content']['blocks'] = gutenberg_prepare_blocks_for_rest( parse_blocks( $post->post_content ) );
+	$content = $post->post_content;
+	if ( 'revision' !== $post->post_type ) {
+		/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+		$block_hooks_post_types = apply_filters( 'rest_block_hooks_post_types', array( 'post', 'page', 'wp_block', 'wp_navigation' ), $post->post_type, $post );
+		if ( is_array( $block_hooks_post_types ) && in_array( $post->post_type, $block_hooks_post_types, true ) ) {
+			$content = apply_block_hooks_to_content_from_post_object( $content, $post, 'insert_hooked_blocks_and_set_ignored_hooked_blocks_metadata' );
+		}
+	}
+
+	$data['content']['blocks'] = gutenberg_prepare_blocks_for_rest( parse_blocks( $content ) );
 	$response->set_data( $data );
 
 	return $response;
@@ -82,17 +92,22 @@ function gutenberg_add_blocks_to_post_rest_response( $response, $post, $request 
 /**
  * Adds `content.blocks` to a post type's REST API item schema.
  *
- * @param array<string, mixed> $schema Item schema.
- * @return array<string, mixed> Item schema.
+ * @param array<string, mixed>|mixed $schema Item schema.
+ * @return array<string, mixed>|mixed Item schema.
  */
-function gutenberg_add_blocks_to_post_rest_schema( array $schema ): array {
+function gutenberg_add_blocks_to_post_rest_schema( $schema ) {
+	if ( ! is_array( $schema ) ) {
+		return $schema;
+	}
+
 	$properties = $schema['properties'] ?? null;
 	if (
 		! is_array( $properties ) ||
 		! isset( $properties['content'] ) ||
 		! is_array( $properties['content'] ) ||
 		! isset( $properties['content']['properties'] ) ||
-		! is_array( $properties['content']['properties'] )
+		! is_array( $properties['content']['properties'] ) ||
+		isset( $properties['content']['properties']['blocks'] )
 	) {
 		return $schema;
 	}
@@ -153,3 +168,7 @@ function gutenberg_register_post_rest_blocks( $post_type, $post_type_object ): v
 	add_filter( "rest_{$post_type}_item_schema", 'gutenberg_add_blocks_to_post_rest_schema' );
 }
 add_action( 'registered_post_type', 'gutenberg_register_post_rest_blocks', 10, 2 );
+
+// Revision schemas copy `content` from the parent post type, so they list `content.blocks` too.
+add_filter( 'rest_prepare_revision', 'gutenberg_add_blocks_to_post_rest_response', 10, 3 );
+add_filter( 'rest_prepare_autosave', 'gutenberg_add_blocks_to_post_rest_response', 10, 3 );
