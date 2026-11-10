@@ -79,11 +79,8 @@ export function convertLegacyBlockNameAndAttributes(
 		newAttributes.legacy = true;
 	}
 
-	// The Cover block stored its minimum height in the `minHeight` and
-	// `minHeightUnit` attributes before it moved to the `dimensions` block
-	// support. Templates skip deprecations, so copy the value to the block
-	// support here. The legacy attributes are kept so that deprecations can
-	// still validate saved content.
+	// Copy the legacy Cover minimum height to the block support, since templates
+	// skip deprecations. Keep the legacy attributes for deprecations.
 	if ( name === 'core/cover' && attributes.minHeight ) {
 		const coverStyle = ( newAttributes.style ?? {} ) as Record<
 			string,
