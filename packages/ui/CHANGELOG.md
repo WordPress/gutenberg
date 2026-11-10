@@ -27,6 +27,7 @@
 
 ### Internal
 
+-   `Meter`, `Progress`: Use the new `--wpds-color-background-indicator-*` tokens for the filled portion. The colors are unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 

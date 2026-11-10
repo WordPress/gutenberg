@@ -18,6 +18,7 @@
 
 ### Internal
 
+-   `ProgressBar`: Use the new `--wpds-color-background-indicator-neutral` token for the filled portion. The color is unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
