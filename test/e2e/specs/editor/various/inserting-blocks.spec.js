@@ -815,7 +815,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.hover();
 
 		await expect(
-			page.locator( '.block-editor-inserter__preview' )
+			page.locator( '.block-editor-inserter__preview-content' )
 		).toBeInViewport();
 	} );
 

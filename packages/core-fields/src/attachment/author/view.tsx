@@ -1,44 +1,16 @@
-import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
-import { useState, useCallback, useEffect } from '@wordpress/element';
-import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import { Icon, Stack } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 import type { MediaItem } from '../types';
-import styles from './style.module.css';
+import AuthorAvatar from '../../shared/author/avatar';
+import styles from '../../shared/author/style.module.css';
 
 /*
- * A copy of the author view of `@wordpress/media-fields`, laid out with
- * `Stack` instead of the `HStack` of `@wordpress/components`, and styled with
- * a CSS module.
+ * The author of a media item: their name, after their avatar when the site
+ * shows avatars. The REST API lists the avatar URLs of a user only then.
  */
 export default function AuthorView( { item }: { item: MediaItem } ) {
 	const author = item?._embedded?.author?.[ 0 ];
 	const text = author?.name;
 	const imageUrl = author?.avatar_urls?.[ 48 ];
-
-	/*
-	 * Use three states to avoid fade-in animation for cached images:
-	 * 'instant' = image already cached, 'loading' = waiting, 'loaded' = just finished.
-	 */
-	const [ loadingState, setLoadingState ] = useState<
-		'instant' | 'loading' | 'loaded'
-	>( 'loading' );
-
-	useEffect( () => {
-		setLoadingState( 'loading' );
-	}, [ imageUrl ] );
-
-	const imgRef = useCallback( ( img: HTMLImageElement | null ) => {
-		if ( img?.complete ) {
-			setLoadingState( 'instant' );
-		}
-	}, [] );
-
-	const handleLoad = () => {
-		if ( loadingState === 'loading' ) {
-			setLoadingState( 'loaded' );
-		}
-	};
 
 	// Some media have no author, and the author id of others matches no user
 	// listed as an author, like a deleted user. A panel row shows the field's
@@ -49,26 +21,7 @@ export default function AuthorView( { item }: { item: MediaItem } ) {
 
 	return (
 		<Stack direction="row" gap="xs" align="flex-start" justify="flex-start">
-			{ !! imageUrl && (
-				<div
-					className={ clsx( styles.avatar, {
-						[ styles[ 'is-loading' ] ]: loadingState === 'loading',
-						[ styles[ 'is-loaded' ] ]: loadingState === 'loaded',
-					} ) }
-				>
-					<img
-						ref={ imgRef }
-						onLoad={ handleLoad }
-						alt={ __( 'Author avatar' ) }
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className={ styles.icon }>
-					<Icon icon={ authorIcon } />
-				</div>
-			) }
+			{ !! imageUrl && <AuthorAvatar src={ imageUrl } /> }
 			<span className={ styles.name }>{ text }</span>
 		</Stack>
 	);
