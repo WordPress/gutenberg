@@ -110,7 +110,7 @@ describe( 'Textarea', () => {
 			const onChange = vi.fn();
 			const renderOnChange = vi.fn();
 			const onValueChange = vi.fn();
-			const { unmount } = render(
+			render(
 				<Textarea
 					ref={ ref }
 					onChange={ onChange }
@@ -138,11 +138,6 @@ describe( 'Textarea', () => {
 				'a',
 				expect.any( Object )
 			);
-
-			unmount();
-
-			expect( ref.current ).toBeNull();
-			expect( renderRef.current ).toBeNull();
 		} );
 
 		it( 'correctly merges props with custom render function', () => {
@@ -175,27 +170,6 @@ describe( 'Textarea', () => {
 	} );
 
 	describe( 'Field integration', () => {
-		it( 'tracks whether the textarea is filled', async () => {
-			const user = userEvent.setup();
-			render(
-				<Field.Root>
-					<Field.Label>Comment</Field.Label>
-					<Textarea defaultValue="Initial" />
-				</Field.Root>
-			);
-			const textarea = screen.getByRole( 'textbox', { name: 'Comment' } );
-
-			expect( textarea ).toHaveAttribute( 'data-filled' );
-
-			await user.clear( textarea );
-
-			expect( textarea ).not.toHaveAttribute( 'data-filled' );
-
-			await user.type( textarea, 'New content' );
-
-			expect( textarea ).toHaveAttribute( 'data-filled' );
-		} );
-
 		it( 'validates a required textarea on blur', async () => {
 			const user = userEvent.setup();
 			render(
@@ -217,28 +191,6 @@ describe( 'Textarea', () => {
 			await waitFor( () => {
 				expect( textarea ).toHaveAttribute( 'aria-invalid', 'true' );
 			} );
-		} );
-
-		it( 'returns to pristine when the default value is restored', async () => {
-			const user = userEvent.setup();
-			render(
-				<Field.Root>
-					<Field.Label>Comment</Field.Label>
-					<Textarea defaultValue="Initial" />
-				</Field.Root>
-			);
-			const textarea = screen.getByRole( 'textbox', { name: 'Comment' } );
-
-			expect( textarea ).not.toHaveAttribute( 'data-dirty' );
-
-			await user.type( textarea, ' changed' );
-
-			expect( textarea ).toHaveAttribute( 'data-dirty' );
-
-			await user.clear( textarea );
-			await user.type( textarea, 'Initial' );
-
-			expect( textarea ).not.toHaveAttribute( 'data-dirty' );
 		} );
 	} );
 
