@@ -87,6 +87,7 @@
 
 		.input-layout-slot {
 			display: flex;
+			flex-shrink: 0;
 			align-items: center;
 
 			&.is-padding-minimal {

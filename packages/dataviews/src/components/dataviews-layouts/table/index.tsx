@@ -1,7 +1,10 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner as WCSpinner, Popover } from '@wordpress/components';
+import {
+	Spinner as WCSpinner,
+	Popover as WCPopover,
+} from '@wordpress/components';
 import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import {
 	useContext,
@@ -538,13 +541,13 @@ function ViewTable< Item >( {
 					) }
 				</colgroup>
 				{ contextMenuAnchor && (
-					<Popover
+					<WCPopover
 						anchor={ contextMenuAnchor }
 						onClose={ () => setContextMenuAnchor( null ) }
 						placement="bottom-start"
 					>
 						<PropertiesSection showLabel={ false } />
-					</Popover>
+					</WCPopover>
 				) }
 				<thead
 					ref={ tableHeaderRefs }
