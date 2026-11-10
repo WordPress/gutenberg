@@ -6,7 +6,7 @@ import {
 import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
@@ -15,7 +15,11 @@ import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
 import PageListPagesControl from '../../page-list/pages-control';
-import { useAddLinkAfterPage } from '../../page-list/use-convert-to-navigation-links';
+import {
+	useAddLinkAfterPage,
+	useDropIntoOrOutOfPageList,
+} from '../../page-list/use-convert-to-navigation-links';
+import { PAGE_DRAG_TYPE } from '../../page-list/pages-list';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -25,6 +29,94 @@ const {
 	useListViewPanelState,
 	useBlockDisplayTitle,
 } = unlock( blockEditorPrivateApis );
+
+/**
+ * Lets a page dragged from the Page List's pages be dropped between the
+ * list view's rows, which turns the Page List into links.
+ *
+ * @param {Object}                                                       props            Component props.
+ * @param {Element}                                                      props.children   The list view.
+ * @param {(pageId: number, clientId: string, isAfter: boolean) => void} props.onDropPage Called with the page ID, the
+ *                                                                                        client ID of the row's block,
+ *                                                                                        and which side of it.
+ */
+function PageDropZone( { children, onDropPage } ) {
+	const [ indicator, setIndicator ] = useState( null );
+
+	const getTarget = ( event ) => {
+		if ( ! event.dataTransfer.types.includes( PAGE_DRAG_TYPE ) ) {
+			return null;
+		}
+		const row = event.target.closest?.( '[role="row"][data-block]' );
+		if ( ! row || ! event.currentTarget.contains( row ) ) {
+			return null;
+		}
+		const rowRect = row.getBoundingClientRect();
+		const zoneRect = event.currentTarget.getBoundingClientRect();
+		const isAfter = event.clientY > rowRect.top + rowRect.height / 2;
+		return {
+			clientId: row.dataset.block,
+			isAfter,
+			top: ( isAfter ? rowRect.bottom : rowRect.top ) - zoneRect.top,
+		};
+	};
+
+	return (
+		<div
+			className="wp-block-navigation__page-drop-zone"
+			// Capturing keeps the list view's own drop handling, which is for
+			// blocks, from seeing a page.
+			onDragOverCapture={ ( event ) => {
+				const target = getTarget( event );
+				if ( ! target ) {
+					return;
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				event.dataTransfer.dropEffect = 'move';
+				if (
+					target.clientId !== indicator?.clientId ||
+					target.isAfter !== indicator?.isAfter
+				) {
+					setIndicator( target );
+				}
+			} }
+			onDragLeave={ ( event ) => {
+				if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+					setIndicator( null );
+				}
+			} }
+			onDropCapture={ ( event ) => {
+				const target = getTarget( event );
+				setIndicator( null );
+				if ( ! target ) {
+					return;
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				let page;
+				try {
+					page = JSON.parse(
+						event.dataTransfer.getData( PAGE_DRAG_TYPE )
+					);
+				} catch {
+					return;
+				}
+				if ( page?.type === 'page' && Number.isInteger( page.id ) ) {
+					onDropPage( page.id, target.clientId, target.isAfter );
+				}
+			} }
+		>
+			{ children }
+			{ indicator && (
+				<div
+					className="wp-block-navigation__page-drop-indicator"
+					style={ { top: indicator.top } }
+				/>
+			) }
+		</div>
+	);
+}
 
 const MainContent = ( {
 	clientId,
@@ -51,6 +143,8 @@ const MainContent = ( {
 	);
 
 	const addLinkAfterPage = useAddLinkAfterPage( pageListClientId );
+	const { dropBlocksNextToPage, dropPageNextToBlock } =
+		useDropIntoOrOutOfPageList( pageListClientId );
 
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
@@ -96,19 +190,22 @@ const MainContent = ( {
 					clientId={ pageListClientId }
 					showAddLink={ ! hasOtherItems }
 					onAddLinkAfter={ addLinkAfterPage }
+					onDropItems={ dropBlocksNextToPage }
 				/>
 			) }
 			{ ( ! pageListClientId || hasOtherItems ) && (
-				<PrivateListView
-					key={ `${ clientId }-${ expandRevision }` }
-					rootClientId={ clientId }
-					isExpanded
-					description={ description }
-					showAppender
-					blockSettingsMenu={ LeafMoreMenu }
-					additionalBlockContent={ NavigationLinkUI }
-					onSelect={ openListViewContentPanel }
-				/>
+				<PageDropZone onDropPage={ dropPageNextToBlock }>
+					<PrivateListView
+						key={ `${ clientId }-${ expandRevision }` }
+						rootClientId={ clientId }
+						isExpanded
+						description={ description }
+						showAppender
+						blockSettingsMenu={ LeafMoreMenu }
+						additionalBlockContent={ NavigationLinkUI }
+						onSelect={ openListViewContentPanel }
+					/>
+				</PageDropZone>
 			) }
 		</div>
 	);

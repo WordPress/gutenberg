@@ -1,5 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -140,6 +140,28 @@ export function useConvertToNavigationLinks( {
 }
 
 /**
+ * Puts blocks straight before or after the link to a page, at the same level,
+ * in a tree of links that isn't in the editor yet.
+ *
+ * @param {Array}   links   Navigation Link and Submenu blocks.
+ * @param {number}  pageId  ID of the page to put the blocks next to.
+ * @param {Array}   blocks  The blocks to add.
+ * @param {boolean} isAfter Whether they go after the page, not before it.
+ *
+ * @return {boolean} Whether the page's link was found.
+ */
+export function insertNextToPageLink( links, pageId, blocks, isAfter ) {
+	const index = links.findIndex( ( link ) => link.attributes.id === pageId );
+	if ( index !== -1 ) {
+		links.splice( isAfter ? index + 1 : index, 0, ...blocks );
+		return true;
+	}
+	return links.some( ( link ) =>
+		insertNextToPageLink( link.innerBlocks, pageId, blocks, isAfter )
+	);
+}
+
+/**
  * Puts a block straight after the link to a page, at the same level, in a
  * tree of links that isn't in the editor yet.
  *
@@ -150,14 +172,30 @@ export function useConvertToNavigationLinks( {
  * @return {boolean} Whether the page's link was found.
  */
 export function insertAfterPageLink( links, pageId, block ) {
+	return insertNextToPageLink( links, pageId, [ block ], true );
+}
+
+/**
+ * Takes the link to a page, with the links to its child pages, out of a tree
+ * of links that isn't in the editor yet.
+ *
+ * @param {Array}  links  Navigation Link and Submenu blocks.
+ * @param {number} pageId ID of the page.
+ *
+ * @return {Object|null} The page's link, or null if it isn't there.
+ */
+export function removePageLink( links, pageId ) {
 	const index = links.findIndex( ( link ) => link.attributes.id === pageId );
 	if ( index !== -1 ) {
-		links.splice( index + 1, 0, block );
-		return true;
+		return links.splice( index, 1 )[ 0 ];
 	}
-	return links.some( ( link ) =>
-		insertAfterPageLink( link.innerBlocks, pageId, block )
-	);
+	for ( const link of links ) {
+		const removed = removePageLink( link.innerBlocks, pageId );
+		if ( removed ) {
+			return removed;
+		}
+	}
+	return null;
 }
 
 /**
@@ -213,4 +251,90 @@ export function useAddLinkAfterPage( clientId ) {
 			)
 		);
 	};
+}
+
+/**
+ * Returns functions that move items in and out of a Page List by dragging.
+ * A Page List can't hold other links, and its pages can't sit between other
+ * links, so either move turns the pages into links first, as Detach does:
+ * in the order shown, without hidden pages.
+ *
+ * @param {string|undefined} clientId Client ID of the Page List block.
+ *
+ * @return {{
+ *   dropBlocksNextToPage: (blockClientIds: string[], pageId: number, isAfter: boolean) => void,
+ *   dropPageNextToBlock: (pageId: number, targetClientId: string, isAfter: boolean) => void,
+ * }} Called when the drop happens.
+ */
+export function useDropIntoOrOutOfPageList( clientId ) {
+	const registry = useRegistry();
+	const { pagesByParentId } = usePageListPages();
+	const { replaceBlock, removeBlock, removeBlocks, insertBlock } =
+		useDispatch( blockEditorStore );
+
+	const getLinks = () => {
+		const attributes =
+			clientId &&
+			registry.select( blockEditorStore ).getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			return null;
+		}
+		const excludedIds = new Set(
+			Array.isArray( attributes.excludedPageIDs )
+				? attributes.excludedPageIDs
+				: []
+		);
+		return convertToNavigationLinks(
+			getVisiblePages( pagesByParentId, excludedIds ),
+			attributes.parentPageID
+		);
+	};
+
+	// Another item of the menu, dropped next to one of the pages.
+	const dropBlocksNextToPage = ( blockClientIds, pageId, isAfter ) => {
+		const links = getLinks();
+		const blocks = registry
+			.select( blockEditorStore )
+			.getBlocksByClientId( blockClientIds )
+			.filter( Boolean );
+		if (
+			! links ||
+			! blocks.length ||
+			! insertNextToPageLink( links, pageId, blocks, isAfter )
+		) {
+			return;
+		}
+		registry.batch( () => {
+			removeBlocks( blockClientIds, false );
+			replaceBlock( clientId, links );
+		} );
+		speak( __( 'The pages are now links, and the item was moved.' ) );
+	};
+
+	// One of the pages, dropped next to another item of the menu.
+	const dropPageNextToBlock = ( pageId, targetClientId, isAfter ) => {
+		const links = getLinks();
+		const pageLink = links && removePageLink( links, pageId );
+		if ( ! pageLink ) {
+			return;
+		}
+		registry.batch( () => {
+			if ( links.length ) {
+				replaceBlock( clientId, links );
+			} else {
+				removeBlock( clientId, false );
+			}
+			const { getBlockIndex, getBlockRootClientId } =
+				registry.select( blockEditorStore );
+			insertBlock(
+				pageLink,
+				getBlockIndex( targetClientId ) + ( isAfter ? 1 : 0 ),
+				getBlockRootClientId( targetClientId ),
+				false
+			);
+		} );
+		speak( __( 'The pages are now links, and the page was moved.' ) );
+	};
+
+	return { dropBlocksNextToPage, dropPageNextToBlock };
 }

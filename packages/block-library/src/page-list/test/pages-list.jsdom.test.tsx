@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import PagesList, { PageDragChip } from '../pages-list';
 import { getPagesByParentId, getPageRows } from '../utils';
 
@@ -20,14 +20,17 @@ function renderPanel( {
 	excludedIds = [] as number[],
 	canReorder = true,
 	canAddLinks = false,
+	isDraggingItems = false,
 }: {
 	excludedIds?: number[];
 	canReorder?: boolean;
 	canAddLinks?: boolean;
+	isDraggingItems?: boolean;
 } = {} ) {
 	const onToggle = vi.fn();
 	const onMove = vi.fn();
 	const onAddLinkAfter = vi.fn();
+	const onDropItems = vi.fn();
 	const rows = getPageRows(
 		getPagesByParentId( PAGES ),
 		0,
@@ -41,9 +44,11 @@ function renderPanel( {
 			onToggle={ onToggle }
 			onMove={ onMove }
 			onAddLinkAfter={ canAddLinks ? onAddLinkAfter : null }
+			canDropItems={ () => isDraggingItems }
+			onDropItems={ onDropItems }
 		/>
 	);
-	return { onToggle, onMove, onAddLinkAfter };
+	return { onToggle, onMove, onAddLinkAfter, onDropItems };
 }
 
 describe( 'PagesList', () => {
@@ -139,5 +144,39 @@ describe( 'PagesList', () => {
 	it( 'shows the page being dragged in its drag chip', () => {
 		render( <PageDragChip title="Catering" /> );
 		expect( screen.getByText( 'Catering' ) ).toBeInTheDocument();
+	} );
+
+	it( 'takes another menu item dropped next to a page', () => {
+		const { onDropItems } = renderPanel( { isDraggingItems: true } );
+		const shop = screen
+			.getAllByRole( 'listitem' )
+			.find( ( item ) => within( item ).queryByText( 'Shop' ) )!;
+
+		fireEvent.dragOver( shop, {
+			clientY: 0,
+			dataTransfer: { dropEffect: 'none' },
+		} );
+		fireEvent.drop( shop );
+		expect( onDropItems ).toHaveBeenCalledWith(
+			expect.objectContaining( { page: PAGES[ 2 ] } ),
+			false
+		);
+	} );
+
+	it( 'doesn’t take a menu item next to a hidden page', () => {
+		const { onDropItems } = renderPanel( {
+			isDraggingItems: true,
+			excludedIds: [ 3 ],
+		} );
+		const shop = screen
+			.getAllByRole( 'listitem' )
+			.find( ( item ) => within( item ).queryByText( 'Shop' ) )!;
+
+		fireEvent.dragOver( shop, {
+			clientY: 0,
+			dataTransfer: { dropEffect: 'none' },
+		} );
+		fireEvent.drop( shop );
+		expect( onDropItems ).not.toHaveBeenCalled();
 	} );
 } );

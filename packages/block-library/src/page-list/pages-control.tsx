@@ -2,7 +2,7 @@ import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -27,6 +27,15 @@ interface PageListPagesControlProps {
 	 * `useAddLinkAfterPage`.
 	 */
 	onAddLinkAfter?: ( pageId: number ) => void;
+	/**
+	 * Called when other items of the Navigation block are dropped next to a
+	 * page, from `useDropIntoOrOutOfPageList`.
+	 */
+	onDropItems?: (
+		blockClientIds: string[],
+		pageId: number,
+		isAfter: boolean
+	) => void;
 }
 
 /**
@@ -38,12 +47,15 @@ interface PageListPagesControlProps {
  * @param props.clientId       Client ID of the Page List block.
  * @param props.showAddLink    Whether to show an Add link button below the pages.
  * @param props.onAddLinkAfter Called with a page ID to add a link after it.
+ * @param props.onDropItems    Called when other items are dropped next to a page.
  */
 export default function PageListPagesControl( {
 	clientId,
 	showAddLink = false,
 	onAddLinkAfter,
+	onDropItems,
 }: PageListPagesControlProps ) {
+	const registry = useRegistry();
 	const { pagesByParentId, hasResolvedPages, canReorderPages } =
 		usePageListPages();
 
@@ -138,6 +150,23 @@ export default function PageListPagesControl( {
 		}
 	};
 
+	// Items are being dragged from elsewhere in this Navigation block, such as
+	// its list view. Read at drag time, so dragging doesn't re-render this.
+	const getDraggedItems = (): string[] => {
+		if ( ! navigationClientId ) {
+			return [];
+		}
+		const { getDraggedBlockClientIds, getBlockParents } =
+			registry.select( blockEditorStore );
+		const dragged: string[] = getDraggedBlockClientIds();
+		return dragged.length &&
+			dragged.every( ( id ) =>
+				getBlockParents( id ).includes( navigationClientId )
+			)
+			? dragged
+			: [];
+	};
+
 	return (
 		<>
 			<PagesList
@@ -151,6 +180,15 @@ export default function PageListPagesControl( {
 						? ( row ) => onAddLinkAfter( row.page.id )
 						: null
 				}
+				canDropItems={ () =>
+					!! onDropItems && getDraggedItems().length > 0
+				}
+				onDropItems={ ( row, isAfter ) => {
+					const dragged = getDraggedItems();
+					if ( onDropItems && dragged.length ) {
+						onDropItems( dragged, row.page.id, isAfter );
+					}
+				} }
 			/>
 			{ showAddLink && navigationClientId && (
 				<Button

@@ -23,6 +23,12 @@ import { Switch, VisuallyHidden } from '@wordpress/ui';
 import { getPageTitle } from './utils';
 import type { PageRow } from './utils';
 
+/**
+ * The drag data type of a page dragged from the list, so a drop target outside
+ * it, such as the Navigation block's list view, can recognise one.
+ */
+export const PAGE_DRAG_TYPE = 'wp-page-list-page';
+
 interface DragState {
 	pageId: number;
 	parentId: number;
@@ -46,6 +52,13 @@ interface PagesListProps {
 	onMove: ( row: PageRow, toIndex: number ) => void;
 	/** Called with a row to add a link after its page, if links can be added. */
 	onAddLinkAfter?: ( ( row: PageRow ) => void ) | null;
+	/**
+	 * Whether what's being dragged, from outside the list, can be dropped next
+	 * to a page: another item of the menu.
+	 */
+	canDropItems?: () => boolean;
+	/** Called when that's dropped, with the row and which side of it. */
+	onDropItems?: ( row: PageRow, isAfter: boolean ) => void;
 }
 
 interface PageRowItemProps {
@@ -125,6 +138,7 @@ function PageRowItem( {
 					// Only used without a drag component, to clone the element.
 					elementId={ `wp-block-page-list__pages-panel-page-${ page.id }` }
 					transferData={ { type: 'page', id: page.id } }
+					__experimentalTransferDataType={ PAGE_DRAG_TYPE }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 					__experimentalDragComponent={
@@ -254,6 +268,8 @@ export default function PagesList( {
 	onToggle,
 	onMove,
 	onAddLinkAfter,
+	canDropItems,
+	onDropItems,
 }: PagesListProps ) {
 	const [ dragState, setDragState ] = useState< DragState | null >( null );
 	const [ dropTarget, setDropTarget ] = useState< DropTarget | null >( null );
@@ -288,7 +304,20 @@ export default function PagesList( {
 	const isSiblingOfDragged = ( row: PageRow ) =>
 		!! dragState && row.page.parent === dragState.parentId;
 
+	// Another item of the menu can go next to any page that's in the menu.
+	const canDropItemsOn = ( row: PageRow ) =>
+		! dragState &&
+		!! canDropItems?.() &&
+		! row.isHiddenByAncestor &&
+		! excludedIds.includes( row.page.id );
+
 	const handleDrop = ( row: PageRow ) => {
+		if ( ! dragState && dropTarget && canDropItemsOn( row ) ) {
+			const { isAfter } = dropTarget;
+			clearDrag();
+			onDropItems?.( row, isAfter );
+			return;
+		}
 		if ( ! dragState || ! dropTarget || ! isSiblingOfDragged( row ) ) {
 			clearDrag();
 			return;
@@ -339,6 +368,15 @@ export default function PagesList( {
 			<ul
 				className="wp-block-page-list__pages-panel-list"
 				aria-label={ __( 'Pages' ) }
+				onDragLeave={ ( event ) => {
+					if (
+						! event.currentTarget.contains(
+							event.relatedTarget as Node | null
+						)
+					) {
+						setDropTarget( null );
+					}
+				} }
 			>
 				{ rows.map( ( row ) => (
 					<PageRowItem
@@ -372,7 +410,10 @@ export default function PagesList( {
 						}
 						onDragEnd={ clearDrag }
 						onDragOver={ ( event ) => {
-							if ( ! isSiblingOfDragged( row ) ) {
+							if (
+								! isSiblingOfDragged( row ) &&
+								! canDropItemsOn( row )
+							) {
 								return;
 							}
 							event.preventDefault();

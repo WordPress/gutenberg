@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import {
 	convertToNavigationLinks,
 	insertAfterPageLink,
+	insertNextToPageLink,
+	removePageLink,
 } from '../use-convert-to-navigation-links';
 
 // Expected entity binding structure for navigation links
@@ -625,5 +627,55 @@ describe( 'insertAfterPageLink', () => {
 		const links = [ link( 1 ) ];
 		expect( insertAfterPageLink( links, 9, newLink ) ).toBe( false );
 		expect( links ).toHaveLength( 1 );
+	} );
+} );
+
+describe( 'insertNextToPageLink', () => {
+	const link = ( id, innerBlocks = [] ) => ( {
+		clientId: `link-${ id }`,
+		attributes: { id },
+		innerBlocks,
+	} );
+	const ids = ( links ) => links.map( ( { clientId } ) => clientId );
+	const moved = [ { clientId: 'a', attributes: {}, innerBlocks: [] } ];
+
+	it( 'puts blocks before a page', () => {
+		const links = [ link( 1 ), link( 2 ) ];
+		insertNextToPageLink( links, 2, moved, false );
+		expect( ids( links ) ).toEqual( [ 'link-1', 'a', 'link-2' ] );
+	} );
+
+	it( 'puts blocks before a child page, among its siblings', () => {
+		const children = [ link( 2 ), link( 3 ) ];
+		insertNextToPageLink( [ link( 1, children ) ], 3, moved, false );
+		expect( ids( children ) ).toEqual( [ 'link-2', 'a', 'link-3' ] );
+	} );
+} );
+
+describe( 'removePageLink', () => {
+	const link = ( id, innerBlocks = [] ) => ( {
+		clientId: `link-${ id }`,
+		attributes: { id },
+		innerBlocks,
+	} );
+
+	it( 'takes out a page with its child pages', () => {
+		const about = link( 1, [ link( 2 ) ] );
+		const links = [ about, link( 3 ) ];
+		expect( removePageLink( links, 1 ) ).toBe( about );
+		expect( links.map( ( { clientId } ) => clientId ) ).toEqual( [
+			'link-3',
+		] );
+	} );
+
+	it( 'takes out a child page', () => {
+		const children = [ link( 2 ), link( 3 ) ];
+		const links = [ link( 1, children ) ];
+		expect( removePageLink( links, 3 ).clientId ).toBe( 'link-3' );
+		expect( children ).toHaveLength( 1 );
+	} );
+
+	it( 'returns null for a page that has no link', () => {
+		expect( removePageLink( [ link( 1 ) ], 9 ) ).toBeNull();
 	} );
 } );
