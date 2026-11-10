@@ -1,5 +1,4 @@
 import type { ForwardedRef } from 'react';
-import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { InputLayout } from '@wordpress/ui';
@@ -49,10 +48,7 @@ function UnforwardedContentEditableControl(
 				</BaseControl.VisualLabel>
 			) }
 			<InputLayout
-				className={ clsx(
-					'components-content-editable-control__field',
-					styles.layout
-				) }
+				className={ styles.layout }
 				visuallyDisabled={ disabled }
 			>
 				<div

@@ -22,6 +22,7 @@
 	min-width: 0;
 	padding-block: calc((var(--wpds-dimension-size-lg) - var(--wpds-typography-line-height-sm)) / 2 - var(--wpds-border-width-xs));
 	padding-inline: var(--wpds-dimension-padding-md);
+	// `.layout` draws the focus ring.
 	outline: none;
 
 	// `::placeholder` only applies to native form fields, so draw the text
