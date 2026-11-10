@@ -6,7 +6,7 @@ This package is still experimental. “Experimental” means this is an early im
 
 An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that describes the edits to apply when saving it. Cropping is the first thing it does. The media editor is built on it.
 
-This package is set to replace `@wordpress/image-cropper`. That package stays as it is for now. It will be rebuilt on the maths in this package's core, and deprecated once it is.
+This package replaces `@wordpress/image-cropper`, which is deprecated and will be removed in a later release.
 
 ## Installation
 
@@ -18,13 +18,46 @@ npm install @wordpress/image-editor --save
 
 ## Styles
 
-The canvas needs the editor's styles to lay out at all, so load them. They ship in `build-style/style.css`:
+The canvas needs its stylesheet for layout. Load `build-style/style.css` from your app's Sass:
 
 ```scss
 @use "@wordpress/image-editor/build-style/style.css";
 ```
 
-The focus ring and the focused resize handle use the admin theme colour. Set `--wp-image-editor-focus-color` on an ancestor to change it.
+Or import it from JavaScript:
+
+```js
+import '@wordpress/image-editor/build-style/style.css';
+```
+
+The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. Gutenberg's media editor reads the user's admin colour scheme for its accent and currently uses a light surface. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
+
+Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
+
+| Property                             | Changes                                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `--wp-image-editor-accent-color`     | Handle borders and keyboard focus colour. Defaults to the admin theme colour, or blue outside WordPress.         |
+| `--wp-image-editor-foreground-color` | Crop outline at rest and dimensions tooltip text. The focused outline uses the accent colour.                    |
+| `--wp-image-editor-surface-color`    | Handle fill, dimensions tooltip background and the inner focus ring.                                             |
+| `--wp-image-editor-dimming-color`    | Colour outside the crop. During a drag, the same colour is used at two-thirds opacity.                           |
+| `--wp-image-editor-grid-color`       | Rule-of-thirds lines.                                                                                            |
+| `--wp-image-editor-canvas-inset`     | Space around the editing surface. Defaults to 24px and cannot go below 22px, so resize handles remain reachable. |
+
+For example, `<ImageEditorCanvas className="my-cropper" ... />` can use:
+
+```css
+.my-cropper {
+	--wp-image-editor-accent-color: rebeccapurple;
+}
+
+.my-cropper.is-dark {
+	--wp-image-editor-foreground-color: #f0f0f0;
+	--wp-image-editor-surface-color: #1e1e1e;
+	--wp-image-editor-dimming-color: rgb( 0 0 0 / 60% );
+}
+```
+
+To use the design tokens outside WordPress, install `@wordpress/theme` and load its `design-tokens.css` in your app. The image editor runs without it, and your custom properties take precedence over the design tokens.
 
 ## Outside WordPress
 
@@ -111,12 +144,17 @@ Use it when saving. The editor stores where the image sits, how far it is zoomed
 
 The returned list contains flip, rotate and crop operations as needed, in the order to apply them. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A locked ratio can produce a crop operation before the person edits anything. The caller applies the operations and saves the result.
 
+### `exportImage( state, options? )`
+
+Use it when the edited image is uploaded as a new file, rather than applied to the original by a server. It loads the image in `state.image`, draws the region the crop frames with the flip, rotation and zoom applied, and resolves with a `Blob` whose dimensions are the ones `getOutputSize( state )` reports. `options.type` is the MIME type, `image/png` by default, and `options.quality` is the quality for lossy types, from 0 to 1.
+
+It runs only in a browser. It rejects when no image has loaded, when the image fails to load, or when the browser refuses to read the canvas: the image is loaded with `crossOrigin` set to `anonymous`, so a source on another origin needs CORS headers.
+
 ## Not Yet Included
 
-The first version covers what the media editor needs. Two additions are likely next, for simpler editors:
+The first version covers what the media editor needs. One addition is likely next, for simpler editors:
 
 -   **A self-contained mode**, where `useImageEditor()` keeps the state itself. An editor without its own undo history would not need to store the state.
--   **Exporting the edited image in the browser** as a `Blob`. An editor that uploads the result, rather than asking a server to edit the original, would need it.
 
 ## More
 

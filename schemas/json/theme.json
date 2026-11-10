@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -1204,6 +1204,9 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
@@ -1217,6 +1220,12 @@
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -1333,7 +1342,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -1466,6 +1487,10 @@
 								},
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"gradient": {
+							"description": "Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image.",
+							"type": "string"
 						}
 					},
 					"additionalProperties": false
@@ -1981,6 +2006,13 @@
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textWrap": {
+							"description": "Sets the `text-wrap` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
@@ -2868,6 +2900,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2881,6 +2916,12 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-author": {
@@ -2997,7 +3038,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/tag-cloud": {
@@ -3416,6 +3469,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -3429,6 +3485,12 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -3545,7 +3607,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -3757,7 +3831,7 @@
 						"type": "string"
 					},
 					"template": {
-						"description": "Filename, without extension, of the template this one is rendered inside of. Its post content block is where this template renders. Templates nest one level deep: the template named is not rendered inside another in turn, even if it names one. A site can override it, or render the template on its own, from the editor.",
+						"description": "Filename, without extension, of the template this one is rendered inside of. Its Template Slot block is where this template renders. Templates nest one level deep: the template named is not rendered inside another in turn, even if it names one. A site can override it, or render the template on its own, from the editor.",
 						"type": "string"
 					}
 				},

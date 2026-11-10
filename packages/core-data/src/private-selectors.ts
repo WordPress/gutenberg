@@ -219,13 +219,14 @@ export const getTemplateId = createRegistrySelector(
 				return;
 			}
 
-			// A template that names one that no longer exists is rendered on
-			// its own, like one that names none.
-			return (
-				templates.find(
-					( { slug } ) => slug === editedTemplate.template
-				)?.id ?? null
+			// A template that names one that no longer exists, or one with no
+			// slot to render it in, is rendered on its own, like one that
+			// names none.
+			const parentTemplate = templates.find(
+				( { slug } ) => slug === editedTemplate.template
 			);
+
+			return parentTemplate?.has_template_slot ? parentTemplate.id : null;
 		}
 
 		const homepage = unlock( select( STORE_NAME ) ).getHomePage();

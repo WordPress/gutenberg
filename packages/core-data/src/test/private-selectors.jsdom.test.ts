@@ -92,7 +92,12 @@ describe( 'getEntityActionsConfig', () => {
 } );
 
 describe( 'getTemplateId', () => {
-	type TestTemplate = { id: string; slug: string; template?: string };
+	type TestTemplate = {
+		id: string;
+		slug: string;
+		template?: string;
+		has_template_slot?: boolean;
+	};
 
 	function setUpRegistry( {
 		editedTemplate,
@@ -109,7 +114,11 @@ describe( 'getTemplateId', () => {
 		} as never;
 	}
 
-	const layout: TestTemplate = { id: 'theme//layout', slug: 'layout' };
+	const layout: TestTemplate = {
+		id: 'theme//layout',
+		slug: 'layout',
+		has_template_slot: true,
+	};
 
 	it( 'returns undefined until the edited template is received', () => {
 		setUpRegistry( { editedTemplate: undefined, templates: [ layout ] } );
@@ -166,6 +175,24 @@ describe( 'getTemplateId', () => {
 				'theme//page-404'
 			)
 		).toBeUndefined();
+	} );
+
+	it( 'returns null when the template it names has no slot to render it in', () => {
+		setUpRegistry( {
+			editedTemplate: { slug: 'page-404', template: 'blank' },
+			templates: [
+				layout,
+				{ id: 'theme//blank', slug: 'blank', has_template_slot: false },
+			],
+		} );
+
+		expect(
+			getTemplateId(
+				partialState( {} ),
+				'wp_template',
+				'theme//page-404'
+			)
+		).toBeNull();
 	} );
 
 	it( 'returns null when the template it names no longer exists', () => {

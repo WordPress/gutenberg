@@ -30,6 +30,7 @@ import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
 import useNetworkReconnect from './use-network-reconnect';
+import { getStartingRenderingMode, getTemplateAround } from './template-around';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -64,12 +65,12 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * The blocks that hold what is being edited when a template is rendered inside
  * another one.
  *
- * The slot is the post content block of the template around it, and the server
+ * The slot is the template slot block of the template around it, and the server
  * substitutes that block alone. A post title or a featured image in the
  * template around it belongs to that template, which is edited on its own
  * screen, so neither is content to edit here.
  */
-const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/post-content' ];
+const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/template-slot' ];
 
 /**
  * Depending on the post, template and template mode,
@@ -188,13 +189,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: _template,
 	} ) => {
-		/*
-		 * A host editing a template names that template as the template too,
-		 * so that the canvas stands for it. There is nothing to render around
-		 * it then, unlike a template that names another one to render inside.
-		 */
-		const standsForOwnTemplate = _template?.id === post.id;
-		const template = standsForOwnTemplate ? undefined : _template;
+		const template = getTemplateAround( post, _template );
+		const standsForOwnTemplate = !! _template && ! template;
 		const hasTemplate = !! template;
 		const {
 			editorSettings,
@@ -230,11 +226,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// post inside its template has nothing to show: the template
 				// is edited on its own however the preference for the post
 				// type reads, and the mode is settled rather than pending.
-				const _defaultMode =
-					renderingMode ??
-					( standsForOwnTemplate
-						? 'post-only'
-						: getDefaultRenderingMode( post.type ) );
+				const _defaultMode = getStartingRenderingMode( {
+					renderingMode,
+					standsForOwnTemplate,
+					getPostTypeDefaultMode: () =>
+						getDefaultRenderingMode( post.type ),
+				} );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -288,7 +285,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		/*
 		 * A template can name the template it is rendered inside, in which case
 		 * the canvas shows that one around it and the template being edited is
-		 * what its post content block renders, the way a page is.
+		 * what its template slot block renders, the way a page is what the
+		 * post content block of its template renders.
 		 */
 		const isTemplateInsideTemplate =
 			shouldRenderTemplate &&
@@ -300,8 +298,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// A template rendered inside another is given the same context, so
 			// that the blocks of the template around it, such as a title block
 			// in its header, stand for the post that template renders rather
-			// than for the template; its post content block is told which
-			// template to render through `templateSlotId` instead.
+			// than for the template; its template slot block is told which
+			// template to render through `templateSlotId`.
 			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';

@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import {
-	BlockContextProvider,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -22,19 +21,6 @@ import { useCanEditEntity } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
-
-/**
- * The context the blocks of a template rendered in this one are given.
- *
- * A template can name the template it is rendered inside, whose content block
- * is the slot its blocks take the place of, and the editor names the template
- * to render there through `templateSlotId`. Everything else in the context
- * already stands for the post that template renders, the way it does when the
- * template is edited on its own, so its blocks only need that name taken away:
- * a content block among them is where that post's content goes rather than
- * the slot rendering the template again.
- */
-const TEMPLATE_SLOT_CONTEXT = { templateSlotId: undefined };
 
 function ReadOnlyContent( {
 	parentLayout,
@@ -89,35 +75,19 @@ function EditableContentLoaded( {
 	blocks,
 	onInput,
 	onChange,
-	slotContext,
 	tagName: TagName = 'div',
 } ) {
-	const { children, ...props } = useInnerBlocksProps( blockProps, {
+	const props = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
 		onChange,
 	} );
-	return (
-		<TagName { ...props }>
-			{ slotContext ? (
-				<BlockContextProvider value={ slotContext }>
-					{ children }
-				</BlockContextProvider>
-			) : (
-				children
-			) }
-		</TagName>
-	);
+	return <TagName { ...props } />;
 }
 
-function EditableContent( {
-	context = {},
-	isTemplateSlot,
-	tagName: TagName = 'div',
-} ) {
+function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
-	const slotContext = isTemplateSlot ? TEMPLATE_SLOT_CONTEXT : undefined;
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -154,7 +124,6 @@ function EditableContent( {
 			blocks={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
-			slotContext={ slotContext }
 			tagName={ TagName }
 		/>
 	);
@@ -258,16 +227,7 @@ export default function PostContentEdit( {
 	__unstableLayoutClassNames: layoutClassNames,
 	__unstableParentLayout: parentLayout,
 } ) {
-	// The content block of a template that another template is rendered
-	// inside is the slot for it, and renders that template in place of a
-	// post. One in a query loop renders the posts of the loop instead, as it
-	// does on the front end.
-	const isTemplateSlot =
-		!! context.templateSlotId && ! Number.isFinite( context.queryId );
-	const contextPostId = isTemplateSlot
-		? context.templateSlotId
-		: context.postId;
-	const contextPostType = isTemplateSlot ? 'wp_template' : context.postType;
+	const { postId: contextPostId, postType: contextPostType } = context;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
@@ -288,12 +248,7 @@ export default function PostContentEdit( {
 			<RecursionProvider uniqueId={ contextPostId }>
 				{ contextPostId && contextPostType ? (
 					<Content
-						context={ {
-							...context,
-							postId: contextPostId,
-							postType: contextPostType,
-						} }
-						isTemplateSlot={ isTemplateSlot }
+						context={ context }
 						parentLayout={ parentLayout }
 						layoutClassNames={ layoutClassNames }
 					/>

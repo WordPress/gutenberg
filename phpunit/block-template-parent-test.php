@@ -10,7 +10,7 @@
  *
  * @covers ::gutenberg_get_block_template_parent_slug
  * @covers ::gutenberg_resolve_block_template_parents
- * @covers ::gutenberg_substitute_template_content_slot
+ * @covers ::gutenberg_substitute_template_slot
  */
 class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
@@ -171,7 +171,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
 
 		if ( null !== $rendered_inside ) {
-			update_post_meta( $post_id, '_wp_page_template', $rendered_inside );
+			update_post_meta( $post_id, GUTENBERG_TEMPLATE_PARENT_META_KEY, $rendered_inside );
 		}
 
 		$this->template_post_ids[] = $post_id;
@@ -222,10 +222,10 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_content_goes_in_the_post_content_block_of_the_parent() {
+	public function test_content_goes_in_the_slot_of_the_parent() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /--><!-- wp:template-part {"slug":"footer"} /-->'
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /--><!-- wp:template-part {"slug":"footer"} /-->'
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -240,9 +240,9 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<p>Not found</p>', $resolved );
 		$this->assertStringContainsString( '"slug":"footer"', $resolved );
 		$this->assertStringContainsString(
-			'<!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+			'<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
 			$resolved,
-			'The content block of the parent keeps its place around the blocks of the child, so that its wrapper still renders.'
+			'The slot of the parent keeps its place around the blocks of the child, so that its wrapper still renders.'
 		);
 		$this->assertLessThan(
 			strpos( $resolved, '<p>Not found</p>' ),
@@ -256,10 +256,10 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_post_content_block_nested_in_the_parent_is_the_slot() {
+	public function test_a_slot_nested_in_the_parent_is_found() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:group {"tagName":"main"} --><main class="wp-block-group"><!-- wp:post-content /--></main><!-- /wp:group -->'
+			'<!-- wp:group {"tagName":"main"} --><main class="wp-block-group"><!-- wp:template-slot /--></main><!-- /wp:group -->'
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -271,7 +271,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			'<!-- wp:group {"tagName":"main"} --><main class="wp-block-group"><!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content --></main><!-- /wp:group -->',
+			'<!-- wp:group {"tagName":"main"} --><main class="wp-block-group"><!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot --></main><!-- /wp:group -->',
 			$resolved
 		);
 	}
@@ -279,7 +279,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	public function test_several_blocks_go_in_the_slot() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-content /--><!-- wp:separator /--></div><!-- /wp:group -->'
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:template-slot /--><!-- wp:separator /--></div><!-- /wp:group -->'
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -291,7 +291,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-content {"templateSlot":true} --><!-- wp:heading --><h2>Oops</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content --><!-- wp:separator /--></div><!-- /wp:group -->',
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:template-slot --><!-- wp:heading --><h2>Oops</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot --><!-- wp:separator /--></div><!-- /wp:group -->',
 			$resolved
 		);
 	}
@@ -299,7 +299,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	public function test_a_post_content_block_in_the_child_is_kept() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /-->'
 		);
 		$child_id = $this->create_template(
 			'single',
@@ -311,7 +311,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:post-title /--><!-- wp:post-content /--><!-- /wp:post-content -->',
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot --><!-- wp:post-title /--><!-- wp:post-content /--><!-- /wp:template-slot -->',
 			$resolved,
 			"The child's own post content block renders the queried post, so it must survive."
 		);
@@ -320,11 +320,11 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	public function test_only_the_template_named_is_rendered_around_it() {
 		$this->create_template(
 			'base',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /-->'
 		);
 		$this->create_template(
 			'layout',
-			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-content /--></div><!-- /wp:group -->',
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:template-slot /--></div><!-- /wp:group -->',
 			'base'
 		);
 		$child_id = $this->create_template(
@@ -337,7 +337,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			'<!-- wp:group --><div class="wp-block-group"><!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content --></div><!-- /wp:group -->',
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot --></div><!-- /wp:group -->',
 			$resolved
 		);
 	}
@@ -345,7 +345,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	public function test_two_templates_naming_each_other_resolve_once() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->',
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /-->',
 			'page-404'
 		);
 		$child_id = $this->create_template(
@@ -358,7 +358,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
 			$resolved
 		);
 	}
@@ -366,7 +366,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	public function test_a_template_that_is_its_own_parent_is_not_resolved() {
 		$child_id = $this->create_template(
 			'page-404',
-			'<!-- wp:post-content /-->',
+			'<!-- wp:template-slot /-->',
 			'page-404'
 		);
 
@@ -375,11 +375,15 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_resolve_block_template_parents( $child->id, $child->content ) );
 	}
 
-	public function test_a_post_content_block_inside_a_query_loop_is_not_the_slot() {
-		$this->create_template(
-			'layout',
-			'<!-- wp:query --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-content /--><!-- /wp:post-template --></div><!-- /wp:query --><!-- wp:post-content /-->'
+	public function test_a_slot_in_a_pattern_of_the_parent_is_found() {
+		register_block_pattern(
+			'gutenberg-test/slot',
+			array(
+				'title'   => 'Slot',
+				'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:template-slot /--></div><!-- /wp:group -->',
+			)
 		);
+		$this->create_template( 'layout', '<!-- wp:pattern {"slug":"gutenberg-test/slot"} /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -389,17 +393,36 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$child    = get_block_template( $child_id, 'wp_template' );
 		$resolved = gutenberg_resolve_block_template_parents( $child->id, $child->content );
 
-		$this->assertSame(
-			'<!-- wp:query --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-content /--><!-- /wp:post-template --></div><!-- /wp:query --><!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
-			$resolved,
-			'A query loop renders its blocks once per post, so its post content block belongs to the post.'
+		unregister_block_pattern( 'gutenberg-test/slot' );
+
+		$this->assertNotNull( $resolved, 'Themes build templates out of patterns, so the slot is found in one, as the editor finds it.' );
+		$this->assertStringContainsString(
+			'<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
+			$resolved
+		);
+		$this->assertStringNotContainsString( 'wp:pattern', $resolved, 'The pattern is resolved into its blocks.' );
+	}
+
+	public function test_a_content_block_in_the_parent_is_not_the_slot() {
+		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+			'layout'
+		);
+
+		$child = get_block_template( $child_id, 'wp_template' );
+
+		$this->assertNull(
+			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
+			'The content block renders the post of the request, whatever template it is in.'
 		);
 	}
 
-	public function test_a_parent_whose_only_post_content_block_is_in_a_query_loop_is_not_resolved() {
+	public function test_the_child_takes_the_place_of_what_the_slot_holds() {
 		$this->create_template(
 			'layout',
-			'<!-- wp:query --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-content /--><!-- /wp:post-template --></div><!-- /wp:query -->'
+			'<!-- wp:template-slot --><!-- wp:paragraph --><p>The latest posts</p><!-- /wp:paragraph --><!-- /wp:template-slot -->'
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -409,20 +432,57 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 		$child = get_block_template( $child_id, 'wp_template' );
 
-		$this->assertNull( gutenberg_resolve_block_template_parents( $child->id, $child->content ) );
+		$this->assertSame(
+			'<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
+			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
+			'What the slot holds is for the requests of the template it is in, rendered on its own.'
+		);
 	}
 
-	public function test_a_template_has_a_content_slot() {
+	public function test_the_first_of_two_slots_is_the_slot() {
+		$this->create_template(
+			'layout',
+			'<!-- wp:template-slot /--><!-- wp:template-slot /-->'
+		);
+		$child_id = $this->create_template(
+			'page-404',
+			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
+			'layout'
+		);
+
+		$child = get_block_template( $child_id, 'wp_template' );
+
+		$this->assertSame(
+			'<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot --><!-- wp:template-slot /-->',
+			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
+			'The editor lets a template have one slot, and treats the first as the slot when it has more anyway.'
+		);
+	}
+
+	public function test_a_template_has_a_slot() {
 		$this->assertTrue(
-			gutenberg_block_template_has_content_slot( '<!-- wp:group --><div><!-- wp:post-content /--></div><!-- /wp:group -->' )
+			gutenberg_block_template_has_slot( '<!-- wp:group --><div><!-- wp:template-slot /--></div><!-- /wp:group -->' )
 		);
 		$this->assertFalse(
-			gutenberg_block_template_has_content_slot( '<!-- wp:paragraph --><p>Hi</p><!-- /wp:paragraph -->' )
+			gutenberg_block_template_has_slot( '<!-- wp:paragraph --><p>Hi</p><!-- /wp:paragraph -->' )
 		);
 		$this->assertFalse(
-			gutenberg_block_template_has_content_slot( '<!-- wp:query --><div><!-- wp:post-template --><!-- wp:post-content /--><!-- /wp:post-template --></div><!-- /wp:query -->' )
+			gutenberg_block_template_has_slot( '<!-- wp:post-content /-->' ),
+			'The content block is not a slot.'
 		);
-		$this->assertFalse( gutenberg_block_template_has_content_slot( '' ) );
+		$this->assertFalse( gutenberg_block_template_has_slot( '' ) );
+
+		register_block_pattern(
+			'gutenberg-test/slot',
+			array(
+				'title'   => 'Slot',
+				'content' => '<!-- wp:template-slot /-->',
+			)
+		);
+		$has_slot = gutenberg_block_template_has_slot( '<!-- wp:pattern {"slug":"gutenberg-test/slot"} /-->' );
+		unregister_block_pattern( 'gutenberg-test/slot' );
+
+		$this->assertTrue( $has_slot, 'A slot in a pattern of the template is one.' );
 	}
 
 	public function test_a_parent_without_a_slot_is_not_resolved() {
@@ -459,7 +519,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 	}
 
 	public function test_a_saved_change_to_the_parent_is_resolved() {
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -477,12 +537,12 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		wp_update_post(
 			array(
 				'ID'           => $layout->wp_id,
-				'post_content' => $this->template_part_block( 'header' ) . '<!-- wp:post-content /-->',
+				'post_content' => $this->template_part_block( 'header' ) . '<!-- wp:template-slot /-->',
 			)
 		);
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
 			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
 			'The templates remembered for the request are forgotten when one of them is saved.'
 		);
@@ -501,7 +561,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 		$this->create_template(
 			'layout',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /-->'
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -516,7 +576,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		gutenberg_render_block_template_inside_parent( ABSPATH . WPINC . '/template-canvas.php' );
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
 			$_wp_current_template_content
 		);
 	}
@@ -526,7 +586,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 		$this->create_template(
 			'layout',
-			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:post-content /-->'
+			'<!-- wp:template-part {"slug":"header"} /--><!-- wp:template-slot /-->'
 		);
 		$child_id = $this->create_template( 'page-404', '', 'layout' );
 
@@ -537,15 +597,15 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		gutenberg_render_block_template_inside_parent( ABSPATH . WPINC . '/template-canvas.php' );
 
 		$this->assertSame(
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content {"templateSlot":true} /-->',
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot /-->',
 			$_wp_current_template_content,
 			'A template with no blocks of its own is still rendered inside the template it names, which is where its header and its footer are.'
 		);
 	}
 
 	public function test_a_template_part_does_not_stand_in_for_the_template_of_the_same_slug() {
-		$this->create_template_part( 'layout', '<!-- wp:paragraph --><p>The part</p><!-- /wp:paragraph --><!-- wp:post-content /-->' );
-		$this->create_template( 'layout', '<!-- wp:paragraph --><p>The template</p><!-- /wp:paragraph --><!-- wp:post-content /-->' );
+		$this->create_template_part( 'layout', '<!-- wp:paragraph --><p>The part</p><!-- /wp:paragraph --><!-- wp:template-slot /-->' );
+		$this->create_template( 'layout', '<!-- wp:paragraph --><p>The template</p><!-- /wp:paragraph --><!-- wp:template-slot /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -567,7 +627,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 	public function test_rest_response_reports_the_template_it_is_rendered_inside() {
 		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->', 'layout' );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
@@ -588,7 +648,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 	public function test_rest_response_reports_the_fields_a_request_names_without_the_id() {
 		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->', 'layout' );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
@@ -602,18 +662,18 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		);
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//layout' );
-		$request->set_param( '_fields', 'slug,has_content_slot' );
+		$request->set_param( '_fields', 'slug,has_template_slot' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertTrue(
-			$response->get_data()['has_content_slot'],
+			$response->get_data()['has_template_slot'],
 			'A request that leaves out both the id and the content is still answered with whether the template can render one inside.'
 		);
 	}
 
 	public function test_rest_request_stores_the_template_to_render_inside() {
 		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->' );
 
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
@@ -630,7 +690,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 	public function test_rest_request_clears_the_template_to_render_inside() {
 		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->', 'layout' );
 
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
@@ -647,16 +707,16 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 	public function test_rest_response_reports_whether_a_template_can_render_one_inside() {
 		wp_set_current_user( self::$admin_id );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$this->create_template( 'page-404', '<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->' );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//layout' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertTrue( $response->get_data()['has_content_slot'] );
+		$this->assertTrue( $response->get_data()['has_template_slot'] );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/' . get_stylesheet() . '//page-404' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertFalse( $response->get_data()['has_content_slot'] );
+		$this->assertFalse( $response->get_data()['has_template_slot'] );
 	}
 
 	public function test_template_parts_do_not_carry_the_field() {
@@ -678,7 +738,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayNotHasKey( 'template', $response->get_data() );
-		$this->assertArrayNotHasKey( 'has_content_slot', $response->get_data() );
+		$this->assertArrayNotHasKey( 'has_template_slot', $response->get_data() );
 	}
 
 	public function test_a_theme_names_the_template_its_templates_are_rendered_inside() {
@@ -704,7 +764,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
 		$this->create_template(
 			'layout',
-			$this->template_part_block( 'header' ) . '<!-- wp:post-content /-->' . $this->template_part_block( 'footer' )
+			$this->template_part_block( 'header' ) . '<!-- wp:template-slot /-->' . $this->template_part_block( 'footer' )
 		);
 		$child_id = $this->create_template(
 			'page-404',
@@ -718,20 +778,20 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Not found', $resolved );
 		$this->assertStringContainsString( '"slug":"footer"', $resolved );
 		$this->assertGreaterThan(
-			strpos( $resolved, '<!-- wp:post-content {"templateSlot":true} -->' ),
+			strpos( $resolved, '<!-- wp:template-slot -->' ),
 			strpos( $resolved, 'Not found' ),
-			'The blocks of the template go in the content block of the one its theme.json names.'
+			'The blocks of the template go in the slot of the one its theme.json names.'
 		);
 		$this->assertLessThan(
-			strpos( $resolved, '<!-- /wp:post-content -->' ),
+			strpos( $resolved, '<!-- /wp:template-slot -->' ),
 			strpos( $resolved, 'Not found' ),
-			'The blocks of the template go in the content block of the one its theme.json names.'
+			'The blocks of the template go in the slot of the one its theme.json names.'
 		);
 	}
 
 	public function test_the_template_of_the_post_wins_over_the_theme_declaration() {
 		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
-		$this->create_template( 'other-layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'other-layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -746,7 +806,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 
 	public function test_a_template_can_be_rendered_on_its_own_against_the_theme_declaration() {
 		$this->switch_to_theme_declaring( array( 'page-404' => 'layout' ) );
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -814,8 +874,8 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame( 'index', $response->get_data()['template'] );
 	}
 
-	public function test_the_slot_keeps_the_attributes_of_the_content_block() {
-		$this->create_template( 'layout', '<!-- wp:post-content {"tagName":"main","align":"wide"} /-->' );
+	public function test_the_slot_keeps_its_attributes() {
+		$this->create_template( 'layout', '<!-- wp:template-slot {"align":"wide"} /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -825,14 +885,14 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$child = get_block_template( $child_id, 'wp_template' );
 
 		$this->assertSame(
-			'<!-- wp:post-content {"tagName":"main","align":"wide","templateSlot":true} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:post-content -->',
+			'<!-- wp:template-slot {"align":"wide"} --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
 			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
-			'The block supports of the content block are what its wrapper is built from, so its attributes have to survive.'
+			'The block supports of the slot are what its wrapper is built from, so its attributes have to survive.'
 		);
 	}
 
-	public function test_the_rendered_slot_carries_the_wrapper_of_the_content_block() {
-		$this->create_template( 'layout', '<!-- wp:post-content {"align":"wide"} /-->' );
+	public function test_the_rendered_slot_carries_its_wrapper() {
+		$this->create_template( 'layout', '<!-- wp:template-slot {"align":"wide"} /-->' );
 		$child_id = $this->create_template(
 			'page-404',
 			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
@@ -847,29 +907,13 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Not found</p>', $rendered );
 
 		$wrapper = substr( $rendered, 0, strpos( $rendered, '>' ) );
-		$this->assertStringContainsString( 'wp-block-post-content', $wrapper );
-		$this->assertStringContainsString( 'entry-content', $wrapper, 'A theme styling the content block reaches the template rendered inside.' );
-		$this->assertStringContainsString( 'alignwide', $wrapper, 'The alignment of the content block applies to the template rendered inside.' );
-		$this->assertStringContainsString( 'is-layout-', $wrapper, 'The layout of the content block applies to the template rendered inside.' );
-	}
-
-	public function test_the_rendered_slot_keeps_the_tag_name_of_the_content_block() {
-		$this->create_template( 'layout', '<!-- wp:post-content {"tagName":"main"} /-->' );
-		$child_id = $this->create_template(
-			'page-404',
-			'<!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph -->',
-			'layout'
-		);
-
-		$child    = get_block_template( $child_id, 'wp_template' );
-		$rendered = do_blocks( gutenberg_resolve_block_template_parents( $child->id, $child->content ) );
-
-		$this->assertStringStartsWith( '<main ', $rendered );
-		$this->assertStringEndsWith( '</main>', $rendered );
+		$this->assertStringContainsString( 'wp-block-template-slot', $wrapper );
+		$this->assertStringContainsString( 'alignwide', $wrapper, 'The alignment of the slot applies to the template rendered inside.' );
+		$this->assertStringContainsString( 'is-layout-', $wrapper, 'The layout of the slot applies to the template rendered inside.' );
 	}
 
 	public function test_an_empty_template_renders_no_wrapper() {
-		$this->create_template( 'layout', '<!-- wp:post-content /-->' );
+		$this->create_template( 'layout', '<!-- wp:template-slot /-->' );
 		$child_id = $this->create_template( 'page-404', '', 'layout' );
 
 		$child = get_block_template( $child_id, 'wp_template' );
@@ -877,29 +921,20 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame(
 			'',
 			do_blocks( gutenberg_resolve_block_template_parents( $child->id, $child->content ) ),
-			'An empty content block renders nothing, the way the content block of an empty post does.'
+			'An empty slot renders nothing.'
 		);
 	}
 
-	public function test_a_content_block_that_is_not_a_slot_still_renders_the_post() {
-		$post_id = self::factory()->post->create(
-			array(
-				'post_content' => '<!-- wp:paragraph --><p>The post</p><!-- /wp:paragraph -->',
-			)
-		);
+	public function test_a_template_rendered_on_its_own_renders_what_its_slot_holds() {
+		$rendered = do_blocks( '<!-- wp:template-slot --><!-- wp:paragraph --><p>The latest posts</p><!-- /wp:paragraph --><!-- /wp:template-slot -->' );
 
-		$GLOBALS['post'] = get_post( $post_id );
-		setup_postdata( $GLOBALS['post'] );
-
-		$rendered = do_blocks( '<!-- wp:post-content /-->' );
-
+		$this->assertStringStartsWith( '<div ', $rendered );
+		$this->assertStringContainsString( 'wp-block-template-slot', $rendered );
 		$this->assertStringContainsString(
-			'>The post</p>',
+			'>The latest posts</p>',
 			$rendered,
-			'A content block that is not the slot of a template renders the post of the request, as it always has.'
+			'A template rendered on its own renders what its slot holds.'
 		);
-
-		wp_reset_postdata();
 	}
 
 	public function test_rest_request_stores_a_template_that_has_no_slot_of_its_own() {
