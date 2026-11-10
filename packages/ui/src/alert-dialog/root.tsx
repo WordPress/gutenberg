@@ -87,6 +87,10 @@ function Root( {
 	//           (cancel/     (animation
 	//            escape)      complete)
 	//
+	//   closing ──> idle
+	//               (onOpenChange
+	//                cancels close)
+	//
 	// `showSpinner` tracks whether the confirm button shows a loading
 	// indicator. It is orthogonal to `phase`:
 	//
