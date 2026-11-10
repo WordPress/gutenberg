@@ -1,6 +1,6 @@
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	privateApis as editorPrivateApis,
@@ -119,13 +119,21 @@ export default function SidebarGlobalStyles() {
 	// revisions canvas is driven by the editor store's styles path rather than
 	// this route's `section` query arg. Keep the store in sync while the
 	// revisions screen is open, so selecting a revision previews it.
+	//
+	// The path is reset only when revisions close, not on unmount: switching
+	// to edit mode unmounts this page, and the sidebar footer opens revisions
+	// in edit mode by setting the path just before that happens. Leaving the
+	// route is covered by the editor, which resets styles navigation there.
 	const { setStylesPath } = unlock( useDispatch( editorStore ) );
+	const wereRevisionsOpenedRef = useRef( false );
 	useEffect( () => {
-		if ( ! areRevisionsOpened ) {
-			return;
+		if ( areRevisionsOpened ) {
+			setStylesPath( section );
+			wereRevisionsOpenedRef.current = true;
+		} else if ( wereRevisionsOpenedRef.current ) {
+			setStylesPath( '/' );
+			wereRevisionsOpenedRef.current = false;
 		}
-		setStylesPath( section );
-		return () => setStylesPath( '/' );
 	}, [ areRevisionsOpened, section, setStylesPath ] );
 	const settings = useSelect(
 		( select ) => select( editSiteStore ).getSettings(),
