@@ -54,8 +54,7 @@
 		margin: 0 0.2rem 0 0.2rem;
 
 		&:last-child {
-			/* rtl:ignore */
-			margin: 0 0 0 0.2rem;
+			margin-inline-end: 0;
 		}
 	}
 }

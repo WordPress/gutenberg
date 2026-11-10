@@ -109,6 +109,7 @@ function KeyCombinationDisplay( {
 	return (
 		<kbd
 			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+			dir="ltr"
 			aria-label={ label }
 		>
 			{ keys.map( ( key, index ) =>
