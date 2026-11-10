@@ -1246,10 +1246,17 @@ test.describe( 'Block Notes: floating notes', () => {
 				.click();
 			await expect( thread ).toHaveClass( /is-selected/ );
 			await expect( content ).toBeHidden();
+			// The hidden note text still reaches screen readers.
+			await expect(
+				getThreadToggle( thread )
+			).toHaveAccessibleDescription( 'A minimized note' );
 
-			// The focused thread expands.
+			// The focused thread expands, and no longer repeats its note text.
 			await thread.click();
 			await expect( content ).toBeVisible();
+			await expect(
+				getThreadToggle( thread )
+			).toHaveAccessibleDescription( '' );
 		} );
 
 		test( 'reflects the room for notes in the menu', async ( {

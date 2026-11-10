@@ -326,14 +326,18 @@ export function NoteThread( {
 			 * Covers the card, so its focus ring outlines the whole thread,
 			 * but lets clicks through to the content. Collapsed, it takes the
 			 * root note as its description: minimized floating threads hide
-			 * the note text.
+			 * the note text, and stay minimized until focused.
 			 */ }
 			<button
 				type="button"
 				className="editor-collab-sidebar-panel__thread-toggle"
 				aria-expanded={ isSelected }
 				aria-controls={ contentId }
-				aria-describedby={ isSelected ? undefined : noteContentId }
+				aria-describedby={
+					! isSelected || ( isFloating && ! hasFocus )
+						? noteContentId
+						: undefined
+				}
 				onClick={ onToggleNote }
 			>
 				<VisuallyHidden>
