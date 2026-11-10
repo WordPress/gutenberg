@@ -18,7 +18,7 @@ export interface UseDropZoneProps {
 	/**
 	 * Called when the zone is moved within.
 	 */
-	onDragOver?: ( e: DragEvent ) => void;
+	onDragOver?: ( e: DragEvent ) => boolean | void;
 	/**
 	 * Called when the zone is left.
 	 */
@@ -30,5 +30,5 @@ export interface UseDropZoneProps {
 	/**
 	 * Called when dropping in the zone.
 	 */
-	onDrop?: ( e: DragEvent ) => void;
+	onDrop?: ( e: DragEvent ) => boolean | void;
 }

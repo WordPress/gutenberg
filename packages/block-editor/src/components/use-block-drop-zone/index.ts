@@ -240,10 +240,9 @@ export function isDropTargetValid(
 	// Otherwise, check if all dragged blocks are allowed.
 	let areBlocksAllowed = true;
 	if ( allowedBlocks ) {
-		// A string entry has no `name`, so it never matches.
 		const allowedBlockNames = (
-			allowedBlocks as Array< { name?: string } >
-		 )?.map( ( { name } ) => name );
+			allowedBlocks as Array< { name?: string } | string >
+		 )?.map( ( item ) => ( typeof item === 'string' ? item : item?.name ) );
 
 		areBlocksAllowed = draggedBlockNames.every( ( name ) =>
 			allowedBlockNames?.includes( name )
@@ -339,6 +338,72 @@ export default function useBlockDropZone( {
 		stopDragging,
 	} = unlock( useDispatch( blockEditorStore ) );
 
+	const getDraggedBlockNames = useCallback(
+		( event?: DragEvent | globalThis.DragEvent ) => {
+			const draggedBlockClientIds = getDraggedBlockClientIds();
+			let names = getBlockNamesByClientId( draggedBlockClientIds );
+			if ( names.length === 0 && event?.dataTransfer?.types ) {
+				names = Array.from( event.dataTransfer.types )
+					.filter( ( type ) => type.startsWith( 'wp-block:' ) )
+					.map( ( type ) => type.slice( 'wp-block:'.length ) );
+			}
+			return names;
+		},
+		[ getDraggedBlockClientIds, getBlockNamesByClientId ]
+	);
+
+	const checkIsDropAllowed = useCallback(
+		( event: DragEvent ) => {
+			const draggedBlockClientIds = getDraggedBlockClientIds();
+			const targetParents = [
+				targetRootClientId,
+				...getBlockParents( targetRootClientId, true ),
+			];
+
+			// Check if the target is within any of the dragged blocks.
+			const isTargetWithinDraggedBlocks = draggedBlockClientIds.some(
+				( clientId: string ) => targetParents.includes( clientId )
+			);
+
+			if ( isTargetWithinDraggedBlocks ) {
+				return false;
+			}
+
+			const allowedBlocks = getAllowedBlocks( targetRootClientId );
+			const targetBlockName = getBlockName( targetRootClientId );
+			const draggedBlockNames = getDraggedBlockNames( event );
+
+			const isBlockDroppingAllowed = isDropTargetValid(
+				getBlockType,
+				allowedBlocks,
+				draggedBlockNames,
+				targetBlockName
+			);
+
+			const isParentDropTargetValid =
+				!! dropZoneElement &&
+				isDropTargetValid(
+					getBlockType,
+					getAllowedBlocks( parentBlockClientId ),
+					draggedBlockNames,
+					getBlockName( parentBlockClientId )
+				);
+
+			return isBlockDroppingAllowed || isParentDropTargetValid;
+		},
+		[
+			getDraggedBlockClientIds,
+			targetRootClientId,
+			getBlockParents,
+			getAllowedBlocks,
+			getBlockName,
+			getDraggedBlockNames,
+			getBlockType,
+			dropZoneElement,
+			parentBlockClientId,
+		]
+	);
+
 	const onBlockDrop = useOnBlockDrop(
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
 			? parentBlockClientId
@@ -377,9 +442,7 @@ export default function useBlockDropZone( {
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
 				const targetBlockName = getBlockName( targetRootClientId );
 
-				const draggedBlockNames = getBlockNamesByClientId(
-					draggedBlockClientIds
-				);
+				const draggedBlockNames = getDraggedBlockNames( event );
 				const isBlockDroppingAllowed = isDropTargetValid(
 					getBlockType,
 					allowedBlocks,
@@ -568,7 +631,6 @@ export default function useBlockDropZone( {
 				getBlockParents,
 				getAllowedBlocks,
 				getBlockName,
-				getBlockNamesByClientId,
 				getBlockType,
 				dropZoneElement,
 				parentBlockClientId,
@@ -584,6 +646,7 @@ export default function useBlockDropZone( {
 				isGroupable,
 				getBlockVariations,
 				getGroupingBlockName,
+				getDraggedBlockNames,
 			]
 		),
 		200
@@ -592,8 +655,17 @@ export default function useBlockDropZone( {
 	return useDropZone( {
 		dropZoneElement,
 		isDisabled,
-		onDrop: onBlockDrop,
+		onDrop( event ) {
+			if ( ! checkIsDropAllowed( event ) ) {
+				return false;
+			}
+			onBlockDrop( event );
+			return true;
+		},
 		onDragOver( event ) {
+			if ( ! checkIsDropAllowed( event ) ) {
+				return false;
+			}
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
@@ -602,6 +674,7 @@ export default function useBlockDropZone( {
 				event,
 				( event.currentTarget as HTMLElement ).ownerDocument
 			);
+			return true;
 		},
 		onDragLeave( event ) {
 			const { ownerDocument } = event.currentTarget as HTMLElement;
@@ -616,7 +689,13 @@ export default function useBlockDropZone( {
 			}
 
 			throttled.cancel();
-			hideInsertionPoint();
+			if ( dropTarget.index !== null ) {
+				setDropTarget( {
+					index: null,
+					operation: 'insert',
+				} );
+				hideInsertionPoint();
+			}
 		},
 		onDragEnd() {
 			throttled.cancel();
