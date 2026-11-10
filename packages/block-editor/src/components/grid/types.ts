@@ -1,6 +1,7 @@
-import type { CSSProperties, ReactNode, Ref } from 'react';
+import type { CSSProperties, ReactNode, Ref, RefObject } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { AlignmentGuide } from './get-alignment-guides';
+import type { GridItemBox, GridPlacement } from './free-placement';
 import type { GridRect } from './utils';
 
 /**
@@ -11,6 +12,8 @@ export interface GridItemLayout {
 	rowStart?: number;
 	columnSpan?: number;
 	rowSpan?: number;
+	/** Where a block placed freely in a manual grid is inside its cells. */
+	box?: GridItemBox;
 	[ key: string ]: unknown;
 }
 
@@ -251,6 +254,8 @@ export interface GridItemMeasurements {
 	 * it isn't in the grid.
 	 */
 	src: { pixelRect: GridPixelRect; rect: GridRect; angle: number } | null;
+	/** Whether the grid's cells have a fixed size. */
+	hasFixedCells: boolean;
 }
 
 /**
@@ -265,6 +270,8 @@ export interface GridDropTarget {
 	span: { columnSpan: number; rowSpan: number };
 	/** The cells the block would land in. */
 	landing: GridRect;
+	/** The block's exact place when it is placed freely, or null. */
+	placement: GridPlacement | null;
 	/** The landing cells in pixels. */
 	landingPixelRect: GridPixelRect;
 	/** The parts of the landing cells other blocks take up, in pixels. */
@@ -280,12 +287,29 @@ export interface GridVisualizerDropLayerProps {
 	gridElement: Element;
 	/** Grid info, from `getGridInfo`. */
 	gridInfo: GridInfo;
-	/** Called with the drop target, or null. */
-	setDropTarget: ( target: GridDropTarget | null ) => void;
+}
+
+/**
+ * A move of a drag over a manual grid's drop layer, with what the drag's data
+ * said when it happened.
+ */
+export interface GridDropLayerMove {
+	clientX: number;
+	clientY: number;
+	/** Whether Shift was held, to snap a block placed freely. */
+	shiftKey: boolean;
+	/** Whether the block is dragged by a drag handle. */
+	isHandleDrag: boolean;
+	/** Client ID of the dragged block, if it can be placed in the grid. */
+	srcClientId: string | null;
+	/** Whether the drag is of blocks from an inserter that the grid allows. */
+	isInserterDrag: boolean;
 }
 
 export interface GridDropIndicatorProps {
 	dropTarget: GridDropTarget;
+	/** Ref to the landing preview, which is moved without rendering. */
+	landingRef: RefObject< HTMLDivElement | null >;
 }
 
 export interface AutoGridVisualizerProps {
