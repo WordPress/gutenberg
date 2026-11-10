@@ -18,7 +18,7 @@ import {
 } from '../private-actions';
 import type { BlockEditorThunkArgs, Settings } from '../types';
 
-type MockDispatch = Mock & Record< string, Mock >;
+type MockDispatch = Mock & { [ key: string ]: any };
 
 function thunkArgs( args: Record< string, unknown > ) {
 	return args as unknown as BlockEditorThunkArgs;
@@ -260,6 +260,7 @@ describe( 'private actions', () => {
 				apiVersion: 3,
 				title: 'Test structure block',
 				category: 'design',
+				attributes: {},
 				save: () => null,
 			} );
 		} );
