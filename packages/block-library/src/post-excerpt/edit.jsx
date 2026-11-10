@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	RichText,
@@ -15,6 +15,9 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useDebounce } from '@wordpress/compose';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	useCanEditEntity,
 	useToolsPanelDropdownMenuProps,
@@ -22,6 +25,78 @@ import {
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const ELLIPSIS = '…';
+
+/**
+ * Requests the excerpt the server generates for a given length.
+ *
+ * `getEntityRecord` is deliberately not used here. It caches a single record by
+ * ID and context and ignores the rest of the query, so every requested length
+ * would share one cache entry: the response for one length would be displayed
+ * for another, and a length that had already been resolved once would never be
+ * requested again, leaving the block showing whichever length was fetched last.
+ * Generated excerpts are therefore kept in state keyed by their request.
+ *
+ * Only `excerpt.rendered` is read, so the request asks for the least
+ * privileged context. In that context the REST API returns an empty excerpt
+ * for password protected posts, which callers therefore do not request.
+ *
+ * @param {string}           postType  Post type of the post to request.
+ * @param {number|string}    postId    ID of the post to request.
+ * @param {number}           length    Excerpt length to request.
+ * @param {boolean}          isEnabled Whether an excerpt has to be generated.
+ * @param {string|undefined} modified  Changes whenever the stored post changes.
+ *
+ * @return {string|undefined} The generated excerpt, or `undefined` while the
+ *                            request for the current length is in flight.
+ */
+function useGeneratedExcerpt( postType, postId, length, isEnabled, modified ) {
+	const baseURL = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityConfig( 'postType', postType )
+				?.baseURL,
+		[ postType ]
+	);
+	const [ generatedExcerpts, setGeneratedExcerpts ] = useState( {} );
+
+	const key =
+		isEnabled && baseURL
+			? `${ postId }|${ modified }|${ length }`
+			: undefined;
+	const isRequested = key !== undefined && key in generatedExcerpts;
+
+	useEffect( () => {
+		if ( key === undefined || isRequested ) {
+			return;
+		}
+
+		let isStale = false;
+
+		apiFetch( {
+			path: addQueryArgs( `${ baseURL }/${ postId }`, {
+				context: 'view',
+				_fields: 'excerpt',
+				excerpt_length: length,
+			} ),
+		} )
+			.then( ( post ) => {
+				if ( ! isStale ) {
+					setGeneratedExcerpts( ( state ) => ( {
+						...state,
+						[ key ]: post?.excerpt?.rendered ?? '',
+					} ) );
+				}
+			} )
+			.catch( () => {
+				// Keep displaying the excerpt already loaded for the post.
+			} );
+
+		return () => {
+			isStale = true;
+		};
+	}, [ key, isRequested, baseURL, postId, length ] );
+
+	return key === undefined ? undefined : generatedExcerpts[ key ];
+}
 
 export default function PostExcerptEditor( props ) {
 	const {
@@ -34,11 +109,80 @@ export default function PostExcerptEditor( props ) {
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
-	const [
-		rawExcerpt,
-		setExcerpt,
-		{ rendered: renderedExcerpt, protected: isProtected } = {},
-	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	const [ rawExcerpt, setExcerpt, fullExcerpt ] = useEntityProp(
+		'postType',
+		postType,
+		'excerpt',
+		postId
+	);
+	const record = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+		[ postType, postId ]
+	);
+
+	/*
+	 * While a revision or a browser backup is displayed, `useEntityProp` reads
+	 * the excerpt from it instead of from the stored post.
+	 */
+	const isShowingRevision = !! fullExcerpt && fullExcerpt !== record?.excerpt;
+
+	/*
+	 * `excerpt_length` only changes the response for posts without a stored
+	 * excerpt: `wp_trim_excerpt()` returns a stored excerpt untouched and
+	 * applies the filter only while generating one from the post content.
+	 * Posts that have an excerpt therefore reuse the record the editor has
+	 * already loaded instead of spending a request per length on a response
+	 * that cannot differ. An excerpt that has been edited but not yet stored
+	 * is displayed as typed, so it does not need a generated excerpt either.
+	 * Password protected posts keep the excerpt loaded in the edit context,
+	 * since a request in the view context returns it empty.
+	 */
+	const needsGeneratedExcerpt =
+		! isShowingRevision &&
+		!! record &&
+		! fullExcerpt?.protected &&
+		! fullExcerpt?.raw?.trim() &&
+		! rawExcerpt?.trim();
+
+	/*
+	 * The excerpt length is sent to the REST API so that the excerpt is
+	 * trimmed on the server, using the same filters that run on the front end.
+	 * Dragging the range control would otherwise trigger a request for every
+	 * intermediate value, so the length used for the request is debounced.
+	 * It is updated from the events that change the length, since blocks
+	 * avoid effects. The control itself and the client-side trimming below
+	 * keep using the attribute directly, so the UI stays responsive while
+	 * dragging.
+	 */
+	const [ requestedExcerptLength, setRequestedExcerptLength ] =
+		useState( excerptLength );
+	const debouncedSetRequestedExcerptLength = useDebounce(
+		setRequestedExcerptLength,
+		300
+	);
+	const setExcerptLength = ( value ) => {
+		setAttributes( { excerptLength: value } );
+		debouncedSetRequestedExcerptLength( value );
+	};
+
+	const generatedExcerpt = useGeneratedExcerpt(
+		postType,
+		postId,
+		requestedExcerptLength,
+		needsGeneratedExcerpt,
+		record?.modified_gmt
+	);
+
+	/*
+	 * While a request is in flight the excerpt already loaded for the post is
+	 * displayed, so that changing the length never blanks the block.
+	 */
+	const renderedExcerpt = needsGeneratedExcerpt
+		? ( generatedExcerpt ?? fullExcerpt?.rendered )
+		: fullExcerpt?.rendered;
+	const isProtected = fullExcerpt?.protected;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -207,6 +351,7 @@ export default function PostExcerptEditor( props ) {
 							showMoreOnNewLine: true,
 							excerptLength: 55,
 						} );
+						debouncedSetRequestedExcerptLength( 55 );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -231,17 +376,13 @@ export default function PostExcerptEditor( props ) {
 					<ToolsPanelItem
 						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
-						onDeselect={ () =>
-							setAttributes( { excerptLength: 55 } )
-						}
+						onDeselect={ () => setExcerptLength( 55 ) }
 						isShownByDefault
 					>
 						<RangeControl
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
-							onChange={ ( value ) => {
-								setAttributes( { excerptLength: value } );
-							} }
+							onChange={ setExcerptLength }
 							min="10"
 							max="100"
 						/>
