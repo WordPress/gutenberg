@@ -158,11 +158,6 @@
 		"dashicons": [ "dashicons-bell" ]
 	},
 	{
-		"slug": "bell-unread",
-		"label": "Bell Unread",
-		"filePath": "library/bell-unread.svg"
-	},
-	{
 		"slug": "block-default",
 		"label": "Block Default",
 		"filePath": "library/block-default.svg",
@@ -226,12 +221,6 @@
 		"dashicons": [ "dashicons-calendar-alt", "dashicons-calendar" ]
 	},
 	{
-		"slug": "cancel-circle-filled",
-		"label": "Cancel Circle Filled",
-		"filePath": "library/cancel-circle-filled.svg",
-		"keywords": [ "close" ]
-	},
-	{
 		"slug": "caption",
 		"label": "Caption",
 		"filePath": "library/caption.svg"
@@ -270,12 +259,6 @@
 		"filePath": "library/caution.svg",
 		"collections": [ "core", "core-admin" ],
 		"dashicons": [ "dashicons-warning" ],
-		"keywords": [ "alert", "exclamation", "warning" ]
-	},
-	{
-		"slug": "caution-filled",
-		"label": "Caution Filled",
-		"filePath": "library/caution-filled.svg",
 		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
@@ -457,11 +440,6 @@
 		"filePath": "library/copy.svg"
 	},
 	{
-		"slug": "copy-small",
-		"label": "Copy Small",
-		"filePath": "library/copy-small.svg"
-	},
-	{
 		"slug": "corner-all",
 		"label": "Corner All",
 		"filePath": "library/corner-all.svg"
@@ -615,7 +593,7 @@
 		"label": "File",
 		"filePath": "library/file.svg",
 		"collections": [ "core" ],
-		"keywords": [ "archive", "document", "folder" ]
+		"keywords": [ "document", "attachment" ]
 	},
 	{
 		"slug": "filter",
@@ -631,6 +609,13 @@
 		"slug": "flip-vertical",
 		"label": "Flip Vertical",
 		"filePath": "library/flip-vertical.svg"
+	},
+	{
+		"slug": "folder",
+		"label": "Folder",
+		"filePath": "library/folder.svg",
+		"collections": [ "core" ],
+		"keywords": [ "archive", "directory" ]
 	},
 	{
 		"slug": "footer",
@@ -838,11 +823,6 @@
 		"filePath": "library/help.svg",
 		"collections": [ "core", "core-admin" ],
 		"dashicons": [ "dashicons-editor-help" ]
-	},
-	{
-		"slug": "help-filled",
-		"label": "Help Filled",
-		"filePath": "library/help-filled.svg"
 	},
 	{
 		"slug": "home",
@@ -1223,11 +1203,6 @@
 		"dashicons": [ "dashicons-admin-post", "dashicons-format-standard" ]
 	},
 	{
-		"slug": "pin-small",
-		"label": "Pin Small",
-		"filePath": "library/pin-small.svg"
-	},
-	{
 		"slug": "play",
 		"label": "Play",
 		"filePath": "library/play.svg"
@@ -1262,11 +1237,6 @@
 		"filePath": "library/plus-circle.svg",
 		"collections": [ "core", "core-admin" ],
 		"dashicons": [ "dashicons-plus-alt" ]
-	},
-	{
-		"slug": "plus-circle-filled",
-		"label": "Plus Circle Filled",
-		"filePath": "library/plus-circle-filled.svg"
 	},
 	{
 		"slug": "position-center",

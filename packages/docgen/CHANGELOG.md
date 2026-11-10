@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 4.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Stop loading project Babel configuration. JavaScript, JSX, and TypeScript remain supported; custom parser plugins are no longer supported ([#85183](https://github.com/WordPress/gutenberg/pull/85183)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 
 ## 3.0.0 (2026-10-20)
 

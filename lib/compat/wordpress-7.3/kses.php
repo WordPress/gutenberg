@@ -57,3 +57,39 @@ function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
 	return 0 === preg_match( '%[\\\(&=}]|/\*%', $css_test_string );
 }
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN, 2 );
+
+/**
+ * Adds 'box-sizing' to the list of safe CSS properties.
+ *
+ * The layout block support gives a child with a fixed size in a flex layout
+ * `box-sizing: border-box`, so that its padding and borders stay inside that size.
+ * The style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_box_sizing_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'box-sizing', $attr, true ) ) {
+		$attr[] = 'box-sizing';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_box_sizing_to_safe_style_css' );
+
+/**
+ * Adds 'text-wrap' to the list of safe CSS properties.
+ * This is needed for the typography text wrap style.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_text_wrap_to_safe_style_css( $attr ) {
+	if ( ! in_array( 'text-wrap', $attr, true ) ) {
+		$attr[] = 'text-wrap';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_text_wrap_to_safe_style_css' );

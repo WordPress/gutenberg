@@ -4,6 +4,12 @@
 
 ### Enhancements
 
+-   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+
+## 17.1.0 (2026-11-04)
+
+### Enhancements
+
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
 
 ### Bug Fixes

@@ -15,7 +15,6 @@ import {
 import {
 	ToggleControl,
 	Disabled,
-	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,6 +24,7 @@ import { __, _x } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
+import { SelectControl } from '@wordpress/ui';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
@@ -37,7 +37,11 @@ const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
 const FILE_LIST_OBJECT_NAME = '[object FileList]';
-const WAVEFORM_STYLE_OPTIONS = [
+const ORDER_ITEMS = [
+	{ label: __( 'Descending' ), value: 'desc' },
+	{ label: __( 'Ascending' ), value: 'asc' },
+];
+const WAVEFORM_STYLE_ITEMS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
 	{ label: _x( 'Mirror', 'waveform style option' ), value: 'mirror' },
 	{ label: _x( 'Line', 'waveform style option' ), value: 'line' },
@@ -84,6 +88,9 @@ const PlaylistEdit = ( {
 		waveformBackgroundColor,
 		waveformBackgroundGradient,
 	} = attributes;
+	const selectedOrderItem =
+		ORDER_ITEMS.find( ( item ) => item.value === order ) ??
+		ORDER_ITEMS[ 0 ];
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
@@ -645,14 +652,15 @@ const PlaylistEdit = ( {
 						hasValue={ () => order !== 'asc' }
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Order' ) }
-							value={ order }
-							options={ [
-								{ label: __( 'Descending' ), value: 'desc' },
-								{ label: __( 'Ascending' ), value: 'asc' },
-							] }
-							onChange={ ( value ) => onChangeOrder( value ) }
+							value={ selectedOrderItem }
+							items={ ORDER_ITEMS }
+							onValueChange={ ( item ) => {
+								if ( item && item !== selectedOrderItem ) {
+									onChangeOrder( item.value );
+								}
+							} }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -693,11 +701,19 @@ const PlaylistEdit = ( {
 						}
 						panelId={ waveformPanelId }
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Shape' ) }
-							value={ waveformStyle }
-							options={ WAVEFORM_STYLE_OPTIONS }
-							onChange={ onChangeWaveformStyle }
+							value={
+								WAVEFORM_STYLE_ITEMS.find(
+									( item ) => item.value === waveformStyle
+								) ?? WAVEFORM_STYLE_ITEMS[ 0 ]
+							}
+							items={ WAVEFORM_STYLE_ITEMS }
+							onValueChange={ ( item ) => {
+								if ( item ) {
+									onChangeWaveformStyle( item.value );
+								}
+							} }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
