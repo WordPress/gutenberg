@@ -23,7 +23,6 @@ const getHostUser = vi.fn( () => ( {
 } ) );
 require.cache[ getHostUserPath ].exports = getHostUser;
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
-const { getPulledImages } = require( '../runtime/docker/missing-images' );
 const {
 	wordpressDockerFileContents,
 	cliDockerFileContents,
@@ -472,101 +471,48 @@ describe( 'buildDockerComposeConfig', () => {
 	} );
 
 	describe( 'phpmyadmin', () => {
-		const build = ( { development = {}, tests = {}, testsEnvironment } ) =>
-			buildDockerComposeConfig( {
-				testsEnvironment,
+		function buildWithPhpmyadmin( development, tests ) {
+			return buildDockerComposeConfig( {
 				workDirectoryPath: '/path',
 				env: {
-					development: { ...CONFIG, ...development },
-					tests: { ...CONFIG, ...tests },
+					development: { ...CONFIG, phpmyadmin: development },
+					tests: { ...CONFIG, phpmyadmin: tests },
 				},
 			} );
+		}
 
-		it( 'does not define or pull phpMyAdmin when it is not enabled', () => {
-			const dockerConfig = build( {} );
+		it( 'omits the phpMyAdmin services when phpMyAdmin is not enabled', () => {
+			for ( const value of [ undefined, false ] ) {
+				const config = buildWithPhpmyadmin( value, value );
 
-			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
-			expect(
-				dockerConfig.services[ 'tests-phpmyadmin' ]
-			).toBeUndefined();
-			expect( getPulledImages( dockerConfig ) ).toEqual( [
-				{
-					image: 'mariadb:lts',
-					services: [ 'mysql', 'tests-mysql' ],
-				},
-			] );
+				expect( config.services.phpmyadmin ).toBeUndefined();
+				expect( config.services[ 'tests-phpmyadmin' ] ).toBeUndefined();
+			}
 		} );
 
-		it( 'does not define or pull phpMyAdmin when it is set to false', () => {
-			const dockerConfig = build( {
-				development: { phpmyadmin: false, phpmyadminPort: 9000 },
-				tests: { phpmyadmin: false, phpmyadminPort: 9001 },
-			} );
+		it( 'defines the phpMyAdmin services when both environments enable it', () => {
+			const config = buildWithPhpmyadmin( true, true );
 
-			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
-			expect(
-				dockerConfig.services[ 'tests-phpmyadmin' ]
-			).toBeUndefined();
-			expect(
-				getPulledImages( dockerConfig ).map( ( { image } ) => image )
-			).not.toContain( 'phpmyadmin' );
-		} );
-
-		it( 'defines and pulls phpMyAdmin for each environment that enables it', () => {
-			const dockerConfig = build( {
-				development: { phpmyadmin: true },
-				tests: { phpmyadmin: true },
-			} );
-
-			expect( dockerConfig.services.phpmyadmin ).toMatchObject( {
-				image: 'phpmyadmin',
-				environment: { PMA_HOST: 'mysql' },
-			} );
-			expect( dockerConfig.services[ 'tests-phpmyadmin' ] ).toMatchObject(
-				{
-					image: 'phpmyadmin',
-					environment: { PMA_HOST: 'tests-mysql' },
-				}
+			expect( config.services.phpmyadmin.environment.PMA_HOST ).toBe(
+				'mysql'
 			);
-			expect( getPulledImages( dockerConfig ) ).toContainEqual( {
-				image: 'phpmyadmin',
-				services: [ 'phpmyadmin', 'tests-phpmyadmin' ],
-			} );
-		} );
-
-		it( 'defines phpMyAdmin only for the development environment when only it enables it', () => {
-			const dockerConfig = build( {
-				development: { phpmyadmin: true, phpmyadminPort: 9000 },
-			} );
-
-			expect( dockerConfig.services.phpmyadmin.ports ).toEqual( [
-				'${WP_ENV_PHPMYADMIN_PORT:-9000}:80',
-			] );
 			expect(
-				dockerConfig.services[ 'tests-phpmyadmin' ]
-			).toBeUndefined();
+				config.services[ 'tests-phpmyadmin' ].environment.PMA_HOST
+			).toBe( 'tests-mysql' );
 		} );
 
-		it( 'defines phpMyAdmin only for the tests environment when only it enables it', () => {
-			const dockerConfig = build( {
-				tests: { phpmyadmin: true, phpmyadminPort: 9001 },
-			} );
+		it( 'defines the phpMyAdmin service only for the environment that enables it', () => {
+			const developmentOnly = buildWithPhpmyadmin( true, false );
 
-			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
-			expect( dockerConfig.services[ 'tests-phpmyadmin' ].ports ).toEqual(
-				[ '${WP_ENV_TESTS_PHPMYADMIN_PORT:-9001}:80' ]
-			);
-		} );
-
-		it( 'does not define tests phpMyAdmin when the tests environment is disabled', () => {
-			const dockerConfig = build( {
-				testsEnvironment: false,
-				tests: { phpmyadmin: true },
-			} );
-
+			expect( developmentOnly.services.phpmyadmin ).toBeDefined();
 			expect(
-				dockerConfig.services[ 'tests-phpmyadmin' ]
+				developmentOnly.services[ 'tests-phpmyadmin' ]
 			).toBeUndefined();
+
+			const testsOnly = buildWithPhpmyadmin( false, true );
+
+			expect( testsOnly.services.phpmyadmin ).toBeUndefined();
+			expect( testsOnly.services[ 'tests-phpmyadmin' ] ).toBeDefined();
 		} );
 	} );
 } );

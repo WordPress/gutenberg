@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Stop `wp-env start` from downloading the phpMyAdmin image for an environment where phpMyAdmin is not enabled. The Docker runtime now only defines the `phpmyadmin` and `tests-phpmyadmin` services for the environments that enable `phpmyadmin`. A failed image pull also no longer reports phpMyAdmin as missing when it is not enabled.
+-   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).
 
 ### Internal
 
