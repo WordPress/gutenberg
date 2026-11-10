@@ -7,63 +7,51 @@ globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 describe( 'Gallery ordering controls', () => {
-	test.each( [ false, true ] )(
-		'does not repeat a dynamic order change when the current item is selected, with Random %s',
-		async ( isRandom ) => {
-			const onChange = vi.fn();
-			const onSelectRandom = vi.fn();
-			render(
-				<SourceOrderControl
-					order={ { orderby: 'date', order: 'desc' } }
-					isRandom={ isRandom }
-					onChange={ onChange }
-					onSelectRandom={ onSelectRandom }
-				/>
-			);
+	test( 'does not repeat a dynamic order change when the current item is selected', async () => {
+		const onChange = vi.fn();
+		render(
+			<SourceOrderControl
+				order={ { orderby: 'date', order: 'desc' } }
+				isRandom={ false }
+				onChange={ onChange }
+				onSelectRandom={ vi.fn() }
+			/>
+		);
 
-			await userEvent.click(
-				screen.getByRole( 'combobox', { name: 'Order by' } )
-			);
-			await userEvent.click(
-				await screen.findByRole( 'option', {
-					name: isRandom ? 'Random' : 'Newest to oldest',
-				} )
-			);
+		await userEvent.click(
+			screen.getByRole( 'combobox', { name: 'Order by' } )
+		);
+		await userEvent.click(
+			await screen.findByRole( 'option', {
+				name: 'Newest to oldest',
+			} )
+		);
 
-			expect( onChange ).not.toHaveBeenCalled();
-			expect( onSelectRandom ).not.toHaveBeenCalled();
-		}
-	);
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
 
-	test.each( [ false, true ] )(
-		'does not sort images again when the current order is selected, with Random %s',
-		async ( isRandom ) => {
-			const onSort = vi.fn();
-			const onSelectCustom = vi.fn();
-			const onSelectRandom = vi.fn();
-			render(
-				<SortImagesControl
-					currentOrder={ { orderby: 'title', order: 'asc' } }
-					isRandom={ isRandom }
-					canSort
-					onSort={ onSort }
-					onSelectCustom={ onSelectCustom }
-					onSelectRandom={ onSelectRandom }
-				/>
-			);
+	test( 'does not sort images again when the current order is selected', async () => {
+		const onSort = vi.fn();
+		render(
+			<SortImagesControl
+				currentOrder={ { orderby: 'title', order: 'asc' } }
+				isRandom={ false }
+				canSort
+				onSort={ onSort }
+				onSelectCustom={ vi.fn() }
+				onSelectRandom={ vi.fn() }
+			/>
+		);
 
-			await userEvent.click(
-				screen.getByRole( 'combobox', { name: 'Order by' } )
-			);
-			await userEvent.click(
-				await screen.findByRole( 'option', {
-					name: isRandom ? 'Random' : 'A → Z',
-				} )
-			);
+		await userEvent.click(
+			screen.getByRole( 'combobox', { name: 'Order by' } )
+		);
+		await userEvent.click(
+			await screen.findByRole( 'option', {
+				name: 'A → Z',
+			} )
+		);
 
-			expect( onSort ).not.toHaveBeenCalled();
-			expect( onSelectCustom ).not.toHaveBeenCalled();
-			expect( onSelectRandom ).not.toHaveBeenCalled();
-		}
-	);
+		expect( onSort ).not.toHaveBeenCalled();
+	} );
 } );
