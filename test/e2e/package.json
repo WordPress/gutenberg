@@ -41,6 +41,7 @@
 	},
 	"scripts": {
 		"browse": "node bin/browse.mjs",
+		"test:e2e:trunk": "node bin/e2e-trunk-check.mts",
 		"test:e2e:update-timings": "flakiness-playwright-timings fetch -c ./playwright.config.ts -o timings.json",
 		"test:e2e": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:debug": "wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json --ui",
