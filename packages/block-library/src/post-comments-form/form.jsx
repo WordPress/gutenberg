@@ -12,10 +12,20 @@ import { useSelect } from '@wordpress/data';
 
 const CommentsFormPlaceholder = () => {
 	const instanceId = useInstanceId( CommentsFormPlaceholder );
+	const { titleReply, labelSubmit } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return (
+			getSettings().__experimentalDiscussionSettings
+				?.commentFormDefaults ?? {}
+		);
+	}, [] );
+	// A filter may return an empty string; fall back rather than render blank.
+	const title = titleReply || __( 'Leave a Reply' );
+	const submitLabel = labelSubmit || __( 'Post Comment' );
 
 	return (
 		<div className="comment-respond">
-			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
+			<h3 className="comment-reply-title">{ title }</h3>
 			<form
 				noValidate
 				className="comment-form"
@@ -41,8 +51,8 @@ const CommentsFormPlaceholder = () => {
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }
-						label={ __( 'Post Comment' ) }
-						value={ __( 'Post Comment' ) }
+						label={ submitLabel }
+						value={ submitLabel }
 						aria-disabled="true"
 					/>
 				</p>
