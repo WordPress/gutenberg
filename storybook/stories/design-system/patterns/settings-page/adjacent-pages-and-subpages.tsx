@@ -7,6 +7,7 @@ import {
 	gatewayFromPath,
 	GeneralPage,
 	PaymentsPage,
+	SETTINGS_CRUMB,
 	subpageHeader,
 	useStoreSettings,
 } from './store-pages';
@@ -17,15 +18,14 @@ function AdjacentPagesAndSubpagesScreen() {
 	const gateway = gatewayFromPath( path );
 
 	if ( gateway ) {
-		// The ancestor is always the area title, while its link returns to
-		// the adjacent page the subpage belongs to.
 		return (
 			<GatewayPage
 				key={ path }
 				gatewayId={ gateway.id }
 				settings={ settings }
 				header={ subpageHeader( [
-					{ label: 'Settings', to: '/payments' },
+					SETTINGS_CRUMB,
+					{ label: 'Payments', to: '/payments' },
 					{ label: gateway.name },
 				] ) }
 			/>
@@ -63,7 +63,8 @@ function AdjacentPagesAndSubpagesScreen() {
 
 /**
  * Adjacent pages where one page leads to a subpage. The subpage drops the
- * section navigation and shows breadcrumbs rooted at the area title.
+ * section navigation, and its breadcrumbs pass through the adjacent page it
+ * belongs to.
  */
 export function AdjacentPagesAndSubpagesExample() {
 	return (

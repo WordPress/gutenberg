@@ -53,7 +53,7 @@ A single page with a few groups of settings. Use it when everything fits on one 
 
 Peer sections of one settings area, such as General, Payments and Emails, switched with the `Page` `navigation`. Use it when the sections are independent and each one is substantial enough to deserve a page.
 
--   Keep the page title the same across adjacent pages; the navigation shows which section is current.
+-   Name the current page in a breadcrumb under the area, for example "Settings / General", and keep the navigation to show its peers. There is no separate Settings page, so "Settings" links to the first adjacent page.
 -   Each page has its own draft and Save. Saving one page doesn't save another.
 -   Pass a router link through `components.link`, so switching pages doesn't reload the screen.
 
@@ -81,7 +81,7 @@ On the subpage, breadcrumbs replace the title and lead back to the parent page. 
 
 ## Adjacent pages and subpages
 
-When a subpage belongs to one of several adjacent pages, the breadcrumb ancestor stays the same as the area title, for example "Settings / Card payments", whichever adjacent page the subpage belongs to. Adjacent pages are peers, not levels, so they never appear in the trail. The ancestor links back to the adjacent page the subpage was opened from, and the subpage drops the section navigation.
+When a subpage belongs to one of several adjacent pages, its trail passes through that page, for example "Settings / Payments / Card payments". "Payments" leads back to the page the subpage was opened from, and the subpage drops the section navigation.
 
 <Canvas
 	of={ SettingsPageStories.AdjacentPagesAndSubpages }
