@@ -1,18 +1,20 @@
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { seen, backup } from '@wordpress/icons';
-import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useOpenGlobalStylesRevisions from '../sidebar-navigation-screen-global-styles/use-open-global-styles-revisions';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
@@ -29,12 +31,20 @@ const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
 	setIsStyleBookOpened,
 	path,
+	section,
 	onChangeSection,
 } ) => {
 	const history = useHistory();
-	const { revisionsCount, isLoading: isLoadingRevisions } =
-		useGlobalStylesRevisions();
-	const { openRevisions } = useOpenGlobalStylesRevisions();
+	const hasRevisions = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
+	}, [] );
+	const areRevisionsOpened = section.startsWith( '/revisions' );
 
 	return (
 		<HStack className="edit-site-styles__header-actions">
@@ -53,11 +63,16 @@ const GlobalStylesPageActions = ( {
 				size="compact"
 			/>
 			<Button
+				isPressed={ areRevisionsOpened }
 				icon={ backup }
 				label={ __( 'Revisions' ) }
-				onClick={ openRevisions }
+				// The revisions screen has no empty state; it expects to be
+				// opened only when revisions exist.
 				accessibleWhenDisabled
-				disabled={ isLoadingRevisions || ! revisionsCount }
+				disabled={ ! hasRevisions }
+				onClick={ () =>
+					onChangeSection( areRevisionsOpened ? '/' : '/revisions' )
+				}
 				size="compact"
 			/>
 			<GlobalStylesActionMenu
@@ -98,6 +113,20 @@ export default function SidebarGlobalStyles() {
 	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
+	const areRevisionsOpened = section.startsWith( '/revisions' );
+
+	// The preview on this route is the editor in preview mode, and its
+	// revisions canvas is driven by the editor store's styles path rather than
+	// this route's `section` query arg. Keep the store in sync while the
+	// revisions screen is open, so selecting a revision previews it.
+	const { setStylesPath } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		if ( ! areRevisionsOpened ) {
+			return;
+		}
+		setStylesPath( section );
+		return () => setStylesPath( '/' );
+	}, [ areRevisionsOpened, section, setStylesPath ] );
 	const settings = useSelect(
 		( select ) => select( editSiteStore ).getSettings(),
 		[]
@@ -111,6 +140,7 @@ export default function SidebarGlobalStyles() {
 						isStyleBookOpened={ isStyleBookOpened }
 						setIsStyleBookOpened={ setIsStyleBookOpened }
 						path={ path }
+						section={ section }
 						onChangeSection={ onChangeSection }
 					/>
 				) : null
