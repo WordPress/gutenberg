@@ -14,15 +14,12 @@
  * Adds `innerBlocks` to the attributes that block bindings support on the Group
  * and Column blocks, so that Core resolves its binding.
  *
- * Not while the inner blocks a source supplied render: Core then skips the
- * binding without calling its source, and the block keeps its own inner blocks.
- *
  * @param string[]|mixed $supported_attributes The attributes supported by block bindings.
  * @param string         $block_type           The block type name.
  * @return string[]|mixed The supported attributes.
  */
 function gutenberg_block_bindings_add_inner_blocks_support( $supported_attributes, $block_type ) {
-	if ( is_array( $supported_attributes ) && in_array( $block_type, array( 'core/group', 'core/column' ), true ) && ! gutenberg_block_bindings_is_rendering_supplied_inner_blocks() ) {
+	if ( is_array( $supported_attributes ) && in_array( $block_type, array( 'core/group', 'core/column' ), true ) ) {
 		$supported_attributes[] = 'innerBlocks';
 	}
 	return $supported_attributes;
@@ -83,29 +80,55 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 }
 
 /**
- * Returns whether the inner blocks a block bindings source supplied are
- * rendering.
+ * Returns what a block asks its block bindings source for `innerBlocks`: the
+ * source, the arguments of the binding, and the context the source uses.
  *
- * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ * Two blocks with the same request get the same inner blocks from the source.
  *
- * @return bool Whether supplied inner blocks are rendering.
+ * @param string   $source_name    The name of the source.
+ * @param array    $source_args    The arguments of the binding.
+ * @param WP_Block $block_instance The block instance.
+ * @return array The request.
  */
-function gutenberg_block_bindings_is_rendering_supplied_inner_blocks() {
-	global $gutenberg_block_bindings_supplied_inner_blocks_host;
-	return null !== $gutenberg_block_bindings_supplied_inner_blocks_host;
+function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance ) {
+	$source  = get_block_bindings_source( $source_name );
+	$context = array();
+	foreach ( $source ? (array) $source->uses_context : array() as $context_name ) {
+		if ( array_key_exists( $context_name, $block_instance->context ) ) {
+			$context[ $context_name ] = $block_instance->context[ $context_name ];
+		}
+	}
+	return array( $source_name, $source_args, $context );
 }
 
 /**
- * Stops tracking the block whose supplied inner blocks were rendering, once
- * the block itself has rendered.
+ * Returns whether the inner blocks a source supplied for the given request are
+ * rendering.
  *
- * While a block renders the inner blocks a source supplied, no descendant gets
- * its inner blocks from a source, not even one inside content that loads as
- * it renders, like the menu of a Navigation block. This way sources whose
- * values bind each other's, directly or through such content, can't render
- * forever. Bindings on sibling blocks still resolve, one after the other.
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
  *
- * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ * @param array $request The request, as `gutenberg_block_bindings_get_inner_blocks_request()` returns it.
+ * @return bool Whether supplied inner blocks for the request are rendering.
+ */
+function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) {
+	global $gutenberg_block_bindings_rendering_inner_blocks;
+	foreach ( (array) $gutenberg_block_bindings_rendering_inner_blocks as $rendering ) {
+		if ( $rendering['request'] === $request ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Stops tracking a block whose supplied inner blocks were rendering, once the
+ * block itself has rendered.
+ *
+ * The blocks still rendering inside it, if any, stopped with it: a block that
+ * doesn't finish rendering, because of an exception, never gets here, so they
+ * are forgotten along with it.
+ *
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
  *
  * @param string   $block_content The rendered block.
  * @param array    $parsed_block  The parsed block.
@@ -113,9 +136,12 @@ function gutenberg_block_bindings_is_rendering_supplied_inner_blocks() {
  * @return string The rendered block.
  */
 function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block_content, $parsed_block, $instance ) {
-	global $gutenberg_block_bindings_supplied_inner_blocks_host;
-	if ( $instance === $gutenberg_block_bindings_supplied_inner_blocks_host ) {
-		$gutenberg_block_bindings_supplied_inner_blocks_host = null;
+	global $gutenberg_block_bindings_rendering_inner_blocks;
+	foreach ( (array) $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
+		if ( $rendering['host'] === $instance ) {
+			$gutenberg_block_bindings_rendering_inner_blocks = array_slice( $gutenberg_block_bindings_rendering_inner_blocks, 0, $index );
+			break;
+		}
 	}
 	return $block_content;
 }
@@ -125,19 +151,43 @@ add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_
  * Parses the inner blocks a block bindings source supplies.
  *
  * The markup never went through the filters that sanitize post content on
- * save, and the user who supplied it may not be allowed unfiltered HTML, so it
- * is sanitized as on save, attributes of its blocks included. Its embeds are
- * expanded as the embeds of the content were, before its blocks render.
+ * save, and the user who supplied it may not be allowed unfiltered HTML, so by
+ * default it is sanitized as on save, attributes of its blocks included. Its
+ * embeds are expanded as the embeds of the content were, before its blocks
+ * render.
  *
  * @global WP_Embed $wp_embed WordPress Embed object.
  *
- * @param string $markup The serialized blocks.
+ * @param string   $markup         The serialized blocks.
+ * @param string   $source_name    The name of the source.
+ * @param array    $source_args    The arguments of the binding.
+ * @param WP_Block $block_instance The block instance.
  * @return array[] The parsed blocks.
  */
-function gutenberg_block_bindings_parse_inner_blocks( $markup ) {
+function gutenberg_block_bindings_parse_inner_blocks( $markup, $source_name, $source_args, $block_instance ) {
 	global $wp_embed;
 
-	$markup = wp_kses_post( $markup );
+	/**
+	 * Filters whether the inner blocks a block bindings source supplies are
+	 * sanitized before they render.
+	 *
+	 * By default the markup is sanitized as the post content of a user without
+	 * the `unfiltered_html` capability, since the user who supplied it is
+	 * unknown: `wp_kses_post()` removes the HTML that user may not publish, in
+	 * the attributes of the blocks included. A source whose markup comes from
+	 * trusted code, not from users, may keep it as supplied. Custom CSS is
+	 * removed from the blocks either way.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param bool     $sanitize       Whether to sanitize the markup. Default true.
+	 * @param string   $source_name    The name of the source.
+	 * @param array    $source_args    The arguments of the binding.
+	 * @param WP_Block $block_instance The block whose inner blocks the source supplies.
+	 */
+	if ( apply_filters( 'block_bindings_sanitize_inner_blocks', true, $source_name, $source_args, $block_instance ) ) {
+		$markup = wp_kses_post( $markup );
+	}
 	if ( $wp_embed instanceof WP_Embed ) {
 		$markup = $wp_embed->run_shortcode( $markup );
 		$markup = $wp_embed->autoembed( $markup );
@@ -249,7 +299,13 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * a binding in the block's own metadata replaces them, not the one the
  * `__default` binding expands to.
  *
- * @global WP_Block|null $gutenberg_block_bindings_supplied_inner_blocks_host The block whose supplied inner blocks are rendering.
+ * Not while the inner blocks the source supplied for the same request render:
+ * the block then keeps its own inner blocks. This way sources whose values
+ * bind each other's, directly or through content that loads as it renders,
+ * like the menu of a Navigation block, can't render forever. Bindings that ask
+ * a source something else still resolve, inside supplied inner blocks too.
+ *
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
  *
  * @param mixed    $value          The value of the source.
  * @param string   $source_name    The name of the source.
@@ -259,7 +315,7 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * @return mixed The value, or null for `innerBlocks`.
  */
 function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
-	global $gutenberg_block_bindings_supplied_inner_blocks_host;
+	global $gutenberg_block_bindings_rendering_inner_blocks;
 
 	if ( 'innerBlocks' !== $attribute_name ) {
 		return $value;
@@ -270,7 +326,12 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		return null;
 	}
 
-	$blocks        = gutenberg_block_bindings_parse_inner_blocks( $value );
+	$request = gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance );
+	if ( gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) ) {
+		return null;
+	}
+
+	$blocks        = gutenberg_block_bindings_parse_inner_blocks( $value, $source_name, $source_args, $block_instance );
 	$inner_content = gutenberg_block_bindings_get_inner_content( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
 	if ( null === $inner_content ) {
 		return null;
@@ -282,7 +343,10 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->inner_blocks                 = new WP_Block_List( array() );
 	$block_instance->refresh_parsed_block_dependents();
 
-	$gutenberg_block_bindings_supplied_inner_blocks_host = $block_instance;
+	$gutenberg_block_bindings_rendering_inner_blocks[] = array(
+		'host'    => $block_instance,
+		'request' => $request,
+	);
 
 	return null;
 }

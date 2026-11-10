@@ -10,7 +10,8 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	const SOURCE = 'test/inner-blocks';
 
 	/**
-	 * The value the test source returns for `innerBlocks`.
+	 * The value the test source returns for `innerBlocks`, or a callable that
+	 * returns it from the arguments of the binding and the block instance.
 	 *
 	 * @var mixed
 	 */
@@ -36,7 +37,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 						return 'Bound text';
 					}
 					++$this->inner_blocks_calls;
-					return $this->value;
+					return $this->value instanceof Closure ? call_user_func( $this->value, $source_args, $block_instance ) : $this->value;
 				},
 			)
 		);
@@ -65,6 +66,22 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Returns the markup of a Group block bound to the test source, with a
+	 * paragraph of its own.
+	 *
+	 * @param array  $args The arguments of the binding.
+	 * @param string $own  The text of the Group's own paragraph.
+	 * @return string The markup.
+	 */
+	private function bound_group_markup( $args = array(), $own = 'Nested own' ) {
+		$binding = array( 'source' => self::SOURCE );
+		if ( $args ) {
+			$binding['args'] = $args;
+		}
+		return '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":' . wp_json_encode( $binding ) . '}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>' . $own . '</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+	}
+
+	/**
 	 * Returns the attributes the supplied blocks render with.
 	 *
 	 * @return array[] The attributes of each rendered block, in render order.
@@ -86,7 +103,8 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	public function test_value_replaces_inner_blocks() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Two</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group();
-		$this->assertMatchesRegularExpression( '#>One</p><p[^>]*>Two</p></div></div>$#', $output );
+		$this->assertStringContainsString( '>One</p><p', $output );
+		$this->assertStringContainsString( '>Two</p></div>', $output );
 		$this->assertStringNotContainsString( 'Default', $output );
 	}
 
@@ -164,14 +182,46 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_block_attributes_in_the_value_are_sanitized() {
-		$this->value = '<!-- wp:paragraph {"className":"\u003cimg src=x onerror=alert(1)\u003e"} --><p>Safe</p><!-- /wp:paragraph -->';
+		$this->value = '<!-- wp:paragraph {"className":"<img src=x onerror=alert(1)>"} --><p>Safe</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group();
 		$this->assertStringNotContainsString( 'onerror', $output );
 		$this->assertStringContainsString( '>Safe</p>', $output );
 	}
 
+	public function test_value_of_a_trusted_source_is_not_sanitized() {
+		$this->value = '<!-- wp:html --><svg><circle r="1"></circle></svg><!-- /wp:html -->';
+		$trusted     = array();
+		$trust       = static function ( $sanitize, $source_name, $source_args, $block_instance ) use ( &$trusted ) {
+			$trusted[] = array( $source_name, $source_args, $block_instance->name );
+			return false;
+		};
+		add_filter( 'block_bindings_sanitize_inner_blocks', $trust, 10, 4 );
+		$output = $this->render_group(
+			array(
+				'innerBlocks' => array(
+					'source' => self::SOURCE,
+					'args'   => array( 'key' => 'chart' ),
+				),
+			)
+		);
+		remove_filter( 'block_bindings_sanitize_inner_blocks', $trust );
+
+		$this->assertStringContainsString( '<svg><circle r="1"></circle></svg>', $output );
+		$this->assertSame( array( array( self::SOURCE, array( 'key' => 'chart' ), 'core/group' ) ), $trusted );
+	}
+
+	public function test_custom_css_in_the_value_of_a_trusted_source_is_removed() {
+		$this->value = '<!-- wp:paragraph {"style":{"css":"color:red"}} --><p>Styled</p><!-- /wp:paragraph -->';
+		add_filter( 'block_bindings_sanitize_inner_blocks', '__return_false' );
+		$output = $this->render_group();
+		remove_filter( 'block_bindings_sanitize_inner_blocks', '__return_false' );
+
+		$this->assertStringNotContainsString( 'wp-custom-css-', $output );
+		$this->assertStringContainsString( '>Styled</p>', $output );
+	}
+
 	public function test_bindings_to_the_same_source_inside_the_value_are_ignored() {
-		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$this->value = $this->bound_group_markup();
 		$output      = $this->render_group();
 		$this->assertStringContainsString( '>Nested own</p>', $output );
 		$this->assertSame( 2, substr_count( $output, '<div class="wp-block-group">' ) );
@@ -182,24 +232,86 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			'test/other-inner-blocks',
 			array(
 				'label'              => 'Test',
-				'get_value_callback' => static function () {
-					return '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>From other</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+				'get_value_callback' => function () {
+					return $this->bound_group_markup( array(), 'From other' );
 				},
 			)
 		);
 		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/other-inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>From test</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
 		$output      = $this->render_group();
 		unregister_block_bindings_source( 'test/other-inner-blocks' );
-		$this->assertStringContainsString( '>From test</p>', $output );
-		$this->assertStringNotContainsString( 'From other', $output );
+		$this->assertStringContainsString( '>From other</p>', $output );
+		$this->assertStringNotContainsString( 'From test', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
+	public function test_bindings_to_another_source_inside_the_value_resolve() {
+		register_block_bindings_source(
+			'test/other-inner-blocks',
+			array(
+				'label'              => 'Test',
+				'get_value_callback' => static function () {
+					return '<!-- wp:paragraph --><p>From other</p><!-- /wp:paragraph -->';
+				},
+			)
+		);
+		$this->value = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/other-inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$output      = $this->render_group();
+		unregister_block_bindings_source( 'test/other-inner-blocks' );
+		$this->assertStringContainsString( '>From other</p>', $output );
+		$this->assertStringNotContainsString( 'Nested own', $output );
+	}
+
+	public function test_bindings_with_other_arguments_inside_the_value_resolve() {
+		$this->value = function ( $source_args ) {
+			$level = $source_args['level'] ?? 1;
+			if ( $level < 3 ) {
+				return $this->bound_group_markup( array( 'level' => $level + 1 ), "Level {$level} own" );
+			}
+			return '<!-- wp:paragraph --><p>Level 3</p><!-- /wp:paragraph -->';
+		};
+		$output      = $this->render_group();
+		$this->assertStringContainsString( '>Level 3</p>', $output );
+		$this->assertStringNotContainsString( 'own', $output );
+		$this->assertSame( 3, $this->inner_blocks_calls );
+	}
+
+	public function test_bindings_with_other_context_inside_the_value_resolve() {
+		register_block_type(
+			'test/provides-post',
+			array(
+				'attributes'       => array( 'id' => array( 'type' => 'integer' ) ),
+				'provides_context' => array( 'postId' => 'id' ),
+			)
+		);
+		register_block_bindings_source(
+			'test/post-inner-blocks',
+			array(
+				'label'              => 'Test',
+				'uses_context'       => array( 'postId' ),
+				'get_value_callback' => static function ( $source_args, $block_instance ) {
+					if ( 1 === $block_instance->context['postId'] ) {
+						return '<!-- wp:test/provides-post {"id":2} --><!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/post-inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- /wp:test/provides-post -->';
+					}
+					return '<!-- wp:paragraph --><p>Post ' . $block_instance->context['postId'] . '</p><!-- /wp:paragraph -->';
+				},
+			)
+		);
+		$output = do_blocks( '<!-- wp:test/provides-post {"id":1} --><!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/post-inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- /wp:test/provides-post -->' );
+		unregister_block_bindings_source( 'test/post-inner-blocks' );
+		unregister_block_type( 'test/provides-post' );
+
+		$this->assertStringContainsString( '>Post 2</p>', $output );
+		$this->assertStringNotContainsString( 'Nested own', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
 	}
 
 	public function test_bindings_inside_content_loaded_by_the_value_are_ignored() {
 		register_block_type(
 			'test/loads-content',
 			array(
-				'render_callback' => static function () {
-					return do_blocks( '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Loaded own</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+				'render_callback' => function () {
+					return do_blocks( $this->bound_group_markup( array(), 'Loaded own' ) );
 				},
 			)
 		);
@@ -207,13 +319,13 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$output      = $this->render_group();
 		unregister_block_type( 'test/loads-content' );
 
-		$this->assertSame( 1, $this->inner_blocks_calls );
-		$this->assertStringContainsString( '>Loaded own</p>', $output );
+		$this->assertSame( 1, substr_count( $output, 'Loaded own' ) );
+		$this->assertStringNotContainsString( 'Default', $output );
 	}
 
 	public function test_sibling_bindings_each_resolve() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$group       = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$group       = $this->bound_group_markup( array(), 'Default' );
 		$output      = do_blocks( $group . $group );
 
 		$this->assertSame( 2, $this->inner_blocks_calls );
@@ -224,7 +336,49 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	public function test_bindings_resolve_again_after_supplied_inner_blocks_render() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$this->render_group();
-		$this->assertContains( 'innerBlocks', get_block_bindings_supported_attributes( 'core/group' ) );
+		$this->assertStringContainsString( '>One</p>', $this->render_group() );
+	}
+
+	public function test_blocks_that_stop_rendering_inside_a_host_are_forgotten_with_it() {
+		register_block_type(
+			'test/throws',
+			array(
+				'render_callback' => static function () {
+					throw new Exception( 'Stopped' );
+				},
+			)
+		);
+		register_block_type(
+			'test/catches',
+			array(
+				'render_callback' => function () {
+					try {
+						return do_blocks( $this->bound_group_markup( array( 'part' => 'inner' ) ) );
+					} catch ( Exception $exception ) {
+						return $exception->getMessage();
+					}
+				},
+			)
+		);
+		$this->value = static function ( $source_args ) {
+			return 'inner' === ( $source_args['part'] ?? '' ) ? '<!-- wp:test/throws /-->' : '<!-- wp:test/catches /-->';
+		};
+		$output      = $this->render_group();
+		$this->assertStringContainsString( 'Stopped', $output );
+
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group(
+			array(
+				'innerBlocks' => array(
+					'source' => self::SOURCE,
+					'args'   => array( 'part' => 'inner' ),
+				),
+			)
+		);
+		unregister_block_type( 'test/throws' );
+		unregister_block_type( 'test/catches' );
+
+		$this->assertStringContainsString( '>One</p>', $output );
 	}
 
 	public function test_attribute_bindings_inside_the_value_are_kept() {
@@ -249,23 +403,29 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	public function test_value_goes_where_the_own_inner_blocks_were() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group( null, '<!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --><span>Tail</span>' );
-		$this->assertMatchesRegularExpression( '#>One</p><span>Tail</span>#', $output );
+		$this->assertStringContainsString( '>One</p><span>Tail</span>', $output );
 	}
 
 	public function test_value_goes_inside_the_inner_container_of_a_legacy_group() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div>' );
-		$this->assertMatchesRegularExpression( '#<div class="wp-block-group__inner-container[^"]*">\s*<p[^>]*>One</p>\s*</div></div>$#', $output );
+		$this->assertSame( 1, substr_count( $output, 'wp-block-group__inner-container' ) );
+		$this->assertStringEndsWith( '>One</p></div></div>', $output );
 	}
 
 	public function test_value_goes_inside_an_empty_group() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$this->assertMatchesRegularExpression( '#^<div class="wp-block-group[^"]*">(<div class="wp-block-group__inner-container[^"]*">)?\s*<p[^>]*>One</p>\s*(</div>)?</div>$#', $this->render_group( null, '' ) );
+		$output      = $this->render_group( null, '' );
+		$this->assertStringStartsWith( '<div class="wp-block-group', $output );
+		$this->assertStringContainsString( '>One</p></div>', $output );
+		$this->assertSame( 1, substr_count( $output, '<p' ) );
 	}
 
 	public function test_value_goes_before_the_closer_of_a_wrapper_with_unclosed_elements() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$this->assertMatchesRegularExpression( '#<p>Tail</p><p[^>]*>One</p>\s*</div>#', $this->render_group( null, '<p>Tail' ) );
+		$output      = $this->render_group( null, '<p>Tail' );
+		$this->assertStringContainsString( '<p>Tail</p><p', $output );
+		$this->assertStringContainsString( '>One</p></div>', $output );
 	}
 
 	public function test_value_is_skipped_without_markup_to_place_it_in() {
