@@ -2,7 +2,7 @@ import { type PlainColorObject } from 'colorjs.io/fn';
 import {
 	WHITE,
 	BLACK,
-	UNIVERSAL_CONTRAST_TOPUP,
+	CONTRAST_ROUNDING_MARGIN,
 	WHITE_TEXT_CONTRAST_MARGIN,
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
@@ -172,8 +172,11 @@ export function adjustContrastTarget( target: number ) {
 		return 1;
 	}
 
-	// Add a little top up to take into account any rounding error and algo imprecisions.
-	return target + UNIVERSAL_CONTRAST_TOPUP;
+	// The search can undershoot by a factor of exp(CONTRAST_EPSILON).
+	// Leave room for that error and for rounding both emitted colors.
+	return (
+		target * ( 1 + CONTRAST_ROUNDING_MARGIN ) * Math.exp( CONTRAST_EPSILON )
+	);
 }
 
 /**
