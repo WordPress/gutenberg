@@ -38,7 +38,7 @@ When the value is in a text field, put the copy action in the field's suffix so 
 	source={ { code: CopyFromFieldSource, language: 'tsx', type: 'code' } }
 />
 
-Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
+Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. A read-only input with a Copy suffix might indicate that the design needs inline text and a copy button instead of an input. The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
 
 ## Copying from a menu
 
