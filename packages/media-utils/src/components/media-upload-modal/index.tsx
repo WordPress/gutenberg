@@ -46,6 +46,7 @@ import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
 import { UploadStatusPopover } from './upload-status-popover';
 import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
+import { getTaxonomyQueryArgs } from './taxonomy-query';
 import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -281,6 +282,15 @@ export function MediaUploadModal( {
 		[ attachedToPostId, postType ]
 	);
 
+	// The attachment taxonomies, so that a filter on a taxonomy field reaches
+	// the query. Only requested when attachments have taxonomies at all.
+	const taxonomies = useSelect( ( select ) => {
+		const { getPostType, getTaxonomies } = select( coreStore );
+		return getPostType( 'attachment' )?.taxonomies?.length
+			? getTaxonomies( { type: 'attachment' } )
+			: undefined;
+	}, [] );
+
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
 	);
@@ -451,9 +461,10 @@ export function MediaUploadModal( {
 			orderby: view.sort?.field,
 			search: view.search,
 			_embed: 'author,wp:attached-to',
+			...getTaxonomyQueryArgs( view.filters, taxonomies ?? [] ),
 			...filters,
 		};
-	}, [ view, allowedTypes, attachedToPostId ] );
+	}, [ view, allowedTypes, attachedToPostId, taxonomies ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
@@ -690,7 +701,7 @@ export function MediaUploadModal( {
 
 	const paginationInfo = useMemo(
 		() => ( {
-			totalItems,
+			totalItems: totalItems ?? 0,
 			totalPages,
 		} ),
 		[ totalItems, totalPages ]

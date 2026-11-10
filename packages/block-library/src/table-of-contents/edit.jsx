@@ -46,6 +46,7 @@ const HEADING_LEVEL_ITEMS = [
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
 function TableOfContentsToolbar( {
+	canDetach,
 	clientId,
 	headingTree,
 	ordered,
@@ -87,7 +88,7 @@ function TableOfContentsToolbar( {
 						isActive={ ordered === true }
 					/>
 				</ToolbarGroup>
-				{ canInsertList && (
+				{ canDetach && canInsertList && (
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => setIsConfirmingDetach( true ) }
@@ -172,8 +173,11 @@ export default function TableOfContentsEdit( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
+	// Without a post, the entries are samples, so there is nothing to detach.
+	// The list style still applies, so its buttons stay available.
 	const toolbarControls = (
 		<TableOfContentsToolbar
+			canDetach={ !! postId }
 			clientId={ clientId }
 			headingTree={ headingTree }
 			ordered={ ordered }
@@ -294,7 +298,7 @@ export default function TableOfContentsEdit( {
 					/>
 				</ListTag>
 			</nav>
-			{ !! postId && toolbarControls }
+			{ toolbarControls }
 			{ inspectorControls }
 		</>
 	);

@@ -69,11 +69,16 @@ Beyond the current URL, the store's state describes the navigation itself: wheth
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be on an element that has `data-wp-interactive` or sits inside an element that does. A region without its own `data-wp-interactive` inherits the namespace of its nearest `data-wp-interactive` ancestor, on the page that supplied its content, so when the ancestor's namespace differs between two pages, each page's content uses its own. An element that the router keeps between the two pages, though, keeps what it set up when it mounted — `data-wp-watch` callbacks, `data-wp-on-window` and `data-wp-on-document` listeners, and `data-wp-init` — with the namespace and references it had then; give it a different `data-wp-key` on each page to mount it again (see [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide). A router region with neither is not updated. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
 
-<div class="callout callout-warning">
-When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
+```html
+<div data-wp-interactive="myblock">
+	<h1>Not updated on navigation</h1>
+	<div data-wp-router-region="main-list">
+		<!-- Updated on navigation; its directives use the "myblock" namespace. -->
+	</div>
 </div>
+```
 
 The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
@@ -137,7 +142,7 @@ navigate( href: string, options: NavigateOptions = {} )
     - `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
     - `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
     - `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
-    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none. Any other value (an empty string, a number, an object, `false`) is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
+    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none, as in a `watch()` callback or its cleanup, which run without a directive scope. Any other value (an empty string, a number, an object, `false`) is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
 
 #### `prefetch`
 
@@ -161,9 +166,9 @@ prefetch( url: string, options: PrefetchOptions = {} )
 
 All three properties are reactive, so reading them inside a directive or a `watch()` callback subscribes to their changes.
 
--   `state.url` (`string`): Synchronized with the current URL.
--   `state.navigating` (`boolean | undefined`): Truthy while a client-side navigation is in flight. The start is published as soon as the navigation enters the client-side pipeline, without waiting for the destination page; the end is published after the new content has been committed to the DOM, on a later frame, and the delay between the commit and the end is unbounded. A navigation that falls back to a full page load mid-flight keeps it truthy while the browser replaces the document, and resets it to `false` if the document is still there 10 seconds later; a navigation that throws while rendering ends normally, with the page possibly only partially updated. In both cases the end promises no new content. Neither the `loadingAnimation` nor the `screenReaderAnnouncement` option affects it: they change the built-in feedback, not this key.
--   `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for back/forward traversals, for calls made with no directive scope, and for calls made from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal that reloads the document clears it to `null`.
+- `state.url` (`string`): Synchronized with the current URL.
+- `state.navigating` (`boolean | undefined`): Truthy while a client-side navigation is in flight. The start is published as soon as the navigation enters the client-side pipeline, without waiting for the destination page; the end is published after the new content has been committed to the DOM, on a later frame, and the delay between the commit and the end is unbounded. A navigation that falls back to a full page load mid-flight keeps it truthy while the browser replaces the document, and resets it to `false` if the document is still there 10 seconds later; a navigation that throws while rendering ends normally, with the page possibly only partially updated. In both cases the end promises no new content. Neither the `loadingAnimation` nor the `screenReaderAnnouncement` option affects it: they change the built-in feedback, not this key.
+- `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for back/forward traversals, for calls made with no directive scope, and for calls made from inside a `watch()` callback or its cleanup that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal that reloads the document clears it to `null`.
 
 Neither `navigating` nor `initiator` is declared when the store is registered, so both read `undefined` until the first client-side navigation writes them, and on pages where the router module never loads. Consume them by truthiness — `if ( state.navigating )` and `state.initiator === myRegionId` — rather than comparing against `false` or `null`. Note that a binding such as `data-wp-bind--aria-busy="state.navigating"` renders no attribute at all while the value is `undefined`, rather than `aria-busy="false"`.
 

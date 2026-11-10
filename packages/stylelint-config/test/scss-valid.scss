@@ -32,3 +32,29 @@ b {
 	@include foo;
 	@include bar;
 }
+
+@mixin bar($value) {
+	@if not $value {
+		@warn "A value is required.";
+	}
+	@if $value == 0 {
+		display: none;
+	}
+}
+
+@function baz($value) {
+	@if $value < 0 {
+		@error "The value must be positive.";
+	}
+	@while $value > 10 {
+		$value: $value - 10;
+	}
+	@return $value;
+}
+
+.qux {
+	display: block;
+	@media (min-width: 600px) {
+		display: flex;
+	}
+}
