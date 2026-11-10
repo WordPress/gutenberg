@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { forwardRef, useState } from '@wordpress/element';
 import {
 	Button,
-	Popover,
+	Popover as WCPopover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
@@ -64,7 +64,7 @@ const URLPopover = forwardRef< HTMLDivElement, URLPopoverProps >(
 		};
 
 		return (
-			<Popover
+			<WCPopover
 				ref={ ref }
 				role="dialog"
 				aria-modal="true"
@@ -101,7 +101,7 @@ const URLPopover = forwardRef< HTMLDivElement, URLPopoverProps >(
 						{ additionalControls }
 					</div>
 				) }
-			</Popover>
+			</WCPopover>
 		);
 	}
 ) as URLPopoverComponent;

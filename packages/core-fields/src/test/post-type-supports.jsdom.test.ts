@@ -14,6 +14,7 @@ describe( 'post_type_supports', () => {
 			'password',
 			'ping_status',
 			'post-content-info',
+			'publish_date',
 			'scheduled_date',
 			'slug',
 			'status',
@@ -110,6 +111,17 @@ describe( 'post_type_supports', () => {
 		expect( isVisible?.( { status: 'publish' } ) ).toBe( false );
 	} );
 
+	// A save drops an `undefined` date, which would keep the old one.
+	it.each( [ 'date', 'scheduled_date' ] )(
+		'resets the date when the %s control is cleared',
+		( id ) => {
+			const { setValue } = postTypeSupports[ id ];
+			expect( setValue?.( { item: {}, value: undefined } ) ).toEqual( {
+				date: null,
+			} );
+		}
+	);
+
 	it( 'shows the date to the users who can publish the post', () => {
 		const { isVisible } = postTypeSupports.date;
 		expect( isVisible?.( { _links: { 'wp:action-publish': [] } } ) ).toBe(
@@ -126,6 +138,46 @@ describe( 'post_type_supports', () => {
 		expect( getValue?.( { item: { status: 'publish' } } ) ).toBe(
 			'publish'
 		);
+	} );
+
+	it( 'drops the future date of a post that is no longer scheduled', () => {
+		const { setValue } = postTypeSupports.status;
+		const item = { status: 'future', date: '2999-01-01T09:00:00' };
+		expect( setValue?.( { item, value: 'draft' } ) ).toEqual( {
+			status: 'draft',
+			date: null,
+		} );
+		expect( setValue?.( { item, value: 'future' } ) ).toEqual( {
+			status: 'future',
+		} );
+		expect(
+			setValue?.( {
+				item: { status: 'future', date: '2000-01-01T09:00:00' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
+		expect(
+			setValue?.( {
+				item: { status: 'publish', date: '2999-01-01T09:00:00' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
+	} );
+
+	it( 'clears the password of a post made private', () => {
+		const { setValue } = postTypeSupports.status;
+		expect(
+			setValue?.( {
+				item: { status: 'publish', password: 'secret' },
+				value: 'private',
+			} )
+		).toEqual( { status: 'private', password: '' } );
+		expect(
+			setValue?.( {
+				item: { status: 'publish', password: 'secret' },
+				value: 'draft',
+			} )
+		).toEqual( { status: 'draft' } );
 	} );
 
 	it( "locks the status for the users who can't publish the post", () => {

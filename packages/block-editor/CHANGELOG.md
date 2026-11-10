@@ -2,12 +2,30 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+
+### Bug Fixes
+
+-   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
+-   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
+-   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+
+## 20.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 - `RichTextToolbarButton`: Passing a `name` prop will no longer render a dedicated Fill unless that name corresponds to a known core toolbar format ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 
 ### Enhancements
 
+-   Migrate `BackgroundClipControl` to `@wordpress/ui` `SelectControl`. Internal markup and CSS classes have changed; custom CSS overrides may need updates ([#86046](https://github.com/WordPress/gutenberg/pull/86046)).
 -   `RichTextToolbarButton`: List the core formats in the "More" dropdown in a fixed order instead of sorting them by title, so the order no longer changes with the locale. The other buttons come after them, in the order they were rendered ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   Match `LinkControl` result type labels and block icons to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   LinkControl, URLInputButton: Label the icon submit button "Apply" instead of "Submit", matching the text button and the image link popover. Tests that find it by its accessible name need updating ([#85725](https://github.com/WordPress/gutenberg/pull/85725)).
@@ -16,9 +34,12 @@
 -   Edit as HTML: Show the block HTML textarea's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85266](https://github.com/WordPress/gutenberg/pull/85266)).
 -   Block Inspector: Slide the inspector in for a Buttons block and a Button inside a Navigation block, as it does for the other menu items ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
 -   DimensionsTool: Show an icon in the shape of each ratio next to the aspect ratio options and the selected value ([#85812](https://github.com/WordPress/gutenberg/pull/85812)).
+-   Block Inspector: Slide the inspector in for a Social Icon inside a Navigation block, as it does for its Social Icons parent ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
+-   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).
+-   Block style variations: Show a variation's text color over a text gradient set for its block type in Global Styles ([#86164](https://github.com/WordPress/gutenberg/pull/86164)).
 -   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
 -   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
 -   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
@@ -28,9 +49,11 @@
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Leave the props that `LineHeightControl`, `LetterSpacingControl`, `TextIndentControl`, `ColorPaletteControl`, `ColorGradientSettingsDropdown` and `FontSizePicker` override out of their types, and accept partial color objects in the color lookups ([#85213](https://github.com/WordPress/gutenberg/pull/85213)).
+-   Inserter: Keep keyboard-focused search results below the sticky search field ([#85706](https://github.com/WordPress/gutenberg/pull/85706)).
 -   Edit as HTML: Follow the markup when an `id`, `class` or `aria-label` is typed by hand or deleted, so the block no longer drops into recovery ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 -   Typography panel: "Reset all" also clears the link color that follows the text color ([#85376](https://github.com/WordPress/gutenberg/pull/85376)).
+-   Block Inspector: While a style state is edited, show the regular style panels for a template part instead of empty section style panels ([#86084](https://github.com/WordPress/gutenberg/pull/86084)).
 
 ### Internal
 
