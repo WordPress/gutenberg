@@ -345,6 +345,13 @@
 		--wp--lightbox-image-height: var(--wp--lightbox-thumbnail-height);
 	}
 
+	// The enlarged figure copies the block's classes and inline styles, so it
+	// would pick up a rotation. State styles are important and print later, so
+	// this has to be important and more specific.
+	.lightbox-image-container .wp-block-image {
+		rotate: none !important;
+	}
+
 	button {
 		border: none;
 		background: none;
