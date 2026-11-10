@@ -46,6 +46,7 @@ const ASPECT_RATIO_SETTINGS = {
 					{ name: 'Square - 1:1', slug: 'square', ratio: '1' },
 					{ name: 'Wide - 16:9', slug: '16-9', ratio: '16/9' },
 				],
+				theme: [ { name: 'Avatar', slug: 'avatar', ratio: '1' } ],
 			},
 		},
 	},
@@ -289,9 +290,14 @@ describe( 'Gallery block', () => {
 			);
 			await selectBlock( 'Block: Gallery' );
 
-			await userEvent.selectOptions(
-				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'16/9'
+			await userEvent.click(
+				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			expect(
+				await screen.findByRole( 'option', { name: 'Avatar' } )
+			).toBeInTheDocument();
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Wide - 16:9' } )
 			);
 
 			// The ratio is rendered from the Gallery's own responsive CSS for
