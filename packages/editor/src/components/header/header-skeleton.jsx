@@ -11,17 +11,6 @@ const toolbarVariations = {
 	hidden: { y: 0 },
 };
 
-const getBackButtonVariations = () => {
-	const hiddenX = isRTL() ? '100%' : '-100%';
-	return {
-		distractionFreeDisabled: { x: hiddenX },
-		distractionFreeHover: { x: 0 },
-		distractionFreeHidden: { x: hiddenX },
-		visible: { x: 0 },
-		hidden: { x: 0 },
-	};
-};
-
 /**
  * Header skeleton component providing the common layout structure.
  *
@@ -39,6 +28,7 @@ export default function HeaderSkeleton( {
 	settings,
 } ) {
 	const hasBackButton = useHasBackButton();
+	const backButtonHiddenX = isRTL() ? '100%' : '-100%';
 
 	/*
 	 * The edit-post-header classname is only kept for backward compatibility
@@ -49,7 +39,13 @@ export default function HeaderSkeleton( {
 			{ hasBackButton && (
 				<motion.div
 					className="editor-header__back-button"
-					variants={ getBackButtonVariations() }
+					variants={ {
+						distractionFreeDisabled: { x: backButtonHiddenX },
+						distractionFreeHover: { x: 0 },
+						distractionFreeHidden: { x: backButtonHiddenX },
+						visible: { x: 0 },
+						hidden: { x: 0 },
+					} }
 					transition={ { type: 'tween' } }
 				>
 					<BackButton.Slot />
