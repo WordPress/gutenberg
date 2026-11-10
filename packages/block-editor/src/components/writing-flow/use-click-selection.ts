@@ -36,21 +36,19 @@ export default function useClickSelection() {
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
 
-				if (
-					! placesCaretOnTap ||
-					pointerType !== 'touch' ||
-					node.contentEditable !== 'true'
-				) {
+				// Shift extends the selection across blocks, which needs the
+				// wrapper.
+				if ( event.shiftKey || node.contentEditable !== 'true' ) {
 					return;
 				}
 
 				const clientId = getBlockClientId( event.target as Element );
 
-				// A touch on a block that is edited on its own element:
-				// on iOS, a tap inside the focused editing host places the
+				// A press on a block that is edited on its own element: give
+				// focus back to the field with the caret before the browser
+				// handles the press, so it handles a press into another field.
+				// On iOS, a tap inside the focused editing host places the
 				// caret there and then loses it once focus moves to the field.
-				// Give focus back to the field with the caret before iOS
-				// handles the touch, so it handles a tap into another field.
 				if ( ! clientId || canHostEditableRoot( clientId ) ) {
 					return;
 				}
@@ -75,7 +73,7 @@ export default function useClickSelection() {
 				node.addEventListener( 'pointercancel', onPointerCancel, {
 					once: true,
 				} );
-				// A tap: nothing to undo.
+				// A press: nothing to undo.
 				node.addEventListener(
 					'pointerup',
 					() =>
