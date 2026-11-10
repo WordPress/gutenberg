@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `RequestUtils`: `createNavigationMenu()` accepts a `slug`, and `NavigationMenu` carries the slug the menu was stored with ([#82945](https://github.com/WordPress/gutenberg/pull/82945)).
+
 ### Bug Fixes
 
 -   `RequestUtils`: Open a new connection for each request, so requests no longer fail intermittently with "socket hang up" ([#86350](https://github.com/WordPress/gutenberg/pull/86350)).
