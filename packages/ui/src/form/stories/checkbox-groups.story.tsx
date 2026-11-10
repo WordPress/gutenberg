@@ -62,7 +62,7 @@ export const GroupingCheckboxes: StoryObj = {
  *
  * `CheckboxGroup.NestedItems` adds standard indentation to nested items.
  *
- * Do not nest more than one level for screen readers.
+ * Limit nesting to one level to keep groups accessible to screen reader users.
  */
 export const Nesting: StoryObj = {
 	render: function Template() {
