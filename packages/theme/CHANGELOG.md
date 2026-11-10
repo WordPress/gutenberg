@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter. Use them instead of `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` for fills: `thumb` tokens are now only for the movable handle of a control, and `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs.
+
 ### Enhancements
 
 -   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
