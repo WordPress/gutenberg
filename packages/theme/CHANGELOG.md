@@ -6,6 +6,10 @@
 
 -   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
 
+### Bug Fixes
+
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
