@@ -40,8 +40,7 @@ test.describe( 'Registered sources', () => {
 			await admin.createNewPost( { title: 'Test bindings' } );
 		} );
 
-		test.afterEach( async ( { editor, requestUtils } ) => {
-			await editor.setIsFixedToolbar( false );
+		test.afterEach( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(
 				'gutenberg-test-block-bindings'
 			);
@@ -63,7 +62,6 @@ test.describe( 'Registered sources', () => {
 			editor,
 			page,
 		} ) => {
-			await editor.setIsFixedToolbar( true );
 			await editor.insertBlock( {
 				name: 'core/image',
 				attributes: {
