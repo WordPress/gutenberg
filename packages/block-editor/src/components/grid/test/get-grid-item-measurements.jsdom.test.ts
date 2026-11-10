@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getGridItemMeasurements } from '../utils';
+import { getRotatedBoundingRect } from '../../../utils/rotation';
 
 interface ChildBox {
 	clientId: string;
@@ -7,6 +8,7 @@ interface ChildBox {
 	top: number;
 	width: number;
 	height: number;
+	rotate?: string;
 }
 
 // Three 100px columns and two 100px rows, with 10px gaps.
@@ -21,6 +23,7 @@ const GRID_CSS: Record< string, string > = {
 
 function setUpGrid( children: ChildBox[] ) {
 	const grid = document.createElement( 'div' );
+	const rotations = new Map< Element, string >();
 	for ( const box of children ) {
 		const child = document.createElement( 'div' );
 		child.setAttribute( 'data-block', box.clientId );
@@ -32,6 +35,9 @@ function setUpGrid( children: ChildBox[] ) {
 			offsetHeight: { get: () => box.height },
 		} );
 		grid.appendChild( child );
+		if ( box.rotate ) {
+			rotations.set( child, box.rotate );
+		}
 	}
 	document.body.appendChild( grid );
 	const gridReads = { count: 0 };
@@ -40,8 +46,14 @@ function setUpGrid( children: ChildBox[] ) {
 			gridReads.count++;
 		}
 		return {
-			getPropertyValue: ( property: string ) =>
-				element === grid ? ( GRID_CSS[ property ] ?? '' ) : '',
+			getPropertyValue: ( property: string ) => {
+				if ( element === grid ) {
+					return GRID_CSS[ property ] ?? '';
+				}
+				return property === 'rotate'
+					? ( rotations.get( element ) ?? 'none' )
+					: '';
+			},
 		} as CSSStyleDeclaration;
 	} );
 	return { grid, gridReads };
@@ -119,5 +131,35 @@ describe( 'getGridItemMeasurements()', () => {
 
 		expect( src ).toBeNull();
 		expect( siblings ).toHaveLength( 3 );
+	} );
+
+	it( 'stores the rotated outline of rotated siblings and the source angle', () => {
+		const { grid } = setUpGrid( [
+			{ ...children[ 0 ], rotate: '45deg' },
+			children[ 1 ],
+			{ ...children[ 2 ], rotate: '30deg' },
+		] );
+
+		const { siblings, src } = getGridItemMeasurements( grid, 'dragged' );
+
+		expect( siblings[ 0 ].pixelRect ).toEqual(
+			getRotatedBoundingRect(
+				{ left: 0, top: 0, right: 100, bottom: 100 },
+				45
+			)
+		);
+		expect( siblings[ 1 ].pixelRect ).toEqual( {
+			left: 110,
+			top: 110,
+			right: 210,
+			bottom: 210,
+		} );
+		expect( src?.angle ).toBe( 30 );
+		expect( src?.pixelRect ).toEqual( {
+			left: 220,
+			top: 0,
+			right: 320,
+			bottom: 210,
+		} );
 	} );
 } );

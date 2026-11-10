@@ -60,8 +60,8 @@ function clamp( value: number, min: number, max: number ): number {
  * @param options.rowTracks    Row tracks, as returned by `getGridTracks`.
  * @param options.columnSpan   Number of columns the block spans. A span wider than the grid is reduced to fit.
  * @param options.rowSpan      Number of rows the block spans. A span taller than the grid is reduced to fit.
- * @param options.width        Width of the block in pixels. Defaults to the width of the columns it spans.
- * @param options.height       Height of the block in pixels. Defaults to the height of the rows it spans.
+ * @param options.width        Width of the block in pixels, without its rotation. Defaults to the width of the columns it spans.
+ * @param options.height       Height of the block in pixels, without its rotation. Defaults to the height of the rows it spans.
  * @param options.grabX        Where the block was grabbed, in pixels from its left edge. Defaults to its center.
  * @param options.grabY        Where the block was grabbed, in pixels from its top edge. Defaults to its center.
  *

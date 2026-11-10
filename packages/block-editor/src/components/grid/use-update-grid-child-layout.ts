@@ -5,6 +5,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
+import { getRotateForState, getUpdatedRotateStyle } from '../../utils/rotation';
 import { getGridGrowthUpdate } from './get-grid-row-updates';
 import {
 	getUnstackedMobileUpdates,
@@ -16,7 +17,9 @@ import type {
 	GridChild,
 	GridStyleLayout,
 } from './mobile-stacking';
-import type { BlockStyleState } from '../../hooks/types';
+import type { BlockStyle, BlockStyleState } from '../../hooks/types';
+
+const MOBILE_STATE: BlockStyleState = { viewport: '@mobile' };
 
 /**
  * A function that gets a grid item's style, the selected state and the grid's
@@ -59,8 +62,9 @@ function isUnstackingEdit(
  *
  * Editing a grid item on mobile while its grid is stacked first gives the grid
  * its own mobile layout, matching the stack, so that the edit has an effect
- * and nothing else moves. A manual grid also grows in the selected state when
- * the item ends up past its last row.
+ * and nothing else moves. Blocks rotated on mobile get a mobile rotation of 0,
+ * as the stack shows them unrotated. A manual grid also grows in the selected
+ * state when the item ends up past its last row.
  *
  * @param options
  * @param options.clientId       Client ID of the grid item.
@@ -97,6 +101,24 @@ export function getGridChildUpdates( {
 			gridAttributes,
 			children,
 		} );
+		// Stacked blocks are shown unrotated, so a block rotated on mobile
+		// gets a mobile rotation of 0, and nothing moves.
+		for ( const { clientId: childClientId, attributes } of children ) {
+			const childUpdate = updates[ childClientId ];
+			if (
+				childUpdate &&
+				getRotateForState(
+					attributes?.style as BlockStyle | undefined,
+					MOBILE_STATE
+				)
+			) {
+				childUpdate.style = getUpdatedRotateStyle(
+					childUpdate.style as BlockStyle,
+					0,
+					MOBILE_STATE
+				) as GridBlockStyle;
+			}
+		}
 	}
 	// The grid as it is after any unstacking.
 	const updatedGridAttributes: GridBlockAttributes = {

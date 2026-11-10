@@ -482,3 +482,64 @@
 	}
 }
 
+.block-editor-grid-item-handles {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-handles.block-editor-grid-item-handles {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		.block-editor-grid-item-handle,
+		.block-editor-grid-item-handle * {
+			pointer-events: all;
+		}
+	}
+}
+
+.block-editor-grid-item-handles__box {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+// Looks like a block toolbar with a single button.
+.block-editor-grid-item-handle {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: $button-size-compact;
+	height: $button-size-compact;
+	// The same border as the block toolbar. No stroke token is as dark.
+	border: var(--wpds-border-width-xs) solid $gray-900;
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral);
+	cursor: grab;
+	touch-action: none;
+
+	&:hover {
+		color: var(--wp-admin-theme-color);
+	}
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+// Outside the bottom right corner, clear of the resize handles in the middle
+// of each side.
+.block-editor-grid-item-handles__rotate {
+	right: -($button-size-compact + $grid-unit-10);
+	bottom: -($button-size-compact + $grid-unit-10);
+}
+
+.block-editor-grid-item-handles__angle {
+	padding: 0 $grid-unit-05;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	font-variant-numeric: tabular-nums;
+}
