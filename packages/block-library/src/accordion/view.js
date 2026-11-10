@@ -56,10 +56,18 @@ const { actions } = store(
 				const panelElement = window.document.querySelector(
 					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
 				);
+				// The toggle button has the item's ID, and its heading can have
+				// an anchor of its own.
+				const headingElement = window.document
+					.getElementById( id )
+					?.closest( '.wp-block-accordion-heading' );
 
 				if (
 					! panelElement ||
-					! panelElement.contains( targetElement )
+					! (
+						panelElement.contains( targetElement ) ||
+						headingElement?.contains( targetElement )
+					)
 				) {
 					return;
 				}
