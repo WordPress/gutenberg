@@ -83,8 +83,8 @@ interface PhpstanReport {
 
 /**
  * Whether an error means a baseline entry records more occurrences of an error
- * than there are now, because some were fixed. Running PHPStan with `--fix`
- * fixes it.
+ * than there are now, because some were fixed. `composer phpstan:fix` fixes
+ * it.
  *
  * @param error The error.
  * @return Whether the baseline entry is stale.
@@ -123,7 +123,7 @@ const SUMMARY_LIMIT = 500;
 
 // Added to the annotation of an error that PHPStan can fix itself, such as an out-of-date baseline entry.
 const FIX_HINT =
-	'This can be fixed automatically by running `composer phpstan -- --fix` (or `npm run typecheck:php -- --fix`).';
+	'This can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).';
 
 /**
  * Escapes the message of a workflow command.
@@ -292,9 +292,9 @@ function buildSummary( errors: PhpstanError[] ): string {
 		);
 		sections.push(
 			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
-			'```bash\ncomposer phpstan -- --fix\n```',
+			'```bash\ncomposer phpstan:fix\n```',
 			'or, in the local environment:',
-			'```bash\nnpm run typecheck:php -- --fix\n```'
+			'```bash\nnpm run typecheck:php:fix\n```'
 		);
 		if (
 			errors.some(
@@ -350,7 +350,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 
 	if ( errors.some( ( error ) => error.fixable ) ) {
 		sections.push(
-			'Errors marked with 🔧 can be fixed automatically by running PHPStan with `--fix`.'
+			'Errors marked with 🔧 can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).'
 		);
 	}
 

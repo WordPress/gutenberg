@@ -5,7 +5,7 @@ Tooling for the [PHPStan](https://phpstan.org/) static analysis of the PHP in th
 ## Contents
 
 - `base.neon`: the shared configuration, which `phpstan.neon.dist` at the repository root includes along with the baseline.
-- `baseline.neon`: the errors that predate the analysis, regenerated with `composer phpstan:baselines`. Entries whose errors were fixed are removed with `composer phpstan -- --fix`.
+- `baseline.neon`: the errors that predate the analysis, regenerated with `composer phpstan:baselines`. Entries whose errors were fixed are removed with `composer phpstan:fix`.
 - `bootstrap.php`, `polyfills.stub`, `wp-build-templates.php`, and `src/`: what PHPStan loads to analyze the code, including the parser for the `wp-build` PHP templates.
 - `generate-wordpress-stubs.php` and `wordpress-stubs/`: the WordPress stubs generated from core trunk, and the script that generates them.
 - `report.ts`: reports the errors in a PHPStan JSON report as annotations and in the job summary in CI.
