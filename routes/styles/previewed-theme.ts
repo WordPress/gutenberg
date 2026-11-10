@@ -40,6 +40,6 @@ export function getPreviewTitle( themeName?: string ) {
 				/* translators: %s: Theme name. */
 				__( 'Previewing %s' ),
 				themeName
-		  )
+			)
 		: __( 'Theme Preview' );
 }

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
@@ -24,6 +24,7 @@ interface EditorProps {
 	backButton?: ReactNode;
 	onActionPerformed?: ( actionId: string, items: any[] ) => void;
 	initialViewport?: string;
+	renderingMode?: string;
 }
 
 /**
@@ -36,6 +37,7 @@ interface EditorProps {
  * @param {ReactNode} props.backButton        Optional back button to render in editor header
  * @param {Function}  props.onActionPerformed Optional callback run after a post action
  * @param {string}    props.initialViewport   Optional device type the entity opens at
+ * @param {string}    props.renderingMode     Optional rendering mode the editor stays in, for a route that shows the site rather than one piece of content
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -45,6 +47,7 @@ export function Editor( {
 	backButton,
 	onActionPerformed,
 	initialViewport,
+	renderingMode,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -118,7 +121,7 @@ export function Editor( {
 					height: '100vh',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
@@ -133,6 +136,7 @@ export function Editor( {
 			styles={ finalSettings.styles }
 			onActionPerformed={ onActionPerformed }
 			initialViewport={ initialViewport }
+			renderingMode={ renderingMode }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 			{ /*

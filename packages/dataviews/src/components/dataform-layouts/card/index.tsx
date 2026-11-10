@@ -11,6 +11,7 @@ import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/com
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -30,7 +31,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -272,7 +273,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+		if ( ! canRenderField( fieldDefinition ) ) {
 			return null;
 		}
 

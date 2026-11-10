@@ -14,7 +14,10 @@ import type { FieldsetRootProps } from './types';
 export const FieldsetRoot = forwardRef<
 	HTMLFieldSetElement,
 	FieldsetRootProps
->( function FieldsetRoot( { className, children, ...restProps }, ref ) {
+>( function UnforwardedFieldsetRoot(
+	{ className, children, ...restProps },
+	ref
+) {
 	const [ descriptionId, setDescriptionId ] = useState< string >();
 
 	const contextValue = useMemo(

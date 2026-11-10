@@ -63,13 +63,21 @@ function resolveFontWeight( fontWeight: FontFace[ 'fontWeight' ] ): string {
  *
  * Example:
  * formatFontFamily( "Open Sans, Font+Name, sans-serif" ) => '"Open Sans", "Font+Name", sans-serif'
- * formatFontFamily( "'Open Sans', generic(kai), sans-serif" ) => '"Open Sans", sans-serif'
- * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16","Slabo 27px",serif'
- * formatFontFamily( "Mine's, Moe's Typography" ) => `"mine's","Moe's Typography"`
+ * formatFontFamily( "'Open Sans', generic(kai), sans-serif" ) => '"Open Sans", generic(kai), sans-serif'
+ * formatFontFamily( "DotGothic16, Slabo 27px, serif" ) => '"DotGothic16", "Slabo 27px", serif'
+ * formatFontFamily( "Mine's, Moe's Typography" ) => `"Mine's", "Moe's Typography"`
+ * formatFontFamily( "var(--my-font), sans-serif" ) => 'var(--my-font), sans-serif'
  */
 export function formatFontFamily( input: string ) {
-	// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
-	const regex = /^(?!generic\([ a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/;
+	// Matches anything that has to be quoted to be a valid font family name.
+	// Left alone: a bare run of letters and hyphens, which covers the generic
+	// keywords such as `sans-serif`; `generic(kai)`; and a reference to a
+	// custom property such as `var(--wp--preset--font-family--body)`. The last
+	// two are CSS function calls rather than names, so quoting either one
+	// would stop it resolving.
+	// TODO: The regex was scoped to `var(--name )` and not things like `var(--name, fallback)`. That'll require more string parsing.
+	const regex =
+		/^(?!generic\([ a-zA-Z\-]+\)$)(?!var\(\s*--[\w-]+\s*\)$)(?!^[a-zA-Z\-]+$).+/;
 	const output = input.trim();
 
 	const formatItem = ( item: string ) => {

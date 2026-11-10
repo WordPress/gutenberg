@@ -39,6 +39,11 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	/*
+	 * `getRenderedLink()` in `edit.jsx` repeats these rules for the editor's
+	 * View button, so keep the two in sync.
+	 */
+
+	/*
 	 * Prepend emails with `mailto:` if not set.
 	 * The `is_email` returns false for emails with schema.
 	 */
@@ -71,7 +76,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $link );
 	$processor->next_tag( 'a' );
 	if ( $open_in_new_tab ) {
-		$processor->set_attribute( 'rel', trim( $rel . ' noopener nofollow' ) );
+		$processor->set_attribute( 'rel', trim( $rel . ' nofollow' ) );
 		$processor->set_attribute( 'target', '_blank' );
 	} elseif ( '' !== $rel ) {
 		$processor->set_attribute( 'rel', trim( $rel ) );
@@ -349,7 +354,6 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	 * @since 6.9.0
 	 *
 	 * @param array $services_data The list of services. Each item is an array containing a 'name' and 'icon' key.
-	 * @return array The list of social services.
 	 */
 	$services_data = apply_filters( 'block_core_social_link_get_services', $services_data );
 

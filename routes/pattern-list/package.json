@@ -10,7 +10,6 @@
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/block-editor": "file:../../packages/block-editor",
-		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
@@ -24,5 +23,8 @@
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/views": "file:../../packages/views"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0"
 	}
 }

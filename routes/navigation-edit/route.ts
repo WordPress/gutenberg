@@ -53,10 +53,16 @@ export const route = {
 			'postType',
 			NAVIGATION_POST_TYPE,
 			navigationId
-		) ) as { title?: { rendered?: string } } | undefined;
+		) ) as { title?: { rendered?: string; raw?: string } } | undefined;
 
 		if ( navigation?.title?.rendered ) {
 			return decodeEntities( navigation.title.rendered );
+		}
+
+		// A record received from a save carries no rendered fields, only raw
+		// ones — that's what the cache holds for a menu created this session.
+		if ( navigation?.title?.raw ) {
+			return navigation.title.raw;
 		}
 
 		return __( 'Navigation' );

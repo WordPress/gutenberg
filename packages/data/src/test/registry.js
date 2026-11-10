@@ -1,10 +1,12 @@
-/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "subscribeUntil"] }] */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-jest.useFakeTimers( { legacyFakeTimers: true } );
+const REGISTER_GENERIC_STORE_DEPRECATION =
+	'wp.data.registerGenericStore is deprecated since version 5.9. Please use wp.data.register( storeDescriptor ) instead.';
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -16,7 +18,7 @@ describe( 'createRegistry', () => {
 		return unsubscribe;
 	}
 	function subscribeUntil( predicates ) {
-		predicates = Array.from( predicates );
+		predicates = Array.isArray( predicates ) ? predicates : [ predicates ];
 
 		return new Promise( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
@@ -28,6 +30,8 @@ describe( 'createRegistry', () => {
 	}
 
 	beforeEach( () => {
+		vi.useFakeTimers();
+		logged[ REGISTER_GENERIC_STORE_DEPRECATION ] = true;
 		registry = createRegistry();
 	} );
 
@@ -36,6 +40,8 @@ describe( 'createRegistry', () => {
 		while ( ( unsubscribe = unsubscribes.shift() ) ) {
 			unsubscribe();
 		}
+		delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
+		vi.useRealTimers();
 	} );
 
 	describe( 'registerGenericStore', () => {
@@ -50,6 +56,7 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should throw if not all required config elements are present', () => {
+			delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 			expect( () =>
 				registry.registerGenericStore( 'grocer', {} )
 			).toThrow();
@@ -65,7 +72,9 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} )
 			).toThrow();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith(
+				REGISTER_GENERIC_STORE_DEPRECATION
+			);
 		} );
 
 		describe( 'getSelectors', () => {
@@ -104,7 +113,7 @@ describe( 'createRegistry', () => {
 
 		describe( 'getActions', () => {
 			it( 'should make actions available via registry.dispatch', () => {
-				const dispatch = jest.fn();
+				const dispatch = vi.fn();
 
 				function setPrice( itemName, price ) {
 					return { type: 'SET_PRICE', itemName, price };
@@ -151,7 +160,7 @@ describe( 'createRegistry', () => {
 
 		describe( 'subscribe', () => {
 			it( 'should send out updates to listeners of the registry', () => {
-				const registryListener = jest.fn();
+				const registryListener = vi.fn();
 
 				let listener = () => {};
 				const storeChanged = () => {
@@ -247,7 +256,7 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should behave as a side effect for the given selector, with arguments', () => {
-			const resolver = jest.fn();
+			const resolver = vi.fn();
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
@@ -259,19 +268,19 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			expect( value ).toBe( 'OK' );
 			expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			expect( resolver ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'should support the object resolver descriptor', () => {
-			const resolver = jest.fn();
+			const resolver = vi.fn();
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
@@ -283,12 +292,12 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			expect( value ).toBe( 'OK' );
 		} );
 
 		it( 'should use isFulfilled definition before calling the side effect', () => {
-			const fulfill = jest.fn().mockImplementation( ( state, page ) => {
+			const fulfill = vi.fn().mockImplementation( ( state, page ) => {
 				return { type: 'SET_PAGE', page, result: [] };
 			} );
 
@@ -319,29 +328,29 @@ describe( 'createRegistry', () => {
 
 			store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			expect( fulfill ).toHaveBeenCalledTimes( 2 );
 
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
-			jest.runAllTimers();
+			vi.runAllTimers();
 
 			// Expected: First and second page fulfillments already triggered, so
 			// should only be one more than previous assertion set.
 			expect( fulfill ).toHaveBeenCalledTimes( 3 );
 
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
-			jest.runAllTimers();
+			vi.runAllTimers();
 			registry.select( 'demo' ).getPage( 4 );
 
 			// Expected:
@@ -354,7 +363,7 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getPage( 4, {} );
 		} );
 
-		it( 'should resolve action to dispatch', () => {
+		it( 'should resolve action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -376,12 +385,13 @@ describe( 'createRegistry', () => {
 			] );
 
 			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
+			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should resolve promise action to dispatch', () => {
+		it( 'should resolve promise action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -403,12 +413,16 @@ describe( 'createRegistry', () => {
 			] );
 
 			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
+			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
+		it( 'should not dispatch resolved promise action on subsequent selector calls', async () => {
+			const resolver = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' && state === 'NOTOK'
@@ -419,7 +433,7 @@ describe( 'createRegistry', () => {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
-					getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+					getValue: resolver,
 				},
 			} );
 
@@ -428,26 +442,29 @@ describe( 'createRegistry', () => {
 			);
 
 			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
+			vi.runAllTimers();
+			await promise;
 			registry.select( 'demo' ).getValue();
-			jest.runAllTimers();
+			vi.runAllTimers();
 
-			return promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+			expect( resolver ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( "should invalidate the resolver's resolution cache", async () => {
+			const fulfill = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
-					return action.type === 'SET_OK' && state === 'NOTOK'
-						? 'OK'
-						: 'NOTOK';
+					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
 					getValue: {
-						fulfill: () => Promise.resolve( { type: 'SET_OK' } ),
+						fulfill,
 						shouldInvalidate: ( action ) =>
 							action.type === 'INVALIDATE',
 					},
@@ -457,22 +474,21 @@ describe( 'createRegistry', () => {
 				},
 			} );
 
-			let promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'OK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK.
-			jest.runAllTimers();
-			await promise;
+			const firstResolution = registry.resolveSelect( 'demo' ).getValue();
+			vi.runAllTimers();
+			await firstResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 1 );
 
 			// Invalidate the cache
 			registry.dispatch( 'demo' ).invalidate();
 
-			promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'NOTOK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK.
-			jest.runAllTimers();
-			await promise;
+			const secondResolution = registry
+				.resolveSelect( 'demo' )
+				.getValue();
+			vi.runAllTimers();
+			await secondResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 2 );
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 	} );
 
@@ -525,8 +541,8 @@ describe( 'createRegistry', () => {
 
 	describe( 'select', () => {
 		it( 'registers multiple selectors to the public API', () => {
-			const selector1 = jest.fn( () => 'result1' );
-			const selector2 = jest.fn( () => 'result2' );
+			const selector1 = vi.fn( () => 'result1' );
+			const selector2 = vi.fn( () => 'result2' );
 			const store = registry.registerStore( 'reducer1', {
 				reducer: () => 'state1',
 				selectors: {
@@ -629,8 +645,8 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 			} );
-			const secondListener = jest.fn();
-			const firstListener = jest.fn( () => {
+			const secondListener = vi.fn();
+			const firstListener = vi.fn( () => {
 				subscribeWithUnsubscribe( secondListener );
 			} );
 
@@ -645,10 +661,10 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 			} );
-			const firstListener = jest.fn( () => {
+			const firstListener = vi.fn( () => {
 				secondUnsubscribe();
 			} );
-			const secondListener = jest.fn();
+			const secondListener = vi.fn();
 
 			subscribeWithUnsubscribe( firstListener );
 			const secondUnsubscribe =
@@ -663,9 +679,49 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'unchanging', {
 				reducer: ( state = {} ) => state,
 			} );
-			const listener = jest.fn();
+			const listener = vi.fn();
 			subscribeWithUnsubscribe( listener );
 
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
+
+		it( 'calls a listener subscribed to a store that gets registered later', () => {
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+
+			expect( listener ).not.toHaveBeenCalled();
+
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'does not call a listener waiting for a store when another store updates', () => {
+			const otherStore = registry.registerStore( 'otherStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			otherStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not call a listener that unsubscribed before the store was registered', () => {
+			const listener = vi.fn();
+			const unsubscribe = registry.subscribe( listener, 'lateStore' );
+			unsubscribe();
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
 			store.dispatch( { type: 'dummy' } );
 
 			expect( listener ).not.toHaveBeenCalled();
@@ -704,7 +760,7 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 			} );
-			const listener = jest.fn();
+			const listener = vi.fn();
 			subscribeWithUnsubscribe( listener );
 
 			registry.batch( () => {} );
@@ -716,7 +772,7 @@ describe( 'createRegistry', () => {
 			} );
 			expect( listener ).toHaveBeenCalledTimes( 1 );
 
-			const listener2 = jest.fn();
+			const listener2 = vi.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
 			const unsubscribe = registry.subscribe(
@@ -735,7 +791,7 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 			} );
-			const listener = jest.fn();
+			const listener = vi.fn();
 			subscribeWithUnsubscribe( listener );
 
 			registry.batch( () => {} );
@@ -756,7 +812,7 @@ describe( 'createRegistry', () => {
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 			} );
-			const listener = jest.fn();
+			const listener = vi.fn();
 			const error = new Error( 'Whoops' );
 			subscribeWithUnsubscribe( listener );
 
@@ -824,8 +880,8 @@ describe( 'createRegistry', () => {
 
 	describe( 'parent registry', () => {
 		it( 'should call parent registry selectors/actions if defined', () => {
-			const mySelector = jest.fn();
-			const myAction = jest.fn();
+			const mySelector = vi.fn();
+			const myAction = vi.fn();
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
@@ -848,8 +904,8 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should override existing store in parent registry', () => {
-			const mySelector = jest.fn();
-			const myAction = jest.fn();
+			const mySelector = vi.fn();
+			const myAction = vi.fn();
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => {};
@@ -863,8 +919,8 @@ describe( 'createRegistry', () => {
 			} );
 
 			const subRegistry = createRegistry( {}, registry );
-			const mySelector2 = jest.fn();
-			const myAction2 = jest.fn();
+			const mySelector2 = vi.fn();
+			const myAction2 = vi.fn();
 			const getSelectors2 = () => ( { mySelector: mySelector2 } );
 			const getActions2 = () => ( { myAction: myAction2 } );
 			const subscribe2 = () => {};
@@ -885,6 +941,25 @@ describe( 'createRegistry', () => {
 
 			expect( mySelector2 ).toHaveBeenCalled();
 			expect( myAction2 ).toHaveBeenCalled();
+		} );
+
+		it( 'should hand a subscription to an unregistered store over to the parent', () => {
+			const subRegistry = createRegistry( {}, registry );
+
+			const listener = vi.fn();
+			const unsubscribe = subRegistry.subscribe( listener, 'lateStore' );
+
+			const parentStore = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			unsubscribe();
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

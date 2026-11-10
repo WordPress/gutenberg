@@ -39,8 +39,8 @@ const html = `
 	<div data-testid="navigated">yes</div>
 
 	<div
-		data-wp-run--hydrated="callbacks.updateIsHydrated"
-		data-wp-run--renderCount="callbacks.updateRenderCount"
+		data-wp-run---hydrated="callbacks.updateIsHydrated"
+		data-wp-run---renderCount="callbacks.updateRenderCount"
 		data-wp-text="state.clickCount"
 	></div>
 </div>
@@ -62,9 +62,8 @@ const { state } = store( 'directive-run', {
 			state.clickCount = state.clickCount + 1;
 		},
 		*navigate() {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			return actions.navigate( window.location, {
 				force: true,
 				html,

@@ -1,0 +1,20 @@
+import { expect, test } from 'vitest';
+import { render } from 'vitest-browser-react';
+import { styles } from './packages/fixture/build-module/index.mjs';
+import './packages/fixture/build-module/duplicate.mjs';
+
+test( 'injects rebuilt module and regular CSS in Browser Mode', async () => {
+	const screen = await render(
+		<button className={ `${ styles.fixture } ordinary-fixture` }>
+			Save
+		</button>
+	);
+	const button = screen.getByRole( 'button', { name: 'Save' } ).element();
+	expect( getComputedStyle( button ).color ).toBe( 'rgb(1, 2, 3)' );
+	expect( getComputedStyle( button ).backgroundColor ).toBe( 'rgb(4, 5, 6)' );
+	expect( getComputedStyle( button ).paddingTop ).toBe( '8px' );
+	expect(
+		document.head.querySelectorAll( 'style[data-wp-hash]' )
+	).toHaveLength( 2 );
+	expect( typeof process ).toBe( 'undefined' );
+} );

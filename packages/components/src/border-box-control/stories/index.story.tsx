@@ -5,7 +5,8 @@ import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components/BorderBoxControl',
+	id: 'components-borderboxcontrol',
+	title: 'Components/@wordpress-components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
@@ -78,4 +79,14 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
+};
+
+/**
+ * With no visible label there is no label row for the linked/unlinked toggle to
+ * join, so it is rendered alongside the border inputs instead.
+ */
+export const WithoutLabel = Template.bind( {} );
+WithoutLabel.args = {
+	...Default.args,
+	label: undefined,
 };

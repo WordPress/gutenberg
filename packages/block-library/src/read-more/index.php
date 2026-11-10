@@ -13,7 +13,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string  Returns the post link.
+ * @return string Returns the post link.
  */
 function render_block_core_read_more( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {

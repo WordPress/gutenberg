@@ -1,0 +1,48 @@
+import { describe, expect, test } from 'vitest';
+import { render } from '@testing-library/react';
+import { View } from '../../view';
+import { VStack } from '..';
+
+globalThis.wpVitest.mockMatchMedia();
+
+describe( 'props', () => {
+	test( 'should render correctly', () => {
+		const { container } = render(
+			<VStack>
+				<View />
+				<View />
+			</VStack>
+		);
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should render alignment', () => {
+		const { container } = render(
+			<VStack alignment="center">
+				<View />
+				<View />
+			</VStack>
+		);
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should render spacing', () => {
+		const { container } = render(
+			<VStack spacing={ 5 }>
+				<View />
+				<View />
+			</VStack>
+		);
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should not pass through invalid props to the `as` component', () => {
+		const AsComponent = ( props: React.JSX.IntrinsicElements[ 'div' ] ) => {
+			return <div { ...props } />;
+		};
+
+		render( <VStack as={ AsComponent }>foobar</VStack> );
+
+		expect( console ).not.toHaveErrored();
+	} );
+} );
