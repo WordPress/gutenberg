@@ -128,19 +128,22 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
 			// The attachment records never resolve in this environment, so
 			// there's nothing to sort by yet; Random doesn't need them. Custom
 			// is only choosable while Random is on, since that's all it does.
 			expect(
-				screen.getByRole( 'option', { name: 'Newest to oldest' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', {
+					name: 'Newest to oldest',
+				} )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 			expect(
-				screen.getByRole( 'option', { name: 'Random' } )
-			).toBeEnabled();
+				await screen.findByRole( 'option', { name: 'Random' } )
+			).not.toHaveAttribute( 'aria-disabled' );
 		} );
 
 		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
@@ -150,19 +153,24 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			// The select is controlled from the `randomOrder` attribute, so
-			// its display value reflects the stored state after each change.
-			await userEvent.selectOptions( orderBy, 'random' );
-			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
+			await userEvent.click( orderBy );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeEnabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).not.toHaveAttribute( 'aria-disabled' );
 
-			await userEvent.selectOptions( orderBy, 'custom' );
-			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
@@ -176,10 +184,12 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			expect( orderBy ).toHaveDisplayValue( 'Newest to oldest' );
+			expect( orderBy ).toHaveTextContent( 'Newest to oldest' );
+			await userEvent.click( orderBy );
 			expect(
 				screen.queryByRole( 'option', { name: 'Custom' } )
 			).not.toBeInTheDocument();
+			await userEvent.keyboard( '{Escape}' );
 			// The order lives in Settings; the Source panel is a plain
 			// PanelBody with no resettable items, hence no options menu.
 			expect(
@@ -189,11 +199,17 @@ describe( 'Gallery block', () => {
 				screen.queryByRole( 'button', { name: 'Source options' } )
 			).not.toBeInTheDocument();
 
-			await userEvent.selectOptions( orderBy, 'random' );
-			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
 
-			await userEvent.selectOptions( orderBy, 'title/asc' );
-			expect( orderBy ).toHaveDisplayValue( 'A → Z' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'A → Z' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'A → Z' );
 		} );
 	} );
 
