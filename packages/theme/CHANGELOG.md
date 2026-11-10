@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ThemeProvider`: Near-gray background seeds, such as those of the "Modern" and "Light" admin color schemes, now carry their tint into the generated neutral surfaces and strokes instead of producing pure gray steps. Generated background ramp steps no longer exceed the seed's chroma ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
+
 ## 4.0.0 (2026-11-04)
 
 ### Breaking Changes
@@ -16,7 +20,6 @@
 ### Bug Fixes
 
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
--   `ThemeProvider`: Near-gray background seeds, such as those of the "Modern" and "Light" admin color schemes, now carry their tint into every generated neutral surface and stroke instead of producing pure gray steps ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
 
 ### Internal
 
