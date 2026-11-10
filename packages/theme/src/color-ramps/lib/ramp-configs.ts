@@ -50,7 +50,7 @@ const fgSurface4Config: RampStepConfig = {
 	taperChromaOptions: FG_TAPER_CHROMA,
 };
 
-export const BG_RAMP_CONFIG: RampConfig = {
+const BASE_RAMP_CONFIG: RampConfig = {
 	// Surface
 	surface1: {
 		contrast: {
@@ -230,37 +230,57 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	},
 };
 
+const withSeedChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
+	step.taperChromaOptions
+		? {
+				...step,
+				taperChromaOptions: {
+					...step.taperChromaOptions,
+					limitToSeedChroma: true,
+				},
+			}
+		: step;
+
+// Keep neutral ramps at or below the seed's chroma, independently of the
+// accent ramp's chroma treatment.
+export const BG_RAMP_CONFIG = Object.fromEntries(
+	Object.entries( BASE_RAMP_CONFIG ).map( ( [ stepName, step ] ) => [
+		stepName,
+		withSeedChromaLimit( step ),
+	] )
+) as RampConfig;
+
 // BG_RAMP: seed => surface2 => {bgFill, surface3 => all other tokens}
 // ACCENT_RAMP: seed => bgFill1 => surface2 => surface3 => all other tokens
 export const ACCENT_RAMP_CONFIG: RampConfig = {
-	...BG_RAMP_CONFIG,
+	...BASE_RAMP_CONFIG,
 	surface1: {
-		...BG_RAMP_CONFIG.surface1,
+		...BASE_RAMP_CONFIG.surface1,
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	surface2: {
 		contrast: {
 			reference: 'bgFill1',
 			followDirection: 'opposite',
-			target: BG_RAMP_CONFIG.bgFill1.contrast.target,
+			target: BASE_RAMP_CONFIG.bgFill1.contrast.target,
 			ignoreWhenAdjustingSeed: true,
 		},
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	surface3: {
-		...BG_RAMP_CONFIG.surface3,
+		...BASE_RAMP_CONFIG.surface3,
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	surface4: {
-		...BG_RAMP_CONFIG.surface4,
+		...BASE_RAMP_CONFIG.surface4,
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	surface5: {
-		...BG_RAMP_CONFIG.surface5,
+		...BASE_RAMP_CONFIG.surface5,
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	surface6: {
-		...BG_RAMP_CONFIG.surface6,
+		...BASE_RAMP_CONFIG.surface6,
 		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 	},
 	bgFill1: {
@@ -271,36 +291,36 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 		},
 	},
 	stroke1: {
-		...BG_RAMP_CONFIG.stroke1,
+		...BASE_RAMP_CONFIG.stroke1,
 	},
 	stroke2: {
-		...BG_RAMP_CONFIG.stroke2,
+		...BASE_RAMP_CONFIG.stroke2,
 	},
 	stroke3: {
-		...BG_RAMP_CONFIG.stroke3,
+		...BASE_RAMP_CONFIG.stroke3,
 		sameAsIfPossible: 'fgSurface3',
 		taperChromaOptions: undefined,
 	},
 	stroke4: {
-		...BG_RAMP_CONFIG.stroke4,
+		...BASE_RAMP_CONFIG.stroke4,
 		taperChromaOptions: undefined,
 	},
 	// fgSurface: do not de-saturate
 	fgSurface1: {
-		...BG_RAMP_CONFIG.fgSurface1,
+		...BASE_RAMP_CONFIG.fgSurface1,
 		taperChromaOptions: undefined,
 	},
 	fgSurface2: {
-		...BG_RAMP_CONFIG.fgSurface2,
+		...BASE_RAMP_CONFIG.fgSurface2,
 		taperChromaOptions: undefined,
 	},
 	fgSurface3: {
-		...BG_RAMP_CONFIG.fgSurface3,
+		...BASE_RAMP_CONFIG.fgSurface3,
 		taperChromaOptions: undefined,
 		sameAsIfPossible: 'bgFill1',
 	},
 	fgSurface4: {
-		...BG_RAMP_CONFIG.fgSurface4,
+		...BASE_RAMP_CONFIG.fgSurface4,
 		taperChromaOptions: undefined,
 	},
 };

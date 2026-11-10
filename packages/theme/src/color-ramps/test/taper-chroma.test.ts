@@ -1,9 +1,13 @@
 import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
 import { describe, expect, it } from 'vitest';
-import { taperChroma } from '../lib/taper-chroma';
+import { taperChroma, type TaperChromaOptions } from '../lib/taper-chroma';
 
-function getTaperedChroma( seed: PlainColorObject, lightness: number ) {
-	const result = taperChroma( seed, lightness );
+function getTaperedChroma(
+	seed: PlainColorObject,
+	lightness: number,
+	options?: TaperChromaOptions
+) {
+	const result = taperChroma( seed, lightness, options );
 	if ( ! ( 'c' in result ) ) {
 		throw new Error( 'Expected a chromatic taper result.' );
 	}
@@ -40,6 +44,29 @@ describe( 'taperChroma', () => {
 		expect( chromas[ 0 ] ).toBeGreaterThan( 0 );
 		expect( chromas[ 0 ] ).toBeLessThan( 0.0005 * 5 );
 	} );
+
+	it.each( [ 0.0005, 0.0045, 0.05 ] )(
+		'keeps chroma at or below a seed chroma of %s with limitToSeedChroma',
+		( chroma ) => {
+			const seed: PlainColorObject = {
+				space: OKLCH,
+				coords: [ 0.93, chroma, 170 ],
+				alpha: 1,
+			};
+
+			for ( const lightness of [ 0.2, 0.5, 0.8, 0.98 ] ) {
+				const limited = getTaperedChroma( seed, lightness, {
+					limitToSeedChroma: true,
+				} );
+
+				expect( limited ).toBeGreaterThan( 0 );
+				expect( limited ).toBeLessThanOrEqual( chroma );
+				expect( limited ).toBeLessThanOrEqual(
+					getTaperedChroma( seed, lightness )
+				);
+			}
+		}
+	);
 
 	it( 'keeps a gray seed gray', () => {
 		const result = taperChroma(

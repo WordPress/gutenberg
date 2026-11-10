@@ -264,11 +264,14 @@ describe( 'buildRamps', () => {
 		'#fcfcfd',
 		'#f6f7f9',
 	] )(
-		'keeps the generated neutral steps of near-gray seed %s in its hue and near-gray',
+		'keeps the generated neutral steps of near-gray seed %s near its hue and chroma',
 		( seed ) => {
 			const { ramp } = buildBgRamp( seed );
 			const seedChroma = get( seed, [ OKLCH, 'c' ] );
 			const seedHue = get( seed, [ OKLCH, 'h' ] );
+
+			// The seed's tint carries into the generated surfaces.
+			expect( get( ramp.surface1, [ OKLCH, 'c' ] ) ).toBeGreaterThan( 0 );
 
 			for ( const step of [
 				'surface1',
@@ -280,20 +283,22 @@ describe( 'buildRamps', () => {
 				'stroke4',
 			] as const ) {
 				const chroma = get( ramp[ step ], [ OKLCH, 'c' ] );
+
+				// Allow for rounding to 8-bit RGB.
+				expect( chroma ).toBeLessThanOrEqual( seedChroma * 1.25 );
+
+				// A faint enough tint can round to pure gray, which has no hue.
+				if ( chroma < 0.001 ) {
+					continue;
+				}
 				const hueDistance = Math.abs(
 					get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue
 				);
-
-				// Pure white and black have no room for chroma.
-				const lightness = get( ramp[ step ], [ OKLCH, 'l' ] );
-				if ( lightness > 0.999 || lightness < 0.001 ) {
-					continue;
-				}
-				expect( chroma ).toBeGreaterThan( 0 );
-				expect( chroma ).toBeLessThan( seedChroma * 6 );
+				// One 8-bit RGB step shifts the hue of such a faint tint by
+				// up to about 20 degrees.
 				expect(
 					Math.min( hueDistance, 360 - hueDistance )
-				).toBeLessThan( 15 );
+				).toBeLessThan( 25 );
 			}
 		}
 	);
