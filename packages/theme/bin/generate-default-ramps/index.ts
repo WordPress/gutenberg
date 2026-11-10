@@ -5,6 +5,7 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
+	buildPrimaryRamp,
 } from '../../src/color-ramps/index.ts';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
@@ -15,7 +16,9 @@ const accentRamps = Object.fromEntries(
 		.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 		.map( ( [ scaleName, seed ] ) => [
 			scaleName,
-			buildAccentRamp( seed, bgRamp ),
+			scaleName === 'primary'
+				? buildPrimaryRamp( seed, bgRamp )
+				: buildAccentRamp( seed, bgRamp ),
 		] )
 );
 

@@ -11,6 +11,7 @@ export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
 	alpha?: number; // base fraction of Cmax at target (default 0.62)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
+	preserveSeedSaturation?: boolean; // retain the seed's relative gamut occupancy
 	// Continuous taper around the seed (desaturate both sides slightly)
 	radiusLight?: number; // distance in L where kLight is reached (default 0.20)
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
@@ -93,7 +94,9 @@ export function createChromaTaper(
 
 		// Intended chroma from local capacity, tempered by seed vividness
 		const cIntendedBase = alpha * cmaxTarget;
-		const cWithCarry = cIntendedBase * seedCarry;
+		const cWithCarry = options.preserveSeedSaturation
+			? Math.max( cIntendedBase * seedCarry, cmaxTarget * seedRelative )
+			: cIntendedBase * seedCarry;
 
 		// Gentle, symmetric desaturation vs distance in L
 		const t = continuousTaper( lSeed, lTarget, {

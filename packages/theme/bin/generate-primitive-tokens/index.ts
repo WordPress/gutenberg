@@ -6,6 +6,7 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
+	buildPrimaryRamp,
 } from '../../src/color-ramps/index.ts';
 import { getColorString } from '../../src/color-ramps/lib/color-utils.ts';
 
@@ -50,7 +51,10 @@ function generatePrimitiveColorTokens() {
 			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
-				ramp: buildAccentRamp( seed, bgRamp ),
+				ramp:
+					scaleName === 'primary'
+						? buildPrimaryRamp( seed, bgRamp )
+						: buildAccentRamp( seed, bgRamp ),
 			} ) );
 
 		// Convert the ramp values in a DTCG compatible format.

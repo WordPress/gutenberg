@@ -20,6 +20,7 @@ const lightnessConstraintBgFill = ( direction: RampDirection ) =>
 
 const BG_SURFACE_TAPER_CHROMA: TaperChromaOptions = {
 	alpha: 0.7,
+	preserveSeedSaturation: true,
 };
 const FG_TAPER_CHROMA: TaperChromaOptions = {
 	alpha: 0.6,
