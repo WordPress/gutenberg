@@ -365,49 +365,273 @@ test.describe( 'Template Part', () => {
 		await expect( paragraph ).toBeVisible();
 	} );
 
-	// Reason: https://github.com/WordPress/gutenberg/issues/47003.
-	test.skip( 'can import a widget area into an empty template part', async ( {
+	test( 'can update and save the template part area @webkit', async ( {
 		admin,
 		editor,
 		page,
+		requestUtils,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+		await editor.selectBlocks(
+			editor.canvas.locator( '[data-type="core/template-part"]' )
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'tab', { name: 'Settings', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Advanced', exact: true } )
+			.click();
 
-		// Add a block and select it.
+		const area = page.getByRole( 'combobox', {
+			name: 'Area',
+			exact: true,
+		} );
+		await area.click();
+		await page
+			.getByRole( 'option', { name: 'Footer', exact: true } )
+			.click();
+		await expect( area ).toHaveText( 'Footer' );
+		await expect( area ).toBeFocused();
+
+		// Dismissing the popup must not change the selected area.
+		await area.press( 'ArrowDown' );
+		await expect( page.getByRole( 'listbox' ) ).toBeVisible();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Escape' );
+		await expect( area ).toHaveText( 'Footer' );
+		await expect( area ).toBeFocused();
+
+		await editor.saveSiteEditorEntities();
+		await expect
+			.poll( async () => {
+				const templatePart = await requestUtils.rest( {
+					path: '/wp/v2/template-parts/emptytheme//header',
+				} );
+				return templatePart.area;
+			} )
+			.toBe( 'footer' );
+	} );
+
+	test( 'can select, clear, and import a widget area @webkit', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await page.route( '**/wp/v2/sidebars?*', ( route ) =>
+			route.fulfill( {
+				json: [
+					{
+						id: 'migration-widgets',
+						name: 'Migration widgets',
+						widgets: [ 'block-1' ],
+					},
+					{ id: 'empty-sidebar', name: 'Empty sidebar', widgets: [] },
+					{
+						id: 'wp_inactive_widgets',
+						name: 'Inactive widgets',
+						widgets: [ 'block-2' ],
+					},
+				],
+			} )
+		);
+		await page.route( '**/wp/v2/widgets?*', ( route ) =>
+			route.fulfill( {
+				json: [
+					{
+						id: 'block-1',
+						id_base: 'block',
+						sidebar: 'migration-widgets',
+						instance: {
+							raw: {
+								content:
+									'<!-- wp:paragraph --><p>Imported widget content</p><!-- /wp:paragraph -->',
+							},
+						},
+					},
+				],
+			} )
+		);
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'import-target',
+			title: 'Import target',
+			content: '',
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'editing all patterns' );
+		await page
+			.getByRole( 'option', { name: 'Enable editing all patterns' } )
+			.click();
 		await editor.insertBlock( {
 			name: 'core/template-part',
+			attributes: { slug: 'import-target', theme: 'emptytheme' },
 		} );
-
-		// Open Block Inspector -> Advanced.
+		await editor.canvas
+			.locator( '[data-type="core/template-part"]' )
+			.last()
+			.scrollIntoViewIfNeeded();
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-
-		// Import the widget area.
 		await page
-			.getByRole( 'combobox', { name: 'Import widget area' } )
-			.selectOption( 'sidebar-1' );
-		await page.getByRole( 'button', { name: 'Import' } ).click();
+			.getByRole( 'button', { name: 'Advanced', exact: true } )
+			.click();
 
-		// Verify that the widget area was imported.
+		const widgetArea = page.getByRole( 'combobox', {
+			name: 'Import widget area',
+		} );
+		const importButton = page.getByRole( 'button', {
+			name: 'Import',
+			exact: true,
+		} );
+		await expect( widgetArea ).toHaveText( 'Select widget area' );
+		await expect( importButton ).toBeDisabled();
+		await widgetArea.click();
 		await expect(
-			editor.canvas.locator( '[data-type="core/search"]' )
-		).toBeVisible();
+			page.getByRole( 'option', { name: 'Empty sidebar' } )
+		).toHaveCount( 0 );
 		await expect(
-			editor.canvas.locator( '[data-type="core/latest-posts"]' )
-		).toBeVisible();
+			page.getByRole( 'option', { name: 'Inactive widgets' } )
+		).toHaveCount( 0 );
+		await page
+			.getByRole( 'option', { name: 'Migration widgets', exact: true } )
+			.click();
+		await expect( importButton ).toBeEnabled();
+		await widgetArea.click();
+		await page
+			.getByRole( 'option', { name: 'Select widget area', exact: true } )
+			.click();
+		await expect( widgetArea ).toHaveText( 'Select widget area' );
+		await expect( importButton ).toBeDisabled();
+
+		await widgetArea.focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( widgetArea ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( page.getByRole( 'listbox' ) ).toBeVisible();
+		await page.keyboard.press( 'End' );
 		await expect(
-			editor.canvas.locator( '[data-type="core/latest-comments"]' )
-		).toBeVisible();
+			page.getByRole( 'option', {
+				name: 'Migration widgets',
+				exact: true,
+			} )
+		).toHaveAttribute( 'data-highlighted' );
+		await page.keyboard.press( 'Enter' );
+		await expect( widgetArea ).toHaveText( 'Migration widgets' );
+		await expect( widgetArea ).toBeFocused();
+		await importButton.click();
 		await expect(
-			editor.canvas.locator( '[data-type="core/archives"]' )
+			editor.canvas.getByText( 'Imported widget content', {
+				exact: true,
+			} )
 		).toBeVisible();
-		await expect(
-			editor.canvas.locator( '[data-type="core/categories"]' )
-		).toBeVisible();
+		await expect( widgetArea ).toBeHidden();
+		const templateParts = await requestUtils.rest( {
+			path: '/wp/v2/template-parts?context=edit',
+		} );
+		expect( templateParts ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					title: expect.objectContaining( {
+						raw: 'Widget area: Migration widgets',
+					} ),
+					content: expect.objectContaining( {
+						raw: expect.stringContaining(
+							'Imported widget content'
+						),
+					} ),
+				} ),
+			] )
+		);
+	} );
+
+	test( 'hides widget import while loading and when no importable areas exist', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		let releaseSidebars;
+		const sidebarsReady = new Promise( ( resolve ) => {
+			releaseSidebars = resolve;
+		} );
+		await page.route( '**/wp/v2/sidebars?*', async ( route ) => {
+			await sidebarsReady;
+			await route.fulfill( {
+				json: [
+					{ id: 'empty-sidebar', name: 'Empty sidebar', widgets: [] },
+					{
+						id: 'wp_inactive_widgets',
+						name: 'Inactive widgets',
+						widgets: [ 'block-1' ],
+					},
+				],
+			} );
+		} );
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'loading-target',
+			title: 'Loading target',
+			content: '',
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'editing all patterns' );
+		await page
+			.getByRole( 'option', { name: 'Enable editing all patterns' } )
+			.click();
+		await editor.insertBlock( {
+			name: 'core/template-part',
+			attributes: { slug: 'loading-target', theme: 'emptytheme' },
+		} );
+		await editor.canvas
+			.locator( '[data-type="core/template-part"]' )
+			.last()
+			.scrollIntoViewIfNeeded();
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'button', { name: 'Advanced', exact: true } )
+			.click();
+		const widgetArea = page.getByRole( 'combobox', {
+			name: 'Import widget area',
+		} );
+		const importButton = page.getByRole( 'button', {
+			name: 'Import',
+			exact: true,
+		} );
+		await expect( widgetArea ).toBeHidden();
+		await expect( importButton ).toBeHidden();
+		const response = page.waitForResponse( '**/wp/v2/sidebars?*' );
+		releaseSidebars();
+		await response;
+		await page.waitForFunction( () =>
+			window.wp.data
+				.select( 'core' )
+				.hasFinishedResolution( 'getSidebars', [
+					{
+						per_page: -1,
+						_fields: 'id,name,description,status,widgets',
+					},
+				] )
+		);
+		await expect( widgetArea ).toBeHidden();
+		await expect( importButton ).toBeHidden();
 	} );
 
 	test( 'can not import a widget area into a non-empty template part', async ( {
