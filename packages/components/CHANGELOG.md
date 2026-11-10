@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
 -   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).
 -   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).

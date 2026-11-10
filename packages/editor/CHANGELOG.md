@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
--   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
