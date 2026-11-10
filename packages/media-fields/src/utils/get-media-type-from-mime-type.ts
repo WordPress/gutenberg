@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { audio, video, image, folder } from '@wordpress/icons';
+import { audio, video, image, file } from '@wordpress/icons';
 import type { MediaType } from '../types';
 
 /**
@@ -42,6 +42,6 @@ export function getMediaTypeFromMimeType( mimeType: string ): MediaType {
 	return {
 		type: 'application',
 		label: __( 'Application' ),
-		icon: folder,
+		icon: file,
 	};
 }

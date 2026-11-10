@@ -19,7 +19,7 @@ import {
 import { useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { folder as icon } from '@wordpress/icons';
+import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
-import { audio, folder, image, video } from '@wordpress/icons';
+import { audio, file, image, video } from '@wordpress/icons';
 import { Icon, Stack, Text } from '@wordpress/ui';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
@@ -30,7 +30,7 @@ function getMediaTypeIcon( mimeType: string ) {
 	if ( mimeType.startsWith( 'audio/' ) ) {
 		return audio;
 	}
-	return folder;
+	return file;
 }
 
 /**
