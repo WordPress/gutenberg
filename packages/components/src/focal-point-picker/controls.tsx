@@ -87,6 +87,7 @@ function FocalPointUnitControl( props: UnitControlProps ) {
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }
+			step={ 1 }
 			units={ [ { value: '%', label: '%' } ] }
 			{ ...props }
 		/>

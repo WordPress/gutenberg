@@ -203,8 +203,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'bgFill1',
 			additionalReferences: [ 'bgFill2' ],
 			followDirection: 'best',
-			// Preserve the 4.5:1 WCAG floor after 8-bit sRGB serialization.
-			target: 4.55,
+			target: 4.5,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,

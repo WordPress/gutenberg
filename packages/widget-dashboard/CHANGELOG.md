@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Widget footer: stop setting `rel="noopener noreferrer"` on actions that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86486](https://github.com/WordPress/gutenberg/pull/86486)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
 ## 0.11.0 (2026-11-04)
 
 -   Widget footer: keep one strip height (text line plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
