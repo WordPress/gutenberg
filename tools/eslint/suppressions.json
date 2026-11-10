@@ -6851,31 +6851,6 @@
 			"count": 2
 		}
 	},
-	"packages/core-data/src/test/entity-sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/rtc-rich-text-cursor-scope.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/rtc-rich-text-offset-space.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/sync-undo-levels.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/customize-widgets/src/components/block-appender/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7044,17 +7019,7 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/redux-store/test/combine-reducers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/redux-store/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/test/keyed-reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
