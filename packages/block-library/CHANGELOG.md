@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#85402](https://github.com/WordPress/gutenberg/pull/85402)).
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#86603](https://github.com/WordPress/gutenberg/pull/86603)).
 
 ### Enhancements
 
