@@ -110,7 +110,7 @@
 
 			/* Add the group label's min-height, so highlighted items don't scroll under a stuck label. */
 			&:has(.group-label) {
-				scroll-padding-block-start: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-popup-padding));
+				scroll-padding-block-start: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-popup-padding, 0px));
 			}
 		}
 
@@ -147,7 +147,7 @@
 			 */
 			.list-scroller & {
 				position: sticky;
-				inset-block-start: calc(-1 * var(--wp-ui-popup-padding));
+				inset-block-start: calc(-1 * var(--wp-ui-popup-padding, 0px));
 				z-index: 1;
 				background-color: var(--wpds-color-background-surface-neutral-strong);
 			}
