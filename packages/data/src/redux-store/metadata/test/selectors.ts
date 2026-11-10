@@ -2,8 +2,12 @@ import type { AnyAction } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
+import type { DataRegistry } from '../../../types';
 
-const getFooSelector: any = ( state: any ) => state;
+const getFooSelector: {
+	( state: unknown ): unknown;
+	normalizeArgs?: ( args: unknown[] ) => unknown[];
+} = ( state ) => state;
 
 const DEPRECATION_MESSAGE =
 	'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
@@ -25,14 +29,14 @@ const testStore = {
 	},
 };
 
-async function resolve( registry: any, selector: string ) {
+async function resolve( registry: DataRegistry, selector: string ) {
 	try {
 		await registry.resolveSelect( 'store' )[ selector ]();
 	} catch {}
 }
 
 describe( 'getIsResolving', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -79,7 +83,7 @@ describe( 'getIsResolving', () => {
 } );
 
 describe( 'hasStartedResolution', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -103,7 +107,7 @@ describe( 'hasStartedResolution', () => {
 } );
 
 describe( 'hasFinishedResolution', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -127,7 +131,7 @@ describe( 'hasFinishedResolution', () => {
 } );
 
 describe( 'isResolving', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -159,7 +163,7 @@ describe( 'isResolving', () => {
 } );
 
 describe( 'hasResolutionFailed', () => {
-	let registry: any;
+	let registry: DataRegistry;
 
 	beforeEach( () => {
 		registry = createRegistry();
@@ -255,7 +259,7 @@ describe( 'hasResolutionFailed', () => {
 } );
 
 describe( 'getResolutionError', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	let shouldFail: boolean;
 
 	beforeEach( () => {
@@ -337,7 +341,7 @@ describe( 'getResolutionError', () => {
 } );
 
 describe( 'hasResolvingSelectors', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
@@ -369,7 +373,7 @@ describe( 'hasResolvingSelectors', () => {
 } );
 
 describe( 'countSelectorsByStatus', () => {
-	let registry: any;
+	let registry: DataRegistry;
 
 	beforeEach( () => {
 		registry = createRegistry();
@@ -456,7 +460,7 @@ describe( 'countSelectorsByStatus', () => {
 } );
 
 describe( 'Selector arguments normalization', () => {
-	let registry: any;
+	let registry: DataRegistry;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.registerStore( 'testStore', testStore );
