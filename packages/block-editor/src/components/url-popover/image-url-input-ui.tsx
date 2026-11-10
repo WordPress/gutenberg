@@ -28,12 +28,13 @@ import { prependHTTPS } from '@wordpress/url';
 import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
 import URLPopover from './index';
 import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
-
-const LINK_DESTINATION_NONE = 'none';
-const LINK_DESTINATION_CUSTOM = 'custom';
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noopener' ];
+import {
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	getMediaLinkDestination,
+	getNewTabLinkAttributes,
+} from './link-destinations';
 
 const ImageURLInputUI = ( {
 	linkDestination,
@@ -96,33 +97,6 @@ const ImageURLInputUI = ( {
 		setIsOpen( false );
 	};
 
-	const getUpdatedLinkTargetSettings = ( value: boolean ) => {
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel;
-		if ( newLinkTarget ) {
-			const rels = ( rel ?? '' ).split( ' ' );
-			NEW_TAB_REL.forEach( ( relVal ) => {
-				if ( ! rels.includes( relVal ) ) {
-					rels.push( relVal );
-				}
-			} );
-			updatedRel = rels.join( ' ' );
-		} else {
-			const rels = ( rel ?? '' )
-				.split( ' ' )
-				.filter(
-					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
-				);
-			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
-		}
-
-		return {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		};
-	};
-
 	const onFocusOutside = () => {
 		return ( event: SyntheticEvent ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
@@ -148,14 +122,12 @@ const ImageURLInputUI = ( {
 			if ( urlInput ) {
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
-				const selectedDestination =
-					getLinkDestinations().find(
-						( destination ) => destination.url === urlInput
-					)?.linkDestination || LINK_DESTINATION_CUSTOM;
-
 				onChangeUrl( {
 					href: prependHTTPS( urlInput ),
-					linkDestination: selectedDestination,
+					linkDestination: getMediaLinkDestination(
+						urlInput,
+						getLinkDestinations()
+					),
 					lightbox: { enabled: false },
 				} );
 			}
@@ -193,26 +165,17 @@ const ImageURLInputUI = ( {
 	};
 
 	const onSetHref = ( value?: string ) => {
-		const linkDestinations = getLinkDestinations();
-		let linkDestinationInput: string;
-		if ( ! value ) {
-			linkDestinationInput = LINK_DESTINATION_NONE;
-		} else {
-			linkDestinationInput = (
-				linkDestinations.find( ( destination ) => {
-					return destination.url === value;
-				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
-			).linkDestination;
-		}
 		onChangeUrl( {
-			linkDestination: linkDestinationInput,
+			linkDestination: getMediaLinkDestination(
+				value,
+				getLinkDestinations()
+			),
 			href: value,
 		} );
 	};
 
 	const onSetNewTab = ( value: boolean ) => {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value );
-		onChangeUrl( updatedLinkTarget );
+		onChangeUrl( getNewTabLinkAttributes( value, rel ) );
 	};
 
 	const onSetLinkRel = ( value: string ) => {

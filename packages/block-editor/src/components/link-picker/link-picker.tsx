@@ -16,12 +16,13 @@ import type { LinkPickerProps } from './types';
  * LinkPicker component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param props                  - Component props
- * @param props.preview          - Preview data object
- * @param props.onSelect         - Callback when a suggestion is selected
- * @param props.suggestionsQuery - Query parameters for suggestions
- * @param props.label            - Label for the control
- * @param props.help             - Help text for the control
+ * @param props                      - Component props
+ * @param props.preview              - Preview data object
+ * @param props.onSelect             - Callback when a suggestion is selected
+ * @param props.suggestionsQuery     - Query parameters for suggestions
+ * @param props.label                - Label for the control
+ * @param props.help                 - Help text for the control
+ * @param props.transformSuggestions - Changes the suggestions before they are shown
  */
 export function LinkPicker( {
 	preview,
@@ -29,6 +30,7 @@ export function LinkPicker( {
 	suggestionsQuery,
 	label,
 	help,
+	transformSuggestions,
 }: LinkPickerProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const instanceId = useId();
@@ -107,6 +109,7 @@ export function LinkPicker( {
 							value={ null }
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={ transformSuggestions }
 							showInitialSuggestions
 							forceIsEditingLink
 							settings={ [] }
