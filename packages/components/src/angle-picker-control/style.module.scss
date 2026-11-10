@@ -10,6 +10,11 @@
 	overflow: hidden;
 	width: 32px;
 
+	&:hover,
+	&:active {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
 	&:active {
 		cursor: grabbing;
 	}
