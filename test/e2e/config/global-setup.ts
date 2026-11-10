@@ -2,7 +2,6 @@ import path from 'path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
-import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
 async function setupSite( baseURL?: string, storageStatePath?: string ) {
 	const requestContext = await request.newContext( {
@@ -32,7 +31,6 @@ async function setupSite( baseURL?: string, storageStatePath?: string ) {
 		requestUtils.deleteAllPages(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
-		setupRtcWebSocketProvider( requestUtils ),
 	] );
 
 	await requestContext.dispose();

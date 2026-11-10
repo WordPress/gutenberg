@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import type { ObjectID, ObjectType } from '@wordpress/sync';
-import { getSyncManager } from '../sync';
+import { getSyncServices } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
 const saveCRDTDocQueues = new Map< string, Promise< void > >();
@@ -10,7 +10,7 @@ async function serializeAndSaveCRDTDoc(
 	objectId: ObjectID,
 	room: string
 ): Promise< void > {
-	const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
+	const serializedDoc = await getSyncServices()?.createPersistedCRDTDoc(
 		objectType,
 		objectId
 	);

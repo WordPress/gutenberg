@@ -1,3 +1,9 @@
+import type {
+	SyncManager,
+	SyncConfig,
+	RecordHandlers,
+	CollectionHandlers,
+} from '@wordpress/sync';
 import warning from '@wordpress/warning';
 
 /**
@@ -11,8 +17,11 @@ import warning from '@wordpress/warning';
  * (documents, transports, presence, conflict handling, undo semantics) lives
  * inside of the manager.
  *
- * This is a private API (see `private-apis.ts`). Only one manager can be
- * registered at a time.
+ * Gutenberg registers no manager of its own. A sync engine plugin supplies
+ * one through `registerEntitySyncProvider` (see `sync.ts`, exposed in
+ * `private-apis.ts`), which hands it the record handlers it needs to write
+ * remote changes back into the store. Only one manager can be registered at
+ * a time.
  */
 
 export type EntitySyncRecord = Record< string, unknown >;
@@ -136,7 +145,37 @@ export interface EntitySyncUndoHistory {
 	clearRedo: () => void;
 }
 
+/** Read access and connection controls supplied by the selected provider. */
+export interface EntitySyncServices extends Pick<
+	SyncManager,
+	| 'getAwareness'
+	| 'getEntitySnapshot'
+	| 'entityContainsSnapshot'
+	| 'createPersistedCRDTDoc'
+> {
+	isAvailable?: () => boolean;
+	retry?: () => void;
+}
+
+/** Editor operations provided to a sync provider at registration. */
+export interface EntitySyncContext {
+	getSyncConfig: ( kind: string, name: string ) => SyncConfig | undefined;
+	recordHandlers: (
+		kind: string,
+		name: string,
+		id: EntitySyncRecordId,
+		handlers: EntitySyncRecordHandlers
+	) => RecordHandlers;
+	collectionHandlers: (
+		kind: string,
+		name: string,
+		handlers: EntitySyncCollectionHandlers
+	) => CollectionHandlers;
+}
+
 export interface EntitySyncManager {
+	readonly services?: EntitySyncServices;
+
 	/**
 	 * Optional check that runs before a record is loaded. When this returns
 	 * false for a record, core-data does not call `load` for it and skips

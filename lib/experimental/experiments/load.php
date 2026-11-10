@@ -65,7 +65,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-real-time-collaboration',
 					'label'       => __( 'Enable real-time collaboration', 'gutenberg' ),
-					'description' => __( 'Allows multiple people to edit the same post at the same time.', 'gutenberg' ),
+					'description' => __( 'Lets a sync engine plugin provide real-time collaboration, so multiple people can edit the same post at the same time. Without such a plugin, the editor keeps the standard post lock.', 'gutenberg' ),
 				),
 			),
 		),

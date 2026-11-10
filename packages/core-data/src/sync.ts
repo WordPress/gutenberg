@@ -8,7 +8,7 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
-	retrySyncConnection,
+	retrySyncConnection as retryDefaultSyncConnection,
 	type ConnectionStatus,
 	type ObjectID,
 	type SyncConfig,
@@ -17,6 +17,9 @@ import {
 } from '@wordpress/sync';
 import {
 	registerEntitySyncManager,
+	getEntitySyncManager,
+	type EntitySyncServices,
+	type EntitySyncContext,
 	type EntitySyncBeforeSaveContext,
 	type EntitySyncCollectionHandlers,
 	type EntitySyncEditOptions,
@@ -43,7 +46,6 @@ export {
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
-	retrySyncConnection,
 };
 
 /**
@@ -95,11 +97,11 @@ export function getEntitySnapshot(
 	name: string,
 	recordId: string | number
 ): string | undefined {
-	if ( ! hasSyncManager() ) {
+	if ( ! getSyncServices() ) {
 		return undefined;
 	}
 
-	return getSyncManager()?.getEntitySnapshot(
+	return getSyncServices()?.getEntitySnapshot(
 		`${ kind }/${ name }`,
 		`${ recordId }`
 	);
@@ -122,12 +124,12 @@ export function entityContainsSnapshot(
 	recordId: string | number,
 	encodedSnapshot: string
 ): boolean {
-	if ( ! hasSyncManager() ) {
+	if ( ! getSyncServices() ) {
 		return false;
 	}
 
 	return (
-		getSyncManager()?.entityContainsSnapshot(
+		getSyncServices()?.entityContainsSnapshot(
 			`${ kind }/${ name }`,
 			`${ recordId }`,
 			encodedSnapshot
@@ -243,6 +245,18 @@ export function createDefaultEntitySyncManager(
 		data.select( STORE_NAME ).getEntityConfig( kind, name )?.syncConfig;
 
 	return {
+		services: {
+			getAwareness: ( ...args ) =>
+				getSyncManager()?.getAwareness( ...args ),
+			getEntitySnapshot: ( ...args ) =>
+				syncManager?.getEntitySnapshot( ...args ),
+			entityContainsSnapshot: ( ...args ) =>
+				syncManager?.entityContainsSnapshot( ...args ) ?? false,
+			createPersistedCRDTDoc: async ( ...args ) =>
+				( await syncManager?.createPersistedCRDTDoc( ...args ) ) ??
+				null,
+			retry: retryDefaultSyncConnection,
+		},
 		shouldSync( kind, name ) {
 			return Boolean( getSyncManager() && getSyncConfig( kind, name ) );
 		},
@@ -573,9 +587,63 @@ function createCollectionHandlers(
 	};
 }
 
-// The experiment flag is printed before this script loads, so the default
-// manager can register as soon as the module evaluates. Without the flag,
-// nothing is registered and core-data leaves entities alone.
-if ( globalThis.window?.__experimentalEnableRealTimeCollaboration ) {
-	registerEntitySyncManager( createDefaultEntitySyncManager() );
+/** Services of the selected provider; never starts the default behind a plugin. */
+export function getSyncServices(): EntitySyncServices | undefined {
+	return getEntitySyncManager()?.services;
+}
+
+export function retrySyncConnection(): void {
+	getSyncServices()?.retry?.();
+}
+
+export function isSyncEngineUnavailable(): boolean {
+	return getSyncServices()?.isAvailable?.() === false;
+}
+
+/**
+ * Registers the entity sync provider a sync engine plugin supplies. Gutenberg
+ * registers none of its own: with the collaboration flag on and no provider
+ * registered, core-data turns collaboration off and the classic post lock
+ * stays in effect (see `getEntityRecord` in `resolvers.ts`).
+ *
+ * The first registration wins. The provider is constructed right away, with
+ * the record handlers it needs to write remote changes into the store, so it
+ * must be registered before the editor loads its first record.
+ *
+ * @param create Creates the provider using the editor's record operations.
+ * @return Unregisters the provider. Does nothing when the registration was
+ *         ignored because collaboration is off or a provider is already
+ *         registered.
+ */
+export function registerEntitySyncProvider(
+	create: ( context: EntitySyncContext ) => EntitySyncManager
+): () => void {
+	if (
+		! globalThis.window?.__experimentalEnableRealTimeCollaboration ||
+		getEntitySyncManager() !== undefined
+	) {
+		return () => {};
+	}
+	const data = defaultDataAccess;
+	const getSyncConfig = (
+		kind: string,
+		entityName: string
+	): SyncConfig | undefined =>
+		data.select( STORE_NAME ).getEntityConfig( kind, entityName )
+			?.syncConfig;
+	const manager = create( {
+		getSyncConfig,
+		recordHandlers: ( kind, entityName, id, handlers ) =>
+			createRecordHandlers(
+				data,
+				kind,
+				entityName,
+				id,
+				getSyncConfig( kind, entityName )!,
+				handlers
+			),
+		collectionHandlers: ( kind, entityName, handlers ) =>
+			createCollectionHandlers( data, kind, entityName, handlers ),
+	} );
+	return registerEntitySyncManager( manager );
 }

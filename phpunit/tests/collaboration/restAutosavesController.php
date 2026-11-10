@@ -30,9 +30,32 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		wp_set_current_user( self::$author_id );
+
+		// A sync engine plugin registers non-revisioned post meta like this
+		// for its persisted document. The controller must keep such meta off
+		// autosave revisions and must not let an autosave overwrite it.
+		register_meta(
+			'post',
+			self::CRDT_DOC_META_KEY,
+			array(
+				'auth_callback'     => static function ( bool $_allowed, string $_meta_key, int $object_id, int $user_id ): bool {
+					return user_can( $user_id, 'edit_post', $object_id );
+				},
+				'revisions_enabled' => false,
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'    => 'string',
+						'context' => array( 'edit' ),
+					),
+				),
+				'single'            => true,
+				'type'              => 'string',
+			)
+		);
 	}
 
 	public function tear_down() {
+		unregister_meta_key( 'post', self::CRDT_DOC_META_KEY );
 		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 		parent::tear_down();
 	}

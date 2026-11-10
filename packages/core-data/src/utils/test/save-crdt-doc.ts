@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import type { SyncManager } from '@wordpress/sync';
-import { getSyncManager } from '../../sync';
+import { getSyncServices } from '../../sync';
 import { saveCRDTDoc } from '../save-crdt-doc';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../../sync' ), () => ( {
-	getSyncManager: vi.fn(),
+	getSyncServices: vi.fn(),
 } ) );
 
 function createDeferred() {
@@ -37,7 +37,7 @@ describe( 'saveCRDTDoc', () => {
 			createPersistedCRDTDoc:
 				vi.fn< SyncManager[ 'createPersistedCRDTDoc' ] >(),
 		};
-		vi.mocked( getSyncManager ).mockReturnValue(
+		vi.mocked( getSyncServices ).mockReturnValue(
 			// The stub provides only what `saveCRDTDoc` needs.
 			syncManager as unknown as SyncManager
 		);

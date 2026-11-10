@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `ENGINE_MISMATCH` connection error code, for a sync provider whose client and server engines disagree.
+
 ## 3.1.0 (2026-11-04)
 
 ## 3.0.0 (2026-10-20)

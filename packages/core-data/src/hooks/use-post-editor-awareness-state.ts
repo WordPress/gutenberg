@@ -1,7 +1,7 @@
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
-import { getSyncManager } from '../sync';
+import { getSyncServices } from '../sync';
 import { usePostContentBlocks } from '../awareness/block-lookup';
 import { isCollaboratorInfo } from '../awareness/utils';
 import type { EditorStoreBlock } from '../awareness/block-lookup';
@@ -77,10 +77,11 @@ function usePostEditorAwarenessState(
 
 		const objectType = `postType/${ postType }`;
 		const objectId = postId.toString();
-		const awareness = getSyncManager()?.getAwareness< PostEditorAwareness >(
-			objectType,
-			objectId
-		);
+		const awareness =
+			getSyncServices()?.getAwareness< PostEditorAwareness >(
+				objectType,
+				objectId
+			);
 
 		if ( ! awareness ) {
 			setState( defaultState );
@@ -187,10 +188,11 @@ function useLastPostSave(
 			return;
 		}
 
-		const awareness = getSyncManager()?.getAwareness< PostEditorAwareness >(
-			`postType/${ postType }`,
-			postId.toString()
-		);
+		const awareness =
+			getSyncServices()?.getAwareness< PostEditorAwareness >(
+				`postType/${ postType }`,
+				postId.toString()
+			);
 
 		if ( ! awareness ) {
 			setLastSave( null );
@@ -199,6 +201,15 @@ function useLastPostSave(
 
 		awareness.setUp();
 
+		/*
+		 * Peer-save notifications observe the shared Y.Doc's state map.
+		 * Engines whose awareness rides a stub doc (no getMap) provide
+		 * presence without this signal.
+		 */
+		if ( 'function' !== typeof awareness.doc?.getMap ) {
+			setLastSave( null );
+			return;
+		}
 		const stateMap = awareness.doc.getMap( 'state' );
 		const recordMap = awareness.doc.getMap( 'document' );
 

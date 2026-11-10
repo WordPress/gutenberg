@@ -26,7 +26,7 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
+	if ( wp_is_collaboration_enabled() ) {
 		$collaboration_enabled = ! (
 			'site-editor.php' === $pagenow ||
 			( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )

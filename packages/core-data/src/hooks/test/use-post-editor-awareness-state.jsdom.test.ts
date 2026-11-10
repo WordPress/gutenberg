@@ -17,7 +17,7 @@ import {
 	useOnCollaboratorLeave,
 	useOnPostSave,
 } from '../use-post-editor-awareness-state';
-import { getSyncManager } from '../../sync';
+import { getSyncServices } from '../../sync';
 import { SelectionType } from '../../utils/crdt-user-selections';
 import type {
 	PostEditorAwarenessState,
@@ -27,7 +27,7 @@ import type { SelectionCursor } from '../../types';
 
 // Mock the sync module
 vi.mock( import( '../../sync' ), () => ( {
-	getSyncManager: vi.fn(),
+	getSyncServices: vi.fn(),
 } ) );
 
 const mockPostContentBlocks = [
@@ -137,7 +137,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			getAwareness: vi.fn().mockReturnValue( mockAwareness ),
 		};
 
-		( getSyncManager as Mock ).mockReturnValue( mockSyncManager );
+		( getSyncServices as Mock ).mockReturnValue( mockSyncManager );
 	} );
 
 	afterEach( () => {
@@ -163,8 +163,8 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( mockSyncManager.getAwareness ).not.toHaveBeenCalled();
 		} );
 
-		test( 'should return empty array when getSyncManager returns undefined', () => {
-			( getSyncManager as Mock ).mockReturnValue( undefined );
+		test( 'should return empty array when getSyncServices returns undefined', () => {
+			( getSyncServices as Mock ).mockReturnValue( undefined );
 
 			const { result } = renderHook( () =>
 				useActiveCollaborators( 123, 'post' )

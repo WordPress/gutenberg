@@ -5,143 +5,6 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/class-wp-sync-config.php';
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
-	require_once __DIR__ . '/interface-wp-sync-storage.php';
-	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
-}
-require_once __DIR__ . '/class-wp-sync-save-server.php';
-
-if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
-	/**
-	 * Registers the custom post type for sync storage.
-	 */
-	function gutenberg_register_sync_storage_post_type() {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return;
-		}
-
-		register_post_type(
-			'wp_sync_storage',
-			array(
-				'labels'             => array(
-					'name'          => __( 'Sync Updates', 'gutenberg' ),
-					'singular_name' => __( 'Sync Update', 'gutenberg' ),
-				),
-				'public'             => false,
-				'hierarchical'       => false,
-				'capabilities'       => array(
-					'read'                   => 'do_not_allow',
-					'read_private_posts'     => 'do_not_allow',
-					'create_posts'           => 'do_not_allow',
-					'publish_posts'          => 'do_not_allow',
-					'edit_posts'             => 'do_not_allow',
-					'edit_others_posts'      => 'do_not_allow',
-					'edit_published_posts'   => 'do_not_allow',
-					'delete_posts'           => 'do_not_allow',
-					'delete_others_posts'    => 'do_not_allow',
-					'delete_published_posts' => 'do_not_allow',
-				),
-				'map_meta_cap'       => false,
-				'publicly_queryable' => false,
-				'query_var'          => false,
-				'rewrite'            => false,
-				'show_in_menu'       => false,
-				'show_in_rest'       => false,
-				'show_ui'            => false,
-				'supports'           => array( 'custom-fields' ),
-			)
-		);
-	}
-	add_action( 'init', 'gutenberg_register_sync_storage_post_type' );
-}
-
-if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
-	/**
-	 * Registers REST API routes for collaborative editing.
-	 */
-	function gutenberg_register_collaboration_rest_routes(): void {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return;
-		}
-
-		/**
-		 * Filters the sync storage implementation for collaborative editing.
-		 *
-		 * Allows plugins to replace the default post meta storage with alternative
-		 * backends. The primary use case is the realtime-collaboration plugin,
-		 * which uses Presence API for awareness and a dedicated wp_collaboration
-		 * table for CRDT updates, eliminating cache side effects.
-		 *
-		 * This filter is unstable and may change as RTC explores fundamental changes
-		 * to how syncing works. The current interface assumes a pure naïve relay,
-		 * which could change.
-		 *
-		 * @since Gutenberg 21.x
-		 *
-		 * @param WP_Sync_Storage $sync_storage Storage implementation. Must implement
-		 *                                      the WP_Sync_Storage interface.
-		 */
-		$sync_storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
-
-		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
-			$sync_storage = new WP_Sync_Post_Meta_Storage();
-		}
-
-		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-		$sync_server->register_routes();
-
-		$sync_save_server = new WP_Sync_Save_Server();
-		$sync_save_server->register_routes();
-	}
-	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
-}
-
-if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
-	/**
-	 * Registers post meta for persisting CRDT documents.
-	 */
-	function gutenberg_rest_api_crdt_post_meta() {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return;
-		}
-
-		// This string must match POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/core-data.
-		$persisted_crdt_post_meta_key = '_crdt_document';
-
-		register_meta(
-			'post',
-			$persisted_crdt_post_meta_key,
-			array(
-				'auth_callback'     => static function ( bool $_allowed, string $_meta_key, int $object_id, int $user_id ): bool {
-					return user_can( $user_id, 'edit_post', $object_id );
-				},
-				/*
-				 * Revisions must be disabled because we always want to preserve
-				 * the latest persisted CRDT document, even when a revision is restored.
-				 * This ensures that we can continue to apply updates to a shared document
-				 * and peers can simply merge the restored revision like any other incoming
-				 * update.
-				 *
-				 * If we want to persist CRDT documents alongside revisions in the
-				 * future, we should do so in a separate meta key.
-				 */
-				'revisions_enabled' => false,
-				'show_in_rest'      => array(
-					'schema' => array(
-						'type'    => 'string',
-						'context' => array( 'edit' ),
-					),
-				),
-				'single'            => true,
-				'type'              => 'string',
-			)
-		);
-	}
-	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
-}
-
 if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	/**
 	 * Determines whether real-time collaboration is enabled.
@@ -151,7 +14,22 @@ if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	 * @return bool Whether real-time collaboration is enabled.
 	 */
 	function wp_is_collaboration_enabled() {
-		return gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' );
+		/**
+		 * Filters whether real-time collaboration is enabled.
+		 *
+		 * Gutenberg ships no sync engine of its own. A sync engine plugin
+		 * turns collaboration on here, which relaxes the exclusive post lock
+		 * and lets the editor hand record syncing to the plugin's registered
+		 * entity sync provider.
+		 *
+		 * @since 22.0.0
+		 *
+		 * @param bool $enabled Whether real-time collaboration is enabled.
+		 */
+		return (bool) apply_filters(
+			'wp_is_collaboration_enabled',
+			gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' )
+		);
 	}
 }
 

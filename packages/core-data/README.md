@@ -164,7 +164,7 @@ wp.data.select( 'core' ).getStatus( recordId );
 
 The store offers a private extension point for real-time collaboration with an entity sync manager. When one is registered, the store tells it when a record is loaded, edited, saved, and deleted, and lets it take over undo. The store itself knows nothing about how the syncing works.
 
-The interface lives in `src/entity-sync.ts`. `registerEntitySyncManager( manager )` and `getEntitySyncManager()` are internal to the package for now and are not exposed. Only one manager can be registered at a time. The `EntitySyncManager` type documents the interface.
+The interface lives in `src/entity-sync.ts`, and the `EntitySyncManager` type documents it. The package registers no manager of its own: a sync engine plugin supplies one through the private `registerEntitySyncProvider( create )`, which calls `create` with the record operations the manager needs (`getSyncConfig`, `recordHandlers`, `collectionHandlers`). Only one manager can be registered at a time; the first registration wins. When the real-time collaboration flag is on but no manager is registered, the store turns collaboration off so the standard post lock applies.
 
 ## Actions
 

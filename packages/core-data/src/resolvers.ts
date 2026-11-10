@@ -3,10 +3,13 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import type { Block } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getEntitySyncManager } from './entity-sync';
 import type { EntitySyncRecord } from './entity-sync';
+import { isSyncEngineUnavailable } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -159,12 +162,41 @@ export const getEntityRecord =
 					? undefined
 					: getEntitySyncManager();
 
-			if (
+			const shouldLoadSync =
 				syncManager &&
 				isNumericID( key ) &&
 				! query &&
-				false !== syncManager.shouldSync?.( kind, name, key )
+				false !== syncManager.shouldSync?.( kind, name, key );
+
+			// With the collaboration flag on but no provider registered, the
+			// post lock must come back. No availability check has run in that
+			// case, so isSyncEngineUnavailable() is still false.
+			const missingProvider =
+				! syncManager &&
+				entityConfig.syncConfig &&
+				globalThis.window?.__experimentalEnableRealTimeCollaboration;
+			if (
+				! shouldLoadSync &&
+				( missingProvider || isSyncEngineUnavailable() )
 			) {
+				if ( select?.isCollaborationSupported?.() !== false ) {
+					dispatch.setCollaborationSupported( false );
+					registry
+						.dispatch( noticesStore )
+						.createNotice(
+							'warning',
+							__(
+								'Real-time collaboration is unavailable, so standard post locking is in effect. Refresh the page to try again.'
+							),
+							{
+								id: 'core-data-sync-engine-unavailable',
+								isDismissible: true,
+							}
+						);
+				}
+			}
+
+			if ( shouldLoadSync ) {
 				// Use the new transient "read/write" config to compute transients for
 				// the sync manager. Otherwise these transients are not available
 				// if / until the record is edited. Use a copy of the record so that

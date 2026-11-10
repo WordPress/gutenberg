@@ -4,13 +4,6 @@ import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
-const baseTestIgnore: Array< string | RegExp > = [];
-if ( Array.isArray( baseConfig.testIgnore ) ) {
-	baseTestIgnore.push( ...baseConfig.testIgnore );
-} else if ( baseConfig.testIgnore ) {
-	baseTestIgnore.push( baseConfig.testIgnore );
-}
-
 // With a comma-separated list of sites in `WP_BASE_URLS`, each worker runs
 // its tests on its own site, so tests can run in parallel.
 const sites = process.env.WP_BASE_URLS?.split( ',' );
@@ -70,13 +63,6 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
-	// The default suite runs RTC tests on the HTTP polling provider. Specs
-	// that rely on WebSocket-only semantics live under `websocket-only/` and
-	// are picked up by playwright.rtc-websocket.config.ts instead.
-	testIgnore: [
-		...baseTestIgnore,
-		'**/specs/editor/collaboration/websocket-only/**',
-	],
 	projects: [
 		{
 			name: 'chromium',

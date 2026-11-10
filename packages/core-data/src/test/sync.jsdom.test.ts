@@ -27,6 +27,12 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 	}
 );
 
+vi.mock( import( '@wordpress/data' ), () => ( {
+	select: vi.fn(),
+	dispatch: vi.fn(),
+	resolveSelect: vi.fn(),
+} ) );
+
 vi.mock(
 	import( '@wordpress/sync' ),
 	() =>
@@ -165,7 +171,7 @@ describe( 'the default entity sync manager', () => {
 		mockSyncManager.undoManager = undefined;
 	} );
 
-	it( 'registers itself through the interface only when the flag is on', async () => {
+	it( 'is not registered on load, with or without the flag', async () => {
 		await loadSync();
 		let { getEntitySyncManager } = await import( '../entity-sync' );
 		expect( getEntitySyncManager() ).toBeUndefined();
@@ -173,13 +179,8 @@ describe( 'the default entity sync manager', () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 		await loadSync();
 		( { getEntitySyncManager } = await import( '../entity-sync' ) );
-		expect( getEntitySyncManager() ).toEqual(
-			expect.objectContaining( {
-				load: expect.any( Function ),
-				update: expect.any( Function ),
-				unloadAll: expect.any( Function ),
-			} )
-		);
+		expect( getEntitySyncManager() ).toBeUndefined();
+		expect( mockCreateSyncManager ).not.toHaveBeenCalled();
 	} );
 
 	describe( 'with the flag on', () => {
@@ -850,5 +851,81 @@ describe( 'the default entity sync manager', () => {
 			mockSyncManager.isLoaded.mockReturnValue( false );
 			expect( manager.isLoaded( 'postType', 'post', 2 ) ).toBe( false );
 		} );
+	} );
+} );
+
+describe( 'registerEntitySyncProvider', () => {
+	afterEach( () => {
+		delete window.__experimentalEnableRealTimeCollaboration;
+		mockCreateSyncManager.mockClear();
+	} );
+
+	it( 'leaves the editor without a provider when none registers', async () => {
+		window.__experimentalEnableRealTimeCollaboration = true;
+		const sync = await loadSync();
+		expect( sync.getSyncServices() ).toBeUndefined();
+		expect( sync.isSyncEngineUnavailable() ).toBe( false );
+		expect(
+			sync.getEntitySnapshot( 'postType', 'post', 1 )
+		).toBeUndefined();
+		expect(
+			sync.entityContainsSnapshot( 'postType', 'post', 1, 'snapshot' )
+		).toBe( false );
+		sync.retrySyncConnection();
+		expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+	} );
+
+	it( 'constructs the first provider with the record operations and routes editor reads to it', async () => {
+		window.__experimentalEnableRealTimeCollaboration = true;
+		const sync = await loadSync();
+		const services = {
+			isAvailable: () => false,
+			getEntitySnapshot: vi.fn( () => 'plugin snapshot' ),
+			entityContainsSnapshot: vi.fn( () => true ),
+			retry: vi.fn(),
+		};
+		const create = vi.fn(
+			() => ( { services } ) as unknown as EntitySyncManager
+		);
+		const cleanup = sync.registerEntitySyncProvider( create );
+		expect( create ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				getSyncConfig: expect.any( Function ),
+				recordHandlers: expect.any( Function ),
+				collectionHandlers: expect.any( Function ),
+			} )
+		);
+		expect( sync.getSyncServices() ).toBe( services );
+		expect( sync.isSyncEngineUnavailable() ).toBe( true );
+		expect( sync.getEntitySnapshot( 'postType', 'post', 1 ) ).toBe(
+			'plugin snapshot'
+		);
+		expect( services.getEntitySnapshot ).toHaveBeenCalledWith(
+			'postType/post',
+			'1'
+		);
+		expect(
+			sync.entityContainsSnapshot( 'postType', 'post', 1, 'snapshot' )
+		).toBe( true );
+		sync.retrySyncConnection();
+		expect( services.retry ).toHaveBeenCalledOnce();
+
+		// A second provider is ignored while the first is registered.
+		const ignored = vi.fn();
+		sync.registerEntitySyncProvider( ignored )();
+		expect( ignored ).not.toHaveBeenCalled();
+		expect( sync.getSyncServices() ).toBe( services );
+		expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+
+		cleanup();
+		expect( sync.getSyncServices() ).toBeUndefined();
+	} );
+
+	it( 'does not construct a provider while collaboration is disabled', async () => {
+		window.__experimentalEnableRealTimeCollaboration = false;
+		const sync = await loadSync();
+		const create = vi.fn();
+		sync.registerEntitySyncProvider( create )();
+		expect( create ).not.toHaveBeenCalled();
 	} );
 } );
