@@ -8,7 +8,7 @@ Users can lock and unlock blocks via the Editor. The locking UI has options for 
 
 ![Image of locking interface](https://developer.wordpress.org/files/2026/06/Locking-interface.png)
 
-Keep in mind that you can apply locking options to blocks nested inside of a containing block by turning on the "Apply to all blocks inside" option. However, you cannot mass lock blocks otherwise.
+Keep in mind that you can apply locking options to blocks nested inside of a containing block by checking the "Include inner blocks" option. To lock several blocks at once, select them and choose "Lock" from the block toolbar options menu.
 
 ## Lock the ability to edit certain blocks
 

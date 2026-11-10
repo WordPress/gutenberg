@@ -292,7 +292,7 @@ test.describe( 'Block Locking', () => {
 			.toEqual( [ { remove: false }, { move: false, remove: false } ] );
 	} );
 
-	test( 'keeps each template lock when "Apply to all blocks inside" is mixed', async ( {
+	test( 'keeps each template lock when "Include inner blocks" is mixed', async ( {
 		editor,
 		page,
 	} ) => {
@@ -325,7 +325,7 @@ test.describe( 'Block Locking', () => {
 		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
 		await expect(
 			modal.getByRole( 'checkbox', {
-				name: 'Apply to all blocks inside',
+				name: 'Include inner blocks',
 				exact: true,
 			} )
 		).toBeChecked( { indeterminate: true } );
@@ -349,7 +349,7 @@ test.describe( 'Block Locking', () => {
 		expect( unlockedGroup.attributes.templateLock ).toBeUndefined();
 	} );
 
-	test( 'disables "Apply to all blocks inside" when a block would only lock movement', async ( {
+	test( 'disables "Include inner blocks" when a block would only lock movement', async ( {
 		editor,
 		page,
 	} ) => {
@@ -382,7 +382,7 @@ test.describe( 'Block Locking', () => {
 
 		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
 		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
-			name: 'Apply to all blocks inside',
+			name: 'Include inner blocks',
 			exact: true,
 		} );
 		await expect(
@@ -415,7 +415,7 @@ test.describe( 'Block Locking', () => {
 		] );
 	} );
 
-	test( 'keeps the template lock when "Apply to all blocks inside" is disabled', async ( {
+	test( 'keeps the template lock when "Include inner blocks" is disabled', async ( {
 		editor,
 		page,
 	} ) => {
@@ -437,7 +437,7 @@ test.describe( 'Block Locking', () => {
 
 		const modal = page.getByRole( 'dialog', { name: 'Lock Group' } );
 		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
-			name: 'Apply to all blocks inside',
+			name: 'Include inner blocks',
 			exact: true,
 		} );
 		await modal
@@ -492,7 +492,7 @@ test.describe( 'Block Locking', () => {
 
 		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
 		const applyToInnerBlocks = modal.getByRole( 'checkbox', {
-			name: 'Apply to all blocks inside',
+			name: 'Include inner blocks',
 			exact: true,
 		} );
 		await expect( applyToInnerBlocks ).toBeChecked( {
@@ -581,7 +581,7 @@ test.describe( 'Block Locking', () => {
 		const modal = page.getByRole( 'dialog', { name: 'Lock Group' } );
 		await expect(
 			modal.getByRole( 'checkbox', {
-				name: 'Apply to all blocks inside',
+				name: 'Include inner blocks',
 				exact: true,
 			} )
 		).toBeChecked();
@@ -670,7 +670,7 @@ test.describe( 'Block Locking', () => {
 			.click();
 		await modal
 			.getByRole( 'checkbox', {
-				name: 'Apply to all blocks inside',
+				name: 'Include inner blocks',
 				exact: true,
 			} )
 			.click();
