@@ -147,6 +147,54 @@ $revision-code-diff-marker-width: 3ch;
 	color: $gray-700;
 }
 
+// Side by side: each half takes half the width, so it lines up with what sits
+// above it, and long lines wrap rather than scrolling the halves together.
+.editor-revisions-code-diff.is-split {
+	.editor-revisions-code-diff__table {
+		min-width: 0;
+		table-layout: fixed;
+	}
+
+	.editor-revisions-code-diff__line-number-column {
+		width: $revision-code-diff-line-number-width;
+	}
+
+	.editor-revisions-code-diff__marker-column {
+		width: $revision-code-diff-marker-width;
+	}
+
+	.editor-revisions-code-diff__line-number,
+	.editor-revisions-code-diff__marker {
+		position: static;
+		vertical-align: top;
+	}
+
+	.editor-revisions-code-diff__code {
+		// The two code columns share the remaining width equally.
+		width: auto;
+		vertical-align: top;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+
+	// The current side starts at the fourth cell.
+	td:nth-child(4) {
+		border-left: $border-width solid $gray-200;
+	}
+
+	td.is-removed {
+		background: rgba($revision-diff-removed-color, 0.12);
+	}
+
+	td.is-added {
+		background: rgba($revision-diff-added-color, 0.12);
+	}
+
+	td.is-empty {
+		background: $gray-100;
+	}
+}
+
 // Diff markers minimap
 .revision-diff-markers {
 	position: relative;

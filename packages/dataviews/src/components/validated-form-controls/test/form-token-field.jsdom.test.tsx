@@ -36,7 +36,7 @@ describe( 'ValidatedFormTokenField', () => {
 		expect( screen.queryByRole( 'textbox' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should preserve the built-in howto description when validation is active', async () => {
+	it( 'should append the validation error alongside the built-in howto description', async () => {
 		const user = userEvent.setup();
 		render(
 			<form>
@@ -54,13 +54,10 @@ describe( 'ValidatedFormTokenField', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
 
-		// The validation error targets the hidden delegate input, not the
-		// interactive combobox. The combobox's built-in description should
-		// be unaffected.
 		await waitFor( () => {
-			expect(
-				screen.getByText( 'Constraints not satisfied' )
-			).toBeVisible();
+			expect( input ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Constraints not satisfied' )
+			);
 		} );
 		expect( input ).toHaveAccessibleDescription(
 			expect.stringContaining( 'Separate with commas or the Enter key.' )

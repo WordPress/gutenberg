@@ -587,7 +587,7 @@ All new components should add stories to the project's [Storybook](https://story
 
 ### Source code display
 
-Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the build uses [terser](https://terser.org/) with `keep_fnames: true` (configured in `storybook/main.ts`).
+Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the production build uses Vite's Oxc minifier with function and class names preserved (`build.rolldownOptions.output.minify` in `storybook/main.ts`).
 
 For function declaration components, no additional configuration is needed — the function name is preserved automatically. For `forwardRef` components, ensure the unforwarded function is named (not an arrow function), and set `displayName` on the forwarded component.
 
