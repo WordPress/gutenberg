@@ -63,7 +63,7 @@ exports[`flags warnings with invalid css (wpds fallbacks) > snapshot matches war
     "line": 19,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks should be injected automatically at build time (see @wordpress/theme package README). (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks should be injected automatically at build time (see @wordpress/theme-build-tools package README). (plugin-wpds/no-token-fallback-values)",
   },
 ]
 `;
