@@ -177,7 +177,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	public function test_default_pattern_overrides_binding_does_not_bind_inner_blocks() {
 		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
 		$output      = $this->render_group( array( '__default' => array( 'source' => 'core/pattern-overrides' ) ) );
-		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertSame( $this->render_group( array() ), $output );
 	}
 
 	public function test_value_is_sanitized() {
@@ -280,6 +280,25 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Level 3</p>', $output );
 		$this->assertStringNotContainsString( 'own', $output );
 		$this->assertSame( 3, $this->inner_blocks_calls );
+	}
+
+	public function test_bindings_asking_for_the_same_value_with_other_arguments_stop_at_the_limit() {
+		$this->value = function () {
+			$value = '<!-- wp:paragraph --><p>Supplied</p><!-- /wp:paragraph -->';
+			foreach ( range( 1, 6 ) as $variant ) {
+				$value .= $this->bound_group_markup( array( 'variant' => $variant ) );
+			}
+			return $value;
+		};
+		$limit       = static function () {
+			return 10;
+		};
+		add_filter( 'block_bindings_nested_inner_blocks_limit', $limit );
+		$output = $this->render_group();
+		remove_filter( 'block_bindings_nested_inner_blocks_limit', $limit );
+
+		$this->assertSame( 11, substr_count( $output, '>Supplied</p>' ) );
+		$this->assertStringContainsString( '>Nested own</p>', $output );
 	}
 
 	public function test_bindings_with_other_attributes_inside_the_value_resolve() {

@@ -309,7 +309,13 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * like the menu of a Navigation block, can't render forever. Bindings that ask
  * a source something else still resolve, inside supplied inner blocks too.
  *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
+ * Only so many of them, though: whoever writes a value writes the arguments
+ * of the bindings inside it, and a value whose bindings ask for it again with
+ * other arguments would otherwise render once for every order they can nest
+ * in. Past the limit, a block inside supplied inner blocks keeps its own.
+ *
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks    The blocks whose supplied inner blocks are rendering, with their requests.
+ * @global int     $gutenberg_block_bindings_nested_inner_blocks_count The number of blocks that got inner blocks from a source inside the ones supplied to the outermost block rendering.
  *
  * @param mixed    $value          The value of the source.
  * @param string   $source_name    The name of the source.
@@ -319,7 +325,7 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * @return mixed The value, or null for `innerBlocks`.
  */
 function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
-	global $gutenberg_block_bindings_rendering_inner_blocks;
+	global $gutenberg_block_bindings_rendering_inner_blocks, $gutenberg_block_bindings_nested_inner_blocks_count;
 
 	if ( 'innerBlocks' !== $attribute_name ) {
 		return $value;
@@ -333,6 +339,26 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$request = gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance );
 	if ( gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) ) {
 		return null;
+	}
+
+	$is_nested = ! empty( $gutenberg_block_bindings_rendering_inner_blocks );
+	if ( $is_nested ) {
+		/**
+		 * Filters how many blocks may get inner blocks from a source inside
+		 * the inner blocks a source supplied to one block.
+		 *
+		 * The limit covers every level of nesting below that block. It keeps a
+		 * value from rendering without bound through bindings that ask for it
+		 * again with other arguments or context.
+		 *
+		 * @since 7.3.0
+		 *
+		 * @param int $limit The number of blocks. Default 100.
+		 */
+		$limit = (int) apply_filters( 'block_bindings_nested_inner_blocks_limit', 100 );
+		if ( (int) $gutenberg_block_bindings_nested_inner_blocks_count >= $limit ) {
+			return null;
+		}
 	}
 
 	$blocks        = gutenberg_block_bindings_parse_inner_blocks( $value, $source_name, $source_args, $block_instance );
@@ -349,7 +375,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->inner_html                   = $block_instance->parsed_block['innerHTML'];
 	$block_instance->refresh_parsed_block_dependents();
 
-	$gutenberg_block_bindings_rendering_inner_blocks[] = array(
+	$gutenberg_block_bindings_nested_inner_blocks_count = $is_nested ? (int) $gutenberg_block_bindings_nested_inner_blocks_count + 1 : 0;
+	$gutenberg_block_bindings_rendering_inner_blocks[]  = array(
 		'host'    => $block_instance,
 		'request' => $request,
 	);
