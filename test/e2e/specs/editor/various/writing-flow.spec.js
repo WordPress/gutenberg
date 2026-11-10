@@ -943,10 +943,19 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 
-		// Click the first paragraph. The click lands at the center of the
-		// paragraph element, past the end of the short text, so the caret
-		// must be placed at the end of the text.
-		await editor.canvas.locator( 'p:text("First")' ).click();
+		await editor.showBlockToolbar();
+		await expect(
+			page.getByRole( 'toolbar', { name: 'Block tools' } )
+		).toBeVisible();
+
+		// Click past the text at the right edge of the first paragraph. Its
+		// center can be covered by the second paragraph's floating toolbar.
+		// The caret must be placed at the end of the text.
+		const firstParagraph = editor.canvas.locator( 'p:text("First")' );
+		const { width, height } = await firstParagraph.boundingBox();
+		await firstParagraph.click( {
+			position: { x: width - 1, y: height / 2 },
+		} );
 		await page.keyboard.type( '!' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
