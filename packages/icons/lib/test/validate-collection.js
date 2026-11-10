@@ -76,6 +76,102 @@ describe( 'validateCollection', () => {
 		}
 	);
 
+	describe( 'keywords', () => {
+		async function writeManifest( icons ) {
+			await writeFile(
+				path.join( fixtureDir, 'manifest.json' ),
+				JSON.stringify(
+					icons.map( ( icon ) => ( {
+						label: 'Check',
+						filePath: `library/${ icon.slug }.svg`,
+						...icon,
+					} ) )
+				)
+			);
+			for ( const { slug } of icons ) {
+				await writeFile(
+					path.join( iconLibraryDir, `${ slug }.svg` ),
+					'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12L10 18L20 6" /></svg>'
+				);
+			}
+		}
+
+		it( 'accepts unique non-empty keywords that do not repeat the label', async () => {
+			await writeManifest( [
+				{
+					slug: 'check',
+					label: 'Check',
+					keywords: [ 'tick', 'approve', 'done' ],
+				},
+			] );
+
+			await expect(
+				validateCollection( iconLibraryDir )
+			).resolves.toBeUndefined();
+		} );
+
+		it.each( [
+			[ 'an empty array', [] ],
+			[ 'a string', 'tick' ],
+			[ 'a non-string item', [ 123 ] ],
+			[ 'an empty string', [ '' ] ],
+			[ 'a whitespace-only string', [ '   ' ] ],
+		] )( 'rejects %s', async ( _, keywords ) => {
+			await writeManifest( [
+				{
+					slug: 'check',
+					keywords,
+				},
+			] );
+
+			await expect(
+				validateCollection( iconLibraryDir )
+			).rejects.toThrow(
+				"expected 'keywords' to be a non-empty array of non-empty strings"
+			);
+		} );
+
+		it.each( [
+			[ 'an exact duplicate', [ 'tick', 'tick' ] ],
+			[ 'a case-insensitive duplicate', [ 'tick', 'Tick' ] ],
+		] )( 'rejects %s within an entry', async ( _, keywords ) => {
+			await writeManifest( [
+				{
+					slug: 'check',
+					keywords,
+				},
+			] );
+
+			await expect(
+				validateCollection( iconLibraryDir )
+			).rejects.toThrow(
+				"expected 'keywords' to contain unique terms"
+			);
+		} );
+
+		it.each( [
+			[ 'with matching case', [ 'tick', 'Check' ] ],
+			[ 'with different case', [ 'tick', 'check' ] ],
+		] )(
+			'rejects a keyword that repeats the label %s',
+			async ( _, keywords ) => {
+				await writeManifest( [
+					{
+						slug: 'check',
+						label: 'Check',
+						keywords,
+					},
+				] );
+
+				await expect(
+					validateCollection( iconLibraryDir )
+				).rejects.toThrow(
+					"'keywords' must not repeat the icon label 'Check'"
+				);
+			}
+		);
+	} );
+
 	describe( 'dashicons', () => {
 		async function writeManifest( icons ) {
 			await writeFile(

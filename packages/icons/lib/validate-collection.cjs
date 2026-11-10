@@ -21,7 +21,8 @@ function isStrokeBasedSvg( svgContent ) {
  * - Each manifest entry has a matching SVG in library/, and vice versa.
  * - Each manifest entry's `collections` property, if present, is a non-empty array of
  *   known collection slugs.
- * - Each manifest entry's `keywords` property, if present, is an array of strings.
+ * - Each manifest entry's `keywords` property, if present, is a non-empty array of
+ *   unique non-empty strings that do not repeat the icon's `label`.
  * - Each manifest entry's `dashicons` property, if present, is a non-empty array
  *   of unique Dashicon class names, on an icon in the `core-admin` collection.
  * - Each Dashicon class name is replaced by at most one icon.
@@ -99,22 +100,60 @@ async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
 		}
 
 		/*
-		 * Verify that `keywords`, if present, is an array of strings.
+		 * Verify that `keywords`, if present, lists unique non-empty search terms
+		 * that do not merely repeat the icon's label.
 		 */
-		if (
-			'keywords' in icon &&
-			( ! Array.isArray( icon.keywords ) ||
-				icon.keywords.some(
-					( keyword ) => typeof keyword !== 'string'
-				) )
-		) {
-			problems.push(
-				`- Invalid icon definition for icon '${
-					icon.slug
-				}': expected 'keywords' to be an array of strings, saw ${ JSON.stringify(
-					icon.keywords
-				) }`
-			);
+		if ( 'keywords' in icon ) {
+			const { keywords } = icon;
+			const isValidShape =
+				Array.isArray( keywords ) &&
+				keywords.length > 0 &&
+				keywords.every(
+					( keyword ) =>
+						typeof keyword === 'string' &&
+						keyword.trim().length > 0
+				);
+
+			if ( ! isValidShape ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'keywords' to be a non-empty array of non-empty strings, saw ${ JSON.stringify(
+						keywords
+					) }`
+				);
+			} else {
+				const normalizedKeywords = keywords.map( ( keyword ) =>
+					keyword.trim().toLowerCase()
+				);
+
+				if (
+					new Set( normalizedKeywords ).size !==
+					normalizedKeywords.length
+				) {
+					problems.push(
+						`- Invalid icon definition for icon '${
+							icon.slug
+						}': expected 'keywords' to contain unique terms, saw ${ JSON.stringify(
+							keywords
+						) }`
+					);
+				}
+
+				const normalizedLabel = icon.label?.trim().toLowerCase();
+				if (
+					normalizedLabel &&
+					normalizedKeywords.includes( normalizedLabel )
+				) {
+					problems.push(
+						`- Invalid icon definition for icon '${
+							icon.slug
+						}': 'keywords' must not repeat the icon label '${ icon.label }', saw ${ JSON.stringify(
+							keywords
+						) }`
+					);
+				}
+			}
 		}
 
 		/*
