@@ -19,7 +19,7 @@
 -   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
 -   Latest Posts: Stop automatically adding `noopener` to links ([#86491](https://github.com/WordPress/gutenberg/pull/86491)).
 -   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
--   Button: Show buttons saved at 100% width in a vertical Buttons block at full width on the front end again, instead of shrinking them to their text ([#86536](https://github.com/WordPress/gutenberg/pull/86536)).
+-   Button: Fix 100% width buttons saved before the width block support shrinking to fit their text in vertical Buttons blocks ([#86536](https://github.com/WordPress/gutenberg/pull/86536)).
 
 ## 12.1.0 (2026-11-04)
 
