@@ -485,7 +485,7 @@
 .block-editor-grid-item-handles {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-item-handles.block-editor-grid-item-handles {
-		z-index: z-index(".block-editor-grid-visualizer");
+		z-index: z-index(".block-editor-grid-item-handles");
 
 		.components-popover__content * {
 			pointer-events: none;
@@ -520,6 +520,9 @@
 	color: var(--wpds-color-foreground-interactive-neutral);
 	cursor: grab;
 	touch-action: none;
+	// A press on a handle drags or turns the block, and never selects text.
+	user-select: none;
+	-webkit-touch-callout: none;
 
 	&:hover {
 		color: var(--wp-admin-theme-color);
@@ -528,6 +531,13 @@
 	&:active {
 		cursor: grabbing;
 	}
+}
+
+// Above the block, where its toolbar would be if the grid didn't show it.
+.block-editor-grid-item-handles__drag {
+	top: -($button-size-compact + $grid-unit-10);
+	left: 50%;
+	margin-left: -$button-size-compact * 0.5;
 }
 
 // Outside the bottom right corner, clear of the resize handles in the middle

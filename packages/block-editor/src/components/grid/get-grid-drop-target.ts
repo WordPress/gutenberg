@@ -48,8 +48,8 @@ function clamp( value: number, min: number, max: number ): number {
 /**
  * Works out which cells a block being dragged over a grid would land in.
  *
- * The block keeps the point it was grabbed at under the pointer, or its center
- * when it wasn't grabbed by its body. The block's top-left corner snaps to the
+ * The block keeps the point it was grabbed at under the pointer (see
+ * `getGrabPoint`), or its center. The block's top-left corner snaps to the
  * closest cell. The landing area keeps the block's span, up to the size of the
  * grid, and is clamped to stay inside the grid.
  *
@@ -93,6 +93,48 @@ export function getGridDropTarget( {
 		columnSpan: fittedColumnSpan,
 		rowSpan: fittedRowSpan,
 	} );
+}
+
+/**
+ * Works out where a block being dragged over its grid was grabbed, from where
+ * the pointer first moves over the grid.
+ *
+ * A block dragged by its body was grabbed at that point inside it. A block
+ * dragged by its drag handle was grabbed outside it, but keeps the same offset
+ * from its top-left corner, so that it doesn't jump when the drag starts. A
+ * block dragged from anywhere else is centered on the pointer.
+ *
+ * @param options
+ * @param options.x            Pointer position in pixels, in the same space as `pixelRect`.
+ * @param options.y            Pointer position in pixels, in the same space as `pixelRect`.
+ * @param options.pixelRect    The block's rectangle, or null when it isn't in the grid.
+ * @param options.isHandleDrag Whether the drag started from the block's drag handle.
+ *
+ * @return Where the block was grabbed, in pixels from its top-left corner, or nothing to center it.
+ */
+export function getGrabPoint( {
+	x,
+	y,
+	pixelRect,
+	isHandleDrag = false,
+}: {
+	x: number;
+	y: number;
+	pixelRect: PixelRect | null;
+	isHandleDrag?: boolean;
+} ): { grabX?: number; grabY?: number } {
+	if ( ! pixelRect ) {
+		return {};
+	}
+	const isInside =
+		x >= pixelRect.left &&
+		x <= pixelRect.right &&
+		y >= pixelRect.top &&
+		y <= pixelRect.bottom;
+	if ( ! isInside && ! isHandleDrag ) {
+		return {};
+	}
+	return { grabX: x - pixelRect.left, grabY: y - pixelRect.top };
 }
 
 /**
