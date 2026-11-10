@@ -60,7 +60,7 @@ export default function TemplateAuthorView( { item }: { item: Template } ) {
 
 	return (
 		<Stack direction="row" gap="xs" align="flex-start">
-			{ imageUrl && <AuthorAvatar src={ imageUrl } /> }
+			{ imageUrl && <AuthorAvatar src={ imageUrl } name={ text } /> }
 			{ ! imageUrl && (
 				<div className={ styles.icon }>
 					<Icon icon={ icon } />

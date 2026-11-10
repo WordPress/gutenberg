@@ -12,12 +12,16 @@ import styles from './style.module.css';
  * image Gravatar serves when the default avatar of the site is "Blank", so
  * the author keeps a mark, like in the admin bar.
  */
-export default function AuthorAvatar( { src }: { src: string } ) {
+export default function AuthorAvatar( {
+	src,
+	name,
+}: {
+	src: string;
+	name: string;
+} ) {
 	return (
 		<span className={ styles.avatar }>
-			<Avatar.Root size="xs" aria-hidden="true">
-				<Avatar.Image src={ src } alt="" keepMounted />
-			</Avatar.Root>
+			<Avatar name={ name } src={ src } size="xs" aria-hidden="true" />
 		</span>
 	);
 }
