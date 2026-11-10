@@ -18,7 +18,11 @@ export function setSafeHTML( element: Element, html: string ) {
 	const { body } =
 		element.ownerDocument.implementation.createHTMLDocument( '' );
 	body.innerHTML = safeHTML( html );
-	element.replaceChildren( ...body.childNodes );
+	const fragment = element.ownerDocument.createDocumentFragment();
+	while ( body.firstChild ) {
+		fragment.appendChild( body.firstChild );
+	}
+	element.replaceChildren( fragment );
 }
 
 /**
