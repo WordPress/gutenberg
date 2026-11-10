@@ -16,6 +16,7 @@ const meta: Meta< typeof Page > = {
 	component: Page,
 	id: 'admin-ui-page',
 	title: 'Design System/Admin UI/Page',
+	tags: [ 'manifest' ],
 	parameters: {
 		layout: 'fullscreen',
 	},
