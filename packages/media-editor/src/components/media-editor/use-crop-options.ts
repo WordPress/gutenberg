@@ -1,10 +1,9 @@
 import { useMemo } from '@wordpress/element';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import {
 	DEFAULT_ASPECT_RATIOS,
-	useMediaEditor,
-	resolveAspectRatio,
-} from '../../state';
+	type AspectRatioPreset,
+} from '../../state/aspect-ratio-presets';
+import { useMediaEditor } from '../../state';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];
@@ -38,8 +37,7 @@ export function getAspectRatioOptions(
 /**
  * Thin selector over the composite media-editor store for the Crop
  * sidebar tab. Reads the cropOptions slice (preset key) and exposes
- * the corresponding setters plus a render-time `resolvedAspectRatio`
- * derivation.
+ * the corresponding setters plus the ratio the image editor has locked.
  *
  * No local React state, no refs, no synchronization effects — the
  * composite store is the single source of truth.
@@ -52,17 +50,15 @@ export function useCropOptions( {
 }: UseCropOptionsArgs = {} ): UseCropOptionsReturn {
 	const controller = useMediaEditor();
 	const { aspectRatioValue } = controller.cropOptions;
-	const cropperImage = controller.cropper.state.image;
 
 	const aspectRatioOptions = useMemo(
 		() => getAspectRatioOptions( aspectRatioPresets ),
 		[ aspectRatioPresets ]
 	);
 
-	const resolvedAspectRatio = useMemo(
-		() => resolveAspectRatio( aspectRatioValue, cropperImage ),
-		[ aspectRatioValue, cropperImage ]
-	);
+	// The image editor owns the locked ratio; the preset is what the
+	// dropdown shows.
+	const resolvedAspectRatio = controller.imageEditor.state.aspectRatio;
 
 	return {
 		aspectRatioValue,
