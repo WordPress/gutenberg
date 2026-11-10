@@ -13,6 +13,7 @@
 -   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).
 -   `useBaseControlProps`: fix instance ID generation crash in CommonJS build by avoiding a circular import of BaseControl ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
 -   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
+-   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
 
 ### Internal
