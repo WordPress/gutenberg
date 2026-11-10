@@ -16,6 +16,7 @@ import {
 	saveEntityRecord,
 	saveEditedEntityRecord,
 	deleteEntityRecord,
+	receiveEntityRecords,
 	receiveUserPermission,
 	receiveAutosaves,
 	receiveCurrentUser,
@@ -1460,6 +1461,66 @@ describe( 'saveEntityRecord', () => {
 				'crdt_snapshot'
 			);
 			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
+		} );
+	} );
+} );
+
+describe( 'receiveEntityRecords', () => {
+	it( 'removes the default "Auto Draft" title from auto-drafts', () => {
+		const action = receiveEntityRecords( 'postType', 'post', {
+			id: 1,
+			status: 'auto-draft',
+			title: { raw: 'Auto Draft', rendered: 'Auto Draft' },
+		} );
+		expect( action.items.title ).toBe( '' );
+	} );
+
+	it( 'removes the default title when provided as a plain string', () => {
+		const action = receiveEntityRecords( 'postType', 'post', {
+			id: 1,
+			status: 'auto-draft',
+			title: 'Auto Draft',
+		} );
+		expect( action.items.title ).toBe( '' );
+	} );
+
+	it( 'preserves meaningful titles on auto-drafts', () => {
+		const title = { raw: 'Failed order', rendered: 'Failed order' };
+		const action = receiveEntityRecords( 'postType', 'post', {
+			id: 1,
+			status: 'auto-draft',
+			title,
+		} );
+		expect( action.items.title ).toEqual( title );
+	} );
+
+	it( 'preserves the default title on non-auto-draft posts', () => {
+		const title = { raw: 'Auto Draft', rendered: 'Auto Draft' };
+		const action = receiveEntityRecords( 'postType', 'post', {
+			id: 1,
+			status: 'draft',
+			title,
+		} );
+		expect( action.items.title ).toEqual( title );
+	} );
+
+	it( 'processes each record of an array', () => {
+		const action = receiveEntityRecords( 'postType', 'post', [
+			{
+				id: 1,
+				status: 'auto-draft',
+				title: { raw: 'Auto Draft', rendered: 'Auto Draft' },
+			},
+			{
+				id: 2,
+				status: 'auto-draft',
+				title: { raw: 'Failed order', rendered: 'Failed order' },
+			},
+		] );
+		expect( action.items[ 0 ].title ).toBe( '' );
+		expect( action.items[ 1 ].title ).toEqual( {
+			raw: 'Failed order',
+			rendered: 'Failed order',
 		} );
 	} );
 } );

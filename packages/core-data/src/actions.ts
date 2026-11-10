@@ -11,6 +11,7 @@ import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
 import { applyUndoLevel, recordEntityEdit } from './utils/sync-undo-levels';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import isDefaultAutoDraftTitle from './utils/is-default-auto-draft-title';
 import type * as ET from './entity-types';
 import type { QueriedItem, QueriedMeta, Query } from './queried-data/types';
 import type { ActionOf, CoreDataThunkArgs } from './private-types';
@@ -25,9 +26,15 @@ import type {
 	SaveEntityRecordOptions,
 } from './types';
 
-function addTitleToAutoDraft( record: object ): object {
-	// A post's status is a string.
-	return ( record as { status?: string } ).status === 'auto-draft'
+function removeDefaultTitleFromAutoDraft( record: object ): object {
+	// A post's title is a string, or `{ raw, rendered }` from the REST API.
+	const { status, title } = record as {
+		status?: string;
+		title?: string | { raw?: string; rendered?: string };
+	};
+	const titleValue =
+		typeof title === 'string' ? title : ( title?.raw ?? title?.rendered );
+	return status === 'auto-draft' && isDefaultAutoDraftTitle( titleValue )
 		? { ...record, title: '' }
 		: record;
 }
@@ -110,12 +117,16 @@ export function receiveEntityRecords(
 	edits: object | null | undefined = undefined,
 	meta: QueriedMeta | null | undefined = undefined
 ) {
-	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
-	// on the server.
+	// The REST API returns the localized "Auto Draft" placeholder title that
+	// `get_default_post_to_edit()` stores for new admin posts, but the editor
+	// treats an empty title as the signal for a clean new post. Strip only the
+	// placeholder so meaningful titles on programmatically created auto-drafts
+	// survive; blanking can't happen on the server because plugins rely on the
+	// stored title.
 	if ( kind === 'postType' ) {
 		records = Array.isArray( records )
-			? records.map( addTitleToAutoDraft )
-			: addTitleToAutoDraft( records );
+			? records.map( removeDefaultTitleFromAutoDraft )
+			: removeDefaultTitleFromAutoDraft( records );
 	}
 	let action;
 	if ( query ) {
