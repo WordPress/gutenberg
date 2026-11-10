@@ -93,7 +93,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		tagName,
+		tagName = '',
 		style,
 	} = attributes;
 
@@ -517,14 +517,14 @@ export default function SearchEdit( {
 					label={ __( 'HTML element' ) }
 					value={
 						TAG_NAME_ITEMS.find(
-							( item ) => item.value === ( tagName ?? '' )
+							( item ) => item.value === tagName
 						) ?? null
 					}
 					items={ TAG_NAME_ITEMS }
 					// Keep the empty-string Default choice selected.
 					itemToStringValue={ ( item ) => `tag:${ item.value }` }
 					onValueChange={ ( item ) => {
-						if ( ! item || item.value === ( tagName ?? '' ) ) {
+						if ( ! item || item.value === tagName ) {
 							return;
 						}
 						const { value } = item;
@@ -539,7 +539,7 @@ export default function SearchEdit( {
 							TAG_NAME_MESSAGES[ value ].replace( /[<>]/g, '' )
 						);
 					} }
-					description={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
+					description={ TAG_NAME_MESSAGES[ tagName ] }
 				/>
 			</InspectorControls>
 		</>
