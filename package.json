@@ -219,6 +219,7 @@
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
 		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
+		"typecheck:php:fix": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
