@@ -1,5 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { BlockNoteUtils, getAuthorTint } = require( './block-notes-utils' );
+const {
+	BlockNoteUtils,
+	getAuthorTint,
+	getThreadToggle,
+} = require( './block-notes-utils' );
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
@@ -743,12 +747,12 @@ test.describe( 'Block Notes: floating notes', () => {
 			page,
 		} ) => {
 			const lastThread = getThread( page, 'Hotel note' );
-			await getThread( page, 'Alpha note' ).focus();
+			await getThreadToggle( getThread( page, 'Alpha note' ) ).focus();
 			await expect( lastThread ).not.toBeInViewport();
 
 			await page.keyboard.press( 'End' );
 
-			await expect( lastThread ).toBeFocused();
+			await expect( getThreadToggle( lastThread ) ).toBeFocused();
 			await expect( lastThread ).toBeInViewport( { ratio: 1 } );
 			await expect
 				.poll( () => getCanvasScrollTop( editor ) )
@@ -1038,6 +1042,14 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( thread ).toBeVisible();
 			await expect( content ).toBeHidden();
 			await expect.poll( () => getReservedWidth( editor ) ).toBe( 82 );
+
+			// The hidden note text still reaches screen readers.
+			await expect( getThreadToggle( thread ) ).toHaveAccessibleName(
+				'Note by admin'
+			);
+			await expect(
+				getThreadToggle( thread )
+			).toHaveAccessibleDescription( 'Narrow canvas note' );
 		} );
 
 		test( 'yields to All notes when the canvas is too narrow', async ( {

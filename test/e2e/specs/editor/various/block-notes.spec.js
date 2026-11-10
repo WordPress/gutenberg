@@ -1,5 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { BlockNoteUtils, getAuthorTint } = require( './block-notes-utils' );
+const {
+	BlockNoteUtils,
+	getAuthorTint,
+	getThreadToggle,
+} = require( './block-notes-utils' );
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
@@ -120,7 +124,7 @@ test.describe( 'Block Notes', () => {
 
 		await expect( thread ).toBeVisible();
 		// Should focus the newly added note thread.
-		await expect( thread ).toBeFocused();
+		await expect( getThreadToggle( thread ) ).toBeFocused();
 		await expect( thread ).toHaveClass( /is-selected/ );
 		// Screen readers handle a label on a list item inconsistently, so
 		// the thread is announced from its content instead.
@@ -140,7 +144,7 @@ test.describe( 'Block Notes', () => {
 		 * preserved. The reply field must not steal focus on mount.
 		 */
 		await expect(
-			blockNoteUtils.getThread( 'Test comment' )
+			getThreadToggle( blockNoteUtils.getThread( 'Test comment' ) )
 		).toBeFocused();
 		await expect( replyTextbox ).toBeVisible();
 		await expect( replyTextbox ).not.toBeFocused();
@@ -229,7 +233,7 @@ test.describe( 'Block Notes', () => {
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
-		await expect( thread ).toBeFocused();
+		await expect( getThreadToggle( thread ) ).toBeFocused();
 		await expect( thread ).not.toHaveClass( /is-selected/ );
 
 		await thread.click();
@@ -363,7 +367,7 @@ test.describe( 'Block Notes', () => {
 			await headingThread.click();
 			await sidebar.getByRole( 'button', { name: 'Resolve' } ).click();
 			await expect( headingThread ).toBeHidden();
-			await expect( imageThread ).toBeFocused();
+			await expect( getThreadToggle( imageThread ) ).toBeFocused();
 
 			await sidebar
 				.getByRole( 'button', { name: 'Filter: Open' } )
@@ -457,8 +461,38 @@ test.describe( 'Block Notes', () => {
 		await test.step( 'Expands and focuses the thread from the "x more replies" button', async () => {
 			await moreReplies.click();
 			await expect( thread ).toHaveClass( /is-selected/ );
-			await expect( thread ).toBeFocused();
+			await expect( getThreadToggle( thread ) ).toBeFocused();
 		} );
+	} );
+
+	test( 'exposes each thread state through a disclosure button', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Disclosed note',
+		} );
+		await blockNoteUtils.deselect();
+		const thread = blockNoteUtils.getThread( 'Disclosed note' );
+		const toggle = getThreadToggle( thread );
+
+		// The list item is structure; the toggle is the focusable control.
+		await expect( thread ).not.toHaveAttribute( 'tabindex' );
+		await expect( toggle ).toHaveAccessibleName( 'Note by admin' );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( toggle ).toHaveAccessibleDescription( 'Disclosed note' );
+
+		await toggle.focus();
+		await page.keyboard.press( 'Enter' );
+		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( toggle ).toBeFocused();
+
+		await page.keyboard.press( 'Space' );
+		await expect( thread ).not.toHaveClass( /is-selected/ );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( toggle ).toBeFocused();
 	} );
 
 	test( 'exposes the note threads as a list rather than a tree', async ( {
@@ -686,7 +720,7 @@ test.describe( 'Block Notes', () => {
 				[ 'ArrowRight', 'ArrowLeft' ],
 			] ) {
 				await test.step( `${ keyToExpand } and ${ keyToCollapse }`, async () => {
-					await thread.focus();
+					await getThreadToggle( thread ).focus();
 					await page.keyboard.press( keyToExpand );
 					await expect( thread ).toHaveClass( /is-selected/ );
 
@@ -694,7 +728,7 @@ test.describe( 'Block Notes', () => {
 					await expect(
 						editor.canvas.getByText( 'Testing block comments' )
 					).toHaveClass( /is-selected/ );
-					await expect( thread ).toBeFocused();
+					await expect( getThreadToggle( thread ) ).toBeFocused();
 
 					await page.keyboard.press( keyToCollapse );
 					await expect( thread ).not.toHaveClass( /is-selected/ );
@@ -717,16 +751,16 @@ test.describe( 'Block Notes', () => {
 			const secondThread = blockNoteUtils.getThread( 'Two' );
 			const lastThread = blockNoteUtils.getThread( 'Three' );
 
-			await firstThread.focus();
+			await getThreadToggle( firstThread ).focus();
 			await page.keyboard.press( 'ArrowDown' );
-			await expect( secondThread ).toBeFocused();
+			await expect( getThreadToggle( secondThread ) ).toBeFocused();
 			await page.keyboard.press( 'ArrowUp' );
-			await expect( firstThread ).toBeFocused();
+			await expect( getThreadToggle( firstThread ) ).toBeFocused();
 
 			await page.keyboard.press( 'End' );
-			await expect( lastThread ).toBeFocused();
+			await expect( getThreadToggle( lastThread ) ).toBeFocused();
 			await page.keyboard.press( 'Home' );
-			await expect( firstThread ).toBeFocused();
+			await expect( getThreadToggle( firstThread ) ).toBeFocused();
 		} );
 
 		test( 'should collapse a note with Escape key and keep it collapsed while editing the same block', async ( {
@@ -768,7 +802,7 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveClass( /is-selected/ );
 			await thread.getByRole( 'button', { name: 'Cancel' } ).click();
 			await expect( thread ).not.toHaveClass( /is-selected/ );
-			await expect( thread ).toBeFocused();
+			await expect( getThreadToggle( thread ) ).toBeFocused();
 		} );
 
 		test( 'should collapse a note when the focus moves outside the note', async ( {
@@ -791,7 +825,7 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveClass( /is-selected/ );
 			await expect( block ).toHaveClass( /is-highlighted/ );
 			await page.keyboard.press( 'Shift+Tab' );
-			await expect( thread ).not.toBeFocused();
+			await expect( getThreadToggle( thread ) ).not.toBeFocused();
 			await expect( thread ).not.toHaveClass( /is-selected/ );
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
@@ -836,7 +870,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			await expect(
-				secondThread,
+				getThreadToggle( secondThread ),
 				'focus should move to the next note if there is one'
 			).toBeFocused();
 			await expect(
@@ -851,7 +885,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			await expect(
-				secondThread,
+				getThreadToggle( secondThread ),
 				"focus should move to the previous note if there isn't a next one"
 			).toBeFocused();
 			await expect(
@@ -888,7 +922,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.deleteNote( 1 );
 			const thread = blockNoteUtils.getThread( 'Test comment' );
 
-			await expect( thread ).toBeFocused();
+			await expect( getThreadToggle( thread ) ).toBeFocused();
 		} );
 
 		test( 'should move focus with the "Add new reply" and "Back to block" skip links', async ( {
@@ -903,7 +937,7 @@ test.describe( 'Block Notes', () => {
 			const thread = blockNoteUtils.getThread( 'Test comment' );
 
 			await test.step( 'Add new reply', async () => {
-				await thread.focus();
+				await getThreadToggle( thread ).focus();
 				await page.keyboard.press( 'Tab' );
 				await expect(
 					thread.getByRole( 'button', { name: 'Add new reply' } )
@@ -959,7 +993,7 @@ test.describe( 'Block Notes', () => {
 			await pageUtils.pressKeys( 'primary+Enter' );
 
 			await expect( thread ).toBeVisible();
-			await expect( thread ).toBeFocused();
+			await expect( getThreadToggle( thread ) ).toBeFocused();
 		} );
 	} );
 

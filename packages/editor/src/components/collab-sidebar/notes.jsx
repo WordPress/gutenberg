@@ -160,19 +160,16 @@ export function Notes( {
 		}
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
-		const isSelfTarget = event.currentTarget === event.target;
+		// The thread's disclosure toggle. Enter and Space are its own clicks.
+		const isSelfTarget = event.target.classList.contains(
+			'editor-collab-sidebar-panel__thread-toggle'
+		);
 
-		if (
-			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
-			isSelfTarget &&
-			! isSelected
-		) {
+		if ( event.key === 'ArrowRight' && isSelfTarget && ! isSelected ) {
 			// Expand thread.
 			pickNote( thread.id, thread.blockClientId );
 		} else if (
-			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
-				isSelfTarget &&
-				isSelected ) ||
+			( event.key === 'ArrowLeft' && isSelfTarget && isSelected ) ||
 			event.key === 'Escape'
 		) {
 			// Collapse thread.

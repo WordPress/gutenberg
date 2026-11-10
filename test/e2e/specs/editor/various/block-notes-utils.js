@@ -311,4 +311,13 @@ class BlockNoteUtils {
 	}
 }
 
-module.exports = { BlockNoteUtils, getAuthorTint };
+/**
+ * Locates a note thread's disclosure toggle, which takes the thread's focus.
+ *
+ * @param {import('@playwright/test').Locator} thread Note thread.
+ */
+function getThreadToggle( thread ) {
+	return thread.getByRole( 'button', { name: /^Note by / } );
+}
+
+module.exports = { BlockNoteUtils, getAuthorTint, getThreadToggle };

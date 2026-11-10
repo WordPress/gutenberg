@@ -167,15 +167,19 @@ export function focusNoteThread(
 	container: HTMLElement | null | undefined,
 	additionalSelector?: string
 ): Promise< void > {
-	return findNoteThread( noteId, container, additionalSelector ).then(
-		( element ) => {
-			if ( ! element ) {
-				return;
-			}
-			element.focus();
-			element.scrollIntoView( { block: 'nearest' } );
+	// A saved thread takes focus through its disclosure toggle.
+	const selector =
+		additionalSelector ??
+		( noteId && noteId !== 'new'
+			? '.editor-collab-sidebar-panel__thread-toggle'
+			: undefined );
+	return findNoteThread( noteId, container, selector ).then( ( element ) => {
+		if ( ! element ) {
+			return;
 		}
-	);
+		element.focus();
+		element.scrollIntoView( { block: 'nearest' } );
+	} );
 }
 
 /**
