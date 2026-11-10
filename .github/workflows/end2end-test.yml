@@ -485,11 +485,17 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  sparse-checkout: .github/workflows/scripts
+                  sparse-checkout: tools/monorepo/scripts
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
 
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-status-check.js --ignore 'End-to-End Tests - Status Check,Merge Artifacts,Update PR meta comment'
+              run: node tools/monorepo/scripts/ci-status-check.mts --ignore 'End-to-End Tests - Status Check,Merge Artifacts,Update PR meta comment'

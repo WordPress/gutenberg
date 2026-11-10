@@ -29,7 +29,10 @@ const POST_TYPES: Record< string, unknown > = {
 	page: { labels: { uploaded_to_this_item: 'Uploaded to this page' } },
 	// A post type that never set the label.
 	cpt: { labels: {} },
+	attachment: { labels: {}, taxonomies: [ 'genre' ] },
 };
+
+const TAXONOMIES = [ { slug: 'genre', rest_base: 'genres' } ];
 
 vi.mock( import( '@wordpress/core-data' ), async () => {
 	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
@@ -101,6 +104,7 @@ function renderModal(
 		reducer: ( state = {} ) => state,
 		selectors: {
 			getPostType: ( state: unknown, slug: string ) => POST_TYPES[ slug ],
+			getTaxonomies: () => TAXONOMIES,
 		},
 	} );
 
@@ -620,6 +624,27 @@ describe( 'MediaUploadModal', () => {
 			expect(
 				screen.queryByRole( 'button', { name: /Attached to/ } )
 			).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'queries a filter on a taxonomy field by the taxonomy', async () => {
+		renderModal(
+			{},
+			{
+				filters: [
+					{ field: 'genres', operator: 'isNone', value: [ 3 ] },
+				],
+			}
+		);
+
+		await waitFor( () => {
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.objectContaining( { genres_exclude: [ 3 ] } )
+			);
 		} );
 	} );
 

@@ -127,6 +127,10 @@ const { state } = store( 'directive-html', {
 		setRejected() {
 			state.rejected = asDangerousHTML( '<b>x</b>' );
 		},
+		/** Replaces the rejected string with a policy value of the same markup. */
+		setRejectedTrusted() {
+			state.rejected = asDangerousHTML( policy.createHTML( '<b>x</b>' ) );
+		},
 		setServerHtml() {
 			state.serverHtml = asDangerousHTML( '<p>Client HTML</p>' );
 		},
