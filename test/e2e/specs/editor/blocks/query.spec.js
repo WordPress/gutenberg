@@ -28,6 +28,191 @@ test.describe( 'Query block', () => {
 		] );
 	} );
 
+	test.describe( 'Query selectors', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-custom-post-types'
+			);
+		} );
+
+		test.beforeEach( async ( { page, editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: { query: { inherit: false, postType: 'post' } },
+				innerBlocks: [
+					{
+						name: 'core/post-template',
+						innerBlocks: [ { name: 'core/post-title' } ],
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Query Loop',
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+			await expect(
+				page.getByRole( 'combobox', { name: 'Post type', exact: true } )
+			).toBeVisible();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-custom-post-types'
+			);
+		} );
+
+		test( 'keeps query state when reselecting the current post type', async ( {
+			page,
+			editor,
+		} ) => {
+			for ( const postType of [ 'post', 'page' ] ) {
+				await page.evaluate( ( type ) => {
+					const { getBlocks } =
+						window.wp.data.select( 'core/block-editor' );
+					const block = getBlocks()[ 0 ];
+					window.wp.data
+						.dispatch( 'core/block-editor' )
+						.updateBlockAttributes( block.clientId, {
+							query: {
+								...block.attributes.query,
+								postType: type,
+								taxQuery: { include: { category: [ 1 ] } },
+								parents: [ 123 ],
+								format: [ 'aside' ],
+								sticky: type === 'post' ? 'exclude' : '',
+								author: '1',
+								search: 'Post',
+								offset: 2,
+							},
+						} );
+				}, postType );
+				const before = ( await editor.getBlocks() )[ 0 ].attributes
+					.query;
+				const control = page.getByRole( 'combobox', {
+					name: 'Post type',
+					exact: true,
+				} );
+				await control.click();
+				await page
+					.getByRole( 'option', {
+						name: postType === 'post' ? 'Post' : 'Page',
+						exact: true,
+					} )
+					.click();
+				await expect( control ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				expect(
+					( await editor.getBlocks() )[ 0 ].attributes.query
+				).toEqual( before );
+			}
+		} );
+
+		test( 'preserves order options and updates order and orderBy together', async ( {
+			page,
+			editor,
+		} ) => {
+			const orderControl = page.getByRole( 'combobox', {
+				name: 'Order by',
+				exact: true,
+			} );
+			const defaultLabels = [
+				'Newest to oldest',
+				'Oldest to newest',
+				'A → Z',
+				'Z → A',
+			];
+			await orderControl.click();
+			await expect( page.getByRole( 'option' ) ).toHaveText(
+				defaultLabels
+			);
+			await page.keyboard.press( 'Escape' );
+			await page
+				.getByRole( 'combobox', { name: 'Post type', exact: true } )
+				.click();
+			await page
+				.getByRole( 'option', { name: 'Page', exact: true } )
+				.click();
+			await orderControl.click();
+			await expect( page.getByRole( 'option' ) ).toHaveText( [
+				...defaultLabels,
+				'Ascending by order',
+				'Descending by order',
+			] );
+			await page
+				.getByRole( 'option', {
+					name: 'Descending by order',
+					exact: true,
+				} )
+				.click();
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.query
+			).toMatchObject( {
+				postType: 'page',
+				order: 'desc',
+				orderBy: 'menu_order',
+			} );
+			await orderControl.focus();
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.press( 'Home' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'Enter' );
+			await expect( orderControl ).toHaveText( 'Oldest to newest' );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.query
+			).toMatchObject( {
+				order: 'asc',
+				orderBy: 'date',
+			} );
+		} );
+
+		test( 'keeps Include selected while storing an empty string', async ( {
+			page,
+			editor,
+		} ) => {
+			const control = page.getByRole( 'combobox', {
+				name: 'Sticky posts',
+				exact: true,
+			} );
+			await expect( control ).toHaveText( 'Include' );
+			await control.click();
+			await expect( page.getByRole( 'option' ) ).toHaveText( [
+				'Include',
+				'Ignore',
+				'Exclude',
+				'Only',
+			] );
+			await page
+				.getByRole( 'option', { name: 'Only', exact: true } )
+				.click();
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.query.sticky
+			).toBe( 'only' );
+			await control.click();
+			await page
+				.getByRole( 'option', { name: 'Include', exact: true } )
+				.click();
+			await expect( control ).toHaveText( 'Include' );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.query.sticky
+			).toBe( '' );
+			await editor.saveDraft();
+			await page.reload();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Query Loop',
+				} )
+			);
+			await expect( control ).toHaveText( 'Include' );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.query.sticky
+			).toBe( '' );
+		} );
+	} );
+
 	test.describe( 'Post Template block movers', () => {
 		test( 'should show vertical movers for blocks inside a grid Post Template', async ( {
 			page,
