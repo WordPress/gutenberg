@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings.
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 
 ### Bug Fixes
