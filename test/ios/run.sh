@@ -138,6 +138,12 @@ xcrun simctl bootstatus "$UDID" -b
 # the first time it shows, which takes the test's taps. Mark it as seen,
 # like Chromium's iOS test runner does.
 xcrun simctl spawn "$UDID" defaults write com.apple.keyboard.preferences DidShowContinuousPathIntroduction -bool true
+# The first suggestions a fresh simulator's keyboard computes, e.g. for a
+# double tapped word, block the app for up to 24 seconds, and the edit
+# menu for the selection then never shows. Turn suggestions off.
+for KEY in KeyboardPrediction KeyboardAutocorrection KeyboardCheckSpelling; do
+	xcrun simctl spawn "$UDID" defaults write com.apple.Preferences "$KEY" -bool false
+done
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
