@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Color placeholders with design system tokens instead of `--wp-components-color-foreground` overrides.
+-   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Color placeholders with design system tokens instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 
 ### Bug Fixes
 
