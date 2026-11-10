@@ -3,7 +3,7 @@ import { useEffect } from '@wordpress/element';
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { GridRect } from './utils';
+import { getGridTracks, GridRect } from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
@@ -370,40 +370,47 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		 * @return Whether another check is needed after a span change.
 		 */
 		const adjustItemSpans = ( allowShrink: boolean ) => {
-			const { rowCount: rawRowCount, columnCount: rawColumnCount } =
+			const { rowCount: rawRowCount } =
 				( getBlockAttributes( clientId ) as { layout?: Layout } | null )
 					?.layout ?? {};
-			if (
-				! isPositiveInteger( rawRowCount ) ||
-				! isPositiveInteger( rawColumnCount )
-			) {
+			if ( ! isPositiveInteger( rawRowCount ) ) {
 				return false;
 			}
 			const rowCount = rawRowCount;
-			const columnCount = rawColumnCount;
 			const computedStyle = view.getComputedStyle( gridElement );
 			// Grid tracks occupy the content box, while client dimensions include
-			// padding. Remove it before deriving the size of each track.
-			const gridHeight =
-				gridElement.clientHeight -
-				getCSSPixelValue( computedStyle.paddingTop ) -
-				getCSSPixelValue( computedStyle.paddingBottom );
+			// padding. Remove it when tracking changes to the grid width.
 			const gridWidth =
 				gridElement.clientWidth -
 				getCSSPixelValue( computedStyle.paddingLeft ) -
 				getCSSPixelValue( computedStyle.paddingRight );
-			if ( gridHeight <= 0 || gridWidth <= 0 ) {
+			if ( gridWidth <= 0 ) {
 				return false;
 			}
 			const rowGap = getCSSPixelValue( computedStyle.rowGap );
 			const columnGap = getCSSPixelValue( computedStyle.columnGap );
-			const rowHeight =
-				( gridHeight - rowGap * ( rowCount - 1 ) ) / rowCount;
+			// Responsive styles can change the number and size of tracks without
+			// changing the layout attributes.
+			const gridRowTracks = getGridTracks(
+				computedStyle.gridTemplateRows,
+				rowGap
+			);
+			const gridColumnTracks = getGridTracks(
+				computedStyle.gridTemplateColumns,
+				columnGap
+			);
+			const rowHeight = gridRowTracks[ 0 ].end - gridRowTracks[ 0 ].start;
 			const columnWidth =
-				( gridWidth - columnGap * ( columnCount - 1 ) ) / columnCount;
-			if ( rowHeight <= 0 || columnWidth <= 0 ) {
+				gridColumnTracks[ 0 ].end - gridColumnTracks[ 0 ].start;
+			if (
+				! Number.isFinite( rowHeight ) ||
+				! Number.isFinite( columnWidth ) ||
+				rowHeight <= 0 ||
+				columnWidth <= 0
+			) {
 				return false;
 			}
+			const columnCount = gridColumnTracks.length;
 			const rowPitch = rowHeight + rowGap;
 			const columnPitch = columnWidth + columnGap;
 
