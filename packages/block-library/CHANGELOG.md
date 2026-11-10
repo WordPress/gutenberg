@@ -4,8 +4,9 @@
 
 ### Enhancements
 
--   Navigation: Use the UI SelectControl for the Overlay template setting ([#86619](https://github.com/WordPress/gutenberg/pull/86619)).
+-   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
+-   Navigation: Use the UI SelectControl for the Overlay template setting ([#86619](https://github.com/WordPress/gutenberg/pull/86619)).
 -   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
