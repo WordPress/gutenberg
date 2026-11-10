@@ -1,3 +1,5 @@
+import getNestedValue from './get-nested-value';
+
 /**
  * How a block attribute value is merged when collaborators change it at the
  * same time.
@@ -74,84 +76,19 @@ function isSetElement( value: unknown ): value is SetElement {
 	return typeof value === 'string' || typeof value === 'number';
 }
 
-/**
- * Order set elements the same way for every collaborator: numbers first, in
- * ascending order, then strings.
- *
- * @param a First element.
- * @param b Second element.
- * @return Negative, zero, or positive, as `Array.prototype.sort` expects.
- */
-function compareSetElements( a: SetElement, b: SetElement ): number {
-	if ( typeof a === 'number' && typeof b === 'number' ) {
-		return a - b;
-	}
-
-	if ( typeof a !== typeof b ) {
-		if ( typeof a === 'number' ) {
-			return -1;
-		}
-
-		return 1;
-	}
-
-	if ( a < b ) {
-		return -1;
-	}
-
-	if ( a > b ) {
-		return 1;
-	}
-
-	return 0;
-}
+// Orders set elements the same way for every collaborator. The locale is
+// fixed so that the order does not depend on the language of the browser, and
+// `numeric` puts 3 before 12.
+const setElementCollator = new Intl.Collator( 'en', { numeric: true } );
 
 /**
- * Read the elements of a set from the value the block editor holds. A single
- * string or number counts as a set of one, which covers content saved before
- * the value became a list.
+ * Whether a value can be stored as a set: a list of strings or numbers.
  *
  * @param value Value at a registered path.
- * @return The elements, or null when the value is not a set.
+ * @return True when the value is a list of strings or numbers.
  */
-function getSetElements( value: unknown ): SetElement[] | null {
-	if ( value === undefined ) {
-		return [];
-	}
-
-	let elements = [ value ];
-	if ( Array.isArray( value ) ) {
-		elements = value;
-	}
-
-	if ( ! elements.every( isSetElement ) ) {
-		return null;
-	}
-
-	return elements;
-}
-
-/**
- * Read the value at a path of property names.
- *
- * @param value Value to read from.
- * @param path  Property names to follow.
- * @return The value at the path, and whether the path exists.
- */
-function getValueAtPath(
-	value: unknown,
-	path: string[]
-): { exists: boolean; value?: unknown } {
-	let result = value;
-
-	for ( const key of path ) {
-		if ( ! isRecord( result ) || ! Object.hasOwn( result, key ) ) {
-			return { exists: false };
-		}
-		result = result[ key ];
-	}
-
-	return { exists: true, value: result };
+function isSetElementList( value: unknown ): value is SetElement[] {
+	return Array.isArray( value ) && value.every( isSetElement );
 }
 
 /**
@@ -209,14 +146,9 @@ export function expandAttributeSets(
 	let result = attributes;
 
 	for ( const [ path, { segments } ] of registrations ) {
-		const current = getValueAtPath( result, segments );
-		if ( ! current.exists ) {
-			continue;
-		}
-
 		// Leave a value alone when it is not a list of strings or numbers.
-		const elements = getSetElements( current.value );
-		if ( ! elements ) {
+		const elements = getNestedValue( result, segments );
+		if ( ! isSetElementList( elements ) ) {
 			continue;
 		}
 
@@ -258,9 +190,11 @@ export function collapseAttributeSets(
 		// A list inside the attribute was written before the path was
 		// registered, or by a collaborator who has not registered it. Keep
 		// its elements too. The next local change moves them to their own keys.
-		const embedded = getSetElements(
-			getValueAtPath( result, segments ).value
-		);
+		let embedded: SetElement[] = [];
+		const current = getNestedValue( result, segments );
+		if ( isSetElementList( current ) ) {
+			embedded = current;
+		}
 
 		result = { ...result };
 		for ( const key of keys ) {
@@ -270,8 +204,8 @@ export function collapseAttributeSets(
 		result = setValueAtPath(
 			result,
 			segments,
-			[ ...new Set( [ ...( embedded ?? [] ), ...elements ] ) ].sort(
-				compareSetElements
+			[ ...new Set( [ ...embedded, ...elements ] ) ].sort( ( a, b ) =>
+				setElementCollator.compare( String( a ), String( b ) )
 			)
 		);
 	}

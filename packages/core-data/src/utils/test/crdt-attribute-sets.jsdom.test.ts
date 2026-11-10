@@ -116,10 +116,10 @@ describe( 'block attribute sets', () => {
 			).toEqual( { 'metadata.noteId#3': 3 } );
 		} );
 
-		it( 'treats a single value as a set of one', () => {
-			expect(
-				expandAttributeSets( { metadata: { noteId: '3' } } )
-			).toEqual( { 'metadata.noteId#3': '3' } );
+		it( 'leaves a single value alone', () => {
+			const attributes = { metadata: { noteId: 3 } };
+
+			expect( expandAttributeSets( attributes ) ).toBe( attributes );
 		} );
 
 		it( 'leaves a value alone when it is not a list of strings or numbers', () => {
@@ -147,10 +147,11 @@ describe( 'block attribute sets', () => {
 			expect(
 				collapseAttributeSets( {
 					metadata: { name: 'Intro' },
+					'metadata.noteId#12': 12,
 					'metadata.noteId#7': 7,
 					'metadata.noteId#3': 3,
 				} )
-			).toEqual( { metadata: { name: 'Intro', noteId: [ 3, 7 ] } } );
+			).toEqual( { metadata: { name: 'Intro', noteId: [ 3, 7, 12 ] } } );
 		} );
 
 		it( 'creates the attribute when it does not exist', () => {
