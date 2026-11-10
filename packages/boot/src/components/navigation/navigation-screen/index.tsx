@@ -12,12 +12,9 @@ import { useReducedMotion } from '@wordpress/compose';
 import styles from './style.module.scss';
 
 const ANIMATION_DURATION = 0.3;
-const getSlideOffset = ( direction: 'forward' | 'backward' ) =>
-	( direction === 'forward' ? 100 : -100 ) * ( isRTL() ? -1 : 1 );
-
 const slideVariants = {
 	initial: ( direction: 'forward' | 'backward' ) => ( {
-		x: getSlideOffset( direction ),
+		x: ( direction === 'forward' ? 100 : -100 ) * ( isRTL() ? -1 : 1 ),
 		opacity: 0,
 	} ),
 	animate: {
@@ -25,7 +22,7 @@ const slideVariants = {
 		opacity: 1,
 	},
 	exit: ( direction: 'forward' | 'backward' ) => ( {
-		x: getSlideOffset( direction ),
+		x: ( direction === 'forward' ? 100 : -100 ) * ( isRTL() ? -1 : 1 ),
 		opacity: 0,
 	} ),
 };
