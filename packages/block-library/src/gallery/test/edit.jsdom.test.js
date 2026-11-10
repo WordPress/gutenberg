@@ -46,6 +46,7 @@ const ASPECT_RATIO_SETTINGS = {
 					{ name: 'Square - 1:1', slug: 'square', ratio: '1' },
 					{ name: 'Wide - 16:9', slug: '16-9', ratio: '16/9' },
 				],
+				theme: [ { name: 'Avatar', slug: 'avatar', ratio: '1' } ],
 			},
 		},
 	},
@@ -196,6 +197,43 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
+	describe( 'Presentation', () => {
+		test( 'restores the inherited aspect ratio when resetting a viewport override', async () => {
+			await setup(
+				[
+					createGallery( { aspectRatio: '1' } ),
+					createBlock( VIEWPORT_STATE_INITIALIZER ),
+				],
+				ASPECT_RATIO_SETTINGS
+			);
+			await selectBlock( 'Block: Gallery' );
+			const ratio = await screen.findByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+			expect( ratio ).toHaveTextContent( 'Square - 1:1' );
+			await userEvent.click( ratio );
+			expect(
+				await screen.findByRole( 'option', { name: 'Avatar' } )
+			).toBeInTheDocument();
+			await userEvent.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
+			expect( ratio ).toHaveTextContent( 'Original' );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Settings options' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'menuitem', {
+					name: 'Aspect ratio, reset to default',
+				} )
+			);
+			expect( ratio ).toHaveTextContent( 'Square - 1:1' );
+		} );
+	} );
+
 	describe( 'Layout', () => {
 		test( 'keeps the custom Gallery controls for the default Flex layout', async () => {
 			await setup( createGallery() );
@@ -273,9 +311,11 @@ describe( 'Gallery block', () => {
 			);
 			await selectBlock( 'Block: Gallery' );
 
-			await userEvent.selectOptions(
-				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'16/9'
+			await userEvent.click(
+				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Wide - 16:9' } )
 			);
 
 			// The ratio is rendered from the Gallery's own responsive CSS for
