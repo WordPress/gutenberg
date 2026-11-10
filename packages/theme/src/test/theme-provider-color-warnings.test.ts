@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildAccentRamp, buildBgRamp, type RampResult } from '../color-ramps';
+import { getContrast } from '../color-ramps/lib/color-utils';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
@@ -72,7 +73,7 @@ describe( 'collectThemeProviderColorWarnings', () => {
 	);
 
 	it( 'checks the final fill after seed adjustment', () => {
-		const seed = '#1b7e4d';
+		const seed = '#1c7c64';
 		const background = buildBgRamp( '#1e1e1e' );
 		const primary = buildAccentRamp( seed, background );
 		const colorValues = new Map( [
@@ -86,6 +87,9 @@ describe( 'collectThemeProviderColorWarnings', () => {
 			],
 		] );
 
+		expect(
+			getContrast( seed, background.ramp.surface3 )
+		).toBeGreaterThanOrEqual( 3 );
 		expect( primary.ramp.bgFill1 ).not.toBe( seed );
 		expect(
 			collectThemeProviderColorWarnings( new Map(), colorValues )
@@ -93,11 +97,11 @@ describe( 'collectThemeProviderColorWarnings', () => {
 			{
 				type: 'contrast',
 				backgroundToken: 'background.surface.neutral-strong',
-				backgroundColor: '#242424',
+				backgroundColor: '#252525',
 				foregroundToken: 'background.interactive.brand-strong',
-				foregroundColor: '#0f7747',
+				foregroundColor: '#0f755d',
 				requiredContrast: 3,
-				achievedContrast: expect.closeTo( 2.7719, 4 ),
+				achievedContrast: expect.closeTo( 2.7173, 4 ),
 			},
 		] );
 	} );
