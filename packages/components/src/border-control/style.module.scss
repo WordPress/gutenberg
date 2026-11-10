@@ -47,7 +47,7 @@
 		border-end-start-radius: $radius-small;
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;
-		border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 	}
 }
 
