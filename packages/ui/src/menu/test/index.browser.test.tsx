@@ -19,7 +19,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-import { copySmall } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import '@wordpress/theme/design-tokens.css';
 import { Icon } from '../../icon';
 import * as Menu from '../index';
@@ -110,7 +110,7 @@ describe( 'Menu', () => {
 	it( 'keeps a submenu trigger as tall as a plain item', async () => {
 		const prefix = (
 			<Menu.PrefixIcon
-				icon={ copySmall }
+				icon={ copy }
 				role="img"
 				aria-label="Prefix icon"
 			/>
@@ -220,7 +220,7 @@ describe( 'Menu', () => {
 				const slotProps = {
 					prefix: (
 						<Menu.PrefixIcon
-							icon={ copySmall }
+							icon={ copy }
 							size={ prefixSize }
 							role="img"
 							aria-label="Prefix icon"
@@ -229,7 +229,7 @@ describe( 'Menu', () => {
 					suffix:
 						typeof suffix === 'number' ? (
 							<Icon
-								icon={ copySmall }
+								icon={ copy }
 								size={ suffix }
 								role="img"
 								aria-label="Suffix icon"
