@@ -28,17 +28,17 @@ function useTemplates(): WpTemplate[] {
 /**
  * Whether a template has somewhere to render another template.
  *
- * The post content block of a template is the slot the template rendered
- * inside it takes the place of, so a template without one has nowhere to put
- * it and is left out of the choices. The server works out which post content
- * block is the slot, if any, and reports it: one inside a query loop belongs
- * to the post that loop is rendering.
+ * The template slot block of a template is where a template rendered inside
+ * it goes, so a template without one has nowhere to put it and is left out of
+ * the choices. The server reports it, having looked in the template's
+ * patterns too.
  *
  * @param template The template to look in.
  */
-function hasContentSlot( template: WpTemplate ): boolean {
+function hasTemplateSlot( template: WpTemplate ): boolean {
 	return (
-		( template as { has_content_slot?: boolean } ).has_content_slot === true
+		( template as { has_template_slot?: boolean } ).has_template_slot ===
+		true
 	);
 }
 
@@ -58,8 +58,8 @@ function namesTemplate( template: WpTemplate ): boolean {
  * render: a template can name one that is rendered on its own, and only when
  * no other template is rendered inside it. That leaves out the template
  * itself, every template that names one of its own, every template when the
- * edited one has templates rendered inside it, and every template with no post
- * content block to render it in.
+ * edited one has templates rendered inside it, and every template with no template
+ * slot block to render it in.
  *
  * @param templates Every template of the site.
  * @param record    The template being edited.
@@ -95,7 +95,7 @@ export function getAvailableTemplates(
 		return (
 			! hasTemplatesInside &&
 			! namesTemplate( template ) &&
-			hasContentSlot( template )
+			hasTemplateSlot( template )
 		);
 	} );
 }

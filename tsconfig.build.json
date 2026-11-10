@@ -84,6 +84,7 @@
 		{ "path": "packages/style-engine/tsconfig.build.json" },
 		{ "path": "packages/style-runtime/tsconfig.build.json" },
 		{ "path": "packages/sync/tsconfig.build.json" },
+		{ "path": "packages/template-inheritance/tsconfig.build.json" },
 		{ "path": "packages/theme/tsconfig.build.json" },
 		{ "path": "packages/theme/tsconfig.prebuilt.json" },
 		{ "path": "packages/theme-build-tools/tsconfig.build.json" },

@@ -20,7 +20,7 @@ function createTemplateInside(
 }
 
 const LAYOUT_CONTENT = `<!-- wp:paragraph --><p>Shared header</p><!-- /wp:paragraph -->
-<!-- wp:post-content /-->
+<!-- wp:template-slot --><!-- wp:paragraph --><p>Shown on its own</p><!-- /wp:paragraph --><!-- /wp:template-slot -->
 <!-- wp:paragraph --><p>Shared footer</p><!-- /wp:paragraph -->`;
 
 const NOT_FOUND_CONTENT = `<!-- wp:heading --><h2 class="wp-block-heading">Nothing here</h2><!-- /wp:heading -->`;
@@ -72,6 +72,8 @@ test.describe( 'Template rendered inside another template', () => {
 		).toBeVisible();
 		await expect( page.getByText( 'Shared header' ) ).toBeVisible();
 		await expect( page.getByText( 'Shared footer' ) ).toBeVisible();
+		// The template takes the place of what the slot holds.
+		await expect( page.getByText( 'Shown on its own' ) ).toBeHidden();
 	} );
 
 	test( 'shows the template it is rendered inside in the summary', async ( {
@@ -112,8 +114,11 @@ test.describe( 'Template rendered inside another template', () => {
 			editor.canvas.getByText( 'Shared footer' )
 		).toBeVisible();
 
-		// The blocks being edited are the editable ones, in the post content
-		// block of the layout template.
+		// The blocks being edited are the editable ones, in the template slot
+		// block of the layout template, in place of what the slot holds.
+		await expect(
+			editor.canvas.getByText( 'Shown on its own' )
+		).toBeHidden();
 		const heading = editor.canvas.getByRole( 'document', {
 			name: 'Block: Heading',
 		} );
@@ -211,7 +216,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'shell',
 			title: 'Shell',
-			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
+			content: '<!-- wp:post-title /--><!-- wp:template-slot /-->',
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'search',
@@ -242,7 +247,7 @@ test.describe( 'Template rendered inside another template', () => {
 			const { getBlocksByName, getBlockEditingMode } =
 				window.wp.data.select( 'core/block-editor' );
 			return Object.fromEntries(
-				[ 'core/post-title', 'core/post-content' ].map( ( name ) => [
+				[ 'core/post-title', 'core/template-slot' ].map( ( name ) => [
 					name,
 					getBlockEditingMode( getBlocksByName( name )[ 0 ] ),
 				] )
@@ -252,12 +257,12 @@ test.describe( 'Template rendered inside another template', () => {
 		expect( editingModes ).toEqual( {
 			/*
 			 * The title block of the template around it is that template's own,
-			 * and the server substitutes the content block alone, so editing it
-			 * here would rename the template being edited and change nothing on
-			 * the front end.
+			 * and the server substitutes the slot alone, so editing it here
+			 * would rename the template being edited and change nothing on the
+			 * front end.
 			 */
 			'core/post-title': 'disabled',
-			'core/post-content': 'contentOnly',
+			'core/template-slot': 'contentOnly',
 		} );
 	} );
 
@@ -283,7 +288,7 @@ test.describe( 'Template rendered inside another template', () => {
 			slug: 'frame',
 			title: 'Frame',
 			content:
-				'<!-- wp:template-part {"slug":"frame-header","theme":"emptytheme"} /--><!-- wp:post-content /-->',
+				'<!-- wp:template-part {"slug":"frame-header","theme":"emptytheme"} /--><!-- wp:template-slot /-->',
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'archive',
@@ -386,7 +391,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'archive-frame',
 			title: 'Archive frame',
-			content: '<!-- wp:post-content /-->',
+			content: '<!-- wp:template-slot /-->',
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'category',
@@ -424,7 +429,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'wrapper',
 			title: 'Wrapper',
-			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
+			content: '<!-- wp:post-title /--><!-- wp:template-slot /-->',
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'single',
@@ -459,7 +464,7 @@ test.describe( 'Template rendered inside another template', () => {
 		await expect( titles.nth( 1 ) ).toHaveText( 'Title' );
 
 		// The content block of the template being edited is where the content of
-		// that post goes, rather than the template rendering itself.
+		// that post goes.
 		await expect(
 			editor.canvas.getByText( 'This is the Content block' )
 		).toBeVisible();

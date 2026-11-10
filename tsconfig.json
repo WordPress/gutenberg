@@ -80,6 +80,7 @@
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/style-runtime" },
 		{ "path": "packages/sync" },
+		{ "path": "packages/template-inheritance" },
 		{ "path": "packages/theme" },
 		{ "path": "packages/theme/tsconfig.bin.json" },
 		{ "path": "packages/theme-build-tools" },

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { WpTemplate } from '@wordpress/core-data';
-import { getAvailableTemplates } from '../wp_template/template/hooks';
+import { getAvailableTemplates } from '../parent-template/hooks';
 
 type TestTemplate = {
 	slug: string;
 	template?: string;
-	has_content_slot?: boolean;
+	has_template_slot?: boolean;
 };
 
 function templates( ...list: TestTemplate[] ): WpTemplate[] {
@@ -19,9 +19,9 @@ function slugs( list: WpTemplate[] ): string[] {
 describe( 'getAvailableTemplates', () => {
 	it( 'offers the templates with a slot, other than the template itself', () => {
 		const all = templates(
-			{ slug: 'layout', has_content_slot: true },
-			{ slug: 'page-404', has_content_slot: true },
-			{ slug: 'blank', has_content_slot: false }
+			{ slug: 'layout', has_template_slot: true },
+			{ slug: 'page-404', has_template_slot: true },
+			{ slug: 'blank', has_template_slot: false }
 		);
 
 		expect(
@@ -31,9 +31,9 @@ describe( 'getAvailableTemplates', () => {
 
 	it( 'leaves out a template that is rendered inside another', () => {
 		const all = templates(
-			{ slug: 'base', has_content_slot: true },
-			{ slug: 'layout', template: 'base', has_content_slot: true },
-			{ slug: 'page-404', has_content_slot: true }
+			{ slug: 'base', has_template_slot: true },
+			{ slug: 'layout', template: 'base', has_template_slot: true },
+			{ slug: 'page-404', has_template_slot: true }
 		);
 
 		expect(
@@ -43,9 +43,9 @@ describe( 'getAvailableTemplates', () => {
 
 	it( 'offers nothing to a template other templates are rendered inside', () => {
 		const all = templates(
-			{ slug: 'base', has_content_slot: true },
-			{ slug: 'layout', has_content_slot: true },
-			{ slug: 'page-404', template: 'layout', has_content_slot: true }
+			{ slug: 'base', has_template_slot: true },
+			{ slug: 'layout', has_template_slot: true },
+			{ slug: 'page-404', template: 'layout', has_template_slot: true }
 		);
 
 		expect(
@@ -55,9 +55,9 @@ describe( 'getAvailableTemplates', () => {
 
 	it( 'keeps the template already named, whatever it holds', () => {
 		const all = templates(
-			{ slug: 'base', has_content_slot: true },
-			{ slug: 'layout', template: 'base', has_content_slot: false },
-			{ slug: 'page-404', template: 'layout', has_content_slot: true }
+			{ slug: 'base', has_template_slot: true },
+			{ slug: 'layout', template: 'base', has_template_slot: false },
+			{ slug: 'page-404', template: 'layout', has_template_slot: true }
 		);
 
 		expect(
@@ -71,7 +71,7 @@ describe( 'getAvailableTemplates', () => {
 	} );
 
 	it( 'offers nothing to a template with no slug', () => {
-		const all = templates( { slug: 'layout', has_content_slot: true } );
+		const all = templates( { slug: 'layout', has_template_slot: true } );
 
 		expect( getAvailableTemplates( all, {} ) ).toEqual( [] );
 	} );

@@ -2,7 +2,7 @@ import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/ui';
-import { getItemTitle } from '../../shared/title/get-item-title';
+import { getItemTitle } from '../get-item-title';
 import { useAvailableTemplates } from './hooks';
 import type { TemplateWithTemplate } from './types';
 
@@ -35,13 +35,16 @@ export default function TemplateEdit( {
 	);
 	const onValueChange = useCallback(
 		( item: { value: string | null } | null ) =>
-			onChange( {
-				[ field.id ]:
-					! item?.value || item.value === NO_TEMPLATE_VALUE
-						? ''
-						: item.value,
-			} ),
-		[ field.id, onChange ]
+			onChange(
+				field.setValue( {
+					item: data,
+					value:
+						! item?.value || item.value === NO_TEMPLATE_VALUE
+							? ''
+							: item.value,
+				} )
+			),
+		[ data, field, onChange ]
 	);
 
 	return (

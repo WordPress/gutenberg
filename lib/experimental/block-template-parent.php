@@ -3,16 +3,17 @@
  * Renders a template inside the template assigned to it.
  *
  * A template can name another template to render inside, the way a page names
- * the template it is rendered inside. The parent's `core/post-content` block
- * is the slot: the child template's blocks are rendered in it, so a template
- * only carries what is particular to it and the header, the footer and
- * whatever else surrounds it live in one place.
+ * the template it is rendered inside. The parent's `core/template-slot` block
+ * is where: the child template's blocks are rendered in it, in place of what
+ * the slot holds for the parent's own requests, so a template only carries
+ * what is particular to it and the header, the footer and whatever else
+ * surrounds it live in one place.
  *
  * A site names it from the editor. The choice is stored in the
- * `_wp_page_template` post meta of the template's own post, the same meta a
- * page uses to name its template, so the REST field is called `template` like
- * the one on a post. The meta is `default` when the site renders the template
- * on its own, and absent when the site has made no choice.
+ * `_wp_template_parent` post meta of the template's own post, and exposed as
+ * the `template` REST field, like the one on a post. The meta is `default`
+ * when the site renders the template on its own, and absent when the site has
+ * made no choice.
  *
  * Behind the `gutenberg-template-inheritance` experiment, which is what loads
  * this file, while the product questions this opens are settled: named slots,
@@ -22,61 +23,62 @@
  */
 
 /**
- * The block whose `core/post-content` blocks are not the slot.
- *
- * A query loop renders its blocks once per post, so the `core/post-content`
- * block inside one belongs to the post it is rendering rather than to the
- * template. The editor leaves those out of the post content blocks it makes
- * editable for the same reason, see the `getPostBlocksByName` selector of the
- * editor package.
+ * The block a template renders the templates inside it in.
  */
-const GUTENBERG_TEMPLATE_CONTENT_SLOT_EXCLUDED_BLOCK = 'core/query';
+const GUTENBERG_TEMPLATE_SLOT_BLOCK = 'core/template-slot';
 
 /**
- * The attribute marking the `core/post-content` block that is the slot.
+ * The post meta storing the template a template is rendered inside.
  *
- * The blocks of the template being rendered are resolved into the serialized
- * blocks of the template around it, so the block that holds them is marked in
- * the markup itself rather than in a variable. It is set while answering a
- * request and never saved.
+ * A key of its own rather than the `_wp_page_template` a post names its
+ * template with, so that what a site stores while trying the experiment can be
+ * renamed or cleaned up, and core is free to give that key a meaning of its own
+ * for templates.
  */
-const GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE = 'templateSlot';
+const GUTENBERG_TEMPLATE_PARENT_META_KEY = '_wp_template_parent';
 
 /**
- * Returns whether a template has a `core/post-content` block to render a
+ * Parses the blocks of a template, with its patterns resolved.
+ *
+ * Themes build templates out of pattern references, so the slot can be in a
+ * pattern rather than in the template itself. Resolving them first finds it
+ * there, the way the editor does once it has loaded the patterns.
+ *
+ * @access private
+ *
+ * @param string $content Serialized blocks of the template.
+ * @return array Parsed blocks, with every `core/pattern` block replaced by its blocks.
+ */
+function gutenberg_parse_block_template_blocks( $content ) {
+	return resolve_pattern_blocks( parse_blocks( (string) $content ) );
+}
+
+/**
+ * Returns whether a template has a `core/template-slot` block to render a
  * template inside.
  *
  * @param string $content Serialized blocks of the template.
  * @return bool Whether it has a slot.
  */
-function gutenberg_block_template_has_content_slot( $content ) {
-	return gutenberg_blocks_have_content_slot( parse_blocks( (string) $content ) );
+function gutenberg_block_template_has_slot( $content ) {
+	return gutenberg_blocks_have_template_slot( gutenberg_parse_block_template_blocks( $content ) );
 }
 
 /**
- * Returns whether a list of parsed blocks holds the `core/post-content` block
- * that is the slot.
- *
- * Follows the same walk as `gutenberg_substitute_content_slot_in_block()`,
- * without building or serializing anything, since it answers the REST field of
- * every template of a collection.
+ * Returns whether a list of parsed blocks holds a `core/template-slot` block.
  *
  * @access private
  *
  * @param array $blocks Parsed blocks to search.
  * @return bool Whether one of them, at any depth, is the slot.
  */
-function gutenberg_blocks_have_content_slot( $blocks ) {
+function gutenberg_blocks_have_template_slot( $blocks ) {
 	foreach ( $blocks as $block ) {
-		if ( GUTENBERG_TEMPLATE_CONTENT_SLOT_EXCLUDED_BLOCK === $block['blockName'] ) {
-			continue;
-		}
-
-		if ( 'core/post-content' === $block['blockName'] ) {
+		if ( GUTENBERG_TEMPLATE_SLOT_BLOCK === $block['blockName'] ) {
 			return true;
 		}
 
-		if ( ! empty( $block['innerBlocks'] ) && gutenberg_blocks_have_content_slot( $block['innerBlocks'] ) ) {
+		if ( ! empty( $block['innerBlocks'] ) && gutenberg_blocks_have_template_slot( $block['innerBlocks'] ) ) {
 			return true;
 		}
 	}
@@ -189,7 +191,7 @@ function gutenberg_get_block_template_parent_slug( $template ) {
 		return '';
 	}
 
-	$slug = get_post_meta( $template->wp_id, '_wp_page_template', true );
+	$slug = get_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_PARENT_META_KEY, true );
 
 	if ( ! is_string( $slug ) || '' === $slug ) {
 		return '';
@@ -199,17 +201,19 @@ function gutenberg_get_block_template_parent_slug( $template ) {
 }
 
 /**
- * Puts blocks inside the first `core/post-content` block of a template.
+ * Puts blocks inside the `core/template-slot` block of a template.
  *
- * Walks the tree in document order and uses the first `core/post-content`
- * block it reaches, at whatever depth, keeping the blocks that surround it.
+ * Walks the tree in document order, with the template's patterns resolved, and
+ * uses the first slot it reaches, at whatever depth, keeping the blocks that
+ * surround it. The editor lets a template have one slot, and treats the first
+ * as the slot when one has more anyway.
  *
  * @param string $parent_content Serialized blocks of the template to substitute into.
  * @param string $child_content  Serialized blocks to put in the slot.
- * @return string|null The combined blocks, or `null` when the template has no `core/post-content` block.
+ * @return string|null The combined blocks, or `null` when the template has no slot.
  */
-function gutenberg_substitute_template_content_slot( $parent_content, $child_content ) {
-	$parent_blocks = parse_blocks( $parent_content );
+function gutenberg_substitute_template_slot( $parent_content, $child_content ) {
+	$parent_blocks = gutenberg_parse_block_template_blocks( $parent_content );
 
 	/*
 	 * The top level of a template is a list of blocks rather than one block, so
@@ -217,7 +221,7 @@ function gutenberg_substitute_template_content_slot( $parent_content, $child_con
 	 * Only the slot block itself changes shape, so no `innerContent` above it
 	 * is rewritten, and this one is never read.
 	 */
-	$result = gutenberg_substitute_content_slot_in_block(
+	$result = gutenberg_substitute_template_slot_in_block(
 		array(
 			'blockName'    => null,
 			'attrs'        => array(),
@@ -236,22 +240,18 @@ function gutenberg_substitute_template_content_slot( $parent_content, $child_con
 }
 
 /**
- * Puts blocks inside the first `core/post-content` block among a block's descendants.
+ * Puts blocks inside the first `core/template-slot` block among a block's descendants.
  *
  * @access private
  *
  * @param array $block        Parsed block to search.
  * @param array $child_blocks Parsed blocks to put in the slot.
- * @return array|null The block with the blocks in its slot, or `null` when it has no `core/post-content` descendant.
+ * @return array|null The block with the blocks in its slot, or `null` when it has no slot among its descendants.
  */
-function gutenberg_substitute_content_slot_in_block( $block, $child_blocks ) {
+function gutenberg_substitute_template_slot_in_block( $block, $child_blocks ) {
 	foreach ( $block['innerBlocks'] as $index => $inner_block ) {
-		if ( GUTENBERG_TEMPLATE_CONTENT_SLOT_EXCLUDED_BLOCK === $inner_block['blockName'] ) {
-			continue;
-		}
-
-		if ( 'core/post-content' === $inner_block['blockName'] ) {
-			$block['innerBlocks'][ $index ] = gutenberg_fill_template_content_slot( $inner_block, $child_blocks );
+		if ( GUTENBERG_TEMPLATE_SLOT_BLOCK === $inner_block['blockName'] ) {
+			$block['innerBlocks'][ $index ] = gutenberg_fill_template_slot( $inner_block, $child_blocks );
 
 			return $block;
 		}
@@ -260,7 +260,7 @@ function gutenberg_substitute_content_slot_in_block( $block, $child_blocks ) {
 			continue;
 		}
 
-		$substituted = gutenberg_substitute_content_slot_in_block( $inner_block, $child_blocks );
+		$substituted = gutenberg_substitute_template_slot_in_block( $inner_block, $child_blocks );
 		if ( null !== $substituted ) {
 			// Only the block holding the slot changes shape, so the
 			// `innerContent` of everything above it still lines up.
@@ -274,101 +274,28 @@ function gutenberg_substitute_content_slot_in_block( $block, $child_blocks ) {
 }
 
 /**
- * Makes the slot block of a template hold the blocks of the template rendered inside it.
+ * Makes the slot of a template hold the blocks of the template rendered inside it.
  *
- * The `core/post-content` block stays where it is and takes the blocks as its
- * own, rather than being replaced by them, so that it still renders its
+ * The blocks take the place of what the slot holds for the template's own
+ * requests. The slot block stays where it is, so that it still renders its
  * wrapper: its layout, its alignment and the rest of its block supports apply
- * to the template rendered inside it, and a theme styling `.entry-content`
- * still reaches it. It is also what the editor shows around the blocks being
- * edited, so the canvas and the front end agree.
+ * to the template rendered inside it, as they do in the editor.
  *
  * @access private
  *
- * @param array $slot         The parsed `core/post-content` block that is the slot.
+ * @param array $slot         The parsed `core/template-slot` block.
  * @param array $child_blocks Parsed blocks to put in it.
  * @return array The slot block, holding the blocks.
  */
-function gutenberg_fill_template_content_slot( $slot, $child_blocks ) {
-	if ( ! is_array( $slot['attrs'] ) ) {
-		$slot['attrs'] = array();
-	}
-
+function gutenberg_fill_template_slot( $slot, $child_blocks ) {
 	$slot['innerBlocks'] = $child_blocks;
 	$slot['innerHTML']   = '';
 	// `serialize_block()` reads one inner block for every `null`, and
 	// `WP_Block::render()` renders one for every `null` in turn.
 	$slot['innerContent'] = array_fill( 0, count( $child_blocks ), null );
 
-	$slot['attrs'][ GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE ] = true;
-
 	return $slot;
 }
-
-/**
- * Renders the blocks a template puts in its slot inside the content block's own wrapper.
- *
- * The slot is a `core/post-content` block that holds the blocks of the
- * template rendered inside it, which `WP_Block::render()` has already rendered
- * into `$content` by the time the block's own callback runs. Rendering the post
- * of the request instead, as the block otherwise would, is what has to be
- * skipped; the wrapper is not, so it is built here the way the block builds it.
- *
- * @access private
- *
- * @param array  $args Arguments of the block type being registered.
- * @param string $name Name of the block type being registered.
- * @return array The arguments, with the slot handled for `core/post-content`.
- */
-function gutenberg_render_template_content_slot( $args, $name ) {
-	if ( 'core/post-content' !== $name || ! isset( $args['render_callback'] ) ) {
-		return $args;
-	}
-
-	$render_post_content = $args['render_callback'];
-
-	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $render_post_content ) {
-		/*
-		 * The attribute marks the slot, and is not registered, so it is read
-		 * from the parsed block rather than from the prepared attributes.
-		 */
-		$is_slot = isset( $block->parsed_block['attrs'][ GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE ] )
-			&& true === $block->parsed_block['attrs'][ GUTENBERG_TEMPLATE_CONTENT_SLOT_ATTRIBUTE ];
-
-		if ( ! $is_slot ) {
-			return call_user_func( $render_post_content, $attributes, $content, $block );
-		}
-
-		if ( '' === trim( $content ) ) {
-			return '';
-		}
-
-		/*
-		 * The allowed tag names and the `entry-content` class follow
-		 * `render_block_core_post_content()`, so that the template rendered
-		 * inside sits in the same wrapper on the front end as in the editor.
-		 */
-		$tag_name = 'div';
-		if ( isset( $attributes['tagName'] ) && is_string( $attributes['tagName'] ) ) {
-			$allowed_tag_names   = array( 'div', 'main', 'section', 'article' );
-			$normalized_tag_name = strtolower( $attributes['tagName'] );
-
-			if ( in_array( $normalized_tag_name, $allowed_tag_names, true ) ) {
-				$tag_name = $normalized_tag_name;
-			}
-		}
-
-		return sprintf(
-			'<%1$s %2$s>%3$s</%1$s>',
-			$tag_name,
-			get_block_wrapper_attributes( array( 'class' => 'entry-content' ) ),
-			$content
-		);
-	};
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_render_template_content_slot', 10, 2 );
 
 /**
  * Renders a template inside the template assigned to it.
@@ -381,7 +308,7 @@ add_filter( 'register_block_type_args', 'gutenberg_render_template_content_slot'
  *
  * Renders the template on its own when it names no template, names itself,
  * names one that is not there or is empty, or names one with no
- * `core/post-content` block to render it in.
+ * `core/template-slot` block to render it in.
  *
  * @param string $template_id ID of the template being rendered, as `theme//slug`.
  * @param string $content     Serialized blocks of the template being rendered.
@@ -408,7 +335,7 @@ function gutenberg_resolve_block_template_parents( $template_id, $content ) {
 		return null;
 	}
 
-	return gutenberg_substitute_template_content_slot( $parent->content, $content );
+	return gutenberg_substitute_template_slot( $parent->content, $content );
 }
 
 /**
@@ -480,7 +407,7 @@ function gutenberg_update_block_template_parent_field( $value, $template ) {
 	 * template on its own is told apart from one that has made no choice and
 	 * takes the template its theme names.
 	 */
-	update_post_meta( $template->wp_id, '_wp_page_template', '' === $value ? 'default' : $value );
+	update_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_PARENT_META_KEY, '' === $value ? 'default' : $value );
 
 	return true;
 }
@@ -491,11 +418,11 @@ function gutenberg_update_block_template_parent_field( $value, $template ) {
  * @access private
  *
  * @param array $item Prepared template response.
- * @return bool Whether the template has a `core/post-content` block to render a template inside.
+ * @return bool Whether the template has a `core/template-slot` block to render a template inside.
  */
-function gutenberg_get_block_template_has_content_slot_field( $item ) {
+function gutenberg_get_block_template_has_template_slot_field( $item ) {
 	if ( isset( $item['content']['raw'] ) ) {
-		return gutenberg_block_template_has_content_slot( $item['content']['raw'] );
+		return gutenberg_block_template_has_slot( $item['content']['raw'] );
 	}
 
 	// The content belongs to the `edit` context, so a response that leaves it
@@ -504,7 +431,7 @@ function gutenberg_get_block_template_has_content_slot_field( $item ) {
 	if ( isset( $item['id'] ) ) {
 		$template = gutenberg_get_block_template_read( $item['id'] );
 
-		return $template ? gutenberg_block_template_has_content_slot( $template->content ) : false;
+		return $template ? gutenberg_block_template_has_slot( $template->content ) : false;
 	}
 
 	return false;
@@ -537,11 +464,11 @@ function gutenberg_register_block_template_parent_field() {
 
 	register_rest_field(
 		'wp_template',
-		'has_content_slot',
+		'has_template_slot',
 		array(
-			'get_callback' => 'gutenberg_get_block_template_has_content_slot_field',
+			'get_callback' => 'gutenberg_get_block_template_has_template_slot_field',
 			'schema'       => array(
-				'description' => __( 'Whether the template has a post content block to render another template inside of.', 'gutenberg' ),
+				'description' => __( 'Whether the template has a template slot block to render another template inside of.', 'gutenberg' ),
 				'type'        => 'boolean',
 				'context'     => array( 'embed', 'view', 'edit' ),
 				'readonly'    => true,
@@ -552,7 +479,40 @@ function gutenberg_register_block_template_parent_field() {
 add_action( 'rest_api_init', 'gutenberg_register_block_template_parent_field' );
 
 /**
- * Adds the `template` field to the form of the template summary.
+ * Registers the field naming the template a template is rendered inside.
+ *
+ * Registered here rather than with the `wp_template` collection of
+ * `@wordpress/core-fields`, which holds the fields core registers, so that the
+ * field and its script module only exist while the experiment is on, and that
+ * package stays as core ships it.
+ *
+ * Its id is `parent_template` rather than the `template` every other post type
+ * has, which is the template that renders a post; its value is the `template`
+ * REST field, which matches the one on a post.
+ *
+ * @access private
+ */
+function gutenberg_register_block_template_parent_entity_field() {
+	wp_register_entity_fields(
+		'gutenberg',
+		'postType',
+		'wp_template',
+		array(
+			array(
+				'id'            => 'parent_template',
+				'type'          => 'text',
+				'label'         => __( 'Template', 'gutenberg' ),
+				'enableSorting' => false,
+				'filterBy'      => false,
+			),
+		),
+		'@wordpress/template-inheritance'
+	);
+}
+add_action( 'wp_entity_fields_api_init', 'gutenberg_register_block_template_parent_entity_field' );
+
+/**
+ * Adds the `parent_template` field to the form of the template summary.
  *
  * The field is merged rather than pinned into the list, so that the view
  * configuration of `wp_template` stays as the plugin ships it and this feature
@@ -568,7 +528,7 @@ function gutenberg_add_block_template_parent_field_to_view_config( $data ) {
 	return $data->merge(
 		array(
 			'form' => array(
-				'fields' => array( 'template' ),
+				'fields' => array( 'parent_template' ),
 			),
 		),
 		1
@@ -576,7 +536,7 @@ function gutenberg_add_block_template_parent_field_to_view_config( $data ) {
 }
 
 /**
- * Registers the view configuration filter of the `template` field.
+ * Registers the view configuration filter of the `parent_template` field.
  *
  * Registered on `init`, after the entity view configuration API has defined the
  * function naming its hook.
