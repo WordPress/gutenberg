@@ -75,15 +75,20 @@ test.describe( 'Site Editor Performance', () => {
 
 		const samples = 10;
 		const throwaway = 1;
-		const iterations = samples + throwaway;
+		// One more load is traced and not counted, as tracing slows it down.
+		const iterations = samples + throwaway + 1;
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				admin,
 				perfUtils,
 				metrics,
 			} ) => {
+				const isTraced = i === iterations;
+
 				// Start tracing before navigating so the page load is captured.
-				await metrics.startTracing();
+				if ( isTraced ) {
+					await metrics.startTracing();
+				}
 
 				// Go to the test draft.
 				await admin.page.goto(
@@ -101,14 +106,12 @@ test.describe( 'Site Editor Performance', () => {
 				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
 
-				// Stop tracing. Save just one representative sample.
-				await metrics.stopTracing(
-					i === Math.floor( iterations / 2 ) &&
-						'site-editor-first-block'
-				);
+				if ( isTraced ) {
+					await metrics.stopTracing( 'site-editor-first-block' );
+				}
 
 				// Save the results.
-				if ( i > throwaway ) {
+				if ( i > throwaway && ! isTraced ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							if ( metric === 'timeSinceResponseEnd' ) {

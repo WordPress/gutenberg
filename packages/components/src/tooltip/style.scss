@@ -3,7 +3,10 @@
 @use "@wordpress/base-styles/z-index" as *;
 
 .components-tooltip {
-	background: $black;
+	// @wordpress/ui Tooltip uses a surface token inside a ThemeProvider fixed to
+	// #1e1e1e. Without that dark theme context, the token can resolve to a light
+	// background. Use the same fixed color here to keep the tooltip dark.
+	background: $gray-900;
 	font-family: $default-font;
 	border-radius: var(--wpds-border-radius-md);
 	color: $gray-100;

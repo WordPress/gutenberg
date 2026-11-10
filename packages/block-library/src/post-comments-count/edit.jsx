@@ -1,35 +1,13 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { usePostCommentsCount } from '../utils/hooks';
 
 export default function PostCommentsCountEdit( { context } ) {
 	const { postId } = context;
-	const [ commentsCount, setCommentsCount ] = useState();
+	const { totalItems: commentsCount } = usePostCommentsCount( postId );
 
 	const blockProps = useBlockProps();
 
-	useEffect( () => {
-		if ( ! postId ) {
-			return;
-		}
-
-		const currentPostId = postId;
-
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				post: postId,
-			} ),
-			parse: false,
-		} ).then( ( res ) => {
-			// Stale requests will have the `currentPostId` of an older closure.
-			if ( currentPostId === postId ) {
-				setCommentsCount( res.headers.get( 'X-WP-Total' ) );
-			}
-		} );
-	}, [ postId ] );
-
-	const hasPostAndComments = postId && commentsCount !== undefined;
+	const hasPostAndComments = postId && commentsCount !== null;
 
 	const blockStyles = {
 		...blockProps.style,
