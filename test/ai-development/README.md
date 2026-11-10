@@ -147,15 +147,17 @@ npm --prefix test/ai-development run view
 
 Results under `results/` are gitignored and may contain source code and tool output.
 
-## Flaky E2E investigation command
+## E2E failure investigation
 
-`specs/testing-skill-routing/flaky-e2e-command.eval.js` asks for the first test command to investigate a hypothetical flaky paragraph test. The subject has read-only tools and can invoke skills, but cannot execute the proposed command or edit files. The scenario states that the build and test environment are ready, so the answer can focus on investigating the test.
+`specs/testing-skill-routing/flaky-e2e-command.eval.js` asks for the first investigation step in four hypothetical cases: a rare CI-only failure with artifacts available, a tagged WebKit failure on Linux, a failure that depends on an earlier test in the same file, and persistent setup failures with different errors across retries. The subject has read-only tools and can invoke skills, but cannot execute commands or edit files. Test environments are already built and running.
 
 ```bash
 npm run test:agent-evals -- --config specs/testing-skill-routing/flaky-e2e-command.eval.js
 ```
 
-The command-quality metric grades a scoped, headless repeat run and its explanation independently of skill invocation and reference reads. A good answer can pass that metric without reading the skill, and reading the skill cannot make a poor command pass. This measures the proposed investigation step, not whether it reproduces or fixes a flake. It does not establish that the skill improves quality; comparing guidance versions remains separate work in [#82000](https://github.com/WordPress/gutenberg/pull/82000).
+Separate quality metrics judge the first investigation step, preservation of relevant failure conditions, and preservation of failure evidence. Skill invocation and reference reads are separate metrics. The rubric accepts artifact inspection when rerunning tests is the wrong first step and has no arbitrary minimum repeat count. Linux WebKit needs a virtual display rather than the headless Chromium command used for the order-dependent case.
+
+This measures proposed investigation decisions, not whether they reproduce or fix a failure. Passing results do not establish that the skill improves quality. A comparison needs fresh agent sessions with identical prompts, model, tools, and quality assertions, while making the testing skill unavailable in one condition. Remove both its source files and generated catalog entry before the disposable workspace's initial commit; disabling the Skill tool alone still leaves the guidance readable. Keep the other repository documentation available in both conditions, and keep grading code and prior results outside both subjects' reach. General comparison infrastructure remains separate work in [#82000](https://github.com/WordPress/gutenberg/pull/82000).
 
 ## Authoring
 
