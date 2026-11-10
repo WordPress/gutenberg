@@ -78,12 +78,10 @@ export function useNoteThreads( postId ) {
 
 		return {
 			clientIds: ids,
-			/*
-			 * The note ids of each block, in the order of `clientIds`, as
-			 * one string. A string only changes when a block gains or loses
-			 * a note, so notes are matched to blocks again exactly then. This
-			 * covers a collaborator's note id that arrives after its thread.
-			 */
+			// Used to react to note ids that arrive from collaborators
+			// during real-time collaboration. Stored as a string so that
+			// it only counts as changed when the note ids change, instead
+			// of on every editor update.
 			noteIdsJson: JSON.stringify(
 				ids.map( ( clientId ) =>
 					getNoteIdsFromMetadata(
