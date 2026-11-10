@@ -101,6 +101,30 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Loading state', () => {
+		it( 'keeps the saved overlay when options finish loading', () => {
+			useEntityRecords.mockReturnValue( {
+				records: null,
+				isResolving: true,
+				hasResolved: false,
+			} );
+			const props = { ...defaultProps, overlay: 'my-overlay' };
+			const { rerender } = render(
+				<OverlayTemplatePartSelector { ...props } />
+			);
+
+			useEntityRecords.mockReturnValue( {
+				records: [ templatePart1 ],
+				isResolving: false,
+				hasResolved: true,
+			} );
+			rerender( <OverlayTemplatePartSelector { ...props } /> );
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
+			).toHaveTextContent( 'My Overlay' );
+			expect( mockSetAttributes ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should disable select control when template parts are resolving', () => {
 			useEntityRecords.mockReturnValue( {
 				records: null,
@@ -118,6 +142,40 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Overlay selection', () => {
+		it( 'shows and clears a missing overlay', async () => {
+			const user = userEvent.setup();
+			useEntityRecords.mockReturnValue( {
+				records: [ templatePart1 ],
+				isResolving: false,
+				hasResolved: true,
+			} );
+			render(
+				<OverlayTemplatePartSelector
+					{ ...defaultProps }
+					overlay="deleted-overlay"
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
+			);
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'deleted-overlay (missing)',
+					selected: true,
+				} )
+			).toBeInTheDocument();
+			await user.keyboard( '{Escape}' );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Reset to default overlay',
+				} )
+			);
+			expect( mockSetAttributes ).toHaveBeenCalledWith( {
+				overlay: undefined,
+			} );
+		} );
+
 		it( 'should show Create Overlay button when no overlays exist', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
@@ -166,7 +224,8 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should show dropdown selector when any overlays exist', () => {
+		it( 'should show dropdown selector when any overlays exist', async () => {
+			const user = userEvent.setup();
 			useEntityRecords.mockReturnValue( {
 				records: [
 					templatePart1,
@@ -184,15 +243,18 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 			expect( select ).toBeInTheDocument();
 
+			expect( select ).toHaveTextContent( 'Default' );
+			await user.click( select );
+
 			// Should have Default + 2 overlays (not the header one)
-			const options = screen.getAllByRole( 'option' );
+			const options = await screen.findAllByRole( 'option' );
 			expect( options ).toHaveLength( 3 );
 
 			expect(
-				screen.getByRole( 'option', { name: 'My Overlay' } )
+				await screen.findByRole( 'option', { name: 'My Overlay' } )
 			).toBeInTheDocument();
 			expect(
-				screen.getByRole( 'option', { name: 'Another Overlay' } )
+				await screen.findByRole( 'option', { name: 'Another Overlay' } )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'option', { name: 'Header Part' } )
@@ -200,11 +262,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			// Should show "Default" option (not "None (default)")
 			expect(
-				screen.getByRole( 'option', { name: 'Default' } )
+				await screen.findByRole( 'option', { name: 'Default' } )
 			).toBeInTheDocument();
 		} );
 
-		it( 'should display overlay slug when title is missing', () => {
+		it( 'should display overlay slug when title is missing', async () => {
+			const user = userEvent.setup();
 			const templatePartNoTitle = {
 				...templatePart1,
 				title: null,
@@ -218,8 +281,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
+			);
+
 			expect(
-				screen.getByRole( 'option', { name: 'my-overlay' } )
+				await screen.findByRole( 'option', { name: 'my-overlay' } )
 			).toBeInTheDocument();
 		} );
 
@@ -238,7 +305,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			await user.selectOptions( select, 'my-overlay' );
+			await user.click( select );
+			await user.click(
+				await screen.findByRole( 'option', { name: 'My Overlay' } )
+			);
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
 				overlay: 'my-overlay',
@@ -265,7 +335,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			await user.selectOptions( select, '' );
+			await user.click( select );
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Default' } )
+			);
 
 			expect( mockSetAttributes ).toHaveBeenCalledWith( {
 				overlay: undefined,
@@ -290,7 +363,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 				name: 'Overlay template',
 			} );
 
-			expect( select ).toHaveValue( 'my-overlay' );
+			expect( select ).toHaveTextContent( 'My Overlay' );
 		} );
 	} );
 
@@ -486,7 +559,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 			// Should show dropdown selector
 			expect(
 				screen.getByRole( 'combobox', { name: 'Overlay template' } )
-			).toBeInTheDocument();
+			).toHaveAccessibleDescription(
+				'Select an overlay for navigation.'
+			);
 
 			// Should show default help text
 			expect(
