@@ -13,6 +13,7 @@
 -   Tabs: Open the tab panels when an HTML anchor on the Tabs block or a Tab Panel contains a character such as `&` or `'`, instead of leaving them hidden ([#86415](https://github.com/WordPress/gutenberg/pull/86415)).
 -   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
 -   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
+-   Latest Posts: Stop automatically adding `noopener` to links ([#86491](https://github.com/WordPress/gutenberg/pull/86491)).
 
 ## 12.1.0 (2026-11-04)
 
