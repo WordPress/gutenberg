@@ -12,6 +12,7 @@ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 import {
 	computeBetterFgColorDirection,
+	adjustContrastTarget,
 	sortByDependency,
 	stepsForStep,
 } from '../lib/utils';
@@ -68,7 +69,31 @@ describe( 'buildRamps', () => {
 		}
 	);
 
-	it( 'reports a ramp warning when rounded colors miss a required contrast target', () => {
+	it( 'does not warn when emitted colors meet the configured target but miss the rounding reserve', () => {
+		const target = 20;
+		const { ramp, warnings } = buildRamp(
+			'rgb(0 10.6 0)',
+			{
+				...BG_RAMP_CONFIG,
+				fgSurface3: {
+					contrast: {
+						reference: 'seed',
+						followDirection: 'lighter',
+						target,
+					},
+					lightness: () => 1,
+				},
+			},
+			{ rescaleToFitContrastTargets: false }
+		);
+		const contrast = getContrast( ramp.surface2, ramp.fgSurface3 );
+
+		expect( contrast ).toBeGreaterThanOrEqual( target );
+		expect( contrast ).toBeLessThan( adjustContrastTarget( target ) );
+		expect( warnings ?? [] ).not.toContain( 'fgSurface3' );
+	} );
+
+	it( 'warns when emitted colors miss the configured target', () => {
 		const { ramp, warnings } = buildRamp(
 			'rgb(0 10.6 0)',
 			{
