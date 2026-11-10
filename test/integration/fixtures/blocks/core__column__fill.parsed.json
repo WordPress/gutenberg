@@ -1,0 +1,29 @@
+[
+	{
+		"blockName": "core/column",
+		"attrs": {
+			"style": {
+				"dimensions": {
+					"width": "var:preset|dimension|fill"
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>This column takes the remaining space.</p>\n\t",
+				"innerContent": [
+					"\n\t<p>This column takes the remaining space.</p>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-column\" style=\"flex-basis:0;flex-grow:1\">\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-column\" style=\"flex-basis:0;flex-grow:1\">\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

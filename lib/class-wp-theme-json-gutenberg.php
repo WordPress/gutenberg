@@ -4250,6 +4250,10 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				$style_variation_declarations[ $style_variation['selector'] ] = $variation_base_declarations;
 
+				if ( 'core/column' === ( $block_metadata['name'] ?? null ) ) {
+					$style_variation_declarations[ $style_variation['selector'] ] = gutenberg_update_column_width_declarations( $style_variation_declarations[ $style_variation['selector'] ] );
+				}
+
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? self::get_block_name_from_metadata_path( $block_metadata ) : null );
 				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_source, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
@@ -4319,6 +4323,10 @@ class WP_Theme_JSON_Gutenberg {
 
 						$feature_ruleset           = static::to_ruleset( ':root :where(' . $combined_selectors . ')', $feature_decl );
 						$variation_responsive_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
+					}
+
+					if ( 'core/column' === $block_name ) {
+						$breakpoint_declarations = gutenberg_update_column_width_declarations( $breakpoint_declarations );
 					}
 
 					if ( ! empty( $breakpoint_declarations ) ) {
@@ -4507,6 +4515,10 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
 				$should_set_root_min_height = true;
 			}
+		}
+
+		if ( 'core/column' === $block_name ) {
+			$declarations = gutenberg_update_column_width_declarations( $declarations );
 		}
 
 		/*

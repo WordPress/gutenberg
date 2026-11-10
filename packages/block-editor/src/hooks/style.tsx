@@ -76,7 +76,12 @@ interface StyleGroup {
 	style: BlockStyle;
 }
 
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+const { getResponsiveMediaQueries, getColumnFlexDeclarations } = unlock(
+	globalStylesEnginePrivateApis
+);
+
+// Blocks whose width must be serialized as flex sizing rather than `width`.
+const FLEX_WIDTH_BLOCKS = [ 'core/column' ];
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 
@@ -387,6 +392,36 @@ function getStateTextAlignCSS(
 }
 
 /**
+ * Returns CSS for a column block's width in a block instance state style object.
+ *
+ * The column block sizes itself with `flex-basis` rather than `width` because
+ * it lives in a flex container, so a state width needs its own declarations.
+ *
+ * @param stateStyles State style object.
+ * @param selector    CSS selector for the generated style.
+ * @return CSS string with the flex declarations.
+ */
+function getStateColumnWidthCSS(
+	stateStyles: PanelStyle | undefined,
+	selector: string | undefined
+) {
+	const width = stateStyles?.dimensions?.width;
+
+	if ( ! width ) {
+		return undefined;
+	}
+
+	const { flexBasis, flexGrow } = getColumnFlexDeclarations(
+		getCSSValueFromRawStyle( width )
+	);
+	const declarations = `flex-basis: ${ flexBasis } !important; flex-grow: ${ flexGrow } !important`;
+
+	return selector
+		? `${ selector } { ${ declarations }; }`
+		: `${ declarations };`;
+}
+
+/**
  * Generates CSS for a block instance state style object.
  *
  * State declarations need to win over preset utility classes, but fallback
@@ -396,18 +431,27 @@ function getStateTextAlignCSS(
  * @param stateStyles State style object.
  * @param selector    CSS selector for the generated style.
  * @param baseStyle   Styles the state layers over, if any.
+ * @param name        Block name, for blocks whose width is flex sizing.
  * @return Generated stylesheet.
  */
 export function getStateStylesCSS(
 	stateStyles: PanelStyle | undefined,
 	selector?: string,
-	baseStyle?: PanelStyle
+	baseStyle?: PanelStyle,
+	name?: string
 ): string {
-	const fallbackDimensionStyles =
-		getStateFallbackDimensionStyles( stateStyles );
-	const stylesWithDimensionFallbacks = fallbackDimensionStyles
-		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
+	const usesFlexWidth = !! name && FLEX_WIDTH_BLOCKS.includes( name );
+	const columnWidthCSS = usesFlexWidth
+		? getStateColumnWidthCSS( stateStyles, selector )
+		: undefined;
+	const engineStyles = columnWidthCSS
+		? omitStyle( stateStyles, [ [ 'dimensions', 'width' ] ] )
 		: stateStyles;
+	const fallbackDimensionStyles =
+		getStateFallbackDimensionStyles( engineStyles );
+	const stylesWithDimensionFallbacks = fallbackDimensionStyles
+		? mergeStyleObjects( engineStyles, fallbackDimensionStyles )
+		: engineStyles;
 	// The block styles have the shape the style engine reads.
 	const css = compileCSS( stylesWithDimensionFallbacks as Style, {
 		selector,
@@ -436,6 +480,7 @@ export function getStateStylesCSS(
 
 	return [
 		importantCSS,
+		columnWidthCSS,
 		textAlignCSS,
 		fallbackCSS,
 		backgroundResetCSS,
@@ -579,7 +624,8 @@ export function getBlockStateStylesCSS(
 					state,
 					name
 				),
-				baseStyle
+				baseStyle,
+				name
 			)
 		)
 		.filter( Boolean );

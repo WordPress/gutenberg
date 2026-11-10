@@ -435,8 +435,9 @@ function gutenberg_get_block_state_element_selectors( $root_selector ) {
  * @param array<string, mixed>      $style       Style object.
  * @param string|null               $rules_group Optional CSS grouping rule, e.g. a media query.
  * @param array<string, mixed>|null $base_style  Optional styles the state layers over.
+ * @param string|null               $block_name  Optional block name, for blocks whose width is flex sizing.
  */
-function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null, $base_style = null ) {
+function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null, $base_style = null, $block_name = null ) {
 	if ( empty( $style ) || ! is_array( $style ) ) {
 		return;
 	}
@@ -447,7 +448,15 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 		gutenberg_normalize_state_style_for_css_output( $style )
 	);
 	$declarations = $compiled['declarations'] ?? array();
-	$text_align   = $style['typography']['textAlign'] ?? null;
+
+	// The column block sizes itself with `flex-basis` rather than `width`.
+	if ( 'core/column' === $block_name && isset( $declarations['width'] ) ) {
+		$flex = gutenberg_get_column_flex_declarations( $declarations['width'] );
+		unset( $declarations['width'] );
+		$declarations = array_merge( $declarations, $flex );
+	}
+
+	$text_align = $style['typography']['textAlign'] ?? null;
 	// Base text alignment is class-based, so state styles need a declaration.
 	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
 		$declarations['text-align'] = $text_align;
@@ -509,7 +518,8 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 				$group['selector'],
 				$group['style'],
 				$rules_group,
-				$base_style
+				$base_style,
+				$block_type->name
 			);
 		}
 	}

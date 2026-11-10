@@ -8,6 +8,10 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from './utils/duotone';
+import {
+	getColumnFlexDeclarations,
+	isColumnFillWidth,
+} from './utils/column-width';
 import { transformToStylesWithTextClipBase } from './core/render';
 import { resolveStyle } from './resolve-style';
 import { getVariationStyle } from './variation';
@@ -23,5 +27,7 @@ lock( privateApis, {
 	getDuotoneUnsetStylesheet,
 	resolveStyle,
 	getVariationStyle,
+	getColumnFlexDeclarations,
+	isColumnFillWidth,
 	transformToStylesWithTextClipBase,
 } );
