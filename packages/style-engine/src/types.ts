@@ -77,6 +77,7 @@ export interface Style {
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textShadow?: CSSProperties[ 'textShadow' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
+		textWrap?: CSSProperties[ 'textWrap' ];
 		writingMode?: CSSProperties[ 'writingMode' ];
 	};
 	color?: {

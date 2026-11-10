@@ -161,7 +161,7 @@ export function getBackgroundImageClasses( style: PanelStyle | undefined ) {
 		hasBackgroundImageValue( style ) || hasBackgroundGradientValue( style );
 
 	// A text clip paints the glyphs, not the block. Mirror of
-	// `gutenberg_render_background_support()`.
+	// `gutenberg_get_background_classes_and_styles()`.
 	if ( ! hasBackground || 'text' === style?.background?.backgroundClip ) {
 		return '';
 	}
