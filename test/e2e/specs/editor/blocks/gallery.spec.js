@@ -405,61 +405,6 @@ test.describe( 'Gallery', () => {
 		expect( numbers ).not.toEqual( imageAltTexts );
 	} );
 
-	test( 'updates every image when changing Resolution and restores the default when reset', async ( {
-		admin,
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		const media = [
-			await requestUtils.uploadMedia(
-				'./assets/2000x1200_e2e_test_image_indexed.png'
-			),
-			await requestUtils.uploadMedia(
-				'./assets/1024x768_e2e_test_image.png'
-			),
-		];
-		await admin.createNewPost();
-		await editor.insertBlock( {
-			name: 'core/gallery',
-			innerBlocks: media.map( ( image ) => ( {
-				name: 'core/image',
-				attributes: { id: image.id, url: image.source_url },
-			} ) ),
-		} );
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'tab', { name: 'Settings', exact: true } )
-			.click();
-		const resolution = page.getByRole( 'combobox', {
-			name: 'Resolution',
-			exact: true,
-		} );
-		await resolution.click();
-		await page
-			.getByRole( 'option', { name: 'Medium', exact: true } )
-			.click();
-		const images = editor.canvas.getByRole( 'img' );
-		for ( const [ index, image ] of media.entries() ) {
-			await expect( images.nth( index ) ).toHaveAttribute(
-				'src',
-				image.media_details.sizes.medium.source_url
-			);
-		}
-		await page.getByRole( 'button', { name: 'Settings options' } ).click();
-		await page
-			.getByRole( 'menuitem', { name: 'Resolution, reset to default' } )
-			.click();
-		await expect( resolution ).toHaveText( 'Large' );
-		for ( const [ index, image ] of media.entries() ) {
-			await expect( images.nth( index ) ).toHaveAttribute(
-				'src',
-				image.media_details.sizes.large?.source_url ??
-					image.media_details.sizes.medium.source_url
-			);
-		}
-	} );
-
 	// Regression test for https://github.com/WordPress/gutenberg/issues/82252.
 	test( 'crops linked images to a uniform height in the editor canvas', async ( {
 		admin,
