@@ -19,7 +19,7 @@
 -   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
 -   Latest Posts: Stop automatically adding `noopener` to links ([#86491](https://github.com/WordPress/gutenberg/pull/86491)).
 -   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
--   Accordion: Rename the Icon Position options from Left and Right to Start and End, so the labels are correct on RTL sites, where the heading mirrors ([#ISSUE](https://github.com/WordPress/gutenberg/pull/ISSUE)).
+-   Accordion: Rename the Icon Position options from Left and Right to Start and End, so the labels are correct on RTL sites, where the heading mirrors ([#86586](https://github.com/WordPress/gutenberg/pull/86586)).
 
 ## 12.1.0 (2026-11-04)
 
