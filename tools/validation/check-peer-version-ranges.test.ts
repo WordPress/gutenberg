@@ -25,7 +25,11 @@ describe( 'nextReleaseVersion', () => {
 } );
 
 describe( 'findRangeMismatches', () => {
-	const workspaces = ( range: string, theme: string ) => ( {
+	const workspaces = (
+		range: string,
+		theme: string,
+		themeVersion = '3.0.0'
+	) => ( {
 		'packages/a': {
 			manifest: {
 				name: '@wordpress/a',
@@ -34,7 +38,7 @@ describe( 'findRangeMismatches', () => {
 			},
 		},
 		'packages/theme': {
-			manifest: { name: '@wordpress/theme', version: '3.0.0' },
+			manifest: { name: '@wordpress/theme', version: themeVersion },
 			changelog: theme,
 		},
 	} );
@@ -56,5 +60,36 @@ describe( 'findRangeMismatches', () => {
 		expect(
 			findRangeMismatches( workspaces( '<4.0.0', changelog( '' ) ) )
 		).toEqual( [] );
+	} );
+
+	describe( 'with a prerelease target version', () => {
+		const prerelease = '3.0.0-next.v.202609171837.0';
+		const breaking = changelog( '### Breaking Changes\n\n-   New.\n' );
+
+		test( 'checks the stable version it leads to', () => {
+			expect(
+				findRangeMismatches(
+					workspaces( '^3.0.0', changelog( '' ), prerelease )
+				)
+			).toEqual( [] );
+			expect(
+				findRangeMismatches(
+					workspaces( '<3.0.0', changelog( '' ), prerelease )
+				)
+			).toHaveLength( 1 );
+		} );
+
+		test( 'also checks the next breaking version', () => {
+			expect(
+				findRangeMismatches(
+					workspaces( '^3.0.0', breaking, prerelease )
+				)
+			).toHaveLength( 1 );
+			expect(
+				findRangeMismatches(
+					workspaces( '^3.0.0 || ^4.0.0', breaking, prerelease )
+				)
+			).toEqual( [] );
+		} );
 	} );
 } );

@@ -88,7 +88,11 @@ export function findRangeMismatches(
 			manifest.peerDependencies ?? {}
 		) ) {
 			const target = byName.get( peer );
-			const current = target?.manifest.version;
+			// A prerelease (e.g. on `wp/next`) is checked as the stable version it leads to.
+			const parsed = semver.parse( target?.manifest.version );
+			const current =
+				parsed &&
+				`${ parsed.major }.${ parsed.minor }.${ parsed.patch }`;
 			if ( ! target || ! current || ! semver.validRange( range ) ) {
 				continue;
 			}
