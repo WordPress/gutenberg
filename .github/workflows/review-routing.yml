@@ -7,6 +7,9 @@ on:
     # GitHub API, and never runs its code.
     pull_request_target:
         types: [opened, reopened, synchronize, ready_for_review]
+    # Temporary, for a demo in this pull request. Remove before merge.
+    pull_request:
+        types: [opened, reopened, synchronize, ready_for_review]
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -14,7 +17,8 @@ permissions: {}
 
 # Only the newest commit needs scores and review requests.
 concurrency:
-    group: ${{ github.workflow }}-${{ github.event.number }}
+    # Temporary: `event_name` keeps the demo run apart from the trunk run.
+    group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event_name }}
     cancel-in-progress: true
 
 jobs:
