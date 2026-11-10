@@ -1105,11 +1105,13 @@ supports: {
 
 An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen.
 
+In Global Styles, a block style variation or state that sets one axis outputs the other axis as `0`. For example, a Global Styles X offset of `3rem` with a `:hover` Y offset alone moves the block back to an X of `0` on hover.
+
 Transforms are applied to the block wrapper. A block can apply them to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies a transform itself can opt out of its output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. A missing axis is `0`. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. A block that sets one axis keeps the other axis from Global Styles, or from its own default value in a state such as `@mobile`, and `0` when neither sets it. For example:
 
 ```js
 attributes: {

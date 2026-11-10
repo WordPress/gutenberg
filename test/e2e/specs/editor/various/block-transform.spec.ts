@@ -172,6 +172,66 @@ test.describe( 'Transform block support', () => {
 		expect( await getRotate( enlargedFigure ) ).toBe( 'none' );
 	} );
 
+	test( 'keeps the Global Styles axis when a heading sets one axis', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const stylesPostId =
+			await requestUtils.getCurrentThemeGlobalStylesPostId();
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/global-styles/${ stylesPostId }`,
+			data: {
+				id: stylesPostId,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: { translate: { x: '30px' } },
+						},
+					},
+				},
+			},
+		} );
+
+		try {
+			// Global Styles reach the editor when it loads.
+			await page.reload();
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'Offset heading',
+					style: {
+						transform: { translate: { y: '4px' } },
+						'@mobile': { transform: { translate: { y: '-4px' } } },
+					},
+				},
+			} );
+
+			const canvasHeading = editor.canvas.locator( 'h2', {
+				hasText: 'Offset heading',
+			} );
+			await expect
+				.poll( () => getTranslate( canvasHeading ) )
+				.toBe( '30px 4px' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const heading = page.getByRole( 'heading', {
+				name: 'Offset heading',
+			} );
+			expect( await getTranslate( heading ) ).toBe( '30px 4px' );
+			await page.setViewportSize( { width: 400, height: 800 } );
+			await expect
+				.poll( () => getTranslate( heading ) )
+				.toBe( '30px -4px' );
+		} finally {
+			await requestUtils.resetThemeGlobalStyles();
+		}
+	} );
+
 	test( 'offsets a heading on mobile only on the front end', async ( {
 		editor,
 		page,

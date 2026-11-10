@@ -32,6 +32,142 @@ function gutenberg_register_transform_support( $block_type ) {
 }
 
 /**
+ * Fills the missing axis of a `translate` value from fallback values.
+ *
+ * CSS `translate` holds both axes, so a value that sets one axis replaces the
+ * other. Each missing axis takes the first valid value for it among the
+ * fallbacks, in order, so the axis renders as it did before.
+ *
+ * @since 7.3.0
+ *
+ * @param mixed $translate    The `translate` value, with `x` and `y` axes.
+ * @param array ...$fallbacks The `translate` values to fill from, in order.
+ * @return mixed The value with its missing axes filled, or the value as it was
+ *               if it is not a value with one axis.
+ */
+function gutenberg_fill_translate_axes( $translate, ...$fallbacks ) {
+	if ( ! is_array( $translate ) || ( isset( $translate['x'] ) === isset( $translate['y'] ) ) ) {
+		return $translate;
+	}
+
+	foreach ( array( 'x', 'y' ) as $axis ) {
+		if ( isset( $translate[ $axis ] ) ) {
+			continue;
+		}
+		foreach ( $fallbacks as $fallback ) {
+			$value = is_array( $fallback ) ? ( $fallback[ $axis ] ?? null ) : null;
+			if ( is_string( $value ) && preg_match( WP_Style_Engine_Gutenberg::VALID_LENGTH_PERCENTAGE_PATTERN, $value ) ) {
+				$translate[ $axis ] = $value;
+				break;
+			}
+		}
+	}
+
+	return $translate;
+}
+
+/**
+ * Returns the Global Styles `translate` value for a block, merged per axis
+ * from the block type and its applied block style variations.
+ *
+ * Mirror of the inherited value the block inspector shows.
+ *
+ * @since 7.3.0
+ *
+ * @param string $block_name Block name.
+ * @param mixed  $class_name The block's `className` attribute.
+ * @return array The `translate` value, empty if Global Styles sets none.
+ */
+function gutenberg_get_global_styles_translate( $block_name, $class_name ) {
+	$block_styles = _wp_array_get( gutenberg_get_global_styles(), array( 'blocks', $block_name ), null );
+	if ( ! is_array( $block_styles ) ) {
+		return array();
+	}
+
+	$layers = array( $block_styles['transform']['translate'] ?? null );
+	foreach ( gutenberg_get_block_style_variation_name_from_class( $class_name ) ?? array() as $variation ) {
+		$layers[] = $block_styles['variations'][ $variation ]['transform']['translate'] ?? null;
+	}
+
+	$translate = array();
+	foreach ( $layers as $layer ) {
+		foreach ( array( 'x', 'y' ) as $axis ) {
+			if ( isset( $layer[ $axis ] ) ) {
+				$translate[ $axis ] = $layer[ $axis ];
+			}
+		}
+	}
+
+	return $translate;
+}
+
+/**
+ * Fills the missing `translate` axis of a block's styles, in every state.
+ *
+ * Each value fills from the block values it layers over, then from Global
+ * Styles: the default value from Global Styles alone, `@mobile` and `:hover`
+ * from the default value, and `@mobile` `:hover` from `:hover`, then
+ * `@mobile`, then the default value. The values are filled when the block is
+ * output, so later Global Styles changes still apply.
+ *
+ * @since 7.3.0
+ *
+ * @param array  $style      The block's `style` attribute.
+ * @param string $block_name Block name.
+ * @param mixed  $class_name The block's `className` attribute.
+ * @return array The styles with the missing axes filled.
+ */
+function gutenberg_get_block_style_with_filled_translate( $style, $block_name, $class_name ) {
+	if ( ! is_array( $style ) ) {
+		return $style;
+	}
+
+	$global_translate = null;
+	$fill             = static function ( $state_style, ...$fallbacks ) use ( &$global_translate, $block_name, $class_name ) {
+		$translate = $state_style['transform']['translate'] ?? null;
+		if ( ! is_array( $translate ) || isset( $translate['x'] ) === isset( $translate['y'] ) ) {
+			return $state_style;
+		}
+		if ( null === $global_translate ) {
+			$global_translate = gutenberg_get_global_styles_translate( $block_name, $class_name );
+		}
+		$fallbacks[]                           = $global_translate;
+		$state_style['transform']['translate'] = gutenberg_fill_translate_axes( $translate, ...$fallbacks );
+		return $state_style;
+	};
+
+	$style             = $fill( $style );
+	$default_translate = $style['transform']['translate'] ?? null;
+
+	$states = array();
+	foreach ( $style as $state => $state_style ) {
+		if ( is_string( $state ) && in_array( $state[0] ?? '', array( '@', ':' ), true ) && is_array( $state_style ) ) {
+			$states[]        = $state;
+			$style[ $state ] = $fill( $state_style, $default_translate );
+		}
+	}
+
+	foreach ( $states as $viewport ) {
+		if ( '@' !== $viewport[0] ) {
+			continue;
+		}
+		foreach ( $style[ $viewport ] as $pseudo_state => $pseudo_style ) {
+			if ( ! is_string( $pseudo_state ) || ':' !== ( $pseudo_state[0] ?? '' ) || ! is_array( $pseudo_style ) ) {
+				continue;
+			}
+			$style[ $viewport ][ $pseudo_state ] = $fill(
+				$pseudo_style,
+				$style[ $pseudo_state ]['transform']['translate'] ?? null,
+				$style[ $viewport ]['transform']['translate'] ?? null,
+				$default_translate
+			);
+		}
+	}
+
+	return $style;
+}
+
+/**
  * Renders a block's transform styles.
  *
  * Features are output as inline styles on the block wrapper. When the block
@@ -60,6 +196,14 @@ function gutenberg_render_transform_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	if ( ! $block_type || ! block_has_support( $block_type, 'transform', false ) ) {
 		return $block_content;
+	}
+
+	if ( isset( $transform['translate'] ) ) {
+		$transform['translate'] = gutenberg_get_block_style_with_filled_translate(
+			array( 'transform' => $transform ),
+			$block['blockName'],
+			$block['attrs']['className'] ?? null
+		)['transform']['translate'];
 	}
 
 	$inline_styles   = array();

@@ -30,7 +30,11 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
-import { TRANSFORM_SUPPORT_KEY, TransformPanel } from './transform';
+import {
+	TRANSFORM_SUPPORT_KEY,
+	TransformPanel,
+	useStyleWithFilledTranslate,
+} from './transform';
 import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
@@ -1086,6 +1090,7 @@ function BlockStyleControls( {
 		[ clientId, name ]
 	);
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+	const stateStyle = useStyleWithFilledTranslate( clientId, name, style );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
@@ -1101,7 +1106,7 @@ function BlockStyleControls( {
 			selectedState
 		);
 		const instanceStateValue = getCanvasStateStyleValue(
-			style,
+			stateStyle,
 			selectedState
 		);
 		let stateValue: PanelStyle;
@@ -1123,7 +1128,7 @@ function BlockStyleControls( {
 		return getBlockStateStylesCSS( stateValue, {
 			name,
 			baseSelector: `[data-block="${ clientId }"]`,
-			baseStyle: getRootStateStyles( style, [
+			baseStyle: getRootStateStyles( stateStyle, [
 				'elements',
 				...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
 			] ),
@@ -1132,7 +1137,7 @@ function BlockStyleControls( {
 		showStateOnCanvas,
 		isPseudoSelectorState,
 		globalBlockStyles,
-		style,
+		stateStyle,
 		selectedState,
 		clientId,
 		name,
@@ -1308,6 +1313,7 @@ function useBlockProps( {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 	const [ viewportSettings ] = useSettings( 'viewport' );
+	const stateStyle = useStyleWithFilledTranslate( clientId, name, style );
 
 	const styles = useMemo( () => {
 		const cssRules: string[] = [];
@@ -1323,10 +1329,10 @@ function useBlockProps( {
 
 		cssRules.push(
 			...getPseudoStateCSSRules(
-				style,
+				stateStyle,
 				name,
 				baseElementSelector,
-				getRootStateStyles( style, [
+				getRootStateStyles( stateStyle, [
 					'elements',
 					...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
 				] )
@@ -1335,7 +1341,7 @@ function useBlockProps( {
 
 		cssRules.push(
 			...getResponsiveStateCSSRules(
-				style,
+				stateStyle,
 				name,
 				baseElementSelector,
 				viewportSettings
@@ -1347,7 +1353,7 @@ function useBlockProps( {
 		baseElementSelector,
 		blockElementStyles,
 		name,
-		style,
+		stateStyle,
 		viewportSettings,
 	] );
 

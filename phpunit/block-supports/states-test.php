@@ -1807,6 +1807,76 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a viewport offset that sets one axis fills the other from the
+	 * block's default offset, then from Global Styles.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 *
+	 * @dataProvider data_translation_state_fills_the_missing_axis
+	 *
+	 * @param array  $style        Block style attribute.
+	 * @param string $expected_css Expected CSS, with `%s` for the state class.
+	 */
+	public function test_translation_state_fills_the_missing_axis( $style, $expected_css ) {
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/image' => array(
+								'transform' => array( 'translate' => array( 'x' => '3rem' ) ),
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$actual = gutenberg_render_block_states_support(
+				'<figure class="wp-block-image"><img src="x.png" /></figure>',
+				array(
+					'blockName' => 'core/image',
+					'attrs'     => array( 'style' => $style ),
+				)
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertSame(
+			sprintf( $expected_css, $matches[0] ?? '' ),
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_translation_state_fills_the_missing_axis() {
+		return array(
+			'from the block default' => array(
+				array(
+					'transform' => array( 'translate' => array( 'x' => '1px' ) ),
+					'@mobile'   => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ),
+				),
+				'@media (width <= 480px){.%s{translate:1px 1rem !important;}}',
+			),
+			'from Global Styles'     => array(
+				array( '@mobile' => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ) ),
+				'@media (width <= 480px){.%s{translate:3rem 1rem !important;}}',
+			),
+		);
+	}
+
+	/**
 	 * Tests that a responsive block gap state generates layout spacing CSS.
 	 *
 	 * Responsive layout CSS is owned by gutenberg_render_layout_support_flag()
