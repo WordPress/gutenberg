@@ -50,7 +50,13 @@ test.describe( 'Post Navigation Link', () => {
 			] );
 
 			await taxonomy.press( 'ArrowDown' );
+			await expect(
+				page.getByRole( 'option', { name: 'Tags', exact: true } )
+			).toBeFocused();
 			await page.keyboard.press( 'Home' );
+			await expect(
+				page.getByRole( 'option', { name: 'Unfiltered', exact: true } )
+			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 			await expect( taxonomy ).toHaveText( 'Unfiltered' );
 			await expect( taxonomy ).toBeFocused();
