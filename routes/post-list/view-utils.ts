@@ -3,6 +3,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { getTaxonomyQueryArgs } from './taxonomy-query';
 
 /**
  * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
@@ -89,7 +90,19 @@ export async function ensureView(
 		queryParams: search,
 	} );
 }
-export function viewToQuery( view: View, postType: string ) {
+/**
+ * Returns the REST query arguments for a view of a post type's items.
+ *
+ * @param view       The view.
+ * @param postType   The post type.
+ * @param taxonomies The post type's taxonomies, so that filters on taxonomy
+ *                   fields reach the query.
+ */
+export function viewToQuery(
+	view: View,
+	postType: string,
+	taxonomies: { slug: string; rest_base?: string }[] = []
+) {
 	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
 	// Pagination, sorting, search.
@@ -170,9 +183,11 @@ export function viewToQuery( view: View, postType: string ) {
 		}
 	}
 
-	// For attachments, we need to embed the parent (attached to) post to get its title.
+	Object.assign( result, getTaxonomyQueryArgs( view.filters, taxonomies ) );
+
+	// For attachments, also embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
-		result._embed = 'wp:attached-to';
+		result._embed = 'author,wp:attached-to';
 	}
 
 	return result;
