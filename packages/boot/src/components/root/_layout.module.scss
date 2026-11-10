@@ -110,6 +110,13 @@
 		.layout-single-page & {
 			margin-top: 0;
 			margin-inline-start: 0;
+
+			// Keep the app pinned to the viewport instead of letting it
+			// scroll away when the wp-admin menu is taller than the window.
+			position: sticky;
+			top: variables.$admin-bar-height;
+			align-self: flex-start;
+			height: calc(100vh - #{variables.$admin-bar-height});
 		}
 	}
 }
