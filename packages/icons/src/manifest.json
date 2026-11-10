@@ -831,7 +831,9 @@
 	{
 		"slug": "funnel",
 		"label": "Funnel",
-		"filePath": "library/funnel.svg"
+		"filePath": "library/funnel.svg",
+		"collections": [ "core-admin" ],
+		"dashicons": [ "dashicons-filter" ]
 	},
 	{
 		"slug": "gallery",

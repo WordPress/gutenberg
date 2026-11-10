@@ -448,6 +448,12 @@ return array(
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-editor-underline' ),
 	),
+	'funnel'                   => array(
+		'label'       => _x( 'Funnel', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/funnel.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-filter' ),
+	),
 	'gallery'                  => array(
 		'label'       => _x( 'Gallery', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/gallery.svg',
