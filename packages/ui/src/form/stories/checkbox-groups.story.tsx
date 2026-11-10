@@ -54,17 +54,15 @@ export const GroupingCheckboxes: StoryObj = {
  * To control a group from a parent checkbox:
  *
  * 1. Use `CheckboxGroup` in controlled mode.
- * 1. Pass the child checkbox values to `allValues`.
- * 1. Mark the parent checkbox with the `parent` prop.
+ * 2. Pass the child checkbox values to `allValues`.
+ * 3. Mark the parent checkbox with the `parent` prop.
  *
  * Pass `CheckboxGroup` to `Fieldset.Root`'s `render` prop so `Fieldset.Legend`
  * gives the group its accessible name.
  *
  * `CheckboxGroup.NestedItems` adds standard indentation to nested items.
  *
- * For multiple groups in one `Fieldset`, render each `CheckboxGroup` inside the
- * fieldset and give it its own accessible name with `aria-label` or
- * `aria-labelledby`. Do not nest more than one level for screen readers.
+ * Do not nest more than one level for screen readers.
  */
 export const Nesting: StoryObj = {
 	render: function Template() {
@@ -90,6 +88,61 @@ export const Nesting: StoryObj = {
 					<CheckboxControl value="orange" label="Orange" />
 					<CheckboxControl value="banana" label="Banana" />
 				</CheckboxGroup.NestedItems>
+			</Fieldset.Root>
+		);
+	},
+};
+
+/**
+ * For multiple groups in one `Fieldset`, render each `CheckboxGroup` inside the
+ * fieldset and give it its own accessible name with `aria-label` or
+ * `aria-labelledby`.
+ *
+ * Each group manages its own selection and parent checkbox.
+ */
+export const MultipleGroups: StoryObj = {
+	render: function Template() {
+		const [ fruitValue, setFruitValue ] = useState( [ 'apple' ] );
+		const [ vegetableValue, setVegetableValue ] = useState< string[] >(
+			[]
+		);
+
+		return (
+			<Fieldset.Root>
+				<Fieldset.Legend>Produce</Fieldset.Legend>
+				<Fieldset.Description>
+					Select the fruit and vegetables you want.
+				</Fieldset.Description>
+				<CheckboxGroup
+					value={ fruitValue }
+					onValueChange={ setFruitValue }
+					allValues={ [ 'apple', 'orange', 'banana' ] }
+					aria-label="Fruit"
+				>
+					<CheckboxControl parent value="fruit" label="All fruit" />
+					<CheckboxGroup.NestedItems>
+						<CheckboxControl value="apple" label="Apple" />
+						<CheckboxControl value="orange" label="Orange" />
+						<CheckboxControl value="banana" label="Banana" />
+					</CheckboxGroup.NestedItems>
+				</CheckboxGroup>
+				<CheckboxGroup
+					value={ vegetableValue }
+					onValueChange={ setVegetableValue }
+					allValues={ [ 'carrot', 'lettuce', 'pepper' ] }
+					aria-label="Vegetables"
+				>
+					<CheckboxControl
+						parent
+						value="vegetable"
+						label="All vegetables"
+					/>
+					<CheckboxGroup.NestedItems>
+						<CheckboxControl value="carrot" label="Carrot" />
+						<CheckboxControl value="lettuce" label="Lettuce" />
+						<CheckboxControl value="pepper" label="Pepper" />
+					</CheckboxGroup.NestedItems>
+				</CheckboxGroup>
 			</Fieldset.Root>
 		);
 	},
