@@ -70,9 +70,11 @@ function isSameValidity( a?: Validity, b?: Validity ) {
  *
  * The wrapped control is cloned with `label` and `required` props, and the
  * validity state is read from the element returned by `getValidityTarget`.
- * Validation messages become visible once the control has been touched
- * (blurred at least once), when the enclosing form is submitted, or when an
- * `invalid` event is dispatched on the validity target.
+ * Validation messages become visible once the control has been touched, when
+ * the enclosing form is submitted, or when an `invalid` event is dispatched on
+ * the validity target. A blur counts as a touch unless it leaves a required
+ * control empty, so tabbing or clicking through a form doesn't report missing
+ * values before the user has entered anything.
  */
 export const ControlWithError = forwardRef<
 	HTMLDivElement,
@@ -187,7 +189,7 @@ export const ControlWithError = forwardRef<
 		}
 	} );
 
-	// Show messages if field has been touched (i.e. has blurred at least once),
+	// Show messages if field has been touched (see `onBlur`),
 	// or validation has been triggered by the consumer/user.
 	useEffect( (): ReturnType< React.EffectCallback > => {
 		if ( ! isTouched || showMessage ) {
@@ -218,9 +220,11 @@ export const ControlWithError = forwardRef<
 			return;
 		}
 
-		if ( ! isTouched ) {
+		const validityTarget = getValidityTarget();
+
+		if ( ! isTouched && ! validityTarget?.validity.valueMissing ) {
 			setIsTouched( true );
-			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
+			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
 
 		// A control that commits an adjusted value on blur (e.g. a number
@@ -228,7 +232,6 @@ export const ControlWithError = forwardRef<
 		// while its controlled value catches up with the parent, so a message
 		// sampled in the render triggered by this event may be stale. Re-read
 		// it once React has flushed the blur's work.
-		const validityTarget = getValidityTarget();
 		const isValidating = customValidity?.type === 'validating';
 		window.queueMicrotask( () => {
 			if ( ! isValidating ) {

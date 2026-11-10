@@ -28,7 +28,8 @@ type Story = StoryObj< typeof ControlWithError >;
 
 /**
  * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
+ * form is submitted. Leaving the control empty doesn't report the missing
+ * value on blur.
  */
 export const Default: Story = {
 	args: {

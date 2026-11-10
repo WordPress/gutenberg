@@ -38,7 +38,7 @@ These components are designed to work with the native HTML5 [Constraint Validati
 
 ### No easy access to underlying validation APIs
 
--   The consumer does not have a simple way to show validation messages at an arbitrary point in time, unless the fields are wrapped in a `form` element. Currently, when to show validation messages to the user are handled by the component — any messages are first made visible on `blur` after the field is considered "touched", or if the user tries to submit the enclosing `form`. Messages can also be triggered to show at any time by calling the `reportValidity()` method on the wrapping `<form>` element.
+-   The consumer does not have a simple way to show validation messages at an arbitrary point in time, unless the fields are wrapped in a `form` element. Currently, when to show validation messages to the user are handled by the component — any messages are first made visible on `blur` after the field is considered "touched", or if the user tries to submit the enclosing `form`. A blur that leaves a required field empty does not mark it as touched, so tabbing or clicking through a form does not report missing values before the user has entered anything. Messages can also be triggered to show at any time by calling the `reportValidity()` method on the wrapping `<form>` element.
 -   The consumer does not have direct access to the [`validity` object](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState) of the underlying element.
 
 We don't foresee these being needed much, but it is technically possible by the consumer accessing the target element's validation APIs via `ref`. Better docs or ergonomics can be added when we have actual use cases.

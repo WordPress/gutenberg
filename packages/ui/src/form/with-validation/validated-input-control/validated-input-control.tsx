@@ -10,8 +10,9 @@ import type { ValidatedControlProps } from '../types';
  *
  * Native constraint violations (e.g. `required`, `pattern`) and custom
  * validity messages passed through the `customValidity` prop are reported
- * inline once the control has been touched (blurred at least once) or the
- * enclosing form is submitted.
+ * inline once the control has been touched or the enclosing form is
+ * submitted. A blur counts as a touch unless it leaves a required control
+ * empty.
  */
 export const ValidatedInputControl = forwardRef<
 	HTMLInputElement,
