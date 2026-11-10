@@ -16,7 +16,6 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -27,6 +26,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -54,6 +54,12 @@ const TAG_NAME_MESSAGES = {
 		'Uses a <form role="search"> wrapper for backward compatibility with existing theme styles.'
 	),
 };
+
+const TAG_NAME_ITEMS = [
+	{ label: __( 'Default' ), value: '' },
+	{ label: '<search>', value: 'search' },
+	{ label: '<form>', value: 'form' },
+];
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -384,15 +390,21 @@ export default function SearchEdit( {
 						} }
 						isShownByDefault
 					>
-						<WCSelectControl
-							value={ buttonPosition }
+						<SelectControl
+							value={
+								buttonPositionControls.find(
+									( item ) => item.value === buttonPosition
+								) ?? null
+							}
 							label={ __( 'Button position' ) }
-							onChange={ ( value ) => {
-								setAttributes( {
-									buttonPosition: value,
-								} );
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== buttonPosition ) {
+									setAttributes( {
+										buttonPosition: item.value,
+									} );
+								}
 							} }
-							options={ buttonPositionControls }
+							items={ buttonPositionControls }
 						/>
 					</ToolsPanelItem>
 					{ buttonPosition !== 'no-button' && (
@@ -501,15 +513,21 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<WCSelectControl
+				<SelectControl
 					label={ __( 'HTML element' ) }
-					value={ tagName ?? '' }
-					options={ [
-						{ label: __( 'Default' ), value: '' },
-						{ label: '<search>', value: 'search' },
-						{ label: '<form>', value: 'form' },
-					] }
-					onChange={ ( value ) => {
+					value={
+						TAG_NAME_ITEMS.find(
+							( item ) => item.value === ( tagName ?? '' )
+						) ?? null
+					}
+					items={ TAG_NAME_ITEMS }
+					// Keep the empty-string Default choice selected.
+					itemToStringValue={ ( item ) => `tag:${ item.value }` }
+					onValueChange={ ( item ) => {
+						if ( ! item || item.value === ( tagName ?? '' ) ) {
+							return;
+						}
+						const { value } = item;
 						setAttributes( { tagName: value } );
 						// The help text is updated via aria-describedby, which
 						// is not re-announced while focus remains on the select.
@@ -521,7 +539,7 @@ export default function SearchEdit( {
 							TAG_NAME_MESSAGES[ value ].replace( /[<>]/g, '' )
 						);
 					} }
-					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
+					description={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
 				/>
 			</InspectorControls>
 		</>
