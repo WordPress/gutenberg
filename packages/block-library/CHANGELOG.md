@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Post Template: Add a `render_block_core_post_template_item` filter for the markup of each post item ([#86396](https://github.com/WordPress/gutenberg/issues/86396)).
+-   Post Template: Add a `query_loop_block_item_html` filter for the markup of each post item ([#86396](https://github.com/WordPress/gutenberg/issues/86396)).
 
 ### Bug Fixes
 

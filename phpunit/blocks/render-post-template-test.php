@@ -81,14 +81,14 @@ END;
 			$calls[] = compact( 'item', 'block_content', 'post_id', 'block' );
 			return $item;
 		};
-		add_filter( 'render_block_core_post_template_item', $callback, 10, 4 );
+		add_filter( 'query_loop_block_item_html', $callback, 10, 4 );
 
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template -->'
 		);
 		( new WP_Block( $parsed_blocks[0] ) )->render();
 
-		remove_filter( 'render_block_core_post_template_item', $callback, 10 );
+		remove_filter( 'query_loop_block_item_html', $callback, 10 );
 
 		$this->assertCount( 2, $calls, 'The filter should run once per post.' );
 		$this->assertSame( self::$other_post->ID, $calls[0]['post_id'] );
@@ -103,14 +103,14 @@ END;
 		$callback = static function ( $item ) {
 			return str_replace( '<li ', '<li data-filtered="yes" ', $item );
 		};
-		add_filter( 'render_block_core_post_template_item', $callback );
+		add_filter( 'query_loop_block_item_html', $callback );
 
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template -->'
 		);
 		$markup        = ( new WP_Block( $parsed_blocks[0] ) )->render();
 
-		remove_filter( 'render_block_core_post_template_item', $callback );
+		remove_filter( 'query_loop_block_item_html', $callback );
 
 		$this->assertSame( 2, substr_count( $markup, '<li data-filtered="yes" ' ) );
 	}
