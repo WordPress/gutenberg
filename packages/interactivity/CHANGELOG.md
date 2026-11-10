@@ -7,7 +7,7 @@
 -   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 -   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 -   `data-wp-html` elements that client-side navigation keeps in a router region now show the new page's server-rendered content when their value on the new page is pending or `{ "wpServerHtml": true }`, instead of the content they had before navigating. The content is copied as nodes, so showing it calls no Trusted Types policy ([#86416](https://github.com/WordPress/gutenberg/pull/86416)).
--   `data-wp-html`: On sites enforcing Trusted Types, show a value from `asDangerousHTML( policy.createHTML( markup ) )` after the browser rejected the same markup as a plain string, instead of leaving the element empty ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   `data-wp-html`: On sites enforcing Trusted Types, show a value from `asDangerousHTML( policy.createHTML( markup ) )` after the browser rejected the same markup as a plain string, instead of leaving the element empty ([#86555](https://github.com/WordPress/gutenberg/pull/86555)).
 
 ### Internal
 
