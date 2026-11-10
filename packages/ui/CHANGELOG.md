@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't mark a required control as touched when focus leaves it while it's empty. Tabbing or clicking through an empty required field no longer shows its validation message, and coming back to type no longer reports an incomplete value on every keystroke. The message still appears when the form is submitted, and a control left with a value still shows its message on blur ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke. Submitting the form still shows the message ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content ([#86497](https://github.com/WordPress/gutenberg/pull/86497)).
 -   `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels and squashed icons in a prefix or suffix. ([#86446](https://github.com/WordPress/gutenberg/pull/86446))
 -   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).

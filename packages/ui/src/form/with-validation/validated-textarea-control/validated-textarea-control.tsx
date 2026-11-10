@@ -10,9 +10,9 @@ import type { ValidatedControlProps } from '../types';
  *
  * Native constraint violations (e.g. `required`, `minLength`) and custom
  * validity messages passed through the `customValidity` prop are reported
- * inline once the control has been touched or the enclosing form is
- * submitted. A blur counts as a touch unless it leaves a required control
- * empty.
+ * inline once focus leaves the control, or when the enclosing form is
+ * submitted. A required control left empty reports its missing value only
+ * when the form is submitted.
  */
 export const ValidatedTextareaControl = forwardRef<
 	HTMLTextAreaElement,

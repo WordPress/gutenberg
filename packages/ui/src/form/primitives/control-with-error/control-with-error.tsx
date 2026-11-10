@@ -221,8 +221,13 @@ export const ControlWithError = forwardRef<
 		}
 
 		const validityTarget = getValidityTarget();
+		const targetValidity = validityTarget?.validity;
+		// A number or date input with unparseable text also reports
+		// `valueMissing`, but the user has entered something.
+		const isLeftEmpty =
+			targetValidity?.valueMissing && ! targetValidity.badInput;
 
-		if ( ! isTouched && ! validityTarget?.validity.valueMissing ) {
+		if ( ! isTouched && ! isLeftEmpty ) {
 			setIsTouched( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}

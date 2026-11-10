@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   DataForm: Don't show the validation message of an empty required field when focus leaves it, so tabbing or clicking through a form no longer reports missing values before the user has entered anything. Submitting the form still shows them. Date fields keep the previous behavior ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   DataForm: Don't show the missing-value message when focus leaves an empty required field, including date fields. Submitting the form, or moving focus out of a `card` or `details` layout, still shows it ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
 

@@ -256,9 +256,20 @@ function ValidatedDateControl< Item >( {
 		// Only consider "blurred from the component" if focus has fully left the wrapping div.
 		// This prevents unnecessary blurs from components with multiple focusable elements.
 		if (
-			! event.relatedTarget ||
-			! event.currentTarget.contains( event.relatedTarget )
+			event.relatedTarget &&
+			event.currentTarget.contains( event.relatedTarget )
 		) {
+			return;
+		}
+
+		// A date input with incomplete text also reports `valueMissing`, but
+		// the user has entered something.
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const isLeftEmpty = refs.every( ( ref ) => {
+			const inputValidity = ref.current?.validity;
+			return inputValidity?.valueMissing && ! inputValidity.badInput;
+		} );
+		if ( ! isLeftEmpty ) {
 			setIsTouched( true );
 		}
 	};

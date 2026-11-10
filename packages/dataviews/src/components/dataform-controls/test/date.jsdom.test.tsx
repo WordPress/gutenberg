@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
 import { resetLocaleData, setLocaleData } from '@wordpress/i18n';
@@ -304,6 +304,43 @@ describe( 'DateControl', () => {
 			).toBeInTheDocument();
 		}
 	);
+
+	it( 'should not show a missing value error when focus leaves an empty required field', async () => {
+		const user = userEvent.setup();
+		const requiredField = normalizeFields< TestItem >( [
+			{
+				id: 'published',
+				label: 'Published',
+				type: 'date',
+				isValid: { required: true },
+			},
+		] )[ 0 ];
+
+		render(
+			<>
+				<DateControl
+					data={ { published: '' } }
+					field={ requiredField }
+					onChange={ noop }
+				/>
+				<button type="button">Next</button>
+			</>
+		);
+
+		const input = screen.getByLabelText< HTMLInputElement >( 'Date' );
+		await user.click( input );
+		await user.click( screen.getByRole( 'button', { name: 'Next' } ) );
+
+		expect(
+			screen.queryByText( input.validationMessage )
+		).not.toBeInTheDocument();
+
+		act( () => {
+			input.dispatchEvent( new Event( 'invalid', { cancelable: true } ) );
+		} );
+
+		expect( screen.getByText( input.validationMessage ) ).toBeVisible();
+	} );
 
 	it( 'should commit the day that was clicked', async () => {
 		setSettings( {

@@ -169,6 +169,27 @@ describe( 'ControlWithError', () => {
 			} );
 			expect( input ).toHaveAttribute( 'data-validity-visible' );
 		} );
+
+		it( 'should mark a required number control with unparseable input as touched on blur', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ValidatedInputControl label="Count" type="number" required />
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'spinbutton', {
+				name: /^Count/,
+			} );
+
+			await user.type( input, '-' );
+			expect( input.validity.badInput ).toBe( true );
+			const badInputMessage = input.validationMessage;
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( badInputMessage ) ).toBeVisible();
+			} );
+		} );
 	} );
 
 	describe( 'aria-describedby', () => {
