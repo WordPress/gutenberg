@@ -161,26 +161,23 @@ export const DetachedInline: Story = {
 				placeholder="Search items"
 				key="input"
 			/>,
-			<div
-				style={ {
-					minHeight: '200px',
-					maxHeight: '200px',
-					marginTop: 8,
-					overflow: 'auto',
-				} }
-				key="div"
-			>
+			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.Collection>
-						{ ( item: FixtureItem ) => (
-							<Combobox.Item key={ item.value } value={ item }>
-								<Combobox.ItemLabel>
-									{ item.label }
-								</Combobox.ItemLabel>
-							</Combobox.Item>
-						) }
-					</Combobox.Collection>
+					<Combobox.ListBody style={ { maxHeight: 200 } }>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
 				</Combobox.List>
 			</div>,
 		],

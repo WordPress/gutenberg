@@ -5,6 +5,8 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 
 /**
  * A layout container for the main scrolling area in the `List`, for holding `Item`s.
+ * In an inline list, give it a `max-height` so that the list scrolls on its own
+ * and group labels stay pinned while their items scroll.
  */
 export const ListBody = forwardRef< HTMLDivElement, ComboboxListBodyProps >(
 	function UnforwardedListBody( { render, ...props }, ref ) {

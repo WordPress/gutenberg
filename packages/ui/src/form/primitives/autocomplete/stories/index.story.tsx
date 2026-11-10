@@ -311,28 +311,23 @@ export const Inline: Story = {
 					aria-label="Command"
 					placeholder="Type a command"
 				/>
-				<div
-					style={ {
-						minHeight: '200px',
-						maxHeight: '200px',
-						marginTop: 8,
-						overflow: 'auto',
-					} }
-				>
+				<div style={ { marginTop: 8 } }>
 					<Autocomplete.Empty>No commands found.</Autocomplete.Empty>
 					<Autocomplete.List>
-						<Autocomplete.Collection>
-							{ ( command: FixtureItem ) => (
-								<Autocomplete.Item
-									key={ command.id }
-									value={ command }
-								>
-									<Autocomplete.ItemLabel>
-										{ command.value }
-									</Autocomplete.ItemLabel>
-								</Autocomplete.Item>
-							) }
-						</Autocomplete.Collection>
+						<Autocomplete.ListBody style={ { maxHeight: 200 } }>
+							<Autocomplete.Collection>
+								{ ( command: FixtureItem ) => (
+									<Autocomplete.Item
+										key={ command.id }
+										value={ command }
+									>
+										<Autocomplete.ItemLabel>
+											{ command.value }
+										</Autocomplete.ItemLabel>
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
 					</Autocomplete.List>
 				</div>
 			</Autocomplete.Root>
@@ -700,6 +695,17 @@ function chunkItems< T >( items: T[], size: number ): T[][] {
  * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
  */
 export const Grid: Story = {
+	parameters: {
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: EMOJI_GROUPS,
 		inline: true,
@@ -720,45 +726,54 @@ export const Grid: Story = {
 				>
 					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
 					<Autocomplete.List aria-label="Emojis">
-						{ ( group: ( typeof EMOJI_GROUPS )[ number ] ) => (
-							<Autocomplete.Group
-								key={ group.value }
-								items={ group.items }
-							>
-								<Autocomplete.GroupLabel>
-									{ group.label }
-								</Autocomplete.GroupLabel>
-								{ chunkItems( group.items, EMOJI_COLUMNS ).map(
-									( row, rowIndex ) => (
-										<Autocomplete.Row
-											key={ rowIndex }
-											style={ emojiPickerRowStyle }
-										>
-											{ row.map( ( emoji ) => (
-												<Autocomplete.Item
-													key={ emoji.value }
-													value={ emoji }
-													aria-label={ emoji.label }
-													style={
-														emojiPickerCellStyle
-													}
-												>
-													<Autocomplete.ItemLabel
+						<Autocomplete.ListBody style={ { maxHeight: 240 } }>
+							<Autocomplete.Collection>
+								{ (
+									group: ( typeof EMOJI_GROUPS )[ number ]
+								) => (
+									<Autocomplete.Group
+										key={ group.value }
+										items={ group.items }
+									>
+										<Autocomplete.GroupLabel>
+											{ group.label }
+										</Autocomplete.GroupLabel>
+										{ chunkItems(
+											group.items,
+											EMOJI_COLUMNS
+										).map( ( row, rowIndex ) => (
+											<Autocomplete.Row
+												key={ rowIndex }
+												style={ emojiPickerRowStyle }
+											>
+												{ row.map( ( emoji ) => (
+													<Autocomplete.Item
+														key={ emoji.value }
+														value={ emoji }
+														aria-label={
+															emoji.label
+														}
 														style={
-															emojiPickerLabelStyle
+															emojiPickerCellStyle
 														}
 													>
-														<span aria-hidden="true">
-															{ emoji.emoji }
-														</span>
-													</Autocomplete.ItemLabel>
-												</Autocomplete.Item>
-											) ) }
-										</Autocomplete.Row>
-									)
+														<Autocomplete.ItemLabel
+															style={
+																emojiPickerLabelStyle
+															}
+														>
+															<span aria-hidden="true">
+																{ emoji.emoji }
+															</span>
+														</Autocomplete.ItemLabel>
+													</Autocomplete.Item>
+												) ) }
+											</Autocomplete.Row>
+										) ) }
+									</Autocomplete.Group>
 								) }
-							</Autocomplete.Group>
-						) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
 					</Autocomplete.List>
 				</div>
 			</Autocomplete.Root>
@@ -774,6 +789,17 @@ export const Grid: Story = {
  * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
  */
 export const InlineInPopover: Story = {
+	parameters: {
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: EMOJI_GROUPS,
 		inline: true,
@@ -810,62 +836,78 @@ export const InlineInPopover: Story = {
 									No matching emojis.
 								</Autocomplete.Empty>
 								<Autocomplete.List aria-label="Emojis">
-									{ (
-										group: ( typeof EMOJI_GROUPS )[ number ]
-									) => (
-										<Autocomplete.Group
-											key={ group.value }
-											items={ group.items }
-										>
-											<Autocomplete.GroupLabel>
-												{ group.label }
-											</Autocomplete.GroupLabel>
-											{ chunkItems(
-												group.items,
-												EMOJI_COLUMNS
-											).map( ( row, rowIndex ) => (
-												<Autocomplete.Row
-													key={ rowIndex }
-													style={
-														emojiPickerRowStyle
-													}
+									<Autocomplete.ListBody
+										style={ { maxHeight: 240 } }
+									>
+										<Autocomplete.Collection>
+											{ (
+												group: ( typeof EMOJI_GROUPS )[ number ]
+											) => (
+												<Autocomplete.Group
+													key={ group.value }
+													items={ group.items }
 												>
-													{ row.map( ( emoji ) => (
-														<Autocomplete.Item
-															key={ emoji.value }
-															value={ emoji }
-															aria-label={
-																emoji.label
-															}
-															style={
-																emojiPickerCellStyle
-															}
-															onClick={ () => {
-																setPickedEmoji(
-																	emoji.emoji
-																);
-																setIsPopoverOpen(
-																	false
-																);
-															} }
-														>
-															<Autocomplete.ItemLabel
+													<Autocomplete.GroupLabel>
+														{ group.label }
+													</Autocomplete.GroupLabel>
+													{ chunkItems(
+														group.items,
+														EMOJI_COLUMNS
+													).map(
+														( row, rowIndex ) => (
+															<Autocomplete.Row
+																key={ rowIndex }
 																style={
-																	emojiPickerLabelStyle
+																	emojiPickerRowStyle
 																}
 															>
-																<span aria-hidden="true">
-																	{
-																		emoji.emoji
-																	}
-																</span>
-															</Autocomplete.ItemLabel>
-														</Autocomplete.Item>
-													) ) }
-												</Autocomplete.Row>
-											) ) }
-										</Autocomplete.Group>
-									) }
+																{ row.map(
+																	(
+																		emoji
+																	) => (
+																		<Autocomplete.Item
+																			key={
+																				emoji.value
+																			}
+																			value={
+																				emoji
+																			}
+																			aria-label={
+																				emoji.label
+																			}
+																			style={
+																				emojiPickerCellStyle
+																			}
+																			onClick={ () => {
+																				setPickedEmoji(
+																					emoji.emoji
+																				);
+																				setIsPopoverOpen(
+																					false
+																				);
+																			} }
+																		>
+																			<Autocomplete.ItemLabel
+																				style={
+																					emojiPickerLabelStyle
+																				}
+																			>
+																				<span aria-hidden="true">
+																					{
+																						emoji.emoji
+																					}
+																				</span>
+																			</Autocomplete.ItemLabel>
+																		</Autocomplete.Item>
+																	)
+																) }
+															</Autocomplete.Row>
+														)
+													) }
+												</Autocomplete.Group>
+											) }
+										</Autocomplete.Collection>
+									</Autocomplete.ListBody>
 								</Autocomplete.List>
 							</div>
 						</Autocomplete.Root>
