@@ -1,4 +1,4 @@
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 // Whether the hash has been handled for the current page load.
 // This is used to prevent the hash from being handled multiple times.
@@ -53,22 +53,11 @@ const { actions } = store(
 					return;
 				}
 
-				const panelElement = window.document.querySelector(
-					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
-				);
-				// The toggle button has the item's ID, and its heading can have
-				// an anchor of its own.
-				const headingElement = window.document
-					.getElementById( id )
-					?.closest( '.wp-block-accordion-heading' );
+				// The Accordion Item contains both its heading and its panel, so a
+				// link to either one opens the item.
+				const { ref } = getElement();
 
-				if (
-					! panelElement ||
-					! (
-						panelElement.contains( targetElement ) ||
-						headingElement?.contains( targetElement )
-					)
-				) {
+				if ( ! ref?.contains( targetElement ) ) {
 					return;
 				}
 
