@@ -143,19 +143,20 @@ export const WithoutActions: Story = {
  * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
  */
 export const WithLinkInDescription: Story = {
-	render: () => (
-		<Notice.Root intent="info">
-			<Notice.Title>Autosave is on</Notice.Title>
-			<Notice.Description>
-				Your changes are saved as you work.{ ' ' }
+	args: {
+		intent: 'info',
+		children: [
+			<Notice.Title key="title">Notice Title</Notice.Title>,
+			<Notice.Description key="description">
+				Description text with a{ ' ' }
 				<Link href="#" tone="neutral">
-					Learn more about autosave
-				</Link>
-				.
-			</Notice.Description>
-			<Notice.CloseIconButton />
-		</Notice.Root>
-	),
+					link
+				</Link>{ ' ' }
+				and details about this notification.
+			</Notice.Description>,
+			<Notice.CloseIconButton key="closeIconButton" />,
+		],
+	},
 };
 
 /**
