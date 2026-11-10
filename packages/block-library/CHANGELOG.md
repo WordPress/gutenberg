@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting.
+-   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 
 ### Bug Fixes
