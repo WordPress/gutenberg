@@ -121,7 +121,6 @@ export default function useSelectionObserver() {
 		isMultiSelecting,
 		getSelectionStart,
 		getSelectionEnd,
-		getSelectedBlockClientId,
 		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
@@ -202,13 +201,6 @@ export default function useSelectionObserver() {
 					if (
 						! isMultiSelecting() &&
 						collapsedClientId &&
-						// Only keep the wrapper editable when the collapsed
-						// selection is in the block that is actually selected.
-						// A stale native selection may linger in a previously
-						// selected editable root block (e.g. Firefox does not
-						// always move it), which must not re-enable the wrapper
-						// after another block has been selected.
-						collapsedClientId === getSelectedBlockClientId() &&
 						canHostEditableRoot( collapsedClientId )
 					) {
 						setContentEditableWrapper( node, true );
