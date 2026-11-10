@@ -3418,14 +3418,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/save.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/test/menu-items-to-blocks.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
