@@ -214,12 +214,16 @@ export function NoteThread( {
 	}
 
 	function onThreadClick( event ) {
+		const thread = event.currentTarget;
+		// Clicks in portaled UI, like the link popover, bubble here too.
+		if ( ! thread.contains( event.target ) ) {
+			return;
+		}
 		if ( ! isSelected ) {
 			onSelectNote();
 			return;
 		}
 		// Clicking the thread's text drops focus, which would deselect it.
-		const thread = event.currentTarget;
 		if ( ! thread.contains( thread.ownerDocument.activeElement ) ) {
 			focusNoteThread( note.id, sidebarRef.current );
 		}

@@ -2658,6 +2658,10 @@ test.describe( 'Block Notes', () => {
 			// Escape must reach the popover rather than the reply field.
 			await expect( linkInput ).toBeFocused();
 
+			// Clicks in the portaled popover must not pull focus back to the thread.
+			await linkInput.click();
+			await expect( linkInput ).toBeFocused();
+
 			// Escape closes the popover and keeps the reply form intact.
 			await page.keyboard.press( 'Escape' );
 			await expect( linkInput ).toBeHidden();
