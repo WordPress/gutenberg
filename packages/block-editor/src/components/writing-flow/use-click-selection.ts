@@ -32,12 +32,9 @@ export default function useClickSelection() {
 			// The block to collapse a multi-selection to on click, recorded
 			// on mousedown. See the comment in `onMouseDown`.
 			let clickCollapseClientId: string | undefined;
-			// Whether a touch gave focus back to the field. See `onPointerDown`.
-			let isHandedBack = false;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
-				isHandedBack = false;
 
 				if (
 					! placesCaretOnTap ||
@@ -70,15 +67,24 @@ export default function useClickSelection() {
 
 				setContentEditableWrapper( node, false );
 				field.focus( { preventScroll: true } );
-				isHandedBack = true;
-			}
 
-			// The touch became a scroll: the wrapper hosts the field again.
-			function onPointerCancel() {
-				if ( isHandedBack ) {
+				// The touch became a scroll: the wrapper hosts the field again.
+				function onPointerCancel() {
 					setContentEditableWrapper( node, true );
 				}
-				isHandedBack = false;
+				node.addEventListener( 'pointercancel', onPointerCancel, {
+					once: true,
+				} );
+				// A tap: nothing to undo.
+				node.addEventListener(
+					'pointerup',
+					() =>
+						node.removeEventListener(
+							'pointercancel',
+							onPointerCancel
+						),
+					{ once: true }
+				);
 			}
 
 			function onMouseDown( event: MouseEvent ) {
@@ -241,13 +247,11 @@ export default function useClickSelection() {
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );
-			node.addEventListener( 'pointercancel', onPointerCancel );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'click', onClick );
 
 			return () => {
 				node.removeEventListener( 'pointerdown', onPointerDown );
-				node.removeEventListener( 'pointercancel', onPointerCancel );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'click', onClick );
 			};
