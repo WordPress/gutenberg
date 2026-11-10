@@ -8,12 +8,6 @@ import { unlock } from '../../lock-unlock';
 
 const { BackButton: BackButtonFill } = unlock( editorPrivateApis );
 
-const getSlideX = () => ( {
-	hidden: { x: isRTL() ? '100%' : '-100%' },
-	distractionFreeInactive: { x: 0 },
-	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-} );
-
 function BackButton( { initialPost } ) {
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
@@ -24,7 +18,14 @@ function BackButton( { initialPost } ) {
 			{ ( { length } ) =>
 				length <= 1 && (
 					<motion.div
-						variants={ getSlideX() }
+						variants={ {
+							hidden: { x: isRTL() ? '100%' : '-100%' },
+							distractionFreeInactive: { x: 0 },
+							hover: {
+								x: 0,
+								transition: { type: 'tween', delay: 0.2 },
+							},
+						} }
 						transition={ { type: 'tween', delay: 0.8 } }
 					>
 						<FullscreenModeClose
