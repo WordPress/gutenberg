@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields.
+-   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
 
 ### Bug Fixes
 
