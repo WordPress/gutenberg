@@ -4,6 +4,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
+	getTemplatePartsOutsidePostBlocks,
 	isCollaborationEnabledForCurrentPost,
 } from '../private-selectors';
 import { lock } from '../../lock-unlock';
@@ -79,6 +80,73 @@ describe( 'getPostBlocksByName', () => {
 			'core/heading',
 		] );
 		expect( result ).toEqual( [ 'block1', 'block2', 'block3' ] );
+	} );
+} );
+
+describe( 'getTemplatePartsOutsidePostBlocks', () => {
+	// A template around a slot: a header part, the slot holding the blocks of
+	// the template being edited with a part of its own, and a query loop with
+	// a post content block that is not the slot.
+	const blocks = {
+		header: { name: 'core/template-part', parent: '' },
+		slot: { name: 'core/post-content', parent: '' },
+		sidebar: { name: 'core/template-part', parent: 'group' },
+		group: { name: 'core/group', parent: 'slot' },
+		query: { name: 'core/query', parent: '' },
+		loopContent: { name: 'core/post-content', parent: 'query' },
+		footer: { name: 'core/template-part', parent: '' },
+	};
+	const state = {};
+
+	const blockEditorSelectors = {
+		getBlocksByName: ( blockNames ) => {
+			const names = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			return Object.keys( blocks ).filter( ( clientId ) =>
+				names.includes( blocks[ clientId ].name )
+			);
+		},
+		getBlockParents: ( clientId ) => {
+			const parents = [];
+			let parent = blocks[ clientId ].parent;
+			while ( parent ) {
+				parents.unshift( parent );
+				parent = blocks[ parent ].parent;
+			}
+			return parents;
+		},
+		getBlockName: ( clientId ) => blocks[ clientId ].name,
+	};
+
+	// `getPostBlocksByName()` is shared with the tests above, which set a
+	// registry of their own, so it is put back after each test here.
+	let postBlocksByNameRegistry;
+
+	beforeEach( () => {
+		postBlocksByNameRegistry = getPostBlocksByName.registry;
+		getPostBlocksByName.registry = {
+			select: () => blockEditorSelectors,
+		};
+		getTemplatePartsOutsidePostBlocks.registry = {
+			select: () => blockEditorSelectors,
+		};
+	} );
+
+	afterEach( () => {
+		getPostBlocksByName.registry = postBlocksByNameRegistry;
+	} );
+
+	it( 'leaves out the template parts inside the post blocks', () => {
+		expect(
+			getTemplatePartsOutsidePostBlocks( state, [ 'core/post-content' ] )
+		).toEqual( [ 'header', 'footer' ] );
+	} );
+
+	it( 'returns every template part when there are no such post blocks', () => {
+		expect(
+			getTemplatePartsOutsidePostBlocks( state, [ 'core/post-title' ] )
+		).toEqual( [ 'header', 'sidebar', 'footer' ] );
 	} );
 } );
 
