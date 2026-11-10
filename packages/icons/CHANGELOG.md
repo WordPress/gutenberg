@@ -14,6 +14,7 @@
 
 ### Enhancements
 
+-   `manifest.json`: Remove `chevronUpSmall`, `chevronDownSmall`, `chevronLeftSmall` and `chevronRightSmall` from the `core-admin` collection. They stay in the `core` collection. Map `dashicons-arrow-up`, `dashicons-arrow-down`, `dashicons-arrow-left` and `dashicons-arrow-right` to `chevronUp`, `chevronDown`, `chevronLeft` and `chevronRight` instead ([#86582](https://github.com/WordPress/gutenberg/pull/86582)).
 -   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `wordCount`: redraw the number sign to match `postCommentsCount` ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).

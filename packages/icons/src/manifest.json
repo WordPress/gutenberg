@@ -280,49 +280,50 @@
 		"label": "Chevron Down",
 		"filePath": "library/chevron-down.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-down-alt2" ]
+		"dashicons": [ "dashicons-arrow-down-alt2", "dashicons-arrow-down" ]
 	},
 	{
 		"slug": "chevron-down-small",
 		"label": "Chevron Down Small",
 		"filePath": "library/chevron-down-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-down" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-left",
 		"label": "Chevron Left",
 		"filePath": "library/chevron-left.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-admin-collapse", "dashicons-arrow-left-alt2" ]
+		"dashicons": [
+			"dashicons-admin-collapse",
+			"dashicons-arrow-left-alt2",
+			"dashicons-arrow-left"
+		]
 	},
 	{
 		"slug": "chevron-left-small",
 		"label": "Chevron Left Small",
 		"filePath": "library/chevron-left-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-left" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-right",
 		"label": "Chevron Right",
 		"filePath": "library/chevron-right.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-right-alt2" ]
+		"dashicons": [ "dashicons-arrow-right-alt2", "dashicons-arrow-right" ]
 	},
 	{
 		"slug": "chevron-right-small",
 		"label": "Chevron Right Small",
 		"filePath": "library/chevron-right-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-right" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "chevron-up",
 		"label": "Chevron Up",
 		"filePath": "library/chevron-up.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-up-alt2" ]
+		"dashicons": [ "dashicons-arrow-up-alt2", "dashicons-arrow-up" ]
 	},
 	{
 		"slug": "chevron-up-down",
@@ -334,8 +335,7 @@
 		"slug": "chevron-up-small",
 		"label": "Chevron Up Small",
 		"filePath": "library/chevron-up-small.svg",
-		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-up" ]
+		"collections": [ "core" ]
 	},
 	{
 		"slug": "classic",
