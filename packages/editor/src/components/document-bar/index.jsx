@@ -158,6 +158,8 @@ export default function DocumentBar( props ) {
 	const pageTypeBadge = usePageTypeBadge( postId );
 
 	const mountedRef = useRef( false );
+	const slideFromEnd = isRTL() ? 'translateX(-15%)' : 'translateX(15%)';
+	const slideFromStart = isRTL() ? 'translateX(15%)' : 'translateX(-15%)';
 	useEffect( () => {
 		mountedRef.current = true;
 	}, [] );
@@ -177,11 +179,11 @@ export default function DocumentBar( props ) {
 						size="compact"
 						initial={
 							mountedRef.current
-								? { opacity: 0, transform: 'translateX(15%)' }
+								? { opacity: 0, transform: slideFromEnd }
 								: false // Don't show entry animation when DocumentBar mounts.
 						}
 						animate={ { opacity: 1, transform: 'translateX(0%)' } }
-						exit={ { opacity: 0, transform: 'translateX(15%)' } }
+						exit={ { opacity: 0, transform: slideFromEnd } }
 						transition={
 							isReducedMotion ? { duration: 0 } : undefined
 						}
@@ -213,8 +215,8 @@ export default function DocumentBar( props ) {
 								? {
 										opacity: 0,
 										transform: hasBackButton
-											? 'translateX(15%)'
-											: 'translateX(-15%)',
+											? slideFromEnd
+											: slideFromStart,
 									}
 								: false // Don't show entry animation when DocumentBar mounts.
 						}

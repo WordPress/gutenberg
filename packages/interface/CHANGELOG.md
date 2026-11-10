@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   InterfaceSkeleton: Slide the secondary sidebar in from the right edge in RTL languages, instead of jumping onto the canvas first ([#86553](https://github.com/WordPress/gutenberg/pull/86553)).
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
