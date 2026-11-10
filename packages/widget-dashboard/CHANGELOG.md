@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Widget footer: stop setting `rel="noopener noreferrer"` on actions that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86486](https://github.com/WordPress/gutenberg/pull/86486)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
