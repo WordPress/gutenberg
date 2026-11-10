@@ -23,6 +23,7 @@ const getHostUser = vi.fn( () => ( {
 } ) );
 require.cache[ getHostUserPath ].exports = getHostUser;
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
+const { getPulledImages } = require( '../runtime/docker/missing-images' );
 const {
 	wordpressDockerFileContents,
 	cliDockerFileContents,
@@ -422,7 +423,6 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.services.mysql ).toBeDefined();
 			expect( dockerConfig.services.wordpress ).toBeDefined();
 			expect( dockerConfig.services.cli ).toBeDefined();
-			expect( dockerConfig.services.phpmyadmin ).toBeDefined();
 
 			// Tests services should not exist.
 			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
@@ -468,6 +468,105 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeDefined();
 			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
 			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
+		} );
+	} );
+
+	describe( 'phpmyadmin', () => {
+		const build = ( { development = {}, tests = {}, testsEnvironment } ) =>
+			buildDockerComposeConfig( {
+				testsEnvironment,
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, ...development },
+					tests: { ...CONFIG, ...tests },
+				},
+			} );
+
+		it( 'does not define or pull phpMyAdmin when it is not enabled', () => {
+			const dockerConfig = build( {} );
+
+			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+			expect( getPulledImages( dockerConfig ) ).toEqual( [
+				{
+					image: 'mariadb:lts',
+					services: [ 'mysql', 'tests-mysql' ],
+				},
+			] );
+		} );
+
+		it( 'does not define or pull phpMyAdmin when it is set to false', () => {
+			const dockerConfig = build( {
+				development: { phpmyadmin: false, phpmyadminPort: 9000 },
+				tests: { phpmyadmin: false, phpmyadminPort: 9001 },
+			} );
+
+			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+			expect(
+				getPulledImages( dockerConfig ).map( ( { image } ) => image )
+			).not.toContain( 'phpmyadmin' );
+		} );
+
+		it( 'defines and pulls phpMyAdmin for each environment that enables it', () => {
+			const dockerConfig = build( {
+				development: { phpmyadmin: true },
+				tests: { phpmyadmin: true },
+			} );
+
+			expect( dockerConfig.services.phpmyadmin ).toMatchObject( {
+				image: 'phpmyadmin',
+				environment: { PMA_HOST: 'mysql' },
+			} );
+			expect( dockerConfig.services[ 'tests-phpmyadmin' ] ).toMatchObject(
+				{
+					image: 'phpmyadmin',
+					environment: { PMA_HOST: 'tests-mysql' },
+				}
+			);
+			expect( getPulledImages( dockerConfig ) ).toContainEqual( {
+				image: 'phpmyadmin',
+				services: [ 'phpmyadmin', 'tests-phpmyadmin' ],
+			} );
+		} );
+
+		it( 'defines phpMyAdmin only for the development environment when only it enables it', () => {
+			const dockerConfig = build( {
+				development: { phpmyadmin: true, phpmyadminPort: 9000 },
+			} );
+
+			expect( dockerConfig.services.phpmyadmin.ports ).toEqual( [
+				'${WP_ENV_PHPMYADMIN_PORT:-9000}:80',
+			] );
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+		} );
+
+		it( 'defines phpMyAdmin only for the tests environment when only it enables it', () => {
+			const dockerConfig = build( {
+				tests: { phpmyadmin: true, phpmyadminPort: 9001 },
+			} );
+
+			expect( dockerConfig.services.phpmyadmin ).toBeUndefined();
+			expect( dockerConfig.services[ 'tests-phpmyadmin' ].ports ).toEqual(
+				[ '${WP_ENV_TESTS_PHPMYADMIN_PORT:-9001}:80' ]
+			);
+		} );
+
+		it( 'does not define tests phpMyAdmin when the tests environment is disabled', () => {
+			const dockerConfig = build( {
+				testsEnvironment: false,
+				tests: { phpmyadmin: true },
+			} );
+
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
 		} );
 	} );
 } );

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Stop `wp-env start` from downloading the phpMyAdmin image for an environment where phpMyAdmin is not enabled. The Docker runtime now only defines the `phpmyadmin` and `tests-phpmyadmin` services for the environments that enable `phpmyadmin`. A failed image pull also no longer reports phpMyAdmin as missing when it is not enabled.
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
