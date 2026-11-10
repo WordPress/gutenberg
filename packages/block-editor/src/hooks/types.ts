@@ -193,7 +193,6 @@ export type BlockGapValue = string | { top?: string; left?: string };
  */
 export interface BlockMetadata {
 	name?: string;
-	noteId?: unknown;
 	blockVisibility?: BlockVisibility;
 	[ key: string ]: unknown;
 }

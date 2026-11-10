@@ -5,6 +5,13 @@
 ### New Features
 
 -   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
+
+### Bug Fixes
+
+-   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).
+
+## 3.1.0 (2026-11-04)
 
 ## 3.0.0 (2026-10-20)
 
