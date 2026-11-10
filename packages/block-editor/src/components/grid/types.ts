@@ -1,10 +1,4 @@
-import type {
-	CSSProperties,
-	Dispatch,
-	ReactNode,
-	Ref,
-	SetStateAction,
-} from 'react';
+import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { GridRect } from './utils';
 
@@ -45,6 +39,16 @@ export interface GridRectOptions {
 export interface GridTrack {
 	start: number;
 	end: number;
+}
+
+/**
+ * A rectangle in pixels, relative to a grid's content box.
+ */
+export interface GridPixelRect {
+	left: number;
+	top: number;
+	right: number;
+	bottom: number;
 }
 
 /**
@@ -131,28 +135,82 @@ export interface GridVisualizerGridProps {
 export interface GridVisualizerCellProps {
 	color: string;
 	children?: ReactNode;
-	className?: string | false;
 }
 
 /**
- * A cell of a manual grid, and how it highlights the area a drag covers.
+ * A cell of a manual grid.
  */
 export interface GridVisualizerCellPosition {
 	column: number;
 	row: number;
 	gridClientId: string;
 	gridInfo: GridInfo;
-	setHighlightedRect: Dispatch< SetStateAction< GridRect | null > >;
 }
 
 /**
- * Drop zone handlers, called with the dragged block when it may drop.
+ * Where a dragged block was grabbed, in pixels from its top-left corner. Empty
+ * when it wasn't grabbed by its body, so it is centered on the pointer.
  */
-export interface DropZoneWithValidationOptions {
-	validateDrag: ( srcClientId: string ) => boolean;
-	onDragEnter: ( srcClientId: string ) => void;
-	onDragLeave: () => void;
-	onDrop: ( srcClientId: string ) => void;
+export interface GridDragGrab {
+	/** Client ID of the dragged block. */
+	srcClientId: string;
+	grab: { grabX?: number; grabY?: number };
+}
+
+/**
+ * A block in a grid, other than the dragged one, as measured in the canvas.
+ */
+export interface GridSibling {
+	/** The block's position in pixels. */
+	pixelRect: GridPixelRect;
+	/** The cells the block covers. */
+	rect: GridRect;
+}
+
+/**
+ * A grid's tracks and blocks, measured in the canvas when a drag starts.
+ * Nothing in the grid moves until the drop.
+ */
+export interface GridItemMeasurements {
+	/** Column tracks. */
+	columnTracks: GridTrack[];
+	/** Row tracks. */
+	rowTracks: GridTrack[];
+	/** The blocks in the grid, other than the dragged one. */
+	siblings: GridSibling[];
+	/** The dragged block, or null when it isn't in the grid. */
+	src: { pixelRect: GridPixelRect; rect: GridRect } | null;
+}
+
+/**
+ * The cells a block dragged over a manual grid would land in.
+ */
+export interface GridDropTarget {
+	/** Client ID of the dragged block. */
+	srcClientId: string;
+	/** Number of columns and rows the block spans. */
+	span: { columnSpan: number; rowSpan: number };
+	/** The cells the block would land in. */
+	landing: GridRect;
+	/** The landing cells in pixels. */
+	landingPixelRect: GridPixelRect;
+	/** The parts of the landing cells other blocks take up, in pixels. */
+	overlaps: GridPixelRect[];
+}
+
+export interface GridVisualizerDropLayerProps {
+	/** Client ID of the grid block. */
+	gridClientId: string;
+	/** The grid element in the canvas. */
+	gridElement: Element;
+	/** Grid info, from `getGridInfo`. */
+	gridInfo: GridInfo;
+	/** Called with the drop target, or null. */
+	setDropTarget: ( target: GridDropTarget | null ) => void;
+}
+
+export interface GridDropIndicatorProps {
+	dropTarget: GridDropTarget;
 }
 
 export interface AutoGridVisualizerProps {
@@ -162,4 +220,5 @@ export interface AutoGridVisualizerProps {
 
 export interface ManualGridVisualizerProps extends AutoGridVisualizerProps {
 	gridClientId: string;
+	gridElement: Element;
 }

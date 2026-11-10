@@ -298,6 +298,8 @@
 	left: 50%;
 }
 
-.block-editor-block-tools--is-dragging > .popover-slot {
+// Popovers in the block tools slots are hidden while blocks are dragged, except
+// those that take part in the drag, such as a manual grid's drop layer.
+.block-editor-block-tools--is-dragging > .popover-slot > :not(.is-shown-while-dragging) {
 	display: none;
 }

@@ -124,6 +124,22 @@ export interface LayoutControlProps {
 }
 
 /**
+ * What a layout needs to take over the drag of one of its blocks.
+ */
+export interface ChildDragOptions {
+	/** Client ID of the dragged block. */
+	clientId: string;
+	/** Client ID of the block whose layout it is. */
+	rootClientId: string;
+	/** The dragged block's element in the canvas. */
+	blockElement: HTMLElement;
+	/** Marks blocks as being dragged. */
+	startDraggingBlocks: ( clientIds: string[] ) => void;
+	/** Marks the drag as over. */
+	stopDraggingBlocks: () => void;
+}
+
+/**
  * A layout type, such as flow, flex, constrained or grid.
  */
 export interface LayoutType {
@@ -140,6 +156,15 @@ export interface LayoutType {
 		layout: Layout,
 		isBlockBasedTheme?: boolean
 	) => LayoutAlignment[];
+	/**
+	 * Takes over the drag of one of the layout's blocks, dragged by its body,
+	 * when the layout moves its blocks itself. Returns whether it did, so that
+	 * the block list doesn't start its own drag.
+	 */
+	startChildDrag?: (
+		event: DragEvent,
+		args: ChildDragOptions & { layout?: Layout }
+	) => boolean;
 }
 
 /**

@@ -12,8 +12,8 @@ import {
 	getChildLayoutStyleRules,
 	getChildLayoutStyles,
 	getResponsiveChildLayoutStyles,
-	getUpdatedChildLayoutStyle,
 } from '../layout-child';
+import { getUpdatedChildLayoutStyle } from '../block-style-state';
 
 describe( 'layout child', () => {
 	describe( 'getChildLayoutStyleRules()', () => {
