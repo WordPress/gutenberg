@@ -29,11 +29,9 @@ function InlineEditButton( {
 		} else {
 			stopEditingContentOnlySection();
 			// Keep the selected section pattern or content block selected after exiting.
-			selectBlock(
-				isContentBlock( getBlockName( clientId ) )
-					? clientId
-					: editedContentOnlySection
-			);
+			if ( ! isContentBlock( getBlockName( clientId ) ) ) {
+				selectBlock( editedContentOnlySection );
+			}
 		}
 	};
 
