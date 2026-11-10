@@ -2,6 +2,12 @@
 export default {
 	versionGroups: [
 		{
+			label: 'Peer ranges on workspace packages must admit the workspace version.',
+			dependencies: [ '@wordpress/**' ],
+			dependencyTypes: [ 'peer', 'local' ],
+			policy: 'sameRange',
+		},
+		{
 			label: 'Internal @wordpress/* workspace packages: ignore (workspaces are the source of truth).',
 			dependencies: [ '@wordpress/**' ],
 			packages: [ '**' ],
