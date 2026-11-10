@@ -27,7 +27,7 @@ brew install colima docker docker-buildx docker-compose
 colima start --cpu 4 --memory 4
 ```
 
-Homebrew installs Buildx and Compose as Docker CLI plugins outside the CLI's search path. On Apple Silicon, point the CLI at them by adding this property to `~/.docker/config.json`, keeping whatever else is already in the file:
+Homebrew installs Buildx and Compose as Docker CLI plugins outside the CLI's search path. Point the CLI at them by adding this property to `~/.docker/config.json`, keeping whatever else is already in the file. The path below is for Apple Silicon; on Intel Macs, use `/usr/local/lib/docker/cli-plugins` instead:
 
 ```json
 "cliPluginsExtraDirs": [ "/opt/homebrew/lib/docker/cli-plugins" ]
@@ -42,7 +42,7 @@ The Docker Desktop application is free for small businesses, personal use, educa
 Use the links below to download and install Docker Desktop for your operating system.
 
 - [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
-- [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+- [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend)
 - [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/)
 
 If you are using a version of Ubuntu prior to 20.04.1, see the additional [troubleshooting notes](#ubuntu-docker-setup) below.

@@ -26,22 +26,9 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 ### Docker runtime
 
-On macOS, you can use [Colima](https://github.com/abiosoft/colima). It's free and open source, needs no account, and runs without a GUI.
+On macOS, you can use [Colima](https://github.com/abiosoft/colima). It's free and open source, needs no account, and runs without a GUI. [Docker Desktop](https://docs.docker.com/desktop/) is available for macOS, Windows, and Linux. Other options are [Rancher Desktop](https://rancherdesktop.io/) on Windows and [Docker Engine](https://docs.docker.com/engine/install/) on Linux.
 
-```sh
-$ brew install colima docker docker-buildx docker-compose
-$ colima start --cpu 4 --memory 4
-```
-
-Homebrew installs Buildx and Compose as Docker CLI plugins outside the CLI's search path. On Apple Silicon, point the CLI at them by adding this property to `~/.docker/config.json`, keeping whatever else is already in the file:
-
-```json
-"cliPluginsExtraDirs": [ "/opt/homebrew/lib/docker/cli-plugins" ]
-```
-
-Colima remembers the CPU and memory settings, so later starts are just `colima start`. To start it at login instead, run `brew services start colima`.
-
-On Windows, use [Rancher Desktop](https://rancherdesktop.io/) with its dockerd (moby) engine, or [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend). On Linux, use [Docker Engine](https://docs.docker.com/engine/install/). Docker Desktop is also available for [macOS](https://docs.docker.com/desktop/install/mac-install/) and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+For setup steps, see [Set up Docker](https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/get-started-with-wp-env.md#set-up-docker) in the Get started with wp-env guide.
 
 ## Experimental runtimes
 
