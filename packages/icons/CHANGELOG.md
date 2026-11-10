@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+
 ### New Features
 
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
