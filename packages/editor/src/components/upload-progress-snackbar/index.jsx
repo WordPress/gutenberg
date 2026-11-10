@@ -4,7 +4,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
-import { Icon as WCIcon, Spinner } from '@wordpress/components';
+import { Icon as WCIcon, Spinner as WCSpinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 import {
 	useTracker,
@@ -50,7 +50,7 @@ export const UPLOAD_SPINNER = (
 		className="editor-upload-progress-snackbar__spinner"
 		aria-hidden="true"
 	>
-		<Spinner />
+		<WCSpinner />
 	</span>
 );
 

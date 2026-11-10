@@ -227,4 +227,16 @@ describe( 'split', () => {
 		};
 		expect( split( deepFreeze( record ) ) ).toBe( undefined );
 	} );
+
+	it( 'should split at indices without selection', () => {
+		const record = {
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'abcd',
+		};
+		const [ before, after ] = split( deepFreeze( record ), 1, 3 );
+
+		expect( before.text ).toBe( 'a' );
+		expect( after.text ).toBe( 'd' );
+	} );
 } );

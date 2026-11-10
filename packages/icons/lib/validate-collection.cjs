@@ -7,6 +7,9 @@ const ICON_VIEW_BOX = '0 0 24 24';
 // The collections an icon may be shipped in.
 const VALID_ICON_COLLECTIONS = [ 'core', 'core-admin' ];
 
+// The format of a Dashicon class name, such as `dashicons-admin-post`.
+const DASHICON_CLASS_PATTERN = /^dashicons-[a-z0-9-]+$/;
+
 function isStrokeBasedSvg( svgContent ) {
 	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
 	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
@@ -19,13 +22,16 @@ function isStrokeBasedSvg( svgContent ) {
  * - Each manifest entry's `collections` property, if present, is a non-empty array of
  *   known collection slugs.
  * - Each manifest entry's `keywords` property, if present, is an array of strings.
+ * - Each manifest entry's `dashicons` property, if present, is a non-empty array
+ *   of unique Dashicon class names, on an icon in the `core-admin` collection.
+ * - Each Dashicon class name is replaced by at most one icon.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
- * - Each stroked graphical element uses a non-scaling stroke.
+ * - Each SVG omits vector-effect so strokes scale with the icon.
  */
-async function validateCollection() {
-	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
+async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
+	const manifestPath = path.join( iconLibraryDir, '..', 'manifest.json' );
 
 	try {
 		await stat( manifestPath );
@@ -51,6 +57,7 @@ async function validateCollection() {
 	 * found in the file system.
 	 */
 	const manifestPaths = [];
+	const dashiconReplacements = new Map();
 	for ( const icon of manifest ) {
 		const expected = `library/${ icon.slug }.svg`;
 
@@ -111,16 +118,63 @@ async function validateCollection() {
 		}
 
 		/*
+		 * Verify that `dashicons`, if present, lists unique Dashicon class names,
+		 * and only on icons the admin interface can render in their place.
+		 */
+		if ( 'dashicons' in icon ) {
+			const { dashicons } = icon;
+			const isValid =
+				Array.isArray( dashicons ) &&
+				dashicons.length > 0 &&
+				dashicons.every(
+					( dashicon ) =>
+						typeof dashicon === 'string' &&
+						DASHICON_CLASS_PATTERN.test( dashicon )
+				) &&
+				new Set( dashicons ).size === dashicons.length;
+
+			if ( ! isValid ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'dashicons' to be a non-empty array of unique Dashicon class names such as 'dashicons-admin-post', saw ${ JSON.stringify(
+						dashicons
+					) }`
+				);
+			} else {
+				if ( ! icon.collections?.includes( 'core-admin' ) ) {
+					problems.push(
+						`- Invalid icon definition for icon '${ icon.slug }': 'dashicons' is only allowed on icons in the 'core-admin' collection`
+					);
+				}
+
+				for ( const dashicon of dashicons ) {
+					if ( dashiconReplacements.has( dashicon ) ) {
+						problems.push(
+							`- Invalid icon definition for icon '${
+								icon.slug
+							}': '${ dashicon }' is already replaced by icon '${ dashiconReplacements.get(
+								dashicon
+							) }'`
+						);
+					} else {
+						dashiconReplacements.set( dashicon, icon.slug );
+					}
+				}
+			}
+		}
+
+		/*
 		 * Verify that the corresponding SVG file is found.
 		 */
 		if (
-			! ( await stat(
-				path.join( ICON_LIBRARY_DIR, '..', expected )
-			).catch( () => false ) )
+			! ( await stat( path.join( iconLibraryDir, '..', expected ) ).catch(
+				() => false
+			) )
 		) {
 			problems.push(
 				`- Icon file ${ path.join(
-					ICON_LIBRARY_DIR,
+					iconLibraryDir,
 					'..',
 					expected
 				) } not found`
@@ -132,7 +186,7 @@ async function validateCollection() {
 	 * Conversely, check that all the SVG files under library/ are listed in
 	 * the manifest.
 	 */
-	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) )
+	const svgFiles = ( await readdir( iconLibraryDir ) )
 		.filter( ( file ) => file.match( /^[a-z0-9--]+\.svg$/ ) )
 		.map( ( file ) => path.join( 'library', file ) )
 
@@ -140,7 +194,7 @@ async function validateCollection() {
 		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
 
 	for ( const file of svgFiles ) {
-		const svgPath = path.join( ICON_LIBRARY_DIR, path.basename( file ) );
+		const svgPath = path.join( iconLibraryDir, path.basename( file ) );
 
 		if ( ! manifestPaths.includes( file ) ) {
 			problems.push( `- Missing entry for icon ${ svgPath }` );
@@ -163,6 +217,12 @@ async function validateCollection() {
 			);
 		}
 
+		if ( /\svector-effect\s*=/.test( svgContent ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must omit vector-effect so its stroke width scales with its size`
+			);
+		}
+
 		if ( isStrokeBasedSvg( svgContent ) ) {
 			const graphicalElements = svgContent.match(
 				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
@@ -174,19 +234,6 @@ async function validateCollection() {
 			if ( ! strokedElements?.length ) {
 				problems.push(
 					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
-				);
-			}
-
-			if (
-				strokedElements?.some(
-					( element ) =>
-						! element.includes(
-							'vector-effect="non-scaling-stroke"'
-						)
-				)
-			) {
-				problems.push(
-					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
 				);
 			}
 		}

@@ -4,6 +4,7 @@
 	--wp-components-notice-text-color: var(--wpds-color-foreground-content-info);
 
 	box-sizing: border-box;
+	isolation: isolate;
 	display: grid;
 	grid-template-columns: 1fr auto;
 	align-items: start;
@@ -64,10 +65,17 @@
 	color: var(--wpds-color-foreground-interactive-neutral);
 	margin-inline-start: var(--wpds-dimension-gap-xs);
 
+	// Tint the dismiss control while retaining its own state styles.
+	mix-blend-mode: luminosity;
+
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
+	@media (forced-colors: active) {
+		mix-blend-mode: normal;
 	}
 }
 

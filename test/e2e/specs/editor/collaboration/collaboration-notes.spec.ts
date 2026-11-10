@@ -1,8 +1,22 @@
+import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
+
+// "All notes" has no toggle before the first note.
+async function showAllNotes( page: Page ) {
+	await page.evaluate( () =>
+		window.wp.data
+			.dispatch( 'core/interface' )
+			.enableComplementaryArea(
+				'core',
+				'edit-post/collab-history-sidebar'
+			)
+	);
+}
 
 test.describe( 'Collaboration - Notes Sync', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'User A adds a note, User B sees it', async ( {
@@ -21,6 +35,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block and adds a note.
 		await editor.insertBlock( {
@@ -83,6 +99,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block so both users have content.
 		await editor.insertBlock( {
@@ -154,6 +172,8 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		await collaborationUtils.openCollaborativeSession( post.id );
 
 		const { page2 } = collaborationUtils;
+		await showAllNotes( page );
+		await showAllNotes( page2 );
 
 		// User A inserts a block and adds a note with a reply.
 		await editor.insertBlock( {

@@ -167,6 +167,10 @@
 			"gradients": true
 		},
 		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
@@ -180,10 +184,18 @@
 				"type": "flex"
 			}
 		},
+		"filter": {
+			"duotone": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		},
 		"listView": true
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-gallery :where(img)"
+		}
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"

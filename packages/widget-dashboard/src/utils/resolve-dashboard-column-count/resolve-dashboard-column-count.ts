@@ -1,60 +1,72 @@
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
+import type { ColumnSteps } from '@wordpress/grid';
 
 /**
- * Container width (px) below which the dashboard uses a single column.
- * Matches `@container widget-dashboard (max-width: …)` in widgets CSS.
- */
-export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN = 600;
-
-/**
- * Container width (px) below which the dashboard drops from the column
- * cap to two. Above this threshold the grid uses the cap itself.
- */
-export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS = 960;
-
-/**
- * Resolves the wide-container column count a host asked for. A finite value
- * is floored, with a floor of one and no ceiling: how many columns a surface
- * can carry is the host's decision, not the package's. An absent or
- * non-finite value resolves to {@link WIDGET_DASHBOARD_COLUMN_COUNT}.
+ * Resolves the column count a host asked for. A finite number is floored,
+ * with a floor of one and no ceiling; a map keeps its finite positive
+ * entries, keyed by container width, each count floored the same way, and
+ * an `'auto'` step only when a floor is set, since the surface skips it
+ * otherwise. Anything else, or a map left with no entries, is unset. How
+ * many columns a surface can carry is the host's decision, not the
+ * package's.
  *
- * @param columns Host-provided `gridSettings.columns`, if any.
- * @return Column count for wide containers.
+ * @param columns        Host-provided `gridSettings.columns`, if any.
+ * @param minColumnWidth Host-provided `gridSettings.minColumnWidth`, if any.
+ * @return The count, the steps, or `undefined` when the host set none.
  */
-export function resolveDashboardColumnCap( columns?: number ): number {
-	if ( typeof columns !== 'number' || ! Number.isFinite( columns ) ) {
-		return WIDGET_DASHBOARD_COLUMN_COUNT;
+export function resolveDashboardColumns(
+	columns?: number | ColumnSteps,
+	minColumnWidth?: number
+): number | ColumnSteps | undefined {
+	if ( typeof columns === 'number' ) {
+		return Number.isFinite( columns )
+			? Math.max( 1, Math.floor( columns ) )
+			: undefined;
 	}
 
-	return Math.max( 1, Math.floor( columns ) );
+	if ( typeof columns !== 'object' || columns === null ) {
+		return undefined;
+	}
+
+	const hasFloor =
+		resolveDashboardMinColumnWidth( minColumnWidth ) !== undefined;
+	const steps: ColumnSteps = {};
+	for ( const [ width, count ] of Object.entries( columns ) ) {
+		const from = Number( width );
+		if ( ! Number.isFinite( from ) || from < 0 ) {
+			continue;
+		}
+		if ( count === 'auto' ) {
+			if ( hasFloor ) {
+				steps[ from ] = 'auto';
+			}
+			continue;
+		}
+		if ( typeof count !== 'number' || ! Number.isFinite( count ) ) {
+			continue;
+		}
+		steps[ from ] = Math.max( 1, Math.floor( count ) );
+	}
+
+	return Object.keys( steps ).length > 0 ? steps : undefined;
 }
 
 /**
- * Resolves the dashboard grid column count from the widget surface
- * container width. Uses discrete steps (cap → 2 → 1), not viewport
- * media queries.
+ * Resolves the per-column floor a host asked for. A finite positive value is
+ * the floor in pixels; anything else leaves it unset.
  *
- * @param containerWidth Measured inline size of the dashboard grid container.
- * @param maxColumns     Column cap for wide containers; see
- *                       {@link resolveDashboardColumnCap}.
- * @return Column count for {@link @wordpress/grid} surfaces.
+ * @param minColumnWidth Host-provided `gridSettings.minColumnWidth`, if any.
+ * @return The floor in pixels, or `undefined` when the host set none.
  */
-export function resolveDashboardColumnCount(
-	containerWidth: number,
-	maxColumns: number = WIDGET_DASHBOARD_COLUMN_COUNT
-): number {
-	if ( containerWidth <= 0 ) {
-		return maxColumns;
+export function resolveDashboardMinColumnWidth(
+	minColumnWidth?: number
+): number | undefined {
+	if (
+		typeof minColumnWidth !== 'number' ||
+		! Number.isFinite( minColumnWidth ) ||
+		minColumnWidth <= 0
+	) {
+		return undefined;
 	}
 
-	if ( containerWidth < WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN ) {
-		return 1;
-	}
-
-	if ( containerWidth < WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS ) {
-		// A cap of one must not step up to two in the middle band.
-		return Math.min( 2, maxColumns );
-	}
-
-	return maxColumns;
+	return minColumnWidth;
 }

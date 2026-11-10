@@ -2,6 +2,7 @@ import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 import Button from '../../button';
@@ -30,11 +31,6 @@ const expectGroupChromeDisabled = ( group: HTMLElement ) => {
 
 const sleep = ( milliseconds: number ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
-
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -114,7 +110,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', async () => {
@@ -129,7 +124,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 } );
 
@@ -921,7 +915,7 @@ describe.each( [
 	} );
 } );
 
-test( 'should render block styles without Emotion-generated classes', async () => {
+test( 'should render block styles with enclosing borders', async () => {
 	await render(
 		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
 			{ options }
@@ -932,7 +926,6 @@ test( 'should render block styles without Emotion-generated classes', async () =
 		name: 'Test Toggle Group Control',
 	} );
 
-	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 0 );
 	expect( control ).toHaveClass(
 		controlStyles[ 'toggle-group-control' ],
 		controlStyles[ 'is-block' ],
@@ -962,4 +955,31 @@ test( 'should render deselectable styles without enclosing borders', async () =>
 		optionStyles.button,
 		optionStyles[ 'is-deselectable' ]
 	);
+} );
+
+test( 'should keep its width when the pressed option changes', async () => {
+	await render(
+		<ControlledToggleGroupControl
+			label="Test Toggle Group Control"
+			value="narrow"
+		>
+			<ToggleGroupControlOption value="narrow" label="i" />
+			<ToggleGroupControlOption value="wide" label="MMMMMMMM" />
+		</ControlledToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'radiogroup', {
+		name: 'Test Toggle Group Control',
+	} );
+	const wideOption = screen.getByRole( 'radio', { name: 'MMMMMMMM' } );
+	const initialWidth = control.getBoundingClientRect().width;
+
+	await userEvent.click( wideOption );
+	await waitFor( () => expect( wideOption ).toBeChecked() );
+	// Wait for the font weight transition to finish.
+	await Promise.all(
+		wideOption.getAnimations().map( ( animation ) => animation.finished )
+	);
+
+	expect( control.getBoundingClientRect().width ).toBe( initialWidth );
 } );

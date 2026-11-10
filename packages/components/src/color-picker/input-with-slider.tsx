@@ -1,7 +1,8 @@
 import { HStack } from '../h-stack';
 import { Text } from '../text';
-import { RangeControl, NumberControlWrapper } from './styles';
-import { COLORS } from '../utils/colors-values';
+import RangeControl from '../range-control';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import type { InputWithSliderProps } from './types';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
@@ -27,7 +28,8 @@ export const InputWithSlider = ( {
 
 	return (
 		<HStack spacing={ 4 }>
-			<NumberControlWrapper
+			<NumberControl
+				className={ styles[ 'number-control' ] }
 				min={ min }
 				max={ max }
 				label={ label }
@@ -35,8 +37,8 @@ export const InputWithSlider = ( {
 				value={ value }
 				onChange={ onNumberControlChange }
 				prefix={
-					<InputControlPrefixWrapper>
-						<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+					<InputControlPrefixWrapper className={ styles.prefix }>
+						<Text color="inherit" lineHeight={ 1 }>
 							{ abbreviation }
 						</Text>
 					</InputControlPrefixWrapper>
@@ -44,6 +46,7 @@ export const InputWithSlider = ( {
 				spinControls="none"
 			/>
 			<RangeControl
+				className={ styles.range }
 				label={ label }
 				hideLabelFromVision
 				min={ min }

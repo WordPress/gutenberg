@@ -4,8 +4,7 @@ import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
+import * as Popover from '../../../../popover';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
@@ -18,6 +17,10 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	tags: [ 'manifest' ],
@@ -25,6 +28,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
+		'Autocomplete.LoadingIndicator': Autocomplete.LoadingIndicator,
 		'Autocomplete.Portal': Autocomplete.Portal,
 		'Autocomplete.Positioner': Autocomplete.Positioner,
 		'Autocomplete.Popup': Autocomplete.Popup,
@@ -197,15 +201,17 @@ function HiddenResultCount() {
 }
 
 /**
- * Fetches matching items asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Autocomplete.LoadingIndicator` inside `Autocomplete.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Autocomplete.Root
@@ -216,7 +222,9 @@ export const AsyncItems: Story = {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
-					clearTimeout( timeoutRef.current );
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
@@ -226,7 +234,7 @@ export const AsyncItems: Story = {
 							)
 						);
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 			>
@@ -237,10 +245,7 @@ export const AsyncItems: Story = {
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Autocomplete.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
@@ -714,7 +719,7 @@ export const Grid: Story = {
 					} }
 				>
 					<Autocomplete.Empty>No matching emojis.</Autocomplete.Empty>
-					<Autocomplete.List>
+					<Autocomplete.List aria-label="Emojis">
 						{ ( group: ( typeof EMOJI_GROUPS )[ number ] ) => (
 							<Autocomplete.Group
 								key={ group.value }
@@ -759,4 +764,145 @@ export const Grid: Story = {
 			</Autocomplete.Root>
 		);
 	},
+};
+
+/**
+ * For a searchable picker that opens from a button, render an inline
+ * `Autocomplete` inside a `Popover`, not an `Autocomplete.Popup`. To close the
+ * popover after a pick, control `open` on `Popover.Root` and set it to `false`
+ * from each item's `onClick`. To open the popover somewhere other than its
+ * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
+ */
+export const InlineInPopover: Story = {
+	args: {
+		items: EMOJI_GROUPS,
+		inline: true,
+		open: true,
+		grid: true,
+		autoHighlight: true,
+	},
+	render: function Template( args ) {
+		const [ isPopoverOpen, setIsPopoverOpen ] = useState( false );
+		const [ pickedEmoji, setPickedEmoji ] = useState< string >();
+
+		return (
+			<>
+				<Popover.Root
+					open={ isPopoverOpen }
+					onOpenChange={ setIsPopoverOpen }
+				>
+					<Popover.Trigger>Insert emoji</Popover.Trigger>
+					<Popover.Popup>
+						<VisuallyHidden render={ <Popover.Title /> }>
+							Insert emoji
+						</VisuallyHidden>
+						<Autocomplete.Root { ...args }>
+							<Autocomplete.Input
+								aria-label="Search emojis"
+								placeholder="Search emojis"
+							/>
+							<div
+								style={ {
+									marginTop: 'var(--wpds-dimension-gap-sm)',
+								} }
+							>
+								<Autocomplete.Empty>
+									No matching emojis.
+								</Autocomplete.Empty>
+								<Autocomplete.List aria-label="Emojis">
+									{ (
+										group: ( typeof EMOJI_GROUPS )[ number ]
+									) => (
+										<Autocomplete.Group
+											key={ group.value }
+											items={ group.items }
+										>
+											<Autocomplete.GroupLabel>
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											{ chunkItems(
+												group.items,
+												EMOJI_COLUMNS
+											).map( ( row, rowIndex ) => (
+												<Autocomplete.Row
+													key={ rowIndex }
+													style={
+														emojiPickerRowStyle
+													}
+												>
+													{ row.map( ( emoji ) => (
+														<Autocomplete.Item
+															key={ emoji.value }
+															value={ emoji }
+															aria-label={
+																emoji.label
+															}
+															style={
+																emojiPickerCellStyle
+															}
+															onClick={ () => {
+																setPickedEmoji(
+																	emoji.emoji
+																);
+																setIsPopoverOpen(
+																	false
+																);
+															} }
+														>
+															<Autocomplete.ItemLabel
+																style={
+																	emojiPickerLabelStyle
+																}
+															>
+																<span aria-hidden="true">
+																	{
+																		emoji.emoji
+																	}
+																</span>
+															</Autocomplete.ItemLabel>
+														</Autocomplete.Item>
+													) ) }
+												</Autocomplete.Row>
+											) ) }
+										</Autocomplete.Group>
+									) }
+								</Autocomplete.List>
+							</div>
+						</Autocomplete.Root>
+					</Popover.Popup>
+				</Popover.Root>
+				<p>Picked emoji: { pickedEmoji ?? 'None' }</p>
+			</>
+		);
+	},
+};
+
+/**
+ * Use `width` on `Autocomplete.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems.map( ( item ) => item.label ),
+	},
+	render: ( args ) => (
+		<Autocomplete.Root { ...args }>
+			<Autocomplete.Input aria-label="Label" />
+			<Autocomplete.Popup width="sm">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: string ) => (
+								<Autocomplete.Item key={ item } value={ item }>
+									<Autocomplete.ItemLabel>
+										{ item }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	),
 };

@@ -4,11 +4,11 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
-	Notice,
+	Notice as WCNotice,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
@@ -187,14 +187,14 @@ function PostFeaturedImage( {
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								{ isMissingMedia ? (
-									<Notice
+									<WCNotice
 										status="warning"
 										isDismissible={ false }
 									>
 										{ __(
 											'Could not retrieve the featured image data.'
 										) }
-									</Notice>
+									</WCNotice>
 								) : (
 									<Button
 										__next40pxDefaultSize
@@ -232,7 +232,7 @@ function PostFeaturedImage( {
 										) }
 										{ ( isLoading ||
 											isRequestingFeaturedImageMedia ) && (
-											<Spinner />
+											<WCSpinner />
 										) }
 										{ ! featuredImageId &&
 											! isLoading &&

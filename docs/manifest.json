@@ -2550,6 +2550,24 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-editor",
+		"slug": "packages-image-editor",
+		"markdown_source": "../packages/image-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Image Editor Architecture",
+		"slug": "packages-image-editor-architecture",
+		"markdown_source": "../packages/image-editor/docs/architecture.md",
+		"parent": "packages-image-editor"
+	},
+	{
+		"title": "Image Editor Recipes",
+		"slug": "packages-image-editor-recipes",
+		"markdown_source": "../packages/image-editor/docs/recipes.md",
+		"parent": "packages-image-editor"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",
@@ -2601,12 +2619,6 @@
 		"title": "@wordpress/lazy-editor",
 		"slug": "packages-lazy-editor",
 		"markdown_source": "../packages/lazy-editor/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/lazy-import",
-		"slug": "packages-lazy-import",
-		"markdown_source": "../packages/lazy-import/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2712,12 +2724,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/project-management-automation",
-		"slug": "packages-project-management-automation",
-		"markdown_source": "../packages/project-management-automation/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/react-i18n",
 		"slug": "packages-react-i18n",
 		"markdown_source": "../packages/react-i18n/README.md",
@@ -2811,6 +2817,12 @@
 		"title": "@wordpress/sync",
 		"slug": "packages-sync",
 		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/theme-build-tools",
+		"slug": "packages-theme-build-tools",
+		"markdown_source": "../packages/theme-build-tools/README.md",
 		"parent": "packages"
 	},
 	{

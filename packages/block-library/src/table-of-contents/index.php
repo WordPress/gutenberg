@@ -137,6 +137,9 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	}
 
 	$content = preg_replace( '/<br\s*\/?>/i', ' ', $rendered_heading );
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the ToC entry.
+	$content = preg_replace( '/<annotation(?:\s[^>]*)?>.*?<\/annotation>/is', '', $content );
 	// Decode entities from rendered heading HTML before the ToC escapes them
 	// once. Use html_entity_decode() because wp_specialchars_decode() only
 	// handles special HTML characters, while headings can contain other named
@@ -383,13 +386,26 @@ function block_core_table_of_contents_render( $attributes, $content, $block = nu
 		return block_core_table_of_contents_add_aria_label( $attributes, $legacy_content );
 	}
 
-	// Outside post content rendering, there is no reliable current post to scan.
-	if ( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) {
-		return block_core_table_of_contents_add_aria_label( $attributes, $content );
+	if ( empty( $block->context['postId'] ) ) {
+		return '';
 	}
 
+	// Outside post content, e.g. in a template, `postId` falls back to the
+	// global post. That is only the post being viewed on singular views; on
+	// archives it would be the first post of the list.
+	$is_in_post_content = is_array( $wp_current_filter ) && in_array( 'the_content', $wp_current_filter, true );
+	if ( ! $is_in_post_content && ! is_singular() ) {
+		return '';
+	}
+
+	// On Preview, WordPress applies the unsaved changes to the global post
+	// only, so read it when it is the post in context. Loading the post by
+	// ID would read the saved version.
 	$post = get_post();
-	if ( ! $post ) {
+	if ( ! $post || (int) $block->context['postId'] !== $post->ID ) {
+		$post = get_post( $block->context['postId'] );
+	}
+	if ( ! $post || post_password_required( $post ) ) {
 		return '';
 	}
 
