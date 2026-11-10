@@ -135,11 +135,6 @@
 			"count": 4
 		}
 	},
-	"packages/block-editor/src/components/block-lock/toolbar.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/block-manager/category.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -203,11 +198,6 @@
 	"packages/block-editor/src/components/block-visibility/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/viewport-toolbar.tsx": {
-		"react-hooks/refs": {
-			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/border-radius-control/index.tsx": {
