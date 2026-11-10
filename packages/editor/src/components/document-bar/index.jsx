@@ -158,7 +158,6 @@ export default function DocumentBar( props ) {
 	const pageTypeBadge = usePageTypeBadge( postId );
 
 	const mountedRef = useRef( false );
-	// Slide towards the inline start edge, mirrored in RTL languages.
 	const slideFromEnd = isRTL() ? 'translateX(-15%)' : 'translateX(15%)';
 	const slideFromStart = isRTL() ? 'translateX(15%)' : 'translateX(-15%)';
 	useEffect( () => {
