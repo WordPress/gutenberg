@@ -194,6 +194,11 @@ export interface LayoutStyleArgs {
 	 * The layout properties a viewport overrides.
 	 */
 	viewportOverrides?: Layout;
+	/**
+	 * The viewport state the styles are for, such as `@mobile`, when they go
+	 * in that viewport's media query.
+	 */
+	viewport?: string;
 	style?: { spacing?: { blockGap?: BlockGapValue; padding?: unknown } };
 	/**
 	 * The block gap set in the global styles.
