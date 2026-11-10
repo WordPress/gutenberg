@@ -34,13 +34,13 @@
 /phpstan.neon.dist                              @westonruter
 
 # UI Components
-/packages/components                            @WordPress/gutenberg-components
-/packages/design-system-mcp                     @WordPress/gutenberg-components
+/packages/components                            @mirka
+/packages/design-system-mcp                     @mirka
 /packages/nux                                   @peterwilsoncc
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
-/packages/theme                                 @WordPress/gutenberg-components
-/packages/theme-build-tools                     @WordPress/gutenberg-components
-/packages/ui                                    @WordPress/gutenberg-components
+/packages/theme                                 @mirka
+/packages/theme-build-tools                     @mirka
+/packages/ui                                    @mirka
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox
 
