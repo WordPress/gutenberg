@@ -1071,9 +1071,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( optionsButton ).toBeFocused();
 
 		const editorCanvasBody = editor.canvas.locator( 'body' );
-		// Focuses the editor canvas body. In the editor the click doesn’t have
-		// to be on the element itself – just somewhere that won’t focus a block.
-		await editorCanvasBody.click();
+		// Click blank space at the edge of the canvas. Depending on the theme,
+		// the center can fall inside the default paragraph instead.
+		await editorCanvasBody.click( { position: { x: 1, y: 1 } } );
+		await expect( editorCanvasBody ).toBeFocused();
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( optionsButton ).toBeFocused();
 	} );
