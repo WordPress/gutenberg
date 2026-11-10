@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Widget inserter: show the "View options" popover above the Add widget dialog ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+-   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).
 
 ### Internal
 
