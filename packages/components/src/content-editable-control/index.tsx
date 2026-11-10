@@ -18,7 +18,6 @@ function UnforwardedContentEditableControl(
 		disabled,
 		required,
 		placeholder,
-		onMouseDown,
 		...additionalProps
 	}: WordPressComponentProps< ContentEditableControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
@@ -43,11 +42,7 @@ function UnforwardedContentEditableControl(
 				<BaseControl.VisualLabel
 					id={ labelId }
 					// Focus the field on label click, like `<label for>` would.
-					onClick={ () => {
-						if ( ! disabled ) {
-							editableRef.current?.focus();
-						}
-					} }
+					onClick={ () => editableRef.current?.focus() }
 				>
 					{ label }
 				</BaseControl.VisualLabel>
@@ -73,13 +68,6 @@ function UnforwardedContentEditableControl(
 					// a field disabled while focused keeps focus.
 					contentEditable={ ! disabled }
 					tabIndex={ disabled ? -1 : undefined }
-					// Like a native disabled field, don't take focus on click.
-					onMouseDown={ ( event ) => {
-						if ( disabled ) {
-							event.preventDefault();
-						}
-						onMouseDown?.( event );
-					} }
 					suppressContentEditableWarning
 					{ ...additionalProps }
 					{ ...controlProps }

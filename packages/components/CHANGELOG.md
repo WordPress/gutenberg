@@ -8,7 +8,6 @@
 
 ### Bug Fixes
 
--   `ContentEditableControl`: Keep a disabled field from taking focus when it or its label is clicked ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
 -   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
 -   `Button`, `Toolbar`: Show the pressed state in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
 -   `TimePicker`: Keep the hours field focus ring visible above the minutes field ([#86442](https://github.com/WordPress/gutenberg/pull/86442)).
