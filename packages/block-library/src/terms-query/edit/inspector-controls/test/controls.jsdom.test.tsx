@@ -2,13 +2,8 @@ import { describe, expect, test, vi } from 'vitest';
 import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-vi.mock( '../../../utils', () => ( {
-	usePublicTaxonomies: () => [
-		{ name: 'Categories', slug: 'category' },
-		{ name: 'Tags', slug: 'post_tag' },
-	],
-} ) );
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
@@ -31,17 +26,45 @@ const { default: OrderControl } = await vi.importActual< {
 	} >;
 } >( '../order-control' );
 
-describe( 'Terms Query selectors', () => {
-	test( 'changes the taxonomy so its selected terms can be cleared', async () => {
-		const user = userEvent.setup();
-		const onChange = vi.fn();
-		render(
+function renderTaxonomyControl( onChange: ( value: string ) => void ) {
+	const registry = createRegistry();
+	registry.register( coreDataStore );
+	registry.dispatch( coreDataStore ).receiveEntityRecords(
+		'root',
+		'taxonomy',
+		[
+			{
+				name: 'Categories',
+				slug: 'category',
+				visibility: { publicly_queryable: true },
+			},
+			{
+				name: 'Tags',
+				slug: 'post_tag',
+				visibility: { publicly_queryable: true },
+			},
+		],
+		{ per_page: -1 }
+	);
+	registry
+		.dispatch( coreDataStore )
+		.finishResolution( 'getTaxonomies', [ { per_page: -1 } ] );
+	return render(
+		<RegistryProvider value={ registry }>
 			<TaxonomyControl
 				label="Taxonomy"
 				value="category"
 				onChange={ onChange }
 			/>
-		);
+		</RegistryProvider>
+	);
+}
+
+describe( 'Terms Query selectors', () => {
+	test( 'changes the taxonomy so its selected terms can be cleared', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		renderTaxonomyControl( onChange );
 
 		await user.tab();
 		await user.keyboard( '{Enter}' );
@@ -53,13 +76,7 @@ describe( 'Terms Query selectors', () => {
 	test( 'does not reset selected terms when reselecting the current taxonomy', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
-		render(
-			<TaxonomyControl
-				label="Taxonomy"
-				value="category"
-				onChange={ onChange }
-			/>
-		);
+		renderTaxonomyControl( onChange );
 
 		await user.tab();
 		await user.keyboard( '{Enter}' );
