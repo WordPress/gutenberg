@@ -1,6 +1,6 @@
 import {
 	TextareaControl as WCTextareaControl,
-	Notice,
+	Notice as WCNotice,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -119,9 +119,9 @@ export default function AdvancedPanel( {
 			className="block-editor-global-styles-advanced-panel"
 		>
 			{ cssError && (
-				<Notice status="error" onRemove={ () => setCSSError( null ) }>
+				<WCNotice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }
-				</Notice>
+				</WCNotice>
 			) }
 			<WCTextareaControl
 				label={ __( 'Additional CSS' ) }

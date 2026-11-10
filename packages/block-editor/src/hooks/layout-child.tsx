@@ -1,9 +1,16 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import {
+	getValueFromObjectPath,
+	isPlainObject,
+	setImmutably,
+} from '../utils/object';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
@@ -589,6 +596,104 @@ function GridTools( {
 		</>
 	);
 }
+
+/**
+ * Returns the child layout of a block style: the default layout and the
+ * layout of each viewport state, keyed by their path in the style object.
+ *
+ * @param {Object|undefined} style Block style attributes.
+ * @return {Array} Pairs of style object path and child layout.
+ */
+function getChildLayoutEntries(
+	style: unknown
+): Array< [ string[], Record< string, unknown > ] > {
+	if ( ! isPlainObject( style ) ) {
+		return [];
+	}
+
+	const entries: Array< [ string[], Record< string, unknown > ] > = [];
+	if ( isPlainObject( style.layout ) ) {
+		entries.push( [ [ 'layout' ], style.layout ] );
+	}
+	Object.entries( style ).forEach( ( [ key, stateStyle ] ) => {
+		// Viewport states (`@mobile`, `@tablet`) hold their own child layout.
+		if (
+			key.startsWith( '@' ) &&
+			isPlainObject( stateStyle ) &&
+			isPlainObject( stateStyle.layout )
+		) {
+			entries.push( [ [ key, 'layout' ], stateStyle.layout ] );
+		}
+	} );
+	return entries;
+}
+
+/**
+ * Keeps the child layout (such as a grid item's position and span) of a block
+ * when it is switched to another block type. The child layout describes the
+ * block's place in its parent, not the block itself, but transforms usually
+ * build new attributes and drop it.
+ *
+ * @param {Object}       result  The transformed block.
+ * @param {Array|Object} source  Original blocks transformed.
+ * @param {number}       index   Index of the transformed block.
+ * @param {Array}        results All blocks that resulted from the transformation.
+ * @return {Object} Modified transformed block.
+ */
+export function addTransforms(
+	result: Block,
+	source: Block | Block[],
+	index: number,
+	results: Block[]
+): Block {
+	// `switchToBlockType` passes on a single original block as it got it.
+	const sourceBlocks = Array.isArray( source ) ? source : [ source ];
+
+	// A wrapping transform (e.g. a paragraph into a group) keeps the
+	// original blocks, child layout included, inside the result.
+	if (
+		results.length === 1 &&
+		result.innerBlocks.length === sourceBlocks.length
+	) {
+		return result;
+	}
+
+	// Only a block that takes the place of exactly one original block can
+	// take its child layout.
+	if ( results.length !== sourceBlocks.length ) {
+		return result;
+	}
+
+	let style = result.attributes?.style;
+	getChildLayoutEntries( sourceBlocks[ index ]?.attributes?.style ).forEach(
+		( [ path, layout ] ) => {
+			// A transform that sets a child layout itself knows best.
+			const styleObject = isPlainObject( style ) ? style : undefined;
+			if ( getValueFromObjectPath( styleObject, path ) === undefined ) {
+				// Setting a path on the style object keeps it an object.
+				style = setImmutably( styleObject, path, layout );
+			}
+		}
+	);
+
+	if ( style === result.attributes?.style ) {
+		return result;
+	}
+
+	return {
+		...result,
+		attributes: {
+			...result.attributes,
+			style,
+		},
+	};
+}
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/layout-child/addTransforms',
+	addTransforms
+);
 
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
