@@ -662,7 +662,8 @@
 		"slug": "file",
 		"label": "File",
 		"filePath": "library/file.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
+		"dashicons": [ "dashicons-media-default" ],
 		"keywords": [ "document", "attachment" ]
 	},
 	{
@@ -688,7 +689,8 @@
 		"slug": "folder",
 		"label": "Folder",
 		"filePath": "library/folder.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
+		"dashicons": [ "dashicons-open-folder" ],
 		"keywords": [ "archive", "directory" ]
 	},
 	{

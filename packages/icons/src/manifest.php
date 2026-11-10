@@ -361,8 +361,9 @@ return array(
 	'file'                     => array(
 		'label'       => _x( 'File', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/file.svg',
-		'collections' => array( 'core' ),
+		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'attachment', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-media-default' ),
 	),
 	'flip-horizontal'          => array(
 		'label'       => _x( 'Flip Horizontal', 'icon label', 'gutenberg' ),
@@ -379,8 +380,9 @@ return array(
 	'folder'                   => array(
 		'label'       => _x( 'Folder', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/folder.svg',
-		'collections' => array( 'core' ),
+		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'archive', 'icon keyword', 'gutenberg' ), _x( 'directory', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-open-folder' ),
 	),
 	'format-bold'              => array(
 		'label'       => _x( 'Format Bold', 'icon label', 'gutenberg' ),
