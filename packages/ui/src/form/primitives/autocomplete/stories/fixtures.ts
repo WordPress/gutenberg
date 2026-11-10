@@ -105,7 +105,7 @@ export const CATEGORY_TREE: FixtureTreeItem[] = [
 	{
 		id: 'clothing',
 		value: 'Clothing',
-		count: 10,
+		count: 26,
 		children: [
 			{
 				id: 'clothing-women',

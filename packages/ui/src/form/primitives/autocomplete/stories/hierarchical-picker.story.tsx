@@ -179,7 +179,6 @@ const popupHeaderStyle: CSSProperties = {
 
 const rowStyle: CSSProperties = {
 	display: 'flex',
-	alignItems: 'stretch',
 };
 
 const checkboxCellStyle: CSSProperties = {
@@ -215,14 +214,9 @@ const labelLayoutStyle: CSSProperties = {
 
 const countStyle: CSSProperties = {
 	marginInlineStart: 'auto',
-	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
-const highlightedCountStyle: CSSProperties = {
-	marginInlineStart: 'auto',
-};
-
-const leafPathStyle: CSSProperties = {
+const weakTextStyle: CSSProperties = {
 	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
@@ -289,7 +283,13 @@ function RowLabel( {
 	return (
 		<>
 			{ item.value }
-			<span style={ isHighlighted ? highlightedCountStyle : countStyle }>
+			<span
+				style={
+					isHighlighted
+						? countStyle
+						: { ...countStyle, ...weakTextStyle }
+				}
+			>
 				{ item.count }
 			</span>
 			{ hasChevron ? (
@@ -553,7 +553,7 @@ function HierarchicalPicker() {
 												<Text
 													id={ pathId }
 													variant="body-sm"
-													style={ leafPathStyle }
+													style={ weakTextStyle }
 												>
 													{ pathLabel }
 												</Text>
@@ -578,7 +578,9 @@ function HierarchicalPicker() {
  * category and shows a checked, mixed, or unchecked state. Branches have a
  * second cell that browses into the category. Leaves have a non-interactive
  * label in its place. While searching, the list shows matches from every level
- * with their path.
+ * with their path. An item matches when its own name or the name of one of its
+ * ancestors contains the query, so searching for a branch also lists everything
+ * under it.
  */
 export const Default: Story = {
 	render: function Template() {
