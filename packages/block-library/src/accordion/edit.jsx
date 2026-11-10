@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -188,11 +188,17 @@ export default function Edit( {
 								} }
 							>
 								<ToggleGroupControlOption
-									label={ __( 'Start' ) }
+									label={ _x(
+										'Start',
+										'Icon position option for Accordion block'
+									) }
 									value="left"
 								/>
 								<ToggleGroupControlOption
-									label={ __( 'End' ) }
+									label={ _x(
+										'End',
+										'Icon position option for Accordion block'
+									) }
 									value="right"
 								/>
 							</ToggleGroupControl>
