@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { Layout } from '../../layouts/types';
+import type { AlignmentGuide } from './get-alignment-guides';
 import type { GridRect } from './utils';
 
 /**
@@ -133,7 +134,14 @@ export interface GridVisualizerGridProps {
 }
 
 export interface GridVisualizerCellProps {
+	/** The grid's text color. */
 	color: string;
+	/**
+	 * Lines in the grid's text color, a square that stands out on any
+	 * background while a block is dragged into the grid, or no lines.
+	 */
+	lineStyle?: 'color' | 'contrasting' | 'none';
+	/** The cell's content. */
 	children?: ReactNode;
 }
 
@@ -196,6 +204,8 @@ export interface GridDropTarget {
 	landingPixelRect: GridPixelRect;
 	/** The parts of the landing cells other blocks take up, in pixels. */
 	overlaps: GridPixelRect[];
+	/** The alignment guides to show for the landing cells. */
+	guides: AlignmentGuide[];
 }
 
 export interface GridVisualizerDropLayerProps {
