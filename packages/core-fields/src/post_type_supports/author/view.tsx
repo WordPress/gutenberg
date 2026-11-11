@@ -65,7 +65,9 @@ export default function AuthorView( { item }: { item: PostWithAuthor } ) {
 	}
 	return (
 		<Stack direction="row" gap="xs" align="flex-start">
-			{ !! imageUrl && <AuthorAvatar src={ imageUrl } /> }
+			{ !! imageUrl && !! text && (
+				<AuthorAvatar src={ imageUrl } name={ text } />
+			) }
 			<span className={ styles.name }>{ text }</span>
 		</Stack>
 	);

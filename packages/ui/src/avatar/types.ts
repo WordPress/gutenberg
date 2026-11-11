@@ -1,68 +1,75 @@
 import type { Avatar as _Avatar } from '@base-ui/react/avatar';
 import type { ComponentProps } from '../utils/types';
 
-export type RootProps = Omit<
+export type AvatarProps = Omit<
 	ComponentProps< typeof _Avatar.Root >,
 	'color'
 > & {
 	/**
-	 * Colors the image's inner ring or opaque fallback background, automatically
-	 * choosing a contrasting foreground tint for fallbacks.
-	 *
-	 * Accepts CSS colors and variables that resolve to a color. Do not use
-	 * `currentColor`, including through variables, or CSS-wide keywords such as
-	 * `inherit`. Browsers without support for colored fallbacks use neutral colors.
+	 * The person's display name, used for initials and the default accessible label.
+	 * Initials use the first complete character of the first and last
+	 * whitespace-separated words. Single-word names show one larger initial.
+	 * Invisible characters are skipped.
+	 * Names without displayable characters leave the fallback empty and warn
+	 * during development.
 	 */
-	color?: React.CSSProperties[ 'color' ];
+	name: string;
 	/**
-	 * The size of the avatar: `xs` (16px), `sm` (24px), `md` (32px),
-	 * `lg` (40px), or `xl` (64px) with the default design tokens.
-	 *
-	 * @default "md"
+	 * The URL of the profile image. Initials appear if the image is unavailable.
 	 */
-	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	src?: React.ComponentProps< typeof _Avatar.Image >[ 'src' ];
 	/**
-	 * The shape of the avatar. Square avatars use the theme's corner radius
-	 * for buttons and controls. Circles keep their shape in every theme.
-	 *
-	 * @default "circle"
+	 * Image configuration, including native image props, custom rendering,
+	 * and loading-status callbacks. The image loads in place to support lazy
+	 * loading and optimized image components. Custom renderers must forward
+	 * their ref, image props, and load/error handlers to the image element.
+	 * The accessible label comes from `name`; the image itself is decorative.
 	 */
-	shape?: 'circle' | 'square';
-	/**
-	 * The avatar image, fallback, and any custom decorations.
-	 */
-	children?: React.ReactNode;
-};
-
-export type ImageProps = Omit<
-	ComponentProps< typeof _Avatar.Image >,
-	'src' | 'alt'
-> & {
-	/**
-	 * The URL of the image to display.
-	 */
-	src?: ComponentProps< typeof _Avatar.Image >[ 'src' ];
-	/**
-	 * Alternative text for the image.
-	 */
-	alt?: ComponentProps< typeof _Avatar.Image >[ 'alt' ];
-};
-
-export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
-	/**
-	 * Custom fallback content. Omit to display the standard person icon.
-	 */
-	children?: React.ReactNode;
-};
-
-export type InitialsProps = Omit< FallbackProps, 'children' > & {
-	/**
-	 * The person's display name. Blank names use the standard person fallback.
-	 */
-	name?: string;
+	imageProps?: Omit<
+		ComponentProps< typeof _Avatar.Image >,
+		| 'src'
+		| 'alt'
+		| 'keepMounted'
+		| 'aria-label'
+		| 'aria-labelledby'
+		| 'aria-hidden'
+	>;
 	/**
 	 * Locale used for character segmentation and uppercase conversion.
 	 * Defaults to the runtime's locale.
 	 */
 	locale?: string;
+	/**
+	 * Colors the opaque fallback background and active ring, automatically
+	 * choosing a contrasting foreground tint for the initials.
+	 * When active, choose a color that contrasts with the surrounding surface.
+	 * Accepts CSS colors and variables that resolve to a color. Do not use
+	 * `currentColor`, including through variables, or CSS-wide keywords such as
+	 * `inherit`. Unusable colors use neutral defaults.
+	 */
+	color?: React.CSSProperties[ 'color' ];
+	/**
+	 * Whether to display the activity ring. This is a visual indication only;
+	 * consumers supply any activity descriptions or announcements.
+	 * Does not indicate keyboard focus, hover, or selection.
+	 *
+	 * @default false
+	 */
+	active?: boolean;
+	/**
+	 * The intended image size on high-DPI screens. The outer footprint also
+	 * reserves room for the activity ring and transparent halo. It remains
+	 * constant across display densities and activity states; the image adjusts
+	 * to the theme's focus-ring width within that space.
+	 *
+	 * @default "md"
+	 */
+	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	/**
+	 * The shape of the image and activity ring. Square images use the theme's
+	 * corner radius for buttons and controls.
+	 *
+	 * @default "circle"
+	 */
+	shape?: 'circle' | 'square';
 };
