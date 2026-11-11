@@ -135,11 +135,6 @@
 			"count": 4
 		}
 	},
-	"packages/block-editor/src/components/block-lock/toolbar.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/block-manager/category.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -203,11 +198,6 @@
 	"packages/block-editor/src/components/block-visibility/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/viewport-toolbar.tsx": {
-		"react-hooks/refs": {
-			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/border-radius-control/index.tsx": {
@@ -1867,7 +1857,7 @@
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 3
+			"count": 2
 		},
 		"react-hooks/immutability": {
 			"count": 1
@@ -6851,31 +6841,6 @@
 			"count": 2
 		}
 	},
-	"packages/core-data/src/test/entity-sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/sync.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/rtc-rich-text-cursor-scope.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/rtc-rich-text-offset-space.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/utils/test/sync-undo-levels.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/customize-widgets/src/components/block-appender/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7029,32 +6994,7 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/redux-store/metadata/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/metadata/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/metadata/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/test/combine-reducers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/redux-store/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/test/keyed-reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

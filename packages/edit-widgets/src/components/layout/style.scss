@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-widgets-layout__footer {
@@ -22,14 +21,11 @@
 }
 
 .edit-widgets-layout__inserter-panel-content {
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+	height: 100%;
 
-	.block-editor-inserter__tablist-and-close {
-		display: none;
-	}
-
-	@include break-medium() {
-		height: 100%;
+	.block-editor-inserter__menu.has-single-tab {
+		.block-editor-tabbed-sidebar__tablist-and-close-button {
+			display: none;
+		}
 	}
 }
