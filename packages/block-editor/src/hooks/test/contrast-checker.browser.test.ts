@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { BlockType } from '@wordpress/blocks';
-import { getBlockElementColors } from '../contrast-checker';
+import {
+	getBlockElementColors,
+	getBlockElementFontSize,
+} from '../contrast-checker';
 
 const blockType = { name: 'core/paragraph' } as BlockType;
 
@@ -95,5 +98,58 @@ describe( 'getBlockElementColors()', () => {
 		expect( getBlockElementColors( blockEl, blockType ).linkColor ).toBe(
 			'rgb(255, 255, 0)'
 		);
+	} );
+} );
+
+describe( 'getBlockElementFontSize()', () => {
+	afterEach( () => {
+		document.body.replaceChildren();
+	} );
+
+	it( 'returns undefined when block element or block type is missing', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 24px">Text</p>'
+		);
+
+		expect( getBlockElementFontSize( null, blockType ) ).toBeUndefined();
+		expect( getBlockElementFontSize( blockEl, null ) ).toBeUndefined();
+	} );
+
+	it( 'reads the computed font size in pixels from the block element', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 28px">Text</p>'
+		);
+
+		expect( getBlockElementFontSize( blockEl, blockType ) ).toBe( 28 );
+	} );
+
+	it( 'prefers the block typography fontSize selector when configured', () => {
+		const blockEl = renderBlock(
+			'<div class="wp-block-paragraph" style="font-size: 16px"><span class="title" style="font-size: 32px">Heading</span></div>'
+		);
+		const customBlockType = {
+			name: 'core/paragraph',
+			selectors: {
+				root: '.wp-block-paragraph',
+				typography: {
+					fontSize: '.title',
+				},
+			},
+		} as unknown as BlockType;
+
+		expect( getBlockElementFontSize( blockEl, customBlockType ) ).toBe( 32 );
+	} );
+
+	it( 'reads the link font size when only link contrast is checked', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 16px"><a href="#test" style="font-size: 26px">Large link</a></p>'
+		);
+
+		expect(
+			getBlockElementFontSize( blockEl, blockType, {
+				checkTextColor: false,
+				checkLinkColor: true,
+			} )
+		).toBe( 26 );
 	} );
 } );
