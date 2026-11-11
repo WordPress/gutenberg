@@ -44,7 +44,7 @@ export async function inferStyleDependencies(
 			}
 
 			// ONLY include if it has wpScript: true (which means it builds styles)
-			if ( depPackageJson.wpScript === true ) {
+			if ( depPackageJson.wpScript ) {
 				// Check the minified file, which is built even with --no-script-debug.
 				const styleFile = path.join(
 					buildDir,
