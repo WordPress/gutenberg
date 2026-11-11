@@ -2,23 +2,24 @@ import type { Flip, ImageEditorState, NormalizedRect } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * How the image loaded in `state.image` is edited: the mirror, rotation
- * and crop that turn it into what the person framed.
- *
- * This is the edit itself, not a list of things to do. The editor holds
- * one mirror, one rotation and one crop, so each is a single optional
- * value here, absent when it changes nothing. Whatever applies the edit
- * does so in this order: mirror, then rotate, then crop.
- *
- *   - `flip`:     mirror along each axis that is `true`.
- *   - `rotation`: degrees clockwise about the centre. The result is the
- *     bounding box of the rotated image.
- *   - `crop`:     the rectangle to keep, as fractions (0-1) of the rotated
- *     image's width and height, from its top left.
+ * How the image loaded in `state.image` is edited: the flip, rotation and
+ * crop that turn it into what the person framed. Apply them in that order.
+ * A part is absent when it changes nothing.
  */
 export interface ImageEdit {
+	/** Mirror along each axis that is `true`. */
 	flip?: Flip;
+	/**
+	 * Degrees clockwise about the centre, applied after the flip. With
+	 * exactly one axis flipped this is 360 minus `state.rotation`. The
+	 * result is the bounding box of the rotated image.
+	 */
 	rotation?: number;
+	/**
+	 * The rectangle to keep, as fractions (0-1) of the rotated image's
+	 * width and height, from its top left. `state.cropRect` is measured
+	 * against the view instead.
+	 */
 	crop?: NormalizedRect;
 }
 
@@ -36,14 +37,12 @@ const CROP_TOLERANCE = 0.001;
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
  * the view. Something that edits the file needs the edit described against
- * the file instead. That loaded image may itself be a file someone edited
- * before; this edit applies to it as it is.
+ * the file instead.
  *
- * Parts that change nothing are left out: a mirror on neither axis, a
- * rotation that comes to 0 degrees, and a crop that covers the whole
- * rotated image to within a rounding error. An edit with no parts at all
- * means there is nothing to apply. A locked ratio can produce a crop
- * before the person edits anything.
+ * Parts that change nothing are left out: a flip on neither axis and a
+ * rotation that comes to 0 degrees. So is a crop within `CROP_TOLERANCE`
+ * of the whole rotated image. A locked ratio can produce a crop before
+ * the person edits anything.
  *
  * Frames and math:
  *
@@ -51,7 +50,7 @@ const CROP_TOLERANCE = 0.001;
  * bounding box (the stencil-reference frame — see `createCamera` /
  * `createExportCamera`). Pan is in that frame; zoom scales the image
  * beneath a fixed stencil. Two conversions are needed to reach the frame
- * the crop edit applies against:
+ * the crop applies against:
  *
  *   1. Express the stencil rect in snap-AABB **pixels**:
  *      Image screen-normalized top-left with zoom/pan is
@@ -64,7 +63,7 @@ const CROP_TOLERANCE = 0.001;
  *      translated rect as fractions of the full AABB.
  *
  * Rotation sign: the editor composes `flip · R(θ)` on the source (see
- * `createExportCamera` — rotate then flip). The edits' `[flip, rotate]`
+ * `createExportCamera` — rotate then flip). The edit's flip-then-rotate
  * order is the opposite: `R(θ') · flip`. For both to land on the
  * same pixels we invert the rotation sign when exactly one flip axis
  * is set (`flip_h · R(θ) = R(-θ) · flip_h`). Both-or-neither flips
@@ -73,8 +72,7 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return The edit, with the parts that change nothing left out, or `null`
- *         when no image has loaded.
+ * @return The edit, or `null` when no image has loaded.
  */
 export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
 	const edit: ImageEdit = {};
@@ -97,7 +95,7 @@ export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
 	}
 
 	const rawAngle = ( ( state.rotation % 360 ) + 360 ) % 360;
-	// Invert the sign for single-axis flips so the edits' `flip → rotate`
+	// Invert the sign for single-axis flips so the edit's `flip → rotate`
 	// order matches the editor's `rotate → flip` composition.
 	const singleAxisFlip = hasFlipH !== hasFlipV;
 	const signedAngle = singleAxisFlip ? ( 360 - rawAngle ) % 360 : rawAngle;

@@ -3,7 +3,7 @@
  * For each edit and output point, invert both paths to source coordinates
  * and allow less than one pixel of floating-point error. A single-axis
  * flip reverses the rotation angle because the camera rotates before
- * flipping while the mapped edits flip before rotating.
+ * flipping while the edit flips before rotating.
  *
  * This simulates the edit order in WordPress Core. It does not run the
  * server, which may edit a different source file and rounds crop pixels.
@@ -65,7 +65,7 @@ function exportSourcePixel(
 }
 
 /**
- * The edit with its absent parts filled in. A missing mirror, rotation or
+ * The edit with its absent parts filled in. A missing flip, rotation or
  * crop each mean "nothing to do", which the simulation below needs as
  * concrete values.
  *
@@ -328,7 +328,7 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 } );
 
 describe( 'getImageEdit without a loaded image', () => {
-	it( 'returns no edits, whatever the edit', () => {
+	it( 'returns null, whatever the edit', () => {
 		const state = makeState( { image: null, rotation: 45 } );
 
 		expect( getImageEdit( state ) ).toBeNull();

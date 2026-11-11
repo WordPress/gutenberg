@@ -8,7 +8,7 @@ How the image editor works inside, for people changing this package. To use it, 
 | --- | --- | --- |
 | Core | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React | `src/react/` | The canvas (`ImageEditorCanvas`), DOM measurement, interaction hooks, overlays, stencil rendering, and the `useImageEditor` hook. |
-| Saving | `src/get-image-edit.ts` | Describes the mirror, rotation and crop to apply to the full-size loaded image. |
+| Saving | `src/get-image-edit.ts` | Describes the flip, rotation and crop to apply to the full-size loaded image. |
 
 The editor keeps no undo history. History belongs to the code that uses the editor, because it covers everything that code edits, not only the crop. The consumer keeps the state: `useImageEditor( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 

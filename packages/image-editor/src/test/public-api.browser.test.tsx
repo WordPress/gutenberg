@@ -118,7 +118,7 @@ describe( 'the public API', () => {
 		expect( rejected ).toBeTruthy();
 	} );
 
-	it( 'crops and maps the edit to the original from the package exports alone', async () => {
+	it( 'crops and describes the edit from the package exports alone', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {
 			controller = next;

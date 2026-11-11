@@ -6,7 +6,7 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ### Breaking Changes
 
--   Replace `mapEditToOriginal` with `getImageEdit`, which returns one `ImageEdit` record with an optional `flip`, `rotation` and `crop` instead of a list of tagged operations. Returns `null` when no image has loaded. Nothing published changes, as neither name has shipped ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
+-   Replace `mapEditToOriginal` with `getImageEdit`, which returns one `ImageEdit` record with an optional `flip`, `rotation` and `crop`, or `null` when no image has loaded, instead of a list of tagged operations ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
 
 ### Enhancements
 

@@ -26,7 +26,6 @@ export { areImageEditorStatesEqual } from './core/state';
 // The size of the image the edit produces.
 export { getOutputSize } from './get-output-size';
 
-// Map the edit onto the original image, for saving it.
 export { getImageEdit } from './get-image-edit';
 export type { ImageEdit } from './get-image-edit';
 

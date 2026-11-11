@@ -136,13 +136,13 @@ Whether two states have the same public edit fields, ignoring tiny floating-poin
 
 ### `getOutputSize( state )`
 
-The dimensions that the edit from `getImageEdit` would produce on the image in `state.image`. A crop that covers the whole image to within a rounding error gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
+The dimensions that the edit from `getImageEdit` would produce on the image in `state.image`. A nearly full crop that `getImageEdit` omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
 
 ### `getImageEdit( state )`
 
 Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `getImageEdit` describes the same result against the full-size image loaded in `state.image`, which may itself be a file someone edited before.
 
-The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
+The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. With exactly one axis flipped, `rotation` is 360 minus `state.rotation`, because the flip comes first. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
 ### `exportImage( state, options? )`
 

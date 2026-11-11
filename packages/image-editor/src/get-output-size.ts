@@ -6,7 +6,7 @@ import { getImageEdit } from './get-image-edit';
  * The dimensions that the edit from `getImageEdit` would produce on the
  * image in `state.image`.
  *
- * A nearly full crop that the mapper omits gives the full image size.
+ * A nearly full crop that `getImageEdit` omits gives the full image size.
  * Use this for a size readout or a minimum-size check against the loaded
  * image. A processor that edits a different file or rounds pixels may
  * produce different dimensions.
