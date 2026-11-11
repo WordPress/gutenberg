@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+
 ### Bug Fixes
 
 -   Preserve explicitly saved registered custom attributes when migrating deprecated block content ([#85723](https://github.com/WordPress/gutenberg/pull/85723)).
