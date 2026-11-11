@@ -15,6 +15,7 @@ import {
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
+	collapseUniqueListsInBlocks,
 	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
@@ -25,7 +26,6 @@ import {
 import { type Post } from '../entity-types/post';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
-import { collapseAttributeSetsInBlocks } from './crdt-attribute-sets';
 import {
 	getSelectionHistory,
 	getShiftedSelection,
@@ -417,7 +417,7 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = collapseAttributeSetsInBlocks(
+						const blocksJson = collapseUniqueListsInBlocks(
 							ymap.get( 'blocks' )?.toJSON() ?? []
 						);
 

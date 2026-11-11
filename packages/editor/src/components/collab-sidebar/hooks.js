@@ -389,8 +389,8 @@ export function useNoteActions() {
 			/*
 			 * If it's a top-level note, update the block attributes with the
 			 * note id. Collaborators can do this at the same time, because
-			 * `hooks/note-sync.ts` declares the note ids as a set for
-			 * real-time collaboration.
+			 * `hooks/note-sync.ts` declares the note ids as a list of
+			 * unique items for real-time collaboration.
 			 */
 			if ( ! parent && savedRecord?.id ) {
 				updateNoteAnchors( clientIds, ( attributes ) => {

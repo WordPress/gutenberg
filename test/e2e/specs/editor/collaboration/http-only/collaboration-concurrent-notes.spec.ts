@@ -6,10 +6,10 @@ import { test, expect } from '../fixtures';
  *
  * When two collaborators attach a note to the same block at the same moment,
  * one write of the block `metadata` attribute replaces the other in the CRDT
- * document. Unless the note ids are stored as a set, with one key per note,
- * the replaced note id is lost. That note then appears as attached to a
- * deleted block ("Original block deleted") for its author and is invisible to
- * everyone else.
+ * document. Unless the note ids are declared as a list of unique items, and
+ * so stored with one key per note, the replaced note id is lost. That note
+ * then appears as attached to a deleted block ("Original block deleted") for
+ * its author and is invisible to everyone else.
  *
  * The test forces true concurrency by holding all wp-sync requests on both
  * pages while each user adds a note, then releasing them so the concurrent
