@@ -204,46 +204,36 @@ describe( 'FeaturedImageEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'falls back to the thumbnail, then the full size, for the preview in the post editor', () => {
-		const renderWith = ( mediaDetails: Record< string, unknown > ) =>
-			render(
-				<RegistryProvider
-					value={ createTestRegistry( [
-						{ ...attachments[ 0 ], media_details: mediaDetails },
-					] ) }
-				>
-					<EntityProvider kind="postType" type="post" id={ 5 }>
-						<FeaturedImageEdit
-							data={
-								{
-									id: 5,
-									type: 'post',
-									featured_media: 42,
-								} as any
-							}
-							field={ field }
-							onChange={ () => {} }
-						/>
-					</EntityProvider>
-				</RegistryProvider>
-			);
-		const preview = () => screen.getByRole( 'img', { name: 'Forty-two' } );
-
-		const view = renderWith( {
-			sizes: {
-				thumbnail: { source_url: 'https://example.com/42-150x150.jpg' },
-			},
-		} );
-		expect( preview() ).toHaveAttribute(
-			'src',
-			'https://example.com/42-150x150.jpg'
+	it( 'falls back to the full size for the preview in the post editor when the image has no `large` size', () => {
+		render(
+			<RegistryProvider
+				value={ createTestRegistry( [
+					{
+						...attachments[ 0 ],
+						media_details: {
+							sizes: {
+								thumbnail: {
+									source_url:
+										'https://example.com/42-150x150.jpg',
+								},
+							},
+						},
+					},
+				] ) }
+			>
+				<EntityProvider kind="postType" type="post" id={ 5 }>
+					<FeaturedImageEdit
+						data={
+							{ id: 5, type: 'post', featured_media: 42 } as any
+						}
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</EntityProvider>
+			</RegistryProvider>
 		);
-		view.unmount();
-
-		renderWith( {} );
-		expect( preview() ).toHaveAttribute(
-			'src',
-			'https://example.com/42.jpg'
-		);
+		expect(
+			screen.getByRole( 'img', { name: 'Forty-two' } )
+		).toHaveAttribute( 'src', 'https://example.com/42.jpg' );
 	} );
 } );

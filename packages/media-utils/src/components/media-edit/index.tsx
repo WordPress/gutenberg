@@ -284,7 +284,12 @@ function MediaPreview( {
 	attachment: MediaEditAttachment;
 	getPreviewUrl?: GetPreviewUrl;
 } ) {
-	const url = getPreviewUrl?.( attachment ) ?? attachment.source_url;
+	// An upload in progress has no sizes and no attachment ID yet, so its
+	// preview is always the blob itself.
+	const url =
+		getPreviewUrl && ! isBlobURL( attachment.source_url )
+			? getPreviewUrl( attachment as Attachment< 'view' > )
+			: attachment.source_url;
 	const mimeType = attachment.mime_type || '';
 	if ( mimeType.startsWith( 'image' ) ) {
 		return (
@@ -305,7 +310,7 @@ function MediaPreview( {
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
-type GetPreviewUrl = ( attachment: MediaEditAttachment ) => string;
+type GetPreviewUrl = ( attachment: Attachment< 'view' > ) => string;
 
 /**
  * Identifies the set of items regardless of their order, so a reorder can be

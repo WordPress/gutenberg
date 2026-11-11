@@ -27,34 +27,29 @@ type FeaturedImageEditProps = {
 	onChange: ( edits: Record< string, any > ) => void;
 };
 
-// An attachment, or an upload in progress, which has no `media_details` yet.
-type PreviewAttachment = Pick< Attachment< 'view' >, 'id' | 'source_url' > &
-	Partial< Pick< Attachment< 'view' >, 'media_details' > >;
-
 /**
- * The URL the preview loads in the post editor, like the classic featured
- * image panel: the `large` size, then `thumbnail`, each through the
- * `editor.PostFeaturedImage.imageSize` filter, then the full size.
+ * The URL the preview loads in the post editor: the size the
+ * `editor.PostFeaturedImage.imageSize` filter picks, `large` by default, or
+ * the full size when the image has no such size.
  *
  * @param attachment The featured image.
  * @param postId     The post being edited.
  * @return The URL of the image file to load.
  */
-function getPreviewUrl( attachment: PreviewAttachment, postId: Item[ 'id' ] ) {
-	const sizes = attachment.media_details?.sizes ?? {};
-	for ( const defaultSize of [ 'large', 'thumbnail' ] ) {
-		const size = applyFilters(
-			'editor.PostFeaturedImage.imageSize',
-			defaultSize,
-			attachment.id,
-			postId
-		) as string;
-		const url = sizes[ size ]?.source_url;
-		if ( url ) {
-			return url;
-		}
-	}
-	return attachment.source_url;
+function getPreviewUrl(
+	attachment: Attachment< 'view' >,
+	postId: Item[ 'id' ]
+) {
+	const size = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'large',
+		attachment.id,
+		postId
+	) as string;
+	return (
+		attachment.media_details?.sizes?.[ size ]?.source_url ??
+		attachment.source_url
+	);
 }
 
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
@@ -72,7 +67,7 @@ const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 				pickerTitle={
 					props.postType?.labels?.featured_image || props.field.label
 				}
-				getPreviewUrl={ ( attachment: PreviewAttachment ) =>
+				getPreviewUrl={ ( attachment: Attachment< 'view' > ) =>
 					getPreviewUrl( attachment, props.data.id )
 				}
 			/>
