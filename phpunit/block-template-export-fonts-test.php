@@ -124,6 +124,18 @@ class Gutenberg_Export_Fonts_Test extends WP_UnitTestCase {
 		$this->assertSame( array(), $files );
 	}
 
+	public function test_maps_symlinked_theme_url_to_relative_path() {
+		$target = $this->create_file( $this->theme_dir . '/node_modules/fontsource/x.woff2' );
+		wp_mkdir_p( $this->theme_dir . '/assets/fonts' );
+		$this->assertTrue( symlink( $target, $this->theme_dir . '/assets/fonts/x.woff2' ) );
+		$files = array();
+
+		$src = gutenberg_get_font_face_src_for_export( self::THEME_URL . '/assets/fonts/x.woff2', $files, array( 'assets/fonts/x.woff2' ) );
+
+		$this->assertSame( 'file:./assets/fonts/x.woff2', $src );
+		$this->assertSame( array(), $files );
+	}
+
 	public function test_leaves_theme_url_for_file_not_in_export() {
 		$this->create_file( $this->theme_dir . '/node_modules/fontsource/x.woff2' );
 		$files = array();

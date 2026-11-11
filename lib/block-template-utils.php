@@ -94,8 +94,10 @@ function gutenberg_get_font_face_src_for_export( $src, array &$files, array $res
 		}
 
 		if ( 'theme' === $dir['type'] ) {
-			// Only point at theme files that are copied into the export.
-			$relative_path = substr( $real_file, strlen( $real_dir ) );
+			// Only point at theme files that are copied into the export. The
+			// archive uses the unresolved path, so look up the URL's path, not
+			// the realpath, which differs for symlinks.
+			$relative_path = ltrim( wp_normalize_path( substr( $url, strlen( $dir_url ) ) ), '/' );
 			return in_array( $relative_path, $reserved_paths, true ) ? 'file:./' . $relative_path : $src;
 		}
 
