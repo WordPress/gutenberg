@@ -231,15 +231,16 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-color-background-interactive-error-weak-active`       | Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.                |
 | `--wpds-color-background-interactive-error-weak-disabled`     | Background color for interactive elements with error tone and weak emphasis, in their disabled state.                            |
 | `--wpds-color-background-track-neutral-weak`                  | Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).                                         |
-| `--wpds-color-background-track-neutral-weak-disabled`         | Background color for tracks with a neutral tone and weak emphasis (eg. switch track), in their disabled state.                   |
-| `--wpds-color-background-track-neutral`                       | Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).                           |
-| `--wpds-color-background-thumb-neutral`                       | Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob).                                           |
+| `--wpds-color-background-track-neutral`                       | Background color for tracks with a neutral tone and normal emphasis (eg. slider, progressbar, or switch track).                  |
+| `--wpds-color-background-track-neutral-disabled`              | Background color for tracks with a neutral tone and normal emphasis (eg. switch track), in their disabled state.                 |
+| `--wpds-color-background-thumb-neutral`                       | Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob when off).                                  |
 | `--wpds-color-background-thumb-neutral-disabled`              | Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob), in their disabled state.                  |
 | `--wpds-color-background-thumb-neutral-weak`                  | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).                                         |
 | `--wpds-color-background-thumb-neutral-weak-active`           | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active.    |
 | `--wpds-color-background-thumb-brand`                         | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb).                                            |
 | `--wpds-color-background-thumb-brand-active`                  | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb) that are hovered, focused, or active.       |
 | `--wpds-color-background-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb), in their disabled state.                   |
+| `--wpds-color-background-thumb-brand-strong`                  | Background color for thumbs with a brand tone and strong emphasis (eg. switch knob when on).                                     |
 | `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                |
 | `--wpds-color-background-indicator-neutral`                   | Background color for indicators with a neutral tone and normal emphasis (eg. the filled portion of a progressbar or meter).      |
 | `--wpds-color-background-indicator-brand`                     | Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter).                       |
@@ -276,6 +277,7 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-color-foreground-interactive-error-strong`            | Foreground color for interactive elements with error tone and strong emphasis.                                                   |
 | `--wpds-color-foreground-interactive-error-strong-active`     | Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.              |
 | `--wpds-color-foreground-interactive-error-strong-disabled`   | Foreground color for interactive elements with error tone and strong emphasis, in their disabled state.                          |
+| `--wpds-color-foreground-thumb-brand-strong`                  | Foreground color for content on thumbs with a brand tone and strong emphasis (eg. the check mark in a switch knob).              |
 | `--wpds-color-stroke-surface-neutral`                         | Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.                                  |
 | `--wpds-color-stroke-surface-neutral-weak`                    | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.                                    |
 | `--wpds-color-stroke-surface-neutral-strong`                  | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                  |

@@ -63,14 +63,15 @@ export default {
 	'--wpds-color-background-thumb-brand-active':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-background-thumb-brand-disabled': '#dbdbdb',
-	'--wpds-color-background-thumb-neutral': '#fff',
-	'--wpds-color-background-thumb-neutral-disabled': '#fff',
+	'--wpds-color-background-thumb-brand-strong': '#fff',
+	'--wpds-color-background-thumb-neutral': '#f0f0f0',
+	'--wpds-color-background-thumb-neutral-disabled': '#f0f0f0',
 	'--wpds-color-background-thumb-neutral-weak': '#8b8b8b',
 	'--wpds-color-background-thumb-neutral-weak-active': '#6c6c6c',
 	'--wpds-color-background-thumb-neutral-weak-disabled': '#dbdbdb',
 	'--wpds-color-background-track-neutral': '#dbdbdb',
+	'--wpds-color-background-track-neutral-disabled': '#e5e5e5',
 	'--wpds-color-background-track-neutral-weak': '#f0f0f0',
-	'--wpds-color-background-track-neutral-weak-disabled': '#f0f0f0',
 	'--wpds-color-foreground-content-caution': '#281d00',
 	'--wpds-color-foreground-content-caution-weak': '#816900',
 	'--wpds-color-foreground-content-error': '#470000',
@@ -106,6 +107,8 @@ export default {
 	'--wpds-color-foreground-interactive-neutral-weak': '#6e6e6e',
 	'--wpds-color-foreground-interactive-neutral-weak-active': '#1e1e1e',
 	'--wpds-color-foreground-interactive-neutral-weak-disabled': '#8b8b8b',
+	'--wpds-color-foreground-thumb-brand-strong':
+		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-stroke-focus': 'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-stroke-interactive-brand':
 		'var(--wp-admin-theme-color, #3858e9)',

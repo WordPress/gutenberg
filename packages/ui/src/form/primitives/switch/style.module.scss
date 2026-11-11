@@ -18,7 +18,7 @@
 			height: var(--_wp-ui-switch-height);
 			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 999px;
-			background-color: var(--wpds-color-background-track-neutral-weak);
+			background-color: var(--wpds-color-background-track-neutral);
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
@@ -51,7 +51,7 @@
 			}
 
 			&[data-disabled] {
-				background-color: var(--wpds-color-background-track-neutral-weak-disabled);
+				background-color: var(--wpds-color-background-track-neutral-disabled);
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 				@media (forced-colors: active) {
@@ -77,7 +77,7 @@
 			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 999px;
 			background-color: var(--wpds-color-background-thumb-neutral);
-			color: var(--wpds-color-foreground-interactive-brand);
+			color: var(--wpds-color-foreground-thumb-brand-strong);
 			box-shadow: var(--_wp-ui-elevation-xs);
 
 			@media not (prefers-reduced-motion) {
@@ -99,6 +99,7 @@
 			}
 
 			&[data-checked] {
+				background-color: var(--wpds-color-background-thumb-brand-strong);
 				border-color: var(--wpds-color-stroke-interactive-brand);
 				transform: translateX(calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width)));
 
