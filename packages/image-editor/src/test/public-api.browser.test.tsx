@@ -8,7 +8,7 @@ import {
 	createImageEditorState,
 	exportImage,
 	getOutputSize,
-	mapEditToImage,
+	getImageEdit,
 	useImageEditor,
 	type ImageEditorController,
 	type ImageEditorState,
@@ -145,13 +145,14 @@ describe( 'the public API', () => {
 
 		act( () => controller.snapRotate90( 1 ) );
 		act( () => controller.toggleFlip( 'horizontal' ) );
-		expect(
-			mapEditToImage( controller.state ).map( ( { type } ) => type )
-		).toEqual( [ 'flip', 'rotate', 'crop' ] );
+		const edit = getImageEdit( controller.state );
+		expect( edit?.flip ).toEqual( { horizontal: true, vertical: false } );
+		expect( edit?.rotation ).toBeGreaterThan( 0 );
+		expect( edit?.crop ).toBeDefined();
 
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
-		expect( mapEditToImage( controller.state ) ).toEqual( [] );
+		expect( getImageEdit( controller.state ) ).toEqual( {} );
 	} );
 
 	it( 'starts with the crop locked to a ratio', async () => {

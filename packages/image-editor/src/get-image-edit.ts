@@ -1,21 +1,25 @@
-import type { ImageEditorState } from './core/types';
+import type { Flip, ImageEditorState, NormalizedRect } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * One edit to apply to the full-size image loaded in `state.image`.
- * `mapEditToImage` returns them in the order to apply them.
+ * An edit to apply to the image loaded in `state.image`.
  *
- *   - `flip`:   mirror along each axis that is `true`.
- *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
- *     result is the bounding box of the rotated image.
- *   - `crop`:   cut out a rectangle of the image as it is **at that
- *     point**, after any `rotate` before it. Position and size are
- *     fractions (0–1) of that image's width and height, from the top-left.
+ * Apply the parts in this order: mirror, then rotate, then crop. A part
+ * that is absent needs nothing done. The order is fixed, which is why this
+ * is one record rather than a list — the editor holds one mirror, one
+ * rotation and one crop, never a sequence of them.
+ *
+ *   - `flip`:     mirror along each axis that is `true`.
+ *   - `rotation`: degrees clockwise about the centre. The result is the
+ *     bounding box of the rotated image.
+ *   - `crop`:     the rectangle to keep, as fractions (0-1) of the rotated
+ *     image's width and height, from its top left.
  */
-export type ImageEditStep =
-	| { type: 'flip'; horizontal: boolean; vertical: boolean }
-	| { type: 'rotate'; angle: number }
-	| { type: 'crop'; x: number; y: number; width: number; height: number };
+export interface ImageEdit {
+	flip?: Flip;
+	rotation?: number;
+	crop?: NormalizedRect;
+}
 
 /**
  * Tolerance (a fraction of the image) used to decide whether a crop rect
@@ -26,22 +30,19 @@ export type ImageEditStep =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * The person's edit, as the flip, rotate and crop steps that produce it
- * on the image loaded in `state.image`.
+ * The person's edit, described against the image loaded in `state.image`.
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. An image processor needs steps to apply to the loaded image
- * instead. This returns them in the order to apply them. That loaded
- * image may itself be a file someone edited before; the steps apply to it
- * as it is.
+ * the view. Something that edits the file needs the edit described against
+ * the file instead. That loaded image may itself be a file someone edited
+ * before; this edit applies to it as it is.
  *
- * Emits `[flip, rotate, crop]` in that order. Identity operations are
- * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
- * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no step. An empty array means no image has loaded or there is
- * no flip, rotation or crop to apply. A locked ratio can produce a crop
- * step even before the person edits anything.
+ * Parts that change nothing are left out: a mirror on neither axis, a
+ * rotation that comes to 0 degrees, and a crop that covers the whole
+ * rotated image to within a rounding error. An edit with no parts at all
+ * means there is nothing to apply. A locked ratio can produce a crop
+ * before the person edits anything.
  *
  * Frames and math:
  *
@@ -71,15 +72,15 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return The steps in the order to apply them; empty when no image has
- *         loaded, or when nothing changes it.
+ * @return The edit, with the parts that change nothing left out, or `null`
+ *         when no image has loaded.
  */
-export function mapEditToImage( state: ImageEditorState ): ImageEditStep[] {
-	const edits: ImageEditStep[] = [];
+export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
+	const edit: ImageEdit = {};
 	const { image } = state;
 
 	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
-		return edits;
+		return null;
 	}
 
 	const imageSize = {
@@ -91,11 +92,7 @@ export function mapEditToImage( state: ImageEditorState ): ImageEditStep[] {
 	const hasFlipV = flip.vertical;
 
 	if ( hasFlipH || hasFlipV ) {
-		edits.push( {
-			type: 'flip',
-			horizontal: hasFlipH,
-			vertical: hasFlipV,
-		} );
+		edit.flip = { horizontal: hasFlipH, vertical: hasFlipV };
 	}
 
 	const rawAngle = ( ( state.rotation % 360 ) + 360 ) % 360;
@@ -104,7 +101,7 @@ export function mapEditToImage( state: ImageEditorState ): ImageEditStep[] {
 	const singleAxisFlip = hasFlipH !== hasFlipV;
 	const signedAngle = singleAxisFlip ? ( 360 - rawAngle ) % 360 : rawAngle;
 	if ( signedAngle !== 0 ) {
-		edits.push( { type: 'rotate', angle: signedAngle } );
+		edit.rotation = signedAngle;
 	}
 
 	const snapRotation = Math.round( state.rotation / 90 ) * 90;
@@ -148,8 +145,8 @@ export function mapEditToImage( state: ImageEditorState ): ImageEditStep[] {
 		height >= 1 - CROP_TOLERANCE;
 
 	if ( ! coversFullFrame ) {
-		edits.push( { type: 'crop', x, y, width, height } );
+		edit.crop = { x, y, width, height };
 	}
 
-	return edits;
+	return edit;
 }

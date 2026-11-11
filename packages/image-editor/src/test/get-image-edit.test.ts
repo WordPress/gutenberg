@@ -1,5 +1,5 @@
 /**
- * Compare `mapEditToImage` with `createExportCamera` on the same image.
+ * Compare `getImageEdit` with `createExportCamera` on the same image.
  * For each edit and output point, invert both paths to source coordinates
  * and allow less than one pixel of floating-point error. A single-axis
  * flip reverses the rotation angle because the camera rotates before
@@ -11,9 +11,9 @@
 
 import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
-import { mapEditToImage } from '../map-edit-to-image';
+import { getImageEdit } from '../get-image-edit';
 import { getOutputSize } from '../get-output-size';
-import type { ImageEditStep } from '../map-edit-to-image';
+import type { ImageEdit } from '../get-image-edit';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
 import type { InternalImageEditorState, Size } from '../core/types';
@@ -65,44 +65,22 @@ function exportSourcePixel(
 }
 
 /**
- * Extract the pieces of the pipeline we need to simulate from the edits.
- * `flip` and `rotate` may be absent (identity-pruned), `crop` may also be
- * absent when the full-frame is framed; in that case the output canvas
- * equals the full rotated AABB.
+ * The edit with its absent parts filled in. A missing mirror, rotation or
+ * crop each mean "nothing to do", which the simulation below needs as
+ * concrete values.
  *
- * @param edits Ordered steps as emitted by `mapEditToImage`.
+ * @param edit The edit as emitted by `getImageEdit`.
  */
-function readEdits( edits: ImageEditStep[] ): {
+function readEdit( edit: ImageEdit | null ): {
 	flip: { horizontal: boolean; vertical: boolean };
 	rotation: number;
 	crop: { x: number; y: number; width: number; height: number } | null;
 } {
-	const flip = { horizontal: false, vertical: false };
-	let rotation = 0;
-	let crop: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} | null = null;
-
-	for ( const edit of edits ) {
-		if ( edit.type === 'flip' ) {
-			flip.horizontal = edit.horizontal;
-			flip.vertical = edit.vertical;
-		} else if ( edit.type === 'rotate' ) {
-			rotation = edit.angle;
-		} else if ( edit.type === 'crop' ) {
-			crop = {
-				x: edit.x,
-				y: edit.y,
-				width: edit.width,
-				height: edit.height,
-			};
-		}
-	}
-
-	return { flip, rotation, crop };
+	return {
+		flip: edit?.flip ?? { horizontal: false, vertical: false },
+		rotation: edit?.rotation ?? 0,
+		crop: edit?.crop ?? null,
+	};
 }
 
 /**
@@ -113,18 +91,18 @@ function readEdits( edits: ImageEditStep[] ): {
  *   3. Undo rotation about the source center to reach the flipped frame.
  *   4. Undo flip about the source center.
  *
- * @param edits     Ordered steps the client sends.
+ * @param edit      The edit the client sends.
  * @param imageSize Natural dimensions of the source image.
  * @param u         Horizontal probe in [0, 1] across the output.
  * @param v         Vertical probe in [0, 1] across the output.
  */
 function serverSourcePixel(
-	edits: ImageEditStep[],
+	edit: ImageEdit | null,
 	imageSize: Size,
 	u: number,
 	v: number
 ): { x: number; y: number } {
-	const { flip, rotation, crop } = readEdits( edits );
+	const { flip, rotation, crop } = readEdit( edit );
 
 	const fullBBox = getRotatedBBox(
 		imageSize.width,
@@ -263,15 +241,15 @@ function buildRows(): ParityRow[] {
 }
 
 /**
- * Output size the server would produce, computed from the edits.
+ * Output size the server would produce, computed from the edit.
  * With a crop: the crop's pixel dims in the full-AABB frame. Without a
  * crop: the full rotated AABB.
  *
- * @param edits     Edits the server will apply.
+ * @param edit      The edit the server will apply.
  * @param imageSize Natural dimensions of the source image.
  */
-function outputSizeFor( edits: ImageEditStep[], imageSize: Size ): Size {
-	const { rotation, crop } = readEdits( edits );
+function outputSizeFor( edit: ImageEdit | null, imageSize: Size ): Size {
+	const { rotation, crop } = readEdit( edit );
 	const full = getRotatedBBox( imageSize.width, imageSize.height, rotation );
 	if ( ! crop ) {
 		return { width: full.width, height: full.height };
@@ -282,17 +260,17 @@ function outputSizeFor( edits: ImageEditStep[], imageSize: Size ): Size {
 	};
 }
 
-describe( 'mapEditToImage ↔ Export-camera parity', () => {
+describe( 'getImageEdit ↔ Export-camera parity', () => {
 	const rows = buildRows();
 
 	for ( const { label, state, u, v } of rows ) {
 		it( label, () => {
-			const edits = mapEditToImage( state );
+			const edit = getImageEdit( state );
 
 			// Output canvas is whatever the server would emit: the crop rect
 			// if present, otherwise the full rotated AABB. This makes (u, v)
 			// map to the same *output* pixel on both paths.
-			const outputSize = outputSizeFor( edits, IMAGE );
+			const outputSize = outputSizeFor( edit, IMAGE );
 
 			const exported = exportSourcePixel(
 				state,
@@ -301,7 +279,7 @@ describe( 'mapEditToImage ↔ Export-camera parity', () => {
 				u,
 				v
 			);
-			const server = serverSourcePixel( edits, IMAGE, u, v );
+			const server = serverSourcePixel( edit, IMAGE, u, v );
 
 			// Tolerance of 1 source pixel. The two paths compose rotations
 			// and scales in different orders, so sub-pixel disagreement is
@@ -312,7 +290,7 @@ describe( 'mapEditToImage ↔ Export-camera parity', () => {
 	}
 } );
 
-describe( 'getOutputSize agrees with mapEditToImage', () => {
+describe( 'getOutputSize agrees with getImageEdit', () => {
 	// Big enough that a crop just inside the pruning tolerance is still
 	// tens of pixels, which a smallest-size check would act on.
 	const BIG = { src: 'big.jpg', naturalWidth: 20000, naturalHeight: 10000 };
@@ -320,7 +298,7 @@ describe( 'getOutputSize agrees with mapEditToImage', () => {
 	it( 'reports the full size when the crop is too near full to be saved', () => {
 		const state = makeState( { image: BIG, zoom: 1.0005 } );
 
-		expect( mapEditToImage( state ) ).toEqual( [] );
+		expect( getImageEdit( state ) ).toEqual( {} );
 		expect( getOutputSize( state ) ).toEqual( {
 			width: 20000,
 			height: 10000,
@@ -349,10 +327,10 @@ describe( 'getOutputSize agrees with mapEditToImage', () => {
 	} );
 } );
 
-describe( 'mapEditToImage without a loaded image', () => {
+describe( 'getImageEdit without a loaded image', () => {
 	it( 'returns no edits, whatever the edit', () => {
 		const state = makeState( { image: null, rotation: 45 } );
 
-		expect( mapEditToImage( state ) ).toEqual( [] );
+		expect( getImageEdit( state ) ).toBeNull();
 	} );
 } );

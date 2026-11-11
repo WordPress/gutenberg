@@ -136,13 +136,13 @@ Whether two states have the same public edit fields, ignoring tiny floating-poin
 
 ### `getOutputSize( state )`
 
-The dimensions that the steps from `mapEditToImage` would produce on the image in `state.image`. A nearly full crop that the mapper omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
+The dimensions that the edit from `getImageEdit` would produce on the image in `state.image`. A crop that covers the whole image to within a rounding error gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
 
-### `mapEditToImage( state )`
+### `getImageEdit( state )`
 
-Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `mapEditToImage` turns that state into the steps that produce the same result on the full-size image loaded in `state.image`, which may itself be a file someone edited before.
+Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `getImageEdit` describes the same result against the full-size image loaded in `state.image`, which may itself be a file someone edited before.
 
-The returned list contains flip, rotate and crop steps as needed, in the order to apply them. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A locked ratio can produce a crop step before the person edits anything. The caller applies the steps and saves the result.
+The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
 ### `exportImage( state, options? )`
 

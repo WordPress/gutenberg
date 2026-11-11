@@ -968,7 +968,7 @@ describe( 'getSourceRegion — non-finite input regression', () => {
 	it( 'returns a finite source region for hostile state', () => {
 		// getSourceRegion feeds the pixel snapping of the crop handles, so
 		// NaN here would end up in the crop rect. The REST /edit payload
-		// comes from mapEditToImage, not from here.
+		// comes from getImageEdit, not from here.
 		const out = getSourceRegion( HOSTILE_STATE, IMAGE );
 		expect( Number.isFinite( out.x ) ).toBe( true );
 		expect( Number.isFinite( out.y ) ).toBe( true );
