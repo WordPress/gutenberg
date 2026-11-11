@@ -93,10 +93,11 @@ export default {
 		'background-interactive-neutral-active',
 		'background-interactive-neutral-disabled',
 		'background-surface-neutral-strong',
+		'background-thumb-neutral',
+		'background-thumb-neutral-disabled',
 	],
 	'bg-fgSurface4': [
 		'background-indicator-neutral',
-		'background-thumb-neutral',
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
 		'foreground-interactive-neutral-active',
@@ -136,6 +137,7 @@ export default {
 	],
 	'bg-stroke1': [
 		'background-track-neutral-weak',
+		'background-track-neutral-weak-disabled',
 		'stroke-surface-neutral-weak',
 	],
 	'bg-bgFillInverted2': [ 'background-interactive-neutral-strong-active' ],

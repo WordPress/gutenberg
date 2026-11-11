@@ -1264,6 +1264,10 @@
 					"$value": "{wpds-color.primitive.bg.stroke1}",
 					"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 				},
+				"neutral-weak-disabled": {
+					"$value": "{wpds-color.primitive.bg.stroke1}",
+					"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. switch track), in their disabled state."
+				},
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
 					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
@@ -1271,8 +1275,12 @@
 			},
 			"thumb": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
-					"$description": "Background color for thumbs with a neutral tone and normal emphasis."
+					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob)."
+				},
+				"neutral-disabled": {
+					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob), in their disabled state."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.stroke3}",

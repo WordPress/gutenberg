@@ -4,8 +4,8 @@
 
 $toggle-width: $grid-unit-40;
 $toggle-height: $grid-unit-20;
+$toggle-thumb-width: $grid-unit-20 + $grid-unit-05;
 $toggle-border-width: 1px;
-$toggle-thumb-size:  $grid-unit-15;
 
 $transition-duration: 0.2s;
 
@@ -21,7 +21,7 @@ $transition-duration: 0.2s;
 		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
-		background-color: var(--wpds-color-background-interactive-neutral-weak);
+		background-color: var(--wpds-color-background-track-neutral-weak);
 		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		width: $toggle-width;
 		height: $toggle-height;
@@ -34,35 +34,56 @@ $transition-duration: 0.2s;
 		}
 	}
 
+	// The thumb covers the track border, so it spans the full toggle height.
 	.components-form-toggle__thumb {
 		display: block;
 		position: absolute;
 		box-sizing: border-box;
-		top: math.div($toggle-thumb-size, 6);
-		left: math.div($toggle-thumb-size, 6);
-		width: $toggle-thumb-size;
-		height: $toggle-thumb-size;
-		border-radius: $radius-round;
+		top: 0;
+		left: 0;
+		width: $toggle-thumb-width;
+		height: $toggle-height;
+		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
+		border-radius: math.div($toggle-height, 2);
+		background-color: var(--wpds-color-background-thumb-neutral);
+		color: var(--wpds-color-foreground-interactive-brand);
+		box-shadow: $elevation-x-small;
 
 		@media not (prefers-reduced-motion) {
 			transition:
 				$transition-duration transform ease,
-				$transition-duration background-color ease-out;
+				$transition-duration border-color ease;
 		}
 
-		background-color: var(--wpds-color-foreground-interactive-neutral);
-		box-shadow: $elevation-x-small;
-
-		// Transparent border acts as a fill in Windows High Contrast Mode.
-		border: math.div($toggle-thumb-size, 2) solid transparent;
-
 		@media ( forced-colors: active ) {
-			background-color: ButtonText;
+			background-color: Canvas;
+			border-color: CanvasText;
+			color: Highlight;
 		}
 	}
 
-	&:not(.is-checked, .is-disabled):hover .components-form-toggle__track {
-		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	// Ignore the thumb border so the check is centered in the full thumb.
+	svg.components-form-toggle__check {
+		position: absolute;
+		top: -$toggle-border-width;
+		left: math.div($toggle-thumb-width - $toggle-height, 2) - $toggle-border-width;
+		width: $toggle-height;
+		height: $toggle-height;
+		opacity: 0;
+		pointer-events: none;
+		// Override the browser's SVG default so the check follows forced system colors.
+		forced-color-adjust: auto;
+
+		@media not (prefers-reduced-motion) {
+			transition: $transition-duration opacity ease;
+		}
+	}
+
+	&:not(.is-checked, .is-disabled):hover {
+		.components-form-toggle__track,
+		.components-form-toggle__thumb {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		}
 	}
 
 	// Checked state.
@@ -81,13 +102,16 @@ $transition-duration: 0.2s;
 
 	&.is-checked {
 		.components-form-toggle__thumb {
-			background-color: var(--wpds-color-foreground-interactive-brand-strong);
-			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
-			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+			border-color: var(--wpds-color-stroke-interactive-brand);
+			transform: translateX($toggle-width - $toggle-thumb-width);
 
 			@media ( forced-colors: active ) {
-				background-color: HighlightText;
+				border-color: Highlight;
 			}
+		}
+
+		svg.components-form-toggle__check {
+			opacity: 1;
 		}
 	}
 
@@ -95,7 +119,7 @@ $transition-duration: 0.2s;
 	&.is-disabled,
 	[inert] & {
 		.components-form-toggle__track {
-			background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			background-color: var(--wpds-color-background-track-neutral-weak-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 			@media ( forced-colors: active ) {
@@ -104,29 +128,14 @@ $transition-duration: 0.2s;
 		}
 
 		.components-form-toggle__thumb {
-			background-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			background-color: var(--wpds-color-background-thumb-neutral-disabled);
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			box-shadow: none;
 
 			@media ( forced-colors: active ) {
-				background-color: GrayText;
 				border-color: GrayText;
-			}
-		}
-
-		&.is-checked .components-form-toggle__track {
-			background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
-			border-color: transparent;
-
-			@media ( forced-colors: active ) {
-				background-color: GrayText;
-			}
-		}
-
-		&.is-checked .components-form-toggle__thumb {
-			background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
-
-			@media ( forced-colors: active ) {
-				background-color: Canvas;
+				color: GrayText;
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from '@wordpress/element';
+import { Icon, check } from '@wordpress/icons';
 import type { FormToggleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -43,7 +44,14 @@ function UnforwardedFormToggle(
 				ref={ ref }
 			/>
 			<span className="components-form-toggle__track"></span>
-			<span className="components-form-toggle__thumb"></span>
+			<span className="components-form-toggle__thumb">
+				<Icon
+					icon={ check }
+					className="components-form-toggle__check"
+					role="presentation"
+					size={ 16 }
+				/>
+			</span>
 		</span>
 	);
 }

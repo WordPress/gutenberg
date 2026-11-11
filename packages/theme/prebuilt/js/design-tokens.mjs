@@ -849,6 +849,24 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-color-background-track-neutral-weak-disabled': {
+		$description:
+			'Background color for tracks with a neutral tone and weak emphasis (eg. switch track), in their disabled state.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#f0f0f0',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.941, 0.941, 0.941 ],
+					hex: '#f0f0f0',
+					alpha: 1,
+				},
+				css: '#f0f0f0',
+			},
+		},
+	},
 	'--wpds-color-background-track-neutral': {
 		$description:
 			'Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).',
@@ -869,19 +887,37 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-thumb-neutral': {
 		$description:
-			'Background color for thumbs with a neutral tone and normal emphasis.',
+			'Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob).',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#fff',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 1, 1, 1 ],
+					hex: '#fff',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#fff',
+			},
+		},
+	},
+	'--wpds-color-background-thumb-neutral-disabled': {
+		$description:
+			'Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob), in their disabled state.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#fff',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 1, 1, 1 ],
+					hex: '#fff',
+					alpha: 1,
+				},
+				css: '#fff',
 			},
 		},
 	},
@@ -3012,6 +3048,7 @@ export const groups = /** @type {const} */ ( {
 					track: {
 						tokens: [
 							'--wpds-color-background-track-neutral-weak',
+							'--wpds-color-background-track-neutral-weak-disabled',
 							'--wpds-color-background-track-neutral',
 						],
 						groups: {},
@@ -3019,6 +3056,7 @@ export const groups = /** @type {const} */ ( {
 					thumb: {
 						tokens: [
 							'--wpds-color-background-thumb-neutral',
+							'--wpds-color-background-thumb-neutral-disabled',
 							'--wpds-color-background-thumb-neutral-weak',
 							'--wpds-color-background-thumb-neutral-weak-active',
 							'--wpds-color-background-thumb-brand',
