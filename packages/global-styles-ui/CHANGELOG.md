@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Font Library: Use normal weight when an uploaded font has no OS/2 table ([#86354](https://github.com/WordPress/gutenberg/pull/86354)).
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
 
 ## 2.1.0 (2026-11-04)
