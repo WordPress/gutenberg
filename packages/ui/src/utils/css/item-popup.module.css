@@ -69,14 +69,12 @@
 		}
 
 		/*
-		 * Slot and typography styles for a list in `.popup`'s `main` grid area.
-		 * Combobox and Autocomplete get this via `.list`. Select applies
-		 * it directly so Select.List can own overflow.
+		 * Typography styles for an item list. Combobox and Autocomplete get this
+		 * via `.list`. Select applies it directly so Select.List can own overflow.
 		 */
 		.list-chrome {
 			--_wp-ui-popup-selection-offset: 0px;
 
-			grid-area: main;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
@@ -275,17 +273,25 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.status {
-			grid-area: status;
+		.status:has(.loading-indicator) {
+			padding-block: var(--wp-ui-popup-padding);
+		}
 
-			&:has(.loading-indicator) {
-				padding-block: var(--wp-ui-popup-padding);
-			}
+		/*
+		 * The named grid areas exist only in `.popup`, so inline parts follow
+		 * the layout they are placed in. `:where()` keeps the specificity.
+		 */
+		:where(.popup) .list-chrome {
+			grid-area: main;
+		}
+
+		:where(.popup) .status {
+			grid-area: status;
 		}
 
 		/* Empty shares main with the list. A VisuallyHidden child still makes
 		   Status :not(:empty). Chrome only when it would not cover the list. */
-		.empty:not(:empty) {
+		:where(.popup) .empty:not(:empty) {
 			grid-area: main;
 		}
 
