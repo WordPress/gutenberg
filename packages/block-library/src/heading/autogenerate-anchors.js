@@ -17,6 +17,11 @@ const anchors = {};
 const getTextWithoutMarkup = ( text ) => {
 	const dummyElement = document.createElement( 'div' );
 	dummyElement.innerHTML = text;
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the anchor.
+	dummyElement
+		.querySelectorAll( 'annotation' )
+		.forEach( ( annotation ) => annotation.remove() );
 	return dummyElement.innerText;
 };
 
