@@ -29,6 +29,8 @@ export function useCanEditEntity( kind, name, recordId ) {
  * known, and stays null when the request fails.
  *
  * @param {number} postId Post ID. Nothing is fetched without one.
+ *
+ * @return {ReturnType<typeof useEntityRecords>} Comments query.
  */
 export function usePostCommentsCount( postId ) {
 	// The view context lets users who can't moderate comments read the count.
