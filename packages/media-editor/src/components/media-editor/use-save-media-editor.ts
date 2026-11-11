@@ -94,9 +94,8 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 		return [];
 	}
 
-	// Core applies modifiers in the order they arrive, and it is the same
-	// order the edit is defined in: flip, then rotate, then crop. Only
-	// the shape and the crop's units (fractions to percentages) differ.
+	// Core applies modifiers in the order they arrive, so send them in the
+	// edit's order: flip, then rotate, then crop.
 	const modifiers: Modifier[] = [];
 	if ( edit.flip ) {
 		modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
