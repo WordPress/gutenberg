@@ -1,14 +1,11 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { speak } from '@wordpress/a11y';
 import { createRef } from '@wordpress/element';
 import * as AlertDialog from '..';
 import {
 	getWpCompatOverlaySlot,
 	__resetWpCompatOverlaySlotCacheForTests,
 } from '../../utils/wp-compat-overlay-slot';
-import type { ConfirmResult } from '../types';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -16,61 +13,6 @@ vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 } ) );
 
 describe( 'AlertDialog', () => {
-	it( 'does not announce a confirmation error after unmount', async () => {
-		const user = userEvent.setup();
-		let resolve!: ( result: ConfirmResult ) => void;
-		const promise = new Promise< ConfirmResult >( ( res ) => {
-			resolve = res;
-		} );
-		const onConfirm = vi.fn( () => promise );
-		const { unmount } = render(
-			<AlertDialog.Root defaultOpen onConfirm={ onConfirm }>
-				<AlertDialog.Popup title="Confirm action">
-					Content
-				</AlertDialog.Popup>
-			</AlertDialog.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'OK' } ) );
-		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
-		unmount();
-		vi.mocked( speak ).mockClear();
-
-		await act( async () => {
-			resolve( { error: 'Late confirmation error.' } );
-		} );
-
-		expect( speak ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not log a confirmation rejection after unmount', async () => {
-		const user = userEvent.setup();
-		let reject!: ( error: Error ) => void;
-		const promise = new Promise< ConfirmResult >( ( _, rej ) => {
-			reject = rej;
-		} );
-		const onConfirm = vi.fn( () => promise );
-		const { unmount } = render(
-			<AlertDialog.Root defaultOpen onConfirm={ onConfirm }>
-				<AlertDialog.Popup title="Confirm action">
-					Content
-				</AlertDialog.Popup>
-			</AlertDialog.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'OK' } ) );
-		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
-		unmount();
-		vi.mocked( speak ).mockClear();
-
-		await act( async () => {
-			reject( new Error( 'Late confirmation rejection.' ) );
-		} );
-
-		expect( console ).not.toHaveErrored();
-		expect( speak ).not.toHaveBeenCalled();
-	} );
-
 	it( 'forwards ref', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();

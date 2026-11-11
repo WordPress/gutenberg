@@ -205,12 +205,12 @@ function Root( {
 				lifecycle.update( { phase: 'idle', showSpinner: false } );
 			}
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( error );
 			if ( confirmIdRef.current !== id ) {
 				return;
 			}
 			lifecycle.update( { phase: 'idle', showSpinner: false } );
-			// eslint-disable-next-line no-console
-			console.error( error );
 		}
 	}, [ lifecycle, onConfirmEvent ] );
 
