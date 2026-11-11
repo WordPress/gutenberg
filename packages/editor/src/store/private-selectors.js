@@ -459,7 +459,8 @@ export function getCurrentRevisionId( state ) {
  * Returns the revision waiting for its post to become the current post.
  *
  * @param {Object} state Global application state.
- * @return {Object|null} `{ postType, postId, revisionId }`, or null.
+ * @return {Object|null} `{ postType, postId, revisionId, fromPostType, fromPostId }`,
+ *                       or null.
  */
 export function getPendingRevision( state ) {
 	return state.pendingRevision;

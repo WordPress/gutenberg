@@ -1878,6 +1878,8 @@ describe( 'Editor actions', () => {
 				postType: 'wp_navigation',
 				postId: 7,
 				revisionId: 12,
+				fromPostType: 'post',
+				fromPostId: postId,
 			} );
 		} );
 

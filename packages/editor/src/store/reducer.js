@@ -457,7 +457,8 @@ export function revisionId( state = null, action ) {
 /**
  * Reducer for a revision to open once its post becomes the current post.
  *
- * @param {Object|null} state  Pending revision: `{ postType, postId, revisionId }`.
+ * @param {Object|null} state  Pending revision: `{ postType, postId, revisionId,
+ *                             fromPostType, fromPostId }`.
  * @param {Object}      action Dispatched action.
  * @return {Object|null} Updated state.
  */

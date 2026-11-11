@@ -595,15 +595,32 @@ export const openRevisionOfPost =
 			select.getCurrentPostType() === postType &&
 			String( select.getCurrentPostId() ) === String( postId )
 		) {
-			dispatch( { type: 'SET_PENDING_REVISION', pendingRevision: null } );
+			dispatch.clearPendingRevision();
 			dispatch.openRevision( revisionId );
 			return;
 		}
+		// Remember where the request came from, so a navigation that never
+		// reaches the post doesn't leave the revision queued for a later visit.
 		dispatch( {
 			type: 'SET_PENDING_REVISION',
-			pendingRevision: { postType, postId, revisionId },
+			pendingRevision: {
+				postType,
+				postId,
+				revisionId,
+				fromPostType: select.getCurrentPostType(),
+				fromPostId: select.getCurrentPostId(),
+			},
 		} );
 	};
+
+/**
+ * Drop a revision queued with `openRevisionOfPost` without opening it.
+ *
+ * @return {Object} Action object.
+ */
+export function clearPendingRevision() {
+	return { type: 'SET_PENDING_REVISION', pendingRevision: null };
+}
 
 /**
  * Open a revision from a shared URL and select the page that contains it.

@@ -619,70 +619,71 @@ const getManipulateDocumentCommands = () =>
 		};
 	};
 
-const getRevisionsCommands = () =>
-	function useRevisionsCommands() {
+/**
+ * Command loader hook for the "Open revisions" command. Exported for tests.
+ *
+ * @return {Object} Command loader result.
+ */
+export function useRevisionsCommands() {
+	const {
+		lastRevisionId,
+		revisionsCount,
+		supportsRevisions,
+		isRevisionsMode,
+		disableVisualRevisions,
+	} = useSelect( ( select ) => {
 		const {
-			lastRevisionId,
-			revisionsCount,
-			supportsRevisions,
-			isRevisionsMode,
-			disableVisualRevisions,
-		} = useSelect( ( select ) => {
-			const {
-				getCurrentPostType,
-				getCurrentPostLastRevisionId,
-				getCurrentPostRevisionsCount,
-				getEditorSettings,
-			} = select( editorStore );
-			const postType =
-				select( coreStore ).getPostType( getCurrentPostType() );
-			return {
-				lastRevisionId: getCurrentPostLastRevisionId(),
-				revisionsCount: getCurrentPostRevisionsCount(),
-				supportsRevisions: !! postType?.supports?.revisions,
-				isRevisionsMode: unlock(
-					select( editorStore )
-				).isRevisionsMode(),
-				disableVisualRevisions:
-					!! getEditorSettings().disableVisualRevisions,
-			};
-		}, [] );
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
-
-		// Same conditions as the Revisions row in the document sidebar.
-		if (
-			isRevisionsMode ||
-			! supportsRevisions ||
-			! lastRevisionId ||
-			revisionsCount < 2
-		) {
-			return { isLoading: false, commands: [] };
-		}
-
+			getCurrentPostType,
+			getCurrentPostLastRevisionId,
+			getCurrentPostRevisionsCount,
+			getEditorSettings,
+		} = select( editorStore );
+		const postType =
+			select( coreStore ).getPostType( getCurrentPostType() );
 		return {
-			isLoading: false,
-			commands: [
-				{
-					name: 'core/open-revisions',
-					label: __( 'Open revisions' ),
-					icon: backup,
-					category: 'view',
-					callback: ( { close } ) => {
-						close();
-						if ( disableVisualRevisions ) {
-							document.location.href = addQueryArgs(
-								'revision.php',
-								{ revision: lastRevisionId }
-							);
-							return;
-						}
-						setCurrentRevisionId( lastRevisionId );
-					},
-				},
-			],
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisionsCount: getCurrentPostRevisionsCount(),
+			supportsRevisions: !! postType?.supports?.revisions,
+			isRevisionsMode: unlock( select( editorStore ) ).isRevisionsMode(),
+			disableVisualRevisions:
+				!! getEditorSettings().disableVisualRevisions,
 		};
+	}, [] );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+
+	// Same conditions as the Revisions row in the document sidebar.
+	if (
+		isRevisionsMode ||
+		! supportsRevisions ||
+		! lastRevisionId ||
+		revisionsCount < 2
+	) {
+		return { isLoading: false, commands: [] };
+	}
+
+	return {
+		isLoading: false,
+		commands: [
+			{
+				name: 'core/open-revisions',
+				label: __( 'Open revisions' ),
+				icon: backup,
+				category: 'view',
+				callback: ( { close } ) => {
+					close();
+					if ( disableVisualRevisions ) {
+						document.location.href = addQueryArgs( 'revision.php', {
+							revision: lastRevisionId,
+						} );
+						return;
+					}
+					setCurrentRevisionId( lastRevisionId );
+				},
+			},
+		],
 	};
+}
 
 export default function useCommands() {
 	useCommandLoader( {
@@ -710,7 +711,7 @@ export default function useCommands() {
 
 	useCommandLoader( {
 		name: 'core/editor/revisions',
-		hook: getRevisionsCommands(),
+		hook: useRevisionsCommands,
 	} );
 
 	useCommandLoader( {
