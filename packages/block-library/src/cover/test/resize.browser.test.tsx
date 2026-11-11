@@ -55,8 +55,14 @@ const {
 async function setup( minHeightUnit: string | undefined, minHeight = 10 ) {
 	const block = createBlock( 'core/cover', {
 		overlayColor: 'black',
-		minHeight,
-		minHeightUnit,
+		style: {
+			dimensions: {
+				minHeight: minHeightUnit
+					? `${ minHeight }${ minHeightUnit }`
+					: undefined,
+				minWidth: '50px',
+			},
+		},
 	} );
 	function TestEditor() {
 		const [ blocks, setBlocks ] = useState( [ block ] );
@@ -67,6 +73,13 @@ async function setup( minHeightUnit: string | undefined, minHeight = 10 ) {
 				onChange={ setBlocks }
 				useSubRegistry={ false }
 				settings={ {
+					__experimentalFeatures: {
+						blocks: {
+							'core/cover': {
+								dimensions: { minHeight: true },
+							},
+						},
+					},
 					colors: [
 						{ name: 'Black', slug: 'black', color: '#000000' },
 					],
@@ -151,8 +164,14 @@ describe( 'Cover resize units', () => {
 				callbacks.onResize( 300 );
 			} );
 			expect( getAttributes() ).toMatchObject( {
-				minHeightUnit: unit,
-				minHeight: Number( ( 300 / pixelsPerUnit ).toFixed( 2 ) ),
+				style: {
+					dimensions: {
+						minHeight: `${ Number(
+							( 300 / pixelsPerUnit ).toFixed( 2 )
+						) }${ unit }`,
+						minWidth: '50px',
+					},
+				},
 			} );
 			expect( select( blockEditorStore ).isSelectionEnabled() ).toBe(
 				false
@@ -161,8 +180,14 @@ describe( 'Cover resize units', () => {
 				getResizeCallbacks().onResizeStop( 400 );
 			} );
 			expect( getAttributes() ).toMatchObject( {
-				minHeightUnit: unit,
-				minHeight: Number( ( 400 / pixelsPerUnit ).toFixed( 2 ) ),
+				style: {
+					dimensions: {
+						minHeight: `${ Number(
+							( 400 / pixelsPerUnit ).toFixed( 2 )
+						) }${ unit }`,
+						minWidth: '50px',
+					},
+				},
 			} );
 			expect(
 				parseFloat( view.getComputedStyle( cover ).minHeight )
@@ -180,8 +205,7 @@ describe( 'Cover resize units', () => {
 			getResizeCallbacks().onResizeStop( 400 );
 		} );
 		expect( getAttributes() ).toMatchObject( {
-			minHeightUnit: 'em',
-			minHeight: 16,
+			style: { dimensions: { minHeight: '16em' } },
 		} );
 	} );
 
@@ -193,8 +217,7 @@ describe( 'Cover resize units', () => {
 			getResizeCallbacks().onResizeStop( 400 );
 		} );
 		expect( getAttributes() ).toMatchObject( {
-			minHeightUnit: 'px',
-			minHeight: 400,
+			style: { dimensions: { minHeight: '400px' } },
 		} );
 	} );
 
@@ -207,8 +230,7 @@ describe( 'Cover resize units', () => {
 				getResizeCallbacks().onResizeStop( 400 );
 			} );
 			expect( getAttributes() ).toMatchObject( {
-				minHeightUnit: 'px',
-				minHeight: 400,
+				style: { dimensions: { minHeight: '400px' } },
 			} );
 		}
 	);

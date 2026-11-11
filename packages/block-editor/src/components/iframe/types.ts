@@ -109,11 +109,3 @@ export type IframeProps = IframeHTMLAttributes< HTMLIFrameElement > & {
 	readonly?: boolean;
 	forwardedRef?: ForwardedRef< HTMLIFrameElement >;
 };
-
-/**
- * An event constructor `bubbleEvent` creates the parent document's event with.
- */
-export type EventConstructor = new (
-	type: string,
-	init?: Record< string, unknown >
-) => Event;

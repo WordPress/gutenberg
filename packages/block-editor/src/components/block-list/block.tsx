@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import { memo, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -16,7 +16,6 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { safeHTML } from '@wordpress/dom';
 import type { ComponentType, ReactNode } from 'react';
 import type { Block as BlockObject } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
@@ -25,6 +24,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
+import SafeRawHTML from '../safe-raw-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
@@ -202,7 +202,7 @@ function BlockListBlock( {
 		block = (
 			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
-				<RawHTML>{ safeHTML( saveContent ) }</RawHTML>
+				<SafeRawHTML html={ saveContent } />
 			</Block>
 		);
 	} else if ( mode === 'html' ) {
@@ -254,11 +254,11 @@ function BlockListBlock( {
 			} }
 		>
 			<BlockCrashBoundary
-				fallback={
+				fallback={ ( error ) => (
 					<Block className="has-warning">
-						<BlockCrashWarning />
+						<BlockCrashWarning error={ error } />
 					</Block>
-				}
+				) }
 			>
 				{ block }
 			</BlockCrashBoundary>
