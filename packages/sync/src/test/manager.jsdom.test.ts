@@ -920,6 +920,144 @@ describe( 'SyncManager', () => {
 			}
 		);
 
+		it( 'defers consecutive solo block edits until the document changes', async () => {
+			const manager = createSyncManager();
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+			const first = [ 'First' ];
+			manager.update(
+				'post',
+				'123',
+				{ blocks: first },
+				LOCAL_EDITOR_ORIGIN,
+				{ previousBlocks: [] }
+			);
+			mockSyncConfig.applyChangesToCRDTDoc.mockClear();
+			const second = [ 'Second' ];
+			manager.update(
+				'post',
+				'123',
+				{ blocks: second },
+				LOCAL_EDITOR_ORIGIN,
+				{ previousBlocks: first }
+			);
+			manager.update(
+				'post',
+				'123',
+				{ blocks: [ 'Third' ] },
+				LOCAL_EDITOR_ORIGIN,
+				{ previousBlocks: second }
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc.mock.calls.map(
+					( [ , changes ] ) => changes.blocks
+				)
+			).toEqual( [ second, [ 'Third' ] ] );
+			manager.unloadAll();
+		} );
+
+		it.each( [ 'before the local edit', 'while a local edit is queued' ] )(
+			'keeps both edits when a document update arrives %s without awareness',
+			async ( arrival ) => {
+				let doc: Y.Doc;
+				mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+					doc = ydoc;
+					return mockProviderResult;
+				} );
+				// A small config that preserves a remote field and returns the
+				// combined block list, like core-data's block rebase.
+				mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+					( ydoc, changes ) => {
+						if ( ! changes.blocks ) {
+							return;
+						}
+						const map = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						const blocks = [ ...( changes.blocks as string[] ) ];
+						if (
+							map.has( 'peer' ) &&
+							! blocks.includes( 'Peer' )
+						) {
+							blocks.push( 'Peer' );
+						}
+						map.set( 'blocks', blocks );
+						return { blocks };
+					}
+				);
+				let record: ObjectData = { ...mockRecord, blocks: [] };
+				mockHandlers.getEditedRecord.mockImplementation(
+					async () => record
+				);
+				mockHandlers.editRecord.mockImplementation( ( changes ) => {
+					record = { ...record, ...changes };
+				} );
+				const manager = createSyncManager();
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					record,
+					mockHandlers
+				);
+				const first = [ 'First' ];
+				const initial = manager.update(
+					'post',
+					'123',
+					{ blocks: first },
+					LOCAL_EDITOR_ORIGIN,
+					{ previousBlocks: [] }
+				);
+				record = { ...record, blocks: first, ...initial };
+				const previousBlocks = record.blocks as string[];
+				const peer = new Y.Doc();
+				Y.applyUpdateV2( peer, Y.encodeStateAsUpdateV2( doc! ) );
+				peer.getMap( CRDT_RECORD_MAP_KEY ).set( 'peer', true );
+				const local = () => {
+					const blocks = [ 'First!' ];
+					const corrections = manager.update(
+						'post',
+						'123',
+						{ blocks },
+						LOCAL_EDITOR_ORIGIN,
+						{ previousBlocks }
+					);
+					record = { ...record, blocks, ...corrections };
+					return corrections;
+				};
+				let corrections: Partial< ObjectData > | undefined;
+				if ( arrival === 'while a local edit is queued' ) {
+					corrections = local() ?? undefined;
+				}
+				Y.applyUpdateV2( doc!, Y.encodeStateAsUpdateV2( peer ) );
+				if ( arrival === 'before the local edit' ) {
+					corrections = local() ?? undefined;
+				}
+				expect( corrections ).toEqual(
+					arrival === 'before the local edit'
+						? { blocks: [ 'First!', 'Peer' ] }
+						: undefined
+				);
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+				expect( record.blocks ).toEqual( [ 'First!', 'Peer' ] );
+				expect(
+					doc!.getMap( CRDT_RECORD_MAP_KEY ).get( 'blocks' )
+				).toEqual( record.blocks );
+				expect(
+					manager.getAwareness( 'post', '123' )!.getStates().size
+				).toBe( 1 );
+				manager.unloadAll();
+				peer.destroy();
+			}
+		);
+
 		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
