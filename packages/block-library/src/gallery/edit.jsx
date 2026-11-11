@@ -22,6 +22,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
+import { useEvent } from '@wordpress/compose';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -60,7 +61,6 @@ import {
 	MAX_COLUMNS,
 } from './constants';
 import useImageSizes from './use-image-sizes';
-import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
@@ -307,23 +307,14 @@ export default function GalleryEdit( props ) {
 		? viewportStyle.aspectRatio
 		: baseAspectRatio;
 
-	const images = useMemo(
-		() =>
-			innerBlockImages?.map( ( block ) => ( {
-				clientId: block.clientId,
-				id: block.attributes.id,
-				url: block.attributes.url,
-				attributes: block.attributes,
-				fromSavedContent: Boolean( block.originalContent ),
-			} ) ),
-		[ innerBlockImages ]
-	);
-
 	const imageData = useGetMedia( innerBlockImages );
+	const mediaById = useMemo(
+		() => new Map( imageData.map( ( media ) => [ media.id, media ] ) ),
+		[ imageData ]
+	);
+	const handledImagesRef = useRef( new Set() );
 
-	const newImages = useGetNewImages( images, imageData );
-
-	const hasImages = !! images.length;
+	const hasImages = !! innerBlockImages.length;
 
 	// The static "Order by" control shows the last sort applied from it, for as
 	// long as the images stay in the sequence that sort produced. Any other
@@ -356,7 +347,7 @@ export default function GalleryEdit( props ) {
 	// when the gallery is in dynamic mode.
 	const displayedImageCount = isDynamic
 		? dynamic.dynamicMedia.length
-		: images.length;
+		: innerBlockImages.length;
 
 	// Check if there is at least one image with lightbox enabled. In dynamic
 	// mode the images inherit the gallery's link setting, so the lightbox is on
@@ -366,15 +357,16 @@ export default function GalleryEdit( props ) {
 		hasLightboxImages = linkTo === LINK_DESTINATION_LIGHTBOX;
 	} else if ( lightboxSetting?.enabled ) {
 		hasLightboxImages =
-			images.filter(
-				( image ) =>
-					image.attributes?.lightbox?.enabled === undefined ||
-					image.attributes?.lightbox?.enabled === true
+			innerBlockImages.filter(
+				( block ) =>
+					block.attributes?.lightbox?.enabled === undefined ||
+					block.attributes?.lightbox?.enabled === true
 			).length > 0;
 	} else {
 		hasLightboxImages =
-			images.filter( ( image ) => image.attributes.lightbox?.enabled )
-				.length > 0;
+			innerBlockImages.filter(
+				( block ) => block.attributes.lightbox?.enabled
+			).length > 0;
 	}
 
 	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
@@ -397,18 +389,6 @@ export default function GalleryEdit( props ) {
 		...( themeOptions || [] ),
 	];
 
-	useEffect( () => {
-		newImages?.forEach( ( newImage ) => {
-			// Update the images data without creating new undo levels.
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( newImage.attributes ),
-				id: newImage.id,
-				align: undefined,
-			} );
-		} );
-	}, [ newImages ] );
-
 	const imageSizeOptions = useImageSizes(
 		isDynamic ? dynamic.dynamicMedia : imageData,
 		isSelected,
@@ -428,9 +408,7 @@ export default function GalleryEdit( props ) {
 	 * @return {Object}                Attributes to set on the new image block.
 	 */
 	function buildImageAttributes( imageAttributes ) {
-		const image = imageAttributes.id
-			? imageData.find( ( { id } ) => id === imageAttributes.id )
-			: null;
+		const image = mediaById.get( imageAttributes.id );
 
 		let newClassName;
 		if ( imageAttributes.className && imageAttributes.className !== '' ) {
@@ -471,6 +449,49 @@ export default function GalleryEdit( props ) {
 			scale: aspectRatio && aspectRatio !== 'auto' ? 'cover' : undefined,
 		};
 	}
+
+	const applyGallerySettings = useEvent( ( blocks ) => {
+		const changedAttributes = Object.fromEntries(
+			blocks.map( ( block ) => [
+				block.clientId,
+				{
+					...buildImageAttributes( block.attributes ),
+					id: block.attributes.id,
+					align: undefined,
+				},
+			] )
+		);
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes(
+			blocks.map( ( block ) => block.clientId ),
+			changedAttributes,
+			{ uniqueByBlock: true }
+		);
+	} );
+
+	// An image block uploads its own file and sets its own size and link, so
+	// the gallery settings can only be applied once the attachment loads.
+	useEffect( () => {
+		const handledImages = handledImagesRef.current;
+		const newImages = [];
+		innerBlockImages.forEach( ( block ) => {
+			if ( handledImages.has( block.clientId ) ) {
+				return;
+			}
+			if ( block.originalContent ) {
+				handledImages.add( block.clientId );
+				return;
+			}
+			if ( ! mediaById.has( block.attributes.id ) ) {
+				return;
+			}
+			handledImages.add( block.clientId );
+			newImages.push( block );
+		} );
+		if ( newImages.length > 0 ) {
+			applyGallerySettings( newImages );
+		}
+	}, [ innerBlockImages, mediaById, applyGallerySettings ] );
 
 	function isValidFileType( file ) {
 		const mediaTypeSelector = file.type;
@@ -803,9 +824,13 @@ export default function GalleryEdit( props ) {
 		} );
 	}
 
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
-	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+	const hasImageIds =
+		hasImages &&
+		innerBlockImages.some( ( block ) => !! block.attributes.id );
+	const imagesUploading = innerBlockImages.some(
+		( block ) =>
+			! block.attributes.id &&
+			block.attributes.url?.indexOf( 'blob:' ) === 0
 	);
 
 	const mediaPlaceholderProps = {
@@ -1245,9 +1270,9 @@ export default function GalleryEdit( props ) {
 							onSelect={ updateImages }
 							name={ __( 'Add' ) }
 							multiple
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
+							mediaIds={ innerBlockImages
+								.filter( ( block ) => block.attributes.id )
+								.map( ( block ) => block.attributes.id ) }
 							addToGallery={ hasImageIds }
 							variant="toolbar"
 						/>
@@ -1271,7 +1296,6 @@ export default function GalleryEdit( props ) {
 				<Gallery
 					{ ...props }
 					isContentLocked={ isContentLocked }
-					images={ images }
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
