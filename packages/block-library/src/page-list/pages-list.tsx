@@ -39,6 +39,8 @@ interface DragState {
 interface DropTarget {
 	pageId: number;
 	isAfter: boolean;
+	/** Whether a dragged page goes inside the page, after its child pages. */
+	isInside: boolean;
 	/** The level the dragged page lands at, for indenting the drop line. */
 	depth: number;
 }
@@ -158,9 +160,13 @@ function PageRowItem( {
 					[ `is-hidden ${ styles[ 'is-hidden' ] }` ]: ! isShown,
 					[ `is-dragging ${ styles[ 'is-dragging' ] }` ]: isDragging,
 					[ `is-drop-before ${ styles[ 'is-drop-before' ] }` ]:
-						dropTarget && ! dropTarget.isAfter,
+						dropTarget &&
+						! dropTarget.isAfter &&
+						! dropTarget.isInside,
 					[ `is-drop-after ${ styles[ 'is-drop-after' ] }` ]:
-						dropTarget?.isAfter,
+						dropTarget?.isAfter && ! dropTarget.isInside,
+					[ `is-drop-inside ${ styles[ 'is-drop-inside' ] }` ]:
+						dropTarget?.isInside,
 				}
 			) }
 			style={
@@ -403,10 +409,24 @@ export default function PagesList( {
 	const canDropPageOn = ( row: PageRow ) =>
 		!! dragState && ! dragState.movingIds.has( row.page.id );
 
-	// Where a page dropped on a row lands. Just below a page whose child
-	// pages follow it, it becomes the first of them. Otherwise it goes before
-	// or after the row's page, at that page's level.
-	const getPageDropPosition = ( row: PageRow, isAfter: boolean ) => {
+	// Where a page dropped on a row lands. On the middle of the row, it goes
+	// inside the row's page, after its child pages. Just below a page whose
+	// child pages follow it, it becomes the first of them. Otherwise it goes
+	// before or after the row's page, at that page's level.
+	const getPageDropPosition = (
+		row: PageRow,
+		isAfter: boolean,
+		isInside: boolean
+	) => {
+		if ( isInside ) {
+			return {
+				parentId: row.page.id,
+				index: rows.filter(
+					( { page } ) => page.parent === row.page.id
+				).length,
+				depth: row.depth + 1,
+			};
+		}
 		const next = rows[ rows.indexOf( row ) + 1 ];
 		if ( isAfter && next && next.depth > row.depth ) {
 			return { parentId: row.page.id, index: 0, depth: row.depth + 1 };
@@ -457,7 +477,8 @@ export default function PagesList( {
 		}
 		const { parentId, index } = getPageDropPosition(
 			row,
-			dropTarget.isAfter
+			dropTarget.isAfter,
+			dropTarget.isInside
 		);
 		// Among its own siblings, the page's old place no longer counts once
 		// it's taken out.
@@ -589,17 +610,29 @@ export default function PagesList( {
 							event.dataTransfer.dropEffect = 'move';
 							const { top, height } =
 								event.currentTarget.getBoundingClientRect();
-							const isAfter = event.clientY > top + height / 2;
+							// A dragged page goes before the row in its top
+							// quarter, after it in its bottom quarter, and
+							// inside its page in between. Other items only go
+							// before or after.
+							const offset = ( event.clientY - top ) / height;
+							const isInside =
+								!! dragState && offset > 0.25 && offset < 0.75;
+							const isAfter = offset >= 0.5;
 							if (
 								dropTarget?.pageId !== row.page.id ||
-								dropTarget?.isAfter !== isAfter
+								dropTarget?.isAfter !== isAfter ||
+								dropTarget?.isInside !== isInside
 							) {
 								setDropTarget( {
 									pageId: row.page.id,
 									isAfter,
+									isInside,
 									depth: dragState
-										? getPageDropPosition( row, isAfter )
-												.depth
+										? getPageDropPosition(
+												row,
+												isAfter,
+												isInside
+											).depth
 										: row.depth,
 								} );
 							}

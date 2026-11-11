@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import {
+	render,
+	screen,
+	fireEvent,
+	within,
+	createEvent,
+} from '@testing-library/react';
 import PagesList, { PageDragChip } from '../pages-list';
 import { getPagesByParentId, getPageRows } from '../utils';
 
@@ -225,5 +231,43 @@ describe( 'PagesList', () => {
 		expect(
 			screen.queryByRole( 'menuitem', { name: /Move out of|Move under/ } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'puts a page dropped on the middle of a row inside that page', () => {
+		const { onMove } = renderPanel();
+		const dataTransfer = {
+			setData: vi.fn(),
+			setDragImage: vi.fn(),
+			effectAllowed: 'none',
+			dropEffect: 'none',
+			types: [],
+		};
+		const row = ( title: string ) =>
+			screen
+				.getAllByRole( 'listitem' )
+				.find( ( item ) => within( item ).queryByText( title ) )!;
+		const about = row( 'About' );
+		vi.spyOn( about, 'getBoundingClientRect' ).mockReturnValue( {
+			top: 0,
+			height: 40,
+		} as DOMRect );
+
+		fireEvent.dragStart(
+			screen.getByRole( 'button', { name: 'Reorder Shop' } ),
+			{ dataTransfer }
+		);
+		// Halfway down About's row. jsdom has no DragEvent, so the position
+		// is set on the event directly.
+		const dragOver = createEvent.dragOver( about, { dataTransfer } );
+		Object.defineProperty( dragOver, 'clientY', { value: 20 } );
+		fireEvent( about, dragOver );
+		fireEvent.drop( about, { dataTransfer } );
+
+		// About has one child page, Team, so Shop goes after it.
+		expect( onMove ).toHaveBeenCalledWith(
+			expect.objectContaining( { page: PAGES[ 2 ] } ),
+			1,
+			1
+		);
 	} );
 } );
