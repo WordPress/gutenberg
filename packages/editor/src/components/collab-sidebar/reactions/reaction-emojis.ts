@@ -76,12 +76,17 @@ export const REACTION_EMOJIS: ReactionEmoji[] = [
 ];
 
 const HEX_KEY_PATTERN = /^[0-9a-f]{4,6}(?:-[0-9a-f]{4,6})*$/;
+const EMOJI_PATTERN = /^\p{Emoji}$/u;
+const EMOJI_PRESENTATION_PATTERN = /^\p{Emoji_Presentation}$/u;
+const SKIN_TONE_PATTERN = /^[\u{1F3FB}-\u{1F3FF}]$/u;
 
 /**
  * The emoji stored under a hex key.
  *
- * A single code point gets U+FE0F back, which the key drops, so emoji such
- * as ❤️ that default to text presentation still render as emoji.
+ * The key drops U+FE0F, so it goes back after each code point that defaults
+ * to text presentation: ❤️ would otherwise render as text, and sequences
+ * such as #️⃣ and 🏳️‍🌈 are only fully qualified with it. A skin tone
+ * already forces emoji presentation.
  *
  * @param hexKey The storage key, e.g. `2764`.
  * @return The emoji, or an empty string for a malformed key.
@@ -96,10 +101,19 @@ export function hexKeyToEmoji( hexKey: string ): string {
 	if ( codePoints.some( ( codePoint ) => codePoint > 0x10ffff ) ) {
 		return '';
 	}
-	if ( codePoints.length === 1 ) {
-		codePoints.push( 0xfe0f );
-	}
-	return String.fromCodePoint( ...codePoints );
+	const chars = codePoints.map( ( codePoint ) =>
+		String.fromCodePoint( codePoint )
+	);
+	return chars
+		.map( ( char, index ) => {
+			const next = chars[ index + 1 ];
+			const needsSelector =
+				EMOJI_PATTERN.test( char ) &&
+				! EMOJI_PRESENTATION_PATTERN.test( char ) &&
+				! ( next && SKIN_TONE_PATTERN.test( next ) );
+			return needsSelector ? char + '\u{FE0F}' : char;
+		} )
+		.join( '' );
 }
 
 /**
