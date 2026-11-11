@@ -14,10 +14,7 @@ export default {
 		'background-interactive-neutral-weak',
 		'background-interactive-neutral-weak-disabled',
 	],
-	'primary-bgFill1': [
-		'background-interactive-brand-strong',
-		'foreground-thumb-brand-strong',
-	],
+	'primary-bgFill1': [ 'background-interactive-brand-strong' ],
 	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-fgFill': [
 		'background-thumb-brand-strong',
