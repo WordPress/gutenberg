@@ -47,6 +47,9 @@ export const init = () => {
 	);
 
 	// Prevent adding template parts inside post content.
+	// Note: this code previously restricted 'core/post-template', which is why the filter
+	// is called `removeTemplatePartsFromPostTemplates`. The filter name is unchanged
+	// for backwards compatibility. See https://github.com/WordPress/gutenberg/pull/86377.
 	const DISALLOWED_PARENTS = [ 'core/post-content' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
