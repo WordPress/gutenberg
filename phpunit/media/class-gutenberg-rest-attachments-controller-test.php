@@ -407,6 +407,44 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * getimagesize() cannot read JPEG XL, so the sideload endpoint reads a
+	 * JXL sub-size's dimensions from its codestream header.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_item_reads_the_dimensions_of_a_jxl_sub_size() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jxl' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=sideload-test.jxl' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( dirname( __DIR__, 2 ) . '/test/e2e/assets/200x150_e2e_test_image_decode.jxl' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$attachment_id = $response->get_data()['id'];
+		$metadata      = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertSame( 200, $metadata['width'] );
+		$this->assertSame( 150, $metadata['height'] );
+
+		// A 64x16 codestream header (div8 set, height 16, ratio 0, width 64),
+		// padded so getimagesize() can read past it.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jxl' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=sideload-test-64x16.jxl' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( "\xFF\x0A\x03\x0E\x00" . str_repeat( "\x00", 64 ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'image/jxl', $data['mime_type'] );
+		$this->assertSame( 64, $data['width'] );
+		$this->assertSame( 16, $data['height'] );
+	}
+
+	/**
 	 * @covers ::sideload_item
 	 * @covers ::sideload_item_permissions_check
 	 */
