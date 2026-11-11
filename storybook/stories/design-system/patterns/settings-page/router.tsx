@@ -1,5 +1,17 @@
-import type { AnchorHTMLAttributes, ComponentProps, ReactNode } from 'react';
-import { createContext, useContext, useId, useState } from '@wordpress/element';
+import type {
+	AnchorHTMLAttributes,
+	ComponentProps,
+	MouseEvent,
+	ReactNode,
+} from 'react';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
@@ -129,8 +141,67 @@ export function useNavigationBlocker( isDirty: boolean ) {
 
 const ScreenContext = createContext< ReactNode >( null );
 
+/**
+ * Places focus after navigating, since the page that held the activated link
+ * is replaced and focus would otherwise fall back to the document. A link in
+ * navigation the new page also has, like the section navigation, hands focus
+ * to that navigation's current item. Any other link, like a breadcrumb or a
+ * subpage row, hands it to the new page's heading, so screen readers announce
+ * the page.
+ */
+function useFocusAfterNavigate() {
+	const containerRef = useRef< HTMLDivElement >( null );
+	const activatedNavigationRef = useRef< string | null >( null );
+	const { pathname } = useLocation();
+	const previousPathnameRef = useRef( pathname );
+
+	useEffect( () => {
+		if ( previousPathnameRef.current === pathname ) {
+			return;
+		}
+		previousPathnameRef.current = pathname;
+		const container = containerRef.current;
+		const { activeElement } = container?.ownerDocument ?? document;
+		if ( ! container || container.contains( activeElement ) ) {
+			return;
+		}
+		const navigationLabel = activatedNavigationRef.current;
+		const currentItem = navigationLabel
+			? container.querySelector< HTMLElement >(
+					`nav[aria-label="${ CSS.escape(
+						navigationLabel
+					) }"] [aria-current="page"]`
+				)
+			: null;
+		if ( currentItem ) {
+			currentItem.focus();
+			return;
+		}
+		const heading = container.querySelector( 'h1' );
+		heading?.setAttribute( 'tabindex', '-1' );
+		heading?.focus();
+	}, [ pathname ] );
+
+	// Clicks that aren't on a link, like confirming a discard prompt, keep the
+	// link that started the navigation.
+	const onClickCapture = ( event: MouseEvent< HTMLDivElement > ) => {
+		const link = ( event.target as Element ).closest( 'a' );
+		if ( link ) {
+			activatedNavigationRef.current =
+				link.closest( 'nav' )?.getAttribute( 'aria-label' ) ?? null;
+		}
+	};
+
+	return { ref: containerRef, onClickCapture };
+}
+
 function Screen() {
-	return <>{ useContext( ScreenContext ) }</>;
+	const containerProps = useFocusAfterNavigate();
+	return (
+		<div { ...containerProps } className={ styles.screen }>
+			{ useContext( ScreenContext ) }
+		</div>
+	);
 }
 
 function createSettingsRouter( initialPath: string ) {

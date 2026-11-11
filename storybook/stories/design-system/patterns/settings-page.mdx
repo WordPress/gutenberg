@@ -40,6 +40,15 @@ These templates use the manual save model from [Save & Submit](?path=/docs/desig
 -   **Pages that only list records have no page-level Save.** Each record editor saves on its own, and the header holds the action that adds a record.
 -   **Leaving with unsaved edits asks first.** Switching pages or following a breadcrumb holds the navigation and asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
 
+## Focus after navigation
+
+Moving between adjacent pages and subpages replaces the page, including the link that was just used. Without help, keyboard focus falls back to the start of the document and screen readers don't announce the new page. Place focus once the new page renders:
+
+-   **After a breadcrumb or subpage row, focus the new page's heading.** The link is gone, and the heading is the first thing that tells people where they are. Give the heading `tabindex="-1"` so it can take focus, and hide the focus ring, since it isn't interactive. Screen readers then read the heading out.
+-   **After the section navigation, focus the newly current item.** The navigation is still on screen, so people can keep moving between pages from where they were.
+
+The templates do this in their in-canvas router. Try it by following a breadcrumb with the keyboard.
+
 ## Simple settings page
 
 A single page with a few groups of settings. Use it when everything fits on one screen.
