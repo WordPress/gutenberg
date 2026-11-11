@@ -26,7 +26,6 @@ import { createBoardStore } from './board-store';
 import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	isAttributeBound,
 	removeNoteIdFromMetadata,
 } from './utils/metadata';
 import { getTextAttributeKey, toRecord } from './utils/rich-text';
@@ -338,10 +337,12 @@ export function useNoteActions() {
 				newAttributes[ removed.attributeKey ] = removed.value;
 			}
 			const range = ranges.get( clientId );
-			// Bound text is anchored at the block level.
+			const bindings = attributes.metadata?.bindings;
+			// Selection offsets are in the bound value, not the stored one.
 			if (
 				range &&
-				! isAttributeBound( attributes, range.attributeKey )
+				! bindings?.[ range.attributeKey ] &&
+				! bindings?.__default
 			) {
 				const { attributeKey, start, end } = range;
 				const value =

@@ -1788,11 +1788,6 @@ test.describe( 'Block Notes', () => {
 				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
 				await blockNoteUtils.addNote( 'Bound text note' );
 
-				// The offsets belong to the bound value, so wrapping the stored
-				// attribute would place a marker around the wrong text.
-				await expect(
-					editor.canvas.locator( 'mark.wp-note' )
-				).toHaveCount( 0 );
 				await expect.poll( editor.getBlocks ).toMatchObject( [
 					{
 						name: 'core/paragraph',

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	isAttributeBound,
 	removeNoteIdFromMetadata,
 } from '../utils/metadata';
 import type { NoteMetadata } from '../utils/metadata';
@@ -284,47 +283,5 @@ describe( 'note id order preservation', () => {
 		const result = addNoteIdToMetadata( { noteId: 42 }, 99 );
 		expect( result.noteId ).toEqual( [ 42, 99 ] );
 		expect( ( result.noteId as number[] )[ 0 ] ).toBe( 42 );
-	} );
-} );
-
-describe( 'isAttributeBound', () => {
-	const binding = { source: 'core/post-meta', args: { key: 'field' } };
-
-	it( 'returns true for an attribute with its own binding', () => {
-		expect(
-			isAttributeBound(
-				{ metadata: { bindings: { content: binding } } },
-				'content'
-			)
-		).toBe( true );
-	} );
-
-	it( 'returns true for every attribute under a pattern overrides binding', () => {
-		expect(
-			isAttributeBound(
-				{
-					metadata: {
-						bindings: {
-							__default: { source: 'core/pattern-overrides' },
-						},
-					},
-				},
-				'content'
-			)
-		).toBe( true );
-	} );
-
-	it( 'returns false when another attribute is bound', () => {
-		expect(
-			isAttributeBound(
-				{ metadata: { bindings: { url: binding } } },
-				'content'
-			)
-		).toBe( false );
-	} );
-
-	it( 'returns false without bindings', () => {
-		expect( isAttributeBound( {}, 'content' ) ).toBe( false );
-		expect( isAttributeBound( undefined, 'content' ) ).toBe( false );
 	} );
 } );

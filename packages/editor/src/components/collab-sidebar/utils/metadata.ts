@@ -64,23 +64,3 @@ export function removeNoteIdFromMetadata(
 		noteId: ids.size > 0 ? [ ...ids ] : undefined,
 	};
 }
-
-/**
- * Whether a block attribute is connected to a binding source, either directly
- * or through the pattern overrides `__default` binding. A bound attribute
- * displays its source's value, so selection offsets don't map to the stored one.
- *
- * @param attributes   Block attributes.
- * @param attributeKey Attribute name.
- * @return Whether the attribute is bound.
- */
-export function isAttributeBound(
-	attributes:
-		| { metadata?: { bindings?: Record< string, unknown > } }
-		| null
-		| undefined,
-	attributeKey: string
-): boolean {
-	const bindings = attributes?.metadata?.bindings;
-	return !! ( bindings?.[ attributeKey ] || bindings?.__default );
-}
