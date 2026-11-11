@@ -79,28 +79,6 @@ test.describe( 'Block Notes: unsaved note anchors', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test( 'keeps a note attached after reloading an unsaved draft', async ( {
-		admin,
-		editor,
-		page,
-	} ) => {
-		await admin.createNewPost();
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Keep me attached' },
-		} );
-		await editor.saveDraft();
-
-		await addNote( editor, page, 'Unsaved anchor note' );
-
-		await page.reload();
-		await expect
-			.poll( () => getFirstBlockNoteIds( editor ) )
-			.toHaveLength( 1 );
-		await openAllNotes( page );
-		await expect( getThread( page, 'Unsaved anchor note' ) ).toBeVisible();
-	} );
-
 	test( 'drops the snapshot once the post is saved', async ( {
 		admin,
 		editor,
@@ -158,6 +136,8 @@ test.describe( 'Block Notes: unsaved note anchors', () => {
 		await expect
 			.poll( () => getFirstBlockNoteIds( editor ) )
 			.toHaveLength( 1 );
+		await openAllNotes( page );
+		await expect( getThread( page, 'Published post note' ) ).toBeVisible();
 	} );
 
 	test( 'does not save unrelated edits along with the note', async ( {

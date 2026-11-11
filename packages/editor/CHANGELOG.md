@@ -10,7 +10,7 @@
 ### Bug Fixes
 
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
--   Notes: Keep a new note attached to its block when the post isn't saved afterwards, by storing the block with the note and re-attaching it on load ([#86471](https://github.com/WordPress/gutenberg/pull/86471)).
+-   Notes: Keep a new note attached to its block when the post isn't saved afterwards ([#86471](https://github.com/WordPress/gutenberg/pull/86471)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
 -   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
 -   PostSchedule: Mark the posts of the month in the site's timezone, including posts at the first and last second of the month ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
