@@ -11,21 +11,80 @@
  */
 
 .components-button {
-	// Share tone-dependent colors across variants. Fixed roles use WPDS tokens directly.
-	--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand);
-	--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-brand-active);
-	--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-brand-strong);
-	--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-brand-strong-active);
-	--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
-	--_wp-components-button-background-strong: var(--wpds-color-background-interactive-brand-strong);
-	--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-brand-strong-active);
-	--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-brand-strong-disabled);
-	--_wp-components-button-background-weak: var(--wpds-color-background-interactive-neutral-weak);
-	--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-neutral-weak-active);
-	--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak-active);
+	// Variants select color values; interaction rules below apply them.
+	--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-neutral);
+	--_wp-components-button-foreground-hover: var(--wpds-color-foreground-interactive-brand);
+	--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-neutral-active);
+	--_wp-components-button-foreground-disabled: var(--wpds-color-foreground-interactive-neutral-disabled);
+	--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground);
+	--_wp-components-button-background: none;
+	--_wp-components-button-background-active: transparent;
+	--_wp-components-button-background-disabled: transparent;
+	--_wp-components-button-background-busy: var(--wpds-color-background-interactive-neutral-weak);
+	--_wp-components-button-background-busy-active: var(--wpds-color-background-interactive-neutral-weak-active);
 	--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-brand);
 	--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-brand-active);
-	--_wp-components-button-foreground-busy: var(--wpds-color-foreground-interactive-neutral);
+	--_wp-components-button-stroke-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+	&.is-primary {
+		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand-strong);
+		--_wp-components-button-foreground-hover: var(--wpds-color-foreground-interactive-brand-strong-active);
+		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-brand-strong-active);
+		--_wp-components-button-foreground-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+		--_wp-components-button-background: var(--wpds-color-background-interactive-brand-strong);
+		--_wp-components-button-background-active: var(--wpds-color-background-interactive-brand-strong-active);
+		--_wp-components-button-background-disabled: var(--wpds-color-background-interactive-brand-strong-disabled);
+		--_wp-components-button-background-busy: var(--_wp-components-button-background);
+		--_wp-components-button-background-busy-active: var(--_wp-components-button-background-active);
+	}
+
+	&.is-secondary,
+	&.is-tertiary {
+		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand);
+		--_wp-components-button-foreground-hover: var(--wpds-color-foreground-interactive-brand-active);
+		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-brand-active);
+		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
+		--_wp-components-button-background: var(--wpds-color-background-interactive-brand-weak);
+		--_wp-components-button-background-active: var(--wpds-color-background-interactive-brand-weak-active);
+		--_wp-components-button-background-busy: var(--_wp-components-button-background);
+		--_wp-components-button-background-busy-active: var(--wpds-color-background-interactive-brand-weak-active);
+	}
+
+	&.is-link {
+		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand);
+		--_wp-components-button-foreground-busy: var(--wpds-color-foreground-interactive-brand-active);
+	}
+
+	&.is-destructive {
+		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error);
+		--_wp-components-button-foreground-hover: var(--wpds-color-foreground-interactive-error);
+		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-error-active);
+		--_wp-components-button-foreground-busy: var(--wpds-color-foreground-interactive-error-active);
+		--_wp-components-button-background-active: var(--wpds-color-background-interactive-error-active);
+		--_wp-components-button-background-busy: var(--wpds-color-background-interactive-error-weak);
+		--_wp-components-button-background-busy-active: var(--wpds-color-background-interactive-error-weak-active);
+		--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-error);
+		--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-error-active);
+
+		&.is-primary {
+			--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error-strong);
+			--_wp-components-button-foreground-hover: var(--wpds-color-foreground-interactive-error-strong-active);
+			--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-error-strong-active);
+			--_wp-components-button-foreground-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
+			--_wp-components-button-background: var(--wpds-color-background-interactive-error-strong);
+			--_wp-components-button-background-active: var(--wpds-color-background-interactive-error-strong-active);
+			--_wp-components-button-background-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
+			--_wp-components-button-background-busy: var(--_wp-components-button-background);
+			--_wp-components-button-background-busy-active: var(--_wp-components-button-background-active);
+		}
+
+		&.is-secondary,
+		&.is-tertiary {
+			--_wp-components-button-foreground-hover: var(--_wp-components-button-foreground-active);
+			--_wp-components-button-background: var(--wpds-color-background-interactive-error-weak);
+			--_wp-components-button-background-active: var(--wpds-color-background-interactive-error-weak-active);
+		}
+	}
 
 	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
 	&:focus:is(a) {
@@ -48,13 +107,13 @@
 	margin: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
-	background: none;
+	background: var(--_wp-components-button-background);
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	color: var(--wpds-color-foreground-interactive-neutral);
+	color: var(--_wp-components-button-foreground);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
@@ -65,7 +124,7 @@
 
 	&[aria-expanded="true"],
 	&:hover:not(:disabled, [aria-disabled="true"], [role^="menuitem"], [role="option"]) {
-		color: var(--_wp-components-button-foreground);
+		color: var(--_wp-components-button-foreground-hover);
 	}
 
 	/**
@@ -74,19 +133,19 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: var(--_wp-components-button-background-strong);
-		color: var(--_wp-components-button-foreground-strong);
+		background: var(--_wp-components-button-background);
+		color: var(--_wp-components-button-foreground);
 		text-decoration: none;
 		text-shadow: none;
 
 		&:hover:not(:disabled) {
-			background-color: var(--_wp-components-button-background-strong-active);
-			color: var(--_wp-components-button-foreground-strong-active);
+			background-color: var(--_wp-components-button-background-active);
+			color: var(--_wp-components-button-foreground-hover);
 		}
 
 		&:active:not(:disabled) {
-			background-color: var(--_wp-components-button-background-strong-active);
-			color: var(--_wp-components-button-foreground-strong-active);
+			background-color: var(--_wp-components-button-background-active);
+			color: var(--_wp-components-button-foreground-active);
 		}
 
 		&:disabled,
@@ -94,22 +153,22 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			color: var(--_wp-components-button-foreground-strong-disabled);
-			background: var(--_wp-components-button-background-strong-disabled);
+			color: var(--_wp-components-button-foreground-disabled);
+			background: var(--_wp-components-button-background-disabled);
 		}
 
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: var(--_wp-components-button-foreground-strong);
+			color: var(--_wp-components-button-foreground);
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				var(--_wp-components-button-background-strong) 33%,
-				var(--_wp-components-button-background-strong-active) 33%,
-				var(--_wp-components-button-background-strong-active) 70%,
-				var(--_wp-components-button-background-strong) 70%
+				var(--_wp-components-button-background-busy) 33%,
+				var(--_wp-components-button-background-busy-active) 33%,
+				var(--_wp-components-button-background-busy-active) 70%,
+				var(--_wp-components-button-background-busy) 70%
 			);
 			/* stylelint-enable */
 		}
@@ -121,16 +180,11 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-brand-weak);
-		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-brand-weak-active);
-		--_wp-components-button-foreground-on-active: var(--_wp-components-button-foreground-active);
-		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
-
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: var(--wpds-color-foreground-interactive-brand-disabled);
-			background: transparent;
+			color: var(--_wp-components-button-foreground-disabled);
+			background: var(--_wp-components-button-background-disabled);
 			transform: none;
 		}
 	}
@@ -147,7 +201,7 @@
 		border-color: var(--_wp-components-button-stroke);
 		white-space: nowrap;
 		color: var(--_wp-components-button-foreground);
-		background: var(--_wp-components-button-background-weak);
+		background: var(--_wp-components-button-background);
 
 		&:active:not(:disabled) {
 			// Hide the border while pressed, keeping its width to avoid a size shift.
@@ -156,8 +210,8 @@
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			border-color: var(--_wp-components-button-stroke-active);
-			color: var(--_wp-components-button-foreground-active);
-			background-color: var(--_wp-components-button-background-on-active);
+			color: var(--_wp-components-button-foreground-hover);
+			background-color: var(--_wp-components-button-background-active);
 		}
 
 		&:focus:not(:active) {
@@ -167,7 +221,7 @@
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+			border-color: var(--_wp-components-button-stroke-disabled);
 		}
 	}
 
@@ -178,15 +232,15 @@
 	&.is-tertiary {
 		white-space: nowrap;
 		color: var(--_wp-components-button-foreground);
-		background: var(--_wp-components-button-background-weak);
+		background: var(--_wp-components-button-background);
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			background-color: var(--_wp-components-button-background-on-active);
-			color: var(--_wp-components-button-foreground-active);
+			background-color: var(--_wp-components-button-background-active);
+			color: var(--_wp-components-button-foreground-hover);
 		}
 
 		&:active:not(:disabled, [aria-disabled="true"]) {
-			background-color: var(--_wp-components-button-background-on-active);
+			background-color: var(--_wp-components-button-background-active);
 		}
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
@@ -199,49 +253,36 @@
 	 * Destructive buttons.
 	 */
 	&.is-destructive {
-		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error);
-		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-error-active);
-		--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-error-strong);
-		--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-error-strong-active);
-		--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
-		--_wp-components-button-background-strong: var(--wpds-color-background-interactive-error-strong);
-		--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-error-strong-active);
-		--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
-		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
-		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
-		--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-error);
-		--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-error-active);
-		--_wp-components-button-foreground-on-active: var(--_wp-components-button-foreground-active);
-		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
-
 		// The shared pressed rule owns its foreground and background.
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link):not(.is-pressed) {
+			--_wp-components-button-foreground-hover: var(--_wp-components-button-foreground-active);
+
 			color: var(--_wp-components-button-foreground);
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
-				color: var(--_wp-components-button-foreground-active);
+				color: var(--_wp-components-button-foreground-hover);
 			}
 
 			&:active:not(:disabled, [aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-error-active);
+				background-color: var(--_wp-components-button-background-active);
 				color: var(--_wp-components-button-foreground-active);
 			}
 
 			&:disabled,
 			&[aria-disabled="true"] {
-				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				color: var(--_wp-components-button-foreground-disabled);
 			}
 		}
 
 		&.is-tertiary,
 		&.is-secondary {
 			&:hover:not(:disabled, [aria-disabled="true"]) {
-				background-color: var(--_wp-components-button-background-on-active);
+				background-color: var(--_wp-components-button-background-active);
 			}
 
 			&:active:not(:disabled, [aria-disabled="true"]) {
-				background-color: var(--_wp-components-button-background-on-active);
+				background-color: var(--_wp-components-button-background-active);
 			}
 		}
 	}
@@ -251,8 +292,6 @@
 	 */
 
 	&.is-link {
-		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
-
 		margin: 0;
 		padding: 0;
 		border: 0;
@@ -281,25 +320,28 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: var(--wpds-color-foreground-interactive-brand-disabled);
+			color: var(--_wp-components-button-foreground-disabled);
 		}
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
-		color: var(--_wp-components-button-foreground-on-active, var(--wpds-color-foreground-interactive-neutral-active));
+		color: var(--_wp-components-button-foreground-active);
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		color: var(--_wp-components-button-foreground-disabled);
 	}
 
 	&.is-busy,
 	&.is-secondary.is-busy,
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
-		--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak);
+		&.is-secondary,
+		&.is-tertiary {
+			--_wp-components-button-background-active: var(--_wp-components-button-background);
+		}
 
 		&:not(.is-primary, .is-pressed) {
 			color: var(--_wp-components-button-foreground-busy);
@@ -312,10 +354,10 @@
 		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 		background-image: linear-gradient(
 			-45deg,
-			var(--_wp-components-button-background-weak) 33%,
-			var(--_wp-components-button-background-weak-active) 33%,
-			var(--_wp-components-button-background-weak-active) 70%,
-			var(--_wp-components-button-background-weak) 70%
+			var(--_wp-components-button-background-busy) 33%,
+			var(--_wp-components-button-background-busy-active) 33%,
+			var(--_wp-components-button-background-busy-active) 70%,
+			var(--_wp-components-button-background-busy) 70%
 		);
 		/* stylelint-enable */
 	}
