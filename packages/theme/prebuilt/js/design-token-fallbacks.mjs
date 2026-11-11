@@ -13,6 +13,9 @@ export default {
 	'--wpds-border-width-md': '4px',
 	'--wpds-border-width-sm': '2px',
 	'--wpds-border-width-xs': '1px',
+	'--wpds-color-background-indicator-brand':
+		'var(--wp-admin-theme-color, #3858e9)',
+	'--wpds-color-background-indicator-neutral': '#1e1e1e',
 	'--wpds-color-background-interactive-brand-strong':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-background-interactive-brand-strong-active':

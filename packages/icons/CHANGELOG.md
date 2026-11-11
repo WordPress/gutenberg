@@ -12,6 +12,10 @@
 -   Remove the `bellUnread` icon. Compose an unread indicator from the `bell` icon and a separately positioned dot instead, so the dot can be separated from the bell with a ring in the surrounding surface colour ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
 -   Redraw `copy` on the footprint the removed `copySmall` occupied, so it sits lighter in the dense contexts that icon served, such as the link preview and the post URL field ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
 
+### New Features
+
+-   Add the `getAspectRatioIcon` function, which returns an icon that draws the shape of an aspect ratio, to pass to `Icon` ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+
 ### Enhancements
 
 -   `formatItalic`: Adds serifs to the italic icon for legibility ([#86561](https://github.com/WordPress/gutenberg/pull/86561)).

@@ -22,6 +22,7 @@
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
 -   Social Link: Stop automatically adding `noopener` to links ([#86494](https://github.com/WordPress/gutenberg/pull/86494)).
 -   Template Part: Allow a template part to be inserted inside a Post Template, keeping the restriction for Post Content ([#86377](https://github.com/WordPress/gutenberg/pull/86377)).
+-   Gallery: Stop automatically adding `noopener` to links ([#86489](https://github.com/WordPress/gutenberg/pull/86489)).
 -   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
 -   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
 -   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
@@ -33,6 +34,7 @@
 -   Button: Fix 100% width buttons saved before the width block support shrinking to fit their text in vertical Buttons blocks ([#86536](https://github.com/WordPress/gutenberg/pull/86536)).
 -   Accordion: Rename the Icon Position options from Left and Right to Start and End, so the labels are correct on RTL sites, where the heading mirrors ([#86586](https://github.com/WordPress/gutenberg/pull/86586)).
 -   RSS: Show the correct date and time for feed items published in the other daylight saving period, instead of an hour off, which could also show the wrong day ([#86639](https://github.com/WordPress/gutenberg/pull/86639)).
+-   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
 
 ## 12.1.0 (2026-11-04)
