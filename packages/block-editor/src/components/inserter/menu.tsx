@@ -24,6 +24,10 @@ import { MediaTab } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
+import {
+	reusableBlocksSelectKey,
+	selectBlockPatternsKey,
+} from '../../store/private-keys';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 import { unlock } from '../../lock-unlock';
@@ -49,14 +53,31 @@ function InserterMenu(
 	}: InserterMenuProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
-		const { isZoomOut, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+	const {
+		isZoomOutMode,
+		hasSectionRootClientId,
+		hasPatternSource,
+		hasMediaCategories,
+	} = useSelect( ( select ) => {
+		const {
+			isZoomOut,
+			getSectionRootClientId,
+			getSettings,
+			getInserterMediaCategories,
+		} = unlock( select( blockEditorStore ) );
+		const settings = getSettings();
 
 		return {
 			isZoomOutMode: isZoomOut(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			// Checks for a source of patterns rather than for loaded patterns,
+			// so the tab does not appear late while they are fetched.
+			hasPatternSource:
+				!! settings[ selectBlockPatternsKey ] ||
+				!! settings[ reusableBlocksSelectKey ] ||
+				!! settings.__experimentalBlockPatterns?.length ||
+				!! settings.__experimentalReusableBlocks?.length,
+			hasMediaCategories: !! getInserterMediaCategories()?.length,
 		};
 	}, [] );
 
@@ -354,13 +375,25 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
-	// Focus first active tab, if any
+	// With only the Blocks tab, the tab list is hidden.
+	const hasSingleTab = ! hasPatternSource && ! hasMediaCategories;
+
+	// Focus first active tab, if any, or the search when the tabs are hidden.
 	const tabsRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( ! tabsRef.current ) {
 			return;
 		}
 		const frame = window.requestAnimationFrame( () => {
+			if ( hasSingleTab ) {
+				tabsRef.current
+					?.closest( '.block-editor-tabbed-sidebar' )
+					?.querySelector< HTMLElement >(
+						'.block-editor-inserter__search input'
+					)
+					?.focus();
+				return;
+			}
 			tabsRef.current
 				?.querySelector< HTMLElement >(
 					'[role="tab"][aria-selected="true"]'
@@ -368,13 +401,14 @@ function InserterMenu(
 				?.focus();
 		} );
 		return () => window.cancelAnimationFrame( frame );
-	}, [] );
+	}, [ hasSingleTab ] );
 
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel,
 				'is-zoom-out': isZoomOutMode,
+				'has-single-tab': hasSingleTab,
 			} ) }
 			ref={ ref }
 		>
@@ -400,30 +434,40 @@ function InserterMenu(
 								</>
 							),
 						},
-						{
-							name: 'patterns',
-							title: __( 'Patterns' ),
-							panelRef: patternsPanelRef,
-							panel: (
-								<>
-									{ inserterSearch }
-									{ selectedTab === 'patterns' &&
-										! delayedFilterValue &&
-										patternsTab }
-								</>
-							),
-						},
-						{
-							name: 'media',
-							title: __( 'Media' ),
-							panelRef: mediaPanelRef,
-							panel: (
-								<>
-									{ inserterSearch }
-									{ mediaTab }
-								</>
-							),
-						},
+						// The widget editors, for one, have neither patterns nor
+						// media categories, which would leave these tabs empty.
+						...( hasPatternSource
+							? [
+									{
+										name: 'patterns',
+										title: __( 'Patterns' ),
+										panelRef: patternsPanelRef,
+										panel: (
+											<>
+												{ inserterSearch }
+												{ selectedTab === 'patterns' &&
+													! delayedFilterValue &&
+													patternsTab }
+											</>
+										),
+									},
+								]
+							: [] ),
+						...( hasMediaCategories
+							? [
+									{
+										name: 'media',
+										title: __( 'Media' ),
+										panelRef: mediaPanelRef,
+										panel: (
+											<>
+												{ inserterSearch }
+												{ mediaTab }
+											</>
+										),
+									},
+								]
+							: [] ),
 					] }
 				/>
 			</div>
