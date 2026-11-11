@@ -151,7 +151,7 @@ const DENYLIST = {
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		SelectControl:
-			'Use `SelectControl` from `@wordpress/ui` instead, or `Select` for the minimal variant. Retain the legacy control when native select behavior is required. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-selectcontrol--migration-guide',
+			'Use `SelectControl` from `@wordpress/ui` instead, or `Select` for the minimal variant. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-selectcontrol--migration-guide',
 		Spinner: 'Use `Spinner` from `@wordpress/ui` instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer:

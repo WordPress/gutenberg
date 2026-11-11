@@ -60,8 +60,3 @@ Examples of **correct** code for this rule with the `{ "allowUseWithCaution": tr
 /* eslint @wordpress/use-recommended-components: ["error", { "allowUseWithCaution": true }] */
 import { Button, Dialog } from '@wordpress/ui';
 ```
-
-## Migration guides
-
-- [SelectControl](https://wordpress.github.io/gutenberg/?path=/docs/components-selectcontrol--migration-guide). Retain the legacy control when native select behavior is required, including multiple selection or native constraint validation.
-- [CustomSelectControl](https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide). The validated wrapper remains an intentional internal exception until UI controls provide an equivalent validation contract.
