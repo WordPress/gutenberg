@@ -128,6 +128,13 @@ const PLACEHOLDER_TEXT = __(
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
+function getDefaultLinkTo() {
+	return (
+		window.wp?.media?.view?.settings?.defaultProps?.link ||
+		LINK_DESTINATION_NONE
+	);
+}
+
 export default function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -172,11 +179,16 @@ export default function GalleryEdit( props ) {
 		imageCrop,
 		randomOrder,
 		linkTarget,
-		linkTo,
 		sizeSlug,
 		aspectRatio,
 		layout,
 	} = attributes;
+	const isDynamic = !! attributes.dynamicContent;
+	// The site default only applies to images being added, which a dynamic
+	// gallery never has, so match the server render.
+	const linkTo =
+		attributes.linkTo ??
+		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkTo() );
 	const isFlexLayout = isGalleryFlexLayout( layout );
 	const previousLayoutRef = useRef( layout );
 
@@ -318,7 +330,6 @@ export default function GalleryEdit( props ) {
 	const newImages = useGetNewImages( images, imageData );
 
 	const hasImages = !! images.length;
-	const isDynamic = !! attributes.dynamicContent;
 
 	// The static "Order by" control shows the last sort applied from it, for as
 	// long as the images stay in the sequence that sort produced. Any other
@@ -340,7 +351,7 @@ export default function GalleryEdit( props ) {
 	// source resolution, the editor-preview blocks, and the mode/ordering
 	// actions.
 	const dynamic = useDynamicGallery( {
-		attributes,
+		attributes: { ...attributes, linkTo },
 		setAttributes,
 		clientId,
 		postId,
@@ -797,18 +808,6 @@ export default function GalleryEdit( props ) {
 			type: 'snackbar',
 		} );
 	}
-
-	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
-		if ( ! linkTo ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				linkTo:
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE,
-			} );
-		}
-	}, [ linkTo ] );
 
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
