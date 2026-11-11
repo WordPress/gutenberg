@@ -1616,6 +1616,80 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
+		for ( const { first, second } of [
+			{
+				first: { name: 'core/paragraph', label: 'Block: Paragraph' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+			{
+				first: { name: 'core/heading', label: 'Block: Heading' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+		] ) {
+			test( `keeps the notes of both blocks when a ${ second.name } block is merged into a ${ first.name } block`, async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				const firstBlock = editor.canvas
+					.getByRole( 'document', { name: first.label } )
+					.first();
+				const secondBlock = editor.canvas
+					.getByRole( 'document', { name: second.label } )
+					.last();
+
+				await blockNoteUtils.insertBlockWithNote( {
+					name: first.name,
+					content: 'One',
+					note: 'First block note',
+				} );
+				await firstBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First block inline note' );
+				await blockNoteUtils.insertBlockWithNote( {
+					name: second.name,
+					content: 'two',
+					note: 'Second block note',
+				} );
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second block inline note' );
+				const blocks = await editor.getBlocks();
+				const noteId = blocks.flatMap(
+					( { attributes } ) => attributes.metadata.noteId
+				);
+				expect( noteId ).toHaveLength( 4 );
+
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+
+				await expect(
+					editor.canvas.getByRole( 'document', { name: first.label } )
+				).toHaveText( 'Onetwo' );
+				await expect(
+					editor.canvas.locator( 'mark.wp-note' )
+				).toHaveText( [ 'One', 'two' ] );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: first.name,
+						attributes: { metadata: { noteId } },
+					},
+				] );
+				for ( const note of [
+					'First block note',
+					'First block inline note',
+					'Second block note',
+					'Second block inline note',
+				] ) {
+					await expect(
+						blockNoteUtils.getThread( note )
+					).toBeVisible();
+				}
+			} );
+		}
+
 		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
 			editor,
 			page,

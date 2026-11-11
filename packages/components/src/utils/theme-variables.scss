@@ -29,11 +29,9 @@ $components-color-gray-300: var(--wp-components-color-gray-300, var(--wpds-color
 $components-color-gray-400: var(--wp-components-color-gray-400, var(--wpds-color-stroke-interactive-neutral));
 $components-color-gray-600: var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral));
 $components-color-gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak));
-$components-color-gray-800: var(--wp-components-color-gray-800, var(--wpds-color-foreground-content-neutral));
 
 $components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-foreground, transparent 38%);
 $components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);
 
 // Semantic aliases (prefer these over raw gray values when applicable).
 $components-color-border: #{ $components-color-gray-600 };
-$components-color-disabled: #{ $components-color-gray-600 };
