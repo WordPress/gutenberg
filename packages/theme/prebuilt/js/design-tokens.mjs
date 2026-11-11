@@ -851,7 +851,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-track-neutral': {
 		$description:
-			'Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).',
+			'Background color for tracks with a neutral tone and normal emphasis (eg. slider, progressbar, or switch track).',
 		$type: 'color',
 		group: 'color',
 		fallback: '#dbdbdb',
@@ -867,21 +867,57 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
-	'--wpds-color-background-thumb-neutral': {
+	'--wpds-color-background-track-neutral-disabled': {
 		$description:
-			'Background color for thumbs with a neutral tone and normal emphasis.',
+			'Background color for tracks with a neutral tone and normal emphasis (eg. switch track), in their disabled state.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#e5e5e5',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.898, 0.898, 0.898 ],
+					hex: '#e5e5e5',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#e5e5e5',
+			},
+		},
+	},
+	'--wpds-color-background-thumb-neutral': {
+		$description:
+			'Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob when off).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#f0f0f0',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.941, 0.941, 0.941 ],
+					hex: '#f0f0f0',
+					alpha: 1,
+				},
+				css: '#f0f0f0',
+			},
+		},
+	},
+	'--wpds-color-background-thumb-neutral-disabled': {
+		$description:
+			'Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob), in their disabled state.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#f0f0f0',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.941, 0.941, 0.941 ],
+					hex: '#f0f0f0',
+					alpha: 1,
+				},
+				css: '#f0f0f0',
 			},
 		},
 	},
@@ -972,6 +1008,24 @@ export const tokens = /** @type {const} */ ( {
 					alpha: 1,
 				},
 				css: '#dbdbdb',
+			},
+		},
+	},
+	'--wpds-color-background-thumb-brand-strong': {
+		$description:
+			'Background color for thumbs with a brand tone and strong emphasis (eg. switch knob when on).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#fff',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.937, 0.941, 0.949 ],
+					hex: '#eff0f2',
+					alpha: 1,
+				},
+				css: '#eff0f2',
 			},
 		},
 	},
@@ -3013,17 +3067,20 @@ export const groups = /** @type {const} */ ( {
 						tokens: [
 							'--wpds-color-background-track-neutral-weak',
 							'--wpds-color-background-track-neutral',
+							'--wpds-color-background-track-neutral-disabled',
 						],
 						groups: {},
 					},
 					thumb: {
 						tokens: [
 							'--wpds-color-background-thumb-neutral',
+							'--wpds-color-background-thumb-neutral-disabled',
 							'--wpds-color-background-thumb-neutral-weak',
 							'--wpds-color-background-thumb-neutral-weak-active',
 							'--wpds-color-background-thumb-brand',
 							'--wpds-color-background-thumb-brand-active',
 							'--wpds-color-background-thumb-brand-disabled',
+							'--wpds-color-background-thumb-brand-strong',
 							'--wpds-color-background-thumb-neutral-weak-disabled',
 						],
 						groups: {},

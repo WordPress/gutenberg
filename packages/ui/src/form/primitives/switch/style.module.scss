@@ -6,17 +6,22 @@
 	@layer components {
 		.root {
 			--_wp-ui-switch-height: var(--wpds-dimension-size-2xs);
-			--_wp-ui-switch-track-inset: var(--wpds-border-width-xs);
+			--_wp-ui-switch-thumb-width: var(--wpds-dimension-size-xs);
+			--_wp-ui-switch-border-width: var(--wpds-border-width-xs);
+			--_wp-ui-switch-label-size: var(--wpds-dimension-size-4xs);
+			/* Centers each label in the part of the track the thumb leaves exposed. */
+			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-label-size)) / 2);
 
+			position: relative;
 			display: inline-block;
 			flex-shrink: 0;
 			appearance: none;
-			padding: var(--_wp-ui-switch-track-inset);
+			padding: 0;
 			width: calc(var(--_wp-ui-switch-height) * 2);
 			height: var(--_wp-ui-switch-height);
-			border: var(--_wp-ui-switch-track-inset) solid var(--wpds-color-stroke-interactive-neutral);
+			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 999px;
-			background-color: var(--wpds-color-background-interactive-neutral-weak);
+			background-color: var(--wpds-color-background-track-neutral);
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
@@ -46,18 +51,10 @@
 				@media (forced-colors: active) {
 					background-color: Highlight;
 				}
-
-				&[data-disabled] {
-					background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
-
-					@media (forced-colors: active) {
-						background-color: GrayText;
-					}
-				}
 			}
 
-			&[data-disabled]:not([data-checked]) {
-				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-track-neutral-disabled);
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 				@media (forced-colors: active) {
@@ -73,56 +70,106 @@
 				0 3px 3px rgba(0, 0, 0, 0.02),
 				0 4px 4px rgba(0, 0, 0, 0.01);
 
+			position: absolute;
+			/* The thumb covers the track border, so it spans the full switch height. */
+			inset-block-start: calc(-1 * var(--_wp-ui-switch-border-width));
+			inset-inline-start: calc(-1 * var(--_wp-ui-switch-border-width));
 			display: block;
-			/* Thumb fills the inner track: height minus padding and border on both sides. */
-			height: calc(var(--_wp-ui-switch-height) - 4 * var(--_wp-ui-switch-track-inset));
-			aspect-ratio: 1;
-			background-color: var(--wpds-color-foreground-interactive-neutral);
-			border-radius: 50%;
+			width: var(--_wp-ui-switch-thumb-width);
+			height: var(--_wp-ui-switch-height);
+			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
+			border-radius: 999px;
+			background-color: var(--wpds-color-background-thumb-neutral);
 			box-shadow: var(--_wp-ui-elevation-xs);
 
 			@media not (prefers-reduced-motion) {
 				transition:
-					background-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
+					border-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
 					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
 			}
 
 			@media (forced-colors: active) {
-				background-color: ButtonText;
+				background-color: Canvas;
+				border-color: CanvasText;
 				transition: none;
 			}
 
+			[data-highlighted] .root:not([data-checked]) > &,
+			.root:hover:not([data-disabled], [data-checked]) > & {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
 			&[data-checked] {
-				background-color: var(--wpds-color-foreground-interactive-brand-strong);
-				transform: translateX(var(--_wp-ui-switch-height));
+				background-color: var(--wpds-color-background-thumb-brand-strong);
+				border-color: var(--wpds-color-stroke-interactive-brand);
+				transform: translateX(calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width)));
 
 				@media (forced-colors: active) {
-					background-color: HighlightText;
+					border-color: Highlight;
 				}
 
 				&:dir(rtl) {
-					transform: translateX(calc(-1 * var(--_wp-ui-switch-height)));
-				}
-
-				&[data-disabled] {
-					background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
-
-					@media (forced-colors: active) {
-						/*
-						 * GrayText on both track and thumb hides the thumb.
-						 * Canvas keeps the knob visible against the GrayText track.
-						 */
-						background-color: Canvas;
-					}
+					transform: translateX(calc(var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-height) * 2));
 				}
 			}
 
-			&[data-disabled]:not([data-checked]) {
-				background-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-thumb-neutral-disabled);
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+				box-shadow: none;
 
 				@media (forced-colors: active) {
-					background-color: GrayText;
+					border-color: GrayText;
 				}
+			}
+		}
+
+		/* The thumb slides over whichever label doesn't match the current state. */
+		.label {
+			position: absolute;
+			inset-block: 0;
+			margin-block: auto;
+			width: var(--_wp-ui-switch-label-size);
+			height: var(--_wp-ui-switch-label-size);
+			opacity: 0;
+			pointer-events: none;
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+			}
+
+			[data-disabled] > & {
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					color: GrayText;
+				}
+			}
+		}
+
+		.on-label {
+			inset-inline-start: var(--_wp-ui-switch-label-offset);
+			color: var(--wpds-color-foreground-interactive-brand-strong);
+
+			@media (forced-colors: active) {
+				color: HighlightText;
+			}
+
+			[data-checked] > & {
+				opacity: 1;
+			}
+		}
+
+		.off-label {
+			inset-inline-end: var(--_wp-ui-switch-label-offset);
+			color: var(--wpds-color-foreground-interactive-neutral-weak);
+
+			@media (forced-colors: active) {
+				color: CanvasText;
+			}
+
+			[data-unchecked] > & {
+				opacity: 1;
 			}
 		}
 	}

@@ -17,6 +17,7 @@ export default {
 	'primary-bgFill1': [ 'background-interactive-brand-strong' ],
 	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-fgFill': [
+		'background-thumb-brand-strong',
 		'foreground-interactive-brand-strong',
 		'foreground-interactive-brand-strong-active',
 	],
@@ -82,10 +83,12 @@ export default {
 	'error-stroke4': [ 'stroke-interactive-error-active' ],
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'bg-surface2': [ 'background-surface-neutral' ],
+	'bg-fgFill': [ 'background-thumb-neutral-disabled' ],
 	'bg-surface5': [
 		'background-interactive-brand-strong-disabled',
 		'background-interactive-error-strong-disabled',
 		'background-interactive-neutral-strong-disabled',
+		'background-track-neutral-disabled',
 	],
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
 	'bg-surface3': [
@@ -96,7 +99,6 @@ export default {
 	],
 	'bg-fgSurface4': [
 		'background-indicator-neutral',
-		'background-thumb-neutral',
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
 		'foreground-interactive-neutral-active',
@@ -138,6 +140,7 @@ export default {
 		'background-track-neutral-weak',
 		'stroke-surface-neutral-weak',
 	],
+	'bg-fgFillDark': [ 'background-thumb-neutral' ],
 	'bg-bgFillInverted2': [ 'background-interactive-neutral-strong-active' ],
 	'bg-bgFillInverted1': [ 'background-interactive-neutral-strong' ],
 	'bg-fgFillInverted': [
