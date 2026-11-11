@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { getImageEdits } from '@wordpress/image-editor';
+import { mapEditToImage } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
 
@@ -91,7 +91,7 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	}
 	// The edits already follow Core's order and frames; only the shape and
 	// the crop's units (fractions to percentages) differ.
-	return getImageEdits( session.imageEditor.state ).map(
+	return mapEditToImage( session.imageEditor.state ).map(
 		( edit ): Modifier => {
 			if ( edit.type === 'flip' ) {
 				return {

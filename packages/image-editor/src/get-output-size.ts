@@ -1,9 +1,9 @@
 import type { ImageEditorState, Size } from './core/types';
 import { getRotatedBBox } from './core/camera';
-import { getImageEdits, type ImageEdit } from './get-image-edits';
+import { mapEditToImage, type ImageEditStep } from './map-edit-to-image';
 
 /**
- * The dimensions that the edits from `getImageEdits` would produce
+ * The dimensions that the steps from `mapEditToImage` would produce
  * on the image in `state.image`.
  *
  * A nearly full crop that the mapper omits gives the full image size.
@@ -21,8 +21,8 @@ export function getOutputSize( state: ImageEditorState ): Size | null {
 	}
 
 	let angle = 0;
-	let crop: Extract< ImageEdit, { type: 'crop' } > | undefined;
-	for ( const edit of getImageEdits( state ) ) {
+	let crop: Extract< ImageEditStep, { type: 'crop' } > | undefined;
+	for ( const edit of mapEditToImage( state ) ) {
 		if ( edit.type === 'rotate' ) {
 			angle = edit.angle;
 		} else if ( edit.type === 'crop' ) {

@@ -198,15 +198,15 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `getImageEdits( state )` turns that state into flip, rotate and crop edits for the full-size image loaded in `state.image`, in the order to apply them. That image may itself be a file someone edited before; the edits apply to it as it is. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A crop fitted to a locked ratio can produce an operation before the person edits anything. Apply the operations to the loaded image to save what the person framed.
+The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `mapEditToImage( state )` turns that state into flip, rotate and crop edits for the full-size image loaded in `state.image`, in the order to apply them. That image may itself be a file someone edited before; the edits apply to it as it is. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A crop fitted to a locked ratio can produce an operation before the person edits anything. Apply the operations to the loaded image to save what the person framed.
 
 The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { getImageEdits } from '@wordpress/image-editor';
+import { mapEditToImage } from '@wordpress/image-editor';
 
-const modifiers = getImageEdits( controller.state ).map( ( edit ) => {
+const modifiers = mapEditToImage( controller.state ).map( ( edit ) => {
 	if ( edit.type === 'flip' ) {
 		return {
 			type: 'flip',

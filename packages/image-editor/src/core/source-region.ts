@@ -45,7 +45,7 @@ export interface SourceRegion {
  *
  * It exists for the snapping helpers below, which round the crop's edges
  * to whole source pixels while a handle is dragged; the Debug story shows
- * it too. It is wrong as a region to crop with: `getImageEdits` gives
+ * it too. It is wrong as a region to crop with: `mapEditToImage` gives
  * that, and `getOutputSize` gives the size on its own.
  *
  * Rotation and flip come back as separate fields because they are

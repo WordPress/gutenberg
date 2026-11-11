@@ -6,7 +6,7 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ### Breaking Changes
 
--   Rename `mapEditToOriginal` to `getImageEdits`, and the `OriginalImageEdit` type to `ImageEdit`. Neither name has shipped, so nothing published changes ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
+-   Rename `mapEditToOriginal` to `mapEditToImage`, and the `OriginalImageEdit` type to `ImageEditStep`. Neither name has shipped, so nothing published changes ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
 
 ### Enhancements
 

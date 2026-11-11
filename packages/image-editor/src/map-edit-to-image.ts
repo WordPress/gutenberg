@@ -3,7 +3,7 @@ import { getRotatedBBox } from './core/camera';
 
 /**
  * One edit to apply to the full-size image loaded in `state.image`.
- * `getImageEdits` returns them in the order to apply them.
+ * `mapEditToImage` returns them in the order to apply them.
  *
  *   - `flip`:   mirror along each axis that is `true`.
  *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
@@ -12,7 +12,7 @@ import { getRotatedBBox } from './core/camera';
  *     point**, after any `rotate` before it. Position and size are
  *     fractions (0–1) of that image's width and height, from the top-left.
  */
-export type ImageEdit =
+export type ImageEditStep =
 	| { type: 'flip'; horizontal: boolean; vertical: boolean }
 	| { type: 'rotate'; angle: number }
 	| { type: 'crop'; x: number; y: number; width: number; height: number };
@@ -26,21 +26,22 @@ export type ImageEdit =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * The person's edit, as flip, rotate and crop edits for the image loaded
- * in `state.image`.
+ * The person's edit, as the flip, rotate and crop steps that produce it
+ * on the image loaded in `state.image`.
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. An image processor needs edits to the loaded image instead.
- * This returns them in application order. That loaded image may itself be
- * a file someone edited before; these edits apply to it as it is.
+ * the view. An image processor needs steps to apply to the loaded image
+ * instead. This returns them in the order to apply them. That loaded
+ * image may itself be a file someone edited before; the steps apply to it
+ * as it is.
  *
  * Emits `[flip, rotate, crop]` in that order. Identity operations are
  * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
  * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no edit. An empty array means no image has loaded or there is
+ * produce no step. An empty array means no image has loaded or there is
  * no flip, rotation or crop to apply. A locked ratio can produce a crop
- * edit even before the person edits anything.
+ * step even before the person edits anything.
  *
  * Frames and math:
  *
@@ -70,11 +71,11 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return Ordered edits; empty when nothing changes the loaded image or
- *         no image has loaded.
+ * @return The steps in the order to apply them; empty when no image has
+ *         loaded, or when nothing changes it.
  */
-export function getImageEdits( state: ImageEditorState ): ImageEdit[] {
-	const edits: ImageEdit[] = [];
+export function mapEditToImage( state: ImageEditorState ): ImageEditStep[] {
+	const edits: ImageEditStep[] = [];
 	const { image } = state;
 
 	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
