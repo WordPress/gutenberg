@@ -118,15 +118,20 @@ function PageDropZone( { children, onDropPage } ) {
 	);
 }
 
-const MainContent = ( {
-	clientId,
-	currentMenuId,
-	isLoading,
-	isNavigationMenuMissing,
-	onCreateNew,
-	expandRevision,
-} ) => {
-	const { hasChildren, pageListClientId, hasOtherItems } = useSelect(
+/**
+ * A Navigation block's items, for its sidebar and the site editor's
+ * Navigation screen. A Page List's pages are listed to switch on and off and
+ * reorder, in place of the Page List, which the list view leaves out. The
+ * list view is only needed for the menu's other items, so a menu of only
+ * pages has an Add link button instead. Dragging items between the two turns
+ * the Page List into links.
+ *
+ * @param {Object}  props          Component props.
+ * @param {string}  props.clientId Client ID of the Navigation block.
+ * @param {Element} props.listView The list view of the Navigation block.
+ */
+export function NavigationMenuItems( { clientId, listView } ) {
+	const { pageListClientId, hasOtherItems } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockName } = select( blockEditorStore );
 			const order = getBlockOrder( clientId );
@@ -134,7 +139,6 @@ const MainContent = ( {
 				( id ) => getBlockName( id ) === 'core/page-list'
 			);
 			return {
-				hasChildren: order.length > 0,
 				pageListClientId: pageList,
 				hasOtherItems: order.length > ( pageList ? 1 : 0 ),
 			};
@@ -145,6 +149,40 @@ const MainContent = ( {
 	const addLinkAfterPage = useAddLinkAfterPage( pageListClientId );
 	const { dropBlocksNextToPage, dropPageNextToBlock } =
 		useDropIntoOrOutOfPageList( pageListClientId );
+
+	if ( ! pageListClientId ) {
+		return listView;
+	}
+
+	return (
+		<>
+			<PageListPagesControl
+				clientId={ pageListClientId }
+				showAddLink={ ! hasOtherItems }
+				onAddLinkAfter={ addLinkAfterPage }
+				onDropItems={ dropBlocksNextToPage }
+			/>
+			{ hasOtherItems && (
+				<PageDropZone onDropPage={ dropPageNextToBlock }>
+					{ listView }
+				</PageDropZone>
+			) }
+		</>
+	);
+}
+
+const MainContent = ( {
+	clientId,
+	currentMenuId,
+	isLoading,
+	isNavigationMenuMissing,
+	onCreateNew,
+	expandRevision,
+} ) => {
+	const hasChildren = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockCount( clientId ),
+		[ clientId ]
+	);
 
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
@@ -179,22 +217,9 @@ const MainContent = ( {
 					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
-			{ /*
-			 * A Page List's pages are edited here rather than in the list
-			 * view, which leaves the Page List out. The list view is only
-			 * needed for the menu's other items, so a menu of only pages has
-			 * an Add link button.
-			 */ }
-			{ pageListClientId && (
-				<PageListPagesControl
-					clientId={ pageListClientId }
-					showAddLink={ ! hasOtherItems }
-					onAddLinkAfter={ addLinkAfterPage }
-					onDropItems={ dropBlocksNextToPage }
-				/>
-			) }
-			{ ( ! pageListClientId || hasOtherItems ) && (
-				<PageDropZone onDropPage={ dropPageNextToBlock }>
+			<NavigationMenuItems
+				clientId={ clientId }
+				listView={
 					<PrivateListView
 						key={ `${ clientId }-${ expandRevision }` }
 						rootClientId={ clientId }
@@ -205,8 +230,8 @@ const MainContent = ( {
 						additionalBlockContent={ NavigationLinkUI }
 						onSelect={ openListViewContentPanel }
 					/>
-				</PageDropZone>
-			) }
+				}
+			/>
 		</div>
 	);
 };
