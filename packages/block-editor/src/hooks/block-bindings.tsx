@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalText as WCText,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
@@ -87,7 +87,7 @@ export const BlockBindingsPanel = ( {
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-editor-bindings__panel"
 			>
-				<ItemGroup isBordered isSeparated>
+				<WCItemGroup isBordered isSeparated>
 					{ bindableAttributes.map( ( attribute ) => (
 						<BlockBindingsAttributeControl
 							key={ attribute }
@@ -96,7 +96,7 @@ export const BlockBindingsPanel = ( {
 							binding={ bindings?.[ attribute ] }
 						/>
 					) ) }
-				</ItemGroup>
+				</WCItemGroup>
 				{ /*
 					Use a div element to make the ToolsPanelHiddenInnerWrapper
 					toggle the visibility of this help text automatically.

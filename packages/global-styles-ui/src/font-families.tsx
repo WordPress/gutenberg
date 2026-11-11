@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	Button,
@@ -70,14 +70,14 @@ function FontFamiliesInner() {
 				</HStack>
 				{ activeFonts.length > 0 && (
 					<>
-						<ItemGroup size="large" isBordered isSeparated>
+						<WCItemGroup size="large" isBordered isSeparated>
 							{ activeFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
 									font={ font }
 								/>
 							) ) }
-						</ItemGroup>
+						</WCItemGroup>
 					</>
 				) }
 				{ ! hasFonts && (

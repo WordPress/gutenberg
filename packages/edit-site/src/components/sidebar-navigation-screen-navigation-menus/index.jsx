@@ -3,7 +3,7 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
@@ -108,7 +108,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 
 	return (
 		<SidebarNavigationScreenWrapper backPath={ backPath }>
-			<ItemGroup className="edit-site-sidebar-navigation-screen-navigation-menus">
+			<WCItemGroup className="edit-site-sidebar-navigation-screen-navigation-menus">
 				{ navigationMenus?.map( ( { id, title, status }, index ) => (
 					<NavMenuItem
 						postId={ id }
@@ -119,7 +119,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 						{ buildMenuLabel( title?.rendered, index + 1, status ) }
 					</NavMenuItem>
 				) ) }
-			</ItemGroup>
+			</WCItemGroup>
 		</SidebarNavigationScreenWrapper>
 	);
 }

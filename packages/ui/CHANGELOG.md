@@ -51,6 +51,7 @@
 -   `Notice.ActionButtonLink`: Add a button-styled link action for use within `Notice.Actions` ([#86959](https://github.com/WordPress/gutenberg/pull/86959)).
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
+-   `ItemGroup`: Add a list whose items each name something and either lead somewhere or carry a control of their own, with `density`, `variant`, descriptions, badges and actions. An item that navigates is named by its title alone, with its description and status attached as descriptions, and controls passed as `actions` are described by the item they belong to ([#86676](https://github.com/WordPress/gutenberg/pull/86676)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 

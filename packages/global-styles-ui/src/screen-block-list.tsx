@@ -4,7 +4,7 @@ import {
 	Button,
 	SearchControl,
 	__experimentalHStack as HStack,
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalText as WCText,
 } from '@wordpress/components';
 import {
@@ -428,7 +428,7 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 		<>
 			{ filteredElementGroups.map( ( group ) => (
 				<ListGroup key={ group.title } title={ group.title }>
-					<ItemGroup
+					<WCItemGroup
 						className="global-styles-ui-block-types-item-list"
 						size="small"
 					>
@@ -438,12 +438,12 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 								element={ element }
 							/>
 						) ) }
-					</ItemGroup>
+					</WCItemGroup>
 				</ListGroup>
 			) ) }
 			{ hasBlockResults && (
 				<ListGroup title={ __( 'Blocks' ) }>
-					<ItemGroup
+					<WCItemGroup
 						ref={ blockTypesListRef }
 						className="global-styles-ui-block-types-item-list"
 						size="small"
@@ -454,7 +454,7 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 								key={ 'menu-itemblock-' + block.name }
 							/>
 						) ) }
-					</ItemGroup>
+					</WCItemGroup>
 				</ListGroup>
 			) }
 		</>

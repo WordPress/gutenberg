@@ -1,4 +1,4 @@
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import {
 	background,
 	blockDefault,
@@ -39,7 +39,7 @@ function RootMenu() {
 
 	return (
 		<>
-			<ItemGroup>
+			<WCItemGroup>
 				{ hasTypographyPanel && (
 					<NavigationButtonAsItem
 						icon={ typography }
@@ -75,7 +75,7 @@ function RootMenu() {
 				<NavigationButtonAsItem icon={ blockDefault } path="/blocks">
 					{ __( 'Blocks & Elements' ) }
 				</NavigationButtonAsItem>
-			</ItemGroup>
+			</WCItemGroup>
 		</>
 	);
 }

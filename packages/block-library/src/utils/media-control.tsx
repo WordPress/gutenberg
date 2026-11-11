@@ -3,7 +3,7 @@ import {
 	DropZone,
 	FlexBlock,
 	Spinner as WCSpinner,
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -94,7 +94,7 @@ function MediaControlIndicator( {
  * @param props.url            Media URL for thumbnail
  * @param props.mediaType      Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
  * @param props.filename       Filename to display
- * @param props.itemGroupProps Optional props to pass to ItemGroup
+ * @param props.itemGroupProps Optional props to pass to WCItemGroup
  * @param props.className      Optional className for Truncate
  * @param props.label          Optional label for accessibility
  * @return Preview component
@@ -108,7 +108,7 @@ export function MediaControlPreview( {
 	label,
 }: MediaControlPreviewProps ) {
 	return (
-		<ItemGroup { ...itemGroupProps } as="span">
+		<WCItemGroup { ...itemGroupProps } as="span">
 			<HStack justify="flex-start">
 				<MediaControlIndicator url={ url } mediaType={ mediaType } />
 				<FlexBlock>
@@ -117,7 +117,7 @@ export function MediaControlPreview( {
 					</Truncate>
 				</FlexBlock>
 			</HStack>
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }
 
