@@ -1,18 +1,24 @@
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { debounce, useInstanceId } from '@wordpress/compose';
+import { debounce } from '@wordpress/compose';
 import {
-	Composite,
-	__experimentalTruncate as Truncate,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
-	Tooltip,
+	Collapsible,
+	Field,
+	Fieldset,
+	Icon,
+	Radio,
+	RadioGroup,
+	Stack,
+	Text,
 } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { chevronDown, chevronUp } from '@wordpress/icons';
 import type { BlockStyle } from '@wordpress/blocks';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
@@ -22,9 +28,6 @@ import { store as blockEditorStore } from '../../store';
 import type { BlockStylesProps } from './types';
 
 const noop = () => {};
-
-const getCompositeItemId = ( instanceId: string, style: BlockStyle ) =>
-	`${ instanceId }-${ style.name }`;
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
@@ -52,18 +55,7 @@ function BlockStyles( {
 	const [ blockStylesAnchor, setBlockStylesAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const instanceId = useInstanceId(
-		BlockStyles,
-		'block-editor-block-styles'
-	);
-
-	const styleRows = useMemo( () => {
-		const rows: BlockStyle[][] = [];
-		for ( let i = 0; i < ( stylesToRender?.length ?? 0 ); i += 2 ) {
-			rows.push( stylesToRender.slice( i, i + 2 ) );
-		}
-		return rows;
-	}, [ stylesToRender ] );
+	const [ isOpen, setIsOpen ] = useState( false );
 
 	const previewBlocks = useMemo( () => {
 		if ( ! hoveredStyle || ! genericPreviewBlock ) {
@@ -111,15 +103,36 @@ function BlockStyles( {
 		onHoverClassName( item?.name ?? null );
 	};
 
-	const onSetActiveId = ( nextActiveId: string | null | undefined ) => {
+	const onValueChange = ( value: unknown ) => {
 		const nextStyle = stylesToRender.find(
-			( style ) =>
-				getCompositeItemId( instanceId, style ) === nextActiveId
+			( style ) => style.name === value
 		);
 		if ( nextStyle && nextStyle.name !== activeStyle.name ) {
 			onSelectStylePreview( nextStyle );
 		}
 	};
+
+	const trigger = (
+		<Collapsible.Trigger
+			render={
+				<Button
+					variant="minimal"
+					tone="brand"
+					size="compact"
+					className="block-editor-block-styles__toggle"
+				/>
+			}
+		>
+			{ isOpen
+				? __( 'Hide styles' )
+				: sprintf(
+						/* translators: %d: Number of available block styles. */
+						__( 'Show all (%d)' ),
+						stylesToRender.length
+					) }
+			<Icon icon={ isOpen ? chevronUp : chevronDown } size={ 16 } />
+		</Collapsible.Trigger>
+	);
 
 	const defaultStyle = getDefaultStyle( stylesToRender );
 
@@ -151,82 +164,73 @@ function BlockStyles( {
 					ref={ setBlockStylesAnchor }
 					className="block-editor-block-styles"
 				>
-					<Composite
-						role="radiogroup"
-						aria-label={ __( 'Styles' ) }
-						className="block-editor-block-styles__variants"
-						activeId={ getCompositeItemId(
-							instanceId,
-							activeStyle
-						) }
-						setActiveId={ onSetActiveId }
-						focusLoop
-						focusWrap
-						focusShift
+					<Collapsible.Root
+						open={ isOpen }
+						onOpenChange={ setIsOpen }
 					>
-						{ styleRows.map( ( row, rowIndex ) => (
-							<Composite.Row
-								key={ rowIndex }
-								className="block-editor-block-styles__row"
+						{ ! isOpen && (
+							<Stack
+								direction="row"
+								align="center"
+								justify="space-between"
+								gap="sm"
+								className="block-editor-block-styles__current"
 							>
-								{ row.map( ( style ) => (
-									<Tooltip.Root key={ style.name }>
-										<Composite.Item
-											id={ getCompositeItemId(
-												instanceId,
-												style
-											) }
-											render={
-												<Tooltip.Trigger
-													render={
-														<Button
-															className="block-editor-block-styles__item"
-															tone="neutral"
-															variant={
-																activeStyle.name ===
-																style.name
-																	? 'solid'
-																	: 'outline'
-															}
-														/>
-													}
-												/>
-											}
-											role="radio"
-											aria-checked={
-												activeStyle.name === style.name
-											}
-											onMouseEnter={ () =>
-												styleItemHandler( style )
-											}
-											onFocus={ () =>
-												styleItemHandler( style )
-											}
-											onMouseLeave={ () =>
-												styleItemHandler( null )
-											}
-											onBlur={ () =>
-												styleItemHandler( null )
-											}
-											onClick={ () =>
-												onSelectStylePreview( style )
-											}
-										>
-											<Truncate
-												numberOfLines={ 2 }
-												className="block-editor-block-styles__item-text"
+								<Text>
+									{ activeStyle.label || activeStyle.name }
+								</Text>
+								{ trigger }
+							</Stack>
+						) }
+						<Collapsible.Panel>
+							<Field.Root>
+								<Fieldset.Root
+									render={
+										<RadioGroup
+											value={ activeStyle.name }
+											onValueChange={ onValueChange }
+										/>
+									}
+								>
+									<Fieldset.Legend hideFromVision>
+										{ __( 'Styles' ) }
+									</Fieldset.Legend>
+									<Stack direction="column" gap="md">
+										{ stylesToRender.map( ( style ) => (
+											<Field.Item
+												key={ style.name }
+												render={
+													<Stack
+														gap="sm"
+														align="start"
+													/>
+												}
+												onMouseEnter={ () =>
+													styleItemHandler( style )
+												}
+												onMouseLeave={ () =>
+													styleItemHandler( null )
+												}
+												onFocus={ () =>
+													styleItemHandler( style )
+												}
+												onBlur={ () =>
+													styleItemHandler( null )
+												}
 											>
-												{ style.label || style.name }
-											</Truncate>
-										</Composite.Item>
-										<Tooltip.Popup>
-											{ style.label || style.name }
-										</Tooltip.Popup>
-									</Tooltip.Root>
-								) ) }
-							</Composite.Row>
-						) ) }
-					</Composite>
+												<Radio value={ style.name } />
+												<Field.Label variant="plain">
+													{ style.label ||
+														style.name }
+												</Field.Label>
+											</Field.Item>
+										) ) }
+									</Stack>
+								</Fieldset.Root>
+							</Field.Root>
+						</Collapsible.Panel>
+						{ isOpen && trigger }
+					</Collapsible.Root>
 					{ previewBlocks && (
 						<PreviewBlockPopover
 							blocks={ previewBlocks }
