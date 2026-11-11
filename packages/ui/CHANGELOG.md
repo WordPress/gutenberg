@@ -19,7 +19,7 @@
 
 ### Bug Fixes
 
--   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column.
+-   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column ([#86652](https://github.com/WordPress/gutenberg/pull/86652)).
 -   `AlertDialog`: Honor canceled open state changes and restore usable controls when closing after confirmation is canceled ([#86544](https://github.com/WordPress/gutenberg/pull/86544)).
 -   `Textarea`: Fix ref and render prop composition, restoring Field filled state, required validation, and returning to pristine when the default value is restored ([#86546](https://github.com/WordPress/gutenberg/pull/86546)).
 -   `Input`, `Combobox`, `Autocomplete`, and their controls: Prevent wp-admin form styles from adding a grey background to read-only and disabled fields, and from changing the text color of disabled fields ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
