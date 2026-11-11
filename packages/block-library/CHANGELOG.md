@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Gallery: Behind the `gutenberg-media-folders` experiment, add `core/media-folder` as a dynamic source, so a gallery can display the images in a media folder ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).

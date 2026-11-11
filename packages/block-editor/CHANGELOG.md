@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   Inserter: Behind the `gutenberg-media-folders` experiment, add a folder filter beneath the Media tab's search, with a "New folder" button, an "Add to folder" picker in the footer, and per-item "Add to folder…" and "Remove from folder" actions ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
