@@ -53,6 +53,31 @@ describe( 'getNavigationMenuBySlug', () => {
 		);
 	} );
 
+	it( 'ignores a menu that has no slug of its own', () => {
+		// An auto draft created in the editor has no `post_name` yet, so it
+		// must not stand in for the slug a block asked for.
+		expect(
+			getNavigationMenuBySlug(
+				[ { id: 4, status: 'draft' }, footer ],
+				'header'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'matches a slug that is stored percent encoded', () => {
+		// `cleanForSlug()` normalizes both sides, so a stored slug that is
+		// already an octet sequence still matches itself.
+		const encoded = {
+			id: 5,
+			slug: '%e4%bd%a0%e5%a5%bd',
+			status: 'publish',
+		};
+
+		expect(
+			getNavigationMenuBySlug( [ encoded ], '%e4%bd%a0%e5%a5%bd' )
+		).toBe( encoded );
+	} );
+
 	it( 'prefers a published menu over a draft with the same slug', () => {
 		const draft = { id: 3, slug: 'header', status: 'draft' };
 

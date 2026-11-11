@@ -235,6 +235,53 @@ test.describe( 'Navigation block', () => {
 			).toBeHidden();
 		} );
 
+		test( 'leaves a menu referenced by post ID referenced that way', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			// Every Navigation block saved before slugs existed references its
+			// menu by post ID, and nothing here should rewrite that.
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				slug: 'header',
+				content:
+					'<!-- wp:navigation-link {"label":"Header link","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+
+			await expect(
+				editor.canvas.locator(
+					`role=textbox[name="Navigation link text"i] >> text="Header link"`
+				)
+			).toBeVisible();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: menu.id },
+				},
+			] );
+			expect(
+				( await editor.getBlocks() )[ 0 ].attributes.slug
+			).toBeUndefined();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.locator(
+					`role=navigation >> role=link[name="Header link"i]`
+				)
+			).toBeVisible();
+		} );
+
 		test( 'creates the missing menu under the referenced slug', async ( {
 			admin,
 			editor,

@@ -108,6 +108,26 @@ describe( 'RenameNavigationMenuModal', () => {
 		expect( saveButton ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
+	it( 'saves an edited name on its own, leaving the slug as it was', async () => {
+		saveEditedEntityRecord.mockResolvedValue( headerMenu );
+
+		const { user, nameInput, saveButton } = await renderModal();
+
+		await user.clear( nameInput );
+		await user.type( nameInput, 'Primary Menu' );
+		await user.click( saveButton );
+
+		// Renaming is what this modal is for, so a slug nobody touched is
+		// never submitted, and the menu keeps the one blocks reference.
+		expect( editEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'wp_navigation',
+			10,
+			{ title: 'Primary Menu' }
+		);
+		expect( createSuccessNotice ).toHaveBeenCalled();
+	} );
+
 	it( 'saves an edited slug on its own', async () => {
 		saveEditedEntityRecord.mockResolvedValue( {
 			...headerMenu,
