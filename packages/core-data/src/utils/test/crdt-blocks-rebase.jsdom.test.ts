@@ -242,6 +242,96 @@ describe( 'rebaseCrdtBlocks', () => {
 				{ id: 'i2', content: 'Two' },
 			] );
 		} );
+
+		it( 'keeps an inner block a peer added to an empty group', () => {
+			const { yA, yB } = createPeers();
+			const emptyGroup = group( 'g1', [] );
+			const p1 = paragraph( 'p1', 'Hello' );
+			mergeCrdtBlocks( yA, [ emptyGroup, p1 ], null );
+
+			rebaseCrdtBlocks(
+				yB,
+				[ emptyGroup, p1 ],
+				[ group( 'g1', [ paragraph( 'i1', 'Inner' ) ] ), p1 ],
+				null
+			);
+			expect(
+				( yA.get( 0 ).get( 'innerBlocks' ) as YBlocks ).length
+			).toBe( 1 );
+
+			// A types in p1 against the list it last rendered, where the
+			// group is still empty.
+			rebaseCrdtBlocks(
+				yA,
+				[ emptyGroup, p1 ],
+				[ group( 'g1', [] ), paragraph( 'p1', 'Hello!' ) ],
+				cursor( 'p1', 6 )
+			);
+
+			const inner = yB.get( 0 ).get( 'innerBlocks' ) as YBlocks;
+			expect( snapshot( inner ) ).toEqual( [
+				{ id: 'i1', content: 'Inner' },
+			] );
+			expect( snapshot( yB )[ 1 ] ).toEqual( {
+				id: 'p1',
+				content: 'Hello!',
+			} );
+		} );
+
+		it( 'leaves a block a peer deleted deleted while rebasing the rest', () => {
+			const { yA, yB } = createPeers();
+			const p1 = paragraph( 'p1', 'One' );
+			const p2 = paragraph( 'p2', 'Two' );
+			const p3 = paragraph( 'p3', 'Three' );
+			mergeCrdtBlocks( yA, [ p1, p2, p3 ], null );
+
+			// B deletes p2 and types in p3. A has rendered neither.
+			rebaseCrdtBlocks(
+				yB,
+				[ p1, p2, p3 ],
+				[ p1, paragraph( 'p3', 'Three!' ) ],
+				cursor( 'p3', 6 )
+			);
+
+			// A types in p1 against the list it last rendered.
+			rebaseCrdtBlocks(
+				yA,
+				[ p1, p2, p3 ],
+				[ paragraph( 'p1', 'One!' ), p2, p3 ],
+				cursor( 'p1', 4 )
+			);
+
+			const expected = [
+				{ id: 'p1', content: 'One!' },
+				{ id: 'p3', content: 'Three!' },
+			];
+			expect( snapshot( yA ) ).toEqual( expected );
+			expect( snapshot( yB ) ).toEqual( expected );
+		} );
+
+		it( 're-creates a block a peer deleted when the editor changed it since', () => {
+			const { yA, yB } = createPeers();
+			const p1 = paragraph( 'p1', 'One' );
+			const p2 = paragraph( 'p2', 'Two' );
+			mergeCrdtBlocks( yA, [ p1, p2 ], null );
+
+			rebaseCrdtBlocks( yB, [ p1, p2 ], [ p1 ], null );
+			expect( yA.length ).toBe( 1 );
+
+			rebaseCrdtBlocks(
+				yA,
+				[ p1, p2 ],
+				[ p1, paragraph( 'p2', 'Two!' ) ],
+				cursor( 'p2', 4 )
+			);
+
+			const expected = [
+				{ id: 'p1', content: 'One' },
+				{ id: 'p2', content: 'Two!' },
+			];
+			expect( snapshot( yA ) ).toEqual( expected );
+			expect( snapshot( yB ) ).toEqual( expected );
+		} );
 	} );
 
 	describe( 'ordinary edits', () => {

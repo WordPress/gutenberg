@@ -715,26 +715,79 @@ export function rebaseCrdtBlocks(
 	incomingBlocks: Block[],
 	attributeCursor: MergeCursorPosition
 ): void {
+	rebaseBlockList(
+		yblocks,
+		baselineBlocks,
+		incomingBlocks,
+		attributeCursor,
+		false
+	);
+}
+
+/**
+ * The body of `rebaseCrdtBlocks`, shared with the inner block lists.
+ *
+ * @param yblocks         The blocks in the local Y.Doc.
+ * @param baselineBlocks  The blocks the editor rendered when the change was made.
+ * @param incomingBlocks  The blocks the editor holds after the change.
+ * @param attributeCursor See `mergeCrdtBlocks`.
+ * @param isNested        Whether `yblocks` is the inner block list of a block
+ *                        the editor and the document share.
+ */
+function rebaseBlockList(
+	yblocks: YBlocks,
+	baselineBlocks: Block[],
+	incomingBlocks: Block[],
+	attributeCursor: MergeCursorPosition,
+	isNested: boolean
+): void {
 	if ( baselineBlocks === incomingBlocks ) {
 		return;
 	}
 
 	const baseline = getSerializableBlocks( baselineBlocks );
 	const incoming = getSerializableBlocks( incomingBlocks );
-	const yBlocksById = indexYBlocksByClientId( yblocks );
 
-	// Every baseline block must be in the Y.Array under its client ID, and
-	// the editor's lists must carry distinct client IDs. An empty baseline
-	// against a non-empty Y.Array means the editor's view did not come from
-	// the document, so there is nothing to rebase onto.
+	// A plain-array mirror of the Y.Array, kept in step with every structural
+	// change below, so positions come from a map instead of a scan of the
+	// Y.Array for each block.
+	const order = yblocks.toArray();
+	const yBlocksById = indexYBlocksByClientId( order );
+	let positions: Map< YBlock, number > | null = null;
+	const indexOf = ( yblock: YBlock ): number => {
+		if ( ! positions ) {
+			positions = new Map( order.map( ( entry, i ) => [ entry, i ] ) );
+		}
+		return positions.get( yblock ) ?? -1;
+	};
+	const deleteAt = ( index: number ): void => {
+		yblocks.delete( index, 1 );
+		order.splice( index, 1 );
+		positions = null;
+	};
+	const insertAt = ( index: number, yblock: YBlock ): void => {
+		yblocks.insert( index, [ yblock ] );
+		order.splice( index, 0, yblock );
+		positions = null;
+	};
+
+	// The editor's lists must carry distinct client IDs, and the baseline
+	// must share at least one with the Y.Array. A baseline block the Y.Array
+	// does not know is one a peer deleted since the editor rendered it, but
+	// a baseline with no known block at all did not come from the document,
+	// as right after a load, when parsed blocks have fresh IDs. An empty
+	// baseline inside a block the editor and the document share is the inner
+	// list the editor saw; at the root it can also mean the editor has not
+	// loaded the document, so it is trusted only against an empty Y.Array.
 	const canRebase =
 		yBlocksById !== null &&
-		( baseline.length > 0 || yblocks.length === 0 ) &&
 		hasDistinctClientIds( baseline ) &&
 		hasDistinctClientIds( incoming ) &&
-		baseline.every( ( block ) =>
-			yBlocksById.has( block.clientId as string )
-		);
+		( baseline.length === 0
+			? isNested || yblocks.length === 0
+			: baseline.some( ( block ) =>
+					yBlocksById.has( block.clientId as string )
+				) );
 
 	if ( ! canRebase ) {
 		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
@@ -748,18 +801,24 @@ export function rebaseCrdtBlocks(
 		incoming.map( ( block ) => block.clientId as string )
 	);
 
-	// Deletions: blocks the editor had and no longer has.
+	// Deletions: blocks the editor had and no longer has. Deleting from the
+	// end keeps the lower indexes valid.
+	const deletedIndexes: number[] = [];
 	for ( const block of baseline ) {
 		const clientId = block.clientId as string;
 		if ( incomingIds.has( clientId ) ) {
 			continue;
 		}
 		const yblock = yBlocksById.get( clientId );
-		const index = yblock ? indexOfYBlock( yblocks, yblock ) : -1;
+		const index = yblock ? indexOf( yblock ) : -1;
 		if ( index !== -1 ) {
-			yblocks.delete( index, 1 );
+			deletedIndexes.push( index );
 		}
 		yBlocksById.delete( clientId );
+	}
+	deletedIndexes.sort( ( a, b ) => b - a );
+	for ( const index of deletedIndexes ) {
+		deleteAt( index );
 	}
 
 	// Updates and insertions, in the editor's order. A new block goes right
@@ -768,27 +827,38 @@ export function rebaseCrdtBlocks(
 		const clientId = block.clientId as string;
 		const existing = yBlocksById.get( clientId );
 
+		const base = baselineById.get( clientId );
+
 		if ( existing ) {
-			const base =
-				baselineById.get( clientId ) ??
-				( existing.toJSON() as unknown as Block );
-			rebaseYBlock( existing, base, block, attributeCursor );
+			rebaseYBlock(
+				existing,
+				base ?? ( existing.toJSON() as unknown as Block ),
+				block,
+				attributeCursor
+			);
 			return;
 		}
 
-		let insertAt = 0;
+		// A baseline block the document no longer has was deleted by a peer.
+		// It stays deleted unless the editor changed it since; then the edit
+		// wins and the block is re-created.
+		if ( base && fastDeepEqual( base, block ) ) {
+			return;
+		}
+
+		let insertIndex = 0;
 		for ( let j = i - 1; j >= 0; j-- ) {
 			const previous = yBlocksById.get(
 				incoming[ j ].clientId as string
 			);
 			if ( previous ) {
-				insertAt = indexOfYBlock( yblocks, previous ) + 1;
+				insertIndex = indexOf( previous ) + 1;
 				break;
 			}
 		}
 
 		const newYBlock = createNewYBlock( block );
-		yblocks.insert( insertAt, [ newYBlock ] );
+		insertAt( insertIndex, newYBlock );
 		yBlocksById.set( clientId, newYBlock );
 	} );
 
@@ -801,15 +871,15 @@ export function rebaseCrdtBlocks(
 		if ( ! yblock ) {
 			continue;
 		}
-		let index = indexOfYBlock( yblocks, yblock );
+		let index = indexOf( yblock );
 		if ( index < previousIndex ) {
 			const moved = createNewYBlock(
 				yblock.toJSON() as unknown as Block
 			);
-			yblocks.delete( index, 1 );
+			deleteAt( index );
 			// The deletion shifted the previous block down by one, so this
 			// index is right after it.
-			yblocks.insert( previousIndex, [ moved ] );
+			insertAt( previousIndex, moved );
 			yBlocksById.set( block.clientId as string, moved );
 			index = previousIndex;
 		}
@@ -820,17 +890,16 @@ export function rebaseCrdtBlocks(
 }
 
 /**
- * Index the blocks of a Y.Array by client ID.
+ * Index a block list by client ID.
  *
- * @param yblocks The block list.
+ * @param yblocks The blocks of a Y.Array.
  * @return The index, or null when a block has no client ID or two share one.
  */
 function indexYBlocksByClientId(
-	yblocks: YBlocks
+	yblocks: YBlock[]
 ): Map< string, YBlock > | null {
 	const byClientId = new Map< string, YBlock >();
-	for ( let i = 0; i < yblocks.length; i++ ) {
-		const yblock = yblocks.get( i );
+	for ( const yblock of yblocks ) {
 		const clientId = yblock.get( 'clientId' );
 		if ( ! clientId || byClientId.has( clientId ) ) {
 			return null;
@@ -849,15 +918,6 @@ function hasDistinctClientIds( blocks: Block[] ): boolean {
 		clientIds.add( block.clientId );
 	}
 	return true;
-}
-
-function indexOfYBlock( yblocks: YBlocks, yblock: YBlock ): number {
-	for ( let i = 0; i < yblocks.length; i++ ) {
-		if ( yblocks.get( i ) === yblock ) {
-			return i;
-		}
-	}
-	return -1;
 }
 
 const BLOCK_STRUCTURE_KEYS = new Set( [
@@ -923,11 +983,12 @@ function rebaseYBlock(
 	const yInnerBlocks = yblock.get( 'innerBlocks' );
 	const innerBlocks = block.innerBlocks ?? [];
 	if ( yInnerBlocks instanceof Y.Array ) {
-		rebaseCrdtBlocks(
+		rebaseBlockList(
 			yInnerBlocks,
 			base.innerBlocks ?? [],
 			innerBlocks,
-			attributeCursor
+			attributeCursor,
+			true
 		);
 	} else if ( innerBlocks.length > 0 ) {
 		const created = new Y.Array< YBlock >();
