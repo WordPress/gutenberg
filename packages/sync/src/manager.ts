@@ -47,6 +47,7 @@ interface CollectionState {
 interface EntityState {
 	awareness?: Awareness;
 	handlers: RecordHandlers;
+	lastLocalBlocks?: unknown;
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
@@ -256,6 +257,12 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
+			// The editor can still hold the last local blocks after the document
+			// has changed. Invalidate before publishing the remote change.
+			entityState.lastLocalBlocks = undefined;
+			// A local edit may have been queued before this update arrived.
+			// Rebase it first, then publish the combined document to the store.
+			flushPendingCRDTDocUpdates();
 			void internal.updateEntityRecord( objectType, objectId );
 		};
 
@@ -779,10 +786,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		setTimeout( flushPendingCRDTDocUpdates, 0 );
 	}
 
-	// Apply local changes synchronously when a remote peer is present (#78756)
-	// or previousBlocks is supplied, so merged fields return to the caller.
-	// Document updates can arrive before awareness identifies the remote peer.
-	// Other updates stay deferred off the typing hot path (#79964).
+	// Defer consecutive solo edits only while the document has not changed
+	// since the previous local edit. Awareness can lag document updates, so
+	// peer count alone cannot establish that the editor's blocks are current.
 	function updateOrDefer(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -790,15 +796,29 @@ export function createSyncManager( debug = false ): SyncManager {
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
 	): Partial< ObjectData > | void {
-		// `getStates()` counts the local client, so > 1 means a remote peer.
+		const entityState = entityStates.get(
+			getEntityId( objectType, objectId )
+		);
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
-
-		if ( hasRemotePeers || options.previousBlocks ) {
+		const needsRebase =
+			options.previousBlocks &&
+			options.previousBlocks !== entityState?.lastLocalBlocks;
+		let rebasedChanges: Partial< ObjectData > | undefined;
+		if ( hasRemotePeers || needsRebase ) {
 			// Apply queued local edits before this synchronous edit so an older
 			// edit cannot overwrite a newer one.
 			flushPendingCRDTDocUpdates();
-			return updateCRDTDoc(
+			rebasedChanges =
+				updateCRDTDoc(
+					objectType,
+					objectId,
+					changes,
+					origin,
+					options
+				) ?? undefined;
+		} else {
+			deferUpdateCRDTDoc(
 				objectType,
 				objectId,
 				changes,
@@ -806,8 +826,11 @@ export function createSyncManager( debug = false ): SyncManager {
 				options
 			);
 		}
-
-		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );
+		if ( entityState && 'blocks' in changes ) {
+			entityState.lastLocalBlocks =
+				rebasedChanges?.blocks ?? changes.blocks;
+		}
+		return rebasedChanges;
 	}
 
 	/**

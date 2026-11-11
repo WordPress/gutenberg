@@ -209,13 +209,15 @@ export function applyPostChangesToCRDTDoc(
 				// survives the keystroke. Without one, the whole list is
 				// merged by position. Neither needs `setValue` because both
 				// operate on a Yjs type that is already in the Y.Doc.
-				const mergedBlocks = rebaseCrdtBlocks(
+				const rebased = rebaseCrdtBlocks(
 					currentBlocks,
 					previousBlocks,
 					newValue,
-					newCursorPosition
+					newCursorPosition,
+					changes.selection
 				);
-				if ( mergedBlocks ) {
+				if ( rebased ) {
+					const mergedBlocks = rebased.blocks ?? newValue;
 					// Return the merged blocks to the caller before it updates its
 					// store. Otherwise a later save serializes the stale local list.
 					rebasedChanges = {
@@ -224,6 +226,9 @@ export function applyPostChangesToCRDTDoc(
 							__unstableSerializeAndClean(
 								( args?.blocks ?? mergedBlocks ) as WPBlock[]
 							),
+						...( rebased.selection
+							? { selection: rebased.selection }
+							: {} ),
 					};
 				}
 				break;
@@ -307,7 +312,7 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		const selection = changes.selection;
+		const selection = rebasedChanges?.selection ?? changes.selection;
 		// Persist selection changes at the end of the current event loop.
 		// This allows undo meta to be saved with the current selection before
 		// it is overwritten by the new selection from Gutenberg.

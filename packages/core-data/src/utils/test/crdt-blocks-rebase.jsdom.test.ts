@@ -436,6 +436,131 @@ describe( 'rebaseCrdtBlocks', () => {
 		} );
 	} );
 
+	describe( 'moves between containers', () => {
+		const layouts = {
+			newParent: ( p: Block ) => [ group( 'g3', [ p ] ) ],
+			root: ( p: Block ) => [ group( 'g1', [] ), group( 'g2', [] ), p ],
+			first: ( p: Block ) => [ group( 'g1', [ p ] ), group( 'g2', [] ) ],
+			second: ( p: Block ) => [ group( 'g1', [] ), group( 'g2', [ p ] ) ],
+		};
+		it.each( [
+			[ 'root', 'first' ],
+			[ 'first', 'root' ],
+			[ 'first', 'second' ],
+			[ 'second', 'first' ],
+			[ 'root', 'newParent' ],
+			[ 'first', 'newParent' ],
+		] as const )(
+			'keeps one edited paragraph when a peer moves it from %s to %s',
+			( from, to ) => {
+				const { yA, yB } = createPeers();
+				const p = paragraph( 'p', 'hello' );
+				const previous = layouts[ from ]( p );
+				mergeCrdtBlocks( yA, previous, null );
+				rebaseCrdtBlocks( yB, previous, layouts[ to ]( p ), null );
+				rebaseCrdtBlocks(
+					yA,
+					previous,
+					layouts[ from ]( paragraph( 'p', 'hello!' ) ),
+					cursor( 'p', 6 )
+				);
+				const expected = layouts[ to ]( paragraph( 'p', 'hello!' ) );
+				expect( yA.toJSON() ).toEqual( expected );
+				expect( yB.toJSON() ).toEqual( expected );
+			}
+		);
+		it.each( [
+			[ 'root', 'first' ],
+			[ 'first', 'root' ],
+			[ 'first', 'second' ],
+			[ 'second', 'first' ],
+			[ 'root', 'newParent' ],
+			[ 'first', 'newParent' ],
+		] as const )(
+			'keeps peer text when the editor moves a paragraph from %s to %s',
+			( from, to ) => {
+				const { yA, yB } = createPeers();
+				const p = paragraph( 'p', 'hello' );
+				const previous = layouts[ from ]( p );
+				mergeCrdtBlocks( yA, previous, null );
+				rebaseCrdtBlocks(
+					yB,
+					previous,
+					layouts[ from ]( paragraph( 'p', 'ABChello' ) ),
+					null
+				);
+				rebaseCrdtBlocks(
+					yA,
+					previous,
+					layouts[ to ]( paragraph( 'p', 'hello!' ) ),
+					cursor( 'p', 6 )
+				);
+				const expected = layouts[ to ]( paragraph( 'p', 'ABChello!' ) );
+				expect( yA.toJSON() ).toEqual( expected );
+				expect( yB.toJSON() ).toEqual( expected );
+			}
+		);
+		it( 'deletes a paragraph the peer moved to a different container', () => {
+			const { yA, yB } = createPeers();
+			const p = paragraph( 'p', 'hello' );
+			const previous = layouts.root( p );
+			mergeCrdtBlocks( yA, previous, null );
+			rebaseCrdtBlocks( yB, previous, layouts.first( p ), null );
+			rebaseCrdtBlocks(
+				yA,
+				previous,
+				[ group( 'g1', [] ), group( 'g2', [] ) ],
+				null
+			);
+			expect( yA.toJSON() ).toEqual( [
+				group( 'g1', [] ),
+				group( 'g2', [] ),
+			] );
+			expect( yB.toJSON() ).toEqual( yA.toJSON() );
+		} );
+	} );
+
+	describe( 'concurrent moves between containers', () => {
+		it.each( [ 'g1', 'g2' ] )(
+			'keeps one paragraph with both edits when the editor moves it to %s after a peer moved it to g1',
+			( destination ) => {
+				const { yA, yB } = createPeers();
+				const previous = [
+					group( 'g1', [] ),
+					group( 'g2', [] ),
+					paragraph( 'p', 'hello' ),
+				];
+				mergeCrdtBlocks( yA, previous, null );
+				rebaseCrdtBlocks(
+					yB,
+					previous,
+					[
+						group( 'g1', [ paragraph( 'p', 'ABChello' ) ] ),
+						group( 'g2', [] ),
+					],
+					null
+				);
+				const atDestination = ( content: string ) =>
+					[ 'g1', 'g2' ].map( ( id ) =>
+						group(
+							id,
+							id === destination
+								? [ paragraph( 'p', content ) ]
+								: []
+						)
+					);
+				rebaseCrdtBlocks(
+					yA,
+					previous,
+					atDestination( 'hello!' ),
+					cursor( 'p', 6 )
+				);
+				expect( yA.toJSON() ).toEqual( atDestination( 'ABChello!' ) );
+				expect( yB.toJSON() ).toEqual( yA.toJSON() );
+			}
+		);
+	} );
+
 	describe( 'fallback to the positional merge', () => {
 		it( 'reconciles by position when the previous blocks carry client IDs the document does not know', () => {
 			const doc = new Y.Doc();

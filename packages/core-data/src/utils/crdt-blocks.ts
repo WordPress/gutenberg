@@ -4,7 +4,9 @@ import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 import {
+	asHtmlStringIndex,
 	asRichTextOffset,
+	htmlIndexToRichTextOffset,
 	createYMap,
 	richTextOffsetToHtmlIndex,
 	type HtmlStringIndex,
@@ -13,7 +15,7 @@ import {
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
 import { Delta } from '../sync';
-import { type WPBlockSelection } from '../types';
+import { type WPBlockSelection, type WPSelection } from '../types';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
@@ -686,6 +688,63 @@ function deduplicateClientIds( yblocks: YBlocks ): void {
 	}
 }
 
+interface BlockRebaseContext {
+	blocksById: Map< string, YBlock >;
+	movedBlocks: Map< string, Block >;
+	previousBlocks: Map< string, { block: Block; parentId?: string } >;
+	selection?: WPSelection;
+}
+
+function indexBlockTree(
+	blocks: Block[],
+	parentId?: string,
+	index = new Map< string, { block: Block; parentId?: string } >()
+) {
+	for ( const block of blocks ) {
+		if ( block.clientId ) {
+			index.set( block.clientId, { block, parentId } );
+		}
+		indexBlockTree( block.innerBlocks ?? [], block.clientId, index );
+	}
+	return index;
+}
+
+function visitYBlockTree(
+	blocks: YBlock[],
+	visit: ( block: YBlock ) => void
+): void {
+	for ( const block of blocks ) {
+		visit( block );
+		const children = block.get( 'innerBlocks' );
+		if ( children instanceof Y.Array ) {
+			visitYBlockTree( children.toArray(), visit );
+		}
+	}
+}
+
+function removeSupersededBlocks(
+	blocks: YBlocks,
+	deletedIds: Set< string >,
+	context: BlockRebaseContext
+): void {
+	for ( let i = blocks.length - 1; i >= 0; i-- ) {
+		const block = blocks.get( i );
+		const id = block.get( 'clientId' )!;
+		if (
+			deletedIds.has( id ) ||
+			( context.movedBlocks.has( id ) &&
+				context.blocksById.get( id ) !== block )
+		) {
+			blocks.delete( i, 1 );
+			continue;
+		}
+		const children = block.get( 'innerBlocks' );
+		if ( children instanceof Y.Array ) {
+			removeSupersededBlocks( children, deletedIds, context );
+		}
+	}
+}
+
 /**
  * Rebase the editor's own change onto the live block list.
  *
@@ -709,25 +768,77 @@ function deduplicateClientIds( yblocks: YBlocks ): void {
  *                        where the caller knows them.
  * @param incomingBlocks  The blocks the editor holds after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
- * @return The merged blocks when they differ from the incoming edit.
+ * @param selection       The selection after the local edit.
+ * @return Corrections to the blocks and selection after rebasing.
  */
 export function rebaseCrdtBlocks(
 	yblocks: YBlocks,
 	previousBlocks: Block[] | undefined,
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
-): Block[] | undefined {
+	attributeCursor: MergeCursorPosition,
+	selection?: WPSelection
+): { blocks?: Block[]; selection?: WPSelection } | undefined {
 	if ( ! previousBlocks ) {
 		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
 		return;
 	}
 
-	rebaseBlockList( yblocks, previousBlocks, incomingBlocks, attributeCursor );
+	const previous = indexBlockTree( getSerializableBlocks( previousBlocks ) );
+	const incoming = indexBlockTree( getSerializableBlocks( incomingBlocks ) );
+	const blocksById = new Map< string, YBlock >();
+	visitYBlockTree( yblocks.toArray(), ( block ) => {
+		const id = block.get( 'clientId' );
+		if ( id ) {
+			blocksById.set( id, block );
+		}
+	} );
+	const movedBlocks = new Map< string, Block >();
+	for ( const [ id, { parentId } ] of incoming ) {
+		const old = previous.get( id );
+		const current = blocksById.get( id );
+		if ( old && old.parentId !== parentId && current ) {
+			// A local move may delete the source before visiting the destination.
+			// Preserve the live subtree, including edits the peer made to it.
+			movedBlocks.set( id, current.toJSON() as unknown as Block );
+		}
+	}
+	const context: BlockRebaseContext = {
+		blocksById,
+		movedBlocks,
+		previousBlocks: previous,
+		selection,
+	};
+	rebaseBlockList(
+		yblocks,
+		previousBlocks,
+		incomingBlocks,
+		attributeCursor,
+		context
+	);
+
+	// A locally deleted block may have moved to another parent remotely.
+	// A local move is not a deletion: its ID is still in the incoming tree.
+	const deletedIds = new Set(
+		[ ...previous.keys() ].filter( ( id ) => ! incoming.has( id ) )
+	);
+	// If both editors moved a block to different parents, remove the old
+	// location after the local move has recreated it with the merged text.
+	if ( deletedIds.size || movedBlocks.size ) {
+		removeSupersededBlocks( yblocks, deletedIds, context );
+	}
 
 	const merged = yblocks.toJSON() as Block[];
-	return fastDeepEqual( merged, getSerializableBlocks( incomingBlocks ) )
+	const blocks = fastDeepEqual(
+		merged,
+		getSerializableBlocks( incomingBlocks )
+	)
 		? undefined
 		: deserializeBlockAttributes( merged );
+	const rebasedSelection =
+		context.selection !== selection ? context.selection : undefined;
+	return blocks || rebasedSelection
+		? { blocks, selection: rebasedSelection }
+		: undefined;
 }
 
 /**
@@ -737,14 +848,16 @@ export function rebaseCrdtBlocks(
  * @param previousBlocks  The blocks the editor held before the change.
  * @param incomingBlocks  The blocks the editor holds after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
+ * @param context         Document-wide identities and the rebased selection.
  */
 function rebaseBlockList(
 	yblocks: YBlocks,
 	previousBlocks: Block[],
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	context: BlockRebaseContext
 ): void {
-	if ( previousBlocks === incomingBlocks ) {
+	if ( previousBlocks === incomingBlocks && ! context.selection ) {
 		return;
 	}
 
@@ -764,12 +877,21 @@ function rebaseBlockList(
 		return positions.get( yblock ) ?? -1;
 	};
 	const deleteAt = ( index: number ): void => {
+		visitYBlockTree( [ order[ index ] ], ( block ) => {
+			const id = block.get( 'clientId' )!;
+			if ( context.blocksById.get( id ) === block ) {
+				context.blocksById.delete( id );
+			}
+		} );
 		yblocks.delete( index, 1 );
 		order.splice( index, 1 );
 		positions = null;
 	};
 	const insertAt = ( index: number, yblock: YBlock ): void => {
 		yblocks.insert( index, [ yblock ] );
+		visitYBlockTree( [ yblock ], ( block ) => {
+			context.blocksById.set( block.get( 'clientId' )!, block );
+		} );
 		order.splice( index, 0, yblock );
 		positions = null;
 	};
@@ -835,10 +957,54 @@ function rebaseBlockList(
 		if ( existing ) {
 			rebaseYBlock(
 				existing,
-				previousBlock ?? ( existing.toJSON() as unknown as Block ),
+				previousBlock ??
+					context.previousBlocks.get( clientId )?.block ??
+					( existing.toJSON() as unknown as Block ),
 				block,
-				attributeCursor
+				attributeCursor,
+				context
 			);
+			return;
+		}
+
+		// A peer may have moved this block into a different container. Apply
+		// the edit at its current location instead of creating a second ID.
+		const movedByPeer = previousBlock && context.blocksById.get( clientId );
+		if ( movedByPeer ) {
+			rebaseYBlock(
+				movedByPeer,
+				previousBlock,
+				block,
+				attributeCursor,
+				context
+			);
+			return;
+		}
+
+		// A peer can move the children out and remove their old container.
+		// Editing those children must not resurrect the container or duplicate them.
+		if (
+			previousBlock &&
+			fastDeepEqual(
+				{ ...previousBlock, innerBlocks: [] },
+				{ ...block, innerBlocks: [] }
+			) &&
+			block.innerBlocks.every(
+				( child ) =>
+					child.clientId &&
+					context.blocksById.has( child.clientId ) &&
+					context.previousBlocks.has( child.clientId )
+			)
+		) {
+			for ( const child of block.innerBlocks ) {
+				rebaseYBlock(
+					context.blocksById.get( child.clientId! )!,
+					context.previousBlocks.get( child.clientId! )!.block,
+					child,
+					attributeCursor,
+					context
+				);
+			}
 			return;
 		}
 
@@ -860,9 +1026,21 @@ function rebaseBlockList(
 			}
 		}
 
-		const newYBlock = createNewYBlock( block );
+		const movedByEditor = context.movedBlocks.get( clientId );
+		const newYBlock = createNewYBlock(
+			movedByEditor ?? { ...block, innerBlocks: [] }
+		);
 		insertAt( insertIndex, newYBlock );
 		yBlocksById.set( clientId, newYBlock );
+		rebaseYBlock(
+			newYBlock,
+			movedByEditor
+				? context.previousBlocks.get( clientId )!.block
+				: { ...block, innerBlocks: [] },
+			block,
+			attributeCursor,
+			context
+		);
 	} );
 
 	// Only restore order when the editor reordered surviving previous blocks.
@@ -947,12 +1125,14 @@ const BLOCK_STRUCTURE_KEYS = new Set( [
  * @param previousBlock   The block as the editor rendered it before the change.
  * @param block           The block after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
+ * @param context         Document-wide identities and the rebased selection.
  */
 function rebaseYBlock(
 	yblock: YBlock,
 	previousBlock: Block,
 	block: Block,
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	context: BlockRebaseContext
 ): void {
 	const yAttributes = yblock.get( 'attributes' );
 	const previousAttributes = previousBlock.attributes ?? {};
@@ -970,7 +1150,17 @@ function rebaseYBlock(
 					previousAttributes,
 					name
 				) && fastDeepEqual( previousAttributes[ name ], value );
-			if ( unchanged ) {
+			if (
+				unchanged &&
+				! [
+					context.selection?.selectionStart,
+					context.selection?.selectionEnd,
+				].some(
+					( point ) =>
+						point?.clientId === block.clientId &&
+						point?.attributeKey === name
+				)
+			) {
 				continue;
 			}
 			rebaseYBlockAttribute(
@@ -980,7 +1170,8 @@ function rebaseYBlock(
 				previousAttributes[ name ],
 				value,
 				yAttributes,
-				attributeCursor
+				attributeCursor,
+				context
 			);
 		}
 
@@ -1003,7 +1194,8 @@ function rebaseYBlock(
 			yInnerBlocks,
 			previousBlock.innerBlocks ?? [],
 			innerBlocks,
-			attributeCursor
+			attributeCursor,
+			context
 		);
 	} else if ( innerBlocks.length > 0 ) {
 		const created = new Y.Array< YBlock >();
@@ -1048,6 +1240,7 @@ function rebaseYBlock(
  * @param attributeValue  The attribute's value after the change.
  * @param yAttributes     The block's attributes in the Y.Doc.
  * @param attributeCursor See `mergeCrdtBlocks`.
+ * @param context         Document-wide identities and the rebased selection.
  */
 function rebaseYBlockAttribute(
 	blockName: string,
@@ -1056,7 +1249,8 @@ function rebaseYBlockAttribute(
 	previousValue: unknown,
 	attributeValue: unknown,
 	yAttributes: YBlockAttributes,
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	context: BlockRebaseContext
 ): void {
 	const schema = getBlockAttributeSchema( blockName, attributeName );
 	const currentValue = yAttributes.get( attributeName );
@@ -1067,7 +1261,7 @@ function rebaseYBlockAttribute(
 		typeof previousValue === 'string' &&
 		currentValue instanceof Y.Text
 	) {
-		rebaseRichTextUpdate(
+		const selectionDelta = rebaseRichTextUpdate(
 			currentValue,
 			previousValue,
 			attributeValue,
@@ -1077,6 +1271,35 @@ function rebaseYBlockAttribute(
 				attributeValue
 			)
 		);
+		if ( selectionDelta && context.selection ) {
+			const shift = ( point: WPBlockSelection ): WPBlockSelection => {
+				const index = resolveRichTextCursorPosition(
+					point,
+					{ attributeKey: attributeName, clientId },
+					attributeValue
+				);
+				if ( index === null ) {
+					return point;
+				}
+				const offset = htmlIndexToRichTextOffset(
+					currentValue.toString(),
+					asHtmlStringIndex(
+						selectionDelta.transformPosition( index, false )
+					)
+				);
+				return offset === point.offset ? point : { ...point, offset };
+			};
+			const { selectionStart, selectionEnd } = context.selection;
+			const start = shift( selectionStart );
+			const end = shift( selectionEnd );
+			if ( start !== selectionStart || end !== selectionEnd ) {
+				context.selection = {
+					...context.selection,
+					selectionStart: start,
+					selectionEnd: end,
+				};
+			}
+		}
 		return;
 	}
 
@@ -1103,13 +1326,14 @@ function rebaseYBlockAttribute(
  * @param previousValue   The value the editor rendered before the edit.
  * @param updatedValue    The value after the edit.
  * @param htmlCursorIndex The cursor index in the updated HTML string.
+ * @return The delta from the local text to the merged text, for selection offsets.
  */
 export function rebaseRichTextUpdate(
 	blockYText: Y.Text,
 	previousValue: string,
 	updatedValue: string,
 	htmlCursorIndex: HtmlStringIndex | null = null
-): void {
+): InstanceType< typeof Delta > | undefined {
 	const currentValue = blockYText.toString();
 
 	if ( currentValue === previousValue ) {
@@ -1139,6 +1363,10 @@ export function rebaseRichTextUpdate(
 	const rebasedDiff = remoteDiff.transform( localDiff, true );
 
 	blockYText.applyDelta( rebasedDiff.ops );
+
+	// Map positions in the editor's already-applied local edit into the merged
+	// text. Use the same operations and tie-breaking as the content rebase.
+	return localDiff.transform( remoteDiff, false );
 }
 
 function deltaToString( delta: Delta ): string {
