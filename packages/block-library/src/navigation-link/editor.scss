@@ -53,14 +53,15 @@
  * Navigation Items.
  */
 
+// Zero specificity so a Global Styles minimum width still applies to the selected item.
+:root :where(.wp-block-navigation-item.is-editing),
+:root :where(.wp-block-navigation-item.is-selected) {
+	min-width: 20px;
+}
+
 .wp-block-navigation-item {
 	.wp-block-navigation-item__content {
 		cursor: text;
-	}
-
-	&.is-editing,
-	&.is-selected {
-		min-width: 20px;
 	}
 
 	.block-list-appender {
