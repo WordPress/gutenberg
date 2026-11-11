@@ -683,6 +683,13 @@ const emojiPickerLabelStyle: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xl)',
 };
 
+const emojiPickerPopoverListBodyStyle: CSSProperties = {
+	maxHeight: 240,
+	scrollbarGutter: 'stable',
+	marginInlineEnd: 'calc(-1 * var(--wpds-dimension-padding-lg))',
+	paddingInlineEnd: 'var(--wpds-dimension-padding-lg)',
+};
+
 function chunkItems< T >( items: T[], size: number ): T[][] {
 	const rows: T[][] = [];
 
@@ -793,6 +800,11 @@ export const Grid: Story = {
  * popover after a pick, control `open` on `Popover.Root` and set it to `false`
  * from each item's `onClick`. To open the popover somewhere other than its
  * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
+ *
+ * If the list scrolls, set `scrollbar-gutter: stable` on `Autocomplete.ListBody`
+ * so that the popover keeps its width when the results stop overflowing. To keep
+ * the scrollbar clear of the last column, extend the list body into the popover's
+ * padding with a negative inline-end margin and the same inline-end padding.
  */
 export const InlineInPopover: Story = {
 	parameters: {
@@ -843,7 +855,9 @@ export const InlineInPopover: Story = {
 								</Autocomplete.Empty>
 								<Autocomplete.List aria-label="Emojis">
 									<Autocomplete.ListBody
-										style={ { maxHeight: 240 } }
+										style={
+											emojiPickerPopoverListBodyStyle
+										}
 									>
 										<Autocomplete.Collection>
 											{ (
