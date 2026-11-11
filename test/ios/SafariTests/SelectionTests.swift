@@ -53,6 +53,21 @@ final class SelectionTests: XCTestCase {
 		return current
 	}
 
+	/// Double taps the word at this point and waits for the edit menu of
+	/// its selection. The simulator now and then delivers the double tap as
+	/// two single taps: the second lands on the caret the first placed and
+	/// opens the Paste, Select, Select All menu. Its Select selects the word
+	/// at the caret.
+	func selectWord( at coordinate: XCUICoordinate, file: StaticString = #filePath, line: UInt = #line ) {
+		coordinate.doubleTap()
+		let cut = app.menuItems[ "Cut" ]
+		let select = app.menuItems[ "Select" ]
+		if !cut.waitForExistence( timeout: 5 ) && select.exists {
+			select.tap()
+		}
+		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word", file: file, line: line )
+	}
+
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
 		// A new post starting with this content: run.sh passes the content
 		// argument of post-new.php through unescaped.
@@ -98,17 +113,9 @@ final class SelectionTests: XCTestCase {
 		// own frame.
 		let bravo = web.staticTexts[ "bravo" ].frame
 
-		// Double tap the first word, "Delta". The simulator now and then
-		// delivers the double tap as two single taps: the second lands on
-		// the caret the first placed and opens the Paste, Select, Select All
-		// menu. Its Select selects the word at the caret, "Delta".
-		point( target.minX + 15, target.midY ).doubleTap()
+		// Select the first word, "Delta".
+		selectWord( at: point( target.minX + 15, target.midY ) )
 		let cut = app.menuItems[ "Cut" ]
-		let select = app.menuItems[ "Select" ]
-		if !cut.waitForExistence( timeout: 5 ) && select.exists {
-			select.tap()
-		}
-		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word" )
 
 		// The start handle's knob sits above the line, at the start of the
 		// word. The selection moves by as much as the finger does, so drag
@@ -252,13 +259,8 @@ final class SelectionTests: XCTestCase {
 		// Select the first word of the heading and drag the start handle to
 		// the start of the paragraph above, as in
 		// testHandleExtendsSelectionIntoPreviousParagraph.
-		point( target.minX + 15, target.midY ).doubleTap()
+		selectWord( at: point( target.minX + 15, target.midY ) )
 		let cut = app.menuItems[ "Cut" ]
-		let select = app.menuItems[ "Select" ]
-		if !cut.waitForExistence( timeout: 5 ) && select.exists {
-			select.tap()
-		}
-		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word" )
 		let alpha = paragraph.frame
 		let knob = target.minY - 6
 		point( target.minX + 1, knob ).press(

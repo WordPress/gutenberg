@@ -18,11 +18,7 @@ describe( 'ValidatedContentEditableControl', () => {
 		).toHaveAccessibleDescription( 'A short bio.' );
 	} );
 
-	// The validity (and its description) lives on the hidden delegate input,
-	// not the editable that assistive technology interacts with. This is the
-	// same pre-existing limitation as the other delegate-based controls,
-	// tracked in #76741.
-	it.skip( 'should append the validation error alongside the help description', async () => {
+	it( 'should append the validation error alongside the help description', async () => {
 		const user = userEvent.setup();
 		render(
 			<form>
@@ -36,8 +32,6 @@ describe( 'ValidatedContentEditableControl', () => {
 			</form>
 		);
 
-		// The hidden validity delegate is also a textbox, so scope the query
-		// to the accessible name only the labeled editable has.
 		const textbox = screen.getByRole( 'textbox', {
 			name: /^Bio/,
 		} );
@@ -54,6 +48,14 @@ describe( 'ValidatedContentEditableControl', () => {
 		);
 	} );
 
+	it( 'should expose only the editable to assistive technology', () => {
+		render(
+			<ValidatedContentEditableControl label="Bio" value="" required />
+		);
+
+		expect( screen.getAllByRole( 'textbox' ) ).toHaveLength( 1 );
+	} );
+
 	it( 'should move focus to the editable when the delegate is focused', async () => {
 		render(
 			<ValidatedContentEditableControl label="Bio" value="" required />
@@ -64,7 +66,7 @@ describe( 'ValidatedContentEditableControl', () => {
 		// Constraint validation lands focus on the hidden delegate; the
 		// wrapper forwards it to the editable the user actually interacts
 		// with.
-		screen.getByRole( 'textbox', { name: '' } ).focus();
+		screen.getByRole( 'textbox', { name: '', hidden: true } ).focus();
 
 		await waitFor( () => expect( textbox ).toHaveFocus() );
 	} );
