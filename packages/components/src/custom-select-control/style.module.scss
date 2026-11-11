@@ -111,11 +111,7 @@ $sizes: (default, 40px, 12px), (small, 24px, 8px);
 	scroll-margin: 4px;
 	user-select: none;
 
-	&[aria-disabled="true"] {
-		cursor: not-allowed;
-	}
-
-	&[data-active-item]:not([aria-disabled="true"]) {
+	&[data-active-item] {
 		// Keep highlight colors paired when options have custom inline colors.
 		@include composite-item.highlight(!important);
 
