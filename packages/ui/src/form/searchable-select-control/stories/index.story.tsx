@@ -1,8 +1,7 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
-import { Spinner } from '../../../spinner';
-import { Stack } from '../../../stack';
 import { VisuallyHidden } from '../../../visually-hidden';
 import { SearchableSelectControl } from '../';
 import {
@@ -25,10 +24,17 @@ const meta: Meta< typeof SearchableSelectControl > = {
 	id: 'design-system-components-form-searchableselectcontrol',
 	component: SearchableSelectControl,
 	subcomponents: {
+		'SearchableSelectControl.LoadingIndicator':
+			SearchableSelectControl.LoadingIndicator,
+		'SearchableSelectControl.Trigger': SearchableSelectControl.Trigger,
 		'SearchableSelectControl.Group': SearchableSelectControl.Group,
 		'SearchableSelectControl.GroupLabel':
 			SearchableSelectControl.GroupLabel,
+		'SearchableSelectControl.Separator': SearchableSelectControl.Separator,
 		'SearchableSelectControl.Item': SearchableSelectControl.Item,
+		'SearchableSelectControl.ItemLabel': SearchableSelectControl.ItemLabel,
+		'SearchableSelectControl.ItemDescription':
+			SearchableSelectControl.ItemDescription,
 		'SearchableSelectControl.Collection':
 			SearchableSelectControl.Collection,
 	},
@@ -59,6 +65,14 @@ export const Default: Story = {
 	},
 };
 
+export const WithItemDescriptions: Story = {
+	...SearchableSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
+	},
+};
+
 /**
  * When no value is selected, the trigger shows the default placeholder text.
  *
@@ -71,6 +85,27 @@ export const WithCustomPlaceholder: Story = {
 		...SearchableSelectStories.WithCustomPlaceholder.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+/**
+ * Pass a `SearchableSelectControl.Trigger` element to `trigger` to customize
+ * button props and content while retaining the field label and description.
+ */
+export const WithCustomTrigger: Story = {
+	args: {
+		...Default.args,
+		defaultValue: ITEMS[ 0 ],
+		trigger: (
+			<SearchableSelectControl.Trigger
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			>
+				{ ( item ) =>
+					item ? <strong>{ item.label }</strong> : null
+				}
+			</SearchableSelectControl.Trigger>
+		),
 	},
 };
 
@@ -175,11 +210,11 @@ export const Creatable: Story = {
 	},
 };
 
-export const WithCustomTriggerAndItems: Story = {
-	...SearchableSelectStories.WithCustomTriggerAndItems,
+export const WithCustomItems: Story = {
+	...SearchableSelectStories.WithCustomItems,
 	args: {
 		...Default.args,
-		...SearchableSelectStories.WithCustomTriggerAndItems.args,
+		...SearchableSelectStories.WithCustomItems.args,
 	},
 };
 
@@ -208,9 +243,10 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `statusContent` shows loading, then
- * a visually hidden result count. Pass `emptyContent={ null }` while
- * loading so Empty does not claim there are no results.
+ * Pass `SearchableSelectControl.LoadingIndicator` as `statusContent` while fetching
+ * items. Pass `children` to customize its message. After loading, pass a
+ * visually hidden result count as `statusContent` to announce it. Pass
+ * `emptyContent={ null }` while loading.
  */
 export const AsyncItems: Story = {
 	args: {
@@ -220,7 +256,7 @@ export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( false );
 		const [ items, setItems ] = useState< typeof ITEMS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<SearchableSelectControl
@@ -228,27 +264,25 @@ export const AsyncItems: Story = {
 				items={ items }
 				statusContent={
 					loading ? (
-						<Stack direction="row" gap="sm" align="center">
-							<Spinner />
-							Loading…
-						</Stack>
+						<SearchableSelectControl.LoadingIndicator />
 					) : (
 						<HiddenResultCount />
 					)
 				}
 				emptyContent={ loading ? null : undefined }
 				onOpenChange={ ( open ) => {
-					if ( ! open ) {
+					if ( timeoutRef.current ) {
 						clearTimeout( timeoutRef.current );
+					}
+					if ( ! open ) {
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			/>
 		);
@@ -267,6 +301,19 @@ export const Grouped: Story = {
 	args: {
 		...SearchableSelectStories.Grouped.args,
 		defaultValue: GROUPED_ITEMS[ 0 ].items[ 0 ],
+		label: 'Fruit',
+		description: 'Choose your favorite fruit.',
+	},
+};
+
+/**
+ * Use `SearchableSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableSelectStories.WithSeparator,
+	args: {
+		...SearchableSelectStories.WithSeparator.args,
+		defaultValue: ITEMS[ 0 ],
 		label: 'Fruit',
 		description: 'Choose your favorite fruit.',
 	},
@@ -333,7 +380,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableSelectControl.ItemLabel>
 								</SearchableSelectControl.Item>
 							) }
 						</SearchableSelectControl.Collection>

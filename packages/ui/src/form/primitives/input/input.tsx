@@ -20,6 +20,7 @@ export const Input = forwardRef< HTMLElement, InputProps >(
 		return (
 			<InputLayout
 				className={ clsx(
+					styles.layout,
 					focusStyles[ 'outset-ring--focus-within' ],
 					className
 				) }

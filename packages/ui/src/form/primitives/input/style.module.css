@@ -6,6 +6,7 @@
 			--_gcd-input-padding:
 				var(--wp-ui-input-padding-block, 0px)
 				var(--wp-ui-input-layout-padding-inline, 0px);
+			--_gcd-input-font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
 
 			padding-block: var(--wp-ui-input-padding-block, 0);
 			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
@@ -17,6 +18,10 @@
 			font-family: inherit;
 			font-size: inherit;
 			line-height: inherit;
+
+			@media (min-width: 600px) {
+				--_gcd-input-font-size: inherit;
+			}
 
 			&::placeholder {
 				color: var(--wpds-color-foreground-interactive-neutral-weak);
@@ -32,6 +37,7 @@
 				}
 
 				@media ( forced-colors: active ) {
+					--_gcd-input-color-disabled: GrayText;
 					color: GrayText;
 				}
 			}
@@ -48,6 +54,29 @@
 				&::-webkit-inner-spin-button {
 					appearance: none;
 					margin: 0;
+				}
+			}
+		}
+	}
+
+	@layer compositions {
+		/*
+		 * Input always hosts a native field. Size prefix/suffix with that
+		 * field. Select and combobox triggers go through InputLayout
+		 * directly and stay at md.
+		 */
+		.layout {
+			font-size: max(var(--wpds-typography-font-size-md), 16px);
+
+			@media (min-width: 600px) {
+				font-size: var(--wpds-typography-font-size-md);
+			}
+
+			&:has(> .input[readonly]) {
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					border-color: GrayText;
 				}
 			}
 		}

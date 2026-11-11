@@ -1,7 +1,12 @@
 import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
 import { PENDING_GETTER } from './proxies/state';
 import { getNamespace } from './namespaces';
-import { isPlainObject, navigationSignal, deepClone } from './utils';
+import {
+	isPlainObject,
+	navigationSignal,
+	deepClone,
+	jsonReviver,
+} from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -259,14 +264,14 @@ export function store(
 export const parseServerData = ( dom = document ) => {
 	const jsonDataScriptTag =
 		// Preferred Script Module data passing form
-		dom.getElementById(
-			'wp-script-module-data-@wordpress/interactivity'
+		dom.querySelector(
+			'script[id="wp-script-module-data-@wordpress/interactivity"]'
 		) ??
 		// Legacy form
-		dom.getElementById( 'wp-interactivity-data' );
-	if ( jsonDataScriptTag?.textContent ) {
+		dom.querySelector( 'script[id="wp-interactivity-data"]' );
+	if ( jsonDataScriptTag instanceof HTMLScriptElement ) {
 		try {
-			return JSON.parse( jsonDataScriptTag.textContent );
+			return JSON.parse( jsonDataScriptTag.text, jsonReviver );
 		} catch {}
 	}
 	return {};

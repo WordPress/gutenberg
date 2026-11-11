@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { Spinner, Composite } from '@wordpress/components';
+import { Spinner as WCSpinner, Composite } from '@wordpress/components';
 import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -290,7 +290,7 @@ export default function ViewPickerActivity< Item >( {
 			>
 				{ isLoading ? (
 					<p>
-						<Spinner />
+						<WCSpinner />
 					</p>
 				) : (
 					empty
@@ -340,7 +340,7 @@ export default function ViewPickerActivity< Item >( {
 			</Composite>
 			{ isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

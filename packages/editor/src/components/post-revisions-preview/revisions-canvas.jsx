@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect } from '@wordpress/element';
@@ -59,11 +59,19 @@ const REVISION_DIFF_STYLES = `
 	.is-revision-removed,
 	.revision-diff-removed {
 		text-decoration: line-through;
-		filter: url(#revision-removed-filter);
 	}
 	.is-revision-removed {
 		outline: 3px dashed #d63638;
 		outline-offset: 2px;
+		filter: url(#revision-removed-filter);
+	}
+	.revision-diff-removed {
+		/* Mirror .revision-diff-added so the ins/del pair reads symmetrically.
+		   Leaving the text at currentColor (rather than recolouring it with an
+		   opacity + color-matrix filter) keeps the theme's own AA-compliant body
+		   contrast on any background. */
+		background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
+		text-decoration-color: #d63638;
 	}
 	.is-revision-modified {
 		outline: 3px dotted #9a7000 !important;
@@ -271,11 +279,11 @@ export default function RevisionsCanvas() {
 	}, [] );
 
 	const { revision, showDiff } = useSelect( ( select ) => {
-		const { getCurrentRevision, isShowingRevisionDiff } = unlock(
+		const { getShownVersion, isShowingRevisionDiff } = unlock(
 			select( editorStore )
 		);
 		return {
-			revision: getCurrentRevision(),
+			revision: getShownVersion(),
 			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );
@@ -289,7 +297,7 @@ export default function RevisionsCanvas() {
 		</>
 	) : (
 		<div className="editor-revisions-canvas__loading">
-			<Spinner />
+			<WCSpinner />
 		</div>
 	);
 }

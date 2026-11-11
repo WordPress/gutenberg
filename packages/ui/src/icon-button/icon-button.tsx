@@ -19,7 +19,7 @@ import { type IconButtonProps } from './types';
  * to coordinate tooltip delays across the group.
  *
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
- * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
+ * for when to use `Button`, `IconButton`, `Link`, or `ButtonLink`.
  */
 export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 	function UnforwardedIconButton(

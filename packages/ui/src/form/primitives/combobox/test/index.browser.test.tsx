@@ -48,7 +48,9 @@ function renderDisabledMultiSelect( disabled: boolean ) {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -70,6 +72,7 @@ describe( 'Combobox', () => {
 		const inputRef = createRef< HTMLInputElement >();
 		const listRef = createRef< HTMLDivElement >();
 		const listBodyRef = createRef< HTMLDivElement >();
+		const separatorRef = createRef< HTMLDivElement >();
 		const listFooterRef = createRef< HTMLDivElement >();
 		const itemRef = createRef< HTMLDivElement >();
 		const chipsRef = createRef< HTMLDivElement >();
@@ -115,11 +118,14 @@ describe( 'Combobox', () => {
 										}
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
 						</Combobox.ListBody>
+						<Combobox.Separator ref={ separatorRef } />
 						<Combobox.ListFooter ref={ listFooterRef } />
 					</Combobox.List>
 				</Combobox.Popup>
@@ -141,6 +147,7 @@ describe( 'Combobox', () => {
 		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
 		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( separatorRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( listFooterRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( chipsRef.current ).toBeInstanceOf( HTMLDivElement );
@@ -169,7 +176,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -249,7 +258,9 @@ describe( 'Combobox', () => {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -270,6 +281,40 @@ describe( 'Combobox', () => {
 			ITEMS[ 1 ],
 			expect.anything()
 		);
+	} );
+
+	it( 'keeps a scrolling inline list out of the Tab order', async () => {
+		const user = userEvent;
+
+		await render(
+			<>
+				<Combobox.Root items={ ITEMS } inline open>
+					<Combobox.Input aria-label="Search" />
+					<Combobox.List>
+						<Combobox.ListBody style={ { maxHeight: 40 } }>
+							<Combobox.Collection>
+								{ ( item ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Root>
+				<button>After</button>
+			</>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Search' } ) );
+		await user.keyboard( '{Tab}' );
+
+		expect( screen.getByRole( 'button', { name: 'After' } ) ).toHaveFocus();
 	} );
 
 	describe( 'portal', () => {
@@ -298,7 +343,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -337,7 +384,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -397,7 +446,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -435,7 +486,9 @@ describe( 'Combobox', () => {
 											key={ item.id }
 											value={ item }
 										>
-											{ item.value }
+											<Combobox.ItemLabel>
+												{ item.value }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									) }
 								</Combobox.Collection>
@@ -480,7 +533,9 @@ describe( 'Combobox', () => {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Combobox.ItemLabel>
+													{ item.value }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
@@ -557,7 +612,9 @@ describe( 'Combobox', () => {
 														key={ item.id }
 														value={ item }
 													>
-														{ item.value }
+														<Combobox.ItemLabel>
+															{ item.value }
+														</Combobox.ItemLabel>
 													</Combobox.Item>
 												) }
 											</Combobox.Collection>

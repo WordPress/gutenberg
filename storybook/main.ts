@@ -2,11 +2,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type InlineConfig, type PluginOption, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import emotion from '@rolldown/plugin-emotion';
 import type { StorybookConfig } from '@storybook/react-vite';
-import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
-import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
-import { createPostcssBrowserPlugin } from './postcss-browser-plugin.mjs';
+import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -34,6 +32,7 @@ const stories = [
 	'../packages/dataviews/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/image-editor/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/media-editor/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
@@ -94,6 +93,12 @@ const config: StorybookConfig = {
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
+			/*
+			 * Vite's root is this workspace, so the plugin's default glob stops
+			 * at its edge and the documented sources need naming explicitly.
+			 */
+			include: [ '**/*.tsx', '../packages/*/src/**/*.tsx' ],
+			exclude: [ '**/test/**', '**/node_modules/**' ],
 			// Use a docgen-specific TypeScript configuration that disables
 			// project references. Without this, docgen follows referenced
 			// projects' built `.d.ts` declarations and emits a duplicate
@@ -130,8 +135,14 @@ const config: StorybookConfig = {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( viteConfig ) => {
+	viteFinal: async ( viteConfig, options ) => {
 		return mergeConfig( viteConfig, {
+			/*
+			 * Storybook roots Vite at the repository root, which owns none of
+			 * the dependencies. Each config roots itself, so the one that
+			 * spreads this gets its own workspace rather than this one.
+			 */
+			root: options.configDir,
 			resolve: {
 				alias: [
 					{
@@ -139,24 +150,14 @@ const config: StorybookConfig = {
 						find: /^@wordpress\/block-editor$/,
 						replacement: path.resolve(
 							import.meta.dirname,
-							'../packages/block-editor/src/index.js'
+							'../packages/block-editor/src/index.ts'
 						),
 					},
 				],
 			},
-			optimizeDeps: {
-				rolldownOptions: {
-					plugins: [
-						createPostcssBrowserPlugin(
-							path.resolve( import.meta.dirname, '..' )
-						),
-					],
-				},
-			},
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,
-				emotion( { sourceMap: true } ),
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
 				{
 					name: 'stub-vips',
@@ -223,19 +224,7 @@ const config: StorybookConfig = {
 				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
 				// meaningful budget above the current 3.15 MB largest chunk.
 				chunkSizeWarningLimit: 3_500,
-				/**
-				 * Use terser with keep_fnames to preserve component names in source code display.
-				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
-				 * which breaks the Storybook docs source code display.
-				 * @see https://github.com/storybookjs/storybook/issues/20769
-				 */
-				minify: NODE_ENV === 'production' ? 'terser' : false,
-				terserOptions: {
-					keep_fnames: true,
-					mangle: {
-						keep_fnames: true,
-					},
-				},
+				minify: NODE_ENV === 'production' ? 'oxc' : false,
 				rolldownOptions: {
 					checks: {
 						// Storybook's legacy `react-docgen` and
@@ -244,6 +233,28 @@ const config: StorybookConfig = {
 						// timing warnings.
 						pluginTimings: false,
 					},
+					// Preserve function and class names so Storybook renders
+					// `<BoxControl>` rather than a mangled `<J>`. Since setting
+					// `output.minify` overrides Vite's minify setting, assign
+					// it only in production where we expect minification.
+					//
+					// See: https://github.com/storybookjs/storybook/issues/20769
+					output:
+						NODE_ENV === 'production'
+							? {
+									minify: {
+										compress: {
+											keepNames: {
+												function: true,
+												class: true,
+											},
+										},
+										mangle: {
+											keepNames: true,
+										},
+									},
+								}
+							: {},
 				},
 			},
 			define: {

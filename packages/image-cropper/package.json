@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/image-cropper",
-	"version": "1.20.0",
-	"description": "A basic image cropper component.",
+	"version": "2.1.0",
+	"description": "Deprecated image cropper component for WordPress. Use @wordpress/image-editor instead.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -20,14 +20,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -47,6 +46,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"dequal": "^2.0.3",
 		"react-easy-crop": "^5.4.2"
+	},
+	"devDependencies": {
+		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

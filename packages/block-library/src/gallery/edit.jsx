@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import {
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	RangeControl,
 	MenuGroup,
@@ -24,6 +23,7 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { SelectControl } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -917,7 +917,7 @@ export default function GalleryEdit( props ) {
 			<InspectorControls
 				group={
 					isViewportStyleState && hasViewportSettings
-						? 'viewport'
+						? 'style-state'
 						: 'default'
 				}
 			>
@@ -1057,15 +1057,22 @@ export default function GalleryEdit( props ) {
 									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
 								}
 							>
-								<WCSelectControl
+								<SelectControl
 									label={ __( 'Resolution' ) }
-									help={ __(
+									description={ __(
 										'Select the size of the source images.'
 									) }
-									value={ sizeSlug }
-									options={ imageSizeOptions }
-									onChange={ updateImagesSize }
-									hideCancelButton
+									value={
+										imageSizeOptions.find(
+											( item ) => item.value === sizeSlug
+										) ?? imageSizeOptions[ 0 ]
+									}
+									items={ imageSizeOptions }
+									onValueChange={ ( item ) => {
+										if ( item && item.value !== sizeSlug ) {
+											updateImagesSize( item.value );
+										}
+									} }
 								/>
 							</ToolsPanelItem>
 						) }
@@ -1101,15 +1108,39 @@ export default function GalleryEdit( props ) {
 							}
 							isShownByDefault
 						>
-							<WCSelectControl
+							<SelectControl
 								label={ __( 'Aspect ratio' ) }
-								help={ __(
+								description={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'
 								) }
-								value={ activeAspectRatio }
-								options={ aspectRatioOptions }
-								onChange={ setAspectRatio }
-							/>
+								value={
+									aspectRatioOptions.find(
+										( item ) =>
+											item.value === activeAspectRatio
+									) ?? aspectRatioOptions[ 0 ]
+								}
+								items={ aspectRatioOptions }
+								onValueChange={ ( item ) => {
+									if (
+										item &&
+										item.value !== activeAspectRatio
+									) {
+										setAspectRatio( item.value );
+									}
+								} }
+							>
+								{ aspectRatioOptions.map( ( item, index ) => (
+									<SelectControl.Item
+										key={ `${ item.value }-${ index }` }
+										value={ item }
+										label={ item.label }
+									>
+										<SelectControl.ItemLabel>
+											{ item.label }
+										</SelectControl.ItemLabel>
+									</SelectControl.Item>
+								) ) }
+							</SelectControl>
 						</ToolsPanelItem>
 					) }
 					{ isFlexLayout && (

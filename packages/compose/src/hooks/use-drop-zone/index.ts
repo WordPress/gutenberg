@@ -179,6 +179,12 @@ export default function useDropZone( {
 			// The `dragstart` event doesn't fire if the drag started outside
 			// the document.
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+			// Browsers can send `dragover` to an iframe without a `dragenter`
+			// first, after a previous drag left the iframe over an element of
+			// the parent document. Start the drag on the first `dragover` too,
+			// so that its end is still handled. It's a capture listener, so
+			// that the drag starts before the drop zone's own `dragover`.
+			ownerDocument.addEventListener( 'dragover', maybeDragStart, true );
 
 			return () => {
 				element.removeAttribute( 'data-is-drop-zone' );
@@ -191,6 +197,11 @@ export default function useDropZone( {
 				ownerDocument.removeEventListener(
 					'dragenter',
 					maybeDragStart
+				);
+				ownerDocument.removeEventListener(
+					'dragover',
+					maybeDragStart,
+					true
 				);
 			};
 		},

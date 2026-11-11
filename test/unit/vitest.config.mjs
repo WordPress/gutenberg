@@ -6,7 +6,6 @@ import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
 import { createPlaywrightProvider } from './config/playwright-provider.mjs';
 import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
-import { createPostcssBrowserPlugin } from '../../storybook/postcss-browser-plugin.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -210,9 +209,6 @@ export default defineConfig( {
 				 */
 				root: CONFIG_DIR,
 				optimizeDeps: {
-					rolldownOptions: {
-						plugins: [ createPostcssBrowserPlugin( ROOT_DIR ) ],
-					},
 					entries: vitestTests.browser.map( ( testPath ) =>
 						path.join( ROOT_DIR, testPath )
 					),
@@ -244,14 +240,20 @@ export default defineConfig( {
 						),
 						isolationSetupFile,
 					],
-					// Revisit the interceptor warning once this fix ships:
-					// https://github.com/vitest-dev/vitest/pull/11377
 					browser: {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: createPlaywrightProvider(),
-						commands: browserTraces?.commands,
+						commands: {
+							...browserTraces?.commands,
+							// Vitest advances fake timers during built-in hover commands.
+							// Exact delay tests must retain control of the clock.
+							async hoverWithManualTimers( { frame }, selector ) {
+								const testFrame = await frame();
+								await testFrame.locator( selector ).hover();
+							},
+						},
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'
@@ -265,6 +267,9 @@ export default defineConfig( {
 		// that overlap explicit and avoid a redundant cleanup pass.
 		clearMocks: false,
 		globals: false,
+		// Match native ES modules, which have no `__dirname`, `require`, or
+		// other CommonJS variables. CommonJS files keep them.
+		injectCjsGlobals: false,
 		includeTaskLocation: true,
 		isolate: true,
 		mockReset: true,
