@@ -14,18 +14,21 @@
  *
  * @param array $settings Default emoji settings.
  * @return array Filtered emoji settings.
+ *
+ * @phpstan-param array{ emojis: list<array{ hex_key: string, label: string }>, allow_unlisted: bool, exclude: list<string> } $settings
+ * @phpstan-return array{ emojis: list<array{ hex_key: string, label: string }>, allow_unlisted: bool, exclude: list<string> }
  */
-function gutenberg_test_note_reaction_emojis( $settings ) {
+function gutenberg_test_note_reaction_emojis( array $settings ): array {
 	$settings['emojis'][] = array(
-		'hexcode' => '1F984',
+		'hex_key' => '1f984',
 		'label'   => 'Unicorn',
 	);
 	$settings['emojis'][] = array(
-		'hexcode' => '1F3C6',
+		'hex_key' => '1f3c6',
 		'label'   => 'Trophy',
 	);
 	// Thumbs down, along with its skin-tone variants.
-	$settings['exclude'][] = '1F44E';
+	$settings['exclude'][] = '1f44e';
 	return $settings;
 }
 add_filter( 'gutenberg_note_reaction_emoji_settings', 'gutenberg_test_note_reaction_emojis' );

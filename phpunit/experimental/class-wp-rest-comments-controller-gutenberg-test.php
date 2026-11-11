@@ -979,11 +979,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
-	public function test_reaction_emojis_filter_affects_validation() {
-		$filter = function ( $settings ) {
+	public function test_reaction_emojis_filter_affects_validation(): void {
+		$filter = function ( array $settings ): array {
 			$settings['emojis']         = array(
 				array(
-					'hexcode' => '1F44D',
+					'hex_key' => '1f44d',
 					'label'   => 'Thumbs Up',
 				),
 			);
@@ -1035,8 +1035,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * @param string $content The reaction hex key to submit.
 	 * @param int    $status  Expected response status.
 	 */
-	public function test_reaction_emoji_rules_affect_validation( $rules, $content, $status ) {
-		$filter = function ( $settings ) use ( $rules ) {
+	public function test_reaction_emoji_rules_affect_validation( $rules, string $content, int $status ): void {
+		$filter = function ( array $settings ) use ( $rules ) {
 			return is_array( $rules ) ? array_merge( $settings, $rules ) : $rules;
 		};
 		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
@@ -1070,7 +1070,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		}
 	}
 
-	public function data_reaction_emoji_rules() {
+	/**
+	 * @return array<string, array{ mixed, string, int }>
+	 */
+	public function data_reaction_emoji_rules(): array {
 		$exclude_wave = array( 'exclude' => array( '1F44B' ) );
 		$named_only   = array( 'allow_unlisted' => false );
 
@@ -1080,6 +1083,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'emoji that is not excluded'         => array( $exclude_wave, '1f389', 201 ),
 			'exclusion written with VS-16'       => array( array( 'exclude' => array( '2763-FE0F' ) ), '2763', 400 ),
 			'unpadded exclusion'                 => array( array( 'exclude' => array( 'A9' ) ), '00a9', 400 ),
+			'over-padded exclusion'              => array( array( 'exclude' => array( '000A9' ) ), '00a9', 400 ),
 			'named-only rejects unlisted'        => array( $named_only, '1f44b', 400 ),
 			'named-only accepts named'           => array( $named_only, '2764', 201 ),
 			'named emoji wins over an exclusion' => array( array( 'exclude' => array( '2764' ) ), '2764', 201 ),
@@ -1091,7 +1095,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * A callback that returns only some keys keeps the defaults for the rest,
 	 * and a non-array return falls back to the defaults entirely.
 	 */
-	public function test_reaction_emoji_settings_fill_missing_keys_from_defaults() {
+	public function test_reaction_emoji_settings_fill_missing_keys_from_defaults(): void {
 		$defaults = gutenberg_get_note_reaction_emoji_settings();
 
 		$partial = function () {
@@ -1117,21 +1121,29 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Named emoji reach the editor as formatted hex keys, and malformed
-	 * entries drop.
+	 * Named emoji reach the editor as normalized hex keys, and malformed,
+	 * unlabeled and duplicate entries drop.
 	 */
-	public function test_reaction_emojis_reach_editor_settings() {
-		$filter = function ( $settings ) {
+	public function test_reaction_emojis_reach_editor_settings(): void {
+		$filter = function ( array $settings ): array {
 			$settings['emojis']         = array(
 				array(
-					'hexcode' => '2764-FE0F',
+					'hex_key' => '2764-FE0F',
 					'label'   => 'Heart',
 				),
 				array(
-					'hexcode' => 'not hex',
+					'hex_key' => 'not hex',
 					'label'   => 'Broken',
 				),
-				array( 'label' => 'No hexcode' ),
+				array( 'label' => 'No hex key' ),
+				array(
+					'hex_key' => '2764',
+					'label'   => 'Duplicate',
+				),
+				array(
+					'hex_key' => '1f984',
+					'label'   => '',
+				),
 			);
 			$settings['allow_unlisted'] = false;
 			$settings['exclude']        = array( '1F595', 'not hex', 42 );
@@ -1148,7 +1160,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				array(
-					'hexcode' => '2764',
+					'hex_key' => '2764',
 					'label'   => 'Heart',
 				),
 			),

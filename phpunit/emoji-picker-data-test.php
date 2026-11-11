@@ -16,7 +16,7 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
-	public function test_default_overrides_seeded_from_named_reactions() {
+	public function test_default_overrides_seeded_from_named_reactions(): void {
 		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
 		// Thumbs up, plus, heart, celebration, smile, eyes, rocket.
@@ -30,8 +30,8 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
-	public function test_filter_can_extend_overrides() {
-		$callback = static function ( $overrides ) {
+	public function test_filter_can_extend_overrides(): void {
+		$callback = static function ( array $overrides ): array {
 			$overrides['1F44D'] = 'Custom thumbs up';
 			return $overrides;
 		};
@@ -47,7 +47,7 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
-	public function test_filter_drops_non_string_values() {
+	public function test_filter_drops_non_string_values(): void {
 		$callback = static function () {
 			return array(
 				'1F600' => 'Grin',                 // Kept.
@@ -72,7 +72,7 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
-	public function test_filter_returning_non_array_is_treated_as_empty() {
+	public function test_filter_returning_non_array_is_treated_as_empty(): void {
 		$callback = static function () {
 			return 'not an array';
 		};
@@ -106,6 +106,14 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 			// No copied data, so the picker must not be pointed at a 404.
 			$this->assertArrayNotHasKey( 'noteEmojibaseUrl', $settings );
 		}
+	}
+
+	/**
+	 * @covers ::gutenberg_add_note_reaction_emojis_setting
+	 */
+	public function test_label_overrides_injected(): void {
+		$settings = gutenberg_add_note_reaction_emojis_setting( array() );
+
 		$this->assertIsArray( $settings['noteEmojiLabelOverrides'] );
 		$this->assertArrayHasKey( '2764', $settings['noteEmojiLabelOverrides'] );
 	}

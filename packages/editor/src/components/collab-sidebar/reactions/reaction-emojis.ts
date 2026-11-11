@@ -208,13 +208,13 @@ export function parseReactionEmojis( raw: unknown ): NamedEmoji[] {
 	}
 	return raw
 		.filter(
-			( entry ): entry is { hexcode: string; label: string } =>
+			( entry ): entry is { hex_key: string; label: string } =>
 				!! entry &&
-				typeof entry.hexcode === 'string' &&
+				typeof entry.hex_key === 'string' &&
 				typeof entry.label === 'string'
 		)
-		.map( ( { hexcode, label } ) => ( {
-			hexKey: hexcode.toLowerCase(),
+		.map( ( { hex_key: hexKey, label } ) => ( {
+			hexKey: hexKey.toLowerCase(),
 			label,
 		} ) )
 		.filter( ( entry ) => HEX_KEY_RE.test( entry.hexKey ) );
@@ -324,7 +324,7 @@ export function getNamedHexKeys( emojis: NamedEmoji[] ): Set< string > {
 /**
  * Whether the rules accept an emoji. Named emoji are always accepted, and
  * skin-tone variants follow their base emoji. Must agree with
- * `gutenberg_is_note_reaction_hex_key_allowed()`.
+ * `gutenberg_is_note_reaction_key_allowed()`.
  *
  * @param hexKey    Normalized hex key of the emoji.
  * @param rules     The emoji rules.
