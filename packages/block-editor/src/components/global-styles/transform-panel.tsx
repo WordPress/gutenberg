@@ -1,18 +1,21 @@
 import {
-	AnglePickerControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 import type {
 	PanelResetAllFilter,
 	StyleSettings,
 	StyleToolsPanelProps,
 	TransformPanelProps,
 } from './types';
+
+const { PrivateAnglePickerControl } = unlock( componentsPrivateApis );
 
 // Mirror of `WP_Style_Engine::VALID_ANGLE_PATTERN` in PHP.
 const ANGLE_PATTERN =
@@ -131,11 +134,18 @@ export default function TransformPanel( {
 					isShownByDefault={ defaultControls.rotate }
 					panelId={ panelId }
 				>
-					<AnglePickerControl
+					<PrivateAnglePickerControl
 						label={ __( 'Rotation' ) }
-						value={ rotate ?? '' }
-						onChange={ ( newValue ) =>
-							setRotate( `${ Math.round( newValue ) }deg` )
+						value={ rotate }
+						min={ -360 }
+						max={ 360 }
+						allowEmpty
+						onChange={ ( newValue: number | undefined ) =>
+							setRotate(
+								newValue === undefined
+									? undefined
+									: `${ Math.round( newValue ) }deg`
+							)
 						}
 					/>
 				</ToolsPanelItem>
