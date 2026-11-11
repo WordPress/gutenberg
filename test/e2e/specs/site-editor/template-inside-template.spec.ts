@@ -389,11 +389,7 @@ test.describe( 'Template rendered inside another template', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await requestUtils.createTemplate( 'wp_template', {
-			slug: 'layout',
-			title: 'Layout',
-			content: LAYOUT_CONTENT,
-		} );
+		// The layout template, created before each test, is the one around.
 		await createTemplateInside( requestUtils, {
 			slug: 'page',
 			title: 'Pages',
@@ -412,6 +408,19 @@ test.describe( 'Template rendered inside another template', () => {
 			postType: 'page',
 			canvas: 'edit',
 		} );
+
+		// A page opens on its own; "Show template" shows it inside its
+		// template, which is where the template around that one appears.
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		const showTemplate = page.getByRole( 'menuitemcheckbox', {
+			name: 'Show template',
+		} );
+		if (
+			( await showTemplate.getAttribute( 'aria-checked' ) ) !== 'true'
+		) {
+			await showTemplate.click();
+		}
+		await page.keyboard.press( 'Escape' );
 
 		// The page is edited inside its template, and that template inside the
 		// one it names, as the front end renders it.
