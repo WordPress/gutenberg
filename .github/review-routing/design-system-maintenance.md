@@ -1,5 +1,5 @@
 ---
-reviewer: WordPress/gutenberg-components
+reviewer: aduth
 threshold: 0.01
 ---
 
