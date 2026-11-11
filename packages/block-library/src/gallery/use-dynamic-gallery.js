@@ -234,7 +234,12 @@ export default function useDynamicGallery( {
 				buildImageBlocks( dynamicMedia, imageAttributes )
 			);
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { dynamicContent: undefined } );
+			// Keep the link the images were built with, since a static
+			// gallery without `linkTo` would derive the site default.
+			setAttributes( {
+				dynamicContent: undefined,
+				linkTo: attributes.linkTo,
+			} );
 		} );
 	}
 
