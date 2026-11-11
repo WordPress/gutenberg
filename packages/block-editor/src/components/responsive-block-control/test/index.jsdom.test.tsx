@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Fragment, useState } from '@wordpress/element';
-import { SelectControl as WCSelectControl } from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Tests the supported native-select render callback.
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import type { ReactNode } from 'react';
 import ResponsiveBlockControl from '../index';
 import type { ResponsiveBlockControlViewport } from '../types';
