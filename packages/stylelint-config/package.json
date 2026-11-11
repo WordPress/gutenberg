@@ -51,7 +51,7 @@
 		"@wordpress/theme": "file:../theme",
 		"stylelint": "^17.14.1",
 		"stylelint-scss": "^7.2.0",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"@wordpress/theme": "^3.0.0 || ^4.0.0",

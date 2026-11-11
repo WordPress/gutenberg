@@ -434,6 +434,27 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 }
 
 /**
+ * Whether a title is exactly what was typed.
+ *
+ * Compares words, not the strings typed, so punctuation does not count: for the search
+ * "coffee beans", "Coffee Beans" and "Coffee Beans." are both exact, and
+ * "Coffee Beans, Lightly Roasted" is not.
+ *
+ * @param title
+ * @param searchTokens
+ *
+ * @return Whether the title's words are the words typed, in the same order.
+ */
+function isExactTitle( title: string, searchTokens: string[] ): boolean {
+	const titleTokens = tokenize( title || '' );
+
+	return (
+		titleTokens.length > 0 &&
+		titleTokens.join( ' ' ) === searchTokens.join( ' ' )
+	);
+}
+
+/**
  * What to sort, and how.
  */
 type SortOptions = {
@@ -459,9 +480,11 @@ type SortOptions = {
  * 2. Ordering of the title matches. "The best coffee beans today" will match above "For the best
  *    coffee, you need the best beans" because of the separation between words
  * 3. Content Type: content > taxonomies > post formats > media
- * 4. Starting with search: "Coffee beans, lightly roasted" will rank above "The freshest coffee
+ * 4. Exact title: "Coffee beans" and "“Coffee beans”" will rank above "Coffee beans, lightly
+ *    roasted"
+ * 5. Starting with search: "Coffee beans, lightly roasted" will rank above "The freshest coffee
  *    beans"
- * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
+ * 6. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
  *
  * @param options
@@ -482,6 +505,7 @@ export function sortResults( {
 		...getTitleMatch( result.title, search ),
 		type: getTypeRank( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
+		exact: isExactTitle( result.title, searchTokens ),
 	} ) );
 
 	scored.sort(
@@ -493,7 +517,10 @@ export function sortResults( {
 			Number( b.contains ) - Number( a.contains ) ||
 			// Matches are equal so far, so enforce banding by type
 			b.type - a.type ||
-			// Within a band, rank matches that start with the search string higher than mid-string matches:
+			// Within a band, a title that is exactly the search comes first, whatever its punctuation:
+			// the search "coffee beans" ranks "“Coffee Beans”" above "Coffee Beans, Lightly Roasted"
+			Number( b.exact ) - Number( a.exact ) ||
+			// Then, rank matches that start with the search string higher than mid-string matches:
 			// i.e the search "cat" ranks the title "caterpillar" higher than "concatenate"
 			Number( b.begins ) - Number( a.begins ) ||
 			// Rank by how much of the matched word the search contains: the search
