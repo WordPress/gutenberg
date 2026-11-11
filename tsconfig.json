@@ -111,6 +111,7 @@
 		{ "path": "routes/identity" },
 		{ "path": "routes/lock-unlock" },
 		{ "path": "routes/media-editor" },
+		{ "path": "routes/media-editor/tsconfig.test.json" },
 		{ "path": "routes/navigation" },
 		{ "path": "routes/navigation-edit" },
 		{ "path": "routes/navigation-list" },

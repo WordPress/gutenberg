@@ -198,36 +198,34 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `mapEditToOriginal( state )` turns that state into flip, rotate and crop operations for the full-size image loaded in `state.image`, in the order to apply them. This loaded image is the "original" for this call, even if the file was edited before. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A crop fitted to a locked ratio can produce an operation before the person edits anything. Apply the operations to the loaded image to save what the person framed.
+The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `getImageEdit( state )` describes the same result against the full-size image loaded in `state.image`. The edit has an optional `flip`, `rotation` and `crop`, to apply in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
 The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { mapEditToOriginal } from '@wordpress/image-editor';
+import { getImageEdit } from '@wordpress/image-editor';
 
-const modifiers = mapEditToOriginal( controller.state ).map( ( edit ) => {
-	if ( edit.type === 'flip' ) {
-		return {
-			type: 'flip',
-			args: {
-				flip: { horizontal: edit.horizontal, vertical: edit.vertical },
-			},
-		};
-	}
-	if ( edit.type === 'rotate' ) {
-		return { type: 'rotate', args: { angle: edit.angle } };
-	}
-	return {
+const edit = getImageEdit( controller.state );
+const modifiers = [];
+
+if ( edit?.flip ) {
+	modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
+}
+if ( edit?.rotation !== undefined ) {
+	modifiers.push( { type: 'rotate', args: { angle: edit.rotation } } );
+}
+if ( edit?.crop ) {
+	modifiers.push( {
 		type: 'crop',
 		args: {
-			left: edit.x * 100,
-			top: edit.y * 100,
-			width: edit.width * 100,
-			height: edit.height * 100,
+			left: edit.crop.x * 100,
+			top: edit.crop.y * 100,
+			width: edit.crop.width * 100,
+			height: edit.crop.height * 100,
 		},
-	};
-} );
+	} );
+}
 
 if ( modifiers.length ) {
 	await apiFetch( {
@@ -236,6 +234,17 @@ if ( modifiers.length ) {
 		data: { src: imageUrl, modifiers },
 	} );
 }
+```
+
+An editor that uploads the result as a new file, rather than asking the server to edit the original, exports it in the browser instead. `exportImage( state, options? )` resolves with a `Blob` of the framed region at the size `getOutputSize( state )` reports:
+
+```ts
+import { exportImage } from '@wordpress/image-editor';
+
+const file = await exportImage( controller.state, {
+	type: 'image/jpeg',
+	quality: 0.9,
+} );
 ```
 
 ## Accessibility Notes

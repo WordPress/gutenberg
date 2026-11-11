@@ -47,14 +47,14 @@
 		"@wordpress/element": "file:../element"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.6.5",
-		"@storybook/react-vite": "^10.6.5",
+		"@storybook/addon-docs": "^10.6.6",
+		"@storybook/react-vite": "^10.6.6",
 		"@testing-library/react": "^16.3.3",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui",
-		"storybook": "^10.6.5",
-		"vitest": "^5.0.5"
+		"storybook": "^10.6.6",
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
