@@ -322,8 +322,9 @@ export function getNamedHexKeys( emojis: NamedEmoji[] ): Set< string > {
 }
 
 /**
- * Whether the rules accept an emoji. Named emoji are always accepted, and
- * skin-tone variants follow their base emoji. Must agree with
+ * Whether the rules accept an emoji. Named emoji are always accepted,
+ * skin-tone variants follow their base emoji, and an excluded emoji is
+ * rejected inside a longer sequence too. Must agree with
  * `gutenberg_is_note_reaction_key_allowed()`.
  *
  * @param hexKey    Normalized hex key of the emoji.
@@ -340,5 +341,11 @@ export function isReactionEmojiAllowed(
 	if ( namedKeys.has( base ) ) {
 		return true;
 	}
-	return rules.allowUnlisted && ! rules.exclude.includes( base );
+	if ( ! rules.allowUnlisted ) {
+		return false;
+	}
+	// An excluded emoji is rejected anywhere in the key, as the server does.
+	return ! rules.exclude.some( ( excluded ) =>
+		`-${ base }-`.includes( `-${ excluded }-` )
+	);
 }

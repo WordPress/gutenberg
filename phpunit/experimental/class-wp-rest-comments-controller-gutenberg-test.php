@@ -1078,16 +1078,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$named_only   = array( 'allow_unlisted' => false );
 
 		return array(
-			'excluded emoji'                     => array( $exclude_wave, '1f44b', 400 ),
-			'skin-tone variant of excluded'      => array( $exclude_wave, '1f44b-1f3fd', 400 ),
-			'emoji that is not excluded'         => array( $exclude_wave, '1f389', 201 ),
-			'exclusion written with VS-16'       => array( array( 'exclude' => array( '2763-FE0F' ) ), '2763', 400 ),
-			'unpadded exclusion'                 => array( array( 'exclude' => array( 'A9' ) ), '00a9', 400 ),
-			'over-padded exclusion'              => array( array( 'exclude' => array( '000A9' ) ), '00a9', 400 ),
-			'named-only rejects unlisted'        => array( $named_only, '1f44b', 400 ),
-			'named-only accepts named'           => array( $named_only, '2764', 201 ),
-			'named emoji wins over an exclusion' => array( array( 'exclude' => array( '2764' ) ), '2764', 201 ),
-			'malformed rules fall back'          => array( 'not-an-array', '1f389', 201 ),
+			'excluded emoji'                      => array( $exclude_wave, '1f44b', 400 ),
+			'skin-tone variant of excluded'       => array( $exclude_wave, '1f44b-1f3fd', 400 ),
+			'excluded emoji plus a text selector' => array( $exclude_wave, '1f44b-fe0e', 400 ),
+			'sequence containing an excluded one' => array( $exclude_wave, '1f44b-200d-1f600', 400 ),
+			'emoji that is not excluded'          => array( $exclude_wave, '1f389', 201 ),
+			'exclusion written with VS-16'        => array( array( 'exclude' => array( '2763-FE0F' ) ), '2763', 400 ),
+			'unpadded exclusion'                  => array( array( 'exclude' => array( 'A9' ) ), '00a9', 400 ),
+			'over-padded exclusion'               => array( array( 'exclude' => array( '000A9' ) ), '00a9', 400 ),
+			'named-only rejects unlisted'         => array( $named_only, '1f44b', 400 ),
+			'named-only accepts named'            => array( $named_only, '2764', 201 ),
+			'named emoji wins over an exclusion'  => array( array( 'exclude' => array( '2764' ) ), '2764', 201 ),
+			'malformed rules fall back'           => array( 'not-an-array', '1f389', 201 ),
 		);
 	}
 

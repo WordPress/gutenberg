@@ -159,7 +159,8 @@ function gutenberg_get_note_reaction_emoji_settings(): array {
 	 *                                    named list. Default true.
 	 *     @type string[] $exclude        Hex keys to reject, eg. `1f595`.
 	 *                                    Excluding an emoji also excludes its
-	 *                                    skin-tone variants. Default empty.
+	 *                                    skin-tone variants and any sequence
+	 *                                    that contains it. Default empty.
 	 * }
 	 */
 	$settings = apply_filters( 'gutenberg_note_reaction_emoji_settings', $defaults );
@@ -213,6 +214,7 @@ function gutenberg_get_note_reaction_emoji_settings(): array {
 /**
  * Whether a reaction hex key is accepted under the emoji rules. An emoji
  * from the named list is always accepted, including its skin-tone variants.
+ * An excluded emoji is rejected on its own and inside a longer sequence.
  *
  * @since 7.3.0
  *
@@ -232,7 +234,22 @@ function gutenberg_is_note_reaction_key_allowed( $hex_key ): bool {
 		}
 	}
 
-	return $settings['allow_unlisted'] && ! in_array( $base_key, $settings['exclude'], true );
+	if ( ! $settings['allow_unlisted'] ) {
+		return false;
+	}
+
+	/*
+	 * An excluded emoji is rejected anywhere in the key, not only as the
+	 * whole key: otherwise appending a code point that does not change how
+	 * it renders, such as U+FE0E, would get it past the exclusion.
+	 */
+	foreach ( $settings['exclude'] as $excluded_key ) {
+		if ( str_contains( "-{$base_key}-", "-{$excluded_key}-" ) ) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**

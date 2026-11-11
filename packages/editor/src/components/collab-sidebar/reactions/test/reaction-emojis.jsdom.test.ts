@@ -55,6 +55,18 @@ describe( 'isReactionEmojiAllowed', () => {
 		expect( isReactionEmojiAllowed( '1f44d', rules, named ) ).toBe( true );
 	} );
 
+	it( 'rejects a longer sequence that contains an excluded emoji', () => {
+		const rules = parseReactionEmojiRules( { exclude: [ '1F44E' ] } );
+		expect( isReactionEmojiAllowed( '1f44e-fe0e', rules, named ) ).toBe(
+			false
+		);
+		expect(
+			isReactionEmojiAllowed( '1f44e-200d-1f600', rules, named )
+		).toBe( false );
+		// A different emoji whose key only starts with the same digits.
+		expect( isReactionEmojiAllowed( '1f44e0', rules, named ) ).toBe( true );
+	} );
+
 	it( 'accepts only named emoji when unlisted ones are off', () => {
 		const rules = parseReactionEmojiRules( { allowUnlisted: false } );
 		expect( isReactionEmojiAllowed( '2764', rules, named ) ).toBe( true );
