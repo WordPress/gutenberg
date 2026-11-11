@@ -27,8 +27,8 @@ export { areImageEditorStatesEqual } from './core/state';
 export { getOutputSize } from './get-output-size';
 
 // Map the edit onto the original image, for saving it.
-export { mapEditToOriginal } from './map-edit-to-original';
-export type { OriginalImageEdit } from './map-edit-to-original';
+export { getImageEdits } from './get-image-edits';
+export type { ImageEdit } from './get-image-edits';
 
 // Export the edited image as a file, in the browser.
 export { exportImage } from './export-image';

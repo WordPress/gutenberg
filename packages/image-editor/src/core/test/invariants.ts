@@ -21,7 +21,7 @@ import type {
 import { DEFAULT_STATE } from '../constants';
 import { imageEditorReducer } from '../state';
 import { getRotatedBBox } from '../camera';
-import { mapEditToOriginal } from '../../map-edit-to-original';
+import { getImageEdits } from '../../get-image-edits';
 import { getOutputSize } from '../../get-output-size';
 
 const IMAGES = [
@@ -329,7 +329,7 @@ describe( 'invariants across a run of edits', () => {
 
 				// The edits sent for saving have to be instructions a
 				// server can carry out.
-				for ( const edit of mapEditToOriginal( state ) ) {
+				for ( const edit of getImageEdits( state ) ) {
 					if (
 						edit.type === 'crop' &&
 						! (

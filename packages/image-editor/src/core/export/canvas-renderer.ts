@@ -3,7 +3,7 @@ import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
 import { degreesToRadians } from '../math/rotation';
 import { getOutputSize } from '../../get-output-size';
-import { mapEditToOriginal } from '../../map-edit-to-original';
+import { getImageEdits } from '../../get-image-edits';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
 const DEFAULT_QUALITY = 0.92;
@@ -59,7 +59,7 @@ export function renderToCanvas(
 	const outW = Math.round( outputSize.width );
 	const outH = Math.round( outputSize.height );
 
-	const hasCrop = mapEditToOriginal( sizedState ).some(
+	const hasCrop = getImageEdits( sizedState ).some(
 		( edit ) => edit.type === 'crop'
 	);
 

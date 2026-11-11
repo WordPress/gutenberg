@@ -136,11 +136,11 @@ Whether two states have the same public edit fields, ignoring tiny floating-poin
 
 ### `getOutputSize( state )`
 
-The dimensions that the edits from `mapEditToOriginal` would produce on the image in `state.image`. A nearly full crop that the mapper omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
+The dimensions that the edits from `getImageEdits` would produce on the image in `state.image`. A nearly full crop that the mapper omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
 
-### `mapEditToOriginal( state )`
+### `getImageEdits( state )`
 
-Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `mapEditToOriginal` turns that state into operations for the full-size image loaded in `state.image`. Here, "original" means the image loaded into this editor, even if that file was edited before.
+Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `getImageEdits` turns that state into edits for the full-size image loaded in `state.image`, which may itself be a file someone edited before.
 
 The returned list contains flip, rotate and crop operations as needed, in the order to apply them. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A locked ratio can produce a crop operation before the person edits anything. The caller applies the operations and saves the result.
 

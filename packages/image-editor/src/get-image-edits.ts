@@ -3,7 +3,7 @@ import { getRotatedBBox } from './core/camera';
 
 /**
  * One edit to apply to the full-size image loaded in `state.image`.
- * `mapEditToOriginal` returns them in the order to apply them.
+ * `getImageEdits` returns them in the order to apply them.
  *
  *   - `flip`:   mirror along each axis that is `true`.
  *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
@@ -12,7 +12,7 @@ import { getRotatedBBox } from './core/camera';
  *     point**, after any `rotate` before it. Position and size are
  *     fractions (0–1) of that image's width and height, from the top-left.
  */
-export type OriginalImageEdit =
+export type ImageEdit =
 	| { type: 'flip'; horizontal: boolean; vertical: boolean }
 	| { type: 'rotate'; angle: number }
 	| { type: 'crop'; x: number; y: number; width: number; height: number };
@@ -26,14 +26,14 @@ export type OriginalImageEdit =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * Map the person's edit onto the full-size image loaded in `state.image`.
+ * The person's edit, as flip, rotate and crop edits for the image loaded
+ * in `state.image`.
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. An image processor needs operations on the loaded image
- * instead. This returns flip, rotate and crop edits in application order.
- * The loaded image may itself be a previously edited file; "original"
- * refers to that image for this call.
+ * the view. An image processor needs edits to the loaded image instead.
+ * This returns them in application order. That loaded image may itself be
+ * a file someone edited before; these edits apply to it as it is.
  *
  * Emits `[flip, rotate, crop]` in that order. Identity operations are
  * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
@@ -70,13 +70,11 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return Ordered edits; empty when nothing changes the original or no
- *         image has loaded.
+ * @return Ordered edits; empty when nothing changes the loaded image or
+ *         no image has loaded.
  */
-export function mapEditToOriginal(
-	state: ImageEditorState
-): OriginalImageEdit[] {
-	const edits: OriginalImageEdit[] = [];
+export function getImageEdits( state: ImageEditorState ): ImageEdit[] {
+	const edits: ImageEdit[] = [];
 	const { image } = state;
 
 	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {

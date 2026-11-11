@@ -1,5 +1,5 @@
 /**
- * Compare `mapEditToOriginal` with `createExportCamera` on the same image.
+ * Compare `getImageEdits` with `createExportCamera` on the same image.
  * For each edit and output point, invert both paths to source coordinates
  * and allow less than one pixel of floating-point error. A single-axis
  * flip reverses the rotation angle because the camera rotates before
@@ -11,9 +11,9 @@
 
 import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
-import { mapEditToOriginal } from '../map-edit-to-original';
+import { getImageEdits } from '../get-image-edits';
 import { getOutputSize } from '../get-output-size';
-import type { OriginalImageEdit } from '../map-edit-to-original';
+import type { ImageEdit } from '../get-image-edits';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
 import type { InternalImageEditorState, Size } from '../core/types';
@@ -70,9 +70,9 @@ function exportSourcePixel(
  * absent when the full-frame is framed; in that case the output canvas
  * equals the full rotated AABB.
  *
- * @param edits Ordered edits as emitted by `mapEditToOriginal`.
+ * @param edits Ordered edits as emitted by `getImageEdits`.
  */
-function readEdits( edits: OriginalImageEdit[] ): {
+function readEdits( edits: ImageEdit[] ): {
 	flip: { horizontal: boolean; vertical: boolean };
 	rotation: number;
 	crop: { x: number; y: number; width: number; height: number } | null;
@@ -119,7 +119,7 @@ function readEdits( edits: OriginalImageEdit[] ): {
  * @param v         Vertical probe in [0, 1] across the output.
  */
 function serverSourcePixel(
-	edits: OriginalImageEdit[],
+	edits: ImageEdit[],
 	imageSize: Size,
 	u: number,
 	v: number
@@ -270,7 +270,7 @@ function buildRows(): ParityRow[] {
  * @param edits     Edits the server will apply.
  * @param imageSize Natural dimensions of the source image.
  */
-function outputSizeFor( edits: OriginalImageEdit[], imageSize: Size ): Size {
+function outputSizeFor( edits: ImageEdit[], imageSize: Size ): Size {
 	const { rotation, crop } = readEdits( edits );
 	const full = getRotatedBBox( imageSize.width, imageSize.height, rotation );
 	if ( ! crop ) {
@@ -282,12 +282,12 @@ function outputSizeFor( edits: OriginalImageEdit[], imageSize: Size ): Size {
 	};
 }
 
-describe( 'mapEditToOriginal ↔ Export-camera parity', () => {
+describe( 'getImageEdits ↔ Export-camera parity', () => {
 	const rows = buildRows();
 
 	for ( const { label, state, u, v } of rows ) {
 		it( label, () => {
-			const edits = mapEditToOriginal( state );
+			const edits = getImageEdits( state );
 
 			// Output canvas is whatever the server would emit: the crop rect
 			// if present, otherwise the full rotated AABB. This makes (u, v)
@@ -312,7 +312,7 @@ describe( 'mapEditToOriginal ↔ Export-camera parity', () => {
 	}
 } );
 
-describe( 'getOutputSize agrees with mapEditToOriginal', () => {
+describe( 'getOutputSize agrees with getImageEdits', () => {
 	// Big enough that a crop just inside the pruning tolerance is still
 	// tens of pixels, which a smallest-size check would act on.
 	const BIG = { src: 'big.jpg', naturalWidth: 20000, naturalHeight: 10000 };
@@ -320,7 +320,7 @@ describe( 'getOutputSize agrees with mapEditToOriginal', () => {
 	it( 'reports the full size when the crop is too near full to be saved', () => {
 		const state = makeState( { image: BIG, zoom: 1.0005 } );
 
-		expect( mapEditToOriginal( state ) ).toEqual( [] );
+		expect( getImageEdits( state ) ).toEqual( [] );
 		expect( getOutputSize( state ) ).toEqual( {
 			width: 20000,
 			height: 10000,
@@ -349,10 +349,10 @@ describe( 'getOutputSize agrees with mapEditToOriginal', () => {
 	} );
 } );
 
-describe( 'mapEditToOriginal without a loaded image', () => {
+describe( 'getImageEdits without a loaded image', () => {
 	it( 'returns no edits, whatever the edit', () => {
 		const state = makeState( { image: null, rotation: 45 } );
 
-		expect( mapEditToOriginal( state ) ).toEqual( [] );
+		expect( getImageEdits( state ) ).toEqual( [] );
 	} );
 } );
