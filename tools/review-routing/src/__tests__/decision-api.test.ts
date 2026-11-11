@@ -4,7 +4,7 @@ import { decide } from '../report.ts';
 
 const RULE = {
 	id: 'design-system',
-	team: 'WordPress/gutenberg-components',
+	reviewer: 'WordPress/gutenberg-components',
 	threshold: 0.7,
 	instructions: 'Ask when UI changes.',
 };
