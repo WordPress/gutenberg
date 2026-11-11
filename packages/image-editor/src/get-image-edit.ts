@@ -2,12 +2,13 @@ import type { Flip, ImageEditorState, NormalizedRect } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * An edit to apply to the image loaded in `state.image`.
+ * How the image loaded in `state.image` is edited: the mirror, rotation
+ * and crop that turn it into what the person framed.
  *
- * Apply the parts in this order: mirror, then rotate, then crop. A part
- * that is absent needs nothing done. The order is fixed, which is why this
- * is one record rather than a list — the editor holds one mirror, one
- * rotation and one crop, never a sequence of them.
+ * This is the edit itself, not a list of things to do. The editor holds
+ * one mirror, one rotation and one crop, so each is a single optional
+ * value here, absent when it changes nothing. Whatever applies the edit
+ * does so in this order: mirror, then rotate, then crop.
  *
  *   - `flip`:     mirror along each axis that is `true`.
  *   - `rotation`: degrees clockwise about the centre. The result is the
