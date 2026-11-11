@@ -1272,7 +1272,7 @@
 			"thumb": {
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.fgSurface4}",
-					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. progressbar indicator)."
+					"$description": "Background color for thumbs with a neutral tone and normal emphasis."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.stroke3}",
@@ -1284,19 +1284,29 @@
 				},
 				"brand": {
 					"$value": "{wpds-color.primitive.primary.stroke3}",
-					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
+					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb)."
 				},
 				"brand-active": {
 					"$value": "{wpds-color.primitive.primary.stroke3}",
-					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
+					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb) that are hovered, focused, or active."
 				},
 				"brand-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb), in their disabled state."
 				},
 				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
 					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state."
+				}
+			},
+			"indicator": {
+				"neutral": {
+					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$description": "Background color for indicators with a neutral tone and normal emphasis (eg. the filled portion of a progressbar or meter)."
+				},
+				"brand": {
+					"$value": "{wpds-color.primitive.primary.stroke3}",
+					"$description": "Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter)."
 				}
 			},
 			"$extensions": {
