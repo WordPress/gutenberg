@@ -752,9 +752,11 @@ const withBlockReset =
 						return;
 					}
 					newState.tree.set( blockId, treeEntry );
-					const controlledEntry = state!.tree.get(
-						'controlled||' + blockId
-					);
+					// Only a block that is still controlled keeps its
+					// controlled entry, so stale entries are dropped.
+					const controlledEntry =
+						preservedControlledInnerBlocks.has( blockId ) &&
+						state!.tree.get( 'controlled||' + blockId );
 					if ( controlledEntry ) {
 						newState.tree.set(
 							'controlled||' + blockId,

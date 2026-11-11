@@ -3002,6 +3002,28 @@ describe( 'state', () => {
 					).toBe( state.tree.get( 'content' ) );
 				} );
 
+				it( 'should drop the controlled tree entry of a block that is no longer controlled in RESET_BLOCKS', () => {
+					let state = getControlledState(
+						[ testBlock( 'content' ) ],
+						[ testBlock( 'content-inner' ) ]
+					);
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'content',
+						hasControlledInnerBlocks: false,
+					} );
+
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [ testBlock( 'chicken' ) ],
+					} );
+
+					expect( state.tree.has( 'content' ) ).toBe( true );
+					expect( state.tree.has( 'controlled||content' ) ).toBe(
+						false
+					);
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = partial< Block >( {
 						clientId: 'template',
