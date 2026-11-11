@@ -24,6 +24,7 @@ export default {
 	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
 	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
 	'primary-stroke3': [
+		'background-indicator-brand',
 		'background-thumb-brand',
 		'background-thumb-brand-active',
 		'stroke-focus',
@@ -94,6 +95,7 @@ export default {
 		'background-surface-neutral-strong',
 	],
 	'bg-fgSurface4': [
+		'background-indicator-neutral',
 		'background-thumb-neutral',
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
