@@ -109,7 +109,7 @@ function gutenberg_get_font_face_src_for_export( $src, array &$files, array $res
 			$name     = pathinfo( $real_file, PATHINFO_FILENAME );
 			$suffix   = '.' . pathinfo( $real_file, PATHINFO_EXTENSION );
 			$zip_path = 'assets/fonts/' . $name . $suffix;
-			for ( $i = 1; isset( $files[ $zip_path ] ) || in_array( $zip_path, $reserved_paths, true ); $i++ ) {
+			for ( $i = 1; isset( $files[ $zip_path ] ) || in_array( $zip_path, $reserved_paths, true ) || file_exists( get_template_directory() . '/' . $zip_path ); $i++ ) {
 				$zip_path = 'assets/fonts/' . $name . '-' . $i . $suffix;
 			}
 			$files[ $zip_path ] = $real_file;
