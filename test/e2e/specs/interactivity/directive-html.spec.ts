@@ -200,6 +200,13 @@ test.describe( 'data-wp-html', () => {
 		] );
 		expect( await rejected.innerHTML() ).toBe( '' );
 		expect( await violations() ).toHaveLength( 1 );
+		// A new token wrapping the same string isn't written again, and a
+		// policy value with the same markup is.
+		await page.getByTestId( 'set rejected html' ).click();
+		expect( await violations() ).toHaveLength( 1 );
+		await page.getByTestId( 'set rejected trusted html' ).click();
+		await expect.poll( () => rejected.innerHTML() ).toBe( '<b>x</b>' );
+		expect( await violations() ).toHaveLength( 1 );
 		expect( pageErrors ).toEqual( [] );
 	} );
 
