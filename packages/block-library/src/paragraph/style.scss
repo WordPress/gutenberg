@@ -21,11 +21,12 @@
 // cannot be set around it, caret position calculation fails in Chrome, and
 // typing at the end of the paragraph doesn't work.
 .has-drop-cap:not(:focus)::first-letter {
-	float: left;
+	float: inline-start;
 	font-size: 8.4em;
 	line-height: 0.68;
 	font-weight: 100;
-	margin: 0.05em 0.1em 0 0;
+	margin: 0.05em 0 0;
+	margin-inline-end: 0.1em;
 	text-transform: uppercase;
 	font-style: normal;
 }
