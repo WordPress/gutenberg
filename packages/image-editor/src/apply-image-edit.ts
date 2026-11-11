@@ -9,33 +9,19 @@ import { imageEditorReducer, withBaseValues } from './core/state';
 import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
 
 /**
- * Why an edit could not be applied.
- *
- *   - `no-image`:      no image has loaded.
- *   - `invalid`:       a value is not a usable number, or the crop has no
- *     area.
- *   - `locked-ratio`:  the crop's shape breaks the ratio the state has
- *     locked.
- *   - `outside-image`: the crop reaches outside the rotated image.
+ * Why an edit was rejected. `invalid` is a non-finite number or a crop
+ * with no area. `outside-image` is a crop reaching outside the image.
  */
 export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
 
-/** The new state, or the reason there is none. */
 export type ApplyImageEditResult =
 	{ state: ImageEditorState } | { rejected: ImageEditRejection };
 
 const WHOLE_IMAGE: NormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 
-/**
- * Whether reading `state` gives back `edit`. A missing part counts as the
- * value that changes nothing, so a nearly full crop that `getImageEdit`
- * omits still matches the crop that was asked for.
- *
- * @param state The state to read.
- * @param edit  The edit it should hold.
- * @return Whether they match within `CROP_TOLERANCE`.
- */
+// Whether `state` reads back as `edit`. A missing part means none, so a
+// near-full crop that `getImageEdit` omits still matches.
 function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 	const held = getImageEdit( state );
 	if ( ! held ) {
@@ -57,23 +43,15 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 }
 
 /**
- * Turn an edit into an editor state, with no canvas involved.
+ * The reverse of `getImageEdit`. A part missing from `edit` means none,
+ * and only the image and locked ratio are kept from `state`.
  *
- * The edit is the whole edit: a part left out means none, whatever flip,
- * rotation or crop `state` had. Only the image and the locked ratio are
- * taken from `state`.
+ * The pan and zoom are replaced: the crop is centred and zoomed in until
+ * it meets an edge of the view or the zoom limit, as after a resize. An
+ * edit the editor cannot hold is rejected, not adjusted.
  *
- * An edit says which pixels to keep, not how the canvas shows them, so
- * the view is chosen here: the crop is centred and zoomed in until it
- * meets an edge of the view or the zoom limit, as it is after a person
- * finishes resizing. The pan and zoom `state` had are replaced.
- *
- * Nothing is approximated. The result is read back with `getImageEdit`,
- * and an edit the editor cannot hold is rejected.
- *
- * @param state The editor state the edit is for.
- * @param edit  The edit, in the shape `getImageEdit` returns.
- * @return The new state, or the reason the edit was rejected.
+ * @param state
+ * @param edit
  */
 export function applyImageEdit(
 	state: ImageEditorState,
@@ -104,15 +82,14 @@ export function applyImageEdit(
 		horizontal: Boolean( edit.flip?.horizontal ),
 		vertical: Boolean( edit.flip?.vertical ),
 	};
-	// The edit rotates after the flip and the editor before it, so one
-	// flipped axis reverses the angle. This undoes the rule in
-	// `getImageEdit`.
+	// Undoes the sign rule in `getImageEdit`: one flipped axis reverses
+	// the angle.
 	const angle = ( ( ( edit.rotation ?? 0 ) % 360 ) + 360 ) % 360;
 	const rotation =
 		flip.horizontal !== flip.vertical ? ( 360 - angle ) % 360 : angle;
 
-	// The crop is measured on the rotated image. The view is measured on
-	// the image at its nearest quarter turn, with the same centre.
+	// The crop is in the rotated image's bounds. The view is the bounds at
+	// the nearest quarter turn, on the same centre.
 	const view = getRotatedBBox(
 		image.naturalWidth,
 		image.naturalHeight,
@@ -162,7 +139,7 @@ export function applyImageEdit(
 	if ( holdsEdit( next, edit ) ) {
 		return { state: next };
 	}
-	// The same edit with no ratio locked tells the two causes apart.
+	// If the edit holds without the lock, the lock rejected it.
 	if ( state.aspectRatio && holdsEdit( reset( candidate ), edit ) ) {
 		return { rejected: 'locked-ratio' };
 	}

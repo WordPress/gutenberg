@@ -157,8 +157,7 @@ describe( 'the public API', () => {
 	} );
 
 	it( 'shows an edit applied from code', async () => {
-		// A quarter turn, then the left half of the turned image: 300 by
-		// 1200 pixels.
+		// The left half of the turned image: 300 by 1200 pixels.
 		const edit = {
 			rotation: 90,
 			crop: { x: 0, y: 0, width: 0.5, height: 1 },

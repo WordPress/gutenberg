@@ -91,13 +91,13 @@ describe( 'applyImageEdit', () => {
 			{ crop: { x: 0.8, y: 0, width: 0.5, height: 1 } },
 		],
 		[
-			// The whole bounding box of a tilted image has empty corners.
+			// A tilted image's bounds have empty corners.
 			'outside-image',
 			clean,
 			{ rotation: 10 },
 		],
 		[
-			// 800 by 400 pixels, against a locked square.
+			// 800 by 400 pixels.
 			'locked-ratio',
 			createImageEditorState( { image: IMAGE, aspectRatio: 1 } ),
 			{ crop: { x: 0.25, y: 0.25, width: 0.5, height: 4 / 9 } },

@@ -129,15 +129,8 @@ function viewShape( state: InternalImageEditorState ): Size | null {
 	);
 }
 
-/**
- * Whether two edits describe the same picture. Written out here, apart
- * from the comparison `applyImageEdit` makes, so the test does not take
- * its answer from the code it checks.
- *
- * @param a One edit, or `null`.
- * @param b The other.
- * @return Whether they match to a thousandth of the image.
- */
+// Whether two edits match to a thousandth. Kept apart from the check in
+// `applyImageEdit`, so the test does not reuse the code it tests.
 function isSameEdit( a: ImageEdit | null, b: ImageEdit | null ): boolean {
 	if ( ! a || ! b ) {
 		return a === b;
@@ -382,9 +375,8 @@ describe( 'invariants across a run of edits', () => {
 					);
 				}
 
-				// An edit read from the editor can be handed back. It is
-				// applied to a clean state, so the view it was read from
-				// cannot carry it through.
+				// Applied to a clean state, so the old view cannot carry
+				// the edit.
 				if ( edit ) {
 					const clean = imageEditorReducer( state, {
 						type: 'RESET',
