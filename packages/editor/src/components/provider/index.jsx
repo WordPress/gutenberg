@@ -150,6 +150,51 @@ function useBlockEditorProps( post, template, mode ) {
 }
 
 /**
+ * Returns the template the template of a post is rendered inside, if any.
+ *
+ * With the templates inside templates experiment a template can name another
+ * template to be rendered inside, in that one's template slot block, so the
+ * front end renders a post inside its template and that template inside the
+ * one it names. The canvas renders the same when it shows the template.
+ *
+ * @param {Object}  post     The post being edited.
+ * @param {?Object} template The template of the post.
+ * @return {?Object|undefined} The template, `null` when there is none, or `undefined` while it resolves.
+ */
+function useTemplateAroundTemplate( post, template ) {
+	return useSelect(
+		( select ) => {
+			// A template rendered inside another is the template being
+			// edited, which the host already names the other one for.
+			if (
+				! template ||
+				post.type === 'wp_template' ||
+				template.type !== 'wp_template'
+			) {
+				return null;
+			}
+
+			const outerTemplateId = unlock( select( coreStore ) ).getTemplateId(
+				'wp_template',
+				template.id
+			);
+			if ( ! outerTemplateId ) {
+				return outerTemplateId;
+			}
+
+			return (
+				select( coreStore ).getEditedEntityRecord(
+					'postType',
+					'wp_template',
+					outerTemplateId
+				) || undefined
+			);
+		},
+		[ post.type, template ]
+	);
+}
+
+/**
  * This component provides the editor context and manages the state of the block editor.
  *
  * @param {Object}  props                                The component props.
@@ -192,6 +237,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const template = getTemplateAround( post, _template );
 		const standsForOwnTemplate = !! _template && ! template;
 		const hasTemplate = !! template;
+		const outerTemplate = useTemplateAroundTemplate( post, template );
+		// The template the canvas renders at its root when it shows the
+		// template: the one the post's template is rendered inside, if any.
+		const canvasTemplate = outerTemplate || template;
+		const hasResolvedCanvasTemplate =
+			hasTemplate && outerTemplate !== undefined;
 		const {
 			editorSettings,
 			selection,
@@ -241,7 +292,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				 */
 				const hasResolvedDefaultMode =
 					_defaultMode === 'template-locked'
-						? hasTemplate
+						? hasResolvedCanvasTemplate
 						: _defaultMode !== undefined;
 				// Wait until the default mode is retrieved and start rendering canvas.
 				const isRenderingModeReady = _defaultMode !== undefined;
@@ -274,14 +325,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			[
 				post.type,
 				post.id,
-				hasTemplate,
+				hasResolvedCanvasTemplate,
 				standsForOwnTemplate,
 				renderingMode,
 			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
-		const rootLevelPost = shouldRenderTemplate ? template : post;
+		const rootLevelPost = shouldRenderTemplate ? canvasTemplate : post;
 		/*
 		 * A template can name the template it is rendered inside, in which case
 		 * the canvas shows that one around it and the template being edited is
@@ -292,6 +343,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			shouldRenderTemplate &&
 			post.type === 'wp_template' &&
 			template.id !== post.id;
+		/*
+		 * The template of a post can name a template too, in which case the
+		 * canvas shows that one at its root, the post's template in its slot,
+		 * and the post in the content block of its template, as the front end
+		 * renders it.
+		 */
+		const isPostTemplateInsideTemplate =
+			shouldRenderTemplate && !! outerTemplate;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
@@ -333,8 +392,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			 * slug of the template around them.
 			 */
 			let templateSlug;
+			let templateSlotId;
 			if ( isTemplateInsideTemplate ) {
 				templateSlug = post.slug;
+				templateSlotId = post.id;
+			} else if ( isPostTemplateInsideTemplate ) {
+				templateSlug = template.slug;
+				templateSlotId = template.id;
 			} else if ( rootLevelPost.type === 'wp_template' ) {
 				templateSlug = rootLevelPost.slug;
 			}
@@ -342,10 +406,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return {
 				...postContext,
 				templateSlug,
-				templateSlotId: isTemplateInsideTemplate ? post.id : undefined,
+				templateSlotId,
 			};
 		}, [
 			isTemplateInsideTemplate,
+			isPostTemplateInsideTemplate,
+			template?.id,
+			template?.slug,
 			shouldRenderTemplate,
 			post.id,
 			post.type,
@@ -363,7 +430,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
-			template,
+			canvasTemplate,
 			mode
 		);
 
