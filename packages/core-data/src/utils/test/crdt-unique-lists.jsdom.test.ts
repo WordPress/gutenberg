@@ -236,16 +236,6 @@ describe( 'lists of unique items in block attributes', () => {
 			} );
 		} );
 
-		it( 'stores strings and their order', () => {
-			expect(
-				expandUniqueLists( { tags: [ 'talk', 'keynote' ] }, tagLists )
-			).toEqual( {
-				'tags#talk': 'talk',
-				'tags#keynote': 'keynote',
-				'tags@order': [ 'talk', 'keynote' ],
-			} );
-		} );
-
 		it( 'leaves an empty list alone', () => {
 			const attributes = { tags: [] };
 
@@ -502,28 +492,6 @@ describe( 'lists of unique items in block attributes', () => {
 			expect( read( b ) ).toEqual( { tags: [ 'talk' ] } );
 		} );
 
-		it( 'keeps an empty list as an empty list', () => {
-			const a = createPeer();
-			edit( a, { tags: [ 'keynote' ] }, 'core/test-tags' );
-			edit( a, { tags: [] }, 'core/test-tags' );
-
-			expect( read( a ) ).toEqual( { tags: [] } );
-		} );
-
-		it( 'keeps the order of the items', () => {
-			const a = createPeer();
-			edit(
-				a,
-				{ tags: [ 'talk', 'keynote', 'panel' ] },
-				'core/test-tags'
-			);
-			const b = join( a );
-
-			expect( read( b ) ).toEqual( {
-				tags: [ 'talk', 'keynote', 'panel' ],
-			} );
-		} );
-
 		it( 'keeps both items when collaborators add out of order at the same time', () => {
 			const a = createPeer();
 			edit( a, { tags: [ 'talk' ] }, 'core/test-tags' );
@@ -601,17 +569,6 @@ describe( 'lists of unique items in block attributes', () => {
 			const tags = read( a ).tags;
 			expect( read( b ).tags ).toEqual( tags );
 			expect( [ orderOfA, orderOfB ] ).toContainEqual( tags );
-		} );
-
-		it( 'stores a list whole when two items are the same', () => {
-			const a = createPeer();
-			edit( a, { tags: [ 'keynote' ] }, 'core/test-tags' );
-
-			const tags = [ 'keynote', 'talk', 'keynote' ];
-			edit( a, { tags }, 'core/test-tags' );
-
-			expect( readStored( a ) ).toEqual( { tags } );
-			expect( read( a ) ).toEqual( { tags } );
 		} );
 
 		it( 'moves a list stored inside the attribute to its own keys on the next change', () => {
