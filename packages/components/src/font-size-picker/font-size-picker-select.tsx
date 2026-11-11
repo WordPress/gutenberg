@@ -25,15 +25,12 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
-		...fontSizes.map( ( fontSize ) => {
-			const hint = generateFontSizeHint( fontSize );
-			return {
-				value: fontSize.slug,
-				label: fontSize.name || fontSize.slug,
-				size: fontSize.size,
-				hint,
-			};
-		} ),
+		...fontSizes.map( ( fontSize ) => ( {
+			value: fontSize.slug,
+			label: fontSize.name || fontSize.slug,
+			size: fontSize.size,
+			description: generateFontSizeHint( fontSize ),
+		} ) ),
 	];
 
 	const selectedOption = ( () => {
@@ -69,14 +66,18 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				popupWidth="anchor"
 				trigger={
 					<SelectControl.Trigger aria-describedby={ descriptionId }>
-						<span className={ styles[ 'selected-value' ] }>
-							{ selectedOption.label }
-							{ selectedOption.hint && (
-								<span className={ styles[ 'selected-hint' ] }>
-									{ selectedOption.hint }
-								</span>
-							) }
-						</span>
+						{ ( item ) => (
+							<>
+								{ item.label }
+								{ item.description && (
+									<span
+										className={ styles[ 'selected-hint' ] }
+									>
+										{ item.description }
+									</span>
+								) }
+							</>
+						) }
 					</SelectControl.Trigger>
 				}
 				onValueChange={ ( item ) => {
@@ -88,26 +89,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 					);
 					onChange( matchingFontSize?.size, matchingFontSize );
 				} }
-			>
-				{ options.map( ( option ) => (
-					<SelectControl.Item
-						key={ option.value ?? 'default' }
-						value={ option }
-						label={ option.label }
-					>
-						<SelectControl.ItemLabel>
-							<span className={ styles[ 'option-label' ] }>
-								{ option.label }
-								{ option.hint && (
-									<span className={ styles[ 'option-hint' ] }>
-										{ option.hint }
-									</span>
-								) }
-							</span>
-						</SelectControl.ItemLabel>
-					</SelectControl.Item>
-				) ) }
-			</SelectControl>
+			/>
 			<VisuallyHidden id={ descriptionId }>
 				{ sprintf(
 					// translators: %s: Currently selected font size.

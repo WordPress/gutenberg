@@ -41,7 +41,7 @@ describe( 'FontSizePickerSelect', () => {
 		const trigger = screen.getByRole( 'combobox', { name: 'Font size' } );
 		await userEvent.click( trigger );
 		expect(
-			screen.getByRole( 'option', { name: 'Small 12px' } )
+			screen.getByRole( 'option', { name: 'Small', description: '12px' } )
 		).toBeVisible();
 		await userEvent.keyboard( '{Home}{ArrowDown}{Enter}' );
 		expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
@@ -138,7 +138,10 @@ describe( 'FontSizePickerSelect', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			await user.click(
-				screen.getByRole( 'option', { name: 'Small 12px' } )
+				screen.getByRole( 'option', {
+					name: 'Small',
+					description: '12px',
+				} )
 			);
 			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		} );

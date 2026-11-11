@@ -124,7 +124,7 @@ export type FontSizePickerSelectOption = {
 	value: string | null;
 	label: string;
 	size?: FontSize[ 'size' ];
-	hint?: string;
+	description?: string;
 };
 
 export type FontSizePickerToggleGroupProps = Pick<
