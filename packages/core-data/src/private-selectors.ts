@@ -408,29 +408,29 @@ export function getEntityActionsConfig(
 }
 
 /**
- * Returns the stored copy of a complete entity record, without resolving it.
+ * Returns how many times an entity record was received complete, without
+ * resolving it. A `_fields` response does not count.
  *
  * @param state    Data state.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record's key.
+ * @param recordId Record's key, or `undefined` for a keyless entity.
  * @param context  REST context the record was received in.
  *
- * @return The stored record, or undefined if no complete record is stored.
+ * @return The number of complete receipts.
  */
-export function getStoredEntityRecord(
+export function getCompleteReceiptCount(
 	state: State,
 	kind: string,
 	name: string,
-	recordId: EntityRecordKey,
+	recordId: EntityRecordKey | undefined,
 	context: string = 'default'
-): unknown {
-	const queriedState =
-		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-	if ( ! queriedState?.itemIsComplete[ context ]?.[ recordId ] ) {
-		return undefined;
-	}
-	return queriedState.items[ context ]?.[ recordId ];
+): number {
+	return (
+		state.entities.records?.[ kind ]?.[ name ]?.completeReceipts?.[
+			context
+		]?.[ recordId as EntityRecordKey ] ?? 0
+	);
 }
 
 /**

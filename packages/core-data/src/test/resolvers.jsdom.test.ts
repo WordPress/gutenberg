@@ -68,10 +68,10 @@ describe( 'getEntityRecord', () => {
 		| 'finishResolutions'
 	>;
 	let syncManager: Record< string, Mock >;
-	let select: { getStoredEntityRecord: Mock };
+	let select: { getCompleteReceiptCount: Mock };
 
 	beforeEach( async () => {
-		select = { getStoredEntityRecord: vi.fn() };
+		select = { getCompleteReceiptCount: vi.fn( () => 0 ) };
 		dispatch = Object.assign( vi.fn(), {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
@@ -265,7 +265,6 @@ describe( 'getEntityRecord', () => {
 
 	it( 'ignores a response delivered after the record was received elsewhere', async () => {
 		const STALE_POST_TYPE = { slug: 'post', name: 'stale' };
-		const RECEIVED_POST_TYPE = { slug: 'post', name: 'received' };
 
 		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
 		const staleResponseGate = new Promise( ( resolve ) => {
@@ -283,12 +282,12 @@ describe( 'getEntityRecord', () => {
 
 		// The record is received outside the resolver while the request is
 		// in flight, as the editor does with an upload's finalize response.
-		select.getStoredEntityRecord.mockReturnValue( RECEIVED_POST_TYPE );
+		select.getCompleteReceiptCount.mockReturnValue( 1 );
 
 		deliverStaleResponse();
 		await staleRequest;
 
-		expect( select.getStoredEntityRecord ).toHaveBeenCalledWith(
+		expect( select.getCompleteReceiptCount ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			'post',
@@ -304,12 +303,14 @@ describe( 'getEntityRecord', () => {
 		const OLDER_POST_TYPE = { slug: 'post', name: 'older' };
 		const NEWER_POST_TYPE = { slug: 'post', name: 'newer' };
 
-		// Stores each received record as a new object, like the reducer.
+		// Counts each received record, like the reducer.
 		let stored: unknown;
-		select.getStoredEntityRecord.mockImplementation( () => stored );
+		let receipts = 0;
+		select.getCompleteReceiptCount.mockImplementation( () => receipts );
 		dispatch.receiveEntityRecords.mockImplementation(
 			( _kind, _name, record ) => {
-				stored = { ...record };
+				stored = record;
+				receipts++;
 			}
 		);
 

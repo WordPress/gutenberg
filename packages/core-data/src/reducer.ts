@@ -9,6 +9,7 @@ import type {
 } from '@wordpress/sync';
 import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
+import getQueryParts from './queried-data/get-query-parts';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
 import type * as ET from './entity-types';
@@ -329,6 +330,36 @@ function entity( entityConfig: EntityConfig ) {
 				}
 
 				return state;
+			},
+
+			// Counts how many times each record was received complete, which
+			// tells a `getEntityRecord` request apart from a newer copy.
+			completeReceipts: (
+				state: EntityRecordsState[ 'completeReceipts' ] = {},
+				action: KeyedEntityAction
+			) => {
+				if ( action.type !== 'RECEIVE_ITEMS' ) {
+					return state;
+				}
+
+				const { context, fields } = action.query
+					? getQueryParts( action.query )
+					: { context: 'default', fields: null };
+				if ( fields ) {
+					return state;
+				}
+
+				const itemsList = Array.isArray( action.items )
+					? action.items
+					: [ action.items ];
+				const receipts = { ...state[ context ] };
+				for ( const item of itemsList ) {
+					// A keyless entity stores its record under `undefined`.
+					const itemId = item?.[ action.key ] as ItemId;
+					receipts[ itemId ] = ( receipts[ itemId ] ?? 0 ) + 1;
+				}
+
+				return { ...state, [ context ]: receipts };
 			},
 
 			saving: (

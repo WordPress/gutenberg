@@ -48,7 +48,7 @@ const lastReceivedResponse = new WeakMap<
  * *delivered* last - even when its body was read from the database before the
  * newer one.
  *
- * Only responses to an identical request are compared, so a request for a
+ * Only responses to an equivalent request are compared, so a request for a
  * different set of `_fields` never discards another one's data.
  *
  * @param registry A `@wordpress/data` registry.
@@ -80,12 +80,41 @@ function claimResponseOrder(
 }
 
 /**
- * The stored record each `getEntityRecord` response last wrote, per registry
- * and per record and context.
+ * Returns a key identifying a record request, regardless of the order of its
+ * query arguments and requested fields.
+ *
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key.
+ * @param query Request query.
+ *
+ * @return Response order key.
+ */
+function getResponseOrderKey(
+	kind: string,
+	name: string,
+	key: string | number,
+	query?: Query
+): string {
+	const fields = getNormalizedCommaSeparable( query?._fields ) ?? [];
+	const canonicalQuery =
+		query &&
+		Object.keys( query )
+			.sort()
+			.map( ( arg ) => [
+				arg,
+				arg === '_fields' ? [ ...fields ].sort().join() : query[ arg ],
+			] );
+	return JSON.stringify( [ kind, name, key, canonicalQuery ?? null ] );
+}
+
+/**
+ * The complete receipt count each `getEntityRecord` response last left, per
+ * registry and per record and context.
  */
 const lastResolverWrite = new WeakMap<
 	CoreDataThunkArgs[ 'registry' ],
-	Map< string, unknown >
+	Map< string, number >
 >();
 
 /**
@@ -96,44 +125,45 @@ const lastResolverWrite = new WeakMap<
  * upload this way while an earlier read of the attachment may still be in
  * flight. See https://github.com/WordPress/gutenberg/issues/81844.
  *
- * @param registry     A `@wordpress/data` registry.
- * @param recordKey    Identifies the stored record and its context.
- * @param storedBefore The stored record when the request began.
- * @param storedNow    The stored record now.
+ * A `_fields` response only updates some fields, so it does not count.
  *
- * @return Whether the stored record changed without the resolver writing it.
+ * @param registry       A `@wordpress/data` registry.
+ * @param recordKey      Identifies the stored record and its context.
+ * @param receiptsBefore Complete receipts when the request began.
+ * @param receiptsNow    Complete receipts now.
+ *
+ * @return Whether a complete record was received without the resolver.
  */
 function wasReceivedElsewhere(
 	registry: CoreDataThunkArgs[ 'registry' ],
 	recordKey: string,
-	storedBefore: unknown,
-	storedNow: unknown
+	receiptsBefore: number,
+	receiptsNow: number
 ): boolean {
 	return (
-		storedNow !== undefined &&
-		storedNow !== storedBefore &&
-		storedNow !== lastResolverWrite.get( registry )?.get( recordKey )
+		receiptsNow !== receiptsBefore &&
+		receiptsNow !== lastResolverWrite.get( registry )?.get( recordKey )
 	);
 }
 
 /**
- * Remembers the stored record a `getEntityRecord` response just wrote.
+ * Remembers the complete receipt count a `getEntityRecord` response left.
  *
  * @param registry  A `@wordpress/data` registry.
  * @param recordKey Identifies the stored record and its context.
- * @param stored    The stored record after the write.
+ * @param receipts  Complete receipts after the write.
  */
 function rememberResolverWrite(
 	registry: CoreDataThunkArgs[ 'registry' ],
 	recordKey: string,
-	stored: unknown
+	receipts: number
 ) {
 	let writes = lastResolverWrite.get( registry );
 	if ( ! writes ) {
 		writes = new Map();
 		lastResolverWrite.set( registry, writes );
 	}
-	writes.set( recordKey, stored );
+	writes.set( recordKey, receipts );
 }
 
 /**
@@ -238,14 +268,22 @@ export const getEntityRecord =
 			} );
 			const isFreshestResponse = claimResponseOrder(
 				registry,
-				JSON.stringify( [ kind, name, key, query ?? null ] )
+				getResponseOrderKey( kind, name, key, query )
 			);
 			const context =
 				( query?.context as string | undefined ) ?? 'default';
 			const recordKey = JSON.stringify( [ kind, name, key, context ] );
-			const getStored = () =>
-				select.getStoredEntityRecord( kind, name, key, context );
-			const storedBefore = getStored();
+			// A keyless entity, such as the site settings, is stored under
+			// `undefined`.
+			const storedKey = key === '' ? undefined : key;
+			const getReceipts = () =>
+				select.getCompleteReceiptCount(
+					kind,
+					name,
+					storedKey,
+					context
+				);
+			const receiptsBefore = getReceipts();
 			const response = await apiFetch( { path, parse: false } );
 			const record: RestRecord = await response.json();
 
@@ -257,8 +295,8 @@ export const getEntityRecord =
 					wasReceivedElsewhere(
 						registry,
 						recordKey,
-						storedBefore,
-						getStored()
+						receiptsBefore,
+						getReceipts()
 					) )
 			) {
 				return;
@@ -396,7 +434,7 @@ export const getEntityRecord =
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
-			rememberResolverWrite( registry, recordKey, getStored() );
+			rememberResolverWrite( registry, recordKey, getReceipts() );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}

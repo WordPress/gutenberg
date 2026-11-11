@@ -219,6 +219,7 @@ export type KeyedEntityAction = Action extends infer A
  */
 export interface EntityRecordsState {
 	queriedData: QueriedDataState;
+	completeReceipts: Record< string, Record< ItemId, number > >;
 	edits: Record< ItemId, Record< string, unknown > >;
 	saving: Record<
 		ItemId,

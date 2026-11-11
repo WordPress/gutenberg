@@ -170,7 +170,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'getEntityRecord', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
-		const select = { getStoredEntityRecord: () => undefined };
+		const select = { getCompleteReceiptCount: () => 0 };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),

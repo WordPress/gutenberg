@@ -124,6 +124,159 @@ describe( 'getEntityRecord', () => {
 		} );
 		expect( triggerFetch ).not.toHaveBeenCalled();
 	} );
+
+	/**
+	 * Holds the next record request until the test delivers its response.
+	 *
+	 * @return Promise settling once the request is made, and the response's
+	 *         delivery function.
+	 */
+	function holdNextResponse(): {
+		requested: Promise< unknown >;
+		deliver: ( record: unknown ) => void;
+	} {
+		let deliver!: ( record: unknown ) => void;
+		let onRequest!: ( value?: unknown ) => void;
+		const gate = new Promise( ( resolve ) => {
+			deliver = resolve;
+		} );
+		const requested = new Promise( ( resolve ) => {
+			onRequest = resolve;
+		} );
+		apiFetchMock.mockImplementationOnce( () => {
+			onRequest();
+			return {
+				json: () => gate,
+				headers: { get: () => null },
+			};
+		} );
+		return { requested, deliver };
+	}
+
+	/**
+	 * Registers entities without a config loader, so that only record
+	 * requests reach the REST API mock.
+	 */
+	function addLoaderlessEntities() {
+		registry.dispatch( coreDataStore ).addEntities( [
+			{
+				kind: 'test',
+				name: 'post',
+				baseURL: '/wp/v2/posts',
+			},
+			{
+				kind: 'test',
+				name: 'settings',
+				key: false,
+				baseURL: '/wp/v2/settings',
+			},
+		] );
+	}
+
+	it( 'keeps a full response when only some fields were received during the request', async () => {
+		addLoaderlessEntities();
+		const { receiveEntityRecords, invalidateResolution } =
+			registry.dispatch( coreDataStore );
+		receiveEntityRecords( 'test', 'post', createTestPost( 1 ) );
+
+		const { requested, deliver } = holdNextResponse();
+		invalidateResolution( 'getEntityRecord', [ 'test', 'post', 1 ] );
+		const request = registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1 );
+		await requested;
+
+		// A `_fields` list lands while the full request is in flight.
+		receiveEntityRecords(
+			'test',
+			'post',
+			[ { id: 1, title: { raw: 'Renamed', rendered: 'Renamed' } } ],
+			{ _fields: 'id,title' }
+		);
+
+		const fullPost = {
+			...createTestPost( 1 ),
+			title: { raw: 'Renamed', rendered: 'Renamed' },
+			content: { raw: 'Updated', rendered: 'Updated' },
+		};
+		deliver( fullPost );
+		await request;
+
+		expect(
+			registry
+				.select( coreDataStore )
+				.getEntityRecord( 'test', 'post', 1 )
+		).toEqual( fullPost );
+	} );
+
+	it( 'ignores a late response once a keyless record was received elsewhere', async () => {
+		addLoaderlessEntities();
+
+		const { requested, deliver } = holdNextResponse();
+		const request = registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'settings' );
+		await requested;
+
+		// The settings are saved while the read is in flight.
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'test', 'settings', { title: 'Saved' } );
+
+		deliver( { title: 'Stale' } );
+		await request;
+
+		expect(
+			registry
+				.select( coreDataStore )
+				.getEntityRecord( 'test', 'settings' )
+		).toEqual( { title: 'Saved' } );
+	} );
+
+	it( 'ignores a late response to the same query with its keys in another order', async () => {
+		addLoaderlessEntities();
+		const { requested: requestedStale, deliver: deliverStale } =
+			holdNextResponse();
+		const staleRequest = registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1, {
+				context: 'view',
+				_fields: 'id,title',
+			} );
+		await requestedStale;
+
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => Promise.resolve( { id: 1, title: 'Fresh' } ),
+			headers: { get: () => null },
+		} ) );
+		registry
+			.dispatch( coreDataStore )
+			.invalidateResolution( 'getEntityRecord', [
+				'test',
+				'post',
+				1,
+				{ context: 'view', _fields: 'id,title' },
+			] );
+		await registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1, {
+				_fields: 'title,id',
+				context: 'view',
+			} );
+
+		deliverStale( { id: 1, title: 'Stale' } );
+		await staleRequest;
+
+		expect(
+			registry
+				.select( coreDataStore )
+				.getEntityRecord( 'test', 'post', 1, {
+					context: 'view',
+					_fields: 'id,title',
+				} )
+		).toEqual( { id: 1, title: 'Fresh' } );
+		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
+	} );
 } );
 
 describe( 'getEntityRecords', () => {
