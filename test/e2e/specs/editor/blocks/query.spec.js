@@ -63,6 +63,60 @@ test.describe( 'Query block', () => {
 			);
 		} );
 
+		for ( const { label, options } of [
+			{
+				label: 'Order by',
+				options: [ 'Newest to oldest', 'Oldest to newest' ],
+			},
+			{ label: 'Sticky posts', options: [ 'Include', 'Exclude' ] },
+		] ) {
+			test( `keeps a saved post unchanged when reselecting ${ label }`, async ( {
+				page,
+				editor,
+			} ) => {
+				const control = page.getByRole( 'combobox', {
+					name: label,
+					exact: true,
+				} );
+				for ( const option of options ) {
+					await control.click();
+					await page
+						.getByRole( 'option', { name: option, exact: true } )
+						.click();
+					await editor.saveDraft();
+					const before = ( await editor.getBlocks() )[ 0 ].attributes
+						.query;
+					await expect
+						.poll( () =>
+							page.evaluate( () =>
+								window.wp.data
+									.select( 'core/editor' )
+									.isEditedPostDirty()
+							)
+						)
+						.toBe( false );
+					await control.click();
+					await page
+						.getByRole( 'option', { name: option, exact: true } )
+						.click();
+					await expect( control ).toHaveAttribute(
+						'aria-expanded',
+						'false'
+					);
+					expect(
+						await page.evaluate( () =>
+							window.wp.data
+								.select( 'core/editor' )
+								.isEditedPostDirty()
+						)
+					).toBe( false );
+					expect(
+						( await editor.getBlocks() )[ 0 ].attributes.query
+					).toEqual( before );
+				}
+			} );
+		}
+
 		test( 'keeps query state when reselecting the current post type', async ( {
 			page,
 			editor,

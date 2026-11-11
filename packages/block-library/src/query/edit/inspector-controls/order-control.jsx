@@ -40,7 +40,7 @@ function OrderControl( {
 			}
 			items={ orderByOptions }
 			onValueChange={ ( item ) => {
-				if ( ! item ) {
+				if ( ! item || item.value === `${ orderBy }/${ order }` ) {
 					return;
 				}
 				const [ newOrderBy, newOrder ] = item.value.split( '/' );

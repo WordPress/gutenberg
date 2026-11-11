@@ -18,7 +18,11 @@ export default function StickyControl( { value, onChange } ) {
 				stickyOptions[ 0 ]
 			}
 			itemToStringValue={ ( item ) => `sticky:${ item.value }` }
-			onValueChange={ ( item ) => item && onChange( item.value ) }
+			onValueChange={ ( item ) => {
+				if ( item && item.value !== value ) {
+					onChange( item.value );
+				}
+			} }
 			description={ __(
 				'Sticky posts always appear first, regardless of their publish date.'
 			) }
