@@ -43,6 +43,7 @@ jobs:
         name: Detect changes relevant to unit tests
         runs-on: 'ubuntu-slim'
         timeout-minutes: 5
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         permissions:
             pull-requests: read
         outputs:
@@ -252,7 +253,7 @@ jobs:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-slim'
         needs: [detect-relevant-changes]
-        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -281,7 +282,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
         needs: [detect-relevant-changes]
-        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         permissions:
             contents: read
         steps:
@@ -668,11 +669,17 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  sparse-checkout: .github/workflows/scripts
+                  sparse-checkout: tools/monorepo/scripts
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
 
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'
+              run: node tools/monorepo/scripts/ci-status-check.mts --ignore 'Unit Tests - Status Check'
