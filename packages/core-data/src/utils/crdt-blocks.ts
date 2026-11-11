@@ -1112,12 +1112,6 @@ function hasDistinctClientIds( blocks: Block[] ): boolean {
 	return true;
 }
 
-const BLOCK_STRUCTURE_KEYS = new Set( [
-	'attributes',
-	'innerBlocks',
-	'clientId',
-] );
-
 /**
  * Apply the change from `previousBlock` to `block` onto a Y.Map block the editor knows.
  *
@@ -1134,9 +1128,21 @@ function rebaseYBlock(
 	attributeCursor: MergeCursorPosition,
 	context: BlockRebaseContext
 ): void {
+	const {
+		attributes: blockAttributes,
+		clientId,
+		innerBlocks: blockInnerBlocks,
+		...record
+	} = block;
+	const {
+		attributes: previousBlockAttributes,
+		clientId: previousClientId,
+		innerBlocks: previousInnerBlocks,
+		...previousProperties
+	} = previousBlock;
 	const yAttributes = yblock.get( 'attributes' );
-	const previousAttributes = previousBlock.attributes ?? {};
-	const attributes = block.attributes ?? {};
+	const previousAttributes = previousBlockAttributes ?? {};
+	const attributes = blockAttributes ?? {};
 
 	if ( ! ( yAttributes instanceof Y.Map ) ) {
 		yblock.set(
@@ -1157,7 +1163,7 @@ function rebaseYBlock(
 					context.selection?.selectionEnd,
 				].some(
 					( point ) =>
-						point?.clientId === block.clientId &&
+						point?.clientId === clientId &&
 						point?.attributeKey === name
 				)
 			) {
@@ -1165,7 +1171,7 @@ function rebaseYBlock(
 			}
 			rebaseYBlockAttribute(
 				block.name,
-				block.clientId,
+				clientId,
 				name,
 				previousAttributes[ name ],
 				value,
@@ -1188,11 +1194,11 @@ function rebaseYBlock(
 	}
 
 	const yInnerBlocks = yblock.get( 'innerBlocks' );
-	const innerBlocks = block.innerBlocks ?? [];
+	const innerBlocks = blockInnerBlocks ?? [];
 	if ( yInnerBlocks instanceof Y.Array ) {
 		rebaseBlockList(
 			yInnerBlocks,
-			previousBlock.innerBlocks ?? [],
+			previousInnerBlocks ?? [],
 			innerBlocks,
 			attributeCursor,
 			context
@@ -1203,23 +1209,13 @@ function rebaseYBlock(
 		mergeCrdtBlocks( created, innerBlocks, attributeCursor );
 	}
 
-	const previousRecord = previousBlock as unknown as Record<
-		string,
-		unknown
-	>;
-	const record = block as unknown as Record< string, unknown >;
-	for ( const key of Object.keys( record ) ) {
-		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
-			continue;
-		}
-		if ( ! fastDeepEqual( previousRecord[ key ], record[ key ] ) ) {
-			yblock.set( key, record[ key ] );
+	const previousRecord: Record< string, unknown > = previousProperties;
+	for ( const [ key, value ] of Object.entries( record ) ) {
+		if ( ! fastDeepEqual( previousRecord[ key ], value ) ) {
+			yblock.set( key, value );
 		}
 	}
 	for ( const key of Object.keys( previousRecord ) ) {
-		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
-			continue;
-		}
 		if (
 			! Object.prototype.hasOwnProperty.call( record, key ) &&
 			yblock.has( key )
