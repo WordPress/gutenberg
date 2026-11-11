@@ -126,18 +126,94 @@ export function getBlockElementColors(
 	};
 }
 
+/**
+ * Computes the rendered font size in pixels for the block element whose
+ * foreground color is evaluated by contrast checking.
+ *
+ * @param blockEl                Rendered block element.
+ * @param blockType              Block type definition.
+ * @param options                Evaluation options matching the contrast check.
+ * @param options.checkTextColor Whether block text contrast is evaluated.
+ * @param options.checkLinkColor Whether link contrast is evaluated.
+ * @return Computed font size in pixels, if measurable.
+ */
+export function getBlockElementFontSize(
+	blockEl: Element | null,
+	blockType: BlockType | null | undefined,
+	{
+		checkTextColor = true,
+		checkLinkColor = true,
+	}: Pick<
+		UseBlockColorContrastWarningOptions,
+		'checkTextColor' | 'checkLinkColor'
+	> = {}
+): number | undefined {
+	if ( ! blockEl || ! blockType ) {
+		return undefined;
+	}
+
+	let targetElement: Element | null = null;
+	if ( ! checkTextColor && checkLinkColor ) {
+		const linkElement = blockEl.querySelector( 'a' );
+		if ( linkElement && linkElement.textContent ) {
+			targetElement = linkElement;
+		}
+	}
+
+	if ( ! targetElement ) {
+		const fontSizeSelector =
+			getBlockSelector( blockType, 'typography.fontSize' ) ||
+			getBlockSelector( blockType, 'typography' ) ||
+			getBlockSelector( blockType, 'color.text', {
+				fallback: true,
+			} );
+		targetElement =
+			( fontSizeSelector && blockEl.querySelector( fontSizeSelector ) ) ||
+			blockEl;
+	}
+
+	const fontSize = Number.parseFloat(
+		getComputedValue( targetElement, 'font-size' )
+	);
+	return Number.isFinite( fontSize ) ? fontSize : undefined;
+}
+
+interface ContrastMeasurements extends BlockElementColors {
+	fontSize?: number;
+}
+
+const MEASUREMENT_KEYS = [
+	'textColor',
+	'backgroundColor',
+	'linkColor',
+	'fontSize',
+] as const;
+
+function getBlockContrastMeasurements(
+	blockEl: Element | null,
+	blockType: BlockType | null | undefined,
+	checkTextColor: boolean,
+	checkLinkColor: boolean
+): ContrastMeasurements {
+	return {
+		...getBlockElementColors( blockEl, blockType ),
+		fontSize: getBlockElementFontSize( blockEl, blockType, {
+			checkTextColor,
+			checkLinkColor,
+		} ),
+	};
+}
+
 function reducer(
-	prevColors: BlockElementColors,
-	newColors: BlockElementColors
-): BlockElementColors {
-	const hasChanged = Object.keys( newColors ).some(
-		( key ) =>
-			prevColors[ key as keyof BlockElementColors ] !==
-			newColors[ key as keyof BlockElementColors ]
+	prevState: ContrastMeasurements,
+	newState: ContrastMeasurements
+): ContrastMeasurements {
+	const hasChanged = MEASUREMENT_KEYS.some(
+		( key ) => prevState[ key ] !== newState[ key ]
 	);
 
-	// Do not re-render if the colors have not changed.
-	return hasChanged ? newColors : prevColors;
+	// Do not re-render if the measurements have not changed.
+	return hasChanged ? newState : prevState;
 }
 
 /**
@@ -166,7 +242,7 @@ export default function useBlockColorContrastWarning( {
 	messageOverride,
 }: UseBlockColorContrastWarningOptions ) {
 	const blockEl = useBlockElement( clientId );
-	const [ colors, setColors ] = useReducer( reducer, {} );
+	const [ measurements, setMeasurements ] = useReducer( reducer, {} );
 
 	const blockType = useSelect(
 		( select ) => {
@@ -188,7 +264,14 @@ export default function useBlockColorContrastWarning( {
 		// after the current paint but before the next paint.
 		window.requestAnimationFrame( () =>
 			window.requestAnimationFrame( () =>
-				setColors( getBlockElementColors( blockEl, blockType ) )
+				setMeasurements(
+					getBlockContrastMeasurements(
+						blockEl,
+						blockType,
+						checkTextColor,
+						checkLinkColor
+					)
+				)
 			)
 		);
 	} );
@@ -201,7 +284,14 @@ export default function useBlockColorContrastWarning( {
 		}
 
 		const observer = new window.MutationObserver( () => {
-			setColors( getBlockElementColors( blockEl, blockType ) );
+			setMeasurements(
+				getBlockContrastMeasurements(
+					blockEl,
+					blockType,
+					checkTextColor,
+					checkLinkColor
+				)
+			);
 		} );
 
 		observer.observe( blockEl, {
@@ -213,13 +303,14 @@ export default function useBlockColorContrastWarning( {
 		return () => {
 			observer.disconnect();
 		};
-	}, [ enabled, blockEl, blockType ] );
+	}, [ enabled, blockEl, blockType, checkTextColor, checkLinkColor ] );
 
 	const warning = enabled
 		? getContrastWarning( {
-				backgroundColor: colors.backgroundColor,
-				textColor: checkTextColor ? colors.textColor : undefined,
-				linkColor: checkLinkColor ? colors.linkColor : undefined,
+				backgroundColor: measurements.backgroundColor,
+				textColor: checkTextColor ? measurements.textColor : undefined,
+				linkColor: checkLinkColor ? measurements.linkColor : undefined,
+				fontSize: measurements.fontSize,
 				messageOverride,
 				enableAlphaChecker: true,
 			} )
