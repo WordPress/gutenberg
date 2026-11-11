@@ -4,11 +4,11 @@
 
 ### Breaking Changes
 
--   `Button`: Use WPDS tokens for ordinary and destructive colors. Customize these colors with `ThemeProvider` instead of legacy color overrides ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
+-   `Button`: Use WPDS tokens for ordinary and destructive colors. Customize these colors with `ThemeProvider` instead of legacy color overrides ([#86683](https://github.com/WordPress/gutenberg/pull/86683)).
 
 ### Enhancements
 
--   `ButtonGroup`: Inherit Button foreground colors and use a theme-aware outline ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
+-   `ButtonGroup`: Inherit Button foreground colors and use a theme-aware outline ([#86683](https://github.com/WordPress/gutenberg/pull/86683)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 -   `FontSizePicker`: Use the WordPress UI select for choosing preset sizes ([#86661](https://github.com/WordPress/gutenberg/pull/86661)).
