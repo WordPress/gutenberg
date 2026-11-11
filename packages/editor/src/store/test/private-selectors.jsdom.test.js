@@ -251,7 +251,7 @@ describe( 'getDefaultRenderingMode', () => {
 
 describe( 'getNoteReactionEmojis', () => {
 	it( 'returns the noteReactionEmojis editor setting', () => {
-		const emojis = [ { hexKey: '1f984', label: 'unicorn' } ];
+		const emojis = [ { hex_key: '1f984', label: 'unicorn' } ];
 		const state = { editorSettings: { noteReactionEmojis: emojis } };
 
 		expect( getNoteReactionEmojis( state ) ).toBe( emojis );

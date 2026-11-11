@@ -158,22 +158,22 @@ export function getReactionEmojisFromSetting(
 		emojis = setting.flatMap( ( entry ) => {
 			if (
 				! entry ||
-				typeof entry.hexKey !== 'string' ||
+				typeof entry.hex_key !== 'string' ||
 				typeof entry.label !== 'string'
 			) {
 				return [];
 			}
-			const emoji = hexKeyToEmoji( entry.hexKey );
+			const emoji = hexKeyToEmoji( entry.hex_key );
 			if ( ! emoji ) {
 				return [];
 			}
 			const known = REACTION_EMOJIS.find(
-				( { hexKey } ) => hexKey === entry.hexKey
+				( { hexKey } ) => hexKey === entry.hex_key
 			);
 			return [
 				known ?? {
 					emoji,
-					hexKey: entry.hexKey,
+					hexKey: entry.hex_key,
 					label: entry.label,
 					sentenceLabel: entry.label,
 				},

@@ -52,11 +52,11 @@ describe( 'getReactionEmojisFromSetting', () => {
 
 	it( 'builds the emoji from each hex key and drops malformed entries', () => {
 		const setting = [
-			{ hexKey: '1f984', label: 'unicorn' },
-			{ hexKey: 'nope', label: 'broken' },
-			{ hexKey: '1f44d' },
+			{ hex_key: '1f984', label: 'unicorn' },
+			{ hex_key: 'nope', label: 'broken' },
+			{ hex_key: '1f44d' },
 			null,
-			{ hexKey: '1f680', label: 'rocket' },
+			{ hex_key: '1f680', label: 'rocket' },
 		];
 
 		expect( getReactionEmojisFromSetting( setting ) ).toEqual( [
@@ -77,7 +77,7 @@ describe( 'getReactionEmojisFromSetting', () => {
 	} );
 
 	it( 'returns the same list for the same setting', () => {
-		const setting = [ { hexKey: '1f984', label: 'unicorn' } ];
+		const setting = [ { hex_key: '1f984', label: 'unicorn' } ];
 
 		expect( getReactionEmojisFromSetting( setting ) ).toBe(
 			getReactionEmojisFromSetting( setting )

@@ -23,8 +23,8 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 			'wp_note_reaction_emojis',
 			static function ( $emojis ) {
 				$emojis[] = array(
-					'hexKey' => '1f984',
-					'label'  => 'unicorn',
+					'hex_key' => '1f984',
+					'label'   => 'unicorn',
 				);
 				return array_slice( $emojis, 1 );
 			}
@@ -55,35 +55,35 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 				return array(
 					// Normalized: lowercase, padded, U+FE0F dropped.
 					array(
-						'hexKey' => '2764-FE0F',
-						'label'  => 'heart',
+						'hex_key' => '2764-FE0F',
+						'label'   => 'heart',
 					),
 					// The same key again.
 					array(
-						'hexKey' => '2764',
-						'label'  => 'red heart',
+						'hex_key' => '2764',
+						'label'   => 'red heart',
 					),
 					array(
-						'hexKey' => '1F468-200D-1F4BB',
-						'label'  => '<b>technologist</b>',
+						'hex_key' => '1F468-200D-1F4BB',
+						'label'   => '<b>technologist</b>',
 					),
 					array(
-						'hexKey' => 'not-hex',
-						'label'  => 'broken',
+						'hex_key' => 'not-hex',
+						'label'   => 'broken',
 					),
 					array(
-						'hexKey' => 'd83d',
-						'label'  => 'surrogate',
+						'hex_key' => 'd83d',
+						'label'   => 'surrogate',
 					),
 					array(
-						'hexKey' => '110000',
-						'label'  => 'past U+10FFFF',
+						'hex_key' => '110000',
+						'label'   => 'past U+10FFFF',
 					),
 					array(
-						'hexKey' => '1f984',
-						'label'  => '',
+						'hex_key' => '1f984',
+						'label'   => '',
 					),
-					array( 'hexKey' => '1f680' ),
+					array( 'hex_key' => '1f680' ),
 					'1f389',
 				);
 			}
@@ -92,12 +92,12 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'hexKey' => '2764',
-					'label'  => 'heart',
+					'hex_key' => '2764',
+					'label'   => 'heart',
 				),
 				array(
-					'hexKey' => '1f468-200d-1f4bb',
-					'label'  => 'technologist',
+					'hex_key' => '1f468-200d-1f4bb',
+					'label'   => 'technologist',
 				),
 			),
 			gutenberg_get_note_reaction_emojis()

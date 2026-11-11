@@ -1208,13 +1208,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				array_filter(
 					$emojis,
 					static function ( $emoji ) {
-						return '2764' !== $emoji['hexKey'];
+						return '2764' !== $emoji['hex_key'];
 					}
 				)
 			);
 			$emojis[] = array(
-				'hexKey' => '1F984',
-				'label'  => 'unicorn',
+				'hex_key' => '1F984',
+				'label'   => 'unicorn',
 			);
 			return $emojis;
 		};

@@ -19,13 +19,13 @@ function gutenberg_test_note_reaction_emojis( $emojis ) {
 		array_filter(
 			$emojis,
 			static function ( $emoji ) {
-				return '1f440' !== $emoji['hexKey'];
+				return '1f440' !== $emoji['hex_key'];
 			}
 		)
 	);
 	$emojis[] = array(
-		'hexKey' => '1f984',
-		'label'  => 'unicorn',
+		'hex_key' => '1f984',
+		'label'   => 'unicorn',
 	);
 	return $emojis;
 }
