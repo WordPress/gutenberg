@@ -76,6 +76,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **dimensions**: `.wp-block-navigation-link:not(.wp-block-navigation__responsive-container.is-menu-open *)`
 - **states**:
   - -current: `.wp-block-navigation .current-menu-item`
 
