@@ -1,67 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Card as WCCard, CardBody } from '@wordpress/components';
-import { DataForm } from '@wordpress/dataviews';
-import { useState } from '@wordpress/element';
+import {
+	AutosaveFeatureListExample,
+	SaveFormLayoutCardExample,
+} from './save-and-submit';
 
-const meta: Meta = {
+const meta = {
 	title: 'Design System/Patterns/Save & Submit',
+	component: SaveFormLayoutCardExample,
 	parameters: {
 		controls: { disable: true },
 	},
 	tags: [ 'docs-only' ],
-};
+} satisfies Meta< typeof SaveFormLayoutCardExample >;
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj< typeof meta >;
+
+export const AutosaveFeatureList: Story = {
+	name: 'Autosave feature list',
+	render: () => <AutosaveFeatureListExample />,
+};
 
 export const SaveFormLayoutCard: Story = {
 	name: 'Save form layout card',
-	render() {
-		const [ data, setData ] = useState( { title: '' } );
-
-		return (
-			<div style={ { maxWidth: '480px' } }>
-				<WCCard
-					size={ {
-						blockStart: 'medium',
-						blockEnd: 'medium',
-						inlineStart: 'medium',
-						inlineEnd: 'medium',
-					} }
-				>
-					<CardBody>
-						<DataForm
-							data={ data }
-							fields={ [
-								{
-									id: 'title',
-									label: 'Title',
-									type: 'text',
-								},
-							] }
-							form={ {
-								layout: { type: 'regular' },
-								fields: [ 'title' ],
-							} }
-							onChange={ ( edits ) =>
-								setData( ( previous ) => ( {
-									...previous,
-									...edits,
-								} ) )
-							}
-						/>
-						<Button
-							variant="primary"
-							isBusy
-							style={ { marginTop: '16px' } }
-							__next40pxDefaultSize
-						>
-							Save
-						</Button>
-					</CardBody>
-				</WCCard>
-			</div>
-		);
-	},
+	render: () => <SaveFormLayoutCardExample />,
 };
