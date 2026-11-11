@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Keyboard shortcuts modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Keep the fine-rotation ruler's ticks and labels visible when the browser forces dark colors ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
 
 ### Internal

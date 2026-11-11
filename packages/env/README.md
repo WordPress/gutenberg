@@ -20,9 +20,15 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 `wp-env` relies on a few commonly used developer tools:
 
--   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Docker**. `wp-env` is powered by Docker by default. Any Docker runtime that provides the `docker` CLI and Docker Compose v2 works. See [Docker runtime](#docker-runtime) below.
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+### Docker runtime
+
+On macOS, you can use [Colima](https://github.com/abiosoft/colima). It's free and open source, needs no account, and runs without a GUI. [Docker Desktop](https://docs.docker.com/desktop/) is available for macOS, Windows, and Linux. Other options are [Rancher Desktop](https://rancherdesktop.io/) on Windows and [Docker Engine](https://docs.docker.com/engine/install/) on Linux.
+
+For setup steps, see [Set up Docker](https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/get-started-with-wp-env.md#set-up-docker) in the Get started with wp-env guide.
 
 ## Experimental runtimes
 
@@ -113,7 +119,7 @@ $ wp-env start --update
 
 ### Starting the environment
 
-First, ensure that Docker is running. You can do this by clicking on the Docker icon in the system tray or menu bar.
+First, ensure that Docker is running. With Colima, run `colima start`. With Docker Desktop or Rancher Desktop, open the app.
 
 Then, change to a directory that contains a WordPress plugin or theme:
 
@@ -179,7 +185,9 @@ $ wp-env start --update
 
 Restarting Docker will restart the underlying Docker containers and volumes which can fix many issues.
 
-To restart Docker:
+With Colima, run `colima restart`.
+
+With Docker Desktop:
 
 1. Click on the Docker icon in the system tray or menu bar.
 2. Select _Restart_.
