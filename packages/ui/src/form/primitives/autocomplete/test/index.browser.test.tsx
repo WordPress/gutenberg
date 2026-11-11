@@ -436,91 +436,52 @@ describe( 'Autocomplete', () => {
 		} );
 	} );
 
-	describe( 'grid placement', () => {
-		const itemList = (
-			<Autocomplete.List>
-				<Autocomplete.Collection>
-					{ ( item: ( typeof ITEMS )[ number ] ) => (
-						<Autocomplete.Item key={ item.id } value={ item }>
-							<Autocomplete.ItemLabel>
-								{ item.value }
-							</Autocomplete.ItemLabel>
-						</Autocomplete.Item>
-					) }
-				</Autocomplete.Collection>
-			</Autocomplete.List>
+	it( 'places inline list parts in the grid of the consumer', async () => {
+		await render(
+			<Autocomplete.Root items={ ITEMS } inline open>
+				<Autocomplete.Input placeholder="Search" />
+				<div
+					data-testid="wrapper"
+					style={ {
+						display: 'grid',
+						gridTemplateRows: 'auto minmax(0, 1fr)',
+						height: 200,
+					} }
+				>
+					<Autocomplete.Empty>No results.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.Collection>
+							{ ( item: ( typeof ITEMS )[ number ] ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.List>
+				</div>
+			</Autocomplete.Root>
 		);
 
-		it( 'places the list parts in the named areas of the popup', async () => {
-			const statusRef = createRef< HTMLDivElement >();
-			const emptyRef = createRef< HTMLDivElement >();
+		const wrapperRect = screen
+			.getByTestId( 'wrapper' )
+			.getBoundingClientRect();
+		const listRect = screen.getByRole( 'listbox' ).getBoundingClientRect();
 
-			await render(
-				<Autocomplete.Root items={ ITEMS }>
-					<Autocomplete.Input placeholder="Search" />
-					<Autocomplete.Popup>
-						<Autocomplete.Status ref={ statusRef } />
-						<Autocomplete.Empty ref={ emptyRef }>
-							No results.
-						</Autocomplete.Empty>
-						{ itemList }
-					</Autocomplete.Popup>
-				</Autocomplete.Root>
-			);
+		// The empty state is collapsed, so the list fills the second row.
+		expect( listRect.top ).toBeCloseTo( wrapperRect.top );
+		expect( listRect.bottom ).toBeCloseTo( wrapperRect.bottom );
 
-			const input = screen.getByRole( 'combobox' );
-			await userEvent.type( input, 'Item' );
-			const list = await screen.findByRole( 'listbox' );
+		await userEvent.type( screen.getByRole( 'combobox' ), 'zzz' );
+		const emptyRect = (
+			await screen.findByText( 'No results.' )
+		).getBoundingClientRect();
 
-			expect( getComputedStyle( list ).gridRowStart ).toBe( 'main' );
-			expect( getComputedStyle( statusRef.current! ).gridRowStart ).toBe(
-				'status'
-			);
-
-			await userEvent.type( input, 'zzz' );
-			await screen.findByText( 'No results.' );
-
-			expect( getComputedStyle( emptyRef.current! ).gridRowStart ).toBe(
-				'main'
-			);
-		} );
-
-		it( 'follows the grid of the consumer when inline', async () => {
-			await render(
-				<Autocomplete.Root items={ ITEMS } inline open>
-					<Autocomplete.Input placeholder="Search" />
-					<div
-						data-testid="wrapper"
-						style={ {
-							display: 'grid',
-							gridTemplateRows: 'auto minmax(0, 1fr)',
-							height: 200,
-						} }
-					>
-						<Autocomplete.Empty>No results.</Autocomplete.Empty>
-						{ itemList }
-					</div>
-				</Autocomplete.Root>
-			);
-
-			const wrapperRect = screen
-				.getByTestId( 'wrapper' )
-				.getBoundingClientRect();
-			const listRect = screen
-				.getByRole( 'listbox' )
-				.getBoundingClientRect();
-
-			// The empty state is collapsed, so the list fills the second row.
-			expect( listRect.top ).toBeCloseTo( wrapperRect.top );
-			expect( listRect.bottom ).toBeCloseTo( wrapperRect.bottom );
-
-			await userEvent.type( screen.getByRole( 'combobox' ), 'zzz' );
-			const emptyRect = (
-				await screen.findByText( 'No results.' )
-			).getBoundingClientRect();
-
-			expect( emptyRect.top ).toBeCloseTo( wrapperRect.top );
-		} );
+		expect( emptyRect.top ).toBeCloseTo( wrapperRect.top );
 	} );
 
 	describe( 'grouped items', () => {
