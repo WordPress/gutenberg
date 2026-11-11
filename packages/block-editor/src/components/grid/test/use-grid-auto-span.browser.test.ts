@@ -8,7 +8,8 @@ import {
 	it,
 	vi,
 } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act } from '@testing-library/react';
+import { renderHook } from 'vitest-browser-react';
 import { dispatch, select } from '@wordpress/data';
 import {
 	createBlock,
@@ -88,8 +89,8 @@ function createItemElement( clientId: string, gridElement: HTMLElement ) {
 	const readScrollHeight = vi.fn( () =>
 		Math.max( getSize( 'grid-row', 'rowSpan' ), content.height )
 	);
-	// jsdom has no layout engine. Model fixed 100px tracks with 10px gaps,
-	// including the hook's temporary placements and any overflowing content.
+	// Supply fixed 100px tracks with 10px gaps so measurement counts and
+	// overflow notifications are deterministic across temporary placements.
 	Object.defineProperties( element, {
 		offsetWidth: { get: () => getSize( 'grid-column', 'columnSpan' ) },
 		offsetHeight: { get: () => getSize( 'grid-row', 'rowSpan' ) },
@@ -189,8 +190,8 @@ describe( 'useGridAutoSpan', () => {
 		unregisterBlockType( BLOCK_NAME );
 	} );
 
-	it( 'fits single-cell content with one measurement', () => {
-		renderHook( () => useGridAutoSpan( { clientId: gridClientId } ) );
+	it( 'fits single-cell content with one measurement', async () => {
+		await renderHook( () => useGridAutoSpan( { clientId: gridClientId } ) );
 		flushFrame();
 
 		expect( item.readScrollWidth ).toHaveBeenCalledTimes( 1 );
@@ -199,16 +200,24 @@ describe( 'useGridAutoSpan', () => {
 			columnStart: 1,
 			rowStart: 1,
 		} );
-		expect( item.element ).toHaveStyle( { gridColumn: '', gridRow: '' } );
+		expect( item.element ).toHaveStyle( {
+			gridColumnStart: 'auto',
+			gridColumnEnd: 'auto',
+			gridRowStart: 'auto',
+			gridRowEnd: 'auto',
+		} );
 		expect( gridElement ).toHaveStyle( {
 			gridTemplateRows: '100px 100px 100px',
-			gridAutoRows: '',
+			gridAutoRows: 'auto',
 		} );
 	} );
 
 	it( 'keeps observing blocks as content and grid children change', async () => {
-		const mutationObserver = vi.spyOn( window, 'MutationObserver' );
-		const { unmount } = renderHook( () =>
+		const observeMutations = vi.spyOn(
+			MutationObserver.prototype,
+			'observe'
+		);
+		const { unmount } = await renderHook( () =>
 			useGridAutoSpan( { clientId: gridClientId } )
 		);
 		flushFrame();
@@ -284,10 +293,14 @@ describe( 'useGridAutoSpan', () => {
 		flushFrame();
 		expect( getItemLayout( newChild.clientId )?.columnSpan ).toBe( 2 );
 		expect( MockResizeObserver.instances ).toHaveLength( 1 );
-		expect( mutationObserver ).toHaveBeenCalledTimes( 1 );
+		expect(
+			observeMutations.mock.calls.filter(
+				( [ target ] ) => target === gridElement
+			)
+		).toHaveLength( 1 );
 		expect( resizeObserver.disconnect ).not.toHaveBeenCalled();
 
-		unmount();
+		await unmount();
 		expect( resizeObserver.disconnect ).toHaveBeenCalledTimes( 1 );
 		expect( frames.size ).toBe( 0 );
 	} );
