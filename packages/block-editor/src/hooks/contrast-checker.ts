@@ -161,12 +161,18 @@ export function getBlockElementFontSize(
 	}
 
 	if ( ! targetElement ) {
-		const fontSizeSelector =
-			getBlockSelector( blockType, 'typography.fontSize' ) ||
-			getBlockSelector( blockType, 'typography' ) ||
+		const candidates = [
+			getBlockSelector( blockType, 'typography.fontSize' ),
+			getBlockSelector( blockType, 'typography.root' ),
+			getBlockSelector( blockType, 'typography' ),
 			getBlockSelector( blockType, 'color.text', {
 				fallback: true,
-			} );
+			} ),
+		];
+		const fontSizeSelector = candidates.find(
+			( selector ): selector is string =>
+				typeof selector === 'string' && selector.length > 0
+		);
 		targetElement =
 			( fontSizeSelector && blockEl.querySelector( fontSizeSelector ) ) ||
 			blockEl;
