@@ -13,7 +13,7 @@ import type { AutocompletePopupProps } from './types';
  * The suggestion list for an `Autocomplete.Input` rendered outside it.
  *
  * Do not render `Autocomplete.Input` inside `Autocomplete.Popup`. For a
- * searchable picker that opens from a button, render an inline
+ * searchable picker that opens from a button, render
  * `<Autocomplete.Root inline open>` inside a `Popover` instead.
  */
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
