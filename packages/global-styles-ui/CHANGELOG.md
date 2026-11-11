@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
+
 ### Bug Fixes
 
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
