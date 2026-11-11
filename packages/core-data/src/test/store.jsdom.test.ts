@@ -242,7 +242,7 @@ describe( 'getEntityRecord', () => {
 		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'ignores a late response once a keyless record was received elsewhere', async () => {
+	it( 'requests a keyless record again when it was received directly during the request', async () => {
 		addLoaderlessEntities();
 
 		const { requested, deliver } = holdNextResponse();
@@ -251,11 +251,15 @@ describe( 'getEntityRecord', () => {
 			.getEntityRecord( 'test', 'settings' );
 		await requested;
 
-		// The settings are saved while the read is in flight.
+		// The settings are received directly while the read is in flight.
 		registry
 			.dispatch( coreDataStore )
 			.receiveEntityRecords( 'test', 'settings', { title: 'Saved' } );
 
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => Promise.resolve( { title: 'Saved' } ),
+			headers: { get: () => null },
+		} ) );
 		deliver( { title: 'Stale' } );
 		await request;
 
@@ -264,6 +268,54 @@ describe( 'getEntityRecord', () => {
 				.select( coreDataStore )
 				.getEntityRecord( 'test', 'settings' )
 		).toEqual( { title: 'Saved' } );
+		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'requests the record again after a direct receipt, even when another request wrote it since', async () => {
+		addLoaderlessEntities();
+		const savedPost = {
+			...createTestPost( 1 ),
+			content: { raw: 'Saved', rendered: 'Saved' },
+		};
+
+		const { requested, deliver: deliverStale } = holdNextResponse();
+		const embedRequest = registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1, { _embed: true } );
+		await requested;
+
+		// The record is received directly, then read by another request,
+		// while the first one is still in flight.
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'test', 'post', savedPost );
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => Promise.resolve( savedPost ),
+			headers: { get: () => null },
+		} ) );
+		registry
+			.dispatch( coreDataStore )
+			.invalidateResolution( 'getEntityRecord', [ 'test', 'post', 1 ] );
+		await registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1 );
+
+		const embeddedPost = { ...savedPost, _embedded: { author: [] } };
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => Promise.resolve( embeddedPost ),
+			headers: { get: () => null },
+		} ) );
+		deliverStale( { ...createTestPost( 1 ), _embedded: { author: [] } } );
+		await embedRequest;
+
+		// The late response is not stored, and the embedded data it was
+		// requested for still arrives.
+		expect(
+			registry
+				.select( coreDataStore )
+				.getEntityRecord( 'test', 'post', 1, { _embed: true } )
+		).toEqual( embeddedPost );
+		expect( triggerFetch ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'ignores a late response to the same query with its keys in another order', async () => {

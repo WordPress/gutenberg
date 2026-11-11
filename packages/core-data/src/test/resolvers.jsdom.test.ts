@@ -267,21 +267,30 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'ignores a response delivered after the record was received elsewhere', async () => {
+	it( 'requests the record again when it was received directly during the request', async () => {
 		const STALE_POST_TYPE = { slug: 'post', name: 'stale' };
+		const FRESH_POST_TYPE = { slug: 'post', name: 'fresh' };
 
 		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
 		const staleResponseGate = new Promise( ( resolve ) => {
 			deliverStaleResponse = resolve;
 		} );
 
-		apiFetchMock.mockImplementationOnce( () => ( {
-			json: () => staleResponseGate.then( () => STALE_POST_TYPE ),
-		} ) );
+		apiFetchMock
+			.mockImplementationOnce( () => ( {
+				json: () => staleResponseGate.then( () => STALE_POST_TYPE ),
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( FRESH_POST_TYPE ),
+			} ) );
 
-		const staleRequest = getEntityRecord( 'root', 'postType', 'post', {
-			context: 'view',
-		} )( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		const query = { context: 'view' };
+		const request = getEntityRecord(
+			'root',
+			'postType',
+			'post',
+			query
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// The record is received outside the resolver while the request is
@@ -289,7 +298,7 @@ describe( 'getEntityRecord', () => {
 		select.getDirectReceiptCount.mockReturnValue( 1 );
 
 		deliverStaleResponse();
-		await staleRequest;
+		await request;
 
 		expect( select.getDirectReceiptCount ).toHaveBeenCalledWith(
 			'root',
@@ -297,7 +306,16 @@ describe( 'getEntityRecord', () => {
 			'post',
 			'view'
 		);
-		expect( dispatch.receiveFetchedEntityRecords ).not.toHaveBeenCalled();
+		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			FRESH_POST_TYPE,
+			query
+		);
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
 			1
 		);

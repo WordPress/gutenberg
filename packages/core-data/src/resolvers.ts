@@ -208,10 +208,7 @@ export const getEntityRecord =
 				...entityConfig.baseURLParams,
 				...query,
 			} );
-			const isFreshestResponse = claimResponseOrder(
-				registry,
-				getResponseOrderKey( kind, name, key, query )
-			);
+			const orderKey = getResponseOrderKey( kind, name, key, query );
 			// A keyless entity, such as the site settings, is stored under
 			// `undefined`.
 			const storedKey = key === '' ? undefined : key;
@@ -222,20 +219,31 @@ export const getEntityRecord =
 					storedKey,
 					( query?.context as string | undefined ) ?? 'default'
 				);
-			const receiptsBefore = getReceipts();
-			const response = await apiFetch( { path, parse: false } );
-			const record: RestRecord = await response.json();
 
-			// A newer response to this request was already received, or the
-			// record was received directly since this request was made, so
-			// this response may be out of date. A `_fields` response only
-			// updates some fields, so a direct receipt does not affect it.
-			if (
-				! isFreshestResponse() ||
-				( ! query?._fields && getReceipts() !== receiptsBefore )
-			) {
-				return;
-			}
+			let response;
+			let record: RestRecord;
+			let isOutdated;
+			do {
+				const isFreshestResponse = claimResponseOrder(
+					registry,
+					orderKey
+				);
+				const receiptsBefore = getReceipts();
+				response = await apiFetch( { path, parse: false } );
+				record = await response.json();
+
+				// A newer response to this request was already received.
+				if ( ! isFreshestResponse() ) {
+					return;
+				}
+
+				// The record was received directly since this request was
+				// made, so this response may be out of date and the record
+				// is requested again. A `_fields` response only updates
+				// some fields, so a direct receipt does not affect it.
+				isOutdated =
+					! query?._fields && getReceipts() !== receiptsBefore;
+			} while ( isOutdated );
 
 			const permissions = getUserPermissionsFromAllowHeader(
 				response.headers?.get( 'allow' )
