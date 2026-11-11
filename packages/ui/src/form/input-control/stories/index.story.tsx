@@ -165,6 +165,15 @@ export const NumberWithSteppers: Story = {
 export const Disabled: Story = {
 	args: {
 		...Default.args,
+		defaultValue: 'Disabled value',
 		disabled: true,
+	},
+};
+
+export const ReadOnly: Story = {
+	args: {
+		...Default.args,
+		defaultValue: 'Read-only value',
+		readOnly: true,
 	},
 };
