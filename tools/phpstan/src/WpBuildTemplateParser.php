@@ -39,6 +39,7 @@ final class WpBuildTemplateParser implements Parser {
 		'{{PAGE_SLUG}}'              => 'example-page',
 		'{{PAGE_SLUG_UNDERSCORE}}'   => 'example_page',
 		'{{CAPABILITY}}'             => 'manage_options',
+		'{{TEXT_DOMAIN_ARG}}'        => ", 'example-text-domain'",
 		'{{VERSION}}'                => '1.0.0',
 		'{{BASE_URL}}'               => 'plugin_dir_url( __FILE__ )',
 		'{{INIT_MODULES_JSON}}'      => '["@wordpress/example-init-module"]',

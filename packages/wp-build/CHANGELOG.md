@@ -6,6 +6,12 @@
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
 
+-   Add the `wpPlugin.textDomain` option, which sets the text domain of the strings in the generated PHP files ([#86698](https://github.com/WordPress/gutenberg/issues/86698)).
+
+### Bug Fixes
+
+-   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page, so that plugins shipping the build pass the WordPress.org Plugin Directory review and Plugin Check ([#86698](https://github.com/WordPress/gutenberg/issues/86698)).
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

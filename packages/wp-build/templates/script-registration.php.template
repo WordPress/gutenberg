@@ -6,6 +6,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Registers a script according to `wp_register_script`. Honors this request by
  * reassigning internal dependency properties of any script handle already

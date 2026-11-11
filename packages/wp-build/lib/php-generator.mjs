@@ -22,13 +22,42 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 
 	// @ts-expect-error specific override to package.json
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
+	// @ts-expect-error specific override to package.json
+	const textDomain = rootPackageJson.wpPlugin?.textDomain;
 	const version = rootPackageJson.version;
 
 	return {
 		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
 		'{{BASE_URL}}': baseUrlExpression,
+		'{{TEXT_DOMAIN_ARG}}': getTextDomainArgument( textDomain ),
 	};
+}
+
+/**
+ * Get the text domain argument appended to the gettext calls in the PHP templates.
+ *
+ * Without a text domain, the calls keep using the `default` text domain, so
+ * that the strings reuse the translations that ship with WordPress.
+ *
+ * @param {unknown} textDomain The `wpPlugin.textDomain` value from the root package.json.
+ * @return {string} The argument, including its leading comma, or an empty string.
+ */
+export function getTextDomainArgument( textDomain ) {
+	if ( textDomain === undefined ) {
+		return '';
+	}
+	if (
+		typeof textDomain !== 'string' ||
+		! /^[A-Za-z0-9_-]+$/.test( textDomain )
+	) {
+		throw new Error(
+			`Invalid wpPlugin.textDomain ${ JSON.stringify(
+				textDomain
+			) }: it must be a non-empty string of letters, numbers, hyphens and underscores.`
+		);
+	}
+	return `, '${ textDomain }'`;
 }
 
 /**

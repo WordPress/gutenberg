@@ -7,6 +7,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Load routes registry
 $routes_file = __DIR__ . '/routes/registry.php';
 if ( ! file_exists( $routes_file ) ) {
