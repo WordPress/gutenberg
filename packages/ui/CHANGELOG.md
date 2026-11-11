@@ -25,14 +25,20 @@
 -   `Textarea`: Fix ref and render prop composition, restoring Field filled state, required validation, and returning to pristine when the default value is restored ([#86546](https://github.com/WordPress/gutenberg/pull/86546)).
 -   `Input`, `Combobox`, `Autocomplete`, and their controls: Prevent wp-admin form styles from adding a grey background to read-only and disabled fields, and from changing the text color of disabled fields ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content ([#86497](https://github.com/WordPress/gutenberg/pull/86497)).
+-   `AlertDialog`: Ignore async confirmation results after the dialog unmounts ([#86545](https://github.com/WordPress/gutenberg/pull/86545)).
 -   `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels and squashed icons in a prefix or suffix. ([#86446](https://github.com/WordPress/gutenberg/pull/86446))
 -   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).
 -   `Menu`: Align the selection indicator, prefix, suffix, shortcut, and submenu chevron with the first line of the label. Prefix icons larger than 16px and tall suffixes no longer sit above the label, and the row grows around them. The suffix, shortcut, and chevron of an item with a wrapped label now follow the first line instead of centering on the whole label ([#86135](https://github.com/WordPress/gutenberg/pull/86135)).
 
 ### Internal
 
+-   `Meter`, `Progress`: Use the new `--wpds-color-background-indicator-*` tokens for the filled portion. The colors are unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+### Documentation
+
+-   `Notice`: Add a Storybook example showing a neutral-toned `Link` inside `Notice.Description` ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
 
 ## 0.26.0 (2026-11-04)
 
