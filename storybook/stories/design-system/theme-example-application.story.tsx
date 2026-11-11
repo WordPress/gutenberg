@@ -150,7 +150,7 @@ export default meta;
 
 /**
  * A mock application demonstrating nested `ThemeProvider` components. The
- * application shell uses its own color preset, while the main content
+ * sidebar uses its own color preset, while the page, including its header,
  * explicitly reapplies the root settings from the Storybook Theme toolbar.
  */
 export const ExampleApplication: StoryObj< typeof meta > = {
@@ -305,40 +305,43 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 							</div>
 						</Stack>
 
-						<Page
-							ariaLabel="Level 1 breadcrumb"
-							visual={ <Icon icon={ wordpress } size={ 24 } /> }
-							subTitle="All of the subtitle text you need goes here."
-							breadcrumbs={
-								<Breadcrumbs
-									items={ [
-										{
-											label: 'Root breadcrumb',
-											to: '/connectors',
-										},
-										{ label: 'Level 1 breadcrumb' },
-									] }
-								/>
-							}
-							badges={
-								<Badge intent="informational">Status</Badge>
-							}
-							actions={
-								<>
-									<Button size="compact" variant="solid">
-										Save
-									</Button>
-								</>
-							}
-							showSidebarToggle={ false }
-						>
-							<div
-								style={ {
-									display: 'grid',
-									flex: 1,
-								} }
+						{ /* Page, including its header, uses the toolbar theme. */ }
+						<ThemeProvider { ...rootThemeSettings }>
+							<Page
+								ariaLabel="Level 1 breadcrumb"
+								visual={
+									<Icon icon={ wordpress } size={ 24 } />
+								}
+								subTitle="All of the subtitle text you need goes here."
+								breadcrumbs={
+									<Breadcrumbs
+										items={ [
+											{
+												label: 'Root breadcrumb',
+												to: '/connectors',
+											},
+											{ label: 'Level 1 breadcrumb' },
+										] }
+									/>
+								}
+								badges={
+									<Badge intent="informational">Status</Badge>
+								}
+								actions={
+									<>
+										<Button size="compact" variant="solid">
+											Save
+										</Button>
+									</>
+								}
+								showSidebarToggle={ false }
 							>
-								<ThemeProvider { ...rootThemeSettings }>
+								<div
+									style={ {
+										display: 'grid',
+										flex: 1,
+									} }
+								>
 									<div
 										style={ {
 											boxSizing: 'border-box',
@@ -535,9 +538,9 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 											</Card.Root>
 										</Stack>
 									</div>
-								</ThemeProvider>
-							</div>
-						</Page>
+								</div>
+							</Page>
+						</ThemeProvider>
 					</div>
 				</ThemeProvider>
 			</div>
