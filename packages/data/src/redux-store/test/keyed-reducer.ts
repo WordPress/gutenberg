@@ -1,9 +1,12 @@
+import type { AnyAction } from 'redux';
 import { describe, expect, it } from 'vitest';
 import { keyedReducer } from '../keyed-reducer';
 
 describe( 'keyedReducer', () => {
-	function createEnhancedReducer( actionProperty ) {
-		const enhanceReducer = keyedReducer( actionProperty );
+	function createEnhancedReducer( actionProperty: string ) {
+		const enhanceReducer = keyedReducer< string, AnyAction >(
+			actionProperty
+		);
 		return enhanceReducer(
 			( state, action ) => 'Called by ' + action.caller
 		);
@@ -27,7 +30,7 @@ describe( 'keyedReducer', () => {
 	it( 'should key by action property', () => {
 		const reducer = createEnhancedReducer( 'caller' );
 
-		let state = Object.freeze( {} );
+		let state: Record< string, string > = Object.freeze( {} );
 		state = reducer( state, { type: 'DO_FOO', caller: 1 } );
 		state = reducer( state, { type: 'DO_FOO', caller: 2 } );
 
