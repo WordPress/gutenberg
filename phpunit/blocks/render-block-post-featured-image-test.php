@@ -75,4 +75,54 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 		$this->assertSame( 'has-border-color wp-post-image', $actual['class'] );
 		$this->assertSame( 'border-color:#ff0000;border-radius:10px;object-fit:cover;box-shadow:1px 1px 1px #000;', $actual['style'] );
 	}
+
+	public function test_image_and_overlay_border_styles() {
+		$block = new WP_Block(
+			array(
+				'blockName' => 'core/post-featured-image',
+				'attrs'     => array(
+					'dimRatio'    => 50,
+					'borderColor' => 'accent-2',
+					'style'       => array(
+						'border' => array(
+							'radius' => 5,
+							'top'    => array(
+								'style' => 'dashed',
+								'width' => '3px',
+							),
+						),
+						'shadow' => '10px 10px 5px #000000',
+					),
+				),
+			),
+			array( 'postId' => self::$post_id )
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $block->render() );
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+		$image = array(
+			'class' => $processor->get_attribute( 'class' ),
+			'style' => $processor->get_attribute( 'style' ),
+		);
+		$this->assertTrue( $processor->next_tag( 'span' ) );
+		$overlay = array(
+			'class' => $processor->get_attribute( 'class' ),
+			'style' => $processor->get_attribute( 'style' ),
+		);
+
+		$this->assertSame(
+			array(
+				'class' => 'has-border-color has-accent-2-border-color wp-post-image',
+				'style' => 'border-radius:5px;border-top-width:3px;border-top-style:dashed;object-fit:cover;box-shadow:10px 10px 5px #000000;',
+			),
+			$image
+		);
+		$this->assertSame(
+			array(
+				'class' => 'wp-block-post-featured-image__overlay has-border-color has-accent-2-border-color has-background-dim has-background-dim-50',
+				'style' => 'border-radius:5px;border-top-width:3px;border-top-style:dashed',
+			),
+			$overlay
+		);
+	}
 }

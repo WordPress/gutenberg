@@ -46,33 +46,6 @@ function render_block_core_icon( $attributes ) {
 	}
 	$background_styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
 
-	// Border.
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => $border['color'] ?? null,
-			'style' => $border['style'] ?? null,
-			'width' => $border['width'] ?? null,
-		);
-	}
-
 	// Shadow.
 	$shadow_styles = $attributes['style']['shadow'] ?? null;
 
@@ -84,16 +57,16 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Generate styles and classes.
-	$styles         = wp_style_engine_get_styles(
+	// Border sits between color and shadow in the style engine's order.
+	$styles_before_border = wp_style_engine_get_styles( array( 'color' => $color_styles ) );
+	$border_styles        = wp_get_border_classes_and_styles( $attributes );
+	$styles_after_border  = wp_style_engine_get_styles(
 		array(
-			'color'      => $color_styles,
-			'border'     => $border_styles,
 			'shadow'     => $shadow_styles,
 			'dimensions' => $dimensions_styles,
-		),
+		)
 	);
-	$spacing_styles = wp_get_spacing_classes_and_styles(
+	$spacing_styles       = wp_get_spacing_classes_and_styles(
 		array(
 			'style' => array(
 				'spacing' => array(
@@ -102,17 +75,20 @@ function render_block_core_icon( $attributes ) {
 			),
 		)
 	);
-	$styles['css']  = ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' );
+	$styles               = array(
+		'classnames' => implode( ' ', array_filter( array( $styles_before_border['classnames'] ?? '', $border_styles['class'] ?? '', $styles_after_border['classnames'] ?? '' ) ) ),
+		'css'        => ( $styles_before_border['css'] ?? '' ) . ( $border_styles['style'] ?? '' ) . ( $styles_after_border['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
+	);
 
 	// The style engine outputs background before the other groups, so it leads here too.
-	$css = ( $background_styles['style'] ?? '' ) . ( $styles['css'] ?? '' );
+	$css = ( $background_styles['style'] ?? '' ) . $styles['css'];
 
 	$svg = wp_get_icon(
 		$attributes['icon'],
 		array(
 			// Width is applied via the dimensions block support styles below.
 			'size'  => null,
-			'class' => $styles['classnames'] ?? '',
+			'class' => $styles['classnames'],
 			'label' => $attributes['ariaLabel'] ?? '',
 		)
 	);

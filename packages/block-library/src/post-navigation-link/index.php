@@ -166,62 +166,28 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  * }
  */
 function block_core_post_navigation_link_get_support_styles( $attributes ) {
-	$block_styles  = $attributes['style'] ?? array();
-	$border        = $block_styles['border'] ?? array();
-	$border_styles = array();
-
-	// Border radius and width accept unitless numbers from the original implementation.
-	if ( isset( $border['radius'] ) ) {
-		$border_styles['radius'] = is_numeric( $border['radius'] ) ? "{$border['radius']}px" : $border['radius'];
-	}
-
-	if ( isset( $border['width'] ) ) {
-		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
-	}
-
-	if ( isset( $border['style'] ) ) {
-		$border_styles['style'] = $border['style'];
-	}
-
-	// A preset border color is stored in its own attribute rather than under `style`.
-	$border_styles['color'] = isset( $attributes['borderColor'] )
-		? "var:preset|color|{$attributes['borderColor']}"
-		: ( $border['color'] ?? null );
-
-	// Individual border sides e.g. top, left etc.
-	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-		$border_styles[ $side ] = array(
-			'width' => $border[ $side ]['width'] ?? null,
-			'color' => $border[ $side ]['color'] ?? null,
-			'style' => $border[ $side ]['style'] ?? null,
-		);
-	}
-
-	$background = $block_styles['background'] ?? null;
+	$support_attributes = $attributes;
 
 	// Post Navigation Link has no clip support, so ignore a stale value.
-	if ( is_array( $background ) ) {
-		unset( $background['backgroundClip'] );
+	if ( isset( $support_attributes['style']['background'] ) && is_array( $support_attributes['style']['background'] ) ) {
+		unset( $support_attributes['style']['background']['backgroundClip'] );
 	}
 
-	$background_styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
-
-	$styles         = wp_style_engine_get_styles(
+	// Dimensions sit between shadow and spacing in the style engine's order, so spacing is fetched separately.
+	$support_styles    = wp_get_block_supports_classes_and_styles( $support_attributes, array( 'background', 'border', 'shadow' ) );
+	$dimensions_styles = wp_style_engine_get_styles(
 		array(
-			'border'     => $border_styles,
 			'dimensions' => array(
-				'minHeight' => $block_styles['dimensions']['minHeight'] ?? null,
-				'minWidth'  => $block_styles['dimensions']['minWidth'] ?? null,
+				'minHeight' => $attributes['style']['dimensions']['minHeight'] ?? null,
+				'minWidth'  => $attributes['style']['dimensions']['minWidth'] ?? null,
 			),
-			'shadow'     => $block_styles['shadow'] ?? null,
 		)
 	);
-	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
+	$spacing_styles    = wp_get_spacing_classes_and_styles( $attributes );
 
-	// The style engine outputs background before the other groups, so it leads here too.
 	return array(
-		'class' => trim( ( $background_styles['class'] ?? '' ) . ' ' . ( $styles['classnames'] ?? '' ) ),
-		'style' => ( $background_styles['style'] ?? '' ) . ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
+		'class' => implode( ' ', array_filter( array( $support_styles['class'] ?? '', $dimensions_styles['classnames'] ?? '' ) ) ),
+		'style' => ( $support_styles['style'] ?? '' ) . ( $dimensions_styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 }
 

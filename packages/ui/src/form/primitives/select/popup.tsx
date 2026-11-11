@@ -27,6 +27,7 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 				<_Select.List
 					className={ clsx(
 						itemPopupStyles[ 'list-chrome' ],
+						itemPopupStyles[ 'list-scroller' ],
 						styles.list
 					) }
 				>

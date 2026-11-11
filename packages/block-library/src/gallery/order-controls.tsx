@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { SelectControl as WCSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	ORDER_OPTIONS,
 	RANDOM_OPTION,
@@ -45,18 +45,28 @@ export function SourceOrderControl( {
 	onChange,
 	onSelectRandom,
 }: SourceOrderControlProps ) {
+	const value = isRandom ? RANDOM_ORDER : toOrderValue( order );
+
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Order by' ) }
-			value={ isRandom ? RANDOM_ORDER : toOrderValue( order ) }
-			options={ SOURCE_ORDER_OPTIONS }
-			help={ getOrderHelp( isRandom ) }
-			onChange={ ( value ) => {
-				if ( value === RANDOM_ORDER ) {
+			value={
+				SOURCE_ORDER_OPTIONS.find(
+					( option ) => option.value === value
+				) ?? null
+			}
+			items={ SOURCE_ORDER_OPTIONS }
+			description={ getOrderHelp( isRandom ) }
+			onValueChange={ ( item ) => {
+				if ( ! item || item.value === null || item.value === value ) {
+					return;
+				}
+				const nextValue = item.value;
+				if ( nextValue === RANDOM_ORDER ) {
 					onSelectRandom();
 					return;
 				}
-				onChange( parseOrderValue( value ) );
+				onChange( parseOrderValue( nextValue ) );
 			} }
 		/>
 	);
@@ -122,12 +132,18 @@ export function SortImagesControl( {
 	}
 
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Order by' ) }
-			value={ value }
-			options={ options }
-			help={ getOrderHelp( isRandom ) }
-			onChange={ ( nextValue ) => {
+			value={
+				options.find( ( option ) => option.value === value ) ?? null
+			}
+			items={ options }
+			description={ getOrderHelp( isRandom ) }
+			onValueChange={ ( item ) => {
+				if ( ! item || item.value === null || item.value === value ) {
+					return;
+				}
+				const nextValue = item.value;
 				if ( nextValue === RANDOM_ORDER ) {
 					onSelectRandom();
 					return;
