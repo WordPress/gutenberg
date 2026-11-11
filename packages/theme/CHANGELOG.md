@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead. `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs in a future release ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
 ### New Features
 
--   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter. Use them instead of `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` for fills: `thumb` tokens are now only for the movable handle of a control, and `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 
 ### Enhancements
 
