@@ -38,7 +38,7 @@ When the value is in a text field, put the copy action in the field's suffix so 
 	source={ { code: CopyFromFieldSource, language: 'tsx', type: 'code' } }
 />
 
-Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. A read-only input with a Copy suffix might indicate that the design needs inline text and a copy button instead of an input. The visible label and the accessible name stay "Copy". A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
+Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. A read-only input with a copy suffix might indicate that the design needs inline text and a copy button instead of an input. Use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
 
 ## Copying from a menu
 
@@ -61,7 +61,7 @@ The local `SnackbarList` and its positioning styles keep this preview self-conta
 | Context | Recommended feedback | Rationale |
 | --- | --- | --- |
 | Standalone copy button | Temporary check or error icon; the label stays "Copy" | The control remains visible. The name stays the action, and the icon shows success or failure. |
-| Text field suffix | Temporary check or error icon on the suffix button; the label stays "Copy" | The button remains visible beside the value. Copy the field's current value. |
+| Text field suffix | Temporary check or error icon on the suffix button; `label` stays "Copy" | The button remains visible beside the value. Copy the field's current value. |
 | Copy action in a menu | The screen's existing snackbar region | The confirmation remains visible after the menu closes; assess its placement and timing. |
 ` }</Markdown>
 

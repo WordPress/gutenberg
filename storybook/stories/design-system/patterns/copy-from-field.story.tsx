@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CopyFromFieldExamples } from './copy-from-field';
+import { CopyFromFieldExample } from './copy-from-field';
 
 const meta = {
 	title: 'Design System/Patterns/Copy from Field',
-	component: CopyFromFieldExamples,
+	component: CopyFromFieldExample,
 	parameters: {
 		controls: { disable: true },
 	},
 	tags: [ 'docs-only' ],
-} satisfies Meta< typeof CopyFromFieldExamples >;
+} satisfies Meta< typeof CopyFromFieldExample >;
 
 export default meta;
 
@@ -16,5 +16,9 @@ type Story = StoryObj< typeof meta >;
 
 export const CopyFromField: Story = {
 	name: 'Copy from a text field',
-	render: () => <CopyFromFieldExamples />,
+	render: () => (
+		<div style={ { maxWidth: '24rem' } }>
+			<CopyFromFieldExample />
+		</div>
+	),
 };
