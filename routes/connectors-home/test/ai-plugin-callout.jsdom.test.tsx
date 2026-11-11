@@ -259,7 +259,10 @@ describe( 'AiPluginCallout', () => {
 		);
 
 		await waitFor( () => {
-			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith(
+				'ai',
+				expect.any( HTMLButtonElement )
+			);
 		} );
 
 		await waitFor( () => {
@@ -288,7 +291,10 @@ describe( 'AiPluginCallout', () => {
 		);
 
 		await waitFor( () => {
-			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith(
+				'ai',
+				expect.any( HTMLButtonElement )
+			);
 		} );
 
 		// Only the initial REST install attempt ran: no activate follow-up

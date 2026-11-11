@@ -93,8 +93,21 @@ export function isFilesystemUnavailableError( error: unknown ): boolean {
  */
 export type WpUpdatesInstallOutcome = 'installed' | 'canceled';
 
+/**
+ * Click event of the button that starts an install.
+ */
+export type InstallButtonClickEvent = { currentTarget: Element };
+
+/**
+ * Installs a plugin via `wp.updates.installPlugin()`.
+ *
+ * @param slug    Plugin slug.
+ * @param trigger Element that started the install. Focus returns to it when
+ *                the filesystem credentials modal closes.
+ */
 export function installPluginViaWpUpdates(
-	slug: string
+	slug: string,
+	trigger?: Element | null
 ): Promise< WpUpdatesInstallOutcome > {
 	return new Promise( ( resolve, reject ) => {
 		const w = window as unknown as WpUpdatesGlobal;
@@ -181,7 +194,7 @@ export function installPluginViaWpUpdates(
 		// Plugins > Add Plugin does. The modal then opens without an error,
 		// and focus returns to the install button when it closes.
 		updates.maybeRequestFilesystemCredentials?.( {
-			target: document.activeElement,
+			target: trigger ?? null,
 		} );
 		updates.installPlugin( { slug } );
 	} );
@@ -199,7 +212,7 @@ interface UseConnectorPluginReturn {
 	currentUsername: string;
 	hasResolvedSettings: boolean;
 	keySource: ApiKeySource;
-	handleButtonClick: () => void;
+	handleButtonClick: ( event?: InstallButtonClickEvent ) => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
 	removeApiKey: () => Promise< void >;
@@ -414,10 +427,13 @@ export function useConnectorPlugin( {
 		);
 	};
 
-	const installPlugin = async () => {
+	const installPlugin = async ( event?: InstallButtonClickEvent ) => {
 		if ( ! pluginSlug ) {
 			return;
 		}
+		// `currentTarget` is only set while the event is being handled, so
+		// read it before the first `await`.
+		const trigger = event?.currentTarget;
 		setIsBusy( true );
 		try {
 			try {
@@ -437,7 +453,10 @@ export function useConnectorPlugin( {
 				if ( ! isFilesystemUnavailableError( error ) ) {
 					throw error;
 				}
-				const outcome = await installPluginViaWpUpdates( pluginSlug );
+				const outcome = await installPluginViaWpUpdates(
+					pluginSlug,
+					trigger
+				);
 				if ( outcome === 'canceled' ) {
 					// User closed the credentials modal; abort silently.
 					return;
@@ -536,12 +555,12 @@ export function useConnectorPlugin( {
 		}
 	};
 
-	const handleButtonClick = () => {
+	const handleButtonClick = ( event?: InstallButtonClickEvent ) => {
 		if ( pluginStatus === 'not-installed' ) {
 			if ( canInstallPlugins === false ) {
 				return;
 			}
-			installPlugin();
+			installPlugin( event );
 		} else if ( pluginStatus === 'inactive' ) {
 			if ( canActivatePlugins === false ) {
 				return;

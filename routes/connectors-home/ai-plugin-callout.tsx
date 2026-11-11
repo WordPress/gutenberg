@@ -16,7 +16,10 @@ import {
 	installPluginViaWpUpdates,
 	isFilesystemUnavailableError,
 } from './use-connector-plugin';
-import type { PluginStatus } from './use-connector-plugin';
+import type {
+	InstallButtonClickEvent,
+	PluginStatus,
+} from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
 const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
@@ -122,7 +125,10 @@ export function AiPluginCallout() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const installPlugin = async () => {
+	const installPlugin = async ( event: InstallButtonClickEvent ) => {
+		// `currentTarget` is only set while the event is being handled, so
+		// read it before the first `await`.
+		const trigger = event.currentTarget;
 		setIsBusy( true );
 		try {
 			try {
@@ -142,8 +148,10 @@ export function AiPluginCallout() {
 				if ( ! isFilesystemUnavailableError( error ) ) {
 					throw error;
 				}
-				const outcome =
-					await installPluginViaWpUpdates( AI_PLUGIN_SLUG );
+				const outcome = await installPluginViaWpUpdates(
+					AI_PLUGIN_SLUG,
+					trigger
+				);
 				if ( outcome === 'canceled' ) {
 					// User closed the credentials modal; abort silently.
 					return;
