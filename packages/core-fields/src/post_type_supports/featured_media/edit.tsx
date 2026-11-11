@@ -7,6 +7,7 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
 import { unlock } from '../../lock-unlock';
 import type { FeaturedMediaField, PostWithFeaturedMedia } from './types';
@@ -26,6 +27,36 @@ type FeaturedImageEditProps = {
 	onChange: ( edits: Record< string, any > ) => void;
 };
 
+// An attachment, or an upload in progress, which has no `media_details` yet.
+type PreviewAttachment = Pick< Attachment< 'view' >, 'id' | 'source_url' > &
+	Partial< Pick< Attachment< 'view' >, 'media_details' > >;
+
+/**
+ * The URL the preview loads in the post editor, like the classic featured
+ * image panel: the `large` size, then `thumbnail`, each through the
+ * `editor.PostFeaturedImage.imageSize` filter, then the full size.
+ *
+ * @param attachment The featured image.
+ * @param postId     The post being edited.
+ * @return The URL of the image file to load.
+ */
+function getPreviewUrl( attachment: PreviewAttachment, postId: Item[ 'id' ] ) {
+	const sizes = attachment.media_details?.sizes ?? {};
+	for ( const defaultSize of [ 'large', 'thumbnail' ] ) {
+		const size = applyFilters(
+			'editor.PostFeaturedImage.imageSize',
+			defaultSize,
+			attachment.id,
+			postId
+		) as string;
+		const url = sizes[ size ]?.source_url;
+		if ( url ) {
+			return url;
+		}
+	}
+	return attachment.source_url;
+}
+
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 	function PostFeaturedImage(
 		props: FeaturedImageEditProps & {
@@ -40,6 +71,9 @@ const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 				featuredImageFlow
 				pickerTitle={
 					props.postType?.labels?.featured_image || props.field.label
+				}
+				getPreviewUrl={ ( attachment: PreviewAttachment ) =>
+					getPreviewUrl( attachment, props.data.id )
 				}
 			/>
 		);
@@ -58,8 +92,9 @@ const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
  * The control resolved through the `editor.PostFeaturedImage` filter, with
  * the read-only facts the classic panel passed to it, `currentPostId`,
  * `featuredImageId`, `media` and `postType`, and its `onRemoveImage` handler;
- * its picker resolves through the `editor.MediaUpload` filter, as the classic
- * panel's does. Callbacks of either filter may read the props to render their
+ * its picker resolves through the `editor.MediaUpload` filter and its preview
+ * size through `editor.PostFeaturedImage.imageSize`, as the classic panel's
+ * do. Callbacks of either filter may read the props to render their
  * own controls next to the picker and may act through the editor store
  * (`editPost`, `useEntityProp`), which is why this only renders where that
  * store's current post is the item (see `FeaturedImageEdit`).
@@ -104,8 +139,9 @@ function FilteredFeaturedImageEdit( props: FeaturedImageEditProps ) {
  * Edit control of the featured image field.
  *
  * In the post editor, where the item is the post in the surrounding entity
- * context, the control goes through the `editor.PostFeaturedImage` filter and
- * its picker through `editor.MediaUpload`, so plugins that extend the classic
+ * context, the control goes through the `editor.PostFeaturedImage` filter, its
+ * picker through `editor.MediaUpload` and its preview size through
+ * `editor.PostFeaturedImage.imageSize`, so plugins that extend the classic
  * featured image panel or its media picker keep working. Elsewhere, such as
  * Quick Edit, it renders the media control directly, with the plain picker.
  *

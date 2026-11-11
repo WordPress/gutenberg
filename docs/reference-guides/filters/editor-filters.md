@@ -177,7 +177,7 @@ The following filters are available to extend features in the Editor.
 
 ### `editor.PostFeaturedImage.imageSize`
 
-You can use this filter to modify the image size displayed in the Post Featured Image component. It defaults to `'post-thumbnail'` and will fail back to the `full` image size when the specified image size doesn't exist in the media object. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
+You can use this filter to modify the image size of the featured image preview in the post editor, both in the post sidebar and in the Post Featured Image component. It is applied to `'large'` and, when that size doesn't exist in the media object, to `'thumbnail'`, falling back to the full image size. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
 
 ```js
 import { addFilter } from '@wordpress/hooks';
