@@ -107,13 +107,7 @@ describe( 'FeaturedImageEdit', () => {
 		);
 	} );
 
-	it( 'applies the editor.PostFeaturedImage, editor.MediaUpload and imageSize filters when the item is the post in context', () => {
-		addFilter( 'editor.PostFeaturedImage', 'test/with-marker', withMarker );
-		addFilter(
-			'editor.MediaUpload',
-			'test/with-picker-marker',
-			withPickerMarker
-		);
+	it( 'applies the editor.PostFeaturedImage, editor.MediaUpload and imageSize filters when the item is the post in context', async () => {
 		const sizeCalls: unknown[][] = [];
 		addFilter(
 			'editor.PostFeaturedImage.imageSize',
@@ -137,20 +131,29 @@ describe( 'FeaturedImageEdit', () => {
 			</RegistryProvider>
 		);
 		expect(
-			screen.getByText(
+			screen.getByRole( 'img', { name: 'Forty-two' } )
+		).toHaveAttribute( 'src', 'https://example.com/42-300x225.jpg' );
+		expect( sizeCalls ).toEqual( [ [ 'large', 42, 5 ] ] );
+
+		// `withFilters` caches the filtered component and only refreshes it
+		// while mounted, so the filters are added after the first render.
+		addFilter( 'editor.PostFeaturedImage', 'test/with-marker', withMarker );
+		addFilter(
+			'editor.MediaUpload',
+			'test/with-picker-marker',
+			withPickerMarker
+		);
+		expect(
+			await screen.findByText(
 				'Extended: image 42 of post 5 (post), media https://example.com/42.jpg'
 			)
 		).toBeInTheDocument();
 		expect(
+			await screen.findByText( 'Picker extended: Cover image' )
+		).toBeInTheDocument();
+		expect(
 			screen.getByRole( 'button', { name: 'Remove' } )
 		).toBeInTheDocument();
-		expect(
-			screen.getByText( 'Picker extended: Cover image' )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'img', { name: 'Forty-two' } )
-		).toHaveAttribute( 'src', 'https://example.com/42-300x225.jpg' );
-		expect( sizeCalls ).toEqual( [ [ 'large', 42, 5 ] ] );
 	} );
 
 	it( 'renders the media control directly, with the plain picker and the full-size preview, outside the post context', () => {
