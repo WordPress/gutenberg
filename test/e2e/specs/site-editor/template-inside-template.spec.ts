@@ -54,6 +54,7 @@ test.describe( 'Template rendered inside another template', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPages();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -380,6 +381,67 @@ test.describe( 'Template rendered inside another template', () => {
 		await expect(
 			editor.canvas.getByText( 'Archive sidebar text!' )
 		).toBeVisible();
+	} );
+
+	test( 'shows a page inside its template inside the template that one names', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'layout',
+			title: 'Layout',
+			content: LAYOUT_CONTENT,
+		} );
+		await createTemplateInside( requestUtils, {
+			slug: 'page',
+			title: 'Pages',
+			content: '<!-- wp:post-title /--><!-- wp:post-content /-->',
+			template: 'layout',
+		} );
+		const { id: pageId } = await requestUtils.createPage( {
+			title: 'About us',
+			content:
+				'<!-- wp:paragraph --><p>Page content</p><!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: pageId,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+
+		// The page is edited inside its template, and that template inside the
+		// one it names, as the front end renders it.
+		await expect(
+			editor.canvas.getByText( 'Shared header' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByText( 'Shared footer' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByText( 'Shown on its own' )
+		).toBeHidden();
+		await expect(
+			editor.canvas.locator( '.wp-block-post-title' )
+		).toHaveText( 'About us' );
+
+		// The page's content is what is edited, as it is in its template alone.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Page content' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '!' );
+		await expect(
+			editor.canvas.getByText( 'Page content!' )
+		).toBeVisible();
+
+		await page.goto( `/?page_id=${ pageId }` );
+		await expect( page.getByText( 'Shared header' ) ).toBeVisible();
+		await expect( page.getByText( 'Page content' ) ).toBeVisible();
 	} );
 
 	test( 'labels the archive by the template being edited rather than the one around it', async ( {
