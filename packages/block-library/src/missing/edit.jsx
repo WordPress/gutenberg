@@ -1,5 +1,4 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -7,8 +6,11 @@ import {
 	Warning,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { safeHTML } from '@wordpress/dom';
+import { unlock } from '../lock-unlock';
+
+const { SafeRawHTML } = unlock( blockEditorPrivateApis );
 
 export default function MissingEdit( { attributes, clientId } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -91,7 +93,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 	return (
 		<div { ...useBlockProps( { className: 'has-warning' } ) }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
-			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
+			<SafeRawHTML html={ originalUndelimitedContent } />
 		</div>
 	);
 }
