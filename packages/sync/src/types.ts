@@ -124,8 +124,6 @@ export interface SyncManagerUpdateOptions {
 }
 
 export interface ApplyChangesOptions {
-	/** Report corrected fields synchronously when rebasing the edit. */
-	onRebase?: ( changes: Partial< ObjectData > ) => void;
 	/**
 	 * The blocks immediately before the change. An editor renders remote
 	 * changes asynchronously, so these blocks can differ from the current
@@ -152,11 +150,16 @@ export interface RecordHandlers {
 }
 
 export interface SyncConfig {
+	/**
+	 * Apply local changes to the document. May return corrected fields when
+	 * the changes were merged with concurrent changes the caller has not
+	 * seen, so the caller can store the merged result.
+	 */
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >,
 		options?: ApplyChangesOptions
-	) => void;
+	) => Partial< ObjectData > | void;
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID

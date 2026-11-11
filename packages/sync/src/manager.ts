@@ -719,12 +719,10 @@ export function createSyncManager( debug = false ): SyncManager {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
 				} );
-				syncConfig.applyChangesToCRDTDoc( ydoc, changes, {
-					onRebase: ( corrected ) => {
-						rebasedChanges = corrected;
-					},
-					previousBlocks,
-				} );
+				rebasedChanges =
+					syncConfig.applyChangesToCRDTDoc( ydoc, changes, {
+						previousBlocks,
+					} ) ?? undefined;
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
@@ -782,8 +780,9 @@ export function createSyncManager( debug = false ): SyncManager {
 	}
 
 	// Apply local changes to the CRDT doc, synchronously when a remote peer is
-	// present so the change lands before a remote update can race it (#78756),
-	// otherwise deferred off the typing hot path (#79964).
+	// present so the change lands before a remote update can race it (#78756)
+	// and so merged fields return to the caller, otherwise deferred off the
+	// typing hot path (#79964). Alone, there is nothing to merge back.
 	function updateOrDefer(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -795,11 +794,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
 
-		if ( hasRemotePeers || options.previousBlocks ) {
+		if ( hasRemotePeers ) {
 			// Apply any updates queued while editing alone first, so changes
 			// are never applied out of order.
 			flushPendingCRDTDocUpdates();
-			// Rebases must return their result before the caller updates its store.
 			return updateCRDTDoc(
 				objectType,
 				objectId,
