@@ -3968,7 +3968,7 @@ class WP_Theme_JSON_Gutenberg {
 					}
 
 					$element_selector = $selectors[ $name ]['elements'][ $element ];
-					// The pagination link is the block root. Keep in sync with getRootLinkElementSelector() in JS.
+
 					if ( 'link' === $element &&
 						is_string( $selector ) && '' !== $selector &&
 						in_array( $name, array( 'core/query-pagination-next', 'core/query-pagination-previous' ), true )
