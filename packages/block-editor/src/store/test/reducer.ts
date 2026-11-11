@@ -3023,6 +3023,81 @@ describe( 'state', () => {
 					}
 				);
 
+				it( 'should keep the tree entries of a nested controlled block in RESET_BLOCKS', () => {
+					let state = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'chicken',
+						blocks: [
+							partial< Block >( {
+								clientId: 'content',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'content',
+						hasControlledInnerBlocks: true,
+					} );
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'content',
+						blocks: [
+							partial< Block >( {
+								clientId: 'content-inner',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					const previousTree = state.tree;
+
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+
+					expect( state.tree.get( 'content' ) ).toBe(
+						previousTree.get( 'content' )
+					);
+					expect( state.tree.get( 'controlled||content' ) ).toBe(
+						previousTree.get( 'controlled||content' )
+					);
+					expect( state.tree.get( 'chicken' )!.innerBlocks ).toEqual(
+						[ state.tree.get( 'content' ) ]
+					);
+					expect(
+						state.tree.get( 'controlled||chicken' )!
+							.innerBlocks[ 0 ]
+					).toBe( state.tree.get( 'content' ) );
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = partial< Block >( {
 						clientId: 'template',

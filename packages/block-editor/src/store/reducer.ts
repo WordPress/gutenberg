@@ -647,6 +647,9 @@ const withBlockReset =
 
 			const preservedControlledInnerBlocks =
 				state?.controlledInnerBlocks ?? new Set();
+			// The preserved controllers that the action gives. A nested
+			// controller is restored along with the controller it's in.
+			const controllersFromAction: string[] = [];
 
 			// Preserve controlled inner blocks data from the old state.
 			// The maps above are rebuilt solely from action.blocks, but
@@ -678,9 +681,12 @@ const withBlockReset =
 
 				for ( const clientId of preservedControlledInnerBlocks ) {
 					// Only preserve if the parent block still exists.
-					if ( ! newState.byClientId.has( clientId ) ) {
-						continue;
+					if ( newState.byClientId.has( clientId ) ) {
+						controllersFromAction.push( clientId );
 					}
+				}
+
+				for ( const clientId of controllersFromAction ) {
 					newState.controlledInnerBlocks.add( clientId );
 					const oldOrder = state.order.get( clientId ) ?? [];
 					newState.order.set( clientId, oldOrder );
@@ -701,8 +707,8 @@ const withBlockReset =
 							state!.attributes.get( blockId )!
 						);
 						newState.parents.set( blockId, parentId );
-						// A nested controller may come before its parent in
-						// the loop, which then skips it as not yet restored.
+						// A nested controller isn't in the loop, so it keeps
+						// its flag here.
 						if ( preservedControlledInnerBlocks.has( blockId ) ) {
 							newState.controlledInnerBlocks.add( blockId );
 						}
@@ -722,7 +728,7 @@ const withBlockReset =
 			// cloned inner blocks instead. The entries are the blocks from the
 			// action, so they are replaced, and their ancestors after them.
 			const fixedClientIds: string[] = [];
-			for ( const clientId of newState.controlledInnerBlocks ) {
+			for ( const clientId of controllersFromAction ) {
 				const controlledOrder = newState.order.get( clientId ) ?? [];
 				const existingEntry = newState.tree.get( clientId );
 				// An entry built from the action may still hold the inner
@@ -733,12 +739,9 @@ const withBlockReset =
 				) {
 					continue;
 				}
-				// An order ID can lack a tree entry when the previous state
-				// was inconsistent, and an undefined inner block crashes the
-				// tree traversals.
-				const innerBlocks = controlledOrder
-					.map( ( id ) => state!.tree.get( id ) )
-					.filter( ( block ): block is TreeBlock => !! block );
+				const innerBlocks = controlledOrder.map(
+					( id ) => state!.tree.get( id ) as TreeBlock
+				);
 				if ( existingEntry ) {
 					newState.tree.set( clientId, {
 						...existingEntry,
@@ -759,6 +762,15 @@ const withBlockReset =
 						return;
 					}
 					newState.tree.set( blockId, treeEntry );
+					const controlledEntry = state!.tree.get(
+						'controlled||' + blockId
+					);
+					if ( controlledEntry ) {
+						newState.tree.set(
+							'controlled||' + blockId,
+							controlledEntry
+						);
+					}
 					const childOrder = newState.order.get( blockId ) || [];
 					childOrder.forEach( preserveTreeEntry );
 				};
