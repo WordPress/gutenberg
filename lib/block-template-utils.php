@@ -6,12 +6,193 @@
  */
 
 /**
+ * Gets the directories the theme export may copy font files from.
+ *
+ * @since 24.5.0
+ *
+ * @return array[] List of directories, each with `url`, `path` and `type` ('font' or 'theme').
+ */
+function gutenberg_get_export_font_source_dirs() {
+	$dirs = array();
+
+	$font_dir = wp_get_font_dir();
+	if ( empty( $font_dir['error'] ) ) {
+		$dirs[] = array(
+			'url'  => $font_dir['url'],
+			'path' => $font_dir['path'],
+			'type' => 'font',
+		);
+	}
+
+	// @core-merge: Do not merge this, it is for the legacy wp-content/fonts directory only used in Gutenberg.
+	$site_path = '';
+	if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
+		$site_path = '/sites/' . get_current_blog_id();
+	}
+	$dirs[] = array(
+		'url'  => content_url( 'fonts' ) . $site_path,
+		'path' => path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path,
+		'type' => 'font',
+	);
+
+	$dirs[] = array(
+		'url'  => get_stylesheet_directory_uri(),
+		'path' => get_stylesheet_directory(),
+		'type' => 'theme',
+	);
+
+	return array_values(
+		array_filter(
+			$dirs,
+			static function ( $dir ) {
+				return is_dir( $dir['path'] );
+			}
+		)
+	);
+}
+
+/**
+ * Gets the `src` a font face should have in the exported theme.json.
+ *
+ * Font Library files are added to `$files` so they can be copied into the
+ * export's `assets/fonts/` directory. Theme files listed in `$reserved_paths`
+ * are pointed at by their relative path. Anything else is returned unchanged.
+ *
+ * @since 24.5.0
+ *
+ * @param mixed    $src            Font face src.
+ * @param string[] $files          Files to add to the export, keyed by their path in the archive. Passed by reference.
+ * @param string[] $reserved_paths Paths of the theme files already in the archive.
+ * @return mixed The src to export.
+ */
+function gutenberg_get_font_face_src_for_export( $src, array &$files, array $reserved_paths = array() ) {
+	if ( ! is_string( $src ) || str_starts_with( $src, 'file:./' ) ) {
+		return $src;
+	}
+
+	$url = set_url_scheme( rawurldecode( preg_replace( '/[?#].*$/', '', $src ) ), 'https' );
+	if ( str_contains( $url, "\0" ) ) {
+		return $src;
+	}
+
+	foreach ( gutenberg_get_export_font_source_dirs() as $dir ) {
+		$dir_url = trailingslashit( set_url_scheme( $dir['url'], 'https' ) );
+		if ( ! str_starts_with( $url, $dir_url ) ) {
+			continue;
+		}
+
+		$real_dir  = realpath( $dir['path'] );
+		$real_file = realpath( $dir['path'] . '/' . substr( $url, strlen( $dir_url ) ) );
+		if ( false === $real_dir || false === $real_file ) {
+			return $src;
+		}
+
+		$real_dir  = trailingslashit( wp_normalize_path( $real_dir ) );
+		$real_file = wp_normalize_path( $real_file );
+		if ( ! str_starts_with( $real_file, $real_dir ) || ! is_file( $real_file ) || ! is_readable( $real_file ) ) {
+			return $src;
+		}
+
+		if ( 'theme' === $dir['type'] ) {
+			// Only point at theme files that are copied into the export.
+			$relative_path = substr( $real_file, strlen( $real_dir ) );
+			return in_array( $relative_path, $reserved_paths, true ) ? 'file:./' . $relative_path : $src;
+		}
+
+		$extension = strtolower( pathinfo( $real_file, PATHINFO_EXTENSION ) );
+		if ( ! in_array( $extension, array( 'woff2', 'woff', 'ttf', 'otf' ), true ) ) {
+			return $src;
+		}
+
+		$zip_path = array_search( $real_file, $files, true );
+		if ( false === $zip_path ) {
+			$name     = pathinfo( $real_file, PATHINFO_FILENAME );
+			$suffix   = '.' . pathinfo( $real_file, PATHINFO_EXTENSION );
+			$zip_path = 'assets/fonts/' . $name . $suffix;
+			for ( $i = 1; isset( $files[ $zip_path ] ) || in_array( $zip_path, $reserved_paths, true ); $i++ ) {
+				$zip_path = 'assets/fonts/' . $name . '-' . $i . $suffix;
+			}
+			$files[ $zip_path ] = $real_file;
+		}
+
+		return 'file:./' . $zip_path;
+	}
+
+	return $src;
+}
+
+/**
+ * Points the font faces in a theme.json array at files in the export.
+ *
+ * Visits the top-level and per-block `typography.fontFamilies` settings, as
+ * returned by `WP_Theme_JSON_Gutenberg::get_data()`.
+ *
+ * @since 24.5.0
+ *
+ * @param array    $theme_json_raw Theme.json data.
+ * @param string[] $reserved_paths Paths in the archive that are already taken.
+ * @return array {
+ *     @type array    $theme_json Theme.json data with updated font face sources.
+ *     @type string[] $files      Files to add to the export, keyed by their path in the archive.
+ * }
+ */
+function gutenberg_prepare_theme_json_fonts_for_export( array $theme_json_raw, array $reserved_paths = array() ) {
+	$files = array();
+
+	$update_font_families = static function ( $font_families ) use ( &$files, $reserved_paths ) {
+		if ( ! is_array( $font_families ) ) {
+			return $font_families;
+		}
+
+		foreach ( $font_families as $family_index => $font_family ) {
+			if ( ! isset( $font_family['fontFace'] ) || ! is_array( $font_family['fontFace'] ) ) {
+				continue;
+			}
+
+			foreach ( $font_family['fontFace'] as $face_index => $font_face ) {
+				if ( ! isset( $font_face['src'] ) ) {
+					continue;
+				}
+
+				if ( is_array( $font_face['src'] ) ) {
+					foreach ( $font_face['src'] as $src_index => $src ) {
+						$font_families[ $family_index ]['fontFace'][ $face_index ]['src'][ $src_index ] = gutenberg_get_font_face_src_for_export( $src, $files, $reserved_paths );
+					}
+				} else {
+					$font_families[ $family_index ]['fontFace'][ $face_index ]['src'] = gutenberg_get_font_face_src_for_export( $font_face['src'], $files, $reserved_paths );
+				}
+			}
+		}
+
+		return $font_families;
+	};
+
+	if ( isset( $theme_json_raw['settings']['typography']['fontFamilies'] ) ) {
+		$theme_json_raw['settings']['typography']['fontFamilies'] = $update_font_families( $theme_json_raw['settings']['typography']['fontFamilies'] );
+	}
+
+	if ( isset( $theme_json_raw['settings']['blocks'] ) && is_array( $theme_json_raw['settings']['blocks'] ) ) {
+		foreach ( $theme_json_raw['settings']['blocks'] as $block_name => $block_settings ) {
+			if ( isset( $block_settings['typography']['fontFamilies'] ) ) {
+				$theme_json_raw['settings']['blocks'][ $block_name ]['typography']['fontFamilies'] = $update_font_families( $block_settings['typography']['fontFamilies'] );
+			}
+		}
+	}
+
+	return array(
+		'theme_json' => $theme_json_raw,
+		'files'      => $files,
+	);
+}
+
+/**
  * Creates an export of the current templates and
  * template parts from the site editor at the
  * specified path in a ZIP file.
  *
  * @since 5.9.0
  * @since 6.0.0 Adds the whole theme to the export archive.
+ * @since 24.5.0 Includes Font Library fonts used by the theme.
  *
  * @global string $wp_version The WordPress version string.
  *
@@ -46,6 +227,7 @@ function gutenberg_generate_block_templates_export_file() {
 	);
 
 	// Make a copy of the current theme.
+	$theme_file_paths = array();
 	foreach ( $theme_files as $file ) {
 		// Skip directories as they are added automatically.
 		if ( ! $file->isDir() ) {
@@ -55,6 +237,7 @@ function gutenberg_generate_block_templates_export_file() {
 
 			if ( ! wp_is_theme_directory_ignored( $relative_path ) ) {
 				$zip->addFile( $file_path, $relative_path );
+				$theme_file_paths[] = $relative_path;
 			}
 		}
 	}
@@ -88,6 +271,13 @@ function gutenberg_generate_block_templates_export_file() {
 	$tree->merge( WP_Theme_JSON_Resolver_Gutenberg::get_user_data() );
 
 	$theme_json_raw = $tree->get_data();
+
+	// Copy the Font Library fonts the theme uses, and point theme.json at the copies.
+	$fonts_export   = gutenberg_prepare_theme_json_fonts_for_export( $theme_json_raw, $theme_file_paths );
+	$theme_json_raw = $fonts_export['theme_json'];
+	foreach ( $fonts_export['files'] as $zip_path => $font_file_path ) {
+		$zip->addFile( $font_file_path, $zip_path );
+	}
 	// If a version is defined, add a schema.
 	if ( $theme_json_raw['version'] ) {
 		$theme_json_version = 'wp/' . substr( $wp_version, 0, 3 );
