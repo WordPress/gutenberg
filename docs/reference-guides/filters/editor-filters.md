@@ -211,6 +211,48 @@ addFilter(
 );
 ```
 
+### `editor.PrePublishPanel.suggestedPostFormat`
+
+Filters the post format the pre-publish panel suggests. It defaults to the format `getSuggestedPostFormat()` infers from the blocks of the post, or `null`. The panel only suggests a format the theme supports, and only when the post does not have it already.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+const suggestGallery = function ( format, postId ) {
+	const images = select( blockEditorStore )
+		.getBlocks()
+		.filter( ( block ) => block.name === 'core/image' );
+
+	return images.length > 1 ? 'gallery' : format;
+};
+
+addFilter(
+	'editor.PrePublishPanel.suggestedPostFormat',
+	'my-plugin/suggest-gallery',
+	suggestGallery
+);
+```
+
+### `editor.PrePublishPanel.suggestionInitialOpen`
+
+Filters whether a suggestion in the pre-publish panel starts open. The second argument names the suggestion: `'post-format'`, `'tags'` and `'category'` start closed, `'external-media'` starts open.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+const openTagsSuggestion = function ( initialOpen, suggestion ) {
+	return 'tags' === suggestion ? true : initialOpen;
+};
+
+addFilter(
+	'editor.PrePublishPanel.suggestionInitialOpen',
+	'my-plugin/open-tags-suggestion',
+	openTagsSuggestion
+);
+```
+
 ### `media.crossOrigin`
 
 This filter is used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e., `<audio>`, `<img>`, `<link>`, `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information on the `crossOrigin` attribute, its values, and how it applies to each element.

@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
@@ -81,7 +82,14 @@ function MaybeCategoryPanel() {
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+		<PanelBody
+			initialOpen={ applyFilters(
+				'editor.PrePublishPanel.suggestionInitialOpen',
+				false,
+				'category'
+			) }
+			title={ panelBodyTitle }
+		>
 			<p>
 				{ __(
 					'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
