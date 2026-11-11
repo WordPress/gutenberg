@@ -3222,5 +3222,36 @@ test.describe( 'Block Notes', () => {
 			await image.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
+
+		test( 'tints an embed without a caption between the noted text', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			await editor.insertBlock( { name: 'core/embed' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.last().click();
+			await blockNoteUtils.selectBlockText( { start: 3, length: 0 } );
+			await paragraphs
+				.first()
+				.click( { modifiers: [ 'Shift' ], position: { x: 1, y: 5 } } );
+			await blockNoteUtils.addNote( 'Note around an embed' );
+
+			await blockNoteUtils.deselect();
+			await expect(
+				editor.canvas.getByRole( 'document', { name: 'Block: Embed' } )
+			).toHaveCSS( 'background-color', tint, { pseudo: 'after' } );
+		} );
 	} );
 } );
