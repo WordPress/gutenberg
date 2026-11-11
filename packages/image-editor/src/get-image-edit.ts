@@ -34,10 +34,10 @@ const CROP_TOLERANCE = 0.001;
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. Something that edits the file needs the edit described against
- * the file instead.
+ * the view. Something that edits the image needs the edit described against
+ * the image instead.
  *
- * A crop within `CROP_TOLERANCE` of the whole rotated image is left out.
+ * A crop within `CROP_TOLERANCE` of the whole rotated image is omitted.
  * A locked ratio can produce a crop before the person edits anything.
  *
  * Frames and math:
