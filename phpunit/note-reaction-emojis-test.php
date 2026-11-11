@@ -6,19 +6,19 @@
  */
 class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 
-	public function tear_down() {
+	public function tear_down(): void {
 		remove_all_filters( 'wp_note_reaction_emojis' );
 		parent::tear_down();
 	}
 
-	public function test_defaults_to_the_seven_quick_reactions() {
+	public function test_defaults_to_the_seven_quick_reactions(): void {
 		$this->assertSame(
 			array( '1f44d', '2795', '2764', '1f389', '1f604', '1f440', '1f680' ),
 			gutenberg_get_note_reaction_keys()
 		);
 	}
 
-	public function test_filter_can_add_and_remove_emoji() {
+	public function test_filter_can_add_and_remove_emoji(): void {
 		add_filter(
 			'wp_note_reaction_emojis',
 			static function ( $emojis ) {
@@ -36,19 +36,19 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_filter_can_remove_every_emoji() {
+	public function test_filter_can_remove_every_emoji(): void {
 		add_filter( 'wp_note_reaction_emojis', '__return_empty_array' );
 
 		$this->assertSame( array(), gutenberg_get_note_reaction_emojis() );
 	}
 
-	public function test_falls_back_to_the_defaults_when_the_filter_returns_no_list() {
+	public function test_falls_back_to_the_defaults_when_the_filter_returns_no_list(): void {
 		add_filter( 'wp_note_reaction_emojis', '__return_null' );
 
 		$this->assertCount( 7, gutenberg_get_note_reaction_emojis() );
 	}
 
-	public function test_drops_malformed_and_duplicate_entries() {
+	public function test_drops_malformed_and_duplicate_entries(): void {
 		add_filter(
 			'wp_note_reaction_emojis',
 			static function () {
@@ -104,7 +104,7 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_passes_the_emoji_to_the_editor() {
+	public function test_passes_the_emoji_to_the_editor(): void {
 		$settings = apply_filters( 'block_editor_settings_all', array(), new WP_Block_Editor_Context() );
 
 		$this->assertSame( gutenberg_get_note_reaction_emojis(), $settings['noteReactionEmojis'] );

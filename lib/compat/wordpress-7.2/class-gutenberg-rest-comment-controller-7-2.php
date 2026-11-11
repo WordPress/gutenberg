@@ -27,10 +27,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * `wp_note_reaction_emojis` filter.
 	 *
 	 * @since 7.2.0
+	 * @since 7.3.0 Reads the filtered list; core calls wp_get_note_reaction_keys() directly.
 	 *
 	 * @return string[] Hex keys of the emoji from `gutenberg_get_note_reaction_emojis()`.
 	 *
-	 * @phpstan-return list<lowercase-string&non-falsy-string>
+	 * @phpstan-return list<lowercase-string&non-empty-string>
 	 */
 	private static function get_note_reaction_keys(): array {
 		return gutenberg_get_note_reaction_keys();

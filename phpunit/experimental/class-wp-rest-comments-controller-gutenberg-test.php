@@ -1201,7 +1201,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * The `wp_note_reaction_emojis` filter decides which emoji the
 	 * REST API accepts: an added emoji is accepted and a removed one is not.
 	 */
-	public function test_reaction_emojis_filter_affects_validation() {
+	public function test_reaction_emojis_filter_affects_validation(): void {
 		$filter = static function ( $emojis ) {
 			// Drop the heart, add a unicorn.
 			$emojis   = array_values(
@@ -1253,7 +1253,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * A reaction whose emoji the site stopped offering can still be removed
 	 * by its author.
 	 */
-	public function test_can_delete_own_reaction_after_its_emoji_is_filtered_out() {
+	public function test_can_delete_own_reaction_after_its_emoji_is_filtered_out(): void {
 		wp_set_current_user( self::$editor_id );
 		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
 		$note_id     = $this->create_note( $post_id, self::$editor_id );
