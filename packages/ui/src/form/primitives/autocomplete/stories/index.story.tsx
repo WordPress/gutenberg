@@ -802,7 +802,7 @@ export const Grid: Story = {
  * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
  *
  * If the list scrolls, set `scrollbar-gutter: stable` on `Autocomplete.ListBody`
- * so that the popover keeps its width when the results stop overflowing. To keep
+ * to prevent width changes when its scrollbar appears or disappears. To keep
  * the scrollbar clear of the last column, extend the list body into the popover's
  * padding with a negative inline-end margin and the same inline-end padding.
  */
