@@ -128,15 +128,17 @@ function InserterMenu(
 			// Check for focus loss due to filtering blocks by selected block type
 			if ( ! shouldFocusBlock ) {
 				window.requestAnimationFrame( () => {
-					// @ts-expect-error Bug: a callback ref has no `current`.
-					const { activeElement, body } = ref.current.ownerDocument;
+					// Null when the inserter closed before this frame.
+					const tab = blockTypesTabRef.current;
 					// Focus moved elsewhere, e.g. into the canvas, is not lost.
-					if ( activeElement === body ) {
+					if (
+						tab &&
+						tab.ownerDocument.activeElement ===
+							tab.ownerDocument.body
+					) {
 						// There has been a focus loss, so focus the first button in the block types tab
 						// @ts-expect-error Bug: the tab has no button when it shows no results.
-						blockTypesTabRef.current
-							?.querySelector( 'button' )
-							.focus();
+						tab.querySelector( 'button' ).focus();
 					}
 				} );
 			}
@@ -146,7 +148,6 @@ function InserterMenu(
 			onInsertBlocks,
 			maybeCloseInserter,
 			onSelect,
-			ref,
 			shouldFocusBlock,
 		]
 	);
