@@ -12,7 +12,7 @@ import {
 	isGridElementWithFixedCells,
 } from './utils';
 import { getResizedGridPlacement } from './free-placement';
-import type { PixelRectEdge } from './free-placement';
+import type { PixelRectHandle } from './free-placement';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import type {
 	GridItemResizerInnerProps,
@@ -120,20 +120,24 @@ function GridItemResizerInner( {
 		return () => observer.disconnect();
 	}, [ blockElement, rootBlockElement, isManualGrid ] );
 
-	// A `null` direction, while not resizing, matches no key.
+	// A `null` direction, while not resizing, matches no key. A corner is
+	// both a horizontal and a vertical side, and each one anchors the box on
+	// its own axis.
+	const horizontalSide = resizeDirection?.match( /left|right/i )?.[ 0 ];
+	const verticalSide = resizeDirection?.match( /top|bottom/i )?.[ 0 ];
 	const styles = useMemo(
 		(): CSSProperties => ( {
 			display: 'flex',
 			justifyContent: 'center',
 			alignItems: 'center',
-			...( justification[ resizeDirection as string ] && {
-				justifyContent: justification[ resizeDirection as string ],
+			...( horizontalSide && {
+				justifyContent: justification[ horizontalSide.toLowerCase() ],
 			} ),
-			...( alignment[ resizeDirection as string ] && {
-				alignItems: alignment[ resizeDirection as string ],
+			...( verticalSide && {
+				alignItems: alignment[ verticalSide.toLowerCase() ],
 			} ),
 		} ),
-		[ resizeDirection ]
+		[ horizontalSide, verticalSide ]
 	);
 	// Keep the handles on the block's edges when it is rotated.
 	const overlayStyles = useRotatedOverlayStyle( blockElement, angle, styles );
@@ -153,13 +157,13 @@ function GridItemResizerInner( {
 				} }
 				enable={ {
 					bottom: enableSide.bottom,
-					bottomLeft: false,
-					bottomRight: false,
+					bottomLeft: enableSide.bottom && enableSide.left,
+					bottomRight: enableSide.bottom && enableSide.right,
 					left: enableSide.left,
 					right: enableSide.right,
 					top: enableSide.top,
-					topLeft: false,
-					topRight: false,
+					topLeft: enableSide.top && enableSide.left,
+					topRight: enableSide.top && enableSide.right,
 				} }
 				// Manual grids grow when a block is resized past the last row,
 				// so they aren't limited to the grid's current size. When the
@@ -236,9 +240,7 @@ function GridItemResizerInner( {
 								right: rect.right,
 								bottom: rect.bottom,
 							},
-							// Only the sides are enabled, so the edge being
-							// dragged is a side.
-							direction: direction as PixelRectEdge,
+							direction: direction as PixelRectHandle,
 							columnTracks: gridColumnTracks,
 							rowTracks: gridRowTracks,
 							rowGap,
