@@ -106,7 +106,7 @@ process.stdout.write(
 		? `${ JSON.stringify(
 				decisions.map( ( { rule, probability, requestReview } ) => ( {
 					rule: rule.id,
-					team: rule.team,
+					reviewer: rule.reviewer,
 					probability,
 					threshold: rule.threshold,
 					requestReview,
