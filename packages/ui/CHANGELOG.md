@@ -14,7 +14,7 @@
 
 ### Enhancements
 
--   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a `Popover` instead.
+-   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a `Popover` instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 
