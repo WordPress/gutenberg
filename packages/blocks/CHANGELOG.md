@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block attribute definitions accept `uniqueItems` on `array` attributes and `properties` on `object` attributes. During real-time collaboration, the items that collaborators add to or remove from a list of unique items at the same time are all kept ([#86628](https://github.com/WordPress/gutenberg/pull/86628)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements
