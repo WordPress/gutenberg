@@ -247,6 +247,34 @@ const file = await exportImage( controller.state, {
 } );
 ```
 
+## Apply an Edit From Code
+
+`applyImageEdit( state, edit )` takes the shape `getImageEdit` returns and gives back a state, so code can edit an image with no canvas on screen. The edit is the whole edit, and its crop is measured on the image after the flip and rotation:
+
+```ts
+import {
+	applyImageEdit,
+	createImageEditorState,
+	exportImage,
+} from '@wordpress/image-editor';
+
+// A quarter turn clockwise, then the top half of the turned photo.
+const result = applyImageEdit(
+	createImageEditorState( {
+		image: { src: photoUrl, naturalWidth: 1600, naturalHeight: 900 },
+	} ),
+	{ rotation: 90, crop: { x: 0, y: 0, width: 1, height: 0.5 } }
+);
+
+if ( 'rejected' in result ) {
+	throw new Error( `The edit was rejected: ${ result.rejected }` );
+}
+
+const file = await exportImage( result.state, { type: 'image/jpeg' } );
+```
+
+With a canvas on screen, store `result.state` as you store any other change, and the canvas shows the edit.
+
 ## Accessibility Notes
 
 -   The crop area is focusable and keyboard-operable, and changes are announced through an ARIA live region.
