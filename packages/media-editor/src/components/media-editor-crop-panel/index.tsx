@@ -76,7 +76,9 @@ export default function MediaEditorCropPanel( {
 										Number( item.value )
 									) }
 								/>
-								{ item.label }
+								<span className="media-editor-crop-panel__aspect-ratio-label">
+									{ item.label }
+								</span>
 							</span>
 						) }
 					</SelectControl.Trigger>
