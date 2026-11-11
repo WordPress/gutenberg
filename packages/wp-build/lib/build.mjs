@@ -23,12 +23,9 @@ import {
 	getPhpReplacements,
 	renderTemplateToString,
 } from './php-generator.mjs';
-import {
-	boolConfigVal,
-	getPackageInfo,
-	getPackageInfoFromFile,
-} from './package-utils.mjs';
+import { boolConfigVal, getPackageInfoFromFile } from './package-utils.mjs';
 import { copyPackageFile, getCopyFiles } from './copy-files.mjs';
+import { inferStyleDependencies } from './style-dependencies.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -880,10 +877,10 @@ async function bundlePackage( packageName, options = {} ) {
 					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
 		}
 
-		const styleDeps = await inferStyleDependencies(
-			scriptDependencies,
-			packageName
-		);
+		const styleDeps = await inferStyleDependencies( scriptDependencies, {
+			resolveDir: path.join( PACKAGES_DIR, packageName ),
+			buildDir: BUILD_DIR,
+		} );
 
 		builtStyles.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -897,69 +894,6 @@ async function bundlePackage( packageName, options = {} ) {
 		scripts: builtScripts,
 		styles: builtStyles,
 	};
-}
-
-/**
- * Infer style dependencies from script dependencies.
- * Only includes dependencies that:
- * 1. Are `@wordpress` packages (start with 'wp-')
- * 2. Have wpScript: true in their package.json
- * 3. Actually have a built style.css file
- *
- * @param {string[]} scriptDependencies Array of script handles from asset file.
- * @param {string}   packageName        Package name (short name) being bundled, for context-aware resolution.
- * @return {Promise<string[]>} Array of style handles to depend on.
- */
-async function inferStyleDependencies( scriptDependencies, packageName ) {
-	if ( ! scriptDependencies || scriptDependencies.length === 0 ) {
-		return [];
-	}
-
-	const styleDeps = [];
-	// Get the resolve directory for context-aware package resolution
-	const resolveDir = path.join( PACKAGES_DIR, packageName );
-
-	for ( const scriptHandle of scriptDependencies ) {
-		// Skip non-package dependencies (like 'react', 'lodash', etc.)
-		if ( ! scriptHandle.startsWith( 'wp-' ) ) {
-			continue;
-		}
-
-		// Convert handle to package name: 'wp-components' → '@wordpress/components'
-		const shortName = scriptHandle.replace( 'wp-', '' );
-		const depPackageName = `@wordpress/${ shortName }`;
-
-		// Read the dependency's package.json with context-aware resolution
-		try {
-			const depPackageJson = getPackageInfo( depPackageName, resolveDir );
-
-			if ( ! depPackageJson ) {
-				continue;
-			}
-
-			// ONLY include if it has wpScript: true (which means it builds styles)
-			if ( depPackageJson.wpScript === true ) {
-				// Check the minified file, which is built even with --no-script-debug.
-				const styleFile = path.join(
-					BUILD_DIR,
-					'styles',
-					shortName,
-					'style.min.css'
-				);
-				try {
-					await readFile( styleFile );
-					styleDeps.push( scriptHandle );
-				} catch {
-					// Style file doesn't exist, skip it
-				}
-			}
-		} catch {
-			// Package not found or can't read package.json - skip it
-			continue;
-		}
-	}
-
-	return styleDeps;
 }
 
 /**
