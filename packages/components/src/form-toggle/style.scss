@@ -21,7 +21,7 @@ $transition-duration: 0.2s;
 		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
-		background-color: var(--wpds-color-background-track-neutral-weak);
+		background-color: var(--wpds-color-background-track-neutral);
 		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		width: $toggle-width;
 		height: $toggle-height;
@@ -46,7 +46,7 @@ $transition-duration: 0.2s;
 		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		border-radius: math.div($toggle-height, 2);
 		background-color: var(--wpds-color-background-thumb-neutral);
-		color: var(--wpds-color-foreground-interactive-brand);
+		color: var(--wpds-color-foreground-thumb-brand-strong);
 		box-shadow: $elevation-x-small;
 
 		@media not (prefers-reduced-motion) {
@@ -102,6 +102,7 @@ $transition-duration: 0.2s;
 
 	&.is-checked {
 		.components-form-toggle__thumb {
+			background-color: var(--wpds-color-background-thumb-brand-strong);
 			border-color: var(--wpds-color-stroke-interactive-brand);
 			transform: translateX($toggle-width - $toggle-thumb-width);
 
@@ -119,7 +120,7 @@ $transition-duration: 0.2s;
 	&.is-disabled,
 	[inert] & {
 		.components-form-toggle__track {
-			background-color: var(--wpds-color-background-track-neutral-weak-disabled);
+			background-color: var(--wpds-color-background-track-neutral-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 			@media ( forced-colors: active ) {
