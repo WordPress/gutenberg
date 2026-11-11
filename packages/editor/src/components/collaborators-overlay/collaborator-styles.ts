@@ -34,6 +34,12 @@ export const BORDER_WIDTH_FOCUS_FALLBACK = '2px';
 // _colors.scss — $white
 export const WHITE = '#fff';
 
+// _colors.scss — $gray-900
+export const GRAY_900 = '#1e1e1e';
+
+// _font.scss — $font-size-small
+export const FONT_SIZE_SMALL = '12px';
+
 // _font.scss — $font-size-x-small
 export const FONT_SIZE_X_SMALL = '11px';
 
