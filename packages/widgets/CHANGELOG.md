@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Legacy widget: Render nothing for an `instance` attribute whose `encoded` or `hash` value is not a string, rather than causing a PHP fatal error, and reject an `encoded` value with characters outside the base64 alphabet ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).
+
 ## 5.1.0 (2026-11-04)
 
 ### Bug Fixes
