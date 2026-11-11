@@ -63,12 +63,13 @@ test.describe( 'Collaboration - WebSocket Concurrent Typing', () => {
 			.toEqual( [ 'Hello!!' ] );
 	} );
 
-	for ( const peerChange of [
-		'insertion',
-		'reorder',
-		'replacement',
+	for ( const { delayAwareness, peerChange } of [
+		{ delayAwareness: false, peerChange: 'insertion' },
+		{ delayAwareness: false, peerChange: 'reorder' },
+		{ delayAwareness: false, peerChange: 'replacement' },
+		{ delayAwareness: true, peerChange: 'insertion' },
 	] as const ) {
-		test( `keeps and saves a peer ${ peerChange } while typing in a stale editor`, async ( {
+		test( `keeps and saves a peer ${ peerChange } while typing in a stale editor${ delayAwareness ? ' before peer awareness arrives' : '' }`, async ( {
 			collaborationUtils,
 			requestUtils,
 			editor,
@@ -81,6 +82,35 @@ test.describe( 'Collaboration - WebSocket Concurrent Typing', () => {
 				status: 'draft',
 			} );
 			await collaborationUtils.openCollaborativeSession( post.id );
+			if ( delayAwareness ) {
+				// Allow document updates through while withholding awareness.
+				await page.routeWebSocket( /./, ( socket ) => {
+					const server = socket.connectToServer();
+					server.onMessage( ( message ) => {
+						// y-websocket messages start with their type: 1 is awareness.
+						if (
+							typeof message === 'string' ||
+							message[ 0 ] !== 1
+						) {
+							socket.send( message );
+						}
+					} );
+				} );
+				await page.reload();
+				await collaborationUtils.waitForEntityReady( page );
+				await collaborationUtils.waitForSyncCycle( page );
+			}
+			const room =
+				await collaborationUtils.getCurrentPostRoomName( page );
+			expect(
+				await page.evaluate(
+					( roomName ) =>
+						( window as any ).__gutenbergTestWebSocketSync.rooms[
+							roomName
+						].awarenessCount,
+					room
+				)
+			).toBe( delayAwareness ? 1 : 2 );
 			await expect
 				.poll( () =>
 					page.evaluate( () =>

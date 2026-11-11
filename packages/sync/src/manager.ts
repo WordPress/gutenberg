@@ -779,10 +779,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		setTimeout( flushPendingCRDTDocUpdates, 0 );
 	}
 
-	// Apply local changes to the CRDT doc, synchronously when a remote peer is
-	// present so the change lands before a remote update can race it (#78756)
-	// and so merged fields return to the caller, otherwise deferred off the
-	// typing hot path (#79964). Alone, there is nothing to merge back.
+	// Apply local changes synchronously when a remote peer is present (#78756)
+	// or previousBlocks is supplied, so merged fields return to the caller.
+	// Document updates can arrive before awareness identifies the remote peer.
+	// Other updates stay deferred off the typing hot path (#79964).
 	function updateOrDefer(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -794,9 +794,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
 
-		if ( hasRemotePeers ) {
-			// Apply any updates queued while editing alone first, so changes
-			// are never applied out of order.
+		if ( hasRemotePeers || options.previousBlocks ) {
+			// Apply queued local edits before this synchronous edit so an older
+			// edit cannot overwrite a newer one.
 			flushPendingCRDTDocUpdates();
 			return updateCRDTDoc(
 				objectType,

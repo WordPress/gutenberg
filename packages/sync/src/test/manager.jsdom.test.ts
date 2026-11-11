@@ -879,37 +879,46 @@ describe( 'SyncManager', () => {
 			] );
 		} );
 
-		it( 'returns merged fields before the caller stores a stale edit', async () => {
-			const manager = createSyncManager();
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-			// Simulate a remote peer so the update applies synchronously.
-			const awareness = manager.getAwareness(
-				'post',
-				'123'
-			) as Awareness;
-			awareness.setLocalState( {} );
-			awareness.states.set( awareness.clientID + 1, {} );
-
-			const corrected = { title: 'Both edits' };
-			mockSyncConfig.applyChangesToCRDTDoc.mockReturnValue( corrected );
-			expect(
-				manager.update(
+		it.each( [ 0, 1 ] )(
+			'returns merged fields before the caller stores a stale edit with %i remote peers',
+			async ( remotePeerCount ) => {
+				const manager = createSyncManager();
+				await manager.load(
+					mockSyncConfig,
 					'post',
 					'123',
-					{ title: 'Local edit' },
-					'local-editor',
-					{
-						previousBlocks: [],
-					}
-				)
-			).toBe( corrected );
-		} );
+					mockRecord,
+					mockHandlers
+				);
+				const awareness = manager.getAwareness(
+					'post',
+					'123'
+				) as Awareness;
+				awareness.setLocalState( {} );
+				if ( remotePeerCount ) {
+					awareness.states.set( awareness.clientID + 1, {} );
+				}
+				expect( awareness.getStates().size ).toBe(
+					remotePeerCount + 1
+				);
+
+				const corrected = { title: 'Both edits' };
+				mockSyncConfig.applyChangesToCRDTDoc.mockReturnValue(
+					corrected
+				);
+				expect(
+					manager.update(
+						'post',
+						'123',
+						{ title: 'Local edit' },
+						'local-editor',
+						{
+							previousBlocks: [],
+						}
+					)
+				).toBe( corrected );
+			}
+		);
 
 		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
 			let capturedDoc: Y.Doc | null = null;
