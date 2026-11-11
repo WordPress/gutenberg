@@ -83,9 +83,16 @@ const MaybeTagsPanel = () => {
 
 	/**
 	 * We only want to show the tag panel if the post type supports
-	 * tags and the site has tags.
+	 * tags and the site has tags, or a filter shows it anyway.
 	 */
-	if ( ! isPostTypeSupported || ! siteHasTags ) {
+	if (
+		! isPostTypeSupported ||
+		! applyFilters(
+			'editor.PrePublishPanel.showSuggestion',
+			siteHasTags,
+			'tags'
+		)
+	) {
 		return null;
 	}
 

@@ -235,6 +235,24 @@ addFilter(
 );
 ```
 
+### `editor.PrePublishPanel.showSuggestion`
+
+Filters whether a suggestion in the pre-publish panel shows. The second argument names the suggestion: for `'tags'` it defaults to whether the site has tags, for `'category'` to whether the site has categories other than the default one. The suggestion still only shows when the post type supports the taxonomy and the post has no terms of it yet.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+const alwaysSuggestTags = function ( show, suggestion ) {
+	return 'tags' === suggestion ? true : show;
+};
+
+addFilter(
+	'editor.PrePublishPanel.showSuggestion',
+	'my-plugin/always-suggest-tags',
+	alwaysSuggestTags
+);
+```
+
 ### `editor.PrePublishPanel.suggestionInitialOpen`
 
 Filters whether a suggestion in the pre-publish panel starts open. The second argument names the suggestion: `'post-format'`, `'tags'` and `'category'` start closed, `'external-media'` starts open.

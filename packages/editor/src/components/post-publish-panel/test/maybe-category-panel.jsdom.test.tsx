@@ -14,6 +14,7 @@ const taxonomy = { types: [ 'post' ], rest_base: 'categories' };
 const site = { default_category: 1 };
 const defaultCategory = { id: 1 };
 const categories = [ { id: 2, name: 'News', parent: 0 } ];
+const noCategories = [];
 
 describe( 'MaybeCategoryPanel', () => {
 	beforeEach( () => {
@@ -43,10 +44,39 @@ describe( 'MaybeCategoryPanel', () => {
 
 	afterEach( () => {
 		removeFilter(
+			'editor.PrePublishPanel.showSuggestion',
+			'test/show-suggestion'
+		);
+		removeFilter(
 			'editor.PrePublishPanel.suggestionInitialOpen',
 			'test/suggestion-initial-open'
 		);
 		vi.restoreAllMocks();
+	} );
+
+	it( 'should render nothing when the site has no other categories', () => {
+		select( coreStore ).getEntityRecords.mockReturnValue( noCategories );
+
+		const { container } = render( <MaybeCategoryPanel /> );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should show when the site has no other categories and the filter says so', () => {
+		select( coreStore ).getEntityRecords.mockReturnValue( noCategories );
+		const filter = vi.fn( () => true );
+		addFilter(
+			'editor.PrePublishPanel.showSuggestion',
+			'test/show-suggestion',
+			filter
+		);
+
+		render( <MaybeCategoryPanel /> );
+
+		expect( filter ).toHaveBeenCalledWith( false, 'category' );
+		expect(
+			screen.getByRole( 'button', { name: /Assign a category/ } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'should start closed', () => {

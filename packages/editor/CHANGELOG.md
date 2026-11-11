@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Pre-publish panel: Add the `editor.PrePublishPanel.suggestedPostFormat` filter for the suggested post format, and the `editor.PrePublishPanel.suggestionInitialOpen` filter to open or close each suggestion ([#86691](https://github.com/WordPress/gutenberg/pull/86691)).
+-   Pre-publish panel: Add the `editor.PrePublishPanel.suggestedPostFormat` filter for the suggested post format, the `editor.PrePublishPanel.showSuggestion` filter to show the tags and category suggestions on sites without terms, and the `editor.PrePublishPanel.suggestionInitialOpen` filter to open or close each suggestion ([#86691](https://github.com/WordPress/gutenberg/pull/86691)).
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).

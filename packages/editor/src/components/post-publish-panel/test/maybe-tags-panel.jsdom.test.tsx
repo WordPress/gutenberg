@@ -30,10 +30,39 @@ describe( 'MaybeTagsPanel', () => {
 
 	afterEach( () => {
 		removeFilter(
+			'editor.PrePublishPanel.showSuggestion',
+			'test/show-suggestion'
+		);
+		removeFilter(
 			'editor.PrePublishPanel.suggestionInitialOpen',
 			'test/suggestion-initial-open'
 		);
 		vi.restoreAllMocks();
+	} );
+
+	it( 'should render nothing when the site has no tags', () => {
+		select( coreStore ).getEntityRecords.mockReturnValue( [] );
+
+		const { container } = render( <MaybeTagsPanel /> );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should show when the site has no tags and the filter says so', () => {
+		select( coreStore ).getEntityRecords.mockReturnValue( [] );
+		const filter = vi.fn( () => true );
+		addFilter(
+			'editor.PrePublishPanel.showSuggestion',
+			'test/show-suggestion',
+			filter
+		);
+
+		render( <MaybeTagsPanel /> );
+
+		expect( filter ).toHaveBeenCalledWith( false, 'tags' );
+		expect(
+			screen.getByRole( 'button', { name: /Add tag/ } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'should start closed', () => {

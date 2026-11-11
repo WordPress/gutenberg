@@ -68,9 +68,16 @@ function MaybeCategoryPanel() {
 
 	// We only want to show the category panel:
 	// if the post type supports categories,
-	// if the site has categories other than the default category,
+	// if the site has categories other than the default category (or a filter shows it anyway),
 	// and if the post has no other categories than the default category.
-	if ( ! shouldShowPanel || ! hasSiteCategories ) {
+	if (
+		! shouldShowPanel ||
+		! applyFilters(
+			'editor.PrePublishPanel.showSuggestion',
+			hasSiteCategories,
+			'category'
+		)
+	) {
 		return null;
 	}
 
