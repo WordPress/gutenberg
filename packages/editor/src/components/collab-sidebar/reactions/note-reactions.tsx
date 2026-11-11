@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 import { Menu as BUMenu } from '@base-ui/react/menu';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -26,6 +26,9 @@ import {
 import type { ReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
 import type { ReactionSummary } from './use-note-reactions';
+
+// Fits the default reaction list on one row; longer lists wrap.
+const REACTION_PICKER_COLUMNS = 7;
 
 interface ReactionButtonProps {
 	noteId: number;
@@ -220,6 +223,14 @@ function ReactionPicker( {
 					<BUMenu.Popup
 						aria-label={ __( 'Add reaction' ) }
 						className="editor-collab-sidebar-panel__reaction-picker"
+						style={
+							{
+								'--editor-reaction-picker-columns': Math.min(
+									emojis.length,
+									REACTION_PICKER_COLUMNS
+								),
+							} as CSSProperties
+						}
 						onKeyDownCapture={ ( event ) => {
 							// Escape would otherwise close only the focused
 							// item's tooltip.
