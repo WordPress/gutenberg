@@ -520,6 +520,19 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertSame( array( 'content' ), $settings['__experimentalBlockBindingsSupportedAttributes']['core/paragraph'] );
 	}
 
+	public function test_editor_offers_inner_blocks_bindings_that_other_blocks_add() {
+		register_block_type( 'test/host' );
+		$add_inner_blocks = static function ( $supported_attributes, $block_type ) {
+			return 'test/host' === $block_type ? array( 'innerBlocks' ) : $supported_attributes;
+		};
+		add_filter( 'block_bindings_supported_attributes', $add_inner_blocks, 10, 2 );
+		$settings = get_block_editor_settings( array(), new WP_Block_Editor_Context() );
+		remove_filter( 'block_bindings_supported_attributes', $add_inner_blocks );
+		unregister_block_type( 'test/host' );
+
+		$this->assertSame( array( 'innerBlocks' ), $settings['__experimentalBlockBindingsSupportedAttributes']['test/host'] );
+	}
+
 	public function test_embeds_in_the_value_are_rendered() {
 		wp_embed_register_handler(
 			'test-inner-blocks',

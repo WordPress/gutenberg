@@ -27,8 +27,8 @@ function gutenberg_block_bindings_add_inner_blocks_support( $supported_attribute
 add_filter( 'block_bindings_supported_attributes', 'gutenberg_block_bindings_add_inner_blocks_support', 10, 2 );
 
 /**
- * Keeps `innerBlocks` out of the attributes the editor offers to bind: the
- * editor doesn't render inner blocks bindings yet.
+ * Keeps `innerBlocks` out of the attributes the editor offers to bind on the
+ * Group and Column blocks: the editor doesn't render inner blocks bindings yet.
  *
  * @param array $settings The block editor settings.
  * @return array The block editor settings.
@@ -37,8 +37,11 @@ function gutenberg_block_bindings_remove_inner_blocks_from_editor( $settings ) {
 	if ( ! isset( $settings['__experimentalBlockBindingsSupportedAttributes'] ) || ! is_array( $settings['__experimentalBlockBindingsSupportedAttributes'] ) ) {
 		return $settings;
 	}
-	foreach ( $settings['__experimentalBlockBindingsSupportedAttributes'] as $block_type => $attributes ) {
-		$attributes = array_values( array_diff( (array) $attributes, array( 'innerBlocks' ) ) );
+	foreach ( array( 'core/group', 'core/column' ) as $block_type ) {
+		if ( ! isset( $settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] ) ) {
+			continue;
+		}
+		$attributes = array_values( array_diff( (array) $settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ], array( 'innerBlocks' ) ) );
 		if ( $attributes ) {
 			$settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] = $attributes;
 		} else {
