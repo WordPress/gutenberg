@@ -86,6 +86,13 @@ describe( 'applyImageEdit', () => {
 
 	it.each( [
 		[ 'no-image', createImageEditorState(), { rotation: 90 } ],
+		[
+			'no-image',
+			createImageEditorState( {
+				image: { ...IMAGE, naturalWidth: Number.NaN },
+			} ),
+			{ rotation: 90 },
+		],
 		[ 'invalid', clean, { crop: { x: 0, y: 0, width: 0, height: 1 } } ],
 		[ 'invalid', clean, { crop: { x: 0, y: 0, width: -0.5, height: 1 } } ],
 		[ 'invalid', clean, { rotation: Number.NaN } ],

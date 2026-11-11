@@ -58,7 +58,7 @@ export function applyImageEdit(
 	edit: ImageEdit
 ): ApplyImageEditResult {
 	const { image } = state;
-	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
+	if ( ! image || ! ( image.naturalWidth > 0 && image.naturalHeight > 0 ) ) {
 		return { rejected: 'no-image' };
 	}
 
