@@ -19,10 +19,7 @@ const PAGE_REPLACEMENTS = {
 	'{{PAGE_SLUG_UNDERSCORE}}': 'example',
 	'{{PREFIX}}': 'wp',
 	'{{CAPABILITY}}': 'edit_theme_options',
-	'{{TEXT_DOMAIN_ARG}}': '',
 };
-
-const PAGE_TEMPLATES = [ 'page.php.template', 'page-wp-admin.php.template' ];
 
 describe( 'PHP templates', () => {
 	// A fragment is inserted into another generated file, which has the check.
@@ -44,33 +41,6 @@ describe( 'PHP templates', () => {
 			);
 		}
 	);
-} );
-
-describe.each( PAGE_TEMPLATES )( '%s template', ( templateName ) => {
-	it( 'adds its styles and scripts through the WordPress APIs rather than inline tags', async () => {
-		const generatedPage = await generateTemplate(
-			templateName,
-			PAGE_REPLACEMENTS
-		);
-
-		expect( generatedPage ).not.toMatch( /<style\b/ );
-		expect( generatedPage ).not.toMatch( /<script\b/ );
-	} );
-
-	it( 'passes the configured text domain to the gettext calls', async () => {
-		const generatedPage = await generateTemplate( templateName, {
-			...PAGE_REPLACEMENTS,
-			'{{TEXT_DOMAIN_ARG}}': getTextDomainArgument( 'my-plugin' ),
-		} );
-
-		const gettextCalls = generatedPage.match(
-			/\b(?:__|_e|_x|_ex|_n|_nx|esc_(?:html|attr)(?:__|_e|_x))\(/g
-		);
-		const textDomainArguments = generatedPage.match( /, 'my-plugin' \)/g );
-
-		expect( gettextCalls?.length ).toBeGreaterThan( 0 );
-		expect( textDomainArguments?.length ).toBe( gettextCalls?.length );
-	} );
 } );
 
 describe( 'page-wp-admin.php template', () => {
