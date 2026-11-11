@@ -25,12 +25,12 @@ import {
 	useNoteDraft,
 	usePickNote,
 } from './hooks';
+import { getNoteExcerpt } from './utils/display';
 import {
 	focusNoteThread,
-	getNoteExcerpt,
 	hasFocusWithin,
 	scrollNoteThreadIntoView,
-} from './utils';
+} from './utils/dom';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
