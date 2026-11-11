@@ -4,8 +4,8 @@ import path from 'node:path';
 export type RoutingRule = {
 	/** File name without `.md`. Also the question id sent to the model. */
 	id: string;
-	/** Who to ask for review: a GitHub username, or a team as `org/team-slug`. */
-	reviewer: string;
+	/** Who to ask for review: GitHub usernames, or teams as `org/team-slug`. */
+	reviewers: string[];
 	/** Lowest probability that asks for review. */
 	threshold: number;
 	/** File body, sent to the model as the question. */
@@ -45,7 +45,13 @@ export function parseRoutingRule( id: string, source: string ): RoutingRule {
 		}
 	}
 
-	if ( ! fields.reviewer ) {
+	// One reviewer, or several as a YAML flow sequence: `[ octocat, org/team ]`.
+	const value = fields.reviewer ?? '';
+	const list = value.match( /^\[(.*)\]$/ );
+	const reviewers = ( list ? list[ 1 ].split( ',' ) : [ value ] )
+		.map( ( reviewer ) => reviewer.trim() )
+		.filter( Boolean );
+	if ( ! reviewers.length ) {
 		throw new Error( `${ id }: the front matter has no \`reviewer\`.` );
 	}
 
@@ -61,7 +67,7 @@ export function parseRoutingRule( id: string, source: string ): RoutingRule {
 		throw new Error( `${ id }: the file has no instructions.` );
 	}
 
-	return { id, reviewer: fields.reviewer, threshold, instructions };
+	return { id, reviewers, threshold, instructions };
 }
 
 /**

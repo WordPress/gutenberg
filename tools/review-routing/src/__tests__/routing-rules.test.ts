@@ -14,10 +14,28 @@ describe( 'parseRoutingRule', () => {
 			)
 		).toEqual( {
 			id: 'data',
-			reviewer: 'WordPress/data',
+			reviewers: [ 'WordPress/data' ],
 			threshold: 0.8,
 			instructions: 'Ask when stores change.',
 		} );
+	} );
+
+	it( 'reads several reviewers as a flow sequence', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: [ octocat, WordPress/data ]\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat', 'WordPress/data' ] );
+	} );
+
+	it( 'splits reviewers only inside brackets', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: octocat, WordPress/data\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat, WordPress/data' ] );
 	} );
 
 	it( 'uses the default threshold when none is set', () => {
@@ -32,6 +50,7 @@ describe( 'parseRoutingRule', () => {
 	it.each( [
 		[ 'no front matter', 'data', 'Ask.' ],
 		[ 'no reviewer', 'data', '---\nthreshold: 0.5\n---\nAsk.' ],
+		[ 'an empty reviewer list', 'data', '---\nreviewer: []\n---\nAsk.' ],
 		[
 			'a bad threshold',
 			'data',
