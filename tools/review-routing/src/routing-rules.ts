@@ -49,7 +49,7 @@ export function parseRoutingRule( id: string, source: string ): RoutingRule {
 	const value = fields.reviewer ?? '';
 	const list = value.match( /^\[(.*)\]$/ );
 	const reviewers = ( list ? list[ 1 ].split( ',' ) : [ value ] )
-		.map( ( reviewer ) => reviewer.trim() )
+		.map( ( reviewer ) => reviewer.trim().replace( /^@/, '' ) )
 		.filter( Boolean );
 	if ( ! reviewers.length ) {
 		throw new Error( `${ id }: the front matter has no \`reviewer\`.` );

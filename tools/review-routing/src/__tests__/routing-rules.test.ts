@@ -29,6 +29,15 @@ describe( 'parseRoutingRule', () => {
 		).toEqual( [ 'octocat', 'WordPress/data' ] );
 	} );
 
+	it( 'removes a leading @ from each reviewer', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: [ @octocat, @WordPress/data ]\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat', 'WordPress/data' ] );
+	} );
+
 	it( 'splits reviewers only inside brackets', () => {
 		expect(
 			parseRoutingRule(
