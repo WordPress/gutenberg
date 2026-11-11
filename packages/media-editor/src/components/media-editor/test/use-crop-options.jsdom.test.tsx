@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from '@wordpress/element';
 import { useCropOptions } from '../use-crop-options';
-import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
 
 const IMAGE = {
@@ -38,7 +37,13 @@ function CropOptionsHarness() {
 			<button
 				onClick={ () =>
 					cropOptions.setAspectRatioValue(
-						ORIGINAL_ASPECT_RATIO.toString()
+						// "Original" is the default preset with a negative
+						// value, as the dropdown offers it.
+						String(
+							cropOptions.aspectRatioOptions.find(
+								( option ) => option.value < 0
+							)?.value
+						)
 					)
 				}
 			>
@@ -71,7 +76,7 @@ describe( 'useCropOptions', () => {
 		).toHaveTextContent( '0,-1,1,1.3333333333333333' );
 	} );
 
-	it( 'resolves the Original aspect ratio from the cropper image dimensions', () => {
+	it( 'resolves the Original aspect ratio from the loaded image dimensions', () => {
 		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Original' } ) );

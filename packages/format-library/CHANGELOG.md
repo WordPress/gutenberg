@@ -4,7 +4,12 @@
 
 ### New Features
 
+-   Text color format: Replace the "Highlight" toolbar item with separate "Text color" and "Highlight color" items, each opening a single color palette ([#85296](https://github.com/WordPress/gutenberg/pull/85296)).
 -   Special characters: Add a "Special characters" item to the rich text "More" menu, which opens a searchable grid of characters to insert at the cursor ([#86338](https://github.com/WordPress/gutenberg/pull/86338)).
+
+### Enhancements
+
+-   Link format: stop adding `rel="noopener"` to links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86516](https://github.com/WordPress/gutenberg/pull/86516)).
 
 ## 6.1.0 (2026-11-04)
 
