@@ -27,8 +27,8 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 	if ( ! held ) {
 		return false;
 	}
-	const difference =
-		( ( held.rotation ?? 0 ) - ( edit.rotation ?? 0 ) + 540 ) % 360;
+	const offset = ( ( held.rotation ?? 0 ) - ( edit.rotation ?? 0 ) ) % 360;
+	const difference = ( offset + 540 ) % 360;
 	const heldCrop = held.crop ?? WHOLE_IMAGE;
 	const crop = edit.crop ?? WHOLE_IMAGE;
 	return (
