@@ -109,7 +109,7 @@ export default function useEntityBlockEditor(
 					id
 				);
 			}
-			const { selection, ...rest } = options;
+			const { previousBlocks, selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
@@ -127,12 +127,9 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: false,
 				...rest,
-				// The block editor computed `newBlocks` from the blocks this
-				// render gave it, so those are the baseline of the change.
-				// A remote change that reached the store since is not in
-				// `newBlocks`, and the sync layer must not treat its absence
-				// as a deletion.
-				baseline: { blocks },
+				// The provider tracks changes synchronously, including multiple
+				// changes between renders and persistence-only notifications.
+				previousBlocks,
 			} );
 		},
 		[
@@ -151,7 +148,7 @@ export default function useEntityBlockEditor(
 			newBlocks: Array< Block >,
 			options: EntityBlockEditorChangeOptions
 		) => {
-			const { selection, ...rest } = options;
+			const { previousBlocks, selection, ...rest } = options;
 			const edits = {
 				selection,
 				...updateFootnotesFromMeta( newBlocks, meta ),
@@ -161,10 +158,10 @@ export default function useEntityBlockEditor(
 				isCached: true,
 				...rest,
 				// See `onChange`.
-				baseline: { blocks },
+				previousBlocks,
 			} );
 		},
-		[ kind, name, id, blocks, meta, editEntityRecord ]
+		[ kind, name, id, meta, editEntityRecord ]
 	);
 
 	return [ blocks, onInput, onChange ];

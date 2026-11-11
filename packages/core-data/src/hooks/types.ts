@@ -5,6 +5,7 @@ import type { Block } from '@wordpress/blocks';
  * `BlockEditorProvider` passes them, forwarded to `editEntityRecord`.
  */
 export interface EntityBlockEditorChangeOptions {
+	previousBlocks?: Block[];
 	selection?: unknown;
 	[ key: string ]: unknown;
 }

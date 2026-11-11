@@ -62,6 +62,43 @@ describe( 'useBlockSync hook', () => {
 		vi.clearAllMocks();
 	} );
 
+	it( 'reports the previous blocks for each edit before another render', () => {
+		const onChange = vi.fn();
+		let registry!: DataRegistry;
+		render(
+			<TestWrapper
+				setRegistry={ ( value ) => {
+					registry = value;
+				} }
+				value={ [
+					{
+						name: 'test/test-block',
+						clientId: 'a',
+						attributes: { foo: 1 },
+						innerBlocks: [],
+					},
+				] }
+				onChange={ onChange }
+				onInput={ onChange }
+			/>
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( 'a', { foo: 2 } );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( 'a', { foo: 3 } );
+		expect(
+			onChange.mock.calls.map( ( [ blocks, options ] ) => ( {
+				before: options.previousBlocks[ 0 ].attributes.foo,
+				after: blocks[ 0 ].attributes.foo,
+			} ) )
+		).toEqual( [
+			{ before: 1, after: 2 },
+			{ before: 2, after: 3 },
+		] );
+	} );
+
 	it( 'resets the block-editor blocks when the controlled value changes', async () => {
 		const fakeBlocks: Block[] = [];
 		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );

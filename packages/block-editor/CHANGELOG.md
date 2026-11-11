@@ -18,6 +18,7 @@
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
 -   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Block quick navigation: Do not offer navigation to a List View panel subsumed by an ancestor's List View ([#86729](https://github.com/WordPress/gutenberg/pull/86729)).
+-   `BlockEditorProvider` includes `previousBlocks` in its change callback options so consumers can distinguish local edits from pending remote changes ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).

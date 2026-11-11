@@ -65,7 +65,12 @@ export interface ClientIdMapping {
  */
 export type OnBlockUpdate = (
 	blocks: Block[],
-	options: { selection: BlockSelectionState; undoIgnore?: boolean }
+	options: {
+		/** The blocks immediately before this change, using external client IDs. */
+		previousBlocks?: Block[];
+		selection: BlockSelectionState;
+		undoIgnore?: boolean;
+	}
 ) => void;
 
 /**

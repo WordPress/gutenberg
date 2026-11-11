@@ -322,10 +322,14 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// getChangesFromCRDTDoc should not be called since there was no persisted doc.
+				// Read initial editor state after hydration, even without persistence.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).not.toHaveBeenCalled();
+				).toHaveBeenCalledExactlyOnceWith(
+					expect.any( Y.Doc ),
+					mockRecord,
+					{ isInitial: true }
+				);
 
 				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
@@ -356,10 +360,15 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// getChangesFromCRDTDoc should be called with the persisted doc and record.
+				// Validate persistence, then read the hydrated editor state.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
+				).toHaveBeenCalledTimes( 2 );
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenLastCalledWith( expect.any( Y.Doc ), mockRecord, {
+					isInitial: true,
+				} );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
@@ -402,10 +411,15 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), expectedChanges );
 
-				// getChangesFromCRDTDoc should be called with the persisted doc and record.
+				// Validate persistence, then read the hydrated editor state.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
+				).toHaveBeenCalledTimes( 2 );
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenLastCalledWith( expect.any( Y.Doc ), mockRecord, {
+					isInitial: true,
+				} );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
@@ -818,7 +832,7 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
 				changes,
-				{ baseline: undefined }
+				{ onRebase: expect.any( Function ), previousBlocks: undefined }
 			);
 
 			// Verify that the record metadata was not updated.
@@ -828,7 +842,7 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
-		it( 'passes the baseline to applyChangesToCRDTDoc', async () => {
+		it( 'passes previousBlocks to applyChangesToCRDTDoc', async () => {
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -841,9 +855,15 @@ describe( 'SyncManager', () => {
 
 			vi.clearAllMocks();
 
-			manager.update( 'post', '123', { title: 'a' }, 'local-editor' );
-			manager.update( 'post', '123', { title: 'b' }, 'local-editor', {
-				baseline: { title: 'a' },
+			const previousBlocks = [ { clientId: 'p1' } ];
+			manager.update(
+				'post',
+				'123',
+				{ blocks: previousBlocks },
+				'local-editor'
+			);
+			manager.update( 'post', '123', { blocks: [] }, 'local-editor', {
+				previousBlocks,
 			} );
 
 			// Wait a tick for the deferred updates to apply.
@@ -852,15 +872,49 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc.mock.calls ).toEqual( [
 				[
 					expect.any( Y.Doc ),
-					{ title: 'a' },
-					{ baseline: undefined },
+					{ blocks: previousBlocks },
+					{
+						onRebase: expect.any( Function ),
+						previousBlocks: undefined,
+					},
 				],
 				[
 					expect.any( Y.Doc ),
-					{ title: 'b' },
-					{ baseline: { title: 'a' } },
+					{ blocks: [] },
+					{
+						onRebase: expect.any( Function ),
+						previousBlocks,
+					},
 				],
 			] );
+		} );
+
+		it( 'returns merged fields before the caller stores a stale edit', async () => {
+			const manager = createSyncManager();
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+			const corrected = { title: 'Both edits' };
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( _doc, _changes, options ) => {
+					options?.onRebase?.( corrected );
+				}
+			);
+			expect(
+				manager.update(
+					'post',
+					'123',
+					{ title: 'Local edit' },
+					'local-editor',
+					{
+						previousBlocks: [],
+					}
+				)
+			).toBe( corrected );
 		} );
 
 		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
@@ -1120,7 +1174,7 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
 				changes,
-				{ baseline: undefined }
+				{ onRebase: expect.any( Function ), previousBlocks: undefined }
 			);
 
 			// Verify that the record metadata was updated.

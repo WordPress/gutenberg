@@ -351,11 +351,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		initializeYjsDoc( ydoc );
 
 		// Get and apply the persisted CRDT document, if it exists.
-		// Observers are attached after hydration so the applyUpdateV2 inside
-		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
-		// just-loaded state, which would dispatch a redundant editRecord whose
-		// blocks already match the editor's parsed content.
+		// Attach observers after hydration. Initial editor state is adopted
+		// below in one update, after validation against the saved record.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// Adopt the hydrated document's identities before the first edit. A
+		// parser can assign different IDs to the same content on each client.
+		const initialChanges = syncConfig.getChangesFromCRDTDoc( ydoc, record, {
+			isInitial: true,
+		} );
+		if ( Object.keys( initialChanges ).length ) {
+			handlers.editRecord( initialChanges );
+		}
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
@@ -685,11 +692,16 @@ export function createSyncManager( debug = false ): SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
-	): void {
-		const { isSave = false, isNewUndoLevel = false, baseline } = options;
+	): Partial< ObjectData > | void {
+		const {
+			isNewUndoLevel = false,
+			isSave = false,
+			previousBlocks,
+		} = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
+		let rebasedChanges: Partial< ObjectData > | undefined;
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
@@ -707,7 +719,12 @@ export function createSyncManager( debug = false ): SyncManager {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
 				} );
-				syncConfig.applyChangesToCRDTDoc( ydoc, changes, { baseline } );
+				syncConfig.applyChangesToCRDTDoc( ydoc, changes, {
+					onRebase: ( corrected ) => {
+						rebasedChanges = corrected;
+					},
+					previousBlocks,
+				} );
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
@@ -720,6 +737,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				markEntityAsSaved( collectionState.ydoc );
 			}, origin );
 		}
+		return rebasedChanges;
 	}
 
 	/*
@@ -772,17 +790,23 @@ export function createSyncManager( debug = false ): SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
-	): void {
+	): Partial< ObjectData > | void {
 		// `getStates()` counts the local client, so > 1 means a remote peer.
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
 
-		if ( hasRemotePeers ) {
+		if ( hasRemotePeers || options.previousBlocks ) {
 			// Apply any updates queued while editing alone first, so changes
 			// are never applied out of order.
 			flushPendingCRDTDocUpdates();
-			updateCRDTDoc( objectType, objectId, changes, origin, options );
-			return;
+			// Rebases must return their result before the caller updates its store.
+			return updateCRDTDoc(
+				objectType,
+				objectId,
+				changes,
+				origin,
+				options
+			);
 		}
 
 		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );

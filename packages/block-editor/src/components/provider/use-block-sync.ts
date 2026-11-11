@@ -52,21 +52,31 @@ function cloneBlockWithMapping(
  * Restores external (original) client IDs on blocks before passing them
  * to onChange/onInput callbacks.
  *
- * @param blocks  The blocks with internal client IDs.
- * @param mapping The mapping object with internalToExternal Map.
+ * @param blocks   The blocks with internal client IDs.
+ * @param mapping  The mapping object with internalToExternal Map.
+ * @param clientId The client ID of the inner block controller, if any.
  * @return Blocks with external client IDs restored.
  */
 function restoreExternalIds(
 	blocks: Block[],
-	mapping: ClientIdMapping
+	mapping: ClientIdMapping,
+	clientId?: string | null
 ): Block[] {
+	if ( ! clientId ) {
+		return blocks;
+	}
+
 	return blocks.map( ( block ) => {
 		const externalId = mapping.internalToExternal.get( block.clientId );
 		return {
 			...block,
 			// Use external ID if available, otherwise keep internal ID (for new blocks)
 			clientId: externalId ?? block.clientId,
-			innerBlocks: restoreExternalIds( block.innerBlocks, mapping ),
+			innerBlocks: restoreExternalIds(
+				block.innerBlocks,
+				mapping,
+				clientId
+			),
 		};
 	} );
 }
@@ -394,6 +404,7 @@ export default function useBlockSync( {
 			const newBlockHistoryMode =
 				__unstableGetLastBlockChangeHistoryMode();
 			const newBlocks = getBlocks( clientId );
+			const previousBlocks = blocks;
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
 			if (
@@ -440,9 +451,11 @@ export default function useBlockSync( {
 
 						// For inner block controllers (clientId is set), restore external IDs
 						// before passing blocks to the parent.
-						const blocksForParent = clientId
-							? restoreExternalIds( blocks, idMappingRef.current )
-							: blocks;
+						const blocksForParent = restoreExternalIds(
+							blocks,
+							idMappingRef.current,
+							clientId
+						);
 
 						// Build selection state for the undo level.
 						const selectionInfo = {
@@ -468,6 +481,11 @@ export default function useBlockSync( {
 							: onInputRef.current;
 						const updateOptions: Parameters< OnBlockUpdate >[ 1 ] =
 							{
+								previousBlocks: restoreExternalIds(
+									previousBlocks,
+									idMappingRef.current,
+									clientId
+								),
 								selection: selectionForParent,
 							};
 						if ( blockHistoryMode === 'ignore' ) {

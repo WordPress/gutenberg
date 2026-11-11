@@ -364,6 +364,41 @@ describe( 'editEntityRecord', () => {
 			);
 		} );
 
+		it( 'stores the rebased blocks with the local edit in one update', () => {
+			const mergedBlocks = [
+				{ clientId: 'local' },
+				{ clientId: 'peer' },
+			];
+			syncManager.update.mockReturnValue( { blocks: mergedBlocks } );
+			const dispatch = vi.fn();
+			editEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ blocks: [ { clientId: 'local' } ] },
+				{ undoIgnore: true }
+			)(
+				thunkArgs( {
+					dispatch,
+					select: {
+						getEntityConfig: () => ( {
+							kind: 'postType',
+							name: 'post',
+						} ),
+						getRawEntityRecord: () => ( { id: 1 } ),
+						getEditedEntityRecord: () => ( { id: 1 } ),
+					},
+				} )
+			);
+			expect( dispatch ).toHaveBeenCalledExactlyOnceWith( {
+				type: 'EDIT_ENTITY_RECORD',
+				kind: 'postType',
+				name: 'post',
+				recordId: 1,
+				edits: { blocks: mergedBlocks },
+			} );
+		} );
+
 		it( 'passes merged edits to the sync manager even when value equals persisted record', () => {
 			const dispatch = vi.fn();
 			const select = {

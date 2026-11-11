@@ -18,6 +18,8 @@ The current array of blocks.
 
 A callback invoked when the blocks have been modified in a persistent manner. Contrasted with `onInput`, a "persistent" change is one which is not an extension of a composed input. Any update to a distinct block or block attribute is treated as persistent.
 
+Both callbacks receive `( blocks, options )`. `options.previousBlocks` contains the blocks immediately before the change, with external client IDs. This value advances with each change, including changes made before the next render. For a notification that only marks an existing change as persistent, it contains the current blocks.
+
 The distinction between these two callbacks is akin to the [differences between `input` and `change` events](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event) in the DOM API:
 
 > The input event is fired every time the value of the element changes. **This is unlike the change event, which only fires when the value is committed**, such as by pressing the enter key, selecting a value from a list of options, and the like.

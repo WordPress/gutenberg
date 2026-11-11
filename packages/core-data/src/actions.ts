@@ -395,16 +395,16 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param kind               Kind of the edited entity record.
- * @param name               Name of the edited entity record.
- * @param recordId           Pass `undefined` for keyless entities.
- * @param edits              The edits.
- * @param options            Options for the edit.
- * @param options.baseline   The record values the edit was computed against, for the fields where the caller knows them. See `EditEntityRecordOptions`.
- * @param options.isCached   Whether the edit is transient (e.g. typing). Transient
- *                           edits are staged and eventually merged into the
- *                           preceding undo level instead of creating a new one.
- * @param options.undoIgnore Whether to ignore the edit in undo history or not.
+ * @param kind                   Kind of the edited entity record.
+ * @param name                   Name of the edited entity record.
+ * @param recordId               Pass `undefined` for keyless entities.
+ * @param edits                  The edits.
+ * @param options                Options for the edit.
+ * @param options.isCached       Whether the edit is transient (e.g. typing). Transient
+ *                               edits are staged and eventually merged into the
+ *                               preceding undo level instead of creating a new one.
+ * @param options.previousBlocks The blocks immediately before the edit, when known. See `EditEntityRecordOptions`.
+ * @param options.undoIgnore     Whether to ignore the edit in undo history or not.
  *
  * @return Action object.
  */
@@ -414,7 +414,7 @@ export const editEntityRecord =
 		name: string,
 		recordId: number | string | undefined,
 		edits: object,
-		{ baseline, isCached, undoIgnore }: EditEntityRecordOptions = {}
+		{ isCached, previousBlocks, undoIgnore }: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
@@ -451,30 +451,33 @@ export const editEntityRecord =
 			return acc;
 		}, {} );
 
-		const edit = {
-			kind,
-			name,
-			recordId,
-			// Clear edits when they are equal to their persisted counterparts
-			// so that the property is not considered dirty.
-			edits: clearUnchangedEdits( editsWithMerges, record ),
-		};
 		// Tell the entity sync manager about the edit before it arrives in the
 		// store. It receives merged edits and the edit's intent, and decides
 		// what to do with them.
 		const syncManager = getEntitySyncManager();
-		syncManager?.update(
+		const rebasedEdits = syncManager?.update(
 			kind,
 			name,
 			// @ts-expect-error Bug: a keyless entity passes an `undefined` ID, which the sync manager's type excludes.
 			recordId,
 			editsWithMerges,
 			{
-				baseline,
 				isCached: Boolean( isCached ),
+				previousBlocks,
 				undoIgnore: Boolean( undoIgnore ),
 			}
 		);
+		const edit = {
+			kind,
+			name,
+			recordId,
+			// Apply corrections before dispatch so the editor and saves see the
+			// same blocks as the shared document.
+			edits: clearUnchangedEdits(
+				{ ...editsWithMerges, ...rebasedEdits },
+				record
+			),
+		};
 		// A record the sync manager has loaded has its undo history tracked
 		// by the manager, which reports each level it opens (see
 		// `recordSyncUndoLevel`). Every other record is recorded here.

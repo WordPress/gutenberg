@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Real-time collaboration: a keystroke made while a remote change was still on its way to the block editor no longer deletes the peer's block or reverts the peer's text. `useEntityBlockEditor` now tells the sync layer which blocks a change was made against, through the new `baseline` option of `editEntityRecord`, and the post sync config applies only that change ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+-   Real-time collaboration: a keystroke made while a remote change was still on its way to the block editor no longer deletes the peer's block or reverts the peer's text. `useEntityBlockEditor` now tells the sync layer which blocks a change was made against, through the new `previousBlocks` option of `editEntityRecord`, and the post sync config applies only that change ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
