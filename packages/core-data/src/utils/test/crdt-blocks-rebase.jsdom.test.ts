@@ -439,6 +439,23 @@ describe( 'rebaseCrdtBlocks', () => {
 			expect( yblocks.length ).toBe( 1 );
 		} );
 
+		it( 'reconciles by position when there is no baseline', () => {
+			const doc = new Y.Doc();
+			const yblocks = doc.getArray< YBlock >( 'blocks' );
+			mergeCrdtBlocks( yblocks, [ paragraph( 'p1', 'Hello' ) ], null );
+
+			rebaseCrdtBlocks(
+				yblocks,
+				undefined,
+				[ paragraph( 'q1', 'Hello!' ) ],
+				cursor( 'q1', 6 )
+			);
+
+			expect( snapshot( yblocks ) ).toEqual( [
+				{ id: 'q1', content: 'Hello!' },
+			] );
+		} );
+
 		it( 'is a no-op when the baseline is the incoming list', () => {
 			const doc = new Y.Doc();
 			const yblocks = doc.getArray< YBlock >( 'blocks' );

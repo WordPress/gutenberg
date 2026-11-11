@@ -400,11 +400,11 @@ export const deleteEntityRecord =
  * @param recordId           Pass `undefined` for keyless entities.
  * @param edits              The edits.
  * @param options            Options for the edit.
- * @param options.undoIgnore Whether to ignore the edit in undo history or not.
+ * @param options.baseline   The record values the edit was computed against, for the fields where the caller knows them. See `EditEntityRecordOptions`.
  * @param options.isCached   Whether the edit is transient (e.g. typing). Transient
  *                           edits are staged and eventually merged into the
  *                           preceding undo level instead of creating a new one.
- * @param options.baseline   The record values the edit was computed against, for the fields where the caller knows them. See `EditEntityRecordOptions`.
+ * @param options.undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @return Action object.
  */
@@ -414,7 +414,7 @@ export const editEntityRecord =
 		name: string,
 		recordId: number | string | undefined,
 		edits: object,
-		{ undoIgnore, isCached, baseline }: EditEntityRecordOptions = {}
+		{ baseline, isCached, undoIgnore }: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
@@ -470,9 +470,9 @@ export const editEntityRecord =
 			recordId,
 			editsWithMerges,
 			{
+				baseline,
 				isCached: Boolean( isCached ),
 				undoIgnore: Boolean( undoIgnore ),
-				...( baseline ? { baseline } : {} ),
 			}
 		);
 		// A record the sync manager has loaded has its undo history tracked

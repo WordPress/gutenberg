@@ -817,7 +817,8 @@ describe( 'SyncManager', () => {
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
-				changes
+				changes,
+				{ baseline: undefined }
 			);
 
 			// Verify that the record metadata was not updated.
@@ -827,7 +828,7 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
-		it( 'passes a baseline to applyChangesToCRDTDoc only when one is given', async () => {
+		it( 'passes the baseline to applyChangesToCRDTDoc', async () => {
 			const manager = createSyncManager();
 
 			await manager.load(
@@ -849,7 +850,11 @@ describe( 'SyncManager', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockSyncConfig.applyChangesToCRDTDoc.mock.calls ).toEqual( [
-				[ expect.any( Y.Doc ), { title: 'a' } ],
+				[
+					expect.any( Y.Doc ),
+					{ title: 'a' },
+					{ baseline: undefined },
+				],
 				[
 					expect.any( Y.Doc ),
 					{ title: 'b' },
@@ -1114,7 +1119,8 @@ describe( 'SyncManager', () => {
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
-				changes
+				changes,
+				{ baseline: undefined }
 			);
 
 			// Verify that the record metadata was updated.

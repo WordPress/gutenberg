@@ -116,12 +116,12 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
-	// Whether this update represents a user-facing entity save.
-	isSave?: boolean;
-	isNewUndoLevel?: boolean;
 	// The record values the change was computed against, for the fields
 	// where the caller knows them. See `ApplyChangesOptions.baseline`.
 	baseline?: Partial< ObjectData >;
+	isNewUndoLevel?: boolean;
+	// Whether this update represents a user-facing entity save.
+	isSave?: boolean;
 }
 
 export interface ApplyChangesOptions {
