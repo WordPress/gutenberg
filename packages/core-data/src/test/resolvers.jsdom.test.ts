@@ -60,7 +60,7 @@ describe( 'getEntityRecord', () => {
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
 	let dispatch: DispatchMock<
-		| 'receiveEntityRecords'
+		| 'receiveFetchedEntityRecords'
 		| '__unstableAcquireStoreLock'
 		| '__unstableReleaseStoreLock'
 		| 'recordSyncUndoLevel'
@@ -68,12 +68,12 @@ describe( 'getEntityRecord', () => {
 		| 'finishResolutions'
 	>;
 	let syncManager: Record< string, Mock >;
-	let select: { getCompleteReceiptCount: Mock };
+	let select: { getDirectReceiptCount: Mock };
 
 	beforeEach( async () => {
-		select = { getCompleteReceiptCount: vi.fn( () => 0 ) };
+		select = { getDirectReceiptCount: vi.fn( () => 0 ) };
 		dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 			recordSyncUndoLevel: vi.fn(),
@@ -108,7 +108,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST_TYPE,
@@ -144,7 +144,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST_TYPE,
@@ -192,7 +192,7 @@ describe( 'getEntityRecord', () => {
 			'post'
 		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			FRESH_POST_TYPE,
@@ -203,7 +203,9 @@ describe( 'getEntityRecord', () => {
 		deliverStaleResponse();
 		await staleRequest;
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			1
+		);
 
 		// The lock is still released for the discarded request.
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
@@ -248,14 +250,16 @@ describe( 'getEntityRecord', () => {
 
 		// Records are only superseded by a newer response for the same
 		// request, so both are received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			2
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			PAGE,
 			undefined
 		);
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST,
@@ -282,18 +286,18 @@ describe( 'getEntityRecord', () => {
 
 		// The record is received outside the resolver while the request is
 		// in flight, as the editor does with an upload's finalize response.
-		select.getCompleteReceiptCount.mockReturnValue( 1 );
+		select.getDirectReceiptCount.mockReturnValue( 1 );
 
 		deliverStaleResponse();
 		await staleRequest;
 
-		expect( select.getCompleteReceiptCount ).toHaveBeenCalledWith(
+		expect( select.getDirectReceiptCount ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			'post',
 			'view'
 		);
-		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
+		expect( dispatch.receiveFetchedEntityRecords ).not.toHaveBeenCalled();
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -302,17 +306,6 @@ describe( 'getEntityRecord', () => {
 	it( 'keeps a newer response delivered after an older one was received', async () => {
 		const OLDER_POST_TYPE = { slug: 'post', name: 'older' };
 		const NEWER_POST_TYPE = { slug: 'post', name: 'newer' };
-
-		// Counts each received record, like the reducer.
-		let stored: unknown;
-		let receipts = 0;
-		select.getCompleteReceiptCount.mockImplementation( () => receipts );
-		dispatch.receiveEntityRecords.mockImplementation(
-			( _kind, _name, record ) => {
-				stored = record;
-				receipts++;
-			}
-		);
 
 		let deliverOlderResponse: ( value?: unknown ) => void = () => {};
 		const olderResponseGate = new Promise( ( resolve ) => {
@@ -350,8 +343,15 @@ describe( 'getEntityRecord', () => {
 		deliverNewerResponse();
 		await newerRequest;
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
-		expect( stored ).toEqual( NEWER_POST_TYPE );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			2
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenLastCalledWith(
+			'root',
+			'postType',
+			NEWER_POST_TYPE,
+			undefined
+		);
 	} );
 
 	it( 'loads entity with sync manager', async () => {
@@ -485,7 +485,7 @@ describe( 'getEntityRecord', () => {
 		expect(
 			selectWithoutCollaboration.isCollaborationSupported
 		).toHaveBeenCalledTimes( 1 );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
 			POST_RECORD,
@@ -662,7 +662,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'dispatches the requested post type', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -681,7 +681,7 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			Object.values( POST_TYPES ),
@@ -694,7 +694,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'Uses state locks', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -726,7 +726,7 @@ describe( 'getEntityRecords', () => {
 	it( 'marks specific entity records as resolved', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -755,7 +755,7 @@ describe( 'getEntityRecords', () => {
 	it( 'caches permissions and marks entity records as resolved when using _fields', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -807,7 +807,7 @@ describe( 'getEntityRecords', () => {
 	it( 'does not cache permissions when _links field is missing from response', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -849,7 +849,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'provides pagination metadata and progressive loading during intermediate results fetching', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 			finishResolutions: vi.fn(),
@@ -880,10 +880,12 @@ describe( 'getEntityRecords', () => {
 		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			4
+		);
 
 		// Check that the first call already includes pagination metadata
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			expect.any( Array ),
@@ -894,7 +896,7 @@ describe( 'getEntityRecords', () => {
 		);
 
 		// Check that all calls include pagination metadata
-		dispatch.receiveEntityRecords.mock.calls.forEach( ( call ) => {
+		dispatch.receiveFetchedEntityRecords.mock.calls.forEach( ( call ) => {
 			// 7th parameter is the pagination metadata
 			expect( call[ 6 ] ).toEqual(
 				expect.objectContaining( { totalItems: 5, totalPages: 1 } )
@@ -902,7 +904,7 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// Should process all the data from the 3 mock pages (2+2+1=5 records total)
-		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenLastCalledWith(
 			'postType',
 			'attachment',
 			expect.arrayContaining( [
@@ -923,7 +925,7 @@ describe( 'getEntityRecords', () => {
 describe( 'taxonomy pagination', () => {
 	const registry = { batch: ( callback: () => void ) => callback() };
 	let dispatch: DispatchMock<
-			| 'receiveEntityRecords'
+			| 'receiveFetchedEntityRecords'
 			| '__unstableAcquireStoreLock'
 			| '__unstableReleaseStoreLock'
 		>,
@@ -931,7 +933,7 @@ describe( 'taxonomy pagination', () => {
 
 	beforeEach( async () => {
 		dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn().mockResolvedValue( 'lock' ),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -1010,7 +1012,7 @@ describe( 'taxonomy pagination', () => {
 			page: 1,
 		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',
 			'category',
 			[

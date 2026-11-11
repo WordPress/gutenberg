@@ -89,7 +89,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
-	completeReceipts?: Record< ET.Context, Record< EntityRecordKey, number > >;
+	directReceipts?: Record< ET.Context, Record< EntityRecordKey, number > >;
 	revisions?: RevisionsQueriedData;
 }
 

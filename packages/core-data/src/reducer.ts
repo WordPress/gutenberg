@@ -332,13 +332,14 @@ function entity( entityConfig: EntityConfig ) {
 				return state;
 			},
 
-			// Counts how many times each record was received complete, which
-			// tells a `getEntityRecord` request apart from a newer copy.
-			completeReceipts: (
-				state: EntityRecordsState[ 'completeReceipts' ] = {},
+			// Counts how many times each complete record was received
+			// directly, and not read by a record resolver. A change tells a
+			// `getEntityRecord` request that its response may be out of date.
+			directReceipts: (
+				state: EntityRecordsState[ 'directReceipts' ] = {},
 				action: KeyedEntityAction
 			) => {
-				if ( action.type !== 'RECEIVE_ITEMS' ) {
+				if ( action.type !== 'RECEIVE_ITEMS' || action.isFetched ) {
 					return state;
 				}
 

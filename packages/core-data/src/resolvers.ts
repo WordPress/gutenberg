@@ -109,64 +109,6 @@ function getResponseOrderKey(
 }
 
 /**
- * The complete receipt count each `getEntityRecord` response last left, per
- * registry and per record and context.
- */
-const lastResolverWrite = new WeakMap<
-	CoreDataThunkArgs[ 'registry' ],
-	Map< string, number >
->();
-
-/**
- * Returns whether a complete record was received from outside the resolver -
- * a save, or a response the caller stored itself - after a request began.
- * Such a record is newer than that request's response, which must not
- * overwrite it. The editor stores the finalize response of a client-side
- * upload this way while an earlier read of the attachment may still be in
- * flight. See https://github.com/WordPress/gutenberg/issues/81844.
- *
- * A `_fields` response only updates some fields, so it does not count.
- *
- * @param registry       A `@wordpress/data` registry.
- * @param recordKey      Identifies the stored record and its context.
- * @param receiptsBefore Complete receipts when the request began.
- * @param receiptsNow    Complete receipts now.
- *
- * @return Whether a complete record was received without the resolver.
- */
-function wasReceivedElsewhere(
-	registry: CoreDataThunkArgs[ 'registry' ],
-	recordKey: string,
-	receiptsBefore: number,
-	receiptsNow: number
-): boolean {
-	return (
-		receiptsNow !== receiptsBefore &&
-		receiptsNow !== lastResolverWrite.get( registry )?.get( recordKey )
-	);
-}
-
-/**
- * Remembers the complete receipt count a `getEntityRecord` response left.
- *
- * @param registry  A `@wordpress/data` registry.
- * @param recordKey Identifies the stored record and its context.
- * @param receipts  Complete receipts after the write.
- */
-function rememberResolverWrite(
-	registry: CoreDataThunkArgs[ 'registry' ],
-	recordKey: string,
-	receipts: number
-) {
-	let writes = lastResolverWrite.get( registry );
-	if ( ! writes ) {
-		writes = new Map();
-		lastResolverWrite.set( registry, writes );
-	}
-	writes.set( recordKey, receipts );
-}
-
-/**
  * Requests authors from the REST API.
  *
  * @param query Optional object of query parameters to
@@ -270,34 +212,27 @@ export const getEntityRecord =
 				registry,
 				getResponseOrderKey( kind, name, key, query )
 			);
-			const context =
-				( query?.context as string | undefined ) ?? 'default';
-			const recordKey = JSON.stringify( [ kind, name, key, context ] );
 			// A keyless entity, such as the site settings, is stored under
 			// `undefined`.
 			const storedKey = key === '' ? undefined : key;
 			const getReceipts = () =>
-				select.getCompleteReceiptCount(
+				select.getDirectReceiptCount(
 					kind,
 					name,
 					storedKey,
-					context
+					( query?.context as string | undefined ) ?? 'default'
 				);
 			const receiptsBefore = getReceipts();
 			const response = await apiFetch( { path, parse: false } );
 			const record: RestRecord = await response.json();
 
-			// A newer copy of this record has already been received since
-			// this request was made, so this response is out of date.
+			// A newer response to this request was already received, or the
+			// record was received directly since this request was made, so
+			// this response may be out of date. A `_fields` response only
+			// updates some fields, so a direct receipt does not affect it.
 			if (
 				! isFreshestResponse() ||
-				( ! query?._fields &&
-					wasReceivedElsewhere(
-						registry,
-						recordKey,
-						receiptsBefore,
-						getReceipts()
-					) )
+				( ! query?._fields && getReceipts() !== receiptsBefore )
 			) {
 				return;
 			}
@@ -430,11 +365,15 @@ export const getEntityRecord =
 			}
 
 			registry.batch( () => {
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveFetchedEntityRecords(
+					kind,
+					name,
+					record,
+					query
+				);
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
-			rememberResolverWrite( registry, recordKey, getReceipts() );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
@@ -583,7 +522,7 @@ export const getEntityRecords =
 
 					records.push( ...pageRecords );
 					registry.batch( () => {
-						dispatch.receiveEntityRecords(
+						dispatch.receiveFetchedEntityRecords(
 							kind,
 							name,
 							records,
@@ -652,7 +591,7 @@ export const getEntityRecords =
 			}
 
 			registry.batch( () => {
-				dispatch.receiveEntityRecords(
+				dispatch.receiveFetchedEntityRecords(
 					kind,
 					name,
 					records,

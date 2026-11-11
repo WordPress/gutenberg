@@ -209,6 +209,39 @@ describe( 'getEntityRecord', () => {
 		).toEqual( fullPost );
 	} );
 
+	it( 'keeps a response when a list holding the record was fetched during the request', async () => {
+		addLoaderlessEntities();
+
+		const { requested, deliver } = holdNextResponse();
+		const request = registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecord( 'test', 'post', 1 );
+		await requested;
+
+		// A list read before the record changed lands first.
+		apiFetchMock.mockImplementationOnce( () => ( {
+			json: () => Promise.resolve( [ createTestPost( 1 ) ] ),
+			headers: { get: () => null },
+		} ) );
+		await registry
+			.resolveSelect( coreDataStore )
+			.getEntityRecords( 'test', 'post', { per_page: 10 } );
+
+		const updatedPost = {
+			...createTestPost( 1 ),
+			content: { raw: 'Updated', rendered: 'Updated' },
+		};
+		deliver( updatedPost );
+		await request;
+
+		expect(
+			registry
+				.select( coreDataStore )
+				.getEntityRecord( 'test', 'post', 1 )
+		).toEqual( updatedPost );
+		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'ignores a late response once a keyless record was received elsewhere', async () => {
 		addLoaderlessEntities();
 

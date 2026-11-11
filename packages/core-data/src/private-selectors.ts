@@ -408,8 +408,9 @@ export function getEntityActionsConfig(
 }
 
 /**
- * Returns how many times an entity record was received complete, without
- * resolving it. A `_fields` response does not count.
+ * Returns how many times a complete entity record was received directly, and
+ * not read by a record resolver, without resolving it. A `_fields` response
+ * does not count.
  *
  * @param state    Data state.
  * @param kind     Entity kind.
@@ -417,9 +418,9 @@ export function getEntityActionsConfig(
  * @param recordId Record's key, or `undefined` for a keyless entity.
  * @param context  REST context the record was received in.
  *
- * @return The number of complete receipts.
+ * @return The number of direct receipts.
  */
-export function getCompleteReceiptCount(
+export function getDirectReceiptCount(
 	state: State,
 	kind: string,
 	name: string,
@@ -427,7 +428,7 @@ export function getCompleteReceiptCount(
 	context: string = 'default'
 ): number {
 	return (
-		state.entities.records?.[ kind ]?.[ name ]?.completeReceipts?.[
+		state.entities.records?.[ kind ]?.[ name ]?.directReceipts?.[
 			context
 		]?.[ recordId as EntityRecordKey ] ?? 0
 	);

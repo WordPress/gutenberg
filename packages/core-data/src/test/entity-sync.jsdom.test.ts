@@ -141,6 +141,7 @@ describe( 'the entity sync interface', () => {
 	let unregister: () => void;
 	let dispatch: DispatchMock<
 		| 'receiveEntityRecords'
+		| 'receiveFetchedEntityRecords'
 		| 'receiveAutosaves'
 		| 'receiveUserPermissions'
 		| 'finishResolutions'
@@ -154,6 +155,7 @@ describe( 'the entity sync interface', () => {
 		unregister = registerEntitySyncManager( manager );
 		dispatch = Object.assign( vi.fn(), {
 			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveAutosaves: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			finishResolutions: vi.fn(),
@@ -170,7 +172,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'getEntityRecord', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
-		const select = { getCompleteReceiptCount: () => 0 };
+		const select = { getDirectReceiptCount: () => 0 };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
@@ -299,7 +301,7 @@ describe( 'the entity sync interface', () => {
 			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			expect( manager.load ).not.toHaveBeenCalled();
-			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				POST_RECORD,
