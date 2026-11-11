@@ -52,10 +52,31 @@ export const Default = AnglePickerWithState.bind( {} );
 
 /**
  * Use `min` and `max` to change the range of angles that can be entered,
- * for example to allow negative angles.
+ * for example to allow negative angles. Dragging the circle anticlockwise
+ * from 0 gives a negative angle, and it stops at `min` and `max`.
  */
 export const WithCustomRange = AnglePickerWithState.bind( {} );
 WithCustomRange.args = {
 	min: -180,
 	max: 180,
+};
+
+/**
+ * A range wider than a full turn keeps counting as the circle turns, so
+ * dragging clockwise from 350 gives 360 and then 370.
+ */
+export const WithMoreThanOneTurn = AnglePickerWithState.bind( {} );
+WithMoreThanOneTurn.args = {
+	min: -360,
+	max: 360,
+};
+
+/**
+ * A range narrower than a full turn stops at `min` and `max`, however far
+ * the circle is dragged.
+ */
+export const WithNarrowRange = AnglePickerWithState.bind( {} );
+WithNarrowRange.args = {
+	min: 0,
+	max: 90,
 };

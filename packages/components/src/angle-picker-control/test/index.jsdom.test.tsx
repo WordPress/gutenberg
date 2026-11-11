@@ -24,12 +24,44 @@ function StatefulPrivateAnglePickerControl( {
 }
 
 function dragAngleCircle( container: HTMLElement, clientX: number ) {
-	// eslint-disable-next-line testing-library/no-node-access
-	const circle = container.querySelector(
-		'.components-angle-picker-control__angle-circle'
-	) as HTMLElement;
+	const circle = getAngleCircle( container );
 	fireEvent.mouseDown( circle, { clientX, clientY: 0 } );
 	fireEvent.mouseUp( circle, { clientX, clientY: 0 } );
+}
+
+function getAngleCircle( container: HTMLElement ) {
+	return container.querySelector(
+		'.components-angle-picker-control__angle-circle'
+	) as HTMLElement;
+}
+
+function getIndicator( container: HTMLElement ) {
+	return container.querySelector(
+		'.components-angle-picker-control__angle-circle-indicator'
+	);
+}
+
+// jsdom gives the dial a zero-size box, so its center is at 0, 0.
+function pointAt( angle: number ) {
+	const radians = ( angle * Math.PI ) / 180;
+	return {
+		clientX: Math.sin( radians ) * 100,
+		clientY: -Math.cos( radians ) * 100,
+	};
+}
+
+function turnDial( container: HTMLElement, angles: number[] ) {
+	const circle = getAngleCircle( container );
+	const [ first, ...rest ] = angles;
+	fireEvent.mouseDown( circle, pointAt( first ) );
+	rest.forEach( ( angle ) => {
+		fireEvent.mouseMove( circle, pointAt( angle ) );
+	} );
+	fireEvent.mouseUp( circle, pointAt( angles[ angles.length - 1 ] ) );
+}
+
+function reportedValues( onChange: ReturnType< typeof vi.fn > ) {
+	return onChange.mock.calls.map( ( [ value ] ) => value );
 }
 
 describe( 'AnglePickerControl', () => {
@@ -120,6 +152,138 @@ describe( 'AnglePickerControl', () => {
 
 		expect( onChange ).toHaveBeenLastCalledWith( 270 );
 	} );
+
+	it( 'wraps from 359 to 0 with the default range', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 340 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 340, 359, 10, 20 ] );
+
+		expect( reportedValues( onChange ) ).toEqual( [
+			340, 359, 10, 20, 20,
+		] );
+	} );
+
+	it( 'stops at the bottom of a -180 to 180 range', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 170 }
+				min={ -180 }
+				max={ 180 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 170, 190, 200 ] );
+		expect( onChange ).toHaveBeenLastCalledWith( 180 );
+
+		onChange.mockClear();
+		turnDial( container, [ 180, 170, 160 ] );
+		expect( onChange ).toHaveBeenLastCalledWith( 160 );
+	} );
+
+	it( 'stops at the bottom of a -180 to 180 range from below 0', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ -170 }
+				min={ -180 }
+				max={ 180 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 190, 170, 160 ] );
+
+		expect( reportedValues( onChange ) ).toEqual( [
+			-170, -180, -180, -180,
+		] );
+	} );
+
+	it( 'keeps counting past a full turn in both directions', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 340 }
+				min={ -360 }
+				max={ 360 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 340, 350, 0, 10 ] );
+		expect( reportedValues( onChange ) ).toEqual( [
+			340, 350, 360, 360, 360,
+		] );
+
+		onChange.mockClear();
+		turnDial( container, [ 0, 330, 300 ] );
+		expect( reportedValues( onChange ) ).toEqual( [ 360, 330, 300, 300 ] );
+	} );
+
+	it( 'turns below 0 and then more than a full turn clockwise', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 0 }
+				min={ -720 }
+				max={ 720 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 0, 350, 340 ] );
+		expect( onChange ).toHaveBeenLastCalledWith( -20 );
+
+		onChange.mockClear();
+		turnDial( container, [ 340, 90, 180, 270, 0, 10 ] );
+		expect( onChange ).toHaveBeenLastCalledWith( 370 );
+	} );
+
+	it( 'points a click at the value closest to the current one', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ -30 }
+				min={ -360 }
+				max={ 360 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 300 ] );
+
+		expect( reportedValues( onChange ) ).toEqual( [ -60, -60 ] );
+	} );
+
+	it( 'stops at min and max on a narrow range without jumping', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 80 }
+				min={ 0 }
+				max={ 90 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 80, 100, 180, 270, 350, 270, 180, 100, 60 ] );
+		expect( reportedValues( onChange ) ).toEqual( [
+			80, 90, 90, 90, 90, 90, 90, 90, 60, 60,
+		] );
+
+		onChange.mockClear();
+		turnDial( container, [ 60, 10, 340, 270, 180, 100 ] );
+		expect( reportedValues( onChange ) ).toEqual( [
+			60, 10, 0, 0, 0, 0, 0,
+		] );
+	} );
 } );
 
 describe( 'PrivateAnglePickerControl', () => {
@@ -140,5 +304,26 @@ describe( 'PrivateAnglePickerControl', () => {
 
 		expect( onChange ).toHaveBeenLastCalledWith( undefined );
 		expect( input ).toHaveValue( null );
+	} );
+
+	it( 'shows no dial indicator for an empty value with allowEmpty', () => {
+		const { container, rerender } = render(
+			<PrivateAnglePickerControl
+				allowEmpty
+				value={ undefined }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect( getIndicator( container ) ).toBeNull();
+
+		rerender(
+			<PrivateAnglePickerControl
+				allowEmpty
+				value={ 0 }
+				onChange={ vi.fn() }
+			/>
+		);
+		expect( getIndicator( container ) ).not.toBeNull();
 	} );
 } );

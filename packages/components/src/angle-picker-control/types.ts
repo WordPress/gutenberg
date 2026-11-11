@@ -15,13 +15,15 @@ export type AnglePickerControlProps = {
 	 */
 	label?: string;
 	/**
-	 * The maximum angle, in degrees, that can be entered.
+	 * The maximum angle, in degrees, that can be entered. Dragging the circle
+	 * stops here.
 	 *
 	 * @default 360
 	 */
 	max?: number;
 	/**
-	 * The minimum angle, in degrees, that can be entered.
+	 * The minimum angle, in degrees, that can be entered. Dragging the circle
+	 * stops here.
 	 *
 	 * @default 0
 	 */
@@ -59,6 +61,11 @@ export type PrivateAnglePickerControlProps = Omit<
 };
 
 export type AngleCircleProps = {
+	/**
+	 * The angle to point at, or `undefined` to show no indicator.
+	 */
 	value: AnglePickerControlProps[ 'value' ] | undefined;
+	min?: number;
+	max?: number;
 	onChange: AnglePickerControlProps[ 'onChange' ];
 };

@@ -8,7 +8,6 @@ import NumberControl from '../number-control';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 import AngleCircle from './angle-circle';
-import { clamp } from '../utils/math';
 import type { WordPressComponentProps } from '../context';
 import type {
 	AnglePickerControlProps,
@@ -43,15 +42,7 @@ function UnforwardedAnglePickerControl(
 		onChange( parseInt( unprocessedValue, 10 ) );
 	};
 
-	// The dial reports 0 to 359, so shift by a full turn to reach a range
-	// such as -180 to 180.
-	const handleOnAngleCircleChange = ( angle: number ) => {
-		if ( angle > max && angle - 360 >= min ) {
-			onChange( angle - 360 );
-			return;
-		}
-		onChange( clamp( angle, min, max ) );
-	};
+	const isEmpty = allowEmpty && ( value === undefined || value === '' );
 
 	const classes = clsx( 'components-angle-picker-control', className );
 
@@ -79,8 +70,10 @@ function UnforwardedAnglePickerControl(
 			<Spacer marginBottom="1" marginTop="auto">
 				<AngleCircle
 					aria-hidden="true"
-					value={ value }
-					onChange={ handleOnAngleCircleChange }
+					value={ isEmpty ? undefined : ( value ?? 0 ) }
+					min={ min }
+					max={ max }
+					onChange={ onChange }
 				/>
 			</Spacer>
 		</Flex>
@@ -92,6 +85,11 @@ function UnforwardedAnglePickerControl(
  * pick an angle. Users can choose an angle in a visual UI with the mouse by
  * dragging an angle indicator inside a circle or by directly inserting the
  * desired angle in a text field.
+ *
+ * With a custom `min` or `max`, the circle works like a knob: dragging changes
+ * the angle by how far it turns, past a full turn if the range allows, and
+ * stops at `min` and `max`. The circle shows the direction and the text field
+ * shows the full angle.
  *
  * ```jsx
  * import { useState } from '@wordpress/element';
