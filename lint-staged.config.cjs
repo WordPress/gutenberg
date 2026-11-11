@@ -16,7 +16,11 @@ module.exports = {
 		'npm run docs:theme-ref',
 		'npm run docs:check-api-docs-unstaged',
 	],
-	'packages/icons/src/library/*': [ 'npm run -w packages/icons build' ],
+	// Normalize design-tool SVG exports before the build validates them.
+	'packages/icons/src/library/*': [
+		'node packages/icons/lib/normalize-export.cjs',
+		'npm run -w packages/icons build',
+	],
 	// The validator takes the repository root, so staged paths are not passed.
 	'**/tsconfig*.json': [ () => 'npm run lint:tsconfig' ],
 };
