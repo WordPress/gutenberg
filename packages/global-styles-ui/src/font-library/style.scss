@@ -98,6 +98,13 @@ $footer-height: 90px;
 	width: 240px;
 }
 
+.font-library__category {
+	// Keep the width independent of the selected label while leaving room for Search.
+	width: 192px;
+	max-width: 50%;
+	flex-shrink: 0;
+}
+
 .font-library__fonts-title {
 	text-transform: uppercase;
 	font-size: 11px;

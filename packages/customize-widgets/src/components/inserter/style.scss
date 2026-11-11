@@ -20,6 +20,14 @@
 	background: $white;
 }
 
+// The panel header has its own close button, so with no tabs to show the
+// inserter's tab list and close button row is hidden.
+.customize-widgets-layout__inserter-panel-content .block-editor-inserter__menu.has-single-tab {
+	.block-editor-tabbed-sidebar__tablist-and-close-button {
+		display: none;
+	}
+}
+
 .customize-widgets-layout__inserter-panel-header {
 	display: flex;
 	justify-content: space-between;
