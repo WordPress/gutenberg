@@ -84,7 +84,8 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
  * source, the arguments of the binding, the context the source uses, and the
  * attributes of the block.
  *
- * Two blocks with the same request get the same inner blocks from the source.
+ * Two blocks with the same request get the same inner blocks from the source,
+ * whatever the order of its keys.
  *
  * @param string   $source_name    The name of the source.
  * @param array    $source_args    The arguments of the binding.
@@ -99,7 +100,9 @@ function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $sourc
 			$context[ $context_name ] = $block_instance->context[ $context_name ];
 		}
 	}
-	return array( $source_name, $source_args, $context, $block_instance->attributes );
+	$request = array( $source_name, $source_args, $context, $block_instance->attributes );
+	wp_recursive_ksort( $request );
+	return $request;
 }
 
 /**
@@ -125,9 +128,8 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * Stops tracking a block whose supplied inner blocks were rendering, once the
  * block itself has rendered.
  *
- * The blocks still rendering inside it, if any, stopped with it: a block that
- * doesn't finish rendering, because of an exception, never gets here, so they
- * are forgotten along with it.
+ * The blocks still rendering inside it, if any, stopped with it, so they are
+ * forgotten along with it.
  *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
  *
@@ -147,6 +149,37 @@ function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_inner_blocks', 10, 3 );
+
+/**
+ * Stops tracking the blocks whose supplied inner blocks were rendering when the
+ * blocks themselves stopped rendering with an exception.
+ *
+ * A block that doesn't finish rendering never reaches the `render_block`
+ * filter. If something catches the exception and goes on rendering, the block
+ * would otherwise count as rendering for the rest of the request. A block is
+ * rendering while its `WP_Block::render()` call is on the call stack.
+ *
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
+ */
+function gutenberg_block_bindings_forget_hosts_that_stopped_rendering() {
+	global $gutenberg_block_bindings_rendering_inner_blocks;
+	if ( empty( $gutenberg_block_bindings_rendering_inner_blocks ) ) {
+		return;
+	}
+
+	$rendering_blocks = array();
+	foreach ( debug_backtrace( DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS ) as $frame ) {
+		if ( isset( $frame['object'] ) && $frame['object'] instanceof WP_Block && 'render' === $frame['function'] ) {
+			$rendering_blocks[] = $frame['object'];
+		}
+	}
+	foreach ( $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
+		if ( ! in_array( $rendering['host'], $rendering_blocks, true ) ) {
+			$gutenberg_block_bindings_rendering_inner_blocks = array_slice( $gutenberg_block_bindings_rendering_inner_blocks, 0, $index );
+			return;
+		}
+	}
+}
 
 /**
  * Parses the inner blocks a block bindings source supplies.
@@ -257,8 +290,13 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
 }
 
 /**
- * Splits the HTML of an element that wraps a block's content before the
+ * Splits the HTML of the element that wraps a block's content before the
  * element's closing tag.
+ *
+ * The wrapper is the last element of the HTML. When all it holds is the inner
+ * container of a Group block saved before WordPress 5.8, the split happens
+ * before the closing tag of the container, where the block's own inner blocks
+ * would be.
  *
  * @param string $html The HTML of the wrapper element.
  * @return string[]|null The HTML before the closing tag and the HTML from it,
@@ -270,28 +308,99 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
 		return null;
 	}
 
-	$before                = '';
-	$after                 = '';
-	$depth_outside_wrapper = null;
-	$is_at_wrapper_closer  = false;
+	$tokens = array();
 	while ( $processor->next_token() ) {
-		if ( null === $depth_outside_wrapper && '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer() ) {
-			$depth_outside_wrapper = $processor->get_current_depth() - 1;
-		} elseif ( $processor->is_tag_closer() && $processor->get_current_depth() === $depth_outside_wrapper ) {
-			$is_at_wrapper_closer = true;
-		}
-
-		if ( $is_at_wrapper_closer ) {
-			$after .= $processor->serialize_token();
-		} else {
-			$before .= $processor->serialize_token();
-		}
+		$is_opener = '#tag' === $processor->get_token_type() && ! $processor->is_tag_closer();
+		$tokens[]  = array(
+			'html'               => $processor->serialize_token(),
+			'depth'              => $processor->get_current_depth(),
+			'is_opener'          => $is_opener,
+			'is_closer'          => '#tag' === $processor->get_token_type() && $processor->is_tag_closer(),
+			'is_inner_container' => $is_opener && $processor->has_class( 'wp-block-group__inner-container' ),
+			'is_whitespace'      => '#text' === $processor->get_token_type() && '' === trim( $processor->get_modifiable_text() ),
+		);
 	}
-
-	if ( ! $is_at_wrapper_closer || null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
+	if ( null !== $processor->get_last_error() || $processor->paused_at_incomplete_token() ) {
 		return null;
 	}
+
+	$closer_index = gutenberg_block_bindings_find_wrapper_closer( $tokens );
+	if ( null === $closer_index ) {
+		return null;
+	}
+	$before = implode( '', array_column( array_slice( $tokens, 0, $closer_index ), 'html' ) );
+	$after  = implode( '', array_column( array_slice( $tokens, $closer_index ), 'html' ) );
 	return array( $before, $after );
+}
+
+/**
+ * Finds the closing tag of the wrapper element among the tokens of a block's
+ * content: the last element of the content, or the legacy inner container of
+ * a Group block when it is all that element holds.
+ *
+ * @param array[] $tokens The tokens, each with its HTML, its depth, and whether it opens an element, closes one, opens a legacy inner container, or is whitespace.
+ * @return int|null The index of the closing tag, or null if no element wraps the content.
+ */
+function gutenberg_block_bindings_find_wrapper_closer( $tokens ) {
+	$wrapper_depth = null;
+	foreach ( $tokens as $token ) {
+		if ( $token['is_opener'] ) {
+			$wrapper_depth = $token['depth'];
+			break;
+		}
+	}
+	if ( null === $wrapper_depth ) {
+		return null;
+	}
+
+	$closer_index = null;
+	foreach ( $tokens as $index => $token ) {
+		if ( $token['is_closer'] && $token['depth'] === $wrapper_depth - 1 ) {
+			$closer_index = $index;
+		}
+	}
+	if ( null === $closer_index ) {
+		return null;
+	}
+
+	$opener_index = $closer_index;
+	while ( ! $tokens[ $opener_index ]['is_opener'] || $tokens[ $opener_index ]['depth'] !== $wrapper_depth ) {
+		--$opener_index;
+	}
+
+	$inner_container_closer_index = gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $opener_index, $closer_index, $wrapper_depth );
+	return $inner_container_closer_index ?? $closer_index;
+}
+
+/**
+ * Finds the closing tag of the legacy inner container of a Group block, when
+ * the container is all that the wrapper element holds, whitespace aside.
+ *
+ * @param array[] $tokens        The tokens of the block's content.
+ * @param int     $opener_index  The index of the wrapper's opening tag.
+ * @param int     $closer_index  The index of the wrapper's closing tag.
+ * @param int     $wrapper_depth The depth of the wrapper's opening tag.
+ * @return int|null The index of the container's closing tag, or null if the wrapper holds anything else.
+ */
+function gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $opener_index, $closer_index, $wrapper_depth ) {
+	$index = $opener_index + 1;
+	while ( $index < $closer_index && $tokens[ $index ]['is_whitespace'] ) {
+		++$index;
+	}
+	if ( $index >= $closer_index || ! $tokens[ $index ]['is_inner_container'] ) {
+		return null;
+	}
+
+	while ( $index < $closer_index && ! ( $tokens[ $index ]['is_closer'] && $tokens[ $index ]['depth'] === $wrapper_depth ) ) {
+		++$index;
+	}
+	$inner_container_closer_index = $index;
+	for ( ++$index; $index < $closer_index; ++$index ) {
+		if ( ! $tokens[ $index ]['is_whitespace'] ) {
+			return null;
+		}
+	}
+	return $inner_container_closer_index < $closer_index ? $inner_container_closer_index : null;
 }
 
 /**
@@ -336,6 +445,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		return null;
 	}
 
+	gutenberg_block_bindings_forget_hosts_that_stopped_rendering();
 	$request = gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance );
 	if ( gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) ) {
 		return null;

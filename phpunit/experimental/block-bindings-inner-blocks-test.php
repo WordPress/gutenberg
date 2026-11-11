@@ -223,6 +223,30 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Default', $output );
 	}
 
+	public function test_bindings_with_the_same_arguments_in_another_order_inside_the_value_are_ignored() {
+		$this->value_callback = function () {
+			return $this->bound_group_markup(
+				array(
+					'b' => 2,
+					'a' => 1,
+				)
+			);
+		};
+		$output               = $this->render_group(
+			array(
+				'innerBlocks' => array(
+					'source' => self::SOURCE,
+					'args'   => array(
+						'a' => 1,
+						'b' => 2,
+					),
+				),
+			)
+		);
+		$this->assertStringContainsString( '>Nested own</p>', $output );
+		$this->assertSame( 2, substr_count( $output, '<div class="wp-block-group">' ) );
+	}
+
 	public function test_bindings_to_another_source_inside_the_value_resolve() {
 		register_block_bindings_source(
 			'test/other-inner-blocks',
@@ -386,6 +410,29 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>One</p>', $output );
 	}
 
+	public function test_a_host_that_stops_rendering_with_an_exception_is_forgotten() {
+		register_block_type(
+			'test/throws',
+			array(
+				'render_callback' => static function () {
+					throw new Exception( 'Stopped' );
+				},
+			)
+		);
+		$this->value = '<!-- wp:test/throws /-->';
+		$stopped     = null;
+		try {
+			$this->render_group();
+		} catch ( Exception $exception ) {
+			$stopped = $exception->getMessage();
+		}
+		unregister_block_type( 'test/throws' );
+		$this->assertSame( 'Stopped', $stopped );
+
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$this->assertStringContainsString( '>One</p>', $this->render_group() );
+	}
+
 	public function test_attribute_bindings_inside_the_value_are_kept() {
 		$this->value = '<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/inner-blocks"}}}} --><p>One</p><!-- /wp:paragraph -->';
 		$this->assertStringContainsString( '>Bound text</p>', $this->render_group() );
@@ -416,6 +463,22 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div>' );
 		$this->assertSame( 1, substr_count( $output, 'wp-block-group__inner-container' ) );
 		$this->assertStringEndsWith( '>One</p></div></div>', $output );
+	}
+
+	public function test_value_goes_inside_the_inner_container_of_an_empty_legacy_group() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output      = $this->render_group( null, '<div class="wp-block-group__inner-container"></div>' );
+		$this->assertStringContainsString( '>One</p></div></div>', $output );
+	}
+
+	public function test_markup_before_the_wrapper_stays_before_the_value() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$markup      = '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><span>Pre</span><div class="wp-block-group"></div><!-- /wp:group -->';
+		$block       = new WP_Block( parse_blocks( $markup )[0] );
+		$output      = $block->render();
+		$this->assertStringContainsString( '>Pre</span>', $output );
+		$this->assertStringContainsString( '>One</p></div>', $output );
+		$this->assertLessThan( strpos( $output, '>One</p>' ), strpos( $output, '</span>' ) );
 	}
 
 	public function test_value_goes_inside_an_empty_group() {
