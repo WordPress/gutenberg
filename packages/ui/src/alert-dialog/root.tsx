@@ -71,8 +71,6 @@ function Root( {
 	defaultOpen,
 	onConfirm,
 }: RootProps ) {
-	const [ internalOpen, setInternalOpen ] = useState( defaultOpen ?? false );
-
 	// Internal state machine for the confirm-and-close lifecycle.
 	//
 	// Phase transitions:
@@ -88,6 +86,10 @@ function Root( {
 	//   idle ──> closing ──> idle
 	//           (cancel/     (animation
 	//            escape)      complete)
+	//
+	//   closing ──> idle
+	//               (onOpenChange
+	//                cancels close)
 	//
 	// `showSpinner` tracks whether the confirm button shows a loading
 	// indicator. It is orthogonal to `phase`:
@@ -118,16 +120,14 @@ function Root( {
 	// dismiss+reopen cycle is silently discarded.
 	const confirmIdRef = useRef( 0 );
 
-	const effectiveOpen = openProp ?? internalOpen;
-
 	// Safety net: if the consumer keeps `open={true}` after a confirm
 	// (i.e. does not react to `onOpenChange`), the phase would be stuck
 	// at 'closing'. Detect the contradiction and reset to idle.
 	useEffect( () => {
-		if ( effectiveOpen && lifecycleState.phase === 'closing' ) {
+		if ( openProp && lifecycleState.phase === 'closing' ) {
 			lifecycle.update( { phase: 'idle', showSpinner: false } );
 		}
-	}, [ effectiveOpen, lifecycle, lifecycleState.phase ] );
+	}, [ openProp, lifecycle, lifecycleState.phase ] );
 
 	const handleOpenChange = useCallback(
 		(
@@ -136,15 +136,19 @@ function Root( {
 		) => {
 			// Block dismiss while a confirm action is pending.
 			if ( ! nextOpen && lifecycle.getValue().phase === 'pending' ) {
+				eventDetails.cancel();
 				return;
 			}
 
-			if ( ! nextOpen && lifecycle.getValue().phase === 'idle' ) {
-				lifecycle.update( { phase: 'closing' } );
-			}
-
-			setInternalOpen( nextOpen );
 			onOpenChange?.( nextOpen, eventDetails );
+
+			if ( ! nextOpen ) {
+				lifecycle.update(
+					eventDetails.isCanceled
+						? { phase: 'idle', showSpinner: false }
+						: { phase: 'closing' }
+				);
+			}
 		},
 		[ lifecycle, onOpenChange ]
 	);
@@ -230,7 +234,7 @@ function Root( {
 
 	return (
 		<_AlertDialog.Root
-			open={ effectiveOpen }
+			open={ openProp }
 			defaultOpen={ defaultOpen }
 			onOpenChange={ handleOpenChange }
 			onOpenChangeComplete={ handleOpenChangeComplete }
