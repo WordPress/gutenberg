@@ -6,6 +6,10 @@
 
 -   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
 
+### Bug Fixes
+
+-   Validate registered direct-parent relationships for structural block wrapping ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements
