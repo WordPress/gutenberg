@@ -36,9 +36,12 @@ const consumer = path.join( directory, 'consumer' );
 mkdirSync( consumer );
 const env = {
 	...process.env,
-	PATH: `${ path.dirname( values.node ) }${ path.delimiter }${
-		process.env.PATH
-	}`,
+	PATH:
+		values.node === process.execPath
+			? process.env.PATH
+			: `${ path.dirname( values.node ) }${ path.delimiter }${
+					process.env.PATH
+				}`,
 	CI: 'true',
 	NO_COLOR: '1',
 };
