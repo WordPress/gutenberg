@@ -227,6 +227,21 @@ export function createWordpressExternalsPlugin(
 		return {
 			name: 'wordpress-externals',
 
+			/*
+			 * The dependencies found so far, for a build that writes its own
+			 * asset data instead of an `.asset.php` file.
+			 */
+			api: {
+				getDependencies: () => ( {
+					dependencies: [
+						...new Set( [ ...dependencies, ...extraDependencies ] ),
+					].sort(),
+					moduleDependencies: [ ...moduleDependencies.entries() ]
+						.sort( ( [ a ], [ b ] ) => a.localeCompare( b ) )
+						.map( ( [ id, kind ] ) => ( { id, import: kind } ) ),
+				} ),
+			},
+
 			outputOptions( options ) {
 				if ( buildFormat !== 'iife' ) {
 					return null;

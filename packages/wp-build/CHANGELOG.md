@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental `wp-build-shared` command, which builds the libraries listed in a package's `wpSharedModules` once, as script modules pruned to a committed export list, and writes their dependencies and version to `modules.php`.
+
 ### Enhancements
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).

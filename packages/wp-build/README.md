@@ -462,6 +462,49 @@ This configuration:
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
 
+## Shared script modules (Experimental)
+
+Every route, script module and widget that wp-build bundles carries its own copy of each library that isn't a WordPress script, such as `@wordpress/ui` or `@wordpress/dataviews`. A plugin with several of them ships the same library several times. The `wp-build-shared` command builds a list of libraries once, as script modules that every bundle can import instead.
+
+List the libraries in the `wpSharedModules` field of the providing package's `package.json`:
+
+```json
+{
+	"wpSharedModules": {
+		"namespace": "my-plugin-shared",
+		"outdir": "build/shared-modules",
+		"modules": {
+			"@wordpress/ui": "ui",
+			"@wordpress/dataviews": "dataviews"
+		},
+		"styles": {
+			"dataviews": [ "@wordpress/dataviews/build-style/style.css" ]
+		},
+		"exports": "shared-modules-exports.json",
+		"consumers": [ "../*/build/routes/*/*.min.js" ]
+	}
+}
+```
+
+- `namespace`: Each library becomes the script module `@<namespace>/<name>`, for example `@my-plugin-shared/ui`.
+- `outdir`: Output directory, relative to the package. Defaults to `build/shared-modules`.
+- `modules`: The bare specifier and module name of each library.
+- `styles`: Stylesheets a module imports when it loads, keyed by module name. Use this for a library whose stylesheet its consumers would otherwise each import.
+- `exports`: The JSON file listing the names each module exports. A module exports only these names, so its size depends on what the consumers use, not on which of them were built first. Commit this file.
+- `consumers`: Globs matching the built bundles that import the modules, for `--update-exports`.
+
+Run `wp-build-shared` in the package directory. It writes a minified module per listed library, the chunks they share, and `modules.php`:
+
+```php
+<?php return array( 'modules' => array( '@my-plugin-shared/ui' => 'ui.min.js', '@my-plugin-shared/dataviews' => 'dataviews.min.js' ), 'dependencies' => array('react', 'wp-i18n'), 'module_dependencies' => array(array('id' => '@wordpress/a11y', 'import' => 'static')), 'version' => '…' );
+```
+
+`dependencies` and `module_dependencies` cover all of the modules together, and `version` is a hash of every output file. Register each module with `wp_register_script_module()`, and the scripts in `dependencies` as dependencies of whatever loads the modules.
+
+Run `wp-build-shared --update-exports` after building the consumers to add the names they import to the export list before building. It only adds names, since a plugin that bundles an older copy may still import one. Remove a name by editing the file.
+
+The build bundles one copy of each package version. Package managers install a package once per set of peer dependencies (pnpm and npm's linked strategy) or once per conflicting parent (npm's nested installs), and two copies of a library split its React contexts and data stores. When the output holds more than one copy of a version, the build bundles again, reading every copy from the first directory by name, and fails if copies remain.
+
 ## SVG imports
 
 SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:

@@ -38,7 +38,8 @@
 		"./package.json": "./package.json"
 	},
 	"bin": {
-		"wp-build": "./lib/build.mjs"
+		"wp-build": "./lib/build.mjs",
+		"wp-build-shared": "./lib/build-shared.mjs"
 	},
 	"dependencies": {
 		"@wordpress/browserslist-config": "file:../browserslist-config",
