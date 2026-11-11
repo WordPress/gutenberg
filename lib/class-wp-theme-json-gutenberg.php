@@ -2341,7 +2341,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Returns the data the active theme declares about its templates.
 	 *
-	 * A template names the template it is rendered inside, whose post content
+	 * A template names the template it is rendered inside, whose Template Slot
 	 * block is where it renders, so that a header and a footer live in one
 	 * template instead of being repeated in every one.
 	 *
