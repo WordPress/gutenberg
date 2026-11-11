@@ -72,6 +72,7 @@ function isSameValidity( a?: Validity, b?: Validity ) {
  * validity state is read from the element returned by `getValidityTarget`.
  * The validation message describes the element returned by
  * `getInteractiveTarget`, or the validity target by default.
+ *
  * Validation messages become visible once the control has been touched, when
  * the enclosing form is submitted, or when an `invalid` event is dispatched on
  * the validity target. A blur counts as a touch unless it leaves a required

@@ -32,11 +32,6 @@ export default meta;
 
 type Story = StoryObj< typeof ValidatedInputControl >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * form is submitted. Leaving the control empty doesn't report the missing
- * value on blur.
- */
 export const Default: Story = {
 	args: {
 		label: 'Text',
