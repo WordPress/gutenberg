@@ -702,7 +702,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 		setupMockCanvas();
 
 		// A zoom of 1.0005 frames all but a hair of the image. `getOutputSize`
-		// reports the full size because the mapper saves no crop that close
+		// reports the full size because `getImageEdit` omits a crop that close
 		// to the frame, and the export has to match what a consumer read.
 		const state = createTestState( {
 			rotation: 0,
@@ -735,7 +735,7 @@ describe( 'renderToCanvas — export matrix verification', () => {
 	it( 'keeps unit scale and centres the image for a fine rotation too near full to crop', () => {
 		setupMockCanvas();
 
-		// At 0.01 degrees the full-frame crop is still within the mapper's
+		// At 0.01 degrees the full-frame crop is still within `getImageEdit`'s
 		// tolerance, so the output is the image's rotated bounds. Mapping the
 		// crop frame onto those bounds would scale X and Y by different
 		// amounts; the image has to be drawn at 1:1 and only turned.

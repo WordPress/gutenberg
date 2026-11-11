@@ -79,6 +79,30 @@ export function convertLegacyBlockNameAndAttributes(
 		newAttributes.legacy = true;
 	}
 
+	// Copy the legacy Cover minimum height to the block support, since templates
+	// skip deprecations. Keep the legacy attributes for deprecations.
+	if ( name === 'core/cover' && attributes.minHeight ) {
+		const coverStyle = ( newAttributes.style ?? {} ) as Record<
+			string,
+			unknown
+		>;
+		const dimensions = ( coverStyle.dimensions ?? {} ) as Record<
+			string,
+			unknown
+		>;
+		if ( ! dimensions.minHeight ) {
+			newAttributes.style = {
+				...coverStyle,
+				dimensions: {
+					...dimensions,
+					minHeight: `${ attributes.minHeight }${
+						attributes.minHeightUnit || 'px'
+					}`,
+				},
+			};
+		}
+	}
+
 	// Column count was stored as a string from WP 6.3-6.6. Convert it to a number.
 	const layout = attributes.layout as Record< string, unknown > | undefined;
 	if ( layout?.type === 'grid' && typeof layout?.columnCount === 'string' ) {
