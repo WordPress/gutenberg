@@ -30,6 +30,7 @@ const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes, name } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
+	const [ url, setURL ] = useState( attributes.feedURL );
 
 	const {
 		blockLayout,
@@ -38,7 +39,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		displayDate,
 		displayExcerpt,
 		excerptLength,
-		feedURL,
 		itemsToShow,
 		openInNewTab,
 		rel,
@@ -57,8 +57,8 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 	function onSubmitURL( event ) {
 		event.preventDefault();
 
-		if ( feedURL ) {
-			setAttributes( { feedURL: prependHTTPS( feedURL ) } );
+		if ( url ) {
+			setAttributes( { feedURL: prependHTTPS( url ) } );
 			setIsEditing( false );
 		}
 	}
@@ -93,10 +93,8 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							type="url"
 							hideLabelFromVision
 							placeholder={ __( 'Enter URL here…' ) }
-							value={ feedURL }
-							onChange={ ( value ) =>
-								setAttributes( { feedURL: value } )
-							}
+							value={ url }
+							onChange={ ( value ) => setURL( value ) }
 							className="wp-block-rss__placeholder-input"
 						/>
 						<Button
