@@ -276,46 +276,46 @@ function InlineUI( {
 							/>
 						</Autocomplete.InputGroup>
 					</div>
-					{ /*
-					 * The arrow keys in the search field drive the grid, so keep
-					 * its scroller out of the Tab order. Browsers would otherwise
-					 * make it a Tab stop, since none of the cells are tabbable.
-					 */ }
-					<div
-						className="format-library-special-characters__viewport"
-						tabIndex={ -1 }
-					>
+					<div className="format-library-special-characters__results">
 						<Autocomplete.Empty>
 							{ __( 'No characters found.' ) }
 						</Autocomplete.Empty>
 						<Autocomplete.List
 							aria-label={ __( 'Characters' ) }
-							className={
-								isSearching
-									? 'format-library-special-characters__list is-searching'
-									: 'format-library-special-characters__list'
-							}
+							className="format-library-special-characters__list"
 						>
-							{ isSearching
-								? renderRows(
+							<Autocomplete.ListBody
+								className={
+									isSearching
+										? 'format-library-special-characters__list-body is-searching'
+										: 'format-library-special-characters__list-body'
+								}
+							>
+								{ isSearching ? (
+									renderRows(
 										items as CharacterOption[],
 										__( 'Search results' )
 									)
-								: ( group: CharacterOptionGroup ) => (
-										<Autocomplete.Group
-											key={ group.key }
-											items={ group.items }
-											className="format-library-special-characters__group"
-										>
-											<Autocomplete.GroupLabel className="format-library-special-characters__group-label">
-												{ group.label }
-											</Autocomplete.GroupLabel>
-											{ renderRows(
-												group.items,
-												group.label
-											) }
-										</Autocomplete.Group>
-									) }
+								) : (
+									<Autocomplete.Collection>
+										{ ( group: CharacterOptionGroup ) => (
+											<Autocomplete.Group
+												key={ group.key }
+												items={ group.items }
+												className="format-library-special-characters__group"
+											>
+												<Autocomplete.GroupLabel>
+													{ group.label }
+												</Autocomplete.GroupLabel>
+												{ renderRows(
+													group.items,
+													group.label
+												) }
+											</Autocomplete.Group>
+										) }
+									</Autocomplete.Collection>
+								) }
+							</Autocomplete.ListBody>
 						</Autocomplete.List>
 					</div>
 					{ /* A sighted-user aid only: each cell's accessible name

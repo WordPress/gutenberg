@@ -15,11 +15,23 @@
 	contain: inline-size;
 }
 
-.format-library-special-characters__viewport {
+.format-library-special-characters__results {
 	// A fixed height, so the popover keeps one size as search results change
 	// and does not jump when it opens above the text.
+	display: flex;
+	flex-direction: column;
 	height: 260px;
-	overflow: auto;
+}
+
+// Fills what the empty message leaves, so the list body scrolls.
+.format-library-special-characters__list {
+	flex: 1;
+	min-height: 0;
+}
+
+// The list's scroller, which also pins each section heading while its rows
+// scroll.
+.format-library-special-characters__list-body {
 	// Reserve room for a classic scrollbar, so the popover keeps its width
 	// when search results stop overflowing.
 	scrollbar-gutter: stable;
@@ -27,35 +39,25 @@
 	// grid still starts at the search field's edge.
 	margin-inline-end: calc(-1 * var(--special-characters-padding));
 	padding-inline-end: var(--special-characters-padding);
-	// A keyboard-scrolled cell stays clear of the sticky section heading.
-	scroll-padding-block: var(--wpds-dimension-size-sm) 0;
-}
-
-// Hold the grid's width even while it is empty (no search results), so the
-// popup doesn't resize and reposition.
-.format-library-special-characters__list {
-	min-inline-size: var(--special-characters-grid-width);
 	padding-block-end: var(--wpds-dimension-padding-sm);
 
 	// Search results have no heading, so space them from the field instead.
 	&.is-searching {
 		padding-block-start: var(--wpds-dimension-padding-sm);
 	}
+
+	// Hold the grid's width while there are no search results, so the
+	// popover doesn't resize and reposition. As content, unlike a minimum
+	// width, it keeps a classic scrollbar's gutter in the popover's width.
+	&:empty::before {
+		content: "";
+		display: block;
+		inline-size: var(--special-characters-grid-width);
+	}
 }
 
 .format-library-special-characters__group + .format-library-special-characters__group {
 	margin-block-start: var(--wpds-dimension-gap-md);
-}
-
-// Pinned while its section scrolls beneath it.
-.format-library-special-characters__group-label {
-	position: sticky;
-	top: 0;
-	z-index: 1;
-	// Rows scroll behind it, so match the popup surface.
-	background-color: var(--wpds-color-background-surface-neutral-strong);
-	// Align the heading with the grid's first column.
-	padding-inline: 0;
 }
 
 .format-library-special-characters__row {
