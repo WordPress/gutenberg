@@ -1,4 +1,4 @@
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, switchToBlockType } from '@wordpress/blocks';
 import type { ComponentProps, ReactElement } from 'react';
 import type {
 	BlockTypeIconDescriptor,
@@ -10,9 +10,12 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, VisuallyHidden } from '@wordpress/ui';
-import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	VisuallyHidden,
+} from '@wordpress/ui';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
@@ -161,7 +164,9 @@ function VariationsToggleGroupControl( {
 function BlockVariationTransforms( {
 	blockClientId,
 }: BlockVariationTransformsProps ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const { replaceBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
 		variations,
@@ -224,6 +229,15 @@ function BlockVariationTransforms( {
 	}, [ variations ] );
 
 	const onSelectVariation = ( variationName: string ) => {
+		const block = registry
+			.select( blockEditorStore )
+			.getBlock( blockClientId );
+		const transformedBlocks =
+			block && switchToBlockType( block, block.name, variationName );
+		if ( transformedBlocks ) {
+			replaceBlocks( blockClientId, transformedBlocks, undefined, null );
+			return;
+		}
 		updateBlockAttributes( blockClientId, {
 			// The selected variation is one of the listed ones.
 			...( variations as BlockVariation[] ).find(

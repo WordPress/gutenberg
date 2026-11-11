@@ -124,19 +124,10 @@ function NavigationListView( {
 		context: 'list',
 	} );
 
-	const actions: Action< Post >[] = useMemo( () => {
-		return [
-			editAction,
-			...( postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					// Skip revisions as Gutenberg does not support it in this context
-					case 'view-post-revisions':
-						return [];
-				}
-				return [ action ];
-			} ) ?? [] ),
-		];
-	}, [ editAction, postTypeActions ] );
+	const actions: Action< Post >[] = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ editAction, postTypeActions ]
+	);
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];

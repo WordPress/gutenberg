@@ -1,11 +1,16 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner as WCSpinner, Popover } from '@wordpress/components';
+import {
+	Spinner as WCSpinner,
+	Popover as WCPopover,
+} from '@wordpress/components';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import {
 	useContext,
 	useEffect,
 	useId,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -316,10 +321,32 @@ function ViewTable< Item >( {
 	const tableSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkSelectionRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
+	// Place the bulk actions toolbar over the header by writing to the DOM
+	// directly: it is correct on first paint and skips a re-render. The sticky
+	// offset is copied so the toolbar follows a header that consumers move.
+	const syncBulkActionsPosition = () => {
+		const header = tableHeaderRef.current;
+		const overlay = bulkActionsRef.current;
+		const win = header?.ownerDocument.defaultView;
+		if ( header && overlay && win ) {
+			overlay.style.setProperty(
+				'--wp-dataviews-table-header-height',
+				`${ header.getBoundingClientRect().height }px`
+			);
+			overlay.style.insetBlockStart =
+				win.getComputedStyle( header ).insetBlockStart;
+		}
+	};
+	const resizeHeaderRef = useResizeObserver< HTMLTableSectionElement >(
+		syncBulkActionsPosition
+	);
+	const tableHeaderRefs = useMergeRefs( [ tableHeaderRef, resizeHeaderRef ] );
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const showBulkActions =
 		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
+	// The resize observer reports after the first paint, so measure on show.
+	useLayoutEffect( syncBulkActionsPosition, [ showBulkActions ] );
 	const hadSelectionRef = useRef( false );
 	useEffect( () => {
 		const tableHead = tableHeaderRef.current;
@@ -453,6 +480,25 @@ function ViewTable< Item >( {
 
 	return (
 		<>
+			{ ( hasBulkActions || isActionInProgress ) && (
+				<div
+					className={ clsx(
+						'dataviews-view-table__bulk-actions-overlay',
+						{
+							'is-refreshing':
+								! isInfiniteScroll && isDelayedLoading,
+						}
+					) }
+					ref={ bulkActionsRef }
+					hidden={ ! showBulkActions }
+					inert={ inertValue( !! isLoading ) }
+				>
+					<BulkActionToolbar
+						onActionInProgressChange={ setIsActionInProgress }
+						selectionCheckboxRef={ bulkSelectionRef }
+					/>
+				</div>
+			) }
 			<table
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
@@ -495,16 +541,16 @@ function ViewTable< Item >( {
 					) }
 				</colgroup>
 				{ contextMenuAnchor && (
-					<Popover
+					<WCPopover
 						anchor={ contextMenuAnchor }
 						onClose={ () => setContextMenuAnchor( null ) }
 						placement="bottom-start"
 					>
 						<PropertiesSection showLabel={ false } />
-					</Popover>
+					</WCPopover>
 				) }
 				<thead
-					ref={ tableHeaderRef }
+					ref={ tableHeaderRefs }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
 							isVerticallyScrolled,
@@ -640,29 +686,6 @@ function ViewTable< Item >( {
 							</th>
 						) }
 					</tr>
-					{ ( hasBulkActions || isActionInProgress ) && (
-						<tr
-							className="dataviews-view-table__bulk-actions-row"
-							hidden={ ! showBulkActions }
-						>
-							<td colSpan={ columnCount }>
-								<div
-									className="dataviews-view-table__bulk-actions-overlay"
-									ref={ bulkActionsRef }
-									inert={ inertValue( !! isLoading ) }
-								>
-									<BulkActionToolbar
-										onActionInProgressChange={
-											setIsActionInProgress
-										}
-										selectionCheckboxRef={
-											bulkSelectionRef
-										}
-									/>
-								</div>
-							</td>
-						</tr>
-					) }
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (

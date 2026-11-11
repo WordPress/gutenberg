@@ -60,7 +60,7 @@ add_action( 'wp_entity_actions_api_init', function () {
 		array(
 			array_merge(
 				$removed[0],
-				array( 'label' => __( 'Move to the bin…', 'acme' ) )
+				array( 'label' => __( 'Move to the bin', 'acme' ) )
 			),
 		),
 		'@wordpress/core-actions/post_type_supports'

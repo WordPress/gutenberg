@@ -1,17 +1,26 @@
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox and Menu, pending WordPress/gutenberg#76135.
-import { Checkbox, Field, Menu, Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button, pending WordPress/gutenberg#76135.
+	Button,
+	Checkbox,
+	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton, pending WordPress/gutenberg#76135.
+	IconButton,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import getActionLabel from '../../utils/get-action-label';
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -138,23 +147,18 @@ function ActionTrigger< Item >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
-	const isMobile = useViewportMatch( 'medium', '<' );
+	const label = getActionLabel( action, items );
 
 	return (
 		<Button
-			variant="secondary"
-			className="dataviews-bulk-actions__action"
-			disabled={ !! action.disabled || isBusy }
-			accessibleWhenDisabled
-			label={ isMobile ? label : undefined }
-			icon={ isMobile ? action.icon : undefined }
+			variant="outline"
+			tone="neutral"
 			size="compact"
+			disabled={ !! action.disabled || isBusy }
+			loading={ isBusy }
 			onClick={ onClick }
-			isBusy={ isBusy }
 		>
-			{ ! isMobile && label }
+			{ label }
 		</Button>
 	);
 }
@@ -186,9 +190,7 @@ function ActionButton< Item >( {
 				disabled={ !! action.disabled || isBusy }
 			>
 				<Menu.ItemLabel>
-					{ typeof action.label === 'string'
-						? action.label
-						: action.label( selectedEligibleItems ) }
+					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }
 				</Menu.ItemLabel>
 			</Menu.Item>
 		);
@@ -219,15 +221,15 @@ function renderBulkActionsContent< Item >(
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
 	const clearSelection = selectedItems.length > 0 && (
-		<Button
+		<IconButton
 			className="dataviews-bulk-actions__clear"
-			icon={ closeSmall }
-			showTooltip
-			tooltipPosition="top"
+			variant="minimal"
+			tone="neutral"
 			size="compact"
+			icon={ closeSmall }
 			label={ __( 'Cancel' ) }
 			disabled={ !! actionInProgress }
-			accessibleWhenDisabled={ false }
+			focusableWhenDisabled={ false }
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
 		/>
 	);
@@ -278,7 +280,12 @@ function renderBulkActionsContent< Item >(
 					) }
 				</span>
 			) }
-			<Stack direction="row" gap="md" justify="start">
+			<Stack
+				direction="row"
+				className="dataviews-bulk-actions__actions"
+				gap="md"
+				justify="start"
+			>
 				{ isMobile
 					? actionsToShow.length > 0 && (
 							<Menu.Root>
@@ -286,15 +293,13 @@ function renderBulkActionsContent< Item >(
 									disabled={ !! actionInProgress }
 									render={
 										<Button
-											variant="secondary"
+											variant="outline"
+											tone="neutral"
 											size="compact"
-											icon={ chevronDown }
-											iconPosition="right"
-											className="dataviews-bulk-actions__action"
-											isBusy={ !! actionInProgress }
-											accessibleWhenDisabled
+											loading={ !! actionInProgress }
 										>
 											{ __( 'Actions' ) }
+											<Button.Icon icon={ chevronDown } />
 										</Button>
 									}
 								/>

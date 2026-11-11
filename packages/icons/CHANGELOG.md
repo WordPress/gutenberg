@@ -2,9 +2,63 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Remove the `copySmall` and `pinSmall` icons. Their full-size counterparts `copy` and `pin` have been optically rebalanced, so a bespoke small drawing is no longer needed ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
+-   Remove the `cautionFilled`, `helpFilled` and `plusCircleFilled` icons in favour of `caution`, `help` and `plusCircle`, which are drawn entirely in strokes and can therefore be stroke-weight balanced for their context ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
+-   Remove the `cancelCircleFilled` icon. It has no stroke-drawn counterpart; use `close` where a cancel affordance is needed ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
+-   Remove the `bellUnread` icon. Compose an unread indicator from the `bell` icon and a separately positioned dot instead, so the dot can be separated from the bell with a ring in the surrounding surface colour ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
+-   Redraw `copy` on the footprint the removed `copySmall` occupied, so it sits lighter in the dense contexts that icon served, such as the link preview and the post URL field ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
+
+### Enhancements
+
+-   `formatItalic`: Adds serifs to the italic icon for legibility ([#86561](https://github.com/WordPress/gutenberg/pull/86561)).
+-   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `wordCount`: redraw the number sign to match `postCommentsCount` ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+-   `customPostType`: draw the asterisk with six spokes, matching the one in [#85442](https://github.com/WordPress/gutenberg/pull/85442) ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
+
+### Bug Fixes
+
+-   `cover`: Redraw the icon on the frame the other container icons share, such as `image` and `caption`, correcting a footprint that read a size larger than its neighbors, and align the bookmark with the top edge of that frame ([#86420](https://github.com/WordPress/gutenberg/pull/86420)).
+
 ### Internal
 
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 -   Add a `normalize-export` script that rewrites a design-tool SVG export into the shape this package expects ([#85272](https://github.com/WordPress/gutenberg/pull/85272)).
+
+## 20.0.0 (2026-11-04)
+
+### Breaking Changes
+
+-   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
+-   Remove the `lockSmall` icon. Use `lock`, which is stroke-drawn and can therefore be scaled down for the dense contexts `lockSmall` served, such as the list view ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
+-   Remove the `insertBefore` and `insertAfter` icons. These were old Dashicons that were never used; use `create` or `plus` instead ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+-   Remove the `offline` icon. It was added in error for a React Native client that is no longer used, so it has no direct replacement; `info` or `error` can stand in ([#85445](https://github.com/WordPress/gutenberg/pull/85445)).
+
+### New Features
+
+-   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
+-   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+
+### Enhancements
+
+-   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
+-   `manifest.json`: Add 39 icons from the `core` collection to the `core-admin` collection, so the admin interface can render them in place of the Dashicons they replace ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
+-   `manifest.json`: New `dashicons` property, listing the Dashicon class names a `core-admin` icon replaces. `manifest.php` includes it too ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
+
+### Bug Fixes
+
+-   `postComments`: restore the second speech bubble, which was lost when the icon was converted to a stroke drawing ([#85275](https://github.com/WordPress/gutenberg/pull/85275)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ## 19.0.0 (2026-10-20)
 

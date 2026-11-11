@@ -1,7 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { IconButton, Menu, Tooltip } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton.
+	IconButton,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Tooltip,
+} from '@wordpress/ui';
 
 export interface ActionsMenuItem {
 	label: string;

@@ -239,7 +239,9 @@ test.describe( 'Cover', () => {
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		await expect(
-			coverBlockEditorSettings.getByLabel( 'Minimum height' )
+			coverBlockEditorSettings.getByRole( 'spinbutton', {
+				name: 'Minimum height',
+			} )
 		).toHaveValue( '' );
 
 		// There is no accessible locator for the draggable block resize edge,
@@ -402,6 +404,7 @@ test.describe( 'Cover', () => {
 		).toBeVisible();
 
 		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
 
 		// The focal point picker is in the Settings tab of the block inspector.
 		await page.getByRole( 'tab', { name: 'Settings' } ).click();
