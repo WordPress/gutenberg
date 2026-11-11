@@ -61,9 +61,6 @@ function _gutenberg_connectors_load_screen(): void {
  * @access private
  */
 function _gutenberg_connectors_print_filesystem_credentials_modal(): void {
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-	require_once ABSPATH . 'wp-admin/includes/template.php';
-
 	wp_print_request_filesystem_credentials_modal();
 	wp_print_admin_notice_templates();
 }
