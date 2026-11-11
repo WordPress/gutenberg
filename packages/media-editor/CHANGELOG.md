@@ -8,10 +8,12 @@
 
 ### Bug Fixes
 
+-   Keyboard shortcuts modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Keep the fine-rotation ruler's ticks and labels visible when the browser forces dark colors ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
 
 ### Internal
 
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ## 0.22.0 (2026-11-04)

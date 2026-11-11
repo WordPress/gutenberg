@@ -607,7 +607,13 @@
 										"vmax",
 										"svmax",
 										"lvmax",
-										"dvmax"
+										"dvmax",
+										"cqw",
+										"cqh",
+										"cqi",
+										"cqb",
+										"cqmin",
+										"cqmax"
 									],
 									"default": "rem"
 								}
@@ -2006,6 +2012,13 @@
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textWrap": {
+							"description": "Sets the `text-wrap` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
