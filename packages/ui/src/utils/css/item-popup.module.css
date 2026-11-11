@@ -280,8 +280,10 @@
 		/*
 		 * The named grid areas exist only in `.popup`, so inline parts follow
 		 * the layout they are placed in. `:where()` keeps the specificity.
+		 * Empty shares main with the list.
 		 */
-		:where(.popup) .list-chrome {
+		:where(.popup) .list-chrome,
+		:where(.popup) .empty:not(:empty) {
 			grid-area: main;
 		}
 
@@ -289,12 +291,8 @@
 			grid-area: status;
 		}
 
-		/* Empty shares main with the list. A VisuallyHidden child still makes
-		   Status :not(:empty). Chrome only when it would not cover the list. */
-		:where(.popup) .empty:not(:empty) {
-			grid-area: main;
-		}
-
+		/* A VisuallyHidden child still makes Status :not(:empty). Chrome only
+		   when it would not cover the list. */
 		.empty:not(:empty),
 		.status:not(:empty):not(:has([data-visually-hidden], .loading-indicator)) {
 			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-md);
