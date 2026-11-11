@@ -53,6 +53,14 @@ function Layout() {
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	/*
+	 * The canvas is rendered from a single place in the tree at every viewport
+	 * width. Rendering it from the mobile layout instead would re-parent it
+	 * when the viewport crosses the breakpoint, remounting the editor and
+	 * reloading its iframe. See https://github.com/WordPress/gutenberg/issues/63750.
+	 */
+	const showCanvas =
+		!! areas.preview && ( ! isMobileViewport || canvas === 'edit' );
 	const mobileToggleRef = useRef();
 	const sidebarRegionRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -157,60 +165,46 @@ function Layout() {
 					<SnackbarNotices className="edit-site-layout__snackbar" />
 					<UploadProgressSnackbar />
 
-					{ isMobileViewport && hasMobileAreas && (
-						<div className="edit-site-layout__mobile">
-							<SidebarNavigationProvider>
-								{ canvas !== 'edit' ? (
-									<>
-										{ showMobileSiteHub && (
-											<SiteHubMobile
-												ref={ mobileToggleRef }
-											/>
-										) }
-										{ areas.mobileContent ? (
-											/*
-											 * ThemeProvider wraps SidebarContent (rather than
-											 * just the content) so the scroll wrapper it renders
-											 * inherits the content background tokens. See
-											 * `.edit-site-sidebar__screen-wrapper` in style.scss.
-											 */
-											<ThemeProvider
-												color={ CONTENT_COLOR }
-											>
-												<SidebarContent
-													routeKey={ routeKey }
-												>
-													<div className="edit-site-layout__mobile-content">
-														<ErrorBoundary>
-															{
-																areas.mobileContent
-															}
-														</ErrorBoundary>
-													</div>
-												</SidebarContent>
-											</ThemeProvider>
-										) : (
+					{ isMobileViewport &&
+						hasMobileAreas &&
+						canvas !== 'edit' && (
+							<div className="edit-site-layout__mobile">
+								<SidebarNavigationProvider>
+									{ showMobileSiteHub && (
+										<SiteHubMobile
+											ref={ mobileToggleRef }
+										/>
+									) }
+									{ areas.mobileContent ? (
+										/*
+										 * ThemeProvider wraps SidebarContent (rather than
+										 * just the content) so the scroll wrapper it renders
+										 * inherits the content background tokens. See
+										 * `.edit-site-sidebar__screen-wrapper` in style.scss.
+										 */
+										<ThemeProvider color={ CONTENT_COLOR }>
 											<SidebarContent
 												routeKey={ routeKey }
 											>
-												<ErrorBoundary>
-													{ areas.mobileSidebar }
-												</ErrorBoundary>
+												<div className="edit-site-layout__mobile-content">
+													<ErrorBoundary>
+														{ areas.mobileContent }
+													</ErrorBoundary>
+												</div>
 											</SidebarContent>
-										) }
-										<SaveHub />
-										<SavePanel />
-									</>
-								) : (
-									<ThemeProvider color={ CONTENT_COLOR }>
-										<ErrorBoundary>
-											{ areas.preview }
-										</ErrorBoundary>
-									</ThemeProvider>
-								) }
-							</SidebarNavigationProvider>
-						</div>
-					) }
+										</ThemeProvider>
+									) : (
+										<SidebarContent routeKey={ routeKey }>
+											<ErrorBoundary>
+												{ areas.mobileSidebar }
+											</ErrorBoundary>
+										</SidebarContent>
+									) }
+									<SaveHub />
+									<SavePanel />
+								</SidebarNavigationProvider>
+							</div>
+						) }
 
 					{ ! isMobileViewport &&
 						areas.content &&
@@ -242,7 +236,7 @@ function Layout() {
 						</div>
 					) }
 
-					{ ! isMobileViewport && areas.preview && (
+					{ showCanvas && (
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (
