@@ -6,14 +6,23 @@
  *
  * Usage:
  *
- *     node e2e-trunk-check.js <pull request commit>
+ *     npm run test:e2e:trunk -- <pull request commit>
  *
  * A failing test is the expected result, so test results never fail this
  * script; only a setup that runs no test does. Set `PLAYWRIGHT_JSON_OUTPUT_FILE` to where Playwright writes results.
  */
 
-const { execFileSync } = require( 'node:child_process' );
-const { readFileSync } = require( 'node:fs' );
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type {
+	JSONReport,
+	JSONReportSpec,
+	JSONReportSuite,
+} from '@playwright/test/reporter';
+
+// npm runs workspace scripts from test/e2e, but git and report paths use the repository root.
+process.chdir( resolve( import.meta.dirname, '../../..' ) );
 
 const SPECS = 'test/e2e/specs/';
 const [ pullRequestCommit ] = process.argv.slice( 2 );
@@ -22,9 +31,9 @@ const [ pullRequestCommit ] = process.argv.slice( 2 );
  * Runs Playwright in Chromium and reads back its tests.
  *
  * @param {string[]} args Playwright arguments.
- * @return {Object[]} Each test, with its file relative to the repository.
+ * @return {JSONReportSpec[]} Each test, with its file relative to the repository.
  */
-function playwright( args ) {
+function playwright( args: string[] ) {
 	try {
 		execFileSync(
 			'npm',
@@ -44,24 +53,26 @@ function playwright( args ) {
 	} catch {
 		// Playwright exits with an error when a test fails.
 	}
-	const specsOf = ( suite ) => [
+	const specsOf = ( suite: JSONReportSuite ): JSONReportSpec[] => [
 		...( suite.specs ?? [] ),
 		...( suite.suites ?? [] ).flatMap( specsOf ),
 	];
-	const report = JSON.parse(
-		readFileSync( process.env.PLAYWRIGHT_JSON_OUTPUT_FILE, 'utf8' )
-	);
+	const reportPath = process.env.PLAYWRIGHT_JSON_OUTPUT_FILE;
+	if ( ! reportPath ) {
+		throw new Error( 'PLAYWRIGHT_JSON_OUTPUT_FILE must be set.' );
+	}
+	const report: JSONReport = JSON.parse( readFileSync( reportPath, 'utf8' ) );
 	return report.suites
 		.flatMap( specsOf )
 		.map( ( spec ) => ( { ...spec, file: SPECS + spec.file } ) );
 }
 
 // Playwright takes paths relative to its own directory.
-const relative = ( path ) => path.replace( 'test/e2e/', '' );
+const relative = ( path: string ) => path.replace( 'test/e2e/', '' );
 
 // The lines the pull request adds or changes, per file.
-const changed = {};
-let file;
+const changed: Record< string, number[] > = {};
+let file = '';
 const diff = execFileSync( 'git', [
 	'diff',
 	'-U0',
@@ -73,7 +84,7 @@ const diff = execFileSync( 'git', [
 for ( const line of diff.split( '\n' ) ) {
 	file = line.startsWith( '+++ b/' ) ? line.slice( 6 ) : file;
 	const hunk = line.match( /^@@ .* \+(\d+)(?:,(\d+))? @@/ );
-	for ( let i = 0; hunk && i < ( hunk[ 2 ] ?? 1 ); i++ ) {
+	for ( let i = 0; hunk && i < Number( hunk[ 2 ] ?? 1 ); i++ ) {
 		( changed[ file ] ??= [] ).push( Number( hunk[ 1 ] ) + i );
 	}
 }
@@ -81,13 +92,13 @@ for ( const line of diff.split( '\n' ) ) {
 // A test changed when a changed line falls between its first line and its
 // closing brace, found by its indentation. Keep the first such line, which is
 // where the annotation goes.
-const tests = new Map();
+const tests = new Map< string, number >();
 for ( const spec of playwright( [
 	'--list',
 	...Object.keys( changed ).map( relative ),
 ] ) ) {
 	const source = readFileSync( spec.file, 'utf8' ).split( '\n' );
-	const indent = source[ spec.line - 1 ].match( /^\s*/ )[ 0 ];
+	const indent = source[ spec.line - 1 ].match( /^\s*/ )?.[ 0 ] ?? '';
 	const end = source.findIndex(
 		( text, i ) => i >= spec.line && text.startsWith( `${ indent }}` )
 	);
@@ -113,8 +124,8 @@ if ( tests.size ) {
 	if ( ! results.some( ( { status } ) => status ) ) {
 		throw new Error( 'No test ran on trunk.' );
 	}
-	const failing = results.filter( ( { status } ) =>
-		[ 'failed', 'timedOut' ].includes( status )
+	const failing = results.filter(
+		( { status } ) => status === 'failed' || status === 'timedOut'
 	);
 	for ( const { path, line } of failing ) {
 		console.log(
