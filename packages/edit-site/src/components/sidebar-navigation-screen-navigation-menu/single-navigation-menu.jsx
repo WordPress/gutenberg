@@ -63,8 +63,9 @@ export default function SingleNavigationMenu( {
 			) }
 			footer={
 				hasRevisions && (
+					// No `record`: the footer would use it to also link to
+					// revision.php, and this opens the editor's revisions view.
 					<SidebarNavigationScreenDetailsFooter
-						record={ navigationMenu }
 						revisionsCount={ revisionsCount }
 						onClick={ openRevisions }
 					/>
