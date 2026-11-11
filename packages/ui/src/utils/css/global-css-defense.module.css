@@ -74,6 +74,18 @@
 		line-height: var(--_gcd-input-line-height, inherit);
 		min-height: var(--_gcd-input-min-height, auto);
 	}
+
+	/* Untyped inputs only match the forms.css rules for read-only and disabled inputs. */
+	&:is(input):not([type]) {
+		&[readonly] {
+			background-color: var(--_gcd-input-background-color, transparent);
+		}
+
+		&:disabled {
+			background: var(--_gcd-input-background-disabled, transparent);
+			color: var(--_gcd-input-color-disabled, var(--wpds-color-foreground-interactive-neutral-disabled));
+		}
+	}
 }
 
 .textarea {
