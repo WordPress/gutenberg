@@ -58,7 +58,9 @@
 	&.is-drop-after::after {
 		content: "";
 		position: absolute;
-		inset-inline: 0;
+		// Indented to the level the dragged page lands at.
+		inset-inline-start: var(--wp-block-page-list-drop-indent, 0);
+		inset-inline-end: 0;
 		height: 2px;
 		background: var(--wp-admin-theme-color);
 	}

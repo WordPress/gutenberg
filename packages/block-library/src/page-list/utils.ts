@@ -31,6 +31,8 @@ export interface PageRow {
 export interface MenuOrderEdit {
 	id: number;
 	menu_order: number;
+	/** The page's new parent page ID, when it moves to another parent. */
+	parent?: number;
 }
 
 /**
@@ -182,4 +184,75 @@ export function getMenuOrderEdits(
 	return reordered.flatMap( ( page, index ) =>
 		page.menu_order === index ? [] : [ { id: page.id, menu_order: index } ]
 	);
+}
+
+/**
+ * Whether a page is another page, or one of its descendants.
+ *
+ * @param pagesByParentId Pages keyed by parent page ID.
+ * @param pageId          ID of the page that may be inside the other.
+ * @param ancestorId      ID of the other page.
+ * @return Whether the page is the other page or inside it.
+ */
+export function isPageOrDescendant(
+	pagesByParentId: Map< number, PageListPage[] >,
+	pageId: number,
+	ancestorId: number
+): boolean {
+	if ( pageId === ancestorId ) {
+		return true;
+	}
+	return ( pagesByParentId.get( ancestorId ) ?? [] ).some( ( child ) =>
+		isPageOrDescendant( pagesByParentId, pageId, child.id )
+	);
+}
+
+/**
+ * Works out the edits that move a page to a position under a parent, which
+ * may be its own parent or another. The pages at its new level are numbered
+ * from zero in their new order, only pages whose `menu_order` changes get an
+ * edit, and the moved page gets its new `parent` when that changes. A page
+ * moves with its child pages, so it can't go under itself or one of them.
+ *
+ * @param pagesByParentId Pages keyed by parent page ID.
+ * @param page            The page to move.
+ * @param parentId        ID of the parent to move it under, or 0.
+ * @param toIndex         Position among that parent's pages, counted
+ *                        without the moved page.
+ * @return Edits to apply.
+ */
+export function getMoveEdits(
+	pagesByParentId: Map< number, PageListPage[] >,
+	page: PageListPage,
+	parentId: number,
+	toIndex: number
+): MenuOrderEdit[] {
+	if ( isPageOrDescendant( pagesByParentId, parentId, page.id ) ) {
+		return [];
+	}
+	if ( parentId === page.parent ) {
+		return getMenuOrderEdits(
+			pagesByParentId.get( parentId ) ?? [],
+			page.id,
+			toIndex
+		);
+	}
+
+	const siblings = ( pagesByParentId.get( parentId ) ?? [] ).filter(
+		( { id } ) => id !== page.id
+	);
+	if ( toIndex < 0 || toIndex > siblings.length ) {
+		return [];
+	}
+	const reordered = [ ...siblings ];
+	reordered.splice( toIndex, 0, page );
+
+	return reordered.flatMap( ( sibling, index ) => {
+		if ( sibling.id === page.id ) {
+			return [ { id: page.id, menu_order: index, parent: parentId } ];
+		}
+		return sibling.menu_order === index
+			? []
+			: [ { id: sibling.id, menu_order: index } ];
+	} );
 }

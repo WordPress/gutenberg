@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { usePageListPages } from './use-page-list-pages';
 import PagesList from './pages-list';
 import styles from './pages-list.module.scss';
-import { getPageRows, getMenuOrderEdits, getPageTitle } from './utils';
+import { getPageRows, getMoveEdits, getPageTitle } from './utils';
 import type { PageRow } from './utils';
 
 const EMPTY_ARRAY: number[] = [];
@@ -121,31 +121,57 @@ export default function PageListPagesControl( {
 		} );
 	};
 
-	const movePage = ( row: PageRow, toIndex: number ) => {
-		const siblings = pagesByParentId.get( row.page.parent ) ?? [];
-		const edits = getMenuOrderEdits( siblings, row.page.id, toIndex );
+	// Moves a page to a position under a parent, which may be another level.
+	const movePage = ( row: PageRow, parentId: number, toIndex: number ) => {
+		const edits = getMoveEdits(
+			pagesByParentId,
+			row.page,
+			parentId,
+			toIndex
+		);
 		if ( ! edits.length ) {
 			return;
 		}
 		// The first edit opens an undo level and the rest are staged into it,
 		// so one undo puts every page back.
-		edits.forEach( ( { id, menu_order: menuOrder }, editIndex ) =>
+		edits.forEach( ( { id, menu_order: menuOrder, parent }, editIndex ) =>
 			editEntityRecord(
 				'postType',
 				'page',
 				id,
-				{ menu_order: menuOrder },
+				parent === undefined
+					? { menu_order: menuOrder }
+					: { menu_order: menuOrder, parent },
 				{ isCached: editIndex > 0 }
 			)
 		);
+		const title = getPageTitle( row.page );
+		if ( parentId === row.page.parent ) {
+			speak(
+				sprintf(
+					/* translators: 1: Page title. 2: New position. 3: Number of pages at that level. */
+					__( '%1$s moved to position %2$d of %3$d.' ),
+					title,
+					toIndex + 1,
+					pagesByParentId.get( parentId )?.length ?? 0
+				)
+			);
+			return;
+		}
+		const newParent = rows.find( ( { page } ) => page.id === parentId );
 		speak(
-			sprintf(
-				/* translators: 1: Page title. 2: New position. 3: Number of pages at that level. */
-				__( '%1$s moved to position %2$d of %3$d.' ),
-				getPageTitle( row.page ),
-				toIndex + 1,
-				siblings.length
-			)
+			newParent
+				? sprintf(
+						/* translators: 1: Page title. 2: Title of the page it was moved under. */
+						__( '%1$s moved under %2$s.' ),
+						title,
+						getPageTitle( newParent.page )
+					)
+				: sprintf(
+						/* translators: %s: Page title. */
+						__( '%s moved to the top level.' ),
+						title
+					)
 		);
 	};
 

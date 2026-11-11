@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { DragEvent } from 'react';
+import type { CSSProperties, DragEvent } from 'react';
 import {
 	Draggable,
 	DropdownMenu,
@@ -32,12 +32,15 @@ export const PAGE_DRAG_TYPE = 'wp-page-list-page';
 
 interface DragState {
 	pageId: number;
-	parentId: number;
+	/** The dragged page and its descendants, which it can't be dropped on. */
+	movingIds: Set< number >;
 }
 
 interface DropTarget {
 	pageId: number;
 	isAfter: boolean;
+	/** The level the dragged page lands at, for indenting the drop line. */
+	depth: number;
 }
 
 interface PagesListProps {
@@ -50,7 +53,11 @@ interface PagesListProps {
 	/** Called with a page ID to show or hide that page. */
 	onToggle: ( pageId: number ) => void;
 	/** Called with a row and the position to move its page to. */
-	onMove: ( row: PageRow, toIndex: number ) => void;
+	/**
+	 * Called with a row, the ID of the parent to move its page under (its
+	 * own, another page or the top level), and its position there.
+	 */
+	onMove: ( row: PageRow, parentId: number, toIndex: number ) => void;
 	/** Called with a row to add a link after its page, if links can be added. */
 	onAddLinkAfter?: ( ( row: PageRow ) => void ) | null;
 	/**
@@ -71,8 +78,14 @@ interface PageRowItemProps {
 	reorderHintId?: string;
 	handleRef: ( node: HTMLButtonElement | null ) => void;
 	onToggle: ( pageId: number ) => void;
-	onMove: ( row: PageRow, toIndex: number ) => void;
+	onMove: ( row: PageRow, parentId: number, toIndex: number ) => void;
 	onKeyboardMove: ( row: PageRow, toIndex: number ) => void;
+	/** The page this page is under, to move it out of, if any. */
+	parentRow?: PageRow;
+	/** The page before this one at its level, to move it under, if any. */
+	previousRow?: PageRow;
+	/** How many child pages `previousRow` has. */
+	previousRowChildCount: number;
 	onAddLinkAfter?: ( ( row: PageRow ) => void ) | null;
 	onDragStart: () => void;
 	onDragEnd: () => void;
@@ -120,6 +133,9 @@ function PageRowItem( {
 	onToggle,
 	onMove,
 	onKeyboardMove,
+	parentRow,
+	previousRow,
+	previousRowChildCount,
 	onAddLinkAfter,
 	onDragStart,
 	onDragEnd,
@@ -147,6 +163,15 @@ function PageRowItem( {
 						dropTarget?.isAfter,
 				}
 			) }
+			style={
+				dropTarget
+					? ( {
+							'--wp-block-page-list-drop-indent': `${
+								dropTarget.depth * 16
+							}px`,
+						} as CSSProperties )
+					: undefined
+			}
 			onDragOver={ onDragOver }
 			onDrop={ onDrop }
 		>
@@ -242,7 +267,11 @@ function PageRowItem( {
 										icon={ chevronUp }
 										disabled={ isFirst }
 										onClick={ () => {
-											onMove( row, index - 1 );
+											onMove(
+												row,
+												page.parent,
+												index - 1
+											);
 											onClose();
 										} }
 									>
@@ -252,12 +281,52 @@ function PageRowItem( {
 										icon={ chevronDown }
 										disabled={ isLast }
 										onClick={ () => {
-											onMove( row, index + 1 );
+											onMove(
+												row,
+												page.parent,
+												index + 1
+											);
 											onClose();
 										} }
 									>
 										{ __( 'Move down' ) }
 									</MenuItem>
+									{ parentRow && (
+										<MenuItem
+											onClick={ () => {
+												onMove(
+													row,
+													parentRow.page.parent,
+													parentRow.index + 1
+												);
+												onClose();
+											} }
+										>
+											{ sprintf(
+												/* translators: %s: Title of the page this page is under. */
+												__( 'Move out of %s' ),
+												getPageTitle( parentRow.page )
+											) }
+										</MenuItem>
+									) }
+									{ previousRow && (
+										<MenuItem
+											onClick={ () => {
+												onMove(
+													row,
+													previousRow.page.id,
+													previousRowChildCount
+												);
+												onClose();
+											} }
+										>
+											{ sprintf(
+												/* translators: %s: Title of the page before this one. */
+												__( 'Move under %s' ),
+												getPageTitle( previousRow.page )
+											) }
+										</MenuItem>
+									) }
 								</MenuGroup>
 							) }
 							{ onAddLinkAfter && (
@@ -315,7 +384,7 @@ export default function PagesList( {
 		const pageId = row.page.id;
 		const view =
 			handleRefs.current.get( pageId )?.ownerDocument.defaultView;
-		onMove( row, toIndex );
+		onMove( row, row.page.parent, toIndex );
 		view?.requestAnimationFrame( () => {
 			const handle = handleRefs.current.get( pageId );
 			if ( handle && handle.ownerDocument.activeElement !== handle ) {
@@ -329,9 +398,37 @@ export default function PagesList( {
 		setDropTarget( null );
 	};
 
-	// A page moves only among its siblings, taking its child pages with it.
-	const isSiblingOfDragged = ( row: PageRow ) =>
-		!! dragState && row.page.parent === dragState.parentId;
+	// A page can be dropped next to any page but itself and its own child
+	// pages, which move with it.
+	const canDropPageOn = ( row: PageRow ) =>
+		!! dragState && ! dragState.movingIds.has( row.page.id );
+
+	// Where a page dropped on a row lands. Just below a page whose child
+	// pages follow it, it becomes the first of them. Otherwise it goes before
+	// or after the row's page, at that page's level.
+	const getPageDropPosition = ( row: PageRow, isAfter: boolean ) => {
+		const next = rows[ rows.indexOf( row ) + 1 ];
+		if ( isAfter && next && next.depth > row.depth ) {
+			return { parentId: row.page.id, index: 0, depth: row.depth + 1 };
+		}
+		return {
+			parentId: row.page.parent,
+			index: row.index + ( isAfter ? 1 : 0 ),
+			depth: row.depth,
+		};
+	};
+
+	// A page and the rows of its child pages, which follow it.
+	const getSubtreeIds = ( row: PageRow ) => {
+		const ids = new Set( [ row.page.id ] );
+		for ( const later of rows.slice( rows.indexOf( row ) + 1 ) ) {
+			if ( later.depth <= row.depth ) {
+				break;
+			}
+			ids.add( later.page.id );
+		}
+		return ids;
+	};
 
 	// Another item of the menu can go next to any page that's in the menu.
 	const canDropItemsOn = ( row: PageRow ) =>
@@ -347,24 +444,32 @@ export default function PagesList( {
 			onDropItems?.( row, isAfter );
 			return;
 		}
-		if ( ! dragState || ! dropTarget || ! isSiblingOfDragged( row ) ) {
+		if ( ! dragState || ! dropTarget || ! canDropPageOn( row ) ) {
 			clearDrag();
 			return;
-		}
-		const { siblingIds } = row;
-		const fromIndex = siblingIds.indexOf( dragState.pageId );
-		let toIndex =
-			siblingIds.indexOf( dropTarget.pageId ) +
-			( dropTarget.isAfter ? 1 : 0 );
-		if ( toIndex > fromIndex ) {
-			toIndex -= 1;
 		}
 		const draggedRow = rows.find(
 			( { page } ) => page.id === dragState.pageId
 		);
 		clearDrag();
-		if ( draggedRow && toIndex !== fromIndex ) {
-			onMove( draggedRow, toIndex );
+		if ( ! draggedRow ) {
+			return;
+		}
+		const { parentId, index } = getPageDropPosition(
+			row,
+			dropTarget.isAfter
+		);
+		// Among its own siblings, the page's old place no longer counts once
+		// it's taken out.
+		const toIndex =
+			parentId === draggedRow.page.parent && index > draggedRow.index
+				? index - 1
+				: index;
+		if (
+			parentId !== draggedRow.page.parent ||
+			toIndex !== draggedRow.index
+		) {
+			onMove( draggedRow, parentId, toIndex );
 		}
 	};
 
@@ -444,17 +549,38 @@ export default function PagesList( {
 						onToggle={ onToggle }
 						onMove={ onMove }
 						onKeyboardMove={ moveWithKeyboard }
+						parentRow={ rows.find(
+							( { page } ) => page.id === row.page.parent
+						) }
+						previousRow={
+							row.index > 0
+								? rows.find(
+										( { page } ) =>
+											page.id ===
+											row.siblingIds[ row.index - 1 ]
+									)
+								: undefined
+						}
+						previousRowChildCount={
+							row.index > 0
+								? rows.filter(
+										( { page } ) =>
+											page.parent ===
+											row.siblingIds[ row.index - 1 ]
+									).length
+								: 0
+						}
 						onAddLinkAfter={ onAddLinkAfter }
 						onDragStart={ () =>
 							setDragState( {
 								pageId: row.page.id,
-								parentId: row.page.parent,
+								movingIds: getSubtreeIds( row ),
 							} )
 						}
 						onDragEnd={ clearDrag }
 						onDragOver={ ( event ) => {
 							if (
-								! isSiblingOfDragged( row ) &&
+								! canDropPageOn( row ) &&
 								! canDropItemsOn( row )
 							) {
 								return;
@@ -471,6 +597,10 @@ export default function PagesList( {
 								setDropTarget( {
 									pageId: row.page.id,
 									isAfter,
+									depth: dragState
+										? getPageDropPosition( row, isAfter )
+												.depth
+										: row.depth,
 								} );
 							}
 						} }

@@ -3,7 +3,9 @@ import {
 	getPagesByParentId,
 	getPageRows,
 	getMenuOrderEdits,
+	getMoveEdits,
 	getVisiblePages,
+	isPageOrDescendant,
 } from '../utils';
 
 const page = ( id: number, title: string, parent = 0, menuOrder = 0 ) => ( {
@@ -141,5 +143,55 @@ describe( 'getMenuOrderEdits', () => {
 		expect( getMenuOrderEdits( siblings, 1, -1 ) ).toEqual( [] );
 		expect( getMenuOrderEdits( siblings, 1, 3 ) ).toEqual( [] );
 		expect( getMenuOrderEdits( siblings, 99, 0 ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'getMoveEdits', () => {
+	// About (with History, then Team), Shop, Contact.
+	const byParent = getPagesByParentId( [
+		page( 1, 'About', 0, 0 ),
+		page( 3, 'History', 1, 0 ),
+		page( 2, 'Team', 1, 1 ),
+		page( 4, 'Shop', 0, 1 ),
+		page( 5, 'Contact', 0, 2 ),
+	] );
+	const find = ( id: number ) =>
+		[ ...byParent.values() ].flat().find( ( p ) => p.id === id )!;
+
+	it( 'moves a child page to the top level', () => {
+		// Team, after About.
+		expect( getMoveEdits( byParent, find( 2 ), 0, 1 ) ).toEqual( [
+			{ id: 2, menu_order: 1, parent: 0 },
+			{ id: 4, menu_order: 2 },
+			{ id: 5, menu_order: 3 },
+		] );
+	} );
+
+	it( 'moves a top-level page under another page', () => {
+		// Contact, first under About.
+		expect( getMoveEdits( byParent, find( 5 ), 1, 0 ) ).toEqual( [
+			{ id: 5, menu_order: 0, parent: 1 },
+			{ id: 3, menu_order: 1 },
+			{ id: 2, menu_order: 2 },
+		] );
+	} );
+
+	it( 'reorders a page that stays at its level', () => {
+		expect( getMoveEdits( byParent, find( 5 ), 0, 0 ) ).toEqual( [
+			{ id: 5, menu_order: 0 },
+			{ id: 1, menu_order: 1 },
+			{ id: 4, menu_order: 2 },
+		] );
+	} );
+
+	it( 'doesn’t move a page under itself or one of its child pages', () => {
+		expect( getMoveEdits( byParent, find( 1 ), 1, 0 ) ).toEqual( [] );
+		expect( getMoveEdits( byParent, find( 1 ), 3, 0 ) ).toEqual( [] );
+	} );
+
+	it( 'knows which pages are inside another', () => {
+		expect( isPageOrDescendant( byParent, 2, 1 ) ).toBe( true );
+		expect( isPageOrDescendant( byParent, 1, 1 ) ).toBe( true );
+		expect( isPageOrDescendant( byParent, 4, 1 ) ).toBe( false );
 	} );
 } );

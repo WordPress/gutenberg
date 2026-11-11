@@ -92,6 +92,7 @@ describe( 'PagesList', () => {
 		fireEvent.keyDown( shopHandle, { key: 'ArrowUp' } );
 		expect( onMove ).toHaveBeenCalledWith(
 			expect.objectContaining( { page: PAGES[ 2 ] } ),
+			0,
 			0
 		);
 
@@ -178,5 +179,51 @@ describe( 'PagesList', () => {
 		} );
 		fireEvent.drop( shop );
 		expect( onDropItems ).not.toHaveBeenCalled();
+	} );
+
+	it( 'moves a child page out of its parent from its options', async () => {
+		const { onMove } = renderPanel();
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Options for Team' } )
+		);
+		fireEvent.click(
+			await screen.findByRole( 'menuitem', { name: 'Move out of About' } )
+		);
+		// About is first at the top level, so Team goes straight after it.
+		expect( onMove ).toHaveBeenCalledWith(
+			expect.objectContaining( { page: PAGES[ 1 ] } ),
+			0,
+			1
+		);
+	} );
+
+	it( 'moves a page under the page before it from its options', async () => {
+		const { onMove } = renderPanel();
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Options for Shop' } )
+		);
+		fireEvent.click(
+			await screen.findByRole( 'menuitem', { name: 'Move under About' } )
+		);
+		// About has one child page, Team, so Shop goes after it.
+		expect( onMove ).toHaveBeenCalledWith(
+			expect.objectContaining( { page: PAGES[ 2 ] } ),
+			1,
+			1
+		);
+	} );
+
+	it( 'offers neither for a top-level page that comes first', async () => {
+		renderPanel();
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Options for About' } )
+		);
+		await screen.findByRole( 'menuitem', { name: 'Move down' } );
+		expect(
+			screen.queryByRole( 'menuitem', { name: /Move out of|Move under/ } )
+		).not.toBeInTheDocument();
 	} );
 } );

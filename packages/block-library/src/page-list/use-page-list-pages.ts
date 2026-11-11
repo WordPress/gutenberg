@@ -35,22 +35,25 @@ export function usePageListPages(): {
 	const { records: savedPages, hasResolved: hasResolvedPages } =
 		useEntityRecords< PageListPage >( 'postType', 'page', PAGES_QUERY );
 
-	// Reordering edits each page's `menu_order`, and those edits stay unsaved
-	// until the page entities are saved, so they're merged in here.
-	// The map of page IDs to edited orders is returned directly, so `useSelect`
-	// compares its values and doesn't re-render while they're unchanged.
-	const menuOrderEdits = useSelect(
+	// Reordering edits each page's `menu_order`, and moving one to another
+	// level its `parent`. The edits stay unsaved until the page entities are
+	// saved, so they're merged in here. A flat map of primitive values is
+	// returned, so `useSelect` compares its values and doesn't re-render
+	// while they're unchanged.
+	const pageEdits = useSelect(
 		( select ) => {
 			const { getEntityRecordEdits } = select( coreStore );
-			return Object.fromEntries(
-				( savedPages ?? [] ).map( ( page ) => [
-					page.id,
-					(
-						getEntityRecordEdits( 'postType', 'page', page.id ) as
-							{ menu_order?: number } | undefined
-					 )?.menu_order,
-				] )
-			) as Record< number, number | undefined >;
+			const edits: Record< string, number | undefined > = {};
+			for ( const page of savedPages ?? [] ) {
+				const pageEdit = getEntityRecordEdits(
+					'postType',
+					'page',
+					page.id
+				) as { menu_order?: number; parent?: number } | undefined;
+				edits[ `order-${ page.id }` ] = pageEdit?.menu_order;
+				edits[ `parent-${ page.id }` ] = pageEdit?.parent;
+			}
+			return edits;
 		},
 		[ savedPages ]
 	);
@@ -73,12 +76,17 @@ export function usePageListPages(): {
 	const pages = useMemo(
 		() =>
 			savedPages?.map( ( page ) => {
-				const menuOrder = menuOrderEdits[ page.id ];
-				return menuOrder === undefined
+				const menuOrder = pageEdits[ `order-${ page.id }` ];
+				const parent = pageEdits[ `parent-${ page.id }` ];
+				return menuOrder === undefined && parent === undefined
 					? page
-					: { ...page, menu_order: menuOrder };
+					: {
+							...page,
+							menu_order: menuOrder ?? page.menu_order,
+							parent: parent ?? page.parent,
+						};
 			} ) ?? savedPages,
-		[ savedPages, menuOrderEdits ]
+		[ savedPages, pageEdits ]
 	);
 
 	const pagesByParentId = useMemo(
