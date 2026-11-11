@@ -239,17 +239,27 @@ addFilter(
 
 Filters whether a suggestion in the pre-publish panel shows. The second argument names the suggestion: for `'tags'` it defaults to whether the site has tags, for `'category'` to whether the site has categories other than the default one. The suggestion still only shows when the post type supports the taxonomy and the post has no terms of it yet.
 
+A suggestion without terms to pick from is only useful when the user can create new ones, so check that too:
+
 ```js
 import { addFilter } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
-const alwaysSuggestTags = function ( show, suggestion ) {
-	return 'tags' === suggestion ? true : show;
+const suggestFirstTags = function ( show, suggestion ) {
+	if ( 'tags' !== suggestion ) {
+		return show;
+	}
+
+	const post = select( editorStore ).getCurrentPost();
+
+	return show || !! post._links?.[ 'wp:action-create-tags' ];
 };
 
 addFilter(
 	'editor.PrePublishPanel.showSuggestion',
-	'my-plugin/always-suggest-tags',
-	alwaysSuggestTags
+	'my-plugin/suggest-first-tags',
+	suggestFirstTags
 );
 ```
 
