@@ -1,5 +1,5 @@
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
@@ -34,7 +34,7 @@ function CategoriesGroup( {
 	currentType,
 } ) {
 	return (
-		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+		<WCItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 			{ templatePartViews?.map( ( view ) => (
 				<CategoryItem
 					key={ view.slug }
@@ -68,7 +68,7 @@ function CategoriesGroup( {
 					}
 				/>
 			) ) }
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }
 
@@ -131,9 +131,9 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
-								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+								<WCItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 									<Item>{ __( 'No items found' ) }</Item>
-								</ItemGroup>
+								</WCItemGroup>
 							) }
 							<CategoriesGroup
 								templatePartViews={ templatePartViews }

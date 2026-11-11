@@ -1,4 +1,4 @@
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	trash,
@@ -50,7 +50,7 @@ export default function DataViewsSidebarContent( {
 
 	return (
 		<>
-			<ItemGroup className="edit-site-sidebar-dataviews">
+			<WCItemGroup className="edit-site-sidebar-dataviews">
 				{ viewList?.map( ( view ) => {
 					const isActive = view.slug === activeView;
 					const slug = view.slug === 'all' ? undefined : view.slug;
@@ -68,7 +68,7 @@ export default function DataViewsSidebarContent( {
 						</SidebarNavigationItem>
 					);
 				} ) }
-			</ItemGroup>
+			</WCItemGroup>
 		</>
 	);
 }

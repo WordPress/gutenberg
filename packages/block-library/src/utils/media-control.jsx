@@ -3,7 +3,7 @@ import {
 	DropZone,
 	FlexBlock,
 	Spinner as WCSpinner,
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -41,7 +41,7 @@ const focusToggleButton = ( containerRef ) => {
  * @param {Object} props
  * @param {string} props.url            Media URL for thumbnail
  * @param {string} props.filename       Filename to display
- * @param {Object} props.itemGroupProps Optional props to pass to ItemGroup
+ * @param {Object} props.itemGroupProps Optional props to pass to WCItemGroup
  * @param {string} props.className      Optional className for Truncate
  * @param {string} props.label          Optional label for accessibility
  * @return {Element} Preview component
@@ -54,7 +54,7 @@ export function MediaControlPreview( {
 	label,
 } ) {
 	return (
-		<ItemGroup { ...itemGroupProps } as="span">
+		<WCItemGroup { ...itemGroupProps } as="span">
 			<HStack justify="flex-start">
 				<span
 					className="block-library-utils__media-control__inspector-image-indicator"
@@ -68,7 +68,7 @@ export function MediaControlPreview( {
 					</Truncate>
 				</FlexBlock>
 			</HStack>
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }
 
