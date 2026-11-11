@@ -25,9 +25,9 @@ const CONFIG = {
 	kind: 'postType',
 	name: 'page',
 	actions: [
-		{ id: 'rename-post', label: 'Rename…' },
+		{ id: 'rename-post', label: 'Rename' },
 		{ id: 'acme/feature', label: 'Feature', supportsBulk: true },
-		{ id: 'move-to-trash', label: 'Trash…', isPrimary: true },
+		{ id: 'move-to-trash', label: 'Trash', isPrimary: true },
 	],
 	script_modules: [
 		{ id: CORE_MODULE, actions: [ 'rename-post', 'move-to-trash' ] },
@@ -68,7 +68,7 @@ describe( 'resolveEntityActionsConfig', () => {
 		);
 
 		expect( actions ).toEqual( [
-			{ id: 'rename-post', label: 'Rename…', RenderModal: RenameModal },
+			{ id: 'rename-post', label: 'Rename', RenderModal: RenameModal },
 			{
 				id: 'acme/feature',
 				label: 'Feature',
@@ -77,7 +77,7 @@ describe( 'resolveEntityActionsConfig', () => {
 			},
 			{
 				id: 'move-to-trash',
-				label: 'Trash…',
+				label: 'Trash',
 				isPrimary: true,
 				RenderModal: TrashModal,
 			},

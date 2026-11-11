@@ -9,6 +9,7 @@ import { LinkPicker } from '../';
 import type { LinkSuggestionsQuery } from '../../link-control/types';
 
 globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockScrollIntoView();
 
 const mockFetchSearchSuggestions = vi.fn();
 

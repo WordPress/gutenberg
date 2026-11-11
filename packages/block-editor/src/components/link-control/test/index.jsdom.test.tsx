@@ -1011,7 +1011,7 @@ describe( 'Link submission', () => {
 		} );
 
 		const submitButton = screen.getByRole( 'button', {
-			name: 'Submit',
+			name: 'Apply',
 		} );
 
 		expect( submitButton ).toBeVisible();
@@ -1051,17 +1051,14 @@ describe( 'Link submission', () => {
 			name: 'Search or type URL',
 		} );
 
-		const createSubmitButton = screen.queryByRole( 'button', {
-			name: 'Submit',
-		} );
-
-		// Check the submit button for "creation" of links is not displayed.
-		expect( createSubmitButton ).not.toBeInTheDocument();
-
 		const editSubmitButton = screen.getByRole( 'button', {
 			name: 'Apply',
 		} );
 
+		// Only the visible-text Apply button for editing should exist; the ↵
+		// icon button for "creation" of links (named via aria-label) shouldn't.
+		expect( editSubmitButton ).toHaveTextContent( 'Apply' );
+		expect( editSubmitButton ).not.toHaveAttribute( 'aria-label' );
 		expect( editSubmitButton ).toBeVisible();
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
 

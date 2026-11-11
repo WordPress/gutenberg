@@ -9,13 +9,12 @@ import {
 	Dropdown,
 	Button,
 	TextControl,
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { Badge } from '@wordpress/ui';
+import { Badge, SelectControl } from '@wordpress/ui';
 import {
 	MediaUpload,
 	MediaUploadCheck,
@@ -135,17 +134,22 @@ function SingleTrackEditor( {
 				/>
 			</Grid>
 			<VStack spacing="4">
-				<WCSelectControl
+				<SelectControl
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
-					options={ KIND_OPTIONS }
-					value={ kind }
-					label={ __( 'Kind' ) }
-					onChange={ ( newKind ) =>
-						setTrackState( ( prevTrackState ) => ( {
-							...prevTrackState,
-							kind: newKind,
-						} ) )
+					items={ KIND_OPTIONS }
+					value={
+						KIND_OPTIONS.find( ( item ) => item.value === kind ) ??
+						null
 					}
+					label={ __( 'Kind' ) }
+					onValueChange={ ( item ) => {
+						if ( item ) {
+							setTrackState( ( prevTrackState ) => ( {
+								...prevTrackState,
+								kind: item.value,
+							} ) );
+						}
+					} }
 				/>
 				<ToggleControl
 					label={ __( 'Set as default track' ) }

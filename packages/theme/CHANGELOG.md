@@ -4,8 +4,46 @@
 
 ### Breaking Changes
 
+-   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead. `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs in a future release ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
+### New Features
+
+-   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
+### Enhancements
+
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
+### Bug Fixes
+
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
+### Internal
+
+-   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 4.0.0 (2026-11-04)
+
+### Breaking Changes
+
 -   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
+### Enhancements
+
+-   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
 
 ## 3.0.0 (2026-10-20)
 

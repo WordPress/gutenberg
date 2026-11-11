@@ -56,7 +56,7 @@ describe( 'URLInputButton', () => {
 		);
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Submit' } )
+			screen.queryByRole( 'button', { name: 'Apply' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -75,9 +75,7 @@ describe( 'URLInputButton', () => {
 			} )
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Submit' } )
-		).toBeVisible();
+		expect( screen.getByRole( 'button', { name: 'Apply' } ) ).toBeVisible();
 	} );
 
 	it( 'should call `onChange` function once per each value change', async () => {
@@ -122,9 +120,7 @@ describe( 'URLInputButton', () => {
 			} )
 		);
 
-		expect(
-			screen.getByRole( 'button', { name: 'Submit' } )
-		).toBeVisible();
+		expect( screen.getByRole( 'button', { name: 'Apply' } ) ).toBeVisible();
 
 		// Click the button to close the form.
 		await user.click(
@@ -134,7 +130,7 @@ describe( 'URLInputButton', () => {
 		);
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Submit' } )
+			screen.queryByRole( 'button', { name: 'Apply' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -161,7 +157,7 @@ describe( 'URLInputButton', () => {
 		await user.type( screen.getByRole( 'combobox' ), 'foo' );
 
 		const submitButton = screen.getByRole( 'button', {
-			name: 'Submit',
+			name: 'Apply',
 		} );
 
 		expect( submitButton ).toBeInTheDocument();

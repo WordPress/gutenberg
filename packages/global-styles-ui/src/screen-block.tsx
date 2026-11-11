@@ -400,7 +400,6 @@ function ScreenBlock( {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -411,7 +410,6 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -421,7 +419,6 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -431,7 +428,6 @@ function ScreenBlock( {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -440,7 +436,6 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -449,7 +444,6 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

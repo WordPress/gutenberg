@@ -3,11 +3,11 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"references": [
 		{ "path": "../components/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../keyboard-shortcuts" },
+		{ "path": "../keyboard-shortcuts/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" }
