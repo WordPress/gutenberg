@@ -1,6 +1,6 @@
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -50,7 +50,7 @@ export default function MobileTabNavigation< T extends InserterTabCategory >( {
 			className="block-editor-inserter__mobile-tab-navigation"
 		>
 			<Navigator.Screen path="/">
-				<ItemGroup>
+				<WCItemGroup>
 					{ categories.map( ( category ) => (
 						<Navigator.Button
 							key={ category.name }
@@ -69,7 +69,7 @@ export default function MobileTabNavigation< T extends InserterTabCategory >( {
 							</HStack>
 						</Navigator.Button>
 					) ) }
-				</ItemGroup>
+				</WCItemGroup>
 			</Navigator.Screen>
 			{ categories.map( ( category ) => (
 				<Navigator.Screen

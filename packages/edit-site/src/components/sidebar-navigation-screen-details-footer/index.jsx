@@ -1,6 +1,6 @@
 import { _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import { backup } from '@wordpress/icons';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
@@ -39,7 +39,7 @@ export default function SidebarNavigationScreenDetailsFooter( {
 		hrefProps.as = 'a';
 	}
 	return (
-		<ItemGroup
+		<WCItemGroup
 			size="large"
 			className="edit-site-sidebar-navigation-screen-details-footer"
 		>
@@ -54,6 +54,6 @@ export default function SidebarNavigationScreenDetailsFooter( {
 					revisionsCount
 				) }
 			</SidebarNavigationItem>
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }

@@ -1,5 +1,5 @@
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	ColorIndicator,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -55,7 +55,7 @@ function Palette( { name }: PaletteProps ) {
 	return (
 		<Stack direction="column" gap="md">
 			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
-			<ItemGroup isBordered isSeparated>
+			<WCItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path={ screenPath }>
 					<Stack
 						direction="row"
@@ -85,7 +85,7 @@ function Palette( { name }: PaletteProps ) {
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</Stack>
 				</NavigationButtonAsItem>
-			</ItemGroup>
+			</WCItemGroup>
 		</Stack>
 	);
 }

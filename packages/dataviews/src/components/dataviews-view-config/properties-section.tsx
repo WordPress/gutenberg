@@ -1,5 +1,5 @@
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalItem as Item,
 	BaseControl,
 	Icon as WCIcon,
@@ -101,7 +101,7 @@ export function PropertiesSection( {
 				direction="column"
 				className="dataviews-view-config__properties"
 			>
-				<ItemGroup isBordered isSeparated size="medium">
+				<WCItemGroup isBordered isSeparated size="medium">
 					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
 						const isVisible = view[ isVisibleFlag ] ?? true;
 						const fieldToRender =
@@ -151,7 +151,7 @@ export function PropertiesSection( {
 							/>
 						);
 					} ) }
-				</ItemGroup>
+				</WCItemGroup>
 			</Stack>
 		</Stack>
 	);

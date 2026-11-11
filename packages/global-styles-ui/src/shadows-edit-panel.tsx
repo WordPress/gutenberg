@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalUnitControl as UnitControl,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -220,7 +220,7 @@ function ShadowEditor( { shadow, onChange }: ShadowEditorProps ) {
 				</Stack>
 			</Stack>
 			<Spacer />
-			<ItemGroup isBordered isSeparated>
+			<WCItemGroup isBordered isSeparated>
 				{ shadowParts.map( ( part, index ) => (
 					<div key={ index } role="listitem">
 						<ShadowItem
@@ -233,7 +233,7 @@ function ShadowEditor( { shadow, onChange }: ShadowEditorProps ) {
 						/>
 					</div>
 				) ) }
-			</ItemGroup>
+			</WCItemGroup>
 		</>
 	);
 }

@@ -1,0 +1,216 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--_wp-ui-item-group-padding-block: var(--wpds-dimension-padding-lg);
+			--_wp-ui-item-group-padding-inline: var(--wpds-dimension-padding-2xl);
+			--_wp-ui-item-group-gap: var(--wpds-dimension-gap-lg);
+			--_wp-ui-item-group-radius: var(--wpds-border-radius-lg);
+
+			display: flex;
+			flex-direction: column;
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.is-compact {
+			--_wp-ui-item-group-padding-block: var(--wpds-dimension-padding-sm);
+			--_wp-ui-item-group-padding-inline: var(--wpds-dimension-padding-md);
+			--_wp-ui-item-group-gap: var(--wpds-dimension-gap-md);
+			/* A tighter corner, to sit among the inspector's own controls. */
+			--_wp-ui-item-group-radius: var(--wpds-border-radius-sm);
+		}
+
+		/* One surface around the whole group. */
+		.bordered {
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: var(--_wp-ui-item-group-radius);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		/*
+		 * The outer items carry the group's corners, so an item's hover tint
+		 * follows them without the group clipping its overflow — which would
+		 * crop the focus ring drawn outside an item. The item's control takes
+		 * the same corners, because an outline follows the radius of the
+		 * element it rings: without them the ring would stay square against a
+		 * rounded end of the group.
+		 */
+		.is-grouped .item:nth-child(1 of .item),
+		.is-grouped .item:nth-child(1 of .item) > .control {
+			border-start-start-radius: var(--_wp-ui-item-group-radius);
+			border-start-end-radius: var(--_wp-ui-item-group-radius);
+		}
+
+		.is-grouped .item:nth-last-child(1 of .item),
+		.is-grouped .item:nth-last-child(1 of .item) > .control {
+			border-end-start-radius: var(--_wp-ui-item-group-radius);
+			border-end-end-radius: var(--_wp-ui-item-group-radius);
+		}
+
+		/*
+		 * An item that renders as a link is also subject to the unlayered
+		 * `.a` global CSS defense, which sets `border-radius` outright and so
+		 * beats anything layered. Its corners have to come through the
+		 * bridging custom property instead, as a physical shorthand: both of
+		 * a row's top corners are rounded together, so there is nothing to
+		 * mirror in right-to-left.
+		 */
+		.is-grouped .item:nth-child(1 of .item) > .control {
+			--_gcd-a-border-radius: var(--_wp-ui-item-group-radius) var(--_wp-ui-item-group-radius) 0 0;
+		}
+
+		.is-grouped .item:nth-last-child(1 of .item) > .control {
+			--_gcd-a-border-radius: 0 0 var(--_wp-ui-item-group-radius) var(--_wp-ui-item-group-radius);
+		}
+
+		.is-grouped .item:nth-child(1 of .item):nth-last-child(1 of .item) > .control {
+			--_gcd-a-border-radius: var(--_wp-ui-item-group-radius);
+		}
+
+		/*
+		 * `of .item` rather than `:first-child`, so a consumer that renders a
+		 * placeholder between items — as `ToolsPanel` does to keep control
+		 * order — does not take the dividing line with it.
+		 */
+		.is-grouped .item:not(:nth-child(1 of .item)) {
+			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		}
+
+		/* Each item is its own surface. */
+		.is-separated {
+			gap: var(--wpds-dimension-gap-md);
+		}
+
+		.is-separated .item,
+		.is-separated .item > .control {
+			border-radius: var(--_wp-ui-item-group-radius);
+		}
+
+		.is-separated .item > .control {
+			--_gcd-a-border-radius: var(--_wp-ui-item-group-radius);
+		}
+
+		.is-separated .item {
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.item {
+			display: flex;
+			align-items: stretch;
+			min-width: 0;
+		}
+
+		.control {
+			display: flex;
+			flex: 1;
+			align-items: center;
+			gap: var(--_wp-ui-item-group-gap);
+			min-width: 0;
+			padding-block: var(--_wp-ui-item-group-padding-block);
+			padding-inline: var(--_wp-ui-item-group-padding-inline);
+			color: inherit;
+			font: inherit;
+			text-align: start;
+			text-decoration: none;
+			background: none;
+			border: 0;
+		}
+
+		:is(a, button).control {
+			cursor: var(--wpds-cursor-control);
+		}
+
+		/*
+		 * Hover tints the surface and nothing else. Recolouring the title as
+		 * well made the row read as two different things in two states. The
+		 * tint sits on the row rather than on its control, so it reaches the
+		 * row's corners and does not stop short of a trailing control.
+		 */
+		.item:has(> :is(a, button).control) {
+			transition: background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+		}
+
+		.item:has(> :is(a, button).control):hover {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		}
+
+		/*
+		 * A focused row lifts above its neighbours. The ring is drawn outside
+		 * the row, so without this the next row's hover tint paints over the
+		 * edge of it.
+		 */
+		.item:has(> .control:focus-visible) {
+			position: relative;
+			z-index: 1;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.item:has(> :is(a, button).control) {
+				transition: none;
+			}
+		}
+
+		.decoration {
+			display: inline-flex;
+			flex-shrink: 0;
+			align-items: center;
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.body {
+			display: flex;
+			flex: 1;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--wpds-dimension-gap-md);
+			min-width: 0;
+		}
+
+		.text {
+			display: flex;
+			flex-direction: column;
+			gap: var(--wpds-dimension-gap-xs);
+			min-width: 0;
+		}
+
+		.title {
+			color: inherit;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
+		}
+
+		.description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.badges {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--wpds-dimension-gap-xs);
+		}
+
+		.glyph {
+			flex-shrink: 0;
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.glyph:dir(rtl) {
+			transform: rotateZ(180deg);
+		}
+
+		.actions {
+			display: flex;
+			flex-shrink: 0;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-sm);
+			padding-inline-end: var(--_wp-ui-item-group-padding-inline);
+		}
+
+		/* The item's own content stops short when controls follow it. */
+		.item:has(> .actions) > .control {
+			padding-inline-end: var(--wpds-dimension-gap-md);
+		}
+	}
+}
