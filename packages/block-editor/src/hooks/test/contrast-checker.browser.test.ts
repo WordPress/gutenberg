@@ -137,7 +137,26 @@ describe( 'getBlockElementFontSize()', () => {
 			},
 		} as unknown as BlockType;
 
-		expect( getBlockElementFontSize( blockEl, customBlockType ) ).toBe( 32 );
+		expect( getBlockElementFontSize( blockEl, customBlockType ) ).toBe(
+			32
+		);
+	} );
+
+	it( 'ignores object typography selectors when resolving font size', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 20px">Text</p>'
+		);
+		const type = {
+			name: 'core/paragraph',
+			selectors: {
+				root: 'p',
+				typography: {
+					textIndent: '.wp-block-paragraph + .wp-block-paragraph',
+				},
+			},
+		} as unknown as BlockType;
+
+		expect( getBlockElementFontSize( blockEl, type ) ).toBe( 20 );
 	} );
 
 	it( 'reads the link font size when only link contrast is checked', () => {
