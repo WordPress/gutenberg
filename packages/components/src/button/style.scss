@@ -22,7 +22,7 @@
 	--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak-active);
 	--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-brand);
 	--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-brand-active);
-	--_wp-components-button-foreground-busy: var(--wpds-color-foreground-content-neutral);
+	--_wp-components-button-foreground-busy: var(--wpds-color-foreground-interactive-neutral);
 
 	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
 	&:focus:is(a) {
@@ -51,7 +51,7 @@
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	color: var(--wpds-color-foreground-content-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
@@ -281,7 +281,7 @@
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
-		color: var(--_wp-components-button-foreground-on-active, var(--wpds-color-foreground-content-neutral));
+		color: var(--_wp-components-button-foreground-on-active, var(--wpds-color-foreground-interactive-neutral-active));
 	}
 
 	&:disabled,
