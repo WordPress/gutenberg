@@ -118,7 +118,7 @@
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
 		"storybook": "^10.6.6",
-		"vitest": "^5.0.5",
+		"vitest": "^5.1.0",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {

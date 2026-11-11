@@ -70,6 +70,8 @@ function isSameValidity( a?: Validity, b?: Validity ) {
  *
  * The wrapped control is cloned with `label` and `required` props, and the
  * validity state is read from the element returned by `getValidityTarget`.
+ * The validation message describes the element returned by
+ * `getInteractiveTarget`, or the validity target by default.
  * Validation messages become visible once the control has been touched, when
  * the enclosing form is submitted, or when an `invalid` event is dispatched on
  * the validity target. A blur counts as a touch unless it leaves a required
@@ -85,6 +87,7 @@ export const ControlWithError = forwardRef<
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
+		getInteractiveTarget,
 		children,
 		render = DEFAULT_RENDER,
 		...restProps
@@ -257,11 +260,13 @@ export const ControlWithError = forwardRef<
 
 	const visibleMessage = showMessage ? message : null;
 
-	// Imperatively manage `aria-describedby` on the validity target so we
-	// merge with any value the child control sets internally (e.g. from a
-	// `help` prop), rather than competing with it at the props level.
+	// Imperatively manage `aria-describedby` on the element users interact
+	// with, so we merge with any value the child control sets internally (e.g.
+	// from a `help` prop), rather than competing with it at the props level.
 	useEffect( () => {
-		const target = getValidityTarget();
+		const target = getInteractiveTarget
+			? getInteractiveTarget()
+			: getValidityTarget();
 		if ( ! target ) {
 			return;
 		}
@@ -285,7 +290,7 @@ export const ControlWithError = forwardRef<
 		setDescribedBy( target, !! visibleMessage );
 
 		return () => setDescribedBy( target, false );
-	}, [ visibleMessage, messageId, getValidityTarget ] );
+	}, [ visibleMessage, messageId, getValidityTarget, getInteractiveTarget ] );
 
 	return useRender( {
 		render,
