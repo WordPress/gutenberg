@@ -209,8 +209,9 @@
 		--_wp-components-button-foreground-on-active: var(--_wp-components-button-foreground-active);
 		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
 
+		// The shared pressed rule owns its foreground and background.
 		// Only the default variant is styled differently from the non-destructive counterparts.
-		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link):not(.is-pressed) {
 			color: var(--_wp-components-button-foreground);
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
