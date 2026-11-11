@@ -1114,7 +1114,7 @@ describe( 'data-wp-html', () => {
 				Element.prototype,
 				'innerHTML'
 			)!;
-			const writes: string[] = [];
+			const writes: unknown[] = [];
 			const warnings = vi.spyOn( console, 'warn' );
 			Object.defineProperty( target, 'innerHTML', {
 				/** Allows the accessor to be discarded with the element. */
@@ -1122,11 +1122,11 @@ describe( 'data-wp-html', () => {
 				/** Serializes the native element's current content. */
 				get: () => descriptor.get!.call( target ),
 				/**
-				 * Records assignments while rejecting only the selected token.
+				 * Records assignments while rejecting only the selected string.
 				 *
 				 * @param value HTML assigned to the element.
 				 */
-				set: ( value: string ) => {
+				set: ( value: unknown ) => {
 					writes.push( value );
 					if ( value === '<b>bad</b>' ) {
 						throw new TypeError( 'rejected' );
@@ -1166,6 +1166,24 @@ describe( 'data-wp-html', () => {
 				state.html = runtime.asDangerousHTML( '<b>c</b>' );
 			} );
 			expect( target.innerHTML ).toBe( '<b>c</b>' );
+
+			// After a rejection, a TrustedHTML value with the rejected markup
+			// is written. This is a minimal stand-in for a native one.
+			const trustedValue = {
+				toString: () => '<b>bad</b>',
+				toJSON: () => '<b>bad</b>',
+			};
+			vi.stubGlobal( 'trustedTypes', {
+				isHTML: ( value: unknown ) => value === trustedValue,
+			} );
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( '<b>bad</b>' );
+			} );
+			expect( target ).toBeEmptyDOMElement();
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( trustedValue as never );
+			} );
+			expect( target.innerHTML ).toBe( '<b>bad</b>' );
 		}
 	);
 } );
