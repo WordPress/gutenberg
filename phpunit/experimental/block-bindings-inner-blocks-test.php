@@ -9,24 +9,16 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	const SOURCE = 'test/inner-blocks';
 
-	/**
-	 * The value the test source returns for `innerBlocks`, or a callable that
-	 * returns it from the arguments of the binding and the block instance.
-	 *
-	 * @var mixed
-	 */
 	private $value;
 
-	/**
-	 * The number of times the test source supplied `innerBlocks`.
-	 *
-	 * @var int
-	 */
+	private $value_callback;
+
 	private $inner_blocks_calls;
 
 	public function set_up() {
 		parent::set_up();
 		$this->value              = null;
+		$this->value_callback     = null;
 		$this->inner_blocks_calls = 0;
 		register_block_bindings_source(
 			self::SOURCE,
@@ -37,7 +29,10 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 						return 'Bound text';
 					}
 					++$this->inner_blocks_calls;
-					return $this->value instanceof Closure ? call_user_func( $this->value, $source_args, $block_instance ) : $this->value;
+					if ( $this->value_callback ) {
+						return call_user_func( $this->value_callback, $source_args, $block_instance );
+					}
+					return $this->value;
 				},
 			)
 		);
@@ -48,14 +43,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	/**
-	 * Renders a Group block with the given bindings and, by default, a
-	 * `Default` paragraph as its own inner blocks.
-	 *
-	 * @param array|null $bindings   The bindings of the Group block.
-	 * @param string     $inner_html The markup inside the Group's wrapper.
-	 * @return string The rendered block.
-	 */
 	private function render_group( $bindings = null, $inner_html = '<!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph -->' ) {
 		$bindings = $bindings ?? array( 'innerBlocks' => array( 'source' => self::SOURCE ) );
 		$markup   = '<!-- wp:group {"metadata":{"bindings":' . wp_json_encode( $bindings ) . '}} -->';
@@ -65,27 +52,14 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		return $block->render();
 	}
 
-	/**
-	 * Returns the markup of a Group block bound to the test source, with a
-	 * paragraph of its own.
-	 *
-	 * @param array  $args The arguments of the binding.
-	 * @param string $own  The text of the Group's own paragraph.
-	 * @return string The markup.
-	 */
-	private function bound_group_markup( $args = array(), $own = 'Nested own' ) {
+	private function bound_group_markup( $args = array(), $own_paragraph = 'Nested own' ) {
 		$binding = array( 'source' => self::SOURCE );
 		if ( $args ) {
 			$binding['args'] = $args;
 		}
-		return '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":' . wp_json_encode( $binding ) . '}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>' . $own . '</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		return '<!-- wp:group {"metadata":{"bindings":{"innerBlocks":' . wp_json_encode( $binding ) . '}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>' . $own_paragraph . '</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
 	}
 
-	/**
-	 * Returns the attributes the supplied blocks render with.
-	 *
-	 * @return array[] The attributes of each rendered block, in render order.
-	 */
 	private function render_group_and_get_supplied_attributes() {
 		$attributes = array();
 		$capture    = static function ( $parsed_block, $source_block, $parent_block ) use ( &$attributes ) {
@@ -115,8 +89,6 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider data_whitespace_after_the_delimiter_opener
-	 *
-	 * @param string $whitespace The whitespace between `<!--` and `wp:`.
 	 */
 	public function test_value_may_have_any_whitespace_after_the_delimiter_opener( $whitespace ) {
 		$this->value = "<!--{$whitespace}wp:paragraph --><p>One</p><!-- /wp:paragraph -->";
@@ -269,28 +241,28 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_bindings_with_other_arguments_inside_the_value_resolve() {
-		$this->value = function ( $source_args ) {
+		$this->value_callback = function ( $source_args ) {
 			$level = $source_args['level'] ?? 1;
 			if ( $level < 3 ) {
 				return $this->bound_group_markup( array( 'level' => $level + 1 ), "Level {$level} own" );
 			}
 			return '<!-- wp:paragraph --><p>Level 3</p><!-- /wp:paragraph -->';
 		};
-		$output      = $this->render_group();
+		$output               = $this->render_group();
 		$this->assertStringContainsString( '>Level 3</p>', $output );
 		$this->assertStringNotContainsString( 'own', $output );
 		$this->assertSame( 3, $this->inner_blocks_calls );
 	}
 
 	public function test_bindings_asking_for_the_same_value_with_other_arguments_stop_at_the_limit() {
-		$this->value = function () {
+		$this->value_callback = function () {
 			$value = '<!-- wp:paragraph --><p>Supplied</p><!-- /wp:paragraph -->';
 			foreach ( range( 1, 6 ) as $variant ) {
 				$value .= $this->bound_group_markup( array( 'variant' => $variant ) );
 			}
 			return $value;
 		};
-		$limit       = static function () {
+		$limit                = static function () {
 			return 10;
 		};
 		add_filter( 'block_bindings_nested_inner_blocks_limit', $limit );
@@ -392,14 +364,15 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 				},
 			)
 		);
-		$this->value = static function ( $source_args ) {
+		$this->value_callback = static function ( $source_args ) {
 			return 'inner' === ( $source_args['part'] ?? '' ) ? '<!-- wp:test/throws /-->' : '<!-- wp:test/catches /-->';
 		};
-		$output      = $this->render_group();
+		$output               = $this->render_group();
 		$this->assertStringContainsString( 'Stopped', $output );
 
-		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$output      = $this->render_group(
+		$this->value_callback = null;
+		$this->value          = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
+		$output               = $this->render_group(
 			array(
 				'innerBlocks' => array(
 					'source' => self::SOURCE,
