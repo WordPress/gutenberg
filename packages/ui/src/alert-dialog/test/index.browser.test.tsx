@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { speak } from '@wordpress/a11y';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
-import { createRef } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 import * as AlertDialog from '..';
 import dialogStyles from '../../dialog/style.module.css';
-import type { ConfirmResult } from '../types';
+import type { ConfirmResult, RootProps } from '../types';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -21,6 +21,33 @@ function createDeferred() {
 		reject = rej;
 	} );
 	return { promise, resolve, reject };
+}
+
+function TestDialog( {
+	controlled,
+	defaultOpen = false,
+	onOpenChange,
+	onConfirm,
+}: Pick< RootProps, 'defaultOpen' | 'onOpenChange' | 'onConfirm' > & {
+	controlled: boolean;
+} ) {
+	const [ open, setOpen ] = useState( defaultOpen );
+	return (
+		<AlertDialog.Root
+			open={ controlled ? open : undefined }
+			defaultOpen={ defaultOpen }
+			onOpenChange={ ( nextOpen, details ) => {
+				onOpenChange?.( nextOpen, details );
+				if ( ! details.isCanceled ) {
+					setOpen( nextOpen );
+				}
+			} }
+			onConfirm={ onConfirm }
+		>
+			<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+			<AlertDialog.Popup title="Confirm action" />
+		</AlertDialog.Root>
+	);
 }
 
 describe( 'AlertDialog', () => {
@@ -147,6 +174,143 @@ describe( 'AlertDialog', () => {
 			.element( screen.getByText( 'Dialog content' ) )
 			.toBeVisible();
 	} );
+
+	describe.each( [ false, true ] )(
+		'transition cancellation, controlled=%s',
+		( controlled ) => {
+			it( 'keeps a canceled opening closed and allows a later opening', async () => {
+				const onOpenChange = vi
+					.fn< NonNullable< RootProps[ 'onOpenChange' ] > >()
+					.mockImplementationOnce( ( nextOpen, details ) =>
+						details.cancel()
+					);
+				await render(
+					<TestDialog
+						controlled={ controlled }
+						onOpenChange={ onOpenChange }
+					/>
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Open' } )
+				);
+				expect( onOpenChange ).toHaveBeenCalledWith(
+					true,
+					expect.anything()
+				);
+				expect(
+					screen.queryByRole( 'alertdialog' )
+				).not.toBeInTheDocument();
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Open' } )
+				);
+				expect( screen.getByRole( 'alertdialog' ) ).toBeInTheDocument();
+			} );
+
+			it.each( [ 'Cancel', 'Escape' ] )(
+				'keeps a canceled %s dismissal open and usable',
+				async ( dismissal ) => {
+					const onOpenChange = vi
+						.fn< NonNullable< RootProps[ 'onOpenChange' ] > >()
+						.mockImplementationOnce( ( nextOpen, details ) =>
+							details.cancel()
+						);
+					await render(
+						<TestDialog
+							controlled={ controlled }
+							defaultOpen
+							onOpenChange={ onOpenChange }
+						/>
+					);
+
+					if ( dismissal === 'Cancel' ) {
+						await userEvent.click(
+							screen.getByRole( 'button', { name: 'Cancel' } )
+						);
+					} else {
+						await userEvent.keyboard( '{Escape}' );
+					}
+
+					expect( onOpenChange ).toHaveBeenCalledWith(
+						false,
+						expect.anything()
+					);
+					expect(
+						screen.getByRole( 'alertdialog' )
+					).toBeInTheDocument();
+					expect(
+						screen.getByRole( 'button', { name: 'OK' } )
+					).not.toHaveAttribute( 'aria-disabled', 'true' );
+					expect(
+						screen.getByRole( 'button', { name: 'Cancel' } )
+					).not.toHaveAttribute( 'aria-disabled', 'true' );
+
+					await userEvent.click(
+						screen.getByRole( 'button', { name: 'Cancel' } )
+					);
+					await waitFor( () =>
+						expect(
+							screen.queryByRole( 'alertdialog' )
+						).not.toBeInTheDocument()
+					);
+				}
+			);
+
+			it( 'restores usable controls when closing after confirmation is canceled', async () => {
+				const deferred = createDeferred();
+				const onOpenChange = vi
+					.fn< NonNullable< RootProps[ 'onOpenChange' ] > >()
+					.mockImplementationOnce( ( nextOpen, details ) =>
+						details.cancel()
+					);
+				const onConfirm = vi.fn( () => deferred.promise );
+				await render(
+					<TestDialog
+						controlled={ controlled }
+						defaultOpen
+						onOpenChange={ onOpenChange }
+						onConfirm={ onConfirm }
+					/>
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'OK' } )
+				);
+				expect(
+					screen.getByRole( 'button', { name: 'OK' } )
+				).toHaveAttribute( 'aria-disabled', 'true' );
+				await act( async () => deferred.resolve() );
+
+				expect( onOpenChange ).toHaveBeenCalledWith(
+					false,
+					expect.objectContaining( { reason: 'imperative-action' } )
+				);
+				expect( screen.getByRole( 'alertdialog' ) ).toBeInTheDocument();
+				expect(
+					screen.getByRole( 'button', { name: 'OK' } )
+				).not.toHaveAttribute( 'aria-disabled', 'true' );
+				expect(
+					within(
+						screen.getByRole( 'button', { name: 'OK' } )
+					).queryByRole( 'presentation' )
+				).not.toBeInTheDocument();
+				expect(
+					screen.getByRole( 'button', { name: 'Cancel' } )
+				).not.toHaveAttribute( 'aria-disabled', 'true' );
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'OK' } )
+				);
+				expect( onConfirm ).toHaveBeenCalledTimes( 2 );
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'alertdialog' )
+					).not.toBeInTheDocument()
+				);
+			} );
+		}
+	);
 
 	describe( 'sync confirm flow', () => {
 		it( 'calls onConfirm and closes on confirm click', async () => {
@@ -674,47 +838,40 @@ describe( 'AlertDialog', () => {
 			);
 		} );
 
-		it( 'blocks dismiss while pending by default', async () => {
-			const deferred = createDeferred();
-			const onOpenChange = vi.fn();
+		describe.each( [ false, true ] )( 'controlled=%s', ( controlled ) => {
+			it( 'blocks dismiss while pending by default', async () => {
+				const deferred = createDeferred();
+				const onOpenChange = vi.fn();
 
-			await render(
-				<AlertDialog.Root
-					open
-					onOpenChange={ onOpenChange }
-					onConfirm={ () => deferred.promise }
-				>
-					<AlertDialog.Popup title="Block Dismiss">
-						Content
-					</AlertDialog.Popup>
-				</AlertDialog.Root>
-			);
+				await render(
+					<TestDialog
+						controlled={ controlled }
+						defaultOpen
+						onOpenChange={ onOpenChange }
+						onConfirm={ () => deferred.promise }
+					/>
+				);
 
-			await waitFor( () => {
-				expect(
+				await userEvent.click(
 					screen.getByRole( 'button', { name: 'OK' } )
-				).toBeVisible();
-			} );
-
-			await userEvent.click(
-				screen.getByRole( 'button', { name: 'OK' } )
-			);
-
-			await waitFor( () => {
+				);
 				expect(
 					screen.getByRole( 'button', { name: 'OK' } )
 				).toHaveAttribute( 'aria-disabled', 'true' );
-			} );
+				await userEvent.keyboard( '{Escape}' );
+				expect( onOpenChange ).not.toHaveBeenCalled();
+				expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
+				expect(
+					screen.getByRole( 'button', { name: 'Cancel' } )
+				).toHaveAttribute( 'aria-disabled', 'true' );
 
-			await userEvent.keyboard( '{Escape}' );
-
-			expect( onOpenChange ).not.toHaveBeenCalledWith(
-				false,
-				expect.anything()
-			);
-
-			await act( async () => {
-				deferred.resolve();
+				await act( async () => deferred.resolve() );
+				expect( onOpenChange ).toHaveBeenCalledTimes( 1 );
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'alertdialog' )
+					).not.toBeInTheDocument()
+				);
 			} );
 		} );
 
