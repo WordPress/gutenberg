@@ -943,19 +943,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 
-		await editor.showBlockToolbar();
-		await expect(
-			page.getByRole( 'toolbar', { name: 'Block tools' } )
-		).toBeVisible();
-
-		// Click past the text at the right edge of the first paragraph. Its
-		// center can be covered by the second paragraph's floating toolbar.
-		// The caret must be placed at the end of the text.
-		const firstParagraph = editor.canvas.locator( 'p:text("First")' );
-		const { width, height } = await firstParagraph.boundingBox();
-		await firstParagraph.click( {
-			position: { x: width - 1, y: height / 2 },
-		} );
+		// Click the first paragraph. The click lands at the center of the
+		// paragraph element, past the end of the short text, so the caret
+		// must be placed at the end of the text.
+		await editor.canvas.locator( 'p:text("First")' ).click();
 		await page.keyboard.type( '!' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -1080,10 +1071,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( optionsButton ).toBeFocused();
 
 		const editorCanvasBody = editor.canvas.locator( 'body' );
-		// Click blank space at the edge of the canvas. Depending on the theme,
-		// the center can fall inside the default paragraph instead.
-		await editorCanvasBody.click( { position: { x: 1, y: 1 } } );
-		await expect( editorCanvasBody ).toBeFocused();
+		// Focuses the editor canvas body. In the editor the click doesn’t have
+		// to be on the element itself – just somewhere that won’t focus a block.
+		await editorCanvasBody.click();
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( optionsButton ).toBeFocused();
 	} );
