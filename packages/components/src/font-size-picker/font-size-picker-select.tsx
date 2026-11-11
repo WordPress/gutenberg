@@ -81,7 +81,11 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 					</SelectControl.Trigger>
 				}
 				onValueChange={ ( item ) => {
-					if ( item?.value === selectedOption.value ) {
+					// Default can represent a custom value that still needs clearing.
+					if (
+						item?.value === selectedOption.value &&
+						( item?.value !== null || value === undefined )
+					) {
 						return;
 					}
 					const matchingFontSize = fontSizes.find(

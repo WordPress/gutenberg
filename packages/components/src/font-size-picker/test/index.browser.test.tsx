@@ -167,6 +167,30 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
+		it( 'clears a custom font size when Default is selected after returning to presets', async () => {
+			const onChange = vi.fn();
+			await render(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value="80px"
+					onChange={ onChange }
+				/>
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Use size preset' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'option', { name: 'Default' } )
+			);
+			expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+				undefined,
+				undefined
+			);
+		} );
+
 		commonTests( fontSizes );
 	} );
 
