@@ -7,7 +7,7 @@ import {
 import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useState, useMemo } from '@wordpress/element';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
@@ -166,8 +166,43 @@ export function NavigationMenuItems( { clientId, listView } ) {
 	const confirmDetach = ( message, detach ) =>
 		setPendingDetach( { message, detach } );
 
+	// A link added here opens its search here, next to its row in the list
+	// view, as one added with the list view's own button does. The row is
+	// looked up each time the search is positioned, as the list view only
+	// shows it once it has rendered, and after the Page List turns into links
+	// the list re-renders around it.
+	const [ addedLinkClientId, setAddedLinkClientId ] = useState( null );
+	const [ wrapper, setWrapper ] = useState( null );
+	const addedLinkAnchor = useMemo(
+		() =>
+			addedLinkClientId && wrapper
+				? {
+						ownerDocument: wrapper.ownerDocument,
+						getBoundingClientRect: () =>
+							(
+								wrapper.querySelector(
+									`[role="row"][data-block="${ addedLinkClientId }"]`
+								) ?? wrapper
+							).getBoundingClientRect(),
+					}
+				: undefined,
+		[ addedLinkClientId, wrapper ]
+	);
+	const addedLinkSearch = addedLinkClientId && (
+		<NavigationLinkUI
+			insertedBlockClientId={ addedLinkClientId }
+			setInsertedBlockClientId={ setAddedLinkClientId }
+			anchor={ addedLinkAnchor }
+		/>
+	);
+
 	if ( ! pageListClientId ) {
-		return listView;
+		return (
+			<div ref={ setWrapper }>
+				{ listView }
+				{ addedLinkSearch }
+			</div>
+		);
 	}
 
 	const afterDetach = __(
@@ -175,10 +210,11 @@ export function NavigationMenuItems( { clientId, listView } ) {
 	);
 
 	return (
-		<>
+		<div ref={ setWrapper }>
 			<PageListPagesControl
 				clientId={ pageListClientId }
 				showAddLink={ ! hasOtherItems }
+				onLinkAdded={ setAddedLinkClientId }
 				onAddLinkAfter={ ( pageId ) =>
 					confirmDetach(
 						sprintf(
@@ -188,7 +224,12 @@ export function NavigationMenuItems( { clientId, listView } ) {
 							),
 							afterDetach
 						),
-						() => addLinkAfterPage( pageId )
+						() => {
+							const linkClientId = addLinkAfterPage( pageId );
+							if ( linkClientId ) {
+								setAddedLinkClientId( linkClientId );
+							}
+						}
 					)
 				}
 				onDropItems={ ( blockClientIds, pageId, isAfter ) =>
@@ -242,7 +283,8 @@ export function NavigationMenuItems( { clientId, listView } ) {
 					onCancel={ () => setPendingDetach( null ) }
 				/>
 			) }
-		</>
+			{ addedLinkSearch }
+		</div>
 	);
 }
 

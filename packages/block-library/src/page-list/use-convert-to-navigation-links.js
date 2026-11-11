@@ -203,11 +203,14 @@ export function removePageLink( links, pageId ) {
  *
  * A link can't go between two pages of a Page List, so adding one there turns
  * the pages into links first, as Detach does: in the order shown, without
- * hidden pages. The new link is selected, which opens its search.
+ * hidden pages. The new link isn't selected, so the caller can open its
+ * search where it was added from.
  *
  * @param {string|undefined} clientId Client ID of the Page List block.
  *
- * @return {(pageId: number) => void} Called with a page ID.
+ * @return {(pageId: number) => string|undefined} Called with a page ID, and
+ *                                                returns the new link's
+ *                                                client ID.
  */
 export function useAddLinkAfterPage( clientId ) {
 	const { pagesByParentId } = usePageListPages();
@@ -218,7 +221,7 @@ export function useAddLinkAfterPage( clientId ) {
 				: null,
 		[ clientId ]
 	);
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	return ( pageId ) => {
 		if ( ! clientId || ! attributes ) {
@@ -239,7 +242,6 @@ export function useAddLinkAfterPage( clientId ) {
 			return;
 		}
 		replaceBlock( clientId, links );
-		selectBlock( link.clientId );
 		const page = visiblePages.find( ( { id } ) => id === pageId );
 		speak(
 			sprintf(
@@ -250,6 +252,7 @@ export function useAddLinkAfterPage( clientId ) {
 				page ? getPageTitle( page ) : ''
 			)
 		);
+		return link.clientId;
 	};
 }
 

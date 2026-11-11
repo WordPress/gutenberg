@@ -30,6 +30,11 @@ interface PageListPagesControlProps {
 	 */
 	onAddLinkAfter?: ( pageId: number ) => void;
 	/**
+	 * Called with the client ID of a link the Add link button added, to open
+	 * its search.
+	 */
+	onLinkAdded?: ( clientId: string ) => void;
+	/**
 	 * Called when other items of the Navigation block are dropped next to a
 	 * page, from `useDropIntoOrOutOfPageList`.
 	 */
@@ -50,12 +55,14 @@ interface PageListPagesControlProps {
  * @param props.showAddLink    Whether to show an Add link button below the pages.
  * @param props.onAddLinkAfter Called with a page ID to add a link after it.
  * @param props.onDropItems    Called when other items are dropped next to a page.
+ * @param props.onLinkAdded    Called with the client ID of a link Add link added.
  */
 export default function PageListPagesControl( {
 	clientId,
 	showAddLink = false,
 	onAddLinkAfter,
 	onDropItems,
+	onLinkAdded,
 }: PageListPagesControlProps ) {
 	const registry = useRegistry();
 	const { pagesByParentId, hasResolvedPages, canReorderPages } =
@@ -143,13 +150,14 @@ export default function PageListPagesControl( {
 	};
 
 	const addLinkAfterPages = () => {
-		if ( navigationClientId ) {
-			insertBlock(
-				createBlock( 'core/navigation-link' ),
-				index + 1,
-				navigationClientId
-			);
+		if ( ! navigationClientId ) {
+			return;
 		}
+		const link = createBlock( 'core/navigation-link' );
+		// Without a caller to open its search, selecting the link opens the
+		// one in the canvas.
+		insertBlock( link, index + 1, navigationClientId, ! onLinkAdded );
+		onLinkAdded?.( link.clientId );
 	};
 
 	// Items are being dragged from elsewhere in this Navigation block, such as
