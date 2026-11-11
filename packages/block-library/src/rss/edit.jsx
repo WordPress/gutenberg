@@ -30,7 +30,6 @@ const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes, name } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
-	const [ url, setURL ] = useState( attributes.feedURL );
 
 	const {
 		blockLayout,
@@ -39,10 +38,20 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		displayDate,
 		displayExcerpt,
 		excerptLength,
+		feedURL,
 		itemsToShow,
 		openInNewTab,
 		rel,
 	} = attributes;
+
+	// The typed URL is written to `feedURL` only on Apply. Reset it when
+	// `feedURL` changes outside the form, such as on undo.
+	const [ url, setURL ] = useState( feedURL );
+	const [ prevFeedURL, setPrevFeedURL ] = useState( feedURL );
+	if ( feedURL !== prevFeedURL ) {
+		setPrevFeedURL( feedURL );
+		setURL( feedURL );
+	}
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
