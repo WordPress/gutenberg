@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	__experimentalItemGroup as ItemGroup,
+	__experimentalItemGroup as WCItemGroup,
 	__experimentalUnitControl as UnitControl,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useNavigator,
@@ -220,7 +220,7 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 					/>
 				</div>
 			</Stack>
-			<ItemGroup isBordered isSeparated>
+			<WCItemGroup isBordered isSeparated>
 				{ textShadowParts.map( ( part, index ) => (
 					<div key={ index } role="listitem">
 						<TextShadowItem
@@ -233,7 +233,7 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 						/>
 					</div>
 				) ) }
-			</ItemGroup>
+			</WCItemGroup>
 		</>
 	);
 }

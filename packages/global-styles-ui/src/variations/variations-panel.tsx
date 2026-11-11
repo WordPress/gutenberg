@@ -1,7 +1,7 @@
 import type { BlockStyle } from '@wordpress/blocks';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import { NavigationButtonAsItem } from '../navigation-button';
 import { useStyle } from '../hooks';
 
@@ -41,7 +41,7 @@ export function VariationsPanel( { name }: VariationsPanelProps ) {
 	const coreBlockStyles = useBlockVariations( name );
 
 	return (
-		<ItemGroup isBordered isSeparated>
+		<WCItemGroup isBordered isSeparated>
 			{ coreBlockStyles.map( ( style, index ) => {
 				if ( style?.isDefault ) {
 					return null;
@@ -60,6 +60,6 @@ export function VariationsPanel( { name }: VariationsPanelProps ) {
 					</NavigationButtonAsItem>
 				);
 			} ) }
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }

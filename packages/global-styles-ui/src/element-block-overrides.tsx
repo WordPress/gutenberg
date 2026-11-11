@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useContext, useMemo } from '@wordpress/element';
 import type { BlockType } from '@wordpress/blocks';
@@ -38,7 +38,7 @@ export default function ElementBlockOverrides( {
 		<ScreenBody>
 			<Stack direction="column" gap="sm">
 				<Subtitle level={ 3 }>{ __( 'Overridden by' ) }</Subtitle>
-				<ItemGroup
+				<WCItemGroup
 					isBordered
 					isSeparated
 					className="global-styles-ui-block-types-item-list global-styles-ui-element-block-overrides__list"
@@ -46,7 +46,7 @@ export default function ElementBlockOverrides( {
 					{ overridingBlockTypes.map( ( block ) => (
 						<BlockMenuItem block={ block } key={ block.name } />
 					) ) }
-				</ItemGroup>
+				</WCItemGroup>
 			</Stack>
 		</ScreenBody>
 	);

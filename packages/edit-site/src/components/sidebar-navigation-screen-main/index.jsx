@@ -1,4 +1,4 @@
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
 	layout,
@@ -15,7 +15,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
-		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
+		<WCItemGroup className="edit-site-sidebar-navigation-screen-main">
 			<SidebarNavigationItem
 				to="/identity"
 				uid="identity-navigation-item"
@@ -73,7 +73,7 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 			>
 				{ __( 'Templates' ) }
 			</SidebarNavigationItem>
-		</ItemGroup>
+		</WCItemGroup>
 	);
 }
 
