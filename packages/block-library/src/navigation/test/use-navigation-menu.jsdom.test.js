@@ -297,14 +297,14 @@ describe( 'useNavigationMenus', () => {
 			// cannot match either case.
 			const encodedMenu = {
 				id: 12,
-				title: 'Ol\u00e1',
-				slug: 'ol%c3%a1',
+				title: '\u4f60\u597d',
+				slug: '%e4%bd%a0%e5%a5%bd',
 				status: 'publish',
 			};
 			resolveRecords( registry, slugMenus );
-			resolveRecordsBySlug( registry, 'ol\u00e1', [ encodedMenu ] );
+			resolveRecordsBySlug( registry, '\u4f60\u597d', [ encodedMenu ] );
 
-			const result = useNavigationMenu( undefined, 'ol\u00e1' );
+			const result = useNavigationMenu( undefined, '\u4f60\u597d' );
 
 			expect( result.navigationMenuId ).toBe( 12 );
 			expect( result.isNavigationMenuMissing ).toBe( false );
@@ -330,6 +330,18 @@ describe( 'useNavigationMenus', () => {
 			expect( result.navigationMenuId ).toBeUndefined();
 			expect( result.isNavigationMenuMissing ).toBe( true );
 			expect( result.isNavigationMenuResolved ).toBe( true );
+		} );
+
+		it( 'Should not fall back to the ref when the slug matches no menu', () => {
+			// A slug is a portability contract: resolving the post ID beside
+			// it would render a different menu than the front end does.
+			resolveRecords( registry, slugMenus );
+			resolveRecordsBySlug( registry, 'sidebar', [] );
+
+			const result = useNavigationMenu( 11, 'sidebar' );
+
+			expect( result.navigationMenuId ).toBeUndefined();
+			expect( result.isNavigationMenuMissing ).toBe( true );
 		} );
 
 		it( 'Should read permissions for the slug resolved menu', () => {

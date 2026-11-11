@@ -19,9 +19,10 @@ type NavigationMenuReferenceFields = {
  * `wp_navigation` post.
  *
  * `cleanForSlug()` only approximates `sanitize_title()`: it works on decoded
- * characters, while WordPress percent encodes them, so `{"slug":"olá"}`
- * normalizes here to `ola` but is stored as `ol%c3%a1`. Resolution therefore
- * falls back to asking the server for the slug, see `useNavigationMenu()`.
+ * characters, while WordPress percent encodes the ones it cannot fold to
+ * ASCII, so `{"slug":"你好"}` normalizes here to `你好` but is stored as
+ * `%e4%bd%a0%e5%a5%bd`. Resolution therefore falls back to asking the server
+ * for the slug, see `useNavigationMenu()`.
  *
  * @param slug The raw slug, as it may have been authored by hand.
  *
