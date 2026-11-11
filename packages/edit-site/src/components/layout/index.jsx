@@ -53,12 +53,6 @@ function Layout() {
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	/*
-	 * The canvas is rendered from a single place in the tree at every viewport
-	 * width. Rendering it from the mobile layout instead would re-parent it
-	 * when the viewport crosses the breakpoint, remounting the editor and
-	 * reloading its iframe. See https://github.com/WordPress/gutenberg/issues/63750.
-	 */
 	const showCanvas =
 		!! areas.preview && ( ! isMobileViewport || canvas === 'edit' );
 	const mobileToggleRef = useRef();

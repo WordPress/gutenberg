@@ -44,8 +44,6 @@ test.describe( 'Site editor canvas', () => {
 		page,
 	} ) => {
 		await page.setViewportSize( { width: 1280, height: 800 } );
-		// The extensible site editor has no "edit whatever the home route
-		// resolves to" route, so name the template explicitly.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
