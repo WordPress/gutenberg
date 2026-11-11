@@ -155,7 +155,7 @@
 	},
 	"selectors": {
 		"css": ".wp-block-navigation:not(.wp-block-navigation__container)",
-		"dimensions": ".wp-block-navigation:not(.wp-block-navigation__container)"
+		"dimensions": ".wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)"
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

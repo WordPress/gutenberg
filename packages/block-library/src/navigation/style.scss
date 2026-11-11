@@ -791,6 +791,13 @@ button.wp-block-navigation-item__content {
 	color: #000;
 }
 
+// A minimum size wider than the open overlay makes it scroll sideways.
+// `!important` beats the inline block style.
+.wp-block-navigation__responsive-container.is-menu-open .wp-block-navigation:not(.wp-block-navigation__container) {
+	min-width: auto !important;
+	min-height: auto !important;
+}
+
 
 // Overlay menu toggle button label
 .wp-block-navigation__toggle_button_label {

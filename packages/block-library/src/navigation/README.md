@@ -120,7 +120,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **css**: `.wp-block-navigation:not(.wp-block-navigation__container)`
-- **dimensions**: `.wp-block-navigation:not(.wp-block-navigation__container)`
+- **dimensions**: `.wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)`
 
 ## Block Markup
 

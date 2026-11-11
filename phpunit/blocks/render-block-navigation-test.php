@@ -566,11 +566,11 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 
 		$this->assertStringContainsString(
-			':root :where(.wp-block-navigation:not(.wp-block-navigation__container)){min-width: 560px;}',
+			':root :where(.wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)){min-width: 560px;}',
 			$stylesheet
 		);
 		$this->assertStringContainsString(
-			'@media (width <= 480px){:root :where(.wp-block-navigation:not(.wp-block-navigation__container)){min-width: 200px;}}',
+			'@media (width <= 480px){:root :where(.wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)){min-width: 200px;}}',
 			$stylesheet
 		);
 		$this->assertStringNotContainsString( ':root :where(.wp-block-navigation){min-width', $stylesheet );
@@ -587,6 +587,6 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 1, $rules );
-		$this->assertSame( '.wp-block-navigation:not(.wp-block-navigation__container)', $rules[0]['selector'] );
+		$this->assertSame( '.wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)', $rules[0]['selector'] );
 	}
 }
