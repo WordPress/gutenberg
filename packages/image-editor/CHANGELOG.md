@@ -4,15 +4,12 @@
 
 Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
-### Breaking Changes
-
--   Replace `mapEditToOriginal` with `getImageEdit`, which returns one `ImageEdit` record with an optional `flip`, `rotation` and `crop`, or `null` when no image has loaded, instead of a list of tagged operations ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
-
 ### Enhancements
 
 -   Follow WordPress Design System colours and spacing by default when its tokens are present, while keeping standalone defaults and consumer overrides ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
 -   Allow consumers to theme the canvas through CSS custom properties ([#86340](https://github.com/WordPress/gutenberg/pull/86340)).
 -   Add `exportImage( state, options? )`, which exports the edited image as a `Blob` in the browser ([#86405](https://github.com/WordPress/gutenberg/pull/86405)).
+-   Describe the edit to apply when saving as one `ImageEdit` record, returned by `getImageEdit( state )` ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
 
 ### Bug Fixes
 
