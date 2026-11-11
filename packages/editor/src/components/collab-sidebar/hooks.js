@@ -7,6 +7,7 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
@@ -44,7 +45,7 @@ import {
 	pickNoteForCaret,
 } from './utils/note-selection';
 import { focusNoteThread } from './utils/dom';
-import { useReattachOrphanedNotes } from './use-reattach-orphaned-notes';
+import { findNoteAnchors } from './find-note-anchors';
 import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -69,10 +70,38 @@ export function useNoteThreads( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	// Restored anchors change block attributes only, which the threads
-	// below don't otherwise track.
-	const anchorsVersion = useReattachOrphanedNotes( threads, hasResolved );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
+
+	// Once the notes have loaded, re-attach those whose anchor was never
+	// saved with the post, without an undo level like the original edit.
+	const registry = useRegistry();
+	const hasReattachedRef = useRef( false );
+	const [ hasReattached, setHasReattached ] = useState( false );
+	useEffect( () => {
+		if ( ! hasResolved || hasReattachedRef.current ) {
+			return;
+		}
+		hasReattachedRef.current = true;
+		const attributesByClientId = findNoteAnchors(
+			threads ?? [],
+			registry.select( blockEditorStore ).getBlocks()
+		);
+		const reattachedClientIds = Object.keys( attributesByClientId );
+		if ( ! reattachedClientIds.length ) {
+			return;
+		}
+		const {
+			__unstableMarkNextChangeAsNotPersistent,
+			__unstableMarkLastChangeAsPersistent,
+			updateBlockAttributes,
+		} = registry.dispatch( blockEditorStore );
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( reattachedClientIds, attributesByClientId, {
+			uniqueByBlock: true,
+		} );
+		__unstableMarkLastChangeAsPersistent();
+		setHasReattached( true );
+	}, [ registry, threads, hasResolved ] );
 	const { clientIds } = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants } = select( blockEditorStore );
 		return {
@@ -189,8 +218,8 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- Recompute once anchors are restored.
-	}, [ clientIds, threads, getBlockAttributes, anchorsVersion ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- Attribute changes aren't tracked, so recompute once anchors are restored.
+	}, [ clientIds, threads, getBlockAttributes, hasReattached ] );
 
 	return {
 		notes,

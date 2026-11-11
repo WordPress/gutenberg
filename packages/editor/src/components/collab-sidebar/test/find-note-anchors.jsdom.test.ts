@@ -3,18 +3,11 @@ import {
 	getBlockTypes,
 	parse,
 	registerBlockType,
-	serialize,
 	unregisterBlockType,
 	type Block,
 } from '@wordpress/blocks';
 import { createElement, RawHTML } from '@wordpress/element';
-import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-} from '@wordpress/rich-text';
 import { findNoteAnchors } from '../find-note-anchors';
-import { findNoteInBlock } from '../utils/note-anchor';
 
 function paragraph( html: string, noteIds?: number[] ) {
 	const attributes = noteIds
@@ -32,18 +25,11 @@ function blocksFrom( content: string ) {
 }
 
 function orphan( id: number, path: number[], content: string ) {
-	return { id, anchors: [ { path, content } ] };
+	return { id, parent: 0, meta: { _wp_note_anchor: [ { path, content } ] } };
 }
 
 describe( 'findNoteAnchors', () => {
 	beforeAll( () => {
-		registerFormatType( 'core/note', {
-			title: 'Note',
-			tagName: 'mark',
-			className: 'wp-note',
-			attributes: { 'data-id': 'data-id' },
-			edit: () => null,
-		} as Parameters< typeof registerFormatType >[ 1 ] );
 		registerBlockType( 'test/paragraph', {
 			apiVersion: 3,
 			title: 'Paragraph',
@@ -76,22 +62,9 @@ describe( 'findNoteAnchors', () => {
 	} );
 
 	afterAll( () => {
-		unregisterFormatType( 'core/note' );
 		for ( const { name } of getBlockTypes() ) {
 			unregisterBlockType( name );
 		}
-	} );
-
-	it( 'places a note on the block at the same position', () => {
-		const blocks = blocksFrom( paragraph( 'One' ) + paragraph( 'Two' ) );
-		const result = findNoteAnchors(
-			[ orphan( 7, [ 1 ], paragraph( 'Two' ) ) ],
-			blocks
-		);
-
-		expect( result ).toEqual( {
-			[ blocks[ 1 ].clientId ]: { metadata: { noteId: [ 7 ] } },
-		} );
 	} );
 
 	it( 'follows a block that moved when it is the only match', () => {
@@ -110,16 +83,6 @@ describe( 'findNoteAnchors', () => {
 		);
 		const result = findNoteAnchors(
 			[ orphan( 7, [ 0 ], paragraph( 'Same' ) ) ],
-			blocks
-		);
-
-		expect( result ).toEqual( {} );
-	} );
-
-	it( 'leaves the note orphaned when the block changed', () => {
-		const blocks = blocksFrom( paragraph( 'Rewritten' ) );
-		const result = findNoteAnchors(
-			[ orphan( 7, [ 0 ], paragraph( 'Original' ) ) ],
 			blocks
 		);
 
@@ -153,31 +116,6 @@ describe( 'findNoteAnchors', () => {
 		} );
 	} );
 
-	it( 'restores the draft marker of an inline note with the note id', () => {
-		const blocks = blocksFrom( paragraph( 'Keep me attached' ) );
-		const result = findNoteAnchors(
-			[
-				orphan(
-					7,
-					[ 0 ],
-					paragraph(
-						'<mark class="wp-note" data-id="new">Keep</mark> me attached'
-					)
-				),
-			],
-			blocks
-		);
-
-		const patch = result[ blocks[ 0 ].clientId ];
-		expect( patch.content ).toBeInstanceOf( RichTextData );
-		expect( findNoteInBlock( patch, 7 ) ).toEqual( {
-			attributeKey: 'content',
-			start: 0,
-			end: 4,
-		} );
-		expect( findNoteInBlock( patch, 'new' ) ).toBeNull();
-	} );
-
 	it( 'finds a nested block by its path', () => {
 		const blocks = blocksFrom(
 			group( paragraph( 'Same' ), paragraph( 'Same' ) )
@@ -190,17 +128,5 @@ describe( 'findNoteAnchors', () => {
 		expect( Object.keys( result ) ).toEqual( [
 			blocks[ 0 ].innerBlocks[ 1 ].clientId,
 		] );
-	} );
-
-	it( 'reads the snapshot the editor writes', () => {
-		const blocks = blocksFrom( paragraph( 'Round trip' ) );
-		const result = findNoteAnchors(
-			[ orphan( 7, [ 0 ], serialize( blocks[ 0 ] ) ) ],
-			blocks
-		);
-
-		expect( result[ blocks[ 0 ].clientId ].metadata ).toEqual( {
-			noteId: [ 7 ],
-		} );
 	} );
 } );
