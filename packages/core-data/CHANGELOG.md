@@ -6,6 +6,7 @@
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
 -   Save only modified post metadata keys, preserving unrelated server updates and values while retaining complete editor and autosave views. Keep resolved metadata references stable across unrelated edits ([#84673](https://github.com/WordPress/gutenberg/pull/84673)).
 
 ## 9.1.0 (2026-11-04)

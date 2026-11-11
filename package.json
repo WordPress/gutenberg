@@ -82,7 +82,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.63.0",
+		"@playwright/test": "^1.65.0",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@wordpress/env": "file:./packages/env",
@@ -189,6 +189,7 @@
 		"test:e2e:rtc-websocket": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:rtc-websocket:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json --ui",
 		"test:e2e:storybook": "npm exec --no --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
+		"test:e2e:trunk": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk --",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:performance:debug": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts --debug",
