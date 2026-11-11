@@ -27,9 +27,8 @@ export interface NormalizedPoint {
 
 /**
  * A rectangle in fractions rather than pixels, measured from its
- * top-left corner. A crop area is a fraction of the view the canvas
- * shows, which is the image turned by its rotation snapped to a quarter
- * turn, not of the image itself.
+ * top-left corner. What it is a fraction of depends on the field that
+ * holds it.
  */
 export interface NormalizedRect {
 	x: number;
@@ -92,7 +91,10 @@ export interface ImageEditorState {
 	readonly rotation: number;
 	/** Whether the image is mirrored along each axis. */
 	readonly flip: Readonly< Flip >;
-	/** The crop area, as fractions of the view the canvas shows. */
+	/**
+	 * The crop area, as fractions of the view the canvas shows. The view
+	 * has the shape of the image at its rotation snapped to a quarter turn.
+	 */
 	readonly cropRect: Readonly< NormalizedRect >;
 	/**
 	 * Locked width / height ratio of the crop, in source pixels.

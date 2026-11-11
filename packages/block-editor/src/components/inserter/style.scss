@@ -119,6 +119,17 @@ $block-inserter-tabs-height: 44px;
 			width: $secondary-sidebar-width + $sidebar-width;
 		}
 	}
+
+	// Keeps the close button but hides the tab list when Blocks is the only tab.
+	&.has-single-tab {
+		.block-editor-tabbed-sidebar__tablist {
+			display: none;
+		}
+
+		.block-editor-tabbed-sidebar__tablist-and-close-button {
+			justify-content: flex-end;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
