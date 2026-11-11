@@ -5,8 +5,9 @@
 ### Bug Fixes
 
 -   When client-side image processing generates a sub-size that exceeds
-    `maxUploadFileSize`, the item is now cancelled with a user-facing error
-    instead of being silently dropped by the server. ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
+    `maxUploadFileSize`, that sub-size is no longer sent to the server, and a
+    warning naming the missing size and the original file is shown once the
+    upload finishes ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
 
 ## 0.44.0 (2026-11-04)
 

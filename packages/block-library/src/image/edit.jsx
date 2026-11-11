@@ -133,7 +133,8 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createWarningNotice } =
+		useDispatch( noticesStore );
 	function onUploadError( message ) {
 		/*
 		 * Upload errors explain what went wrong and what to do about it, which
@@ -146,6 +147,15 @@ export function ImageEdit( {
 		} );
 		setTemporaryURL();
 		setAttributes( { blob: undefined } );
+	}
+
+	// The image uploaded; only some of its sub-sizes are missing, so leave the
+	// block and its temporary URL alone.
+	function onUploadWarning( message ) {
+		createWarningNotice( message, {
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
 	}
 
 	function onFilesPreUpload( files ) {
@@ -335,6 +345,7 @@ export function ImageEdit( {
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
+		onWarning: onUploadWarning,
 	} );
 
 	const isExternal = isExternalImage( id, url );
@@ -481,6 +492,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
+					onWarning={ onUploadWarning }
 					placeholder={ placeholder }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					handleUpload={ ( files ) => files.length === 1 }

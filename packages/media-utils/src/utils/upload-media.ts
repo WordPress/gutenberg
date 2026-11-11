@@ -30,6 +30,9 @@ interface UploadMediaArgs {
 	maxUploadFileSize?: number;
 	// Function called when an error happens.
 	onError?: OnErrorHandler;
+	// Function called when an upload finishes with a caveat. Only the
+	// client-side media pipeline emits warnings; the server path never does.
+	onWarning?: ( message: string ) => void;
 	// Function called each time a file or a temporary representation of the file is available.
 	onFileChange?: OnChangeHandler;
 	// List of allowed mime types and file extensions.

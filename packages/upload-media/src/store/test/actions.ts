@@ -707,6 +707,85 @@ describe( 'actions', () => {
 			// Item should be removed by cancelItem.
 			expect( sideloadItem ).toBeUndefined();
 		} );
+
+		it( 'warns once when a sibling sub-size succeeds but one is too large', async () => {
+			let finishParentUpload: ( () => void ) | undefined;
+			const mediaUpload = vi.fn( ( { onFileChange } ) => {
+				finishParentUpload = () =>
+					onFileChange( [
+						{ id: 100, url: 'https://example.com/example.jpg' },
+					] );
+			} );
+			const mediaSideload = vi.fn( ( { onSuccess } ) => {
+				onSuccess( {
+					image_size: 'thumbnail',
+					width: 150,
+					height: 150,
+					file: 'example-150x150.jpg',
+					mime_type: 'image/jpeg',
+					filesize: 1,
+				} );
+			} );
+			const onSuccess = vi.fn();
+			const onWarning = vi.fn();
+			const onError = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaUpload,
+				mediaSideload,
+				maxUploadFileSize: 1,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				batchId: 'batch-1',
+				operations: [ OperationType.Upload ],
+				onSuccess,
+				onWarning,
+				onError,
+			} );
+
+			const parentId = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ].id;
+
+			// Fits within maxUploadFileSize (1 byte).
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: new File( [ 'x' ], 'example.jpg', {
+					type: 'image/jpeg',
+				} ),
+				parentId,
+				batchId: 'batch-1',
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// jpegFile is 3 bytes, so this sub-size is rejected before sending.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId,
+				batchId: 'batch-1',
+				additionalData: { post: 100, image_size: '1536x1536' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// Only the sibling that fits was sent.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 1 );
+
+			finishParentUpload?.();
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// The upload still succeeds; the user is told what is missing.
+			expect( onError ).not.toHaveBeenCalled();
+			expect( onSuccess ).toHaveBeenCalledTimes( 1 );
+			expect( onWarning ).toHaveBeenCalledTimes( 1 );
+			expect( onWarning ).toHaveBeenCalledWith(
+				"The 1536x1536 size of example.jpg wasn't created because it's larger than the maximum upload size."
+			);
+		} );
 	} );
 
 	describe( 'cancelItem', () => {
