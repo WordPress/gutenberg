@@ -832,7 +832,7 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
 				changes,
-				{ onRebase: expect.any( Function ), previousBlocks: undefined }
+				{ previousBlocks: undefined }
 			);
 
 			// Verify that the record metadata was not updated.
@@ -873,19 +873,9 @@ describe( 'SyncManager', () => {
 				[
 					expect.any( Y.Doc ),
 					{ blocks: previousBlocks },
-					{
-						onRebase: expect.any( Function ),
-						previousBlocks: undefined,
-					},
+					{ previousBlocks: undefined },
 				],
-				[
-					expect.any( Y.Doc ),
-					{ blocks: [] },
-					{
-						onRebase: expect.any( Function ),
-						previousBlocks,
-					},
-				],
+				[ expect.any( Y.Doc ), { blocks: [] }, { previousBlocks } ],
 			] );
 		} );
 
@@ -898,12 +888,16 @@ describe( 'SyncManager', () => {
 				mockRecord,
 				mockHandlers
 			);
+			// Simulate a remote peer so the update applies synchronously.
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
 			const corrected = { title: 'Both edits' };
-			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
-				( _doc, _changes, options ) => {
-					options?.onRebase?.( corrected );
-				}
-			);
+			mockSyncConfig.applyChangesToCRDTDoc.mockReturnValue( corrected );
 			expect(
 				manager.update(
 					'post',
@@ -1174,7 +1168,7 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
 				changes,
-				{ onRebase: expect.any( Function ), previousBlocks: undefined }
+				{ previousBlocks: undefined }
 			);
 
 			// Verify that the record metadata was updated.

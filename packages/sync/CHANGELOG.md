@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `SyncManager.update()` accepts a `previousBlocks` option with the blocks before an edit. Sync configs receive `previousBlocks` and an `onRebase` callback in the optional third argument of `applyChangesToCRDTDoc`. Updates with `previousBlocks` run synchronously and return corrected fields reported through `onRebase`, so callers can store the merged result ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+-   `SyncManager.update()` accepts a `previousBlocks` option with the blocks before an edit, and passes it to the sync config's `applyChangesToCRDTDoc` in a new optional third argument. The config may return merged fields when it rebased the edit over concurrent changes; when a remote peer is present, `update()` returns them so the caller can store the merged result ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
 -   `getChangesFromCRDTDoc` receives `{ isInitial: true }` during document load, so sync configs can adopt transient state without marking unchanged content dirty ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
 
 ## 3.1.0 (2026-11-04)

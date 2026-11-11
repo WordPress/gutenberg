@@ -414,9 +414,10 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 			 * @param crdtDoc
 			 * @param changes
 			 * @param options
+			 * @return Merged fields when the changes were rebased over concurrent ones.
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes, options ) => {
-				const rebasedChanges = applyPostChangesToCRDTDoc(
+			applyChangesToCRDTDoc: ( crdtDoc, changes, options ) =>
+				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
 					syncedProperties,
@@ -424,11 +425,7 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 					options as {
 						previousBlocks?: PostChanges[ 'blocks' ];
 					}
-				);
-				if ( rebasedChanges ) {
-					options?.onRebase?.( rebasedChanges );
-				}
-			},
+				),
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.
