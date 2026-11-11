@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Legacy widget: Render nothing for an `instance` attribute whose `encoded` or `hash` value is not a string, rather than throwing a `TypeError` on PHP 8, and reject an `encoded` value with characters outside the base64 alphabet ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).
+-   Legacy widget: Render nothing for an `instance` attribute whose `encoded` value is an array, rather than throwing a `TypeError` on PHP 8, and reject an `encoded` value with characters outside the base64 alphabet ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).
 
 ## 5.1.0 (2026-11-04)
 
