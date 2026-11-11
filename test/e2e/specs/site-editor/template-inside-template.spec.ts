@@ -389,11 +389,7 @@ test.describe( 'Template rendered inside another template', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await requestUtils.createTemplate( 'wp_template', {
-			slug: 'layout',
-			title: 'Layout',
-			content: LAYOUT_CONTENT,
-		} );
+		// The layout template, created before each test, is the one around.
 		await createTemplateInside( requestUtils, {
 			slug: 'page',
 			title: 'Pages',
@@ -413,43 +409,18 @@ test.describe( 'Template rendered inside another template', () => {
 			canvas: 'edit',
 		} );
 
-		// TEMPORARY: diagnostics for the canvas around a page's template.
-		await page.waitForTimeout( 3000 );
-		// eslint-disable-next-line no-console
-		console.log(
-			'TEMPLATE-DEBUG',
-			JSON.stringify(
-				await page.evaluate( () => {
-					const core = ( window as any ).wp.data.select( 'core' );
-					const editorStore = ( window as any ).wp.data.select(
-						'core/editor'
-					);
-					const templateId = editorStore.getCurrentTemplateId();
-					const record = core.getEditedEntityRecord(
-						'postType',
-						'wp_template',
-						templateId
-					);
-					const list = core.getEntityRecords(
-						'postType',
-						'wp_template',
-						{ per_page: -1 }
-					);
-					return {
-						mode: editorStore.getRenderingMode(),
-						templateId,
-						recordTemplate: record?.template,
-						recordKeys: record ? Object.keys( record ) : null,
-						listCount: list?.length,
-						layout: list
-							?.filter( ( t: any ) =>
-								t.slug.startsWith( 'layout' )
-							)
-							.map( ( t: any ) => [ t.id, t.has_template_slot ] ),
-					};
-				} )
-			)
-		);
+		// A page opens on its own; "Show template" shows it inside its
+		// template, which is where the template around that one appears.
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		const showTemplate = page.getByRole( 'menuitemcheckbox', {
+			name: 'Show template',
+		} );
+		if (
+			( await showTemplate.getAttribute( 'aria-checked' ) ) !== 'true'
+		) {
+			await showTemplate.click();
+		}
+		await page.keyboard.press( 'Escape' );
 
 		// The page is edited inside its template, and that template inside the
 		// one it names, as the front end renders it.
