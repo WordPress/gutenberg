@@ -74,6 +74,12 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `submenuVisibility`
 - `core/isInsideSubmenu`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **dimensions**: `.wp-block-page-list:not(.wp-block-navigation__responsive-container.is-menu-open *)`
+
 ## Block Markup
 
 This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.
