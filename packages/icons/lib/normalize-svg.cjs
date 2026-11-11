@@ -13,8 +13,8 @@
  * drawing while leaving a file that still builds.
  *
  * Usage:
- *   node lib/normalize-export.cjs src/library/my-icon.svg [...more]
- *   node lib/normalize-export.cjs --check src/library/*.svg
+ *   node lib/normalize-svg.cjs src/library/my-icon.svg [...more]
+ *   node lib/normalize-svg.cjs --check src/library/*.svg
  */
 
 const fs = require( 'fs' );
@@ -264,7 +264,7 @@ function main( argv ) {
 	if ( ! files.length ) {
 		// eslint-disable-next-line no-console
 		console.error(
-			'Usage: node lib/normalize-export.cjs [--check] <file.svg> [...]'
+			'Usage: node lib/normalize-svg.cjs [--check] <file.svg> [...]'
 		);
 		return 1;
 	}

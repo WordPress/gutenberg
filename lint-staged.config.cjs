@@ -18,7 +18,7 @@ module.exports = {
 	],
 	// Normalize design-tool SVG exports before the build validates them.
 	'packages/icons/src/library/*': [
-		'node packages/icons/lib/normalize-export.cjs',
+		'node packages/icons/lib/normalize-svg.cjs',
 		'npm run -w packages/icons build',
 	],
 	// The validator takes the repository root, so staged paths are not passed.

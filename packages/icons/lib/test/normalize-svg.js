@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module';
 import { describe, expect, it } from 'vitest';
 const require = createRequire( import.meta.url );
-const { normalizeIconSvg } = require( '../normalize-export.cjs' );
+const { normalizeIconSvg } = require( '../normalize-svg.cjs' );
 
 const EXPORT_ROOT =
 	'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">';
