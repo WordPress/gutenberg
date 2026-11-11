@@ -97,15 +97,25 @@
 			grid-template-areas: "scrollable" "footer";
 		}
 
-		.list-scrollable-container {
+		.list-scroller {
 			overflow-block: auto;
 			overscroll-behavior: contain;
-			grid-area: scrollable;
 			scroll-padding-block: var(--wp-ui-popup-padding);
 
 			&:not(:empty) {
 				padding-block: var(--wp-ui-popup-padding);
 			}
+
+			/* Add the group label's min-height, so highlighted items don't scroll under a stuck label. */
+			&:has(.group-label) {
+				scroll-padding-block-start: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-popup-padding, 0px));
+			}
+		}
+
+		.list-scrollable-container {
+			composes: list-scroller;
+
+			grid-area: scrollable;
 		}
 
 		.list-footer {
@@ -128,6 +138,17 @@
 			padding-inline-start: calc(var(--wp-ui-popup-padding) + var(--wpds-dimension-padding-sm) + var(--_wp-ui-popup-selection-offset));
 			padding-inline-end: calc(var(--wp-ui-popup-padding) + var(--wpds-dimension-padding-sm));
 			color: var(--wpds-color-foreground-content-neutral-weak);
+
+			/*
+			 * The negative inset cancels the scroller's block padding, so items
+			 * don't show above the label.
+			 */
+			.list-scroller & {
+				position: sticky;
+				inset-block-start: calc(-1 * var(--wp-ui-popup-padding, 0px));
+				z-index: 1;
+				background-color: var(--wpds-color-background-surface-neutral-strong);
+			}
 		}
 
 		.separator {
