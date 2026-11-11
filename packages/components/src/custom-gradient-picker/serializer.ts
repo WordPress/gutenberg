@@ -1,4 +1,5 @@
 import type gradientParser from 'gradient-parser';
+import type { GradientAST } from './types';
 
 export function serializeGradientColor( {
 	type,
@@ -63,10 +64,18 @@ export function serializeGradientOrientation(
 
 export function serializeGradient( {
 	type,
+	colorInterpolation,
 	orientation,
 	colorStops,
-}: gradientParser.GradientNode ) {
-	const serializedOrientation = serializeGradientOrientation( orientation );
+}: GradientAST ) {
+	// The color interpolation method shares the first argument with the
+	// orientation, e.g. `linear-gradient(in oklch 160deg, …)`.
+	const serializedOrientation = [
+		colorInterpolation,
+		serializeGradientOrientation( orientation ),
+	]
+		.filter( Boolean )
+		.join( ' ' );
 	const serializedColorStops = colorStops
 		.sort( ( colorStop1, colorStop2 ) => {
 			const getNumericStopValue = (

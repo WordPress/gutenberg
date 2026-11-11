@@ -1,5 +1,5 @@
 type InserterMediaCategory =
-	import( '../../../store/actions' ).InserterMediaCategory;
+	import( '../../../store/types' ).InserterMediaCategory;
 
 /**
  * Taken from the registration interface so the two cannot drift.
@@ -33,3 +33,18 @@ export type MediaItem = {
 	caption?: string;
 	date?: string;
 };
+
+export interface MediaCategoryPanelProps {
+	onInsert: ( block: import( '@wordpress/blocks' ).Block ) => void;
+	category: MediaCategory;
+	search: string;
+	onChangeSearch: ( search: string ) => void;
+	/** Fewer than two renders no tab bar. */
+	mediaTypes?: { value: MediaType; label: string }[];
+	mediaType: MediaType;
+	onChangeMediaType?: ( mediaType: MediaType ) => void;
+	/** Rendered beside the search input. */
+	sourceMenu?: import( 'react' ).ReactNode;
+	/** Rendered beneath the pager. */
+	footer?: import( 'react' ).ReactNode;
+}

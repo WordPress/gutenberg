@@ -887,6 +887,144 @@ describe( 'useHandleLinkChange', () => {
 		} );
 	} );
 
+	describe( 'open in new tab setting', () => {
+		it( 'should apply open in new tab when it is checked in the link editing UI', () => {
+			const attributes = {
+				url: 'https://wordpress.org',
+				label: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: false,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://wordpress.org',
+				title: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: true,
+			} );
+
+			expect( mockSetAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( { opensInNewTab: true } )
+			);
+		} );
+
+		it( 'should apply open in new tab when it is unchecked in the link editing UI', () => {
+			const attributes = {
+				url: 'https://wordpress.org',
+				label: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: true,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://wordpress.org',
+				title: 'WordPress',
+				kind: 'custom',
+				type: 'custom',
+				opensInNewTab: false,
+			} );
+
+			expect( mockSetAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( { opensInNewTab: false } )
+			);
+		} );
+
+		it( 'should apply open in new tab when changing a bound entity link to a custom URL', () => {
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				createBinding: mockCreateBinding,
+				clearBinding: mockClearBinding,
+			} );
+
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Page',
+				kind: 'post-type',
+				type: 'page',
+				opensInNewTab: false,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			result.current( {
+				url: 'https://custom-url.com',
+				title: 'Page',
+				opensInNewTab: true,
+			} );
+
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledWith(
+				clientId,
+				expect.objectContaining( { opensInNewTab: true } )
+			);
+		} );
+
+		it( 'should not change open in new tab when the link change does not include it', () => {
+			useEntityBinding.mockReturnValue( {
+				hasUrlBinding: true,
+				createBinding: mockCreateBinding,
+				clearBinding: mockClearBinding,
+			} );
+
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Page',
+				kind: 'post-type',
+				type: 'page',
+				opensInNewTab: true,
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			// A search suggestion, as selected from the sidebar link picker,
+			// carries no link settings.
+			result.current( {
+				url: 'https://custom-url.com',
+				title: 'Custom URL',
+			} );
+
+			// `toHaveBeenCalledWith` treats an `undefined` property as absent,
+			// so check the key directly: dispatching `undefined` would reset
+			// the setting.
+			expect( mockUpdateBlockAttributes ).toHaveBeenCalledTimes( 1 );
+			expect(
+				mockUpdateBlockAttributes.mock.calls[ 0 ][ 1 ]
+			).not.toHaveProperty( 'opensInNewTab' );
+		} );
+	} );
+
 	describe( 'edge cases', () => {
 		it( 'should return early if updatedLink is null', () => {
 			const attributes = {};

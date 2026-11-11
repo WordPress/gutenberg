@@ -3,11 +3,15 @@ const {
 	expect,
 } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const AUTOSAVE_FAILED =
-	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.';
+const AUTOSAVE_FAILED = 'Auto-save failed. You can also save manually.';
 
-const withDetails = ( details ) =>
-	`${ AUTOSAVE_FAILED } <details class="editor-save-error-details"><summary>Show details</summary><span class="editor-save-error-details__message">${ details }</span></details>`;
+const AUTOSAVE_FAILED_NO_RESPONSE =
+	'Auto-save failed because there was no response from the server. You can also save manually.';
+
+const UPDATING_FAILED_OFFLINE =
+	'Updating failed because you were offline. Please verify your connection and try again.';
+
+const withDetails = ( details ) => ( { content: AUTOSAVE_FAILED, details } );
 
 const isAutosaveRequest = ( request ) =>
 	request.method() === 'POST' &&
@@ -49,7 +53,9 @@ const test = base.extend( {
 					window.wp.data
 						.select( 'core/notices' )
 						.getNotices()
-						.map( ( { content } ) => content )
+						.map( ( { content, details } ) =>
+							details ? { content, details } : content
+						)
 				);
 			},
 		} );
@@ -72,78 +78,91 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	for ( const [ title, failure, notice ] of [
-		// TODO: Show the PHP error the response includes in `data.error`.
-		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
-		// TODO: Sanitize the message HTML and show it, keeping links.
+		[
+			'PHP fatal error',
+			'fatal-error',
+			// The stack trace's paths and line numbers depend on the
+			// WordPress version, so only its start is checked.
+			withDetails(
+				expect.stringMatching(
+					/^Error code 500\. There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
+				)
+			),
+		],
 		[
 			'database connection lost',
 			'database-connection-lost',
-			AUTOSAVE_FAILED,
+			withDetails(
+				'Error code 500. Error establishing a database connection'
+			),
 		],
-		// TODO: Sanitize the message HTML and show it, keeping links.
 		[
 			'error message containing a link',
 			'link-in-message',
-			AUTOSAVE_FAILED,
+			withDetails(
+				'Error code 403. Blocked. Learn more (https://example.com).'
+			),
 		],
-		// TODO: Say the server could not be reached, and retry right away.
+		// TODO: Retry right away.
 		[
 			'connection dropped before a response',
 			'dropped-connection',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
-		// TODO: Show the status code.
-		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
+		[
+			'error without a message',
+			'no-message',
+			withDetails( 'Error code 500.' ),
+		],
 		[
 			'error with a plain text message',
 			'plain-message',
-			withDetails( 'Something went wrong on the server.' ),
+			withDetails(
+				'Error code 500. Something went wrong on the server.'
+			),
 		],
 		[
 			'permission denied',
 			'permission',
-			withDetails( 'Sorry, you are not allowed to edit this post.' ),
+			withDetails(
+				'Error code 403. Sorry, you are not allowed to edit this post.'
+			),
 		],
+		// The error's `data` is the database error, so there is no status in it.
 		[
 			'database write failed',
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		// TODO: Show the status code (502) instead.
-		[
-			'HTML error page',
-			'bad-gateway',
-			withDetails( 'The response is not a valid JSON response.' ),
-		],
-		// TODO: Show the status code (429) instead.
+		[ 'HTML error page', 'bad-gateway', withDetails( 'Error code 502.' ) ],
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails( 'Error code 429.' ),
 		],
+		// The error is printed before the headers, so the status stays 200.
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		],
 		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		],
-		// TODO: Say the server could not be reached.
 		[
 			'redirected to another site',
 			'redirect-to-other-site',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
 		[
 			'maintenance mode',
 			'maintenance',
 			withDetails(
-				'Briefly unavailable for scheduled maintenance. Check back in a minute.'
+				'Error code 503. Briefly unavailable for scheduled maintenance. Check back in a minute.'
 			),
 		],
 		// TODO: Report the failure; the autosave fails without a notice.
@@ -163,7 +182,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		await context.setOffline( false );
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.',
+			'Auto-save failed because you were offline. You can also save manually once you’re back online.',
 		] );
 	} );
 
@@ -198,7 +217,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		// TODO: Say the session expired and offer to log in again.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'Cookie check failed' ),
+			withDetails( 'Error code 403. Cookie check failed' ),
 		] );
 	} );
 
@@ -211,7 +230,7 @@ test.describe( 'Autosave failure notice', () => {
 		const title = await autosaveFailure.autosave();
 		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'The response is not a valid JSON response.' ),
+			AUTOSAVE_FAILED,
 		] );
 
 		const postId = await page.evaluate( () =>
@@ -271,6 +290,53 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	test.describe( 'after a failure', () => {
+		test( 'notice counts down to the next autosave', async ( {
+			autosaveFailure,
+			page,
+		} ) => {
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.updateEditorSettings( { autosaveInterval: 10 } )
+			);
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+
+			const notice = page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
+				new RegExp(
+					`${ AUTOSAVE_FAILED_NO_RESPONSE.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
+				)
+			);
+			await expect( notice ).toContainText(
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying in 7 seconds.`
+			);
+		} );
+
+		test( 'notice shows the retry while it is in flight', async ( {
+			autosaveFailure,
+			page,
+		} ) => {
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.updateEditorSettings( { autosaveInterval: 1 } )
+			);
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			await autosaveFailure.fail( 'slow' );
+
+			const notice = page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying…`
+			);
+			await expect( notice ).toHaveCount( 0 );
+		} );
+
 		for ( const newEdits of [ false, true ] ) {
 			test( `autosave is retried at every interval ${
 				newEdits ? 'with' : 'without'
@@ -298,34 +364,121 @@ test.describe( 'Autosave failure notice', () => {
 					}
 				}
 				expect( await autosaveFailure.getNotices() ).toEqual( [
-					AUTOSAVE_FAILED,
+					AUTOSAVE_FAILED_NO_RESPONSE,
 				] );
 			} );
 		}
 
-		test( 'notice stays after a later autosave succeeds', async ( {
+		test( 'notice is removed after a later autosave succeeds', async ( {
 			autosaveFailure,
-			page,
 		} ) => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await autosaveFailure.stopFailing();
 			await autosaveFailure.autosave();
-			expect(
-				await page.evaluate( () =>
-					window.wp.data
-						.select( 'core/editor' )
-						.didPostSaveRequestFail()
-				)
-			).toBe( false );
-			// TODO: Remove the failure notice once an autosave succeeds.
-			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
-			] );
+			expect( await autosaveFailure.getNotices() ).toEqual( [] );
 		} );
+
+		test( 'notice is replaced by the outcome of a manual save', async ( {
+			autosaveFailure,
+			pageUtils,
+		} ) => {
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				AUTOSAVE_FAILED_NO_RESPONSE,
+			] );
+
+			await autosaveFailure.stopFailing();
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ 'Draft saved.' ] );
+		} );
+
+		test( 'notice is replaced by a failed manual save', async ( {
+			autosaveFailure,
+			context,
+			page,
+			pageUtils,
+		} ) => {
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				AUTOSAVE_FAILED_NO_RESPONSE,
+			] );
+
+			await context.setOffline( true );
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ UPDATING_FAILED_OFFLINE ] );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data.select( 'core/editor' ).isSavingPost()
+					)
+				)
+				.toBe( false );
+			await context.setOffline( false );
+		} );
+
+		for ( const [ status, afterAutosave, afterManualSave ] of [
+			// TODO: Should a manual save stay possible, so it creates a revision?
+			[ 'draft', [], [] ],
+			[ 'publish', [ UPDATING_FAILED_OFFLINE ], [ 'Post updated.' ] ],
+		] ) {
+			test( `failed manual save notice is cleared once nothing is left to save (${ status })`, async ( {
+				admin,
+				autosaveFailure,
+				context,
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				const { id } = await requestUtils.createPost( {
+					title: 'Manual save',
+					status,
+				} );
+				await admin.editPost( id );
+				await autosaveFailure.edit();
+				await context.setOffline( true );
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( () =>
+						page.evaluate( () =>
+							window.wp.data
+								.select( 'core/editor' )
+								.isSavingPost()
+						)
+					)
+					.toBe( false );
+				await context.setOffline( false );
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.fail( 'dropped-connection' );
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.stopFailing();
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual(
+					afterAutosave
+				);
+
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( autosaveFailure.getNotices )
+					.toEqual( afterManualSave );
+			} );
+		}
 	} );
 } );

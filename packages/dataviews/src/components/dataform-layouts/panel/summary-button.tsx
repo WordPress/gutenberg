@@ -22,21 +22,32 @@ function SummaryValue< Item >( {
 	field: NormalizedField< Item >;
 	showPlaceholderIfEmpty: boolean;
 } ) {
-	// The same notion of empty as the `required` validator: a field whose
-	// empty value differs (an id of `0`, an object) normalizes it in `getValue`.
-	if (
-		showPlaceholderIfEmpty &&
-		field.placeholder &&
-		[ undefined, null, '' ].includes( field.getValue( { item } ) )
-	) {
-		return (
-			<span className="dataforms-layouts-panel__field-placeholder">
-				{ field.placeholder }
-			</span>
-		);
+	if ( ! showPlaceholderIfEmpty || ! field.placeholder ) {
+		return <field.render item={ item } field={ field } />;
 	}
 
-	return <field.render item={ item } field={ field } />;
+	const placeholder = (
+		<span className="dataforms-layouts-panel__field-placeholder">
+			{ field.placeholder }
+		</span>
+	);
+
+	// The same notion of empty as the `required` validator.
+	if ( [ undefined, null, '' ].includes( field.getValue( { item } ) ) ) {
+		return placeholder;
+	}
+
+	// A value can still render nothing, like an id matching no record, which
+	// the field may only learn after fetching it. The placeholder follows the
+	// render output, and the styles show it only when that output is empty.
+	return (
+		<>
+			<span className="dataforms-layouts-panel__field-value">
+				<field.render item={ item } field={ field } />
+			</span>
+			{ placeholder }
+		</>
+	);
 }
 
 export default function SummaryButton< Item >( {

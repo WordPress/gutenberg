@@ -26,7 +26,7 @@ Choose the smallest public composition that meets the interaction contract. Keep
 ## Check the changed integration
 
 - Before building a custom button, dialog, or other UI component, check whether an existing public component or composition meets the need. Use documented props and composition to adjust presentation instead of copying a component's implementation.
-- For a migration, use the [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api), including extension points used outside the repository.
+- For a migration, use the [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api), including extension points used outside the repository. In Gutenberg, when replacing a `@wordpress/components` component with its `@wordpress/ui` replacement, also follow [Replace a legacy component](../../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component) for when a migration is worth doing and how to handle lint exceptions and suppressions.
 - For overlays or changed rendering destinations, read [Setup depends on the document](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document). Inspect the actual portal container and its owner document. Check style delivery, inherited tokens, and focus there; a same-document portal does not create a new document.
 - For a separate app or document, verify setup only for packages that render there. Record unresolved stylesheet, runtime-style, theming, or overlay requirements when they affect completion.
 

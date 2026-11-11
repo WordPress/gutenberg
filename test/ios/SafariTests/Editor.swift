@@ -1,9 +1,9 @@
 import XCTest
 
 /// A block in the editor canvas as accessibility reports it: the title from
-/// its "Block: <title>" label and its content as text. Safari gives a UI
-/// test no way to run the editor's JavaScript, so this stands in for the
-/// block list of the Playwright end-to-end tests.
+/// its "Block: <title>" label and its content as text. A UI test has no way
+/// to run the editor's JavaScript, so this stands in for the block list of
+/// the Playwright end-to-end tests.
 struct Block: Equatable, CustomStringConvertible {
 	let title: String
 	let content: String
@@ -13,12 +13,12 @@ struct Block: Equatable, CustomStringConvertible {
 	}
 }
 
-/// Utilities for the block editor in Safari.
+/// Utilities for the block editor in the host app's web view.
 struct Editor {
-	let safari: XCUIApplication
+	let app: XCUIApplication
 
 	var canvas: XCUIElement {
-		safari.webViews.firstMatch
+		app.webViews.firstMatch
 	}
 
 	/// The block with this title and exactly this content.

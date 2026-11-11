@@ -21,7 +21,7 @@
 	},
 	"devDependencies": {
 		"@apidevtools/json-schema-ref-parser": "^11.6.4",
-		"@babel/core": "^7.25.7",
+		"@babel/parser": "^7.28.6",
 		"@wordpress/docgen": "file:../../packages/docgen",
 		"chalk": "^4.1.1",
 		"change-case": "^4.1.2",

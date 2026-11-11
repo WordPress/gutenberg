@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "4.57.0",
+	"version": "5.1.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,7 @@
 		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

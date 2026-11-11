@@ -19,9 +19,10 @@ test.describe( 'Settings', () => {
 		admin,
 	} ) => {
 		// We won't select the option that we updated and will also remove some
-		// _transient options that seem to change at every update.
+		// _transient options that seem to change at every update, and the
+		// rewrite rules, which WordPress generates on a later request.
 		const optionsInputsSelector =
-			'form#all-options table.form-table input:not([id*="_transient"]):not([id="blogdescription"])';
+			'form#all-options table.form-table input:not([id*="_transient"]):not([id="blogdescription"]):not([id="rewrite_rules"])';
 		const optionsBefore = await getOptionsValues(
 			optionsInputsSelector,
 			admin,

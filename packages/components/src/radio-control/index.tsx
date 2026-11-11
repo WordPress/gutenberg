@@ -1,12 +1,11 @@
 import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 import { useInstanceId } from '@wordpress/compose';
+import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
-import { VStack } from '../v-stack';
 import { StyledHelp } from '../base-control/styles/base-control-styles';
-import { VisuallyHidden } from '../visually-hidden';
 
 function generateOptionDescriptionId( radioGroupId: string, index: number ) {
 	return `${ radioGroupId }-${ index }-option-description`;
@@ -83,19 +82,30 @@ export function RadioControl(
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				<VisuallyHidden render={ <legend /> }>{ label }</VisuallyHidden>
 			) : (
 				<BaseControl.VisualLabel as="legend">
 					{ label }
 				</BaseControl.VisualLabel>
 			) }
 
-			<VStack
-				spacing={ 3 }
+			<Stack
+				direction="column"
+				gap="md"
+				align="stretch"
 				className={ clsx( 'components-radio-control__group-wrapper', {
 					'has-help': !! help,
 				} ) }
 			>
+				{ !! help && (
+					<Text
+						id={ generateHelpId( id ) }
+						variant="body-sm"
+						className="components-radio-control__help"
+					>
+						{ help }
+					</Text>
+				) }
 				{ options.map( ( option, index ) => (
 					<div
 						key={ generateOptionId( id, index ) }
@@ -139,15 +149,7 @@ export function RadioControl(
 						) : null }
 					</div>
 				) ) }
-			</VStack>
-			{ !! help && (
-				<StyledHelp
-					id={ generateHelpId( id ) }
-					className="components-base-control__help"
-				>
-					{ help }
-				</StyledHelp>
-			) }
+			</Stack>
 		</fieldset>
 	);
 }

@@ -24,6 +24,9 @@ import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
 const NOTICE_TIMEOUT = 6000;
+// Snackbars with an action stay up longer, so there is time to read the
+// message and then use the action.
+const NOTICE_TIMEOUT_WITH_ACTIONS = 10000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -122,6 +125,9 @@ function UnforwardedSnackbar(
 		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
+	const timeout =
+		actions.length > 0 ? NOTICE_TIMEOUT_WITH_ACTIONS : NOTICE_TIMEOUT;
+
 	useEffect( () => {
 		if ( explicitDismiss || ! isPresent ) {
 			return;
@@ -130,10 +136,10 @@ function UnforwardedSnackbar(
 		const timeoutHandle = setTimeout( () => {
 			callbacksRef.current.onDismiss?.();
 			callbacksRef.current.onRemove?.();
-		}, NOTICE_TIMEOUT );
+		}, timeout );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss, isPresent ] );
+	}, [ explicitDismiss, isPresent, timeout ] );
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,

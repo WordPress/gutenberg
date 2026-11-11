@@ -162,7 +162,7 @@ export function toTree< T >( {
 	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
-		const character = text.charAt( i );
+		let character = text.charAt( i );
 		const shouldInsertPadding =
 			isEditableTree &&
 			// Pad the line if the line is empty.
@@ -323,10 +323,34 @@ export function toTree< T >( {
 			} );
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
-		} else if ( ! isText( pointer ) ) {
-			pointer = append( getParent( pointer ), character );
 		} else {
-			appendText( pointer, character );
+			// The next characters with the same formats go in the same text
+			// node, so append them at once, up to a character handled
+			// differently or a selection boundary.
+			let runEnd = i + 1;
+			while (
+				runEnd < text.length &&
+				formats[ runEnd ] === characterFormats &&
+				runEnd !== start &&
+				runEnd !== end &&
+				text[ runEnd ] !== OBJECT_REPLACEMENT_CHARACTER &&
+				( preserveWhiteSpace || text[ runEnd ] !== '\n' )
+			) {
+				runEnd++;
+			}
+
+			if ( runEnd > i + 1 ) {
+				character = text.slice( i, runEnd );
+				i = runEnd - 1;
+			}
+
+			if ( ! isText( pointer ) ) {
+				pointer = append( getParent( pointer ), character );
+			} else {
+				appendText( pointer, character );
+			}
+
+			character = text.charAt( i );
 		}
 
 		if ( onStartIndex && start === i + 1 ) {

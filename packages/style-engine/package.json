@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "2.57.0",
+	"version": "3.1.0",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -65,7 +65,7 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19"

@@ -1,19 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
+import { parseCSSUnitValue } from '../unit-values';
 
 describe( 'unit-values', () => {
-	describe( 'createCSSUnitValue', () => {
-		it.each`
-			value     | unit      | output
-			${ 100 }  | ${ 'em' } | ${ '100em' }
-			${ '40' } | ${ 'vw' } | ${ '40vw' }
-		`(
-			'should combine $value and $unit to create $output',
-			( { value, unit, output } ) =>
-				expect( createCSSUnitValue( value, unit ) ).toEqual( output )
-		);
-	} );
-
 	describe( 'parseCSSUnitValue', () => {
 		it.each`
 			value                  | output

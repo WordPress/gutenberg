@@ -1,15 +1,17 @@
+import clsx from 'clsx';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
@@ -48,18 +50,20 @@ export default function PostNavigationLinkEdit( {
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 
 	/*
-	 * Border, dimensions, shadow and spacing serialization is skipped for this
-	 * block so the styles are not applied to the empty wrapper the front end
-	 * renders when there is no adjacent post. The editor always renders the
-	 * link, so they always apply here.
+	 * Background, border, dimensions, shadow and spacing serialization is
+	 * skipped for this block so the styles are not applied to the empty
+	 * wrapper the front end renders when there is no adjacent post. The editor
+	 * always renders the link, so they always apply here.
 	 */
+	const backgroundProps = useBackgroundProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const blockProps = useBlockProps( {
-		className: borderProps.className,
+		className: clsx( backgroundProps.className, borderProps.className ),
 		style: {
+			...backgroundProps.style,
 			...borderProps.style,
 			...dimensionsProps.style,
 			...shadowProps.style,
@@ -77,22 +81,20 @@ export default function PostNavigationLinkEdit( {
 		},
 		[ postType ]
 	);
-	const getTaxonomyOptions = () => {
-		const selectOption = {
+	const taxonomyOptions = [
+		{
 			label: __( 'Unfiltered' ),
 			value: '',
-		};
-		const taxonomyOptions = ( taxonomies ?? [] )
+		},
+		...( taxonomies ?? [] )
 			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
 			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			} );
-
-		return [ selectOption, ...taxonomyOptions ];
-	};
+			} ),
+	];
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -198,16 +200,22 @@ export default function PostNavigationLinkEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<WCSelectControl
+				<SelectControl
 					label={ __( 'Filter by taxonomy' ) }
-					value={ taxonomy }
-					options={ getTaxonomyOptions() }
-					onChange={ ( value ) =>
+					items={ taxonomyOptions }
+					itemToStringValue={ ( item ) => `taxonomy:${ item.value }` }
+					value={
+						taxonomyOptions.find(
+							( item ) => item.value === taxonomy
+						) ?? taxonomyOptions[ 0 ]
+					}
+					onValueChange={ ( item ) =>
+						item &&
 						setAttributes( {
-							taxonomy: value,
+							taxonomy: item.value,
 						} )
 					}
-					help={ __(
+					description={ __(
 						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
 					) }
 				/>

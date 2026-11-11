@@ -41,6 +41,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
@@ -54,6 +57,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 - **background**: `.wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input`
 - **border**: `.wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper`
 - **shadow**: `.wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper`
+- **dimensions**: `.wp-block-search .wp-block-search__inside-wrapper`
 
 ## Block Markup
 

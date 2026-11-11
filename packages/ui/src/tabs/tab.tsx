@@ -1,8 +1,6 @@
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
-import { chevronRight } from '@wordpress/icons';
-import { Icon } from '../icon';
 import { useRegisterTab } from './context';
 import styles from './style.module.css';
 import type { TabProps } from './types';
@@ -27,10 +25,6 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >(
 				{ ...otherProps }
 			>
 				<span className={ styles[ 'tab-children' ] }>{ children }</span>
-				<Icon
-					icon={ chevronRight }
-					className={ styles[ 'tab-chevron' ] }
-				/>
 			</_Tabs.Tab>
 		);
 	}

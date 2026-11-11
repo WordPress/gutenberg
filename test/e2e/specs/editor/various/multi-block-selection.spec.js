@@ -514,8 +514,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: '2' },
 		} );
-		// To hide the block tool bar.
-		await page.keyboard.press( 'ArrowDown' );
+		// Put the caret in the first paragraph, so moving the mouse shows the
+		// block toolbar above it, not over the paragraph the drag starts in.
+		await page.keyboard.press( 'ArrowUp' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -550,9 +551,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				},
 			],
 		} );
-		// To hide the block tool bar.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
+		// Put the caret in the first paragraph, so moving the mouse shows the
+		// block toolbar above it, not over the paragraph the drag starts in.
+		await page.keyboard.press( 'ArrowUp' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -989,6 +990,55 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'a' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
+	test( 'should select a single list item with a link on triple click', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'One <a href="#">two</a> three' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: 'Second' },
+				},
+			],
+		} );
+
+		// The browser extends the forward selection to offset 0 of the next
+		// list item's rich text, which has no previous sibling in its block.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: List item' } )
+			.first()
+			.getByText( 'One' )
+			.click( { clickCount: 3 } );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/list-item' } ] );
+
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'Second' },
+					},
+				],
+			},
 		] );
 	} );
 
@@ -1871,6 +1921,65 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 						)
 				)
 				.toMatch( /text s/ );
+		} );
+
+		test( 'should preserve text selection on shift+click within the same paragraph', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'sample paragraph text' },
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			const paragraph = editor.canvas.getByText(
+				'sample paragraph text',
+				{ exact: true }
+			);
+
+			// Click to place caret at the beginning.
+			await paragraph.click( { position: { x: 10, y: 8 } } );
+
+			// Shift+click towards the end of the same paragraph.
+			await paragraph.click( {
+				modifiers: [ 'Shift' ],
+				position: { x: 80, y: 8 },
+			} );
+
+			// Extending selection within the same block keeps text selection active.
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							blocks: sel.getSelectedBlockClientIds().length,
+							startKey: sel.getSelectionStart()?.attributeKey,
+							endKey: sel.getSelectionEnd()?.attributeKey,
+							isFullySelected: sel.__unstableIsFullySelected(),
+						};
+					} )
+				)
+				.toEqual( {
+					blocks: 1,
+					startKey: 'content',
+					endKey: 'content',
+					isFullySelected: false,
+				} );
+
+			await expect
+				.poll( () =>
+					page
+						.frame( { name: 'editor-canvas' } )
+						.evaluate( () =>
+							document
+								.getSelection()
+								.toString()
+								.replace( /\s+/g, ' ' )
+						)
+				)
+				.not.toBe( '' );
 		} );
 
 		test( 'should multi-select blocks without text selection', async ( {
