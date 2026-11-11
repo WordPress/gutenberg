@@ -36,7 +36,9 @@ interface WpUpdatesInstallPluginErrorResponse {
 }
 
 interface WpUpdates {
-	installPlugin: ( args: { slug: string } ) => void;
+	installPlugin: ( args: { slug: string } ) => {
+		fail?: ( callback: ( response: unknown ) => void ) => void;
+	} | void;
 }
 
 type JQueryHandler = (
@@ -132,7 +134,13 @@ export function installPluginViaWpUpdates(
 		jq( document ).on( 'wp-plugin-install-error', onError );
 		jq( document ).on( 'credential-modal-cancel', onCancel );
 
-		updates.installPlugin( { slug } );
+		const request = updates.installPlugin( { slug } );
+		request?.fail?.( ( response ) => {
+			if ( typeof response !== 'object' || response === null ) {
+				cleanup();
+				reject( new Error( 'Install failed.' ) );
+			}
+		} );
 	} );
 }
 
