@@ -217,7 +217,10 @@ describe( 'Restore original', () => {
 
 	it.each( [
 		{ withTransform: false, target: 'the original attachment' },
-		{ withTransform: true, target: 'a new attachment after rotating' },
+		{
+			withTransform: true,
+			target: 'a new attachment after flipping, rotating and cropping',
+		},
 	] )( 'saves restored details to $target', async ( { withTransform } ) => {
 		const { registry, writes, onSaved } = await setup();
 		await restoreOriginal();
@@ -226,13 +229,24 @@ describe( 'Restore original', () => {
 			'Updated original text'
 		);
 		if ( withTransform ) {
+			// All three parts of the edit, so the assertion on `modifiers`
+			// below also checks the order they are sent in.
 			await userEvent.click(
 				screen.getByRole( 'tab', { name: 'Crop' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Flip horizontal' } )
 			);
 			await userEvent.click(
 				screen.getByRole( 'button', {
 					name: 'Rotate 90° clockwise',
 				} )
+			);
+			await userEvent.click(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Square (1:1)' } )
 			);
 		}
 
@@ -259,6 +273,13 @@ describe( 'Restore original', () => {
 		const editWrite = withTransform
 			? writes.mock.calls[ 0 ][ 1 ]
 			: undefined;
+		// The largest square in the rotated 400 × 600 image, centred.
+		const squareCrop = {
+			left: expect.closeTo( 0 ),
+			top: expect.closeTo( 100 / 6 ),
+			width: expect.closeTo( 100 ),
+			height: expect.closeTo( 200 / 3 ),
+		};
 		expect( {
 			src: editWrite?.src,
 			post: editWrite?.post,
@@ -268,7 +289,16 @@ describe( 'Restore original', () => {
 				? {
 						src: original.source_url,
 						post: original.post,
-						modifiers: [ { type: 'rotate', args: { angle: 90 } } ],
+						modifiers: [
+							{
+								type: 'flip',
+								args: {
+									flip: { horizontal: true, vertical: false },
+								},
+							},
+							{ type: 'rotate', args: { angle: 90 } },
+							{ type: 'crop', args: squareCrop },
+						],
 					}
 				: { src: undefined, post: undefined, modifiers: undefined }
 		);
