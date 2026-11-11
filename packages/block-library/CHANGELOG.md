@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing.
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).

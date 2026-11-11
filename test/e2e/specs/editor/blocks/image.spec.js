@@ -1371,6 +1371,62 @@ test.describe( 'Image - lightbox', () => {
 			} );
 		} );
 
+		test( 'should keep the overlay intact when reopened before the close cleanup runs', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+
+			const pageErrors = [];
+			page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
+
+			await page.goto( `/?p=${ postId }` );
+
+			const image = page.locator( '.wp-lightbox-container img' );
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+			const enlargedImage = overlay.locator(
+				'img[data-wp-bind--src="state.enlargedSrc"]'
+			);
+
+			await image.click();
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Controls the timer that cleans up after the close animation.
+			await page.clock.install();
+
+			await overlay.getByRole( 'button', { name: 'Close' } ).click();
+			await expect( overlay ).not.toHaveClass( /active/ );
+
+			// Reopens before the close cleanup timer fires. The click is
+			// dispatched directly because the closing overlay still covers the
+			// image.
+			await image.dispatchEvent( 'click' );
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Lets the pending close cleanup run.
+			await page.clock.runFor( 1000 );
+
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( overlay ).toHaveAttribute( 'role', 'dialog' );
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				uploadedMedia.source_url
+			);
+
+			// Closing again restores focus to the trigger button without errors.
+			await page.keyboard.press( 'Escape' );
+			await page.clock.runFor( 1000 );
+			await expect( overlay ).not.toHaveClass( /active/ );
+			await expect(
+				page.locator( 'button.lightbox-trigger' )
+			).toBeFocused();
+			expect( pageErrors ).toEqual( [] );
+		} );
+
 		test.describe( 'Overlay not a direct child of body', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(
