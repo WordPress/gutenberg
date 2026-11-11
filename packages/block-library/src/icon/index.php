@@ -39,49 +39,12 @@ function render_block_core_icon( $attributes ) {
 	$custom_background_color    = $attributes['style']['color']['background'] ?? null;
 	$color_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
-	// Background image, size and gradient.
-	$background_styles = array();
-	if ( isset( $attributes['style']['background'] ) && is_array( $attributes['style']['background'] ) ) {
-		$background_styles = array_intersect_key(
-			$attributes['style']['background'],
-			array_flip( array( 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat', 'backgroundAttachment', 'gradient' ) )
-		);
-
-		// Mirror of the defaults in the background block support.
-		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] ??= 'cover';
-			if ( 'contain' === $background_styles['backgroundSize'] && empty( $background_styles['backgroundPosition'] ) ) {
-				$background_styles['backgroundPosition'] = '50% 50%';
-			}
-		}
+	// Background image, size and gradient. Icon has no clip support, so ignore a stale value.
+	$background = $attributes['style']['background'] ?? null;
+	if ( is_array( $background ) ) {
+		unset( $background['backgroundClip'] );
 	}
-
-	// Border.
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => $border['color'] ?? null,
-			'style' => $border['style'] ?? null,
-			'width' => $border['width'] ?? null,
-		);
-	}
+	$background_styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
 
 	// Shadow.
 	$shadow_styles = $attributes['style']['shadow'] ?? null;
@@ -94,17 +57,16 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Generate styles and classes.
-	$styles         = wp_style_engine_get_styles(
+	// Border sits between color and shadow in the style engine's order.
+	$styles_before_border = wp_style_engine_get_styles( array( 'color' => $color_styles ) );
+	$border_styles        = wp_get_border_classes_and_styles( $attributes );
+	$styles_after_border  = wp_style_engine_get_styles(
 		array(
-			'color'      => $color_styles,
-			'background' => $background_styles,
-			'border'     => $border_styles,
 			'shadow'     => $shadow_styles,
 			'dimensions' => $dimensions_styles,
-		),
+		)
 	);
-	$spacing_styles = wp_get_spacing_classes_and_styles(
+	$spacing_styles       = wp_get_spacing_classes_and_styles(
 		array(
 			'style' => array(
 				'spacing' => array(
@@ -113,14 +75,20 @@ function render_block_core_icon( $attributes ) {
 			),
 		)
 	);
-	$styles['css']  = ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' );
+	$styles               = array(
+		'classnames' => implode( ' ', array_filter( array( $styles_before_border['classnames'] ?? '', $border_styles['class'] ?? '', $styles_after_border['classnames'] ?? '' ) ) ),
+		'css'        => ( $styles_before_border['css'] ?? '' ) . ( $border_styles['style'] ?? '' ) . ( $styles_after_border['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
+	);
+
+	// The style engine outputs background before the other groups, so it leads here too.
+	$css = ( $background_styles['style'] ?? '' ) . $styles['css'];
 
 	$svg = wp_get_icon(
 		$attributes['icon'],
 		array(
 			// Width is applied via the dimensions block support styles below.
 			'size'  => null,
-			'class' => $styles['classnames'] ?? '',
+			'class' => $styles['classnames'],
 			'label' => $attributes['ariaLabel'] ?? '',
 		)
 	);
@@ -131,7 +99,7 @@ function render_block_core_icon( $attributes ) {
 
 	$processor = new WP_HTML_Tag_Processor( $svg );
 	if ( $processor->next_tag( 'svg' ) ) {
-		if ( ! empty( $styles['css'] ) ) {
+		if ( '' !== $css ) {
 			// Merge with the SVG's intrinsic style (e.g. `fill: none` on
 			// stroke-based icons) so it is preserved. The block styles come last
 			// so they win on any conflicting property.
@@ -140,14 +108,13 @@ function render_block_core_icon( $attributes ) {
 				? rtrim( trim( $existing_style ), ';' )
 				: '';
 			$merged_style   = '' !== $trimmed_style
-				? $trimmed_style . '; ' . $styles['css']
-				: $styles['css'];
+				? $trimmed_style . '; ' . $css
+				: $css;
 			$processor->set_attribute( 'style', $merged_style );
 		}
 
-		// The style engine only adds `has-background` for a gradient.
-		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$processor->add_class( 'has-background' );
+		if ( ! empty( $background_styles['class'] ) ) {
+			$processor->add_class( $background_styles['class'] );
 		}
 
 		// Apply flip classes to the SVG.

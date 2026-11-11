@@ -717,7 +717,6 @@ export default function LatestPostsEdit( {
 										<a
 											className="wp-block-latest-posts__read-more"
 											href={ post.link }
-											rel="noopener"
 											onClick={
 												showRedirectionPreventedNotice
 											}

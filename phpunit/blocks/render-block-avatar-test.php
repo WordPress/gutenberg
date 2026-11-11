@@ -64,4 +64,34 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 		$this->assertSame( 'avatar avatar-96 photo wp-block-avatar__image has-border-color', $actual['class'] );
 		$this->assertSame( 'border-color:#ff0000;border-radius:10px;box-shadow:1px 1px 1px #000;', $actual['style'] );
 	}
+
+	public function test_image_border_and_shadow_styles() {
+		$attributes = array(
+			'userId'      => self::$user_id,
+			'borderColor' => 'accent-2',
+			'style'       => array(
+				'border' => array(
+					'radius' => 5,
+					'top'    => array(
+						'style' => 'dashed',
+						'width' => '3px',
+					),
+				),
+				'shadow' => '10px 10px 5px #000000',
+			),
+		);
+
+		$processor = new WP_HTML_Tag_Processor( do_blocks( '<!-- wp:avatar ' . wp_json_encode( $attributes ) . ' /-->' ) );
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+		$this->assertSame(
+			array(
+				'class' => 'avatar avatar-96 photo wp-block-avatar__image has-border-color has-accent-2-border-color',
+				'style' => 'border-radius:5px;border-top-width:3px;border-top-style:dashed;box-shadow:10px 10px 5px #000000;',
+			),
+			array(
+				'class' => $processor->get_attribute( 'class' ),
+				'style' => $processor->get_attribute( 'style' ),
+			)
+		);
+	}
 }

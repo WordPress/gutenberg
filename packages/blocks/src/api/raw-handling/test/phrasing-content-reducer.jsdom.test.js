@@ -49,11 +49,11 @@ describe( 'phrasingContentReducer', () => {
 		);
 	} );
 
-	it( 'should normalise the rel attribute', () => {
+	it( 'should remove the rel attribute and keep target="_blank"', () => {
 		const input =
-			'<a href="https://wordpress.org" target="_blank">WordPress</a>';
+			'<a href="https://wordpress.org" target="_blank" rel="noreferrer nofollow">WordPress</a>';
 		const output =
-			'<a href="https://wordpress.org" target="_blank" rel="noopener">WordPress</a>';
+			'<a href="https://wordpress.org" target="_blank">WordPress</a>';
 		expect(
 			deepFilterHTML( input, [ phrasingContentReducer ], {} )
 		).toEqual( output );

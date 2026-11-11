@@ -44,6 +44,24 @@ parameters:
 			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
 			identifier: function.notFound
 
+		# wp_get_background_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_border_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
 		# Level 3:
 		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
 		# template (`@template TOffset of key-of<T>`, `@param T[TOffset] $value`). PHPStan does not resolve that
@@ -60,3 +78,12 @@ parameters:
 			message: '#^WP_REST_Request(?:<.+>)? does not accept .+\.$#'
 			identifier: offsetAssign.valueType
 			reportUnmatched: false
+
+		# Level 4:
+		# The Navigation block checks for WP_Theme_JSON_Gutenberg::get_viewport_media_queries() before falling back to
+		# WP_Theme_JSON. PHPStan sees the Gutenberg class as always defined, but the block library also runs in
+		# WordPress Core, where it is not, so the check is needed there.
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			path: packages/block-library/src/navigation/index.php
