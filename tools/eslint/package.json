@@ -33,7 +33,7 @@
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-jest-dom": "^5.10.1",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"eslint-plugin-storybook": "^10.6.1",
+		"eslint-plugin-storybook": "^10.6.3",
 		"eslint-plugin-testing-library": "^7.16.2",
 		"glob": "^13.0.6",
 		"globals": "^16.0.0",
@@ -42,7 +42,7 @@
 		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
