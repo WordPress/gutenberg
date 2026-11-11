@@ -12,27 +12,38 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
     <span
       class="components-form-toggle__track"
     />
+    <svg
+      aria-hidden="true"
+      class="components-form-toggle__label components-form-toggle__on-label"
+      focusable="false"
+      viewBox="0 0 8 8"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 1.5v5"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      class="components-form-toggle__label components-form-toggle__off-label"
+      focusable="false"
+      viewBox="0 0 8 8"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="4"
+        cy="4"
+        fill="none"
+        r="2.5"
+        stroke="currentColor"
+      />
+    </svg>
     <span
       class="components-form-toggle__thumb"
-    >
-      <svg
-        aria-hidden="true"
-        class="components-form-toggle__check"
-        focusable="false"
-        height="16"
-        role="presentation"
-        stroke="currentColor"
-        stroke-width="1.5"
-        style="fill: none;"
-        viewBox="0 0 24 24"
-        width="16"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M7 12L10 15L17 8"
-        />
-      </svg>
-    </span>
+    />
   </span>
 </div>
 `;

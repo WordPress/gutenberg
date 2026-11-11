@@ -20,10 +20,6 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 		foreground: 'foreground.interactive.neutral',
 	},
 	{
-		background: 'background.thumb.brand-strong',
-		foreground: 'foreground.thumb.brand-strong',
-	},
-	{
 		background: 'background.interactive.neutral-active',
 		foreground: 'foreground.interactive.neutral-weak',
 	},

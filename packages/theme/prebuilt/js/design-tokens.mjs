@@ -1678,24 +1678,6 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
-	'--wpds-color-foreground-thumb-brand-strong': {
-		$description:
-			'Foreground color for content on thumbs with a brand tone and strong emphasis (eg. the check mark in a switch knob).',
-		$type: 'color',
-		group: 'color',
-		fallback: 'var(--wp-admin-theme-color, #3858e9)',
-		modes: {
-			default: {
-				$value: {
-					colorSpace: 'srgb',
-					components: [ 0.22, 0.345, 0.914 ],
-					hex: '#3858e9',
-					alpha: 1,
-				},
-				css: '#3858e9',
-			},
-		},
-	},
 	'--wpds-color-stroke-surface-neutral': {
 		$description:
 			'Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.',
@@ -3155,12 +3137,6 @@ export const groups = /** @type {const} */ ( {
 							'--wpds-color-foreground-interactive-error-strong',
 							'--wpds-color-foreground-interactive-error-strong-active',
 							'--wpds-color-foreground-interactive-error-strong-disabled',
-						],
-						groups: {},
-					},
-					thumb: {
-						tokens: [
-							'--wpds-color-foreground-thumb-brand-strong',
 						],
 						groups: {},
 					},

@@ -1462,12 +1462,6 @@
 					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
 				}
 			},
-			"thumb": {
-				"brand-strong": {
-					"$value": "{wpds-color.primitive.primary.bgFill1}",
-					"$description": "Foreground color for content on thumbs with a brand tone and strong emphasis (eg. the check mark in a switch knob)."
-				}
-			},
 			"$extensions": {
 				"com.figma.scopes": [ "TEXT_FILL", "SHAPE_FILL" ]
 			}

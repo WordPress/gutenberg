@@ -193,8 +193,6 @@
 	--wpds-color-foreground-interactive-neutral-weak-active: #1e1e1e;
 	/* Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
 	--wpds-color-foreground-interactive-neutral-weak-disabled: #8b8b8b;
-	/* Foreground color for content on thumbs with a brand tone and strong emphasis (eg. the check mark in a switch knob). */
-	--wpds-color-foreground-thumb-brand-strong: #3858e9;
 	/* Accessible stroke color applied to focus rings. */
 	--wpds-color-stroke-focus: #3858e9;
 	/* Accessible stroke color used for interactive brand-toned elements with normal emphasis. */

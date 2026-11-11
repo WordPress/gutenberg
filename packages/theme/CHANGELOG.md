@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` and `--wpds-color-foreground-thumb-brand-strong` for the knob and check mark of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
+-   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` for the knob of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 
 ### Enhancements

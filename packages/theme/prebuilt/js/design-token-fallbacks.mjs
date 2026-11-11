@@ -107,8 +107,6 @@ export default {
 	'--wpds-color-foreground-interactive-neutral-weak': '#6e6e6e',
 	'--wpds-color-foreground-interactive-neutral-weak-active': '#1e1e1e',
 	'--wpds-color-foreground-interactive-neutral-weak-disabled': '#8b8b8b',
-	'--wpds-color-foreground-thumb-brand-strong':
-		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-stroke-focus': 'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-stroke-interactive-brand':
 		'var(--wp-admin-theme-color, #3858e9)',

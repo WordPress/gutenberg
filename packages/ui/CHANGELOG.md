@@ -14,7 +14,7 @@
 
 ### Enhancements
 
--   `Switch`, `SwitchControl`: Show a check mark in the thumb when the switch is on, including when it's disabled, so the state doesn't rely on color and thumb position alone. The thumb is now a light pill in every state, spanning the full switch height, and disabled switches use the same track whether on or off ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
+-   `Switch`, `SwitchControl`: Show a `1` on the track when the switch is on and a `0` when it's off, as on iOS, so the state doesn't rely on color and thumb position alone. The thumb is now a pill that spans the full switch height and slides over the label that doesn't apply, and disabled switches use the same track whether on or off ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
