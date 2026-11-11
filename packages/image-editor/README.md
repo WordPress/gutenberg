@@ -146,11 +146,11 @@ The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order
 
 ### `applyImageEdit( state, edit )`
 
-The reverse of `getImageEdit`, for editing from code. It returns `{ state }`: store that state as you store any other change, and the canvas shows the edit.
+The reverse of `getImageEdit`. Returns `{ state }`, to store like any other change.
 
-The edit is the whole edit. A part left out means none, whatever `state` had; only the image and the locked ratio are taken from `state`. The crop is measured on the image after the flip and rotation, so changing either without changing the crop frames a different part of the image. The pan and zoom are replaced: the crop is centred and zoomed in until it meets an edge of the view or the zoom limit, as it is after a person resizes it.
+A part missing from `edit` means none. Only the image and locked ratio are kept from `state`. The crop is measured after the flip and rotation, so keeping the crop while changing either frames a different region. The pan and zoom are replaced: the crop is centred and zoomed in, as after a resize.
 
-An edit the editor cannot hold is rejected, not adjusted. The result is then `{ rejected }`, with `'no-image'`, `'invalid'` for a value that is not a finite number or a crop with no area, `'locked-ratio'` for a crop whose shape breaks the locked ratio, or `'outside-image'` for a crop that reaches outside the image. So `{ rotation: 10 }` on its own is rejected: the whole bounding box of a tilted image has empty corners.
+An edit the editor cannot hold is rejected, not adjusted. `{ rejected }` is then `'no-image'`, `'invalid'`, `'locked-ratio'` or `'outside-image'`. `invalid` is a non-finite number or a crop with no area. `{ rotation: 10 }` alone is `outside-image`: a tilted image's bounds have empty corners.
 
 ### `exportImage( state, options? )`
 

@@ -249,7 +249,7 @@ const file = await exportImage( controller.state, {
 
 ## Apply an Edit From Code
 
-`applyImageEdit( state, edit )` takes the shape `getImageEdit` returns and gives back a state, so code can edit an image with no canvas on screen. The edit is the whole edit, and its crop is measured on the image after the flip and rotation:
+`applyImageEdit( state, edit )` turns an edit back into a state. With a canvas, store `result.state` like any other change. Without one, export it:
 
 ```ts
 import {
@@ -272,8 +272,6 @@ if ( 'rejected' in result ) {
 
 const file = await exportImage( result.state, { type: 'image/jpeg' } );
 ```
-
-With a canvas on screen, store `result.state` as you store any other change, and the canvas shows the edit.
 
 ## Accessibility Notes
 
