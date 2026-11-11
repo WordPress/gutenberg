@@ -7,7 +7,6 @@ import { getRotatedBBox } from './core/camera';
  * A part is absent when it changes nothing.
  */
 export interface ImageEdit {
-	/** Mirror along each axis that is `true`. */
 	flip?: Flip;
 	/**
 	 * Degrees clockwise about the centre, applied after the flip. With

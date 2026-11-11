@@ -93,8 +93,8 @@ export interface ImageEditorState {
 	readonly flip: Readonly< Flip >;
 	/**
 	 * The crop area, as fractions of the view the canvas shows. The view
-	 * is the image turned by its rotation snapped to a quarter turn, not
-	 * the image itself.
+	 * is the image at its rotation snapped to a quarter turn, not the
+	 * image itself.
 	 */
 	readonly cropRect: Readonly< NormalizedRect >;
 	/**
