@@ -750,6 +750,23 @@ button.wp-block-navigation-item__content {
 						right: auto;
 						left: 0;
 					}
+
+					// Unfold submenus of a vertical navigation inline, pushing the
+					// items after them down, instead of floating over them.
+					.is-vertical .has-child {
+						flex-wrap: wrap;
+
+						> .wp-block-navigation__submenu-container {
+							flex-basis: 100%;
+							position: static;
+							border: none;
+							background-color: transparent;
+							color: inherit;
+							padding-left: var(--wp--style--block-gap, 2em);
+							// Has to be !important to override the inline instance style.
+							box-shadow: none !important;
+						}
+					}
 				}
 			}
 		}
