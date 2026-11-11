@@ -36,9 +36,10 @@ interface WpUpdatesInstallPluginErrorResponse {
 }
 
 interface WpUpdates {
-	installPlugin: ( args: { slug: string } ) => {
-		fail?: ( callback: ( response: unknown ) => void ) => void;
-	} | void;
+	installPlugin: ( args: { slug: string } ) => void;
+	maybeRequestFilesystemCredentials?: ( event: {
+		target: Element | null;
+	} ) => void;
 }
 
 type JQueryHandler = (
@@ -47,13 +48,25 @@ type JQueryHandler = (
 		WpUpdatesInstallPluginResponse | WpUpdatesInstallPluginErrorResponse
 ) => void;
 
+type JQueryAjaxCompleteHandler = (
+	event: unknown,
+	xhr: { status: number; responseJSON?: unknown },
+	settings: { data?: unknown }
+) => void;
+
 interface WpUpdatesGlobal {
 	wp?: {
 		updates?: WpUpdates;
 	};
 	jQuery?: ( target: Document ) => {
-		on: ( events: string, handler: JQueryHandler ) => void;
-		off: ( events: string, handler: JQueryHandler ) => void;
+		on: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
+		off: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
 	};
 }
 
@@ -101,6 +114,7 @@ export function installPluginViaWpUpdates(
 			jq( document ).off( 'wp-plugin-install-success', onSuccess );
 			jq( document ).off( 'wp-plugin-install-error', onError );
 			jq( document ).off( 'credential-modal-cancel', onCancel );
+			jq( document ).off( 'ajaxComplete', onAjaxComplete );
 		};
 
 		const onSuccess: JQueryHandler = ( _event, response ) => {
@@ -129,18 +143,47 @@ export function installPluginViaWpUpdates(
 			cleanup();
 			resolve( 'canceled' );
 		};
+		// When the server returns an unexpected response (for example, an
+		// expired nonce or a PHP fatal error), none of the events above
+		// fire. Watch the install request itself so the install fails
+		// instead of staying on "Installing…".
+		const onAjaxComplete: JQueryAjaxCompleteHandler = (
+			_event,
+			xhr,
+			settings
+		) => {
+			if ( typeof settings.data !== 'string' ) {
+				return;
+			}
+			const params = new URLSearchParams( settings.data );
+			if (
+				params.get( 'action' ) !== 'install-plugin' ||
+				params.get( 'slug' ) !== slug
+			) {
+				return;
+			}
+			if (
+				xhr.status !== 200 ||
+				typeof xhr.responseJSON !== 'object' ||
+				xhr.responseJSON === null
+			) {
+				cleanup();
+				reject( new Error( 'Install failed.' ) );
+			}
+		};
 
 		jq( document ).on( 'wp-plugin-install-success', onSuccess );
 		jq( document ).on( 'wp-plugin-install-error', onError );
 		jq( document ).on( 'credential-modal-cancel', onCancel );
+		jq( document ).on( 'ajaxComplete', onAjaxComplete );
 
-		const request = updates.installPlugin( { slug } );
-		request?.fail?.( ( response ) => {
-			if ( typeof response !== 'object' || response === null ) {
-				cleanup();
-				reject( new Error( 'Install failed.' ) );
-			}
+		// Open the credentials modal before sending the request, as
+		// Plugins > Add Plugin does. The modal then opens without an error,
+		// and focus returns to the install button when it closes.
+		updates.maybeRequestFilesystemCredentials?.( {
+			target: document.activeElement,
 		} );
+		updates.installPlugin( { slug } );
 	} );
 }
 
