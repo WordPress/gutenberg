@@ -19,6 +19,8 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 -   Describe the edit to apply when saving as one `ImageEdit` record, returned by `getImageEdit( state )` ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
 -   Add `mapImageEdit( edit, handlers )`, which turns each part of an `ImageEdit` into the consumer's own format in the order the parts apply ([#86704](https://github.com/WordPress/gutenberg/pull/86704)).
 
+-   Add `applyImageEdit( state, edit )`, which turns an `ImageEdit` back into an editor state ([#86665](https://github.com/WordPress/gutenberg/pull/86665)).
+
 ### Bug Fixes
 
 -   Compare only the public edit fields when checking whether two image editor states are equal ([#86286](https://github.com/WordPress/gutenberg/pull/86286)).
