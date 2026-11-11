@@ -217,10 +217,7 @@ describe( 'Restore original', () => {
 
 	it.each( [
 		{ withTransform: false, target: 'the original attachment' },
-		{
-			withTransform: true,
-			target: 'a new attachment after flipping, rotating and cropping',
-		},
+		{ withTransform: true, target: 'a new attachment after a transform' },
 	] )( 'saves restored details to $target', async ( { withTransform } ) => {
 		const { registry, writes, onSaved } = await setup();
 		await restoreOriginal();
@@ -229,8 +226,7 @@ describe( 'Restore original', () => {
 			'Updated original text'
 		);
 		if ( withTransform ) {
-			// All three parts of the edit, so the assertion on `modifiers`
-			// below also checks the order they are sent in.
+			// All three parts, so the assertion below also checks their order.
 			await userEvent.click(
 				screen.getByRole( 'tab', { name: 'Crop' } )
 			);

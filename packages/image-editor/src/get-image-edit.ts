@@ -17,8 +17,7 @@ export interface ImageEdit {
 	rotation?: number;
 	/**
 	 * The rectangle to keep, as fractions (0-1) of the rotated image's
-	 * width and height, from its top left. `state.cropRect` is measured
-	 * against the view instead.
+	 * width and height, from its top left.
 	 */
 	crop?: NormalizedRect;
 }
@@ -39,10 +38,8 @@ const CROP_TOLERANCE = 0.001;
  * the view. Something that edits the file needs the edit described against
  * the file instead.
  *
- * Parts that change nothing are left out: a flip on neither axis and a
- * rotation that comes to 0 degrees. So is a crop within `CROP_TOLERANCE`
- * of the whole rotated image. A locked ratio can produce a crop before
- * the person edits anything.
+ * A crop within `CROP_TOLERANCE` of the whole rotated image is left out.
+ * A locked ratio can produce a crop before the person edits anything.
  *
  * Frames and math:
  *

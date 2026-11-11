@@ -64,13 +64,6 @@ function exportSourcePixel(
 	return { x: out[ 0 ], y: out[ 1 ] };
 }
 
-/**
- * The edit with its absent parts filled in. A missing flip, rotation or
- * crop each mean "nothing to do", which the simulation below needs as
- * concrete values.
- *
- * @param edit The edit as emitted by `getImageEdit`.
- */
 function readEdit( edit: ImageEdit | null ): {
 	flip: { horizontal: boolean; vertical: boolean };
 	rotation: number;
