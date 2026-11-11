@@ -30,7 +30,11 @@ describe( 'DetachPageListDialog', () => {
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Detach' } ) );
 		expect( onConfirm ).toHaveBeenCalled();
-		fireEvent.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		// The header's close button is labelled Cancel too; the footer's is last.
+		const cancelButtons = screen.getAllByRole( 'button', {
+			name: 'Cancel',
+		} );
+		fireEvent.click( cancelButtons[ cancelButtons.length - 1 ] );
 		expect( onCancel ).toHaveBeenCalled();
 	} );
 } );
