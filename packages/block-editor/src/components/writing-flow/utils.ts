@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { create, slice, toHTMLString } from '@wordpress/rich-text';
 import {
 	serialize,
 	createBlock,
@@ -13,27 +14,76 @@ import type { DataRegistry } from '@wordpress/data';
 import type { ClipboardEvent as ReactClipboardEvent } from 'react';
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
+import { getBoundAttributesForCopy } from '../provider/block-refs-provider';
+import type { AttributesForCopy } from '../provider/types';
 
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
 
-/**
- * Sets the clipboard data for the provided blocks, with both HTML and plain
- * text representations.
- *
- * @param event    Clipboard event.
- * @param blocks   Blocks to set as clipboard data.
- * @param registry The registry to select from.
- */
-export function setClipboardBlocks(
-	event: ClipboardEvent | ReactClipboardEvent,
-	blocks: Block[],
-	registry: DataRegistry
+export function getBoundPartialBlockForCopy(
+	block: Block,
+	partialBlock: Block,
+	attributesForCopy: AttributesForCopy | undefined,
+	{
+		attributeKey,
+		startOffset = 0,
+		endOffset,
+	}: { attributeKey?: string; startOffset?: number; endOffset?: number }
 ) {
-	let _blocks: Block | Block[] = blocks;
+	const boundAttributes = getBoundAttributesForCopy(
+		block,
+		attributesForCopy
+	);
+	if ( ! boundAttributes ) {
+		return partialBlock;
+	}
+	const attributes = { ...partialBlock.attributes, ...boundAttributes };
+	if ( Object.hasOwn( boundAttributes, attributeKey! ) ) {
+		const value = create( {
+			html: boundAttributes[ attributeKey! ] as string,
+		} );
+		attributes[ attributeKey! ] = toHTMLString( {
+			value: slice( value, startOffset, endOffset ?? value.text.length ),
+		} );
+	}
+	return { ...partialBlock, attributes };
+}
+
+export function getClipboardBlocksContent(
+	blocks: Block[],
+	registry: Pick< DataRegistry, 'select' >,
+	attributesForCopy?: AttributesForCopy,
+	{ addWrapper = false } = {}
+) {
+	let hasBoundAttributes = false;
+	function resolveBlockForCopy( block: Block ): Block {
+		const boundAttributes = getBoundAttributesForCopy(
+			block,
+			attributesForCopy
+		);
+		const innerBlocks = block.innerBlocks.map( resolveBlockForCopy );
+		const hasChangedInnerBlocks = innerBlocks.some(
+			( innerBlock, index ) => innerBlock !== block.innerBlocks[ index ]
+		);
+
+		if ( ! boundAttributes && ! hasChangedInnerBlocks ) {
+			return block;
+		}
+
+		hasBoundAttributes ||= !! boundAttributes;
+		return {
+			...block,
+			attributes: boundAttributes
+				? { ...block.attributes, ...boundAttributes }
+				: block.attributes,
+			innerBlocks,
+		};
+	}
+
+	let blocksForCopy: Block | Block[] = blocks.map( resolveBlockForCopy );
 
 	const [ firstBlock ] = blocks;
 
-	if ( firstBlock ) {
+	if ( addWrapper && firstBlock ) {
 		const firstBlockType = registry
 			.select( blocksStore )
 			.getBlockType( firstBlock.name );
@@ -52,21 +102,44 @@ export function setClipboardBlocks(
 			const wrapperBlockName = getBlockName( wrapperBlockClientId );
 
 			if ( wrapperBlockName ) {
-				// A named wrapper block exists, so it has attributes.
-				_blocks = createBlock(
+				blocksForCopy = createBlock(
 					wrapperBlockName,
 					getBlockAttributes( wrapperBlockClientId! )!,
-					_blocks
+					blocksForCopy
 				);
 			}
 		}
 	}
 
-	const serialized = serialize( _blocks );
+	const html = serialize( blocksForCopy );
 
-	// Copy and cut events carry clipboard data.
-	event.clipboardData!.setData( 'text/plain', toPlainText( serialized ) );
-	event.clipboardData!.setData( 'text/html', serialized );
+	return { html, plainText: toPlainText( html ), hasBoundAttributes };
+}
+
+/**
+ * Sets the clipboard data for the provided blocks, with both HTML and plain
+ * text representations.
+ *
+ * @param event             Clipboard event.
+ * @param blocks            Blocks to set as clipboard data.
+ * @param registry          The registry to select from.
+ * @param attributesForCopy Resolved bound attributes by block instance.
+ */
+export function setClipboardBlocks(
+	event: ClipboardEvent | ReactClipboardEvent,
+	blocks: Block[],
+	registry: Pick< DataRegistry, 'select' >,
+	attributesForCopy?: AttributesForCopy
+) {
+	const { html, plainText } = getClipboardBlocksContent(
+		blocks,
+		registry,
+		attributesForCopy,
+		{ addWrapper: true }
+	);
+
+	event.clipboardData!.setData( 'text/plain', plainText );
+	event.clipboardData!.setData( 'text/html', html );
 }
 
 /**

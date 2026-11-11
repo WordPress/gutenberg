@@ -4,12 +4,12 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe } from '@wordpress/compose';
 import type { ComponentProps } from 'react';
 import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
@@ -21,6 +21,9 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { BlockRefs } from '../provider/block-refs-provider';
+import { getClipboardBlocksContent } from '../writing-flow/utils';
+import useBlockCopyToClipboard from './use-block-copy-to-clipboard';
 import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
@@ -28,7 +31,7 @@ const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( {
+export function CopyMenuItem( {
 	clientIds,
 	onCopy,
 	label,
@@ -38,9 +41,18 @@ function CopyMenuItem( {
 }: CopyMenuItemProps ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const { attributesForCopy } = useContext( BlockRefs );
 	const notifyCopy = useNotifyCopy();
-	const ref = useCopyToClipboard(
-		// The copied blocks exist.
+	const ref = useBlockCopyToClipboard(
+		() =>
+			eventType === 'copyStyles'
+				? { hasBoundAttributes: false }
+				: getClipboardBlocksContent(
+						getBlocksByClientId( clientIds ) as Block[],
+						registry,
+						attributesForCopy
+					),
 		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
 		() => {
 			switch ( eventType ) {
