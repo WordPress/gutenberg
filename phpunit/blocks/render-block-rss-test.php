@@ -113,7 +113,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	 * Test that each item's date uses the site's UTC offset on that item's date,
 	 * not today's offset, when the site timezone observes daylight saving time.
 	 *
-	 * @ticket 86637
+	 * @link https://github.com/WordPress/gutenberg/issues/86637
 	 *
 	 * @covers ::gutenberg_render_block_core_rss
 	 */
