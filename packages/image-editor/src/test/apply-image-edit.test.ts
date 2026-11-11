@@ -95,6 +95,12 @@ describe( 'applyImageEdit', () => {
 		],
 		[ 'invalid', clean, { crop: { x: 0, y: 0, width: 0, height: 1 } } ],
 		[ 'invalid', clean, { crop: { x: 0, y: 0, width: -0.5, height: 1 } } ],
+		[
+			// Half a pixel wide.
+			'invalid',
+			clean,
+			{ crop: { x: 0.5, y: 0.5, width: 0.5 / 1600, height: 0.5 } },
+		],
 		[ 'invalid', clean, { rotation: Number.NaN } ],
 		[
 			'outside-image',

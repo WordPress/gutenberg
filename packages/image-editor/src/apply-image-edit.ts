@@ -10,7 +10,8 @@ import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
 
 /**
  * Why an edit was rejected. `invalid` is a non-finite number or a crop
- * with no area. `outside-image` is a crop reaching outside the image.
+ * under one pixel wide or high. `outside-image` is a crop reaching outside
+ * the image.
  */
 export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
@@ -70,11 +71,7 @@ export function applyImageEdit(
 		crop.width,
 		crop.height,
 	];
-	if (
-		! numbers.every( Number.isFinite ) ||
-		crop.width <= 0 ||
-		crop.height <= 0
-	) {
+	if ( ! numbers.every( Number.isFinite ) ) {
 		return { rejected: 'invalid' };
 	}
 
@@ -90,15 +87,18 @@ export function applyImageEdit(
 
 	// The crop is in the rotated image's bounds. The view is the bounds at
 	// the nearest quarter turn, on the same centre.
-	const view = getRotatedBBox(
-		image.naturalWidth,
-		image.naturalHeight,
-		Math.round( rotation / 90 ) * 90
-	);
 	const rotated = getRotatedBBox(
 		image.naturalWidth,
 		image.naturalHeight,
 		rotation
+	);
+	if ( crop.width * rotated.width < 1 || crop.height * rotated.height < 1 ) {
+		return { rejected: 'invalid' };
+	}
+	const view = getRotatedBBox(
+		image.naturalWidth,
+		image.naturalHeight,
+		Math.round( rotation / 90 ) * 90
 	);
 	const left =
 		( crop.x * rotated.width - ( rotated.width - view.width ) / 2 ) /
