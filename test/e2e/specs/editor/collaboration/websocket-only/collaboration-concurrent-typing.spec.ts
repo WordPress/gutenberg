@@ -27,6 +27,165 @@ async function getParagraphContents( page: Page ): Promise< string[] > {
 }
 
 test.describe( 'Collaboration - WebSocket Concurrent Typing', () => {
+	test( 'does not duplicate consecutive edits made before the editor renders', async ( {
+		collaborationUtils,
+		requestUtils,
+		page,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Consecutive local edits',
+			date_gmt: new Date().toISOString(),
+			content: paragraph( 'Hello' ),
+			status: 'draft',
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const [ block ] = select( 'core/block-editor' ).getBlocks();
+			dispatch( 'core/block-editor' ).updateBlockAttributes(
+				block.clientId,
+				{
+					content: 'Hello!',
+				}
+			);
+			dispatch( 'core/block-editor' ).updateBlockAttributes(
+				block.clientId,
+				{
+					content: 'Hello!!',
+				}
+			);
+		} );
+		await expect
+			.poll( () => getParagraphContents( collaborationUtils.page2 ) )
+			.toEqual( [ 'Hello!!' ] );
+		await expect
+			.poll( () => getParagraphContents( page ) )
+			.toEqual( [ 'Hello!!' ] );
+	} );
+
+	for ( const peerChange of [
+		'insertion',
+		'reorder',
+		'replacement',
+	] as const ) {
+		test( `keeps and saves a peer ${ peerChange } while typing in a stale editor`, async ( {
+			collaborationUtils,
+			requestUtils,
+			editor,
+			page,
+		} ) => {
+			const post = await requestUtils.createPost( {
+				title: 'Stale edit then save',
+				date_gmt: new Date().toISOString(),
+				content: [ 'Hello', 'Second' ].map( paragraph ).join( '\n\n' ),
+				status: 'draft',
+			} );
+			await collaborationUtils.openCollaborativeSession( post.id );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isEditedPostDirty()
+					)
+				)
+				.toBe( false );
+			// Force the local edit into the gap between core-data receiving a
+			// remote update and React passing it to the block-editor store.
+			await page.evaluate( ( postId ) => {
+				const { select, dispatch, subscribe } = window.wp.data;
+				const unsubscribe = subscribe( () => {
+					const record = select( 'core' ).getEditedEntityRecord(
+						'postType',
+						'post',
+						postId
+					);
+					const contents = record.blocks?.map( ( block: any ) =>
+						String( block.attributes.content )
+					);
+					if (
+						! contents ||
+						contents.join( '|' ) === 'Hello|Second'
+					) {
+						return;
+					}
+					unsubscribe();
+					const [ block ] = select( 'core/block-editor' ).getBlocks();
+					dispatch( 'core/block-editor' ).updateBlockAttributes(
+						block.clientId,
+						{ content: 'Hello!' }
+					);
+				}, 'core' );
+			}, post.id );
+			await collaborationUtils.page2.evaluate( ( change ) => {
+				const { select, dispatch } = window.wp.data;
+				const blocks = select( 'core/block-editor' ).getBlocks();
+				if ( change === 'reorder' ) {
+					dispatch( 'core/block-editor' ).moveBlocksUp( [
+						blocks[ 1 ].clientId,
+					] );
+				} else {
+					const added = window.wp.blocks.createBlock(
+						'core/paragraph',
+						{ content: 'Peer paragraph' }
+					);
+					if ( change === 'replacement' ) {
+						dispatch( 'core/block-editor' ).replaceBlocks(
+							blocks.map(
+								( block: { clientId: string } ) =>
+									block.clientId
+							),
+							[ added ]
+						);
+					} else {
+						dispatch( 'core/block-editor' ).insertBlocks(
+							[ added ],
+							blocks.length
+						);
+					}
+				}
+			}, peerChange );
+			const expected = {
+				insertion: [ 'Hello!', 'Second', 'Peer paragraph' ],
+				reorder: [ 'Second', 'Hello!' ],
+				replacement: [ 'Hello!', 'Peer paragraph' ],
+			}[ peerChange ];
+			await expect
+				.poll( () => getParagraphContents( page ) )
+				.toEqual( expected );
+			await expect
+				.poll( () => getParagraphContents( collaborationUtils.page2 ) )
+				.toEqual( expected );
+			// Continue through the DOM, then verify the saved content and reload.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Hello!' } )
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( '?' );
+			const afterTyping = expected.map( ( text ) =>
+				text === 'Hello!' ? 'Hello!?' : text
+			);
+			await expect
+				.poll( () => getParagraphContents( page ) )
+				.toEqual( afterTyping );
+			await expect
+				.poll( () => getParagraphContents( collaborationUtils.page2 ) )
+				.toEqual( afterTyping );
+			await editor.saveDraft();
+			const saved = await requestUtils.rest( {
+				path: `/wp/v2/posts/${ post.id }?context=edit`,
+			} );
+			for ( const content of afterTyping ) {
+				expect( saved.content.raw ).toContain( content );
+			}
+			await page.reload();
+			await expect
+				.poll( () => getParagraphContents( page ) )
+				.toEqual( afterTyping );
+		} );
+	}
+
 	test( 'does not lose characters when two users rapidly type in different paragraphs', async ( {
 		collaborationUtils,
 		requestUtils,

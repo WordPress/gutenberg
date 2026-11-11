@@ -12,6 +12,7 @@ import {
 	taxonomySyncConfig,
 } from './utils/crdt';
 import type { Post } from './entity-types/post';
+import type { PostChanges } from './utils/crdt';
 import type { EntityConfigLoader, RestTypeDescription } from './private-types';
 import type { EntityConfig, TransientEditConfig } from './types';
 
@@ -414,13 +415,20 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 			 * @param changes
 			 * @param options
 			 */
-			applyChangesToCRDTDoc: ( crdtDoc, changes, options ) =>
-				applyPostChangesToCRDTDoc(
+			applyChangesToCRDTDoc: ( crdtDoc, changes, options ) => {
+				const rebasedChanges = applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
 					syncedProperties,
-					options
-				),
+					// Post sync uses the editor's block representation.
+					options as {
+						previousBlocks?: PostChanges[ 'blocks' ];
+					}
+				);
+				if ( rebasedChanges ) {
+					options?.onRebase?.( rebasedChanges );
+				}
+			},
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.
@@ -442,14 +450,16 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 			 *
 			 * @param crdtDoc
 			 * @param editedRecord
+			 * @param options
 			 * @return Changes to record
 			 */
-			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord, options ) =>
 				getPostChangesFromCRDTDoc(
 					crdtDoc,
 					// The records of post type entities are posts.
 					editedRecord as Post,
-					syncedProperties
+					syncedProperties,
+					options
 				),
 
 			/**

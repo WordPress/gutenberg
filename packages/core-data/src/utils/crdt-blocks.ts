@@ -696,63 +696,59 @@ function deduplicateClientIds( yblocks: YBlocks ): void {
  * way to it sends a list that lacks the update, and a positional merge then
  * deletes the peer's block, or reverts the peer's text.
  *
- * Given the list the change was made against (`baselineBlocks`), this
- * function applies only the difference between the baseline and the incoming
+ * Given the list the change was made against (`previousBlocks`), this
+ * function applies only the difference between the previous and the incoming
  * list, matching blocks by client ID. Blocks the editor has never seen stay
  * untouched, and a rich-text edit is transformed over the text peers added to
  * the same field since. It falls back to the positional merge when there is
- * no baseline, or when the baseline does not match the Y.Array, for example
- * right after a load, when the editor's parsed blocks carry client IDs the
- * document does not know yet.
+ * no previous blocks, IDs are ambiguous, or freshly parsed IDs describe exactly
+ * the same content as the document.
  *
  * @param yblocks         The blocks in the local Y.Doc.
- * @param baselineBlocks  The blocks the editor rendered when the change was
- *                        made, where the caller knows them.
+ * @param previousBlocks  The blocks the editor held before the change,
+ *                        where the caller knows them.
  * @param incomingBlocks  The blocks the editor holds after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
+ * @return The merged blocks when they differ from the incoming edit.
  */
 export function rebaseCrdtBlocks(
 	yblocks: YBlocks,
-	baselineBlocks: Block[] | undefined,
+	previousBlocks: Block[] | undefined,
 	incomingBlocks: Block[],
 	attributeCursor: MergeCursorPosition
-): void {
-	if ( ! baselineBlocks ) {
+): Block[] | undefined {
+	if ( ! previousBlocks ) {
 		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
 		return;
 	}
 
-	rebaseBlockList(
-		yblocks,
-		baselineBlocks,
-		incomingBlocks,
-		attributeCursor,
-		false
-	);
+	rebaseBlockList( yblocks, previousBlocks, incomingBlocks, attributeCursor );
+
+	const merged = yblocks.toJSON() as Block[];
+	return fastDeepEqual( merged, getSerializableBlocks( incomingBlocks ) )
+		? undefined
+		: deserializeBlockAttributes( merged );
 }
 
 /**
  * The body of `rebaseCrdtBlocks`, shared with the inner block lists.
  *
  * @param yblocks         The blocks in the local Y.Doc.
- * @param baselineBlocks  The blocks the editor rendered when the change was made.
+ * @param previousBlocks  The blocks the editor held before the change.
  * @param incomingBlocks  The blocks the editor holds after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
- * @param isNested        Whether `yblocks` is the inner block list of a block
- *                        the editor and the document share.
  */
 function rebaseBlockList(
 	yblocks: YBlocks,
-	baselineBlocks: Block[],
+	previousBlocks: Block[],
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition,
-	isNested: boolean
+	attributeCursor: MergeCursorPosition
 ): void {
-	if ( baselineBlocks === incomingBlocks ) {
+	if ( previousBlocks === incomingBlocks ) {
 		return;
 	}
 
-	const baseline = getSerializableBlocks( baselineBlocks );
+	const previous = getSerializableBlocks( previousBlocks );
 	const incoming = getSerializableBlocks( incomingBlocks );
 
 	// A plain-array mirror of the Y.Array, kept in step with every structural
@@ -778,31 +774,31 @@ function rebaseBlockList(
 		positions = null;
 	};
 
-	// The editor's lists must carry distinct client IDs, and the baseline
-	// must share at least one with the Y.Array. A baseline block the Y.Array
-	// does not know is one a peer deleted since the editor rendered it, but
-	// a baseline with no known block at all did not come from the document,
-	// as right after a load, when parsed blocks have fresh IDs. An empty
-	// baseline inside a block the editor and the document share is the inner
-	// list the editor saw; at the root it can also mean the editor has not
-	// loaded the document, so it is trusted only against an empty Y.Array.
+	// Missing IDs can mean a peer replaced every block. Only use positional
+	// matching for freshly parsed IDs when all previous blocks still match
+	// the document's content. An empty previous list is a valid empty document.
 	const canRebase =
 		yBlocksById !== null &&
-		hasDistinctClientIds( baseline ) &&
-		hasDistinctClientIds( incoming ) &&
-		( baseline.length === 0
-			? isNested || yblocks.length === 0
-			: baseline.some( ( block ) =>
-					yBlocksById.has( block.clientId as string )
-				) );
+		hasDistinctClientIds( previous ) &&
+		hasDistinctClientIds( incoming );
 
-	if ( ! canRebase ) {
+	if (
+		! canRebase ||
+		( previous.length > 0 &&
+			previous.length === order.length &&
+			! previous.some( ( block ) =>
+				yBlocksById.has( block.clientId as string )
+			) &&
+			previous.every( ( block, index ) =>
+				areBlocksEqual( block, order[ index ] )
+			) )
+	) {
 		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
 		return;
 	}
 
-	const baselineById = new Map(
-		baseline.map( ( block ) => [ block.clientId as string, block ] )
+	const previousBlocksById = new Map(
+		previous.map( ( block ) => [ block.clientId as string, block ] )
 	);
 	const incomingIds = new Set(
 		incoming.map( ( block ) => block.clientId as string )
@@ -811,7 +807,7 @@ function rebaseBlockList(
 	// Deletions: blocks the editor had and no longer has. Deleting from the
 	// end keeps the lower indexes valid.
 	const deletedIndexes: number[] = [];
-	for ( const block of baseline ) {
+	for ( const block of previous ) {
 		const clientId = block.clientId as string;
 		if ( incomingIds.has( clientId ) ) {
 			continue;
@@ -834,32 +830,32 @@ function rebaseBlockList(
 		const clientId = block.clientId as string;
 		const existing = yBlocksById.get( clientId );
 
-		const base = baselineById.get( clientId );
+		const previousBlock = previousBlocksById.get( clientId );
 
 		if ( existing ) {
 			rebaseYBlock(
 				existing,
-				base ?? ( existing.toJSON() as unknown as Block ),
+				previousBlock ?? ( existing.toJSON() as unknown as Block ),
 				block,
 				attributeCursor
 			);
 			return;
 		}
 
-		// A baseline block the document no longer has was deleted by a peer.
+		// A previous block the document no longer has was deleted by a peer.
 		// It stays deleted unless the editor changed it since; then the edit
 		// wins and the block is re-created.
-		if ( base && fastDeepEqual( base, block ) ) {
+		if ( previousBlock && fastDeepEqual( previousBlock, block ) ) {
 			return;
 		}
 
 		let insertIndex = 0;
 		for ( let j = i - 1; j >= 0; j-- ) {
-			const previous = yBlocksById.get(
+			const previousSibling = yBlocksById.get(
 				incoming[ j ].clientId as string
 			);
-			if ( previous ) {
-				insertIndex = indexOf( previous ) + 1;
+			if ( previousSibling ) {
+				insertIndex = indexOf( previousSibling ) + 1;
 				break;
 			}
 		}
@@ -869,9 +865,20 @@ function rebaseBlockList(
 		yBlocksById.set( clientId, newYBlock );
 	} );
 
-	// Moves: keep the editor's order among the blocks it knows about. A moved
-	// block is re-created at its new place; blocks the editor has not seen
-	// keep their position relative to their neighbours.
+	// Only restore order when the editor reordered surviving previous blocks.
+	// A text edit must not undo a peer's move.
+	const previousOrder = previous
+		.filter( ( block ) => incomingIds.has( block.clientId as string ) )
+		.map( ( block ) => block.clientId );
+	const incomingOrder = incoming
+		.filter( ( block ) =>
+			previousBlocksById.has( block.clientId as string )
+		)
+		.map( ( block ) => block.clientId );
+	if ( fastDeepEqual( previousOrder, incomingOrder ) ) {
+		return;
+	}
+
 	let previousIndex = -1;
 	for ( const block of incoming ) {
 		const yblock = yBlocksById.get( block.clientId as string );
@@ -934,21 +941,21 @@ const BLOCK_STRUCTURE_KEYS = new Set( [
 ] );
 
 /**
- * Apply the change from `base` to `block` onto a Y.Map block the editor knows.
+ * Apply the change from `previousBlock` to `block` onto a Y.Map block the editor knows.
  *
  * @param yblock          The block in the Y.Doc.
- * @param base            The block as the editor rendered it before the change.
+ * @param previousBlock   The block as the editor rendered it before the change.
  * @param block           The block after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
  */
 function rebaseYBlock(
 	yblock: YBlock,
-	base: Block,
+	previousBlock: Block,
 	block: Block,
 	attributeCursor: MergeCursorPosition
 ): void {
 	const yAttributes = yblock.get( 'attributes' );
-	const baseAttributes = base.attributes ?? {};
+	const previousAttributes = previousBlock.attributes ?? {};
 	const attributes = block.attributes ?? {};
 
 	if ( ! ( yAttributes instanceof Y.Map ) ) {
@@ -959,8 +966,10 @@ function rebaseYBlock(
 	} else {
 		for ( const [ name, value ] of Object.entries( attributes ) ) {
 			const unchanged =
-				Object.prototype.hasOwnProperty.call( baseAttributes, name ) &&
-				fastDeepEqual( baseAttributes[ name ], value );
+				Object.prototype.hasOwnProperty.call(
+					previousAttributes,
+					name
+				) && fastDeepEqual( previousAttributes[ name ], value );
 			if ( unchanged ) {
 				continue;
 			}
@@ -968,7 +977,7 @@ function rebaseYBlock(
 				block.name,
 				block.clientId,
 				name,
-				baseAttributes[ name ],
+				previousAttributes[ name ],
 				value,
 				yAttributes,
 				attributeCursor
@@ -977,7 +986,7 @@ function rebaseYBlock(
 
 		// Attributes the editor removed. Ones it never had, such as an
 		// attribute a peer added since, are left alone.
-		for ( const name of Object.keys( baseAttributes ) ) {
+		for ( const name of Object.keys( previousAttributes ) ) {
 			if (
 				! Object.prototype.hasOwnProperty.call( attributes, name ) &&
 				yAttributes.has( name )
@@ -992,10 +1001,9 @@ function rebaseYBlock(
 	if ( yInnerBlocks instanceof Y.Array ) {
 		rebaseBlockList(
 			yInnerBlocks,
-			base.innerBlocks ?? [],
+			previousBlock.innerBlocks ?? [],
 			innerBlocks,
-			attributeCursor,
-			true
+			attributeCursor
 		);
 	} else if ( innerBlocks.length > 0 ) {
 		const created = new Y.Array< YBlock >();
@@ -1003,17 +1011,20 @@ function rebaseYBlock(
 		mergeCrdtBlocks( created, innerBlocks, attributeCursor );
 	}
 
-	const baseRecord = base as unknown as Record< string, unknown >;
+	const previousRecord = previousBlock as unknown as Record<
+		string,
+		unknown
+	>;
 	const record = block as unknown as Record< string, unknown >;
 	for ( const key of Object.keys( record ) ) {
 		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
 			continue;
 		}
-		if ( ! fastDeepEqual( baseRecord[ key ], record[ key ] ) ) {
+		if ( ! fastDeepEqual( previousRecord[ key ], record[ key ] ) ) {
 			yblock.set( key, record[ key ] );
 		}
 	}
-	for ( const key of Object.keys( baseRecord ) ) {
+	for ( const key of Object.keys( previousRecord ) ) {
 		if ( BLOCK_STRUCTURE_KEYS.has( key ) ) {
 			continue;
 		}
@@ -1033,7 +1044,7 @@ function rebaseYBlock(
  * @param blockName       The block's name, used to look up the attribute schema.
  * @param clientId        The block's client ID, used to scope the cursor hint.
  * @param attributeName   The attribute to update.
- * @param baseValue       The attribute's value as the editor rendered it before the change.
+ * @param previousValue   The attribute's value as the editor rendered it before the change.
  * @param attributeValue  The attribute's value after the change.
  * @param yAttributes     The block's attributes in the Y.Doc.
  * @param attributeCursor See `mergeCrdtBlocks`.
@@ -1042,7 +1053,7 @@ function rebaseYBlockAttribute(
 	blockName: string,
 	clientId: string | undefined,
 	attributeName: string,
-	baseValue: unknown,
+	previousValue: unknown,
 	attributeValue: unknown,
 	yAttributes: YBlockAttributes,
 	attributeCursor: MergeCursorPosition
@@ -1053,12 +1064,12 @@ function rebaseYBlockAttribute(
 	if (
 		schema?.type === 'rich-text' &&
 		typeof attributeValue === 'string' &&
-		typeof baseValue === 'string' &&
+		typeof previousValue === 'string' &&
 		currentValue instanceof Y.Text
 	) {
 		rebaseRichTextUpdate(
 			currentValue,
-			baseValue,
+			previousValue,
 			attributeValue,
 			resolveRichTextCursorPosition(
 				attributeCursor,
@@ -1080,49 +1091,49 @@ function rebaseYBlockAttribute(
 }
 
 /**
- * Apply the edit from `baselineValue` to `updatedValue` onto a Y.Text that
- * may have moved on since the editor read `baselineValue`.
+ * Apply the edit from `previousValue` to `updatedValue` onto a Y.Text that
+ * may have moved on since the editor read `previousValue`.
  *
- * The editor's edit is computed as a delta against the baseline, the peers'
- * edits as a delta from the baseline to the current text, and the first is
+ * The editor's edit is computed as a delta against the previous value, the peers'
+ * edits as a delta from the previous value to the current text, and the first is
  * transformed over the second so both survive. When the text has not moved,
  * this is the ordinary cursor-aware merge.
  *
  * @param blockYText      The Y.Text to update.
- * @param baselineValue   The value the editor rendered before the edit.
+ * @param previousValue   The value the editor rendered before the edit.
  * @param updatedValue    The value after the edit.
  * @param htmlCursorIndex The cursor index in the updated HTML string.
  */
 export function rebaseRichTextUpdate(
 	blockYText: Y.Text,
-	baselineValue: string,
+	previousValue: string,
 	updatedValue: string,
 	htmlCursorIndex: HtmlStringIndex | null = null
 ): void {
 	const currentValue = blockYText.toString();
 
-	if ( currentValue === baselineValue ) {
+	if ( currentValue === previousValue ) {
 		mergeRichTextUpdate( blockYText, updatedValue, htmlCursorIndex );
 		return;
 	}
 
-	const baselineDelta = new Delta().insert( baselineValue );
+	const previousDelta = new Delta().insert( previousValue );
 	const updatedDelta = new Delta().insert( updatedValue );
-	const cursorDiff = baselineDelta.diffWithCursor(
+	const cursorDiff = previousDelta.diffWithCursor(
 		updatedDelta,
 		htmlCursorIndex
 	);
 
 	// `diffWithCursor()` can produce a corrupt diff in some cases (see
-	// `mergeRichTextUpdate`). Check it against the baseline, which is the
+	// `mergeRichTextUpdate`). Check it against the previous value, which is the
 	// text it was computed from, and fall back to the plain diff otherwise.
 	const localDiff =
 		htmlCursorIndex === null ||
-		deltaToString( baselineDelta.compose( cursorDiff ) ) === updatedValue
+		deltaToString( previousDelta.compose( cursorDiff ) ) === updatedValue
 			? cursorDiff
-			: baselineDelta.diff( updatedDelta );
+			: previousDelta.diff( updatedDelta );
 
-	const remoteDiff = baselineDelta.diff( new Delta().insert( currentValue ) );
+	const remoteDiff = previousDelta.diff( new Delta().insert( currentValue ) );
 
 	// Treat the peers' edits as having happened first.
 	const rebasedDiff = remoteDiff.transform( localDiff, true );

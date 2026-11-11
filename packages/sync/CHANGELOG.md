@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--   `SyncManager.update()` accepts a `baseline` option, the record values a change was computed against, and passes it to the sync config's `applyChangesToCRDTDoc( ydoc, changes, { baseline } )` as a new third argument. Configs that ignore the argument keep their current behavior ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+-   `SyncManager.update()` accepts a `previousBlocks` option with the blocks before an edit. Sync configs receive `previousBlocks` and an `onRebase` callback in the optional third argument of `applyChangesToCRDTDoc`. Updates with `previousBlocks` run synchronously and return corrected fields reported through `onRebase`, so callers can store the merged result ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+-   `getChangesFromCRDTDoc` receives `{ isInitial: true }` during document load, so sync configs can adopt transient state without marking unchanged content dirty.
 
 ## 3.1.0 (2026-11-04)
 

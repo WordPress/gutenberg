@@ -396,7 +396,7 @@ describe( 'crdt', () => {
 			);
 		} );
 
-		it( 'applies only the editor’s own change when a baseline is given', () => {
+		it( 'applies only the editor’s own change when previous blocks are given', () => {
 			const p1 = {
 				name: 'core/paragraph',
 				attributes: { content: 'Hello' },
@@ -423,7 +423,7 @@ describe( 'crdt', () => {
 					blocks: [ { ...p1, attributes: { content: 'Hello!' } } ],
 				},
 				defaultSyncedProperties,
-				{ baseline: { blocks: [ p1 ] } }
+				{ previousBlocks: [ p1 ] }
 			);
 
 			expect(
@@ -1212,6 +1212,32 @@ describe( 'crdt', () => {
 
 				expect( changes.selection ).toBeUndefined();
 			} );
+		} );
+
+		it( 'adopts persisted block IDs without marking unchanged content dirty on load', () => {
+			const block = {
+				name: 'core/paragraph',
+				clientId: 'shared',
+				attributes: { content: 'Hello' },
+				innerBlocks: [],
+			};
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ block ] },
+				defaultSyncedProperties
+			);
+			const record = {
+				blocks: [ { ...block, clientId: 'parsed' } ],
+				content: { raw: 'serialized:1' },
+			} as unknown as Post;
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				record,
+				defaultSyncedProperties,
+				{ isInitial: true }
+			);
+			expect( changes.blocks?.[ 0 ].clientId ).toBe( 'shared' );
+			expect( changes ).not.toHaveProperty( 'content' );
 		} );
 
 		it( 'injects a closure-based content function when blocks changed but content did not', () => {

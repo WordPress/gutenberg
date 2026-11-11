@@ -116,24 +116,24 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
-	// The record values the change was computed against, for the fields
-	// where the caller knows them. See `ApplyChangesOptions.baseline`.
-	baseline?: Partial< ObjectData >;
 	isNewUndoLevel?: boolean;
 	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
+	// The blocks before the change. See `ApplyChangesOptions.previousBlocks`.
+	previousBlocks?: unknown[];
 }
 
 export interface ApplyChangesOptions {
+	/** Report corrected fields synchronously when rebasing the edit. */
+	onRebase?: ( changes: Partial< ObjectData > ) => void;
 	/**
-	 * The record values the change was computed against, for the fields where
-	 * the caller knows them. An editor renders remote changes asynchronously,
-	 * so a change it emits can derive from a value the document has since
-	 * moved past. With the baseline, the sync config can apply only the
-	 * caller's own change instead of reconciling its whole value against the
-	 * document, which would undo what peers changed in between.
+	 * The blocks immediately before the change. An editor renders remote
+	 * changes asynchronously, so these blocks can differ from the current
+	 * document. The sync config uses them to apply only the caller's own
+	 * change and preserve changes from peers. Their shape is defined by
+	 * the sync config.
 	 */
-	baseline?: Partial< ObjectData >;
+	previousBlocks?: unknown[];
 }
 
 export interface RecordHandlers {
@@ -161,9 +161,11 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		objectId?: ObjectID
 	) => Awareness | undefined;
+	/** Read changes; on load, isInitial lets configs adopt transient IDs without dirtying saved content. */
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
-		editedRecord: ObjectData
+		editedRecord: ObjectData,
+		options?: { isInitial?: boolean }
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 	shouldSync?: (
@@ -209,13 +211,14 @@ export interface SyncManager {
 	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
+	/** Apply an edit; with previousBlocks, return rebased fields synchronously. */
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
 		options?: SyncManagerUpdateOptions
-	) => void;
+	) => Partial< ObjectData > | void;
 }
 
 /**

@@ -99,12 +99,12 @@ describe( 'rebaseCrdtBlocks', () => {
 
 			// B adds a paragraph. The update reaches A's doc at once, but A's
 			// block editor has not rendered it yet.
-			const bBaseline = [ paragraph( 'p1', 'Hello' ) ];
+			const bPreviousBlocks = [ paragraph( 'p1', 'Hello' ) ];
 			const bBlocks = [
 				paragraph( 'p1', 'Hello' ),
 				paragraph( 'p2', 'World' ),
 			];
-			rebaseCrdtBlocks( yB, bBaseline, bBlocks, null );
+			rebaseCrdtBlocks( yB, bPreviousBlocks, bBlocks, null );
 			expect( yA.length ).toBe( 2 );
 
 			// A types in p1 against the list it last rendered: just p1.
@@ -335,6 +335,37 @@ describe( 'rebaseCrdtBlocks', () => {
 	} );
 
 	describe( 'ordinary edits', () => {
+		it( 'keeps a peer reorder when the editor only changes text', () => {
+			const { yA, yB } = createPeers();
+			const a = paragraph( 'a', 'A' );
+			const b = paragraph( 'b', 'B' );
+			mergeCrdtBlocks( yA, [ a, b ], null );
+			rebaseCrdtBlocks( yB, [ a, b ], [ b, a ], null );
+			rebaseCrdtBlocks(
+				yA,
+				[ a, b ],
+				[ paragraph( 'a', 'A!' ), b ],
+				null
+			);
+			expect( snapshot( yA ) ).toEqual( [
+				{ id: 'b', content: 'B' },
+				{ id: 'a', content: 'A!' },
+			] );
+		} );
+
+		it( 'keeps a peer replacement when no previous block remains', () => {
+			const { yA, yB } = createPeers();
+			const a = paragraph( 'a', 'A' );
+			const b = paragraph( 'b', 'B' );
+			mergeCrdtBlocks( yA, [ a ], null );
+			rebaseCrdtBlocks( yB, [ a ], [ b ], null );
+			rebaseCrdtBlocks( yA, [ a ], [ paragraph( 'a', 'A!' ) ], null );
+			expect( snapshot( yA ) ).toEqual( [
+				{ id: 'a', content: 'A!' },
+				{ id: 'b', content: 'B' },
+			] );
+		} );
+
 		it( 'inserts a new block right after its predecessor', () => {
 			const { yA, yB } = createPeers();
 			const a = paragraph( 'a', 'A' );
@@ -406,7 +437,7 @@ describe( 'rebaseCrdtBlocks', () => {
 	} );
 
 	describe( 'fallback to the positional merge', () => {
-		it( 'reconciles by position when the baseline carries client IDs the document does not know', () => {
+		it( 'reconciles by position when the previous blocks carry client IDs the document does not know', () => {
 			const doc = new Y.Doc();
 			const yblocks = doc.getArray< YBlock >( 'blocks' );
 			mergeCrdtBlocks( yblocks, [ paragraph( 'p1', 'Hello' ) ], null );
@@ -424,7 +455,7 @@ describe( 'rebaseCrdtBlocks', () => {
 			] );
 		} );
 
-		it( 'reconciles by position when the baseline is empty but the document is not', () => {
+		it( 'keeps a peer paragraph added while the editor still saw an empty document', () => {
 			const doc = new Y.Doc();
 			const yblocks = doc.getArray< YBlock >( 'blocks' );
 			mergeCrdtBlocks( yblocks, [ paragraph( 'p1', 'Hello' ) ], null );
@@ -436,10 +467,13 @@ describe( 'rebaseCrdtBlocks', () => {
 				null
 			);
 
-			expect( yblocks.length ).toBe( 1 );
+			expect( snapshot( yblocks ) ).toEqual( [
+				{ id: 'q1', content: 'Hello' },
+				{ id: 'p1', content: 'Hello' },
+			] );
 		} );
 
-		it( 'reconciles by position when there is no baseline', () => {
+		it( 'reconciles by position when there is no previous blocks', () => {
 			const doc = new Y.Doc();
 			const yblocks = doc.getArray< YBlock >( 'blocks' );
 			mergeCrdtBlocks( yblocks, [ paragraph( 'p1', 'Hello' ) ], null );
@@ -456,7 +490,7 @@ describe( 'rebaseCrdtBlocks', () => {
 			] );
 		} );
 
-		it( 'is a no-op when the baseline is the incoming list', () => {
+		it( 'is a no-op when the previous blocks are the incoming list', () => {
 			const doc = new Y.Doc();
 			const yblocks = doc.getArray< YBlock >( 'blocks' );
 			const blocks = [ paragraph( 'p1', 'Hello' ) ];

@@ -368,7 +368,7 @@ describe( 'the default entity sync manager', () => {
 				'post',
 				1,
 				{ blocks: [] },
-				{ isCached: true, undoIgnore: false, baseline: { blocks: [] } }
+				{ isCached: true, previousBlocks: [], undoIgnore: false }
 			);
 
 			expect( mockSyncManager.update.mock.calls ).toEqual( [
@@ -398,7 +398,7 @@ describe( 'the default entity sync manager', () => {
 					1,
 					{ blocks: [] },
 					'local-editor',
-					{ isNewUndoLevel: false, baseline: { blocks: [] } },
+					{ isNewUndoLevel: false, previousBlocks: [] },
 				],
 			] );
 		} );

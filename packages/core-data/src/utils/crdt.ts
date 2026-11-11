@@ -47,7 +47,9 @@ import {
 type ContentFromBlocksFn = ( args?: { blocks: Block[] } ) => string;
 
 // Changes that can be applied to a post entity record.
-export type PostChanges = Partial< Post > & {
+export type PostChanges = Partial<
+	Omit< Post, 'content' | 'excerpt' | 'title' >
+> & {
 	blocks?: Block[];
 	content?: Post[ 'content' ] | string | ContentFromBlocksFn;
 	excerpt?: Post[ 'excerpt' ] | string;
@@ -133,20 +135,20 @@ function applyTaxonomyChangesToCRDTDoc(
  * @param {PostChanges} changes
  * @param {Set<string>} syncedProperties
  * @param {Object}      options
- * @param {PostChanges} options.baseline The record values the changes were
- *                                       computed against, where known. With
- *                                       `baseline.blocks`, only the editor's own
- *                                       block changes are applied.
- * @return {void}
+ * @param {Block[]}     options.previousBlocks The blocks immediately before the change,
+ *                                             when known. Only the editor's own block
+ *                                             changes are applied.
+ * @return {PostChanges|void} Merged fields that should replace the local edits.
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
 	syncedProperties: Set< string >,
-	options: { baseline?: Partial< PostChanges > } = {}
-): void {
+	options: { previousBlocks?: Block[] } = {}
+): PostChanges | void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
-	const baselineBlocks = options.baseline?.blocks;
+	const previousBlocks = options.previousBlocks;
+	let rebasedChanges: PostChanges | undefined;
 
 	Object.keys( changes ).forEach( ( key ) => {
 		if ( ! syncedProperties.has( key ) ) {
@@ -202,17 +204,28 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// With a baseline, only the editor's own change is applied,
+				// With previous blocks, only the editor's own change is applied,
 				// so a remote update the editor has not rendered yet
 				// survives the keystroke. Without one, the whole list is
 				// merged by position. Neither needs `setValue` because both
 				// operate on a Yjs type that is already in the Y.Doc.
-				rebaseCrdtBlocks(
+				const mergedBlocks = rebaseCrdtBlocks(
 					currentBlocks,
-					baselineBlocks,
+					previousBlocks,
 					newValue,
 					newCursorPosition
 				);
+				if ( mergedBlocks ) {
+					// Return the merged blocks to the caller before it updates its
+					// store. Otherwise a later save serializes the stale local list.
+					rebasedChanges = {
+						blocks: mergedBlocks,
+						content: ( args ) =>
+							__unstableSerializeAndClean(
+								( args?.blocks ?? mergedBlocks ) as WPBlock[]
+							),
+					};
+				}
 				break;
 			}
 
@@ -304,6 +317,7 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+	return rebasedChanges;
 }
 
 /**
@@ -390,12 +404,15 @@ function getTaxonomyChangesFromCRDTDoc(
  * @param {CRDTDoc}     ydoc
  * @param {Post}        editedRecord
  * @param {Set<string>} syncedProperties
+ * @param {Object}      options
+ * @param {boolean}     options.isInitial Whether this is the initial document load.
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
-	editedRecord: Post,
-	syncedProperties: Set< string >
+	editedRecord: Post & { blocks?: Block[] },
+	syncedProperties: Set< string >,
+	options: { isInitial?: boolean } = {}
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -536,6 +553,22 @@ export function getPostChangesFromCRDTDoc(
 		const capturedBlocks = changes.blocks;
 		changes.content = () =>
 			__unstableSerializeAndClean( capturedBlocks as WPBlock[] );
+	}
+
+	// Loading persisted block IDs changes only transient editor state. Do not
+	// mark an unchanged post dirty by installing a new content serializer.
+	if (
+		options.isInitial &&
+		changes.blocks &&
+		__unstableSerializeAndClean( changes.blocks as WPBlock[] ).trim() ===
+			__unstableSerializeAndClean(
+				( editedRecord.blocks ??
+					parse(
+						getRawValue( editedRecord.content ) ?? ''
+					) ) as WPBlock[]
+			).trim()
+	) {
+		delete changes.content;
 	}
 
 	// Meta changes must be merged with the edited record since not all meta
