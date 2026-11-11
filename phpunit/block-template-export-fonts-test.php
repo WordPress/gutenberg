@@ -184,6 +184,29 @@ class Gutenberg_Export_Fonts_Test extends WP_UnitTestCase {
 		$this->assertSame( 'file:./assets/fonts/inter.woff2', $src );
 	}
 
+	public function test_matches_percent_encoded_theme_url() {
+		// get_stylesheet_directory_uri() percent-encodes the theme directory name.
+		$theme_dir = $this->root . '/themes/my theme';
+		$this->create_file( $theme_dir . '/assets/fonts/x.woff2' );
+		$files = array();
+
+		$filter_dir = static function () use ( $theme_dir ) {
+			return $theme_dir;
+		};
+		$filter_uri = static function () {
+			return 'https://example.org/wp-content/themes/my%20theme';
+		};
+		add_filter( 'stylesheet_directory', $filter_dir, 20 );
+		add_filter( 'stylesheet_directory_uri', $filter_uri, 20 );
+
+		$src = gutenberg_get_font_face_src_for_export( 'https://example.org/wp-content/themes/my%20theme/assets/fonts/x.woff2', $files, array( 'assets/fonts/x.woff2' ) );
+
+		remove_filter( 'stylesheet_directory', $filter_dir, 20 );
+		remove_filter( 'stylesheet_directory_uri', $filter_uri, 20 );
+
+		$this->assertSame( 'file:./assets/fonts/x.woff2', $src );
+	}
+
 	public function test_reuses_path_for_same_file() {
 		$this->create_file( $this->font_dir . '/inter.woff2' );
 		$files = array();

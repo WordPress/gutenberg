@@ -76,7 +76,7 @@ function gutenberg_get_font_face_src_for_export( $src, array &$files, array $res
 	}
 
 	foreach ( gutenberg_get_export_font_source_dirs() as $dir ) {
-		$dir_url = trailingslashit( set_url_scheme( $dir['url'], 'https' ) );
+		$dir_url = trailingslashit( set_url_scheme( rawurldecode( $dir['url'] ), 'https' ) );
 		if ( ! str_starts_with( $url, $dir_url ) ) {
 			continue;
 		}
