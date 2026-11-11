@@ -28,45 +28,49 @@ export default function useGenerateDefaultNavigationTitle( clientId ) {
 	const area = useTemplatePartAreaLabel( isDisabled ? undefined : clientId );
 
 	const registry = useRegistry();
-	return useCallback( async () => {
-		// Ensure other navigation menus have loaded so an
-		// accurate name can be created.
-		if ( isDisabled ) {
-			return '';
-		}
-		const { getEntityRecords } = registry.resolveSelect( coreStore );
+	return useCallback(
+		async ( suppliedTitle ) => {
+			// Ensure other navigation menus have loaded so an
+			// accurate name can be created.
+			if ( isDisabled ) {
+				return suppliedTitle || '';
+			}
+			const { getEntityRecords } = registry.resolveSelect( coreStore );
 
-		const [ draftNavigationMenus, navigationMenus ] = await Promise.all( [
-			getEntityRecords( ...DRAFT_MENU_PARAMS ),
-			getEntityRecords( ...PUBLISHED_MENU_PARAMS ),
-		] );
+			const [ draftNavigationMenus, navigationMenus ] = await Promise.all(
+				[
+					getEntityRecords( ...DRAFT_MENU_PARAMS ),
+					getEntityRecords( ...PUBLISHED_MENU_PARAMS ),
+				]
+			);
 
-		const title = area
-			? sprintf(
-					// translators: %s: the name of a menu (e.g. Header menu).
-					__( '%s menu' ),
-					area
+			const title =
+				suppliedTitle ||
+				( area
+					? sprintf(
+							// translators: %s: the name of a menu (e.g. Header menu).
+							__( '%s menu' ),
+							area
+						)
+					: // translators: 'menu' as in website navigation menu.
+						__( 'Menu' ) );
+
+			const existingTitles = new Set(
+				[ ...draftNavigationMenus, ...navigationMenus ].map(
+					( menu ) => menu?.title?.raw
 				)
-			: // translators: 'menu' as in website navigation menu.
-				__( 'Menu' );
+			);
 
-		// Determine how many menus start with the automatic title.
-		const matchingMenuTitleCount = [
-			...draftNavigationMenus,
-			...navigationMenus,
-		].reduce(
-			( count, menu ) =>
-				menu?.title?.raw?.startsWith( title ) ? count + 1 : count,
-			0
-		);
+			// Append a number to the end of the title if a menu with
+			// the same name exists.
+			let titleWithCount = title;
+			let suffix = 2;
+			while ( existingTitles.has( titleWithCount ) ) {
+				titleWithCount = `${ title } ${ suffix++ }`;
+			}
 
-		// Append a number to the end of the title if a menu with
-		// the same name exists.
-		const titleWithCount =
-			matchingMenuTitleCount > 0
-				? `${ title } ${ matchingMenuTitleCount + 1 }`
-				: title;
-
-		return titleWithCount || '';
-	}, [ isDisabled, area, registry ] );
+			return titleWithCount || '';
+		},
+		[ isDisabled, area, registry ]
+	);
 }

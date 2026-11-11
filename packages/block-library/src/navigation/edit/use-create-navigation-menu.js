@@ -20,6 +20,11 @@ export default function useCreateNavigationMenu( clientId ) {
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
+		/**
+		 * @param {string|null}                         title      Optional title to deduplicate.
+		 * @param {import('@wordpress/blocks').Block[]} blocks     Menu blocks.
+		 * @param {string}                              postStatus Status of the created post.
+		 */
 		async ( title = null, blocks = [], postStatus ) => {
 			// Guard against creating Navigations without a title.
 			// Note you can pass no title, but if one is passed it must be
@@ -38,18 +43,16 @@ export default function useCreateNavigationMenu( clientId ) {
 			setValue( null );
 			setError( null );
 
-			if ( ! title ) {
-				title = await generateDefaultTitle().catch( ( err ) => {
-					setError( err?.message );
-					setStatus( CREATE_NAVIGATION_MENU_ERROR );
-					throw new Error(
-						'Failed to create title when saving new Navigation Menu.',
-						{
-							cause: err,
-						}
-					);
-				} );
-			}
+			title = await generateDefaultTitle( title ).catch( ( err ) => {
+				setError( err?.message );
+				setStatus( CREATE_NAVIGATION_MENU_ERROR );
+				throw new Error(
+					'Failed to create title when saving new Navigation Menu.',
+					{
+						cause: err,
+					}
+				);
+			} );
 			const record = {
 				title,
 				content: serialize( blocks ),
