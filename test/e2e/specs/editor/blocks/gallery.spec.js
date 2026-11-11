@@ -150,6 +150,16 @@ test.describe( 'Gallery', () => {
 		] );
 		const [ gallery ] = await editor.getBlocks();
 		expect( gallery.attributes ).not.toHaveProperty( 'linkTo' );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Gallery' } )
+		);
+		await editor.clickBlockToolbarButton( 'Link' );
+		await expect(
+			page.getByRole( 'menuitemradio', {
+				name: 'Link images to media files',
+			} )
+		).toBeChecked();
 	} );
 
 	test( 'gallery caption can be edited', async ( {

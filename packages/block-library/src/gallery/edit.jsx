@@ -46,6 +46,7 @@ import {
 import { getHrefAndDestination } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
+	getDefaultLinkDestination,
 	getUpdatedLinkTargetSettings,
 	getImageSizeAttributes,
 } from '../image/utils';
@@ -128,13 +129,6 @@ const PLACEHOLDER_TEXT = __(
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
-function getDefaultLinkTo() {
-	return (
-		window.wp?.media?.view?.settings?.defaultProps?.link ||
-		LINK_DESTINATION_NONE
-	);
-}
-
 export default function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -188,7 +182,7 @@ export default function GalleryEdit( props ) {
 	// gallery never has, so match the server render.
 	const linkTo =
 		attributes.linkTo ??
-		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkTo() );
+		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkDestination() );
 	const isFlexLayout = isGalleryFlexLayout( layout );
 	const previousLayoutRef = useRef( layout );
 
