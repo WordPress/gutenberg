@@ -120,6 +120,12 @@ function Root( {
 	// dismiss+reopen cycle is silently discarded.
 	const confirmIdRef = useRef( 0 );
 
+	useEffect( () => {
+		return () => {
+			confirmIdRef.current += 1;
+		};
+	}, [] );
+
 	// Safety net: if the consumer keeps `open={true}` after a confirm
 	// (i.e. does not react to `onOpenChange`), the phase would be stuck
 	// at 'closing'. Detect the contradiction and reset to idle.
@@ -199,12 +205,12 @@ function Root( {
 				lifecycle.update( { phase: 'idle', showSpinner: false } );
 			}
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( error );
 			if ( confirmIdRef.current !== id ) {
 				return;
 			}
 			lifecycle.update( { phase: 'idle', showSpinner: false } );
-			// eslint-disable-next-line no-console
-			console.error( error );
 		}
 	}, [ lifecycle, onConfirmEvent ] );
 
