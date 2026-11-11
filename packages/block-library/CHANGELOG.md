@@ -4,10 +4,16 @@
 
 ### Enhancements
 
+-   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
+-   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
+-   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).
 -   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
+-   Navigation: Use the UI SelectControl for the Overlay template setting ([#86619](https://github.com/WordPress/gutenberg/pull/86619)).
 -   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
+-   Query Loop: Use the UI SelectControl for the Post type, Order by, and Sticky posts settings ([#86560](https://github.com/WordPress/gutenberg/pull/86560)).
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
+-   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
 
 ### Bug Fixes
 
