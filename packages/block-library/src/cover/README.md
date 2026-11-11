@@ -122,8 +122,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `isUserOverlayColor` | `boolean` | — | — |
 | `backgroundType` | `string` | `"image"` | — |
 | `focalPoint` | `object` | — | — |
-| `minHeight` | `number` | — | — |
-| `minHeightUnit` | `string` | — | — |
 | `gradient` | `string` | — | — |
 | `customGradient` | `string` | — | — |
 | `contentPosition` | `string` | — | — |
@@ -155,6 +153,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`enableContrastChecker`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `aspectRatio`: `true`
+  - `minHeight`: `true`
   - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`

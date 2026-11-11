@@ -15,7 +15,10 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 		: keyCombination.character;
 
 	return (
-		<kbd className="editor-keyboard-shortcut-help-modal__shortcut-key-combination">
+		<kbd
+			className="editor-keyboard-shortcut-help-modal__shortcut-key-combination"
+			dir="ltr"
+		>
 			<VisuallyHidden render={ <span /> }>
 				{ forceAriaLabel || ariaLabel }
 			</VisuallyHidden>

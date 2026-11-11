@@ -16,7 +16,10 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 	const shortcuts = Array.isArray( shortcut ) ? shortcut : [ shortcut ];
 
 	return (
-		<kbd className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination">
+		<kbd
+			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
+			dir="ltr"
+		>
 			<VisuallyHidden render={ <span /> }>
 				{ forceAriaLabel || ariaLabel }
 			</VisuallyHidden>
