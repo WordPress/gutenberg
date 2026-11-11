@@ -3,7 +3,12 @@ import { useEffect, useRef } from '@wordpress/element';
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { getGridTracks, GridRect } from './utils';
+import {
+	getGridItemPlacement,
+	getGridTracks,
+	getRequiredGridRowCount,
+	GridRect,
+} from './utils';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
 
@@ -434,21 +439,20 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				const attributes = getBlockAttributes(
 					childId
 				) as GridItemAttributes;
-				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes?.style?.layout ?? {};
+				const placement = getGridItemPlacement(
+					attributes?.style?.layout
+				);
 				if (
-					isPositiveInteger( columnStart ) &&
-					isPositiveInteger( rowStart )
+					isPositiveInteger( placement.columnStart ) &&
+					isPositiveInteger( placement.rowStart )
 				) {
-					const rect = new GridRect( {
-						columnStart,
-						rowStart,
-						columnSpan: isPositiveInteger( columnSpan )
-							? columnSpan
-							: 1,
-						rowSpan: isPositiveInteger( rowSpan ) ? rowSpan : 1,
-					} );
-					rects.set( childId, rect );
+					if ( ! isPositiveInteger( placement.columnSpan ) ) {
+						placement.columnSpan = 1;
+					}
+					if ( ! isPositiveInteger( placement.rowSpan ) ) {
+						placement.rowSpan = 1;
+					}
+					rects.set( childId, new GridRect( placement ) );
 					itemLayouts.set( childId, attributes );
 				}
 			}
@@ -755,13 +759,9 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			// Growing past the last row adds rows. Shrinking back removes only
 			// rows that were added automatically. Row height stays the same
 			// because the grid's aspect ratio scales with the row count.
-			let bottomMostRow = 0;
-			for ( const rect of rects.values() ) {
-				bottomMostRow = Math.max( bottomMostRow, rect.rowEnd );
-			}
-			const desiredRowCount = Math.max(
-				autoSpanRows.base,
-				bottomMostRow
+			const desiredRowCount = getRequiredGridRowCount(
+				rects.values(),
+				autoSpanRows.base
 			);
 			if ( desiredRowCount !== rowCount ) {
 				const gridLayout = (
