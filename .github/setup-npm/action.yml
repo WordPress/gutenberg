@@ -22,7 +22,20 @@ runs:
               NPM_VERSION="$(jq -r '.devEngines.packageManager.version // empty' package.json)"
               if [ -n "$NPM_VERSION" ]; then
                   # Contributors need the floor; CI stays on that major's newest release.
-                  npm install --global "npm@${NPM_VERSION/>=/^}"
+                  # Keep the bootstrap npm intact while installing its replacement.
+                  NPM_PREFIX="$RUNNER_TEMP/npm"
+                  npm install --global --prefix "$NPM_PREFIX" "npm@${NPM_VERSION/>=/^}"
+                  if [ "$RUNNER_OS" = 'Windows' ]; then
+                      NPM_BIN="$NPM_PREFIX"
+                  else
+                      NPM_BIN="$NPM_PREFIX/bin"
+                  fi
+                  echo "$NPM_BIN" >> "$GITHUB_PATH"
+                  if [ "$RUNNER_OS" = 'Windows' ]; then
+                      NPM_BIN="$(cygpath -u "$NPM_BIN")"
+                  fi
+                  export PATH="$NPM_BIN:$PATH"
+                  hash -r
                   echo "Required npm version: $NPM_VERSION"
               else
                   echo "No devEngines.packageManager.version, keeping the bundled npm."
