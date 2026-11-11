@@ -185,7 +185,7 @@
 			color: var(--_wp-components-button-foreground-active);
 		}
 
-		&:active:not(:disabled, [aria-disabled="true"]) {
+		&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background-color: var(--_wp-components-button-background-on-active);
 		}
 
@@ -234,13 +234,8 @@
 			}
 		}
 
-		&.is-tertiary,
 		&.is-secondary {
-			&:hover:not(:disabled, [aria-disabled="true"]) {
-				background-color: var(--_wp-components-button-background-on-active);
-			}
-
-			&:active:not(:disabled, [aria-disabled="true"]) {
+			&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
 				background-color: var(--_wp-components-button-background-on-active);
 			}
 		}
