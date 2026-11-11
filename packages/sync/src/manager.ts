@@ -707,16 +707,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
 				} );
-				// Only pass the options argument when there is a baseline, so
-				// configs written against the two-argument signature see no
-				// change in how they are called.
-				if ( baseline === undefined ) {
-					syncConfig.applyChangesToCRDTDoc( ydoc, changes );
-				} else {
-					syncConfig.applyChangesToCRDTDoc( ydoc, changes, {
-						baseline,
-					} );
-				}
+				syncConfig.applyChangesToCRDTDoc( ydoc, changes, { baseline } );
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );

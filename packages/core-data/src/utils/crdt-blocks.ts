@@ -700,21 +700,28 @@ function deduplicateClientIds( yblocks: YBlocks ): void {
  * function applies only the difference between the baseline and the incoming
  * list, matching blocks by client ID. Blocks the editor has never seen stay
  * untouched, and a rich-text edit is transformed over the text peers added to
- * the same field since. It falls back to the positional merge when the
- * baseline does not match the Y.Array, for example right after a load, when
- * the editor's parsed blocks carry client IDs the document does not know yet.
+ * the same field since. It falls back to the positional merge when there is
+ * no baseline, or when the baseline does not match the Y.Array, for example
+ * right after a load, when the editor's parsed blocks carry client IDs the
+ * document does not know yet.
  *
  * @param yblocks         The blocks in the local Y.Doc.
- * @param baselineBlocks  The blocks the editor rendered when the change was made.
+ * @param baselineBlocks  The blocks the editor rendered when the change was
+ *                        made, where the caller knows them.
  * @param incomingBlocks  The blocks the editor holds after the change.
  * @param attributeCursor See `mergeCrdtBlocks`.
  */
 export function rebaseCrdtBlocks(
 	yblocks: YBlocks,
-	baselineBlocks: Block[],
+	baselineBlocks: Block[] | undefined,
 	incomingBlocks: Block[],
 	attributeCursor: MergeCursorPosition
 ): void {
+	if ( ! baselineBlocks ) {
+		mergeCrdtBlocks( yblocks, incomingBlocks, attributeCursor );
+		return;
+	}
+
 	rebaseBlockList(
 		yblocks,
 		baselineBlocks,

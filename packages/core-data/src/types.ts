@@ -303,9 +303,12 @@ export type EntityRecordFetch = ( options: {
  */
 export interface EditEntityRecordOptions {
 	/**
-	 * Whether to ignore the edit in undo history or not.
+	 * The record values the edit was computed against, for the fields where
+	 * the caller knows them. `useEntityBlockEditor` passes the blocks the
+	 * block editor rendered, so the sync layer can apply only the editor's
+	 * own change when a remote change arrived in the meantime.
 	 */
-	undoIgnore?: boolean;
+	baseline?: Record< string, unknown >;
 	/**
 	 * Whether the edit is transient (e.g. typing). Transient edits are staged
 	 * and eventually merged into the preceding undo level instead of creating
@@ -313,12 +316,9 @@ export interface EditEntityRecordOptions {
 	 */
 	isCached?: boolean;
 	/**
-	 * The record values the edit was computed against, for the fields where
-	 * the caller knows them. `useEntityBlockEditor` passes the blocks the
-	 * block editor rendered, so the sync layer can apply only the editor's
-	 * own change when a remote change arrived in the meantime.
+	 * Whether to ignore the edit in undo history or not.
 	 */
-	baseline?: Record< string, unknown >;
+	undoIgnore?: boolean;
 }
 
 /**

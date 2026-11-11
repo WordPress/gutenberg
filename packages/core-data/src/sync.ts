@@ -312,10 +312,8 @@ export function createDefaultEntitySyncManager(
 				edits,
 				getEditOrigin( options ),
 				{
+					baseline: options.baseline,
 					isNewUndoLevel: isNewUndoLevel( options ),
-					...( options.baseline
-						? { baseline: options.baseline }
-						: {} ),
 				}
 			);
 		},

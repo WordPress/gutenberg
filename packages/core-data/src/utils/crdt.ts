@@ -202,25 +202,17 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// Neither merge needs `setValue` because both operate on a
-				// Yjs type that is already in the Y.Doc.
-				if ( Array.isArray( baselineBlocks ) ) {
-					// The caller told us which blocks its change was made
-					// against. Apply only that change, so a remote update the
-					// editor has not rendered yet survives the keystroke.
-					rebaseCrdtBlocks(
-						currentBlocks,
-						baselineBlocks,
-						newValue,
-						newCursorPosition
-					);
-				} else {
-					mergeCrdtBlocks(
-						currentBlocks,
-						newValue,
-						newCursorPosition
-					);
-				}
+				// With a baseline, only the editor's own change is applied,
+				// so a remote update the editor has not rendered yet
+				// survives the keystroke. Without one, the whole list is
+				// merged by position. Neither needs `setValue` because both
+				// operate on a Yjs type that is already in the Y.Doc.
+				rebaseCrdtBlocks(
+					currentBlocks,
+					baselineBlocks,
+					newValue,
+					newCursorPosition
+				);
 				break;
 			}
 
