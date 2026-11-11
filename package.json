@@ -189,6 +189,7 @@
 		"test:e2e:rtc-websocket": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:rtc-websocket:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json --ui",
 		"test:e2e:storybook": "npm exec --no --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
+		"test:e2e:trunk": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk --",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:performance:debug": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts --debug",
@@ -219,6 +220,7 @@
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
 		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
+		"typecheck:php:fix": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
