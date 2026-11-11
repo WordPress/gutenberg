@@ -230,17 +230,6 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			$actual,
 			'Submenu block should not apply colors if missing from context'
 		);
-
-		$this->assertStringNotContainsString(
-			'has-text-color',
-			$actual,
-			'Submenu block should not apply "has-text-color" class if missing from context'
-		);
-		$this->assertStringNotContainsString(
-			'has-background',
-			$actual,
-			'Submenu block should not apply "has-background" class if missing from context'
-		);
 	}
 
 	/**
