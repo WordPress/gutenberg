@@ -48,6 +48,10 @@ describe( 'applyImageEdit', () => {
 		expect( state.rotation ).toBe( 90 );
 	} );
 
+	it.each( [ 720, 810 ] )( 'accepts a rotation of %i°', ( rotation ) => {
+		expect( apply( clean, { rotation } ).rotation ).toBe( rotation % 360 );
+	} );
+
 	it( 'gives the same state whatever the pan and zoom were', () => {
 		const edit = { crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.3 } };
 		let zoomed = imageEditorReducer( withBaseValues( clean ), {
