@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
 	privateApis as blockEditorPrivateApis,
 	InspectorControls,
@@ -20,6 +21,7 @@ import {
 	useDropIntoOrOutOfPageList,
 } from '../../page-list/use-convert-to-navigation-links';
 import { PAGE_DRAG_TYPE } from '../../page-list/pages-list';
+import dropZoneStyles from './page-drop-zone.module.scss';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -63,7 +65,10 @@ function PageDropZone( { children, onDropPage } ) {
 
 	return (
 		<div
-			className="wp-block-navigation__page-drop-zone"
+			className={ clsx(
+				'wp-block-navigation__page-drop-zone',
+				dropZoneStyles.zone
+			) }
 			// Capturing keeps the list view's own drop handling, which is for
 			// blocks, from seeing a page.
 			onDragOverCapture={ ( event ) => {
@@ -110,7 +115,10 @@ function PageDropZone( { children, onDropPage } ) {
 			{ children }
 			{ indicator && (
 				<div
-					className="wp-block-navigation__page-drop-indicator"
+					className={ clsx(
+						'wp-block-navigation__page-drop-indicator',
+						dropZoneStyles.indicator
+					) }
 					style={ { top: indicator.top } }
 				/>
 			) }

@@ -716,18 +716,3 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-audio__autoplay-help-text {
 	grid-column: 1/-1;
 }
-
-// A page dragged from the Page List's pages, over the menu's list view.
-.wp-block-navigation__page-drop-zone {
-	position: relative;
-}
-
-.wp-block-navigation__page-drop-indicator {
-	position: absolute;
-	left: 0;
-	right: 0;
-	height: 2px;
-	margin-top: -1px;
-	background: var(--wp-admin-theme-color);
-	pointer-events: none;
-}

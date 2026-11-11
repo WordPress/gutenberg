@@ -21,6 +21,7 @@ import {
 } from '@wordpress/icons';
 import { Switch, VisuallyHidden } from '@wordpress/ui';
 import { getPageTitle } from './utils';
+import styles from './pages-list.module.scss';
 import type { PageRow } from './utils';
 
 /**
@@ -88,9 +89,19 @@ interface PageRowItemProps {
  */
 export function PageDragChip( { title }: { title: string } ) {
 	return (
-		<div className="wp-block-page-list__pages-panel-drag-chip">
+		<div
+			className={ clsx(
+				'wp-block-page-list__pages-panel-drag-chip',
+				styles[ 'drag-chip' ]
+			) }
+		>
 			<Icon icon={ pageIcon } size={ 20 } />
-			<span className="wp-block-page-list__pages-panel-drag-chip-title">
+			<span
+				className={ clsx(
+					'wp-block-page-list__pages-panel-drag-chip-title',
+					styles[ 'drag-chip-title' ]
+				) }
+			>
 				{ title }
 			</span>
 			<Icon icon={ dragHandle } size={ 18 } />
@@ -124,12 +135,18 @@ function PageRowItem( {
 
 	return (
 		<li
-			className={ clsx( 'wp-block-page-list__pages-panel-row', {
-				'is-hidden': ! isShown,
-				'is-dragging': isDragging,
-				'is-drop-before': dropTarget && ! dropTarget.isAfter,
-				'is-drop-after': dropTarget?.isAfter,
-			} ) }
+			className={ clsx(
+				'wp-block-page-list__pages-panel-row',
+				styles.row,
+				{
+					[ `is-hidden ${ styles[ 'is-hidden' ] }` ]: ! isShown,
+					[ `is-dragging ${ styles[ 'is-dragging' ] }` ]: isDragging,
+					[ `is-drop-before ${ styles[ 'is-drop-before' ] }` ]:
+						dropTarget && ! dropTarget.isAfter,
+					[ `is-drop-after ${ styles[ 'is-drop-after' ] }` ]:
+						dropTarget?.isAfter,
+				}
+			) }
 			onDragOver={ onDragOver }
 			onDrop={ onDrop }
 		>
@@ -149,7 +166,10 @@ function PageRowItem( {
 						<button
 							ref={ handleRef }
 							type="button"
-							className="wp-block-page-list__pages-panel-handle"
+							className={ clsx(
+								'wp-block-page-list__pages-panel-handle',
+								styles.handle
+							) }
 							draggable
 							onDragStart={ onDraggableStart }
 							onDragEnd={ onDraggableEnd }
@@ -178,13 +198,19 @@ function PageRowItem( {
 				</Draggable>
 			) }
 			<span
-				className="wp-block-page-list__pages-panel-title"
+				className={ clsx(
+					'wp-block-page-list__pages-panel-title',
+					styles.title
+				) }
 				style={ { paddingInlineStart: depth * 16 } }
 			>
 				<Truncate>{ title }</Truncate>
 			</span>
 			<Switch
-				className="wp-block-page-list__pages-panel-toggle"
+				className={ clsx(
+					'wp-block-page-list__pages-panel-toggle',
+					styles.toggle
+				) }
 				checked={ isShown }
 				disabled={ isHiddenByAncestor }
 				onCheckedChange={ () => onToggle( page.id ) }
@@ -203,7 +229,10 @@ function PageRowItem( {
 						title
 					) }
 					toggleProps={ { size: 'small' } }
-					className="wp-block-page-list__pages-panel-options"
+					className={ clsx(
+						'wp-block-page-list__pages-panel-options',
+						styles.options
+					) }
 				>
 					{ ( { onClose } ) => (
 						<>
@@ -341,7 +370,12 @@ export default function PagesList( {
 
 	return (
 		<div className="wp-block-page-list__pages-panel">
-			<p className="wp-block-page-list__pages-panel-help">
+			<p
+				className={ clsx(
+					'wp-block-page-list__pages-panel-help',
+					styles.help
+				) }
+			>
 				{ canReorder
 					? __(
 							'Pages that are switched on show in this menu, in the order of this list. Changing the order changes the order of your pages everywhere on your site.'
@@ -356,17 +390,26 @@ export default function PagesList( {
 				</VisuallyHidden>
 			) }
 			<div
-				className={ clsx( 'wp-block-page-list__pages-panel-head', {
-					'has-handle': canReorder,
-					'has-options': hasOptions,
-				} ) }
+				className={ clsx(
+					'wp-block-page-list__pages-panel-head',
+					styles.head,
+					{
+						[ `has-handle ${ styles[ 'has-handle' ] }` ]:
+							canReorder,
+						[ `has-options ${ styles[ 'has-options' ] }` ]:
+							hasOptions,
+					}
+				) }
 				aria-hidden="true"
 			>
 				<span>{ __( 'Page' ) }</span>
 				<span>{ __( 'In menu' ) }</span>
 			</div>
 			<ul
-				className="wp-block-page-list__pages-panel-list"
+				className={ clsx(
+					'wp-block-page-list__pages-panel-list',
+					styles.list
+				) }
 				aria-label={ __( 'Pages' ) }
 				onDragLeave={ ( event ) => {
 					if (

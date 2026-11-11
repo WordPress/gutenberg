@@ -7,8 +7,10 @@ import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { plus } from '@wordpress/icons';
+import clsx from 'clsx';
 import { usePageListPages } from './use-page-list-pages';
 import PagesList from './pages-list';
+import styles from './pages-list.module.scss';
 import { getPageRows, getMenuOrderEdits, getPageTitle } from './utils';
 import type { PageRow } from './utils';
 
@@ -193,7 +195,10 @@ export default function PageListPagesControl( {
 			{ showAddLink && navigationClientId && (
 				<Button
 					__next40pxDefaultSize
-					className="wp-block-page-list__pages-panel-add-link"
+					className={ clsx(
+						'wp-block-page-list__pages-panel-add-link',
+						styles[ 'add-link' ]
+					) }
 					variant="secondary"
 					icon={ plus }
 					onClick={ addLinkAfterPages }
