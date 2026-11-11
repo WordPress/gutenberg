@@ -276,19 +276,20 @@ export async function isHeicFile( file: File ): Promise< boolean > {
 }
 
 /**
- * Whether client-side media processing can process a file.
+ * Whether client-side media processing supports a file's format.
  *
  * Accepts any object with a name and type, such as a plupload file, so
  * callers outside the store can decide which files to route to it. HEIC
  * and HEIF are also matched by extension, since a browser without a HEIC
- * codec may give them no type.
+ * codec may give them no type. This only checks the format; it does not
+ * read the file or check browser support.
  *
  * @param file      File, or an object describing one.
  * @param file.name File name.
  * @param file.type MIME type.
- * @return Whether the file can be processed client-side.
+ * @return Whether the file's format is supported client-side.
  */
-export function isClientSideProcessable( file: {
+export function isClientSideSupportedFormat( file: {
 	name?: string;
 	type?: string;
 } ): boolean {

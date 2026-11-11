@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isClientSideProcessable } from '../utils';
+import { isClientSideSupportedFormat } from '../utils';
 
-describe( 'isClientSideProcessable', () => {
+describe( 'isClientSideSupportedFormat', () => {
 	it.each( [
 		[ 'photo.jpg', 'image/jpeg' ],
 		[ 'image.png', 'image/png' ],
@@ -12,7 +12,7 @@ describe( 'isClientSideProcessable', () => {
 		[ 'photo.heif', 'image/heif' ],
 		[ 'PHOTO.JPG', 'IMAGE/JPEG' ],
 	] )( 'accepts %s (%s)', ( name, type ) => {
-		expect( isClientSideProcessable( { name, type } ) ).toBe( true );
+		expect( isClientSideSupportedFormat( { name, type } ) ).toBe( true );
 	} );
 
 	it.each( [
@@ -20,7 +20,7 @@ describe( 'isClientSideProcessable', () => {
 		[ 'photo.HEIF', '' ],
 		[ 'photo.heic', 'application/octet-stream' ],
 	] )( 'accepts HEIC by extension: %s (%s)', ( name, type ) => {
-		expect( isClientSideProcessable( { name, type } ) ).toBe( true );
+		expect( isClientSideSupportedFormat( { name, type } ) ).toBe( true );
 	} );
 
 	it.each( [
@@ -33,11 +33,11 @@ describe( 'isClientSideProcessable', () => {
 		[ 'photo.jpg', '' ],
 		[ '', '' ],
 	] )( 'rejects %s (%s)', ( name, type ) => {
-		expect( isClientSideProcessable( { name, type } ) ).toBe( false );
+		expect( isClientSideSupportedFormat( { name, type } ) ).toBe( false );
 	} );
 
 	it( 'accepts a native File', () => {
 		const file = new File( [ '' ], 'photo.webp', { type: 'image/webp' } );
-		expect( isClientSideProcessable( file ) ).toBe( true );
+		expect( isClientSideSupportedFormat( file ) ).toBe( true );
 	} );
 } );
