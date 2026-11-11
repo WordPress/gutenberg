@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -40,7 +40,7 @@ export default function Edit( {
 	isSelected: isSingleSelected,
 } ) {
 	const registry = useRegistry();
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockOrder, getBlockName } = useSelect( blockEditorStore );
 	const blockProps = useBlockProps( {
 		role: 'group',
 	} );
@@ -67,17 +67,22 @@ export default function Edit( {
 	};
 
 	/**
-	 * Update all child Accordion Header blocks with a new heading level
+	 * Update all child Accordion Heading blocks with a new heading level
 	 * based on the accordion group setting.
 	 * @param {number} newHeadingLevel The new heading level to set
 	 */
 	const updateHeadingLevel = ( newHeadingLevel ) => {
 		const innerBlockClientIds = getBlockOrder( clientId );
 
-		// Get all accordion-header blocks from all accordion-content blocks.
+		// Get the Accordion Heading block of each Accordion Item block, leaving
+		// out the Accordion Panel block, which has no heading level.
 		const accordionHeaderClientIds = [];
 		innerBlockClientIds.forEach( ( contentClientId ) => {
-			const headerClientIds = getBlockOrder( contentClientId );
+			const headerClientIds = getBlockOrder( contentClientId ).filter(
+				( childClientId ) =>
+					getBlockName( childClientId ) ===
+					ACCORDION_HEADING_BLOCK_NAME
+			);
 			accordionHeaderClientIds.push( ...headerClientIds );
 		} );
 
@@ -183,11 +188,17 @@ export default function Edit( {
 								} }
 							>
 								<ToggleGroupControlOption
-									label={ __( 'Left' ) }
+									label={ _x(
+										'Start',
+										'Icon position option for Accordion block'
+									) }
 									value="left"
 								/>
 								<ToggleGroupControlOption
-									label={ __( 'Right' ) }
+									label={ _x(
+										'End',
+										'Icon position option for Accordion block'
+									) }
 									value="right"
 								/>
 							</ToggleGroupControl>
