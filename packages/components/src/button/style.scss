@@ -11,12 +11,15 @@
  */
 
 .components-button {
+	// Share tone-dependent colors across variants. Fixed roles use WPDS tokens directly.
 	--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand);
 	--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-brand-active);
 	--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-brand-strong);
 	--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-brand-strong-active);
+	--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
 	--_wp-components-button-background-strong: var(--wpds-color-background-interactive-brand-strong);
 	--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-brand-strong-active);
+	--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-brand-strong-disabled);
 	--_wp-components-button-background-weak: var(--wpds-color-background-interactive-neutral-weak);
 	--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-neutral-weak-active);
 	--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak-active);
@@ -91,8 +94,8 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
-			background: var(--wpds-color-background-interactive-brand-strong-disabled);
+			color: var(--_wp-components-button-foreground-strong-disabled);
+			background: var(--_wp-components-button-background-strong-disabled);
 		}
 
 		&.is-busy,
@@ -200,8 +203,10 @@
 		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-error-active);
 		--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-error-strong);
 		--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-error-strong-active);
+		--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
 		--_wp-components-button-background-strong: var(--wpds-color-background-interactive-error-strong);
 		--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-error-strong-active);
+		--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
 		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
 		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
 		--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-error);
