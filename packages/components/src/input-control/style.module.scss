@@ -159,15 +159,7 @@
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&::-webkit-input-placeholder {
-		color: var(--wpds-color-foreground-interactive-neutral-weak);
-	}
-
-	&::-moz-placeholder {
-		color: var(--wpds-color-foreground-interactive-neutral-weak);
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 

@@ -27,29 +27,12 @@
 		background: $components-color-background;
 	}
 
-	// Keep the legacy vendor placeholder selectors.
-	&::-webkit-input-placeholder {
-		color: var(--wpds-color-foreground-interactive-neutral-weak);
-	}
-
-	&::-moz-placeholder {
-		color: var(--wpds-color-foreground-interactive-neutral-weak);
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	:global(.is-dark-theme) & {
-		&::-webkit-input-placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
-
-		&::-moz-placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
-
-		&:-ms-input-placeholder {
+		&::placeholder {
 			color: $components-color-light-gray-placeholder;
 		}
 	}
