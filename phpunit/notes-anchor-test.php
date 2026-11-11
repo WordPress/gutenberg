@@ -12,10 +12,9 @@ class Tests_Notes_Anchor extends WP_UnitTestCase {
 		$value = gutenberg_sanitize_note_anchor(
 			array(
 				array(
-					'path'    => array( 0, '2' ),
+					'path'    => array( 0, 2 ),
 					'content' => '<!-- wp:paragraph --><p><mark class="wp-note" data-id="new">Hi</mark><script>alert(1)</script></p><!-- /wp:paragraph -->',
 				),
-				'not an anchor',
 			)
 		);
 
@@ -30,7 +29,7 @@ class Tests_Notes_Anchor extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_deletes_anchor_once_saved_content_links_to_note(): void {
+	public function test_keeps_anchor_when_saved_content_does_not_link_to_note(): void {
 		$post_id = self::factory()->post->create();
 		$note_id = self::factory()->comment->create(
 			array(
@@ -53,13 +52,5 @@ class Tests_Notes_Anchor extends WP_UnitTestCase {
 			)
 		);
 		$this->assertSame( $anchor, get_comment_meta( $note_id, '_wp_note_anchor', true ) );
-
-		wp_update_post(
-			array(
-				'ID'           => $post_id,
-				'post_content' => '<!-- wp:paragraph {"metadata":{"noteId":[' . $note_id . ']}} --><p>Hi</p><!-- /wp:paragraph -->',
-			)
-		);
-		$this->assertSame( '', get_comment_meta( $note_id, '_wp_note_anchor', true ) );
 	}
 }

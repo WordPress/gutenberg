@@ -55,63 +55,18 @@ add_action( 'init', 'gutenberg_register_note_anchor_meta' );
  * content for users who can't post unfiltered HTML.
  *
  * @param mixed $value Meta value.
- * @return list<array{path: list<int>, content: string}> Sanitized snapshot.
+ * @return mixed Sanitized meta value.
  */
-function gutenberg_sanitize_note_anchor( $value ): array {
-	if ( ! is_array( $value ) ) {
-		return array();
+function gutenberg_sanitize_note_anchor( $value ) {
+	if ( ! is_array( $value ) || current_user_can( 'unfiltered_html' ) ) {
+		return $value;
 	}
-
-	$anchors = array();
-	foreach ( $value as $anchor ) {
-		if ( ! is_array( $anchor ) || ! is_string( $anchor['content'] ?? null ) || ! is_array( $anchor['path'] ?? null ) ) {
-			continue;
-		}
-
-		$path = array();
-		foreach ( $anchor['path'] as $index ) {
-			if ( is_numeric( $index ) ) {
-				$path[] = absint( $index );
-			}
-		}
-
-		$content = $anchor['content'];
-		if ( ! current_user_can( 'unfiltered_html' ) ) {
-			$content = wp_kses_post( $content );
-		}
-
-		$anchors[] = array(
-			'path'    => $path,
-			'content' => $content,
-		);
-	}
-	return $anchors;
-}
-
-/**
- * Collects the note ids the blocks link to, through `metadata.noteId`.
- *
- * @param mixed[] $blocks Parsed blocks.
- * @return int[] Note ids.
- */
-function gutenberg_get_note_ids_from_blocks( array $blocks ): array {
-	$note_ids = array();
-	foreach ( $blocks as $block ) {
-		if ( ! is_array( $block ) ) {
-			continue;
-		}
-		$metadata = is_array( $block['attrs'] ?? null ) ? ( $block['attrs']['metadata'] ?? null ) : null;
-		$ids      = is_array( $metadata ) ? ( $metadata['noteId'] ?? null ) : null;
-		foreach ( (array) $ids as $id ) {
-			if ( is_numeric( $id ) ) {
-				$note_ids[] = (int) $id;
-			}
-		}
-		if ( is_array( $block['innerBlocks'] ?? null ) ) {
-			$note_ids = array_merge( $note_ids, gutenberg_get_note_ids_from_blocks( $block['innerBlocks'] ) );
+	foreach ( $value as &$anchor ) {
+		if ( is_array( $anchor ) && is_string( $anchor['content'] ?? null ) ) {
+			$anchor['content'] = wp_kses_post( $anchor['content'] );
 		}
 	}
-	return $note_ids;
+	return $value;
 }
 
 /**
@@ -121,30 +76,33 @@ function gutenberg_get_note_ids_from_blocks( array $blocks ): array {
  *
  * @param int     $post_id Post ID.
  * @param WP_Post $post    Post object.
- * @param bool    $update  Whether this is an existing post being updated.
  */
-function gutenberg_delete_persisted_note_anchors( $post_id, $post, $update ): void {
-	if ( ! $update || 'revision' === $post->post_type ) {
-		return;
-	}
-	$note_ids = get_comments(
-		array(
-			'post_id'  => $post_id,
-			'type'     => 'note',
-			'parent'   => 0,
-			'meta_key' => '_wp_note_anchor',
-			'fields'   => 'ids',
-		)
-	);
-	if ( ! is_array( $note_ids ) || ! $note_ids ) {
-		return;
-	}
-	$linked = gutenberg_get_note_ids_from_blocks( parse_blocks( $post->post_content ) );
-	foreach ( $note_ids as $note_id ) {
-		$note_id = (int) $note_id;
-		if ( $note_id > 0 && in_array( $note_id, $linked, true ) ) {
-			delete_comment_meta( $note_id, '_wp_note_anchor' );
+function gutenberg_delete_persisted_note_anchors( $post_id, $post ): void {
+	$blocks   = parse_blocks( $post->post_content );
+	$note_ids = array();
+	foreach ( _flatten_blocks( $blocks ) as $block ) {
+		$ids = is_array( $block ) ? _wp_array_get( $block, array( 'attrs', 'metadata', 'noteId' ), array() ) : array();
+		foreach ( (array) $ids as $id ) {
+			if ( is_numeric( $id ) ) {
+				$note_ids[] = (int) $id;
+			}
 		}
 	}
+	if ( ! $note_ids ) {
+		return;
+	}
+
+	$snapshot_ids = get_comments(
+		array(
+			'post_id'     => $post_id,
+			'type'        => 'note',
+			'comment__in' => $note_ids,
+			'meta_key'    => '_wp_note_anchor',
+			'fields'      => 'ids',
+		)
+	);
+	foreach ( array_filter( $snapshot_ids ) as $note_id ) {
+		delete_comment_meta( $note_id, '_wp_note_anchor' );
+	}
 }
-add_action( 'wp_after_insert_post', 'gutenberg_delete_persisted_note_anchors', 10, 3 );
+add_action( 'wp_after_insert_post', 'gutenberg_delete_persisted_note_anchors', 10, 2 );
