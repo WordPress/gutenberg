@@ -144,6 +144,9 @@ export const DetachedInline: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The listbox still owns its options.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},

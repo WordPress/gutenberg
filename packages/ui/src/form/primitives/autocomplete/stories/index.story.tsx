@@ -286,6 +286,9 @@ export const Inline: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The listbox still owns its options.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},
@@ -702,6 +705,9 @@ export const Grid: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The grid still owns its rows.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},
