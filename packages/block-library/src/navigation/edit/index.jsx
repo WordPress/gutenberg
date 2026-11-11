@@ -39,7 +39,7 @@ import { page } from '@wordpress/icons';
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
-import { normalizeNavigationMenuSlug } from '../get-navigation-menu-by-slug';
+import getMenuReferenceAttributes from './get-menu-reference-attributes';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -299,31 +299,16 @@ function Navigation( {
 
 	const setNavigationMenuReference = useCallback(
 		( menu ) => {
-			// A block that already references its menu by slug keeps doing so,
-			// so that switching menus does not silently downgrade a portable
-			// reference to a site specific post ID.
-			if ( slug && menu?.slug ) {
-				// The reference may already resolve to this menu, as it does
-				// when a hand authored `Header Menu` created the `header-menu`
-				// the server stored. Leave the slug as it was authored then,
-				// rather than rewriting saved markup to no effect.
-				const isSameMenu =
-					menu.id === navigationMenuId ||
-					normalizeNavigationMenuSlug( menu.slug ) ===
-						normalizeNavigationMenuSlug( slug );
+			const referenceAttributes = getMenuReferenceAttributes( {
+				menu,
+				ref,
+				slug,
+				navigationMenuId,
+			} );
 
-				if ( isSameMenu && ref === undefined ) {
-					return;
-				}
-
-				setAttributes( {
-					slug: isSameMenu ? slug : menu.slug,
-					ref: undefined,
-				} );
-				return;
+			if ( referenceAttributes ) {
+				setAttributes( referenceAttributes );
 			}
-
-			setAttributes( { ref: menu?.id, slug: undefined } );
 		},
 		[ navigationMenuId, ref, slug, setAttributes ]
 	);
