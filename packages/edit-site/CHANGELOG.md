@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show a warning notice while editing the posts page, as the post editor does ([#86653](https://github.com/WordPress/gutenberg/pull/86653)).
+
 ## 8.1.0 (2026-11-04)
 
 ## 8.0.0 (2026-10-20)

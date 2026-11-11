@@ -12,6 +12,7 @@ import { unlock } from '../../lock-unlock';
 const {
 	Editor: PrivateEditor,
 	BackButton,
+	PostsPageNotice,
 	PreferencesModal,
 	ToolsMoreMenuGroup,
 	SiteExport,
@@ -152,6 +153,7 @@ export function Editor( {
 			<ToolsMoreMenuGroup>
 				<SiteExport />
 			</ToolsMoreMenuGroup>
+			<PostsPageNotice />
 		</PrivateEditor>
 	);
 }

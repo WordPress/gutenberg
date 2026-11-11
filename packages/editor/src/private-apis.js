@@ -4,6 +4,7 @@ import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
+import PostsPageNotice from './components/posts-page-notice';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import usePostFields from './components/post-fields';
@@ -28,6 +29,7 @@ lock( privateApis, {
 	Editor,
 	PluginPostExcerpt,
 	PostCardPanel,
+	PostsPageNotice,
 	PreferencesModal,
 	usePostActions,
 	usePostFields,

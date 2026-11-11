@@ -36,7 +36,7 @@ import {
 } from './use-resolve-edited-entity';
 import SitePreview from './site-preview';
 
-const { Editor, BackButton } = unlock( editorPrivateApis );
+const { Editor, BackButton, PostsPageNotice } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function getListPathForPostType( postType ) {
@@ -267,6 +267,7 @@ export default function EditSiteEditor( {
 						</BackButton>
 					) }
 					<SiteEditorMoreMenu />
+					<PostsPageNotice />
 				</Editor>
 			) }
 		</>
