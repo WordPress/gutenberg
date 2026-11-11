@@ -44,7 +44,6 @@ function MediaPreviewFileInfo( {
 			<a
 				href={ mediaUrl }
 				target="_blank"
-				rel="noopener"
 				className="media-editor-preview__download-link"
 			>
 				{ __( 'View file' ) }

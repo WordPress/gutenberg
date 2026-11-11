@@ -438,8 +438,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				continue;
 			}
 
-			$icon['content'] = $icon['content'] ?? $this->get_content( $icon['name'] );
-			$icons[]         = $icon;
+			$icon['content'] ??= $this->get_content( $icon['name'] );
+			$icons[]           = $icon;
 		}
 
 		return $icons;

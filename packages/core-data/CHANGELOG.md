@@ -4,7 +4,9 @@
 
 ### Bug Fixes
 
+-   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
 -   `getEntityRecord`: Discard a REST response that is delivered after a newer response for the same request. Invalidating a resolution starts a second request while the first may still be in flight, and the store kept whichever one arrived last, so a record read from the database before an update could overwrite the updated one. A response is also discarded when a complete copy of the record was received outside the resolver, such as a save response, after the request was made ([#81846](https://github.com/WordPress/gutenberg/pull/81846)).
 
 ## 9.1.0 (2026-11-04)
