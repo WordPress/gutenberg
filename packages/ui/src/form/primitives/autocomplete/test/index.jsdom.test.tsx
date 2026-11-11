@@ -111,6 +111,20 @@ describe( 'Autocomplete', () => {
 		} );
 	} );
 
+	it( 'throws when Autocomplete.Input is inside Autocomplete.Popup', () => {
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ ITEMS } open>
+					<Autocomplete.Popup>
+						<Autocomplete.Input aria-label="Search" />
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			)
+		).toThrow(
+			'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup'
+		);
+	} );
+
 	describe( 'grid rows', () => {
 		const GRID_ITEMS = [
 			{
