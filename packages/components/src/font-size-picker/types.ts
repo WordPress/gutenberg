@@ -121,9 +121,9 @@ export type FontSizePickerSelectProps = Pick<
 };
 
 export type FontSizePickerSelectOption = {
-	key: string;
-	name: string;
-	value?: FontSize[ 'size' ];
+	value: string | null;
+	label: string;
+	size?: FontSize[ 'size' ];
 	hint?: string;
 };
 

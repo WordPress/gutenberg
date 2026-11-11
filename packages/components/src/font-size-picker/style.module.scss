@@ -20,11 +20,26 @@
 	margin-bottom: 0;
 }
 
-// Force a line break between name and hint while keeping the checkmark on the right.
-.select {
-	:global(.components-custom-select-control__item) {
-		:global(.components-custom-select-control__item-hint) {
-			width: 100%;
-		}
+.selected-value {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.selected-hint {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	margin-inline-start: 8px;
+}
+
+.option-label {
+	display: flex;
+	flex-direction: column;
+}
+
+.option-hint {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+
+	[data-highlighted] & {
+		color: inherit;
 	}
 }
