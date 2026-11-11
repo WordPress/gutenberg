@@ -225,6 +225,7 @@
 
 			&:active:not(:disabled, [aria-disabled="true"]) {
 				background-color: var(--wpds-color-background-interactive-error-active);
+				color: var(--_wp-components-button-foreground-active);
 			}
 
 			&:disabled,
