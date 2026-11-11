@@ -635,44 +635,18 @@ const withBlockReset =
 			 * - have the `controlledInnerBlocks` flag
 			 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
 			 * The controller owns the inner blocks, so any inner blocks the action
-			 * gives such a block are dropped.
+			 * gives such a block are replaced.
 			 * Nested controllers (e.g., `post-content`, patterns) don't lose their
 			 * controlled status and don't unnecessarily re-clone blocks.
 			 */
-			const preservedControlledInnerBlocks =
-				state?.controlledInnerBlocks ?? new Set();
-			// Leave out the inner blocks the action gives a controller,
-			// copying only the blocks above it.
-			const withoutControlledInnerBlocks = (
-				blocks: Block[]
-			): Block[] => {
-				let hasChanged = false;
-				const result = blocks.map( ( block ) => {
-					if ( ! block.innerBlocks.length ) {
-						return block;
-					}
-					const innerBlocks = preservedControlledInnerBlocks.has(
-						block.clientId
-					)
-						? []
-						: withoutControlledInnerBlocks( block.innerBlocks );
-					if ( innerBlocks === block.innerBlocks ) {
-						return block;
-					}
-					hasChanged = true;
-					return { ...block, innerBlocks };
-				} );
-				return hasChanged ? result : blocks;
-			};
 			const newState = reducer( undefined, {
 				type: 'INSERT_BLOCKS',
 				rootClientId: '',
-				blocks: withoutControlledInnerBlocks( action.blocks ),
+				blocks: action.blocks,
 			} );
 
-			// The preserved controllers that the action gives. A nested
-			// controller is restored along with the controller it's in.
-			const controllersFromAction: string[] = [];
+			const preservedControlledInnerBlocks =
+				state?.controlledInnerBlocks ?? new Set();
 
 			// Preserve controlled inner blocks data from the old state.
 			// The maps above are rebuilt solely from action.blocks, but
@@ -682,17 +656,13 @@ const withBlockReset =
 			if ( state?.order ) {
 				for ( const clientId of preservedControlledInnerBlocks ) {
 					// Only preserve if the parent block still exists.
-					if ( newState.byClientId.has( clientId ) ) {
-						controllersFromAction.push( clientId );
-					}
-				}
-
-				for ( const clientId of controllersFromAction ) {
-					newState.controlledInnerBlocks.add( clientId );
-					const oldOrder = state.order.get( clientId );
-					if ( ! oldOrder?.length ) {
+					if ( ! newState.byClientId.has( clientId ) ) {
 						continue;
 					}
+					newState.controlledInnerBlocks.add( clientId );
+					// The controller owns its inner blocks, even when it has
+					// none, so they replace any the action gives it.
+					const oldOrder = state.order.get( clientId ) ?? [];
 					newState.order.set( clientId, oldOrder );
 					const preserveBlock = (
 						blockId: string,
@@ -708,11 +678,6 @@ const withBlockReset =
 							state!.attributes.get( blockId )!
 						);
 						newState.parents.set( blockId, parentId );
-						// A nested controller isn't in the loop, so it keeps
-						// its flag here.
-						if ( preservedControlledInnerBlocks.has( blockId ) ) {
-							newState.controlledInnerBlocks.add( blockId );
-						}
 						const childOrder = state!.order.get( blockId ) || [];
 						newState.order.set( blockId, childOrder );
 						childOrder.forEach( ( childId ) =>
@@ -729,11 +694,8 @@ const withBlockReset =
 			// cloned inner blocks instead. The entries are the blocks from the
 			// action, so they are replaced, and their ancestors after them.
 			const fixedClientIds: string[] = [];
-			for ( const clientId of controllersFromAction ) {
-				const controlledOrder = newState.order.get( clientId );
-				if ( ! controlledOrder?.length ) {
-					continue;
-				}
+			for ( const clientId of newState.controlledInnerBlocks ) {
+				const controlledOrder = newState.order.get( clientId )!;
 				const innerBlocks = controlledOrder.map(
 					( id ) => state!.tree.get( id ) as TreeBlock
 				);
@@ -752,17 +714,6 @@ const withBlockReset =
 						return;
 					}
 					newState.tree.set( blockId, treeEntry );
-					// Only a block that is still controlled keeps its
-					// controlled entry, so stale entries are dropped.
-					const controlledEntry =
-						preservedControlledInnerBlocks.has( blockId ) &&
-						state!.tree.get( 'controlled||' + blockId );
-					if ( controlledEntry ) {
-						newState.tree.set(
-							'controlled||' + blockId,
-							controlledEntry
-						);
-					}
 					const childOrder = newState.order.get( blockId ) || [];
 					childOrder.forEach( preserveTreeEntry );
 				};
