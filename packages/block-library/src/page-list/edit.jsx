@@ -18,12 +18,12 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import DetachPageListDialog from './detach-dialog';
 import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
 import { getVisiblePages } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -33,25 +33,6 @@ const EMPTY_ARRAY = [];
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
-function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
-	return (
-		<ConfirmDialog
-			isOpen
-			title={ __( 'Detach Page List' ) }
-			__experimentalHideHeader={ false }
-			confirmButtonText={ __( 'Detach' ) }
-			onConfirm={ onConfirm }
-			onCancel={ onCancel }
-			isBusy={ isBusy }
-			size="medium"
-		>
-			{ __(
-				"This Navigation Menu displays your website's pages. Detaching will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
-			) }
-		</ConfirmDialog>
-	);
-}
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,

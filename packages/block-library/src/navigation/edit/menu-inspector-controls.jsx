@@ -20,6 +20,7 @@ import {
 	useAddLinkAfterPage,
 	useDropIntoOrOutOfPageList,
 } from '../../page-list/use-convert-to-navigation-links';
+import DetachPageListDialog from '../../page-list/detach-dialog';
 import { PAGE_DRAG_TYPE } from '../../page-list/pages-list';
 import dropZoneStyles from './page-drop-zone.module.scss';
 
@@ -158,22 +159,88 @@ export function NavigationMenuItems( { clientId, listView } ) {
 	const { dropBlocksNextToPage, dropPageNextToBlock } =
 		useDropIntoOrOutOfPageList( pageListClientId );
 
+	// Each of these turns the pages into links, so it's confirmed first, as
+	// Detach is. Leaving the dialog keeps the Page List, and anything dragged
+	// stays where it was.
+	const [ pendingDetach, setPendingDetach ] = useState( null );
+	const confirmDetach = ( message, detach ) =>
+		setPendingDetach( { message, detach } );
+
 	if ( ! pageListClientId ) {
 		return listView;
 	}
+
+	const afterDetach = __(
+		'New pages will no longer be added to the menu automatically, and pages that are switched off will be left out.'
+	);
 
 	return (
 		<>
 			<PageListPagesControl
 				clientId={ pageListClientId }
 				showAddLink={ ! hasOtherItems }
-				onAddLinkAfter={ addLinkAfterPage }
-				onDropItems={ dropBlocksNextToPage }
+				onAddLinkAfter={ ( pageId ) =>
+					confirmDetach(
+						sprintf(
+							/* translators: %s: What happens to the menu after it's detached. */
+							__(
+								"A link can only go between two pages once this menu's pages are links. %s"
+							),
+							afterDetach
+						),
+						() => addLinkAfterPage( pageId )
+					)
+				}
+				onDropItems={ ( blockClientIds, pageId, isAfter ) =>
+					confirmDetach(
+						sprintf(
+							/* translators: %s: What happens to the menu after it's detached. */
+							__(
+								"To move this item between pages, this menu's pages will become links. %s"
+							),
+							afterDetach
+						),
+						() =>
+							dropBlocksNextToPage(
+								blockClientIds,
+								pageId,
+								isAfter
+							)
+					)
+				}
 			/>
 			{ hasOtherItems && (
-				<PageDropZone onDropPage={ dropPageNextToBlock }>
+				<PageDropZone
+					onDropPage={ ( pageId, targetClientId, isAfter ) =>
+						confirmDetach(
+							sprintf(
+								/* translators: %s: What happens to the menu after it's detached. */
+								__(
+									"To move this page among the menu's other items, this menu's pages will become links. %s"
+								),
+								afterDetach
+							),
+							() =>
+								dropPageNextToBlock(
+									pageId,
+									targetClientId,
+									isAfter
+								)
+						)
+					}
+				>
 					{ listView }
 				</PageDropZone>
+			) }
+			{ pendingDetach && (
+				<DetachPageListDialog
+					message={ pendingDetach.message }
+					onConfirm={ () => {
+						pendingDetach.detach();
+						setPendingDetach( null );
+					} }
+					onCancel={ () => setPendingDetach( null ) }
+				/>
 			) }
 		</>
 	);
