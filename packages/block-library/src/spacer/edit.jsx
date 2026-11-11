@@ -270,6 +270,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					'100px';
 				setAttributesCovertly( {
+					height: '0px',
 					width: '0px',
 					style: {
 						...blockStyle,
@@ -306,6 +307,14 @@ const SpacerEdit = ( {
 					? { width: undefined }
 					: { height: undefined }
 			);
+		} else if (
+			isFlexLayout &&
+			inheritedOrientation === 'horizontal' &&
+			height !== '0px'
+		) {
+			// The flex size supplies the horizontal spacing. Do not let a
+			// retained height make the Row taller on the front end.
+			setAttributesCovertly( { height: '0px' } );
 		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
 			setAttributesCovertly( {
 				...( inheritedOrientation === 'horizontal'
