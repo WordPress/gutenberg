@@ -31,9 +31,6 @@ const root = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
-const repositoryPackage = JSON.parse(
-	readFileSync( path.join( root, 'package.json' ), 'utf8' )
-);
 const directory = mkdtempSync( path.join( tmpdir(), 'wp-vitest-consumer-' ) );
 const consumer = path.join( directory, 'consumer' );
 mkdirSync( consumer );
@@ -134,24 +131,6 @@ function pack( name ) {
 	const packed = readNpmPackResult( stdout, manifest.name );
 	return `file:${ path.join( directory, packed.filename ) }`;
 }
-// Keep this check dependency-free: CI does not install repository dependencies.
-const npmVersion = execute( 'npm', [ '--version' ], consumer ).stdout.trim();
-const requiredNpmVersion = repositoryPackage.engines.npm;
-assert.match( requiredNpmVersion, /^>=\d+\.\d+\.\d+$/ );
-assert.match( npmVersion, /^\d+\.\d+\.\d+$/ );
-const minimumNpmVersion = requiredNpmVersion
-	.slice( 2 )
-	.split( '.' )
-	.map( Number );
-const npmComparison =
-	npmVersion
-		.split( '.' )
-		.map( ( part, index ) => Number( part ) - minimumNpmVersion[ index ] )
-		.find( ( difference ) => difference !== 0 ) ?? 0;
-assert.ok(
-	npmComparison >= 0,
-	`Vitest consumers require npm ${ requiredNpmVersion }; found ${ npmVersion }. Upgrade npm before running this check.`
-);
 const scripts = values.scripts ?? pack( 'scripts' );
 const eslintPlugin = values[ 'eslint-plugin' ] ?? pack( 'eslint-plugin' );
 write(
@@ -160,7 +139,6 @@ write(
 		name: 'wp-vitest-consumer',
 		private: true,
 		type: 'module',
-		allowScripts: repositoryPackage.allowScripts,
 		devDependencies: {
 			'@wordpress/scripts': scripts,
 			'@wordpress/eslint-plugin': eslintPlugin,
@@ -184,19 +162,18 @@ write(
 		overrides: { '@wordpress/eslint-plugin': '$@wordpress/eslint-plugin' },
 	} )
 );
-write(
-	'.npmrc',
-	[
-		readFileSync( path.join( root, '.npmrc' ), 'utf8' ),
-		// Exercise the default consumer layout rather than the monorepo's links.
-		'install-strategy = hoisted',
-		// The ESLint 10 compatibility checks include plugins with older peer ranges.
-		'strict-peer-deps = false',
-		// Permit only direct fixture tarballs, keeping transitive files blocked.
-		'allow-file = root',
-		'',
-	].join( '\n' )
+const fixtureRoot = path.join(
+	root,
+	'tools/validation/fixtures/vitest-consumer'
 );
+write( '.npmrc', readFileSync( path.join( fixtureRoot, '.npmrc' ) ) );
+// npm warns, but does not fail, for settings it does not understand.
+const { stderr } = execute(
+	'npm',
+	[ 'config', 'get', 'min-release-age' ],
+	consumer
+);
+assert.equal( stderr, '' );
 if ( values.lockfile ) {
 	cpSync(
 		path.resolve( values.lockfile ),
@@ -233,10 +210,6 @@ const wpScripts = path.join(
 );
 const command = ( ...args ) =>
 	run( values.node, [ wpScripts, 'test-unit-js', ...args ] );
-const fixtureRoot = path.join(
-	root,
-	'tools/validation/fixtures/vitest-consumer'
-);
 for ( const name of [ 'node.test.mjs', 'dom.test.jsx', 'browser.test.jsx' ] ) {
 	write( name, readFileSync( path.join( fixtureRoot, `${ name }.txt` ) ) );
 }

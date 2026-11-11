@@ -9,7 +9,6 @@ on:
             - 'packages/eslint-plugin/**'
             - 'tools/validation/test-vitest-consumers.mjs'
             - 'tools/validation/fixtures/vitest-consumer/**'
-            - '.npmrc'
             - 'package.json'
             - 'package-lock.json'
             - '.github/setup-npm/**'
