@@ -3,12 +3,14 @@
 ## Unreleased
 
 ### Enhancements
-
+-   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 
 ### Bug Fixes
 
+-   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
+-   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 -   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
