@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use `--wpds-typography-*` design tokens for font family, size, and line height in the `heading-*` and `body-*` mixins.
+
 ## 15.0.0 (2026-11-04)
 
 ### Breaking Changes
