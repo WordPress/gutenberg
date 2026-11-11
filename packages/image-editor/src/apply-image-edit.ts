@@ -64,9 +64,9 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
  * taken from `state`.
  *
  * An edit says which pixels to keep, not how the canvas shows them, so
- * the view is chosen here: the crop is centred and its longer side fills
- * the view, as it is after a person finishes resizing. The pan and zoom
- * `state` had are replaced.
+ * the view is chosen here: the crop is centred and zoomed in until it
+ * meets an edge of the view or the zoom limit, as it is after a person
+ * finishes resizing. The pan and zoom `state` had are replaced.
  *
  * Nothing is approximated. The result is read back with `getImageEdit`,
  * and an edit the editor cannot hold is rejected.
