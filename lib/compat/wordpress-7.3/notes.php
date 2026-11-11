@@ -55,18 +55,37 @@ add_action( 'init', 'gutenberg_register_note_anchor_meta' );
  * content for users who can't post unfiltered HTML.
  *
  * @param mixed $value Meta value.
- * @return mixed Sanitized meta value.
+ * @return list<array{path: list<int>, content: string}> Sanitized snapshot.
  */
-function gutenberg_sanitize_note_anchor( $value ) {
-	if ( ! is_array( $value ) || current_user_can( 'unfiltered_html' ) ) {
-		return $value;
+function gutenberg_sanitize_note_anchor( $value ): array {
+	if ( ! is_array( $value ) ) {
+		return array();
 	}
-	foreach ( $value as &$anchor ) {
-		if ( is_array( $anchor ) && is_string( $anchor['content'] ?? null ) ) {
-			$anchor['content'] = wp_kses_post( $anchor['content'] );
+
+	$anchors = array();
+	foreach ( $value as $anchor ) {
+		if ( ! is_array( $anchor ) || ! is_string( $anchor['content'] ?? null ) || ! is_array( $anchor['path'] ?? null ) ) {
+			continue;
 		}
+
+		$path = array();
+		foreach ( $anchor['path'] as $index ) {
+			if ( is_numeric( $index ) ) {
+				$path[] = absint( $index );
+			}
+		}
+
+		$content = $anchor['content'];
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			$content = wp_kses_post( $content );
+		}
+
+		$anchors[] = array(
+			'path'    => $path,
+			'content' => $content,
+		);
 	}
-	return $value;
+	return $anchors;
 }
 
 /**

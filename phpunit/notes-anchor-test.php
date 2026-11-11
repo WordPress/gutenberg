@@ -12,9 +12,10 @@ class Tests_Notes_Anchor extends WP_UnitTestCase {
 		$value = gutenberg_sanitize_note_anchor(
 			array(
 				array(
-					'path'    => array( 0, 2 ),
+					'path'    => array( 0, '2' ),
 					'content' => '<!-- wp:paragraph --><p><mark class="wp-note" data-id="new">Hi</mark><script>alert(1)</script></p><!-- /wp:paragraph -->',
 				),
+				'not an anchor',
 			)
 		);
 
