@@ -50,12 +50,6 @@
 		"focalPoint": {
 			"type": "object"
 		},
-		"minHeight": {
-			"type": "number"
-		},
-		"minHeightUnit": {
-			"type": "string"
-		},
 		"gradient": {
 			"type": "string"
 		},
@@ -137,7 +131,11 @@
 		},
 		"dimensions": {
 			"aspectRatio": true,
-			"minWidth": true
+			"minHeight": true,
+			"minWidth": true,
+			"__experimentalDefaultControls": {
+				"minHeight": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
