@@ -38,7 +38,16 @@ function gutenberg_register_media_folder_taxonomy() {
 			// useful way to inspect assignments while the feature is
 			// experimental.
 			'show_ui'               => true,
-			'show_in_menu'          => false,
+			// Adds a Folders item under Media. The editor only creates flat
+			// folders and cannot rename or delete one, so the term screen is
+			// currently the only way to nest, rename or remove a folder, and
+			// the only place the term counts are visible.
+			//
+			// TODO: decide whether folders belong in the admin menu before
+			// landing the feature. This is here to inspect and manage the
+			// taxonomy while it is experimental, not necessarily as the
+			// intended home for managing folders.
+			'show_in_menu'          => true,
 			'show_in_nav_menus'     => false,
 			'show_in_rest'          => true,
 			'rest_base'             => 'media-folders',
