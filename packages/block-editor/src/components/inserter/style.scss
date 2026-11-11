@@ -30,18 +30,6 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-// Keeps the close button but hides the tab list when Blocks is the only tab,
-// as in the widget editors.
-.block-editor-inserter__menu.has-single-tab {
-	.block-editor-tabbed-sidebar__tablist {
-		display: none;
-	}
-
-	.block-editor-tabbed-sidebar__tablist-and-close-button {
-		justify-content: flex-end;
-	}
-}
-
 .block-editor-inserter__main-area {
 	height: 100%;
 	gap: $grid-unit-20;
@@ -129,6 +117,17 @@ $block-inserter-tabs-height: 44px;
 	&.show-panel {
 		@include break-medium() {
 			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
+
+	// Keeps the close button but hides the tab list when Blocks is the only tab.
+	&.has-single-tab {
+		.block-editor-tabbed-sidebar__tablist {
+			display: none;
+		}
+
+		.block-editor-tabbed-sidebar__tablist-and-close-button {
+			justify-content: flex-end;
 		}
 	}
 }
