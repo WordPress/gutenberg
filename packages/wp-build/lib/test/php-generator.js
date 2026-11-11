@@ -63,11 +63,13 @@ describe.each( PAGE_TEMPLATES )( '%s template', ( templateName ) => {
 			'{{TEXT_DOMAIN_ARG}}': getTextDomainArgument( 'my-plugin' ),
 		} );
 
-		const gettextCalls = generatedPage.match( /\b\w*__\( '.*?' .*?\)/g );
-		expect( gettextCalls ).not.toHaveLength( 0 );
-		for ( const call of gettextCalls ) {
-			expect( call ).toMatch( /, 'my-plugin' \)$/ );
-		}
+		const gettextCalls = generatedPage.match(
+			/\b(?:__|_e|_x|_ex|_n|_nx|esc_(?:html|attr)(?:__|_e|_x))\(/g
+		);
+		const textDomainArguments = generatedPage.match( /, 'my-plugin' \)/g );
+
+		expect( gettextCalls?.length ).toBeGreaterThan( 0 );
+		expect( textDomainArguments?.length ).toBe( gettextCalls?.length );
 	} );
 } );
 

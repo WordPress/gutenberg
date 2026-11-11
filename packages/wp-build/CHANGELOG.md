@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
--   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page, so that plugins shipping the build pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
+-   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page. With `wpPlugin.textDomain` set, plugins shipping the build pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
 
 ### Internal
 
