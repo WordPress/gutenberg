@@ -5,6 +5,8 @@
 
 	@layer components {
 		.text {
+			/* Text variants can render as either paragraphs or headings, so both
+			   element-specific CSS defenses need the variant's typography. */
 			--_gcd-heading-font-size: var(--_wp-ui-text-font-size);
 			--_gcd-heading-font-weight: var(--_wp-ui-text-font-weight);
 			--_gcd-p-font-size: var(--_wp-ui-text-font-size);
