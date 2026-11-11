@@ -41,9 +41,7 @@ control in `@wordpress/dataviews` for the canonical assembly).
  - Required: No
  - Default: `false`
 
-Whether the field is non-editable. A disabled field exposes
-`aria-disabled` and, like a native disabled field, takes no focus from
-the Tab key or a click. It keeps focus if it had it.
+Whether the field is non-editable.
 
 ### `hideLabelFromVision`
 
