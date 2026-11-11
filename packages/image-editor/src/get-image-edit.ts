@@ -27,7 +27,7 @@ export interface ImageEdit {
  * value are treated as no crop. Matches the historical threshold used by
  * the legacy `use-save-image.js` (which compared against `99.9` percent).
  */
-const CROP_TOLERANCE = 0.001;
+export const CROP_TOLERANCE = 0.001;
 
 /**
  * The person's edit, described against the image loaded in `state.image`.
