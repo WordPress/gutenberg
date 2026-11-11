@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SyncManager.update()` accepts a `previousBlocks` option with the blocks before an edit, and passes it to the sync config's `applyChangesToCRDTDoc` in a new optional third argument. The config may return merged fields when it rebased the edit over concurrent changes. Stale block updates run synchronously and return merged fields even before peer awareness arrives. Consecutive solo edits remain deferred while their previous block list matches the last local edit and no remote update has arrived ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+-   `getChangesFromCRDTDoc` receives `{ isInitial: true }` during document load, so sync configs can adopt transient state without marking unchanged content dirty ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
+
 ## 3.1.0 (2026-11-04)
 
 ## 3.0.0 (2026-10-20)

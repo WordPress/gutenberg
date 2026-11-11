@@ -116,9 +116,22 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
+	isNewUndoLevel?: boolean;
 	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
-	isNewUndoLevel?: boolean;
+	// The blocks before the change. See `ApplyChangesOptions.previousBlocks`.
+	previousBlocks?: unknown[];
+}
+
+export interface ApplyChangesOptions {
+	/**
+	 * The blocks immediately before the change. An editor renders remote
+	 * changes asynchronously, so these blocks can differ from the current
+	 * document. The sync config uses them to apply only the caller's own
+	 * change and preserve changes from peers. Their shape is defined by
+	 * the sync config.
+	 */
+	previousBlocks?: unknown[];
 }
 
 export interface RecordHandlers {
@@ -137,17 +150,25 @@ export interface RecordHandlers {
 }
 
 export interface SyncConfig {
+	/**
+	 * Apply local changes to the document. May return corrected fields when
+	 * the changes were merged with concurrent changes the caller has not
+	 * seen, so the caller can store the merged result.
+	 */
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
-	) => void;
+		changes: Partial< ObjectData >,
+		options?: ApplyChangesOptions
+	) => Partial< ObjectData > | void;
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
 	) => Awareness | undefined;
+	/** Read changes; on load, isInitial lets configs adopt transient IDs without dirtying saved content. */
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
-		editedRecord: ObjectData
+		editedRecord: ObjectData,
+		options?: { isInitial?: boolean }
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 	shouldSync?: (
@@ -193,13 +214,14 @@ export interface SyncManager {
 	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
+	/** Apply an edit; with previousBlocks, return rebased fields synchronously. */
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
 		options?: SyncManagerUpdateOptions
-	) => void;
+	) => Partial< ObjectData > | void;
 }
 
 /**

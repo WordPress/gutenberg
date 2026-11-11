@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Block } from '@wordpress/blocks';
 import type {
 	SyncConfig,
 	ConnectionStatusDisconnected,
@@ -303,15 +304,21 @@ export type EntityRecordFetch = ( options: {
  */
 export interface EditEntityRecordOptions {
 	/**
-	 * Whether to ignore the edit in undo history or not.
-	 */
-	undoIgnore?: boolean;
-	/**
 	 * Whether the edit is transient (e.g. typing). Transient edits are staged
 	 * and eventually merged into the preceding undo level instead of creating
 	 * a new one.
 	 */
 	isCached?: boolean;
+	/**
+	 * The blocks immediately before the edit. The sync layer uses them to
+	 * apply only the editor's own change when a remote change arrived in
+	 * the meantime.
+	 */
+	previousBlocks?: Block[];
+	/**
+	 * Whether to ignore the edit in undo history or not.
+	 */
+	undoIgnore?: boolean;
 }
 
 /**

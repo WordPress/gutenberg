@@ -21,7 +21,11 @@ import {
 	type YPostRecord,
 } from '../crdt';
 import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
-import { updateSelectionHistory } from '../crdt-selection';
+import {
+	getSelectionHistory,
+	getShiftedSelection,
+	updateSelectionHistory,
+} from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
 /**
@@ -395,6 +399,181 @@ describe( 'crdt', () => {
 				changes.blocks
 			);
 		} );
+
+		it( 'applies only the editor’s own change when previous blocks are given', () => {
+			const p1 = {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+				innerBlocks: [],
+				clientId: 'p1',
+			};
+			const p2 = {
+				name: 'core/paragraph',
+				attributes: { content: 'World' },
+				innerBlocks: [],
+				clientId: 'p2',
+			};
+
+			// The document holds two blocks; the editor rendered only the
+			// first, then changed it.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ p1, p2 ] },
+				defaultSyncedProperties
+			);
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [ { ...p1, attributes: { content: 'Hello!' } } ],
+				},
+				defaultSyncedProperties,
+				{ previousBlocks: [ p1 ] }
+			);
+
+			expect(
+				( map.get( 'blocks' ) as YBlocks )
+					.toJSON()
+					.map( ( block: Block ) => block.attributes.content )
+			).toEqual( [ 'Hello!', 'World' ] );
+		} );
+
+		it.each( [
+			{
+				label: 'caret after an insertion',
+				previous: 'hello',
+				remote: 'ABChello',
+				local: 'hello!',
+				start: 6,
+				end: 6,
+				expected: 'ABChello!',
+				expectedStart: 9,
+				expectedEnd: 9,
+			},
+			{
+				label: 'caret after a deletion',
+				previous: 'ABChello',
+				remote: 'hello',
+				local: 'ABChello!',
+				start: 9,
+				end: 9,
+				expected: 'hello!',
+				expectedStart: 6,
+				expectedEnd: 6,
+			},
+			{
+				label: 'backward selection',
+				previous: 'hello',
+				remote: 'ABChello',
+				local: 'hello!',
+				start: 5,
+				end: 1,
+				expected: 'ABChello!',
+				expectedStart: 8,
+				expectedEnd: 4,
+			},
+			{
+				label: 'formatted text and an entity',
+				previous: '<strong>hello</strong> &amp;',
+				remote: 'ABC<strong>hello</strong> &amp;',
+				local: '<strong>hello!</strong> &amp;',
+				start: 6,
+				end: 6,
+				expected: 'ABC<strong>hello!</strong> &amp;',
+				expectedStart: 9,
+				expectedEnd: 9,
+			},
+			{
+				label: 'simultaneous insertions at the caret',
+				previous: 'hello',
+				remote: 'helloABC',
+				local: 'hello!',
+				start: 6,
+				end: 6,
+				expected: 'helloABC!',
+				expectedStart: 9,
+				expectedEnd: 9,
+			},
+		] )(
+			'returns and records the rebased $label',
+			( {
+				previous,
+				remote,
+				local,
+				start,
+				end,
+				expected,
+				expectedStart,
+				expectedEnd,
+			} ) => {
+				const block = ( content: string ): Block => ( {
+					attributes: { content },
+					clientId: 'p1',
+					innerBlocks: [],
+					name: 'core/paragraph',
+				} );
+				applyPostChangesToCRDTDoc(
+					doc,
+					{ blocks: [ block( remote ) ] },
+					defaultSyncedProperties
+				);
+				const selection = {
+					selectionEnd: {
+						attributeKey: 'content',
+						clientId: 'p1',
+						offset: end,
+					},
+					selectionStart: {
+						attributeKey: 'content',
+						clientId: 'p1',
+						offset: start,
+					},
+				};
+				const result = applyPostChangesToCRDTDoc(
+					doc,
+					{ blocks: [ block( local ) ], selection },
+					defaultSyncedProperties,
+					{ previousBlocks: [ block( previous ) ] }
+				);
+				const corrected = {
+					selectionEnd: {
+						...selection.selectionEnd,
+						offset: expectedEnd,
+					},
+					selectionStart: {
+						...selection.selectionStart,
+						offset: expectedStart,
+					},
+				};
+				expect( result?.selection ).toEqual( corrected );
+				expect(
+					( map.get( 'blocks' ) as YBlocks ).toJSON()[ 0 ].attributes
+						.content
+				).toBe( expected );
+				vi.runAllTimers();
+				expect( getSelectionHistory( doc )[ 0 ] ).toMatchObject( {
+					end: { offset: expectedEnd },
+					start: { offset: expectedStart },
+				} );
+				const text = ( map.get( 'blocks' ) as YBlocks )
+					.get( 0 )
+					.get( 'attributes' )!
+					.get( 'content' ) as Y.Text;
+				text.insert( 0, 'Z' );
+				expect(
+					getShiftedSelection( doc, getSelectionHistory( doc ) )
+				).toEqual( {
+					selectionEnd: {
+						...corrected.selectionEnd,
+						offset: expectedEnd + 1,
+					},
+					selectionStart: {
+						...corrected.selectionStart,
+						offset: expectedStart + 1,
+					},
+				} );
+				expect( selection.selectionStart.offset ).toBe( start );
+			}
+		);
 
 		it( 'initializes blocks as Y.Array when not present', () => {
 			const changes = {
@@ -1175,6 +1354,32 @@ describe( 'crdt', () => {
 
 				expect( changes.selection ).toBeUndefined();
 			} );
+		} );
+
+		it( 'adopts persisted block IDs without marking unchanged content dirty on load', () => {
+			const block = {
+				name: 'core/paragraph',
+				clientId: 'shared',
+				attributes: { content: 'Hello' },
+				innerBlocks: [],
+			};
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ block ] },
+				defaultSyncedProperties
+			);
+			const record = {
+				blocks: [ { ...block, clientId: 'parsed' } ],
+				content: { raw: 'serialized:1' },
+			} as unknown as Post;
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				record,
+				defaultSyncedProperties,
+				{ isInitial: true }
+			);
+			expect( changes.blocks?.[ 0 ].clientId ).toBe( 'shared' );
+			expect( changes ).not.toHaveProperty( 'content' );
 		} );
 
 		it( 'injects a closure-based content function when blocks changed but content did not', () => {

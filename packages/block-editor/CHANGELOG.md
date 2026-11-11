@@ -3,12 +3,14 @@
 ## Unreleased
 
 ### Enhancements
+
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 
 ### Bug Fixes
 
+-   `BlockEditorProvider` includes `previousBlocks` in its change callback options so consumers can distinguish local edits from pending remote changes ([#85977](https://github.com/WordPress/gutenberg/pull/85977)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).

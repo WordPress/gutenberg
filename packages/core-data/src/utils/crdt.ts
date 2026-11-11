@@ -19,6 +19,7 @@ import {
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
+	rebaseCrdtBlocks,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -46,7 +47,9 @@ import {
 type ContentFromBlocksFn = ( args?: { blocks: Block[] } ) => string;
 
 // Changes that can be applied to a post entity record.
-export type PostChanges = Partial< Post > & {
+export type PostChanges = Partial<
+	Omit< Post, 'content' | 'excerpt' | 'title' >
+> & {
 	blocks?: Block[];
 	content?: Post[ 'content' ] | string | ContentFromBlocksFn;
 	excerpt?: Post[ 'excerpt' ] | string;
@@ -131,14 +134,21 @@ function applyTaxonomyChangesToCRDTDoc(
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
  * @param {Set<string>} syncedProperties
- * @return {void}
+ * @param {Object}      options
+ * @param {Block[]}     options.previousBlocks The blocks immediately before the change,
+ *                                             when known. Only the editor's own block
+ *                                             changes are applied.
+ * @return {PostChanges|void} Merged fields that should replace the local edits.
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	syncedProperties: Set< string >
-): void {
+	syncedProperties: Set< string >,
+	options: { previousBlocks?: Block[] } = {}
+): PostChanges | void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
+	const previousBlocks = options.previousBlocks;
+	let rebasedChanges: PostChanges | undefined;
 
 	Object.keys( changes ).forEach( ( key ) => {
 		if ( ! syncedProperties.has( key ) ) {
@@ -194,9 +204,33 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// Merge blocks does not need `setValue` because it is operating on a
-				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newValue, newCursorPosition );
+				// With previous blocks, only the editor's own change is applied,
+				// so a remote update the editor has not rendered yet
+				// survives the keystroke. Without one, the whole list is
+				// merged by position. Neither needs `setValue` because both
+				// operate on a Yjs type that is already in the Y.Doc.
+				const rebased = rebaseCrdtBlocks(
+					currentBlocks,
+					previousBlocks,
+					newValue,
+					newCursorPosition,
+					changes.selection
+				);
+				if ( rebased ) {
+					const mergedBlocks = rebased.blocks ?? newValue;
+					// Return the merged blocks to the caller before it updates its
+					// store. Otherwise a later save serializes the stale local list.
+					rebasedChanges = {
+						blocks: mergedBlocks,
+						content: ( args ) =>
+							__unstableSerializeAndClean(
+								( args?.blocks ?? mergedBlocks ) as WPBlock[]
+							),
+						...( rebased.selection
+							? { selection: rebased.selection }
+							: {} ),
+					};
+				}
 				break;
 			}
 
@@ -278,7 +312,7 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		const selection = changes.selection;
+		const selection = rebasedChanges?.selection ?? changes.selection;
 		// Persist selection changes at the end of the current event loop.
 		// This allows undo meta to be saved with the current selection before
 		// it is overwritten by the new selection from Gutenberg.
@@ -288,6 +322,7 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+	return rebasedChanges;
 }
 
 /**
@@ -374,12 +409,15 @@ function getTaxonomyChangesFromCRDTDoc(
  * @param {CRDTDoc}     ydoc
  * @param {Post}        editedRecord
  * @param {Set<string>} syncedProperties
+ * @param {Object}      options
+ * @param {boolean}     options.isInitial Whether this is the initial document load.
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
-	editedRecord: Post,
-	syncedProperties: Set< string >
+	editedRecord: Post & { blocks?: Block[] },
+	syncedProperties: Set< string >,
+	options: { isInitial?: boolean } = {}
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -520,6 +558,22 @@ export function getPostChangesFromCRDTDoc(
 		const capturedBlocks = changes.blocks;
 		changes.content = () =>
 			__unstableSerializeAndClean( capturedBlocks as WPBlock[] );
+	}
+
+	// Loading persisted block IDs changes only transient editor state. Do not
+	// mark an unchanged post dirty by installing a new content serializer.
+	if (
+		options.isInitial &&
+		changes.blocks &&
+		__unstableSerializeAndClean( changes.blocks as WPBlock[] ).trim() ===
+			__unstableSerializeAndClean(
+				( editedRecord.blocks ??
+					parse(
+						getRawValue( editedRecord.content ) ?? ''
+					) ) as WPBlock[]
+			).trim()
+	) {
+		delete changes.content;
 	}
 
 	// Meta changes must be merged with the edited record since not all meta

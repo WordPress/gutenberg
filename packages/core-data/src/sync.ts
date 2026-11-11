@@ -306,12 +306,15 @@ export function createDefaultEntitySyncManager(
 				return;
 			}
 
-			getSyncManager()?.update(
+			return getSyncManager()?.update(
 				`${ kind }/${ name }`,
 				toObjectId( recordId ),
 				edits,
 				getEditOrigin( options ),
-				{ isNewUndoLevel: isNewUndoLevel( options ) }
+				{
+					isNewUndoLevel: isNewUndoLevel( options ),
+					previousBlocks: options.previousBlocks,
+				}
 			);
 		},
 

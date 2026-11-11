@@ -109,7 +109,7 @@ export default function useEntityBlockEditor(
 					id
 				);
 			}
-			const { selection, ...rest } = options;
+			const { previousBlocks, selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
@@ -127,6 +127,9 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: false,
 				...rest,
+				// The provider tracks changes synchronously, including multiple
+				// changes between renders and persistence-only notifications.
+				previousBlocks,
 			} );
 		},
 		[
@@ -145,7 +148,7 @@ export default function useEntityBlockEditor(
 			newBlocks: Array< Block >,
 			options: EntityBlockEditorChangeOptions
 		) => {
-			const { selection, ...rest } = options;
+			const { previousBlocks, selection, ...rest } = options;
 			const edits = {
 				selection,
 				...updateFootnotesFromMeta( newBlocks, meta ),
@@ -154,6 +157,8 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,
 				...rest,
+				// See `onChange`.
+				previousBlocks,
 			} );
 		},
 		[ kind, name, id, meta, editEntityRecord ]

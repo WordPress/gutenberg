@@ -47,6 +47,7 @@ interface CollectionState {
 interface EntityState {
 	awareness?: Awareness;
 	handlers: RecordHandlers;
+	lastLocalBlocks?: unknown;
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
@@ -256,6 +257,12 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
+			// The editor can still hold the last local blocks after the document
+			// has changed. Invalidate before publishing the remote change.
+			entityState.lastLocalBlocks = undefined;
+			// A local edit may have been queued before this update arrived.
+			// Rebase it first, then publish the combined document to the store.
+			flushPendingCRDTDocUpdates();
 			void internal.updateEntityRecord( objectType, objectId );
 		};
 
@@ -351,11 +358,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		initializeYjsDoc( ydoc );
 
 		// Get and apply the persisted CRDT document, if it exists.
-		// Observers are attached after hydration so the applyUpdateV2 inside
-		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
-		// just-loaded state, which would dispatch a redundant editRecord whose
-		// blocks already match the editor's parsed content.
+		// Attach observers after hydration. Initial editor state is adopted
+		// below in one update, after validation against the saved record.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// Adopt the hydrated document's identities before the first edit. A
+		// parser can assign different IDs to the same content on each client.
+		const initialChanges = syncConfig.getChangesFromCRDTDoc( ydoc, record, {
+			isInitial: true,
+		} );
+		if ( Object.keys( initialChanges ).length ) {
+			handlers.editRecord( initialChanges );
+		}
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
@@ -685,11 +699,16 @@ export function createSyncManager( debug = false ): SyncManager {
 		changes: Partial< ObjectData >,
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
-	): void {
-		const { isSave = false, isNewUndoLevel = false } = options;
+	): Partial< ObjectData > | void {
+		const {
+			isNewUndoLevel = false,
+			isSave = false,
+			previousBlocks,
+		} = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
+		let rebasedChanges: Partial< ObjectData > | undefined;
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
@@ -707,7 +726,10 @@ export function createSyncManager( debug = false ): SyncManager {
 				log( 'updateCRDTDoc', 'applying changes', entityId, {
 					changedKeys: Object.keys( changes ),
 				} );
-				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+				rebasedChanges =
+					syncConfig.applyChangesToCRDTDoc( ydoc, changes, {
+						previousBlocks,
+					} ) ?? undefined;
 
 				if ( isSave ) {
 					markEntityAsSaved( ydoc );
@@ -720,6 +742,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				markEntityAsSaved( collectionState.ydoc );
 			}, origin );
 		}
+		return rebasedChanges;
 	}
 
 	/*
@@ -763,29 +786,51 @@ export function createSyncManager( debug = false ): SyncManager {
 		setTimeout( flushPendingCRDTDocUpdates, 0 );
 	}
 
-	// Apply local changes to the CRDT doc, synchronously when a remote peer is
-	// present so the change lands before a remote update can race it (#78756),
-	// otherwise deferred off the typing hot path (#79964).
+	// Defer consecutive solo edits only while the document has not changed
+	// since the previous local edit. Awareness can lag document updates, so
+	// peer count alone cannot establish that the editor's blocks are current.
 	function updateOrDefer(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
-	): void {
-		// `getStates()` counts the local client, so > 1 means a remote peer.
+	): Partial< ObjectData > | void {
+		const entityState = entityStates.get(
+			getEntityId( objectType, objectId )
+		);
 		const hasRemotePeers =
 			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
-
-		if ( hasRemotePeers ) {
-			// Apply any updates queued while editing alone first, so changes
-			// are never applied out of order.
+		const needsRebase =
+			options.previousBlocks &&
+			options.previousBlocks !== entityState?.lastLocalBlocks;
+		let rebasedChanges: Partial< ObjectData > | undefined;
+		if ( hasRemotePeers || needsRebase ) {
+			// Apply queued local edits before this synchronous edit so an older
+			// edit cannot overwrite a newer one.
 			flushPendingCRDTDocUpdates();
-			updateCRDTDoc( objectType, objectId, changes, origin, options );
-			return;
+			rebasedChanges =
+				updateCRDTDoc(
+					objectType,
+					objectId,
+					changes,
+					origin,
+					options
+				) ?? undefined;
+		} else {
+			deferUpdateCRDTDoc(
+				objectType,
+				objectId,
+				changes,
+				origin,
+				options
+			);
 		}
-
-		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );
+		if ( entityState && 'blocks' in changes ) {
+			entityState.lastLocalBlocks =
+				rebasedChanges?.blocks ?? changes.blocks;
+		}
+		return rebasedChanges;
 	}
 
 	/**

@@ -1,4 +1,5 @@
 import warning from '@wordpress/warning';
+import type { Block } from '@wordpress/blocks';
 
 /**
  * The entity sync interface.
@@ -31,6 +32,11 @@ export type EntitySyncRecordId = string | number;
  */
 export interface EntitySyncEditOptions {
 	isCached: boolean;
+	/**
+	 * The blocks immediately before the edit. Lets the manager apply only
+	 * the caller's own change when the shared document has changed since.
+	 */
+	previousBlocks?: Block[];
 	undoIgnore: boolean;
 }
 
@@ -186,9 +192,8 @@ export interface EntitySyncManager {
 	 * store. The edits already have merged fields applied
 	 * (see `mergedEdits` on the entity config).
 	 *
-	 * Known ordering: a manager that calls `editRecord` synchronously from
-	 * here has its edit overwritten by the store update that follows.
-	 * Dispatch such edits from a later task.
+	 * Return corrected fields when merging the edit with concurrent changes.
+	 * core-data applies these with the original edit in one store update.
 	 */
 	update: (
 		kind: string,
@@ -196,7 +201,7 @@ export interface EntitySyncManager {
 		recordId: EntitySyncRecordId,
 		edits: EntitySyncRecord,
 		options: EntitySyncEditOptions
-	) => void;
+	) => EntitySyncRecord | void;
 
 	/**
 	 * Called right before a save request goes out for an existing record,
