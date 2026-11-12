@@ -31,6 +31,14 @@ export type URLPopoverLinkEditorProps = Omit<
 	'value'
 > & {
 	autocompleteRef?: URLInputProps[ 'autocompleteRef' ];
+	/**
+	 * Validity of the URL, shown as an error on the input when invalid.
+	 */
+	customValidity?: URLInputProps[ 'customValidity' ];
+	/**
+	 * Ref to the URL input element.
+	 */
+	inputRef?: URLInputProps[ 'inputRef' ];
 	onChangeInputValue: URLInputProps[ 'onChange' ];
 	value?: string;
 };

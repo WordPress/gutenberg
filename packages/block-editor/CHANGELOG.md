@@ -18,6 +18,7 @@
 -   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
+-   Image link settings: Validate the link URL the same way as `LinkControl`, in the Image and Media & Text blocks. An invalid URL, such as a shortcode, now shows "Please enter a valid URL." instead of being saved with `https://` in front of it ([#86736](https://github.com/WordPress/gutenberg/pull/86736)).
 
 ### Internal
 
