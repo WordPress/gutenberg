@@ -42,12 +42,11 @@ These templates use the manual save model from [Save & Submit](?path=/docs/desig
 
 ## Focus after navigation
 
-Moving between adjacent pages and subpages replaces the page, including the link that was just used. Without help, keyboard focus falls back to the start of the document and screen readers don't announce the new page. Place focus once the new page renders:
+Moving between adjacent pages and subpages replaces the page, including the link that was just used. Without help, keyboard focus falls back to the start of the document and screen readers don't announce the new page.
 
--   **After a breadcrumb or subpage row, focus the new page's heading.** The link is gone, and the heading is the first thing that tells people where they are. Give the heading `tabindex="-1"` so it can take focus, and hide the focus ring, since it isn't interactive. Screen readers then read the heading out.
--   **After the section navigation, focus the newly current item.** The navigation is still on screen, so people can keep moving between pages from where they were.
+Admin pages built on `@wordpress/boot` handle this for you: when a navigation removes the focused element, focus moves to the new page's `Page` region, and screen readers announce it by name. The region takes its name from `title`, so a subpage whose breadcrumbs replace the title needs an `ariaLabel` naming the page, such as "Card payments". Don't move focus yourself on those pages. If your app routes without `@wordpress/boot`, do the same after each navigation that loses focus.
 
-The templates do this in their in-canvas router. Try it by following a breadcrumb with the keyboard.
+The templates' in-canvas router follows the same behavior. Try it by following a breadcrumb with the keyboard.
 
 ## Simple settings page
 

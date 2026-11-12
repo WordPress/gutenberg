@@ -64,6 +64,7 @@ function RecordsSubpageScreen() {
 					] }
 				/>
 			}
+			ariaLabel={ key.name }
 			saved={ key }
 			onSave={ saveKey }
 		>

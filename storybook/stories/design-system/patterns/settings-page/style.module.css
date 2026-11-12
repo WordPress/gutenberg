@@ -28,19 +28,11 @@
 	inline-size: revert !important;
 }
 
-/* `Page` sets `z-index: 1`, so overlays need their own layer above it. */
 .screen {
 	display: contents;
 }
 
-/*
- * The heading takes focus after navigation so screen readers announce the
- * new page. It isn't interactive, so it shows no focus ring.
- */
-.screen h1[tabindex="-1"]:focus {
-	outline: none;
-}
-
+/* `Page` sets `z-index: 1`, so overlays need their own layer above it. */
 .example > .overlays {
 	flex: none;
 	position: relative;

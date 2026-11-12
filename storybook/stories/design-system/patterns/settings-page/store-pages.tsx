@@ -67,7 +67,12 @@ type StoreSettings = ReturnType< typeof useStoreSettings >;
 
 type HeaderProps = Pick<
 	ComponentProps< typeof SettingsFormPage >,
-	'title' | 'subTitle' | 'breadcrumbs' | 'navigation' | 'components'
+	| 'title'
+	| 'subTitle'
+	| 'breadcrumbs'
+	| 'ariaLabel'
+	| 'navigation'
+	| 'components'
 >;
 
 /**
@@ -92,12 +97,16 @@ export function adjacentPageHeader( currentHref: string ): HeaderProps {
 }
 
 /**
- * Header props for a subpage. The breadcrumb trail stands in for the title.
+ * Header props for a subpage. The breadcrumb trail stands in for the title,
+ * so the page region takes its name from the last crumb.
  */
 export function subpageHeader(
 	trail: Array< { label: string; to?: string } >
 ): HeaderProps {
-	return { breadcrumbs: <Breadcrumbs items={ trail } /> };
+	return {
+		breadcrumbs: <Breadcrumbs items={ trail } />,
+		ariaLabel: trail[ trail.length - 1 ].label,
+	};
 }
 
 export function GeneralPage( {
