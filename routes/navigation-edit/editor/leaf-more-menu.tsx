@@ -3,7 +3,11 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import {
+	createBlock,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -12,18 +16,43 @@ const POPOVER_PROPS = {
 
 export default function LeafMoreMenu( {
 	clientId,
+	setInsertedBlockClientId,
 	...props
 }: {
 	clientId: string;
+	setInsertedBlockClientId: ( clientId: string | null ) => void;
 } ) {
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
 		removeBlocks,
 		duplicateBlocks,
-		insertBeforeBlock,
-		insertAfterBlock,
+		insertBlock,
 	} = useDispatch( blockEditorStore );
+	const blockEditorSelectors = useSelect( blockEditorStore );
+	const blocksSelectors = useSelect( blocksStore );
+
+	// The block editor is rendered hidden, so a block selected on insertion
+	// opens its own link UI with nothing visible to anchor to. Insert without
+	// selecting and let the List View open the link UI on the row instead.
+	const insertSibling = ( offset: number ) => {
+		const { defaultBlock } =
+			blockEditorSelectors.getBlockListSettings( rootClientId ) ?? {};
+		const blockName =
+			defaultBlock?.name ?? blocksSelectors.getDefaultBlockName();
+		if ( ! blockName ) {
+			return;
+		}
+		const block = createBlock( blockName, defaultBlock?.attributes );
+		const updateSelectionOnInsert = false;
+		insertBlock(
+			block,
+			blockEditorSelectors.getBlockIndex( clientId ) + offset,
+			rootClientId,
+			updateSelectionOnInsert
+		);
+		setInsertedBlockClientId( block.clientId );
+	};
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -122,7 +151,7 @@ export default function LeafMoreMenu( {
 							<>
 								<MenuItem
 									onClick={ () => {
-										insertBeforeBlock( clientId );
+										insertSibling( 0 );
 										onClose();
 									} }
 								>
@@ -130,7 +159,7 @@ export default function LeafMoreMenu( {
 								</MenuItem>
 								<MenuItem
 									onClick={ () => {
-										insertAfterBlock( clientId );
+										insertSibling( 1 );
 										onClose();
 									} }
 								>
