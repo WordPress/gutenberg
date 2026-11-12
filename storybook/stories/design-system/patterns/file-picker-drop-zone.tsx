@@ -3,9 +3,12 @@ import { DropZone, FormFileUpload } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { Button, Stack } from '@wordpress/ui';
 
-function preventFileNavigation( event: DragEvent ) {
+function preventFileNavigation( event: DragEvent< HTMLFieldSetElement > ) {
 	if ( event.dataTransfer.types.includes( 'Files' ) ) {
 		event.preventDefault();
+		if ( event.currentTarget.disabled ) {
+			event.dataTransfer.dropEffect = 'none';
+		}
 	}
 }
 
