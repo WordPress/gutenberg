@@ -83,7 +83,9 @@
 	--emoji-picker-cell-size: var(--wpds-dimension-size-lg);
 	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
 	--emoji-picker-padding: var(--wpds-dimension-padding-lg);
-	--emoji-picker-grid-width: calc(var(--emoji-picker-cell-size) * 6 + var(--emoji-picker-gap) * 5);
+	// Must match `COLUMNS` in `emoji-picker.tsx`.
+	--emoji-picker-columns: 6;
+	--emoji-picker-grid-width: calc(var(--emoji-picker-cell-size) * var(--emoji-picker-columns) + var(--emoji-picker-gap) * (var(--emoji-picker-columns) - 1));
 
 	display: flex;
 	flex-direction: column;
@@ -139,14 +141,11 @@
 	scroll-padding-block: var(--wpds-dimension-size-md) 0;
 }
 
-// Hold the grid's width even while it is empty (loading, or no search
-// results) so the popup doesn't resize and reposition.
 .editor-collab-sidebar-panel__picker-list {
+	// Hold the grid's width even while it is empty (loading, or no search
+	// results) so the popup doesn't resize and reposition.
 	min-inline-size: var(--emoji-picker-grid-width);
-}
-
-// The last row gets the same padding as the sides.
-.editor-collab-sidebar-panel__picker-list {
+	// The last row gets the same padding as the sides.
 	padding-block-end: var(--emoji-picker-padding);
 }
 
@@ -175,7 +174,7 @@
 
 .editor-collab-sidebar-panel__picker-row {
 	display: grid;
-	grid-template-columns: repeat(6, var(--emoji-picker-cell-size));
+	grid-template-columns: repeat(var(--emoji-picker-columns), var(--emoji-picker-cell-size));
 	gap: var(--emoji-picker-gap);
 	// Skip offscreen rows so the ~330-row list mounts quickly; the
 	// intrinsic-size hint matches the real row height to keep scroll

@@ -22,7 +22,6 @@ import {
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import {
-	emojiToHexKey,
 	getCuratedLabel,
 	getNamedHexKeys,
 	isReactionEmojiAllowed,
@@ -50,6 +49,8 @@ interface EmojiOption {
 	label: string;
 	// Normalized hexcode of the base record, used for usage tracking.
 	hexKey: string;
+	// The key a reaction with `value` is stored under.
+	reactionKey: string;
 }
 
 /**
@@ -67,10 +68,6 @@ interface EmojiPickerProps {
 	 * as its `render` element.
 	 */
 	trigger: ReactElement< Record< string, unknown > >;
-	/**
-	 * Whether the trigger is disabled.
-	 */
-	disabled?: boolean;
 	/**
 	 * Accessible name for the picker popup.
 	 */
@@ -236,14 +233,12 @@ export function searchEmojis(
  *
  * @param props                Component props.
  * @param props.trigger        The button that opens the picker.
- * @param props.disabled       Whether the trigger is disabled.
  * @param props.label          Accessible name for the popup.
  * @param props.reactedHexKeys Hex keys of the user's own reactions.
  * @param props.onSelect       Called with the selected emoji character.
  */
 export default function EmojiPicker( {
 	trigger,
-	disabled = false,
 	label,
 	reactedHexKeys = EMPTY_HEX_KEYS,
 	onSelect,
@@ -338,15 +333,17 @@ export default function EmojiPicker( {
 			 * drives search, usage, and the grid key.
 			 */
 			const display = applySkinTone( entry, skinTone );
+			const reactionKey = normalizeHexcode( display.hexcode );
 			return {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
 				label:
 					getOverrideLabel( labelOverrides, display.hexcode ) ||
-					getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
+					getCuratedLabel( reactionKey ) ||
 					display.label ||
 					'',
 				hexKey: normalizeHexcode( entry.hexcode ),
+				reactionKey,
 			};
 		};
 
@@ -394,6 +391,11 @@ export default function EmojiPicker( {
 		skinTone,
 	] );
 
+	const reactedKeys = useMemo(
+		() => new Set( reactedHexKeys ),
+		[ reactedHexKeys ]
+	);
+
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
 	 *
@@ -407,9 +409,7 @@ export default function EmojiPicker( {
 				className="editor-collab-sidebar-panel__picker-row"
 			>
 				{ row.map( ( option ) => {
-					const isReacted = reactedHexKeys.includes(
-						emojiToHexKey( option.value )
-					);
+					const isReacted = reactedKeys.has( option.reactionKey );
 					return (
 						<Autocomplete.Item
 							key={ option.key }
@@ -509,7 +509,6 @@ export default function EmojiPicker( {
 		>
 			<Autocomplete.Trigger
 				render={ trigger }
-				disabled={ disabled }
 				onMouseEnter={ warm }
 				onFocus={ warm }
 			/>
