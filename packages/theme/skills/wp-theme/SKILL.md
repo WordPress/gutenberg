@@ -12,8 +12,9 @@ This skill ships with the `@wordpress/theme` package and matches the installed v
 -   Prefer a component's props when they already express the styling intent. Use tokens for styles that no component covers.
 -   Use `--wpds-*` tokens instead of fixed hex colors, pixel font sizes, radii, shadows or motion values.
 -   Pick the token by its semantic role and state, such as the property, the kind of element and the tone, and not by the nearest raw value. Two tokens with the same value in one theme are not interchangeable.
--   Verify that the token exists in the installed `@wordpress/theme` version. Do not copy token names from memory.
--   Use the bundled [token reference](references/tokens.md). It explains how to pick a token and lists every semantic token with its meaning. When available, the Design System MCP server's `get_design_tokens` tool returns the same guidance.
+-   Verify that every token exists in the installed `@wordpress/theme` version, with the `check` command below. Do not copy token names from memory.
+-   Search and check tokens with the bundled script instead of reading the whole reference. Run `node scripts/tokens.mjs search <terms>`, with the path relative to this skill's directory, to find tokens by property, target, tone or a word from the description, for example `search background interactive brand`. Run `node scripts/tokens.mjs check <names>` to confirm that a token exists. For an unknown name, it suggests the closest existing tokens and exits with an error. The script reads the installed `@wordpress/theme`, so the results match your version.
+-   Read the bundled [token reference](references/tokens.md) for how to pick a token and for the full list. It explains how to pick a token and lists every semantic token with its meaning. When available, the Design System MCP server's `get_design_tokens` tool returns the same guidance.
 -   Do not replace every CSS literal. A value that is not a design decision, such as a one-off layout measurement, does not need a token.
 -   Use `--wp--preset--*` custom properties, not `--wpds-*`, when styling blocks or content previews with the active theme's `theme.json` presets.
 
