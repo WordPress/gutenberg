@@ -14,20 +14,32 @@ This skill ships with the `@wordpress/ui` package and matches the installed vers
 -   For a narrow text or prop change, keep the component that is already there.
 -   Check whether the project configures `@wordpress/use-recommended-components` with `allowUseWithCaution: true`. If it does, adopting components marked "Use with caution" in the Storybook is fine alongside stable ones. Do this in new UI that uses only `@wordpress/ui` components. Do not do it in a view that mixes `@wordpress/components` and `@wordpress/ui`, because their visual design and behavior can differ. Without that option, treat "Use with caution" components as not ready to adopt.
 
-## 2. Check the target version
+## 2. Take an inventory with ESLint
+
+This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it. Use ESLint's JSON output as the source of the inventory, and do not search the code by hand.
+
+-   Run `npx eslint . --format json --output-file eslint-report.json`, limited to the source directories if the project is large. Read the report, and do not commit it.
+-   Keep only the messages with the `ruleId` `@wordpress/use-recommended-components`. Each has the `filePath`, `line` and `column` of the import, and a `message` that says what to use instead.
+-   Group the messages by the imported component and count them. Some messages do not name the component, so read the import specifier at the reported line and column. List the most used components first.
+-   Separate three kinds of result. A message that names a `@wordpress/ui` replacement is a candidate for migration. A message that says to write your own CSS, or that the component is planned for deprecation, has no `@wordpress/ui` replacement, so do not migrate it. A flagged `@wordpress/ui` component is not recommended yet, or is marked "Use with caution".
+-   For each candidate, link its **Migration Guide** page in the [Storybook](https://wordpress.github.io/gutenberg/), which is under the legacy component. If there is no guide, say so.
+-   If the project uses ESLint's suppressions baseline, suppressed reports are not in the output. Read `eslint-suppressions.json` for the files and counts of the suppressed ones.
+-   Show the inventory to the user, and migrate one component at a time from it.
+
+## 3. Check the target version
 
 -   If the application bundles `@wordpress/ui`, check the installed version for the exports and props you need.
 -   If WordPress provides `@wordpress/components` at runtime, check the minimum WordPress version you support. `@wordpress/ui` is an npm package and is not provided by WordPress, so it must be bundled.
 -   Follow the setup in the package README for each document where the component renders, including iframes and popup windows. Test overlays and focus in their real rendering document, especially next to `@wordpress/components` overlays.
 
-## 3. Read the migration guide, then compare contracts
+## 4. Read the migration guide, then compare contracts
 
 -   Look for the component's **Migration Guide** page in the Storybook, under the legacy component. Use it for renamed props, changed callbacks and removed behavior.
 -   Without a guide, or to check one, compare the old and new component yourself: accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, keyboard and focus behavior, and submitted form values.
 -   Do not assume props keep their names. For example, `onChange` can become a differently named callback with a different argument.
 -   Check extension points your code exposes to others, such as SlotFill children and render callbacks. An adapter that handles your own callers may not handle values that other plugins pass.
 
-## 4. Migrate the styles with the component
+## 5. Migrate the styles with the component
 
 -   Use the new component's design as it is. Do not override its appearance: no custom colors, borders, radii, typography, shadows or spacing inside the component, and no CSS that only reproduces how the legacy component looked. Remove that CSS during the migration. Use the component's props for variants, tones and sizes.
 -   The only styles that belong with the component are sizing and layout, such as its width or its position in a layout. The component does not decide those, so the code that uses it does, usually with `Stack` or a layout style on a wrapper.
@@ -38,7 +50,7 @@ This skill ships with the `@wordpress/ui` package and matches the installed vers
 -   If a new component seems to misbehave, suspect a CSS reset or specificity conflict in your project before adding a workaround.
 -   If a feature or design that the legacy component had is missing from the new component, do not override the new component's styles to get it. First check whether the latest version of `@wordpress/ui` already has the feature or component, in the package changelog, the [Storybook](https://wordpress.github.io/gutenberg/) or the latest release on npm. If it does, suggest updating the package. Then search the [WordPress/gutenberg issues](https://github.com/WordPress/gutenberg/issues) for an existing request for the feature. If there is none, raise a feature request that describes the missing feature or design. Use the component as it is in the meantime, or keep the legacy component for that use. If a workaround for missing behavior cannot wait, keep it temporary and add a code comment that links the issue.
 
-## 5. Migrate and verify
+## 6. Migrate and verify
 
 -   Migrate one component or area at a time, and keep the change focused.
 -   Use documented props and public exports only. Do not import from package-private paths or copy a component's implementation.
@@ -46,7 +58,7 @@ This skill ships with the `@wordpress/ui` package and matches the installed vers
 -   Run your lint, type and test checks. Check the keyboard and pointer paths, accessible names, dismissal and focus return in a browser, because unit tests do not prove visual parity or overlay behavior.
 -   Report what you verified and any parity you could not confirm.
 
-## 6. Migrate gradually with lint suppressions
+## 7. Migrate gradually with lint suppressions
 
 This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it.
 
