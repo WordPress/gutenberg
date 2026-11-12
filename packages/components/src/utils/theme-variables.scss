@@ -30,5 +30,4 @@ $components-color-gray-400: var(--wp-components-color-gray-400, var(--wpds-color
 $components-color-gray-600: var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral));
 $components-color-gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak));
 
-$components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-foreground, transparent 38%);
 $components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);

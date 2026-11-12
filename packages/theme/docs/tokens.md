@@ -241,6 +241,9 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                |
 | `--wpds-color-background-indicator-neutral`                   | Background color for indicators with a neutral tone and normal emphasis (eg. the filled portion of a progressbar or meter).      |
 | `--wpds-color-background-indicator-brand`                     | Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter).                       |
+| `--wpds-color-background-indicator-success`                   | Background color for indicators with a success tone and normal emphasis (eg. the filled portion of a meter).                     |
+| `--wpds-color-background-indicator-warning`                   | Background color for indicators with a warning tone and normal emphasis (eg. the filled portion of a meter).                     |
+| `--wpds-color-background-indicator-error`                     | Background color for indicators with an error tone and normal emphasis (eg. the filled portion of a meter).                      |
 | `--wpds-color-foreground-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                     |
 | `--wpds-color-foreground-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                       |
 | `--wpds-color-foreground-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                    |
