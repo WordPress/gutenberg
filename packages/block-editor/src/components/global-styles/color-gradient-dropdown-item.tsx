@@ -176,14 +176,23 @@ function ColorGradientTab( {
 			 */
 			clearable={ userValue !== undefined }
 			headingLevel={ 3 }
+			/*
+			 * An empty warning means contrast is being checked and is fine. The
+			 * notice is still rendered, hidden, to hold its space: otherwise the
+			 * popover changes height as the notice comes and goes, and where it
+			 * is pinned to the edge of a short viewport it jumps under the
+			 * cursor while a color is picked.
+			 */
 			noticeProps={
-				contrastWarning
+				contrastWarning !== undefined
 					? {
-							children: contrastWarning,
+							children: contrastWarning || '\u00A0',
 							status: 'warning',
 							spokenMessage: null,
-							className:
+							className: clsx(
 								'block-editor-panel-color-gradient-settings__contrast-notice',
+								{ 'is-placeholder': ! contrastWarning }
+							),
 						}
 					: undefined
 			}

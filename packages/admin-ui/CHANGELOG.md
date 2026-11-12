@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Admin color schemes: darken the primary color of the Fresh, Midnight, Coffee, Ocean, Ectoplasm, Blue and Sunrise schemes slightly, so filled primary buttons keep white text in the Site Editor instead of switching to black.
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 
 ### Internal
