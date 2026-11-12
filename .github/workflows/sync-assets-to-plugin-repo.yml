@@ -24,6 +24,9 @@ jobs:
             SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
 
         steps:
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
+
             - name: Check out Gutenberg assets folder from WP.org plugin repo
               run: |
                   svn checkout "$PLUGIN_REPO_URL/assets" \
