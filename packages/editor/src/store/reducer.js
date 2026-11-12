@@ -466,6 +466,8 @@ export function browserBackup( state = null, action ) {
 	switch ( action.type ) {
 		case 'VIEW_BROWSER_BACKUP':
 			return action.backup;
+		// The backup belongs to the post it was read for.
+		case 'SET_EDITED_POST':
 		case 'SET_CURRENT_REVISION_ID':
 			return null;
 	}

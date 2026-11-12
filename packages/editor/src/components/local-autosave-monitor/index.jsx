@@ -1,172 +1,66 @@
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 import AutosaveMonitor from '../autosave-monitor';
 import {
-	localAutosaveGet,
-	localAutosaveGetSnapshot,
+	hasSessionStorageSupport,
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
-import { BROWSER_BACKUP_NOTICE_ID } from '../../store/constants';
-import { unlock } from '../../lock-unlock';
-import useEntityContainsSnapshot from '../provider/use-entity-contains-snapshot';
 
 const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
 	: window.requestAnimationFrame;
 
-let hasStorageSupport;
-
 /**
- * Function which returns true if the current environment supports browser
- * sessionStorage, or false otherwise. The result of this function is cached and
- * reused in subsequent invocations.
+ * Custom hook which writes a local autosave when the page is hidden or
+ * unloaded, so that edits made since the last interval aren't lost.
  */
-const hasSessionStorageSupport = () => {
-	if ( hasStorageSupport !== undefined ) {
-		return hasStorageSupport;
-	}
-
-	try {
-		// Private Browsing in Safari 10 and earlier will throw an error when
-		// attempting to set into sessionStorage. The test here is intentional in
-		// causing a thrown error as condition bailing from local autosave.
-		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
-		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
-		hasStorageSupport = true;
-	} catch {
-		hasStorageSupport = false;
-	}
-
-	return hasStorageSupport;
-};
-
-/**
- * Custom hook which manages the creation of a notice prompting the user to
- * restore a local autosave, if one exists.
- *
- * Under real-time collaboration, the backup records a Yjs snapshot of the
- * shared document it captured. The notice decision is deferred until the
- * shared document is checked against that snapshot (see
- * `useEntityContainsSnapshot`): a positive result proves the shared
- * document already accounts for everything the backup captured (even when
- * the post content has since moved on, e.g. after a revision restore), so
- * the backup is redundant and is cleared without a notice.
- */
-function useAutosaveNotice() {
+function useAutosaveOnLeave() {
 	const registry = useRegistry();
-	const { postId, postType, isEditedPostNew } = useSelect(
-		( select ) => ( {
-			postId: select( editorStore ).getCurrentPostId(),
-			postType: select( editorStore ).getCurrentPostType(),
-			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-		} ),
-		[]
-	);
-
-	// Read and parse the backup once per post, so that its snapshot (if any)
-	// can drive the snapshot status decision below.
-	const localAutosave = useMemo( () => {
-		const backup = localAutosaveGet( postId, isEditedPostNew );
-		if ( ! backup ) {
-			return null;
-		}
-
-		try {
-			return JSON.parse( backup );
-		} catch {
-			// Not usable if it can't be parsed.
-			return null;
-		}
-	}, [ postId, isEditedPostNew ] );
-
-	const snapshotStatus = useEntityContainsSnapshot( {
-		postType,
-		postId,
-		snapshot: localAutosaveGetSnapshot( localAutosave ),
-	} );
 
 	useEffect( () => {
-		if ( ! localAutosave ) {
-			return;
-		}
+		let lastEditsReference;
 
-		// Keep waiting for the snapshot status to resolve.
-		if ( 'pending' === snapshotStatus ) {
-			return;
-		}
-
-		if ( 'present' === snapshotStatus ) {
-			// The shared document provably holds everything the backup
-			// captured, so the backup is redundant even when its content
-			// differs from the current post (e.g. after a revision restore).
-			localAutosaveClear( postId, isEditedPostNew );
-			return;
-		}
-
-		const { post_title: title, content, excerpt } = localAutosave;
-		const edits = { title, content, excerpt };
-
-		const { getEditedPostAttribute, getEditorSettings } =
-			registry.select( editorStore );
-
-		// Only display a notice if there is a difference between what has been
-		// saved and that which is stored in sessionStorage.
-		const hasDifference = Object.keys( edits ).some( ( key ) => {
-			return edits[ key ] !== getEditedPostAttribute( key );
-		} );
-
-		if ( ! hasDifference ) {
-			// If there is no difference, it can be safely ejected from storage.
-			localAutosaveClear( postId, isEditedPostNew );
-			return;
-		}
-
-		const hasRemoteAutosave = !! getEditorSettings().autosave;
-		if ( hasRemoteAutosave ) {
-			return;
-		}
-
-		const { createWarningNotice } = registry.dispatch( noticesStore );
-		const { viewBrowserBackup } = unlock(
-			registry.dispatch( editorStore )
-		);
-
-		createWarningNotice(
-			// Backups written before the time was recorded don't have one.
-			localAutosave.time
-				? sprintf(
-						/* translators: %s: Date and time the backup was made. */
-						__(
-							'The backup of this post in your browser from %s is different from the version below.'
-						),
-						dateI18n(
-							getDateSettings().formats.datetime,
-							localAutosave.time
-						)
-					)
-				: __(
-						'The backup of this post in your browser is different from the version below.'
-					),
-			{
-				id: BROWSER_BACKUP_NOTICE_ID,
-				actions: [
-					{
-						label: __( 'View the backup' ),
-						onClick: () =>
-							viewBrowserBackup( {
-								...edits,
-								time: localAutosave.time,
-							} ),
-					},
-				],
+		// The local autosave is synchronous, so it completes before the
+		// page goes away; an idle callback might never run.
+		function backup() {
+			const editsReference = registry
+				.select( coreStore )
+				.getReferenceByDistinctEdits();
+			if (
+				editsReference === lastEditsReference ||
+				! registry.select( editorStore ).isEditedPostDirty()
+			) {
+				return;
 			}
-		);
-	}, [ registry, postId, isEditedPostNew, localAutosave, snapshotStatus ] );
+			// Record the write only once it succeeds, e.g. within the
+			// storage quota.
+			registry
+				.dispatch( editorStore )
+				.autosave( { local: true } )
+				.then( () => {
+					lastEditsReference = editsReference;
+				} );
+		}
+
+		function onVisibilityChange() {
+			if ( 'hidden' === document.visibilityState ) {
+				backup();
+			}
+		}
+
+		window.addEventListener( 'pagehide', backup );
+		document.addEventListener( 'visibilitychange', onVisibilityChange );
+		return () => {
+			window.removeEventListener( 'pagehide', backup );
+			document.removeEventListener(
+				'visibilitychange',
+				onVisibilityChange
+			);
+		};
+	}, [ registry ] );
 }
 
 /**
@@ -216,8 +110,8 @@ function LocalAutosaveMonitor() {
 	const deferredAutosave = useCallback( () => {
 		requestIdleCallback( () => autosave( { local: true } ) );
 	}, [] );
-	useAutosaveNotice();
 	useAutosavePurge();
+	useAutosaveOnLeave();
 
 	const localAutosaveInterval = useSelect(
 		( select ) =>
@@ -236,8 +130,8 @@ function LocalAutosaveMonitor() {
 /**
  * Monitors local autosaves of a post in the editor.
  * It uses several hooks and functions to manage autosave behavior:
- * - `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
  * - `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+ * - `useAutosaveOnLeave` hook: Writes a local autosave when the page is hidden or unloaded.
  * - `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
  * - `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
  *
