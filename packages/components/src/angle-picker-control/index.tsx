@@ -90,9 +90,9 @@ function UnforwardedAnglePickerControl(
  * dragging an angle indicator inside a circle or by directly inserting the
  * desired angle in a text field.
  *
- * With a custom `min` or `max`, the circle works like a knob: dragging changes
+ * With a custom `min` or `max`, the dial works like a knob: dragging changes
  * the angle by how far it turns, past a full turn if the range allows, and
- * stops at `min` and `max`. The circle shows the direction and the text field
+ * stops at `min` and `max`. The dial shows the direction and the text field
  * shows the full angle.
  *
  * ```jsx

@@ -15,14 +15,14 @@ export type AnglePickerControlProps = {
 	 */
 	label?: string;
 	/**
-	 * The maximum angle, in degrees, that can be entered. Dragging the circle
+	 * The maximum angle, in degrees, that can be entered. Dragging the dial
 	 * stops here.
 	 *
 	 * @default 360
 	 */
 	max?: number;
 	/**
-	 * The minimum angle, in degrees, that can be entered. Dragging the circle
+	 * The minimum angle, in degrees, that can be entered. Dragging the dial
 	 * stops here.
 	 *
 	 * @default 0

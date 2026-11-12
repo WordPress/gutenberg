@@ -52,7 +52,7 @@ export const Default = AnglePickerWithState.bind( {} );
 
 /**
  * Use `min` and `max` to change the range of angles that can be entered,
- * for example to allow negative angles. Dragging the circle anticlockwise
+ * for example to allow negative angles. Dragging the dial anticlockwise
  * from 0 gives a negative angle, and it stops at `min` and `max`.
  */
 export const WithCustomRange = AnglePickerWithState.bind( {} );
@@ -62,7 +62,7 @@ WithCustomRange.args = {
 };
 
 /**
- * A range wider than a full turn keeps counting as the circle turns, so
+ * A range wider than a full turn keeps counting as the dial turns, so
  * dragging anticlockwise from 0 goes below 0, and dragging clockwise from
  * 350 stops at 360.
  */
@@ -74,7 +74,7 @@ WithMoreThanOneTurn.args = {
 
 /**
  * A range narrower than a full turn stops at `min` and `max`, however far
- * the circle is dragged.
+ * the dial is dragged.
  */
 export const WithNarrowRange = AnglePickerWithState.bind( {} );
 WithNarrowRange.args = {

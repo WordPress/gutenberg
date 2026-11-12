@@ -23,13 +23,13 @@ function StatefulPrivateAnglePickerControl( {
 	);
 }
 
-function dragAngleCircle( container: HTMLElement, clientX: number ) {
-	const circle = getAngleCircle( container );
-	fireEvent.mouseDown( circle, { clientX, clientY: 0 } );
-	fireEvent.mouseUp( circle, { clientX, clientY: 0 } );
+function clickDial( container: HTMLElement, clientX: number ) {
+	const dial = getDial( container );
+	fireEvent.mouseDown( dial, { clientX, clientY: 0 } );
+	fireEvent.mouseUp( dial, { clientX, clientY: 0 } );
 }
 
-function getAngleCircle( container: HTMLElement ) {
+function getDial( container: HTMLElement ) {
 	return container.querySelector(
 		'.components-angle-picker-control__angle-circle'
 	) as HTMLElement;
@@ -51,13 +51,13 @@ function pointAt( angle: number ) {
 }
 
 function turnDial( container: HTMLElement, angles: number[] ) {
-	const circle = getAngleCircle( container );
+	const dial = getDial( container );
 	const [ first, ...rest ] = angles;
-	fireEvent.mouseDown( circle, pointAt( first ) );
+	fireEvent.mouseDown( dial, pointAt( first ) );
 	rest.forEach( ( angle ) => {
-		fireEvent.mouseMove( circle, pointAt( angle ) );
+		fireEvent.mouseMove( dial, pointAt( angle ) );
 	} );
-	fireEvent.mouseUp( circle, pointAt( angles[ angles.length - 1 ] ) );
+	fireEvent.mouseUp( dial, pointAt( angles[ angles.length - 1 ] ) );
 }
 
 function reportedValues( onChange: ReturnType< typeof vi.fn > ) {
@@ -137,7 +137,7 @@ describe( 'AnglePickerControl', () => {
 		);
 
 		// Left of center is 270 degrees on the dial.
-		dragAngleCircle( container, -10 );
+		clickDial( container, -10 );
 
 		expect( onChange ).toHaveBeenLastCalledWith( -90 );
 	} );
@@ -148,7 +148,7 @@ describe( 'AnglePickerControl', () => {
 			<AnglePickerControl value={ 0 } onChange={ onChange } />
 		);
 
-		dragAngleCircle( container, -10 );
+		clickDial( container, -10 );
 
 		expect( onChange ).toHaveBeenLastCalledWith( 270 );
 	} );
