@@ -1,6 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { Button, Spinner as WCSpinner } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Spinner } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import PatternsExplorerModal from '../block-patterns-explorer';
@@ -47,7 +48,7 @@ function BlockPatternsTab( {
 
 	if ( isLoading ) {
 		return (
-			<WCSpinner className="block-editor-inserter__categories-panel-spinner" />
+			<Spinner className="block-editor-inserter__categories-panel-spinner" />
 		);
 	}
 
