@@ -224,10 +224,18 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 				},
 			} ),
 		} ) );
+	const colorExamples = getColorExamples( colors );
+
+	const overviewBlockExamples = getOverviewBlockExamples( colors );
+
 	const isHeadingBlockRegistered = !! getBlockType( 'core/heading' );
 
 	if ( ! isHeadingBlockRegistered ) {
-		return nonHeadingBlockExamples;
+		return [
+			...colorExamples,
+			...nonHeadingBlockExamples,
+			...overviewBlockExamples,
+		];
 	}
 
 	// Use our own example for the Heading block so that we can show multiple
@@ -247,9 +255,6 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 			} );
 		} ),
 	};
-	const colorExamples = getColorExamples( colors );
-
-	const overviewBlockExamples = getOverviewBlockExamples( colors );
 
 	return [
 		headingsExample,

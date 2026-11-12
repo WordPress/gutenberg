@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+
+## 6.1.0 (2026-11-04)
+
+## 6.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Keep the block selected when choosing an option in a `@wordpress/ui` overlay, such as the Legacy Widget type select ([#84628](https://github.com/WordPress/gutenberg/pull/84628)).
+
 ## 5.57.0 (2026-10-07)
 
 ### Bug Fixes

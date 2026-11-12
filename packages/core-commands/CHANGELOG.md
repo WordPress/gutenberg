@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-11-04)
+
+### Enhancements
+
+-   Add native TypeScript support and export the command palette settings and admin menu command types ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).
+
+### Bug Fixes
+
+-   Hide template navigation commands on classic themes while keeping permitted template parts available ([#86142](https://github.com/WordPress/gutenberg/pull/86142)).
+
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ## 1.57.0 (2026-10-07)
 
 ## 1.56.0 (2026-09-23)

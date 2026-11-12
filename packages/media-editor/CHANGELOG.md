@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEditor.MoreMenu` takes `actions` and `item` props, and lists the actions eligible for the item, such as "Permanently delete". It now also shows for media other than images when it has actions ([#86349](https://github.com/WordPress/gutenberg/pull/86349)).
+-   Show the shape of each aspect ratio in the aspect ratio dropdown of the crop panel and in the aspect ratio menu used on narrow screens ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+
+### Bug Fixes
+
+-   Keyboard shortcuts modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   Keep the fine-rotation ruler's ticks and labels visible when the browser forces dark colors ([#86402](https://github.com/WordPress/gutenberg/pull/86402)).
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Use the image cropper from the new `@wordpress/image-editor` package ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
+
+## 0.22.0 (2026-11-04)
+
+### Enhancements
+
+-   Use the design system focus ring for the rotation ruler ([#85535](https://github.com/WordPress/gutenberg/pull/85535)).
+-   Animate the details/crop sidebar when it opens or closes beside the canvas ([#85889](https://github.com/WordPress/gutenberg/pull/85889)).
+-   `MediaPreview` shows an inline preview of PDF files when the browser has a built-in PDF viewer, and falls back to the file info otherwise ([#86002](https://github.com/WordPress/gutenberg/pull/86002)).
+-   Add an `onEditOriginal` prop to `MediaEditor`. When set, the history menu reads "Edit original" and hands the original's id to the caller instead of loading it into the cropper, so a frame can open it on its own ([#86281](https://github.com/WordPress/gutenberg/pull/86281)).
+
+### Bug Fixes
+
+-   Keep the rotation ruler's center marker visible in forced colors mode ([#85546](https://github.com/WordPress/gutenberg/pull/85546)).
+
+## 0.21.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses when it gets no `form` prop. `MediaEditor` and the private `MediaEditorModal` pass a `form` prop through to it ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Lay out the default form of `MediaForm` in a fixed order of the core attachment fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass a `form` to show them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Migrate crop and story selectors to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo`, `global.d.ts` and the test and story files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).

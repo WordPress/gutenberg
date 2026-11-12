@@ -69,7 +69,7 @@ The function called when the image size changes. It is passed an object with `{ 
 
 ### onChangeImage
 
-The function called when a new image size is selected. It is passed the `slug` as an argument. This is not required, but necessary when `imageSizeOptions` is used.
+The function called when a new image size is selected. It receives the selected `slug` and an object containing `{ event }`. The event comes from the interaction that selected the popup option, including a synthesized click for keyboard selection. It is no longer a native select change event. Read the selected value from the `slug` argument rather than `event.target.value`. This is not required, but necessary when `imageSizeOptions` is used.
 
 -   Type: `Function`
 -   Required: No

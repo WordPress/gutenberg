@@ -30,7 +30,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	select: vi.fn(),
 } ) );
 
-// @ts-expect-error `@wordpress/block-editor` does not publish TypeScript declarations.
+// @ts-expect-error The mock provides only what the tests need.
 vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: 'core/block-editor',
 } ) );

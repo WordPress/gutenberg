@@ -1776,6 +1776,58 @@ describe( 'actions', () => {
 			expect( vipsResizeImage ).toHaveBeenCalled();
 		} );
 
+		it( 'keeps animation in sub-sizes by default', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			( vipsResizeImage as Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				item.id,
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { preserveAnimation: true } )
+			);
+		} );
+
+		it( 'flattens sub-sizes when generateAnimatedImageSubsizes is false', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				generateAnimatedImageSubsizes: false,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			( vipsResizeImage as Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				item.id,
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { preserveAnimation: false } )
+			);
+		} );
+
 		it( 'skips resize when no resize args are provided', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,

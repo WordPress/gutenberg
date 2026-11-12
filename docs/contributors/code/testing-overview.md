@@ -538,7 +538,7 @@ test( 'should contain mars if planets is true', () => {
 } );
 ```
 
-The runner-neutral `toMatchDiffSnapshot` matcher remains available in Gutenberg. Use it to compare two states without recording two full snapshots. `@testing-library/jest-dom` also remains supported; its name does not make it a Jest runner dependency.
+Prefer direct assertions for the behavior that changes between two states. `@testing-library/jest-dom` remains supported; its name does not make it a Jest runner dependency.
 
 Test rendered styles in Browser Mode. Node and jsdom use a CSS-module proxy, so their snapshots cannot establish computed style behavior. Browser Mode loads styles imported by the test graph. Import a package's global stylesheet explicitly when WordPress normally enqueues it separately. For a test in `packages/components/src/button/test/`, for example:
 

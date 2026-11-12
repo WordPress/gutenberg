@@ -3,6 +3,7 @@ import { create } from 'rungen';
 import isPromise from 'is-promise';
 import type { Dispatch, AnyAction } from 'redux';
 import { isActionOfType, isAction } from './is-action';
+import type { Controls } from './types';
 
 /**
  * Create a co-routine runtime.
@@ -11,10 +12,7 @@ import { isActionOfType, isAction } from './is-action';
  * @param dispatch Unhandled action dispatch.
  */
 export default function createRuntime(
-	controls: Record<
-		string,
-		( value: any ) => Promise< boolean > | boolean
-	> = {},
+	controls: Controls = {},
 	dispatch: Dispatch
 ) {
 	const rungenControls = Object.entries( controls ).map(

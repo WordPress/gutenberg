@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `heading-*` and `body-*` mixins now use `--wpds-typography-*` design tokens for font family, size, and line height ([#86635](https://github.com/WordPress/gutenberg/pull/86635)).
+
+## 15.0.0 (2026-11-04)
+
+### Breaking Changes
+
+-   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).
+
+## 14.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Rename the `.fields-create-template-part-modal` z-index entry to `.patterns-create-template-part-modal`, since the modal moved to `@wordpress/patterns` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+
 ## 13.3.0 (2026-10-07)
 
 ### Enhancements

@@ -4,7 +4,8 @@ import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { WordPressComponentProps } from '../context';
-import { ValueInput } from './styles/unit-control-styles';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
@@ -13,6 +14,7 @@ import {
 	getValidParsedQuantityAndUnit,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { multiply } from '../utils/math';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 
@@ -101,6 +103,7 @@ function UnforwardedUnitControl(
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
 		'components-unit-control-wrapper',
+		styles[ 'value-input' ],
 		className
 	);
 
@@ -193,18 +196,23 @@ function UnforwardedUnitControl(
 	) : null;
 
 	let step = props.step;
+	let spinFactor = props.spinFactor;
 
 	/*
-	 * If no step prop has been passed, lookup the active unit and
-	 * try to get step from `units`, or default to a value of `1`
+	 * If no step prop has been passed, default to 'any' so that typed fractional
+	 * values are preserved across CSS units and browser validation accepts them,
+	 * while deriving spinFactor from the active unit for keyboard and drag stepping.
 	 */
-	if ( ! step && units ) {
-		const activeUnit = units.find( ( option ) => option.value === unit );
-		step = activeUnit?.step ?? 1;
+	if ( step === undefined ) {
+		const activeUnit = units?.find( ( option ) => option.value === unit );
+		const unitStep = activeUnit?.step ?? 1;
+
+		step = 'any';
+		spinFactor = multiply( props.spinFactor ?? 1, unitStep );
 	}
 
 	return (
-		<ValueInput
+		<NumberControl
 			{ ...props }
 			autoComplete={ autoComplete }
 			className={ classes }
@@ -220,6 +228,7 @@ function UnforwardedUnitControl(
 			type={ isPressEnterToChange ? 'text' : 'number' }
 			value={ parsedQuantity ?? '' }
 			step={ step }
+			spinFactor={ spinFactor }
 			onFocus={ onFocusProp }
 			__unstableStateReducer={ __unstableStateReducer }
 		/>

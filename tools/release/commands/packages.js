@@ -1,7 +1,6 @@
 const path = require( 'path' );
 const fs = require( 'fs' );
 const readline = require( 'readline' );
-const { join } = require( 'path' );
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const { inc: semverInc, parse: semverParse } = require( 'semver' );
@@ -60,7 +59,7 @@ class NpmReleaseVerificationPendingError extends Error {}
  * @typedef WPPackagesCommandOptions
  *
  * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
- * @property {string}  [repositoryPath] Relative path to the git repository.
+ * @property {string}  [repositoryPath] Path to the git repository, relative to the working directory or absolute.
  * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
  * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
  */
@@ -2063,7 +2062,7 @@ function getConfig(
 		abortMessage: 'Aborting!',
 		distTag,
 		gitWorkingDirectoryPath:
-			repositoryPath && join( process.cwd(), repositoryPath ),
+			repositoryPath && path.resolve( repositoryPath ),
 		interactive: ! ci,
 		minimumVersionBump: semver,
 		npmReleaseBranch,

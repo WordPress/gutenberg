@@ -796,7 +796,7 @@ test.describe( 'Pattern Overrides', () => {
 		await button.focus();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
+			page.getByRole( 'link', { name: 'wp.org' } ).getByRole( 'img' )
 		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
 
 		// The link popup doesn't have a role which is a bit unfortunate.

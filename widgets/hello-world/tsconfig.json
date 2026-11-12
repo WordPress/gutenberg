@@ -9,10 +9,7 @@
 		"composite": false,
 		"types": [ "style-imports" ]
 	},
-	"references": [
-		{ "path": "../../packages/ui/tsconfig.build.json" },
-		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
-	],
+	"references": [ { "path": "../../packages/ui/tsconfig.build.json" } ],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "**/test/**", "build", "node_modules" ]
 }

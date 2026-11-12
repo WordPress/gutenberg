@@ -17,10 +17,10 @@ test.describe( 'Relocated color controls with block style states', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
-		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
 
 		// Text color now lives in the Typography panel.
@@ -75,10 +75,10 @@ test.describe( 'Relocated color controls with block style states', () => {
 
 		// Switch the block's editing context to the Mobile viewport state.
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
-		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
 
 		const elementsPanel = settings
@@ -93,7 +93,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )
@@ -199,10 +199,10 @@ test.describe( 'Relocated color controls with block style states', () => {
 		} );
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
-		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page.keyboard.press( 'Escape' );
 
 		// Reset all of the Background panel while the Mobile state is selected.

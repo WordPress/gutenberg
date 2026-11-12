@@ -3,6 +3,7 @@ import { run } from '../run.ts';
 
 const api = vi.hoisted( () => ( {
 	getPullRequest: vi.fn(),
+	branchContains: vi.fn(),
 	findComments: vi.fn(),
 	createComment: vi.fn(),
 	updateComment: vi.fn(),
@@ -54,7 +55,7 @@ describe( 'run', () => {
 			'commit-sha': '',
 			'run-url': '',
 			'retire-comments-matching': '',
-			'require-base': '',
+			'require-base-contains': '',
 		} );
 	} );
 
@@ -182,29 +183,42 @@ describe( 'run', () => {
 	 * pull request targets, so without this it reaches release branches whose
 	 * own writers still truncate at render.
 	 */
-	it( 'writes nothing when the pull request targets another branch', async () => {
+	it( 'writes nothing when the target branch lacks the required commit', async () => {
 		api.getPullRequest.mockResolvedValue( {
 			headSha: HEAD,
 			baseRef: 'wp/7.1',
 		} );
-		withInputs( { 'require-base': 'trunk' } );
+		api.branchContains.mockResolvedValue( false );
+		withInputs( { 'require-base-contains': 'b'.repeat( 40 ) } );
 
 		await run();
 
+		expect( api.branchContains ).toHaveBeenCalledWith(
+			'wp/7.1',
+			'b'.repeat( 40 )
+		);
 		expect( api.createComment ).not.toHaveBeenCalled();
 		expect( api.updateComment ).not.toHaveBeenCalled();
 		expect( api.deleteComment ).not.toHaveBeenCalled();
 	} );
 
-	it( 'writes when the pull request targets the required branch', async () => {
+	it( 'writes when the target branch contains the required commit', async () => {
 		api.getPullRequest.mockResolvedValue( {
 			headSha: HEAD,
-			baseRef: 'trunk',
+			baseRef: 'refactor/stacked-on-trunk',
 		} );
-		withInputs( { 'require-base': 'trunk' } );
+		api.branchContains.mockResolvedValue( true );
+		withInputs( { 'require-base-contains': 'b'.repeat( 40 ) } );
 
 		await run();
 
+		expect( api.createComment ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'does not compare branches without the input', async () => {
+		await run();
+
+		expect( api.branchContains ).not.toHaveBeenCalled();
 		expect( api.createComment ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

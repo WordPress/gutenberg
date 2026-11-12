@@ -50,7 +50,7 @@ test.describe( 'Styles', () => {
 				.setRenderingMode( 'template-locked' );
 		}, [] );
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks' } ).click();
+		await page.getByRole( 'button', { name: 'Blocks & Elements' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Social Icons', exact: true } )
 			.click();

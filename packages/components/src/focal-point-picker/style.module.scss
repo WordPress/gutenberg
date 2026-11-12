@@ -1,0 +1,148 @@
+@use "@wordpress/base-styles/colors" as colors;
+@use "@wordpress/base-styles/variables" as variables;
+
+.root {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	font-family: variables.$font-family-body;
+	font-size: 13px;
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+}
+
+.media-wrapper {
+	background-color: transparent;
+	display: flex;
+	text-align: center;
+	width: 100%;
+	contain: layout;
+}
+
+.media-container {
+	align-items: center;
+	border-radius: variables.$radius-small;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
+	cursor: pointer;
+	display: inline-flex;
+	justify-content: center;
+	margin: auto;
+	position: relative;
+	height: 100%;
+
+	&::after {
+		border-radius: inherit;
+		inset: 0;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+		content: "";
+		pointer-events: none;
+		position: absolute;
+	}
+
+	img,
+	video {
+		border-radius: inherit;
+		box-sizing: border-box;
+		display: block;
+		height: auto;
+		margin: 0;
+		max-height: 100%;
+		max-width: 100%;
+		pointer-events: none;
+		user-select: none;
+		width: 100%;
+	}
+}
+
+.media-placeholder {
+	background: colors.$gray-100;
+	border-radius: inherit;
+	box-sizing: border-box;
+	height: 170px;
+	max-width: 280px;
+	min-width: 200px;
+	width: 100%;
+}
+
+.unit-control {
+	width: 100%;
+}
+
+.controls {
+	max-width: 320px;
+	padding-top: 1em;
+
+	&:where(.has-help-text) {
+		padding-bottom: 1em;
+	}
+}
+
+.grid {
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Center the grid on physical image coordinates in both LTR and RTL. */
+	left: 50%;
+	overflow: hidden;
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	transform: translate3d(-50%, -50%, 0);
+	z-index: 1;
+	opacity: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 100ms linear;
+	}
+
+	&:where(.show-overlay) {
+		opacity: 1;
+	}
+}
+
+.grid-line {
+	background: rgba(255, 255, 255, 0.4);
+	backdrop-filter: blur(16px) saturate(180%);
+	position: absolute;
+	transform: translateZ(0);
+}
+
+.grid-line-x {
+	height: 1px;
+	inset-inline: 1px;
+}
+
+.grid-line-y {
+	width: 1px;
+	inset-block: 1px;
+}
+
+.pointer {
+	cursor: grab;
+	height: 40px;
+	margin-top: -20px;
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Offset the pointer from its physical left image coordinate in both LTR and RTL. */
+	margin-left: -20px;
+	position: absolute;
+	user-select: none;
+	width: 40px;
+	will-change: transform;
+	z-index: 10000;
+	background: rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	border-radius: variables.$radius-round;
+	backdrop-filter: blur(16px) saturate(180%);
+	box-shadow: rgb(0 0 0 / 10%) 0 0 8px;
+
+	@media not (prefers-reduced-motion) {
+		transition: transform 100ms linear;
+	}
+
+	&:where(.is-dragging) {
+		box-shadow: rgb(0 0 0 / 12%) 0 0 10px;
+		transform: scale(1.1);
+		cursor: grabbing;
+	}
+}

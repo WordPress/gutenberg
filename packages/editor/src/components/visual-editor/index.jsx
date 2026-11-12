@@ -8,7 +8,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -404,6 +404,15 @@ function VisualEditor( {
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
 
+	const { setCanvasHeight } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setCanvasHeight(
+			typeof canvasHeight === 'number' ? canvasHeight : undefined
+		);
+	}, [ canvasHeight, setCanvasHeight ] );
+	// The store must not retain dimensions for a canvas that is no longer mounted.
+	useEffect( () => () => setCanvasHeight( undefined ), [ setCanvasHeight ] );
+
 	// A resizable canvas (device preview) or a scaled one (zoom out) has no
 	// margin.
 	const hasCanvasMargin = ! isPreview && ! isZoomedOut && ! enableResizing;
@@ -482,11 +491,13 @@ function VisualEditor( {
 				className,
 				{
 					// Vertical padding frames a width-constrained canvas
-					// (device preview or after a resize) as a centered preview.
-					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
+					// (device preview or after a resize) or a resizable
+					// focused entity as a centered preview.
+					'has-vertical-padding':
+						( isFocusedEntity && enableResizing ) || hasCanvasWidth,
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
-					'has-horizontal-padding': isFocusedEntity || enableResizing,
+					'has-horizontal-padding': enableResizing,
 				}
 			) }
 		>

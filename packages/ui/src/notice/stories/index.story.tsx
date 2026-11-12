@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { unseen } from '@wordpress/icons';
+import { tip, unseen } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
+import { Button } from '../../button';
+import { Link } from '../../link';
+import { Stack } from '../../stack';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
@@ -8,6 +12,7 @@ const meta: Meta< typeof Notice.Root > = {
 	component: Notice.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {
+		'Notice.List': Notice.List,
 		'Notice.Title': Notice.Title,
 		'Notice.Description': Notice.Description,
 		'Notice.Actions': Notice.Actions,
@@ -19,7 +24,7 @@ const meta: Meta< typeof Notice.Root > = {
 		docs: {
 			description: {
 				component:
-					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+					'Use Notice.List for announcements of dynamic notices. Standalone notices stay silent. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for examples and migration guidance. See [Notice with disclosed details](?path=/docs/design-system-components-notice-disclosure--docs) for a composition with native details and a copy button.',
 			},
 		},
 		componentStatus: {
@@ -133,6 +138,28 @@ export const WithoutActions: Story = {
 };
 
 /**
+ * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and blend with the notice colors.
+ *
+ * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
+ */
+export const WithLinkInDescription: Story = {
+	args: {
+		intent: 'info',
+		children: [
+			<Notice.Title key="title">Notice Title</Notice.Title>,
+			<Notice.Description key="description">
+				Description text with a{ ' ' }
+				<Link href="#" tone="neutral">
+					link
+				</Link>{ ' ' }
+				and details about this notification.
+			</Notice.Description>,
+			<Notice.CloseIconButton key="closeIconButton" />,
+		],
+	},
+};
+
+/**
  * Title only, no description or actions.
  */
 export const TitleOnly: Story = {
@@ -171,5 +198,131 @@ export const CustomIcon: Story = {
 				Parent block is hidden on Desktop
 			</Notice.Description>,
 		],
+	},
+};
+
+/**
+ * Use an info notice with the tip icon for contextual guidance.
+ */
+export const Tip: Story = {
+	args: {
+		intent: 'info',
+		icon: tip,
+		children: [
+			<Notice.Description key="description">
+				While writing, you can press <kbd>/</kbd> to quickly insert new
+				blocks.
+			</Notice.Description>,
+		],
+	},
+};
+
+type Message = {
+	id: number;
+	intent: 'success' | 'error';
+	description: string;
+	politeness?: 'polite' | 'assertive';
+	spokenMessage?: string;
+};
+
+export const DynamicNotices: StoryObj< typeof Notice.List > = {
+	args: { className: '', style: {} },
+	argTypes: {
+		className: { control: 'text' },
+		style: { control: 'object' },
+	},
+	parameters: { controls: { include: [ 'className', 'style' ] } },
+	render: function DynamicNoticesExample( args ) {
+		const [ messages, setMessages ] = useState< Message[] >( [
+			{
+				id: 0,
+				intent: 'success',
+				description: 'This notice was present when the list mounted.',
+			},
+		] );
+		const [ nextId, setNextId ] = useState( 1 );
+
+		function addNotice( isUrgent: boolean ) {
+			setMessages( ( previous ) => [
+				...previous,
+				{
+					id: nextId,
+					intent: isUrgent ? 'error' : 'success',
+					description: isUrgent
+						? 'The connection was lost. Check your connection and try again.'
+						: 'Your draft has been saved.',
+					politeness: isUrgent ? 'assertive' : 'polite',
+				},
+			] );
+			setNextId( ( previous ) => previous + 1 );
+		}
+
+		return (
+			<Stack direction="column" gap="md">
+				<Stack gap="sm" wrap="wrap">
+					<Button onClick={ () => addNotice( false ) }>
+						Save draft
+					</Button>
+					<Button onClick={ () => addNotice( true ) }>
+						Simulate failed save
+					</Button>
+					<Button
+						disabled={ ! messages.length }
+						onClick={ () =>
+							setMessages( ( previous ) =>
+								previous.map( ( message, index ) =>
+									index === previous.length - 1
+										? {
+												...message,
+												spokenMessage:
+													'The latest notice has been updated.',
+												description:
+													'The latest notice has been updated.',
+											}
+										: message
+								)
+							)
+						}
+					>
+						Update latest notice
+					</Button>
+				</Stack>
+				<Notice.List { ...args }>
+					{ messages.map( ( message ) => (
+						<Notice.Root
+							key={ message.id }
+							intent={ message.intent }
+							politeness={ message.politeness }
+							spokenMessage={ message.spokenMessage }
+						>
+							<Notice.Title>
+								{ message.intent === 'error'
+									? 'Changes not saved'
+									: 'Draft saved' }
+							</Notice.Title>
+							<Notice.Description>
+								{ message.description }
+							</Notice.Description>
+							<Notice.Actions>
+								<Notice.ActionButton
+									onClick={ () => addNotice( false ) }
+								>
+									Save again
+								</Notice.ActionButton>
+							</Notice.Actions>
+							<Notice.CloseIconButton
+								onClick={ () =>
+									setMessages( ( previous ) =>
+										previous.filter(
+											( item ) => item.id !== message.id
+										)
+									)
+								}
+							/>
+						</Notice.Root>
+					) ) }
+				</Notice.List>
+			</Stack>
+		);
 	},
 };

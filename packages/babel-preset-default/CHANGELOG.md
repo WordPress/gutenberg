@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 10.1.0 (2026-11-04)
+
+### Enhancements
+
+-   Always polyfill `Array.prototype.toSorted`, even when all supported browsers implement it natively ([#86159](https://github.com/WordPress/gutenberg/pull/86159)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+
+## 10.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Add list of included polyfills to header comment when generating the bundle ([#84835](https://github.com/WordPress/gutenberg/pull/84835))
+
 ## 9.0.0 (2026-10-07)
 
 ### Breaking Changes

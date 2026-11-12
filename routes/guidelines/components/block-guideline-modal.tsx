@@ -2,7 +2,7 @@ import {
 	Button,
 	ComboboxControl,
 	Modal,
-	Notice,
+	Notice as WCNotice,
 	TextControl,
 	TextareaControl as WCTextareaControl,
 	__experimentalHStack as HStack,
@@ -158,13 +158,16 @@ export default function BlockGuidelineModal( {
 					rows={ 6 }
 				/>
 				{ error && (
-					<Notice status="error" onRemove={ () => setError( null ) }>
+					<WCNotice
+						status="error"
+						onRemove={ () => setError( null ) }
+					>
 						{ sprintf(
 							/* translators: %s: Error message. */
 							__( 'Error: %s' ),
 							error
 						) }
-					</Notice>
+					</WCNotice>
 				) }
 				<HStack
 					justify="flex-end"
