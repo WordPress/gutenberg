@@ -9,9 +9,11 @@ import { imageEditorReducer, withBaseValues } from './core/state';
 import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
 
 /**
- * Why an edit was rejected. `invalid` is a non-finite number or a crop
- * under one pixel wide or high. `outside-image` is a crop reaching outside
- * the image.
+ * Why an edit was rejected. `no-image` means no image with a usable size
+ * has loaded. `invalid` is a non-finite number or a crop under one pixel
+ * wide or high. `locked-ratio` is an edit that would apply without the
+ * locked ratio, but its crop is a different shape. `outside-image` is a
+ * crop reaching outside the image.
  */
 export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
