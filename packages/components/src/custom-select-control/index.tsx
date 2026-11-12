@@ -42,8 +42,7 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 
 /**
  * `CustomSelectControl` is a dropdown for selecting a single option from a
- * list, with support for custom styling. Use `SelectControl`
- * from `@wordpress/ui` with custom items.
+ * list, with support for custom styling.
  */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
