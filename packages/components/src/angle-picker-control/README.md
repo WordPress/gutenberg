@@ -9,10 +9,7 @@ pick an angle. Users can choose an angle in a visual UI with the mouse by
 dragging an angle indicator inside a circle or by directly inserting the
 desired angle in a text field.
 
-With a custom `min` or `max`, the dial works like a knob: dragging changes
-the angle by how far it turns, past a full turn if the range allows, and
-stops at `min` and `max`. The dial shows the direction and the text field
-shows the full angle.
+With a custom `min` or `max`, the dial works like a knob: dragging changes the angle by how far it turns, past a full turn if the range allows, and stops at `min` and `max`. The dial shows the direction and the text field shows the full angle.
 
 ```jsx
 import { useState } from '@wordpress/element';
@@ -52,8 +49,7 @@ Label to use for the angle picker.
  - Required: No
  - Default: `360`
 
-The maximum angle, in degrees, that can be entered. Dragging the dial
-stops here.
+The maximum angle, in degrees, that can be entered. Dragging the dial stops here.
 
 ### `min`
 
@@ -61,8 +57,7 @@ stops here.
  - Required: No
  - Default: `0`
 
-The minimum angle, in degrees, that can be entered. Dragging the dial
-stops here.
+The minimum angle, in degrees, that can be entered. Dragging the dial stops here.
 
 ### `onChange`
 
