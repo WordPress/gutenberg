@@ -1,4 +1,4 @@
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { REACTION_EMOJIS } from './reaction-emojis';
@@ -119,20 +119,23 @@ export function useFrequentEmojis(): {
 	recordUse: ( key: string ) => void;
 } {
 	const registry = useRegistry();
-	const frequentKeys = useSelect(
+	const entries = useSelect(
 		( select ) =>
-			getFrequentEmojiKeys(
-				select( preferencesStore ).get(
-					'core',
-					FREQUENT_EMOJIS_PREFERENCE_KEY
-				)
+			select( preferencesStore ).get(
+				'core',
+				FREQUENT_EMOJIS_PREFERENCE_KEY
 			),
 		[]
+	);
+	// Derived outside the selector, which must return a stable value.
+	const frequentKeys = useMemo(
+		() => getFrequentEmojiKeys( entries ),
+		[ entries ]
 	);
 	const recordUse = useCallback(
 		( key: string ) => {
 			// Read at call time so back-to-back picks don't clobber.
-			const entries = registry
+			const current = registry
 				.select( preferencesStore )
 				.get( 'core', FREQUENT_EMOJIS_PREFERENCE_KEY );
 			registry
@@ -140,7 +143,7 @@ export function useFrequentEmojis(): {
 				.set(
 					'core',
 					FREQUENT_EMOJIS_PREFERENCE_KEY,
-					recordEmojiUse( entries, key )
+					recordEmojiUse( current, key )
 				);
 		},
 		[ registry ]
