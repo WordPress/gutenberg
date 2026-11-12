@@ -420,7 +420,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  */
 function gutenberg_define_interactivity_modules_support() {
 	// Load the auto-generated module registry.
-	$modules_registry_file = gutenberg_dir_path() . 'build/modules/index.php';
+	$modules_registry_file = gutenberg_dir_path() . 'build/modules/registry.php';
 	if ( ! file_exists( $modules_registry_file ) ) {
 		return;
 	}
@@ -435,7 +435,6 @@ function gutenberg_define_interactivity_modules_support() {
 		}
 	}
 }
-remove_action( 'wp_default_scripts', 'wp_define_interactivity_modules_support' );
 add_action( 'wp_default_scripts', 'gutenberg_define_interactivity_modules_support' );
 
 /**
