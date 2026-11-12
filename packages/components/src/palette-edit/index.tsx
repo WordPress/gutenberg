@@ -263,6 +263,94 @@ export function deduplicateElementSlugs< T extends PaletteElement >(
 	} );
 }
 
+function getPaletteElementKey( slug: string, occurrence = 0, generation = 0 ) {
+	return JSON.stringify( [ slug, occurrence, generation ] );
+}
+
+function usePaletteElementKeys( elements: PaletteElement[] ) {
+	const info = useMemo( () => {
+		const counts = new Map< string, number >();
+		const occurrences = elements.map( ( { slug } ) => {
+			const occurrence = counts.get( slug ) ?? 0;
+			counts.set( slug, occurrence + 1 );
+			return occurrence;
+		} );
+		return {
+			occurrences,
+			rawKeys: elements.map( ( { slug }, index ) =>
+				JSON.stringify( [ slug, occurrences[ index ] ] )
+			),
+			normalizedSlugs: deduplicateElementSlugs< PaletteElement >(
+				elements
+			).map( ( { slug } ) => slug ),
+		};
+	}, [ elements ] );
+	const [ previous, setPrevious ] = useState( () => ( {
+		info,
+		keys: elements.map( ( { slug }, index ) =>
+			getPaletteElementKey( slug, info.occurrences[ index ] )
+		),
+	} ) );
+	if (
+		info.rawKeys.length === previous.info.rawKeys.length &&
+		info.rawKeys.every(
+			( key, index ) => key === previous.info.rawKeys[ index ]
+		)
+	) {
+		return previous.keys;
+	}
+	const matched = new Set< number >();
+	const keys: Array< string | undefined > = info.rawKeys.map( ( key ) => {
+		const oldIndex = previous.info.rawKeys.indexOf( key );
+		if ( oldIndex < 0 ) {
+			return undefined;
+		}
+		matched.add( oldIndex );
+		return previous.keys[ oldIndex ];
+	} );
+	// Match raw identities first. A new real slug must not take an existing
+	// duplicate's key merely because it was that duplicate's normalized slug.
+	keys.forEach( ( key, index ) => {
+		if ( key !== undefined || info.occurrences[ index ] !== 0 ) {
+			return;
+		}
+		const oldIndex = previous.info.normalizedSlugs.findIndex(
+			( slug, candidateIndex ) =>
+				slug === elements[ index ].slug &&
+				! matched.has( candidateIndex )
+		);
+		if ( oldIndex >= 0 ) {
+			matched.add( oldIndex );
+			keys[ index ] = previous.keys[ oldIndex ];
+		}
+	} );
+	// Reserve removed keys too, so a replacement cannot inherit an open editor.
+	const reserved = new Set( previous.keys );
+	const nextKeys = keys.map( ( key, index ) => {
+		if ( key !== undefined ) {
+			return key;
+		}
+		let generation = 0;
+		let nextKey = getPaletteElementKey(
+			elements[ index ].slug,
+			info.occurrences[ index ],
+			generation
+		);
+		while ( reserved.has( nextKey ) ) {
+			generation++;
+			nextKey = getPaletteElementKey(
+				elements[ index ].slug,
+				info.occurrences[ index ],
+				generation
+			);
+		}
+		reserved.add( nextKey );
+		return nextKey;
+	} );
+	setPrevious( { info, keys: nextKeys } );
+	return nextKeys;
+}
+
 /**
  * Returns a name and slug for a palette item. The name takes the format "Color + id".
  * To ensure there are no duplicate ids, this function checks all slugs.
@@ -537,6 +625,7 @@ function Option< T extends PaletteElement >( {
 
 function PaletteEditListView< T extends PaletteElement >( {
 	elements,
+	elementKeys,
 	onChange,
 	canOnlyChangeValues,
 	variant,
@@ -564,7 +653,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 						variant={ variant }
 						colorPalette={ colorPalette }
 						canOnlyChangeValues={ canOnlyChangeValues }
-						key={ index }
+						key={ elementKeys[ index ] }
 						element={ element }
 						onChange={ ( newElement ) => {
 							debounceOnChange(
@@ -647,6 +736,7 @@ export function PaletteEdit( {
 		variant = 'duotone';
 	}
 	const elements = gradients ?? duotones ?? colors;
+	const elementKeys = usePaletteElementKeys( elements );
 	// Filtered once here so every duotone path — the swatches, the shadows and
 	// highlights pickers, and the value a newly added duotone starts from —
 	// works from colors a duotone can actually be built with.
@@ -655,9 +745,16 @@ export function PaletteEdit( {
 		[ colorPalette ]
 	);
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState<
-		number | null | undefined
+	const [ editingElementKey, setEditingElementKey ] = useState<
+		string | null
 	>( null );
+	const editingElement =
+		editingElementKey === null
+			? -1
+			: elementKeys.indexOf( editingElementKey );
+	if ( editingElementKey !== null && editingElement < 0 ) {
+		setEditingElementKey( null );
+	}
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
@@ -677,13 +774,17 @@ export function PaletteEdit( {
 					: elements[ newEditingElementIndex ];
 			const key = variant === 'gradient' ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
-			if ( !! selectedElement && selectedElement[ key ] === value ) {
-				setEditingElement( newEditingElementIndex );
+			if (
+				newEditingElementIndex !== undefined &&
+				!! selectedElement &&
+				selectedElement[ key ] === value
+			) {
+				setEditingElementKey( elementKeys[ newEditingElementIndex ] );
 			} else {
 				setIsEditing( true );
 			}
 		},
-		[ variant, elements ]
+		[ variant, elements, elementKeys ]
 	);
 
 	// Two duotones can hold the same pair of colors, so the picker's reported
@@ -695,12 +796,12 @@ export function PaletteEdit( {
 				newEditingElementIndex !== undefined &&
 				( duotones ?? [] )[ newEditingElementIndex ]
 			) {
-				setEditingElement( newEditingElementIndex );
+				setEditingElementKey( elementKeys[ newEditingElementIndex ] );
 			} else {
 				setIsEditing( true );
 			}
 		},
-		[ duotones ]
+		[ duotones, elementKeys ]
 	);
 
 	const addColorRef = useRef< HTMLButtonElement >( null );
@@ -729,7 +830,7 @@ export function PaletteEdit( {
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
-								setEditingElement( null );
+								setEditingElementKey( null );
 							} }
 						>
 							{ __( 'Done' ) }
@@ -781,7 +882,9 @@ export function PaletteEdit( {
 									] );
 								}
 								setIsEditing( true );
-								setEditingElement( elements.length );
+								setEditingElementKey(
+									getPaletteElementKey( slug )
+								);
 							} }
 						/>
 					) }
@@ -820,7 +923,7 @@ export function PaletteEdit( {
 									{ ! canOnlyChangeValues && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingElementKey( null );
 												setIsEditing( false );
 												onChange();
 											} }
@@ -833,7 +936,7 @@ export function PaletteEdit( {
 									{ canReset && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingElementKey( null );
 												onChange();
 											} }
 										>
@@ -853,6 +956,7 @@ export function PaletteEdit( {
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
+							elementKeys={ elementKeys }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
 							variant={ variant }
@@ -861,11 +965,11 @@ export function PaletteEdit( {
 							addColorRef={ addColorRef }
 						/>
 					) }
-					{ ! isEditing && editingElement !== null && (
+					{ ! isEditing && editingElement >= 0 && (
 						<ColorPickerPopover
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
-							onClose={ () => setEditingElement( null ) }
+							onClose={ () => setEditingElementKey( null ) }
 							onChange={ (
 								newElement: ( typeof elements )[ number ]
 							) => {
@@ -886,7 +990,7 @@ export function PaletteEdit( {
 									)
 								);
 							} }
-							element={ elements[ editingElement ?? -1 ] }
+							element={ elements[ editingElement ] }
 							popoverProps={ popoverProps }
 						/>
 					) }
@@ -917,7 +1021,10 @@ export function PaletteEdit( {
 						<ColorPalette
 							presentation="command-buttons"
 							aria-labelledby={ paletteLabelId }
-							colors={ colors }
+							colors={ colors.map( ( color, index ) => ( {
+								...color,
+								slug: elementKeys[ index ],
+							} ) ) }
 							onChange={ onSelectPaletteItem }
 							clearable={ false }
 							disableCustomColors
