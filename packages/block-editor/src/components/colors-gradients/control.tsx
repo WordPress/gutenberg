@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import type { ComponentProps } from 'react';
 import { __ } from '@wordpress/i18n';
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
@@ -24,6 +25,42 @@ const colorsAndGradientKeys = [
 ];
 
 const TAB_IDS = { color: 'color', gradient: 'gradient' };
+
+function ColorNoticeContainer( {
+	noticeProps,
+}: {
+	noticeProps?: NoticeProps;
+} ) {
+	const [ minHeight, setMinHeight ] = useState< number | undefined >(
+		undefined
+	);
+	const ref = useRef< HTMLDivElement >( null );
+
+	useLayoutEffect( () => {
+		if ( noticeProps && ref.current ) {
+			const height = ref.current.getBoundingClientRect().height;
+			if ( height > 0 ) {
+				setMinHeight( ( prev ) => Math.max( prev ?? 0, height ) );
+			}
+		}
+	}, [ noticeProps ] );
+
+	if ( ! noticeProps && minHeight === undefined ) {
+		return null;
+	}
+
+	return (
+		<div
+			ref={ ref }
+			className="block-editor-color-gradient-control__notice-container"
+			style={ minHeight ? { minHeight } : undefined }
+		>
+			{ noticeProps && (
+				<WCNotice isDismissible={ false } { ...noticeProps } />
+			) }
+		</div>
+	);
+}
 
 function ColorGradientControlInner( {
 	colors,
@@ -80,9 +117,7 @@ function ColorGradientControlInner( {
 		/>
 	);
 
-	const notice = noticeProps && (
-		<WCNotice isDismissible={ false } { ...noticeProps } />
-	);
+	const notice = <ColorNoticeContainer noticeProps={ noticeProps } />;
 
 	const tabPanels = {
 		// The `ColorPalette` must stay at a stable position in the tree whether
