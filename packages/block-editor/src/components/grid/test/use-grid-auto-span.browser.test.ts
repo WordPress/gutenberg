@@ -21,6 +21,7 @@ import {
 import { store as blockEditorStore } from '../../../store';
 import { useBlockElement } from '../../block-list/use-block-props/use-block-refs';
 import { useGridAutoSpan } from '../use-grid-auto-span';
+import type { Layout } from '../../../layouts/types';
 import type { GridItemAttributes } from '../types';
 
 vi.mock(
@@ -64,6 +65,14 @@ function getItemLayout( clientId: string ) {
 		select( blockEditorStore ).getBlockAttributes( clientId ) as
 			GridItemAttributes | undefined
 	 )?.style?.layout;
+}
+
+function getGridLayout( clientId: string ) {
+	return (
+		select( blockEditorStore ).getBlockAttributes( clientId ) as {
+			layout?: Layout;
+		} | null
+	 )?.layout;
 }
 
 function createItemElement( clientId: string, gridElement: HTMLElement ) {
@@ -376,6 +385,122 @@ describe( 'useGridAutoSpan', () => {
 				rowSpan: expectedSpan,
 			} );
 		}
+	} );
+
+	describe( 'automatic grid rows', () => {
+		const setItemContentHeight = async ( height: number ) => {
+			item.content.height = height;
+			await act( async () => {
+				await dispatch( blockEditorStore ).updateBlockAttributes(
+					childClientId,
+					{ content: `Content height: ${ height }px` }
+				);
+			} );
+			flushFrame();
+			flushFrame();
+		};
+
+		beforeEach( async () => {
+			await dispatch( blockEditorStore ).updateBlockAttributes(
+				childClientId,
+				{ style: { layout: { columnStart: 1, rowStart: 3 } } }
+			);
+			await renderHook( () =>
+				useGridAutoSpan( { clientId: gridClientId } )
+			);
+			flushFrame();
+		} );
+
+		it( 'adds rows when growing content extends beyond the last row', async () => {
+			expect( getItemLayout( childClientId )?.rowSpan ).toBeUndefined();
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 3 );
+
+			for ( const [ height, rowSpan, rowCount ] of [
+				[ 150, 2, 4 ],
+				[ 250, 3, 5 ],
+			] ) {
+				await setItemContentHeight( height );
+				expect( getItemLayout( childClientId ) ).toMatchObject( {
+					rowStart: 3,
+					rowSpan,
+				} );
+				expect( getGridLayout( gridClientId )?.rowCount ).toBe(
+					rowCount
+				);
+			}
+		} );
+
+		it( 'removes automatically added rows when content shrinks', async () => {
+			await setItemContentHeight( 350 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBe( 4 );
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 6 );
+
+			await setItemContentHeight( 50 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBeUndefined();
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 3 );
+		} );
+
+		it( 'preserves user-added rows when content shrinks', async () => {
+			await act( async () => {
+				await dispatch( blockEditorStore ).updateBlockAttributes(
+					gridClientId,
+					{
+						layout: {
+							...getGridLayout( gridClientId ),
+							rowCount: 4,
+						},
+					}
+				);
+			} );
+			MockResizeObserver.instances[ 0 ].resize( gridElement );
+			flushFrame();
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 4 );
+
+			await setItemContentHeight( 350 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBe( 4 );
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 6 );
+
+			await setItemContentHeight( 50 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBeUndefined();
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 4 );
+		} );
+
+		it( 'keeps rows still occupied by other blocks when one block shrinks', async () => {
+			const otherChild = createBlock( BLOCK_NAME, {
+				style: { layout: { columnStart: 2, rowStart: 5 } },
+			} );
+			const otherItem = createItemElement(
+				otherChild.clientId,
+				gridElement
+			);
+			otherItem.content.height = 150;
+			await act( async () => {
+				await dispatch( blockEditorStore ).insertBlock(
+					otherChild,
+					1,
+					gridClientId
+				);
+			} );
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( otherChild.clientId ) ).toMatchObject( {
+				rowStart: 5,
+				rowSpan: 2,
+			} );
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 6 );
+
+			await setItemContentHeight( 450 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBe( 5 );
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 7 );
+
+			await setItemContentHeight( 50 );
+			expect( getItemLayout( childClientId )?.rowSpan ).toBeUndefined();
+			expect( getItemLayout( otherChild.clientId ) ).toMatchObject( {
+				rowStart: 5,
+				rowSpan: 2,
+			} );
+			expect( getGridLayout( gridClientId )?.rowCount ).toBe( 6 );
+		} );
 	} );
 
 	it( 'keeps observing blocks as content and grid children change', async () => {
