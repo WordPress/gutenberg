@@ -1,139 +1,132 @@
 <?php
 /**
- * Tests that the note mention kses allowance is scoped to `note` comments.
+ * Tests the note mention kses allowance.
  *
- * The `<a class="wp-note-mention user-N" href="…">` markup must survive
- * sanitization when a note is written by a user without `unfiltered_html`,
- * while the sanitization of every other comment type - which reaches back to
- * anonymous front-end comments - stays byte-identical to core's defaults.
+ * The `<span class="wp-note-mention user-N">` mention chip must survive
+ * sanitization when a note is written by a user without `unfiltered_html`.
+ * The allowance is always on - it applies to every comment type - but it is
+ * narrow: `span` may only carry the two mention class tokens, and every other
+ * tag and attribute is sanitized exactly as by core's defaults.
  *
  * @group notes
  */
 class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
-	/*
-	 * The mention href is external to the test site so that core's
-	 * wp_rel_ugc() 'pre_comment_content' filter - which applies to notes like
-	 * any other comment - deterministically appends `rel="nofollow ugc"`
-	 * regardless of the test environment's home URL.
-	 */
-	const MENTION_CONTENT  = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/">@admin</a>!';
-	const MENTION_FILTERED = 'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
-	const STRIPPED_CONTENT = 'Hi <a href="https://example.com/author/admin/" rel="nofollow ugc">@admin</a>!';
+	const MENTION_CONTENT = 'Hi <span class="wp-note-mention user-2">@admin</span>!';
 
 	public function test_mention_markup_survives_note_content_filtering() {
 		$filtered = $this->filter_comment_with_kses( 'note' );
 
-		$this->assertSame( self::MENTION_FILTERED, wp_unslash( $filtered['comment_content'] ) );
+		$this->assertSame( self::MENTION_CONTENT, wp_unslash( $filtered['comment_content'] ) );
 	}
 
-	public function test_mention_markup_stripped_from_regular_comment_content() {
+	public function test_mention_markup_survives_regular_comment_content_filtering() {
+		// The allowance is always on rather than armed per note write: the
+		// mention markup is inert, so uniform sanitization beats stateful
+		// per-comment-type kses arming.
 		$filtered = $this->filter_comment_with_kses( 'comment' );
 
-		$this->assertSame( self::STRIPPED_CONTENT, wp_unslash( $filtered['comment_content'] ) );
+		$this->assertSame( self::MENTION_CONTENT, wp_unslash( $filtered['comment_content'] ) );
 	}
 
-	public function test_only_default_link_attributes_and_class_are_allowed_on_note_links() {
+	public function test_comment_kses_strips_mention_span_by_default() {
+		// Baseline proving the allowance is required at all: without the
+		// notes filter, the comment kses context strips `span` entirely.
+		// WordPress trunk ships the allowance natively (see r62832), hooked
+		// as `_wp_kses_allow_note_mention_span`, so detach that one too.
+		remove_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_span' );
+		remove_filter( 'wp_kses_allowed_html', '_wp_kses_allow_note_mention_span' );
+
+		$stripped = wp_kses( self::MENTION_CONTENT, 'pre_comment_content' );
+
+		$this->assertSame( 'Hi @admin!', $stripped );
+	}
+
+	public function test_class_tokens_beyond_the_mention_tokens_are_stripped() {
 		$filtered = $this->filter_comment_with_kses(
 			'note',
-			'Hi <a class="wp-note-mention user-2" href="https://example.com/author/admin/" data-user-id="2" onclick="alert(1)" style="color:red">@admin</a>!'
+			'Hi <span class="wp-note-mention user-2 is-destructive components-button">@admin</span>!'
 		);
 
 		$this->assertSame(
-			self::MENTION_FILTERED,
+			self::MENTION_CONTENT,
 			wp_unslash( $filtered['comment_content'] ),
-			'Attributes beyond `class` and the default link attributes should be stripped from note links.'
+			'Class tokens beyond `wp-note-mention` and `user-N` should be stripped from spans.'
 		);
 	}
 
-	public function test_mention_allowance_does_not_leak_after_note_filtering() {
-		$this->filter_comment_with_kses( 'note' );
+	public function test_class_tokens_are_stripped_from_uppercase_span_tags() {
+		// kses preserves tag-name casing, so the class reduction must match
+		// `SPAN` case-insensitively rather than bail on a `<span` substring check.
+		$filtered = $this->filter_comment_with_kses(
+			'note',
+			'Hi <SPAN class="wp-note-mention user-2 is-destructive">@admin</SPAN>!'
+		);
 
-		// A regular comment filtered after a note still gets the default rules.
-		$filtered = $this->filter_comment_with_kses( 'comment' );
+		$this->assertEqualHTML(
+			self::MENTION_CONTENT,
+			wp_unslash( $filtered['comment_content'] ),
+			'<body>',
+			'Class tokens should be reduced on spans regardless of tag-name casing.'
+		);
+	}
+
+	public function test_class_attribute_is_removed_when_no_mention_tokens_remain() {
+		$filtered = $this->filter_comment_with_kses(
+			'comment',
+			'Hi <span class="is-destructive user-0 user-x wp-note-mention-foo">there</span>!'
+		);
+
+		// Markup-equivalence assertion: the HTML API's whitespace handling
+		// when removing the final attribute is not part of its contract.
+		$this->assertEqualHTML(
+			'Hi <span>there</span>!',
+			wp_unslash( $filtered['comment_content'] ),
+			'<body>',
+			'A span with no valid mention tokens should lose its class attribute entirely.'
+		);
+	}
+
+	public function test_other_span_attributes_are_stripped() {
+		$filtered = $this->filter_comment_with_kses(
+			'note',
+			'Hi <span class="wp-note-mention user-2" data-user-id="2" onclick="alert(1)" style="color:red" id="mention">@admin</span>!'
+		);
+
 		$this->assertSame(
-			self::STRIPPED_CONTENT,
+			self::MENTION_CONTENT,
 			wp_unslash( $filtered['comment_content'] ),
-			'The mention markup should be stripped from a regular comment filtered after a note.'
-		);
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'The allowlist filter should not outlive the note write that armed it.'
-		);
-		$this->assertFalse(
-			has_filter( 'pre_comment_content', 'gutenberg_notes_disarm_mention_kses' ),
-			'The disarm filter should remove itself.'
-		);
-		$this->assertFalse(
-			has_filter( 'rest_request_after_callbacks', 'gutenberg_notes_disarm_mention_kses' ),
-			'The disarm backstop should remove itself.'
+			'Attributes beyond `class` should be stripped from spans.'
 		);
 	}
 
-	public function test_rest_prepare_arms_for_note_update() {
-		$post_id = self::factory()->post->create();
-		$note_id = self::factory()->comment->create(
-			array(
-				'comment_post_ID' => $post_id,
-				'comment_type'    => 'note',
-			)
+	public function test_class_is_still_stripped_from_other_tags() {
+		$filtered = $this->filter_comment_with_kses(
+			'note',
+			'Hi <a class="wp-note-mention user-2" href="https://example.com/">@admin</a>!'
 		);
 
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
-		$request->set_param( 'id', $note_id );
-
-		// Updates do not carry the comment type in the prepared data.
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertNotFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Updating a note should arm the mention allowance.'
-		);
-
-		gutenberg_notes_disarm_mention_kses();
-	}
-
-	public function test_rest_prepare_arms_for_note_creation() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'type', 'note' );
-
-		// On creation the prepared data does not carry the comment type either:
-		// the controller only copies the `type` param in after preparing.
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertNotFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Creating a note should arm the mention allowance.'
-		);
-
-		gutenberg_notes_disarm_mention_kses();
-	}
-
-	public function test_rest_prepare_does_not_arm_for_regular_comment_creation() {
-		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'type', 'comment' );
-
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Creating a regular comment should not arm the mention allowance.'
+		$this->assertSame(
+			'Hi <a href="https://example.com/" rel="nofollow ugc">@admin</a>!',
+			wp_unslash( $filtered['comment_content'] ),
+			'The class allowance is scoped to spans; links keep core\'s default sanitization.'
 		);
 	}
 
-	public function test_rest_prepare_does_not_arm_for_regular_comment_update() {
-		$post_id    = self::factory()->post->create();
-		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
+	public function test_class_reduction_skipped_when_restrictive_kses_is_inactive() {
+		// Users with `unfiltered_html` are filtered through
+		// `wp_filter_post_kses` (or not at all); the mention class reduction
+		// must not narrow what core allows them to post. kses_init() hooks
+		// wp_filter_kses by default in the test environment, so detach it to
+		// simulate the unfiltered_html configuration.
+		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
-		$request->set_param( 'id', $comment_id );
+		$content = 'Hi <span class="components-button is-destructive">there</span>!';
 
-		gutenberg_notes_scope_mention_kses_rest( array(), $request );
-
-		$this->assertFalse(
-			has_filter( 'wp_kses_allowed_html', 'gutenberg_notes_allow_mention_attributes' ),
-			'Updating a regular comment should not arm the mention allowance.'
+		$this->assertSame(
+			wp_slash( $content ),
+			gutenberg_notes_sanitize_mention_classes( wp_slash( $content ) ),
+			'Span classes should be left untouched when wp_filter_kses is not active.'
 		);
 	}
 
@@ -159,7 +152,7 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 
 		$this->assertIsInt( $comment_id );
-		$this->assertSame( self::MENTION_FILTERED, get_comment( $comment_id )->comment_content );
+		$this->assertSame( self::MENTION_CONTENT, get_comment( $comment_id )->comment_content );
 	}
 
 	public function test_mention_markup_survives_rest_note_creation_end_to_end() {
@@ -180,13 +173,12 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 
 		/*
 		 * REST creation reaches kses through wp_filter_comment() directly, not
-		 * through wp_new_comment() and its 'preprocess_comment' filter, so the
-		 * REST-specific arming must cover it or mentions written by users
-		 * without `unfiltered_html` are silently stripped on save.
+		 * through wp_new_comment(), so this proves the always-on allowance
+		 * covers the REST write path too.
 		 */
 		$data = $response->get_data();
 		$this->assertSame(
-			self::MENTION_FILTERED,
+			self::MENTION_CONTENT,
 			get_comment( (int) $data['id'] )->comment_content
 		);
 	}
@@ -194,9 +186,8 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	/**
 	 * Runs commentdata of the given type through the insert-path sanitization.
 	 *
-	 * Mirrors wp_new_comment(): the 'preprocess_comment' filter (which arms the
-	 * allowance for notes) followed by wp_filter_comment() with kses attached as
-	 * it is for users without `unfiltered_html`.
+	 * Mirrors wp_new_comment(): wp_filter_comment() with kses attached as it
+	 * is for users without `unfiltered_html`.
 	 *
 	 * @param string $comment_type The comment type to filter.
 	 * @param string $content      Optional. The comment content to filter.
@@ -205,8 +196,7 @@ class Tests_Notes_Mention_Kses extends WP_UnitTestCase {
 	private function filter_comment_with_kses( $comment_type, $content = self::MENTION_CONTENT ) {
 		add_filter( 'pre_comment_content', 'wp_filter_kses' );
 
-		$commentdata = apply_filters( 'preprocess_comment', wp_slash( $this->get_commentdata( $comment_type, $content ) ) );
-		$filtered    = wp_filter_comment( $commentdata );
+		$filtered = wp_filter_comment( wp_slash( $this->get_commentdata( $comment_type, $content ) ) );
 
 		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type * as React from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 
 type PolymorphicElementProps< T extends React.ElementType > = Omit<

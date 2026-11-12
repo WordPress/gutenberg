@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -18,10 +15,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
-
-/**
- * Internal dependencies
- */
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -37,17 +30,32 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
+/**
+ * The synced patterns the inserter offers: every pattern the user can read.
+ *
+ * They load in the `view` context. The `edit` context only includes the
+ * patterns the user can edit, and an author can still use an administrator's
+ * pattern. Every pattern the user can edit, they can also read.
+ *
+ * @param {(store: Object) => Object} select Registry select.
+ * @return {?Object[]} Pattern records, or null while loading.
+ */
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
 	return getEntityRecords( 'postType', 'wp_block', {
 		per_page: -1,
+		context: 'view',
 		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	} );
 }
 
 function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
+}
+
+function currentUserIdSelect( select ) {
+	return select( coreStore ).getCurrentUser()?.id;
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -58,6 +66,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalGlobalStylesBaseStyles',
 	'allImageSizes',
 	'alignWide',
+	'blockStatesEditingEnabled',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
 	'allowedMimeTypes',
@@ -109,6 +118,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
@@ -139,6 +149,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -217,6 +228,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				bigImageSizeThreshold: baseData?.image_size_threshold,
 				imageStripMeta: baseData?.image_strip_meta,
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
+				generateAnimatedImageSubsizes:
+					baseData?.generate_animated_image_subsizes,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -261,7 +274,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 								'postType',
 								'wp_template_part',
 								postId
-						  )?.area === 'navigation-overlay'
+							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
 			};
@@ -351,8 +364,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		return settings.allowedBlockTypes;
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
-	const forceDisableFocusMode = settings.focusMode === false;
-
 	// The "Attachments" media category depends on the edited post and its post
 	// type label (which gates whether it's offered and words its copy), so the
 	// categories are derived rather than being a static list.
@@ -375,9 +386,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			bigImageSizeThreshold,
 			imageStripMeta,
 			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
 			allowedBlockTypes,
 			allowRightClickOverrides,
-			focusMode: focusMode && ! forceDisableFocusMode,
+			focusMode,
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
@@ -391,8 +403,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( { id, onUpdate, onClose } ) =>
-				openMediaEditorModal( { id, onUpdate, onClose } ),
+			[ openMediaEditorModalKey ]: ( {
+				id,
+				onUpdate,
+				onUndo,
+				onClose,
+			} ) => openMediaEditorModal( { id, onUpdate, onUndo, onClose } ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -413,6 +429,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
@@ -442,10 +459,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			[ sectionRootClientIdKey ]: sectionRootClientId,
-			editorTool:
-				renderingMode === 'post-only' && postType !== 'wp_template'
-					? 'edit'
-					: undefined,
 			// When editing template parts, patterns, or navigation directly,
 			// we're in an isolated editing context (focused on that entity alone).
 			[ isIsolatedEditorKey ]: [
@@ -473,7 +486,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,
-		forceDisableFocusMode,
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
@@ -501,6 +513,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
 	] );
 }

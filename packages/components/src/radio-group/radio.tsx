@@ -1,16 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { RadioGroupContext } from './context';
 import type { WordPressComponentProps } from '../context';

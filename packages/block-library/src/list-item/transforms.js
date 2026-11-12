@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, cloneBlock } from '@wordpress/blocks';
 
 const transforms = {

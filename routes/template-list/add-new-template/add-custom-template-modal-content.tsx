@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -18,10 +15,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { safeDecodeURI } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY: any[] = [];
@@ -214,7 +207,7 @@ interface AddCustomTemplateModalContentProps {
 	onSelect: ( template: any ) => void;
 	entityForSuggestions: EntityForSuggestions;
 	onBack: () => void;
-	containerRef: React.RefObject< HTMLDivElement >;
+	containerRef: React.RefObject< HTMLDivElement | null >;
 }
 
 function AddCustomTemplateModalContent( {

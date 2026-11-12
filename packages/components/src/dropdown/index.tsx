@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { contextConnect, useContextSystem } from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';

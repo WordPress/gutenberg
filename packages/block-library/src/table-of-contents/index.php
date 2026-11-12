@@ -14,7 +14,7 @@ const BLOCK_CORE_TABLE_OF_CONTENTS_DEFAULT_HEADING_LEVEL = 2;
  * Adds an aria-label to the table of contents block content.
  *
  * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param string $content    Content of the block being rendered.
  *
  * @return string The content of the block being rendered.
  */
@@ -137,6 +137,9 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	}
 
 	$content = preg_replace( '/<br\s*\/?>/i', ' ', $rendered_heading );
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the ToC entry.
+	$content = preg_replace( '/<annotation(?:\s[^>]*)?>.*?<\/annotation>/is', '', $content );
 	// Decode entities from rendered heading HTML before the ToC escapes them
 	// once. Use html_entity_decode() because wp_specialchars_decode() only
 	// handles special HTML characters, while headings can contain other named
@@ -177,7 +180,7 @@ function block_core_table_of_contents_normalize_heading_context( $content, $cont
 		$context,
 		array(
 			'current_page'              => 1,
-			'is_paginated'              => false !== strpos( $content, '<!--nextpage-->' ),
+			'is_paginated'              => str_contains( $content, '<!--nextpage-->' ),
 			'only_include_current_page' => false,
 			'permalink'                 => '',
 			'target_page'               => 1,
@@ -363,20 +366,46 @@ function block_core_table_of_contents_build_list_items( $nested_headings, $list_
 /**
  * Renders the table of contents block from current post headings.
  *
- * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param array         $attributes Attributes of the block being rendered.
+ * @param string        $content    Content of the block being rendered.
+ * @param WP_Block|null $block      Block instance.
  *
  * @return string The content of the block being rendered.
  */
-function block_core_table_of_contents_render( $attributes, $content ) {
+function block_core_table_of_contents_render( $attributes, $content, $block = null ) {
 	global $wp_current_filter;
 
-	if ( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) {
-		return block_core_table_of_contents_add_aria_label( $attributes, $content );
+	// Preserve legacy saved markup for old posts that have not been edited and migrated yet.
+	$legacy_content = $content;
+	if ( '' === trim( $legacy_content ) && ! empty( $block->parsed_block['innerHTML'] ) ) {
+		$legacy_content = $block->parsed_block['innerHTML'];
 	}
 
+	// Once a post is edited and saved, the block migrates to dynamic rendering.
+	if ( '' !== trim( $legacy_content ) ) {
+		return block_core_table_of_contents_add_aria_label( $attributes, $legacy_content );
+	}
+
+	if ( empty( $block->context['postId'] ) ) {
+		return '';
+	}
+
+	// Outside post content, e.g. in a template, `postId` falls back to the
+	// global post. That is only the post being viewed on singular views; on
+	// archives it would be the first post of the list.
+	$is_in_post_content = is_array( $wp_current_filter ) && in_array( 'the_content', $wp_current_filter, true );
+	if ( ! $is_in_post_content && ! is_singular() ) {
+		return '';
+	}
+
+	// On Preview, WordPress applies the unsaved changes to the global post
+	// only, so read it when it is the post in context. Loading the post by
+	// ID would read the saved version.
 	$post = get_post();
-	if ( ! $post ) {
+	if ( ! $post || (int) $block->context['postId'] !== $post->ID ) {
+		$post = get_post( $block->context['postId'] );
+	}
+	if ( ! $post || post_password_required( $post ) ) {
 		return '';
 	}
 

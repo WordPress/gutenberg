@@ -1,14 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
+	createContext,
+	useContext,
 	useState,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useSyncExternalStore,
 } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
+import { getBlockType } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
@@ -16,31 +19,39 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as interfaceStore } from '@wordpress/interface';
-import { RichTextData, create } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { NOTE_FORMAT_NAME } from './format';
 import {
-	applyNoteFormat,
-	calculateNotePositions,
-	findNoteInBlock,
-	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	removeNoteFormat,
 	removeNoteIdFromMetadata,
-} from './utils';
+} from './utils/metadata';
+import { getTextAttributeKey, toRecord } from './utils/rich-text';
+import {
+	findNoteInBlock,
+	getBlockLevelClientIds,
+	getInlineMarkerStart,
+	getNoteRanges,
+	removeInlineNote,
+	wrapInlineNote,
+} from './utils/note-anchor';
+import {
+	getCaretChange,
+	getNoteAtCaret,
+	hasBlockDraft,
+	pickNoteForCaret,
+} from './utils/note-selection';
+import { focusNoteThread } from './utils/dom';
+import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+/**
+ * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
+ */
+export const NoteDraftsContext = createContext();
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -77,15 +88,21 @@ export function useNoteThreads( postId ) {
 		 * types returned by the comments REST endpoint.
 		 */
 		const blocksWithNotes = {};
-		const clientIdByNoteId = new Map();
+		// Duplicating or splitting a block copies its notes, so a note can
+		// belong to several blocks.
+		const clientIdsByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
-			if ( noteIds.length > 0 ) {
-				blocksWithNotes[ clientId ] = noteIds;
-				for ( const noteId of noteIds ) {
-					clientIdByNoteId.set( noteId, clientId );
+			if ( noteIds.length === 0 ) {
+				continue;
+			}
+			blocksWithNotes[ clientId ] = noteIds;
+			for ( const noteId of noteIds ) {
+				if ( ! clientIdsByNoteId.has( noteId ) ) {
+					clientIdsByNoteId.set( noteId, [] );
 				}
+				clientIdsByNoteId.get( noteId ).push( clientId );
 			}
 		}
 
@@ -94,13 +111,13 @@ export function useNoteThreads( postId ) {
 		const threadsById = new Map();
 		const rootThreads = [];
 		for ( const item of threads ) {
+			const blockClientIds =
+				( item.parent === 0 && clientIdsByNoteId.get( item.id ) ) || [];
 			const thread = {
 				...item,
 				reply: [],
-				blockClientId:
-					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
-						: null,
+				blockClientIds,
+				blockClientId: blockClientIds[ 0 ] ?? null,
 			};
 			threadsById.set( item.id, thread );
 			if ( item.parent === 0 ) {
@@ -133,7 +150,7 @@ export function useNoteThreads( postId ) {
 			const orderedThreads = noteIds
 				.map( ( noteId ) => {
 					const thread = threadsById.get( noteId );
-					if ( ! thread ) {
+					if ( ! thread || thread.blockClientId !== clientId ) {
 						return null;
 					}
 					return {
@@ -176,116 +193,44 @@ export function useNoteThreads( postId ) {
 	};
 }
 
-/**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
- *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
- */
-function readInlineSelection( getSelectionStart, getSelectionEnd ) {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
-	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
-}
-
-/**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
- *
- * @param {*}      value Existing block attribute value.
- * @param {number} id    New note id to embed as `data-id`.
- * @param {number} start Range start offset.
- * @param {number} end   Range end offset.
- * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
- */
-function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
-		return null;
-	}
-	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
-		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
-		start,
-		end
-	);
-	// Round-trip through HTML to normalise format references (applyNoteFormat
-	// leaves them un-normalised) so the stored value matches a fresh reload.
-	return RichTextData.fromHTMLString(
-		new RichTextData( record ).toHTMLString()
-	);
-}
-
-/**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
- *
- * @param {number}   noteId                      Note id whose marker to remove.
- * @param {Function} getClientIdsWithDescendants Block-editor selector.
- * @param {Function} getBlockAttributes          Block-editor selector.
- * @param {Function} updateBlockAttributes       Block-editor action.
- */
-function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
-) {
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
-		}
-		return;
-	}
-}
-
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
-		getClientIdsWithDescendants,
-		getSelectedBlockClientId,
+		getBlockCount,
+		getBlockName,
+		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
+		__unstableIsFullySelected: isFullySelected,
+		__unstableIsSelectionCollapsed: isSelectionCollapsed,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
+
+	// Splitting and merging store rich text as an HTML string, but the
+	// marker helpers only write rich text data.
+	const getNoteAttributes = ( clientId ) => {
+		const attributes = getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			return attributes;
+		}
+		const schema = getBlockType( getBlockName( clientId ) )?.attributes;
+		return Object.fromEntries(
+			Object.entries( attributes ).map( ( [ key, value ] ) => [
+				key,
+				typeof value === 'string' &&
+				schema?.[ key ]?.type === 'rich-text'
+					? RichTextData.fromHTMLString( value )
+					: value,
+			] )
+		);
+	};
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -298,15 +243,119 @@ export function useNoteActions() {
 		} );
 	};
 
+	/*
+	 * Update a note's anchor without an undo step, since undo can't bring the
+	 * note back with it. The last call flags the post as changed, so "Save
+	 * draft" turns on.
+	 */
+	const updateNoteAnchor = ( clientIds, attributes, options ) => {
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( clientIds, attributes, options );
+		__unstableMarkLastChangeAsPersistent();
+	};
+
+	const updateNoteAnchors = ( clientIds, getNewAttributes ) => {
+		const attributesByClientId = {};
+		for ( const clientId of clientIds ) {
+			const attributes = getNoteAttributes( clientId );
+			if ( ! attributes ) {
+				continue;
+			}
+			const newAttributes = getNewAttributes( attributes, clientId );
+			if ( newAttributes && Object.keys( newAttributes ).length > 0 ) {
+				attributesByClientId[ clientId ] = newAttributes;
+			}
+		}
+		const updatedClientIds = Object.keys( attributesByClientId );
+		if ( updatedClientIds.length > 0 ) {
+			updateNoteAnchor( updatedClientIds, attributesByClientId, {
+				uniqueByBlock: true,
+			} );
+		}
+	};
+
+	const removeNoteMarker = ( clientIds, noteId ) =>
+		updateNoteAnchors( clientIds, ( attributes ) => {
+			const removed = removeInlineNote( attributes, noteId );
+			return removed && { [ removed.attributeKey ]: removed.value };
+		} );
+
+	// A caret or whole blocks select no text.
+	const getSelectedNoteRanges = ( clientIds ) =>
+		isFullySelected() || isSelectionCollapsed()
+			? new Map()
+			: getNoteRanges( {
+					blocks: clientIds.map( ( clientId ) => ( {
+						clientId,
+						attributes: getNoteAttributes( clientId ),
+						attributeKey: getTextAttributeKey(
+							clientId,
+							getBlockName,
+							getBlockCount
+						),
+					} ) ),
+					selectionStart: getSelectionStart(),
+					selectionEnd: getSelectionEnd(),
+				} );
+
+	// A text block the selection gives no text, like the block a selection
+	// starts at the end of, isn't part of a new note, unless no block has any:
+	// the note then takes them all as whole blocks.
+	const getNoteClientIds = () => {
+		const clientIds = getSelectedBlockClientIds();
+		const ranges = getSelectedNoteRanges( clientIds );
+		const textClientIds = clientIds.filter( ( clientId ) => {
+			const range = ranges.get( clientId );
+			return ! range || range.start < range.end;
+		} );
+		return textClientIds.length ? textClientIds : clientIds;
+	};
+
+	// The draft marker (id `new`) wraps the text an unsent note is about, so
+	// the anchor follows edits until the note is sent.
+	const onDiscard = ( clientIds ) => removeNoteMarker( clientIds, 'new' );
+
+	// Starting again from another selection moves the marker. A caret or the
+	// whole block keeps it, so a block's unsent draft keeps its text; across
+	// blocks, a marker left by one block's draft isn't this note's.
+	const onStart = ( clientIds ) => {
+		const selectedClientIds = getSelectedBlockClientIds();
+		if (
+			clientIds[ 0 ] !== selectedClientIds[ 0 ] ||
+			clientIds.length !== selectedClientIds.length
+		) {
+			return;
+		}
+		const ranges = getSelectedNoteRanges( clientIds );
+		if ( ! ranges.size && clientIds.length === 1 ) {
+			return;
+		}
+		updateNoteAnchors( clientIds, ( attributes, clientId ) => {
+			const newAttributes = {};
+			const removed = removeInlineNote( attributes, 'new' );
+			if ( removed ) {
+				newAttributes[ removed.attributeKey ] = removed.value;
+			}
+			const range = ranges.get( clientId );
+			if ( range ) {
+				const { attributeKey, start, end } = range;
+				const value =
+					newAttributes[ attributeKey ] ?? attributes[ attributeKey ];
+				const wrapped =
+					start < end && wrapInlineNote( value, 'new', start, end );
+				if ( wrapped ) {
+					newAttributes[ attributeKey ] = wrapped;
+				}
+			}
+			return newAttributes;
+		} );
+	};
+
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture inline selection *before* the async save: focus may shift
-			// during the round-trip and the editor's stored selection can
-			// collapse if the user clicks elsewhere. The selection drives the
-			// in-content marker written below, which is the note's only anchor.
-			const inlineSelection = ! parent
-				? readInlineSelection( getSelectionStart, getSelectionEnd )
-				: null;
+			// Capture the target blocks *before* the async save: selection may
+			// shift during the round-trip, attaching the note to the wrong block.
+			const clientIds = ! parent ? getNoteClientIds() : [];
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -330,36 +379,28 @@ export function useNoteActions() {
 			 * https://github.com/WordPress/gutenberg/issues/74751.
 			 */
 			if ( ! parent && savedRecord?.id ) {
-				const clientId =
-					inlineSelection?.clientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return savedRecord;
-				}
-				const attributes = getBlockAttributes( clientId );
-				const metadata = attributes?.metadata;
-				const updatedMetadata = addNoteIdToMetadata(
-					metadata,
-					savedRecord.id
-				);
-				const newAttributes = {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				};
+				updateNoteAnchors( clientIds, ( attributes ) => {
+					const newAttributes = {
+						metadata: cleanEmptyObject(
+							addNoteIdToMetadata(
+								attributes.metadata,
+								savedRecord.id
+							)
+						),
+					};
 
-				// Inline path: also wrap the selected text with a core/note
-				// marker so the anchor survives later edits.
-				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
-						attributes?.[ inlineSelection.attributeKey ],
-						savedRecord.id,
-						inlineSelection.start,
-						inlineSelection.end
-					);
-					if ( wrapped ) {
-						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+					// Inline path: the draft marker becomes the note's marker.
+					const draft = removeInlineNote( attributes, 'new' );
+					if ( draft ) {
+						newAttributes[ draft.attributeKey ] = wrapInlineNote(
+							draft.value,
+							savedRecord.id,
+							draft.start,
+							draft.end
+						);
 					}
-				}
-
-				updateBlockAttributes( clientId, newAttributes );
+					return newAttributes;
+				} );
 			}
 
 			createNotice(
@@ -376,7 +417,8 @@ export function useNoteActions() {
 		}
 	};
 
-	const onEdit = async ( { id, content, status } ) => {
+	const onEdit = async ( note, { content, status } ) => {
+		const { id } = note;
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -406,19 +448,19 @@ export function useNoteActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newNoteData, {
-					throwOnError: true,
-				} );
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					newNoteData,
+					{
+						throwOnError: true,
+					}
+				);
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
 				if ( status === 'approved' ) {
-					clearInlineNoteMarker(
-						id,
-						getClientIdsWithDescendants,
-						getBlockAttributes,
-						updateBlockAttributes
-					);
+					removeNoteMarker( note.blockClientIds, id );
 				}
 
 				// The note visibly updates in place, so there is no snackbar,
@@ -428,66 +470,85 @@ export function useNoteActions() {
 						? __( 'Note marked as resolved.' )
 						: __( 'Note reopened.' )
 				);
-			} else {
-				const updateData = {
-					id,
-					content,
-					status,
-				};
 
-				await saveEntityRecord( 'root', 'comment', updateData, {
-					throwOnError: true,
-				} );
-
-				createNotice( 'snackbar', __( 'Note updated.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				return savedRecord;
 			}
+
+			const updateData = {
+				id,
+				content,
+				status,
+			};
+
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				updateData,
+				{
+					throwOnError: true,
+				}
+			);
+
+			createNotice( 'snackbar', __( 'Note updated.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
 	};
 
-	const onDelete = async ( note ) => {
+	const restoreNote = async ( noteId, anchors ) => {
 		try {
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
-				throwOnError: true,
-			} );
+			// Untrash first, so a failure doesn't leave an anchor without a note.
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{ id: noteId, status: 'untrash' },
+				{ throwOnError: true }
+			);
 
-			if ( ! note.parent ) {
-				// Use blockClientId if available, otherwise fall back to selected block.
-				const clientId =
-					note.blockClientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return;
-				}
-				const attributes = getBlockAttributes( clientId );
-				const newAttributes = {
-					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata(
-							attributes?.metadata,
-							note.id
-						)
-					),
-				};
-				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
-				const found = findNoteInBlock( attributes, note.id );
-				if ( found ) {
-					const next = removeNoteFormat(
-						attributes[ found.attributeKey ],
-						note.id
+			// No anchors (a reply or an orphan), or their blocks are gone:
+			// the note comes back on its own.
+			updateNoteAnchors( anchors.keys(), ( attributes, clientId ) => {
+				const newAttributes = {};
+				// The editor's undo may have brought the anchor back already.
+				if (
+					! getNoteIdsFromMetadata( attributes.metadata ).includes(
+						noteId
+					)
+				) {
+					newAttributes.metadata = addNoteIdToMetadata(
+						attributes.metadata,
+						noteId
 					);
-					if ( next ) {
-						newAttributes[ found.attributeKey ] = next;
+				}
+				const inline = anchors.get( clientId );
+				const value = inline && attributes[ inline.attributeKey ];
+				// Re-wrap only text that hasn't changed since the delete;
+				// otherwise the note comes back as a block-level note.
+				if (
+					inline &&
+					! findNoteInBlock( attributes, noteId ) &&
+					toRecord( value ).text.slice( inline.start, inline.end ) ===
+						inline.text
+				) {
+					const wrapped = wrapInlineNote(
+						value,
+						noteId,
+						inline.start,
+						inline.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inline.attributeKey ] = wrapped;
 					}
 				}
-				updateBlockAttributes( clientId, newAttributes );
-			}
+				return newAttributes;
+			} );
 
-			createNotice( 'snackbar', __( 'Note deleted.' ), {
+			createNotice( 'snackbar', __( 'Note restored.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
@@ -496,37 +557,450 @@ export function useNoteActions() {
 		}
 	};
 
-	return { onCreate, onEdit, onDelete };
+	const onDelete = async ( note ) => {
+		try {
+			// Without the trash, the note can only be deleted permanently,
+			// and there's nothing for Undo to bring back.
+			const canMoveToTrash = !! note._links?.[ 'wp:action-trash' ];
+			await deleteEntityRecord(
+				'root',
+				'comment',
+				note.id,
+				canMoveToTrash ? undefined : { force: true },
+				{ throwOnError: true }
+			);
+
+			// What Undo needs to re-attach the note to its blocks.
+			const anchors = new Map();
+			updateNoteAnchors(
+				note.blockClientIds,
+				( attributes, clientId ) => {
+					if (
+						! getNoteIdsFromMetadata(
+							attributes.metadata
+						).includes( note.id )
+					) {
+						return null;
+					}
+					const newAttributes = {
+						metadata: cleanEmptyObject(
+							removeNoteIdFromMetadata(
+								attributes.metadata,
+								note.id
+							)
+						),
+					};
+					// Strip the inline marker too (if any) so the deleted note's
+					// highlight doesn't linger in the content.
+					let inline = null;
+					const removed = removeInlineNote( attributes, note.id );
+					if ( removed ) {
+						const { value, ...anchor } = removed;
+						newAttributes[ anchor.attributeKey ] = value;
+						inline = anchor;
+					}
+					anchors.set( clientId, inline );
+					return newAttributes;
+				}
+			);
+
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+				actions: canMoveToTrash
+					? [
+							{
+								label: __( 'Undo' ),
+								onClick: () => restoreNote( note.id, anchors ),
+							},
+						]
+					: [],
+			} );
+
+			return true;
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
+	return { onStart, onDiscard, onCreate, onEdit, onDelete };
 }
 
-export function useEnableFloatingSidebar( enabled = false ) {
+/**
+ * Keeps a note form's unsent content, so it survives the form unmounting.
+ *
+ * @param {string|number} key The block client ID for a new note, or the note ID for a reply.
+ * @return {Object} The draft stored when the form mounted, its setter, and a check for a stored draft.
+ */
+export function useNoteDraft( key ) {
+	const drafts = useContext( NoteDraftsContext );
+	const [ initialValue ] = useState( () => drafts.get( key ) ?? '' );
+	const setDraft = ( content ) => {
+		if ( content ) {
+			drafts.set( key, content );
+		} else {
+			drafts.delete( key );
+		}
+	};
+	const hasDraft = () => drafts.has( key );
+	return { initialValue, setDraft, hasDraft };
+}
+
+/**
+ * Calls back when the caret moves, see `getCaretChange`. A store
+ * subscription, not `useSelect`: nothing renders from it.
+ *
+ * @param {(caret: Object) => void} onChange Receives `{ clientIds, previousClientIds, isBlockChange, attributes, noteAtCaret }`; `attributes` only while one block is selected.
+ */
+function useCaretChange( onChange ) {
 	const registry = useRegistry();
+	const handleChange = useEvent( onChange );
 	useEffect( () => {
-		if ( ! enabled ) {
+		const {
+			getBlockAttributes,
+			getSelectedBlockClientIds,
+			getSelectionStart,
+			getSelectionEnd,
+		} = registry.select( blockEditorStore );
+		const getSnapshot = () => {
+			const clientIds = getSelectedBlockClientIds();
+			return {
+				clientIds,
+				// The caret rules read one block's markers.
+				attributes:
+					clientIds.length === 1
+						? getBlockAttributes( clientIds[ 0 ] )
+						: undefined,
+				selectionStart: getSelectionStart(),
+				selectionEnd: getSelectionEnd(),
+			};
+		};
+		let snapshot = getSnapshot();
+		return registry.subscribe( () => {
+			const previous = snapshot;
+			snapshot = getSnapshot();
+			const change = getCaretChange( previous, snapshot );
+			if ( ! change ) {
+				return;
+			}
+			const { clientIds, attributes, selectionStart, selectionEnd } =
+				snapshot;
+			handleChange( {
+				clientIds,
+				previousClientIds: previous.clientIds,
+				isBlockChange: change.isBlockChange,
+				attributes,
+				noteAtCaret: getNoteAtCaret(
+					attributes,
+					selectionStart,
+					selectionEnd
+				),
+			} );
+		}, blockEditorStore );
+	}, [ registry, handleChange ] );
+}
+
+/**
+ * Syncs the selected note with the caret; see "Note selection" in the README.
+ *
+ * @param {Object}                        props
+ * @param {Array}                         props.notes     Threads shown in the sidebar.
+ * @param {Map}                           props.drafts    Unsent note drafts, see `NoteDraftsContext`.
+ * @param {(clientIds: string[]) => void} props.onDiscard Drops the draft marker of a form's blocks.
+ */
+export function useNoteSelection( { notes, drafts, onDiscard } ) {
+	const { getBlockAttributes, getBlockCount, getBlockName } =
+		useSelect( blockEditorStore );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+
+	useCaretChange( ( caret ) => {
+		const selectedNoteId = getSelectedNote();
+		// Duplicating or splitting selects the new block before `notes`
+		// re-renders with it, so read the block's notes from the store and
+		// count it among each note's blocks.
+		const [ clientId ] = caret.clientIds;
+		const blockNoteIds = getNoteIdsFromMetadata(
+			caret.attributes?.metadata
+		);
+		const isTextBlock = ( id ) =>
+			!! getTextAttributeKey( id, getBlockName, getBlockCount );
+		const noteId = pickNoteForCaret( {
+			...caret,
+			blockThreads: notes.filter(
+				( thread ) =>
+					blockNoteIds.includes( thread.id ) &&
+					getBlockLevelClientIds(
+						thread.id,
+						[ ...thread.blockClientIds, clientId ],
+						getBlockAttributes,
+						isTextBlock
+					).includes( clientId )
+			),
+			hasDraft: hasBlockDraft( drafts, caret.clientIds ),
+			selectedNoteId,
+		} );
+
+		// Leaving an empty new note form strips its draft marker.
+		const isLeavingForm =
+			selectedNoteId === 'new' &&
+			( caret.isBlockChange || noteId !== 'new' );
+		if (
+			isLeavingForm &&
+			! hasBlockDraft( drafts, caret.previousClientIds )
+		) {
+			onDiscard( caret.previousClientIds );
+		}
+
+		if ( noteId !== selectedNoteId ) {
+			selectNote( noteId );
+		}
+	} );
+}
+
+/**
+ * Selects a note from an explicit action. Selects its block first, so the
+ * caret events for the block change run before the note is set.
+ *
+ * @param {Object}                        props
+ * @param {Map}                           props.drafts    Unsent note drafts, see `NoteDraftsContext`.
+ * @param {(clientIds: string[]) => void} props.onDiscard Drops the draft marker of a form's blocks.
+ *
+ * @return {(noteId: number|string, clientId: ?string, options?: Object) => void} Picks a note, see `selectNote` for the options.
+ */
+export function usePickNote( { drafts, onDiscard } ) {
+	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
+	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	return ( noteId, clientId, options ) => {
+		const formClientIds = getSelectedBlockClientIds();
+		if ( clientId ) {
+			// A new note keeps the blocks it's added to selected.
+			if ( noteId !== 'new' || ! formClientIds.includes( clientId ) ) {
+				// `null`: don't move focus to the block.
+				selectBlock( clientId, null );
+			}
+			toggleBlockHighlight( clientId, true );
+		}
+
+		// No caret event strips the marker here, and the form unmounts before its focus-out runs.
+		if (
+			getSelectedNote() === 'new' &&
+			noteId !== 'new' &&
+			! hasBlockDraft( drafts, formClientIds )
+		) {
+			onDiscard( formClientIds );
+		}
+		selectNote( noteId, options );
+	};
+}
+
+/**
+ * Focuses the selected note's thread when the selection asks for it. Lives
+ * with the threads' DOM: the sidebar ref is only set once they render.
+ *
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef Ref to the sidebar element.
+ * @param {boolean} props.isPlaced   Whether the selected thread is positioned; focusing it earlier scrolls the canvas to the top.
+ */
+export function useNoteFocus( { sidebarRef, isPlaced } ) {
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectedNote, noteFocused } = useSelect( ( select ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			select( editorStore )
+		);
+		return {
+			selectedNote: getSelectedNote(),
+			noteFocused: isNoteFocused(),
+		};
+	}, [] );
+
+	useEffect( () => {
+		if ( ! noteFocused || ! selectedNote || ! isPlaced ) {
+			return;
+		}
+		focusNoteThread(
+			selectedNote,
+			sidebarRef.current,
+			selectedNote === 'new' ? '[role="textbox"]' : undefined
+		);
+		// Re-select without the flag so the focus happens once.
+		selectNote( selectedNote );
+	}, [ noteFocused, selectedNote, isPlaced, selectNote, sidebarRef ] );
+}
+
+const subscribeNoop = () => () => {};
+
+/**
+ * Extends the canvas past the lowest thread, or a short post can't scroll it
+ * into view. The canvas margin's CSS applies the property as the root's
+ * `min-height` (see `getCanvasMarginCSS`), so the room goes away with the
+ * margin. Keyed on the canvas, since a new document starts without it.
+ *
+ * @param {Object}       props
+ * @param {?HTMLElement} props.canvas        Canvas scroll container.
+ * @param {number}       props.contentHeight Content height that fits every thread.
+ * @param {boolean}      props.isFloating    Whether the notes float over the canvas.
+ */
+function useCanvasRoom( { canvas, contentHeight, isFloating } ) {
+	useLayoutEffect( () => {
+		if ( ! isFloating || ! canvas || ! contentHeight ) {
+			return;
+		}
+		// On the root element, where the margin's rule reads it, whichever
+		// element scrolls.
+		const root = canvas.ownerDocument.documentElement;
+		root.style.setProperty(
+			'--wp-editor-canvas-min-height',
+			`${ contentHeight }px`
+		);
+		return () => {
+			root.style.removeProperty( '--wp-editor-canvas-min-height' );
+		};
+	}, [ isFloating, canvas, contentHeight ] );
+}
+
+/**
+ * Mirrors the floating panel's scroll position with the canvas's. The panel
+ * is a real scroller with the canvas's scroll range, and notes are positioned
+ * in canvas content-space, so the panel's own scroll moves them with the
+ * canvas, and wheel, keys, focus and `scrollIntoView()` all work natively.
+ *
+ * @param {Object}       props
+ * @param {Object}       props.sidebarRef Ref to the floating panel.
+ * @param {?HTMLElement} props.canvas     Canvas scroll container.
+ * @param {boolean}      props.isFloating Whether the notes float over the canvas.
+ */
+function useMirroredScroll( { sidebarRef, canvas, isFloating } ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel || ! canvas ) {
 			return;
 		}
 
-		const { getActiveComplementaryArea } =
-			registry.select( interfaceStore );
-		const { disableComplementaryArea, enableComplementaryArea } =
-			registry.dispatch( interfaceStore );
+		const isNear = ( a, b ) => Math.abs( a - b ) < 1;
 
-		const unsubscribe = registry.subscribe( () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		} );
-
-		return () => {
-			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+		let range;
+		const syncRange = () => {
+			const next = canvas.scrollHeight - canvas.clientHeight;
+			if ( next !== range ) {
+				range = next;
+				panel.style.setProperty(
+					'--canvas-scroll-range',
+					`${ next }px`
+				);
 			}
 		};
-	}, [ enabled, registry ] );
+
+		// A programmatic scroll fires its own `scroll` event a frame later,
+		// by which time the other side may have scrolled on (the compositor
+		// scrolls ahead of the main thread). Each side remembers where it was
+		// scrolled to and ignores that echo, or it would drag the other side
+		// back on every frame.
+		let panelEcho = -1;
+		let canvasEcho = -1;
+
+		// `instant` overrides a theme's `scroll-behavior: smooth`, which
+		// would animate every sync.
+		const scrollPanelTo = ( top ) => {
+			panel.scrollTo( { top, behavior: 'instant' } );
+			panelEcho = panel.scrollTop;
+		};
+		const fromCanvas = () => {
+			const top = canvas.scrollTop;
+			const isEcho = isNear( top, canvasEcho );
+			canvasEcho = -1;
+			if ( ! isEcho && ! isNear( panel.scrollTop, top ) ) {
+				scrollPanelTo( top );
+			}
+		};
+		// The canvas owns the position: when it can't follow (its room for
+		// a newly expanded thread isn't there yet), the panel snaps back.
+		const fromPanel = () => {
+			const top = panel.scrollTop;
+			const isEcho = isNear( top, panelEcho );
+			panelEcho = -1;
+			if ( isEcho || isNear( canvas.scrollTop, top ) ) {
+				return;
+			}
+			canvas.scrollTo( { top, behavior: 'instant' } );
+			canvasEcho = canvas.scrollTop;
+			if ( ! isNear( canvasEcho, top ) ) {
+				scrollPanelTo( canvasEcho );
+			}
+		};
+		syncRange();
+		fromCanvas();
+
+		// Range only: a clamped scroller fires its own scroll event, and
+		// syncing positions here would undo a panel scroll whose event is
+		// still pending. The body is observed too, since a theme's
+		// `html { height: 100% }` keeps the root box fixed as content grows.
+		const { body, defaultView: view } = canvas.ownerDocument;
+		const resizeObserver = new window.ResizeObserver( syncRange );
+		resizeObserver.observe( canvas );
+		resizeObserver.observe( body );
+		resizeObserver.observe( panel );
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		// Scrollable blocks fire there too, and are skipped.
+		const onCanvasScroll = ( event ) => {
+			if (
+				event.target === canvas ||
+				event.target === canvas.ownerDocument
+			) {
+				fromCanvas();
+			}
+		};
+		const listenerOptions = { passive: true, capture: true };
+		view.addEventListener( 'scroll', onCanvasScroll, listenerOptions );
+		panel.addEventListener( 'scroll', fromPanel, { passive: true } );
+		return () => {
+			resizeObserver.disconnect();
+			view.removeEventListener(
+				'scroll',
+				onCanvasScroll,
+				listenerOptions
+			);
+			panel.removeEventListener( 'scroll', fromPanel );
+			panel.style.removeProperty( '--canvas-scroll-range' );
+		};
+	}, [ sidebarRef, isFloating, canvas ] );
+}
+
+/**
+ * Offsets the threads by the canvas frame and its scrollbar.
+ *
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef     Ref to the floating panel.
+ * @param {number}  props.frameOffset    Canvas frame top, relative to the panel.
+ * @param {number}  props.scrollbarWidth Width of the canvas scrollbar.
+ * @param {boolean} props.isFloating     Whether the notes float over the canvas.
+ */
+function usePanelOffsets( {
+	sidebarRef,
+	frameOffset,
+	scrollbarWidth,
+	isFloating,
+} ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel ) {
+			return;
+		}
+		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
+		panel.style.setProperty(
+			'--canvas-scrollbar-width',
+			`${ scrollbarWidth }px`
+		);
+		return () => {
+			panel.style.removeProperty( '--canvas-offset' );
+			panel.style.removeProperty( '--canvas-scrollbar-width' );
+		};
+	}, [ sidebarRef, isFloating, frameOffset, scrollbarWidth ] );
 }
 
 export function useFloatingBoard( {
@@ -535,60 +1009,40 @@ export function useFloatingBoard( {
 	isFloating,
 	sidebarRef,
 } ) {
-	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
 
-	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
+	// Only floating mode needs measurements; without a subscriber the store
+	// drops its observer.
+	const { heights, anchorRects, canvas, frameOffset, scrollbarWidth } =
+		useSyncExternalStore(
+			isFloating ? store.subscribe : subscribeNoop,
+			store.getSnapshot
+		);
 
-	// Notes are positioned in canvas content-space; CSS inherits
-	// `--canvas-scroll` to translate each thread in sync with the canvas.
-	useEffect( () => {
-		if ( ! isFloating || ! sidebarRef?.current ) {
-			return;
-		}
+	// Moving blocks shifts anchors without resizing anything or re-registering.
+	useLayoutEffect( () => {
+		store.requestMeasure();
+	}, [ store, threads ] );
 
-		const panel = sidebarRef.current;
-		const blockEl = store.getFirstBlockElement();
-		// Climb to the block-list root so nested scroll containers
-		// (e.g. a Group with overflow:auto) don't shadow the canvas.
-		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
-		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
-
-		const applyScroll = () => {
-			panel.style.setProperty(
-				'--canvas-scroll',
-				`${ -( canvas?.scrollTop ?? 0 ) }px`
-			);
-		};
-
-		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		const rafId = window.requestAnimationFrame( () => {
-			const result = calculateNotePositions( {
+	// Derived during render, so a resize reaches the screen in the same paint.
+	const { positions: notePositions, contentHeight } = useMemo(
+		() =>
+			getThreadLayout( {
 				threads,
 				selectedNoteId,
-				blockRects: store.getBlockRects(),
+				blockRects: anchorRects,
 				heights,
-				scrollTop: canvas?.scrollTop ?? 0,
-			} );
+			} ),
+		[ threads, selectedNoteId, anchorRects, heights ]
+	);
 
-			setNotePositions( result.positions );
-			applyScroll();
-		} );
-
-		// Root scrolling elements (documentElement/body) don't fire scroll
-		// on themselves; capture on the window catches them in either canvas.
-		const view = canvas?.ownerDocument?.defaultView;
-		const listenerOptions = { passive: true, capture: true };
-		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
-
-		return () => {
-			window.cancelAnimationFrame( rafId );
-			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
-		};
-	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+	useCanvasRoom( { canvas, contentHeight, isFloating } );
+	useMirroredScroll( { sidebarRef, canvas, isFloating } );
+	usePanelOffsets( { sidebarRef, frameOffset, scrollbarWidth, isFloating } );
 
 	return {
 		notePositions,
+		heights,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};

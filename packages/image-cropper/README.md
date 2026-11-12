@@ -1,20 +1,24 @@
 # Image Cropper
 
+<div class="callout callout-warning">
+This package is deprecated and will be removed in a later release. It remains available so existing imports keep working. New code should use <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/image-editor/README.md"><code>@wordpress/image-editor</code></a>, which has the canvas and controller the media editor is built on. The one consumer in this repository, <code>wp.blockEditor.__experimentalImageEditor</code>, is deprecated too.
+</div>
+
 An implementation of [react-easy-crop](https://www.npmjs.com/package/react-easy-crop).
 
 ## Current features
 
--   **Image Cropping**: Interactive aspect ratio-based crop area with drag and resize functionality
--   **Rotation**: Rotate images in 90-degree increments
--   **Zoom Control**: Zoom in/out with configurable min/max limits
--   **Aspect Ratio**: Set and maintain specific aspect ratios
--   **Flip Controls**: Horizontal and vertical image flipping
--   **State Management**: Centralized state management with React Context
--   **Custom Reset State**: Configure custom initial states for reset operations
+- **Image Cropping**: Interactive aspect ratio-based crop area with drag and resize functionality
+- **Rotation**: Rotate images in 90-degree increments
+- **Zoom Control**: Zoom in/out with configurable min/max limits
+- **Aspect Ratio**: Set and maintain specific aspect ratios
+- **Flip Controls**: Horizontal and vertical image flipping
+- **State Management**: Centralized state management with React Context
+- **Custom Reset State**: Configure custom initial states for reset operations
 
 ## Future features
 
--   [ ] Freeform cropping
+- [ ] Freeform cropping
 
 ## Installation
 
@@ -28,7 +32,7 @@ npm install @wordpress/image-cropper --save
 
 ### Components
 
--   `ImageCropper` - The main cropping component that provides the cropping canvas.
+- `ImageCropper` - The main cropping component that provides the cropping canvas.
 
 ```tsx
 interface ImageCropperProps {
@@ -39,11 +43,11 @@ interface ImageCropperProps {
 }
 ```
 
--   `ImageCropperProvider` - Context provider for state management. This component implements the React Context pattern to share cropper state across your application. It manages all internal cropper state including crop position, zoom levels, rotation, flip transformations, aspect ratios, and media dimensions. Any component that needs to read or modify cropper state must be a descendant of this provider. The provider also handles state persistence and provides methods for resetting to custom initial states.
+- `ImageCropperProvider` - Context provider for state management. This component implements the React Context pattern to share cropper state across your application. It manages all internal cropper state including crop position, zoom levels, rotation, flip transformations, aspect ratios, and media dimensions. Any component that needs to read or modify cropper state must be a descendant of this provider. The provider also handles state persistence and provides methods for resetting to custom initial states.
 
 ### Hooks
 
--   `useImageCropper` - Provides access to all cropper state and methods.
+- `useImageCropper` - Provides access to all cropper state and methods.
 
 ```tsx
 import { useImageCropper } from '@wordpress/image-cropper';
@@ -66,15 +70,15 @@ const {
 
 ### Types
 
--   `ImageCropperState` - State interface for cropper data
--   `ImageCropperProps` - Props interface for ImageCropper component
--   `ImageCropperContextValue` - Context value interface
--   `Flip` - Flip state interface
--   `Point`, `Area`, `MediaSize` - Re-exported from react-easy-crop
+- `ImageCropperState` - State interface for cropper data
+- `ImageCropperProps` - Props interface for ImageCropper component
+- `ImageCropperContextValue` - Context value interface
+- `Flip` - Flip state interface
+- `Point`, `Area`, `MediaSize` - Re-exported from react-easy-crop
 
 ### Utilities
 
--   `normalizeRotation` - Utility function to normalize rotation values to 0-360 degrees
+- `normalizeRotation` - Utility function to normalize rotation values to 0-360 degrees
 
 ```tsx
 import { normalizeRotation } from '@wordpress/image-cropper';

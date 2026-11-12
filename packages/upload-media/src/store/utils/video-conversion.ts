@@ -1,11 +1,8 @@
-/**
- * Internal dependencies
- */
 import { getFileBasename } from '../../utils';
 import type { QueueItemId } from '../types';
 
 /**
- * Message prefix used by @wordpress/video-conversion to flag an
+ * Message prefix used by `@wordpress/video-conversion` to flag an
  * unsupported-but-graceful conversion outcome (no WebCodecs, unsupported
  * codec). This MUST mirror the package's exported `UNSUPPORTED_ERROR_PREFIX`.
  *
@@ -20,7 +17,7 @@ import type { QueueItemId } from '../types';
 const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
- * Message prefix used by @wordpress/video-conversion for GIFs skipped
+ * Message prefix used by `@wordpress/video-conversion` for GIFs skipped
  * because they exceed the total-pixel budget. This MUST mirror the
  * package's exported `SIZE_LIMIT_ERROR_PREFIX`; it is duplicated here for
  * the same bundle-size reason as UNSUPPORTED_ERROR_PREFIX above.
@@ -89,47 +86,45 @@ export function isConversionTimeoutError( error: unknown ): boolean {
 }
 
 /**
- * Cached dynamic import promise for @wordpress/video-conversion/worker.
+ * Cached dynamic import promise for `@wordpress/video-conversion/worker`.
  *
  * Using a dynamic import keeps the worker module out of the main bundle; it
  * is fetched only when GIF-to-video conversion is actually triggered.
  */
 let videoConversionModulePromise:
-	| Promise< typeof import('@wordpress/video-conversion/worker') >
+	| Promise< typeof import( '@wordpress/video-conversion/worker' ) >
 	| undefined;
 
 /**
  * The resolved module reference, available synchronously after first load.
  */
 let videoConversionModule:
-	| typeof import('@wordpress/video-conversion/worker')
-	| undefined;
+	typeof import( '@wordpress/video-conversion/worker' ) | undefined;
 
 /**
- * Lazily loads and caches the @wordpress/video-conversion/worker module.
+ * Lazily loads and caches the `@wordpress/video-conversion/worker` module.
  *
  * @return The video conversion worker module.
  */
 function loadVideoConversionModule(): Promise<
-	typeof import('@wordpress/video-conversion/worker')
+	typeof import( '@wordpress/video-conversion/worker' )
 > {
 	if ( ! videoConversionModulePromise ) {
-		videoConversionModulePromise = import(
-			'@wordpress/video-conversion/worker'
-		)
-			.then( ( mod ) => {
-				videoConversionModule = mod;
-				return mod;
-			} )
-			.catch( ( error ) => {
-				/*
-				 * Reset the cached promise so a transient chunk-load failure
-				 * does not permanently break later conversions; the next call
-				 * retries the import.
-				 */
-				videoConversionModulePromise = undefined;
-				throw error;
-			} );
+		videoConversionModulePromise =
+			import( '@wordpress/video-conversion/worker' )
+				.then( ( mod ) => {
+					videoConversionModule = mod;
+					return mod;
+				} )
+				.catch( ( error ) => {
+					/*
+					 * Reset the cached promise so a transient chunk-load failure
+					 * does not permanently break later conversions; the next call
+					 * retries the import.
+					 */
+					videoConversionModulePromise = undefined;
+					throw error;
+				} );
 	}
 	return videoConversionModulePromise;
 }

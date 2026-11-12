@@ -2,11 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import { Stack } from '../../stack';
+import { Button } from '../../button';
 import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
-	title: 'Design System/Components/Dialog',
+	title: 'Components/@wordpress-ui/Dialog',
+	id: 'design-system-components-dialog',
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,
@@ -16,7 +18,7 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Title': Dialog.Title,
 		'Dialog.Description': Dialog.Description,
 		'Dialog.Content': Dialog.Content,
-		'Dialog.CloseIcon': Dialog.CloseIcon,
+		'Dialog.CloseIconButton': Dialog.CloseIconButton,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
 	},
@@ -49,7 +51,7 @@ export const _Default: Story = {
 			<Dialog.Popup key="popup">
 				<Dialog.Header>
 					<Dialog.Title>Welcome</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Dialog.Description>
@@ -66,7 +68,16 @@ export const _Default: Story = {
 	},
 };
 
-const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
+type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
+
+const ALL_SIZES = Object.keys( {
+	small: true,
+	medium: true,
+	large: true,
+	stretch: true,
+	full: true,
+	auto: true,
+} satisfies Record< Size, true > ) as Size[];
 
 function SizeSelector( {
 	value,
@@ -113,7 +124,7 @@ function SizePlaygroundContent() {
 			<Dialog.Popup size={ size }>
 				<Dialog.Header>
 					<Dialog.Title>Size Playground</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Stack direction="column" gap="lg" align="start">
@@ -135,6 +146,44 @@ function SizePlaygroundContent() {
 export const AllSizes: Story = {
 	args: {
 		children: <SizePlaygroundContent />,
+	},
+};
+
+function AutoSizeContent() {
+	const widths = [ 200, 450, 750, 1600 ];
+	const [ index, setIndex ] = useState( 0 );
+	return (
+		<>
+			<Dialog.Trigger>Open content-sized dialog</Dialog.Trigger>
+			<Dialog.Popup size="auto">
+				<Dialog.Header>
+					<Dialog.Title>Content width</Dialog.Title>
+					<Dialog.CloseIconButton />
+				</Dialog.Header>
+				<Dialog.Content>
+					<div style={ { width: widths[ index ], maxWidth: '100%' } }>
+						<p>Content width: { widths[ index ] }px</p>
+						<Button
+							onClick={ () =>
+								setIndex( ( index + 1 ) % widths.length )
+							}
+						>
+							Next content width
+						</Button>
+					</div>
+				</Dialog.Content>
+			</Dialog.Popup>
+		</>
+	);
+}
+
+/**
+ * Fits changing content widths while retaining the responsive minimum and
+ * viewport inset. Wide content must also be constrained to the content area.
+ */
+export const AutoSize: Story = {
+	args: {
+		children: <AutoSizeContent />,
 	},
 };
 
@@ -169,7 +218,7 @@ export const WithCustomZIndex: Story = {
 			>
 				<Dialog.Header>
 					<Dialog.Title>Custom z-index</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Dialog.Description>
@@ -238,7 +287,7 @@ function ScrollableContent() {
 	const header = (
 		<Dialog.Header>
 			<Dialog.Title>Terms of service</Dialog.Title>
-			<Dialog.CloseIcon />
+			<Dialog.CloseIconButton />
 		</Dialog.Header>
 	);
 
@@ -329,7 +378,7 @@ export const WithVisuallyHiddenTitle: Story = {
 					<VisuallyHidden render={ <Dialog.Title /> }>
 						Accessible dialog heading
 					</VisuallyHidden>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<p style={ { margin: 0 } }>

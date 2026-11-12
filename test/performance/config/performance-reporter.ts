@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { writeFileSync } from 'fs';
 import type {
@@ -9,10 +6,6 @@ import type {
 	TestCase,
 	TestResult,
 } from '@playwright/test/reporter';
-
-/**
- * Internal dependencies
- */
 import { stats, round } from '../utils';
 
 export interface WPRawPerformanceResults {
@@ -30,6 +23,9 @@ export interface WPRawPerformanceResults {
 	typeWithTopToolbar: number[];
 	typeContainer: number[];
 	focus: number[];
+	firstFocus: number[];
+	selectAll: number[];
+	undo: number[];
 	inserterOpen: number[];
 	inserterSearch: number[];
 	inserterHover: number[];
@@ -73,6 +69,9 @@ export interface WPPerformanceResults {
 	typeWithTopToolbar?: PerformanceStats;
 	typeContainer?: PerformanceStats;
 	focus?: PerformanceStats;
+	firstFocus?: PerformanceStats;
+	selectAll?: PerformanceStats;
+	undo?: PerformanceStats;
 	inserterOpen?: PerformanceStats;
 	inserterSearch?: PerformanceStats;
 	inserterHover?: PerformanceStats;
@@ -118,6 +117,9 @@ export function curateResults(
 		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
 		typeContainer: stats( results.typeContainer ),
 		focus: stats( results.focus ),
+		firstFocus: stats( results.firstFocus ),
+		selectAll: stats( results.selectAll ),
+		undo: stats( results.undo ),
 		inserterOpen: stats( results.inserterOpen ),
 		inserterSearch: stats( results.inserterSearch ),
 		inserterHover: stats( results.inserterHover ),

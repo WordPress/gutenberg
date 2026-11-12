@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const ENDPOINT = [
@@ -219,7 +216,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 			.getByRole( 'button', { name: 'Background options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Color' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Color, show' } )
 			.click();
 
 		const backgroundColorButton = page

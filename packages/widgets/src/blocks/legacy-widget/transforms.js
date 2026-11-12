@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const legacyWidgetTransforms = [
@@ -172,7 +169,7 @@ const legacyWidgetTransforms = [
 				: createBlock(
 						block,
 						transform ? transform( instance.raw ) : undefined
-				  );
+					);
 			if ( ! instance.raw?.title ) {
 				return transformedBlock;
 			}

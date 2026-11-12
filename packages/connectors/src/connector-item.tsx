@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf, type TransformedText } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { ReactNode } from 'react';
 import type { ApiKeySource } from './types';
 
@@ -39,7 +32,7 @@ export function ConnectorItem( {
 }: ConnectorItemProps ) {
 	const headingId = useId();
 	return (
-		<Item className={ className }>
+		<Item className={ className } role="listitem">
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
 					{ logo }
@@ -69,8 +62,7 @@ export function ConnectorItem( {
 export type { ApiKeySource } from './types';
 
 type ConnectorHelpMessage =
-	| `${ string }%s${ string }`
-	| TransformedText< `${ string }%s${ string }` >;
+	`${ string }%s${ string }` | TransformedText< `${ string }%s${ string }` >;
 type ConnectorHelpInterpolatedMessage = `${ string }<a></a>${ string }`;
 
 function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
@@ -137,25 +129,9 @@ function useConnectorSettingsSave< TValue >(
 	};
 }
 
-function ConnectorSettingsFrame( {
-	readOnly,
-	children,
-}: {
-	readOnly: boolean;
-	children: ReactNode;
-} ) {
+function ConnectorSettingsFrame( { children }: { children: ReactNode } ) {
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-					  }
-					: undefined
-			}
-		>
+		<VStack spacing={ 4 } className="connector-settings">
 			{ children }
 		</VStack>
 	);
@@ -274,7 +250,7 @@ export function DefaultConnectorSettings( {
 						__(
 							'Your API key is stored securely. You can manage it at %s'
 						)
-				  )
+					)
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
@@ -288,7 +264,7 @@ export function DefaultConnectorSettings( {
 	};
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -390,7 +366,7 @@ export function ApplicationPasswordConnectorSettings( {
 	}
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'Username' ) }
 				value={ username }

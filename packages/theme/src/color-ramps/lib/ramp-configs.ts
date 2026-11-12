@@ -1,5 +1,5 @@
-import type { RampStepConfig, RampConfig, RampDirection } from './types';
-import type { TaperChromaOptions } from './taper-chroma';
+import type { RampStepConfig, RampConfig, RampDirection } from './types.ts';
+import type { TaperChromaOptions } from './taper-chroma.ts';
 
 const lightnessConstraintForegroundHighContrast = (
 	direction: RampDirection
@@ -201,9 +201,9 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	fgFill: {
 		contrast: {
 			reference: 'bgFill1',
+			additionalReferences: [ 'bgFill2' ],
 			followDirection: 'best',
 			target: 4.5,
-			preferLighter: true,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,

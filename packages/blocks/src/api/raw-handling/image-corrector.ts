@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import { v4 as uuid } from 'uuid';
 import { createBlobURL } from '@wordpress/blob';
 
 export default function imageCorrector( img: Node ): void {
@@ -40,7 +38,11 @@ export default function imageCorrector( img: Node ): void {
 			uint8Array[ i ] = decoded.charCodeAt( i );
 		}
 
-		const name = type.replace( '/', '.' );
+		// Each pasted image needs its own filename: images pasted together are
+		// uploaded concurrently, and identical names race in the server's
+		// unique filename check, so one upload can overwrite another.
+		const subtype = type.slice( type.indexOf( '/' ) + 1 );
+		const name = `image-${ uuid().slice( 0, 8 ) }.${ subtype }`;
 		const file = new window.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );

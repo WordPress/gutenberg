@@ -1,21 +1,34 @@
-/**
- * External dependencies
- */
-import fetch from 'node-fetch';
 import readline from 'readline';
-
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
+import fetch from 'node-fetch';
+import { gte } from 'semver';
 
 const REPO = 'WordPress/gutenberg';
-const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const { values, positionals } = parseArgs( {
+	options: {
+		'dry-run': {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	allowPositionals: true,
+	strict: false,
+} );
+const DRY_RUN = values[ 'dry-run' ];
+const LABEL = positionals[ 0 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
+// Earlier versions query the sunset Projects (classic) API and always fail on
+// `gh pr edit`.
+// See https://github.com/cli/cli/pull/10942.
+const MINIMUM_GH_VERSION = '2.73.0';
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com' );
-
-const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
+const GITHUB_CLI_VERSION = getGhVersion();
+const GITHUB_CLI_SUPPORTED = isGhVersionSupported( GITHUB_CLI_VERSION );
 
 /**
  * The main function of this script. It:
@@ -26,14 +39,26 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
  * * It keeps track of the failed cherry-picks and then retries them
  * * Retrying keeps going as long as at least one cherry-pick succeeds
  * * Pushes the local branch to `origin`
- * * (optional) Uses the [`gh` console utility](https://cli.github.com/) to comment on the remote PRs and remove the labels
+ * * Uses the [`gh` console utility](https://cli.github.com/) to comment on the remote PRs and remove the labels
  * * Reports the results
  */
 async function main() {
 	if ( ! GITHUB_CLI_AVAILABLE ) {
-		await reportGhUnavailable();
+		console.error(
+			'GitHub CLI is not setup. Install the `gh` utility from https://cli.github.com/ ' +
+				'and log in with `gh auth login`.'
+		);
+		process.exit( 1 );
 	}
-
+	if ( ! GITHUB_CLI_SUPPORTED ) {
+		console.error(
+			`GitHub CLI ${ GITHUB_CLI_VERSION } is too old. Upgrade to ${ MINIMUM_GH_VERSION } or newer.`
+		);
+		process.exit( 1 );
+	}
+	console.log( `Label: "${ LABEL }"` );
+	console.log( `Dry run: ${ DRY_RUN }` );
+	console.log( '' );
 	console.log( `You are on branch "${ BRANCH }".` );
 	console.log( `This script will:` );
 	console.log(
@@ -49,6 +74,9 @@ async function main() {
 	console.log( `` );
 	await promptDoYouWantToProceed();
 
+	// Captured before pulling, so a dry run can restore the branch exactly.
+	const headBeforeRun = cli( 'git', [ 'rev-parse', 'HEAD' ] );
+
 	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
 	cli( 'git', [ 'pull', 'origin', BRANCH, '--rebase' ], true );
 
@@ -60,19 +88,31 @@ async function main() {
 	const [ successes, failures ] = cherryPickAll( PRs );
 	console.log( 'Cherry-picking finished!' );
 
+	if ( DRY_RUN ) {
+		console.log(
+			'Dry run: resetting branch to original HEAD, no commits will be kept.'
+		);
+		cli( 'git', [ 'reset', '--hard', headBeforeRun ] );
+	}
+
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
-		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+		if ( DRY_RUN ) {
+			console.log(
+				'Dry run: skipping push, comments, and label removal.'
+			);
+			console.log( 'PRs that would be cherry-picked:' );
+			successes.forEach( ( PR ) =>
+				console.log( indent( prToString( PR, false ) ) )
+			);
+		} else {
 			console.log( `About to push to origin/${ BRANCH }` );
 			await promptDoYouWantToProceed();
 			cli( 'git', [ 'push', 'origin', BRANCH ] );
 
 			console.log( `Commenting and removing labels...` );
 			successes.forEach( GHcommentAndRemoveLabel );
-		} else {
-			console.log( 'Cherry-picked PRs with copy-able comments:' );
-			successes.forEach( reportSuccessManual );
 		}
 	}
 	if ( failures.length ) {
@@ -376,17 +416,8 @@ function reportSummaryNextSteps( successes, failures ) {
 	console.log( '' );
 
 	const nextSteps = [];
-	if ( successes.length && ! AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
-		nextSteps.push( 'Push this branch' );
-		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
-		nextSteps.push( `Remove the ${ LABEL } label` );
-
-		if ( LABEL === 'Backport to WP Beta/RC' ) {
-			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
-		}
-
-		nextSteps.push( 'Request a backport to wordpress-develop if required' );
-		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
+	if ( DRY_RUN && successes.length ) {
+		nextSteps.push( 'Run again without --dry-run to apply these changes' );
 	}
 	if ( failures.length ) {
 		nextSteps.push( 'Manually cherry-pick the PRs that failed' );
@@ -518,6 +549,37 @@ function getMilestoneFromBranch() {
 }
 
 /**
+ * Extracts the version from the output of `gh --version`.
+ *
+ * @param {string} output Raw command output.
+ * @return {string|null} Version string such as "2.73.0", or null if not found.
+ */
+function parseGhVersion( output ) {
+	return output.match( /gh version (\d+\.\d+\.\d+)/ )?.[ 1 ] || null;
+}
+
+/**
+ * Returns the installed `gh` version.
+ *
+ * @return {string|null} Version string such as "2.73.0", or null if unavailable.
+ */
+function getGhVersion() {
+	return parseGhVersion(
+		spawnSync( 'gh', [ '--version' ] )?.stdout?.toString() || ''
+	);
+}
+
+/**
+ * Checks whether a `gh` version meets the minimum this script requires.
+ *
+ * @param {string|null} version The installed version.
+ * @return {boolean} Whether the version is supported.
+ */
+function isGhVersionSupported( version ) {
+	return !! version && gte( version, MINIMUM_GH_VERSION );
+}
+
+/**
  * Returns the current git branch.
  *
  * @return {string} Branch name.
@@ -526,30 +588,6 @@ function getCurrentBranch() {
 	return spawnSync( 'git', [ 'rev-parse', '--abbrev-ref', 'HEAD' ] )
 		.stdout.toString()
 		.trim();
-}
-
-/**
- * Reports when the gh CLI tool is missing, describes the consequences, asks
- * whether to proceed.
- *
- * @return {Promise<void>}
- */
-async function reportGhUnavailable() {
-	console.log(
-		'GitHub CLI is not setup. This script will not be able to automatically'
-	);
-	console.log(
-		'comment on the processed PRs and remove the backport label from them.'
-	);
-	console.log(
-		'Instead, you will see a detailed list of next steps to perform manually.'
-	);
-	console.log( '' );
-	console.log(
-		'To enable automatic handling, install the `gh` utility from https://cli.github.com/'
-	);
-	console.log( '' );
-	await promptDoYouWantToProceed();
 }
 
 /**
@@ -585,4 +623,10 @@ if (
 	main();
 }
 
-export { cherryPickAll, cherryPickOne };
+export {
+	cherryPickAll,
+	cherryPickOne,
+	isGhVersionSupported,
+	parseGhVersion,
+	MINIMUM_GH_VERSION,
+};

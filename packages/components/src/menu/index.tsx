@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem, contextConnectWithoutRef } from '../context';
 import type { ContextProps, Props } from './types';
 import { Context } from './context';
@@ -97,6 +86,10 @@ const UnconnectedMenu = ( props: Props ) => {
  * It is responsible for managing the state of the menu and its items, and for
  * rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
  * component, and the `Menu.Popover` component.
+ *
+ * This component is deprecated. When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.
+ *
+ * @deprecated
  */
 export const Menu = Object.assign(
 	contextConnectWithoutRef( UnconnectedMenu, 'Menu' ),

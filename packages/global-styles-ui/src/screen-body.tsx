@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import clsx from 'clsx';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -59,6 +56,17 @@ const MOCK_CANT_EMBED_RESPONSE = {
 	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
+// What the proxy returns for an untrusted provider whose HTML has no iframe:
+// core drops the HTML but keeps the type.
+const MOCK_UNTRUSTED_NO_IFRAME_RESPONSE = {
+	url: 'https://mastodon.social/@Mastodon/117466985005297414',
+	html: false,
+	type: 'rich',
+	provider_name: 'mastodon.social',
+	provider_url: 'https://mastodon.social',
+	version: '1.0',
+};
+
 const MOCK_BAD_WORDPRESS_RESPONSE = {
 	code: 'oembed_invalid_url',
 	message: 'Not Found',
@@ -80,6 +88,7 @@ test.describe( 'Embedding content', () => {
 	} );
 
 	test( 'should render embeds in the correct state', async ( {
+		page,
 		editor,
 		embedUtils,
 	} ) => {
@@ -90,6 +99,8 @@ test.describe( 'Embedding content', () => {
 			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
+			'https://mastodon.social/@Mastodon/117466985005297414':
+				MOCK_UNTRUSTED_NO_IFRAME_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
 				MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
@@ -130,6 +141,24 @@ test.describe( 'Embedding content', () => {
 			'Provider whose oembed API has gone wrong. Should render failed, edit state.'
 		).toHaveValue( 'https://twitter.com/thatbunty' );
 
+		// Check the result once the preview response is handled.
+		const mastodonPreview = page.waitForResponse(
+			( response ) =>
+				new URL( response.url() ).searchParams.get( 'url' ) ===
+				'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await embedUtils.insertEmbed(
+			'https://mastodon.social/@Mastodon/117466985005297414'
+		);
+		await mastodonPreview;
+		await expect(
+			currentEmbedBlock.getByText(
+				'Sorry, this content could not be embedded.',
+				{ exact: true }
+			),
+			'Untrusted provider whose html core dropped. Should render failed, edit state.'
+		).toBeVisible();
+
 		await embedUtils.insertEmbed(
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/'
 		);
@@ -151,6 +180,33 @@ test.describe( 'Embedding content', () => {
 			currentEmbedBlock.locator( 'iframe' ),
 			'Photo content. Should render valid iframe element.'
 		).toHaveAttribute( 'title', 'Embedded content from cloudup.com' );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/73288.
+	test( 'should send a referrer from iframes inside embed previews @webkit', async ( {
+		page,
+		embedUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc': {
+				...MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+				html: '<iframe title="YouTube video" src="https://www.youtube.com/embed/lXMskKTw3Bc"></iframe>',
+			},
+		} );
+		const embedRequest = page.waitForRequest(
+			'https://www.youtube.com/embed/lXMskKTw3Bc'
+		);
+		await page.route( 'https://www.youtube.com/embed/**', ( route ) =>
+			route.fulfill( { contentType: 'text/html', body: '' } )
+		);
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		expect( await ( await embedRequest ).headerValue( 'referer' ) ).toBe(
+			`${ new URL( page.url() ).origin }/`
+		);
 	} );
 
 	test( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async ( {

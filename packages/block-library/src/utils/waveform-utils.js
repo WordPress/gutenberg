@@ -2,12 +2,8 @@
  * Shared utilities for waveform audio player functionality.
  * Used by both the WaveformPlayer component (editor) and view.js (frontend).
  */
-
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-import WaveformPlayerLib from '@arraypress/waveform-player';
+import WaveformPlayerLib from '@arraypress/waveform-player/no-autoinit';
 
 /**
  * Configuration constants.

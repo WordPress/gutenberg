@@ -36,8 +36,8 @@ function block_core_page_list_get_submenu_visibility( $context ) {
  *
  * @since 5.8.0
  *
- * @param  array $attributes Block attributes.
- * @param  array $context    Navigation block context.
+ * @param array $attributes Block attributes.
+ * @param array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
 function block_core_page_list_build_css_colors( $attributes, $context ) {
@@ -128,20 +128,20 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
  *
  * @since 5.8.0
  *
- * @param string  $submenu_visibility The submenu visibility mode: 'hover', 'click', or 'always'.
- * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
- * @param boolean $is_navigation_child If block is a child of Navigation block.
- * @param array   $nested_pages The array of nested pages.
- * @param boolean $is_nested Whether the submenu is nested or not.
+ * @param string  $submenu_visibility       The submenu visibility mode: 'hover', 'click', or 'always'.
+ * @param boolean $show_submenu_icons       Whether to show submenu indicator icons.
+ * @param boolean $is_navigation_child      If block is a child of Navigation block.
+ * @param array   $nested_pages             The array of nested pages.
+ * @param boolean $is_nested                Whether the submenu is nested or not.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
- * @param array   $colors Color information for overlay styles.
- * @param integer $depth The nesting depth.
+ * @param array   $colors                   Color information for overlay styles.
+ * @param integer $depth                    The nesting depth.
  *
  * @return string List markup.
  */
 function block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
-		return;
+		return '';
 	}
 	$front_page_id = (int) get_option( 'page_on_front' );
 	$markup        = '';
@@ -227,13 +227,13 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
  * @since 5.8.0
  *
  * @param array $current_level The level being iterated through.
- * @param array $children The children grouped by parent post ID.
+ * @param array $children      The children grouped by parent post ID.
  *
  * @return array The nested array of pages.
  */
 function block_core_page_list_nest_pages( $current_level, $children ) {
 	if ( empty( $current_level ) ) {
-		return;
+		return array();
 	}
 	foreach ( (array) $current_level as $key => $current ) {
 		if ( isset( $children[ $key ] ) ) {
@@ -258,8 +258,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
-	$parent_page_id = $attributes['parentPageID'];
-	$is_nested      = ! empty( $block->context['core/isInsideSubmenu'] );
+	$parent_page_id_attr = $attributes['parentPageID'] ?? null;
+	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
+	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
 	$all_pages = get_pages(
 		array(
@@ -270,7 +271,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	// If there are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {
-		return;
+		return '';
 	}
 
 	$top_level_pages = array();
@@ -317,7 +318,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	if ( 0 !== $parent_page_id ) {
 		// If the parent page has no child pages, there is nothing to show.
 		if ( ! array_key_exists( $parent_page_id, $pages_with_children ) ) {
-			return;
+			return '';
 		}
 
 		$nested_pages = block_core_page_list_nest_pages(

@@ -54,7 +54,7 @@ To update an existing page:
 
 ### Create a new document
 
-To add a new document requires a working JavaScript development environment to build the documentation, see the [JavaScript build setup documentation](/docs/how-to-guides/javascript/js-build-setup.md):
+To add a new document requires a working JavaScript development environment to build the documentation, see the [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) guide:
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/HEAD/docs) folder, use lower-case, no spaces, if needed a dash separator, and `.md` extension.
 2. Add content using markdown notation. All documents require one and only `h1` tag.
@@ -169,6 +169,17 @@ https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/ge
 and will have to be hardcoded for the endpoint in the Block Editor Handbook as
 `<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a>`
 to link correctly in the handbook.
+
+### Line wrapping
+
+Do not hard-wrap prose. Keep each paragraph, list item, and table row on a single line and let your editor soft-wrap it on screen. There is no line length limit for documentation; the `MD013` rule is disabled in the project's markdownlint configuration.
+
+Hard-wrapped text renders the same, but it makes later edits hard to review: changing one word reflows the paragraph and the diff then covers every line of it instead of the line that actually changed.
+
+Hard wrapping is also an accessibility problem in the source file. A screen reader reads a plain text file line by line and a braille display shows it one line at a time, so a sentence broken across four lines arrives as four fragments, and most screen readers cannot navigate source text by sentence to piece it back together. A sentence kept on one line means reading a line gives a complete thought. The Google developer documentation style guide gives the same rule: ["Don't force line breaks (hard returns) within sentences and paragraphs."](https://developers.google.com/style/accessibility)
+
+Keep line breaks where Markdown needs them, such as between list items and table rows, and never reflow fenced code blocks.
+
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.

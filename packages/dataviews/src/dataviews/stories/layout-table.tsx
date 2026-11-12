@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -50,7 +43,7 @@ export const LayoutTableComponent = ( {
 							field: 'type',
 							direction: 'asc',
 							showLabel: groupByLabel,
-					  }
+						}
 					: undefined,
 				showMedia,
 			};

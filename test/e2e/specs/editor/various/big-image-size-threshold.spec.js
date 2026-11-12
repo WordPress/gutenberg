@@ -1,19 +1,23 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
+const { readFileSync } = require( 'fs' );
 const os = require( 'os' );
-const { randomUUID } = require( 'crypto' );
-
-/**
- * WordPress dependencies
- */
+const { createHash, randomUUID } = require( 'crypto' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
  */
+
+/**
+ * Returns the file name of an upload-relative path such as `2026/08/image.jpeg`.
+ *
+ * @param {string} file Upload-relative file path.
+ * @return {string} File name.
+ */
+function wpBasename( file ) {
+	return file.split( '/' ).pop();
+}
 
 test.use( {
 	imageBlockUtils: async ( { page }, use ) => {
@@ -67,7 +71,7 @@ test.describe( 'Big image size threshold', () => {
 		await expect( imageBlock ).toBeVisible();
 
 		// Upload a large image (3200x2400) that exceeds the default threshold (2560).
-		await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' ),
 			'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
 		);
@@ -100,49 +104,46 @@ test.describe( 'Big image size threshold', () => {
 					?.attributes?.id
 		);
 
-		if ( imageId ) {
-			// Fetch the attachment details from the REST API.
-			const media = await requestUtils.rest( {
-				method: 'GET',
-				path: `/wp/v2/media/${ imageId }`,
-			} );
+		expect( imageId ).toBeDefined();
 
-			// The image should be scaled down (either client-side or server-side).
-			expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
-			expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
+		// Fetch the attachment details from the REST API.
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
 
-			if ( media.source_url.includes( '-scaled' ) ) {
-				// When client-side scaling adds the -scaled suffix,
-				// original_image may or may not be set depending on whether
-				// the server also processes the image. Only check if present.
-				if ( media.media_details.original_image ) {
-					expect( media.media_details.original_image ).toBeDefined();
-				}
+		// The image should be scaled down to the threshold.
+		expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
+		expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
 
-				// Verify thumbnails were generated.
-				const sizes = media.media_details.sizes;
-				expect( sizes ).toBeDefined();
+		/*
+		 * Only the scaled-down copy carries the `-scaled` suffix, and the
+		 * untouched upload is kept alongside it as `original_image`. If the
+		 * server also scales the upload while the client owns the derivatives,
+		 * the client's scaled file collides with the server's and is stored as
+		 * `-scaled-1`, the sub-sizes inherit the numbered name, and the
+		 * server's full-size file is orphaned on disk.
+		 * See https://core.trac.wordpress.org/ticket/65708.
+		 */
+		expect( wpBasename( media.media_details.file ) ).toBe(
+			`${ fileName }-scaled.jpeg`
+		);
+		expect( media.media_details.original_image ).toBe(
+			`${ fileName }.jpeg`
+		);
 
-				// Check that at least some standard sizes were created.
-				// The exact sizes depend on theme/site configuration.
-				const hasStandardSizes =
-					sizes.thumbnail || sizes.medium || sizes.large;
-				expect( hasStandardSizes ).toBeTruthy();
+		// Sub-sizes are named after the original, with no collision suffix.
+		// The `full` entry is the attached file itself, so it is skipped.
+		const sizes = Object.entries( media.media_details.sizes ).filter(
+			( [ name ] ) => name !== 'full'
+		);
+		expect( sizes.length ).toBeGreaterThan( 0 );
 
-				// If thumbnail exists, verify it has reasonable dimensions.
-				// Default thumbnail size is 150x150.
-				if ( sizes.thumbnail ) {
-					expect( sizes.thumbnail.width ).toBeLessThanOrEqual( 150 );
-					expect( sizes.thumbnail.height ).toBeLessThanOrEqual( 150 );
-				}
-
-				// If medium exists, verify dimensions.
-				// Default medium size is 300x300.
-				if ( sizes.medium ) {
-					expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
-					expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
-				}
-			}
+		for ( const [ name, size ] of sizes ) {
+			expect(
+				size.file,
+				`the "${ name }" sub-size should be named after the original`
+			).toBe( `${ fileName }-${ size.width }x${ size.height }.jpeg` );
 		}
 	} );
 
@@ -203,21 +204,110 @@ test.describe( 'Big image size threshold', () => {
 					?.attributes?.id
 		);
 
-		if ( imageId ) {
-			// Fetch the attachment details from the REST API.
-			const media = await requestUtils.rest( {
-				method: 'GET',
-				path: `/wp/v2/media/${ imageId }`,
-			} );
+		expect( imageId ).toBeDefined();
 
-			// The image should NOT be scaled since it's below the threshold.
-			expect( media.source_url ).not.toContain( '-scaled' );
-			// Original dimensions should be preserved.
-			expect( media.media_details.width ).toBe( 1024 );
-			expect( media.media_details.height ).toBe( 768 );
-		}
+		// Fetch the attachment details from the REST API.
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+
+		// The image should NOT be scaled since it's below the threshold.
+		expect( media.source_url ).not.toContain( '-scaled' );
+		expect( media.media_details.original_image ).toBeUndefined();
+		// Original dimensions should be preserved.
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
+	} );
+
+	test( 'should finish uploading an image the browser cannot decode', async ( {
+		page,
+		editor,
+		imageBlockUtils,
+		requestUtils,
+	} ) => {
+		const isCrossOriginIsolated = await page.evaluate(
+			() => window.crossOriginIsolated
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isCrossOriginIsolated,
+			'Cross-origin isolation headers not configured on server'
+		);
+
+		/*
+		 * wasm-vips decodes this damaged JPEG tolerantly and generates its
+		 * sub-sizes, but `createImageBitmap()` rejects it. That rejection in
+		 * the threshold check must not leave the upload stuck in thumbnail
+		 * generation.
+		 * See https://github.com/WordPress/gutenberg/issues/83512.
+		 */
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.uploadBuffer(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			createDamagedJpeg(),
+			'.jpeg'
+		);
+
+		await page.waitForFunction(
+			() =>
+				window.wp.data.select( 'core/upload-media' ).getItems()
+					.length === 0,
+			undefined,
+			{ timeout: 60000 }
+		);
+
+		const imageId = await page.evaluate(
+			() =>
+				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
+					?.attributes?.id
+		);
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+
+		// The sub-sizes are generated, but no scaled copy replaces the upload,
+		// even though it is larger than the threshold.
+		expect( media.media_details.width ).toBe( 4000 );
+		expect( media.media_details.sizes ).toHaveProperty( 'thumbnail' );
+		expect( media.media_details.original_image ).toBeUndefined();
 	} );
 } );
+
+/**
+ * Builds a JPEG with a valid header and a corrupt body: the start of a real
+ * photo followed by 20 KB of deterministic noise, with its frame size raised
+ * above the big image threshold.
+ *
+ * @return {Buffer} Damaged JPEG data.
+ */
+function createDamagedJpeg() {
+	const source = readFileSync(
+		path.join(
+			__dirname,
+			'../../../assets/1024x768_e2e_test_image_size.jpeg'
+		)
+	);
+	const noise = Buffer.concat(
+		Array.from( { length: 625 }, ( _, i ) =>
+			createHash( 'sha256' ).update( `83512-${ i }` ).digest()
+		)
+	);
+	const damaged = Buffer.concat( [ source.subarray( 0, 6000 ), noise ] );
+
+	// Declare a 4000x3000 frame, above the big image threshold.
+	const sof = damaged.indexOf( Buffer.from( [ 0xff, 0xc0 ] ) );
+	damaged.writeUInt16BE( 3000, sof + 5 );
+	damaged.writeUInt16BE( 4000, sof + 7 );
+	return damaged;
+}
 
 class ImageBlockUtils {
 	constructor( { page } ) {
@@ -239,6 +329,19 @@ class ImageBlockUtils {
 			? `${ this.basePath }/${ customFile }`
 			: this.TEST_IMAGE_FILE_PATH;
 		await fs.copyFile( filePath, tmpFileName );
+
+		await inputElement.setInputFiles( tmpFileName );
+
+		return fileName;
+	}
+
+	async uploadBuffer( inputElement, buffer, extension ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const fileName = randomUUID();
+		const tmpFileName = path.join( tmpDirectory, fileName + extension );
+		await fs.writeFile( tmpFileName, buffer );
 
 		await inputElement.setInputFiles( tmpFileName );
 

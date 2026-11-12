@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, getBlockContent } from '@wordpress/blocks';
 import { create, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {

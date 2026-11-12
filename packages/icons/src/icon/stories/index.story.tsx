@@ -1,19 +1,13 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
 import type { StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';
 
 const meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},
@@ -65,3 +59,36 @@ export const CurrentColor: StoryFn< typeof Icon > = ( args ) => {
 CurrentColor.args = {
 	icon: icons.wordpress,
 };
+
+export const StrokeScaling = (): ReactElement => (
+	<table>
+		<caption>Stroke-based icons at different sizes</caption>
+		<thead>
+			<tr>
+				<th scope="col">Icon</th>
+				{ [ 16, 20, 24, 36, 48 ].map( ( size ) => (
+					<th key={ size } scope="col">
+						{ size }px
+					</th>
+				) ) }
+			</tr>
+		</thead>
+		<tbody>
+			{ [
+				{ label: 'Check', icon: icons.check },
+				{ label: 'Paragraph', icon: icons.paragraph },
+				{ label: 'Image', icon: icons.image },
+				{ label: 'Settings', icon: icons.cog },
+			].map( ( { label, icon } ) => (
+				<tr key={ label }>
+					<th scope="row">{ label }</th>
+					{ [ 16, 20, 24, 36, 48 ].map( ( size ) => (
+						<td key={ size }>
+							<Icon icon={ icon } size={ size } />
+						</td>
+					) ) }
+				</tr>
+			) ) }
+		</tbody>
+	</table>
+);

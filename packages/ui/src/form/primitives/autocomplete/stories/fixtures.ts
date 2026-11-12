@@ -64,3 +64,34 @@ export const URLS: FixtureItem[] = [
 	{ id: 'u6', value: 'make.wordpress.org/core/' },
 	{ id: 'u7', value: 'make.wordpress.org/design/' },
 ];
+
+export const EMOJIS = [
+	{ value: 'grinning', emoji: '😀', label: 'grinning face' },
+	{ value: 'laugh', emoji: '😂', label: 'face with tears of joy' },
+	{ value: 'wink', emoji: '😉', label: 'winking face' },
+	{
+		value: 'heart-eyes',
+		emoji: '😍',
+		label: 'smiling face with heart eyes',
+	},
+	{ value: 'thumbs-up', emoji: '👍', label: 'thumbs up' },
+	{ value: 'clap', emoji: '👏', label: 'clapping hands' },
+	{ value: 'wave', emoji: '👋', label: 'waving hand' },
+	{ value: 'heart', emoji: '❤️', label: 'red heart' },
+	{ value: 'sparkles', emoji: '✨', label: 'sparkles' },
+	{ value: 'fire', emoji: '🔥', label: 'fire' },
+	{ value: 'star', emoji: '⭐', label: 'star' },
+	{ value: 'coffee', emoji: '☕', label: 'hot beverage' },
+	{ value: 'pizza', emoji: '🍕', label: 'pizza' },
+	{ value: 'dog', emoji: '🐶', label: 'dog face' },
+	{ value: 'sun', emoji: '☀️', label: 'sun' },
+	{ value: 'rocket', emoji: '🚀', label: 'rocket' },
+];
+
+export const EMOJI_GROUPS = [
+	{
+		value: 'emojis',
+		label: 'Recently used',
+		items: EMOJIS,
+	},
+];

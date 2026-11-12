@@ -1,11 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
 import { notFound } from '@wordpress/route';
+import { unlock } from '@wordpress/routes-lock-unlock';
+
+/**
+ * The stage only renders a form, so it requests the `form` of the entity view
+ * configuration alone. Must match the fields the stage requests, so both
+ * resolve under the same cache key.
+ */
+const VIEW_CONFIG_FIELDS = 'form';
 
 declare global {
 	interface Window {
@@ -57,13 +63,30 @@ export const route = {
 			throw notFound();
 		}
 	},
+	loader: async () => {
+		// Resolve the fields and the form the stage renders. A failure is not
+		// fatal: the stage reports a failure to load the fields, and the editor
+		// falls back to its default form, so neither blocks the route.
+		await Promise.all( [
+			unlock( resolveSelect( editorStore ) )
+				.getEntityFields( 'postType', 'attachment' )
+				.catch( () => {} ),
+			unlock( resolveSelect( coreStore ) )
+				.getViewConfig( 'postType', 'attachment', {
+					fields: VIEW_CONFIG_FIELDS,
+				} )
+				.catch( () => {} ),
+		] );
+	},
 	title: async ( { params }: { params: { id: string } } ) => {
 		const attachmentId = getAttachmentId( params.id );
-		const attachment = await resolveSelect( coreStore ).getEntityRecord(
+		const attachment = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			'attachment',
 			attachmentId
-		);
+		) ) as
+			| { title?: string | { rendered?: string; raw?: string } }
+			| undefined;
 
 		return attachment
 			? getAttachmentTitle( attachment )

@@ -44,6 +44,12 @@
 		.wp-block-cover__inner-container {
 			z-index: 2;
 		}
+
+		// Keep the loading spinner above the dim overlay (1) and the inner
+		// blocks (2) so it stays visible over child content while media loads.
+		.components-spinner {
+			z-index: 3;
+		}
 	}
 
 	// Shown while media is being uploaded

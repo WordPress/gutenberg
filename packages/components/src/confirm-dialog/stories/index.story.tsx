@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { ConfirmDialog } from '../component';
 
 const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
-	title: 'Components/Overlays/ConfirmDialog',
+	title: 'Components/@wordpress-components/Overlays/ConfirmDialog',
 	id: 'components-confirmdialog',
 	argTypes: {
 		isOpen: {
