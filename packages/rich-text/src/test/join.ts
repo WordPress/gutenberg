@@ -1,17 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { join } from '../join';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength, partialValue } from './helpers';
 
 describe( 'join', () => {
 	const em = { type: 'em' };
 	const separators = [
 		' ',
-		{
+		partialValue( {
 			formats: [ , ],
 			replacements: [ , ],
 			text: ' ',
-		},
+		} ),
 	];
 
 	separators.forEach( ( separator ) => {
@@ -32,7 +31,7 @@ describe( 'join', () => {
 				text: 'one two',
 			};
 			const result = join(
-				[ deepFreeze( one ), deepFreeze( two ) ],
+				[ freezeValue( one ), freezeValue( two ) ],
 				separator
 			);
 

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { normaliseFormats } from '../normalise-formats';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'normaliseFormats', () => {
 	const strong = { type: 'strong' };
@@ -19,7 +18,7 @@ describe( 'normaliseFormats', () => {
 			],
 			text: 'one two three',
 		};
-		const result = normaliseFormats( deepFreeze( record ) );
+		const result = normaliseFormats( freezeValue( record ) );
 
 		expect( result ).toEqual( record );
 		expect( result ).not.toBe( record );

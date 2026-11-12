@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { replace } from '../replace';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength, partialValue } from './helpers';
 
 describe( 'replace', () => {
 	const em = { type: 'em' };
@@ -21,7 +20,7 @@ describe( 'replace', () => {
 			start: 5,
 			end: 5,
 		};
-		const result = replace( deepFreeze( record ), 'two', '2' );
+		const result = replace( freezeValue( record ), 'two', '2' );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -36,11 +35,11 @@ describe( 'replace', () => {
 			start: 6,
 			end: 6,
 		};
-		const replacement = {
+		const replacement = partialValue( {
 			formats: [ , ],
 			replacements: [ , ],
 			text: '2',
-		};
+		} );
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
 			replacements: [ , , , , , , , , , , , ],
@@ -48,7 +47,7 @@ describe( 'replace', () => {
 			start: 5,
 			end: 5,
 		};
-		const result = replace( deepFreeze( record ), 'two', replacement );
+		const result = replace( freezeValue( record ), 'two', replacement );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -72,7 +71,7 @@ describe( 'replace', () => {
 		};
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
 		const result = replace(
-			deepFreeze( record ),
+			freezeValue( record ),
 			/([^\d]*)(\d*)([^\w]*)/,
 			( match, p1, p2, p3 ) => {
 				return [ p1, p2, p3 ].join( ' - ' );
@@ -99,7 +98,7 @@ describe( 'replace', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = replace( deepFreeze( record ), /(?<digits>\d+)/, 'X' );
+		const result = replace( freezeValue( record ), /(?<digits>\d+)/, 'X' );
 
 		expect( result ).toEqual( expected );
 	} );
@@ -112,7 +111,7 @@ describe( 'replace', () => {
 			start: 0,
 			end: 0,
 		};
-		const result = replace( deepFreeze( record ), 'a', 'xyz' );
+		const result = replace( freezeValue( record ), 'a', 'xyz' );
 
 		expect( result.text ).toBe( 'xyzb' );
 		expect( result.start ).toBe( 3 );

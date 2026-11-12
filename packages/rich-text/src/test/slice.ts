@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { slice } from '../slice';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'slice', () => {
 	const em = { type: 'em' };
@@ -17,7 +16,7 @@ describe( 'slice', () => {
 			replacements: [ , , , ],
 			text: ' tw',
 		};
-		const result = slice( deepFreeze( record ), 3, 6 );
+		const result = slice( freezeValue( record ), 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -37,7 +36,7 @@ describe( 'slice', () => {
 			replacements: [ , , , ],
 			text: ' tw',
 		};
-		const result = slice( deepFreeze( record ) );
+		const result = slice( freezeValue( record ) );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

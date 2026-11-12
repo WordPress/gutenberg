@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { toggleFormat } from '../toggle-format';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'toggleFormat', () => {
 	const strong = { type: 'strong' };
@@ -38,7 +37,7 @@ describe( 'toggleFormat', () => {
 			start: 3,
 			end: 6,
 		};
-		const result = toggleFormat( deepFreeze( record ), strong );
+		const result = toggleFormat( freezeValue( record ), strong );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -73,7 +72,7 @@ describe( 'toggleFormat', () => {
 			start: 3,
 			end: 6,
 		};
-		const result = toggleFormat( deepFreeze( record ), strong );
+		const result = toggleFormat( freezeValue( record ), strong );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

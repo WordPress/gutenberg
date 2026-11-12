@@ -19,7 +19,7 @@ describe( 'create', () => {
 
 		it( description, () => {
 			const element = createElement( document, html );
-			const range = createRange( element );
+			const range = createRange?.( element );
 			const createdRecord = create( {
 				element,
 				range,
@@ -43,7 +43,7 @@ describe( 'create', () => {
 			value: expectedValue,
 		} ) => {
 			it( description, () => {
-				if ( formatName ) {
+				if ( formatName && formatType ) {
 					registerFormatType( formatName, formatType );
 				}
 
@@ -98,7 +98,7 @@ describe( 'create', () => {
 	} );
 
 	describe( 'collapseWhiteSpace', () => {
-		function fromHTML( html ) {
+		function fromHTML( html: string ) {
 			const element = createElement( document, html );
 			const richTextData = RichTextData.fromHTMLElement( element );
 			return {
