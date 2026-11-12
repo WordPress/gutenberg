@@ -167,9 +167,11 @@ add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
  * @param WP_User      $user    The recipient.
  * @param WP_Comment   $comment The note that triggered the notification.
  * @param WP_Post|null $post    The post the note belongs to.
+ * @param string       $context Why this user is being notified, reported to
+ *                              `wp_note_notification_sent` listeners.
  * @return bool Whether the email was accepted for delivery by wp_mail().
  */
-function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post ): bool {
+function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post, string $context = 'mention' ): bool {
 	$switched_locale = switch_to_user_locale( $user->ID );
 
 	/*
@@ -212,14 +214,53 @@ function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?
 		$lines[] = __( 'Edit This', 'gutenberg' ) . ': ' . $edit_link;
 	}
 
+	$body = implode( "\n", $lines );
+
+	/**
+	 * Filters the note mention notification email body.
+	 *
+	 * Lets features layered on top of mentions extend the message, such as the
+	 * per-thread follower subscriptions appending an unfollow link.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string     $body    Email body.
+	 * @param WP_User    $user    Recipient.
+	 * @param WP_Comment $comment The note that triggered the notification.
+	 */
+	$body = apply_filters( 'wp_note_notification_text', $body, $user, $comment );
+
 	// Declared explicitly so a filtered default cannot turn the message into HTML.
 	$headers = 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . '"';
 
-	$sent = wp_mail( $user->user_email, $subject, implode( "\n", $lines ), $headers );
+	$sent = wp_mail( $user->user_email, $subject, $body, $headers );
 
 	if ( $switched_locale ) {
 		restore_previous_locale();
 	}
+
+	/**
+	 * Fires once for each user a note notification was addressed to.
+	 *
+	 * Email is the only channel notes ship with. This action is the seam for
+	 * the others: a plugin routing notes to Slack, a webhook, or mobile push
+	 * can hook it to learn who was told what, and a future WordPress
+	 * notifications API can consume the same signal.
+	 *
+	 * The notification has already been handed to wp_mail() when this fires;
+	 * `$sent` reports whether wp_mail() accepted it, which is not a delivery
+	 * receipt.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int        $user_id Recipient user ID.
+	 * @param WP_Comment $comment The note that triggered the notification.
+	 * @param string     $context Why the user was notified: 'mention',
+	 *                            'post_author_mention', 'follower', 'resolved',
+	 *                            or 'reopen'.
+	 * @param bool       $sent    Whether wp_mail() accepted the message.
+	 */
+	do_action( 'wp_note_notification_sent', (int) $user->ID, $comment, $context, $sent );
 
 	return $sent;
 }
