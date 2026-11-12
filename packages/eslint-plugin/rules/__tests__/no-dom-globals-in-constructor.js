@@ -27,11 +27,26 @@ ruleTester.run( 'no-dom-globals-in-constructor', rule, {
 				constructor() { this.name = "test"; }
 			}`,
 		},
+		{
+			// Non-React classes may use DOM globals in constructors.
+			code: `class Gallery {
+				constructor( container ) {
+					window.addEventListener( "resize", () => this.reflow() );
+				}
+				reflow() {}
+			}`,
+		},
+		{
+			code: `class Gallery {
+				constructor() { document.title = "test"; }
+			}`,
+		},
 	],
 	invalid: [
 		{
-			code: `class Foo {
+			code: `class Foo extends Component {
 				constructor() { document.title = "test"; }
+				render() { return null; }
 			}`,
 			errors: [
 				{
@@ -41,13 +56,39 @@ ruleTester.run( 'no-dom-globals-in-constructor', rule, {
 			],
 		},
 		{
-			code: `class Foo {
+			code: `class Foo extends React.Component {
 				constructor() { window.addEventListener("resize", () => {}); }
+				render() { return null; }
 			}`,
 			errors: [
 				{
 					messageId: 'defaultMessage',
 					data: { name: 'window' },
+				},
+			],
+		},
+		{
+			code: `class Foo extends PureComponent {
+				constructor() { document.title = "test"; }
+				render() { return null; }
+			}`,
+			errors: [
+				{
+					messageId: 'defaultMessage',
+					data: { name: 'document' },
+				},
+			],
+		},
+		{
+			// JSX render without extending Component still counts as React CC.
+			code: `class Foo {
+				constructor() { document.title = "test"; }
+				render() { return <div />; }
+			}`,
+			errors: [
+				{
+					messageId: 'defaultMessage',
+					data: { name: 'document' },
 				},
 			],
 		},
@@ -75,6 +116,12 @@ tsRuleTester.run( 'no-dom-globals-in-constructor (TypeScript)', rule, {
 			}`,
 		},
 		{
+			// Non-React TS class with DOM access in constructor.
+			code: `class Gallery {
+				constructor() { document.title = "test"; }
+			}`,
+		},
+		{
 			// TSInterfaceHeritage — extending a DOM interface.
 			code: 'interface MyEl extends HTMLElement {}',
 		},
@@ -89,9 +136,10 @@ tsRuleTester.run( 'no-dom-globals-in-constructor (TypeScript)', rule, {
 	],
 	invalid: [
 		{
-			// Value-level usage should still be flagged even in TS files.
-			code: `class Foo {
+			// Value-level usage should still be flagged for React classes.
+			code: `class Foo extends Component {
 				constructor() { document.title = "test"; }
+				render() { return null; }
 			}`,
 			errors: [
 				{
