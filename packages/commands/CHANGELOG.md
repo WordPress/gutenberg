@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Replace the `cmdk` dependency with the `Autocomplete` primitive from `@wordpress/ui` to resolve accessibility issues ([#83263](https://github.com/WordPress/gutenberg/pull/83263)).
+
 ## 2.1.0 (2026-11-04)
 
 ## 2.0.0 (2026-10-20)
