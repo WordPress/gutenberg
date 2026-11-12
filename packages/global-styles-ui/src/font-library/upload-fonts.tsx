@@ -1,11 +1,11 @@
 import { Progress } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
-	Notice,
+	Notice as WCNotice,
 	FormFileUpload,
 	FlexItem,
 } from '@wordpress/components';
@@ -98,17 +98,27 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const loadFiles = async ( files: File[] ) => {
-		const fontFacesLoaded = await Promise.all(
-			files.map( async ( fontFile: File ) => {
-				const fontFaceData = await getFontFaceMetadata( fontFile );
-				await loadFontFaceInBrowser(
-					fontFaceData,
-					fontFaceData.file,
-					'all'
-				);
-				return fontFaceData;
-			} )
-		);
+		let fontFacesLoaded;
+		try {
+			fontFacesLoaded = await Promise.all(
+				files.map( async ( fontFile: File ) => {
+					const fontFaceData = await getFontFaceMetadata( fontFile );
+					await loadFontFaceInBrowser(
+						fontFaceData,
+						fontFaceData.file,
+						'all'
+					);
+					return fontFaceData;
+				} )
+			);
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: ( error as Error ).message,
+			} );
+			setIsUploading( false );
+			return;
+		}
 		handleInstall( fontFacesLoaded );
 	};
 
@@ -152,7 +162,19 @@ function UploadFonts() {
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
 		const fontName = name.get( 16 ) || name.get( 1 );
-		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
+		if ( ! fontName ) {
+			throw new Error(
+				sprintf(
+					// translators: %s: Name of the uploaded font file.
+					__(
+						"%s cannot be installed because it does not include a font family name. Try a different version of this font, for example one downloaded from the font's official source."
+					),
+					fontFile.name
+				)
+			);
+		}
+		const subfamily = name.get( 2 ) || '';
+		const isItalic = subfamily.toLowerCase().includes( 'italic' );
 		const fontWeight =
 			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
 		const isVariable = !! font.opentype.tables.fvar;
@@ -179,9 +201,8 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const handleInstall = async ( fontFaces: FontFace[] ) => {
-		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-
 		try {
+			const fontFamilies = makeFamiliesFromFaces( fontFaces );
 			await installFonts( fontFamilies );
 			setNotice( {
 				type: 'success',
@@ -206,7 +227,7 @@ function UploadFonts() {
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library__local-fonts" justify="start">
 				{ notice && (
-					<Notice
+					<WCNotice
 						status={ notice.type }
 						__unstableHTML
 						onRemove={ () => setNotice( null ) }
@@ -219,7 +240,7 @@ function UploadFonts() {
 								) ) }
 							</ul>
 						) }
-					</Notice>
+					</WCNotice>
 				) }
 				{ isUploading && (
 					<FlexItem>

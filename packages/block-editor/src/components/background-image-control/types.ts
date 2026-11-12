@@ -42,7 +42,6 @@ export interface BackgroundControlsPanelProps {
 	onToggle?: ( isOpen: boolean ) => void;
 	hasImageValue: boolean;
 	onReset?: () => void;
-	hasLocalOverride?: boolean;
 	containerRef: RefObject< HTMLDivElement | null >;
 }
 
@@ -75,6 +74,4 @@ export interface BackgroundImageControlProps {
 	settings?: StyleSettings;
 	/** The values the controls default to. */
 	defaultValues?: Record< string, unknown >;
-	/** Whether the control shows where its value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }

@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
+import { check } from '@wordpress/icons';
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 import { NavigableMenu } from '../../navigable-container';
@@ -157,5 +159,60 @@ describe( 'DropdownMenu hover navigation', () => {
 		await user.hover( screen.getByText( 'Item' ) );
 		expect( item ).toHaveFocus();
 		expect( container.scrollTop ).toBe( 0 );
+	} );
+} );
+
+describe( 'DropdownMenu checkbox items', () => {
+	const CheckboxMenu = () => {
+		const [ selected, setSelected ] = useState( [ 'First', 'Second' ] );
+
+		return (
+			<DropdownMenu label="Open dropdown">
+				{ () =>
+					[ 'First', 'Second' ].map( ( option ) => {
+						const isSelected = selected.includes( option );
+
+						return (
+							<MenuItem
+								key={ option }
+								role="menuitemcheckbox"
+								isSelected={ isSelected }
+								icon={ isSelected ? check : null }
+								onClick={ () =>
+									setSelected( ( options ) =>
+										isSelected
+											? options.filter(
+													( item ) => item !== option
+												)
+											: [ ...options, option ]
+									)
+								}
+							>
+								{ option }
+							</MenuItem>
+						);
+					} )
+				}
+			</DropdownMenu>
+		);
+	};
+
+	it( 'keeps the menu width stable when an item is unchecked', async () => {
+		const user = userEvent.setup();
+		await render( <CheckboxMenu /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open dropdown' } )
+		);
+		const menu = screen.getByRole( 'menu' );
+		const initialWidth = menu.getBoundingClientRect().width;
+
+		const first = screen.getByRole( 'menuitemcheckbox', { name: 'First' } );
+		await user.click( first );
+		await expect
+			.element( first )
+			.toHaveAttribute( 'aria-checked', 'false' );
+
+		expect( menu.getBoundingClientRect().width ).toBe( initialWidth );
 	} );
 } );

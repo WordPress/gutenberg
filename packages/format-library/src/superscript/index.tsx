@@ -24,6 +24,7 @@ export const superscript = {
 
 		return (
 			<RichTextToolbarButton
+				name="superscript"
 				icon={ superscriptIcon }
 				title={ title }
 				onClick={ onClick }

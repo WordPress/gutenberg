@@ -38,6 +38,19 @@ const NESTING_BLOCK_NAMES = [
 	'core/navigation-submenu',
 ];
 
+/**
+ * Focuses the appender of the block list that contains the given element.
+ *
+ * The parent's appender changes from the button appender to the dropdown
+ * appender once it has items, so the appender that opened the Link UI may no
+ * longer be there to receive focus when the Link UI closes.
+ *
+ * @param {?Element} container The block list container element.
+ */
+function focusAppender( container ) {
+	container?.querySelector( ':scope > .block-list-appender button' )?.focus();
+}
+
 function getMissingText( type ) {
 	let missingText = '';
 
@@ -97,8 +110,8 @@ export default function NavigationLinkEdit( {
 	// A link is "new" only if it has an undefined label
 	// After the link is created, even if no label is provided, it's set to an empty string.
 	const isNewLink = useRef( label === undefined );
-	// Track whether we should focus the submenu appender when closing the link UI
-	const shouldSelectSubmenuAppenderOnClose = useRef( false );
+	// Track whether we should focus the parent's appender when closing the link UI
+	const shouldFocusAppenderOnClose = useRef( false );
 
 	const {
 		isAtMaxNesting,
@@ -106,7 +119,6 @@ export default function NavigationLinkEdit( {
 		isParentOfSelectedBlock,
 		hasChildren,
 		parentBlockClientId,
-		isSubmenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -143,7 +155,6 @@ export default function NavigationLinkEdit( {
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				parentBlockClientId: parentBlockId,
-				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
@@ -238,20 +249,16 @@ export default function NavigationLinkEdit( {
 			// are accurate.
 			selectBlock( clientId, null );
 
-			// Edge case: When the created link is the first child of a submenu, the focus will have
-			// originated from the add submenu toolbar button. In this case, we need to return focus
-			// to the submenu appender if the user closes the link ui using the keyboard.
-			// Check if this is the first and only child of a newly created submenu.
-			if ( isSubmenu ) {
-				const parentBlocks = getBlocks( parentBlockClientId );
-				// If this is the only child, then this is a new submenu.
-				// Set the flag to select the submenu appender when the link ui is closed.
-				if (
-					parentBlocks.length === 1 &&
-					parentBlocks[ 0 ].clientId === clientId
-				) {
-					shouldSelectSubmenuAppenderOnClose.current = true;
-				}
+			// Edge case: When the created link is the first child of a navigation
+			// or submenu, the appender that opened the link UI (or the add submenu
+			// toolbar button) is gone. In this case, we need to return focus to the
+			// parent's appender if the user closes the link ui using the keyboard.
+			const parentBlocks = getBlocks( parentBlockClientId );
+			if (
+				parentBlocks.length === 1 &&
+				parentBlocks[ 0 ].clientId === clientId
+			) {
+				shouldFocusAppenderOnClose.current = true;
 			}
 		}
 	}, [ url, isLinkOpen, isNewLink, label ] );
@@ -464,28 +471,28 @@ export default function NavigationLinkEdit( {
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
 								// `onReplace` is undefined when the block can't be removed.
 								if ( ! url && ! hasUrlBinding && onReplace ) {
+									const container =
+										listItemRef.current?.parentElement;
+									const isOnlyChild =
+										getBlocks( parentBlockClientId )
+											.length === 1;
 									onReplace( [] );
+
+									// Removing the only item swaps the parent's appender, so
+									// focus the new one once it has rendered.
+									if ( isOnlyChild ) {
+										container?.ownerDocument.defaultView.requestAnimationFrame(
+											() => focusAppender( container )
+										);
+									}
 									return;
 								}
 
-								// Edge case: If this is the first child of a new submenu, focus the submenu's appender
-								if (
-									shouldSelectSubmenuAppenderOnClose.current
-								) {
-									shouldSelectSubmenuAppenderOnClose.current = false;
-
-									// The appender is the next sibling in the DOM after the current block
-									if (
-										listItemRef.current?.nextElementSibling
-									) {
-										const appenderButton =
-											listItemRef.current.nextElementSibling.querySelector(
-												'.block-editor-button-block-appender'
-											);
-										if ( appenderButton ) {
-											appenderButton.focus();
-										}
-									}
+								if ( shouldFocusAppenderOnClose.current ) {
+									shouldFocusAppenderOnClose.current = false;
+									focusAppender(
+										listItemRef.current?.parentElement
+									);
 								}
 							} }
 							anchor={ popoverAnchor }
