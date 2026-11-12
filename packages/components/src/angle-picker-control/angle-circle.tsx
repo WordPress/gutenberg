@@ -43,7 +43,7 @@ function AngleCircle( {
 		};
 	};
 
-	const getPointerAngle = ( event: UseDraggingCallbackEvent ) => {
+	const capturePointerAngle = ( event: UseDraggingCallbackEvent ) => {
 		if ( event === undefined ) {
 			return undefined;
 		}
@@ -63,7 +63,7 @@ function AngleCircle( {
 	};
 
 	const startTurn = ( event: UseDraggingCallbackEvent ) => {
-		const angle = getPointerAngle( event );
+		const angle = capturePointerAngle( event );
 		if ( angle === undefined || onChange === undefined ) {
 			return;
 		}
@@ -84,7 +84,7 @@ function AngleCircle( {
 	};
 
 	const continueTurn = ( event: UseDraggingCallbackEvent ) => {
-		const angle = getPointerAngle( event );
+		const angle = capturePointerAngle( event );
 		if ( angle === undefined || onChange === undefined ) {
 			return;
 		}
