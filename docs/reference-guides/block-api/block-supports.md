@@ -1089,21 +1089,23 @@ _**Note:** Since WordPress 7.3._
 -   Subproperties:
     -   `rotate`: type `boolean`, default value `false`
     -   `translate`: type `boolean`, default value `false`
+    -   `scale`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate` or `settings.transform.translate`, which are `true` by default.
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, `settings.transform.translate` or `settings.transform.scale`, which are `true` by default.
 
-Each feature is output as its own CSS property, such as `rotate` or `translate`, and never as the `transform` shorthand. This way a rotation and an offset combine with each other and with any `transform` a theme or block already applies.
+Each feature is output as its own CSS property, such as `rotate`, `translate` or `scale`, and never as the `transform` shorthand. This way a rotation, an offset and a scale combine with each other and with any `transform` a theme or block already applies.
 
 ```js
 supports: {
 	transform: {
 		rotate: true, // Enable the rotation control.
 		translate: true, // Enable the X and Y offset controls.
+		scale: true, // Enable the scale control.
 	}
 }
 ```
 
-An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen.
+An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen. A scale does the same: it grows or shrinks the block around its center without changing the layout around it.
 
 In Global Styles, a block style variation or state that sets one axis outputs the other axis as `0`. For example, a Global Styles X offset of `3rem` with a `:hover` Y offset alone moves the block back to an X of `0` on hover.
 
@@ -1111,7 +1113,7 @@ Transforms are applied to the block wrapper. A block can apply them to an inner 
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. A block that sets one axis keeps the other axis from Global Styles, or from its own default value in a state such as `@mobile`, and `0` when neither sets it. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate`, `translate` or `scale` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. A block that sets one axis keeps the other axis from Global Styles, or from its own default value in a state such as `@mobile`, and `0` when neither sets it. A scale is a single non-negative number, such as `1.2`, or percentage, such as `"120%"`, that scales both axes. For example:
 
 ```js
 attributes: {
@@ -1122,6 +1124,7 @@ attributes: {
                 x: "10px",
                 y: "-50%",
             },
+            scale: 1.2,
         }
     }
 }
