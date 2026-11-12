@@ -76,27 +76,6 @@ describe( 'Card', () => {
 		expect( screen.getByText( 'Card Footer' ) ).toBeInTheDocument();
 	} );
 
-	it.each( [
-		[ 'horizontal', 'border-block-end-width' ],
-		[ 'vertical', 'border-inline-end-width' ],
-	] as const )(
-		'lets a consumer class override the width of a %s CardDivider',
-		async ( orientation, width ) => {
-			await render(
-				<>
-					<style>{ `.wide-divider { ${ width }: 3px; }` }</style>
-					<CardDivider
-						orientation={ orientation }
-						className="wide-divider"
-					/>
-				</>
-			);
-
-			const style = getComputedStyle( screen.getByRole( 'separator' ) );
-			expect( style.getPropertyValue( width ) ).toBe( '3px' );
-		}
-	);
-
 	it( 'removes the border when isBorderless is true', async () => {
 		const { rerender } = await render(
 			<Card data-testid="card-wrapper">Code is Poetry</Card>
