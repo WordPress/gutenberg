@@ -180,5 +180,8 @@
 		"packages/**/*.js": [
 			"node ./bin/update-readmes"
 		]
+	},
+	"overrides": {
+		"node-gyp": "12.4.0"
 	}
 }
