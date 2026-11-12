@@ -366,7 +366,8 @@ export function AutosaveFeatureListExample( {
  *
  * Leaving discards the edits and can't be undone, so the confirmation uses
  * the `irreversible` intent. With no unsaved changes, "Back" leaves
- * straight away.
+ * straight away. Reloading or closing the tab is guarded by the browser's
+ * own `beforeunload` warning.
  */
 export function UnsavedChangesOnExitExample() {
 	const [ savedData, setSavedData ] = useState( { title: 'Pizza Planet' } );
@@ -379,6 +380,18 @@ export function UnsavedChangesOnExitExample() {
 		snackbar.show( SAVED_MESSAGE );
 	} );
 	const hasChanges = data.title !== savedData.title;
+
+	useEffect( () => {
+		if ( ! hasChanges ) {
+			return;
+		}
+		const onBeforeUnload = ( event: BeforeUnloadEvent ) => {
+			event.preventDefault();
+		};
+		window.addEventListener( 'beforeunload', onBeforeUnload );
+		return () =>
+			window.removeEventListener( 'beforeunload', onBeforeUnload );
+	}, [ hasChanges ] );
 
 	function leave() {
 		setData( savedData );
@@ -454,9 +467,9 @@ export function UnsavedChangesOnExitExample() {
 			>
 				<AlertDialog.Popup
 					intent="irreversible"
-					title="Leave without saving?"
+					title="Discard unsaved changes?"
 					description="Your changes will be lost."
-					confirmButtonText="Leave without saving"
+					confirmButtonText="Discard changes"
 					cancelButtonText="Keep editing"
 				/>
 			</AlertDialog.Root>
