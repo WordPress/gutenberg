@@ -108,11 +108,15 @@ export default function useDropZone( {
 			}
 
 			function onDragOver( event: DragEvent ): void {
+				let isHandled: unknown = true;
+
 				if ( ! event.defaultPrevented && _onDragOver ) {
-					onDragOverEvent( event );
+					isHandled = onDragOverEvent( event );
 				}
 
-				event.preventDefault();
+				if ( isHandled !== false ) {
+					event.preventDefault();
+				}
 			}
 
 			function onDragLeave( event: DragEvent ): void {
@@ -139,18 +143,22 @@ export default function useDropZone( {
 					return;
 				}
 
-				// Prevent the browser default while also signalling to parent
-				// drop zones that `onDrop` is already handled.
-				event.preventDefault();
-
 				// This seemingly useless line has been shown to resolve a
 				// Safari issue where files dragged directly from the dock are
 				// not recognized.
 				// eslint-disable-next-line no-unused-expressions
 				event.dataTransfer && event.dataTransfer.files.length;
 
+				let isHandled: unknown = true;
+
 				if ( _onDrop ) {
-					onDropEvent( event );
+					isHandled = onDropEvent( event );
+				}
+
+				if ( isHandled !== false ) {
+					// Prevent the browser default while also signalling to parent
+					// drop zones that `onDrop` is already handled.
+					event.preventDefault();
 				}
 
 				maybeDragEnd( event );
