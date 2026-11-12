@@ -72,6 +72,46 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
+	describe( 'setEntityNavigator', () => {
+		it( 'sets and clears the navigator getEntityNavigator returns', () => {
+			const registry = createRegistryWithStores();
+			const getEntityNavigator = () =>
+				unlock( registry.select( editorStore ) ).getEntityNavigator();
+			const { setEntityNavigator } = unlock(
+				registry.dispatch( editorStore )
+			);
+
+			expect( getEntityNavigator() ).toBeUndefined();
+
+			const navigator = vi.fn();
+			setEntityNavigator( navigator );
+			expect( getEntityNavigator() ).toBe( navigator );
+
+			setEntityNavigator( undefined );
+			expect( getEntityNavigator() ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'setQuickEditOpener', () => {
+		it( 'sets and clears the opener getQuickEditOpener returns', () => {
+			const registry = createRegistryWithStores();
+			const getQuickEditOpener = () =>
+				unlock( registry.select( editorStore ) ).getQuickEditOpener();
+			const { setQuickEditOpener } = unlock(
+				registry.dispatch( editorStore )
+			);
+
+			expect( getQuickEditOpener() ).toBeUndefined();
+
+			const opener = vi.fn();
+			setQuickEditOpener( opener );
+			expect( getQuickEditOpener() ).toBe( opener );
+
+			setQuickEditOpener( undefined );
+			expect( getQuickEditOpener() ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'setCanvasWidth', () => {
 		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
 			const registry = createRegistryWithStores();

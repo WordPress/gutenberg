@@ -11,6 +11,8 @@ import {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	entityNavigator,
+	quickEditOpener,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -332,6 +334,58 @@ describe( 'state', () => {
 					isOpen: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'entityNavigator()', () => {
+		it( 'should apply default state', () => {
+			expect( entityNavigator( undefined, {} ) ).toBeUndefined();
+		} );
+
+		it( 'should default to returning the same state', () => {
+			const navigator = () => {};
+			expect( entityNavigator( navigator, {} ) ).toBe( navigator );
+		} );
+
+		it( 'should set and clear the navigator', () => {
+			const navigator = () => {};
+			const state = entityNavigator( undefined, {
+				type: 'SET_ENTITY_NAVIGATOR',
+				navigator,
+			} );
+			expect( state ).toBe( navigator );
+			expect(
+				entityNavigator( state, {
+					type: 'SET_ENTITY_NAVIGATOR',
+					navigator: undefined,
+				} )
+			).toBeUndefined();
+		} );
+	} );
+
+	describe( 'quickEditOpener()', () => {
+		it( 'should apply default state', () => {
+			expect( quickEditOpener( undefined, {} ) ).toBeUndefined();
+		} );
+
+		it( 'should default to returning the same state', () => {
+			const opener = () => {};
+			expect( quickEditOpener( opener, {} ) ).toBe( opener );
+		} );
+
+		it( 'should set and clear the opener', () => {
+			const opener = () => {};
+			const state = quickEditOpener( undefined, {
+				type: 'SET_QUICK_EDIT_OPENER',
+				opener,
+			} );
+			expect( state ).toBe( opener );
+			expect(
+				quickEditOpener( state, {
+					type: 'SET_QUICK_EDIT_OPENER',
+					opener: undefined,
+				} )
+			).toBeUndefined();
 		} );
 	} );
 } );
