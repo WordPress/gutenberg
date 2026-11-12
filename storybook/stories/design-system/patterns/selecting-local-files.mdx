@@ -1,13 +1,15 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
 import * as InputControlStories from '../../../../packages/ui/src/form/input-control/stories/index.story';
+import * as FilePickerButtonStories from './file-picker-button.story';
 import * as FilePickerMenuStories from './file-picker-menu.story';
+import FilePickerButtonSource from './file-picker-button.tsx?raw';
 import FilePickerMenuSource from './file-picker-menu.tsx?raw';
 
 <Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
 
 # Selecting local files
 
-Use a labeled file input when choosing files is part of a form. When the action lives in a menu, keep the file input mounted after the popup closes so it can receive the selection.
+Use a labeled file input when choosing files is part of a form. A button or menu item can also open the native picker. Keep the file input mounted until the user finishes choosing a file.
 
 ## In a form
 
@@ -15,9 +17,18 @@ Use `InputControl` with `type="file"`. Read the selected files from `event.curre
 
 <Canvas of={ InputControlStories.FileInput } />
 
+## From a button
+
+When the visible control should be a button, use `Button` to open a hidden `Input type="file"`. Call the input's `click()` method in the button's `onClick` handler. Read the file in the input's `onChange` handler to display its name beside the button.
+
+<Canvas
+	of={ FilePickerButtonStories.ChooseFile }
+	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
+/>
+
 ## From a menu item
 
-Render the menu through the `render` prop of `FormFileUpload` and pass `openFileDialog` to the item's `onClick`. Putting `FormFileUpload` inside `Menu.Popup` would remove its hidden input when the menu closes, before the user finishes choosing a file.
+Keep the hidden `Input` outside `Menu.Popup` and open it from the `Menu.Item` click handler. The popup closes when the item is activated. The input stays mounted to receive the selected file.
 
 <Canvas
 	of={ FilePickerMenuStories.ChooseFile }
