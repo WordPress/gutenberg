@@ -74,7 +74,7 @@ describe( 'Function date', () => {
 		[ 'h:i A', '11:00 AM' ],
 		[ 'G:i:s', '11:00:00' ],
 		[ 'H:i:s', '11:00:00' ],
-		[ 'B', '499' ],
+		[ 'B', '500' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
 		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
@@ -246,6 +246,22 @@ describe( 'Function date', () => {
 	} );
 } );
 
+describe( 'Function date, Swatch Internet Time', () => {
+	// Expected values are PHP's, for example:
+	//   php -r 'echo gmdate( "B", strtotime( "2019-06-18T11:00:00Z" ) );'
+	test.each( [
+		[ '2019-06-18T11:00:00.000Z', '500' ],
+		[ '2024-01-01T05:24:00.000Z', '266' ],
+		[ '2024-01-01T22:59:59.000Z', '999' ],
+		[ '2024-01-01T23:00:00.000Z', '000' ],
+		[ '2024-01-01T23:05:00.000Z', '003' ],
+		[ '1970-01-01T00:00:00.000Z', '041' ],
+	] )( 'should format %s as "%s", matching PHP', ( dateValue, expected ) => {
+		expect( dateNoI18n( 'B', dateValue ) ).toBe( expected );
+		expect( dateNoI18n( 'B', dateValue, 'Asia/Kolkata' ) ).toBe( expected );
+	} );
+} );
+
 describe( 'Function gmdate', () => {
 	test.each( [
 		[ 'j/n/y', '18/6/19' ],
@@ -262,7 +278,7 @@ describe( 'Function gmdate', () => {
 		[ 'h:i A', '11:00 AM' ],
 		[ 'G:i:s', '11:00:00' ],
 		[ 'H:i:s', '11:00:00' ],
-		[ 'B', '499' ],
+		[ 'B', '500' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
 		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
@@ -345,7 +361,7 @@ describe( 'Function dateI18n', () => {
 		[ 'h:i A', '11:00 AM' ],
 		[ 'G:i:s', '11:00:00' ],
 		[ 'H:i:s', '11:00:00' ],
-		[ 'B', '499' ],
+		[ 'B', '500' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
 		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],
@@ -602,7 +618,7 @@ describe( 'Function gmdateI18n', () => {
 		[ 'h:i A', '11:00 AM' ],
 		[ 'G:i:s', '11:00:00' ],
 		[ 'H:i:s', '11:00:00' ],
-		[ 'B', '499' ],
+		[ 'B', '500' ],
 		[ 'u', '000000' ],
 		[ 'v', '000' ],
 		[ 'e I T', 'Coordinated Universal Time 0 UTC' ],

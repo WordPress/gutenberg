@@ -334,15 +334,17 @@ const formatMap = {
 		const seconds = parseInt( timezoned.format( 's' ), 10 ),
 			minutes = parseInt( timezoned.format( 'm' ), 10 ),
 			hours = parseInt( timezoned.format( 'H' ), 10 );
-		return parseInt(
-			(
-				( seconds +
-					minutes * MINUTE_IN_SECONDS +
-					hours * HOUR_IN_SECONDS ) /
-				86.4
-			).toString(),
-			10
+		// One beat is 86.4 seconds. Divide whole numbers, as PHP does, since
+		// dividing by 86.4 directly gives 499.99999999999994 for noon.
+		const beats = Math.floor(
+			( ( seconds +
+				minutes * MINUTE_IN_SECONDS +
+				hours * HOUR_IN_SECONDS ) *
+				10 ) /
+				864
 		);
+		// PHP pads the value to three digits.
+		return beats.toString().padStart( 3, '0' );
 	},
 	g: 'h',
 	G: 'H',
