@@ -62,6 +62,7 @@ Viewport pan/zoom lets the user inspect or follow the crop area without changing
 | Task | API |
 | --- | --- |
 | Describe the edit to apply to the loaded image when saving | `getImageEdit()`. |
+| Turn the edit into instructions in the order they apply | `mapImageEdit()`. |
 | Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
 | Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 

@@ -28,6 +28,7 @@ export { getOutputSize } from './get-output-size';
 
 export { getImageEdit } from './get-image-edit';
 export type { ImageEdit } from './get-image-edit';
+export { mapImageEdit } from './map-image-edit';
 
 // Export the edited image as a file, in the browser.
 export { exportImage } from './export-image';
