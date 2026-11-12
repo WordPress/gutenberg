@@ -49,8 +49,17 @@ const ImageURLInputUI = ( {
 	lightboxEnabled,
 	onSetLightbox,
 	resetLightbox,
+	open,
+	onToggle,
 }: ImageURLInputUIProps ) => {
-	const [ isOpen, setIsOpen ] = useState( false );
+	const [ isOpenState, setIsOpenState ] = useState( false );
+	// The popover can be opened from the block, e.g. with a keyboard shortcut,
+	// in which case the block controls whether it's open.
+	const isOpen = open ?? isOpenState;
+	const setIsOpen = ( willOpen: boolean ) => {
+		setIsOpenState( willOpen );
+		onToggle?.( willOpen );
+	};
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
