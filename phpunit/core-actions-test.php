@@ -24,6 +24,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const WP_BLOCK = '@wordpress/core-actions/wp_block';
 
 	/**
+	 * The script module of the actions of templates.
+	 */
+	const WP_TEMPLATE = '@wordpress/core-actions/wp_template';
+
+	/**
 	 * The script module of the actions of template parts.
 	 */
 	const WP_TEMPLATE_PART = '@wordpress/core-actions/wp_template_part';
@@ -207,16 +212,22 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Templates are not duplicated: the editor creates them from the theme.
+	 * Templates are duplicated by the action of the `wp_template` module, with
+	 * a block theme only. The action applies to the custom templates.
 	 */
-	public function test_the_actions_of_templates() {
+	public function test_templates_are_only_duplicated_with_a_block_theme() {
 		wp_set_current_user( self::$admin_id );
-		switch_theme( 'block-theme' );
 
+		switch_theme( 'block-theme' );
 		$this->assertSame(
-			array_merge( array( 'view-post-revisions', 'rename-post' ), self::EVERY_POST_TYPE ),
-			$this->get_action_ids( 'wp_template' )
+			array_merge( array( 'view-post-revisions', 'duplicate-template', 'rename-post' ), self::EVERY_POST_TYPE ),
+			$this->get_action_ids( 'wp_template' ),
+			'A block theme can duplicate templates.'
 		);
+		$this->assertSame( array( 'duplicate-template' ), array_column( wp_get_registered_entity_action_modules( 'postType', 'wp_template' ), 'actions', 'id' )[ self::WP_TEMPLATE ] );
+
+		switch_theme( 'default' );
+		$this->assertNotContains( 'duplicate-template', $this->get_action_ids( 'wp_template' ), 'A classic theme cannot.' );
 	}
 
 	/**
@@ -249,11 +260,13 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		wp_set_current_user( self::$admin_id );
 		$this->assertContains( 'duplicate-post', $this->get_action_ids( 'page' ) );
 		$this->assertContains( 'duplicate-pattern', $this->get_action_ids( 'wp_block' ) );
+		$this->assertContains( 'duplicate-template', $this->get_action_ids( 'wp_template' ) );
 		$this->assertContains( 'duplicate-template-part', $this->get_action_ids( 'wp_template_part' ) );
 
 		wp_set_current_user( self::$editor_id );
 		$this->assertContains( 'duplicate-post', $this->get_action_ids( 'page' ), 'Editors can create pages.' );
 		$this->assertContains( 'duplicate-pattern', $this->get_action_ids( 'wp_block' ), 'Editors can create patterns.' );
+		$this->assertNotContains( 'duplicate-template', $this->get_action_ids( 'wp_template' ), 'Editors cannot create templates.' );
 		$this->assertNotContains( 'duplicate-template-part', $this->get_action_ids( 'wp_template_part' ), 'Editors cannot create template parts.' );
 
 		wp_set_current_user( self::$contributor_id );
@@ -385,6 +398,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$modules = array(
 			'page'             => array( self::POST_TYPE_SUPPORTS, self::PAGE ),
 			'wp_block'         => array( self::POST_TYPE_SUPPORTS, self::WP_BLOCK ),
+			'wp_template'      => array( self::POST_TYPE_SUPPORTS, self::WP_TEMPLATE ),
 			'wp_template_part' => array( self::POST_TYPE_SUPPORTS, self::WP_TEMPLATE_PART ),
 		);
 		foreach ( $modules as $post_type => $module_ids ) {
