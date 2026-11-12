@@ -1307,6 +1307,18 @@
 				"brand": {
 					"$value": "{wpds-color.primitive.primary.stroke3}",
 					"$description": "Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter)."
+				},
+				"success": {
+					"$value": "{wpds-color.primitive.success.stroke4}",
+					"$description": "Background color for indicators with a success tone and normal emphasis (eg. the filled portion of a meter)."
+				},
+				"warning": {
+					"$value": "{wpds-color.primitive.warning.stroke4}",
+					"$description": "Background color for indicators with a warning tone and normal emphasis (eg. the filled portion of a meter)."
+				},
+				"error": {
+					"$value": "{wpds-color.primitive.error.stroke4}",
+					"$description": "Background color for indicators with an error tone and normal emphasis (eg. the filled portion of a meter)."
 				}
 			},
 			"$extensions": {
