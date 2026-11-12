@@ -1,5 +1,5 @@
 ---
-reviewer: aduth
+reviewer: [aduth, ciampo]
 threshold: 0.01
 ---
 
