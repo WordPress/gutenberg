@@ -49,7 +49,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 * so that wp_trim_excerpt doesn't pre-trim the content before wp_trim_words can
 	 * apply the user's desired length.
 	 */
-	$excerpt_length = $attributes['excerptLength'];
+	$excerpt_length = isset( $attributes['excerptLength'] ) ? $attributes['excerptLength'] : null;
 	add_filter( 'excerpt_length', 'block_core_post_excerpt_excerpt_length', PHP_INT_MAX );
 
 	$excerpt = get_the_excerpt( $block->context['postId'] );
