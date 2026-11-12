@@ -8,8 +8,8 @@ import styles from './style.module.css';
 
 /**
  * A standard layout for admin screens. It includes a header with support for
- * a title or breadcrumbs, badges, actions such as a Save button, and links to
- * the sections of the screen. The page content shows below the header.
+ * a title or breadcrumbs, badges, actions such as a Save button, and tab-style
+ * links to the sections of the screen. The page content shows below the header.
  */
 function Page( {
 	headingLevel,
@@ -79,9 +79,9 @@ function Page( {
 	 */
 	actions?: React.ReactNode;
 	/**
-	 * Links to the sections of the screen, shown in the page header. Each
-	 * section has its own URL. Give the list of links and the `href` of the
-	 * current one, for example
+	 * Tab-style links to the sections of the screen, shown in the page header.
+	 * Each section has its own URL. Give the list of links and the `href` of
+	 * the current one, for example
 	 * `{ items: [ { label: 'General', href: '/general' } ], currentHref: '/general' }`.
 	 *
 	 * To navigate with a client-side router, pass its link component as
