@@ -20,6 +20,7 @@ import {
 import {
 	ImageEditorCanvas,
 	createImageEditorState,
+	exportImage,
 	getOutputSize,
 	useImageEditor,
 } from '..';
@@ -31,7 +32,6 @@ import {
 	loadImage,
 	renderToCanvas,
 	canvasToDataURL,
-	downloadCroppedImage,
 } from '../core/export/canvas-renderer';
 import {
 	createCamera,
@@ -814,15 +814,21 @@ const DebugComponent = () => {
 							__next40pxDefaultSize
 							variant="primary"
 							icon={ downloadIcon }
-							onClick={ () =>
-								downloadCroppedImage(
-									src,
-									state,
-									'cropped',
-									exportFormat,
-									0.9
-								)
-							}
+							onClick={ async () => {
+								// The public export, as a consumer would call it.
+								const blob = await exportImage( state, {
+									type: exportFormat,
+									quality: 0.9,
+								} );
+								const url = URL.createObjectURL( blob );
+								const link = document.createElement( 'a' );
+								link.href = url;
+								link.download = `cropped.${
+									exportFormat.split( '/' )[ 1 ] ?? 'png'
+								}`;
+								link.click();
+								URL.revokeObjectURL( url );
+							} }
 						>
 							Download
 						</Button>

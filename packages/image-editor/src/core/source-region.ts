@@ -10,7 +10,9 @@ import { isValidSize, sanitizeImageEditorState } from './math/sanitize';
 import { normalizeRotation } from './math/rotation';
 
 /**
- * The selected image region in source-pixel coordinates.
+ * The crop's size in source pixels, with the position of the image point
+ * under its centre. Not an axis-aligned region of the image — see
+ * `getSourceRegion`.
  */
 export interface SourceRegion {
 	/** X offset in source pixels. */
@@ -30,22 +32,29 @@ export interface SourceRegion {
 }
 
 /**
- * Get the selected image region in source-pixel coordinates.
+ * The crop's size in source pixels, positioned at the point of the image
+ * that sits under the crop's centre.
  *
- * Converts the current crop state (normalized visual space) to the actual
- * region of the original image that's selected. This is the bridge between
- * the editor's internal coordinate system and external tools (image
- * processing libraries, AI APIs, server-side processing) that work in
- * source-pixel coordinates.
+ * The width and height are measured along the view, which is the image
+ * turned to its nearest quarter turn. At 90 or 270 degrees they are
+ * therefore swapped relative to the image's own axes: a full-frame crop of
+ * a 1600x900 image at 90 degrees reports a width of 900 and a height of
+ * 1600. The centre is a real point of the image, so the rectangle as a
+ * whole is not an axis-aligned region of the image and can fall outside
+ * it.
  *
- * The returned rectangle accounts for pan, zoom, and the crop rect position,
- * but expresses the crop in the unrotated image's coordinate space. Rotation
- * and flip are included as separate fields since they represent transforms,
- * not a region.
+ * It exists for the snapping helpers below, which round the crop's edges
+ * to whole source pixels while a handle is dragged; the Debug story shows
+ * it too. It is wrong as a region to crop with: `getImageEdit` gives
+ * that, and `getOutputSize` gives the size on its own.
+ *
+ * Rotation and flip come back as separate fields because they are
+ * transforms rather than part of a region.
  *
  * @param state     The current editor state.
  * @param imageSize The natural dimensions of the source image.
- * @return The selected region in source pixels plus rotation/flip metadata.
+ * @return The crop size in source pixels, where its centre sits, and the
+ *         rotation and flip in force.
  */
 export function getSourceRegion(
 	state: InternalImageEditorState,
@@ -318,50 +327,5 @@ function snapCropRectEdgesToSourcePixels(
 		y: shouldSnapY ? snappedCropRect.y : cropRect.y,
 		width: shouldSnapX ? snappedCropRect.width : cropRect.width,
 		height: shouldSnapY ? snappedCropRect.height : cropRect.height,
-	};
-}
-
-/**
- * The selected crop region expressed as percentages of the source image.
- */
-export interface SourceRegionPercent {
-	/** X offset as a percentage (0–100) of the source image width. */
-	x: number;
-	/** Y offset as a percentage (0–100) of the source image height. */
-	y: number;
-	/** Width as a percentage (0–100) of the source image width. */
-	width: number;
-	/** Height as a percentage (0–100) of the source image height. */
-	height: number;
-}
-
-/**
- * Get the selected image region as percentages of the source image dimensions.
- *
- * Returns `{ x, y, width, height }` where each value is a percentage (0–100)
- * of the source image's natural width or height. This format is compatible
- * with the WordPress REST API attachments `/edit` endpoint and CSS-based
- * crop workflows.
- *
- * Internally delegates to `getSourceRegion` and divides by the image
- * dimensions, so accuracy is identical.
- *
- * @param state     The current editor state.
- * @param imageSize The natural dimensions of the source image.
- * @return The crop region as percentages (0–100).
- */
-export function getSourceRegionPercent(
-	state: InternalImageEditorState,
-	imageSize: Size
-): SourceRegionPercent {
-	if ( ! isValidSize( imageSize ) ) {
-		return { x: 0, y: 0, width: 0, height: 0 };
-	}
-	const region = getSourceRegion( state, imageSize );
-	return {
-		x: ( region.x / imageSize.width ) * 100,
-		y: ( region.y / imageSize.height ) * 100,
-		width: ( region.width / imageSize.width ) * 100,
-		height: ( region.height / imageSize.height ) * 100,
 	};
 }

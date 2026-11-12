@@ -1341,7 +1341,7 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
-		test( 'closes the new note form on focus-out only when empty', async ( {
+		test( 'keeps the new note form open while its block is edited', async ( {
 			editor,
 			page,
 		} ) => {
@@ -1354,11 +1354,35 @@ test.describe( 'Block Notes', () => {
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await expect( newNoteForm ).toBeFocused();
 			await editor.canvas.getByText( 'First block' ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+			await expect(
+				editor.canvas.getByText( 'First block edited' )
+			).toBeVisible();
+			await expect( newNoteForm ).toBeVisible();
+		} );
+
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const optionsButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toBeHidden();
 
 			await editor.clickBlockOptionsMenuItem( 'Add note' );
 			await newNoteForm.pressSequentially( 'Unsent draft' );
-			await editor.canvas.getByText( 'First block' ).click();
+			await optionsButton.focus();
 			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
 		} );
 
@@ -1592,6 +1616,80 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'One two three four' );
 		} );
 
+		for ( const { first, second } of [
+			{
+				first: { name: 'core/paragraph', label: 'Block: Paragraph' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+			{
+				first: { name: 'core/heading', label: 'Block: Heading' },
+				second: { name: 'core/paragraph', label: 'Block: Paragraph' },
+			},
+		] ) {
+			test( `keeps the notes of both blocks when a ${ second.name } block is merged into a ${ first.name } block`, async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				const firstBlock = editor.canvas
+					.getByRole( 'document', { name: first.label } )
+					.first();
+				const secondBlock = editor.canvas
+					.getByRole( 'document', { name: second.label } )
+					.last();
+
+				await blockNoteUtils.insertBlockWithNote( {
+					name: first.name,
+					content: 'One',
+					note: 'First block note',
+				} );
+				await firstBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'First block inline note' );
+				await blockNoteUtils.insertBlockWithNote( {
+					name: second.name,
+					content: 'two',
+					note: 'Second block note',
+				} );
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await blockNoteUtils.addNote( 'Second block inline note' );
+				const blocks = await editor.getBlocks();
+				const noteId = blocks.flatMap(
+					( { attributes } ) => attributes.metadata.noteId
+				);
+				expect( noteId ).toHaveLength( 4 );
+
+				await secondBlock.click();
+				await blockNoteUtils.selectBlockText();
+				await page.keyboard.press( 'ArrowLeft' );
+				await page.keyboard.press( 'Backspace' );
+
+				await expect(
+					editor.canvas.getByRole( 'document', { name: first.label } )
+				).toHaveText( 'Onetwo' );
+				await expect(
+					editor.canvas.locator( 'mark.wp-note' )
+				).toHaveText( [ 'One', 'two' ] );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: first.name,
+						attributes: { metadata: { noteId } },
+					},
+				] );
+				for ( const note of [
+					'First block note',
+					'First block inline note',
+					'Second block note',
+					'Second block inline note',
+				] ) {
+					await expect(
+						blockNoteUtils.getThread( note )
+					).toBeVisible();
+				}
+			} );
+		}
+
 		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
 			editor,
 			page,
@@ -1648,6 +1746,62 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				blockNoteUtils.getThread( 'Just this accordion word' )
 			).toBeVisible();
+		} );
+
+		test( 'adds a block-level note when the selected text is bound to a source', async ( {
+			editor,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			try {
+				await page.evaluate( () =>
+					window.wp.data.dispatch( 'core/editor' ).editPost( {
+						meta: { text_custom_field: 'Hello brave new world.' },
+					} )
+				);
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Fallback',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraph ).toHaveText(
+					'Hello brave new world.'
+				);
+
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Bound text note' );
+
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Fallback',
+							metadata: { noteId: [ expect.any( Number ) ] },
+						},
+					},
+				] );
+			} finally {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-block-bindings'
+				);
+			}
 		} );
 
 		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
