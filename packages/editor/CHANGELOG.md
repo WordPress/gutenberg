@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#81554](https://github.com/WordPress/gutenberg/pull/81554)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
