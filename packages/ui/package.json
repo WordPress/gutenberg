@@ -25,7 +25,8 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types"
+		"build-types",
+		"skills"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

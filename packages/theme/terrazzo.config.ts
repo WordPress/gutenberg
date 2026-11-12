@@ -81,6 +81,10 @@ const config: Config = {
 		pluginDsTokenDocs( {
 			filename: 'docs/tokens.md',
 		} ),
+		// The `wp-theme` agent skill ships its own copy of the reference.
+		pluginDsTokenDocs( {
+			filename: 'skills/wp-theme/references/tokens.md',
+		} ),
 		typescriptTypes( {
 			filename: 'src/prebuilt/ts/token-types.ts',
 			types: [
