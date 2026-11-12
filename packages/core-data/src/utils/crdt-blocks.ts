@@ -1022,45 +1022,52 @@ function resolveRichTextCursorPosition(
 		: null;
 }
 
-// Cached block attribute types, populated once from getBlockTypes().
-let cachedBlockAttributeSchemas: Map<
-	string,
-	Map< string, BlockAttributeSchema >
->;
+// What is cached for each block type.
+interface CachedBlockAttributeSchema {
+	// The type definition of each attribute, by attribute name.
+	attributes: Map< string, BlockAttributeSchema >;
 
-// Cached lists of unique items of each block type, populated together with
-// the block attribute types.
-let cachedBlockUniqueLists: Map< string, UniqueList[] >;
+	// The lists of unique items that the block type declares.
+	uniqueLists: UniqueList[];
+}
+
+// Cached block attribute types, populated once from getBlockTypes().
+let cachedBlockAttributeSchemas:
+	Map< string, CachedBlockAttributeSchema > | undefined;
 
 /**
- * Read the attribute definitions of all block types once.
+ * Get the cached attribute definitions of a block type. The definitions of
+ * all block types are read once, the first time this is called.
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The cached definitions. Undefined when the block type is not registered.
  */
-function cacheBlockAttributeSchemas(): void {
-	if ( cachedBlockAttributeSchemas ) {
-		return;
+function getCachedBlockAttributeSchema(
+	blockName: string
+): CachedBlockAttributeSchema | undefined {
+	if ( ! cachedBlockAttributeSchemas ) {
+		const schemas = new Map< string, CachedBlockAttributeSchema >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const attributes = blockType.attributes ?? {};
+
+			schemas.set( blockType.name, {
+				attributes: new Map< string, BlockAttributeSchema >(
+					Object.entries( attributes ).map(
+						( [ name, definition ] ) => {
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
+						}
+					)
+				),
+				uniqueLists: findUniqueLists( attributes ),
+			} );
+		}
+
+		cachedBlockAttributeSchemas = schemas;
 	}
 
-	cachedBlockAttributeSchemas = new Map();
-	cachedBlockUniqueLists = new Map();
-
-	for ( const blockType of getBlockTypes() as BlockType[] ) {
-		const attributes = blockType.attributes ?? {};
-
-		cachedBlockAttributeSchemas.set(
-			blockType.name,
-			new Map< string, BlockAttributeSchema >(
-				Object.entries( attributes ).map( ( [ name, definition ] ) => {
-					const { role, type, query } = definition;
-					return [ name, { role, type, query } ];
-				} )
-			)
-		);
-
-		cachedBlockUniqueLists.set(
-			blockType.name,
-			findUniqueLists( attributes )
-		);
-	}
+	return cachedBlockAttributeSchemas.get( blockName );
 }
 
 /**
@@ -1074,9 +1081,9 @@ function getBlockAttributeSchema(
 	blockName: string,
 	attributeName: string
 ): BlockAttributeSchema | undefined {
-	cacheBlockAttributeSchemas();
-
-	return cachedBlockAttributeSchemas.get( blockName )?.get( attributeName );
+	return getCachedBlockAttributeSchema( blockName )?.attributes.get(
+		attributeName
+	);
 }
 
 // Returned for block types that are not registered.
@@ -1102,9 +1109,10 @@ const NO_UNIQUE_LISTS: UniqueList[] = [];
  * @return The lists of unique items. Empty when the block type has none.
  */
 function getBlockUniqueLists( blockName: string ): UniqueList[] {
-	cacheBlockAttributeSchemas();
-
-	return cachedBlockUniqueLists.get( blockName ) ?? NO_UNIQUE_LISTS;
+	return (
+		getCachedBlockAttributeSchema( blockName )?.uniqueLists ??
+		NO_UNIQUE_LISTS
+	);
 }
 
 /**
