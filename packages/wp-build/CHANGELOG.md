@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Format the generated style, script and script module registries (`build/styles/registry.php`, `build/scripts/registry.php` and `build/modules/registry.php`) to follow the WordPress Coding Standards: align the `=>` operators and add spaces inside non-empty `array()` literals, so WordPress Core can copy them without PHPCS errors.
+-   Format the generated style, script and script module registries (`build/styles/registry.php`, `build/scripts/registry.php` and `build/modules/registry.php`) to follow the WordPress Coding Standards: align the `=>` operators and add spaces inside non-empty `array()` literals, so WordPress Core can copy them without PHPCS errors ([#86766](https://github.com/WordPress/gutenberg/pull/86766)).
 
 ### Internal
 
