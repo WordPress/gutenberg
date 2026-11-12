@@ -3315,6 +3315,14 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/navigation/edit/test/menu-inspector-controls.jsdom.test.jsx": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/navigation/edit/test/navigation-menu-selector.jsdom.test.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
