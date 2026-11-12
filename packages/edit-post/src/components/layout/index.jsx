@@ -260,17 +260,6 @@ function MetaBoxesMain() {
 		return;
 	}
 
-	const contents = (
-		<div
-			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
-			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isOpen }
-		>
-			<MetaBoxes location="normal" />
-			<MetaBoxes location="advanced" />
-		</div>
-	);
-
 	const isAutoHeight = openHeight === undefined;
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
 	const usedHeight = isOpen ? usedOpenHeight : min;
@@ -341,7 +330,14 @@ function MetaBoxesMain() {
 				{ toggle }
 				{ separator }
 			</div>
-			{ contents }
+			<div
+				// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
+				className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
+				hidden={ ! isOpen }
+			>
+				<MetaBoxes location="normal" />
+				<MetaBoxes location="advanced" />
+			</div>
 		</NavigableRegion>
 	);
 }

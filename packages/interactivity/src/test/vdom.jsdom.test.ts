@@ -1,7 +1,11 @@
-import { h } from 'preact';
-import type { ComponentChild } from 'preact';
-import { describe, expect, it, vi } from 'vitest';
-import { parseDirectiveValue, toVdom } from '../vdom';
+import { h, type ComponentChild, type VNode } from 'preact';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+	getHtmlFallback,
+	getInteractiveNamespace,
+	parseDirectiveValue,
+	toVdom,
+} from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -904,6 +908,185 @@ describe( 'toVdom', () => {
 		} );
 	} );
 
+	describe( 'Initial namespace', () => {
+		/**
+		 * Appends the markup to the document body and returns the element
+		 * matching the selector, so the conversion root has ancestors.
+		 *
+		 * @param html     Markup to attach.
+		 * @param selector Selector of the element to return.
+		 * @return The matching element.
+		 */
+		function attach( html: string, selector: string ): HTMLElement {
+			const container = document.createElement( 'div' );
+			container.innerHTML = html.trim();
+			document.body.append( container );
+			return container.querySelector( selector )!;
+		}
+
+		/**
+		 * Lists the namespace of the `data-wp-test` directive of every
+		 * element in the vDOM, in document order, including `<template>`
+		 * content. Elements without the directive are skipped.
+		 *
+		 * @param vnode The vDOM to read.
+		 * @return The namespaces.
+		 */
+		function testNamespaces( vnode: any ): Array< string | null > {
+			const found: Array< string | null > = [];
+			const visit = ( node: any ) => {
+				if ( ! node || typeof node !== 'object' ) {
+					return;
+				}
+				const entries = node.props.__directives?.test;
+				if ( entries ) {
+					found.push( entries[ 0 ].namespace );
+				}
+				[
+					...( node.props.content ?? [] ),
+					...( node.props.children ?? [] ),
+				].forEach( visit );
+			};
+			visit( vnode );
+			return found;
+		}
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'should resolve the unprefixed directives of the root and of its template content against the given namespace', () => {
+			const root = attach(
+				`<section id="root" data-wp-test="a"><p data-wp-test="b"></p><template><i data-wp-test="c"></i></template></section>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( root, 'given' ) ) ).toEqual( [
+				'given',
+				'given',
+				'given',
+			] );
+		} );
+
+		it( 'should let a data-wp-interactive on the root or inside it and a namespace prefix take precedence over the given namespace', () => {
+			const root = attach(
+				`<span id="root" data-wp-interactive="own" data-wp-test="a"><i data-wp-interactive="inside" data-wp-test="b"></i><u data-wp-test="prefix::c"></u><s data-wp-test="d"></s></span>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( root, 'given' ) ) ).toEqual( [
+				'own',
+				'inside',
+				'prefix',
+				'own',
+			] );
+
+			document.body.innerHTML = '';
+			const inner = attach(
+				`<section id="root" data-wp-test="a"><div data-wp-interactive="inside"><p data-wp-test="b"></p></div><template><i data-wp-test="c"></i></template></section>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( inner, 'given' ) ) ).toEqual( [
+				'given',
+				'inside',
+				'given',
+			] );
+
+			document.body.innerHTML = '';
+			const prefixed = attach(
+				`<span id="root" data-wp-test="prefix::a"></span>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( prefixed, 'given' ) ) ).toEqual( [
+				'prefix',
+			] );
+		} );
+
+		it( 'should resolve the unprefixed directives against no namespace when null is given', () => {
+			const root = attach(
+				`<span id="root" data-wp-test="a"><template><p data-wp-test="b"></p></template></span>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( root, null ) ) ).toEqual( [
+				null,
+				null,
+			] );
+		} );
+
+		it( 'should not read the ancestors of the root when no namespace is given', () => {
+			const root = attach(
+				`<div data-wp-interactive="ancestor"><span id="root" data-wp-test="a"><template><p data-wp-test="b"></p></template></span></div>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( root ) ) ).toEqual( [
+				null,
+				null,
+			] );
+
+			// Neither does the given namespace come from them.
+			expect( testNamespaces( toVdom( root, 'given' ) ) ).toEqual( [
+				'given',
+				'given',
+			] );
+		} );
+
+		it( 'should convert islands as before when no namespace is given', () => {
+			const island = attach(
+				`<div id="root" data-wp-interactive="own" data-wp-test="a"><template><p data-wp-test="b"></p></template></div>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( island ) ) ).toEqual( [
+				'own',
+				'own',
+			] );
+		} );
+
+		it( 'should not leak the given namespace into a following conversion without one', () => {
+			const root = attach(
+				`<span id="root" data-wp-test="a"></span>`,
+				'#root'
+			);
+			expect( testNamespaces( toVdom( root, 'given' ) ) ).toEqual( [
+				'given',
+			] );
+			expect( testNamespaces( toVdom( root ) ) ).toEqual( [ null ] );
+		} );
+	} );
+
+	describe( 'getInteractiveNamespace', () => {
+		it.each( [
+			[ 'a string value', 'my-plugin', 'my-plugin' ],
+			[
+				'an object with a namespace string',
+				'{ "namespace": "object-ns", "state": {} }',
+				'object-ns',
+			],
+			[ 'an object without a namespace', '{ "state": {} }', null ],
+			[
+				'an object with a non-string namespace',
+				'{ "namespace": 1 }',
+				null,
+			],
+			[ 'a reserved string', 'constructor', null ],
+			[
+				'an object with a reserved namespace',
+				'{ "namespace": "__proto__" }',
+				null,
+			],
+		] )(
+			'should give the namespace that toVdom() applies for %s',
+			( _description, attributeValue, expected ) => {
+				const { value } = parseDirectiveValue( attributeValue );
+				expect( getInteractiveNamespace( value ) ).toBe( expected );
+
+				const root = createElementFromHTML(
+					`<div data-wp-interactive='${ attributeValue }'><p data-wp-test="a"></p></div>`
+				);
+				const entries = ( toVdom( root ) as any ).props.children[ 0 ]
+					.props.__directives.test;
+				expect( entries[ 0 ].namespace ).toBe( expected );
+			}
+		);
+	} );
+
 	describe( 'Suffixes and Unique IDs', () => {
 		it( 'should parse directives with suffixes only', () => {
 			const element = createElementFromHTML(
@@ -1334,5 +1517,90 @@ describe( 'toVdom', () => {
 				[ 'b', 'z' ],
 			] );
 		} );
+	} );
+} );
+
+describe( 'HTML fallback snapshots', () => {
+	it( 'copies non-HTML template elements with their child nodes', () => {
+		const fallback = createElementFromHTML(
+			'<div data-wp-html="state.html"><svg><template><text>Static</text></template></svg></div>'
+		);
+		const snapshot = getHtmlFallback( toVdom( fallback ) as VNode< any > )!;
+		const svg = snapshot.firstChild as SVGElement;
+		const template = svg.firstChild as SVGElement;
+
+		expect( svg.namespaceURI ).toBe( 'http://www.w3.org/2000/svg' );
+		expect( template.localName ).toBe( 'template' );
+		expect( template.namespaceURI ).toBe( 'http://www.w3.org/2000/svg' );
+		expect( template.childNodes ).toHaveLength( 1 );
+		expect( template.firstChild ).toMatchObject( {
+			localName: 'text',
+			namespaceURI: 'http://www.w3.org/2000/svg',
+		} );
+		expect(
+			( template.firstChild as SVGElement ).firstChild
+		).toMatchObject( {
+			nodeType: Node.TEXT_NODE,
+			nodeValue: 'Static',
+		} );
+	} );
+
+	it( 'uses the live document template-contents owner for every copied node', () => {
+		const fallbackMarkup = `<div data-wp-html="state.html">fallback<template><section>nested<template><b>deep</b></template></section></template></div>`;
+		const templateContentsDocument =
+			document.createElement( 'template' ).content.ownerDocument;
+		const liveSource = createElementFromHTML( fallbackMarkup );
+		const sourceTemplate = document.createElement( 'template' );
+		sourceTemplate.innerHTML = fallbackMarkup;
+		const templateSource =
+			sourceTemplate.content.querySelector( '[data-wp-html]' )!;
+		const parsedDocument = new DOMParser().parseFromString(
+			fallbackMarkup,
+			'text/html'
+		);
+		const parsedSource = parsedDocument.querySelector( '[data-wp-html]' )!;
+		const snapshots = [ liveSource, templateSource, parsedSource ].map(
+			( source ) => getHtmlFallback( toVdom( source ) as VNode< any > )!
+		);
+
+		// The inputs exercise the live, template-contents, and parsed-page docs.
+		expect( liveSource.ownerDocument ).toBe( document );
+		expect( templateSource.ownerDocument ).toBe( templateContentsDocument );
+		expect( parsedSource.ownerDocument ).not.toBe(
+			templateContentsDocument
+		);
+		expect(
+			parsedDocument.createElement( 'template' ).content.ownerDocument
+		).not.toBe( templateContentsDocument );
+
+		const snapshotOwnerDocuments = new Set< Document >();
+		/**
+		 * Collects owner documents from a snapshot node and nested template contents.
+		 *
+		 * @param node Snapshot node to inspect.
+		 */
+		function collectTemplateContentsOwners( node: Node ): void {
+			snapshotOwnerDocuments.add( node.ownerDocument! );
+			if (
+				node.nodeType === 1 &&
+				( node as Element ).localName === 'template'
+			) {
+				const contents = ( node as HTMLTemplateElement ).content;
+				snapshotOwnerDocuments.add( contents.ownerDocument );
+				for ( const child of contents.childNodes ) {
+					collectTemplateContentsOwners( child );
+				}
+			}
+			for ( const child of node.childNodes ) {
+				collectTemplateContentsOwners( child );
+			}
+		}
+
+		for ( const snapshot of snapshots ) {
+			collectTemplateContentsOwners( snapshot );
+		}
+		expect( snapshotOwnerDocuments ).toEqual(
+			new Set( [ templateContentsDocument ] )
+		);
 	} );
 } );

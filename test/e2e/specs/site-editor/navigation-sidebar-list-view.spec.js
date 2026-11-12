@@ -372,6 +372,33 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeHidden();
 	} );
+
+	test( 'lists the pages of a Page List block', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Page List Menu',
+			content: '<!-- wp:page-list /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 1' } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 2' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {

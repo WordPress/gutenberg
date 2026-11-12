@@ -46,7 +46,7 @@ function GridItemResizerInner( {
 	blockElement,
 	rootBlockElement,
 	onChange,
-	isManualGrid,
+	isManualGrid = false,
 }: GridItemResizerInnerProps ) {
 	const [ resizeDirection, setResizeDirection ] = useState< string | null >(
 		null
@@ -59,6 +59,19 @@ function GridItemResizerInner( {
 	} );
 
 	useEffect( () => {
+		// In a manual grid every side is always available: a side on the
+		// grid's edge can still shrink the block, and the resize is kept
+		// inside the grid by its bounds. Checking the edges here would also
+		// go stale when the block moves without changing size.
+		if ( isManualGrid ) {
+			setEnableSide( {
+				top: true,
+				bottom: true,
+				left: true,
+				right: true,
+			} );
+			return;
+		}
 		const observer = new window.ResizeObserver( () => {
 			const blockClientRect = blockElement.getBoundingClientRect();
 			const rootBlockClientRect =
@@ -73,13 +86,9 @@ function GridItemResizerInner( {
 				blockClientRect.right < rootBlockClientRect.right;
 
 			setEnableSide( {
-				top: !! isManualGrid
-					? topAvailable
-					: ! bottomAvailable && topAvailable,
+				top: ! bottomAvailable && topAvailable,
 				bottom: bottomAvailable,
-				left: !! isManualGrid
-					? leftAvailable
-					: ! rightAvailable && leftAvailable,
+				left: ! rightAvailable && leftAvailable,
 				right: rightAvailable,
 			} );
 		} );
@@ -90,11 +99,19 @@ function GridItemResizerInner( {
 	const justification: Record< string, string > = {
 		right: 'left',
 		left: 'right',
+		topRight: 'left',
+		bottomRight: 'left',
+		topLeft: 'right',
+		bottomLeft: 'right',
 	};
 
 	const alignment: Record< string, string > = {
 		top: 'flex-end',
 		bottom: 'flex-start',
+		topRight: 'flex-end',
+		topLeft: 'flex-end',
+		bottomRight: 'flex-start',
+		bottomLeft: 'flex-start',
 	};
 
 	// A `null` direction, while not resizing, matches no key.
@@ -125,13 +142,13 @@ function GridItemResizerInner( {
 				} }
 				enable={ {
 					bottom: enableSide.bottom,
-					bottomLeft: false,
-					bottomRight: false,
+					bottomLeft: enableSide.left && enableSide.bottom,
+					bottomRight: enableSide.bottom && enableSide.right,
 					left: enableSide.left,
 					right: enableSide.right,
 					top: enableSide.top,
-					topLeft: false,
-					topRight: false,
+					topLeft: enableSide.top && enableSide.left,
+					topRight: enableSide.top && enableSide.right,
 				} }
 				bounds={ bounds }
 				boundsByDirection
