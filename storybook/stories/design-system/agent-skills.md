@@ -16,7 +16,7 @@ Agents only read skills from their own skills directory, such as `.claude/skills
 
 ## pnpm
 
-pnpm 12.11 and later link skills from your direct dependencies on `pnpm install`. Install the packages as direct dependencies, then approve their skills:
+[pnpm 12.11](https://pnpm.io/blog/releases/12.11.0) or later links skills from your direct dependencies on `pnpm install`. Install the packages as direct dependencies, then approve their skills:
 
 ```bash
 pnpm add @wordpress/ui @wordpress/theme
@@ -35,17 +35,30 @@ permissions:
     skills: true
 ```
 
-`skills: true` links every skill the package ships. A list of skill names, such as `skills: [ wp-ui ]`, links only those skills, and `false` links none.
+`skills: true` links every skill the package ships, and `false` links none. To approve only some of a package's skills, list their names:
 
-By default, pnpm links skills into the agent skills directories that already exist in your project root, plus the one for the agent running pnpm. To choose the directories yourself, set `skills.dirs`. This replaces the detected directories and creates any that are missing:
+```yaml
+permissions:
+  '@wordpress/ui':
+    skills: [ wp-ui, wp-ui-migration ]
+  '@wordpress/theme':
+    skills: [ wp-theme ]
+```
+
+Skills that are not in the list are not linked, and pnpm does not offer them for approval again.
+
+pnpm links the approved skills into every agent skills directory it detects in your project root, such as `.claude/skills` and `.agents/skills`, plus the one for the agent running pnpm. To control the directories yourself, set `skills.dirs`. It replaces the detected directories, and pnpm creates any that are missing:
 
 ```yaml
 skills:
   dirs:
-    - .claude/skills
+    - .ai/skills
+    - .agents/skills
 ```
 
-See the pnpm settings reference for [`permissions`](https://pnpm.io/settings/build#permissions) and [`skills.dirs`](https://pnpm.io/settings/build#skillsdirs).
+pnpm writes the links and its `.gitignore` into those directories. If your project tracks one of them in git, or it is a symlink to a tracked folder, point `skills.dirs` at a directory that is not tracked.
+
+See the pnpm documentation on [agent skills](https://pnpm.io/agent-skills) and the settings reference for [`permissions`](https://pnpm.io/settings/build#permissions) and [`skills.dirs`](https://pnpm.io/settings/build#skillsdirs).
 
 ## npm
 
@@ -85,14 +98,13 @@ Tools that scan `node_modules` can't see packages in Yarn's default Plug'n'Play 
 
 Look for the skills from the table above, such as `wp-ui` and `wp-theme`, in your agent's skills directory, for example `.claude/skills`, then start a new agent session.
 
-Commit the links, or ignore them in `.gitignore` if your team prefers to link the skills again on every install. For example, to ignore the `@wordpress/ui` and `@wordpress/theme` skills:
+The links point into `node_modules`, so do not commit them: committed links would be broken until the dependencies are installed.
+
+pnpm adds a `# pnpm` block to a `.gitignore` in each agent skills directory and keeps it up to date, so you don't need to ignore anything for pnpm. pnpm links each skill under its own name, such as `wp-ui`, and only uses the longer `pnpm-<package>-<skill>` name when two skills collide.
+
+For the `skills` CLI (npm and Yarn), add the links to your `.gitignore`. For example, to ignore the `@wordpress/ui` and `@wordpress/theme` skills:
 
 ```gitignore
-# pnpm names each link pnpm-<package>-<skill>, so this also ignores skills from other @wordpress packages.
-.claude/skills/pnpm-*wordpress*
-.agents/skills/pnpm-*wordpress*
-
-# The skills CLI (npm and Yarn) names each link after the skill.
 .claude/skills/wp-ui
 .claude/skills/wp-ui-migration
 .claude/skills/wp-ui-setup
@@ -105,4 +117,4 @@ Commit the links, or ignore them in `.gitignore` if your team prefers to link th
 .agents/skills/wp-theme-setup
 ```
 
-Keep only the lines for the directories and tool you use. The `skills` CLI also writes a `skills-lock.json` file that you should commit.
+Keep only the lines for the directories you use. The `skills` CLI also writes a `skills-lock.json` file that you should commit.
