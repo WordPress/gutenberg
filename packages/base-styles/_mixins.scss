@@ -1,5 +1,11 @@
 /**
  * Typography
+ *
+ * The `Text` component in `@wordpress/ui` turns the declarations of the
+ * `heading-*` and `body-*` mixins into custom properties, and reads only
+ * `font-family`, `font-weight`, `font-size`, and `line-height` from them.
+ * If one of these mixins gains another property, update
+ * `packages/ui/src/text/style.module.scss` to read it too.
  */
 
 @use "sass:color";
