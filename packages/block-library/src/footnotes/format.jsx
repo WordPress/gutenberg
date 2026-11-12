@@ -76,6 +76,8 @@ export const format = {
 					getBlockParentsByBlockName: _getBlockParentsByBlockName,
 					getSelectedBlockClientId: _getSelectedBlockClientId,
 					getBlockName: _getBlockName,
+					getBlocksByName: _getBlocksByName,
+					canInsertBlockType: _canInsertBlockType,
 				} = select( blockEditorStore );
 
 				const selectedClientId = _getSelectedBlockClientId();
@@ -87,6 +89,26 @@ export const format = {
 				// Check if the selected block itself is a footnotes block.
 				if (
 					_getBlockName( selectedClientId ) === FOOTNOTES_BLOCK_NAME
+				) {
+					return false;
+				}
+
+				// When the post has no footnotes block, adding a footnote inserts
+				// one. Don't offer it when that isn't possible, such as in a post
+				// type with a locked template.
+				const parentPostContent = _getBlockParentsByBlockName(
+					selectedClientId,
+					POST_CONTENT_BLOCK_NAME
+				);
+				const rootClientId = parentPostContent.length
+					? parentPostContent[ parentPostContent.length - 1 ]
+					: null;
+				if (
+					! _canInsertBlockType(
+						FOOTNOTES_BLOCK_NAME,
+						rootClientId
+					) &&
+					! _getBlocksByName( FOOTNOTES_BLOCK_NAME ).length
 				) {
 					return false;
 				}
