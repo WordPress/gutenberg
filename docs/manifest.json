@@ -1032,6 +1032,12 @@
 		"parent": "core-blocks-theme"
 	},
 	{
+		"title": "With Results",
+		"slug": "core-block-query-with-results",
+		"markdown_source": "../packages/block-library/src/query-with-results/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
 		"title": "Query Loop",
 		"slug": "core-block-query",
 		"markdown_source": "../packages/block-library/src/query/README.md",
