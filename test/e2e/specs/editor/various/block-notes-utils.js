@@ -212,7 +212,7 @@ class BlockNoteUtils {
 		// The caret entered the block before the notes list had the note.
 		const thread = this.getThread( note );
 		await thread.click();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveClass( /is-selected/ );
 	}
 
 	async addNote( content ) {
@@ -233,9 +233,18 @@ class BlockNoteUtils {
 	 * @param {string} content Text of the thread's root note.
 	 */
 	getThread( content ) {
-		return this.#getNotesSurface().getByRole( 'treeitem', {
-			name: `Note: ${ content }`,
-		} );
+		return (
+			this.#getNotesSurface()
+				.getByRole( 'listitem' )
+				.filter( { hasText: content } )
+				// Skip the new note form while it still holds the typed text.
+				.filter( {
+					hasNot: this.#page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} )
+		);
 	}
 
 	/**
@@ -302,4 +311,13 @@ class BlockNoteUtils {
 	}
 }
 
-module.exports = { BlockNoteUtils, getAuthorTint };
+/**
+ * Locates a note thread's disclosure toggle, which takes the thread's focus.
+ *
+ * @param {import('@playwright/test').Locator} thread Note thread.
+ */
+function getThreadToggle( thread ) {
+	return thread.getByRole( 'button', { name: /^Note by / } );
+}
+
+module.exports = { BlockNoteUtils, getAuthorTint, getThreadToggle };

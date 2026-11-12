@@ -258,7 +258,9 @@ test.describe( 'Comments', () => {
 		await page.keyboard.type( 'A note' );
 		await pageUtils.pressKeys( 'primary+Enter' );
 		await expect(
-			page.getByRole( 'treeitem', { name: 'Note: A note' } )
+			page
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.filter( { hasText: 'A note' } )
 		).toBeVisible();
 
 		await expect.poll( () => heldRequests ).toBe( 1 );

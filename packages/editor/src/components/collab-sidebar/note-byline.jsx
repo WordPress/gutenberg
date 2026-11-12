@@ -1,5 +1,5 @@
 import { Stack, Tooltip } from '@wordpress/ui';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import {
 	dateI18n,
 	getSettings as getDateSettings,
@@ -72,8 +72,8 @@ export function NoteByline( { avatar, name, date, userId } ) {
 			<img
 				src={ avatar || currentUserAvatar }
 				className="editor-collab-sidebar-panel__user-avatar"
-				// translators: alt text for user avatar image
-				alt={ __( 'User avatar' ) }
+				// Decorative: the author's name follows the avatar.
+				alt=""
 				width={ 32 }
 				height={ 32 }
 				style={ {

@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. Each thread now opens and closes through a disclosure button that carries `aria-expanded` and takes the thread's keyboard focus, in place of a focusable list item, and the button is described by the note text, so a minimized floating note still reads it. Threads no longer carry an `aria-label`, which screen readers handle inconsistently on a list item, and note avatars are now decorative, since the author's name follows them ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).

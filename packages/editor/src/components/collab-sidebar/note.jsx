@@ -49,6 +49,7 @@ function NoteActionsMenu( { items, buttonRef } ) {
 }
 
 export function Note( {
+	contentId,
 	note,
 	parentNote,
 	isSelected,
@@ -182,6 +183,7 @@ export function Note( {
 		body = (
 			<div
 				ref={ commentRef }
+				id={ contentId }
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
 					'editor-collab-sidebar-panel__resolution-text':
 						isResolutionNote,
@@ -216,7 +218,6 @@ export function Note( {
 			note={ note }
 			actions={ actions }
 			className="editor-collab-sidebar-panel__note"
-			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			<div className="editor-collab-sidebar-panel__note-body">
 				{ body }
