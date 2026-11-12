@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { isInaccessible, screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import FontSizePickerSelect from '../font-size-picker-select';
 import type { FontSize } from '../types';
@@ -24,6 +24,25 @@ describe( 'FontSizePickerSelect', () => {
 			size: '20px',
 		},
 	];
+
+	it( 'exposes the selected preset hint as the description without repeating the value', async () => {
+		await render(
+			<FontSizePickerSelect
+				fontSizes={ fontSizes }
+				value="12px"
+				onChange={ vi.fn() }
+				onSelectCustom={ vi.fn() }
+				disableCustomFontSizes={ false }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Font size' } );
+		const hint = within( trigger ).getByText( '12px' );
+		expect( trigger ).toHaveAccessibleDescription( '12px' );
+		expect( trigger ).toHaveTextContent( 'Small' );
+		expect( hint ).toBeVisible();
+		expect( isInaccessible( hint ) ).toBe( true );
+	} );
 
 	it( 'selects a preset with the keyboard inside a legacy Modal and returns focus', async () => {
 		const onChange = vi.fn();

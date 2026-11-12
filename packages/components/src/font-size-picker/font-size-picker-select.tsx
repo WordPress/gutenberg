@@ -1,4 +1,4 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import type {
@@ -72,6 +72,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 								{ item.description && (
 									<span
 										className={ styles[ 'selected-hint' ] }
+										aria-hidden="true"
 									>
 										{ item.description }
 									</span>
@@ -95,11 +96,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				} }
 			/>
 			<VisuallyHidden id={ descriptionId }>
-				{ sprintf(
-					// translators: %s: Currently selected font size.
-					__( 'Currently selected font size: %s' ),
-					selectedOption.label
-				) }
+				{ selectedOption.description }
 			</VisuallyHidden>
 		</>
 	);
