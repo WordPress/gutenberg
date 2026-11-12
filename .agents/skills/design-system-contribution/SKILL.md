@@ -33,3 +33,13 @@ Start with existing tests and stories. Add coverage only for a concrete regressi
 When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together. When a `@wordpress/ui` component replaces a `@wordpress/components` component, follow the stages in [Replace a legacy component](../../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component).
 
 Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.
+
+## Maintain the published agent skills
+
+`@wordpress/ui` and `@wordpress/theme` ship consumer skills in `packages/<package>/skills/<name>/SKILL.md`, which consumers link into their agent skills directories. Consumer setup is in [Using with AI: Skills](../../../storybook/stories/design-system/agent-skills.md).
+
+- Name each skill `wp-` plus the short package name, such as `wp-ui` for `@wordpress/ui`, with a suffix for a narrower topic, such as `wp-ui-migration`, and keep `skills` in the package's `files` list so it is published.
+- Keep each skill self-contained. It is copied into consumer projects, so relative links into this repository do not resolve there. Link to the published Storybook or packages instead.
+- Do not publish the skills in `.agents/skills/` as they are. They are for contributors working in a Gutenberg checkout and link into the repository. [design-system-ui-composition](../design-system-ui-composition/SKILL.md) and [design-system-ui-review](../design-system-ui-review/SKILL.md) are written for application code that only consumes the packages, so adapt them as the source for the published skills. The consumer-facing sections of the [package guide](../../../docs/contributors/design/design-system-packages.md) (work boundary, target version, choosing a component, setup per document) can be adapted the same way. The other skills cover contributing, testing, security and release compatibility, and are not useful to consumers.
+- When a published skill changes, add a changelog entry to the affected package.
+- `packages/theme/skills/wp-theme/references/tokens.md` is a generated copy of `packages/theme/docs/tokens.md`, written by the token build. Edit the source, then run the token build instead of editing the copy.
