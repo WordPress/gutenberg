@@ -26,6 +26,7 @@ import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	isTemplatePartEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
@@ -454,6 +455,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	/** The device the editor previews, such as `Desktop`. */
 	[ deviceTypeKey ]?: string;
 	[ isIsolatedEditorKey ]?: boolean;
+	/** Whether the editor is editing a template part on its own. */
+	[ isTemplatePartEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
 	) => UserPattern[] | null;

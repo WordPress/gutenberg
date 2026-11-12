@@ -127,6 +127,7 @@ const {
 	deviceTypeKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
+	isTemplatePartEditorKey,
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
@@ -467,6 +468,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_navigation',
 			].includes( postType ),
 			[ isNavigationPostEditorKey ]: postType === 'wp_navigation',
+			[ isTemplatePartEditorKey ]: postType === 'wp_template_part',
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
 			// don't treat template parts as contentOnly sections.
 			disableContentOnlyForTemplateParts:
