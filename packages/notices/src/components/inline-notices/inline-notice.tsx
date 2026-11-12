@@ -6,6 +6,7 @@ import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
 import DetailsText from './details-text';
+import getHTMLNoticeText from './get-html-notice-text';
 import { NOTICE_SLOT } from '../../store/constants';
 import type {
 	Notice as NoticeType,
@@ -100,11 +101,10 @@ export default function InlineNotice( {
 		}
 		previousNoticeRef.current = notice;
 
-		// Read rendered HTML before the list observes this update. innerText
-		// preserves the breaks between lines and paragraphs.
-		const message = notice.spokenMessage
-			? ( htmlDescriptionRef.current?.innerText ?? notice.spokenMessage )
-			: '';
+		const message =
+			notice.spokenMessage && htmlDescriptionRef.current
+				? getHTMLNoticeText( htmlDescriptionRef.current ).trim()
+				: ( notice.spokenMessage ?? '' );
 		// As in @wordpress/a11y, alternate a trailing space so an identical
 		// message changes the live region without remounting the notice.
 		setSpokenMessage( ( previous ) =>

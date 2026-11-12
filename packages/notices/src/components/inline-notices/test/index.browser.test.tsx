@@ -260,20 +260,21 @@ describe( 'InlineNotices', () => {
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'preserves line breaks and paragraph boundaries in HTML announcements', async () => {
+		it( 'preserves line breaks and omits hidden text in HTML announcements', async () => {
 			const registry = await renderWithNotice( 'error' );
 			registry
 				.dispatch( noticesStore )
 				.createNotice(
 					'error',
-					'<p>Save <strong>failed</strong>.</p><p>Retry<br>later &amp; reopen.</p>',
+					'<p>Save <strong>failed</strong><span aria-hidden="true"> (error)</span>.</p><p>Retry<br>later &amp; reopen.<span hidden>Hidden detail</span><span style="display:none">Hidden by CSS</span></p>',
 					{ __unstableHTML: true }
 				);
 
 			expect( console ).toHaveWarned();
 			await waitFor( () =>
-				expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
-					/^Save failed\. Retry later & reopen\.$/
+				expect( screen.getByRole( 'alert' ) ).toHaveProperty(
+					'textContent',
+					'Save failed.\n\nRetry\nlater & reopen.'
 				)
 			);
 		} );
