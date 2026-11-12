@@ -203,6 +203,25 @@ describe( 'CircularOptionPicker', () => {
 		} );
 	} );
 
+	it( 'starts keyboard navigation at the initially selected option', async () => {
+		await render(
+			<CircularOptionPicker
+				aria-label="Colors"
+				options={ [
+					<CircularOptionPicker.Option key="red" aria-label="Red" />,
+					<CircularOptionPicker.Option
+						key="blue"
+						aria-label="Blue"
+						isSelected
+					/>,
+				] }
+			/>
+		);
+
+		await userEvent.tab();
+		expect( getOption( 'Blue' ) ).toHaveFocus();
+	} );
+
 	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
 			await render(
