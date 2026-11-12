@@ -54,6 +54,33 @@ class WP_Icon_Collections_Registry_Gutenberg extends WP_Icon_Collections_Registr
 	}
 
 	/**
+	 * Unregisters an icon collection.
+	 *
+	 * Any icons registered under the given collection are also unregistered.
+	 * The "core-admin" collection is used by the WordPress administration
+	 * interface and cannot be unregistered.
+	 *
+	 * @param string $collection_slug Icon collection slug.
+	 * @return bool True if the collection was unregistered successfully, false otherwise.
+	 */
+	public function unregister( $collection_slug ) {
+		if ( 'core-admin' === $collection_slug ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon collection slug. */
+					__( 'Icon collection "%s" is used by the administration interface and cannot be unregistered.', 'gutenberg' ),
+					$collection_slug
+				),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		return parent::unregister( $collection_slug );
+	}
+
+	/**
 	 * Returns the shared registry instance, preserving existing collections.
 	 *
 	 * @return WP_Icon_Collections_Registry_Gutenberg The shared registry instance.
