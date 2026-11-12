@@ -1,6 +1,7 @@
 import { type LinearGradientNode } from 'gradient-parser';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
@@ -62,11 +63,13 @@ const GradientTypePicker = ( {
 		Number( HORIZONTAL_GRADIENT_ORIENTATION.value )
 	);
 
-	if ( type === 'linear-gradient' && gradientAST.orientation ) {
-		lastLinearOrientationAngle.current = Number(
-			gradientAST.orientation.value
-		);
-	}
+	useIsomorphicLayoutEffect( () => {
+		if ( type === 'linear-gradient' && gradientAST.orientation ) {
+			lastLinearOrientationAngle.current = Number(
+				gradientAST.orientation.value
+			);
+		}
+	}, [ gradientAST, type ] );
 
 	const onSetLinearGradient = () => {
 		onChange(
