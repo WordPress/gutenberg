@@ -335,210 +335,171 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 									</>
 								}
 								showSidebarToggle={ false }
+								hasPadding
 							>
-								<div
+								<Stack
+									direction="column"
+									gap="lg"
 									style={ {
-										display: 'grid',
-										flex: 1,
+										width: '100%',
+										maxWidth: '640px',
+										marginInline: 'auto',
 									} }
 								>
-									<div
-										style={ {
-											boxSizing: 'border-box',
-											backgroundColor:
-												'var(--wpds-color-background-surface-neutral)',
-											color: 'var(--wpds-color-foreground-content-neutral)',
-											height: '100%',
-											padding:
-												'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl)',
-										} }
-									>
-										<Stack
-											direction="column"
-											gap="lg"
-											style={ {
-												width: '100%',
-												maxWidth: '640px',
-												marginInline: 'auto',
-											} }
-										>
-											<Notice.Root intent="info">
-												<Notice.Title>
-													Welcome to your new site
-												</Notice.Title>
-												<Notice.Description>
-													Complete the steps below to
-													finish setting up.
-												</Notice.Description>
-											</Notice.Root>
+									<Notice.Root intent="info">
+										<Notice.Title>
+											Welcome to your new site
+										</Notice.Title>
+										<Notice.Description>
+											Complete the steps below to finish
+											setting up.
+										</Notice.Description>
+									</Notice.Root>
 
-											{ /* Card 1: General */ }
-											<Card.Root id={ generalSettingsId }>
-												<Card.Header>
-													<Card.Title>
-														General
-													</Card.Title>
-												</Card.Header>
-												<Card.Content>
+									{ /* Card 1: General */ }
+									<Card.Root id={ generalSettingsId }>
+										<Card.Header>
+											<Card.Title>General</Card.Title>
+										</Card.Header>
+										<Card.Content>
+											<Stack direction="column" gap="md">
+												<Text>
+													Configure the basic settings
+													for your site. The fields
+													below adopt the corner
+													radius preset alongside
+													cards, buttons, and other
+													surfaces.
+												</Text>
+												<InputControl
+													label="Site title"
+													placeholder="My WordPress site"
+													defaultValue="My WordPress site"
+												/>
+												<InputControl
+													label="Tagline"
+													description="A short phrase shown below the site title."
+													placeholder="Just another WordPress site"
+												/>
+												<InputControl
+													label="Admin email address"
+													type="email"
+													placeholder="you@example.com"
+													defaultValue="admin@example.com"
+												/>
+												<SelectControl
+													label="Site language"
+													description="The default language for the site interface."
+													items={
+														siteLanguageOptions
+													}
+													defaultValue={
+														siteLanguageOptions[ 0 ]
+													}
+												/>
+												<Stack
+													direction="row"
+													style={ {
+														justifyContent:
+															'flex-end',
+													} }
+												>
+													<Button>Save</Button>
+												</Stack>
+											</Stack>
+										</Card.Content>
+									</Card.Root>
+
+									{ /* Card 2: Display */ }
+									<Card.Root id={ displaySettingsId }>
+										<Card.Header>
+											<Card.Title>Display</Card.Title>
+										</Card.Header>
+										<Card.Content>
+											<Tabs.Root defaultValue="appearance">
+												<Tabs.List variant="minimal">
+													<Tabs.Tab value="appearance">
+														Appearance
+													</Tabs.Tab>
+													<Tabs.Tab value="layout">
+														Layout
+													</Tabs.Tab>
+													<Tabs.Tab value="accessibility">
+														Accessibility
+													</Tabs.Tab>
+												</Tabs.List>
+												<Tabs.Panel value="appearance">
 													<Stack
 														direction="column"
 														gap="md"
+														style={ {
+															paddingBlockStart:
+																'var(--wpds-dimension-padding-md)',
+														} }
 													>
 														<Text>
-															Configure the basic
-															settings for your
-															site. The fields
-															below adopt the
-															corner radius preset
-															alongside cards,
-															buttons, and other
-															surfaces.
+															Control how your
+															site looks to
+															visitors. Adjust{ ' ' }
+															<Link href="#">
+																typography
+															</Link>
+															,{ ' ' }
+															<Link href="#">
+																colors
+															</Link>
+															, and spacing to
+															match your brand.
 														</Text>
-														<InputControl
-															label="Site title"
-															placeholder="My WordPress site"
-															defaultValue="My WordPress site"
-														/>
-														<InputControl
-															label="Tagline"
-															description="A short phrase shown below the site title."
-															placeholder="Just another WordPress site"
-														/>
-														<InputControl
-															label="Admin email address"
-															type="email"
-															placeholder="you@example.com"
-															defaultValue="admin@example.com"
-														/>
-														<SelectControl
-															label="Site language"
-															description="The default language for the site interface."
-															items={
-																siteLanguageOptions
-															}
-															defaultValue={
-																siteLanguageOptions[ 0 ]
-															}
-														/>
-														<Stack
-															direction="row"
-															style={ {
-																justifyContent:
-																	'flex-end',
-															} }
-														>
-															<Button>
-																Save
-															</Button>
-														</Stack>
 													</Stack>
-												</Card.Content>
-											</Card.Root>
-
-											{ /* Card 2: Display */ }
-											<Card.Root id={ displaySettingsId }>
-												<Card.Header>
-													<Card.Title>
-														Display
-													</Card.Title>
-												</Card.Header>
-												<Card.Content>
-													<Tabs.Root defaultValue="appearance">
-														<Tabs.List variant="minimal">
-															<Tabs.Tab value="appearance">
-																Appearance
-															</Tabs.Tab>
-															<Tabs.Tab value="layout">
-																Layout
-															</Tabs.Tab>
-															<Tabs.Tab value="accessibility">
-																Accessibility
-															</Tabs.Tab>
-														</Tabs.List>
-														<Tabs.Panel value="appearance">
-															<Stack
-																direction="column"
-																gap="md"
-																style={ {
-																	paddingBlockStart:
-																		'var(--wpds-dimension-padding-md)',
-																} }
-															>
-																<Text>
-																	Control how
-																	your site
-																	looks to
-																	visitors.
-																	Adjust{ ' ' }
-																	<Link href="#">
-																		typography
-																	</Link>
-																	,{ ' ' }
-																	<Link href="#">
-																		colors
-																	</Link>
-																	, and
-																	spacing to
-																	match your
-																	brand.
-																</Text>
-															</Stack>
-														</Tabs.Panel>
-														<Tabs.Panel value="layout">
-															<Stack
-																direction="column"
-																gap="md"
-																style={ {
-																	paddingBlockStart:
-																		'var(--wpds-dimension-padding-md)',
-																} }
-															>
-																<Text>
-																	Choose a
-																	layout
-																	structure
-																	for your
-																	pages.
-																	Options
-																	include
-																	full-width,
-																	boxed, and{ ' ' }
-																	<Link href="#">
-																		custom
-																		layouts
-																	</Link>
-																	.
-																</Text>
-															</Stack>
-														</Tabs.Panel>
-														<Tabs.Panel value="accessibility">
-															<Stack
-																direction="column"
-																gap="md"
-																style={ {
-																	paddingBlockStart:
-																		'var(--wpds-dimension-padding-md)',
-																} }
-															>
-																<Text>
-																	Review your
-																	site&apos;s{ ' ' }
-																	<Link href="#">
-																		accessibility
-																		settings
-																	</Link>{ ' ' }
-																	to ensure it
-																	meets WCAG
-																	guidelines.
-																</Text>
-															</Stack>
-														</Tabs.Panel>
-													</Tabs.Root>
-												</Card.Content>
-											</Card.Root>
-										</Stack>
-									</div>
-								</div>
+												</Tabs.Panel>
+												<Tabs.Panel value="layout">
+													<Stack
+														direction="column"
+														gap="md"
+														style={ {
+															paddingBlockStart:
+																'var(--wpds-dimension-padding-md)',
+														} }
+													>
+														<Text>
+															Choose a layout
+															structure for your
+															pages. Options
+															include full-width,
+															boxed, and{ ' ' }
+															<Link href="#">
+																custom layouts
+															</Link>
+															.
+														</Text>
+													</Stack>
+												</Tabs.Panel>
+												<Tabs.Panel value="accessibility">
+													<Stack
+														direction="column"
+														gap="md"
+														style={ {
+															paddingBlockStart:
+																'var(--wpds-dimension-padding-md)',
+														} }
+													>
+														<Text>
+															Review your
+															site&apos;s{ ' ' }
+															<Link href="#">
+																accessibility
+																settings
+															</Link>{ ' ' }
+															to ensure it meets
+															WCAG guidelines.
+														</Text>
+													</Stack>
+												</Tabs.Panel>
+											</Tabs.Root>
+										</Card.Content>
+									</Card.Root>
+								</Stack>
 							</Page>
 						</ThemeProvider>
 					</div>
