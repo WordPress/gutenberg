@@ -200,7 +200,7 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `getImageEdit( state )` describes the same result against the full-size image loaded in `state.image`. The edit has an optional `flip`, `rotation` and `crop`, to apply in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
-The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the order they arrive, with the crop in percentages. `mapImageEdit( edit, handlers )` calls one handler for each part the edit has, in the order the parts apply, so the list comes out in the right order:
+For example, the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the order they arrive, with the crop in percentages. `mapImageEdit( edit, handlers )` calls one handler for each part the edit has, in the order the parts apply, so the list comes out in the right order:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
