@@ -27,6 +27,7 @@
 
 ### Enhancements
 
+-   Let users reorder fields by dragging them in the view config's Properties panel, which now lists fields in the order they appear. A new optional `view.fieldOrder` remembers where a hidden field sits, so it returns to its place when shown again.
 -   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
 -   Use the UI SelectControl for Sort by and relative-date Unit settings ([#86167](https://github.com/WordPress/gutenberg/pull/86167)).
 -   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
