@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.11.0 (2026-11-04)
+
 ### Enhancements
 
 -   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
@@ -13,6 +20,8 @@
 
 ### Internal
 
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 -   Type check tests through the default dev project, replacing `tsconfig.test.json` ([#85516](https://github.com/WordPress/gutenberg/pull/85516)).
 
 ## 0.10.0 (2026-10-20)

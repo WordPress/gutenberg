@@ -6,6 +6,14 @@
 
 -   List each Global Styles change on its own line in the save confirmation panel, followed by badges for the style states it applies to (e.g. Default, Mobile, Tablet) ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
 
+### Bug Fixes
+
+-   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
+-   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
+
+## 9.1.0 (2026-11-04)
+
 ### Internal
 
 -   Convert the footnotes and private actions to TypeScript and type check the JavaScript ([#85078](https://github.com/WordPress/gutenberg/pull/85078)).
