@@ -283,6 +283,40 @@ describe( 'Combobox', () => {
 		);
 	} );
 
+	it( 'keeps a scrolling inline list out of the Tab order', async () => {
+		const user = userEvent;
+
+		await render(
+			<>
+				<Combobox.Root items={ ITEMS } inline open>
+					<Combobox.Input aria-label="Search" />
+					<Combobox.List>
+						<Combobox.ListBody style={ { maxHeight: 40 } }>
+							<Combobox.Collection>
+								{ ( item ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										<Combobox.ItemLabel>
+											{ item.value }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Root>
+				<button>After</button>
+			</>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Search' } ) );
+		await user.keyboard( '{Tab}' );
+
+		expect( screen.getByRole( 'button', { name: 'After' } ) ).toHaveFocus();
+	} );
+
 	describe( 'portal', () => {
 		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent;

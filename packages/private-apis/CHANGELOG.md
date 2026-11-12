@@ -4,7 +4,8 @@
 
 ### Internal
 
--   Remove '@wordpress/global-styles-engine' from the list of core modules allowed to use private APIs ([#86115](https://github.com/WordPress/gutenberg/pull/86115)).
+-   Remove `@wordpress/global-styles-engine` from the list of core modules allowed to use private APIs ([#86115](https://github.com/WordPress/gutenberg/pull/86115)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 3.1.0 (2026-11-04)
 
