@@ -108,9 +108,58 @@ test.describe( 'Gallery', () => {
 
 		// Check that content has a valid gallery with an image.
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
+	} );
+
+	test( 'links an added image using the site default until a link is chosen', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page.evaluate( () => {
+			window.wp.media.view.settings.defaultProps.link = 'file';
+		} );
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{
+						attributes: {
+							href: uploadedMedia.source_url,
+							linkDestination: 'media',
+						},
+					},
+				],
+			},
+		] );
+		const [ gallery ] = await editor.getBlocks();
+		expect( gallery.attributes ).not.toHaveProperty( 'linkTo' );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Gallery' } )
+		);
+		await editor.clickBlockToolbarButton( 'Link' );
+		await expect(
+			page.getByRole( 'menuitemradio', {
+				name: 'Link images to media files',
+			} )
+		).toBeChecked();
 	} );
 
 	test( 'gallery caption can be edited', async ( {
