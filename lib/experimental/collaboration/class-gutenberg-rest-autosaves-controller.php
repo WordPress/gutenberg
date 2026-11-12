@@ -134,7 +134,11 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
 
 			if ( ! is_wp_error( $autosave_id ) ) {
-				$this->update_parent_post_meta( $post, $meta, $request );
+				$meta_update = $this->update_parent_post_meta( $post, $request );
+
+				if ( is_wp_error( $meta_update ) ) {
+					return $meta_update;
+				}
 			}
 		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
@@ -169,46 +173,29 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	/**
 	 * Persists meta sent with an autosave to the parent post it updated.
 	 *
-	 * When an autosave is stored as a revision, create_post_autosave() writes
-	 * the request's revisioned meta (e.g. `footnotes`) to that revision. When
-	 * an autosave updates the parent post directly, core drops the request's
-	 * meta. This writes the same keys to the parent post so both branches
-	 * behave alike. RTC uses the filter to add the CRDT document, so it is
-	 * stored in the same request as the content it describes.
+	 * An autosave that updates the parent post directly writes the same post
+	 * a regular save writes, but core drops the request's meta in that case.
+	 * This stores the meta exactly as a regular save does: every key exposed
+	 * in the REST API, with the same validation and permission checks. RTC
+	 * relies on this to store the CRDT document in the same request as the
+	 * content it describes.
 	 *
 	 * @since 7.3.0
 	 *
 	 * @param WP_Post         $post    The parent post the autosave updated.
-	 * @param array           $meta    Meta values submitted with the autosave.
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return void
+	 * @return null|WP_Error Null on success, WP_Error if a meta value could not be stored.
 	 */
-	private function update_parent_post_meta( $post, $meta, $request ) {
-		/**
-		 * Filters the meta keys persisted to the parent post when an autosave
-		 * updates it directly instead of creating a revision.
-		 *
-		 * Defaults to the keys registered with `revisions_enabled`, which are
-		 * the keys an autosave revision stores.
-		 *
-		 * @since 7.3.0
-		 *
-		 * @param string[]        $meta_keys Meta keys to persist to the parent post.
-		 * @param WP_Post         $post      The parent post the autosave updated.
-		 * @param WP_REST_Request $request   Full details about the request.
-		 */
-		$meta_keys = apply_filters(
-			'rest_autosave_parent_post_meta_keys',
-			wp_post_revision_meta_keys( $post->post_type ),
-			$post,
-			$request
-		);
+	private function update_parent_post_meta( $post, $request ) {
+		$schema = $this->gutenberg_parent_controller->get_item_schema();
 
-		foreach ( $meta_keys as $meta_key ) {
-			if ( isset( $meta[ $meta_key ] ) ) {
-				update_metadata( 'post', $post->ID, $meta_key, wp_slash( $meta[ $meta_key ] ) );
-			}
+		if ( empty( $schema['properties']['meta'] ) || ! isset( $request['meta'] ) ) {
+			return null;
 		}
+
+		$meta_fields = new WP_REST_Post_Meta_Fields( $post->post_type );
+
+		return $meta_fields->update_value( $request['meta'], $post->ID );
 	}
 
 	/**

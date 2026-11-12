@@ -613,11 +613,12 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_ignores_meta_that_is_not_revisioned() {
-		// Only the allowlisted keys are persisted to the parent post. A key
-		// that is exposed in the REST API but not revisioned is dropped, as
-		// it is when an autosave is stored as a revision.
-		$meta_key = 'test_unrevisioned_meta';
+	public function test_auto_draft_promotion_persists_meta_exposed_in_the_rest_api() {
+		// The autosave that promotes an auto-draft writes the parent post, so
+		// it stores meta the way a regular save does. That covers every key
+		// exposed in the REST API, whether or not the key is revisioned.
+		$meta_key            = 'test_unrevisioned_meta';
+		$revisioned_meta_key = 'test_revisioned_meta';
 		register_post_meta(
 			'post',
 			$meta_key,
@@ -627,34 +628,9 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 				'show_in_rest' => true,
 			)
 		);
-
-		$post_id = $this->create_auto_draft();
-
-		$response = $this->dispatch_autosave(
-			$post_id,
-			'Promoted auto-draft title with unrevisioned meta',
-			'<!-- wp:paragraph --><p>Promoted auto-draft content with unrevisioned meta</p><!-- /wp:paragraph -->',
-			array(
-				$meta_key => 'dropped meta value',
-			)
-		);
-
-		unregister_post_meta( 'post', $meta_key );
-
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'draft', get_post_status( $post_id ) );
-		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
-	}
-
-	public function test_auto_draft_promotion_persists_revisioned_meta_on_the_parent_post() {
-		// Revisioned meta sent with an autosave is stored on the revision when
-		// one is created, so it must also land on the parent post when the
-		// autosave updates the parent directly. A dedicated revisioned key
-		// stands in for `footnotes`.
-		$meta_key = 'test_revisioned_meta';
 		register_post_meta(
 			'post',
-			$meta_key,
+			$revisioned_meta_key,
 			array(
 				'single'            => true,
 				'type'              => 'string',
@@ -667,10 +643,46 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 
 		$response = $this->dispatch_autosave(
 			$post_id,
-			'Promoted auto-draft title with revisioned meta',
-			'<!-- wp:paragraph --><p>Promoted auto-draft content with revisioned meta</p><!-- /wp:paragraph -->',
+			'Promoted auto-draft title with meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with meta</p><!-- /wp:paragraph -->',
 			array(
-				$meta_key => 'promoted meta value',
+				$meta_key            => 'promoted meta value',
+				$revisioned_meta_key => 'promoted revisioned meta value',
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+		unregister_post_meta( 'post', $revisioned_meta_key );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( 'promoted meta value', get_post_meta( $post_id, $meta_key, true ) );
+		$this->assertSame( 'promoted revisioned meta value', get_post_meta( $post_id, $revisioned_meta_key, true ) );
+	}
+
+	public function test_auto_draft_promotion_ignores_meta_not_exposed_in_the_rest_api() {
+		// A regular save cannot write a key that is hidden from the REST API,
+		// so the promoting autosave cannot either, even for a revisioned key.
+		$meta_key = 'test_hidden_revisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => false,
+				'revisions_enabled' => true,
+			)
+		);
+
+		$post_id = $this->create_auto_draft();
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with hidden meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with hidden meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key => 'hidden meta value',
 			)
 		);
 
@@ -678,7 +690,45 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'draft', get_post_status( $post_id ) );
-		$this->assertSame( 'promoted meta value', get_post_meta( $post_id, $meta_key, true ) );
+		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
+	}
+
+	public function test_auto_draft_promotion_rejects_meta_the_user_cannot_edit_but_keeps_the_crdt_document() {
+		// A key the user may not edit fails as it does on a regular save. The
+		// other keys in the request are still stored, so the promoted post is
+		// never left with content but no CRDT document.
+		$meta_key = 'test_forbidden_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'        => true,
+				'type'          => 'string',
+				'show_in_rest'  => true,
+				'auth_callback' => '__return_false',
+			)
+		);
+
+		$post_id = $this->create_auto_draft();
+		$doc     = '{"document":"AQEBAAA=","updateId":3}';
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with forbidden meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with forbidden meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key               => 'forbidden meta value',
+				self::CRDT_DOC_META_KEY => $doc,
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_cannot_update', $response->get_data()['code'] );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
+		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
 	public function test_autosave_stores_the_crdt_snapshot_on_the_revision() {

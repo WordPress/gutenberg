@@ -142,30 +142,6 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
-if ( ! function_exists( 'gutenberg_add_crdt_document_to_autosave_parent_post_meta_keys' ) ) {
-	/**
-	 * Persists the CRDT document when an autosave updates the parent post.
-	 *
-	 * The editor sends the document in `meta` with the autosave that promotes
-	 * an auto-draft to a draft. The document is not revisioned, so it is not
-	 * in the default allowlist of meta an autosave persists. Add it so the
-	 * parent content and the document that describes it are stored together.
-	 *
-	 * @param string[] $meta_keys Meta keys persisted to the parent post.
-	 * @return string[] Meta keys including the CRDT document.
-	 */
-	function gutenberg_add_crdt_document_to_autosave_parent_post_meta_keys( $meta_keys ) {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return $meta_keys;
-		}
-
-		$meta_keys[] = '_crdt_document';
-
-		return $meta_keys;
-	}
-	add_filter( 'rest_autosave_parent_post_meta_keys', 'gutenberg_add_crdt_document_to_autosave_parent_post_meta_keys' );
-}
-
 if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	/**
 	 * Determines whether real-time collaboration is enabled.
