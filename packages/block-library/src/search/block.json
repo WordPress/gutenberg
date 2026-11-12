@@ -4,7 +4,7 @@
 	"name": "core/search",
 	"title": "Search",
 	"category": "widgets",
-	"description": "Help visitors find your content.",
+	"description": "Helps visitors find your content.",
 	"keywords": [ "find" ],
 	"textdomain": "default",
 	"attributes": {

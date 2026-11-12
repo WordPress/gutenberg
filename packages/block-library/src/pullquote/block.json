@@ -4,7 +4,7 @@
 	"name": "core/pullquote",
 	"title": "Pullquote",
 	"category": "text",
-	"description": "Give special visual emphasis to a quote from your text.",
+	"description": "Gives a special visual emphasis to a quote from your text.",
 	"textdomain": "default",
 	"attributes": {
 		"value": {

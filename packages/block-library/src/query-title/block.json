@@ -4,7 +4,7 @@
 	"name": "core/query-title",
 	"title": "Query Title",
 	"category": "theme",
-	"description": "Display the query title.",
+	"description": "Displays the query title.",
 	"textdomain": "default",
 	"attributes": {
 		"type": {

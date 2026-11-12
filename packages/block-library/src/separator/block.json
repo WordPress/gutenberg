@@ -4,7 +4,7 @@
 	"name": "core/separator",
 	"title": "Separator",
 	"category": "design",
-	"description": "Create a break between ideas or sections with a horizontal separator.",
+	"description": "Creates a break between ideas or sections with a horizontal separator.",
 	"keywords": [ "horizontal-line", "hr", "divider" ],
 	"textdomain": "default",
 	"attributes": {

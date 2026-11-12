@@ -4,7 +4,7 @@
 	"name": "core/preformatted",
 	"title": "Preformatted",
 	"category": "text",
-	"description": "Add text that respects your spacing and tabs, and also allows styling.",
+	"description": "Adds text that respects your spacing and tabs, and also allows styling.",
 	"textdomain": "default",
 	"attributes": {
 		"content": {

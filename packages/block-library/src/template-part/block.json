@@ -4,7 +4,7 @@
 	"name": "core/template-part",
 	"title": "Template Part",
 	"category": "theme",
-	"description": "Edit the different global regions of your site, like the header, footer, sidebar, or create your own.",
+	"description": "Edits the different global regions of your site, like the header, footer, sidebar, or create your own.",
 	"textdomain": "default",
 	"attributes": {
 		"slug": {
