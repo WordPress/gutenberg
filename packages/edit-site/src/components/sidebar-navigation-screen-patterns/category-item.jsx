@@ -1,4 +1,5 @@
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function CategoryItem( {
 	count,
@@ -8,7 +9,10 @@ export default function CategoryItem( {
 	label,
 	type,
 } ) {
-	if ( ! count ) {
+	if (
+		count === undefined ||
+		( ! count && type === TEMPLATE_PART_POST_TYPE )
+	) {
 		return;
 	}
 	const queryArgs = [ `postType=${ type }` ];
