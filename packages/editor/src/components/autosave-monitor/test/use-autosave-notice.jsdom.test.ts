@@ -2,34 +2,40 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-import useAutosaveNotice from '../use-autosave-notice';
+import useAutosaveNotice, { getAutosaveNotice } from '../use-autosave-notice';
 import { SNAPSHOT_STATUS_SYNC_WAIT_MS } from '../use-entity-contains-snapshot';
 
-vi.mock( import( '@wordpress/data' ), () => ( {
-	useRegistry: vi.fn(),
-	useSelect: vi.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/data' ),
+	() => ( { useRegistry: vi.fn(), useSelect: vi.fn() } ) as any
+);
 
-vi.mock( import( '@wordpress/core-data' ), () => ( {
-	store: 'core',
-	privateApis: {
-		entityContainsSnapshot: vi.fn(),
-	},
-} ) );
+vi.mock(
+	import( '@wordpress/core-data' ),
+	() =>
+		( {
+			store: 'core',
+			privateApis: { entityContainsSnapshot: vi.fn() },
+		} ) as any
+);
 
-vi.mock( import( '@wordpress/notices' ), () => ( {
-	store: 'core/notices',
-} ) );
+vi.mock(
+	import( '@wordpress/notices' ),
+	() => ( { store: 'core/notices' } ) as any
+);
 
-vi.mock( import( '../../../store' ), () => ( {
-	store: 'core/editor',
-} ) );
+vi.mock(
+	import( '../../../store' ),
+	() => ( { store: 'core/editor' } ) as any
+);
 
 vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( object ) => object,
+	unlock: ( object: any ) => object,
 } ) );
 
-const { entityContainsSnapshot } = coreDataPrivateApis;
+const entityContainsSnapshot = vi.mocked(
+	( coreDataPrivateApis as any ).entityContainsSnapshot
+);
 
 const createWarningNotice = vi.fn();
 const removeNotice = vi.fn();
@@ -38,7 +44,7 @@ const isCollaborationEnabledForCurrentPost = vi.fn();
 const getEntitySyncConnectionStatus = vi.fn();
 const getEditorSettings = vi.fn();
 
-function select( store ) {
+function select( store: string ) {
 	if ( 'core' === store ) {
 		return { getEntitySyncConnectionStatus };
 	}
@@ -46,30 +52,64 @@ function select( store ) {
 	return { isCollaborationEnabledForCurrentPost, getEditorSettings };
 }
 
-const PROPS = { postType: 'post', postId: 7, isNew: false, recovery: false };
+type Props = Parameters< typeof useAutosaveNotice >[ 0 ];
+
+const PROPS: Props = { postType: 'post', postId: 7, isNew: false };
 const EDIT_LINK = '/wp-admin/revision.php?revision=123';
 const NOTICE_TEXT =
 	'There is an autosave of this post that is more recent than the version below.';
 
-function renderAutosaveNotice( props ) {
-	return renderHook( ( hookProps ) => useAutosaveNotice( hookProps ), {
+function renderAutosaveNotice( props: Partial< Props > = {} ) {
+	return renderHook( ( hookProps: Props ) => useAutosaveNotice( hookProps ), {
 		initialProps: { ...PROPS, ...props },
 	} );
 }
+
+describe( 'getAutosaveNotice', () => {
+	it.each( [
+		[ 'pending', 'missing', true, true, 'pending' ],
+		[ 'missing', 'pending', true, true, 'pending' ],
+		[ 'missing', 'missing', true, true, 'backup' ],
+		[ 'present', 'missing', true, true, 'autosave' ],
+		[ 'missing', 'missing', false, true, 'autosave' ],
+		[ 'missing', 'present', false, true, null ],
+		[ 'missing', 'missing', false, false, null ],
+	] as const )(
+		'backup %s, autosave %s, backup differs %s, autosave flagged %s: %s',
+		(
+			backupStatus,
+			autosaveStatus,
+			hasBackupDifference,
+			hasAutosave,
+			expected
+		) => {
+			expect(
+				getAutosaveNotice( {
+					backupStatus,
+					autosaveStatus,
+					hasBackupDifference,
+					hasAutosave,
+				} )
+			).toBe( expected );
+		}
+	);
+} );
 
 describe( 'useAutosaveNotice', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
 		vi.useFakeTimers();
 
-		useSelect.mockImplementation( ( callback ) => callback( select ) );
-		useRegistry.mockReturnValue( {
+		vi.mocked( useSelect ).mockImplementation( ( callback: any ) =>
+			callback( select )
+		);
+		vi.mocked( useRegistry ).mockReturnValue( {
 			select,
-			dispatch: ( store ) =>
+			dispatch: ( store: string ) =>
 				'core/notices' === store
 					? { createWarningNotice, removeNotice }
 					: { setCurrentRevisionId },
-		} );
+		} as any );
 
 		entityContainsSnapshot.mockReturnValue( false );
 		isCollaborationEnabledForCurrentPost.mockReturnValue( false );
@@ -105,19 +145,6 @@ describe( 'useAutosaveNotice', () => {
 
 	it( 'does not create the notice without an autosave flag', () => {
 		renderAutosaveNotice();
-
-		act( () => {
-			vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
-		} );
-
-		expect( createWarningNotice ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not create the notice in recovery mode', () => {
-		renderAutosaveNotice( {
-			recovery: true,
-			autosave: { editLink: EDIT_LINK, crdtSnapshot: 'snapshot' },
-		} );
 
 		act( () => {
 			vi.advanceTimersByTime( SNAPSHOT_STATUS_SYNC_WAIT_MS );
@@ -231,7 +258,7 @@ describe( 'useAutosaveNotice', () => {
 				autosave: { editLink: EDIT_LINK },
 			} );
 
-			const [ , options ] = createWarningNotice.mock.calls[ 0 ];
+			const [ , options ] = createWarningNotice.mock.calls[ 0 ] as any;
 			const [ action ] = options.actions;
 
 			expect( action.label ).toBe( 'View the autosave' );
@@ -248,7 +275,7 @@ describe( 'useAutosaveNotice', () => {
 				autosave: { editLink },
 			} );
 
-			const [ , options ] = createWarningNotice.mock.calls[ 0 ];
+			const [ , options ] = createWarningNotice.mock.calls[ 0 ] as any;
 			const [ action ] = options.actions;
 
 			expect( action.onClick ).toBeUndefined();

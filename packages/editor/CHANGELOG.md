@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `EditorProvider` no longer shows the autosave and browser backup notices; the post and site editors still do. `LocalAutosaveMonitor` only writes backups.
+
 ### Enhancements
 
+-   Site editors back up the edited post, page, template, template part, pattern or navigation menu in the browser, like the post editor. Post types that don't support autosave get no browser backup.
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).

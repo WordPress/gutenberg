@@ -38,8 +38,8 @@ export const hasSessionStorageSupport = () => {
  *
  * @see https://github.com/WordPress/wordpress-develop/blob/6dad32d2aed47e6c0cf2aee8410645f6d7aba6bd/src/wp-login.php#L103
  *
- * @param {string}  postId    Post ID.
- * @param {boolean} isPostNew Whether post new.
+ * @param {number|string} postId    Post ID.
+ * @param {boolean}       isPostNew Whether post new.
  *
  * @return {string} sessionStorage key
  */
@@ -52,8 +52,8 @@ function postKey( postId, isPostNew ) {
 /**
  * Returns the browser backup of a post.
  *
- * @param {string}  postId    Post ID.
- * @param {boolean} isPostNew Whether post new.
+ * @param {number|string} postId    Post ID.
+ * @param {boolean}       isPostNew Whether post new.
  *
  * @return {Object|null} The backup's `title`, `content`, `excerpt`, `time` and
  *                       CRDT `snapshot`, or null when there is none to use.
@@ -127,15 +127,15 @@ export function localAutosaveSet(
 /**
  * Removes the browser backup of a post.
  *
- * @param {string}  postId    Post ID.
- * @param {boolean} isPostNew Whether post new.
- * @param {number}  [time]    Remove the backup only if it was made at this
- *                            time, so a newer one written since is kept.
+ * @param {number|string} postId    Post ID.
+ * @param {boolean}       isPostNew Whether post new.
+ * @param {number}        [time]    Keep the backup if it was made after this time,
+ *                                  so edits backed up since are not lost.
  */
 export function localAutosaveClear( postId, isPostNew, time ) {
 	if (
 		time !== undefined &&
-		getBrowserBackup( postId, isPostNew )?.time !== time
+		( getBrowserBackup( postId, isPostNew )?.time ?? 0 ) > time
 	) {
 		return;
 	}
