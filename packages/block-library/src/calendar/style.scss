@@ -57,9 +57,8 @@
 	//
 	// Color- or style-only selections add a default solid style with no
 	// width. Without an explicit width the table would draw medium (3px)
-	// over the 1px cells, and inheriting that through thead/tbody/tr
-	// thickens the lines between rows. Match the cell default instead.
-	// Do not touch tables that already have a width so cells still inherit it.
+	// over the 1px cells. Match the cell default instead. Do not touch
+	// tables that already have a width so cells still inherit it.
 	table.has-border-color:not([style*="border-width"]),
 	table[style*="border-style"]:not([style*="border-width"]) {
 		border-width: 1px;
@@ -75,6 +74,9 @@
 		}
 	}
 
+	// Cells inherit from their parent row, so width/style must pass through
+	// thead/tbody/tr. When only a style is set, also inherit width so those
+	// elements pick up the table's 1px instead of falling back to medium (~3px).
 	table[style*="border-style"] {
 		thead,
 		tbody,
@@ -82,6 +84,7 @@
 		th,
 		td {
 			border-style: inherit;
+			border-width: inherit;
 		}
 	}
 
