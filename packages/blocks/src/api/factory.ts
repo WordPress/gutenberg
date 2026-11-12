@@ -15,6 +15,7 @@ import {
 import type {
 	Block,
 	BlockBlockTransform,
+	BlockExample,
 	BlockTransform,
 	BlockType,
 	NormalizedBlockTransform,
@@ -671,16 +672,6 @@ export function switchToBlockType(
  *
  * @return block.
  */
-type BlockExample = {
-	attributes?: Record< string, unknown >;
-	innerBlocks?: Array< {
-		name: string;
-		attributes?: Record< string, unknown >;
-		innerBlocks?: BlockExample[ 'innerBlocks' ];
-	} >;
-	innerContent?: Array< string | null >;
-};
-
 export const getBlockFromExample = (
 	name: string,
 	example: BlockExample
