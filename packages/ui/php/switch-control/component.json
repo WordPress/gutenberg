@@ -1,0 +1,25 @@
+{
+	"name": "switch-control",
+	"props": {
+		"label": { "type": "string", "required": true },
+		"name": { "type": "string", "required": true },
+		"checked": { "type": "boolean", "default": false },
+		"disabled": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"styles": [
+		"form/switch-control/style",
+		"form/primitives/switch/style",
+		"stack/style",
+		"utils/css/resets",
+		"utils/css/field"
+	],
+	"example": {
+		"props": { "label": "Enable taxes", "name": "enable_taxes" }
+	},
+	"interactive": true,
+	"react": {
+		"component": "SwitchControl",
+		"rename": { "checked": "defaultChecked" }
+	}
+}
