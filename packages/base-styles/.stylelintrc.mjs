@@ -11,7 +11,9 @@ export default {
 			{
 				...disallowedValues,
 				'/.*/': [
-					...disallowedValues[ '/.*/' ],
+					...disallowedValues[ '/.*/' ].filter(
+						( pattern ) => ! pattern.includes( '$font-family-' )
+					),
 					'/var\\(\\s*--wpds-/',
 				],
 			},

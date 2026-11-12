@@ -1,6 +1,12 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
+const FONT_FAMILY_VARIABLE_REPLACEMENTS = {
+	'$font-family-body': 'var(--wpds-typography-font-family-body)',
+	'$font-family-headings': 'var(--wpds-typography-font-family-heading)',
+	'$font-family-mono': 'var(--wpds-typography-font-family-mono)',
+};
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -18,6 +24,7 @@ module.exports = {
 					'/--wp-components-color-/',
 					'/\\$font-weight-regular/',
 					'/\\$font-weight-medium/',
+					'/\\$font-family-(body|headings|mono)\\b/',
 				],
 				cursor: [ 'pointer' ],
 				'flex-direction': [ '/^(row|column)-reverse/' ],
@@ -41,6 +48,12 @@ module.exports = {
 							? '$font-weight-regular'
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
+					const fontFamilyVariable = Object.keys(
+						FONT_FAMILY_VARIABLE_REPLACEMENTS
+					).find( ( variable ) => value.includes( variable ) );
+					if ( fontFamilyVariable ) {
+						return `Avoid using the \`${ fontFamilyVariable }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamilyVariable ] }\` instead.`;
 					}
 					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
 				},
