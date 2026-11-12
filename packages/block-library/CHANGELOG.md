@@ -35,6 +35,7 @@
 -   Accordion: Rename the Icon Position options from Left and Right to Start and End, so the labels are correct on RTL sites, where the heading mirrors ([#86586](https://github.com/WordPress/gutenberg/pull/86586)).
 -   RSS: Show the correct date and time for feed items published in the other daylight saving period, instead of an hour off, which could also show the wrong day ([#86639](https://github.com/WordPress/gutenberg/pull/86639)).
 -   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#](https://github.com/WordPress/gutenberg/pull/)).
 
 ## 12.1.0 (2026-11-04)
 

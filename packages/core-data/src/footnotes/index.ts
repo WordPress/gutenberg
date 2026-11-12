@@ -6,6 +6,21 @@ import type { Footnote } from './types';
 
 let oldFootnotes: Record< string, Footnote > = {};
 
+/**
+ * Checks whether an item of the parsed footnotes meta can be used as a
+ * footnote.
+ *
+ * @param value An item of the parsed footnotes meta.
+ * @return Whether the item is an object with a string `id`.
+ */
+function isFootnote( value: unknown ): value is Footnote {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		typeof ( value as { id?: unknown } ).id === 'string'
+	);
+}
+
 export function updateFootnotesFromMeta(
 	blocks: Array< Block >,
 	meta: Record< string, unknown > | undefined
@@ -38,7 +53,13 @@ export function updateFootnotesFromMeta(
 
 	let footnotes: Array< Footnote > = [];
 	if ( Array.isArray( parsed ) ) {
-		footnotes = parsed;
+		// Skip items that aren't footnotes, such as `null` or a string.
+		footnotes = parsed.filter( isFootnote );
+		if ( footnotes.length !== parsed.length ) {
+			warning(
+				'Footnotes post meta has items that are not footnotes; ignoring them.'
+			);
+		}
 	} else {
 		warning( 'Footnotes post meta is not a JSON array; ignoring it.' );
 	}

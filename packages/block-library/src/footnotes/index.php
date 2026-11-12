@@ -44,15 +44,27 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 	$block_content = '';
 
 	foreach ( $footnotes as $footnote ) {
+		// The meta is a string that something else may have written, so an
+		// item can be something other than a footnote. Skip it.
+		if ( ! is_array( $footnote ) || empty( $footnote['id'] ) || ! is_string( $footnote['id'] ) ) {
+			continue;
+		}
+
+		$footnote_content = isset( $footnote['content'] ) && is_string( $footnote['content'] ) ? $footnote['content'] : '';
+
 		// Translators: %d: Integer representing the number of return links on the page.
 		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
 			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
 			esc_attr( $footnote['id'] ),
-			wp_kses_post( $footnote['content'] ),
+			wp_kses_post( $footnote_content ),
 			esc_attr( $aria_label )
 		);
 		++$footnote_index;
+	}
+
+	if ( '' === $block_content ) {
+		return '';
 	}
 
 	return sprintf(

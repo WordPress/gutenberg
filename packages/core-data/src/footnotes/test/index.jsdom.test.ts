@@ -43,6 +43,8 @@ describe( 'updateFootnotesFromMeta', () => {
 			[ 'malformed JSON', '{' ],
 			[ 'a truncated array', '[{"id":"a","content":"x"' ],
 			[ 'not JSON at all', 'footnotes' ],
+			[ 'an array holding null', '[null]' ],
+			[ 'an array holding a string', '["text"]' ],
 		] )( 'does not throw on %s', ( _label, footnotes ) => {
 			expect( () =>
 				updateFootnotesFromMeta( blocks, { footnotes } )
