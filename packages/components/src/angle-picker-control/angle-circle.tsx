@@ -65,7 +65,7 @@ function AngleCircle( {
 		return getAngle( centerX, centerY, event.clientX, event.clientY );
 	};
 
-	const startTurn = ( event: UseDraggingCallbackEvent ) => {
+	const turnDial = ( event: UseDraggingCallbackEvent, isStart: boolean ) => {
 		const angle = capturePointerAngle( event );
 		if ( angle === undefined || onChange === undefined ) {
 			return;
@@ -76,36 +76,25 @@ function AngleCircle( {
 			return;
 		}
 
-		const currentValue = Number( value );
-		const reference =
-			value !== '' && Number.isFinite( currentValue )
-				? clamp( currentValue, min, max )
-				: clamp( 0, min, max );
-		const unclampedValue = getNearestEquivalent( angle, reference );
-		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
-		onChange( clamp( unclampedValue, min, max ) );
-	};
-
-	const continueTurn = ( event: UseDraggingCallbackEvent ) => {
-		const angle = capturePointerAngle( event );
-		if ( angle === undefined || onChange === undefined ) {
-			return;
+		let unclampedValue;
+		if ( isStart ) {
+			const currentValue = Number( value );
+			const reference =
+				value !== '' && Number.isFinite( currentValue )
+					? clamp( currentValue, min, max )
+					: clamp( 0, min, max );
+			unclampedValue = getNearestEquivalent( angle, reference );
+		} else {
+			if ( dragStateRef.current === undefined ) {
+				return;
+			}
+			// Between two events the pointer is taken to have turned the short
+			// way round, so a fast flick of more than half a turn reverses.
+			unclampedValue =
+				dragStateRef.current.unclampedValue +
+				getShortestTurn( dragStateRef.current.lastPointerAngle, angle );
 		}
 
-		if ( isDefaultRange ) {
-			onChange( angle );
-			return;
-		}
-
-		if ( dragStateRef.current === undefined ) {
-			return;
-		}
-
-		// Between two events the pointer is taken to have turned the short
-		// way round, so a fast flick of more than half a turn reverses.
-		const unclampedValue =
-			dragStateRef.current.unclampedValue +
-			getShortestTurn( dragStateRef.current.lastPointerAngle, angle );
 		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
 		onChange( clamp( unclampedValue, min, max ) );
 	};
@@ -113,11 +102,11 @@ function AngleCircle( {
 	const { startDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
 			setAngleCircleCenter();
-			startTurn( event );
+			turnDial( event, true );
 		},
-		onDragMove: continueTurn,
+		onDragMove: ( event ) => turnDial( event, false ),
 		onDragEnd: ( event ) => {
-			continueTurn( event );
+			turnDial( event, false );
 			dragStateRef.current = undefined;
 		},
 	} );
