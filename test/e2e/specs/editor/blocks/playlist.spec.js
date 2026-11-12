@@ -381,6 +381,91 @@ test.describe( 'Playlist block', () => {
 		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 
+	test( 'sets and removes the track image from the block settings sidebar', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/playlist',
+			innerBlocks: [
+				{
+					name: 'core/playlist-track',
+					attributes: {
+						id: uploadedAudio.id,
+						src: uploadedAudio.source_url,
+						title: 'Existing Track',
+					},
+				},
+			],
+		} );
+
+		await editor.canvas
+			.getByRole( 'button', { name: /Existing Track/ } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+
+		const blockSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const alternativeText = blockSettings.getByRole( 'textbox', {
+			name: 'Alternative text',
+		} );
+		// The track image is a media control, named after the current image
+		// or, without one, what it adds.
+		const trackImageControl = blockSettings.getByRole( 'button', {
+			name: 'Add image',
+		} );
+		const trackImageName = uploadedImage.source_url.split( '/' ).pop();
+
+		// Alternative text describes the track image, so it waits for one.
+		await expect( alternativeText ).toBeHidden();
+
+		await trackImageControl.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Open Media Library' } )
+			.click();
+		const mediaLibrary = page.locator( '.media-modal' );
+		await mediaLibrary
+			.getByRole( 'tab', { name: 'Media Library' } )
+			.click();
+		await mediaLibrary
+			.locator( `.attachment[data-id="${ uploadedImage.id }"]` )
+			.click();
+		await mediaLibrary
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		await expect(
+			blockSettings.getByRole( 'button', { name: trackImageName } )
+		).toBeVisible();
+		await expect( alternativeText ).toBeVisible();
+		await alternativeText.fill( 'Green square' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/playlist',
+				innerBlocks: [
+					{
+						name: 'core/playlist-track',
+						attributes: {
+							image: uploadedImage.source_url,
+							imageAlt: 'Green square',
+						},
+					},
+				],
+			},
+		] );
+
+		await blockSettings.getByRole( 'button', { name: 'Reset' } ).click();
+
+		await expect( trackImageControl ).toBeFocused();
+		await expect( alternativeText ).toBeHidden();
+		const [ playlist ] = await editor.getBlocks();
+		expect( playlist.innerBlocks[ 0 ].attributes.image ).toBeUndefined();
+		expect( playlist.innerBlocks[ 0 ].attributes.imageAlt ).toBeUndefined();
+	} );
+
 	test( 'keeps the playlist when the only added track fails to upload', async ( {
 		admin,
 		editor,

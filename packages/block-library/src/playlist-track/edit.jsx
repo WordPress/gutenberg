@@ -1,10 +1,8 @@
 import { isBlobURL } from '@wordpress/blob';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	MediaUpload,
-	MediaUploadCheck,
 	BlockIcon,
 	useBlockProps,
 	BlockControls,
@@ -12,7 +10,6 @@ import {
 	PlainText,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	TextControl,
 	TextareaControl as WCTextareaControl,
@@ -25,9 +22,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { getFilename } from '@wordpress/url';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -44,7 +43,6 @@ const PlaylistTrackEdit = ( {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
-	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
@@ -125,9 +123,10 @@ const PlaylistTrackEdit = ( {
 
 	function onRemoveTrackImage() {
 		setAttributes( { image: undefined, imageAlt: undefined } );
+	}
 
-		// Move focus back to the Media Upload button.
-		imageButton.current.focus();
+	function onTrackImageUploadError( message ) {
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	if ( ! hasTrackSource ) {
@@ -194,51 +193,22 @@ const PlaylistTrackEdit = ( {
 							setAttributes( { album: albumValue } );
 						} }
 					/>
-					<MediaUploadCheck>
-						<BaseControl>
-							<BaseControl.VisualLabel>
-								{ __( 'Track image' ) }
-							</BaseControl.VisualLabel>
-							<div className="editor-video-poster-control">
-								{ !! image && (
-									<img
-										src={ image }
-										alt={ __(
-											'Preview of the track image'
-										) }
-									/>
-								) }
-								<MediaUpload
-									title={ __( 'Select image' ) }
-									onSelect={ onSelectTrackImage }
-									allowedTypes={
-										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
-									}
-									render={ ( { open } ) => (
-										<Button
-											__next40pxDefaultSize
-											variant="primary"
-											onClick={ open }
-											ref={ imageButton }
-										>
-											{ ! image
-												? __( 'Select' )
-												: __( 'Replace' ) }
-										</Button>
-									) }
-								/>
-								{ !! image && (
-									<Button
-										__next40pxDefaultSize
-										onClick={ onRemoveTrackImage }
-										variant="tertiary"
-									>
-										{ __( 'Remove' ) }
-									</Button>
-								) }
-							</div>
-						</BaseControl>
-					</MediaUploadCheck>
+					<BaseControl>
+						<BaseControl.VisualLabel>
+							{ __( 'Track image' ) }
+						</BaseControl.VisualLabel>
+						<MediaControl
+							mediaUrl={ image }
+							filename={
+								image ? getFilename( image ) : undefined
+							}
+							allowedTypes={ TRACK_IMAGE_ALLOWED_MEDIA_TYPES }
+							onSelect={ onSelectTrackImage }
+							onError={ onTrackImageUploadError }
+							onReset={ onRemoveTrackImage }
+							emptyLabel={ __( 'Add image' ) }
+						/>
+					</BaseControl>
 					{ !! image && (
 						<WCTextareaControl
 							label={ __( 'Alternative text' ) }
