@@ -793,42 +793,13 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Return the input schema at the root and per origin.
+	 * Calls WP_Theme_JSON_Sanitizer_Gutenberg::schema_in_root_and_per_origin(), where the logic now lives.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Moved to WP_Theme_JSON_Sanitizer_Gutenberg.
 	 *
 	 * @param array $schema The base schema.
 	 * @return array The schema at the root and per origin.
-	 *
-	 * Example:
-	 * schema_in_root_and_per_origin(
-	 *   array(
-	 *    'fontFamily' => null,
-	 *    'slug' => null,
-	 *   )
-	 * )
-	 *
-	 * Returns:
-	 * array(
-	 *  'fontFamily' => null,
-	 *  'slug' => null,
-	 *  'default' => array(
-	 *    'fontFamily' => null,
-	 *    'slug' => null,
-	 *  ),
-	 *  'blocks' => array(
-	 *    'fontFamily' => null,
-	 *    'slug' => null,
-	 *  ),
-	 *  'theme' => array(
-	 *     'fontFamily' => null,
-	 *     'slug' => null,
-	 *  ),
-	 *  'custom' => array(
-	 *     'fontFamily' => null,
-	 *     'slug' => null,
-	 *  ),
-	 * )
 	 */
 	protected static function schema_in_root_and_per_origin( $schema ) {
 		return WP_Theme_JSON_Sanitizer_Gutenberg::schema_in_root_and_per_origin( $schema );
@@ -1103,9 +1074,12 @@ class WP_Theme_JSON_Gutenberg {
 		$new_theme_json = $theme_json;
 		$variations     = $new_theme_json['styles']['variations'];
 
-		foreach ( array_keys( $variations ) as $variation_name ) {
-			if ( ! in_array( $variation_name, array_merge( array(), ...array_values( $valid_variations ) ), true ) ) {
-				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+		if ( WP_Theme_JSON_Sanitizer_Gutenberg::is_collecting() ) {
+			$registered_variations = array_merge( array(), ...array_values( $valid_variations ) );
+			foreach ( array_keys( $variations ) as $variation_name ) {
+				if ( ! in_array( $variation_name, $registered_variations, true ) ) {
+					WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+				}
 			}
 		}
 
@@ -1177,13 +1151,14 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Sanitizes the input according to the schemas.
+	 * Calls WP_Theme_JSON_Sanitizer_Gutenberg::sanitize(), where the logic now lives.
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
 	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
 	 * @since 7.1.1 Updated schema to allow responsive breakpoint states and pseudo-selectors
 	 *              at the top level of `styles` for block style variation partials.
+	 * @since 7.3.0 Moved to WP_Theme_JSON_Sanitizer_Gutenberg.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -1606,12 +1581,11 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Given a tree, removes the keys that are not present in the schema.
-	 *
-	 * It is recursive and modifies the input in-place.
+	 * Calls WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema(), where the logic now lives.
 	 *
 	 * @since 5.8.0
 	 * @since 7.0.0 Added type validation for boolean values.
+	 * @since 7.3.0 Moved to WP_Theme_JSON_Sanitizer_Gutenberg.
 	 *
 	 * @param array $tree   Input to process.
 	 * @param array $schema Schema to adhere to.

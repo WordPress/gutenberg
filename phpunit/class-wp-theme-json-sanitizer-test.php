@@ -207,6 +207,18 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( array(), $inside, 'A drop before collect() must not leak into a later collection.' );
 	}
 
+	public function test_unknown_code_is_reported_as_incorrect_usage() {
+		$this->setExpectedIncorrectUsage( 'WP_Theme_JSON_Sanitizer_Gutenberg::get_diagnostic_message' );
+
+		$diagnostics = WP_Theme_JSON_Sanitizer_Gutenberg::collect(
+			static function () {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_not_a_code', array( 'styles' ) );
+			}
+		);
+
+		$this->assertSame( '', $diagnostics[0]['message'] );
+	}
+
 	public function test_collect_restores_state_after_an_exception() {
 		try {
 			WP_Theme_JSON_Sanitizer_Gutenberg::collect(

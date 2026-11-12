@@ -3,7 +3,7 @@
  * WP_Theme_JSON_Sanitizer_Gutenberg class
  *
  * @package gutenberg
- * @since 7.2.0
+ * @since 7.3.0
  */
 
 if ( class_exists( 'WP_Theme_JSON_Sanitizer_Gutenberg' ) ) {
@@ -18,7 +18,7 @@ if ( class_exists( 'WP_Theme_JSON_Sanitizer_Gutenberg' ) ) {
  * This is a low-level API that may need to do breaking changes. Please,
  * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
  *
- * @since 7.2.0
+ * @since 7.3.0
  * @access private
  */
 class WP_Theme_JSON_Sanitizer_Gutenberg {
@@ -28,7 +28,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * Null is the normal state. Sanitization only records what it drops while a `collect()`
 	 * callback runs, so the ordinary paths do no extra work.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 * @var array[]|null
 	 */
 	private static $diagnostics = null;
@@ -321,11 +321,11 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 							continue;
 						}
 						if ( isset( $presets[0] ) ) {
-							$presets = static::remove_invalid_preset_items( $presets, array_merge( array( 'settings' ), $path ) );
+							$presets = static::remove_invalid_preset_items( $presets, $path );
 						} else {
 							foreach ( WP_Theme_JSON_Gutenberg::VALID_ORIGINS as $origin ) {
 								if ( isset( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
-									$presets[ $origin ] = static::remove_invalid_preset_items( $presets[ $origin ], array_merge( array( 'settings' ), $path, array( $origin ) ) );
+									$presets[ $origin ] = static::remove_invalid_preset_items( $presets[ $origin ], $path, $origin );
 								}
 							}
 						}
@@ -349,22 +349,23 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * Preset leaves are untyped in VALID_SETTINGS, but consumers read `$preset['slug']` as a string.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 *
-	 * @param array $items Preset items.
-	 * @param array $path  Path of the list within the theme.json structure, used in diagnostics.
+	 * @param array       $items  Preset items.
+	 * @param array       $path   Path of the preset list within `settings`, used in diagnostics.
+	 * @param string|null $origin Optional. Origin key the items sit under, when the list is keyed by origin. Default null.
 	 * @return array The valid items, re-indexed.
 	 */
-	private static function remove_invalid_preset_items( $items, $path ) {
+	private static function remove_invalid_preset_items( $items, $path, $origin = null ) {
 		$valid = array();
 
 		foreach ( $items as $index => $item ) {
 			if ( ! is_array( $item ) ) {
-				static::add_diagnostic( 'theme_json_expected_object', array_merge( $path, array( $index ) ) );
+				static::add_diagnostic( 'theme_json_expected_object', array_merge( array( 'settings' ), $path, null === $origin ? array() : array( $origin ), array( $index ) ) );
 				continue;
 			}
 			if ( isset( $item['slug'] ) && ! is_scalar( $item['slug'] ) ) {
-				static::add_diagnostic( 'theme_json_expected_scalar', array_merge( $path, array( $index, 'slug' ) ) );
+				static::add_diagnostic( 'theme_json_expected_scalar', array_merge( array( 'settings' ), $path, null === $origin ? array() : array( $origin ), array( $index, 'slug' ) ) );
 				continue;
 			}
 			$valid[] = $item;
@@ -380,7 +381,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 7.0.0 Added type validation for boolean values.
-	 * @since 7.2.0 Added the `$path` parameter.
+	 * @since 7.3.0 Added the `$path` parameter.
 	 *
 	 * @param array $tree   Input to process.
 	 * @param array $schema Schema to adhere to.
@@ -494,13 +495,14 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * Collection is scoped to the callback. Nothing is recorded outside it, so the ordinary
 	 * construction paths pay no cost. Calls can nest; the outer collection resumes afterwards.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 *
 	 * @param callable $callback Code to run, typically a `sanitize()` call.
 	 * @return array[] Diagnostics recorded while the callback ran, in no particular order. Each has:
 	 *                 - `code`    string  Stable identifier, one of the codes `get_diagnostic_message()` knows.
 	 *                 - `path`    array   Keys from the root of the structure to the value.
 	 *                 - `message` string  Translated text for display. Not part of the contract; never branch on it.
+	 *                 Keys and names from the structure appear verbatim in `path` and `message`. Escape them before output.
 	 */
 	public static function collect( callable $callback ) {
 		$previous          = self::$diagnostics;
@@ -517,12 +519,25 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	}
 
 	/**
+	 * Whether a `collect()` callback is running.
+	 *
+	 * Lets a caller skip work that only exists to build a diagnostic, such as a list to check a name against.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @return bool
+	 */
+	public static function is_collecting() {
+		return null !== self::$diagnostics;
+	}
+
+	/**
 	 * Records a diagnostic, when a `collect()` callback is running.
 	 *
 	 * Outside `collect()` this returns immediately. The message is built here rather than at the
 	 * call site, so translation only runs when something is collecting.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 *
 	 * @param string $code Diagnostic code, one of the codes `get_diagnostic_message()` knows.
 	 * @param array  $path Path to the value in the theme.json structure. Empty for the whole structure.
@@ -542,7 +557,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	/**
 	 * Builds the human readable message for a diagnostic.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 *
 	 * @param string $code Diagnostic code.
 	 * @param array  $path Path to the value.
@@ -594,6 +609,8 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 				return __( 'Viewport breakpoints were normalized, or replaced by the defaults because no valid breakpoint was found.', 'gutenberg' );
 		}
 
+		_doing_it_wrong( __METHOD__, sprintf( 'Unknown diagnostic code "%s".', esc_html( $code ) ), '7.3.0' );
+
 		return '';
 	}
 
@@ -605,7 +622,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * `remove_keys_not_in_schema()` would do, so the sanitized output does not change. Numeric lists are
 	 * left alone because the walk keeps them as they are.
 	 *
-	 * @since 7.2.0
+	 * @since 7.3.0
 	 *
 	 * @param array $input             Structure to sanitize.
 	 * @param array $valid_block_names List of valid block names.

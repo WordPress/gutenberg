@@ -435,7 +435,7 @@ function gutenberg_get_theme_directory_pattern_slugs() {
  * `message` is display text. This function stays in the plugin until the shape has been
  * exercised by real callers.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param array  $theme_json A structure that follows the theme.json schema.
  * @param array  $args {
