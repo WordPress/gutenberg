@@ -4,6 +4,8 @@
 
 ### Enhancements
 
+-   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
+-   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 -   `AnglePickerControl`: Increase dial border contrast on hover and while pressed ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
@@ -11,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
