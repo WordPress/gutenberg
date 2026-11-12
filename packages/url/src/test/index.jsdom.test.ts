@@ -346,6 +346,29 @@ describe( 'getFilename', () => {
 		expect( getFilename( url ) ).toBe( filename );
 	} );
 
+	it.each( [
+		[
+			'https://wordpress.org/uploads/%E7%94%9F%E6%88%90%E6%B3%A2%E3%81%AE%E9%9F%B31.mp3',
+			'生成波の音1.mp3',
+		],
+		[ 'https://wordpress.org/uploads/my%20photo.jpg', 'my photo.jpg' ],
+		[ '/uploads/caf%C3%A9.png?query=%E9%9F%B3#%E9%9F%B3', 'café.png' ],
+		[ 'https://wordpress.org/uploads/生成波の音2.wav', '生成波の音2.wav' ],
+		[ 'https://wordpress.org/uploads/a%2Fb.jpg', 'a/b.jpg' ],
+		[ 'https://wordpress.org/uploads/100%25.jpg', '100%.jpg' ],
+	] )(
+		'decodes percent-encoded characters in the filename: %s',
+		( url, filename ) => {
+			expect( getFilename( url ) ).toBe( filename );
+		}
+	);
+
+	it( 'returns the filename as is when it can not be decoded', () => {
+		expect(
+			getFilename( 'https://wordpress.org/uploads/%E9%9F.mp3' )
+		).toBe( '%E9%9F.mp3' );
+	} );
+
 	it( 'returns undefined when the provided value does not contain a filename', () => {
 		expect( getFilename( 'http://localhost:8080/' ) ).toBe( undefined );
 		expect( getFilename( 'http://localhost:8080/a/path/' ) ).toBe(

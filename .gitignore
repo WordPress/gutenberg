@@ -16,8 +16,6 @@ coverage
 **/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
 .reassure
-.dev-ready
-
 
 # Directories/files that may appear in your environment
 *.log
@@ -56,6 +54,7 @@ Thumbs.db
 junit.xml
 
 # Local overrides
+.env
 .wp-env.override.json
 .wp-env.test.override.json
 playwright.config.override.ts
