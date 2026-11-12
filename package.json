@@ -176,7 +176,7 @@
 		"metro-react-native-babel-transformer": "0.56.0",
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
-		"node-sass": "4.14.1",
+		"node-sass": "npm:sass@1.32.8",
 		"node-watch": "0.6.0",
 		"patch-package": "6.2.2",
 		"postcss": "7.0.32",
@@ -312,6 +312,7 @@
 		"welcome-build-command": "npm run dev"
 	},
 	"overrides": {
-		"react-native-svg": "https://codeload.github.com/wordpress-mobile/react-native-svg/tar.gz/a628e92990a2404e30a0086f168bd2b5b7b4ce96"
+		"react-native-svg": "https://codeload.github.com/wordpress-mobile/react-native-svg/tar.gz/a628e92990a2404e30a0086f168bd2b5b7b4ce96",
+		"node-sass": "$node-sass"
 	}
 }
