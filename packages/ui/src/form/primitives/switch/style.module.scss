@@ -1,0 +1,129 @@
+@use "../../../utils/css/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--_wp-ui-switch-height: var(--wpds-dimension-size-2xs);
+			--_wp-ui-switch-track-inset: var(--wpds-border-width-xs);
+
+			display: inline-block;
+			flex-shrink: 0;
+			appearance: none;
+			padding: var(--_wp-ui-switch-track-inset);
+			width: calc(var(--_wp-ui-switch-height) * 2);
+			height: var(--_wp-ui-switch-height);
+			border: var(--_wp-ui-switch-track-inset) solid var(--wpds-color-stroke-interactive-neutral);
+			border-radius: 999px;
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			&:focus {
+				@include mixins.focus-ring();
+			}
+
+			@media not (prefers-reduced-motion) {
+				&:not(:hover):not(:active) {
+					transition:
+						background-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
+						border-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+				}
+			}
+
+			[data-highlighted] &:not([data-checked]),
+			&:hover:not([data-disabled], [data-checked]) {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
+			&[data-checked] {
+				background-color: var(--wpds-color-background-interactive-brand-strong);
+				border-color: transparent;
+
+				@media (forced-colors: active) {
+					background-color: Highlight;
+				}
+
+				&[data-disabled] {
+					background-color: var(--wpds-color-background-interactive-brand-strong-disabled);
+
+					@media (forced-colors: active) {
+						background-color: GrayText;
+					}
+				}
+			}
+
+			&[data-disabled]:not([data-checked]) {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					border-color: GrayText;
+				}
+			}
+		}
+
+		.thumb {
+			--_wp-ui-elevation-xs:
+				0 1px 1px rgba(0, 0, 0, 0.03),
+				0 1px 2px rgba(0, 0, 0, 0.02),
+				0 3px 3px rgba(0, 0, 0, 0.02),
+				0 4px 4px rgba(0, 0, 0, 0.01);
+
+			display: block;
+			/* Thumb fills the inner track: height minus padding and border on both sides. */
+			height: calc(var(--_wp-ui-switch-height) - 4 * var(--_wp-ui-switch-track-inset));
+			aspect-ratio: 1;
+			background-color: var(--wpds-color-foreground-interactive-neutral);
+			border-radius: 50%;
+			box-shadow: var(--_wp-ui-elevation-xs);
+
+			@media not (prefers-reduced-motion) {
+				transition:
+					background-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
+					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+			}
+
+			@media (forced-colors: active) {
+				background-color: ButtonText;
+				transition: none;
+			}
+
+			&[data-checked] {
+				background-color: var(--wpds-color-foreground-interactive-brand-strong);
+				transform: translateX(var(--_wp-ui-switch-height));
+
+				@media (forced-colors: active) {
+					background-color: HighlightText;
+				}
+
+				&:dir(rtl) {
+					transform: translateX(calc(-1 * var(--_wp-ui-switch-height)));
+				}
+
+				&[data-disabled] {
+					background-color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+
+					@media (forced-colors: active) {
+						/*
+						 * GrayText on both track and thumb hides the thumb.
+						 * Canvas keeps the knob visible against the GrayText track.
+						 */
+						background-color: Canvas;
+					}
+				}
+			}
+
+			&[data-disabled]:not([data-checked]) {
+				background-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					background-color: GrayText;
+				}
+			}
+		}
+	}
+}

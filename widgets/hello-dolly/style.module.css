@@ -1,0 +1,12 @@
+.root {
+	height: 100%;
+	padding: var(--wpds-dimension-padding-2xl);
+	background-color: var(--wpds-color-background-surface-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
+}
+
+.quote {
+	text-align: center;
+	font-style: italic;
+	font-family: Georgia, "Times New Roman", Times, serif;
+}

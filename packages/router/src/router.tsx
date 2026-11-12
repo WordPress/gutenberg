@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import RouteRecognizer from 'route-recognizer';
 import { createBrowserHistory } from 'history';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -22,10 +15,6 @@ import {
 	buildQueryString,
 } from '@wordpress/url';
 import { useEvent, usePrevious } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { ReactNode } from 'react';
 
 const history = createBrowserHistory();
@@ -65,6 +54,7 @@ interface Config {
 export interface NavigationOptions {
 	transition?: string;
 	state?: Record< string, any >;
+	replace?: boolean;
 }
 
 const RoutesContext = createContext< Match | null >( null );
@@ -106,7 +96,7 @@ export function useHistory() {
 				const result = beforeNavigate
 					? beforeNavigate( { path, query } )
 					: { path, query };
-				return history.push(
+				return history[ options.replace ? 'replace' : 'push' ](
 					{
 						search: buildQueryString( {
 							[ pathArg ]: result.path,
@@ -164,7 +154,7 @@ export default function useMatch(
 	location: LocationWithQuery,
 	matcher: RouteRecognizer,
 	pathArg: string,
-	matchResolverArgs: Record< string, any >
+	matchResolverArgs?: Record< string, any >
 ): Match | undefined {
 	const { query: rawQuery = {} } = location;
 	const [ resolvedMatch, setMatch ] = useState< Match | undefined >();
@@ -234,11 +224,11 @@ export function RouterProvider( {
 	children,
 	matchResolverArgs,
 }: {
-	routes: Route[];
+	routes?: Route[];
 	pathArg: string;
 	beforeNavigate?: BeforeNavigate;
-	children: React.ReactNode;
-	matchResolverArgs: Record< string, any >;
+	children: ReactNode;
+	matchResolverArgs?: Record< string, any >;
 } ) {
 	const location = useSyncExternalStore(
 		history.listen,

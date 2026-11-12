@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -10,14 +7,10 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { FontLibrary } from '@wordpress/global-styles-ui';
 import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 import './style.scss';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function FontLibraryPage() {
@@ -74,35 +67,37 @@ function FontLibraryPage() {
 
 	return (
 		<Page title={ __( 'Fonts' ) } className="font-library-page">
-			<Tabs
-				selectedTabId={ activeTab }
-				onSelect={ ( tabId: string ) => setActiveTab( tabId ) }
-			>
-				<div className="font-library-page__tablist">
-					<Tabs.TabList>
-						{ tabs.map( ( { id, title } ) => (
-							<Tabs.Tab key={ id } tabId={ id }>
-								{ title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</div>
-				{ tabs.map( ( { id } ) => (
-					<Tabs.TabPanel
-						key={ id }
-						tabId={ id }
-						focusable={ false }
-						className="font-library-page__tab-panel"
-					>
-						<FontLibrary
-							value={ user }
-							baseValue={ base }
-							onChange={ setUser }
-							activeTab={ id }
-						/>
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs>
+			<div className="font-library-page__content">
+				<WCTabs
+					selectedTabId={ activeTab }
+					onSelect={ ( tabId: string ) => setActiveTab( tabId ) }
+				>
+					<div className="font-library-page__tablist">
+						<WCTabs.TabList>
+							{ tabs.map( ( { id, title } ) => (
+								<WCTabs.Tab key={ id } tabId={ id }>
+									{ title }
+								</WCTabs.Tab>
+							) ) }
+						</WCTabs.TabList>
+					</div>
+					{ tabs.map( ( { id } ) => (
+						<WCTabs.TabPanel
+							key={ id }
+							tabId={ id }
+							focusable={ false }
+							className="font-library-page__tab-panel"
+						>
+							<FontLibrary
+								value={ user }
+								baseValue={ base }
+								onChange={ setUser }
+								activeTab={ id }
+							/>
+						</WCTabs.TabPanel>
+					) ) }
+				</WCTabs>
+			</div>
 		</Page>
 	);
 }

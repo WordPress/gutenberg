@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { TanninLocaleDomain } from 'tannin';
 import Tannin from 'tannin';
-
-/**
- * WordPress dependencies
- */
 import type { Hooks } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import type {
 	getFilterDomain,
 	I18n,

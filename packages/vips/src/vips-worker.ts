@@ -1,14 +1,13 @@
-/**
- * External dependencies
- */
 import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
-
-/**
- * Internal dependencies
- */
-import type { ItemId, ImageSizeCrop } from './types';
-import type { WorkerAPI } from './worker';
-import { workerCode } from './worker-code';
+import type {
+	ItemId,
+	ImageSizeCrop,
+	ConvertImageOptions,
+	EncodePixelsOptions,
+	ResizeImageOptions,
+} from './types.ts';
+import type { WorkerAPI } from './worker.ts';
+import { workerCode } from './worker-code.ts';
 
 /**
  * The worker instance, lazily created on first use.
@@ -56,8 +55,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param buffer     Original file buffer.
  * @param inputType  Input mime type.
  * @param outputType Output mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param options    Conversion options.
  * @return Converted file buffer.
  */
 export async function vipsConvertImageFormat(
@@ -65,50 +63,42 @@ export async function vipsConvertImageFormat(
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
-	return api.convertImageFormat(
-		id,
-		buffer,
-		inputType,
-		outputType,
-		quality,
-		interlaced
-	);
+	return api.convertImageFormat( id, buffer, inputType, outputType, options );
 }
 
 /**
  * Compresses an existing image using vips in a worker.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file buffer.
  */
 export async function vipsCompressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const api = getWorkerAPI();
-	return api.compressImage( id, buffer, type, quality, interlaced );
+	return api.compressImage( id, buffer, type, options );
 }
 
 /**
  * Resizes an image using vips in a worker.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1). Defaults to 0.82.
+ * UltraHDR JPEGs are auto-detected by libvips and their gain map is
+ * preserved through the resize.
+ *
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -116,8 +106,7 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -126,51 +115,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
-}
-
-/**
- * Resizes an image into multiple sizes in a single pass using a worker.
- *
- * Decodes the source once and uses copyMemory() + thumbnailImage()
- * to avoid re-decoding for each sub-size.
- *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param inputType  Input mime type.
- * @param outputType Output mime type for all results.
- * @param resizes    Array of resize configurations.
- * @param smartCrop  Whether to use smart cropping.
- * @return Array of processed results.
- */
-export async function vipsBatchResizeImage(
-	id: ItemId,
-	buffer: ArrayBuffer,
-	inputType: string,
-	outputType: string,
-	resizes: Array< {
-		resize: ImageSizeCrop;
-		quality: number;
-	} >,
-	smartCrop = false
-): Promise<
-	Array< {
-		buffer: ArrayBuffer | ArrayBufferLike;
-		width: number;
-		height: number;
-		originalWidth: number;
-		originalHeight: number;
-	} >
-> {
-	const api = getWorkerAPI();
-	return api.batchResizeImage(
-		id,
-		buffer,
-		inputType,
-		outputType,
-		resizes,
-		smartCrop
-	);
+	return api.resizeImage( id, buffer, type, resize, options );
 }
 
 /**
@@ -184,6 +129,23 @@ export async function vipsHasTransparency(
 ): Promise< boolean > {
 	const api = getWorkerAPI();
 	return api.hasTransparency( buffer );
+}
+
+/**
+ * Probes a JPEG buffer for UltraHDR (ISO 21496-1 gain map) support using vips
+ * in a worker.
+ *
+ * @param buffer Image buffer to probe.
+ * @return UltraHDR info (dimensions and HDR headroom in stops) if the buffer
+ *         is a valid UltraHDR JPEG; otherwise null.
+ */
+export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ): Promise< {
+	width: number;
+	height: number;
+	hdrCapacity: number;
+} | null > {
+	const api = getWorkerAPI();
+	return api.getUltraHdrInfo( buffer );
 }
 
 /**
@@ -207,6 +169,28 @@ export async function vipsRotateImage(
 } > {
 	const api = getWorkerAPI();
 	return api.rotateImage( id, buffer, type, orientation );
+}
+
+/**
+ * Encodes raw RGBA pixels as a JPEG using vips in a worker, optionally
+ * carrying over the EXIF block from the file the pixels were decoded from.
+ *
+ * @param id      Item ID.
+ * @param pixels  Tightly packed 8-bit RGBA pixel data.
+ * @param width   Image width in pixels.
+ * @param height  Image height in pixels.
+ * @param options Encoding options.
+ * @return JPEG file data.
+ */
+export async function vipsEncodePixelsAsJpeg(
+	id: ItemId,
+	pixels: ArrayBuffer,
+	width: number,
+	height: number,
+	options: EncodePixelsOptions = {}
+): Promise< ArrayBuffer | ArrayBufferLike > {
+	const api = getWorkerAPI();
+	return api.encodePixelsAsJpeg( id, pixels, width, height, options );
 }
 
 /**

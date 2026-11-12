@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine global functions that interact with the WP_Style_Engine class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 
@@ -195,6 +195,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_dimensions_width_style'          => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'width' => '50%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'width:50%;',
+					'declarations' => array(
+						'width' => '50%',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(
@@ -206,13 +221,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'textColumns'    => '2',
 						'textDecoration' => 'underline',
 						'textTransform'  => 'uppercase',
+						'textWrap'       => 'balance',
 						'letterSpacing'  => '2',
 						'writingMode'    => 'vertical-rl',
 					),
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;writing-mode:vertical-rl;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;text-wrap:balance;letter-spacing:2;writing-mode:vertical-rl;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -222,6 +238,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'column-count'    => '2',
 						'text-decoration' => 'underline',
 						'text-transform'  => 'uppercase',
+						'text-wrap'       => 'balance',
 						'letter-spacing'  => '2',
 						'writing-mode'    => 'vertical-rl',
 					),
@@ -591,7 +608,70 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background-size'       => 'cover',
 						'background-attachment' => 'fixed',
 					),
+					'classnames'   => 'has-background',
 				),
+			),
+
+			'inline_background_gradient_clipped_to_text'   => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-image'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
+				),
+			),
+
+			'inline_background_clip_border_box'            => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'border-box',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:border-box;-webkit-text-fill-color:currentColor;',
+					'declarations' => array(
+						'background-clip'         => 'border-box',
+						'-webkit-text-fill-color' => 'currentColor',
+					),
+				),
+			),
+
+			'inline_background_clip_text_with_vendor_prefixes' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
+				),
+			),
+
+			'inline_background_clip_invalid_value'         => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'invalid-value',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
 			),
 		);
 	}
@@ -806,6 +886,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests returning a generated stylesheet with important declarations.
+	 *
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_with_important_declarations() {
+		$declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+		$declarations->add_declaration(
+			'background-image',
+			'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+			array(
+				'important' => true,
+			)
+		);
+		$css_rules = array(
+			array(
+				'selector'     => '.responsive-state',
+				'declarations' => $declarations,
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( '.responsive-state{background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;}', $compiled_stylesheet );
+	}
+
+	/**
 	 * Tests returning a generated stylesheet from a set of nested rules and merging their declarations.
 	 */
 	public function test_should_merge_declarations_for_rules_groups() {
@@ -859,5 +965,68 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 
 		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests that storing a rule whose selector is only whitespace is skipped
+	 * instead of calling {@see WP_Style_Engine_CSS_Rule_Gutenberg::add_declarations()} on null.
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
+	 */
+	public function test_should_skip_storing_rule_with_whitespace_selector() {
+		$css_rules = array(
+			array(
+				'selector'     => ' ',
+				'declarations' => array(
+					'color' => 'red',
+				),
+			),
+		);
+
+		gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'context' => 'test-whitespace-selector' ) );
+
+		$store = WP_Style_Engine_Gutenberg::get_store( 'test-whitespace-selector' );
+		$this->assertInstanceOf( WP_Style_Engine_CSS_Rules_Store_Gutenberg::class, $store );
+		$this->assertSame( array(), $store->get_all_rules(), 'Expected no rule to be stored.' );
+	}
+
+	/**
+	 * Tests that non-string style values are left out of the returned declarations,
+	 * since {@see WP_Style_Engine_CSS_Declarations_Gutenberg::add_declaration()} would drop them from the CSS anyway.
+	 *
+	 * @covers ::gutenberg_style_engine_get_styles
+	 */
+	public function test_should_omit_non_string_values_from_declarations() {
+		$block_styles = array(
+			'border'     => array(
+				'top' => array(
+					'width' => 5,
+					'style' => 'solid',
+				),
+			),
+			'typography' => array(
+				'textColumns' => 2,
+				'fontSize'    => '12px',
+			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'  => 5,
+					'left' => '1em',
+				),
+			),
+		);
+
+		$this->assertSame(
+			array(
+				'css'          => 'border-top-style:solid;padding-left:1em;font-size:12px;',
+				'declarations' => array(
+					'border-top-style' => 'solid',
+					'padding-left'     => '1em',
+					'font-size'        => '12px',
+				),
+			),
+			gutenberg_style_engine_get_styles( $block_styles )
+		);
 	}
 }

@@ -29,7 +29,6 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
-			__next40pxDefaultSize
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -81,13 +80,6 @@ If onChange is called without any parameter, it should reset the value, attendin
 
 -   Required: Yes
 
-### `size`: `'default' | '__unstable-large'`
-
-Size of the control.
-
--   Required: No
--   Default: `'default'`
-
 ### `units`: `string[]`
 
 Available units for custom font size selection.
@@ -126,10 +118,3 @@ If `true`, a slider will be displayed alongside the input field when a custom fo
 
 -   Required: no
 -   Default: `false`
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Required: No
-- Default: `false`

@@ -22,11 +22,12 @@
 }
 
 .block-editor-block-card__title {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
 	gap: calc($grid-unit-10 / 2) $grid-unit-10;
+	overflow-wrap: anywhere;
 
 	&.block-editor-block-card__title {
 		font-size: $default-font-size;

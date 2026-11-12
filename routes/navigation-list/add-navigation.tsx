@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate } from '@wordpress/route';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -62,7 +59,8 @@ export const AddNavigationModal = ( {
 				// Navigate to the newly created navigation menu
 				navigate( {
 					to: `/navigation/edit/${ encodeURIComponent(
-						savedRecord.id
+						// Saved navigation menus have a numeric ID.
+						savedRecord.id as number
 					) }`,
 				} );
 			}
@@ -113,6 +111,7 @@ export const AddNavigationModal = ( {
 							onClick={ closeModal }
 							disabled={ isBusy }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Cancel' ) }
 						</Button>
@@ -122,6 +121,7 @@ export const AddNavigationModal = ( {
 							aria-busy={ isBusy }
 							disabled={ isBusy || ! menuTitle?.trim() }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Create Menu' ) }
 						</Button>

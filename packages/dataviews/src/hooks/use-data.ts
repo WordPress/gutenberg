@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 type PaginationInfo = {
@@ -62,9 +55,8 @@ export default function useData< Item >( {
 }: UseDataParams< Item > ): UseDataResult< Item > {
 	const isInfiniteScrollEnabled = view.infiniteScrollEnabled;
 
-	const [ hasInitiallyLoaded, setHasInitiallyLoaded ] = useState(
-		! isLoading
-	);
+	const [ hasInitiallyLoaded, setHasInitiallyLoaded ] =
+		useState( ! isLoading );
 	useEffect( () => {
 		if ( ! isLoading ) {
 			setHasInitiallyLoaded( true );
@@ -149,7 +141,7 @@ export default function useData< Item >( {
 			// Reset scroll direction to prevent stale directional filtering
 			scrollDirectionRef.current = undefined;
 			// Use the view's startPosition if defined, otherwise default to 1
-			const startPosition = view.search ? 1 : view.startPosition ?? 1;
+			const startPosition = view.search ? 1 : ( view.startPosition ?? 1 );
 			const records = shownData.map( ( record, index ) => {
 				const position = startPosition + index;
 				positionMapRef.current.set( getItemId( record ), position );
@@ -174,7 +166,7 @@ export default function useData< Item >( {
 		// 39 items before the first item in shownData.
 		// When there's an active search, always start from position 1 since
 		// search results are a filtered subset, not a paginated view.
-		const basePosition = view.search ? 1 : view.startPosition ?? 1;
+		const basePosition = view.search ? 1 : ( view.startPosition ?? 1 );
 		const newRecords = shownData.map( ( record, index ) => {
 			const itemId = getItemId( record );
 			const position = view.infiniteScrollEnabled

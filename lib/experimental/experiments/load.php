@@ -25,19 +25,9 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-form-blocks',
-					'label'       => __( 'Form and input blocks', 'gutenberg' ),
-					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-no-tinymce',
-					'label'       => __( 'Disable Classic block', 'gutenberg' ),
-					'description' => __( 'Hides the Classic block from any inserters in the block editor.', 'gutenberg' ),
 				),
 			),
 		),
@@ -47,34 +37,13 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-media-editor',
-					'label'       => __( 'Media Editor', 'gutenberg' ),
-					'description' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-media-editor-modal',
-					'label'       => __( 'Media Editor Modal', 'gutenberg' ),
-					'description' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
+					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
+					'description' => __( 'Replaces the core Edit Media screen with a dedicated route-based media editor for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
-				),
-			),
-		),
-		array(
-			'slug'  => 'data-views',
-			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'          => 'gutenberg-content-only-inspector-fields',
-					'label'       => __( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
-					'description' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-dataform-inspector',
-					'label'       => __( 'Editor Inspector: Use DataForm', 'gutenberg' ),
-					'description' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
 				),
 			),
 		),
@@ -90,14 +59,13 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'templates',
-			'label' => _x( 'Templates', 'experiments group name', 'gutenberg' ),
+			'slug'  => 'real-time-collaboration',
+			'label' => _x( 'Real-Time Collaboration', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'             => 'active_templates',
-					'label'          => __( 'Template Activation', 'gutenberg' ),
-					'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. (Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.)', 'gutenberg' ),
-					'separateOption' => true,
+					'id'          => 'gutenberg-real-time-collaboration',
+					'label'       => __( 'Enable real-time collaboration', 'gutenberg' ),
+					'description' => __( 'Allows multiple people to edit the same post at the same time.', 'gutenberg' ),
 				),
 			),
 		),
@@ -105,11 +73,6 @@ function gutenberg_initialize_experiments_settings() {
 			'slug'  => 'other',
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(
-				array(
-					'id'          => 'gutenberg-color-randomizer',
-					'label'       => __( 'Color randomizer', 'gutenberg' ),
-					'description' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
-				),
 				array(
 					'id'          => 'gutenberg-workflow-palette',
 					'label'       => __( 'Workflow Palette', 'gutenberg' ),
@@ -123,17 +86,22 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
-					'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-content-types',
-					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
+					'id'          => 'gutenberg-wpds-admin-restyle',
+					'label'       => __( 'Admin design tokens', 'gutenberg' ),
+					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. No markup changes. (Warning: this can change how plugin styles apply to admin screens, and it loads admin stylesheets one by one instead of combined. Use it for testing, not on a live site.)', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-react-19',
+					'label'       => __( 'React 19', 'gutenberg' ),
+					'description' => __( 'Uses React 19 for the registered React scripts, instead of the legacy React 18 version. Can be disabled when the new React 19 script cause compatibility issues with plugins and themes.', 'gutenberg' ),
 				),
 			),
 		),
@@ -149,15 +117,8 @@ function gutenberg_initialize_experiments_settings() {
 				'description' => $experiment['description'],
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
+				'default'     => gutenberg_get_experiment_default( $experiment['id'] ),
 			);
-
-			// Metadata-only entry: values for separateOption experiments live in
-			// their own option (e.g. `active_templates`). Surfaced here so the UI
-			// can render them from the settings schema.
-			if ( ! empty( $experiment['separateOption'] ) ) {
-				$property['separate_option'] = true;
-				$property['option_name']     = $experiment['id'];
-			}
 
 			$properties[ $experiment['id'] ] = $property;
 		}
@@ -170,8 +131,15 @@ function gutenberg_initialize_experiments_settings() {
 			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
 			'show_in_rest' => array(
 				'schema' => array(
-					'type'       => 'object',
-					'properties' => $properties,
+					'type'                 => 'object',
+					'properties'           => $properties,
+					/*
+					 * A site that enabled an experiment which was since removed still
+					 * carries that ID in the saved option.
+					 */
+					'additionalProperties' => array(
+						'type' => 'boolean',
+					),
 				),
 			),
 			'default'      => array(),
@@ -180,21 +148,6 @@ function gutenberg_initialize_experiments_settings() {
 }
 
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
-
-/**
- * Registers the Experiments submenu page under the Gutenberg menu.
- */
-function gutenberg_experiments_menu() {
-	add_submenu_page(
-		'gutenberg',
-		__( 'Experiments Settings', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
-		'manage_options',
-		'experiments-wp-admin',
-		'gutenberg_experiments_wp_admin_render_page'
-	);
-}
-add_action( 'admin_menu', 'gutenberg_experiments_menu' );
 
 /**
  * Allows the legacy `gutenberg-experiments` route. Without this, accessing
@@ -212,9 +165,7 @@ add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
  * `?page=experiments-wp-admin` URL.
  */
 function gutenberg_redirect_legacy_experiments_page() {
-	wp_safe_redirect( admin_url( 'admin.php?page=experiments-wp-admin' ) );
+	wp_safe_redirect( admin_url( 'options-general.php?page=experiments-wp-admin' ) );
 	exit;
 }
 add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-toplevel_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
-add_action( 'load-gutenberg_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );

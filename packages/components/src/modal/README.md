@@ -163,6 +163,7 @@ Titles are required for accessibility reasons, see `contentLabel` and `title` fo
 #### `bodyOpenClassName`: `string`
 
 Class name added to the body element when the modal is open.
+If you use a custom class name, its styles must set `overflow: hidden` to preserve the Modal's scroll lock.
 
 -   Required: No
 -   Default: `modal-open`
@@ -189,7 +190,7 @@ If this property is false, focus will not be transferred and it is the responsib
 
 If set to `firstElement` focus will be placed on the first tabbable element anywhere within the Modal.
 
-If set to `firstContentElement` focus will be placed on the first tabbable element within the Modal's **content** (i.e. children). Note that it is the responsibility of the consumer to ensure there is at least one tabbable element within the children **or the focus will be lost**.
+If set to `firstContentElement`, focus will be placed on the first tabbable element within the Modal's **content** (i.e. children).
 
 -   Required: No
 -   Default: `true`
@@ -272,7 +273,7 @@ Titles are required for accessibility reasons, see `aria.labelledby` and `conten
 
 #### `__experimentalHideHeader`: `boolean`
 
-When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
+When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered. A `title` is then applied to the dialog as its `aria-label`, so the dialog keeps an accessible name.
 
 _Warning_: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 

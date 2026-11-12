@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	isSameDay,
 	subMonths,
@@ -12,31 +9,18 @@ import {
 	addWeeks,
 	isSameMonth,
 } from 'date-fns';
-import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { CSSProperties, KeyboardEventHandler } from 'react';
+import clsx from 'clsx';
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { dateI18n, date as formatDate, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useLilius } from './use-lilius';
 import type { DatePickerProps } from '../types';
-import {
-	Wrapper,
-	Navigator,
-	ViewPreviousMonthButton,
-	ViewNextMonthButton,
-	NavigatorHeading,
-	Calendar,
-	DayOfWeek,
-	DayButton,
-} from './styles';
+import Button from '../../button';
+import { HStack } from '../../h-stack';
+import { Heading } from '../../heading';
+import styles from './style.module.scss';
 import {
 	inputToDate,
 	setInConfiguredTimezone,
@@ -109,13 +93,14 @@ export function DatePicker( {
 	}
 
 	return (
-		<Wrapper
-			className="components-datetime__date"
+		<div
+			className={ clsx( 'components-datetime__date', styles.wrapper ) }
 			role="application"
 			aria-label={ __( 'Calendar' ) }
 		>
-			<Navigator>
-				<ViewPreviousMonthButton
+			<HStack className={ styles.navigator }>
+				<Button
+					className={ styles[ 'previous-month' ] }
 					icon={ isRTL() ? arrowRight : arrowLeft }
 					variant="tertiary"
 					aria-label={ __( 'View previous month' ) }
@@ -133,7 +118,7 @@ export function DatePicker( {
 					} }
 					size="compact"
 				/>
-				<NavigatorHeading level={ 3 }>
+				<Heading level={ 3 } className={ styles.heading }>
 					<strong>
 						{ dateI18n(
 							'F',
@@ -142,8 +127,9 @@ export function DatePicker( {
 						) }
 					</strong>{ ' ' }
 					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
-				</NavigatorHeading>
-				<ViewNextMonthButton
+				</Heading>
+				<Button
+					className={ styles[ 'next-month' ] }
 					icon={ isRTL() ? arrowLeft : arrowRight }
 					variant="tertiary"
 					aria-label={ __( 'View next month' ) }
@@ -161,15 +147,19 @@ export function DatePicker( {
 					} }
 					size="compact"
 				/>
-			</Navigator>
-			<Calendar
+			</HStack>
+			<div
+				className={ styles.calendar }
 				onFocus={ () => setIsFocusWithinCalendar( true ) }
 				onBlur={ () => setIsFocusWithinCalendar( false ) }
 			>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
-					<DayOfWeek key={ day.toString() }>
+					<div
+						className={ styles[ 'day-of-week' ] }
+						key={ day.toString() }
+					>
 						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
-					</DayOfWeek>
+					</div>
 				) ) }
 				{ calendar[ 0 ].map( ( week ) =>
 					week.map( ( day, index ) => {
@@ -284,8 +274,8 @@ export function DatePicker( {
 						);
 					} )
 				) }
-			</Calendar>
-		</Wrapper>
+			</div>
+		</div>
 	);
 }
 
@@ -328,22 +318,33 @@ function Day( {
 	}, [ isFocusable ] );
 
 	return (
-		<DayButton
+		// Invalid dates intentionally cannot receive focus or be selected.
+		// eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled
+		<Button
 			__next40pxDefaultSize
 			ref={ ref }
-			className="components-datetime__date__day" // Unused, for backwards compatibility.
+			className={ clsx(
+				'components-datetime__date__day', // Unused, for backwards compatibility.
+				styles.day,
+				{
+					[ styles[ 'is-selected' ] ]: isSelected,
+					[ styles[ 'is-today' ] ]: ! isSelected && isToday,
+					[ styles[ 'has-events' ] ]: numEvents > 0,
+				}
+			) }
+			style={
+				{
+					'--_wp-components-date-picker-column': column,
+				} as CSSProperties
+			}
 			disabled={ isInvalid }
 			tabIndex={ isFocusable ? 0 : -1 }
 			aria-label={ getDayLabel( day, isSelected, isToday, numEvents ) }
-			column={ column }
-			isSelected={ isSelected }
-			isToday={ isToday }
-			hasEvents={ numEvents > 0 }
 			onClick={ onClick }
 			onKeyDown={ onKeyDown }
 		>
 			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
-		</DayButton>
+		</Button>
 	);
 }
 

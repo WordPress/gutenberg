@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
@@ -59,7 +48,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		return (
 			<div className="dataviews-loading">
 				<p>
-					<Spinner />
+					<WCSpinner />
 				</p>
 			</div>
 		);

@@ -341,7 +341,7 @@ export function deleteColumn( state, { columnIndex } ) {
 							row.cells.length >= columnIndex
 								? row.cells.filter(
 										( cell, index ) => index !== columnIndex
-								  )
+									)
 								: row.cells,
 					} ) )
 					.filter( ( row ) => row.cells.length ),

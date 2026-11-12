@@ -1,7 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf, isRTL } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	useNavigator,
 	__experimentalText as WCText,
@@ -11,10 +9,6 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import FontDemo from './font-demo';
 
 function FontCard( {
@@ -22,11 +16,13 @@ function FontCard( {
 	onClick,
 	variantsText,
 	navigatorPath,
+	shouldFocus,
 }: {
 	font: FontFamily;
 	onClick: () => void;
 	variantsText?: string;
 	navigatorPath?: string;
+	shouldFocus?: boolean;
 } ) {
 	const variantsCount = font.fontFace?.length || 1;
 
@@ -35,9 +31,17 @@ function FontCard( {
 	};
 
 	const navigator = useNavigator();
+	const ref = useRef< HTMLButtonElement >( null );
+
+	useEffect( () => {
+		if ( shouldFocus ) {
+			ref.current?.focus();
+		}
+	}, [ shouldFocus ] );
 
 	return (
 		<Button
+			ref={ ref }
 			__next40pxDefaultSize
 			onClick={ () => {
 				onClick();

@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { InputLayout } from '@wordpress/ui';
 import type { DataFormControlProps } from '../../types';
 import ValidatedText from './utils/validated-input';
 
@@ -18,7 +12,7 @@ export default function Text< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { prefix, suffix } = config || {};
+	const { prefix, prefixPadding, suffix, suffixPadding } = config || {};
 
 	return (
 		<ValidatedText
@@ -29,8 +23,20 @@ export default function Text< Item >( {
 				hideLabelFromVision,
 				markWhenOptional,
 				validity,
-				prefix: prefix ? createElement( prefix ) : undefined,
-				suffix: suffix ? createElement( suffix ) : undefined,
+				prefix: prefix ? (
+					<InputLayout.Slot padding={ prefixPadding }>
+						{ typeof prefix === 'string'
+							? prefix
+							: createElement( prefix ) }
+					</InputLayout.Slot>
+				) : undefined,
+				suffix: suffix ? (
+					<InputLayout.Slot padding={ suffixPadding }>
+						{ typeof suffix === 'string'
+							? suffix
+							: createElement( suffix ) }
+					</InputLayout.Slot>
+				) : undefined,
 			} }
 		/>
 	);

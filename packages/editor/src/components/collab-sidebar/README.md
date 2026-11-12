@@ -9,109 +9,144 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 
 ## File structure
 
-```
-collab-sidebar/
-├── README.md                       this file
-├── index.js                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
-├── notes.js                        Notes - coordinator (outer Stack, actions, keyboard nav)
-├── note-thread.js                  NoteThread - per-thread (selection, floating registration, reply form)
-├── note.js                         Note - per-card state (edit/delete mode, menu, dialog)
-├── note-card.js                    NoteCard - presentational shell (byline + actions slot + children)
-├── note-byline.js                  NoteByline - avatar + name + relative date
-├── note-form.js                    NoteForm - autosizing textarea + submit/cancel
-├── add-note.js                     AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.js           AddNoteMenuItem - block-toolbar "Add note" trigger
-├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars
-├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
-│
-├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
-├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
-├── constants.js                    sidebar identifier strings
-├── style.scss
-└── test/
-    └── utils.js
-```
+The components are in the hierarchy below. Besides them:
+
+- `hooks.js`: `useNoteThreads`, `useNoteActions`, `useNoteDraft`, `useNoteSelection`, `usePickNote`, `useNoteFocus`, `useFloatingBoard`.
+- `utils/`: pure helpers, one module per concern. See the table below.
+- `board-store.js`: DOM measurement for the floating layout, see "Floating board".
+- `note-highlight-styles.js`: the canvas tint for notes and their markers.
+- `format.js`: the `core/note` format that serializes an inline note's marker.
+- `notes-filters.tsx`, `notes-display-mode-menu.tsx`: the sidebar's filters and the Options menu's Notes submenu.
+- `rich-text-control/`, `note-mention-completer.tsx`: the note form's rich text field and its `@` mentions.
+- `reactions/`: emoji reactions on a note.
+
+| `utils/` module | Owns |
+| --- | --- |
+| `note-format` | `core/note` markers on rich text records, shaped like rich-text's `applyFormat` and `removeFormat` |
+| `note-anchor` | Markers in block attributes: finding, wrapping and removing them, and which blocks hold a note at block level |
+| `rich-text` | Converting attribute values to records and back. Local copies of block editor helpers that aren't exported name their originals |
+| `note-selection` | The caret rules, see "Note selection" |
+| `metadata` | `metadata.noteId` |
+| `dom` | Marker selectors, anchor rects, focusing and scrolling threads |
+| `layout` | Floating thread positions, see "Floating board" |
+| `display` | Excerpts and avatar colors |
 
 ## Component hierarchy
 
-```
-NotesSidebarContainer (index.js)         - gates on post type support
- └── NotesSidebar (index.js)             - owns sidebarRef + useNoteThreads + sidebar registration
-      ├── AddNoteMenuItem                - slot fill in the block toolbar
-      ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
+```text
+NotesSidebarContainer (index.jsx)         - gates on post type support, owns the unsent drafts Map
+ └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + useNoteSelection + sidebar registration
+      ├── AddNoteMenuItem                - slot fill in the block options menu
+      ├── AddNoteToolbarButton           - slot fill in the block toolbar (once the post has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.js)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
-      │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
-      │         └── NoteThread[]         - per thread
+      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteFocus + keyboard nav + focusThreadOrAdjacent
+      │         ├── AddNote              - new note form for the selected blocks, rendered when selectedNote === 'new', calls useNoteActions
+      │         └── NoteThread[]         - per thread, calls useNoteActions
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard
       │                   │         └── NoteByline + actions slot + body children
       │                   ├── Note[]     - replies (when selected)
-      │                   └── NoteCard + NoteForm - inline reply form (when selected)
+      │                   └── NoteReply  - inline reply form (when selected)
       └── PluginSidebar (floating)       - floating sidebar (large viewport, unresolved notes)
            └── Notes (same)              - isFloating
 ```
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
 
+Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill. The text a new note is started from is wrapped with a `core/note` marker whose id is `new`, the same sentinel `selectNote` uses for the form, until the note is sent, so the anchor follows edits like a saved note's does; `onCreate` swaps in the saved id, and each exit from an empty form strips it with `onDiscard` at the point of exit: Cancel, the form's focus-out, and `useNoteSelection` when the caret moves the selection away from `new`.
+
+A new note is added to the selected blocks, so selecting several blocks, or text across them, adds one note to each, as if added to each block on its own; from then on it is a note shared by several blocks. Each block's `new` marker wraps the text a format applied across blocks would (`getNoteRanges`). A text block the selection gives no text, like the one it starts at the end of, is left out, unless no block has any. A block without a sole rich text field, like an Image, takes the note without a marker and holds it at block level, unlike a text block a split left without the note's marker; `getBlockLevelClientIds` decides this for both the tint and the caret. The selection stays while the form is open, and the form's blocks are the selected blocks; moving either end of a selection across blocks leaves the form, as entering another block does. Starting a note across blocks strips any `new` marker from them, since one left by a single block's unsent draft isn't this note's. Its text is kept under the first; only a draft on one block keeps its marker when the form is left, so a draft across blocks comes back on its first block.
+
+## Note selection
+
+The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, filtered by `getCaretChange`, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. The tests in `test/note-selection.jsdom.test.ts` have one `describe` per row of this table, so a rule change is a change to both. Three caret events change the selected note, and everything else leaves it alone:
+
+| Caret event | Selected note becomes |
+| --- | --- |
+| Enters a marker | That note, or the new note form for the `new` marker |
+| Enters another block, or moves an end of a selection across blocks | The block's note: its unsent draft, else a block-level note (the selected one, else the primary), else none |
+| Leaves the selected note's marker | The block's note, as above |
+| Anything else: typing, moving in plain text, a caret not reported yet | Unchanged |
+
+A block-level note is one the block holds at block level, see `getBlockLevelClientIds`, so a text block a split left with the note's id but none of its text doesn't select it. "Anything else" is what keeps explicit actions in place: a block-level note collapsed with Escape stays collapsed while editing, since a block-level note has no caret position. A caret not reported yet is unknown, not outside: RichText reports no offsets on focus until mouseup, and `selectBlock` stores none.
+
+Explicit actions set the selected note directly:
+
+| Action | Effect |
+| --- | --- |
+| Thread click, avatar, keyboard expand, Add note | `usePickNote`: selects the block, then the note, so the caret events run on the block change before the pick lands |
+| Escape | None, until one of the caret events above |
+| Cancel, the new note form's focus-out | Strips the draft marker, none |
+
+A thread's or the new note form's focus-out deselects only when focus did not land in one of its blocks, see `isFocusInBlocks`; in those blocks, the caret events decide. While the canvas is the editing host (the selected block supports `editableRoot`), the host holds focus, so the block holding the caret counts.
+
 ## Floating board
 
 Goal: in the floating sidebar, each unresolved note appears beside its associated block, tracks canvas scroll, and shifts up/down to avoid overlapping with neighbors - all without re-rendering threads as the canvas scrolls.
 
+A note shared by several blocks has one place: beside its first block, whichever of its blocks is selected. Hovering or focusing the thread highlights that block, picking the thread selects it, and Back to block returns to it.
+
 Three layers cooperate:
 
-### 1. `board-store.js` - imperative DOM registry
+### 1. `board-store.js` - DOM measurement
 
-A plain JS module returning a store created via `createBoardStore()` (one per mounted `Notes`). Holds:
+A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It is the only place that reads layout for the thread positions; the scroll mirror in `useMirroredScroll` reads the canvas's scroll range separately. It holds:
 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
 - `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `heights: { [noteId]: number }` - observed heights of floating elements.
-- `snapshot: { ... }` - frozen shallow copy of `heights` (for `useSyncExternalStore`).
+- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`. When the root changes, the observers are rebuilt.
+- `snapshot: { heights, anchorRects, canvas, frameOffset }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it. `frameOffset` is the canvas frame's top minus the top of the threads' container (their `offsetParent`): anchors are read in the frame's viewport, threads are positioned in the container, and anything above the canvas (e.g. an editor notice or the device preview inset) separates the two.
 
-A single shared `ResizeObserver` watches every registered floating element; when a floating note changes height, it updates `heights`, snapshots, and calls every `listener` in the store's `Set`.
+One `ResizeObserver` watches:
+
+- each floating element, for thread heights;
+- the root, so editing, adding or removing a block re-anchors the threads below it;
+- the root's parent, which grows when content above the root (e.g. a wrapping post title) moves the root without resizing it;
+- the canvas frame, which shrinks when content above the canvas moves it. A frame that moves without resizing isn't detected.
+
+Each callback runs `measure()`, which reads the heights and anchors (via `getNoteAnchorRect()` in `utils/dom.ts`) and emits only when a value changed.
+
+A `MutationObserver` watches `style` attributes under the root. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions. The observer calls `requestMeasure()` once a changed element has no transform, so threads move when the animation ends rather than on every frame.
 
 API:
-- `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
-- `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
-- `unregisterThread(id)` - inverse; called on unmount.
-- `getBlockRects()` - returns a batched snapshot of block `getBoundingClientRect()` values. Batches reads so subsequent CSS writes don't trigger layout thrash.
-- `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
 
-The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
+- `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. The observers only exist while there are subscribers: the first subscriber creates them and observes everything already registered, the last one disconnects them.
+- `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Updates the refs, swaps the observed floating element, and requests a measurement.
+- `unregisterThread(id)` - inverse; called on unmount.
+- `requestMeasure()` - asks for a new pass when anchors may move without anything resizing or re-registering (e.g. blocks reordered).
+
+Registering never measures directly. `requestMeasure()` re-observes the root; a new observation always reports once, so the observer runs another pass before the next paint, together with any other resizes in that frame.
+
+`getNoteAnchorRect(noteId, blockEl)` resolves the anchor at read time, because rich-text re-renders replace the marker element: an inline note, the pending `new` note included, anchors to its marker, and anything else to its block.
 
 ### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
 
 Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) and:
 
-1. Subscribes to `heights` via `useSyncExternalStore(store.subscribe, store.getSnapshot)`.
-2. In a `useEffect` keyed on `threads + heights + selectedNoteId + isFloating + sidebarRef`:
-   - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
-   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getBlockRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
-   - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
-3. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
+1. Subscribes via `useSyncExternalStore` only while floating; otherwise it passes a no-op subscribe, so the store drops its observer.
+2. Requests a measurement whenever `threads` changes. `threads` is rebuilt on any block insert, removal or move, which can shift anchors without resizing the root.
+3. Derives `notePositions` during render with `useMemo( () => getThreadLayout(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
+4. `useCanvasRoom`: in a layout effect keyed on `isFloating + canvas + contentHeight`, writes the `contentHeight` from the same `getThreadLayout` call as `--wp-editor-canvas-min-height` on the canvas root. The canvas margin's CSS (`getCanvasMarginCSS` in `visual-editor/canvas-margin.js`) applies it as the root's `min-height` inside its tiers, so a short post can always scroll to the lowest thread and the room goes away with the margin. The value changes at most twice per selection change (new positions, then the expanded thread's measured height), both before the next paint.
+5. `useMirroredScroll`: in a layout effect keyed on `isFloating + sidebarRef + canvas`, mirrors the panel and the canvas. The floating panel is a real scroller (`overflow-y: auto`, hidden scrollbar) whose `::before` spacer gives it the canvas's scroll range, written as `--canvas-scroll-range` from a `ResizeObserver` on the canvas root, its body and the panel. A `scroll` listener on each side scrolls the other to its position, and the canvas owns the position: when it can't follow the panel, the panel snaps back. The code comments cover the details (instant scrolls, the echo guard, why the observer never sets positions).
+6. `usePanelOffsets`: writes the snapshot's `frameOffset` as `--canvas-offset` and `scrollbarWidth` as `--canvas-scrollbar-width` on the panel.
+7. Returns `{ notePositions, heights, registerThread, unregisterThread }` - the positions and heights flow down as props; the two register callbacks flow to each `NoteThread`.
 
-### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
+### 3. `getThreadLayout` - pure layout math (in `utils/layout.ts`)
 
-Given the list of threads, the currently selected note id, the block rects, the floating heights, and the canvas scroll offset, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
-
-Algorithm, keyed on the selected note as an **anchor**:
-
-1. Anchor the selected note at `blockRect.top + THREAD_ALIGN_OFFSET` (−16). If no selected note, anchor the first thread.
-2. Walk forward from the anchor: each subsequent thread starts at its block's top; if it would overlap the previous thread's bottom (plus `THREAD_GAP` of 16), push it further down by `OVERLAP_MARGIN` (20).
-3. Walk backward from the anchor: mirror - push upward into any overlap.
-4. Convert each final offset into content-space by adding `blockRect.top + scrollTop`.
+Given the threads, the selected note id, the anchor rects and the floating heights, returns `{ positions: { [noteId]: top }, contentHeight }` in canvas content-space. The selected note (else the first thread) stays beside its anchor, and two sweeps from it push the threads below down and the threads above up until none overlap.
 
 ### 4. `FloatingContainer` - the render shell
 
-Renders a `Stack` with `top: floating.y` when in floating mode. CSS uses the `--canvas-scroll` custom property to translate the whole panel in sync with the canvas, so per-thread `top` values stay stable while scrolling.
+Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset`, so it tracks the canvas frame; the panel's own scroll, mirrored with the canvas, tracks the canvas scroll, so per-thread `top` values stay stable while scrolling. A `top` transition eases reflows (e.g. on selection change) unless the user prefers reduced motion; a thread's first positioning starts from `top: auto` and doesn't animate.
 
 ### Why this shape
 
-- `ResizeObserver` is canonical for height changes that must drive layout without polling.
-- `useSyncExternalStore` is the right React 18 primitive for "external mutable source with snapshot" - gives concurrent-mode-safe subscriptions without a provider.
-- The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render. Per-note `top` only recomputes when threads, heights, selection, or structural inputs change.
-- Batching `getBoundingClientRect` reads inside the `rAF` and separating them from style writes avoids forced layout.
+Each layer has one job, so a new anchor type or layout rule touches only one of them:
+
+- DOM reads happen only in `measure()`, inside the `ResizeObserver` callback. It runs after layout and before paint, so reads are cheap, the result is painted in the same frame, and the browser's resize-loop detection covers any feedback between positions and sizes. Don't add rAFs or timers around it.
+- The snapshot is plain data compared by value, so unrelated resizes don't re-render `Notes`.
+- Observer lifetime follows subscriptions, so remounts (and StrictMode's double effects) rebuild it from the registered refs.
+- `getThreadLayout` is pure and derived during render; anything computable from props, state and the snapshot should stay out of React state.
+- The scroll listeners mirror scroll positions and the range observer updates a CSS variable, never React state, so scrolling doesn't re-render.

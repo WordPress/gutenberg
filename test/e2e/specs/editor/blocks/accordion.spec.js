@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Accordion', () => {
@@ -237,5 +234,114 @@ test.describe( 'Accordion', () => {
 		await link.click();
 		await expect( accordionPanel ).toBeVisible();
 		await expect( targetParagraph ).toBeInViewport();
+	} );
+
+	test( 'should open accordion panel by default when its heading is the URL hash target', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert a tall spacer block to ensure anchor scrolling behaves as expected.
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '1000px' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: {
+								anchor: 'target',
+								title: 'Accordion Title',
+							},
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Accordion Panel Content',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }#target` );
+
+		const accordionPanel = page.getByRole( 'region', {
+			name: 'Accordion Title',
+		} );
+		await expect( accordionPanel ).toBeVisible();
+		const targetHeading = page.locator( '#target' );
+		await expect( targetHeading ).toBeInViewport();
+	} );
+
+	test( 'should open accordion panel when clicking a link to its heading', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="#target">Open panel and scroll to heading</a>',
+			},
+		} );
+		// Insert a tall spacer block to ensure anchor scrolling behaves as expected.
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '1000px' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: {
+								anchor: 'target',
+								title: 'Accordion Title',
+							},
+						},
+						{
+							name: 'core/accordion-panel',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Accordion Panel Content',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const link = page.getByRole( 'link', {
+			name: 'Open panel and scroll to heading',
+		} );
+		const accordionPanel = page.getByRole( 'region', {
+			name: 'Accordion Title',
+		} );
+		const targetHeading = page.locator( '#target' );
+
+		await expect( accordionPanel ).toBeHidden();
+		await link.click();
+		await expect( accordionPanel ).toBeVisible();
+		await expect( targetHeading ).toBeInViewport();
 	} );
 } );

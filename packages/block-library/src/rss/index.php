@@ -15,11 +15,16 @@
  * @return string Returns the block content with received rss items.
  */
 function render_block_core_rss( $attributes ) {
-	if ( in_array( untrailingslashit( $attributes['feedURL'] ), array( site_url(), home_url() ), true ) ) {
+	$feed_url = $attributes['feedURL'] ?? null;
+	if ( ! is_string( $feed_url ) ) {
+		return '';
+	}
+
+	if ( in_array( untrailingslashit( $feed_url ), array( site_url(), home_url() ), true ) ) {
 		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site’s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
 	}
 
-	$rss = fetch_feed( $attributes['feedURL'] );
+	$rss = fetch_feed( $feed_url );
 
 	if ( is_wp_error( $rss ) ) {
 		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . esc_html( $rss->get_error_message() ) . '</div></div>';
@@ -33,7 +38,8 @@ function render_block_core_rss( $attributes ) {
 	$list_items = '';
 
 	$open_in_new_tab = ! empty( $attributes['openInNewTab'] );
-	$rel             = ! empty( $attributes['rel'] ) ? trim( $attributes['rel'] ) : '';
+	$rel_attr        = $attributes['rel'] ?? null;
+	$rel             = is_string( $rel_attr ) && '' !== $rel_attr ? trim( $rel_attr ) : '';
 
 	$link_attributes = '';
 
@@ -64,13 +70,10 @@ function render_block_core_rss( $attributes ) {
 			$timestamp = $item->get_date( 'U' );
 
 			if ( $timestamp ) {
-				$gmt_offset = get_option( 'gmt_offset' );
-				$timestamp += (int) ( (float) $gmt_offset * HOUR_IN_SECONDS );
-
 				$date_markup = sprintf(
 					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
-					esc_attr( date_i18n( 'c', $timestamp ) ),
-					esc_html( date_i18n( get_option( 'date_format' ), $timestamp ) )
+					esc_attr( wp_date( 'c', $timestamp ) ),
+					esc_html( wp_date( get_option( 'date_format' ), $timestamp ) )
 				);
 			}
 		}
@@ -97,7 +100,7 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
-			if ( '[...]' === substr( $excerpt, -5 ) ) {
+			if ( str_ends_with( $excerpt, '[...]' ) ) {
 				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';
 			}
 

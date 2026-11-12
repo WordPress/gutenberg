@@ -125,11 +125,19 @@
 
 		&.is-pressed {
 			background: $gray-900;
+
+			@media (forced-colors: active) {
+				background: SelectedItem !important;
+
+				&:disabled,
+				&[aria-disabled="true"] {
+					background: GrayText !important;
+				}
+			}
 		}
 
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
-			outline: 1px solid transparent;
+		&:focus:not(:active) {
+			@include outset-ring__focus();
 		}
 
 		&::before {

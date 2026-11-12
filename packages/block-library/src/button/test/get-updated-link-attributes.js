@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getUpdatedLinkAttributes } from '../get-updated-link-attributes';
 
 describe( 'getUpdatedLinkAttributes method', () => {
