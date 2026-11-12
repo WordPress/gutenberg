@@ -6,6 +6,10 @@
 
 -   Add `@wordpress/image-editor` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-image-editor` script ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
+### Bug Fixes
+
+-   Externalize `@wordpress/dataviews/wp` as `wp-dataviews` instead of bundling it, so WordPress-script consumers get the shared runtime handle and its translations. [#80986](https://github.com/WordPress/gutenberg/pull/80986)
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
