@@ -122,7 +122,7 @@ function buildScssFile( styleFile ) {
 	const builtSass = sass.renderSync( {
 		file: styleFile,
 		includePaths: [ path.resolve( __dirname, '../../assets/stylesheets' ) ],
-		// Dart Sass reads an imported .css file as plain CSS; LibSass read it as SCSS.
+		// Dart Sass reads an imported .css file as plain CSS, and this one calls Sass functions.
 		importer( url ) {
 			if ( url === 'node_modules/react-dates/lib/css/_datepicker' ) {
 				return { contents: fs.readFileSync( path.resolve( __dirname, '../../', url + '.css' ), 'utf8' ) };
