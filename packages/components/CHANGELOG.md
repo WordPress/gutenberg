@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Autocomplete`: Use the last committed completion callback when a background update suspends ([#86738](https://github.com/WordPress/gutenberg/pull/86738)).
 -   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
