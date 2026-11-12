@@ -8,7 +8,11 @@ test.describe( 'Site Logo', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.updateSiteSettings( { site_logo: 0 } );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: { site_logo: 0 },
+		} );
 		await requestUtils.deleteAllMedia();
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-allow-svg-uploads'
@@ -33,7 +37,11 @@ test.describe( 'Site Logo', () => {
 			path: `/wp/v2/media/${ media.id }`,
 			data: { alt_text: 'Circle logo' },
 		} );
-		await requestUtils.updateSiteSettings( { site_logo: media.id } );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: { site_logo: media.id },
+		} );
 
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/site-logo' } );
