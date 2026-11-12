@@ -311,5 +311,8 @@
 			"                                                `---'"
 		],
 		"welcome-build-command": "npm run dev"
+	},
+	"overrides": {
+		"react-native-svg": "https://codeload.github.com/wordpress-mobile/react-native-svg/tar.gz/a628e92990a2404e30a0086f168bd2b5b7b4ce96"
 	}
 }
