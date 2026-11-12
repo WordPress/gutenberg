@@ -79,9 +79,8 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: rgba($white, 0.4);
-			background: $components-color-accent;
+			color: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+			background: var(--wpds-color-background-interactive-brand-strong-disabled);
 		}
 
 		&.is-busy,
@@ -110,7 +109,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			background: transparent;
 			transform: none;
 		}
@@ -198,7 +197,7 @@
 
 			&:disabled,
 			&[aria-disabled="true"] {
-				color: $gray-600;
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 		}
 
@@ -247,7 +246,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 		}
 	}
 
@@ -258,7 +257,7 @@
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	&.is-busy,
