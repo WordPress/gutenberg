@@ -46,8 +46,9 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 }
 
 /**
- * The reverse of `getImageEdit`. A part missing from `edit` means none,
- * and only the image and locked ratio are kept from `state`.
+ * The reverse of `getImageEdit`. The edit replaces the current one: a part
+ * left out of `edit` is reset (no flip, no rotation, the whole image), and
+ * only the image and locked ratio are kept from `state`.
  *
  * The pan and zoom are replaced: the crop is centred and zoomed in until
  * it meets an edge of the view or the zoom limit, as after a resize. An
