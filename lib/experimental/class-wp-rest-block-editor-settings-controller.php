@@ -543,13 +543,19 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 					// Get extra script data (localized data).
 					$extra_script = $wp_scripts->print_extra_script( $handle, false );
 
-					// Store before scripts (includes extra/localized data).
+					// Get translation data.
+					$translations = $wp_scripts->print_translations( $handle, false );
+
+					// Store before scripts (includes extra/localized data and translations).
 					$before_content = '';
 					if ( ! empty( $before_script ) ) {
 						$before_content .= $before_script . "\n";
 					}
 					if ( ! empty( $extra_script ) ) {
 						$before_content .= $extra_script . "\n";
+					}
+					if ( ! empty( $translations ) ) {
+						$before_content .= $translations . "\n";
 					}
 
 					if ( ! empty( $before_content ) ) {
