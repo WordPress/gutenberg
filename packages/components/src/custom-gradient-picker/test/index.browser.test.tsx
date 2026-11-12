@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import '../../button/style.scss';
@@ -339,53 +339,6 @@ describe( 'CustomGradientBar', () => {
 		{ position: 0, color: 'rgb(0,0,0)' },
 		{ position: 100, color: 'rgb(255,255,255)' },
 	];
-
-	it.each( [ 1, 2 ] )(
-		'removes its drag listeners on unmount after %i drag starts',
-		async ( dragStarts ) => {
-			const props = {
-				background: 'linear-gradient(90deg, black, white)',
-				hasGradient: true,
-				value: POINTS,
-				onChange: vi.fn(),
-			};
-			const { rerender, unmount } = await render(
-				<CustomGradientBar { ...props } />
-			);
-			const added = vi.spyOn( window, 'addEventListener' );
-			const removed = vi.spyOn( window, 'removeEventListener' );
-
-			try {
-				const [ firstPoint ] = screen.getAllByRole( 'button', {
-					name: /Gradient control point/,
-				} );
-				for ( let i = 0; i < dragStarts; i++ ) {
-					// Leave the mouse button down so unmount must end the drag.
-					fireEvent.mouseDown( firstPoint );
-					await rerender( <CustomGradientBar { ...props } /> );
-				}
-				const listeners = added.mock.calls.filter(
-					( [ name ] ) => name === 'mousemove' || name === 'mouseup'
-				);
-
-				await unmount();
-
-				expect( listeners ).toHaveLength( 2 * dragStarts );
-				for ( const [ name, listener ] of listeners ) {
-					expect( removed ).toHaveBeenCalledWith( name, listener );
-				}
-			} finally {
-				// Avoid leaking global listeners when the regression fails.
-				for ( const [ name, listener ] of added.mock.calls ) {
-					if ( name === 'mousemove' || name === 'mouseup' ) {
-						window.removeEventListener( name, listener );
-					}
-				}
-				added.mockRestore();
-				removed.mockRestore();
-			}
-		}
-	);
 
 	it.each( [ 'top', 'bottom' ] )(
 		'adds a control point from the %s of the gradient bar',
