@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
@@ -20,6 +18,7 @@ const meta: Meta< typeof Combobox.Root > = {
 	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
+		'Combobox.LoadingIndicator': Combobox.LoadingIndicator,
 		'Combobox.Trigger': Combobox.Trigger,
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
@@ -145,6 +144,9 @@ export const DetachedInline: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The listbox still owns its options.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},
@@ -162,26 +164,23 @@ export const DetachedInline: Story = {
 				placeholder="Search items"
 				key="input"
 			/>,
-			<div
-				style={ {
-					minHeight: '200px',
-					maxHeight: '200px',
-					marginTop: 8,
-					overflow: 'auto',
-				} }
-				key="div"
-			>
+			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.Collection>
-						{ ( item: FixtureItem ) => (
-							<Combobox.Item key={ item.value } value={ item }>
-								<Combobox.ItemLabel>
-									{ item.label }
-								</Combobox.ItemLabel>
-							</Combobox.Item>
-						) }
-					</Combobox.Collection>
+					<Combobox.ListBody style={ { maxHeight: 200 } }>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
 				</Combobox.List>
 			</div>,
 		],
@@ -282,8 +281,10 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Combobox.LoadingIndicator` inside `Combobox.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -319,7 +320,7 @@ export const AsyncItems: Story = {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
@@ -332,10 +333,7 @@ export const AsyncItems: Story = {
 					</div>
 					<Combobox.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Combobox.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
