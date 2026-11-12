@@ -1090,6 +1090,31 @@ describe( 'toggleSection', () => {
 		expect( state ).toEqual( expected );
 	} );
 
+	it( 'uses the logical column count of the first body row when the row contains colspan', () => {
+		const tableWithColspan = {
+			head: [],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+							colspan: '2',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = toggleSection( tableWithColspan, 'head' );
+
+		expect( state.head[ 0 ].cells ).toHaveLength( 3 );
+	} );
+
 	it( 'uses the number of cells in the first row of the body for the added table row', () => {
 		const tableWithEmptyHead = {
 			head: [],
