@@ -122,6 +122,9 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$label = $post_type_object->labels->archives;
 			if ( 'post' === $post_type && $page_for_posts ) {
 				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+			} else {
+				/** This filter is documented in wp-includes/general-template.php */
+				$label = apply_filters( 'post_type_archive_title', $label, $post_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			}
 			$breadcrumb_items[] = array(
 				'label' => $label,
