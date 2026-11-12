@@ -1,4 +1,4 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { Spinner } from '@wordpress/ui';
@@ -22,7 +22,6 @@ function BlockPatternsTab( {
 	children,
 }: BlockPatternsTabProps ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ isLoading, setIsLoading ] = useState( true );
 
 	const categories = usePatternCategories( rootClientId );
 
@@ -34,28 +33,14 @@ function BlockPatternsTab( {
 		[]
 	);
 
-	/**
-	 * Hide spinner when atleast one category is loaded or pattern resolution is complete.
-	 */
-	useEffect( () => {
-		if (
-			( categories?.length > 0 || ! isResolvingPatterns ) &&
-			isLoading
-		) {
-			setIsLoading( false );
-		}
-	}, [ isLoading, categories, isResolvingPatterns ] );
-
-	if ( isLoading ) {
-		return (
+	if ( ! categories.length ) {
+		return isResolvingPatterns ? (
 			<div className="block-editor-inserter__patterns-loading">
 				<Spinner />
 			</div>
+		) : (
+			<InserterNoResults />
 		);
-	}
-
-	if ( ! categories.length && ! isResolvingPatterns ) {
-		return <InserterNoResults />;
 	}
 
 	return (
