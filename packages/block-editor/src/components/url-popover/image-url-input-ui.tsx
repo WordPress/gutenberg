@@ -24,8 +24,10 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
-import { prependHTTPS } from '@wordpress/url';
 import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
+import normalizeUrl from '../link-control/normalize-url';
+import validateUrl from '../link-control/validate-url';
+import type { LinkControlValidity } from '../link-control/types';
 import URLPopover from './index';
 import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
 
@@ -62,9 +64,20 @@ const ImageURLInputUI = ( {
 
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState< string | null >( null );
+	const [ customValidity, setCustomValidity ] = useState<
+		LinkControlValidity | undefined
+	>( undefined );
 
 	const autocompleteRef = useRef< HTMLDivElement >( null );
 	const wrapperRef = useRef< HTMLDivElement >( undefined );
+	const urlInputRef = useRef< HTMLInputElement >( null );
+
+	// Show the error once the input has the invalid state, as `LinkControl` does.
+	useEffect( () => {
+		if ( customValidity?.type === 'invalid' ) {
+			urlInputRef.current?.reportValidity?.();
+		}
+	}, [ customValidity ] );
 
 	useEffect( () => {
 		if ( ! wrapperRef.current ) {
@@ -88,6 +101,12 @@ const ImageURLInputUI = ( {
 
 	const stopEditLink = () => {
 		setIsEditingLink( false );
+		setCustomValidity( undefined );
+	};
+
+	const onChangeUrlInput = ( value: string ) => {
+		setUrlInput( value );
+		setCustomValidity( undefined );
 	};
 
 	const closeLinkUI = () => {
@@ -139,7 +158,17 @@ const ImageURLInputUI = ( {
 
 	const onSubmitLinkChange = () => {
 		return ( event: FormEvent ) => {
+			event.preventDefault();
+
 			if ( urlInput ) {
+				// Validate the same way as `LinkControl`, so that every link
+				// field accepts the same values.
+				const validity = validateUrl( urlInput );
+				if ( validity.type === 'invalid' ) {
+					setCustomValidity( validity );
+					return;
+				}
+
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
 				const selectedDestination =
@@ -148,14 +177,13 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: prependHTTPS( urlInput ),
+					href: normalizeUrl( urlInput ).url,
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
 			}
 			stopEditLink();
 			setUrlInput( null );
-			event.preventDefault();
 		};
 	};
 
@@ -288,9 +316,11 @@ const ImageURLInputUI = ( {
 				<URLPopover.LinkEditor
 					className="block-editor-url-popover__link-container-content"
 					value={ linkEditorValue }
-					onChangeInputValue={ setUrlInput }
+					onChangeInputValue={ onChangeUrlInput }
 					onSubmit={ onSubmitLinkChange() }
 					autocompleteRef={ autocompleteRef }
+					customValidity={ customValidity }
+					inputRef={ urlInputRef }
 				/>
 			);
 		} else if ( url && ! isEditingLink ) {
