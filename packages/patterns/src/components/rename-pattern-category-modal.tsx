@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import type { FormEvent, RefObject } from 'react';
+import type { RestError } from '../types';
 import { CATEGORY_SLUG } from './category-selector';
 import type { RenamePatternCategoryModalProps } from './types';
 
@@ -84,7 +85,6 @@ export default function RenamePatternCategoryModal( {
 			// normalized for use alongside template part areas, core pattern
 			// categories etc. As a result we won't just destructure the passed
 			// category object.
-			// Without `throwOnError`, a failed save resolves to `undefined`.
 			const savedRecord = ( await saveEntityRecord(
 				'taxonomy',
 				CATEGORY_SLUG,
@@ -92,12 +92,12 @@ export default function RenamePatternCategoryModal( {
 					id: category.id,
 					slug: category.slug,
 					name,
-				}
-			) ) as Term< 'edit' > | undefined;
+				},
+				{ throwOnError: true }
+			) ) as Term< 'edit' >;
 
 			invalidateResolution( 'getUserPatternCategories' );
 			onSuccess?.( savedRecord );
-			onClose();
 
 			createSuccessNotice( __( 'Pattern category renamed.' ), {
 				type: 'snackbar',
@@ -105,14 +105,24 @@ export default function RenamePatternCategoryModal( {
 			} );
 		} catch ( error ) {
 			onError?.();
-			// Save failures reject with an object that carries a `message`.
-			createErrorNotice( ( error as Error ).message, {
+
+			// A REST API error is a plain object, not an `Error`.
+			const restError = error as RestError;
+			const errorMessage =
+				restError.message && restError.code !== 'unknown_error'
+					? restError.message
+					: __(
+							'An error occurred while renaming the pattern category.'
+						);
+
+			createErrorNotice( errorMessage, {
 				type: 'snackbar',
 				id: 'pattern-category-update',
 			} );
 		} finally {
 			setIsSaving( false );
 			setName( '' );
+			onClose();
 		}
 	};
 
