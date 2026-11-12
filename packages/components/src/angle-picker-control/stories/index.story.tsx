@@ -63,7 +63,8 @@ WithCustomRange.args = {
 
 /**
  * A range wider than a full turn keeps counting as the circle turns, so
- * dragging clockwise from 350 gives 360 and then 370.
+ * dragging anticlockwise from 0 goes below 0, and dragging clockwise from
+ * 350 stops at 360.
  */
 export const WithMoreThanOneTurn = AnglePickerWithState.bind( {} );
 WithMoreThanOneTurn.args = {
