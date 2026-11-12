@@ -7,7 +7,12 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { SelectControl } from '@wordpress/ui';
+import {
+	SelectControl,
+	Stack,
+	SwitchControl,
+	TextareaControl,
+} from '@wordpress/ui';
 import {
 	rotateLeft,
 	rotateRight,
@@ -19,10 +24,13 @@ import {
 } from '@wordpress/icons';
 import {
 	ImageEditorCanvas,
+	applyImageEdit,
 	createImageEditorState,
 	exportImage,
+	getImageEdit,
 	getOutputSize,
 	useImageEditor,
+	type ImageEditorState,
 } from '..';
 // The debug story shows the editor's internals, so it uses them directly.
 import { useInternalImageEditor } from '../react/hooks/use-image-editor';
@@ -490,6 +498,102 @@ export const WithControls: Story = {
 		a11y: { test: 'todo' },
 	},
 	render: WithControlsComponent,
+};
+
+// The edit as JSON, rounded so floating-point noise does not show.
+function formatEdit( state: ImageEditorState ) {
+	return JSON.stringify( getImageEdit( state ) ?? {}, ( _key, value ) =>
+		typeof value === 'number' ? Math.round( value * 1e4 ) / 1e4 : value
+	);
+}
+
+/**
+ * Type an edit as JSON and apply it with `applyImageEdit`. The edit the
+ * canvas holds is shown below it, so you can edit by hand, copy that edit
+ * into the box, reset, and apply it again.
+ */
+const ApplyAnEditComponent = () => {
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const controller = useImageEditor( { state, onChange: setState } );
+	const [ text, setText ] = useState(
+		'{ "rotation": 90, "crop": { "x": 0, "y": 0, "width": 0.5, "height": 1 } }'
+	);
+	const [ message, setMessage ] = useState( '' );
+
+	const apply = () => {
+		let edit;
+		try {
+			edit = JSON.parse( text );
+		} catch {
+			setMessage( 'Not valid JSON.' );
+			return;
+		}
+		const result = applyImageEdit( state, edit );
+		if ( 'rejected' in result ) {
+			setMessage( `Rejected: ${ result.rejected }` );
+			return;
+		}
+		setState( result.state );
+		setMessage( 'Applied.' );
+	};
+
+	return (
+		<div>
+			<div className={ styles.toolbar }>
+				<TextareaControl
+					label="Edit to apply"
+					value={ text }
+					onChange={ ( event ) => setText( event.target.value ) }
+					rows={ 3 }
+				/>
+				<Stack direction="row" gap="sm" align="center" wrap="wrap">
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ apply }
+					>
+						Apply
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setText( formatEdit( state ) ) }
+					>
+						Copy the current edit
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => controller.reset() }
+					>
+						Reset
+					</Button>
+					<SwitchControl
+						label="Lock the crop to a square"
+						checked={ state.aspectRatio === 1 }
+						onCheckedChange={ ( isLocked ) =>
+							controller.setAspectRatio(
+								isLocked ? 1 : undefined
+							)
+						}
+					/>
+				</Stack>
+				{ message && <p>{ message }</p> }
+			</div>
+			<div className={ styles.container }>
+				<ImageEditorCanvas
+					src={ SAMPLE_IMAGE }
+					controller={ controller }
+				/>
+			</div>
+			<pre className={ styles.state }>{ formatEdit( state ) }</pre>
+			{ IMAGE_CREDIT }
+		</div>
+	);
+};
+
+export const ApplyAnEdit: Story = {
+	render: ApplyAnEditComponent,
 };
 
 /**
