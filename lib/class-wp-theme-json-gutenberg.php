@@ -3917,6 +3917,7 @@ class WP_Theme_JSON_Gutenberg {
 							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
 							isset( $selectors[ $name ]['states'][ $custom_state ] )
 						) {
+							// Feature selectors must target the element that carries the state class.
 							$custom_css_selector     = $selectors[ $name ]['states'][ $custom_state ];
 							$state_feature_selectors = static::append_to_feature_selectors( $feature_selectors, ':is(' . $custom_css_selector . ')' );
 							$nodes[]                 = array(
