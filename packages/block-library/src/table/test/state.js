@@ -402,6 +402,46 @@ describe( 'insertRow', () => {
 		expect( state.body[ 1 ].cells ).toHaveLength( 5 );
 	} );
 
+	it( 'treats an invalid colspan in the first row as 1', () => {
+		const tableWithInvalidColspan = {
+			body: [
+				{
+					cells: [
+						{
+							align: 'left',
+							content: 'A',
+							tag: 'td',
+							colspan: 'abc',
+						},
+						{
+							align: 'right',
+							content: 'B',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithInvalidColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{
+				align: 'left',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'right',
+				content: '',
+				tag: 'td',
+			},
+		] );
+	} );
+
 	it( 'inherits align from the correct spanning source cell when the first row contains colspan', () => {
 		const tableWithAlignmentAndColspan = {
 			body: [
