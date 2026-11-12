@@ -235,7 +235,7 @@ function BlockVariationTransforms( {
 		const transformedBlocks =
 			block && switchToBlockType( block, block.name, variationName );
 		if ( transformedBlocks ) {
-			replaceBlocks( blockClientId, transformedBlocks );
+			replaceBlocks( blockClientId, transformedBlocks, undefined, null );
 			return;
 		}
 		updateBlockAttributes( blockClientId, {

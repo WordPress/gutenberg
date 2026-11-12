@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

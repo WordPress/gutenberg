@@ -336,7 +336,7 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
  * @param int   $attachment_id The image attachment ID.
  * @param array $attributes    The gallery block attributes.
  * @return array Partial image block attributes (`href`, `linkDestination`,
- *               `linkTarget`, `rel`, `lightbox`).
+ *               `linkTarget`, `lightbox`).
  */
 function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attributes ) {
 	$link_to = $attributes['linkTo'] ?? 'none';
@@ -362,7 +362,6 @@ function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attr
 
 	if ( ! empty( $attrs['href'] ) && '_blank' === ( $attributes['linkTarget'] ?? '' ) ) {
 		$attrs['linkTarget'] = '_blank';
-		$attrs['rel']        = 'noopener';
 	}
 
 	return $attrs;
@@ -420,10 +419,9 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
 	// Wrap in a link when the gallery links images somewhere.
 	if ( ! empty( $image_attributes['href'] ) ) {
 		$image_markup = sprintf(
-			'<a href="%1$s"%2$s%3$s>%4$s</a>',
+			'<a href="%1$s"%2$s>%3$s</a>',
 			esc_url( $image_attributes['href'] ),
 			isset( $image_attributes['linkTarget'] ) ? ' target="' . esc_attr( $image_attributes['linkTarget'] ) . '"' : '',
-			isset( $image_attributes['rel'] ) ? ' rel="' . esc_attr( $image_attributes['rel'] ) . '"' : '',
 			$image_markup
 		);
 	}

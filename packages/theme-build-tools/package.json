@@ -85,11 +85,11 @@
 		"postcss": "^8.4.38",
 		"source-map": "^0.6.1",
 		"stylelint": "^17.14.1",
-		"vite": "^8.3.5",
-		"vitest": "^5.0.5"
+		"vite": "^8.3.6",
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
-		"@wordpress/theme": "^3.0.0 || ^4.0.0",
+		"@wordpress/theme": "^3.0.0 || ^4.0.0 || ^5.0.0",
 		"esbuild": ">=0.27.2 <1.0.0",
 		"lightningcss": ">=1.33.0 <2.0.0",
 		"postcss": "^8.0.0",
