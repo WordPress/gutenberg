@@ -119,11 +119,7 @@ export { createSyncManager } from './manager';
 /**
  * Quill Delta implementation used to describe rich text changes.
  */
-export {
-	default as Delta,
-	type DiffOptions,
-	tokenizeHtml,
-} from './quill-delta/Delta';
+export { default as Delta } from './quill-delta/Delta';
 
 /**
  * Retries the HTTP polling connection now instead of waiting for the next

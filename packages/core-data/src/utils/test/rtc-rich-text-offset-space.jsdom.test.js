@@ -8,6 +8,7 @@ import { mergeCrdtBlocks } from '../crdt-blocks';
 import {
 	getRootMap,
 	richTextOffsetToHtmlIndex,
+	splitHtmlTag,
 	tokenizeHtml,
 } from '../crdt-utils';
 /**
@@ -161,7 +162,7 @@ function deltaForUpdate( oldHtml, newHtml, cursorPosition ) {
 	return new Delta( [ { insert: oldHtml } ] ).diffWithCursor(
 		new Delta( [ { insert: newHtml } ] ),
 		cursorPosition,
-		{ tokenizer: tokenizeHtml }
+		{ tokenizer: tokenizeHtml, splitToken: splitHtmlTag }
 	);
 }
 

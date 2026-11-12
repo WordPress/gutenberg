@@ -7,6 +7,7 @@ import {
 	asRichTextOffset,
 	createYMap,
 	richTextOffsetToHtmlIndex,
+	splitHtmlTag,
 	tokenizeHtml,
 	type HtmlStringIndex,
 	type YMapRecord,
@@ -1111,7 +1112,10 @@ export function mergeRichTextUpdate(
 
 	const currentValueAsDelta = new Delta( blockYText.toDelta() );
 	const updatedValueAsDelta = new Delta( [ { insert: updatedValue } ] );
-	const diffOptions = { tokenizer: tokenizeHtml };
+	const diffOptions = {
+		tokenizer: tokenizeHtml,
+		splitToken: splitHtmlTag,
+	};
 	const deltaDiff = currentValueAsDelta.diffWithCursor(
 		updatedValueAsDelta,
 		htmlCursorIndex,

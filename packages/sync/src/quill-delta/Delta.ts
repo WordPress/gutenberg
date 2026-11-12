@@ -27,22 +27,13 @@ export interface DiffOptions {
 	 * token atomicity during merges.
 	 */
 	tokenizer?: ( value: string ) => string[];
-}
-
-/**
- * Tokenize an HTML string so that HTML tags, HTML comments, and character
- * entities are treated as indivisible atomic tokens during diffing. All other
- * characters are matched as individual Unicode code points.
- *
- * @param html - The HTML string to tokenize.
- * @return An array of token strings.
- */
-export function tokenizeHtml( html: string ): string[] {
-	return (
-		html.match(
-			/<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:"[^"]*"|'[^']*'|[^'">])*>|&[a-zA-Z0-9#]+;|[\s\S]/gu
-		) ?? []
-	);
+	/**
+	 * An optional function that splits one token into smaller parts. When a
+	 * replacement starts with the same kind of token on both sides (their first
+	 * parts are equal), the two tokens are compared part by part, and only the
+	 * parts that changed are replaced.
+	 */
+	splitToken?: ( token: string ) => string[];
 }
 
 /**
@@ -60,14 +51,78 @@ function normalizeChangeCounts( changes: Change[] ): Change[] {
 	} ) );
 }
 
+function diffTokens(
+	a: string,
+	b: string,
+	tokenizer: ( value: string ) => string[]
+): Change[] {
+	const tokenDiff = new Diff();
+	tokenDiff.tokenize = tokenizer;
+	tokenDiff.join = ( tokens: string[] ) => tokens.join( '' );
+	return tokenDiff.diff( a, b ) as Change[];
+}
+
 function computeDiff( a: string, b: string, options?: DiffOptions ): Change[] {
-	if ( options?.tokenizer ) {
-		const customDiff = new Diff();
-		customDiff.tokenize = options.tokenizer;
-		customDiff.join = ( tokens: string[] ) => tokens.join( '' );
-		return customDiff.diff( a, b ) as Change[];
+	if ( ! options?.tokenizer ) {
+		return diffChars( a, b );
 	}
-	return diffChars( a, b );
+
+	const { tokenizer, splitToken } = options;
+	const changes = diffTokens( a, b, tokenizer );
+
+	if ( ! splitToken ) {
+		return changes;
+	}
+
+	const refined: Change[] = [];
+
+	for ( let i = 0; i < changes.length; i++ ) {
+		const removed = changes[ i ];
+		const added = changes[ i + 1 ];
+
+		if ( removed.removed && added?.added ) {
+			// Look at the first token on each side of the replacement.
+			const [ oldFirst, ...oldRest ] = tokenizer( removed.value );
+			const [ newFirst, ...newRest ] = tokenizer( added.value );
+			const oldParts = splitToken( oldFirst );
+			const newParts = splitToken( newFirst );
+
+			if (
+				oldParts.length > 1 &&
+				newParts.length > 1 &&
+				oldParts[ 0 ] === newParts[ 0 ]
+			) {
+				// Same kind of token on both sides. Replace only the parts
+				// that changed, so the token itself stays in place.
+				refined.push( ...diffTokens( oldFirst, newFirst, splitToken ) );
+
+				if ( oldRest.length > 0 ) {
+					refined.push( {
+						value: oldRest.join( '' ),
+						count: oldRest.length,
+						added: false,
+						removed: true,
+					} );
+				}
+
+				if ( newRest.length > 0 ) {
+					refined.push( {
+						value: newRest.join( '' ),
+						count: newRest.length,
+						added: true,
+						removed: false,
+					} );
+				}
+
+				i++;
+				continue;
+			}
+		}
+
+		refined.push( removed );
+	}
+
+	return refined;
 }
 
 function isOffsetOnTokenBoundary(

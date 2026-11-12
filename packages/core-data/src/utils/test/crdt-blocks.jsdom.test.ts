@@ -3088,6 +3088,37 @@ describe( 'crdt-blocks', () => {
 				'the <em><span title="a > b">quick</span> brown</em> fox',
 			] ).toContain( merged );
 		} );
+
+		it( 'keeps both changes when two peers change different attributes of the same link', () => {
+			const peerADoc = new Y.Doc();
+			const peerBDoc = new Y.Doc();
+			const textA = peerADoc.getText( 'content' );
+			const textB = peerBDoc.getText( 'content' );
+			textA.insert(
+				0,
+				'see <a href="https://old.example/">the docs</a> now'
+			);
+			Y.applyUpdate( peerBDoc, Y.encodeStateAsUpdate( peerADoc ) );
+			// Peer A changes the link URL.
+			mergeRichTextUpdate(
+				textA,
+				'see <a href="https://new.example/">the docs</a> now'
+			);
+			// Peer B sets the same link to open in a new tab.
+			mergeRichTextUpdate(
+				textB,
+				'see <a href="https://old.example/" target="_blank" rel="noreferrer noopener">the docs</a> now'
+			);
+			// Synchronize the two peers
+			const updateA = Y.encodeStateAsUpdate( peerADoc );
+			const updateB = Y.encodeStateAsUpdate( peerBDoc );
+			Y.applyUpdate( peerADoc, updateB );
+			Y.applyUpdate( peerBDoc, updateA );
+			expect( textA.toString() ).toBe( textB.toString() );
+			expect( textA.toString() ).toBe(
+				'see <a href="https://new.example/" target="_blank" rel="noreferrer noopener">the docs</a> now'
+			);
+		} );
 	} );
 
 	describe( 'mergeRichTextUpdate - rapid typing', () => {

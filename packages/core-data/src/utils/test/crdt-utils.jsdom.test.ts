@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { Y } from '@wordpress/sync';
+import { Delta, Y } from '@wordpress/sync';
 import {
 	asHtmlStringIndex,
 	asRichTextOffset,
 	getYTextByAttributeKey,
 	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
 	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
+	splitHtmlTag,
+	tokenizeHtml,
 } from '../crdt-utils';
 
 function htmlIndexToRichTextOffset( html: string, htmlIndex: number ) {
@@ -445,4 +447,248 @@ describe( 'round-trip consistency', () => {
 			}
 		} );
 	}
+} );
+
+describe( 'tokenizeHtml', () => {
+	it( 'tokenizes plain text into individual code points', () => {
+		expect( tokenizeHtml( 'abc' ) ).toEqual( [ 'a', 'b', 'c' ] );
+	} );
+
+	it( 'does not split surrogate pairs when tokenizing emojis', () => {
+		expect( tokenizeHtml( 'a 😀 b' ) ).toEqual( [
+			'a',
+			' ',
+			'😀',
+			' ',
+			'b',
+		] );
+		expect( tokenizeHtml( '🇺🇸' ) ).toEqual( [ '🇺', '🇸' ] );
+		expect( tokenizeHtml( '👋🏽' ) ).toEqual( [ '👋', '🏽' ] );
+	} );
+
+	it( 'handles supplementary plane characters', () => {
+		// CJK Unified Ideographs Extension B (U+20BB7)
+		expect( tokenizeHtml( '𠮷' ) ).toEqual( [ '𠮷' ] );
+		// Mathematical alphanumeric symbols (U+1D400)
+		expect( tokenizeHtml( '𝐀' ) ).toEqual( [ '𝐀' ] );
+	} );
+
+	it( 'treats HTML tags as single tokens', () => {
+		expect( tokenizeHtml( '<strong>bold</strong>' ) ).toEqual( [
+			'<strong>',
+			'b',
+			'o',
+			'l',
+			'd',
+			'</strong>',
+		] );
+	} );
+
+	it( 'treats tags with attributes (including quotes and spaces) as single tokens', () => {
+		expect(
+			tokenizeHtml( '<a href="https://example.com?foo=1&bar=2">link</a>' )
+		).toEqual( [
+			'<a href="https://example.com?foo=1&bar=2">',
+			'l',
+			'i',
+			'n',
+			'k',
+			'</a>',
+		] );
+	} );
+
+	it( 'treats self-closing tags as single tokens', () => {
+		expect(
+			tokenizeHtml( '<img src="image.jpg" alt="test > arrow" />' )
+		).toEqual( [ '<img src="image.jpg" alt="test > arrow" />' ] );
+		expect( tokenizeHtml( '<br />' ) ).toEqual( [ '<br />' ] );
+		expect( tokenizeHtml( '<hr/>' ) ).toEqual( [ '<hr/>' ] );
+	} );
+
+	it( 'treats custom element tags and namespaced tags as single tokens', () => {
+		expect(
+			tokenizeHtml( '<my-custom-tag value="123"></my-custom-tag>' )
+		).toEqual( [ '<my-custom-tag value="123">', '</my-custom-tag>' ] );
+		expect( tokenizeHtml( '<svg:path d="M0 0h24v24H0z" />' ) ).toEqual( [
+			'<svg:path d="M0 0h24v24H0z" />',
+		] );
+	} );
+
+	it( 'treats HTML comments as single tokens', () => {
+		expect(
+			tokenizeHtml( '<!-- wp:paragraph {"fontSize":"small"} -->' )
+		).toEqual( [ '<!-- wp:paragraph {"fontSize":"small"} -->' ] );
+		expect(
+			tokenizeHtml( '<!-- comment with <div> and > inside -->' )
+		).toEqual( [ '<!-- comment with <div> and > inside -->' ] );
+	} );
+
+	it( 'treats HTML character entities as single tokens', () => {
+		expect(
+			tokenizeHtml( '&amp;&lt;&gt;&quot;&nbsp;&#123;&#x1F600;' )
+		).toEqual( [
+			'&amp;',
+			'&lt;',
+			'&gt;',
+			'&quot;',
+			'&nbsp;',
+			'&#123;',
+			'&#x1F600;',
+		] );
+	} );
+
+	it( 'does not treat raw angle brackets in math comparisons as tags', () => {
+		expect( tokenizeHtml( '3 < 5 and 7 > 2' ) ).toEqual( [
+			'3',
+			' ',
+			'<',
+			' ',
+			'5',
+			' ',
+			'a',
+			'n',
+			'd',
+			' ',
+			'7',
+			' ',
+			'>',
+			' ',
+			'2',
+		] );
+	} );
+
+	it( 'handles empty string and malformed/unclosed tags gracefully', () => {
+		expect( tokenizeHtml( '' ) ).toEqual( [] );
+		expect( tokenizeHtml( '<strong unclosed' ) ).toEqual( [
+			'<',
+			's',
+			't',
+			'r',
+			'o',
+			'n',
+			'g',
+			' ',
+			'u',
+			'n',
+			'c',
+			'l',
+			'o',
+			's',
+			'e',
+			'd',
+		] );
+	} );
+} );
+
+describe( 'splitHtmlTag', () => {
+	it( 'splits opening tags into tag name, attributes, and closing bracket', () => {
+		expect( splitHtmlTag( '<a href="x" target="_blank">' ) ).toEqual( [
+			'<a',
+			' href="x"',
+			' target="_blank"',
+			'>',
+		] );
+	} );
+
+	it( 'returns non-opening tags whole', () => {
+		expect( splitHtmlTag( '</a>' ) ).toEqual( [ '</a>' ] );
+		expect( splitHtmlTag( '<!-- comment -->' ) ).toEqual( [
+			'<!-- comment -->',
+		] );
+		expect( splitHtmlTag( '&amp;' ) ).toEqual( [ '&amp;' ] );
+		expect( splitHtmlTag( 'text' ) ).toEqual( [ 'text' ] );
+	} );
+} );
+
+describe( 'tokenized diffing via DiffOptions', () => {
+	it( 'should keep HTML tags as indivisible units during diff', () => {
+		const oldDelta = new Delta().insert( 'the quick brown fox' );
+		const newDelta = new Delta().insert(
+			'the <strong data-attr="test">quick</strong> brown fox'
+		);
+
+		const diff = oldDelta.diff( newDelta, {
+			tokenizer: tokenizeHtml,
+			splitToken: splitHtmlTag,
+		} );
+		expect( diff.ops ).toEqual( [
+			{ retain: 4 },
+			{ insert: '<strong data-attr="test">' },
+			{ retain: 5 },
+			{ insert: '</strong>' },
+		] );
+	} );
+
+	it( 'should not interleave characters inside HTML tags when formatting overlapping text', () => {
+		const oldDelta = new Delta().insert( 'the quick brown fox' );
+		const linkDelta = new Delta().insert(
+			'the qu<a href="https://example.com">ick brown</a> fox'
+		);
+
+		const diff = oldDelta.diff( linkDelta, {
+			tokenizer: tokenizeHtml,
+			splitToken: splitHtmlTag,
+		} );
+		expect( diff.ops ).toEqual( [
+			{ retain: 6 },
+			{ insert: '<a href="https://example.com">' },
+			{ retain: 9 },
+			{ insert: '</a>' },
+		] );
+	} );
+
+	it( 'refines tag replacement when modifying attributes of the same tag', () => {
+		const oldDelta = new Delta().insert(
+			'see <a href="https://old.example/">the docs</a> now'
+		);
+		const newDelta = new Delta().insert(
+			'see <a href="https://new.example/">the docs</a> now'
+		);
+
+		const diff = oldDelta.diff( newDelta, {
+			tokenizer: tokenizeHtml,
+			splitToken: splitHtmlTag,
+		} );
+
+		// Should retain 'see <a', replace href, and retain '>'
+		expect( diff.ops ).toEqual( [
+			{ retain: 6 }, // 'see <a'
+			{ insert: ' href="https://new.example/"' },
+			{ delete: 28 }, // ' href="https://old.example/"'
+		] );
+	} );
+
+	it( 'replaces the tag completely when tag names differ', () => {
+		const oldDelta = new Delta().insert( 'the <strong>quick</strong> fox' );
+		const newDelta = new Delta().insert( 'the <em>quick</em> fox' );
+
+		const diff = oldDelta.diff( newDelta, {
+			tokenizer: tokenizeHtml,
+			splitToken: splitHtmlTag,
+		} );
+
+		expect( diff.ops ).toEqual( [
+			{ retain: 4 },
+			{ insert: '<em>' },
+			{ delete: 8 }, // '<strong>'
+			{ retain: 5 },
+			{ insert: '</em>' },
+			{ delete: 9 }, // '</strong>'
+		] );
+	} );
+
+	it( 'should replace emoji atomically without splitting surrogate pairs', () => {
+		const oldDelta = new Delta().insert( 'a 😀 b' );
+		const newDelta = new Delta().insert( 'a 😐 b' );
+
+		const diff = oldDelta.diff( newDelta, {
+			tokenizer: tokenizeHtml,
+			splitToken: splitHtmlTag,
+		} );
+		expect( diff.ops ).toEqual( [
+			{ retain: 2 },
+			{ insert: '😐' },
+			{ delete: 2 },
+		] );
+	} );
 } );
