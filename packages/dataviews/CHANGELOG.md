@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   DataForm: Don't show the missing-value message when focus leaves an empty required field, including date fields. Submitting the form, or moving focus out of a `card` or `details` layout, still shows it ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields. Submitting the form, or moving focus out of a `card` or `details` layout, still shows it ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
