@@ -68,25 +68,10 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 				}
 			}
 			// The schema below only covers registered names, so report these before they vanish as unknown keys.
-			$input = static::report_unregistered_names( $input, $valid_block_names, $valid_variations );
+			$input = self::report_unregistered_names( $input, $valid_block_names, $valid_variations );
 		}
 
-		/*
-		 * Remove any rules that are annotated as "top" in VALID_STYLES constant.
-		 * Some styles are only meant to be available at the top-level (e.g.: blockGap),
-		 * hence, the schema for blocks & elements should not have them.
-		 */
 		$styles_non_top_level = WP_Theme_JSON_Gutenberg::VALID_STYLES;
-		foreach ( array_keys( $styles_non_top_level ) as $section ) {
-			// array_key_exists() needs to be used instead of isset() because the value can be null.
-			if ( array_key_exists( $section, $styles_non_top_level ) && is_array( $styles_non_top_level[ $section ] ) ) {
-				foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
-					if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
-						unset( $styles_non_top_level[ $section ][ $prop ] );
-					}
-				}
-			}
-		}
 
 		// Build the schema based on valid block & element names.
 		$schema                   = array();
@@ -153,21 +138,18 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ] = $common_block_settings;
 			$schema_styles_blocks[ $block ]   = $common_block_schema;
+			$block_pseudo_selectors           = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ?? array();
 
 			// Add responsive pseudo-selectors only to blocks that support them.
-			if ( isset( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-				foreach ( $breakpoint_states as $breakpoint_state ) {
-					foreach ( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-						$schema_styles_blocks[ $block ][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
-					}
+			foreach ( $breakpoint_states as $breakpoint_state ) {
+				foreach ( $block_pseudo_selectors as $pseudo_selector ) {
+					$schema_styles_blocks[ $block ][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
 				}
 			}
 
 			// Add pseudo-selectors for blocks that support them.
-			if ( isset( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-				foreach ( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
-				}
+			foreach ( $block_pseudo_selectors as $pseudo_selector ) {
+				$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
 			}
 
 			// Add custom states for blocks that support them (e.g. '-current' for navigation).
@@ -176,10 +158,8 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 					$custom_state_schema = $styles_non_top_level;
 					// The same pseudo-selectors valid for the block at the top level
 					// are also valid within each custom state.
-					if ( isset( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-						foreach ( WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo ) {
-							$custom_state_schema[ $pseudo ] = $styles_non_top_level;
-						}
+					foreach ( $block_pseudo_selectors as $pseudo ) {
+						$custom_state_schema[ $pseudo ] = $styles_non_top_level;
 					}
 					$schema_styles_blocks[ $block ][ $custom_state ] = $custom_state_schema;
 				}
@@ -321,11 +301,11 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 							continue;
 						}
 						if ( isset( $presets[0] ) ) {
-							$presets = static::remove_invalid_preset_items( $presets, $path );
+							$presets = self::remove_invalid_preset_items( $presets, $path );
 						} else {
 							foreach ( WP_Theme_JSON_Gutenberg::VALID_ORIGINS as $origin ) {
 								if ( isset( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
-									$presets[ $origin ] = static::remove_invalid_preset_items( $presets[ $origin ], $path, $origin );
+									$presets[ $origin ] = self::remove_invalid_preset_items( $presets[ $origin ], $path, $origin );
 								}
 							}
 						}
@@ -550,7 +530,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		self::$diagnostics[] = array(
 			'code'    => $code,
 			'path'    => $path,
-			'message' => static::get_diagnostic_message( $code, $path ),
+			'message' => self::get_diagnostic_message( $code, $path ),
 		);
 	}
 
