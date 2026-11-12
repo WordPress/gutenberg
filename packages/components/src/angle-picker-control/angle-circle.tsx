@@ -105,10 +105,7 @@ function AngleCircle( {
 		// way round, so a fast flick of more than half a turn reverses.
 		const unclampedValue =
 			dragStateRef.current.unclampedValue +
-			getNearestEquivalent(
-				angle - dragStateRef.current.lastPointerAngle,
-				0
-			);
+			getShortestTurn( dragStateRef.current.lastPointerAngle, angle );
 		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
 		onChange( clamp( unclampedValue, min, max ) );
 	};
@@ -200,6 +197,18 @@ function getAngle(
  */
 function getNearestEquivalent( angle: number, reference: number ) {
 	return angle + 360 * Math.round( ( reference - angle ) / 360 );
+}
+
+/**
+ * Returns the turn in degrees from `from` to `to` the short way round, with
+ * a half turn going clockwise.
+ *
+ * @param from The starting angle in degrees.
+ * @param to   The ending angle in degrees.
+ */
+function getShortestTurn( from: number, to: number ) {
+	const delta = to - from;
+	return delta + 360 * Math.round( -delta / 360 );
 }
 
 export default AngleCircle;
