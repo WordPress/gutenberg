@@ -311,6 +311,46 @@ describe( 'Notice.List', () => {
 		}
 	);
 
+	it.each( [
+		[ 'hidden', true ],
+		[ 'aria-hidden', false ],
+	] as const )(
+		'clears an external announcement when an ancestor becomes %s without replaying it on reveal',
+		async ( attribute, explicit ) => {
+			const list = ( message?: string ) => (
+				<section aria-label="Editor">
+					<Notice.List liveRegionContainer={ document.body }>
+						{ message && (
+							<Notice.Root
+								spokenMessage={ explicit ? message : undefined }
+							>
+								<Notice.Description>
+									{ message }
+								</Notice.Description>
+							</Notice.Root>
+						) }
+					</Notice.List>
+				</section>
+			);
+			const { rerender } = render( list() );
+			const editor = screen.getByRole( 'region', { name: 'Editor' } );
+			const status = screen.getByRole( 'status' );
+			rerender( list( 'Saved.' ) );
+			await waitFor( () =>
+				expect( status ).toHaveTextContent( 'Saved.' )
+			);
+			editor.setAttribute( attribute, 'true' );
+			await waitFor( () => expect( status ).toBeEmptyDOMElement() );
+			editor.removeAttribute( attribute );
+			await act( () => Promise.resolve() );
+			expect( status ).toBeEmptyDOMElement();
+			rerender( list( 'Updated.' ) );
+			await waitFor( () =>
+				expect( status ).toHaveTextContent( 'Updated.' )
+			);
+		}
+	);
+
 	it( 'removes dismissed announcements without repeating remaining messages', async () => {
 		const { rerender } = render( <Notice.List /> );
 		rerender(
