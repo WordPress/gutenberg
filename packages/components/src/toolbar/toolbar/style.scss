@@ -80,11 +80,8 @@
 			}
 
 			&::before {
-				background: var(--wpds-color-background-interactive-neutral-strong-active);
-			}
-
-			&:is(:disabled, [aria-disabled="true"])::before {
-				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+				background: var(--_wp-components-button-pressed-background);
+				background-position: inherit;
 			}
 
 			// The fill stays on the `::before`, which is inset from the button. A

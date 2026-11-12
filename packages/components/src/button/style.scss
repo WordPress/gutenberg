@@ -371,11 +371,14 @@
 
 	// Keep the pressed foreground and fill together in every interaction state.
 	&.is-pressed {
+		// The Toolbar paints this same background on its inset pseudo-element.
+		--_wp-components-button-pressed-background: var(--wpds-color-background-interactive-neutral-strong-active);
+
 		&,
 		&:hover,
 		&.is-busy {
 			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
-			background: var(--wpds-color-background-interactive-neutral-strong-active);
+			background: var(--_wp-components-button-pressed-background);
 		}
 
 		&.is-secondary:not(:disabled, [aria-disabled="true"]) {
@@ -383,10 +386,18 @@
 		}
 
 		&:is(:disabled, [aria-disabled="true"]) {
+			--_wp-components-button-pressed-background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+
 			&,
 			&.is-busy {
 				color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
-				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+				background: var(--_wp-components-button-pressed-background);
+			}
+
+			&.is-busy {
+				--_wp-components-button-pressed-background:
+					linear-gradient(-45deg, transparent 33%, var(--wpds-color-background-interactive-neutral-disabled) 33% 70%, transparent 70%)
+					0 0 / 100px 100% var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
 
