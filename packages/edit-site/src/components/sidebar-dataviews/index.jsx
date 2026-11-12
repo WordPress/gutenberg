@@ -59,6 +59,12 @@ export default function DataViewsSidebarContent( {
 						<SidebarNavigationItem
 							key={ view.slug }
 							icon={ icon }
+							// Views narrowed by more than their status have no count.
+							suffix={
+								typeof view.count === 'number' && (
+									<span>{ view.count.toLocaleString() }</span>
+								)
+							}
 							to={ addQueryArgs( path, {
 								activeView: slug,
 							} ) }
