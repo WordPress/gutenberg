@@ -129,6 +129,41 @@ const tableWithAttribute = deepFreeze( {
 	],
 } );
 
+const tableWithRowspanHead = deepFreeze( {
+	head: [
+		{
+			cells: [
+				{ content: 'A', tag: 'th', rowspan: '2' },
+				{ content: 'B', tag: 'th', rowspan: '2' },
+				{
+					content: 'Grouped',
+					tag: 'th',
+					align: 'center',
+					colspan: '2',
+				},
+				{ content: 'E', tag: 'th', rowspan: '2' },
+			],
+		},
+		{
+			cells: [
+				{ content: 'Sub C', tag: 'th' },
+				{ content: 'Sub D', tag: 'th' },
+			],
+		},
+	],
+	body: [
+		{
+			cells: [
+				{ content: 'A1', tag: 'td' },
+				{ content: 'B1', tag: 'td' },
+				{ content: 'C1', tag: 'td' },
+				{ content: 'D1', tag: 'td' },
+				{ content: 'E1', tag: 'td' },
+			],
+		},
+	],
+} );
+
 describe( 'createTable', () => {
 	it( 'should create a table', () => {
 		const state = createTable( { rowCount: 2, columnCount: 2 } );
@@ -545,6 +580,78 @@ describe( 'insertRow', () => {
 		} );
 
 		expect( state ).toBe( tableWithHead );
+	} );
+
+	it( 'extends cells above that span across the inserted row and skips their columns', () => {
+		const state = insertRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 1,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '3' },
+					{ content: 'B', tag: 'th', rowspan: '3' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th', rowspan: '3' },
+				],
+			},
+			{
+				cells: [
+					{ content: '', tag: 'th', align: 'center' },
+					{ content: '', tag: 'th', align: 'center' },
+				],
+			},
+			{
+				cells: [
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'does not extend cells whose rowspan ends before the inserted row', () => {
+		const state = insertRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 2,
+		} );
+
+		expect( state.head[ 0 ] ).toEqual( tableWithRowspanHead.head[ 0 ] );
+		expect( state.head[ 2 ].cells ).toHaveLength( 5 );
+	} );
+
+	it( 'skips every column covered by a cell spanning both rows and columns', () => {
+		const state = insertRow(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{
+								content: 'X',
+								tag: 'td',
+								colspan: '2',
+								rowspan: '2',
+							},
+							{ content: 'Y', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'Z', tag: 'td' } ] },
+				],
+			} ),
+			{ sectionName: 'body', rowIndex: 1 }
+		);
+
+		expect( state.body[ 0 ].cells[ 0 ].rowspan ).toBe( '3' );
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{ content: '', tag: 'td' },
+		] );
 	} );
 } );
 
