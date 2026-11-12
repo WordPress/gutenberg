@@ -101,6 +101,13 @@ const BUILD_TASK_BY_EXTENSION = {
 		const builtSass = await renderSass( {
 			file,
 			includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
+			// Dart Sass reads an imported .css file as plain CSS, and this one calls Sass functions.
+			importer( url ) {
+				if ( url === 'node_modules/react-dates/lib/css/_datepicker' ) {
+					return { contents: fs.readFileSync( path.resolve( __dirname, '../../', url + '.css' ), 'utf8' ) };
+				}
+				return null;
+			},
 			data:
 				[
 					'colors',
