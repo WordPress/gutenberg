@@ -232,8 +232,10 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 			{
 				cells: Array.from( { length: cellCount } ).map(
 					( _, index ) => {
-						const firstCellInColumn =
-							getCellAtColumnIndex( firstRow, index ) ?? {};
+						const firstCellInColumn = getCellAtColumnIndex(
+							firstRow,
+							index
+						);
 
 						const inheritedAttributes = Object.fromEntries(
 							Object.entries( firstCellInColumn ).filter(
