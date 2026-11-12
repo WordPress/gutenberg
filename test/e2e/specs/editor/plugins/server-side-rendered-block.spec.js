@@ -445,7 +445,7 @@ test.describe( 'PHP-only pattern blocks', () => {
 		await blockOption.hover();
 
 		const preview = page
-			.locator( '.block-editor-inserter__preview iframe' )
+			.locator( '.block-editor-inserter__preview-content iframe' )
 			.contentFrame();
 		await expect(
 			preview.getByText( 'Block cannot be rendered inside itself.' )
