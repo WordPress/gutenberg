@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
