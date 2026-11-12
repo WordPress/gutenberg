@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
@@ -280,50 +281,48 @@ function usePaletteElementKeys( elements: PaletteElement[] ) {
 			rawKeys: elements.map( ( { slug }, index ) =>
 				JSON.stringify( [ slug, occurrences[ index ] ] )
 			),
-			normalizedSlugs: deduplicateElementSlugs< PaletteElement >(
-				elements
-			).map( ( { slug } ) => slug ),
 		};
 	}, [ elements ] );
-	const [ previous, setPrevious ] = useState( () => ( {
+	const [ previous, setPrevious ] = useState< {
+		info: typeof info;
+		keys: string[];
+		normalization?: { elements: PaletteElement[]; keys: string[] };
+	} >( () => ( {
 		info,
 		keys: elements.map( ( { slug }, index ) =>
 			getPaletteElementKey( slug, info.occurrences[ index ] )
 		),
 	} ) );
+	const rememberNormalization = useCallback(
+		( normalizedElements: PaletteElement[], keys: string[] ) => {
+			setPrevious( ( current ) => ( {
+				...current,
+				normalization: {
+					elements: normalizedElements,
+					keys,
+				},
+			} ) );
+		},
+		[]
+	);
 	if (
 		info.rawKeys.length === previous.info.rawKeys.length &&
 		info.rawKeys.every(
 			( key, index ) => key === previous.info.rawKeys[ index ]
 		)
 	) {
-		return previous.keys;
+		return { elementKeys: previous.keys, rememberNormalization };
 	}
-	const matched = new Set< number >();
-	const keys: Array< string | undefined > = info.rawKeys.map( ( key ) => {
-		const oldIndex = previous.info.rawKeys.indexOf( key );
-		if ( oldIndex < 0 ) {
-			return undefined;
-		}
-		matched.add( oldIndex );
-		return previous.keys[ oldIndex ];
-	} );
-	// Match raw identities first. A new real slug must not take an existing
-	// duplicate's key merely because it was that duplicate's normalized slug.
-	keys.forEach( ( key, index ) => {
-		if ( key !== undefined || info.occurrences[ index ] !== 0 ) {
-			return;
-		}
-		const oldIndex = previous.info.normalizedSlugs.findIndex(
-			( slug, candidateIndex ) =>
-				slug === elements[ index ].slug &&
-				! matched.has( candidateIndex )
-		);
-		if ( oldIndex >= 0 ) {
-			matched.add( oldIndex );
-			keys[ index ] = previous.keys[ oldIndex ];
-		}
-	} );
+	// Only an edit emitted by this component can establish a normalization alias.
+	// An unrelated incoming slug may instead identify a replacement preset.
+	const normalization = previous.normalization;
+	const keys: Array< string | undefined > =
+		normalization && fastDeepEqual( elements, normalization.elements )
+			? normalization.keys
+			: info.rawKeys.map( ( key ) => {
+					const oldIndex = previous.info.rawKeys.indexOf( key );
+					return oldIndex < 0 ? undefined : previous.keys[ oldIndex ];
+				} );
 	// Reserve removed keys too, so a replacement cannot inherit an open editor.
 	const reserved = new Set( previous.keys );
 	const nextKeys = keys.map( ( key, index ) => {
@@ -348,7 +347,7 @@ function usePaletteElementKeys( elements: PaletteElement[] ) {
 		return nextKey;
 	} );
 	setPrevious( { info, keys: nextKeys } );
-	return nextKeys;
+	return { elementKeys: nextKeys, rememberNormalization };
 }
 
 /**
@@ -626,6 +625,7 @@ function Option< T extends PaletteElement >( {
 function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	elementKeys,
+	onEdit,
 	onChange,
 	canOnlyChangeValues,
 	variant,
@@ -639,11 +639,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce(
-		( updatedElements: T[] ) =>
-			onChange( deduplicateElementSlugs( updatedElements ) ),
-		100
-	);
+	const debounceOnChange = useDebounce( onEdit, 100 );
 
 	return (
 		<VStack spacing={ 3 }>
@@ -664,7 +660,8 @@ function PaletteEditListView< T extends PaletteElement >( {
 										}
 										return currentElement;
 									}
-								)
+								),
+								elementKeys
 							);
 						} }
 						onRemove={ () => {
@@ -736,7 +733,8 @@ export function PaletteEdit( {
 		variant = 'duotone';
 	}
 	const elements = gradients ?? duotones ?? colors;
-	const elementKeys = usePaletteElementKeys( elements );
+	const { elementKeys, rememberNormalization } =
+		usePaletteElementKeys( elements );
 	// Filtered once here so every duotone path — the swatches, the shadows and
 	// highlights pickers, and the value a newly added duotone starts from —
 	// works from colors a duotone can actually be built with.
@@ -762,7 +760,21 @@ export function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const onEdit = useCallback(
+		(
+			updatedElements: PaletteElement[],
+			updatedKeys: string[],
+			normalizeSlugs = false
+		) => {
+			const normalizedElements =
+				deduplicateElementSlugs( updatedElements );
+			rememberNormalization( normalizedElements, updatedKeys );
+			// @ts-expect-error TODO: Don't know how to resolve
+			onChange( normalizeSlugs ? normalizedElements : updatedElements );
+		},
+		[ onChange, rememberNormalization ]
+	);
+	const debounceOnChange = useDebounce( onEdit, 100 );
 	const onSelectPaletteItem = useCallback(
 		(
 			value?: PaletteElement[ keyof PaletteElement ],
@@ -957,6 +969,9 @@ export function PaletteEdit( {
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
 							elementKeys={ elementKeys }
+							onEdit={ ( updatedElements, updatedKeys ) =>
+								onEdit( updatedElements, updatedKeys, true )
+							}
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
 							variant={ variant }
@@ -974,7 +989,6 @@ export function PaletteEdit( {
 								newElement: ( typeof elements )[ number ]
 							) => {
 								debounceOnChange(
-									// @ts-expect-error TODO: Don't know how to resolve
 									elements.map(
 										(
 											currentElement: ( typeof elements )[ number ],
@@ -987,7 +1001,8 @@ export function PaletteEdit( {
 											}
 											return currentElement;
 										}
-									)
+									),
+									elementKeys
 								);
 							} }
 							element={ elements[ editingElement ] }
