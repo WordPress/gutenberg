@@ -20,6 +20,20 @@
 		padding-left: 0;
 	}
 
+	// Prevent page list from filling all space by default.
+	.wp-block-page-list {
+		flex-grow: 0;
+		flex-shrink: 1;
+		min-width: fit-content;
+	}
+
+	// Allow it to grow when layout is space-between.
+	&.items-justified-space-between {
+		.wp-block-page-list {
+			flex-grow: 1;
+		}
+	}
+
 	// Revert any margins.
 	// This also makes it work with classic theme auto margins.
 	.wp-block-navigation-item.wp-block {
