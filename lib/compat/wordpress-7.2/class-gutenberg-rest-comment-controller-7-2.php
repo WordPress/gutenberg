@@ -726,7 +726,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			 */
 			if ( $is_hex_key ) {
 				foreach ( explode( '-', $emoji_key ) as $codepoint ) {
-					$value = hexdec( $codepoint );
+					$value = (int) hexdec( $codepoint );
 					if ( $value > 0x10FFFF || ( $value >= 0xD800 && $value <= 0xDFFF ) ) {
 						$is_hex_key = false;
 						break;
