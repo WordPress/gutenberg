@@ -1,10 +1,5 @@
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import {
-	SearchableChipSelectControl,
-	Spinner,
-	Stack,
-	VisuallyHidden,
-} from '@wordpress/ui';
+import { SearchableChipSelectControl, VisuallyHidden } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect, useMemo, Fragment } from '@wordpress/element';
@@ -428,12 +423,7 @@ function TaxonomyItem( {
 	const isLimited = ! isHierarchical && listTotal > shownTerms.length;
 	let statusContent = <ListedTermCount />;
 	if ( isPending ) {
-		statusContent = (
-			<Stack direction="row" gap="sm" align="center">
-				<Spinner />
-				{ __( 'Loading…' ) }
-			</Stack>
-		);
+		statusContent = <SearchableChipSelectControl.LoadingIndicator />;
 	} else if ( isLimited ) {
 		statusContent = (
 			<div className="block-library-query-inspector__taxonomy-control-limited-count">

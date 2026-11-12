@@ -62,6 +62,22 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveValue( '100' );
 		} );
 
+		it( 'should allow fractional pixel values without rounding on blur or Enter', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+
+			await user.type( input, '14.8' );
+			await user.keyboard( '{Enter}' );
+
+			expect( input ).toHaveValue( '14.8' );
+
+			await user.click( document.body );
+			expect( input ).toHaveValue( '14.8' );
+		} );
+
 		it( 'should update input values when interacting with slider', () => {
 			render( <UncontrolledBoxControl /> );
 
