@@ -278,7 +278,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertSame( 3, $this->inner_blocks_calls );
 	}
 
-	public function test_bindings_asking_for_the_same_value_with_other_arguments_stop_at_the_limit() {
+	public function test_bindings_asking_for_the_same_value_with_other_arguments_stop_at_the_budget() {
 		$this->value_callback = function () {
 			$value = '<!-- wp:paragraph --><p>Supplied</p><!-- /wp:paragraph -->';
 			foreach ( range( 1, 6 ) as $variant ) {
@@ -286,12 +286,12 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 			}
 			return $value;
 		};
-		$limit                = static function () {
+		$budget               = static function () {
 			return 10;
 		};
-		add_filter( 'block_bindings_nested_inner_blocks_limit', $limit );
+		add_filter( 'block_bindings_inner_blocks_budget', $budget );
 		$output = $this->render_group();
-		remove_filter( 'block_bindings_nested_inner_blocks_limit', $limit );
+		remove_filter( 'block_bindings_inner_blocks_budget', $budget );
 
 		$this->assertSame( 11, substr_count( $output, '>Supplied</p>' ) );
 		$this->assertStringContainsString( '>Nested own</p>', $output );
@@ -367,7 +367,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>One</p>', $this->render_group() );
 	}
 
-	public function test_blocks_that_stop_rendering_inside_a_host_are_forgotten_with_it() {
+	public function test_blocks_that_stop_rendering_inside_a_bound_block_are_forgotten_with_it() {
 		register_block_type(
 			'test/throws',
 			array(
@@ -410,7 +410,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>One</p>', $output );
 	}
 
-	public function test_a_host_that_stops_rendering_with_an_exception_is_forgotten() {
+	public function test_a_bound_block_that_stops_rendering_with_an_exception_is_forgotten() {
 		register_block_type(
 			'test/throws',
 			array(

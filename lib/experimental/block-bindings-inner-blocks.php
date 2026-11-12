@@ -83,17 +83,17 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
 }
 
 /**
- * Returns what a block asks its block bindings source for `innerBlocks`: the
- * source, the arguments of the binding, the context the source uses, and the
- * attributes of the block.
+ * Returns the binding request of a bound block: what it asks its block bindings
+ * source for `innerBlocks`. That is the source, the arguments of the binding,
+ * the context the source uses, and the attributes of the block.
  *
- * Two blocks with the same request get the same inner blocks from the source,
- * whatever the order of its keys.
+ * Two bound blocks with the same binding request get the same inner blocks
+ * from the source, whatever the order of its keys.
  *
  * @param string   $source_name    The name of the source.
  * @param array    $source_args    The arguments of the binding.
  * @param WP_Block $block_instance The block instance.
- * @return array The request.
+ * @return array The binding request.
  */
 function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance ) {
 	$source  = get_block_bindings_source( $source_name );
@@ -109,13 +109,13 @@ function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $sourc
 }
 
 /**
- * Returns whether the inner blocks a source supplied for the given request are
- * rendering.
+ * Returns whether the inner blocks a source supplied for the given binding
+ * request are rendering.
  *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
- * @param array $request The request, as `gutenberg_block_bindings_get_inner_blocks_request()` returns it.
- * @return bool Whether supplied inner blocks for the request are rendering.
+ * @param array $request The binding request, as `gutenberg_block_bindings_get_inner_blocks_request()` returns it.
+ * @return bool Whether supplied inner blocks for the binding request are rendering.
  */
 function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) {
 	global $gutenberg_block_bindings_rendering_inner_blocks;
@@ -134,7 +134,7 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * The blocks still rendering inside it, if any, stopped with it, so they are
  * forgotten along with it.
  *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
  * @param string   $block_content The rendered block.
  * @param array    $parsed_block  The parsed block.
@@ -144,7 +144,7 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
 function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block_content, $parsed_block, $instance ) {
 	global $gutenberg_block_bindings_rendering_inner_blocks;
 	foreach ( (array) $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
-		if ( $rendering['host'] === $instance ) {
+		if ( $rendering['bound_block'] === $instance ) {
 			$gutenberg_block_bindings_rendering_inner_blocks = array_slice( $gutenberg_block_bindings_rendering_inner_blocks, 0, $index );
 			break;
 		}
@@ -159,12 +159,12 @@ add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_
  *
  * A block that doesn't finish rendering never reaches the `render_block`
  * filter. If something catches the exception and goes on rendering, the block
- * would otherwise count as rendering for the rest of the request. A block is
+ * would otherwise count as rendering for the rest of the page load. A block is
  * rendering while its `WP_Block::render()` call is on the call stack.
  *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The blocks whose supplied inner blocks are rendering, with their requests.
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  */
-function gutenberg_block_bindings_forget_hosts_that_stopped_rendering() {
+function gutenberg_block_bindings_forget_bound_blocks_that_stopped_rendering() {
 	global $gutenberg_block_bindings_rendering_inner_blocks;
 	if ( empty( $gutenberg_block_bindings_rendering_inner_blocks ) ) {
 		return;
@@ -177,7 +177,7 @@ function gutenberg_block_bindings_forget_hosts_that_stopped_rendering() {
 		}
 	}
 	foreach ( $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
-		if ( ! in_array( $rendering['host'], $rendering_blocks, true ) ) {
+		if ( ! in_array( $rendering['bound_block'], $rendering_blocks, true ) ) {
 			$gutenberg_block_bindings_rendering_inner_blocks = array_slice( $gutenberg_block_bindings_rendering_inner_blocks, 0, $index );
 			return;
 		}
@@ -415,19 +415,22 @@ function gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $op
  * a binding in the block's own metadata replaces them, not the one the
  * `__default` binding expands to.
  *
- * Not while the inner blocks the source supplied for the same request render:
- * the block then keeps its own inner blocks. This way sources whose values
- * bind each other's, directly or through content that loads as it renders,
- * like the menu of a Navigation block, can't render forever. Bindings that ask
- * a source something else still resolve, inside supplied inner blocks too.
+ * Not while the inner blocks the source supplied for the same binding request
+ * render: the block then keeps its own inner blocks. This way sources whose
+ * values bind each other's, directly or through content that loads as it
+ * renders, like the menu of a Navigation block, can't render forever. Bindings
+ * that ask a source something else still resolve, inside supplied inner blocks
+ * too.
  *
- * Only so many of them, though: whoever writes a value writes the arguments
- * of the bindings inside it, and a value whose bindings ask for it again with
+ * Only within a budget, though: whoever writes a value writes the arguments of
+ * the bindings inside it, and a value whose bindings ask for it again with
  * other arguments would otherwise render once for every order they can nest
- * in. Past the limit, a block inside supplied inner blocks keeps its own.
+ * in. The budget counts every bound block that gets inner blocks inside the
+ * ones supplied to the outermost bound block, at any depth. Once it is spent,
+ * a bound block inside supplied inner blocks keeps its own.
  *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks    The blocks whose supplied inner blocks are rendering, with their requests.
- * @global int     $gutenberg_block_bindings_nested_inner_blocks_count The number of blocks that got inner blocks from a source inside the ones supplied to the outermost block rendering.
+ * @global array[] $gutenberg_block_bindings_rendering_inner_blocks    The bound blocks whose supplied inner blocks are rendering, with their binding requests.
+ * @global int     $gutenberg_block_bindings_inner_blocks_budget_spent How many bound blocks got inner blocks from a source inside the ones supplied to the outermost bound block rendering.
  *
  * @param mixed    $value          The value of the source.
  * @param string   $source_name    The name of the source.
@@ -437,7 +440,7 @@ function gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $op
  * @return mixed The value, or null for `innerBlocks`.
  */
 function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
-	global $gutenberg_block_bindings_rendering_inner_blocks, $gutenberg_block_bindings_nested_inner_blocks_count;
+	global $gutenberg_block_bindings_rendering_inner_blocks, $gutenberg_block_bindings_inner_blocks_budget_spent;
 
 	if ( 'innerBlocks' !== $attribute_name ) {
 		return $value;
@@ -448,7 +451,7 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		return null;
 	}
 
-	gutenberg_block_bindings_forget_hosts_that_stopped_rendering();
+	gutenberg_block_bindings_forget_bound_blocks_that_stopped_rendering();
 	$request = gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance );
 	if ( gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) ) {
 		return null;
@@ -457,19 +460,21 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$is_nested = ! empty( $gutenberg_block_bindings_rendering_inner_blocks );
 	if ( $is_nested ) {
 		/**
-		 * Filters how many blocks may get inner blocks from a source inside
-		 * the inner blocks a source supplied to one block.
+		 * Filters the inner blocks bindings budget: how many bound blocks may
+		 * get inner blocks from a source inside the inner blocks a source
+		 * supplied to one bound block.
 		 *
-		 * The limit covers every level of nesting below that block. It keeps a
-		 * value from rendering without bound through bindings that ask for it
-		 * again with other arguments or context.
+		 * The budget counts bound blocks at every depth below that block, and
+		 * siblings alike, rather than levels of nesting. It keeps a value from
+		 * rendering without bound through bindings that ask for it again with
+		 * other arguments or context.
 		 *
 		 * @since 7.3.0
 		 *
-		 * @param int $limit The number of blocks. Default 100.
+		 * @param int $budget The number of bound blocks. Default 100.
 		 */
-		$limit = (int) apply_filters( 'block_bindings_nested_inner_blocks_limit', 100 );
-		if ( (int) $gutenberg_block_bindings_nested_inner_blocks_count >= $limit ) {
+		$budget = (int) apply_filters( 'block_bindings_inner_blocks_budget', 100 );
+		if ( (int) $gutenberg_block_bindings_inner_blocks_budget_spent >= $budget ) {
 			return null;
 		}
 	}
@@ -488,10 +493,10 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 	$block_instance->inner_html                   = $block_instance->parsed_block['innerHTML'];
 	$block_instance->refresh_parsed_block_dependents();
 
-	$gutenberg_block_bindings_nested_inner_blocks_count = $is_nested ? (int) $gutenberg_block_bindings_nested_inner_blocks_count + 1 : 0;
+	$gutenberg_block_bindings_inner_blocks_budget_spent = $is_nested ? (int) $gutenberg_block_bindings_inner_blocks_budget_spent + 1 : 0;
 	$gutenberg_block_bindings_rendering_inner_blocks[]  = array(
-		'host'    => $block_instance,
-		'request' => $request,
+		'bound_block' => $block_instance,
+		'request'     => $request,
 	);
 
 	return null;
