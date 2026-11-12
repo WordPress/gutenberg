@@ -1,6 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { check } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '../../store';
 
@@ -57,7 +58,9 @@ export default function PreferenceToggleMenuItem( {
 
 	return (
 		<MenuItem
-			showSelectionIndicator
+			className="components-menu-item__selection-row"
+			iconPosition="left"
+			icon={ isActive ? check : null }
 			isSelected={ isActive }
 			onClick={ () => {
 				onToggle();

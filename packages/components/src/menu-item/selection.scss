@@ -1,17 +1,17 @@
-// Selection marks reserve menu-wide space. Action prefixes indent only their row.
-.menu.menu,
-:global([role="menu"]):has(.item) {
+// Internal to Gutenberg menus that supply a leading check through MenuItem's icon.
+[role="menu"].components-menu-item__selection-menu,
+[role="menu"]:has(.components-menu-item__selection-row) {
 	--_wp-components-menu-selection-width: var(--wpds-dimension-size-2xs);
 	--_wp-components-menu-item-inset: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
 
-	:global(.components-menu-item__button):not(.item),
-	:global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
+	.components-menu-item__button:not(.components-menu-item__selection-row),
+	.components-dropdown-menu__menu-item:not(.is-icon-only) {
 		padding-inline-start:
 			calc(var(--_wp-components-menu-item-inset) +
 			var(--_wp-components-menu-selection-width));
 	}
 
-	:global(.components-menu-group__label) {
+	.components-menu-group__label {
 		padding-inline-start:
 			calc(var(--_wp-components-menu-item-inset) +
 			var(--_wp-components-menu-selection-width) +
@@ -19,14 +19,13 @@
 	}
 }
 
-// Outrank DropdownMenu's padding defaults regardless of stylesheet order.
-.item.item:global(.components-menu-item__button.components-button) {
+.components-menu-item__selection-row.components-menu-item__button.components-button[aria-checked] {
 	gap: 0;
 	padding-block: var(--wpds-dimension-padding-xs);
 	padding-inline-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
 	padding-inline-end: var(--wpds-dimension-padding-sm);
 
-	> .indicator {
+	> .components-menu-items__item-icon {
 		flex: 0 0 auto;
 		width: var(--wpds-dimension-size-2xs);
 		height: var(--wpds-dimension-size-2xs);
@@ -36,30 +35,30 @@
 		margin-inline-end: calc(var(--wpds-dimension-gap-xs) / 2);
 	}
 
-	> :global(.components-menu-items__item-icon):not(.indicator):not(:global(.has-icon-right)) {
-		margin-inline-end: var(--wpds-dimension-gap-xs);
+	// Reserve the check's column even when the item has no icon.
+	&:not(.has-icon) {
+		padding-inline-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs) + var(--wpds-dimension-size-2xs));
+
+		> .components-menu-item__item:only-child {
+			padding-right: 0;
+		}
 	}
 
-	&:has(:global(.components-menu-item__info-wrapper)) {
+	&:has(.components-menu-item__info-wrapper) {
 		align-items: flex-start;
 
-		> .indicator {
+		> .components-menu-items__item-icon {
 			// Center the selection mark on the title line.
 			translate: 0 calc((1lh - 100%) / 2);
 		}
 
-		:global(.components-menu-item__shortcut) {
+		.components-menu-item__shortcut {
 			align-self: flex-start;
 		}
 	}
-
-	// Keep the leading space for unchecked rows and actions in a selection menu.
-	&:not([aria-checked="true"]) > .indicator {
-		visibility: hidden;
-	}
 }
 
-:global(.components-dropdown-menu__menu):has(.item):has(:global(.components-menu-group)) > :global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
+.components-dropdown-menu__menu:has(.components-menu-item__selection-row):has(.components-menu-group) > .components-dropdown-menu__menu-item:not(.is-icon-only) {
 	margin-inline: var(--wpds-dimension-padding-sm);
 	width: calc(100% - 2 * var(--wpds-dimension-padding-sm));
 }

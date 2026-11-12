@@ -1,4 +1,4 @@
-import { aspectRatio as aspectRatioIcon } from '@wordpress/icons';
+import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { ComponentProps } from 'react';
@@ -25,7 +25,9 @@ function AspectRatioGroup( {
 					} }
 					role="menuitemradio"
 					isSelected={ ratio === value }
-					showSelectionIndicator
+					className="components-menu-item__selection-row"
+					iconPosition="left"
+					icon={ ratio === value ? check : null }
 				>
 					{ name }
 				</MenuItem>

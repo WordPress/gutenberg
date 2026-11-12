@@ -57,7 +57,6 @@ IsSelected.args = {
 	...Default.args,
 	isSelected: true,
 	role: 'menuitemcheckbox',
-	showSelectionIndicator: true,
 };
 
 export const WithIcon = Template.bind( {} );

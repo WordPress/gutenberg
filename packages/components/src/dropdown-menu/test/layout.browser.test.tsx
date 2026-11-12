@@ -48,7 +48,9 @@ describe( 'DropdownMenu row layout', () => {
 							<MenuItem
 								role="menuitemcheckbox"
 								isSelected={ selected }
-								showSelectionIndicator
+								className="components-menu-item__selection-row"
+								iconPosition="left"
+								icon={ selected ? check : undefined }
 								onClick={ () => setSelected( ! selected ) }
 							>
 								Show details
@@ -56,7 +58,8 @@ describe( 'DropdownMenu row layout', () => {
 							<MenuItem
 								role="menuitemcheckbox"
 								isSelected={ false }
-								showSelectionIndicator
+								className="components-menu-item__selection-row"
+								iconPosition="left"
 							>
 								Show outlines
 							</MenuItem>
@@ -84,42 +87,10 @@ describe( 'DropdownMenu row layout', () => {
 		const width = menu.getBoundingClientRect().width;
 		await user.click( item );
 		expect( item ).not.toBeChecked();
-		expect( indicator ).not.toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( item.querySelector( 'svg' ) ).toBeNull();
 		expect( textLeft( 'Show details' ) ).toBe( left );
 		expect( menu.getBoundingClientRect().width ).toBe( width );
-	} );
-
-	it( 'preserves custom icons and suffixes alongside a selection indicator', async () => {
-		await render(
-			<NavigableMenu>
-				<MenuItem
-					role="menuitemcheckbox"
-					isSelected
-					showSelectionIndicator
-					icon={ <span>Prefix</span> }
-					iconPosition="left"
-					suffix={ <span>Draft</span> }
-				>
-					Show details
-				</MenuItem>
-			</NavigableMenu>
-		);
-		const item = screen.getByRole( 'menuitemcheckbox', {
-			name: /Show details/,
-		} );
-		await expect.element( item ).toBeVisible();
-		// The decorative selection mark has no accessible role to query.
-		// eslint-disable-next-line testing-library/no-node-access
-		const indicator = item.querySelector( 'svg' )!;
-		await expect.element( indicator ).toBeVisible();
-		expect( screen.getByText( 'Prefix' ) ).toBeVisible();
-		expect( screen.getByText( 'Draft' ) ).toBeVisible();
-		expect( indicator.getBoundingClientRect().right ).toBeLessThanOrEqual(
-			screen.getByText( 'Prefix' ).getBoundingClientRect().left
-		);
-		expect( textLeft( 'Show details' ) ).toBeGreaterThan(
-			screen.getByText( 'Prefix' ).getBoundingClientRect().right
-		);
 	} );
 
 	it( 'keeps selection marks inside standalone rows', async () => {
@@ -243,8 +214,6 @@ describe( 'DropdownMenu row layout', () => {
 		// Decorative selection marks have no accessible role to query.
 		// eslint-disable-next-line testing-library/no-node-access
 		const visualIcon = visual.querySelector( 'svg' )!;
-		// eslint-disable-next-line testing-library/no-node-access
-		const codeIcon = code.querySelector( 'svg' )!;
 		await expect.element( visualIcon ).toBeVisible();
 		const left = textLeft( 'Plain action' );
 		for ( const label of [
@@ -261,8 +230,10 @@ describe( 'DropdownMenu row layout', () => {
 		);
 
 		await user.click( code );
-		await expect.element( codeIcon ).toBeVisible();
-		expect( visualIcon ).not.toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( code.querySelector( 'svg' ) ).toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( visual.querySelector( 'svg' ) ).toBeNull();
 		expect( textLeft( 'Visual editor' ) ).toBe( left );
 		expect( textLeft( 'Code editor' ) ).toBe( left );
 	} );

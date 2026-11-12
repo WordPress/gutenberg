@@ -1,3 +1,4 @@
+import { check } from '@wordpress/icons';
 import MenuItem from '../menu-item';
 import type { MenuItemsChoiceProps } from './types';
 
@@ -51,11 +52,12 @@ function MenuItemsChoice( {
 						key={ item.value }
 						role="menuitemradio"
 						disabled={ item.disabled }
-						showSelectionIndicator
+						iconPosition="left"
+						icon={ isSelected ? check : null }
 						info={ item.info }
 						isSelected={ isSelected }
 						shortcut={ item.shortcut }
-						className="components-menu-items-choice"
+						className="components-menu-items-choice components-menu-item__selection-row"
 						onClick={ () => {
 							if ( ! isSelected ) {
 								onSelect( item.value );

@@ -123,6 +123,12 @@ export default function StateControl( {
 								{ viewportOptions.map( ( option ) => (
 									<MenuItem
 										key={ `viewport-${ option.value }` }
+										className="components-menu-item__selection-row"
+										role="menuitemradio"
+										isSelected={
+											viewportValue === option.value
+										}
+										iconPosition="left"
 										onClick={ () => {
 											onChangeViewport?.( option.value );
 											if (
@@ -148,6 +154,12 @@ export default function StateControl( {
 								{ pseudoStateOptions.map( ( option ) => (
 									<MenuItem
 										key={ `pseudo-${ option.value }` }
+										className="components-menu-item__selection-row"
+										role="menuitemradio"
+										isSelected={
+											pseudoStateValue === option.value
+										}
+										iconPosition="left"
 										onClick={ () => {
 											onChangePseudoState?.(
 												option.value
