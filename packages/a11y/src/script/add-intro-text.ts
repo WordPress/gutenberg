@@ -15,19 +15,18 @@ export default function addIntroText() {
 	introText.className = 'a11y-speak-intro-text';
 	introText.textContent = __( 'Notifications' );
 
-	introText.setAttribute(
-		'style',
-		'position:absolute;' +
-			'margin:-1px;' +
-			'padding:0;' +
-			'height:1px;' +
-			'width:1px;' +
-			'overflow:hidden;' +
-			'clip-path:inset(50%);' +
-			'border:0;' +
-			'word-wrap:normal !important;' +
-			'word-break:normal !important;'
-	);
+	Object.assign( introText.style, {
+		position: 'absolute',
+		margin: '-1px',
+		padding: '0',
+		height: '1px',
+		width: '1px',
+		overflow: 'hidden',
+		clipPath: 'inset(50%)',
+		border: '0',
+	} );
+	introText.style.setProperty( 'word-wrap', 'normal', 'important' );
+	introText.style.setProperty( 'word-break', 'normal', 'important' );
 	introText.setAttribute( 'hidden', '' );
 
 	const { body } = document;
