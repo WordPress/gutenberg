@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86379](https://github.com/WordPress/gutenberg/pull/86379)).
 -   `MenuItem` and `DropdownMenu`: Stop showing a focus ring when a disabled item is hovered with a pointer ([#86269](https://github.com/WordPress/gutenberg/pull/86269)).
 -   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#86062](https://github.com/WordPress/gutenberg/pull/86062)).
