@@ -10,6 +10,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 async function addMenuItem( page, listView, task ) {
 	await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
 	await page.getByRole( 'menuitem', { name: task } ).click();
+	await expect(
+		page.getByRole( 'menu', { name: 'Add menu item' } )
+	).toBeHidden();
 }
 
 test.describe( 'Navigation sidebar - list view editing', () => {
@@ -205,6 +208,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		// Select an item, then add a new one from the appender. The edit is
 		// what carries the sidebar's selection over to the entity.
 		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
+		// Selecting the item opens its settings, which takes focus. Wait for
+		// it, so it doesn't close the appender's menu as that opens.
+		await expect(
+			page.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
 		await addMenuItem( page, listView, 'Add page' );
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
