@@ -1,6 +1,6 @@
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
@@ -10,6 +10,7 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { seen } from '@wordpress/icons';
 import { store as editSiteStore } from '../../store';
+import { shouldOpenStyleBook } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
@@ -25,7 +26,6 @@ const TOOLS_PANEL_POPOVER_PROPS = {
 
 const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
-	setIsStyleBookOpened,
 	path,
 	onChangeSection,
 } ) => {
@@ -38,7 +38,6 @@ const GlobalStylesPageActions = ( {
 				icon={ seen }
 				label={ __( 'Style Book' ) }
 				onClick={ () => {
-					setIsStyleBookOpened( ! isStyleBookOpened );
 					const updatedPath = ! isStyleBookOpened
 						? addQueryArgs( path, { preview: 'stylebook' } )
 						: removeQueryArgs( path, 'preview' );
@@ -64,12 +63,16 @@ export const useSection = () => {
 	const { path, query } = useLocation();
 	const history = useHistory();
 	return useMemo( () => {
+		const section = query.section ?? '/';
 		return [
-			query.section ?? '/',
+			section,
 			( updatedSection ) => {
 				history.navigate(
 					addQueryArgs( path, {
 						section: updatedSection,
+						...( shouldOpenStyleBook( section, updatedSection ) && {
+							preview: 'stylebook',
+						} ),
 					} )
 				);
 			},
@@ -78,11 +81,8 @@ export const useSection = () => {
 };
 
 export default function SidebarGlobalStyles() {
-	const { path } = useLocation();
-
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
-		path.includes( 'preview=stylebook' )
-	);
+	const { path, query } = useLocation();
+	const isStyleBookOpened = query.preview === 'stylebook';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
 	const settings = useSelect(
@@ -96,7 +96,6 @@ export default function SidebarGlobalStyles() {
 				! isMobileViewport ? (
 					<GlobalStylesPageActions
 						isStyleBookOpened={ isStyleBookOpened }
-						setIsStyleBookOpened={ setIsStyleBookOpened }
 						path={ path }
 						onChangeSection={ onChangeSection }
 					/>
