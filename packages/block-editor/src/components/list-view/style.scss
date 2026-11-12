@@ -603,7 +603,8 @@ svg {
 	height: 32px;
 }
 
-.list-view-appender .block-editor-inserter__toggle {
+.list-view-appender .block-editor-inserter__toggle,
+.list-view-appender .block-editor-list-view-appender__toggle {
 	background-color: $gray-900;
 	color: $white;
 	margin: $grid-unit-10 0 0 $grid-unit-30;
