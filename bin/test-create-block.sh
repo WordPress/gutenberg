@@ -9,6 +9,9 @@
 # Exit if any command fails.
 set -e
 
+# webpack 4 hashes with md4, which OpenSSL 3 disables.
+export NODE_OPTIONS=--openssl-legacy-provider
+
 DIRECTORY="$PWD"
 
 status () {
