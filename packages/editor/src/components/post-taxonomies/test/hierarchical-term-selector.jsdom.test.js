@@ -162,4 +162,16 @@ describe( 'getFilterMatcher', () => {
 		const matcher = getFilterMatcher( 'parent' );
 		expect( matcher( input ) ).toEqual( output );
 	} );
+
+	test( 'should match term names containing HTML entities', () => {
+		const input = {
+			id: 2232,
+			parent: 0,
+			name: 'Tour &amp; Travel',
+			children: [],
+		};
+		expect( getFilterMatcher( 'Tour & ' )( input ) ).toEqual( input );
+		expect( getFilterMatcher( '& Travel' )( input ) ).toEqual( input );
+		expect( getFilterMatcher( 'amp' )( input ) ).toBe( false );
+	} );
 } );
