@@ -377,8 +377,9 @@ export function AutosaveFeatureListExample( {
  *
  * Leaving discards the edits and can't be undone, so the confirmation uses
  * the `irreversible` intent. With no unsaved changes, "Back" leaves
- * straight away. Reloading or closing the tab is guarded by the browser's
- * own `beforeunload` warning.
+ * straight away, and during a save it waits for the save to finish first.
+ * Reloading or closing the tab is guarded by the browser's own
+ * `beforeunload` warning.
  */
 export function UnsavedChangesOnExitExample() {
 	const [ savedData, setSavedData ] = useState( { title: 'Pizza Planet' } );
@@ -390,10 +391,11 @@ export function UnsavedChangesOnExitExample() {
 		setSavedData( saved );
 		snackbar.show( SAVED_MESSAGE );
 	} );
+	const [ isLeavePending, setIsLeavePending ] = useState( false );
 	const hasChanges = data.title !== savedData.title;
 
 	useEffect( () => {
-		if ( ! hasChanges ) {
+		if ( hasLeft || ! hasChanges ) {
 			return;
 		}
 		const onBeforeUnload = ( event: BeforeUnloadEvent ) => {
@@ -402,7 +404,29 @@ export function UnsavedChangesOnExitExample() {
 		window.addEventListener( 'beforeunload', onBeforeUnload );
 		return () =>
 			window.removeEventListener( 'beforeunload', onBeforeUnload );
-	}, [ hasChanges ] );
+	}, [ hasLeft, hasChanges ] );
+
+	useEffect( () => {
+		if ( ! isLeavePending || isSaving ) {
+			return;
+		}
+		setIsLeavePending( false );
+		if ( hasChanges ) {
+			setIsConfirmOpen( true );
+		} else {
+			setHasLeft( true );
+		}
+	}, [ isLeavePending, isSaving, hasChanges ] );
+
+	function requestLeave() {
+		if ( isSaving ) {
+			setIsLeavePending( true );
+		} else if ( hasChanges ) {
+			setIsConfirmOpen( true );
+		} else {
+			leave();
+		}
+	}
 
 	function leave() {
 		setIsConfirmOpen( false );
@@ -434,9 +458,9 @@ export function UnsavedChangesOnExitExample() {
 					<Button
 						variant="minimal"
 						tone="neutral"
-						onClick={ () =>
-							hasChanges ? setIsConfirmOpen( true ) : leave()
-						}
+						loading={ isLeavePending }
+						loadingAnnouncement="Saving changes"
+						onClick={ requestLeave }
 					>
 						Back
 					</Button>
