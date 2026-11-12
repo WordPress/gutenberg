@@ -527,6 +527,7 @@ class WP_Theme_JSON_Gutenberg {
 					'fontFeatureSettings'   => null,
 					'fontStyle'             => null,
 					'fontStretch'           => null,
+					'fontVariant'           => null,
 					'fontVariationSettings' => null,
 					'fontWeight'            => null,
 					'lineGapOverride'       => null,

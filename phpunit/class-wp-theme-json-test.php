@@ -5680,6 +5680,47 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_font_face_settings_are_preserved() {
+		$font_face = array(
+			'ascentOverride'        => '90%',
+			'descentOverride'       => '20%',
+			'fontDisplay'           => 'swap',
+			'fontFamily'            => 'Roboto',
+			'fontFeatureSettings'   => '"liga" 1',
+			'fontStretch'           => 'normal',
+			'fontStyle'             => 'normal',
+			'fontVariant'           => 'small-caps',
+			'fontVariationSettings' => '"wght" 400',
+			'fontWeight'            => '400',
+			'lineGapOverride'       => '0%',
+			'sizeAdjust'            => '100%',
+			'src'                   => array( 'file:./assets/fonts/roboto.woff2' ),
+			'unicodeRange'          => 'U+0000-00FF',
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fontFamilies' => array(
+							array(
+								'name'       => 'Roboto',
+								'slug'       => 'roboto',
+								'fontFamily' => 'Roboto, sans-serif',
+								'fontFace'   => array( $font_face ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+
+		$this->assertSame( $font_face, $settings['typography']['fontFamilies']['theme'][0]['fontFace'][0] );
+	}
+
 	public function test_get_element_class_name_button() {
 		$expected = 'wp-element-button';
 		$actual   = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
