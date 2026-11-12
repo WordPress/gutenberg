@@ -1,13 +1,14 @@
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
-import {
-	useLayoutEffect,
-	useRef,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
-import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useDebounce,
+	useEvent,
+	useIsomorphicLayoutEffect,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import getDefaultUseItems from './get-default-use-items';
@@ -73,7 +74,7 @@ function ListBox( {
 	);
 }
 
-export function AutocompleterUI( {
+export function AutocompleterUI< TReplacement >( {
 	autocompleter,
 	filterValue,
 	instanceId,
@@ -85,13 +86,16 @@ export function AutocompleterUI( {
 	onHover,
 	reset,
 	contentRef,
-}: AutocompleterUIProps ) {
-	// The useItems hook is derived from the autocompleter prop. This is safe
-	// because the parent renders this component with key={autocompleter.name},
-	// ensuring a fresh mount (and stable hook identity) when the completer changes.
-	const useItems =
-		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
-	const [ items ] = useItems( filterValue );
+}: AutocompleterUIProps< TReplacement > ) {
+	// The parent remounts this component when the completer identity changes
+	// or when it switches between default and custom item hooks.
+	const customUseItems = autocompleter.useItems;
+	const useItems = customUseItems ?? getDefaultUseItems( autocompleter );
+	const itemResult = useItems( filterValue );
+	const [ items ] = itemResult;
+	const itemCompleter = customUseItems
+		? autocompleter
+		: ( itemResult[ 1 ] ?? autocompleter );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
@@ -122,7 +126,7 @@ export function AutocompleterUI( {
 
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	function announce( options: Array< KeyedOption > ) {
+	const announce = useEvent( ( options: Array< KeyedOption > ) => {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
@@ -157,14 +161,13 @@ export function AutocompleterUI( {
 		} else {
 			debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
-	}
-
-	useLayoutEffect( () => {
-		onChangeOptions( items );
+	} );
+	useIsomorphicLayoutEffect( () => {
+		onChangeOptions( items, itemCompleter );
+	}, [ items, itemCompleter, onChangeOptions ] );
+	useIsomorphicLayoutEffect( () => {
 		announce( items );
-		// We want to avoid introducing unexpected side effects.
-		// See https://github.com/WordPress/gutenberg/pull/41820
-	}, [ items ] );
+	}, [ items, announce ] );
 
 	if ( items.length === 0 ) {
 		return null;

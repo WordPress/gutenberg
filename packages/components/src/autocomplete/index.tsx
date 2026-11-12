@@ -30,6 +30,7 @@ import type {
 	AutocompleteState,
 	InsertOption,
 	KeyedOption,
+	ListedOptionCompleter,
 	OptionCompletion,
 	ReplaceOption,
 	UseAutocompleteProps,
@@ -65,7 +66,7 @@ function getCompletionObject< TReplacement >(
 
 const initialState: AutocompleteState< never > = {
 	selectedIndex: 0,
-	filteredOptions: EMPTY_FILTERED_OPTIONS,
+	optionKeys: [],
 	filterValue: '',
 	autocompleter: null,
 };
@@ -80,15 +81,33 @@ function autocompleteReducer< TReplacement >(
 		case 'SELECT':
 			return { ...state, selectedIndex: action.index };
 		case 'OPTIONS':
+			if (
+				action.options.length === state.optionKeys.length &&
+				action.options.every(
+					( option, index ) =>
+						option.key === state.optionKeys[ index ]
+				)
+			) {
+				return state;
+			}
 			return {
 				...state,
-				filteredOptions: action.options,
+				optionKeys: action.options.map( ( option ) => option.key ),
 				selectedIndex:
-					action.options.length === state.filteredOptions.length
+					action.options.length === state.optionKeys.length
 						? state.selectedIndex
 						: 0,
 			};
 		case 'MATCH':
+			if (
+				state.autocompleter &&
+				state.autocompleter.name === action.completer.name &&
+				state.autocompleter.triggerPrefix ===
+					action.completer.triggerPrefix &&
+				state.filterValue === action.query
+			) {
+				return state;
+			}
 			return {
 				...state,
 				autocompleter: action.completer,
@@ -109,9 +128,30 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		autocompleteReducer< TReplacement >,
 		initialState
 	);
-	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
-		state;
+	const {
+		selectedIndex,
+		optionKeys,
+		filterValue,
+		autocompleter: matchedCompleter,
+	} = state;
+	const autocompleter = matchedCompleter
+		? ( completers.find(
+				( candidate ) =>
+					candidate.name === matchedCompleter.name &&
+					candidate.triggerPrefix === matchedCompleter.triggerPrefix
+			) ?? null )
+		: null;
 
+	// Keep committed option data with its provider. State only needs the keys,
+	// so refreshed data with the same keys does not retrigger provider renders.
+	const optionsRef = useRef< {
+		options: KeyedOption[];
+		completer: ListedOptionCompleter< TReplacement >;
+	} | null >( null );
+	const reset = useEvent( () => {
+		optionsRef.current = null;
+		dispatch( { type: 'RESET' } );
+	} );
 	const backspacingRef = useRef( false );
 	const prevRecordTextRef = useRef( '' );
 	const lastCompletionRef = useRef< {
@@ -133,13 +173,14 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 	}
 
 	function select( option: KeyedOption ) {
-		if ( option.isDisabled || ! autocompleter ) {
+		const optionCompleter = optionsRef.current?.completer;
+		if ( option.isDisabled || ! autocompleter || ! optionCompleter ) {
 			return;
 		}
 
-		const { getOptionCompletion } = autocompleter;
+		const { getOptionCompletion } = optionCompleter;
 		if ( ! getOptionCompletion ) {
-			dispatch( { type: 'RESET' } );
+			reset();
 			contentRef.current?.focus();
 			return;
 		}
@@ -176,24 +217,32 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		dispatch( { type: 'RESET' } );
+		reset();
 
 		// Make sure that the content remains focused after making a selection
 		// and that the text cursor position is not lost.
 		contentRef.current?.focus();
 	}
 
-	function onChangeOptions( options: Array< KeyedOption > ) {
-		dispatch( { type: 'OPTIONS', options } );
-	}
+	const onChangeOptions = useEvent(
+		(
+			options: KeyedOption[],
+			completer: ListedOptionCompleter< TReplacement >
+		) => {
+			optionsRef.current = { options, completer };
+			dispatch( { type: 'OPTIONS', options } );
+		}
+	);
 
 	function handleKeyDown( event: KeyboardEvent ) {
+		const currentOptions =
+			optionsRef.current?.options ?? EMPTY_FILTERED_OPTIONS;
 		backspacingRef.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
 		}
-		if ( filteredOptions.length === 0 ) {
+		if ( currentOptions.length === 0 ) {
 			return;
 		}
 
@@ -206,13 +255,13 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 			case 'ArrowDown': {
 				const offset = event.key === 'ArrowUp' ? -1 : 1;
 				const newIndex =
-					( selectedIndex + offset + filteredOptions.length ) %
-					filteredOptions.length;
+					( selectedIndex + offset + currentOptions.length ) %
+					currentOptions.length;
 				dispatch( { type: 'SELECT', index: newIndex } );
 				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
 				if ( isAppleOS() ) {
 					speak(
-						getNodeText( filteredOptions[ newIndex ].label ),
+						getNodeText( currentOptions[ newIndex ].label ),
 						'assertive'
 					);
 				}
@@ -220,17 +269,17 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 			}
 
 			case 'Escape':
-				dispatch( { type: 'RESET' } );
+				reset();
 				event.preventDefault();
 				break;
 
 			case 'Enter':
-				select( filteredOptions[ selectedIndex ] );
+				select( currentOptions[ selectedIndex ] );
 				break;
 
 			case 'ArrowLeft':
 			case 'ArrowRight':
-				dispatch( { type: 'RESET' } );
+				reset();
 				return;
 
 			default:
@@ -252,7 +301,7 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		return '';
 	}, [ record ] );
 
-	useEffect( () => {
+	const refreshMatch = useEvent( () => {
 		const isTextChange = record.text !== prevRecordTextRef.current;
 		prevRecordTextRef.current = record.text;
 
@@ -269,15 +318,15 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		}
 
 		const match = getAutocompleteMatch( textContent, completers, {
-			matchCount: filteredOptions.length,
+			matchCount: optionKeys.length,
 			isBackspacing: backspacingRef.current,
 			getTextAfterSelection,
 			lastCompletion: lastCompletionRef.current,
 		} );
 
 		if ( ! match ) {
-			if ( autocompleter ) {
-				dispatch( { type: 'RESET' } );
+			if ( matchedCompleter ) {
+				reset();
 			}
 			return;
 		}
@@ -289,7 +338,7 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		// caret, so the effect re-runs, but `record.text` does not.
 		// Complements the render-time `didUserInput` gate in
 		// `useAutocompleteProps` for callers using this hook directly.
-		if ( ! autocompleter && ! isTextChange ) {
+		if ( ! matchedCompleter && ! isTextChange ) {
 			return;
 		}
 
@@ -305,13 +354,14 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		}
 
 		dispatch( { type: 'MATCH', completer, query } );
-		// We want to avoid introducing unexpected side effects.
-		// See https://github.com/WordPress/gutenberg/pull/41820
-	}, [ textContent ] );
+	} );
+	useEffect( () => {
+		refreshMatch();
+	}, [ textContent, completers, refreshMatch ] );
 
-	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+	const selectedKey = optionKeys[ selectedIndex ] ?? '';
 	const { className } = autocompleter || {};
-	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+	const isExpanded = !! autocompleter && optionKeys.length > 0;
 	const listBoxId = isExpanded
 		? `components-autocomplete-listbox-${ instanceId }`
 		: undefined;
@@ -327,7 +377,11 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
-				key={ autocompleter.name + autocompleter.triggerPrefix }
+				key={
+					autocompleter.name +
+					autocompleter.triggerPrefix +
+					( autocompleter.useItems ? ':custom' : ':default' )
+				}
 				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
@@ -338,7 +392,7 @@ export function useAutocomplete< TReplacement = RichTextValue >( {
 				onSelect={ select }
 				onHover={ ( index ) => dispatch( { type: 'SELECT', index } ) }
 				contentRef={ contentRef }
-				reset={ () => dispatch( { type: 'RESET' } ) }
+				reset={ reset }
 			/>
 		),
 	};

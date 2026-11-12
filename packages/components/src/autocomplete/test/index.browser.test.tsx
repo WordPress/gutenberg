@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { page, userEvent } from 'vitest/browser';
+import { act, screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import {
 	Suspense,
@@ -8,8 +8,9 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { useAutocomplete, useAutocompleteProps } from '..';
-import type { UseAutocompleteProps } from '../types';
+import type { UseAutocompleteProps, WPCompleter } from '../types';
 import '../../style.scss';
 
 function makeRecord( text: string ) {
@@ -191,5 +192,192 @@ describe( 'useAutocompleteProps', () => {
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( { text: 'Apple' } )
 		);
+	} );
+} );
+
+const OTHER_COMPLETER: WPCompleter< string > = {
+	name: 'other',
+	triggerPrefix: '/',
+	options: [ 'Other' ],
+	getOptionLabel: ( option ) => option,
+	getOptionCompletion: ( option ) => option,
+};
+
+function ProviderField( { completer }: { completer: WPCompleter< string > } ) {
+	const contentRef = useRef< HTMLTextAreaElement >( null );
+	const [ record, setRecord ] = useState< RichTextValue >( () =>
+		makeRecord( '' )
+	);
+	const { popover, onKeyDown, listBoxId, activeId } = useAutocomplete( {
+		record: {
+			...record,
+			start: record.start ?? record.text.length,
+			end: record.end ?? record.text.length,
+		},
+		contentRef,
+		// Callers can recreate the array and configuration on render.
+		completers: [ { ...completer }, OTHER_COMPLETER ],
+		onChange: setRecord,
+		onReplace: () => {},
+	} );
+
+	return (
+		<>
+			<textarea
+				aria-label="Complete a fruit"
+				aria-controls={ listBoxId }
+				aria-activedescendant={ activeId ?? undefined }
+				ref={ contentRef }
+				value={ record.text }
+				onChange={ ( event ) =>
+					setRecord( makeRecord( event.target.value ) )
+				}
+				onKeyDown={ ( event ) => onKeyDown( event.nativeEvent ) }
+			/>
+			{ popover }
+		</>
+	);
+}
+
+const FRUIT_COMPLETER: WPCompleter< string > = {
+	name: 'fruit',
+	triggerPrefix: '~',
+	options: [ 'Apple' ],
+	getOptionLabel: ( option ) => option,
+	getOptionCompletion: ( option ) => `Old ${ option }`,
+};
+
+function useCustomFruitItems() {
+	const [ items ] = useState( [
+		{
+			key: 'custom-apricot',
+			value: 'Apricot',
+			label: 'Apricot',
+			isDisabled: false,
+		},
+	] );
+	return [ items ] as const;
+}
+
+describe( 'Autocomplete provider updates', () => {
+	it( 'refreshes results and keyboard completion when the provider changes', async () => {
+		const user = userEvent.setup();
+		const view = await render(
+			<ProviderField completer={ FRUIT_COMPLETER } />
+		);
+		const field = screen.getByRole( 'textbox', {
+			name: 'Complete a fruit',
+		} );
+		await user.click( field );
+		await user.keyboard( '~Ap' );
+		await screen.findByRole( 'option', { name: 'Apple' } );
+
+		await view.rerender(
+			<ProviderField
+				completer={ {
+					...FRUIT_COMPLETER,
+					options: [ 'Apricot' ],
+					getOptionCompletion: ( option ) => `New ${ option }`,
+				} }
+			/>
+		);
+		await screen.findByRole( 'option', { name: 'Apricot' } );
+		expect( field ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( field ).toHaveValue( 'New Apricot' );
+	} );
+
+	it( 'completes visible results with their provider while replacement results load', async () => {
+		const user = userEvent.setup();
+		let resolve!: ( options: string[] ) => void;
+		const pending = new Promise< string[] >( ( done ) => {
+			resolve = done;
+		} );
+		const view = await render(
+			<ProviderField completer={ FRUIT_COMPLETER } />
+		);
+		const field = screen.getByRole( 'textbox', {
+			name: 'Complete a fruit',
+		} );
+		await user.click( field );
+		await user.keyboard( '~Ap' );
+		await screen.findByRole( 'option', { name: 'Apple' } );
+
+		await view.rerender(
+			<ProviderField
+				completer={ {
+					...FRUIT_COMPLETER,
+					options: () => pending,
+					getOptionCompletion: ( option ) => `New ${ option }`,
+				} }
+			/>
+		);
+		await expect
+			.element( page.getByRole( 'option', { name: 'Apple' } ) )
+			.toBeVisible();
+		expect( field ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( field ).toHaveValue( 'Old Apple' );
+		await act( async () => resolve( [ 'Apricot' ] ) );
+	} );
+
+	it( 'allows a new line after a completion that keeps its trigger', async () => {
+		const user = userEvent.setup();
+		await render(
+			<ProviderField
+				completer={ {
+					...FRUIT_COMPLETER,
+					triggerPrefix: '@',
+					getOptionCompletion: ( option ) => `@${ option }`,
+				} }
+			/>
+		);
+		const field = screen.getByRole( 'textbox', {
+			name: 'Complete a fruit',
+		} );
+		await user.click( field );
+		await user.keyboard( '@Ap' );
+		await screen.findByRole( 'option', { name: 'Apple' } );
+		await user.keyboard( '{Enter}' );
+		expect( field ).toHaveValue( '@Apple' );
+		await user.keyboard( ' extra{Enter}' );
+		expect( field ).toHaveValue( '@Apple extra\n' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'switches between default items and a custom items hook without losing the query', async () => {
+		const user = userEvent.setup();
+		const view = await render(
+			<ProviderField completer={ FRUIT_COMPLETER } />
+		);
+		const field = screen.getByRole( 'textbox', {
+			name: 'Complete a fruit',
+		} );
+		await user.click( field );
+		await user.keyboard( '~Ap' );
+		await screen.findByRole( 'option', { name: 'Apple' } );
+
+		await view.rerender(
+			<ProviderField
+				completer={ {
+					...FRUIT_COMPLETER,
+					useItems: useCustomFruitItems,
+				} }
+			/>
+		);
+		await screen.findByRole( 'option', { name: 'Apricot' } );
+		expect( field ).toHaveValue( '~Ap' );
+		await view.rerender(
+			<ProviderField
+				completer={ {
+					...FRUIT_COMPLETER,
+					getOptionCompletion: ( option ) => `Restored ${ option }`,
+				} }
+			/>
+		);
+		await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( field ).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( field ).toHaveValue( 'Restored Apple' );
 	} );
 } );

@@ -90,6 +90,7 @@ export type WPCompleter<
 	 * A function that returns an array of items to be displayed in the
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
 	 * `AutocompleterUIProps.filterValue`.
+	 * A custom hook must keep its hook calls consistent for a given completer name.
 	 */
 	useItems?: ( filterValue: string ) => readonly [ Array< KeyedOption > ];
 	/**
@@ -112,11 +113,11 @@ export type ListedOptionCompleter< TReplacement = unknown > = WPCompleter<
 
 type ContentRef = React.RefObject< HTMLElement | null >;
 
-export type AutocompleterUIProps = {
+export type AutocompleterUIProps< TReplacement = unknown > = {
 	/**
 	 * The autocompleter configuration object.
 	 */
-	autocompleter: ListedOptionCompleter;
+	autocompleter: ListedOptionCompleter< TReplacement >;
 	/**
 	 * The value to filter the options by.
 	 */
@@ -141,7 +142,10 @@ export type AutocompleterUIProps = {
 	/**
 	 * A function to be called when the filterValue changes.
 	 */
-	onChangeOptions: ( items: Array< KeyedOption > ) => void;
+	onChangeOptions: (
+		items: Array< KeyedOption >,
+		completer: ListedOptionCompleter< TReplacement >
+	) => void;
 	/**
 	 * A function to be called when an option is selected.
 	 */
@@ -192,7 +196,7 @@ export type UseAutocompleteProps< TReplacement = RichTextValue > = {
 
 export type AutocompleteState< TReplacement = RichTextValue > = {
 	selectedIndex: number;
-	filteredOptions: KeyedOption[];
+	optionKeys: string[];
 	filterValue: string;
 	autocompleter: ListedOptionCompleter< TReplacement > | null;
 };
