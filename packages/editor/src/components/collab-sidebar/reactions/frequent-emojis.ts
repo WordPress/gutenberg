@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { REACTION_EMOJIS } from './reaction-emojis';
+import { REACTION_EMOJIS, useReactionEmojis } from './reaction-emojis';
 
 /**
  * A recorded frequently-used emoji: its normalized hex key and how many
@@ -119,6 +119,11 @@ export function useFrequentEmojis(): {
 	recordUse: ( key: string ) => void;
 } {
 	const registry = useRegistry();
+	/*
+	 * Seed from the named list, not the shipped defaults, so a site using
+	 * `gutenberg_note_reaction_emoji_settings` sees its own set.
+	 */
+	const emojis = useReactionEmojis();
 	const entries = useSelect(
 		( select ) =>
 			select( preferencesStore ).get(
@@ -129,8 +134,12 @@ export function useFrequentEmojis(): {
 	);
 	// Derived outside the selector, which must return a stable value.
 	const frequentKeys = useMemo(
-		() => getFrequentEmojiKeys( entries ),
-		[ entries ]
+		() =>
+			getFrequentEmojiKeys(
+				entries,
+				emojis.map( ( entry ) => entry.hexKey )
+			),
+		[ entries, emojis ]
 	);
 	const recordUse = useCallback(
 		( key: string ) => {

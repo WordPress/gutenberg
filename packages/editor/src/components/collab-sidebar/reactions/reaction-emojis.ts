@@ -1,4 +1,7 @@
 import { _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * A reaction emoji.
@@ -178,4 +181,171 @@ export function hexKeyToEmoji( hexKey: string ): string {
 	} catch {
 		return hexKey;
 	}
+}
+
+/**
+ * A named reaction emoji from the `noteReactionEmojis` setting.
+ */
+export interface NamedEmoji {
+	hexKey: string;
+	label: string;
+}
+
+/**
+ * Read the named emoji list from the raw editor setting, falling back to
+ * the curated set only when the setting is absent. Malformed entries drop,
+ * and an emptied list stays empty.
+ *
+ * @param raw The `noteReactionEmojis` setting.
+ * @return The named emoji.
+ */
+export function parseReactionEmojis( raw: unknown ): NamedEmoji[] {
+	if ( ! Array.isArray( raw ) ) {
+		return REACTION_EMOJIS.map( ( { hexKey, label } ) => ( {
+			hexKey,
+			label,
+		} ) );
+	}
+	return raw
+		.filter(
+			( entry ): entry is { hex_key: string; label: string } =>
+				!! entry &&
+				typeof entry.hex_key === 'string' &&
+				typeof entry.label === 'string'
+		)
+		.map( ( { hex_key: hexKey, label } ) => ( {
+			hexKey: hexKey.toLowerCase(),
+			label,
+		} ) )
+		.filter( ( entry ) => HEX_KEY_RE.test( entry.hexKey ) );
+}
+
+/**
+ * The named emoji from editor settings. The server injects them via
+ * `gutenberg_note_reaction_emoji_settings`, so "Frequently used" starts
+ * from the set the site chose.
+ *
+ * @return The named emoji.
+ */
+export function useReactionEmojis(): NamedEmoji[] {
+	const raw = useSelect(
+		( select ) =>
+			(
+				select( blockEditorStore ).getSettings() as Record<
+					string,
+					unknown
+				>
+			 ).noteReactionEmojis,
+		[]
+	);
+	return useMemo( () => parseReactionEmojis( raw ), [ raw ] );
+}
+
+/**
+ * Which emoji the picker offers beyond the named list. Mirrors the
+ * `allow_unlisted` and `exclude` from the server's
+ * `gutenberg_note_reaction_emoji_settings`.
+ */
+export interface ReactionEmojiRules {
+	allowUnlisted: boolean;
+	// Base hex keys that are never accepted.
+	exclude: string[];
+}
+
+const DEFAULT_REACTION_EMOJI_RULES: ReactionEmojiRules = {
+	allowUnlisted: true,
+	exclude: [],
+};
+
+/**
+ * Drop skin-tone modifiers so a variant resolves to its base emoji.
+ *
+ * @param hexKey Normalized hex key.
+ * @return The base emoji's hex key.
+ */
+function stripSkinTones( hexKey: string ): string {
+	return hexKey
+		.split( '-' )
+		.filter( ( part ) => ! /^1f3f[b-f]$/.test( part ) )
+		.join( '-' );
+}
+
+/**
+ * Read the emoji rules from the raw editor setting, defaulting to any emoji
+ * when it is absent or malformed.
+ *
+ * @param raw The `noteReactionEmojiRules` setting.
+ * @return The parsed rules.
+ */
+export function parseReactionEmojiRules( raw: unknown ): ReactionEmojiRules {
+	if ( ! raw || typeof raw !== 'object' ) {
+		return DEFAULT_REACTION_EMOJI_RULES;
+	}
+	const { allowUnlisted, exclude } = raw as Record< string, unknown >;
+	return {
+		allowUnlisted: allowUnlisted !== false,
+		exclude: Array.isArray( exclude )
+			? exclude
+					.filter( ( key ): key is string => typeof key === 'string' )
+					.map( ( key ) => key.toLowerCase() )
+			: [],
+	};
+}
+
+/**
+ * The emoji rules from editor settings.
+ *
+ * @return The rules the REST API applies to reactions.
+ */
+export function useReactionEmojiRules(): ReactionEmojiRules {
+	const raw = useSelect(
+		( select ) =>
+			(
+				select( blockEditorStore ).getSettings() as Record<
+					string,
+					unknown
+				>
+			 ).noteReactionEmojiRules,
+		[]
+	);
+	return useMemo( () => parseReactionEmojiRules( raw ), [ raw ] );
+}
+
+/**
+ * Base hex keys of the named emoji, which the rules always accept.
+ *
+ * @param emojis The named emoji.
+ * @return Set of base hex keys.
+ */
+export function getNamedHexKeys( emojis: NamedEmoji[] ): Set< string > {
+	return new Set( emojis.map( ( entry ) => stripSkinTones( entry.hexKey ) ) );
+}
+
+/**
+ * Whether the rules accept an emoji. Named emoji are always accepted,
+ * skin-tone variants follow their base emoji, and an excluded emoji is
+ * rejected inside a longer sequence too. Must agree with
+ * `gutenberg_is_note_reaction_key_allowed()`.
+ *
+ * @param hexKey    Normalized hex key of the emoji.
+ * @param rules     The emoji rules.
+ * @param namedKeys Hex keys from `getNamedHexKeys()`.
+ * @return Whether the emoji can be used as a reaction.
+ */
+export function isReactionEmojiAllowed(
+	hexKey: string,
+	rules: ReactionEmojiRules,
+	namedKeys: Set< string >
+): boolean {
+	const base = stripSkinTones( hexKey );
+	if ( namedKeys.has( base ) ) {
+		return true;
+	}
+	if ( ! rules.allowUnlisted ) {
+		return false;
+	}
+	// An excluded emoji is rejected anywhere in the key, as the server does.
+	return ! rules.exclude.some( ( excluded ) =>
+		`-${ base }-`.includes( `-${ excluded }-` )
+	);
 }

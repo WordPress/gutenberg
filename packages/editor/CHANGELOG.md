@@ -5,6 +5,7 @@
 ### New Features
 
 -   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#83538](https://github.com/WordPress/gutenberg/pull/83538)).
+-   Notes: sites can customize emoji reactions through the `noteReactionEmojis`, `noteReactionEmojiRules`, and `noteEmojiLabelOverrides` editor settings, which the plugin fills from the `gutenberg_note_reaction_emoji_settings` and `gutenberg_emoji_picker_label_overrides` filters ([#84043](https://github.com/WordPress/gutenberg/pull/84043)).
 
 ### Enhancements
 
