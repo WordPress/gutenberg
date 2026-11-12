@@ -20,7 +20,6 @@ import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -138,18 +137,6 @@ function useBlockEditorProps( post, template, mode ) {
 }
 
 /**
- * Shows the autosave notices of one post. Keyed by post and mounted once that
- * post is the edited one, so the decision is made per post and its notice
- * goes away with it.
- *
- * @param {Object} props Props passed to `useAutosaveNotice`.
- */
-function AutosaveNotice( props ) {
-	useAutosaveNotice( props );
-	return null;
-}
-
-/**
  * This component provides the editor context and manages the state of the block editor.
  *
  * @param {Object}  props                                The component props.
@@ -200,15 +187,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			isInRevisionsMode,
 			currentRevisionId,
 			browserBackup,
-			isCurrentPost,
 		} = useSelect(
 			( select ) => {
 				const {
 					getEditorSettings,
 					getRenderingMode,
 					__unstableIsEditorReady,
-					getCurrentPostId,
-					getCurrentPostType,
 					getDefaultRenderingMode,
 					isRevisionsMode: _isRevisionsMode,
 					getCurrentRevisionId: _getCurrentRevisionId,
@@ -248,9 +232,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
-					isCurrentPost:
-						getCurrentPostId() === post.id &&
-						getCurrentPostType() === post.type,
 					mode: isRenderingModeReady ? _mode : undefined,
 					defaultMode: hasResolvedDefaultMode
 						? _defaultMode
@@ -470,16 +451,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							{ children }
-							{ isCurrentPost && (
-								<AutosaveNotice
-									key={ `${ post.type }-${ post.id }` }
-									postType={ post.type }
-									postId={ post.id }
-									isNew={ post.status === 'auto-draft' }
-									recovery={ recovery }
-									autosave={ settings.autosave }
-								/>
-							) }
 							{ ! settings.isPreviewMode && (
 								<>
 									<PatternsMenuItems />

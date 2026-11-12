@@ -14,6 +14,8 @@ import { unlock } from '../../lock-unlock';
 
 const { entityContainsSnapshot } = unlock( coreDataPrivateApis );
 
+export type SnapshotStatus = 'pending' | 'present' | 'missing';
+
 /**
  * How long the snapshot status decision waits for the shared document to
  * sync before failing open and resolving to 'missing'. The decision can
@@ -40,24 +42,28 @@ export const SNAPSHOT_STATUS_SYNC_WAIT_MS = 3000;
  *   snapshotted artifact as meaningful.
  * - 'pending' while the decision is still waiting for one of those signals.
  *
- * IMPORTANT: Call this hook after the mount effect that dispatches
- * `setupEditor`, so that the collaboration check can read the current post.
+ * IMPORTANT: Mount this hook only once the post is the edited one, so that
+ * the collaboration check reads this post.
  *
- * @param {Object}        props            Hook props.
- * @param {string}        props.postType   The post type.
- * @param {number|string} props.postId     The post ID.
- * @param {string}        [props.snapshot] Base64-encoded snapshot to check.
- *
- * @return {'pending'|'present'|'missing'} The snapshot status.
+ * @param props            Hook props.
+ * @param props.postType   The post type.
+ * @param props.postId     The post ID.
+ * @param [props.snapshot] Base64-encoded snapshot to check.
+ * @return The snapshot status.
  */
 export default function useEntityContainsSnapshot( {
 	postType,
 	postId,
 	snapshot,
-} ) {
+}: {
+	postType: string;
+	postId: number | string;
+	snapshot?: string;
+} ): SnapshotStatus {
 	const registry = useRegistry();
 
-	const [ snapshotStatus, setSnapshotStatus ] = useState( 'pending' );
+	const [ snapshotStatus, setSnapshotStatus ] =
+		useState< SnapshotStatus >( 'pending' );
 
 	// Whether the decision is still waiting for a signal from the shared
 	// document. Only set for collaborative posts.
@@ -143,7 +149,7 @@ export default function useEntityContainsSnapshot( {
 			registry.select( coreStore )
 		).getEntitySyncConnectionStatus( 'postType', postType, postId );
 
-		let nextSnapshotStatus;
+		let nextSnapshotStatus: SnapshotStatus;
 
 		if ( containsSnapshot ) {
 			nextSnapshotStatus = 'present';

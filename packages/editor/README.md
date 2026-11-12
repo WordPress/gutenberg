@@ -433,14 +433,9 @@ _Type_
 
 ### LocalAutosaveMonitor
 
-Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
+Keeps a backup of the edited post in the browser's `sessionStorage`: every `localAutosaveInterval` seconds, and when the page is hidden or unloaded. A save clears the backups written before it started.
 
-- `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
-- `useAutosaveOnLeave` hook: Writes a local autosave when the page is hidden or unloaded.
-- `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
-- `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
-
-The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
+The editor already does this for the post it edits, so render it only in a custom editor.
 
 ### MediaPlaceholder
 

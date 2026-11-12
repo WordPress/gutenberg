@@ -1,3 +1,4 @@
+import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice as WCNotice } from '@wordpress/components';
@@ -5,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
+import Autosave from '../autosave-monitor/autosave';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
@@ -30,6 +32,19 @@ function Editor( {
 	extraSidebarPanels,
 	...props
 } ) {
+	// The `autosave` setting describes the post the page loaded, as it was
+	// then, so it is offered only until the editor moves to another post.
+	const postKey = `${ postType }-${ postId }`;
+	const [ loadedPostKey ] = useState( postKey );
+	const [ hasLeftLoadedPost, setHasLeftLoadedPost ] = useState( false );
+	if ( postKey !== loadedPostKey && ! hasLeftLoadedPost ) {
+		setHasLeftLoadedPost( true );
+	}
+	const loadedPostAutosave =
+		postKey === loadedPostKey && ! hasLeftLoadedPost
+			? settings.autosave
+			: undefined;
+
 	const {
 		post,
 		template,
@@ -119,6 +134,12 @@ function Editor( {
 						{ extraContent }
 					</EditorInterface>
 					{ children }
+					<Autosave
+						postType={ post.type }
+						postId={ post.id }
+						isNew={ post.status === 'auto-draft' }
+						autosave={ loadedPostAutosave }
+					/>
 					<Sidebar
 						onActionPerformed={ onActionPerformed }
 						extraPanels={ extraSidebarPanels }

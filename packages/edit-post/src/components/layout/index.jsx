@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
-	AutosaveMonitor,
-	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	ErrorBoundary,
 	PostLockedModal,
@@ -598,8 +596,6 @@ function Layout( {
 								/>
 								<BrowserURL />
 								<UnsavedChangesWarning />
-								<AutosaveMonitor />
-								<LocalAutosaveMonitor />
 								<EditPostKeyboardShortcuts />
 								{ currentPostType === 'wp_block' && (
 									<InitPatternModal />
