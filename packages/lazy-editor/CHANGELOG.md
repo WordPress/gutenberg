@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `viewportWidth` prop to the `Preview` component to control the width at which the content is rendered.
+
 ## 2.1.0 (2026-11-04)
 
 ## 2.0.0 (2026-10-20)

@@ -3820,6 +3820,11 @@
 							"type": "string"
 						},
 						"default": [ "page" ]
+					},
+					"viewportWidth": {
+						"description": "Width, in pixels, of the viewport used to render the template's preview thumbnail. Defaults to 1200 when omitted.",
+						"type": "integer",
+						"minimum": 1
 					}
 				},
 				"required": [ "name", "title" ],

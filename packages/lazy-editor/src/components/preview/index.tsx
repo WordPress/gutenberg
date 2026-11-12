@@ -15,10 +15,12 @@ function PreviewContent( {
 	blocks,
 	content,
 	description,
+	viewportWidth,
 }: {
 	blocks?: any[];
 	content?: string;
 	description: string;
+	viewportWidth?: number;
 } ) {
 	const descriptionId = useId();
 	const backgroundColor = useStyle( 'color.background' );
@@ -41,7 +43,10 @@ function PreviewContent( {
 			{ isEmpty && __( 'Empty.' ) }
 			{ ! isEmpty && (
 				<BlockPreview.Async>
-					<BlockPreview blocks={ actualBlocks } />
+					<BlockPreview
+						blocks={ actualBlocks }
+						viewportWidth={ viewportWidth }
+					/>
 				</BlockPreview.Async>
 			) }
 			{ !! description && (
@@ -57,10 +62,12 @@ export function Preview( {
 	blocks,
 	content,
 	description,
+	viewportWidth,
 }: {
 	blocks?: any[];
 	content?: string;
 	description: string;
+	viewportWidth?: number;
 } ) {
 	// Resolve styles ID from template
 	const stylesId = useStylesId();
@@ -86,6 +93,7 @@ export function Preview( {
 				blocks={ blocks }
 				content={ content }
 				description={ description }
+				viewportWidth={ viewportWidth }
 			/>
 		</BlockEditorProvider>
 	);
