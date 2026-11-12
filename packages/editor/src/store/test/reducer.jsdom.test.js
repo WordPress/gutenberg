@@ -11,6 +11,7 @@ import {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	browserBackup,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -332,6 +333,23 @@ describe( 'state', () => {
 					isOpen: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'browserBackup()', () => {
+		it( 'drops the backup when another post is edited', () => {
+			const state = browserBackup( undefined, {
+				type: 'VIEW_BROWSER_BACKUP',
+				backup: { title: { raw: 'Backup' } },
+			} );
+
+			expect(
+				browserBackup( state, {
+					type: 'SET_EDITED_POST',
+					postType: 'page',
+					postId: 2,
+				} )
+			).toBeNull();
 		} );
 	} );
 } );

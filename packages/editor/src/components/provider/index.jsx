@@ -138,6 +138,18 @@ function useBlockEditorProps( post, template, mode ) {
 }
 
 /**
+ * Shows the autosave notices of one post. Keyed by post and mounted once that
+ * post is the edited one, so the decision is made per post and its notice
+ * goes away with it.
+ *
+ * @param {Object} props Props passed to `useAutosaveNotice`.
+ */
+function AutosaveNotice( props ) {
+	useAutosaveNotice( props );
+	return null;
+}
+
+/**
  * This component provides the editor context and manages the state of the block editor.
  *
  * @param {Object}  props                                The component props.
@@ -188,12 +200,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			isInRevisionsMode,
 			currentRevisionId,
 			browserBackup,
+			isCurrentPost,
 		} = useSelect(
 			( select ) => {
 				const {
 					getEditorSettings,
 					getRenderingMode,
 					__unstableIsEditorReady,
+					getCurrentPostId,
+					getCurrentPostType,
 					getDefaultRenderingMode,
 					isRevisionsMode: _isRevisionsMode,
 					getCurrentRevisionId: _getCurrentRevisionId,
@@ -233,6 +248,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
+					isCurrentPost:
+						getCurrentPostId() === post.id &&
+						getCurrentPostType() === post.type,
 					mode: isRenderingModeReady ? _mode : undefined,
 					defaultMode: hasResolvedDefaultMode
 						? _defaultMode
@@ -365,11 +383,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
 
-		// Manages the "more recent autosave" notice. Called after the mount
-		// effect above so that its own mount effect runs once `setupEditor`
-		// has populated the current post.
-		useAutosaveNotice( { post, recovery, settings } );
-
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
@@ -457,6 +470,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							{ children }
+							{ isCurrentPost && (
+								<AutosaveNotice
+									key={ `${ post.type }-${ post.id }` }
+									postType={ post.type }
+									postId={ post.id }
+									isNew={ post.status === 'auto-draft' }
+									recovery={ recovery }
+									autosave={ settings.autosave }
+								/>
+							) }
 							{ ! settings.isPreviewMode && (
 								<>
 									<PatternsMenuItems />

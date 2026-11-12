@@ -3,6 +3,32 @@ import { unlock } from '../lock-unlock';
 
 const { CRDT_AUTOSAVE_SNAPSHOT_KEY } = unlock( coreDataPrivateApis );
 
+let hasStorageSupport;
+
+/**
+ * Function which returns true if the current environment supports browser
+ * sessionStorage, or false otherwise. The result of this function is cached and
+ * reused in subsequent invocations.
+ */
+export const hasSessionStorageSupport = () => {
+	if ( hasStorageSupport !== undefined ) {
+		return hasStorageSupport;
+	}
+
+	try {
+		// Private Browsing in Safari 10 and earlier will throw an error when
+		// attempting to set into sessionStorage. The test here is intentional in
+		// causing a thrown error as condition bailing from local autosave.
+		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
+		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
+		hasStorageSupport = true;
+	} catch {
+		hasStorageSupport = false;
+	}
+
+	return hasStorageSupport;
+};
+
 /**
  * Function returning a sessionStorage key to set or retrieve a given post's
  * automatic session backup.
@@ -23,8 +49,39 @@ function postKey( postId, isPostNew ) {
 	}`;
 }
 
-export function localAutosaveGet( postId, isPostNew ) {
-	return window.sessionStorage.getItem( postKey( postId, isPostNew ) );
+/**
+ * Returns the browser backup of a post.
+ *
+ * @param {string}  postId    Post ID.
+ * @param {boolean} isPostNew Whether post new.
+ *
+ * @return {Object|null} The backup's `title`, `content`, `excerpt`, `time` and
+ *                       CRDT `snapshot`, or null when there is none to use.
+ */
+export function getBrowserBackup( postId, isPostNew ) {
+	if ( ! hasSessionStorageSupport() ) {
+		return null;
+	}
+
+	const backup = window.sessionStorage.getItem(
+		postKey( postId, isPostNew )
+	);
+	if ( ! backup ) {
+		return null;
+	}
+
+	try {
+		const {
+			post_title: title,
+			content,
+			excerpt,
+			time,
+			[ CRDT_AUTOSAVE_SNAPSHOT_KEY ]: snapshot,
+		} = JSON.parse( backup );
+		return { title, content, excerpt, time, snapshot };
+	} catch {
+		return null;
+	}
 }
 
 export function localAutosaveSet(
@@ -68,17 +125,20 @@ export function localAutosaveSet(
 }
 
 /**
- * Returns the CRDT snapshot recorded in a parsed local autosave backup, if any.
+ * Removes the browser backup of a post.
  *
- * @param {Object|null} backup Parsed local autosave backup.
- *
- * @return {string|undefined} Base64-encoded snapshot, or undefined when the
- *                            backup does not record one.
+ * @param {string}  postId    Post ID.
+ * @param {boolean} isPostNew Whether post new.
+ * @param {number}  [time]    Remove the backup only if it was made at this
+ *                            time, so a newer one written since is kept.
  */
-export function localAutosaveGetSnapshot( backup ) {
-	return backup?.[ CRDT_AUTOSAVE_SNAPSHOT_KEY ];
-}
+export function localAutosaveClear( postId, isPostNew, time ) {
+	if (
+		time !== undefined &&
+		getBrowserBackup( postId, isPostNew )?.time !== time
+	) {
+		return;
+	}
 
-export function localAutosaveClear( postId, isPostNew ) {
 	window.sessionStorage.removeItem( postKey( postId, isPostNew ) );
 }

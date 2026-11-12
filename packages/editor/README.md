@@ -435,8 +435,8 @@ _Type_
 
 Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
 
-- `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
 - `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+- `useAutosaveOnLeave` hook: Writes a local autosave when the page is hidden or unloaded.
 - `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
 - `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
 
