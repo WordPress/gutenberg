@@ -3,7 +3,7 @@ import { page, userEvent } from 'vitest/browser';
 import { describe, expect, it, vi } from 'vitest';
 import { useId, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
-import '@wordpress/components/build-style/style.css';
+import '@wordpress/components/src/style.scss';
 import '../../style.scss';
 import DataViews from '../index';
 import type { DataFormControlProps, Field, View } from '../../types';
