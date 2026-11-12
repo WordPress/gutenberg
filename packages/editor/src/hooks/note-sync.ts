@@ -11,29 +11,6 @@ import type { BlockType } from '@wordpress/blocks';
  * The declaration lives here, with the other note hooks, because the block
  * editor adds the `metadata` attribute without knowing about notes.
  *
- * @example
- * ```js
- * addNoteIdSchema( {
- *     name: 'core/paragraph',
- *     attributes: { metadata: { type: 'object' } },
- * } );
- * // => {
- * //     name: 'core/paragraph',
- * //     attributes: {
- * //         metadata: {
- * //             type: 'object',
- * //             properties: {
- * //                 noteId: {
- * //                     type: 'array',
- * //                     items: { type: 'number' },
- * //                     uniqueItems: true,
- * //                 },
- * //             },
- * //         },
- * //     },
- * // }
- * ```
- *
  * @param settings Block type settings.
  * @return Filtered block type settings.
  */

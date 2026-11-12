@@ -15,7 +15,6 @@ import {
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
-	collapseUniqueListsInBlocks,
 	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
@@ -417,13 +416,14 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = collapseUniqueListsInBlocks(
+						const blocksJson = deserializeBlockAttributes(
 							ymap.get( 'blocks' )?.toJSON() ?? []
 						);
 
 						return (
-							__unstableSerializeAndClean( blocksJson ).trim() !==
-							getRawValue( editedRecord.content )
+							__unstableSerializeAndClean(
+								blocksJson as WPBlock[]
+							).trim() !== getRawValue( editedRecord.content )
 						);
 					}
 

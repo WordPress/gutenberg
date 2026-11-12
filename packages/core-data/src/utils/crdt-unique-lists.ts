@@ -3,20 +3,6 @@ import getNestedValue from './get-nested-value';
 /**
  * The parts of a block attribute definition that describe a list of unique
  * items.
- *
- * @example
- * ```js
- * // A list of unique strings or numbers.
- * { type: 'array', uniqueItems: true }
- *
- * // A list of unique numbers inside an object attribute.
- * {
- *     type: 'object',
- *     properties: {
- *         noteId: { type: 'array', uniqueItems: true },
- *     },
- * }
- * ```
  */
 export interface UniqueListSchema {
 	type?: string;
@@ -104,12 +90,11 @@ export function findUniqueLists(
 	for ( const [ name, schema ] of Object.entries( schemas ) ) {
 		// Block types can come from plugins, so a definition can have any
 		// shape. A value with a `query` is stored as a shared type instead.
-		if ( ! schema || typeof schema !== 'object' || schema.query ) {
+		if ( ! schema || schema.query ) {
 			continue;
 		}
 
 		const path = [ ...parentPath, name ];
-		const { properties } = schema;
 
 		if ( schema.type === 'array' && schema.uniqueItems === true ) {
 			lists.push( {
@@ -117,12 +102,8 @@ export function findUniqueLists(
 				itemKeyPrefix: path.join( '.' ) + ITEM_KEY_SEPARATOR,
 				orderKey: path.join( '.' ) + ORDER_KEY_SUFFIX,
 			} );
-		} else if (
-			schema.type === 'object' &&
-			properties &&
-			typeof properties === 'object'
-		) {
-			lists.push( ...findUniqueLists( properties, path ) );
+		} else if ( schema.type === 'object' && schema.properties ) {
+			lists.push( ...findUniqueLists( schema.properties, path ) );
 		}
 	}
 

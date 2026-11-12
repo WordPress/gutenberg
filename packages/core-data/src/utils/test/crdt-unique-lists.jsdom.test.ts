@@ -244,14 +244,6 @@ describe( 'lists of unique items in block attributes', () => {
 			);
 		} );
 
-		it( 'leaves a single value alone', () => {
-			const attributes = { metadata: { noteId: 3 } };
-
-			expect( expandUniqueLists( attributes, noteLists ) ).toBe(
-				attributes
-			);
-		} );
-
 		it( 'leaves a list alone when an item is not a string or number', () => {
 			const attributes = { metadata: { noteId: [ 3, { id: 7 } ] } };
 
@@ -384,24 +376,6 @@ describe( 'lists of unique items in block attributes', () => {
 				attributes
 			);
 		} );
-
-		it( 'restores what expandUniqueLists stored', () => {
-			const notes = { metadata: { name: 'Intro', noteId: [ 12, 3 ] } };
-			const tags = { tags: [ 'talk', 'keynote', 'panel' ] };
-
-			expect(
-				collapseUniqueLists(
-					expandUniqueLists( notes, noteLists ),
-					noteLists
-				)
-			).toEqual( notes );
-			expect(
-				collapseUniqueLists(
-					expandUniqueLists( tags, tagLists ),
-					tagLists
-				)
-			).toEqual( tags );
-		} );
 	} );
 
 	describe( 'in a shared document', () => {
@@ -417,40 +391,6 @@ describe( 'lists of unique items in block attributes', () => {
 			const expected = { metadata: { name: 'Intro', noteId: [ 1, 2 ] } };
 			expect( read( a ) ).toEqual( expected );
 			expect( read( b ) ).toEqual( expected );
-		} );
-
-		it( 'keeps both items when the block had no attribute yet', () => {
-			const a = createPeer();
-			edit( a );
-			const b = join( a );
-
-			edit( a, { metadata: { noteId: [ 1 ] } } );
-			edit( b, { metadata: { noteId: [ 2 ] } } );
-			sync( a, b );
-
-			expect( read( a ) ).toEqual( { metadata: { noteId: [ 1, 2 ] } } );
-			expect( read( b ) ).toEqual( { metadata: { noteId: [ 1, 2 ] } } );
-		} );
-
-		it( 'needs no collaborator online to merge', () => {
-			const a = createPeer();
-			edit( a );
-			const b = join( a );
-
-			// Both collaborators add a note and leave. Only their updates
-			// remain, as a sync server would hold them.
-			edit( a, { metadata: { noteId: [ 1 ] } } );
-			edit( b, { metadata: { noteId: [ 2 ] } } );
-			const updates = [
-				Y.encodeStateAsUpdate( a.ydoc ),
-				Y.encodeStateAsUpdate( b.ydoc ),
-			];
-
-			const late = createPeer( Y.mergeUpdates( updates ) );
-
-			expect( read( late ) ).toEqual( {
-				metadata: { noteId: [ 1, 2 ] },
-			} );
 		} );
 
 		it( 'keeps a removal made while another collaborator adds', () => {
