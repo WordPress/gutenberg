@@ -33,6 +33,8 @@ import {
 import {
 	TRANSFORM_SUPPORT_KEY,
 	TransformPanel,
+	getElementStylesWithoutScale,
+	getStateStyleWithSupportedScale,
 	useStyleWithFilledTranslate,
 } from './transform';
 import {
@@ -574,7 +576,10 @@ export function getBlockStateStylesCSS(
 	] )
 		? ( options.baseStyle ?? {} )
 		: undefined;
-	const rules = getStateStyleGroups( stateStyles, name )
+	const rules = getStateStyleGroups(
+		getStateStyleWithSupportedScale( stateStyles, name ),
+		name
+	)
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				// Grouping keeps the shape of the state styles.
@@ -710,7 +715,7 @@ export function getResponsiveStateCSSRules(
 			}
 
 			const elementCSS = getElementCSSRules(
-				viewportStyles.elements,
+				getElementStylesWithoutScale( viewportStyles.elements ),
 				name,
 				baseSelector
 			);

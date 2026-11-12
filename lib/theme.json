@@ -278,7 +278,8 @@
 		},
 		"transform": {
 			"rotate": true,
-			"translate": true
+			"translate": true,
+			"scale": true
 		},
 		"typography": {
 			"customFontSize": true,

@@ -53,7 +53,7 @@ const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 export const TRANSFORM_SUPPORT_KEY = 'transform';
 
-const TRANSFORM_FEATURES = [ 'rotate', 'translate' ];
+const TRANSFORM_FEATURES = [ 'rotate', 'translate', 'scale' ];
 
 // Used for generating the instance ID.
 const TRANSFORM_BLOCK_PROPS_REFERENCE = {};
@@ -278,6 +278,69 @@ export function useStyleWithFilledTranslate< T extends StyleWithTranslate >(
 	}, [ needsFill, style, globalStyles, name, variationName ] );
 }
 
+/**
+ * Returns a state style with its scale removed when the block does not
+ * support `transform.scale`. Mirror of
+ * `gutenberg_get_state_style_with_supported_scale()` in PHP.
+ *
+ * @param stateStyle State style object.
+ * @param name       Block name, or `null` for an element, which never scales.
+ *
+ * @return The state style object.
+ */
+export function getStateStyleWithSupportedScale< T extends StyleWithTranslate >(
+	stateStyle: T,
+	name: string | null
+): T {
+	if (
+		! stateStyle?.transform ||
+		! Object.hasOwn( stateStyle.transform, 'scale' ) ||
+		( name && hasTransformSupport( name, 'scale' ) )
+	) {
+		return stateStyle;
+	}
+	const { scale, ...transform } = stateStyle.transform;
+	return { ...stateStyle, transform } as T;
+}
+
+/**
+ * Returns element state styles with every scale removed, as elements never
+ * scale. Mirror of the element states in `gutenberg_render_block_states_support()`.
+ *
+ * @param elements Element styles keyed by element name.
+ *
+ * @return The element styles without a scale.
+ */
+export function getElementStylesWithoutScale<
+	T extends Record< string, any > | undefined,
+>( elements: T ): T {
+	if ( ! elements ) {
+		return elements;
+	}
+	return Object.fromEntries(
+		Object.entries( elements ).map( ( [ element, elementStyle ] ) => {
+			const withoutScale = getStateStyleWithSupportedScale(
+				elementStyle,
+				null
+			) as Record< string, any > | undefined;
+			if ( ! withoutScale || typeof withoutScale !== 'object' ) {
+				return [ element, withoutScale ];
+			}
+			return [
+				element,
+				Object.fromEntries(
+					Object.entries( withoutScale ).map( ( [ key, value ] ) => [
+						key,
+						key.startsWith( ':' )
+							? getStateStyleWithSupportedScale( value, null )
+							: value,
+					] )
+				),
+			];
+		} )
+	) as T;
+}
+
 function TransformInspectorControl( {
 	children,
 	resetAllFilter,
@@ -428,6 +491,7 @@ export function TransformPanel( {
 			defaultControls={ {
 				rotate: false,
 				translate: false,
+				scale: false,
 				...defaultControls,
 			} }
 			inheritedValue={ inheritedValue }

@@ -1,4 +1,5 @@
 import {
+	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -53,10 +54,39 @@ export function getAngleInDegrees( value: unknown ): number | undefined {
 	return Math.round( degrees ) + 0;
 }
 
+// Mirror of `WP_Style_Engine::VALID_SCALE_PATTERN` in PHP.
+const SCALE_PATTERN = /^((?:\d+(?:\.\d+)?|\.\d+))(%?)$/;
+
+// Typed values keep two decimals; spinning moves by 0.05.
+const SCALE_STEP = 0.01;
+const SCALE_SPIN_FACTOR = 5;
+const SCALE_SPIN = SCALE_STEP * SCALE_SPIN_FACTOR;
+
+/**
+ * Converts a scale value to the number the scale field shows.
+ *
+ * @param value A scale, such as `1.2` or `'120%'`.
+ * @return The scale as a number, such as `1.2`, or `undefined` when the value
+ * is not a single non-negative number or percentage.
+ */
+export function getScaleAsNumber( value: unknown ): number | undefined {
+	const scale =
+		typeof value === 'number' && Number.isFinite( value )
+			? String( value )
+			: value;
+	const match =
+		typeof scale === 'string' ? SCALE_PATTERN.exec( scale ) : null;
+	if ( ! match ) {
+		return undefined;
+	}
+	return match[ 2 ] ? Number( match[ 1 ] ) / 100 : Number( match[ 1 ] );
+}
+
 export function useHasTransformPanel( settings: StyleSettings | undefined ) {
 	const hasRotate = useHasRotateControl( settings );
 	const hasTranslate = useHasTranslateControl( settings );
-	return hasRotate || hasTranslate;
+	const hasScale = useHasScaleControl( settings );
+	return hasRotate || hasTranslate || hasScale;
 }
 
 function useHasRotateControl( settings: StyleSettings | undefined ) {
@@ -65,6 +95,10 @@ function useHasRotateControl( settings: StyleSettings | undefined ) {
 
 function useHasTranslateControl( settings: StyleSettings | undefined ) {
 	return !! settings?.transform?.translate;
+}
+
+function useHasScaleControl( settings: StyleSettings | undefined ) {
+	return !! settings?.transform?.scale;
 }
 
 const TRANSLATE_AXES = [
@@ -100,6 +134,7 @@ function TransformToolsPanel( {
 const DEFAULT_CONTROLS: Record< string, boolean > = {
 	rotate: true,
 	translate: true,
+	scale: true,
 };
 
 export default function TransformPanel( {
@@ -149,6 +184,34 @@ export default function TransformPanel( {
 	const hasTranslateValue = ( axis: 'x' | 'y' ) =>
 		value?.transform?.translate?.[ axis ] !== undefined;
 
+	const showScaleControl = useHasScaleControl( settings );
+	const scale =
+		getScaleAsNumber( value?.transform?.scale ) ??
+		getScaleAsNumber( inheritedValue?.transform?.scale );
+	const setScale = ( newValue: number | undefined ) => {
+		onChange( setImmutably( value, [ 'transform', 'scale' ], newValue ) );
+	};
+	const onScaleChange = (
+		newValue: string | undefined,
+		{ event }: { event: { type: string } }
+	) => {
+		// A cleared field removes the value, so an inherited scale shows again.
+		if ( newValue === undefined || newValue === '' ) {
+			setScale( undefined );
+			return;
+		}
+		let nextScale = Number( newValue );
+		if ( ! Number.isFinite( nextScale ) || nextScale < 0 ) {
+			return;
+		}
+		// Spinning an empty field starts from the unscaled size, not 0.
+		if ( scale === undefined && event.type !== 'change' ) {
+			nextScale = nextScale > 0 ? 1 + SCALE_SPIN : 1 - SCALE_SPIN;
+		}
+		setScale( nextScale );
+	};
+	const hasScaleValue = () => value?.transform?.scale !== undefined;
+
 	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			return {
@@ -157,6 +220,7 @@ export default function TransformPanel( {
 					...previousValue?.transform,
 					rotate: undefined,
 					translate: undefined,
+					scale: undefined,
 				},
 			};
 		},
@@ -215,6 +279,25 @@ export default function TransformPanel( {
 						/>
 					</ToolsPanelItem>
 				) ) }
+			{ showScaleControl && (
+				<ToolsPanelItem
+					label={ __( 'Scale' ) }
+					hasValue={ hasScaleValue }
+					onDeselect={ () => setScale( undefined ) }
+					isShownByDefault={ defaultControls.scale }
+					panelId={ panelId }
+				>
+					<NumberControl
+						label={ __( 'Scale' ) }
+						value={ scale ?? '' }
+						min={ 0 }
+						step={ SCALE_STEP }
+						spinFactor={ SCALE_SPIN_FACTOR }
+						placeholder="1"
+						onChange={ onScaleChange }
+					/>
+				</ToolsPanelItem>
+			) }
 		</Wrapper>
 	);
 }

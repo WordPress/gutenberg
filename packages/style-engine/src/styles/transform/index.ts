@@ -9,6 +9,28 @@ const VALID_ANGLE_PATTERN =
 const VALID_LENGTH_PERCENTAGE_PATTERN =
 	/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:%|px|cm|mm|q|in|pt|pc|r?em|r?ex|r?ch|r?cap|r?ic|r?lh|[sld]?v(?:w|h|i|b|min|max)|cq(?:w|h|i|b|min|max))|0)$/i;
 
+// Mirror of `WP_Style_Engine::VALID_SCALE_PATTERN` in PHP.
+const VALID_SCALE_PATTERN = /^(?:\d+(?:\.\d+)?|\.\d+)%?$/;
+
+/**
+ * Returns a scale value as a CSS string. Mirror of
+ * `WP_Style_Engine::get_scale_css_value()` in PHP.
+ *
+ * @param value A raw scale value, such as `1.2` or `'120%'`.
+ *
+ * @return The scale as a CSS string, or `undefined` if it is not a single
+ * non-negative number or percentage.
+ */
+function getScaleCSSValue( value: unknown ): string | undefined {
+	const scale =
+		typeof value === 'number' && Number.isFinite( value )
+			? String( value )
+			: value;
+	return typeof scale === 'string' && VALID_SCALE_PATTERN.test( scale )
+		? scale
+		: undefined;
+}
+
 const rotate = {
 	name: 'rotate',
 	generate: (
@@ -73,4 +95,25 @@ const translate = {
 	},
 };
 
-export default [ rotate, translate ];
+const scale = {
+	name: 'scale',
+	generate: (
+		style: Style,
+		options: StyleOptions
+	): ReturnType< typeof generateRule > => {
+		const value = getScaleCSSValue( style?.transform?.scale );
+		if ( value === undefined ) {
+			return [];
+		}
+
+		return [
+			{
+				selector: options.selector,
+				key: 'scale',
+				value,
+			},
+		];
+	},
+};
+
+export default [ rotate, translate, scale ];

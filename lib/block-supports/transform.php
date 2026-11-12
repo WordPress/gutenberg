@@ -3,7 +3,7 @@
  * Transform block support flag.
  *
  * Each transform feature outputs its own individual CSS property, such as
- * `rotate` or `translate`, never the `transform` shorthand, so features
+ * `rotate`, `translate` or `scale`, never the `transform` shorthand, so features
  * combine with each other and with any transform a block already applies.
  *
  * @package gutenberg
@@ -206,10 +206,15 @@ function gutenberg_render_transform_support( $block_content, $block ) {
 		)['transform']['translate'];
 	}
 
+	// A numeric zero would be dropped by the style engine as an empty value.
+	if ( isset( $transform['scale'] ) ) {
+		$transform['scale'] = WP_Style_Engine_Gutenberg::get_scale_css_value( $transform['scale'] );
+	}
+
 	$inline_styles   = array();
 	$selector_styles = array();
 
-	foreach ( array( 'rotate', 'translate' ) as $feature ) {
+	foreach ( array( 'rotate', 'translate', 'scale' ) as $feature ) {
 		if (
 			! isset( $transform[ $feature ] ) ||
 			! block_has_support( $block_type, array( 'transform', $feature ), false ) ||

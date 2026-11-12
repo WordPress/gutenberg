@@ -183,3 +183,43 @@ function gutenberg_allow_translate_lengths_only( $allow_css, $css_test_string ) 
 	return true;
 }
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_translate_lengths_only', 10, 2 );
+
+/**
+ * Adds 'scale' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `scale` property. The
+ * style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_scale_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'scale', $attr, true ) ) {
+		$attr[] = 'scale';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_scale_to_safe_style_css' );
+
+/**
+ * Only allows a single uniform scale as the value of the `scale` property.
+ *
+ * Mirrors the style engine, so negative values, per-axis lists and functions
+ * such as `calc()` or `var()` are rejected.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_scale_uniform_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) || 'scale' !== strtolower( trim( $parts[0] ) ) ) {
+		return $allow_css;
+	}
+
+	return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_SCALE_PATTERN, trim( $parts[1] ) );
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_scale_uniform_only', 10, 2 );

@@ -478,6 +478,35 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 }
 
 /**
+ * Returns a state style with its scale removed when the block does not
+ * support `transform.scale`, else with the scale as a CSS string.
+ *
+ * Mirror of `getStateStyleWithSupportedScale()` in JS.
+ *
+ * @param array              $state_style State style object.
+ * @param WP_Block_Type|null $block_type  Block type, or `null` for an element, which never scales.
+ * @return array State style object.
+ */
+function gutenberg_get_state_style_with_supported_scale( $state_style, $block_type ) {
+	if ( ! isset( $state_style['transform'] ) || ! is_array( $state_style['transform'] ) || ! array_key_exists( 'scale', $state_style['transform'] ) ) {
+		return $state_style;
+	}
+
+	$scale = $block_type && block_has_support( $block_type, array( 'transform', 'scale' ), false )
+		? WP_Style_Engine_Gutenberg::get_scale_css_value( $state_style['transform']['scale'] )
+		: null;
+
+	if ( null === $scale ) {
+		unset( $state_style['transform']['scale'] );
+	} else {
+		// A numeric zero would be dropped by the style engine as an empty value.
+		$state_style['transform']['scale'] = $scale;
+	}
+
+	return $state_style;
+}
+
+/**
  * Builds compiled state style rules, preserving the selector each rule targets.
  *
  * @param array<string, mixed>      $state_styles Map of state to style array.
@@ -501,6 +530,8 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 		if ( empty( $state_style ) || ! is_array( $state_style ) ) {
 			continue;
 		}
+
+		$state_style = gutenberg_get_state_style_with_supported_scale( $state_style, $block_type );
 
 		foreach ( gutenberg_get_state_style_groups( $state_style, $block_selectors ) as $group ) {
 			gutenberg_add_block_state_style_rule(
@@ -786,7 +817,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 					$css_rules,
 					'',
 					$element_selectors[ $element_name ],
-					$root_element_style,
+					gutenberg_get_state_style_with_supported_scale( $root_element_style, null ),
 					$media_query
 				);
 
@@ -802,7 +833,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 						$css_rules,
 						$pseudo_state,
 						$element_selectors[ $element_name ],
-						$element_style[ $pseudo_state ],
+						gutenberg_get_state_style_with_supported_scale( $element_style[ $pseudo_state ], null ),
 						$media_query
 					);
 				}

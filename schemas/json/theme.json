@@ -497,6 +497,11 @@
 							"description": "Allow users to set an X and Y offset.",
 							"type": "boolean",
 							"default": true
+						},
+						"scale": {
+							"description": "Allow users to set a uniform scale.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -1970,6 +1975,19 @@
 								}
 							},
 							"additionalProperties": false
+						},
+						"scale": {
+							"description": "Sets the `scale` CSS property. Accepts a single non-negative number, such as `1.2`, or percentage, such as `120%`. One value scales both axes.",
+							"oneOf": [
+								{
+									"type": "number",
+									"minimum": 0
+								},
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+(?:\\.\\d+)?|\\.\\d+)%?$"
+								}
+							]
 						}
 					},
 					"additionalProperties": false

@@ -53,6 +53,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
   - `rotate`: `true`
   - `translate`: `true`
+  - `scale`: `true`
 
 ## Context
 
