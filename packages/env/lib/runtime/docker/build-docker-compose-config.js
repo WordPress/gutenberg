@@ -262,7 +262,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			extra_hosts: [ 'host.docker.internal:host-gateway' ],
 		},
-		phpmyadmin: {
+	};
+
+	// Only define the services that will be started. Pulling images, stopping,
+	// destroying, and checking for missing images all act on every service in
+	// this file, so a phpMyAdmin that is defined but disabled would still have
+	// its image downloaded and be reported as missing when a pull fails.
+	if ( config.env.development.phpmyadmin ) {
+		services.phpmyadmin = {
 			image: 'phpmyadmin',
 			ports: [ developmentPhpmyadminPorts ],
 			environment: {
@@ -271,8 +278,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				PMA_USER: 'root',
 				PMA_PASSWORD: 'password',
 			},
-		},
-	};
+		};
+	}
 
 	const volumes = {
 		...( ! config.env.development.coreSource && { wordpress: {} } ),
@@ -340,16 +347,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			extra_hosts: [ 'host.docker.internal:host-gateway' ],
 		};
-		services[ 'tests-phpmyadmin' ] = {
-			image: 'phpmyadmin',
-			ports: [ testsPhpmyadminPorts ],
-			environment: {
-				PMA_PORT: 3306,
-				PMA_HOST: 'tests-mysql',
-				PMA_USER: 'root',
-				PMA_PASSWORD: 'password',
-			},
-		};
+		if ( config.env.tests.phpmyadmin ) {
+			services[ 'tests-phpmyadmin' ] = {
+				image: 'phpmyadmin',
+				ports: [ testsPhpmyadminPorts ],
+				environment: {
+					PMA_PORT: 3306,
+					PMA_HOST: 'tests-mysql',
+					PMA_USER: 'root',
+					PMA_PASSWORD: 'password',
+				},
+			};
+		}
 
 		if ( ! config.env.tests.coreSource ) {
 			volumes[ 'tests-wordpress' ] = {};
