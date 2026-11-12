@@ -169,7 +169,7 @@ describe( 'AnglePickerControl', () => {
 		] );
 	} );
 
-	it( 'stops at the bottom of a -180 to 180 range', () => {
+	it( 'stops at the top of a -180 to 180 range', () => {
 		const onChange = vi.fn();
 		const { container } = render(
 			<StatefulPrivateAnglePickerControl
