@@ -23,6 +23,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 
 ### Internal
 
