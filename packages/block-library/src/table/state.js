@@ -160,6 +160,25 @@ function getSpan( value ) {
 }
 
 /**
+ * Returns a copy of the cell with the given rowspan, omitting the attribute
+ * when the cell no longer spans multiple rows.
+ *
+ * @param {Object} cell    The cell attributes.
+ * @param {number} rowspan The new rowspan.
+ *
+ * @return {Object} The updated cell attributes.
+ */
+function setCellRowspan( cell, rowspan ) {
+	const newCell = { ...cell };
+	if ( rowspan > 1 ) {
+		newCell.rowspan = String( rowspan );
+	} else {
+		delete newCell.rowspan;
+	}
+	return newCell;
+}
+
+/**
  * Calculates the effective column count in a row, accounting for colspan values.
  *
  * @param {Object} row The row object containing cells.
@@ -334,10 +353,54 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
  * @return {Object} New table state.
  */
 export function deleteRow( state, { sectionName, rowIndex } ) {
+	const section = state[ sectionName ];
+	const positions = getSectionCellPositions( section );
+
+	// Cells that start in the deleted row and span down move to the next row.
+	const movedCells = ( section[ rowIndex ]?.cells ?? [] ).flatMap(
+		( cell, cellIndex ) => {
+			const { columnIndex, rowspan } = positions[ rowIndex ][ cellIndex ];
+			return rowspan > 1
+				? [ { columnIndex, cell: setCellRowspan( cell, rowspan - 1 ) } ]
+				: [];
+		}
+	);
+
 	return {
-		[ sectionName ]: state[ sectionName ].filter(
-			( row, index ) => index !== rowIndex
-		),
+		[ sectionName ]: section
+			.map( ( row, index ) => {
+				// Cells in the rows above that span into the deleted row shrink by one row.
+				if ( index < rowIndex ) {
+					return {
+						...row,
+						cells: row.cells.map( ( cell, cellIndex ) => {
+							const { rowspan } = positions[ index ][ cellIndex ];
+							return index + rowspan > rowIndex
+								? setCellRowspan( cell, rowspan - 1 )
+								: cell;
+						} ),
+					};
+				}
+
+				// Place the moved cells among the next row's cells by column.
+				if ( index === rowIndex + 1 && movedCells.length ) {
+					const cells = row.cells.map( ( cell, cellIndex ) => ( {
+						columnIndex:
+							positions[ index ][ cellIndex ].columnIndex,
+						cell,
+					} ) );
+
+					return {
+						...row,
+						cells: [ ...movedCells, ...cells ]
+							.sort( ( a, b ) => a.columnIndex - b.columnIndex )
+							.map( ( { cell } ) => cell ),
+					};
+				}
+
+				return row;
+			} )
+			.filter( ( row, index ) => index !== rowIndex ),
 	};
 }
 
