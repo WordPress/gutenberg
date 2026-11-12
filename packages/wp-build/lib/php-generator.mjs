@@ -52,6 +52,41 @@ export function applyTemplateReplacements( template, replacements ) {
 }
 
 /**
+ * Format a PHP list as an `array()` literal, following the WordPress Coding
+ * Standards: `array( 'a', 'b' )`, or `array()` when the list is empty.
+ *
+ * @param {string[]} values PHP expressions for the array values.
+ * @return {string} PHP array literal.
+ */
+export function toPhpListLiteral( values ) {
+	return values.length > 0 ? `array( ${ values.join( ', ' ) } )` : 'array()';
+}
+
+/**
+ * Format a PHP associative array as a multi-line `array()` literal, with the
+ * `=>` operators aligned as the WordPress Coding Standards require. Fields
+ * whose value is `undefined` are omitted.
+ *
+ * @param {Record<string, string|undefined>} fields Map of array keys to PHP expressions.
+ * @param {string}                           indent Indentation of the `array(` line.
+ * @return {string} PHP array literal, without a trailing comma.
+ */
+export function toPhpAssociativeArrayLiteral( fields, indent = '' ) {
+	const entries = Object.entries( fields ).filter(
+		( [ , value ] ) => value !== undefined
+	);
+	const keyWidth = Math.max( 0, ...entries.map( ( [ key ] ) => key.length ) );
+	const lines = entries.map(
+		( [ key, value ] ) =>
+			`${ indent }\t'${ key }'${ ' '.repeat(
+				keyWidth - key.length
+			) } => ${ value },\n`
+	);
+
+	return `${ indent }array(\n${ lines.join( '' ) }${ indent })`;
+}
+
+/**
  * Render a template to a string with replacements.
  *
  * @param {string}                 templateName Template file name.
