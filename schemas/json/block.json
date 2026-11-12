@@ -455,6 +455,8 @@
 												"right",
 												"center",
 												"space-between",
+												"space-around",
+												"space-evenly",
 												"left",
 												"stretch"
 											]
