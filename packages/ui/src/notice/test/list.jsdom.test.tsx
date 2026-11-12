@@ -9,6 +9,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StrictMode, useState } from '@wordpress/element';
+import * as Dialog from '../../dialog';
 import * as Notice from '../index';
 
 function Message( {
@@ -242,6 +243,44 @@ describe( 'Notice.List', () => {
 		rerender( renderNotices( 2 ) );
 		await act( () => Promise.resolve() );
 		expect( status ).toBeEmptyDOMElement();
+	} );
+
+	it( 'announces in the supplied container while a dialog hides the list', async () => {
+		const renderNotices = ( open: boolean, showError: boolean ) => (
+			<>
+				<div aria-live="polite" />
+				<Notice.List liveRegionContainer={ document.body }>
+					{ showError && (
+						<>
+							<Message
+								politeness="assertive"
+								spokenMessage="Save failed."
+							/>
+							<Message
+								aria-hidden="true"
+								spokenMessage="Hidden notice."
+							/>
+						</>
+					) }
+				</Notice.List>
+				<Dialog.Root open={ open }>
+					<Dialog.Popup>
+						<Dialog.Title>Preferences</Dialog.Title>
+					</Dialog.Popup>
+				</Dialog.Root>
+			</>
+		);
+		const { rerender } = render( renderNotices( false, false ) );
+		rerender( renderNotices( true, false ) );
+		await screen.findByRole( 'dialog', { name: 'Preferences' } );
+
+		rerender( renderNotices( true, true ) );
+		await waitFor( () =>
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Save failed\.$/
+			)
+		);
+		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 	} );
 
 	it( 'removes dismissed announcements without repeating remaining messages', async () => {

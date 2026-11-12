@@ -1,4 +1,4 @@
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useEvent, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { createPortal, forwardRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
@@ -18,14 +18,11 @@ type Announcement = {
 function isHidden( element: Element, root: Element ) {
 	for (
 		let current: Element | null = element;
-		current;
+		current && current !== root;
 		current = current.parentElement
 	) {
 		if ( current.matches( HIDDEN_CONTENT ) ) {
 			return true;
-		}
-		if ( current === root ) {
-			break;
 		}
 	}
 	return false;
@@ -80,87 +77,102 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		const [ announcements, setAnnouncements ] = useState(
 			new Map< HTMLElement, Announcement >()
 		);
-		const observerRef = useRefEffect< HTMLDivElement >( ( element ) => {
-			let nextId = 0;
-			let previous = new Map< HTMLElement, Announcement >();
-			const readNotices = () =>
-				new Map(
-					Array.from(
-						element.querySelectorAll< HTMLElement >(
-							`.${ styles.notice }`
+		const isListHidden = useEvent( ( list: HTMLElement ) => {
+			// A modal can apply aria-hidden directly to the list. With external
+			// live regions, only an explicit request to hide the list should
+			// suppress its announcements.
+			const ariaHidden = liveRegionContainer
+				? props[ 'aria-hidden' ]
+				: list.getAttribute( 'aria-hidden' );
+			return list.hidden || ariaHidden === true || ariaHidden === 'true';
+		} );
+		const observerRef = useRefEffect< HTMLDivElement >(
+			( element ) => {
+				let nextId = 0;
+				let previous = new Map< HTMLElement, Announcement >();
+				const readNotices = () =>
+					new Map(
+						Array.from(
+							isListHidden( element )
+								? []
+								: element.querySelectorAll< HTMLElement >(
+										`.${ styles.notice }`
+									)
 						)
-					)
-						.filter(
-							( notice ) =>
-								notice.closest( LIST_SELECTOR ) === element &&
-								! isHidden( notice, element )
-						)
-						.map( ( notice ) => [
-							notice,
-							{
-								id: previous.get( notice )?.id ?? nextId++,
-								message:
-									notice.dataset.wpUiNoticeSpokenMessage ??
-									readMessage( notice ),
-								politeness: notice.dataset
-									.wpUiNoticePoliteness as Announcement[ 'politeness' ],
-							},
-						] )
+							.filter(
+								( notice ) =>
+									notice.closest( LIST_SELECTOR ) ===
+										element && ! isHidden( notice, element )
+							)
+							.map( ( notice ) => [
+								notice,
+								{
+									id: previous.get( notice )?.id ?? nextId++,
+									message:
+										notice.dataset
+											.wpUiNoticeSpokenMessage ??
+										readMessage( notice ),
+									politeness: notice.dataset
+										.wpUiNoticePoliteness as Announcement[ 'politeness' ],
+								},
+							] )
+					);
+				// Establish initial content without populating the live regions.
+				previous = readNotices();
+				setAnnouncements( ( existing ) =>
+					existing.size ? new Map() : existing
 				);
-			// Establish initial content without populating the live regions.
-			previous = readNotices();
-			setAnnouncements( ( existing ) =>
-				existing.size ? new Map() : existing
-			);
-			// Descendant components can change their own text without re-rendering
-			// Notice.Root. Observe message props and content in the same DOM batch.
-			const observer = new MutationObserver( () => {
-				const current = readNotices();
-				const changed = new Map< HTMLElement, Announcement >();
-				for ( const [ notice, announcement ] of current ) {
-					const before = previous.get( notice );
-					if (
-						announcement.message &&
-						announcement.politeness !== 'off' &&
-						( announcement.message !== before?.message ||
-							announcement.politeness !== before?.politeness )
-					) {
-						changed.set( notice, announcement );
-					}
-				}
-				previous = current;
-				setAnnouncements( ( existing ) => {
-					const next = new Map( existing );
-					for ( const notice of existing.keys() ) {
-						const announcement = current.get( notice );
+				// Descendant components can change their own text without re-rendering
+				// Notice.Root. Observe message props and content in the same DOM batch.
+				const observer = new MutationObserver( () => {
+					const current = readNotices();
+					const changed = new Map< HTMLElement, Announcement >();
+					for ( const [ notice, announcement ] of current ) {
+						const before = previous.get( notice );
 						if (
-							! announcement?.message ||
-							announcement.politeness === 'off'
+							announcement.message &&
+							announcement.politeness !== 'off' &&
+							( announcement.message !== before?.message ||
+								announcement.politeness !== before?.politeness )
 						) {
-							next.delete( notice );
+							changed.set( notice, announcement );
 						}
 					}
-					for ( const [ notice, announcement ] of changed ) {
-						next.set( notice, announcement );
-					}
-					return changed.size || next.size !== existing.size
-						? next
-						: existing;
+					previous = current;
+					setAnnouncements( ( existing ) => {
+						const next = new Map( existing );
+						for ( const notice of existing.keys() ) {
+							const announcement = current.get( notice );
+							if (
+								! announcement?.message ||
+								announcement.politeness === 'off'
+							) {
+								next.delete( notice );
+							}
+						}
+						for ( const [ notice, announcement ] of changed ) {
+							next.set( notice, announcement );
+						}
+						return changed.size || next.size !== existing.size
+							? next
+							: existing;
+					} );
 				} );
-			} );
-			observer.observe( element, {
-				childList: true,
-				characterData: true,
-				subtree: true,
-				attributeFilter: [
-					'hidden',
-					'aria-hidden',
-					'data-wp-ui-notice-politeness',
-					'data-wp-ui-notice-spoken-message',
-				],
-			} );
-			return () => observer.disconnect();
-		}, [] );
+				observer.observe( element, {
+					childList: true,
+					characterData: true,
+					subtree: true,
+					attributeFilter: [
+						'hidden',
+						'aria-hidden',
+						'data-wp-ui-notice-politeness',
+						'data-wp-ui-notice-spoken-message',
+					],
+				} );
+				return () => observer.disconnect();
+			},
+			[ isListHidden ]
+		);
 		const mergedRef = useMergeRefs( [ ref, observerRef ] );
 
 		const liveRegions = (
